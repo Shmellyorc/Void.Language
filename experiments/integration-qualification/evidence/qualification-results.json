@@ -1,0 +1,358 @@
+{
+  "qualified": true,
+  "profiles": {
+    "release": {
+      "common": {
+        "tests": 63,
+        "failures": [],
+        "skipped": [],
+        "reported": {
+          "name": "Linux-clang++",
+          "tests": "63",
+          "failures": "0",
+          "disabled": "0",
+          "skipped": "0",
+          "hostname": "gamedev",
+          "time": "322",
+          "timestamp": "2026-11-05T22:16:16"
+        }
+      },
+      "boundary": {
+        "tests": 22,
+        "failures": [],
+        "skipped": [],
+        "reported": {
+          "name": "Linux-clang++",
+          "tests": "22",
+          "failures": "0",
+          "disabled": "0",
+          "skipped": "0",
+          "hostname": "gamedev",
+          "time": "184",
+          "timestamp": "2026-11-05T22:22:11"
+        }
+      }
+    },
+    "debug": {
+      "common": {
+        "tests": 63,
+        "failures": [],
+        "skipped": [],
+        "reported": {
+          "name": "Linux-clang++",
+          "tests": "63",
+          "failures": "0",
+          "disabled": "0",
+          "skipped": "0",
+          "hostname": "gamedev",
+          "time": "1560",
+          "timestamp": "2026-11-05T22:24:37"
+        }
+      },
+      "boundary": {
+        "tests": 22,
+        "failures": [],
+        "skipped": [],
+        "reported": {
+          "name": "Linux-clang++",
+          "tests": "22",
+          "failures": "0",
+          "disabled": "0",
+          "skipped": "0",
+          "hostname": "gamedev",
+          "time": "412",
+          "timestamp": "2026-11-05T22:51:29"
+        }
+      }
+    },
+    "strict": {
+      "common": {
+        "tests": 62,
+        "failures": [],
+        "skipped": [],
+        "reported": {
+          "name": "Linux-clang++",
+          "tests": "62",
+          "failures": "0",
+          "disabled": "0",
+          "skipped": "0",
+          "hostname": "gamedev",
+          "time": "1231",
+          "timestamp": "2026-11-05T22:50:52"
+        }
+      },
+      "boundary": {
+        "tests": 22,
+        "failures": [],
+        "skipped": [],
+        "reported": {
+          "name": "Linux-clang++",
+          "tests": "22",
+          "failures": "0",
+          "disabled": "0",
+          "skipped": "0",
+          "hostname": "gamedev",
+          "time": "401",
+          "timestamp": "2026-11-05T23:12:31"
+        }
+      }
+    }
+  },
+  "editor_processes": {
+    "editor-baseline": [
+      {
+        "client": "client-0",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-1",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-10",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-11",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-2",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-3",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-4",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-5",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-6",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-7",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-8",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-9",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      }
+    ],
+    "editor-integrated": [
+      {
+        "client": "client-0",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-1",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-10",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-11",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-2",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-3",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-4",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-5",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-6",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-7",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-8",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-9",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      }
+    ],
+    "editor-debug": [
+      {
+        "client": "client-0",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-1",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-10",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-11",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-2",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-3",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-4",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-5",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-6",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-7",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-8",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-9",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      }
+    ],
+    "editor-strict": [
+      {
+        "client": "client-0",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-1",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-10",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-11",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-2",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-3",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-4",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-5",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-6",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-7",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-8",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      },
+      {
+        "client": "client-9",
+        "returncode": 0,
+        "stack": "Max stack size            1048576              1048576              bytes     "
+      }
+    ]
+  },
+  "strict_sanitizer_markers": [],
+  "stack_soft_and_hard_bytes": 1048576,
+  "original_advanced_failure_preserved": true,
+  "production_source_changed": false,
+  "platform_scope": "local Linux x86-64 only",
+  "hosted_CI_run": false,
+  "SIMD_implemented_or_benchmarked": false
+}

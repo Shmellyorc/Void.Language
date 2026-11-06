@@ -391,14 +391,27 @@ std::shared_ptr<FileBorrow> borrow_file(Runtime& runtime, void* identity, ErrorK
 }
 }
 
-extern "C" void vd_filesystem_call(void* output, const vd::filesystem::ReplyLayout* layout,
+static std::int64_t filesystem_call_impl(void* output, const vd::filesystem::ReplyLayout* layout,
     unsigned operation, void* const* references, const std::int64_t* numbers,
-    const void* generation, bool asynchronous, vd::RuntimeFailure* failure) noexcept {
+    const void* generation, bool asynchronous, bool compact, vd::RuntimeFailure* failure) noexcept {
     using namespace vd;
     using namespace vd::filesystem;
     std::shared_ptr<Job> job;
     try {
         auto& runtime = Runtime::current();
+        if(compact) {
+            if(!output || !layout || operation!=static_cast<unsigned>(Operation::write_bytes) || asynchronous || !layout->entry)throw std::logic_error("Invalid compact write layout");
+            for(unsigned n=0;n<10;++n) {
+                auto bytes=n==6?sizeof(bool):n<6?sizeof(std::int64_t):sizeof(void*);
+                if(layout->fields[n]>layout->size || bytes>layout->size-layout->fields[n])throw std::logic_error("Invalid compact reply extent");
+                for(unsigned j=0;j<n;++j){auto prior=j==6?sizeof(bool):j<6?sizeof(std::int64_t):sizeof(void*);if(layout->fields[n]<layout->fields[j]+prior && layout->fields[j]<layout->fields[n]+bytes)throw std::logic_error("Overlapping compact reply fields");}
+                if(n>=7) {
+                    auto* word=reinterpret_cast<void**>(static_cast<char*>(output)+layout->fields[n]);
+                    if(reinterpret_cast<std::uintptr_t>(word)%alignof(void*))throw std::logic_error("Unaligned compact output");
+                    (void)runtime.root_word(word);
+                }
+            }
+        }
         job = prepare(runtime, *layout, operation, references, numbers);
         if (asynchronous) {
             TypeLayout task{layout->task_size, {}};
@@ -408,12 +421,12 @@ extern "C" void vd_filesystem_call(void* output, const vd::filesystem::ReplyLayo
             }
             task.descriptor = runtime.descriptor(layout->task_key);
             async_submit_native(static_cast<void**>(output), task, generation, job);
-            return;
+            return -1;
         }
         if (operation == cleanup_operation) {
             if (job->result.error != ErrorKind::success) {
                 failure->message = "File deinit cannot close a busy resource";
-                return;
+                return -1;
             }
             job->request.operation = Operation::close;
         }
@@ -429,8 +442,9 @@ extern "C" void vd_filesystem_call(void* output, const vd::filesystem::ReplyLayo
                 job->abandon(&cleanup);
                 if (cleanup.message) vd_cleanup_failure(failure, &cleanup);
             }
-            return;
+            return -1;
         }
+        if(compact && job->result.error==ErrorKind::success)return job->result.completed;
         Reply reply(runtime, *layout);
         reply.build(runtime, job->result);
         if (job->opening && job->acquisition) {
@@ -460,6 +474,14 @@ extern "C" void vd_filesystem_call(void* output, const vd::filesystem::ReplyLayo
         job->abandon(&cleanup);
         if (cleanup.message) vd_cleanup_failure(failure, &cleanup);
     }
+    return -1;
+}
+
+extern "C" void vd_filesystem_call(void* output,const vd::filesystem::ReplyLayout* layout,unsigned operation,void* const* references,const std::int64_t* numbers,const void* generation,bool asynchronous,vd::RuntimeFailure* failure) noexcept {
+    (void)filesystem_call_impl(output,layout,operation,references,numbers,generation,asynchronous,false,failure);
+}
+extern "C" std::int64_t vd_filesystem_write_checked(void* error,const vd::filesystem::ReplyLayout* layout,void* const* references,const std::int64_t* numbers,vd::RuntimeFailure* failure) noexcept {
+    return filesystem_call_impl(error,layout,static_cast<unsigned>(vd::filesystem::Operation::write_bytes),references,numbers,nullptr,false,true,failure);
 }
 
 extern "C" std::int64_t vd_file_control(unsigned operation, void* identity,

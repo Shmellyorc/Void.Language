@@ -1,0 +1,93 @@
+{
+  "binary_sha256": "0302e5e99575d13501d1e6efc56122d09f400b2d0bd98a2834f816288a642036",
+  "rows": [
+    {
+      "mode": 0,
+      "repeat": 0,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 0.0655732,
+      "process_cpu_seconds": 0.063414
+    },
+    {
+      "mode": 0,
+      "repeat": 1,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 0.0665322,
+      "process_cpu_seconds": 0.063889
+    },
+    {
+      "mode": 0,
+      "repeat": 2,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 0.0651812,
+      "process_cpu_seconds": 0.063324
+    },
+    {
+      "mode": 1,
+      "repeat": 0,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 0.10632,
+      "process_cpu_seconds": 0.104624
+    },
+    {
+      "mode": 1,
+      "repeat": 1,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 0.064658,
+      "process_cpu_seconds": 0.063445
+    },
+    {
+      "mode": 1,
+      "repeat": 2,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 0.0656025,
+      "process_cpu_seconds": 0.064026
+    },
+    {
+      "mode": 2,
+      "repeat": 0,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 0.0688678,
+      "process_cpu_seconds": 0.066412
+    },
+    {
+      "mode": 2,
+      "repeat": 1,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 0.0765318,
+      "process_cpu_seconds": 0.064785
+    },
+    {
+      "mode": 2,
+      "repeat": 2,
+      "bytes": 16777216,
+      "writes": 256,
+      "workers": 1,
+      "seconds": 0.0659091,
+      "process_cpu_seconds": 0.06389
+    }
+  ],
+  "medians": {
+    "no_http": 0.0655732,
+    "idle_http": 0.0656025,
+    "paused_http": 0.0688678
+  },
+  "baseline": false,
+  "scope": "Same optimized source/Runtime, one worker, 256 async 64-KiB writes per invocation; JIT compilation excluded; compare the separate baseline receipt"
+}

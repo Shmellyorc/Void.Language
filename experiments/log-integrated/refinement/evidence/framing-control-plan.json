@@ -1,0 +1,43 @@
+{
+  "reason": "Primary near-limit framing showed block drift and remaining 3-7 percent aggregate differences; one fixed-core matched control, no source changes",
+  "cpu": 2,
+  "allowed": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "versions": [
+    "v1",
+    "candidate",
+    "candidate",
+    "v1"
+  ],
+  "stages": [
+    7
+  ],
+  "shapes": [
+    1,
+    4,
+    7,
+    2,
+    5,
+    8,
+    9
+  ],
+  "warmup_per_case": 1,
+  "samples_per_case": 3,
+  "pool_with_primary": false
+}

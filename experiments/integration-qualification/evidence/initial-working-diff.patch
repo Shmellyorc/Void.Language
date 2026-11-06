@@ -1,0 +1,1393 @@
+diff --git a/include/void/filesystem_abi.hpp b/include/void/filesystem_abi.hpp
+index 46ca0a15..a03366ca 100644
+--- a/include/void/filesystem_abi.hpp
++++ b/include/void/filesystem_abi.hpp
+@@ -35,4 +35,6 @@ extern "C" void vd_filesystem_call(void*, const vd::filesystem::ReplyLayout*,
+     unsigned, void* const*, const std::int64_t*, const void*, bool,
+     vd::RuntimeFailure*) noexcept;
+ 
++extern "C" std::int64_t vd_filesystem_write_checked(void*,const vd::filesystem::ReplyLayout*,void* const*,const std::int64_t*,vd::RuntimeFailure*) noexcept;
++
+ extern "C" std::int64_t vd_file_control(unsigned, void*, vd::RuntimeFailure*) noexcept;
+diff --git a/include/void/ir.hpp b/include/void/ir.hpp
+index 3115bc83..8fe78b30 100644
+--- a/include/void/ir.hpp
++++ b/include/void/ir.hpp
+@@ -128,7 +128,7 @@ enum class Op { math, random_xor, random_seed, global_cell, bitcast, native_call
+     remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate, aggregate, extract, insert,
+     stage_begin, gc_construct, gc_allocate, gc_read, gc_write, gc_collect, gc_poll, gc_alive,
+     upcast, virtual_call, base_init, stage_prefix, interface_pack, interface_prepare, interface_call, string_literal, string_concat, string_equal, string_count, string_index, string_encode, string_decode, text_case, scalar_display, scalar_format, format_unwrap, format_layout, scalar_parse, result_unwrap, memory_write, temporal_result, temporal_native, string_join, collection_enter, collection_leave, collection_append, collection_finish, os_query, url_native, http_native, http_async, http_control, console_endpoint, console_native, console_print, filesystem_native, filesystem_async, filesystem_control,
+-    fixed_array, array_get, array_set, fixed_snapshot, fixed_select, fixed_commit, array_count, list_push, list_remove, list_index, list_version, list_commit, list_check, array_capture, array_allocate, array_initialize, list_insert, list_clear, array_slice, dict_new, dict_get, dict_set, dict_contains, dict_remove, dict_clear, dict_count, dict_version, dict_check, dict_entry, text_translate };
++    fixed_array, array_get, array_set, fixed_snapshot, fixed_select, fixed_commit, array_count, list_push, list_remove, list_index, list_version, list_commit, list_check, array_capture, array_allocate, array_initialize, list_insert, list_clear, array_slice, dict_new, dict_get, dict_set, dict_contains, dict_remove, dict_clear, dict_count, dict_version, dict_check, dict_entry, text_translate, string_join_encode, local_cleanup, filesystem_write };
+ // A validated local aggregate storage path; never a source-visible reference.
+ struct Place { std::uint32_t slot = 0; std::vector<unsigned> fields; };
+ struct Instruction {
+diff --git a/include/void/runtime.hpp b/include/void/runtime.hpp
+index e9d246dc..fb49e039 100644
+--- a/include/void/runtime.hpp
++++ b/include/void/runtime.hpp
+@@ -85,6 +85,7 @@ public:
+                           RegisteredRootWord replacements, const NativeArrayElement& strings,
+                           std::int64_t max_bytes);
+     void string_encode_into(void**, void*);
++    void string_join_bytes_into(void**,void***,std::size_t,bool& encoding);
+     bool string_decode_into(void**, RegisteredRootWord);
+ 
+     static std::size_t string_payload_size(std::size_t left, std::size_t right);
+@@ -198,11 +199,16 @@ private:
+     static thread_local Thread* current_thread_;
+     Thread& thread() const;
+     void require_managed() const;
++    struct RootLocation { Frame* frame; std::size_t slot, offset; };
++    RootLocation locate_root(void**) const;
++    static bool registered_at(const Frame&,std::size_t,std::size_t,void**);
++    void require_public_root(void**) const;
+     Frame* require_output(void**) const;
+     void string_parts_into(void**,std::string_view,std::string_view);
+     void validate_descriptor(const TypeLayout&) const; // Caller holds mutex_.
+     void validate_buffer_layout(const BufferLayoutRef&) const; // mutex_ held
+     ElementSchemaRef fixed_scalar_schema(ScalarEncoding);
++    static std::string_view scalar_identity(ScalarEncoding);
+     void validate_fixed_layout(const BufferLayoutRef&) const; // mutex_ held
+     void validate_dictionary_key_schema(const RuntimeMetadata&,const ElementSchema&) const;
+     struct DictionaryHeader {void* entries;void* buckets;std::uint64_t count,capacity,version;};
+@@ -217,6 +223,7 @@ private:
+     void array_write_value(RegisteredRootWord,const ElementSchemaRef&,const BufferLayout*,std::uint64_t,const void*,bool,std::optional<std::uint64_t>);
+     static std::string list_identity(const ElementSchemaRef&);
+     ListHeader& list_header(RegisteredRootWord,const ElementSchemaRef&) const;
++    ListHeader& list_header(void*,const ElementSchemaRef&,std::string_view) const;
+     ListHeader& list_header(RegisteredRootWord,ScalarEncoding) const; // mutex_ held
+     void validate_native_element(const void*,DataCursor&,const ElementSchemaRef&) const;
+     void append_native(BufferBuilder&,const BufferLayoutRef&,const void*);
+@@ -233,6 +240,13 @@ private:
+     using NominalCatalog=std::map<std::string,std::shared_ptr<const NominalDescriptor>,std::less<>>;
+     using TypeCatalog=RuntimeMetadata;
+     std::shared_ptr<const TypeCatalog> types_ = {};
++    // At most one default zero-capacity layout per admitted schema. No payloads
++    // or caller ABI descriptors; exact catalog membership is checked on every use.
++    struct CollectionMetadata {
++        BufferLayoutRef empty;
++        std::shared_ptr<const NominalDescriptor> dictionary_header;
++    };
++    mutable std::map<const ElementSchema*,CollectionMetadata> collection_metadata_;
+     std::vector<Thread*> threads_;
+     std::vector<Handle*> handles_;
+     std::vector<std::unique_ptr<Handle>> globals_;
+@@ -296,6 +310,7 @@ private:
+     Frame* previous_;
+     const Slot* slots_;
+     std::size_t count_;
++    std::uint64_t identity_;
+ };
+ class Runtime::Handle {
+ public:
+@@ -333,11 +348,17 @@ private:
+ class Runtime::RegisteredRootWord {
+ private:
+     friend class Runtime;
+-    RegisteredRootWord(const Runtime* r,Frame* f,void** p) : runtime_(r),frame_(f),slot_(p),owner_(std::this_thread::get_id()) {}
++    RegisteredRootWord(const Runtime* r,RootLocation location,void** p)
++        : runtime_(r),frame_(location.frame),slot_(p),owner_(std::this_thread::get_id()),
++          identity_(location.frame->identity_),slot_index_(location.slot),offset_index_(location.offset),
++          descriptor_(location.frame->slots_[location.slot]) {}
+     const Runtime* runtime_;
+     Frame* frame_;
+     void** slot_;
+     std::thread::id owner_;
++    std::uint64_t identity_;
++    std::size_t slot_index_,offset_index_;
++    Slot descriptor_;
+ };
+ struct Runtime::RootedInterfaceSource {
+     RegisteredRootWord object;
+@@ -356,6 +377,7 @@ public:
+     std::uint64_t count() const {return count_;}
+ private:
+     friend class Runtime::BufferBuilder;
++    friend class Runtime;
+     void validate() const; // Runtime mutex held, Managed owner thread
+     Runtime& runtime_;
+     BufferLayoutRef layout_;
+@@ -376,6 +398,7 @@ public:
+     BufferBuilder& operator=(BufferBuilder&&)=delete;
+     void write_scalar(std::uint64_t bits);
+     void write_bytes(std::span<const std::byte> native_input);
++    void write_string(RegisteredRootWord);
+     void write_reference(RegisteredRootWord source);
+     void write_interface(const RootedInterfaceSource& source);
+     void zero_elements(std::uint64_t count);
+diff --git a/include/void/runtime_abi.hpp b/include/void/runtime_abi.hpp
+index 504c6737..fbed1b29 100644
+--- a/include/void/runtime_abi.hpp
++++ b/include/void/runtime_abi.hpp
+@@ -43,6 +43,7 @@ bool vd_scalar_display(void**,unsigned,std::uint64_t,void*,void*,bool,vd::Runtim
+ bool vd_string_decode(void**,void**,vd::RuntimeFailure*) noexcept;
+ bool vd_format_layout(void**,void*,unsigned,vd::RuntimeFailure*) noexcept;
+ void vd_string_join(void**,void***,std::size_t,vd::RuntimeFailure*) noexcept;
++bool vd_string_join_encode(void**,void***,std::size_t,vd::RuntimeFailure*) noexcept;
+ 
+ void vd_string_literal(void**, const char*, std::size_t, vd::RuntimeFailure*) noexcept;
+ void vd_string_concat(void**, void*, void*, vd::RuntimeFailure*) noexcept;
+diff --git a/include/void/tooling.hpp b/include/void/tooling.hpp
+index 8b7ad4ec..1854490b 100644
+--- a/include/void/tooling.hpp
++++ b/include/void/tooling.hpp
+@@ -1,17 +1,67 @@
+ #pragma once
+ #include "void/frontend.hpp"
+ #include <map>
++#include <iterator>
++#include <span>
+ namespace vd {
+ // Owns the successful analysis. Query results are copies with owning source spans.
+ class ToolingIndex {
+     std::shared_ptr<const ValidatedAnalysis> analysis_;
+-    std::vector<AnalyzedDeclaration> all_declarations_;
+-    std::vector<AnalyzedReference> all_references_;
+     std::map<std::string,std::size_t> declarations_;
+     std::map<std::string,std::vector<std::size_t>> modules_, incoming_, positions_;
+ public:
+-    const auto& declarations() const { return all_declarations_; }
+-    const auto& references() const { return all_references_; }
++    // Ordinary records precede editor records, exactly as in the former copied
++    // vectors. Views and their iterators retain the immutable backing analysis.
++    template<class T> class Records {
++        friend class ToolingIndex;
++        std::shared_ptr<const ValidatedAnalysis> owner_;
++        std::span<const T> first_,second_;
++        Records(std::shared_ptr<const ValidatedAnalysis> owner,const std::vector<T>& first,const std::vector<T>& second)
++            :owner_(std::move(owner)),first_(first),second_(second) {}
++    public:
++        std::size_t size() const {return first_.size()+second_.size();}
++        bool empty() const {return !size();}
++        const T& operator[](std::size_t n) const {return n<first_.size()?first_[n]:second_[n-first_.size()];}
++        class iterator {
++            friend class Records;
++            std::shared_ptr<const ValidatedAnalysis> owner_;
++            const T* current_=nullptr;
++            const T* limit_=nullptr;
++            const T* next_=nullptr;
++            const T* next_limit_=nullptr;
++            iterator(const Records& view,bool at_end):owner_(view.owner_) {
++                auto end=[](auto span){return span.empty()?span.data():span.data()+span.size();};
++                if(at_end){current_=view.second_.empty()?end(view.first_):end(view.second_);return;}
++                if(view.first_.empty()) {
++                    current_=view.second_.empty()?view.first_.data():view.second_.data();
++                    limit_=view.second_.empty()?current_:end(view.second_);
++                } else {
++                    current_=view.first_.data();limit_=end(view.first_);
++                    if(!view.second_.empty()){next_=view.second_.data();next_limit_=end(view.second_);}
++                }
++            }
++        public:
++            using iterator_category=std::forward_iterator_tag;
++            using value_type=T;
++            using difference_type=std::ptrdiff_t;
++            using pointer=const T*;
++            using reference=const T&;
++            iterator()=default;
++            reference operator*() const {return *current_;}
++            pointer operator->() const {return current_;}
++            iterator& operator++(){
++                ++current_;
++                if(current_==limit_ && next_){current_=next_;limit_=next_limit_;next_=nullptr;}
++                return *this;
++            }
++            iterator operator++(int){auto old=*this;++*this;return old;}
++            bool operator==(const iterator& other) const {return current_==other.current_;}
++        };
++        iterator begin() const {return iterator(*this,false);}
++        iterator end() const {return iterator(*this,true);}
++    };
++    auto declarations() const {return Records<AnalyzedDeclaration>(analysis_,analysis_->declarations(),analysis_->editor_declarations());}
++    auto references() const {return Records<AnalyzedReference>(analysis_,analysis_->references(),analysis_->editor_references());}
+     explicit ToolingIndex(std::shared_ptr<const ValidatedAnalysis> analysis);
+     std::optional<AnalyzedDeclaration> declaration(const std::string& identity) const;
+     std::vector<AnalyzedDeclaration> definitions_at(const std::string& module, std::size_t byte_offset) const;
+diff --git a/src/backend/llvm/backend.cpp b/src/backend/llvm/backend.cpp
+index f7c25ebf..74e6e4a1 100644
+--- a/src/backend/llvm/backend.cpp
++++ b/src/backend/llvm/backend.cpp
+@@ -1157,6 +1157,24 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
+                     else v = b.CreateStore(stored,address);
+                     break;
+                 }
++                case Op::local_cleanup:{
++                    auto* invoke=llvm::BasicBlock::Create(context,"local.cleanup.active",fn);
++                    auto* done=llvm::BasicBlock::Create(context,"local.cleanup.done",fn);
++                    b.CreateCondBr(b.CreateLoad(b.getInt1Ty(),slots[instruction.b]),invoke,done);b.SetInsertPoint(invoke);
++                    b.CreateStore(b.getFalse(),slots[instruction.b]);
++                    llvm::IRBuilder<> allocations(&*fn->getEntryBlock().begin());
++                    auto* secondary=home(allocations.CreateAlloca(failure_type),StorageRole::known_abi,llvm_backend::HomeKind::value);
++                    b.CreateStore(llvm::Constant::getNullValue(failure_type),secondary);
++                    b.CreateCall(module->getOrInsertFunction("vd_async_cleanup_enter",b.getVoidTy()));
++                    auto* target=functions.at(instruction.callee);
++                    b.CreateCall(target,{b.CreateLoad(type(f.locals[instruction.a]),slots[instruction.a]),secondary});
++                    b.CreateCall(module->getOrInsertFunction("vd_async_cleanup_leave",b.getVoidTy()));
++                    b.CreateStore(llvm::Constant::getNullValue(type(f.locals[instruction.a])),slots[instruction.a]);
++                    b.CreateCall(module->getOrInsertFunction("vd_cleanup_failure",b.getVoidTy(),b.getPtrTy(),b.getPtrTy()),{failure,secondary});
++                    b.CreateBr(done);b.SetInsertPoint(done);
++                    if(active_block<*f.cleanup_entry)selected_failure();
++                    v=llvm::UndefValue::get(b.getInt8Ty());break;
++                }
+                 case Op::cleanup_call:{
+                     llvm::IRBuilder<> entry_builder(&*fn->getEntryBlock().begin());auto* secondary=home(entry_builder.CreateAlloca(failure_type),StorageRole::known_abi,llvm_backend::HomeKind::value);
+                     b.CreateStore(llvm::Constant::getNullValue(failure_type),secondary);
+@@ -1290,14 +1308,18 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
+                     else {auto name=instruction.op==Op::collection_enter?"vd_collection_enter":instruction.op==Op::collection_leave?"vd_collection_leave":"vd_collection_append";auto* call=b.CreateCall(module->getOrInsertFunction(name,instruction.op==Op::collection_enter?b.getInt1Ty():b.getVoidTy(),b.getPtrTy(),b.getPtrTy()),{values[instruction.a],failure});fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),"Collection display failed");if(instruction.op==Op::collection_enter)v=call;}
+                     break;
+                 }
++                case Op::string_join_encode:
+                 case Op::string_join: {
+                     auto* storage=value_roots[n].at(values.size());
+                     auto* pointers=llvm::ArrayType::get(b.getPtrTy(),instruction.arguments.size());
+                     llvm::IRBuilder<> allocations(&*fn->getEntryBlock().begin());
+                     auto* inputs=home(allocations.CreateAlloca(pointers),StorageRole::known_abi,llvm_backend::HomeKind::value);
+                     for(unsigned k=0;k<instruction.arguments.size();++k)b.CreateStore(value_roots[n].at(instruction.arguments[k]),b.CreateInBoundsGEP(pointers,inputs,{b.getInt32(0),b.getInt32(k)}));
+-                    b.CreateCall(module->getOrInsertFunction("vd_string_join",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy()),{storage,inputs,llvm::ConstantInt::get(size_type,instruction.arguments.size()),failure});
+-                    fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),"Interpolation failed");v=b.CreateLoad(b.getPtrTy(),storage);break;
++                    const bool fused=instruction.op==Op::string_join_encode;
++                    auto* phase=b.CreateCall(module->getOrInsertFunction(fused?"vd_string_join_encode":"vd_string_join",fused?b.getInt1Ty():b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy()),{storage,inputs,llvm::ConstantInt::get(size_type,instruction.arguments.size()),failure});
++                    auto* failed=b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure));
++                    if(fused)fail_if(b.CreateAnd(failed,phase),"UTF-8 text operation failed");
++                    fail_if(failed,"Interpolation failed");v=b.CreateLoad(b.getPtrTy(),storage);break;
+                 }
+                 case Op::format_unwrap: {
+                     auto result=values[instruction.a];auto* bad=llvm::BasicBlock::Create(context,"format_rejected",fn);auto* ready=llvm::BasicBlock::Create(context,"format_accepted",fn);
+@@ -1901,7 +1923,7 @@ Jit::Jit(DebugCache cache,ir::Emission emission) : impl_(std::make_shared<Impl>(
+     bind("pow",static_cast<double(*)(double,double)>(std::pow));
+     bind("powf",static_cast<float(*)(float,float)>(std::pow));
+     bind("vd_random_seed", vd_random_seed);
+-    bind("vd_filesystem_call", vd_filesystem_call);
++    bind("vd_filesystem_call", vd_filesystem_call);bind("vd_filesystem_write_checked",vd_filesystem_write_checked);
+     bind("vd_url_call", vd_url_call);
+     bind("vd_http_call", vd_http_call);
+     bind("vd_http_cleanup", vd_http_cleanup);
+@@ -1910,7 +1932,7 @@ Jit::Jit(DebugCache cache,ir::Emission emission) : impl_(std::make_shared<Impl>(
+     bind("vd_console_v2",vd_console_v2);bind("vd_console_print",vd_console_print);
+     bind("vd_temporal",vd_temporal);bind("vd_format_layout",vd_format_layout);bind("vd_display_enter",vd_display_enter);bind("vd_display_leave",vd_display_leave);bind("vd_display_error",vd_display_error);
+     bind("vd_collection_scope",vd_collection_scope);bind("vd_collection_scope_leave",vd_collection_scope_leave);bind("vd_collection_enter",vd_collection_enter);bind("vd_collection_leave",vd_collection_leave);bind("vd_collection_append",vd_collection_append);bind("vd_collection_finish",vd_collection_finish);
+-    bind("vd_scalar_display",vd_scalar_display);bind("vd_string_join",vd_string_join);
++    bind("vd_scalar_display",vd_scalar_display);bind("vd_string_join",vd_string_join);bind("vd_string_join_encode",vd_string_join_encode);
+     bind("vd_text_case", vd_text_case);
+     bind("vd_text_translate", vd_text_translate);
+     bind("vd_string_count",vd_string_count);bind("vd_string_index",vd_string_index);bind("vd_string_encode",vd_string_encode);bind("vd_string_decode",vd_string_decode);
+@@ -2047,7 +2069,7 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
+     try {
+     identity="VOID-native-object-v2";
+     auto field=[&](std::string_view value){llvm_backend::cache_field(identity,value);};
+-    field(impl_->cache.build_identity);field(formatting::abi_version);field(temporal::abi_version);field(impl_->target_identity);field(analysis.entry_identity());field(async_root?"async-root-v1":"sync-root");
++    field(impl_->cache.build_identity);field("integrated-log-v1;rooted-local-cleanup;join-utf8;compact-sync-write");field("checked-root-location-v2");field(std::to_string(sizeof(Runtime::Frame)));field(formatting::abi_version);field(temporal::abi_version);field(impl_->target_identity);field(analysis.entry_identity());field(async_root?"async-root-v1":"sync-root");
+     field(optimize?"ir-O2":"no-ir-O2");
+     field(impl_->emission==ir::Emission::entry?"entry-emission-v1":"all-exports");
+     field(analysis.compatibility_contract());field(analysis.constant_contract());field(runtime ? "forced-runtime" : "automatic-runtime");
+diff --git a/src/backend/llvm/filesystem.inc b/src/backend/llvm/filesystem.inc
+index b9d83157..872854c6 100644
+--- a/src/backend/llvm/filesystem.inc
++++ b/src/backend/llvm/filesystem.inc
+@@ -8,10 +8,11 @@
+                         static_cast<llvm::Value*>(llvm::UndefValue::get(b.getInt8Ty())) : result;
+                     break;
+                 }
++                case Op::filesystem_write:
+                 case Op::filesystem_native:
+                 case Op::filesystem_async: {
+                     bool asynchronous = instruction.op == Op::filesystem_async;
+-                    auto reply = asynchronous ? ir::field_type(instruction.type, 1) : instruction.type;
++                    auto reply = asynchronous ? ir::field_type(instruction.type, 1) : instruction.op==Op::filesystem_write ? ir::field_type(instruction.type,2) : instruction.type;
+                     auto* reply_type = type(reply);
+                     auto* payload = asynchronous ? type(ir::Type(instruction.type.definition)) : nullptr;
+                     auto* offsets_type = llvm::ArrayType::get(size_type, 10);
+@@ -63,6 +64,16 @@
+                     }
+                     auto* output = value_roots[n].at(values.size());
+                     b.CreateStore(llvm::Constant::getNullValue(type(instruction.type)), output);
++                    if(instruction.op==Op::filesystem_write) {
++                        auto* error=b.CreateStructGEP(type(instruction.type),output,2);
++                        auto call=module->getOrInsertFunction("vd_filesystem_write_checked",b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy());
++                        auto* completed=b.CreateCall(call,{error,record,references,numbers,failure});selected_failure();
++                        auto* failed=llvm::BasicBlock::Create(context,"write.domain.failure",fn);auto* success=llvm::BasicBlock::Create(context,"write.completed",fn);auto* done=llvm::BasicBlock::Create(context,"write.checked",fn);
++                        b.CreateCondBr(b.CreateICmpSLT(completed,b.getInt64(0)),failed,success);
++                        b.SetInsertPoint(failed);b.CreateStore(b.getInt32(1),b.CreateStructGEP(type(instruction.type),output,0));b.CreateBr(done);
++                        b.SetInsertPoint(success);b.CreateStore(completed,b.CreateStructGEP(type(instruction.type),output,1));b.CreateBr(done);
++                        b.SetInsertPoint(done);v=b.CreateLoad(type(instruction.type),output);break;
++                    }
+                     auto call = module->getOrInsertFunction("vd_filesystem_call", b.getVoidTy(),
+                         b.getPtrTy(), b.getPtrTy(), b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(),
+                         b.getPtrTy(), b.getInt1Ty(), b.getPtrTy());
+diff --git a/src/frontend/capabilities.inc b/src/frontend/capabilities.inc
+index 769d84bc..ed359907 100644
+--- a/src/frontend/capabilities.inc
++++ b/src/frontend/capabilities.inc
+@@ -306,7 +306,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
+                 }
+                 if (e.target.starts_with("$io.")) {
+                     bool asynchronous = e.target.starts_with("$io.async.");
+-                    auto operation = std::stoul(e.target.substr(asynchronous ? 10 : 9));
++                    auto operation = e.target=="$io.write.checked" ? static_cast<unsigned>(filesystem::Operation::write_bytes) : std::stoul(e.target.substr(asynchronous ? 10 : 9));
+                     const auto& contract = filesystem::source_operations.at(operation);
+                     for (unsigned n = 0; n < arguments.size(); ++n) {
+                         if (contract.arguments[n] != 'F') continue;
+diff --git a/src/frontend/compiler.cpp b/src/frontend/compiler.cpp
+index d06a3e37..4092e5ab 100644
+--- a/src/frontend/compiler.cpp
++++ b/src/frontend/compiler.cpp
+@@ -391,6 +391,7 @@ struct Statement {
+     unsigned slot = 0, flow = 0;
+     bool readonly = false, invalid = false, using_field = false, event = false, task_group = false;
+     std::string visibility = "public";
++    std::string cleanup_target; // Selected nonvirtual destructor for the compiler-owned with handler.
+     Statement(Kind k, Token t) : kind(k), token(std::move(t)) {}
+ };
+ struct Parameter {
+@@ -3110,6 +3111,7 @@ class Semantics {
+             for (unsigned n = 0; n < os::operations.size(); ++n)
+                 if (e.token.text == os::operations[n].name) return os_call(e, n);
+         }
++        if (unit.identity == filesystem::source_module && e.qualifier.empty() && e.token.text=="_io_write_bytes_checked")return filesystem_call(e,static_cast<unsigned>(filesystem::Operation::write_bytes),false,true);
+         if (unit.identity == filesystem::source_module && e.qualifier.empty()) {
+             for (unsigned n = 0; n < filesystem::source_operations.size(); ++n) {
+                 auto name = filesystem::source_operations[n].name;
+@@ -3530,7 +3532,12 @@ class Semantics {
+             auto cell=unit.make_capture_record(current->symbol+"::$cell$"+std::to_string(s.slot),type,true);auto initial=type;initial.nullable=true;std::const_pointer_cast<ir::ValueType>(cell.definition)->fields[0].type=initial;current->captured_locals.emplace(s.slot,cell);
+             Function lambda;lambda.anonymous=true;lambda.token=s.token;lambda.token.text="$with$"+std::to_string(current->lambdas.size());lambda.visibility="private";
+             Statement invoke(Statement::Kind::expression,s.token);invoke.expression=std::make_unique<Expr>(Expr::Kind::method_call,Token{TokenKind::name,"deinit",s.token.offset});invoke.expression->parts.push_back(std::make_unique<Expr>(Expr::Kind::name,s.binder));lambda.body.push_back(std::move(invoke));
+-            s.selection=std::make_unique<Expr>(Expr::Kind::lambda,s.token);s.selection->slot=current->lambdas.size();current->lambdas.push_back(std::move(lambda));expression(*s.selection);current->cleanup_type=unit.make_cleanup();flow=sequence(s.body,false);scopes.pop_back();break;
++            s.selection=std::make_unique<Expr>(Expr::Kind::lambda,s.token);s.selection->slot=current->lambdas.size();current->lambdas.push_back(std::move(lambda));expression(*s.selection);
++            for(const auto& selected:unit.functions)if(selected.symbol==s.selection->target && selected.body.size()==1 && selected.body[0].expression){
++                const auto& dispose=*selected.body[0].expression;
++                if(dispose.kind==Expr::Kind::method_call && dispose.token.text=="deinit" && dispose.type==Type::none && dispose.virtual_slot.empty() && !dispose.interface_call && dispose.native_symbol.empty() && dispose.parts.size()==1 && dispose.parts[0]->type==current->locals[s.slot])s.cleanup_target=dispose.target;
++            }
++            current->cleanup_type=unit.make_cleanup();flow=sequence(s.body,false);scopes.pop_back();break;
+         }
+         case K::deferred:
+             if(!current)error(source,s.token,Code::invalid_value,"defer requires a function activation.");
+@@ -3920,7 +3927,38 @@ class Lowering {
+     const ConstructionContext* context=nullptr;
+     std::map<unsigned,unsigned> cells;
+     std::optional<unsigned> cleanup_head,return_slot;
+-    struct WithScope {unsigned slot;bool group=false;std::optional<unsigned> owned_group={};};
++    struct LocalCleanup {unsigned binding,active;std::string callee;};
++    std::map<unsigned,std::string> local_cleanup_targets;
++    std::vector<LocalCleanup> local_cleanups;
++    std::set<std::string> elided_cleanup_handlers;
++    bool select_local_cleanups(const Function& f) {
++        local_cleanup_targets.clear();local_cleanups.clear();elided_cleanup_handlers.clear();
++        if(f.asynchronous || f.deferred)return false;
++        std::vector<const Statement*> pending;for(const auto& s:f.body)pending.push_back(&s);
++        std::vector<const Statement*> scopes;std::vector<const Statement*> assignments;
++        while(!pending.empty()) {
++            auto* s=pending.back();pending.pop_back();
++            if(s->kind==Statement::Kind::deferred || s->task_group)return false;
++            if(s->kind==Statement::Kind::scoped)scopes.push_back(s);
++            if(s->kind==Statement::Kind::assignment)assignments.push_back(s);
++            for(const auto& child:s->body)pending.push_back(&child);
++            for(const auto& child:s->otherwise)pending.push_back(&child);
++        }
++        if(scopes.empty() || f.lambdas.size()!=scopes.size())return false;
++        std::set<std::string> handlers;std::map<unsigned,std::string> targets;
++        for(auto* scope:scopes) {
++            if(scope->cleanup_target.empty() || !scope->selection || scope->selection->kind!=Expr::Kind::function_reference || scope->selection->parts.size()!=1)return false;
++            const auto& capture=*scope->selection->parts[0];
++            if(capture.kind!=Expr::Kind::capture_reference || capture.slot!=scope->slot || capture.implicit)return false;
++            for(auto* assignment:assignments)if(assignment->slot==scope->slot)return false;
++            targets.emplace(scope->slot,scope->cleanup_target);handlers.insert(scope->selection->target);
++        }
++        local_cleanup_targets=std::move(targets);elided_cleanup_handlers=std::move(handlers);return true;
++    }
++    void dispose_local(const LocalCleanup& cleanup,const Token& token) {
++        ir::Instruction call{ir::Op::local_cleanup,cleanup.binding,cleanup.active};call.callee=cleanup.callee;call.type=Type::none;call.receiver=ir::Place{cleanup.binding,{}};emit(call,token);
++    }
++    struct WithScope {unsigned slot;bool group=false;std::optional<unsigned> owned_group={};bool local=false;};
+     std::vector<WithScope> with_scopes;
+     std::vector<std::size_t> loop_with_depth;
+     unsigned register_cleanup(unsigned handler,bool active,const Token& token){
+@@ -3930,6 +3968,9 @@ class Lowering {
+     void leave_with(WithScope scope,const Token& token,bool cancel=true){
+         if(scope.group){join_group(scope.slot,cancel,token);return;}
+         if(scope.owned_group)join_group(*scope.owned_group,cancel,token);
++        if(scope.local) {
++            dispose_local(local_cleanups[scope.slot],token);return;
++        }
+         auto slot=scope.slot;
+         auto owner=emit({ir::Op::load,slot},token);ir::Instruction deactivate{ir::Op::gc_write,owner,constant(Type::boolean,{0,{}},token)};deactivate.immediate=2;emit(deactivate,token);
+         auto handler=extract_managed(owner,1,token);emit({ir::Op::function_call,handler},token);
+@@ -3982,7 +4023,7 @@ class Lowering {
+             i.op == ir::Op::console_native ||
+             i.op == ir::Op::console_print ||
+             i.op == ir::Op::dict_new ||
+-            i.op == ir::Op::string_join ||
++            i.op == ir::Op::string_join || i.op == ir::Op::string_join_encode || i.op == ir::Op::local_cleanup || i.op == ir::Op::filesystem_write ||
+             i.op == ir::Op::format_unwrap ||
+             i.op == ir::Op::format_layout ||
+             i.op == ir::Op::text_case || i.op == ir::Op::text_translate ||
+@@ -4480,6 +4521,12 @@ class Lowering {
+                 for (auto slot : slots) operation.arguments.push_back(emit({ir::Op::load, slot}, e.token));
+                 return emit(operation, e.token);
+             }
++            if(e.target=="$io.write.checked") {
++                std::vector<unsigned> slots(e.parts.size());
++                for(unsigned n=0;n<e.parts.size();++n)slots[e.argument_indexes.at(n)]=snapshot(expression(*e.parts[n]),expression_type(*e.parts[n]),e.parts[n]->token);
++                ir::Instruction call{ir::Op::filesystem_write};call.type=e.type;call.immediate=static_cast<unsigned>(filesystem::Operation::write_bytes);
++                for(auto slot:slots)call.arguments.push_back(emit({ir::Op::load,slot},e.token));return emit(call,e.token);
++            }
+             if (e.target.starts_with("$io.")) {
+                 bool asynchronous = e.target.starts_with("$io.async.");
+                 std::vector<unsigned> slots(e.parts.size());
+@@ -4642,6 +4689,9 @@ class Lowering {
+                 return emit(i,e.token);
+             });
+             if(e.target.starts_with("$safe."))return safe_collection(e);
++            // Keep ordinary interpolation followed by encoding. The experimental
++            // rooted segment operation has no generally profitable source class;
++            // automatic fusion must not guess from logger identity or byte length.
+             if(e.target=="$text.to_utf8" || e.target=="$text.from_utf8"){ir::Instruction i{e.target=="$text.to_utf8"?ir::Op::string_encode:ir::Op::string_decode,expression(*e.parts[0])};i.type=e.type;return emit(i,e.token);}
+             if(e.target=="$event.emit")return event_emit(e);
+             if(e.target.starts_with("$dict.")) return frontend_case([&]() -> unsigned {
+@@ -4793,6 +4843,15 @@ class Lowering {
+         }
+         case K::scoped:{
+             if(s.task_group){emit({ir::Op::store,s.slot,emit({ir::Op::async_group_enter},s.token)},s.token);with_scopes.push_back({s.slot,true});sequence(s.body);if(current)join_group(s.slot,false,s.token);with_scopes.pop_back();break;}
++            if(auto selected=local_cleanup_targets.find(s.slot);selected!=local_cleanup_targets.end()) {
++                auto active=static_cast<unsigned>(output.locals.size());output.locals.push_back(Type::boolean);
++                local_cleanups.push_back({s.slot,active,selected->second});auto index=static_cast<unsigned>(local_cleanups.size()-1);
++                emit({ir::Op::store,active,constant(Type::boolean,{0,{}},s.token)},s.token);
++                emit({ir::Op::store,s.slot,expression(*s.expression)},s.token);
++                emit({ir::Op::store,active,constant(Type::boolean,{1,{}},s.token)},s.token);
++                with_scopes.push_back({index,false,{},true});sequence(s.body);
++                if(current)leave_with(with_scopes.back(),s.token,false);with_scopes.pop_back();break;
++            }
+             std::optional<unsigned> group;
+             auto home=cells.at(s.slot);auto cell=output.locals.at(home);auto field=ir::field_type(cell,0);ir::Instruction construct{ir::Op::gc_construct};construct.type=cell;construct.arguments={constant(field,{0,{}},s.token)};emit({ir::Op::store,home,emit(construct,s.token)},s.token);
+             auto node=register_cleanup(expression(*s.selection),false,s.token);
+@@ -4949,15 +5008,17 @@ class Lowering {
+     }
+ public:
+     explicit Lowering(const SourceFile& s, ir::Module& m, StringPool& p) : source(s), module(m), strings(p) {}
++    const std::set<std::string>& elided_handlers() const {return elided_cleanup_handlers;}
+     ir::Function lower(const Function& f, const ConstructionContext* construction=nullptr) {
+         context=construction;normal_return=!f.body.empty() && f.body.back().kind==Statement::Kind::returned?&f.body.back():nullptr;
+         output = {}; output.name = f.symbol; output.source_name = f.concrete_name.empty() ? f.token.text : f.concrete_name; output.display_name=f.display_name; output.source = source.location(f.token.offset);
+         output.asynchronous=f.asynchronous;output.task=f.task;output.lexical_owner=f.receiver?Type::key(f.receiver->type):f.lexical_owner;output.lexical_parent=f.lexical_parent;output.operator_owner=f.operator_owner;output.operator_glyph=f.operator_glyph;
+         output.bound_receiver=f.bound_receiver;output.closure=f.anonymous;cells.clear();cleanup_head.reset();return_slot.reset();cleanup_jumps.clear();with_scopes.clear();loop_with_depth.clear();
+         output.parameters.clear(); output.result = f.result; output.locals = f.locals; current = block();
++        const bool rooted_cleanup=select_local_cleanups(f);
+         if(f.cleanup_type!=Type::none){cleanup_head=output.locals.size();auto head=f.cleanup_type;head.nullable=true;output.locals.push_back(head);}
+         if((cleanup_head || f.asynchronous) && f.result!=Type::none){return_slot=output.locals.size();output.locals.push_back(f.result);}
+-        for(const auto& [slot,type]:f.captured_locals){cells.emplace(slot,static_cast<unsigned>(output.locals.size()));output.locals.push_back(type);}
++        for(const auto& [slot,type]:f.captured_locals){if(rooted_cleanup && local_cleanup_targets.contains(slot))continue;cells.emplace(slot,static_cast<unsigned>(output.locals.size()));output.locals.push_back(type);}
+         for(const auto& [slot,field]:f.capture_inputs){
+             auto environment=emit({ir::Op::argument,0},f.token);ir::Instruction read{ir::Op::gc_read,environment};read.immediate=field;
+             emit({ir::Op::store,cells.at(slot),emit(read,f.token)},f.token);
+@@ -5000,7 +5061,8 @@ public:
+         if(cleanup_head || f.asynchronous){
+             auto entry=block();output.cleanup_entry=entry;for(auto from:cleanup_jumps)output.blocks[from].end.yes=entry;current=entry;
+             if(f.asynchronous)emit({ir::Op::async_drain},f.token);
+-            if(cleanup_head){
++            for(auto i=local_cleanups.rbegin();i!=local_cleanups.rend();++i)dispose_local(*i,f.token);
++            if(cleanup_head && !rooted_cleanup){
+             // A separate loop entry prevents executing the structured drain again.
+             auto loop=block();jump(loop);current=loop;
+             auto head=output.locals[*cleanup_head];auto node=head;node.nullable=false;
+@@ -5976,9 +6038,11 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
+     for(const auto& [id,u]:units) {auto& imports=module.source_imports[id];for(const auto& i:u->imports) if(!i.target.empty()) imports.insert(i.target);}
+     module.source_path = units.at(entry)->source.path();
+     generic_provenance(module,units);
++    std::set<std::string> elided_handlers;
+     for (auto& [id, unit] : units) {
+         Lowering lowering(unit->source,module,strings);
+         for (const auto& f : unit->functions) {
++            if(elided_handlers.contains(f.symbol))continue;
+             if(!f.native_symbol.empty()){module.native_library=std::string(native_provider(f.native_symbol));module.coordinated=true;continue;}
+             if(f.interface_requirement) {
+                 ir::Function requirement;requirement.name=f.symbol;requirement.parameters={f.receiver->type};
+@@ -5987,7 +6051,7 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
+                 module.interface_requirements.push_back(std::move(requirement));continue;
+             }
+             if (!f.initializer || f.receiver->type.kind!=Type::managed_ref) {
+-                auto lowered = lowering.lower(f); lowered.module_identity = id;
++                auto lowered = lowering.lower(f); lowered.module_identity = id;elided_handlers.insert(lowering.elided_handlers().begin(),lowering.elided_handlers().end());
+                 if (f.global_initializer) {
+                     auto value = std::find_if(unit->globals.begin(), unit->globals.end(), [&](const auto& g) { return g.initializer == &f; });
+                     lowered.result = value->cell;
+@@ -6005,7 +6069,7 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
+                 module.functions.push_back(std::move(lowered));
+             }
+             for (const auto& [mask,context]:f.construction_contexts) {
+-                auto lowered=lowering.lower(f,&context); lowered.module_identity=id;
++                auto lowered=lowering.lower(f,&context); lowered.module_identity=id;elided_handlers.insert(lowering.elided_handlers().begin(),lowering.elided_handlers().end());
+                 module.functions.push_back(std::move(lowered));
+             }
+         }
+diff --git a/src/frontend/filesystem.inc b/src/frontend/filesystem.inc
+index 1d0d720c..a307b520 100644
+--- a/src/frontend/filesystem.inc
++++ b/src/frontend/filesystem.inc
+@@ -1,4 +1,4 @@
+-    VOID_SEMANTIC_HANDLER Type filesystem_call(Expr& expression, unsigned operation, bool asynchronous) {
++    VOID_SEMANTIC_HANDLER Type filesystem_call(Expr& expression, unsigned operation, bool asynchronous, bool compact = false) {
+         if (!current || (asynchronous && !current->asynchronous)) {
+             error(source, expression.token, Code::unsupported_type,
+                   "Native file jobs require an owning async activation; filesystem calls require runtime evaluation.");
+@@ -11,6 +11,7 @@
+         target.token = expression.token;
+         target.symbol = std::string(asynchronous ? "$io.async." : "$io.sync.") + std::to_string(operation);
+         target.result = Type(unit.structure_names.at("_reply")->definition);
++        if(compact){target.result=unit.make_result(Type::i64,target.result);target.symbol="$io.write.checked";}
+         if (operation >= filesystem::claim_operation) {
+             target.result = operation == filesystem::claim_operation ? Type::i64 : Type::none;
+         }
+diff --git a/src/frontend/tooling.cpp b/src/frontend/tooling.cpp
+index bf0fea8a..feda047b 100644
+--- a/src/frontend/tooling.cpp
++++ b/src/frontend/tooling.cpp
+@@ -7,11 +7,7 @@
+ namespace vd {
+ ToolingIndex::ToolingIndex(std::shared_ptr<const ValidatedAnalysis> analysis) : analysis_(std::move(analysis)) {
+     if (!analysis_) throw std::invalid_argument("tooling index requires successful analysis");
+-    all_declarations_ = analysis_->declarations();
+-    all_declarations_.insert(all_declarations_.end(),analysis_->editor_declarations().begin(),analysis_->editor_declarations().end());
+-    all_references_ = analysis_->references();
+-    all_references_.insert(all_references_.end(),analysis_->editor_references().begin(),analysis_->editor_references().end());
+-    const auto& declarations = all_declarations_;
++    const auto declarations = this->declarations();
+     for (std::size_t i=0; i<declarations.size(); ++i) {
+         declarations_.emplace(declarations[i].identity,i);
+         modules_[declarations[i].module].push_back(i);
+@@ -20,7 +16,7 @@ ToolingIndex::ToolingIndex(std::shared_ptr<const ValidatedAnalysis> analysis) :
+         (void)module;
+         std::sort(indices.begin(),indices.end(),[&](auto a,auto b) { return declarations[a].identity < declarations[b].identity; });
+     }
+-    const auto& references = all_references_;
++    const auto references = this->references();
+     for (std::size_t i=0; i<references.size(); ++i) {
+         if (!references[i].implicit) {
+             incoming_[references[i].to].push_back(i);
+@@ -39,19 +35,19 @@ ToolingIndex::ToolingIndex(std::shared_ptr<const ValidatedAnalysis> analysis) :
+ std::optional<AnalyzedDeclaration> ToolingIndex::declaration(const std::string& identity) const {
+     auto found=declarations_.find(identity);
+     if (found==declarations_.end()) return {};
+-    return all_declarations_[found->second];
++    return declarations()[found->second];
+ }
+ std::vector<AnalyzedDeclaration> ToolingIndex::definitions_at(const std::string& module,std::size_t offset) const {
+     std::vector<AnalyzedDeclaration> result;
+     auto found=positions_.find(module);
+     if(found==positions_.end())return result;
+     const auto& indices=found->second;
+-    auto next=std::upper_bound(indices.begin(),indices.end(),offset,[&](auto at,auto i){return at<all_references_[i].source.begin;});
++    auto next=std::upper_bound(indices.begin(),indices.end(),offset,[&](auto at,auto i){return at<references()[i].source.begin;});
+     if(next==indices.begin())return result;
+-    auto begin=all_references_[*std::prev(next)].source.begin;
++    auto begin=references()[*std::prev(next)].source.begin;
+     std::set<std::string> seen;
+     while(next!=indices.begin()) {
+-        const auto& ref=all_references_[*--next];if(ref.source.begin!=begin)break;
++        const auto& ref=references()[*--next];if(ref.source.begin!=begin)break;
+         if(offset>=ref.source.end || !seen.insert(ref.to).second)continue;
+         if(auto d=declaration(ref.to)){if(!ref.signature.empty())d->signature=ref.signature;result.push_back(std::move(*d));}
+     }
+@@ -74,13 +70,13 @@ std::optional<AnalyzedDeclaration> ToolingIndex::definition_at(const std::string
+ std::vector<AnalyzedReference> ToolingIndex::references_to(const std::string& identity) const {
+     std::vector<AnalyzedReference> result;
+     auto found=incoming_.find(identity);
+-    if (found!=incoming_.end()) for(auto i:found->second) result.push_back(all_references_[i]);
++    if (found!=incoming_.end()) for(auto i:found->second) result.push_back(references()[i]);
+     return result;
+ }
+ std::vector<AnalyzedDeclaration> ToolingIndex::declarations_in(const std::string& module) const {
+     std::vector<AnalyzedDeclaration> result;
+     auto found=modules_.find(module);
+-    if(found!=modules_.end()) for(auto i:found->second) result.push_back(all_declarations_[i]);
++    if(found!=modules_.end()) for(auto i:found->second) result.push_back(declarations()[i]);
+     return result;
+ }
+ namespace {
+diff --git a/src/ir/filesystem.inc b/src/ir/filesystem.inc
+index e505adf1..f4ba37ca 100644
+--- a/src/ir/filesystem.inc
++++ b/src/ir/filesystem.inc
+@@ -1,3 +1,4 @@
++                case Op::filesystem_write:
+                 case Op::filesystem_control:
+                 case Op::filesystem_native:
+                 case Op::filesystem_async: {
+@@ -46,6 +47,10 @@
+                     if (i.immediate >= filesystem::claim_operation) fail("file control requires control opcode");
+                     valid_type(i.type);
+                     auto reply = i.type;
++                    if(i.op==Op::filesystem_write) {
++                        if(f.asynchronous || i.immediate!=static_cast<unsigned>(filesystem::Operation::write_bytes) || reply.kind!=Type::aggregate || !reply.definition || !reply.definition->result_type || reply.definition->fields.size()!=3 || field_type(reply,1)!=Type::i64)fail("invalid compact write result");
++                        reply=field_type(reply,2);
++                    }
+                     if (asynchronous) {
+                         if (reply.kind != Type::managed_ref || !reply.definition ||
+                             !reply.definition->task_result || reply.nullable || reply.readonly) {
+diff --git a/src/ir/module.cpp b/src/ir/module.cpp
+index 60bbc959..89c9f260 100644
+--- a/src/ir/module.cpp
++++ b/src/ir/module.cpp
+@@ -934,6 +934,13 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+                     for(unsigned n=0;n<i.type.definition->call_parameters.size();++n)if(target->second.parameters[n+(target->second.closure?1:0)]!=Type(i.type.definition->call_parameters[n]) || capability_key(target->second.parameters[n+(target->second.closure?1:0)])!=capability_key(i.type.definition->call_parameters[n]))fail("function reference parameter authority mismatch");
+                     if(!capability_assignable(target->second.result,*i.type.definition->call_result))fail("function reference discards result authority");result=i.type;break;
+                 }
++                case Op::local_cleanup: {
++                    auto target=functions.find(i.callee);
++                    if(!m.coordinated || f.asynchronous || !f.cleanup_entry || i.a>=f.locals.size() || i.b>=f.locals.size() || i.a==i.b || f.locals[i.a].kind!=Type::managed_ref || f.locals[i.a].nullable || f.locals[i.b]!=Type::boolean || i.type!=Type::none || !i.receiver || i.receiver->slot!=i.a || !i.receiver->fields.empty() || !i.arguments.empty() || i.immediate || i.initialization || i.array_repeat || target==functions.end())fail("invalid rooted local cleanup");
++                    const auto& callee=*target->second;
++                    if(!callee.receiver || callee.asynchronous || callee.closure || callee.initializer || !callee.virtual_slot.empty() || callee.method_name!="deinit" || callee.parameters.size()!=1 || callee.parameters[0]!=f.locals[i.a] || callee.result!=Type::none)fail("invalid local destructor authority");
++                    result=Type::none;break;
++                }
+                 case Op::cleanup_call:
+                     if(!operand(i.a).definition || !operand(i.a).definition->callable || !operand(i.a).definition->call_parameters.empty() || Type(*operand(i.a).definition->call_result)!=Type::none || !f.cleanup_entry || static_cast<unsigned>(&b-f.blocks.data())<*f.cleanup_entry || !i.arguments.empty() || i.receiver || !i.callee.empty())fail("invalid cleanup call");result=Type::none;break;
+                 case Op::function_call: {
+@@ -1088,6 +1095,10 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+                     else {auto owner=operand(i.a);if((owner.kind!=Type::growable_array && owner.kind!=Type::dictionary) || owner.nullable || owner.construction)fail("invalid collection display owner");result=i.op==Op::collection_enter?Type::boolean:Type::none;}
+                     if(i.type!=result)fail("invalid collection display result");break;
+                 }
++                case Op::string_join_encode:
++                    valid_type(i.type);
++                    if(!m.coordinated || i.a || i.b || i.receiver || !i.callee.empty() || i.initialization || i.array_repeat || i.immediate || i.type.kind!=Type::growable_array || array_element(i.type)!=Type::u8 || i.type.readonly)fail("invalid fused UTF-8 join");
++                    for(auto value:i.arguments)if(operand(value)!=Type::string)fail("invalid fused UTF-8 part");result=i.type;break;
+                 case Op::string_join:
+                     if(!m.coordinated || i.a || i.b || i.type!=Type::string || i.receiver || !i.callee.empty() || i.initialization || i.array_repeat || i.immediate)fail("invalid interpolation join");
+                     for(auto value:i.arguments)if(operand(value)!=Type::string)fail("invalid interpolation text");result=Type::string;break;
+@@ -1407,6 +1418,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+         if(f.asynchronous){
+ #include "async_validation.inc"
+         }
++#include "local_cleanup.inc"
+         validate_construction(f,m,body_types);
+         validate_fixed_ownership(f,m,body_types);
+     }
+@@ -1425,7 +1437,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+                 case Op::native_call:
+                     if (native_binding(instruction.callee).name == "register") fail("native callback registration during global startup");
+                     break;
+-                case Op::call: case Op::base_init:
++                case Op::local_cleanup: case Op::call: case Op::base_init:
+                     pending.push_back(instruction.callee); break;
+                 case Op::function_call: case Op::cleanup_call: {
+                     auto function_index = static_cast<std::size_t>(&function - m.functions.data());
+@@ -1490,10 +1502,10 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+                 case Op::global_cell:fail("worker cannot access runtime globals");break;
+                 case Op::os_query:fail("worker cannot perform OS queries");break;
+                 case Op::http_control:case Op::http_native:case Op::http_async:case Op::url_native:fail("worker cannot perform URL operations");break;
+-                case Op::filesystem_control:case Op::filesystem_native:case Op::filesystem_async:case Op::console_print:case Op::console_native:fail("worker cannot perform console I/O");break;
++                case Op::filesystem_write:case Op::filesystem_control:case Op::filesystem_native:case Op::filesystem_async:case Op::console_print:case Op::console_native:fail("worker cannot perform console I/O");break;
+                 case Op::temporal_native:if(temporal::operations.at(i.immediate).clock)fail("worker cannot read Runtime clocks");break;
+                 case Op::native_call:case Op::async_call:case Op::async_cancel:case Op::async_cancel_children:case Op::async_group_enter:case Op::async_group_join:case Op::await:case Op::function_call:case Op::interface_call:case Op::virtual_call:fail("unsupported worker task/indirect effect");break;
+-                case Op::call:case Op::base_init:case Op::function_reference:{auto target=functions.find(i.callee);if(target==functions.end())fail("worker has unknown native effect");graph.push_back(target->second);break;}
++                case Op::local_cleanup:case Op::call:case Op::base_init:case Op::function_reference:{auto target=functions.find(i.callee);if(target==functions.end())fail("worker has unknown native effect");graph.push_back(target->second);break;}
+                 default:break;
+                 }
+             }
+diff --git a/src/ir/reference_capabilities.inc b/src/ir/reference_capabilities.inc
+index 0e0ddc73..a476da31 100644
+--- a/src/ir/reference_capabilities.inc
++++ b/src/ir/reference_capabilities.inc
+@@ -60,7 +60,10 @@ std::set<unsigned> validate_reference_initialization(const Function& f) {
+         };
+         for(const auto& i:f.blocks[block].instructions) {
+             if(i.op==Op::load) require(i.a);
+-            if(i.receiver) require(i.receiver->slot);
++            // local_cleanup's receiver is read only when its dedicated flag is
++            // active. local_cleanup.inc proves every activation follows the
++            // binding store; ordinary loads/receivers keep definite-init checks.
++            if(i.receiver && i.op!=Op::local_cleanup) require(i.receiver->slot);
+             if(i.op==Op::store) state.insert(i.a);else if(i.op==Op::array_capture)state.insert(static_cast<unsigned>(i.immediate));
+         }
+     }
+@@ -196,6 +199,7 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
+                         }
+                         break;
+                     }
++                    case Op::filesystem_write:
+                     case Op::filesystem_control:
+                     case Op::filesystem_native:
+                     case Op::filesystem_async: {
+@@ -237,7 +241,7 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
+                             if (found->second.readonly) fail("write through readonly reference");
+                         }
+                         retain(values[i.b],field_type(types[function][block][i.a],static_cast<unsigned>(i.immediate))); value={}; break;
+-                    case Op::async_call: case Op::interface_call: case Op::call: case Op::virtual_call: case Op::base_init: {
++                    case Op::local_cleanup: case Op::async_call: case Op::interface_call: case Op::call: case Op::virtual_call: case Op::base_init: {
+                         if(i.op==Op::base_init && i.callee.empty()) { for(auto argument:i.arguments) retain(values[argument]); break; }
+                         auto found=indexes.find(i.callee);
+                         if (found==indexes.end()) break; // Existing trusted scalar ABI.
+diff --git a/src/runtime/abi.cpp b/src/runtime/abi.cpp
+index f03d59c5..5e387d64 100644
+--- a/src/runtime/abi.cpp
++++ b/src/runtime/abi.cpp
+@@ -197,6 +197,15 @@ bool vd_format_layout(void** out,void* specification,unsigned part,vd::RuntimeFa
+     catch(const std::length_error&){failure->message="Format layout extent is unrepresentable";}
+     catch(...){std::terminate();}return false;
+ }
++bool vd_string_join_encode(void** out,void*** parts,std::size_t count,vd::RuntimeFailure* failure) noexcept {
++    bool encoding=false;
++    try {vd::Runtime::current().string_join_bytes_into(out,parts,count,encoding);}
++    catch(const std::bad_alloc&){failure->message=encoding?"UTF-8 byte allocation failed":"Interpolation allocation failed";}
++    catch(const std::length_error&){failure->message=encoding?"UTF-8 byte conversion failed":"Interpolation extent is unrepresentable";}
++    catch(const std::exception&){failure->message=encoding?"UTF-8 byte conversion failed":"Invalid interpolation storage";}
++    catch(...){std::terminate();}
++    return encoding;
++}
+ void vd_string_join(void** out,void*** roots,std::size_t count,vd::RuntimeFailure* failure) noexcept {
+     try {auto& runtime=vd::Runtime::current();vd::formatting::Builder builder;
+         for(std::size_t i=0;i<count;++i)builder.append(runtime.string_bytes(*roots[i]));
+diff --git a/src/runtime/array.cpp b/src/runtime/array.cpp
+index 8aab34da..06baee6b 100644
+--- a/src/runtime/array.cpp
++++ b/src/runtime/array.cpp
+@@ -14,7 +14,10 @@ std::string Runtime::list_identity(const ElementSchemaRef& schema) {
+     return schema->identity().starts_with(scalar) ? "void.list.v1/"+schema->identity().substr(scalar.size()) : "void.list.v2/"+schema->identity();
+ }
+ Runtime::ListHeader& Runtime::list_header(RegisteredRootWord source,const ElementSchemaRef& schema) const {
+-    auto* object=reference_source(source);const auto key=list_identity(schema);
++    auto* object=reference_source(source);
++    return list_header(object,schema,list_identity(schema));
++}
++Runtime::ListHeader& Runtime::list_header(void* object,const ElementSchemaRef& schema,std::string_view key) const {
+     if(!types_)throw std::invalid_argument("missing list catalog");
+     auto admitted=types_->schemas.find(schema->identity());if(admitted==types_->schemas.end() || admitted->second!=schema)throw std::invalid_argument("foreign list schema");
+     auto type=types_->types.find(key);
+@@ -30,7 +33,7 @@ Runtime::ListHeader& Runtime::list_header(RegisteredRootWord source,const Elemen
+ }
+ BufferLayoutRef Runtime::native_array_layout(const NativeArrayElement& element,std::uint64_t capacity) {
+     require_managed();if(!element.key || (element.count && !element.fields))throw std::invalid_argument("missing native element metadata");
+-    if(element.count==1 && element.fields[0].offset==0 && element.fields[0].kind<=10 && std::string_view(element.key)=="void.fixed.scalar.v1/"+std::to_string(element.fields[0].kind)) {
++    if(element.count==1 && element.fields[0].offset==0 && element.fields[0].kind<=10 && std::string_view(element.key)==scalar_identity(static_cast<ScalarEncoding>(element.fields[0].kind))) {
+         auto result=fixed_scalar_layout(static_cast<ScalarEncoding>(element.fields[0].kind),capacity);if(result->schema()->bytes()!=element.bytes || result->alignment()!=element.alignment)throw std::invalid_argument("invalid native scalar geometry");return result;
+     }
+     ElementSchemaRef schema;
+@@ -82,7 +85,7 @@ void Runtime::array_new(void** out,const BufferLayoutRef& layout,bool list,bool
+         const auto key=list_identity(layout->schema());
+         {std::lock_guard lock(mutex_);if(types_) {auto found=types_->types.find(key);if(found!=types_->types.end())type=found->second;}}
+         if(!type) {Native native(*this);NominalDescriptor spec{key,"","array-list-v2",{sizeof(ListHeader),{offsetof(ListHeader,backing)}}};admit_types({&spec,1});type=descriptor(key);}
+-        if(type->layout.size!=sizeof(ListHeader) || type->layout.references!=std::vector<std::size_t>{offsetof(ListHeader,backing)})throw std::invalid_argument("invalid list descriptor");
++        if(type->layout.size!=sizeof(ListHeader) || type->layout.references.size()!=1 || type->layout.references[0]!=offsetof(ListHeader,backing))throw std::invalid_argument("invalid list descriptor");
+     }
+     void* backing=nullptr;constexpr std::size_t zero=0;Slot slot{&backing,sizeof(backing),&zero,1};Frame roots(*this,&slot,1);
+     auto live=zero_live ? layout->capacity() : 0;
+@@ -313,6 +316,25 @@ void Runtime::string_index_into(void** out,void* source,ScalarEncoding encoding,
+     // string_into stages the complete bytes before its first safepoint.
+     string_into(out,text.substr(offset,utf8_scalar_bytes(text,offset)));
+ }
++void Runtime::string_join_bytes_into(void** out,void*** parts,std::size_t count,bool& encoding) {
++    require_managed();(void)root_word(out);encoding=false;std::size_t total=0;
++    for(std::size_t i=0;i<count;++i){
++        if(!(i%64))poll();auto part=root_word(parts[i]);
++        std::lock_guard lock(mutex_);auto bytes=heap_.string_bytes(reference_source(part));
++        if(bytes.size()>std::string{}.max_size()-total)throw std::length_error("joined UTF-8 extent");total+=bytes.size();
++        (void)string_payload_size(total,0);
++    }
++    encoding=true;auto layout=fixed_scalar_layout(ScalarEncoding::u8,total);
++    void* backing=nullptr;void* result=nullptr;constexpr std::size_t zero=0;
++    Slot slots[]={{&backing,sizeof(backing),&zero,1},{&result,sizeof(result),&zero,1}};Frame roots(*this,slots,2);
++    if(total){BufferBuilder builder(*this,layout,total,quota);
++        for(std::size_t i=0;i<count;++i){if(!(i%64))poll();builder.write_string(root_word(parts[i]));}
++        builder.finish_into(&backing);
++    }
++    array_new(&result,fixed_scalar_layout(ScalarEncoding::u8,0),true);
++    auto root=root_word(&result);std::lock_guard lock(mutex_);require_buffer_output(out);heap_.validate_output_address(out);
++    auto& header=list_header(root,layout->schema());header.backing=backing;header.count=header.capacity=total;*out=result;
++}
+ void Runtime::string_encode_into(void** out,void* source) {
+     bytes_into(out,string_bytes(source));
+ }
+@@ -341,7 +363,15 @@ std::string Runtime::byte_array_bytes(RegisteredRootWord source) {
+     {std::lock_guard lock(mutex_);const auto& header=list_header(source,schema);count=header.count;backing=header.backing;if(backing)layout=heap_.buffer_state(backing).layout;}
+     std::string bytes;
+     if(count){BufferReadLease lease(*this,root_word(&backing),layout);bytes.resize(count);
+-        for(std::uint64_t i=0;i<count;++i)bytes[i]=static_cast<char>(buffer_byte(backing,layout,i,0));}
++        if(layout->schema()==schema && layout->stride()==1){
++            for(std::uint64_t offset=0;offset<count;){
++                auto size=static_cast<std::size_t>(std::min<std::uint64_t>(count-offset,quota.bytes));poll();
++                {std::lock_guard lock(mutex_);lease.validate();
++                    if(offset>lease.count_ || size>lease.count_-offset)throw std::out_of_range("byte snapshot live extent");
++                    std::memcpy(bytes.data()+offset,static_cast<const char*>(lease.value_)+layout->element_offset(offset),size);}
++                offset+=size;
++            }
++        }else for(std::uint64_t i=0;i<count;++i)bytes[i]=static_cast<char>(buffer_byte(backing,layout,i,0));}
+     return bytes;
+ }
+ bool Runtime::string_decode_into(void** out,RegisteredRootWord source) {
+diff --git a/src/runtime/buffer.cpp b/src/runtime/buffer.cpp
+index d9ca4bfa..a66ead19 100644
+--- a/src/runtime/buffer.cpp
++++ b/src/runtime/buffer.cpp
+@@ -82,7 +82,15 @@ std::optional<DataCursor::Event> DataCursor::next(std::size_t& work) {
+ }
+ BufferLayoutRef Runtime::buffer_layout(ElementSchemaRef schema,std::uint64_t capacity,std::size_t base,std::size_t stride) const {
+     reference_shape(schema); // Exact catalog pointer membership, not just equal keys.
+-    return BufferLayoutRef(new BufferLayout(std::move(schema),capacity,base,stride));
++    if(capacity || base || stride)return BufferLayoutRef(new BufferLayout(std::move(schema),capacity,base,stride));
++    std::lock_guard lock(mutex_);
++    auto found=collection_metadata_.find(schema.get());
++    if(found!=collection_metadata_.end())return found->second.empty;
++    BufferLayoutRef layout(new BufferLayout(schema,0,0,0));
++    // Optional indexing must not turn successful layout construction into a
++    // failed operation. Insertion is the only allocation permitted to fail here.
++    try {collection_metadata_.emplace(schema.get(),CollectionMetadata{layout,{}});}catch(const std::bad_alloc&) {}
++    return layout;
+ }
+ void Runtime::validate_buffer_layout(const BufferLayoutRef& layout) const {
+     if(!layout || !types_) throw std::invalid_argument("missing buffer layout");
+@@ -102,9 +110,12 @@ Runtime::PrivateRoot::~PrivateRoot() noexcept {
+ }
+ Runtime::Frame* Runtime::require_buffer_output(void** output) const {
+     auto* frame=require_output(output);
+-    for(auto* root=thread().private_roots;root;root=root->previous_) if(output==&root->value_) throw std::invalid_argument("publication into private builder root");
++    require_public_root(output);
+     return frame;
+ }
++void Runtime::require_public_root(void** output) const {
++    for(auto* root=thread().private_roots;root;root=root->previous_) if(output==&root->value_) throw std::invalid_argument("publication into private builder root");
++}
+ Runtime::BufferBuilder::BufferBuilder(Runtime& r,BufferLayoutRef layout,std::uint64_t live,BufferWorkQuota quota)
+     :runtime_(r),layout_(std::move(layout)),quota_(quota),root_(r),owner_(std::this_thread::get_id()),requested_(live) {
+     std::shared_ptr<const RuntimeMetadata> catalog;
+@@ -173,6 +184,23 @@ void Runtime::BufferBuilder::write_scalar(std::uint64_t bits) {
+         normalize();
+     } catch(...) {failed_=true;throw;}
+ }
++void Runtime::BufferBuilder::write_string(RegisteredRootWord source) {
++    try {
++        require_active();
++        if(!cursor_.dense_u8() || layout_->stride()!=1 || in_element_)throw std::invalid_argument("string append requires dense byte builder");
++        std::size_t size;
++        {std::lock_guard lock(runtime_.mutex_);size=runtime_.heap_.string_bytes(runtime_.reference_source(source)).size();}
++        if(size>requested_-prefix_)throw std::out_of_range("string append beyond requested prefix");
++        for(std::size_t offset=0;offset<size;) {
++            auto count=std::min(size-offset,quota_.bytes);runtime_.poll();
++            {std::lock_guard lock(runtime_.mutex_);validate_private();
++                auto bytes=runtime_.heap_.string_bytes(runtime_.reference_source(source));
++                if(bytes.size()!=size)throw std::logic_error("immutable string extent changed");
++                std::memcpy(static_cast<char*>(root_.value_)+layout_->element_offset(prefix_),bytes.data()+offset,count);prefix_+=count;offset+=count;}
++        }
++        event_.reset();consumed_=0;cursor_.reset();
++    }catch(...){failed_=true;throw;}
++}
+ void Runtime::BufferBuilder::write_bytes(std::span<const std::byte> input) {
+     try {
+         require_active();
+@@ -200,18 +228,19 @@ void Runtime::BufferBuilder::write_bytes(std::span<const std::byte> input) {
+ }
+ Runtime::RegisteredRootWord Runtime::root_word(void** slot) const {
+     require_managed();std::lock_guard lock(mutex_);
+-    return RegisteredRootWord(this,require_buffer_output(slot),slot);
++    auto location=locate_root(slot);require_public_root(slot);
++    return RegisteredRootWord(this,location,slot);
+ }
+ void* Runtime::reference_source(const RegisteredRootWord& token) const {
+     require_managed();
+     if(token.runtime_!=this || token.owner_!=std::this_thread::get_id()) throw std::invalid_argument("foreign reference root token");
+     bool linked=false;for(auto* f=thread().frames;f;f=f->previous_) if(f==token.frame_) {linked=true;break;}
+-    if(!linked) throw std::invalid_argument("expired reference root token");
+-    require_buffer_output(token.slot_);
+-    bool exact=false;
+-    for(std::size_t i=0;i<token.frame_->count_ && !exact;++i)for(std::size_t j=0;j<token.frame_->slots_[i].count && !exact;++j)
+-        if(static_cast<const char*>(token.frame_->slots_[i].storage)+token.frame_->slots_[i].offsets[j]==reinterpret_cast<const char*>(token.slot_))exact=true;
+-    if(!exact)throw std::invalid_argument("reference source registration changed");
++    if(!linked || token.frame_->identity_!=token.identity_) throw std::invalid_argument("expired reference root token");
++    require_public_root(token.slot_);
++    if(!registered_at(*token.frame_,token.slot_index_,token.offset_index_,token.slot_))throw std::invalid_argument("reference source registration changed");
++    const auto& current=token.frame_->slots_[token.slot_index_];const auto& original=token.descriptor_;
++    if(current.storage!=original.storage || current.size!=original.size || current.offsets!=original.offsets || current.count!=original.count)
++        throw std::invalid_argument("reference source registration changed");
+     void* value=nullptr;std::memcpy(&value,token.slot_,sizeof(value));
+     if(value && !heap_.contains(value)) throw std::invalid_argument("untracked or private reference source");
+     return value;
+@@ -360,16 +389,24 @@ void Runtime::validate_fixed_layout(const BufferLayoutRef& layout) const {
+        (schema.bytes() || schema.has_references() || !schema.zero_data_complete()))
+         throw std::invalid_argument("fixed runtime proof requires scalar or zero-footprint element");
+ }
+-ElementSchemaRef Runtime::fixed_scalar_schema(ScalarEncoding encoding) {
+-    require_managed();
++std::string_view Runtime::scalar_identity(ScalarEncoding encoding) {
++    static constexpr std::string_view keys[]={
++        "void.fixed.scalar.v1/0","void.fixed.scalar.v1/1","void.fixed.scalar.v1/2",
++        "void.fixed.scalar.v1/3","void.fixed.scalar.v1/4","void.fixed.scalar.v1/5",
++        "void.fixed.scalar.v1/6","void.fixed.scalar.v1/7","void.fixed.scalar.v1/8",
++        "void.fixed.scalar.v1/9","void.fixed.scalar.v1/10"};
+     if(static_cast<unsigned>(encoding)>static_cast<unsigned>(ScalarEncoding::boolean))
+         throw std::invalid_argument("invalid fixed scalar encoding");
+-    const auto key="void.fixed.scalar.v1/"+std::to_string(static_cast<unsigned>(encoding));
++    return keys[static_cast<unsigned>(encoding)];
++}
++ElementSchemaRef Runtime::fixed_scalar_schema(ScalarEncoding encoding) {
++    require_managed();
++    const auto key=scalar_identity(encoding);
+     ElementSchemaRef schema;
+     {std::lock_guard lock(mutex_);if(types_) {auto i=types_->schemas.find(key);if(i!=types_->schemas.end()) schema=i->second;}}
+     if(!schema) {
+         Native native(*this);
+-        ElementSchemaSpec spec{key,"mutable",key,StorageDomain::native(),0,{SchemaScalar{encoding}}};
++        ElementSchemaSpec spec{std::string(key),"mutable",std::string(key),StorageDomain::native(),0,{SchemaScalar{encoding}}};
+         admit_buffer_schemas({&spec,1});schema=buffer_schema(key);
+     }
+     return schema;
+diff --git a/src/runtime/coordination.cpp b/src/runtime/coordination.cpp
+index a2564d05..d6f0c9aa 100644
+--- a/src/runtime/coordination.cpp
++++ b/src/runtime/coordination.cpp
+@@ -195,15 +195,39 @@ Runtime::Collection Runtime::collect(std::chrono::milliseconds timeout) {
+     changed_.notify_all();
+     return result;
+ }
+-Runtime::Frame* Runtime::require_output(void** slot) const {
++namespace {
++bool root_offset(const Runtime::Slot& slot,void** word,std::size_t& offset) {
++    if(!slot.storage || !slot.offsets)return false;
++    const auto storage=reinterpret_cast<std::uintptr_t>(slot.storage),address=reinterpret_cast<std::uintptr_t>(word);
++    if(address<storage)return false;
++    offset=address-storage;
++    return offset<=slot.size && slot.size-offset>=sizeof(void*);
++}
++}
++bool Runtime::registered_at(const Frame& frame,std::size_t i,std::size_t j,void** word) {
++    if(i>=frame.count_ || !frame.slots_)return false;
++    const auto& slot=frame.slots_[i];
++    std::size_t offset;
++    return j<slot.count && root_offset(slot,word,offset) && slot.offsets[j]==offset;
++}
++Runtime::RootLocation Runtime::locate_root(void** slot) const {
+     require_managed();
+     if (!slot) throw std::invalid_argument("null allocation output");
+-    for (auto* f = thread().frames; f; f = f->previous_)
+-        for (std::size_t i = 0; i < f->count_; ++i)
+-            for (std::size_t j = 0; j < f->slots_[i].count; ++j)
+-                if (static_cast<const char*>(f->slots_[i].storage) + f->slots_[i].offsets[j] == reinterpret_cast<const char*>(slot)) return f;
++    for (auto* f = thread().frames; f; f = f->previous_) {
++        for (std::size_t i = 0; i < f->count_; ++i) {
++            const auto& descriptor=f->slots_[i];std::size_t offset;
++            if(!root_offset(descriptor,slot,offset))continue;
++            // Containment only filters impossible Slots. Exact offset identity
++            // is still required, including unsorted and duplicate descriptors.
++            for (std::size_t j = 0; j < descriptor.count; ++j)
++                if (descriptor.offsets[j]==offset) {
++                    return {f,i,j};
++                }
++        }
++    }
+     throw std::invalid_argument("allocation output is not a registered precise root");
+ }
++Runtime::Frame* Runtime::require_output(void** slot) const {return locate_root(slot).frame;}
+ std::string_view Runtime::string_bytes(void* object) const {
+     require_managed();
+     std::lock_guard lock(mutex_);
+@@ -378,7 +402,7 @@ console::Error Runtime::close() {
+     return error;
+ }
+ Runtime::Frame::Frame(Runtime& r, const Slot* slots, std::size_t count)
+-    : runtime_(r), previous_(nullptr), slots_(slots), count_(count) {
++    : runtime_(r), previous_(nullptr), slots_(slots), count_(count),identity_(0) {
+     r.require_managed();
+     if (count && !slots) throw std::invalid_argument("null root frame slots");
+     for (std::size_t i = 0; i < count; ++i) {
+@@ -387,6 +411,13 @@ Runtime::Frame::Frame(Runtime& r, const Slot* slots, std::size_t count)
+         for (std::size_t j = 0; j < s.count; ++j)
+             if (s.offsets[j] > s.size || s.size - s.offsets[j] < sizeof(void*)) throw std::invalid_argument("invalid root offset");
+     }
++    // Process-wide, nonwrapping identities also distinguish attachment/thread
++    // and Runtime address reuse. Reserve only after descriptor validation.
++    static std::atomic<std::uint64_t> next{1};
++    auto identity=next.load(std::memory_order_relaxed);
++    do {if(identity==std::numeric_limits<std::uint64_t>::max())throw std::overflow_error("root frame identity exhausted");}
++    while(!next.compare_exchange_weak(identity,identity+1,std::memory_order_relaxed));
++    identity_=identity;
+     previous_ = r.thread().frames;
+     r.thread().frames = this;
+ }
+diff --git a/src/runtime/dictionary.cpp b/src/runtime/dictionary.cpp
+index 6b4e61c6..456b27a6 100644
+--- a/src/runtime/dictionary.cpp
++++ b/src/runtime/dictionary.cpp
+@@ -28,9 +28,22 @@ Runtime::DictionaryLayout Runtime::dictionary_layout(const NativeDictionary& d)
+     const auto& hash=d.entry->fields[d.entry->count-1];if(hash.kind!=7 || hash.offset!=d.hash_offset || hash.nullable || hash.extent)throw std::invalid_argument("invalid dictionary hash field");
+     for(std::size_t i=0;i<d.key->count;++i){const auto& a=d.entry->fields[i];const auto& b=d.key->fields[i];if(a.offset!=b.offset || a.kind!=b.kind || a.nullable!=b.nullable || a.extent!=b.extent || !a.target || !b.target || std::string_view(a.target)!=b.target)throw std::invalid_argument("dictionary key does not match entry prefix");}
+     for(std::size_t i=d.key->count;i+1<d.entry->count;++i)if(d.entry->fields[i].offset<d.value_offset || d.entry->fields[i].offset>=d.hash_offset)throw std::invalid_argument("invalid dictionary value fields");
+-    auto entries=native_array_layout(*d.entry,0),key=native_array_layout(*d.key,0);{std::lock_guard lock(mutex_);if(types_)validate_dictionary_key_schema(*types_,*key->schema());}auto identity="void.dict.v1/"+std::string(d.entry->key);std::shared_ptr<const NominalDescriptor> header;{std::lock_guard lock(mutex_);if(types_){auto found=types_->types.find(identity);if(found!=types_->types.end())header=found->second;}}
+-    if(!header){Native native(*this);NominalDescriptor spec{identity,"","dictionary-v1",{sizeof(DictionaryHeader),{offsetof(DictionaryHeader,entries),offsetof(DictionaryHeader,buckets)}}};admit_types({&spec,1});header=descriptor(identity);}
+-    if(header->layout.size!=sizeof(DictionaryHeader) || header->layout.references!=std::vector<std::size_t>{offsetof(DictionaryHeader,entries),offsetof(DictionaryHeader,buckets)})throw std::invalid_argument("invalid dictionary header descriptor");
++    auto entries=native_array_layout(*d.entry,0),key=native_array_layout(*d.key,0);
++    std::shared_ptr<const NominalDescriptor> header;
++    {std::lock_guard lock(mutex_);
++        if(types_)validate_dictionary_key_schema(*types_,*key->schema());
++        auto found=collection_metadata_.find(entries->schema().get());
++        if(found!=collection_metadata_.end())header=found->second.dictionary_header;
++    }
++    if(!header) {
++        auto identity="void.dict.v1/"+std::string(d.entry->key);
++        {std::lock_guard lock(mutex_);if(types_){auto found=types_->types.find(identity);if(found!=types_->types.end())header=found->second;}}
++        if(!header){Native native(*this);NominalDescriptor spec{identity,"","dictionary-v1",{sizeof(DictionaryHeader),{offsetof(DictionaryHeader,entries),offsetof(DictionaryHeader,buckets)}}};admit_types({&spec,1});header=descriptor(identity);}
++    }
++    const auto& references=header->layout.references;
++    if(header->layout.size!=sizeof(DictionaryHeader) || references.size()!=2 || references[0]!=offsetof(DictionaryHeader,entries) || references[1]!=offsetof(DictionaryHeader,buckets))throw std::invalid_argument("invalid dictionary header descriptor");
++    {std::lock_guard lock(mutex_);auto found=collection_metadata_.find(entries->schema().get());
++        if(found!=collection_metadata_.end())found->second.dictionary_header=header;}
+     return {entries,key,header};
+ }
+ Runtime::DictionaryHeader& Runtime::dictionary_header(RegisteredRootWord source,const DictionaryLayout& l) const {
+diff --git a/src/runtime/filesystem_abi.cpp b/src/runtime/filesystem_abi.cpp
+index e95292f3..7353cd82 100644
+--- a/src/runtime/filesystem_abi.cpp
++++ b/src/runtime/filesystem_abi.cpp
+@@ -391,14 +391,27 @@ std::shared_ptr<FileBorrow> borrow_file(Runtime& runtime, void* identity, ErrorK
+ }
+ }
+ 
+-extern "C" void vd_filesystem_call(void* output, const vd::filesystem::ReplyLayout* layout,
++static std::int64_t filesystem_call_impl(void* output, const vd::filesystem::ReplyLayout* layout,
+     unsigned operation, void* const* references, const std::int64_t* numbers,
+-    const void* generation, bool asynchronous, vd::RuntimeFailure* failure) noexcept {
++    const void* generation, bool asynchronous, bool compact, vd::RuntimeFailure* failure) noexcept {
+     using namespace vd;
+     using namespace vd::filesystem;
+     std::shared_ptr<Job> job;
+     try {
+         auto& runtime = Runtime::current();
++        if(compact) {
++            if(!output || !layout || operation!=static_cast<unsigned>(Operation::write_bytes) || asynchronous || !layout->entry)throw std::logic_error("Invalid compact write layout");
++            for(unsigned n=0;n<10;++n) {
++                auto bytes=n==6?sizeof(bool):n<6?sizeof(std::int64_t):sizeof(void*);
++                if(layout->fields[n]>layout->size || bytes>layout->size-layout->fields[n])throw std::logic_error("Invalid compact reply extent");
++                for(unsigned j=0;j<n;++j){auto prior=j==6?sizeof(bool):j<6?sizeof(std::int64_t):sizeof(void*);if(layout->fields[n]<layout->fields[j]+prior && layout->fields[j]<layout->fields[n]+bytes)throw std::logic_error("Overlapping compact reply fields");}
++                if(n>=7) {
++                    auto* word=reinterpret_cast<void**>(static_cast<char*>(output)+layout->fields[n]);
++                    if(reinterpret_cast<std::uintptr_t>(word)%alignof(void*))throw std::logic_error("Unaligned compact output");
++                    (void)runtime.root_word(word);
++                }
++            }
++        }
+         job = prepare(runtime, *layout, operation, references, numbers);
+         if (asynchronous) {
+             TypeLayout task{layout->task_size, {}};
+@@ -408,12 +421,12 @@ extern "C" void vd_filesystem_call(void* output, const vd::filesystem::ReplyLayo
+             }
+             task.descriptor = runtime.descriptor(layout->task_key);
+             async_submit_native(static_cast<void**>(output), task, generation, job);
+-            return;
++            return -1;
+         }
+         if (operation == cleanup_operation) {
+             if (job->result.error != ErrorKind::success) {
+                 failure->message = "File deinit cannot close a busy resource";
+-                return;
++                return -1;
+             }
+             job->request.operation = Operation::close;
+         }
+@@ -429,8 +442,9 @@ extern "C" void vd_filesystem_call(void* output, const vd::filesystem::ReplyLayo
+                 job->abandon(&cleanup);
+                 if (cleanup.message) vd_cleanup_failure(failure, &cleanup);
+             }
+-            return;
++            return -1;
+         }
++        if(compact && job->result.error==ErrorKind::success)return job->result.completed;
+         Reply reply(runtime, *layout);
+         reply.build(runtime, job->result);
+         if (job->opening && job->acquisition) {
+@@ -460,6 +474,14 @@ extern "C" void vd_filesystem_call(void* output, const vd::filesystem::ReplyLayo
+         job->abandon(&cleanup);
+         if (cleanup.message) vd_cleanup_failure(failure, &cleanup);
+     }
++    return -1;
++}
++
++extern "C" void vd_filesystem_call(void* output,const vd::filesystem::ReplyLayout* layout,unsigned operation,void* const* references,const std::int64_t* numbers,const void* generation,bool asynchronous,vd::RuntimeFailure* failure) noexcept {
++    (void)filesystem_call_impl(output,layout,operation,references,numbers,generation,asynchronous,false,failure);
++}
++extern "C" std::int64_t vd_filesystem_write_checked(void* error,const vd::filesystem::ReplyLayout* layout,void* const* references,const std::int64_t* numbers,vd::RuntimeFailure* failure) noexcept {
++    return filesystem_call_impl(error,layout,static_cast<unsigned>(vd::filesystem::Operation::write_bytes),references,numbers,nullptr,false,true,failure);
+ }
+ 
+ extern "C" std::int64_t vd_file_control(unsigned operation, void* identity,
+diff --git a/src/runtime/list.cpp b/src/runtime/list.cpp
+index b04ad6ba..055057e6 100644
+--- a/src/runtime/list.cpp
++++ b/src/runtime/list.cpp
+@@ -29,10 +29,14 @@ void store_bits(void* p,std::uint64_t bits,std::size_t width) {
+ 
+ }
+ Runtime::ListHeader& Runtime::list_header(RegisteredRootWord source,ScalarEncoding encoding) const {
+-    auto key="void.fixed.scalar.v1/"+std::to_string(static_cast<unsigned>(encoding));
++    // Invalid encodings retain the metadata/schema error ordering of this
++    // checked-header boundary; scalar construction validates its own enum.
+     if(!types_)throw std::invalid_argument("missing list metadata");
++    if(static_cast<unsigned>(encoding)>static_cast<unsigned>(ScalarEncoding::boolean))throw std::invalid_argument("missing list scalar schema");
++    auto key=scalar_identity(encoding);
+     auto found=types_->schemas.find(key);if(found==types_->schemas.end())throw std::invalid_argument("missing list scalar schema");
+-    return list_header(source,found->second);
++    static constexpr std::string_view lists[]={"void.list.v1/0","void.list.v1/1","void.list.v1/2","void.list.v1/3","void.list.v1/4","void.list.v1/5","void.list.v1/6","void.list.v1/7","void.list.v1/8","void.list.v1/9","void.list.v1/10"};
++    return list_header(reference_source(source),found->second,lists[static_cast<unsigned>(encoding)]);
+ }
+ void Runtime::list_into(void** out,ScalarEncoding encoding,std::uint64_t count) {array_new(out,fixed_scalar_layout(encoding,count),true,true);}
+ std::uint64_t Runtime::list_count(RegisteredRootWord source,ScalarEncoding encoding) const {require_managed();std::lock_guard lock(mutex_);return list_header(source,encoding).count;}
+diff --git a/stdlib/io.void b/stdlib/io.void
+index 0245e67b..1d78a2eb 100644
+--- a/stdlib/io.void
++++ b/stdlib/io.void
+@@ -576,12 +576,11 @@ async func (self file) read_line_async(max_bytes: i64 = 67108864) -> result<text
+ ## @return Ok with bytes written, or Err with actual progress; earlier writes are not rolled back.
+ func (self file) write_bytes(const bytes: [u8]) -> result<i64, error>:
+     with _reserve(self, "write_bytes")? as lease:
+-        var reply = _io_write_bytes(self, bytes)
+-
+-        if reply.kind != 0:
+-            return Err(_error("write_bytes", self._path, "", reply))
+-
+-        return Ok(reply.completed)
++        match _io_write_bytes_checked(self, bytes):
++            Err(var reply):
++                return Err(_error("write_bytes", self._path, "", reply))
++            Ok(var completed):
++                return Ok(completed)
+ 
+ 
+ ## Write owned input bytes at the shared cursor, looping over short native transfers.
+diff --git a/tests/advanced/tests.cpp b/tests/advanced/tests.cpp
+index 5c824947..ec91b4fd 100644
+--- a/tests/advanced/tests.cpp
++++ b/tests/advanced/tests.cpp
+@@ -51,11 +51,20 @@ void run(const std::filesystem::path& root,bool optimized) {
+         managed_test::Probe probe;probe.inspect_roots=true;probe.collect_before=true;probe.frames.reserve(256);
+         {managed_test::Observe observe(probe);if(code->invoke(7)!=answer)throw std::runtime_error(std::string("advanced source result: ")+name);}
+         require(probe.frames.empty() && probe.roots_valid && probe.commits_valid,"advanced roots/publication/collection");empty(*runtime);
+-        if(std::string(name)=="with_transaction")for(unsigned construction:{5u,6u}){
+-            managed_test::Probe failed;failed.inspect_roots=true;failed.capture=true;failed.fail_construction=construction;failed.fail_allocation=0;failed.frames.reserve(256);bool raised=false;
++        if(std::string(name)=="with_transaction")for(bool inside:{false,true}){
++            managed_test::Probe failed;failed.inspect_roots=true;failed.capture=true;failed.frames.reserve(256);bool raised=false;unsigned target_hits=0;
++            failed.before_construct=[&](std::size_t ordinal,const void* payload,std::size_t size){
++                bool target=false;
++                if(!inside && failed.retained && size==sizeof(void*)) {void* value=nullptr;std::memcpy(&value,payload,size);target=value==failed.retained->get();}
++                if(inside && size==sizeof(std::int32_t)) {std::int32_t value;std::memcpy(&value,payload,size);target=value==7;}
++                if(target) {++target_hits;failed.fail_construction=ordinal;failed.fail_allocation=0;}
++            };
+             {managed_test::Observe observe(failed);try{code->invoke(7);}catch(const std::runtime_error&){raised=true;}}
++            require(target_hits==1 && failed.fail_construction>0 && failed.constructions==failed.fail_construction,"with semantic allocation fault target not reached exactly once");
+             require(raised && failed.retained && failed.frames.empty() && failed.roots_valid && failed.commits_valid,"with allocation failure/root publication");
+-            {Runtime::Attachment attachment(*runtime);Runtime::Managed managed(*runtime);std::int32_t total;std::memcpy(&total,failed.retained->get(),sizeof(total));require(total==(construction==5?0:1),"with lost an acquired resource during allocation failure");}failed.retained.reset();empty(*runtime);
++            {Runtime::Attachment attachment(*runtime);Runtime::Managed managed(*runtime);std::int32_t total;std::memcpy(&total,failed.retained->get(),sizeof(total));require(total==(inside?1:0),"with lost an acquired resource during allocation failure");}
++            std::cout<<(optimized?"O2":"normal")<<" with semantic fault="<<(inside?"first-body-allocation":"resource-acquisition")<<" observed ordinal="<<failed.fail_construction<<" passed\n";
++            failed.retained.reset();empty(*runtime);
+         }
+         if(std::string(name)=="combined"){require(code->invoke(-1)==-3,"combined propagation cleanup");empty(*runtime);}
+         if(std::string(name)=="propagation"){require(code->invoke(0)==-10,"Err bypassed defer");empty(*runtime);}
+diff --git a/tests/runtime/buffers.cpp b/tests/runtime/buffers.cpp
+index b98b7f34..a973befe 100644
+--- a/tests/runtime/buffers.cpp
++++ b/tests/runtime/buffers.cpp
+@@ -923,6 +923,56 @@ void output_alias_collection_order() {
+         check(!scratch.value,"empty-buffer alias fast path failed");
+     }
+ }
++// Registration proofs must not survive descriptor or frame lifetime changes.
++void registration_locations() {
++    Runtime r;Runtime::Attachment a(r);Runtime::Managed m(r);
++    auto empty=r.fixed_scalar_layout(ScalarEncoding::i32,0);
++    std::array<void*,8> homes{};std::array<std::size_t,9> offsets{56,0,40,16,48,8,32,24,56};
++    Runtime::Slot slot{homes.data(),sizeof(homes),offsets.data(),offsets.size()};
++    Runtime::Frame frame(r,&slot,1);
++    for(unsigned round=0;round<3;++round)for(auto& home:homes) {
++        auto token=r.root_word(&home);
++        check(r.fixed_scalar_layout(token,ScalarEncoding::i32,0)==empty,"checked root location lost registration");
++    }
++    auto token=r.root_word(&homes[7]);
++    auto original=slot;
++    --slot.count;reject([&]{r.fixed_scalar_layout(token,ScalarEncoding::i32,0);});slot=original;
++    slot.size-=sizeof(void*);reject([&]{r.fixed_scalar_layout(token,ScalarEncoding::i32,0);});reject([&]{r.root_word(&homes[7]);});slot=original;
++    auto other_offsets=offsets;slot.offsets=other_offsets.data();reject([&]{r.fixed_scalar_layout(token,ScalarEncoding::i32,0);});slot=original;
++    offsets[0]=0;reject([&]{r.fixed_scalar_layout(token,ScalarEncoding::i32,0);});offsets[0]=56;
++    std::atomic<bool> foreign_rejected=false;
++    std::thread worker([&]{Runtime::Attachment attached(r);Runtime::Managed managed(r);
++        try{r.fixed_scalar_layout(token,ScalarEncoding::i32,0);}catch(const std::invalid_argument&){foreign_rejected=true;}});
++    worker.join();check(foreign_rejected,"foreign thread accepted root proof");
++    alignas(Runtime::Frame) std::byte storage[sizeof(Runtime::Frame)];
++    auto* first=new(storage) Runtime::Frame(r,&slot,1);auto expired=r.root_word(&homes[7]);first->~Frame();
++    auto* second=new(storage) Runtime::Frame(r,&slot,1);
++    reject([&]{r.fixed_scalar_layout(expired,ScalarEncoding::i32,0);});
++    check(r.fixed_scalar_layout(token,ScalarEncoding::i32,0)==empty,"overlap invalidated older frame");
++    auto current=r.root_word(&homes[7]);check(r.fixed_scalar_layout(current,ScalarEncoding::i32,0)==empty,"reused frame rejected new proof");second->~Frame();
++    reject([&]{r.fixed_scalar_layout(current,ScalarEncoding::i32,0);});
++    fail_after=0;try{for(auto& home:homes)(void)r.root_word(&home);}catch(...){fail_after=-1;throw;}fail_after=-1;
++    check(r.collect()==Runtime::Collection::completed,"checked registration broke collection");
++}
++void canonical_collection_metadata() {
++    Runtime r;Runtime::Attachment a(r);Runtime::Managed m(r);
++    for(unsigned n=0;n<=10;++n) {
++        auto encoding=static_cast<ScalarEncoding>(n);auto empty=r.fixed_scalar_layout(encoding,0);
++        check(r.fixed_scalar_layout(encoding,0)==empty,"zero scalar metadata not reused");
++        NativeArrayField field{"",0,0,n,0};auto key=empty->schema()->identity();NativeArrayElement native{key.c_str(),empty->schema()->bytes(),empty->alignment(),1,&field};
++        check(r.native_array_layout(native,0)==empty,"native zero scalar metadata not canonical");
++        auto nonempty=r.fixed_scalar_layout(encoding,2);check(nonempty!=empty && nonempty->capacity()==2,"capacity metadata aliased");
++        native.bytes+=1;reject([&]{r.native_array_layout(native,0);});native.bytes-=1;
++    }
++    ElementSchemaRef fresh;
++    {Runtime::Native native(r);fresh=admit(r,spec("cache-insertion-fallback",{SchemaScalar{ScalarEncoding::u8}}));}
++    // Layout allocation and its shared owner succeed; optional map insertion fails.
++    fail_after=2;BufferLayoutRef uncached;try{uncached=r.buffer_layout(fresh,0);}catch(...){fail_after=-1;throw;}fail_after=-1;
++    check(uncached && uncached->schema()==fresh,"optional cache failure escaped");
++    auto cached=r.buffer_layout(fresh,0);check(cached==r.buffer_layout(fresh,0),"cache retry failed");
++    {Runtime::Native native(r);auto repeated=spec("cache-insertion-fallback",{SchemaScalar{ScalarEncoding::u8}});r.admit_buffer_schemas({&repeated,1});}
++    check(r.buffer_layout(fresh,0)==cached,"compatible admission invalidated canonical metadata");
++}
+ void source_layout_reuse() {
+     Runtime r(1);Runtime::Attachment a(r);Runtime::Managed m(r);Output source(r),out(r);
+     auto layout=r.fixed_scalar_layout(ScalarEncoding::i32,3);
+@@ -1255,7 +1305,7 @@ void measure() {
+ int main(int argc,char** argv) {
+     try {
+         if(argc>1) {if(std::string_view(argv[1])=="--measure")measure();else if(std::string_view(argv[1])=="--measure-reference")measure_references();else if(std::string_view(argv[1])=="reference-leak-bytes")checked_reference_transaction(-1,true,37);else if(std::string_view(argv[1])=="reference-leak-zero")checked_reference_transaction(-1,true,0);else fatal(argv[1]);}
+-        else {layouts();byte_oracles();scalar_and_deep_oracles();empty_aligned_and_negatives();failures();native_and_chunk_collections();reference_buffers();object_table_lifetime();reference_failures();buffer_copy_bytes();check(!stats[3].live && !stats[3].live_calls,"byte copy native allocations outlived Runtime");nested_copy_and_collections();copy_negatives();copy_compactness();copy_failures();foundation_acceptance_stress();output_alias_bounds();output_alias_collection_order();source_layout_reuse();fixed_values();fixed_poll_and_roots();fixed_failures();fixed_private_bridge();reference_poll_reacquisition();
++        else {layouts();byte_oracles();scalar_and_deep_oracles();empty_aligned_and_negatives();failures();native_and_chunk_collections();reference_buffers();object_table_lifetime();reference_failures();buffer_copy_bytes();check(!stats[3].live && !stats[3].live_calls,"byte copy native allocations outlived Runtime");nested_copy_and_collections();copy_negatives();copy_compactness();copy_failures();foundation_acceptance_stress();output_alias_bounds();output_alias_collection_order();registration_locations();canonical_collection_metadata();source_layout_reuse();fixed_values();fixed_poll_and_roots();fixed_failures();fixed_private_bridge();reference_poll_reacquisition();
+ #ifdef VD_BUFFER_WRAP_COLLECT
+             reference_poll_reacquisition(true);
+ #endif
+diff --git a/tests/runtime/root_lookup_measure.cpp b/tests/runtime/root_lookup_measure.cpp
+index 8608c6c4..659b8cb3 100644
+--- a/tests/runtime/root_lookup_measure.cpp
++++ b/tests/runtime/root_lookup_measure.cpp
+@@ -5,6 +5,10 @@
+ #include <array>
+ #include <chrono>
+ #include <cstdlib>
++#include <ctime>
++#if defined(__unix__)
++#include <sys/resource.h>
++#endif
+ #include <iostream>
+ #include <iomanip>
+ #include <new>
+@@ -18,7 +22,8 @@ std::uint64_t checksum=0;
+ template<class F> void measure(const char* name,unsigned size,unsigned iterations,F work) {
+     for(unsigned i=0;i<100;++i)checksum+=work();
+     std::array<double,5> samples;
+-    for(auto& ns:samples){auto start=std::chrono::steady_clock::now();for(unsigned i=0;i<iterations;++i)checksum+=work();auto end=std::chrono::steady_clock::now();ns=std::chrono::duration<double,std::nano>(end-start).count()/iterations;}
++    unsigned sample=0;
++    for(auto& ns:samples){auto cpu=std::clock();auto start=std::chrono::steady_clock::now();for(unsigned i=0;i<iterations;++i)checksum+=work();auto end=std::chrono::steady_clock::now();ns=std::chrono::duration<double,std::nano>(end-start).count()/iterations;std::cerr<<"SAMPLE,"<<name<<','<<size<<','<<sample++<<','<<ns<<','<<1e9*double(std::clock()-cpu)/CLOCKS_PER_SEC/iterations<<'\n';}
+     allocations=bytes=0;counting=true;for(unsigned i=0;i<100;++i)checksum+=work();counting=false;
+     std::sort(samples.begin(),samples.end());
+     std::cout<<name<<','<<size<<','<<iterations<<','<<samples[2]<<','<<samples.front()<<','<<samples.back()<<','<<double(allocations)/100<<','<<double(bytes)/100<<'\n';
+@@ -34,6 +39,10 @@ void* operator new(std::size_t n,std::align_val_t a){account(n);void* p=nullptr;
+ void operator delete(void* p,std::align_val_t) noexcept {std::free(p);}
+ void operator delete(void* p,std::size_t,std::align_val_t) noexcept {std::free(p);}
+ int main(){
++#if defined(__unix__)
++    rlimit limits{};if(getrlimit(RLIMIT_STACK,&limits))std::abort();std::cerr<<"STACK_BYTES,"<<limits.rlim_cur<<','<<limits.rlim_max<<'\n';
++#endif
++    std::cerr<<"FRAME_BYTES,"<<sizeof(Runtime::Frame)<<",TOKEN_BYTES,"<<sizeof(Runtime::RegisteredRootWord)<<'\n';
+     std::cout<<std::setprecision(12)<<"case,size,iterations,median_ns,min_ns,max_ns,allocations_per_op,requested_bytes_per_op\n";
+     constexpr std::size_t zero=0;constexpr BufferWorkQuota quota{16384,256,4096};
+     for(unsigned count:{8u,128u,1024u}){
+@@ -44,8 +53,30 @@ int main(){
+         Runtime::Frame f(r,slots.data(),count);
+         measure("root_word_last",count,20000,[&]{auto token=r.root_word(&homes.back());(void)token;return 1u;});
+     }
++    for(bool packed:{false,true})for(unsigned count:{8u,128u,1024u,16384u}) {
++        Runtime r;Runtime::Attachment a(r);Runtime::Managed m(r);
++        std::vector<void*> homes(count);std::vector<Runtime::Slot> slots(count);std::vector<std::size_t> offsets(count);
++        for(unsigned i=0;i<count;++i){slots[i]={&homes[i],sizeof(void*),&zero,1};offsets[i]=i*sizeof(void*);}
++        Runtime::Slot group{homes.data(),homes.size()*sizeof(void*),offsets.data(),offsets.size()};
++        Runtime::Frame frame(r,packed?&group:slots.data(),packed?1:count);
++        for(unsigned pattern=0;pattern<4;++pattern){unsigned state=7;
++            auto name=std::string(packed?"packed_":"slots_")+std::array{"first","last","random","hot4"}[pattern];
++            measure(name.c_str(),count,5000,[&]{state=state*1664525+1013904223;auto i=pattern==0?0:pattern==1?count-1:pattern==2?state%count:count-1-(state%4);auto token=r.root_word(&homes[i]);(void)token;return 1u;});
++        }
++        auto layout=r.fixed_scalar_layout(ScalarEncoding::i32,0);auto token=r.root_word(&homes.back());
++        measure(packed?"packed_reused_token":"slots_reused_token",count,5000,[&]{return r.fixed_scalar_layout(token,ScalarEncoding::i32,0)->capacity()+1;});
++        measure(packed?"packed_temporary_frame":"slots_temporary_frame",count,5000,[&]{void* temporary=nullptr;Runtime::Slot s{&temporary,sizeof(void*),&zero,1};Runtime::Frame nested(r,&s,1);auto t=r.root_word(&homes.back());(void)t;return 1u;});
++    }
++    {
++        Runtime r;Runtime::Attachment a(r);Runtime::Managed m(r);
++        std::array<void*,64> homes{};std::array<Runtime::Slot,64> slots;std::array<std::optional<Runtime::Frame>,64> frames;
++        for(unsigned i=0;i<64;++i){slots[i]={&homes[i],sizeof(void*),&zero,1};frames[i].emplace(r,&slots[i],1);}
++        measure("deep64_outer",64,5000,[&]{auto t=r.root_word(&homes[0]);(void)t;return 1u;});
++        for(unsigned i=64;i--;)frames[i].reset();
++    }
+     {
+         Runtime r;Runtime::Attachment a(r);Runtime::Managed m(r);auto l=r.fixed_scalar_layout(ScalarEncoding::i32,16);
++        measure("scalar_layout_zero",0,50000,[&]{return r.fixed_scalar_layout(ScalarEncoding::i32,0)->capacity()+1;});
+         measure("scalar_layout",16,50000,[&]{return r.fixed_scalar_layout(ScalarEncoding::i32,16)->capacity();});
+     }
+     for(unsigned count:{1u,128u,1024u}){
+diff --git a/tests/text_encoding/performance.cpp b/tests/text_encoding/performance.cpp
+index 4f9a8279..b89cec08 100644
+--- a/tests/text_encoding/performance.cpp
++++ b/tests/text_encoding/performance.cpp
+@@ -3,6 +3,7 @@
+ 
+ #include <algorithm>
+ #include <chrono>
++#include <ctime>
+ #include <iostream>
+ #include <stdexcept>
+ #include <vector>
+@@ -23,12 +24,14 @@ int main(int argc, char** argv) {
+             for (int count : {256, 1024, 4096, 16384}) {
+                 std::vector<double> samples;
+                 for (unsigned repetition = 0; repetition < 3; ++repetition) {
++                    const auto cpu = std::clock();
+                     const auto start = std::chrono::steady_clock::now();
+                     if (code->invoke(count) != 1) {
+                         throw std::runtime_error("benchmark correctness invariant failed");
+                     }
+                     samples.push_back(std::chrono::duration<double, std::milli>(
+                         std::chrono::steady_clock::now() - start).count());
++                    std::cerr << "RAW," << optimized << ',' << count*4 << ',' << repetition << ',' << samples.back() << ',' << 1000.0*(std::clock()-cpu)/CLOCKS_PER_SEC << '\n';
+                 }
+                 std::sort(samples.begin(), samples.end());
+                 std::cout << (optimized ? "O2" : "normal") << ',' << count * 4 << ','
+diff --git a/tests/tooling/tests.cpp b/tests/tooling/tests.cpp
+index 2f935bbe..213c56fe 100644
+--- a/tests/tooling/tests.cpp
++++ b/tests/tooling/tests.cpp
+@@ -24,6 +24,20 @@ std::size_t at(const vd::ValidatedAnalysis& a,const std::string& module,const st
+ }
+ void queries(const fs::path& root) {
+     project(root); auto a=analyze(root); vd::ToolingIndex index(a);
++    auto declarations=index.declarations();auto references=index.references();
++    check(declarations.size()==a->declarations().size()+a->editor_declarations().size(),"declaration view population");
++    check(references.size()==a->references().size()+a->editor_references().size(),"reference view population");
++    auto verify_cursor=[](const auto& view){
++        std::size_t n=0;for(const auto& record:view){check(n<view.size() && &record==&view[n],"record cursor changed concatenation order");++n;}
++        check(n==view.size() && static_cast<std::size_t>(std::distance(view.begin(),view.end()))==view.size(),"record cursor crossed its end");
++    };
++    verify_cursor(declarations);verify_cursor(references);
++    auto blank=vd::analyze_source({"blank.void",""});check(blank.succeeded(),"empty tooling analysis");
++    vd::ToolingIndex blank_index(blank.program);verify_cursor(blank_index.declarations());verify_cursor(blank_index.references());
++
++    for(std::size_t n=0;n<declarations.size();++n)check(&declarations[n]==(n<a->declarations().size()?&a->declarations()[n]:&a->editor_declarations()[n-a->declarations().size()]),"declaration record copied or reordered");
++    for(std::size_t n=0;n<references.size();++n)check(&references[n]==(n<a->references().size()?&a->references()[n]:&a->editor_references()[n-a->references().size()]),"reference record copied or reordered");
++
+     auto d=index.declaration("/leaf.void::calculate");
+     check(d && d->module=="/leaf.void" && d->visibility=="internal" && d->parameters==std::vector<vd::ir::Type>{vd::ir::Type::i32} && d->type==vd::ir::Type::i32,"signature/visibility");
+     auto refs=index.references_to(d->identity); check(refs.size()==2,"multiple modules/callers");
+@@ -71,6 +85,20 @@ void queries(const fs::path& root) {
+     try { vd::ToolingIndex invalid(nullptr); throw std::logic_error("failed analysis indexed"); } catch(const std::invalid_argument&) {}
+     std::cout<<"queries: aliased/direct definitions, 2 callers, root/local constants, byte spans and retained snapshots\n";
+ }
++void borrowed_lifetimes() {
++    std::weak_ptr<const vd::ValidatedAnalysis> weak;
++    std::optional<vd::AnalyzedDeclaration> owned;
++    {
++        auto view=[&]{auto a=vd::analyze_source({"view.void","func entry(x: i32) -> i32:\n    return x\n"});
++            check(a.succeeded(),"borrowed view fixture");weak=a.program;vd::ToolingIndex index(a.program);
++            owned=index.declaration("view.void::entry");return index.declarations();}();
++        check(!weak.expired() && !view.empty(),"view lost analysis owner");
++        auto iterator=[&]{vd::ToolingIndex temporary(weak.lock());return temporary.declarations().begin();}();
++        check(iterator->identity==view[0].identity,"iterator lost temporary view owner");
++    }
++    check(weak.expired(),"index view leaked analysis");
++    check(owned && owned->source.source && owned->source.source->text().find("return x")!=std::string::npos,"outward result borrowed dead source");
++}
+ void planning(const fs::path& root) {
+     project(root); auto a=analyze(root);
+     auto old=vd::plan_invalidation(*a,{"/leaf.void","/leaf.void"});
+@@ -346,4 +374,4 @@ void documentation_tests(const fs::path& root) {
+ }
+ 
+ }
+-void tooling_tests(const fs::path& output) { documentation_tests(output/"documentation"); discovery(output/"discovery"); queries(output/"queries"); planning(output/"planning"); cycles(output/"cycles"); containment(output/"containment"); editor_metadata(output/"editor"); }
++void tooling_tests(const fs::path& output) { borrowed_lifetimes(); documentation_tests(output/"documentation"); discovery(output/"discovery"); queries(output/"queries"); planning(output/"planning"); cycles(output/"cycles"); containment(output/"containment"); editor_metadata(output/"editor"); }

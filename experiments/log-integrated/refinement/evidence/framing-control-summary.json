@@ -1,0 +1,198 @@
+{
+  "1": {
+    "v1": {
+      "wall_ms": 5.0132065,
+      "cpu_ms": 4.9605,
+      "max_wall_ms": 5.504378
+    },
+    "candidate": {
+      "wall_ms": 4.833848,
+      "cpu_ms": 4.8015,
+      "max_wall_ms": 5.20357
+    },
+    "change_percent": {
+      "wall_ms": -3.577720167720999,
+      "cpu_ms": -3.205322044148773
+    },
+    "pairs": [
+      {
+        "v1": 5.074231,
+        "candidate": 4.842953,
+        "change_percent": -4.557892614664183
+      },
+      {
+        "v1": 4.952182,
+        "candidate": 4.824743,
+        "change_percent": -2.5733908810298134
+      }
+    ]
+  },
+  "4": {
+    "v1": {
+      "wall_ms": 7.787781000000001,
+      "cpu_ms": 7.7475,
+      "max_wall_ms": 8.588121
+    },
+    "candidate": {
+      "wall_ms": 7.9582195,
+      "cpu_ms": 7.8865,
+      "max_wall_ms": 8.465092
+    },
+    "change_percent": {
+      "wall_ms": 2.188537402374302,
+      "cpu_ms": 1.7941271377863943
+    },
+    "pairs": [
+      {
+        "v1": 7.869926,
+        "candidate": 7.598306,
+        "change_percent": -3.4513666329264114
+      },
+      {
+        "v1": 7.701126,
+        "candidate": 8.068314,
+        "change_percent": 4.767978085282598
+      }
+    ]
+  },
+  "7": {
+    "v1": {
+      "wall_ms": 5.216590500000001,
+      "cpu_ms": 5.1915,
+      "max_wall_ms": 6.231524
+    },
+    "candidate": {
+      "wall_ms": 5.185096,
+      "cpu_ms": 5.154,
+      "max_wall_ms": 5.566058
+    },
+    "change_percent": {
+      "wall_ms": -0.603737249454428,
+      "cpu_ms": -0.7223345853799357
+    },
+    "pairs": [
+      {
+        "v1": 5.28376,
+        "candidate": 5.192601,
+        "change_percent": -1.7252676124578037
+      },
+      {
+        "v1": 5.12919,
+        "candidate": 5.110731,
+        "change_percent": -0.3598813847800475
+      }
+    ]
+  },
+  "2": {
+    "v1": {
+      "wall_ms": 2.739094,
+      "cpu_ms": 2.7035,
+      "max_wall_ms": 2.805364
+    },
+    "candidate": {
+      "wall_ms": 2.5811205,
+      "cpu_ms": 2.568,
+      "max_wall_ms": 2.785444
+    },
+    "change_percent": {
+      "wall_ms": -5.767363223021926,
+      "cpu_ms": -5.012021453671167
+    },
+    "pairs": [
+      {
+        "v1": 2.740934,
+        "candidate": 2.496525,
+        "change_percent": -8.916996906893782
+      },
+      {
+        "v1": 2.737254,
+        "candidate": 2.747214,
+        "change_percent": 0.363868314741711
+      }
+    ]
+  },
+  "5": {
+    "v1": {
+      "wall_ms": 1.993449,
+      "cpu_ms": 1.9845,
+      "max_wall_ms": 2.081198
+    },
+    "candidate": {
+      "wall_ms": 2.030418,
+      "cpu_ms": 2.0214999999999996,
+      "max_wall_ms": 2.208107
+    },
+    "change_percent": {
+      "wall_ms": 1.8545244949833117,
+      "cpu_ms": 1.8644494834970882
+    },
+    "pairs": [
+      {
+        "v1": 1.992319,
+        "candidate": 2.069368,
+        "change_percent": 3.8673023747703095
+      },
+      {
+        "v1": 1.994579,
+        "candidate": 1.985829,
+        "change_percent": -0.4386890667153365
+      }
+    ]
+  },
+  "8": {
+    "v1": {
+      "wall_ms": 3.185677,
+      "cpu_ms": 3.1689999999999996,
+      "max_wall_ms": 3.41022
+    },
+    "candidate": {
+      "wall_ms": 3.172757,
+      "cpu_ms": 3.141,
+      "max_wall_ms": 3.308861
+    },
+    "change_percent": {
+      "wall_ms": -0.40556528486724863,
+      "cpu_ms": -0.8835594824865733
+    },
+    "pairs": [
+      {
+        "v1": 3.197732,
+        "candidate": 3.203671,
+        "change_percent": 0.18572538286512064
+      },
+      {
+        "v1": 3.173622,
+        "candidate": 3.146782,
+        "change_percent": -0.8457213871091107
+      }
+    ]
+  },
+  "9": {
+    "v1": {
+      "wall_ms": 3.6939085,
+      "cpu_ms": 3.6775,
+      "max_wall_ms": 4.130507
+    },
+    "candidate": {
+      "wall_ms": 3.7788135,
+      "cpu_ms": 3.7595,
+      "max_wall_ms": 3.928958
+    },
+    "change_percent": {
+      "wall_ms": 2.2985138911805647,
+      "cpu_ms": 2.229775662814415
+    },
+    "pairs": [
+      {
+        "v1": 3.921498,
+        "candidate": 3.882768,
+        "change_percent": -0.9876327872665014
+      },
+      {
+        "v1": 3.655899,
+        "candidate": 3.687419,
+        "change_percent": 0.8621682382363494
+      }
+    ]
+  }
+}

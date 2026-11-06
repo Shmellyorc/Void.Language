@@ -82,7 +82,15 @@ std::optional<DataCursor::Event> DataCursor::next(std::size_t& work) {
 }
 BufferLayoutRef Runtime::buffer_layout(ElementSchemaRef schema,std::uint64_t capacity,std::size_t base,std::size_t stride) const {
     reference_shape(schema); // Exact catalog pointer membership, not just equal keys.
-    return BufferLayoutRef(new BufferLayout(std::move(schema),capacity,base,stride));
+    if(capacity || base || stride)return BufferLayoutRef(new BufferLayout(std::move(schema),capacity,base,stride));
+    std::lock_guard lock(mutex_);
+    auto found=collection_metadata_.find(schema.get());
+    if(found!=collection_metadata_.end())return found->second.empty;
+    BufferLayoutRef layout(new BufferLayout(schema,0,0,0));
+    // Optional indexing must not turn successful layout construction into a
+    // failed operation. Insertion is the only allocation permitted to fail here.
+    try {collection_metadata_.emplace(schema.get(),CollectionMetadata{layout,{}});}catch(const std::bad_alloc&) {}
+    return layout;
 }
 void Runtime::validate_buffer_layout(const BufferLayoutRef& layout) const {
     if(!layout || !types_) throw std::invalid_argument("missing buffer layout");
@@ -102,8 +110,11 @@ Runtime::PrivateRoot::~PrivateRoot() noexcept {
 }
 Runtime::Frame* Runtime::require_buffer_output(void** output) const {
     auto* frame=require_output(output);
-    for(auto* root=thread().private_roots;root;root=root->previous_) if(output==&root->value_) throw std::invalid_argument("publication into private builder root");
+    require_public_root(output);
     return frame;
+}
+void Runtime::require_public_root(void** output) const {
+    for(auto* root=thread().private_roots;root;root=root->previous_) if(output==&root->value_) throw std::invalid_argument("publication into private builder root");
 }
 Runtime::BufferBuilder::BufferBuilder(Runtime& r,BufferLayoutRef layout,std::uint64_t live,BufferWorkQuota quota)
     :runtime_(r),layout_(std::move(layout)),quota_(quota),root_(r),owner_(std::this_thread::get_id()),requested_(live) {
@@ -173,6 +184,23 @@ void Runtime::BufferBuilder::write_scalar(std::uint64_t bits) {
         normalize();
     } catch(...) {failed_=true;throw;}
 }
+void Runtime::BufferBuilder::write_string(RegisteredRootWord source) {
+    try {
+        require_active();
+        if(!cursor_.dense_u8() || layout_->stride()!=1 || in_element_)throw std::invalid_argument("string append requires dense byte builder");
+        std::size_t size;
+        {std::lock_guard lock(runtime_.mutex_);size=runtime_.heap_.string_bytes(runtime_.reference_source(source)).size();}
+        if(size>requested_-prefix_)throw std::out_of_range("string append beyond requested prefix");
+        for(std::size_t offset=0;offset<size;) {
+            auto count=std::min(size-offset,quota_.bytes);runtime_.poll();
+            {std::lock_guard lock(runtime_.mutex_);validate_private();
+                auto bytes=runtime_.heap_.string_bytes(runtime_.reference_source(source));
+                if(bytes.size()!=size)throw std::logic_error("immutable string extent changed");
+                std::memcpy(static_cast<char*>(root_.value_)+layout_->element_offset(prefix_),bytes.data()+offset,count);prefix_+=count;offset+=count;}
+        }
+        event_.reset();consumed_=0;cursor_.reset();
+    }catch(...){failed_=true;throw;}
+}
 void Runtime::BufferBuilder::write_bytes(std::span<const std::byte> input) {
     try {
         require_active();
@@ -200,18 +228,19 @@ void Runtime::BufferBuilder::write_bytes(std::span<const std::byte> input) {
 }
 Runtime::RegisteredRootWord Runtime::root_word(void** slot) const {
     require_managed();std::lock_guard lock(mutex_);
-    return RegisteredRootWord(this,require_buffer_output(slot),slot);
+    auto location=locate_root(slot);require_public_root(slot);
+    return RegisteredRootWord(this,location,slot);
 }
 void* Runtime::reference_source(const RegisteredRootWord& token) const {
     require_managed();
     if(token.runtime_!=this || token.owner_!=std::this_thread::get_id()) throw std::invalid_argument("foreign reference root token");
     bool linked=false;for(auto* f=thread().frames;f;f=f->previous_) if(f==token.frame_) {linked=true;break;}
-    if(!linked) throw std::invalid_argument("expired reference root token");
-    require_buffer_output(token.slot_);
-    bool exact=false;
-    for(std::size_t i=0;i<token.frame_->count_ && !exact;++i)for(std::size_t j=0;j<token.frame_->slots_[i].count && !exact;++j)
-        if(static_cast<const char*>(token.frame_->slots_[i].storage)+token.frame_->slots_[i].offsets[j]==reinterpret_cast<const char*>(token.slot_))exact=true;
-    if(!exact)throw std::invalid_argument("reference source registration changed");
+    if(!linked || token.frame_->identity_!=token.identity_) throw std::invalid_argument("expired reference root token");
+    require_public_root(token.slot_);
+    if(!registered_at(*token.frame_,token.slot_index_,token.offset_index_,token.slot_))throw std::invalid_argument("reference source registration changed");
+    const auto& current=token.frame_->slots_[token.slot_index_];const auto& original=token.descriptor_;
+    if(current.storage!=original.storage || current.size!=original.size || current.offsets!=original.offsets || current.count!=original.count)
+        throw std::invalid_argument("reference source registration changed");
     void* value=nullptr;std::memcpy(&value,token.slot_,sizeof(value));
     if(value && !heap_.contains(value)) throw std::invalid_argument("untracked or private reference source");
     return value;
@@ -360,16 +389,24 @@ void Runtime::validate_fixed_layout(const BufferLayoutRef& layout) const {
        (schema.bytes() || schema.has_references() || !schema.zero_data_complete()))
         throw std::invalid_argument("fixed runtime proof requires scalar or zero-footprint element");
 }
-ElementSchemaRef Runtime::fixed_scalar_schema(ScalarEncoding encoding) {
-    require_managed();
+std::string_view Runtime::scalar_identity(ScalarEncoding encoding) {
+    static constexpr std::string_view keys[]={
+        "void.fixed.scalar.v1/0","void.fixed.scalar.v1/1","void.fixed.scalar.v1/2",
+        "void.fixed.scalar.v1/3","void.fixed.scalar.v1/4","void.fixed.scalar.v1/5",
+        "void.fixed.scalar.v1/6","void.fixed.scalar.v1/7","void.fixed.scalar.v1/8",
+        "void.fixed.scalar.v1/9","void.fixed.scalar.v1/10"};
     if(static_cast<unsigned>(encoding)>static_cast<unsigned>(ScalarEncoding::boolean))
         throw std::invalid_argument("invalid fixed scalar encoding");
-    const auto key="void.fixed.scalar.v1/"+std::to_string(static_cast<unsigned>(encoding));
+    return keys[static_cast<unsigned>(encoding)];
+}
+ElementSchemaRef Runtime::fixed_scalar_schema(ScalarEncoding encoding) {
+    require_managed();
+    const auto key=scalar_identity(encoding);
     ElementSchemaRef schema;
     {std::lock_guard lock(mutex_);if(types_) {auto i=types_->schemas.find(key);if(i!=types_->schemas.end()) schema=i->second;}}
     if(!schema) {
         Native native(*this);
-        ElementSchemaSpec spec{key,"mutable",key,StorageDomain::native(),0,{SchemaScalar{encoding}}};
+        ElementSchemaSpec spec{std::string(key),"mutable",std::string(key),StorageDomain::native(),0,{SchemaScalar{encoding}}};
         admit_buffer_schemas({&spec,1});schema=buffer_schema(key);
     }
     return schema;

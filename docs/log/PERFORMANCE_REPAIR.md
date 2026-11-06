@@ -1,5 +1,16 @@
 # Logging performance repair
 
+## Current integrated qualification — 5 November 2026
+
+The dated investigation below is historical, including its original stop and
+release-HOLD interpretation. The current refined logging/internal implementation
+is already integrated; [consolidated local qualification](../compiler-health/INTEGRATED_PERFORMANCE_QUALIFICATION.md)
+is the active handoff. Boss clarifies that FILE200 <10 ms is an optimization aim,
+not a mandatory release requirement; it is not claimed passed. Historical crash
+records remain unresolved in their own scope and are not reclassified by passing
+current-toolchain controls. No further crash campaign or optimization redesign
+is part of this qualification.
+
 ## Architecture approved; implementation blocked by reproduced crash
 
 Boss approved `text.translate_scalars` with mandatory refinements. That approval

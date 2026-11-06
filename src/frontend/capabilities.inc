@@ -306,7 +306,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 }
                 if (e.target.starts_with("$io.")) {
                     bool asynchronous = e.target.starts_with("$io.async.");
-                    auto operation = std::stoul(e.target.substr(asynchronous ? 10 : 9));
+                    auto operation = e.target=="$io.write.checked" ? static_cast<unsigned>(filesystem::Operation::write_bytes) : std::stoul(e.target.substr(asynchronous ? 10 : 9));
                     const auto& contract = filesystem::source_operations.at(operation);
                     for (unsigned n = 0; n < arguments.size(); ++n) {
                         if (contract.arguments[n] != 'F') continue;

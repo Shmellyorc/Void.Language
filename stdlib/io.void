@@ -576,12 +576,11 @@ async func (self file) read_line_async(max_bytes: i64 = 67108864) -> result<text
 ## @return Ok with bytes written, or Err with actual progress; earlier writes are not rolled back.
 func (self file) write_bytes(const bytes: [u8]) -> result<i64, error>:
     with _reserve(self, "write_bytes")? as lease:
-        var reply = _io_write_bytes(self, bytes)
-
-        if reply.kind != 0:
-            return Err(_error("write_bytes", self._path, "", reply))
-
-        return Ok(reply.completed)
+        match _io_write_bytes_checked(self, bytes):
+            Err(var reply):
+                return Err(_error("write_bytes", self._path, "", reply))
+            Ok(var completed):
+                return Ok(completed)
 
 
 ## Write owned input bytes at the shared cursor, looping over short native transfers.

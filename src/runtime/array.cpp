@@ -14,7 +14,10 @@ std::string Runtime::list_identity(const ElementSchemaRef& schema) {
     return schema->identity().starts_with(scalar) ? "void.list.v1/"+schema->identity().substr(scalar.size()) : "void.list.v2/"+schema->identity();
 }
 Runtime::ListHeader& Runtime::list_header(RegisteredRootWord source,const ElementSchemaRef& schema) const {
-    auto* object=reference_source(source);const auto key=list_identity(schema);
+    auto* object=reference_source(source);
+    return list_header(object,schema,list_identity(schema));
+}
+Runtime::ListHeader& Runtime::list_header(void* object,const ElementSchemaRef& schema,std::string_view key) const {
     if(!types_)throw std::invalid_argument("missing list catalog");
     auto admitted=types_->schemas.find(schema->identity());if(admitted==types_->schemas.end() || admitted->second!=schema)throw std::invalid_argument("foreign list schema");
     auto type=types_->types.find(key);
@@ -30,7 +33,7 @@ Runtime::ListHeader& Runtime::list_header(RegisteredRootWord source,const Elemen
 }
 BufferLayoutRef Runtime::native_array_layout(const NativeArrayElement& element,std::uint64_t capacity) {
     require_managed();if(!element.key || (element.count && !element.fields))throw std::invalid_argument("missing native element metadata");
-    if(element.count==1 && element.fields[0].offset==0 && element.fields[0].kind<=10 && std::string_view(element.key)=="void.fixed.scalar.v1/"+std::to_string(element.fields[0].kind)) {
+    if(element.count==1 && element.fields[0].offset==0 && element.fields[0].kind<=10 && std::string_view(element.key)==scalar_identity(static_cast<ScalarEncoding>(element.fields[0].kind))) {
         auto result=fixed_scalar_layout(static_cast<ScalarEncoding>(element.fields[0].kind),capacity);if(result->schema()->bytes()!=element.bytes || result->alignment()!=element.alignment)throw std::invalid_argument("invalid native scalar geometry");return result;
     }
     ElementSchemaRef schema;
@@ -82,7 +85,7 @@ void Runtime::array_new(void** out,const BufferLayoutRef& layout,bool list,bool 
         const auto key=list_identity(layout->schema());
         {std::lock_guard lock(mutex_);if(types_) {auto found=types_->types.find(key);if(found!=types_->types.end())type=found->second;}}
         if(!type) {Native native(*this);NominalDescriptor spec{key,"","array-list-v2",{sizeof(ListHeader),{offsetof(ListHeader,backing)}}};admit_types({&spec,1});type=descriptor(key);}
-        if(type->layout.size!=sizeof(ListHeader) || type->layout.references!=std::vector<std::size_t>{offsetof(ListHeader,backing)})throw std::invalid_argument("invalid list descriptor");
+        if(type->layout.size!=sizeof(ListHeader) || type->layout.references.size()!=1 || type->layout.references[0]!=offsetof(ListHeader,backing))throw std::invalid_argument("invalid list descriptor");
     }
     void* backing=nullptr;constexpr std::size_t zero=0;Slot slot{&backing,sizeof(backing),&zero,1};Frame roots(*this,&slot,1);
     auto live=zero_live ? layout->capacity() : 0;
@@ -313,6 +316,25 @@ void Runtime::string_index_into(void** out,void* source,ScalarEncoding encoding,
     // string_into stages the complete bytes before its first safepoint.
     string_into(out,text.substr(offset,utf8_scalar_bytes(text,offset)));
 }
+void Runtime::string_join_bytes_into(void** out,void*** parts,std::size_t count,bool& encoding) {
+    require_managed();(void)root_word(out);encoding=false;std::size_t total=0;
+    for(std::size_t i=0;i<count;++i){
+        if(!(i%64))poll();auto part=root_word(parts[i]);
+        std::lock_guard lock(mutex_);auto bytes=heap_.string_bytes(reference_source(part));
+        if(bytes.size()>std::string{}.max_size()-total)throw std::length_error("joined UTF-8 extent");total+=bytes.size();
+        (void)string_payload_size(total,0);
+    }
+    encoding=true;auto layout=fixed_scalar_layout(ScalarEncoding::u8,total);
+    void* backing=nullptr;void* result=nullptr;constexpr std::size_t zero=0;
+    Slot slots[]={{&backing,sizeof(backing),&zero,1},{&result,sizeof(result),&zero,1}};Frame roots(*this,slots,2);
+    if(total){BufferBuilder builder(*this,layout,total,quota);
+        for(std::size_t i=0;i<count;++i){if(!(i%64))poll();builder.write_string(root_word(parts[i]));}
+        builder.finish_into(&backing);
+    }
+    array_new(&result,fixed_scalar_layout(ScalarEncoding::u8,0),true);
+    auto root=root_word(&result);std::lock_guard lock(mutex_);require_buffer_output(out);heap_.validate_output_address(out);
+    auto& header=list_header(root,layout->schema());header.backing=backing;header.count=header.capacity=total;*out=result;
+}
 void Runtime::string_encode_into(void** out,void* source) {
     bytes_into(out,string_bytes(source));
 }
@@ -341,7 +363,15 @@ std::string Runtime::byte_array_bytes(RegisteredRootWord source) {
     {std::lock_guard lock(mutex_);const auto& header=list_header(source,schema);count=header.count;backing=header.backing;if(backing)layout=heap_.buffer_state(backing).layout;}
     std::string bytes;
     if(count){BufferReadLease lease(*this,root_word(&backing),layout);bytes.resize(count);
-        for(std::uint64_t i=0;i<count;++i)bytes[i]=static_cast<char>(buffer_byte(backing,layout,i,0));}
+        if(layout->schema()==schema && layout->stride()==1){
+            for(std::uint64_t offset=0;offset<count;){
+                auto size=static_cast<std::size_t>(std::min<std::uint64_t>(count-offset,quota.bytes));poll();
+                {std::lock_guard lock(mutex_);lease.validate();
+                    if(offset>lease.count_ || size>lease.count_-offset)throw std::out_of_range("byte snapshot live extent");
+                    std::memcpy(bytes.data()+offset,static_cast<const char*>(lease.value_)+layout->element_offset(offset),size);}
+                offset+=size;
+            }
+        }else for(std::uint64_t i=0;i<count;++i)bytes[i]=static_cast<char>(buffer_byte(backing,layout,i,0));}
     return bytes;
 }
 bool Runtime::string_decode_into(void** out,RegisteredRootWord source) {

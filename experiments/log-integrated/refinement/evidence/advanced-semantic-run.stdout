@@ -1,0 +1,12 @@
+normal captures allocation failures: 226
+normal with allocation failures: 210
+normal events allocation failures: 388
+normal fixed_capture allocation failures: 133
+normal with semantic fault=resource-acquisition observed ordinal=2 passed
+normal with semantic fault=first-body-allocation observed ordinal=3 passed
+O2 captures allocation failures: 226
+O2 with allocation failures: 210
+O2 events allocation failures: 388
+O2 fixed_capture allocation failures: 133
+O2 with semantic fault=resource-acquisition observed ordinal=2 passed
+O2 with semantic fault=first-body-allocation observed ordinal=3 passed

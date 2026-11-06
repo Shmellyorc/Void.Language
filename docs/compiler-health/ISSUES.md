@@ -1,5 +1,22 @@
 # Compiler-health issue inventory
 
+## Integrated performance status — 5 November 2026
+
+The [consolidated qualification](INTEGRATED_PERFORMANCE_QUALIFICATION.md) is the
+active local handoff for refined logging and the completed
+[internal repairs](INTERNAL_PERFORMANCE_REPAIR_RESULT.md). Checked root locations
+and lifetime tokens, Runtime-owned metadata reuse and analysis-backed LSP records
+are integrated. The regressing Frame cache is removed; automatic string/UTF-8
+fusion is disabled. No incremental checker or new scheduler was introduced.
+
+Editor/HTTP timing regressions and the historical baseline editor startup EOF
+require their recorded, bounded disposition; a passing run does not prove a
+causal repair. These are distinct from H1–H7 below. The old FILE200 10 ms aim is
+not a Boss-mandated release requirement. Native-platform/hosted acceptance of
+this combined patch is separate from local Linux qualification. Future
+[automatic SIMD](../DEVELOPMENT_STRATEGY.md#future-optimization-automatic-simd--boss-direction-5-november-2026)
+is documented only, pending selection after integration settles.
+
 **STATUS: COMPILER STABILIZATION COMPLETED / STANDARD-LIBRARY DEVELOPMENT HOLD LIFTED BY BOSS.**
 
 Boss authorized this change after local acceptance of the await/propagation

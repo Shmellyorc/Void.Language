@@ -1,0 +1,17 @@
+IR /@stdlib/io.void::file::method::read_bytes fused=0 local_cleanup=1 compact_write=0 constructs=0
+IR /@stdlib/io.void::file::method::read_exact fused=0 local_cleanup=1 compact_write=0 constructs=0
+IR /@stdlib/io.void::file::method::read_line fused=0 local_cleanup=1 compact_write=0 constructs=0
+IR /@stdlib/io.void::file::method::write_bytes fused=0 local_cleanup=1 compact_write=1 constructs=0
+IR /@stdlib/io.void::file::method::seek fused=0 local_cleanup=1 compact_write=0 constructs=0
+IR /@stdlib/io.void::file::method::position fused=0 local_cleanup=1 compact_write=0 constructs=0
+IR /@stdlib/io.void::file::method::length fused=0 local_cleanup=1 compact_write=0 constructs=0
+IR /@stdlib/io.void::file::method::set_length fused=0 local_cleanup=1 compact_write=0 constructs=0
+IR /@stdlib/io.void::file::method::flush fused=0 local_cleanup=1 compact_write=0 constructs=0
+IR /@stdlib/io.void::file::method::close fused=0 local_cleanup=1 compact_write=0 constructs=0
+IR /@stdlib/io.void::file::method::read_pascal_string fused=0 local_cleanup=1 compact_write=0 constructs=0
+FRAME ordinary_join=2 ordinary_encode=1 fused=0
+IR /@stdlib/log.void::logger::method::write fused=0 local_cleanup=1 compact_write=0 constructs=0
+IR /@stdlib/log.void::logger::method::close fused=0 local_cleanup=1 compact_write=0 constructs=0
+IR /@stdlib/log.void::logger::method::write_lazy fused=0 local_cleanup=1 compact_write=0 constructs=0
+IR /benchmark.void::enabled fused=0 local_cleanup=4 compact_write=0 constructs=0
+TOTAL fused=0 local_cleanup=18 compact_write=1 invalid_private_operations_rejected=3

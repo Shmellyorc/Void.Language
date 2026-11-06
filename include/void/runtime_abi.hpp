@@ -43,6 +43,7 @@ bool vd_scalar_display(void**,unsigned,std::uint64_t,void*,void*,bool,vd::Runtim
 bool vd_string_decode(void**,void**,vd::RuntimeFailure*) noexcept;
 bool vd_format_layout(void**,void*,unsigned,vd::RuntimeFailure*) noexcept;
 void vd_string_join(void**,void***,std::size_t,vd::RuntimeFailure*) noexcept;
+bool vd_string_join_encode(void**,void***,std::size_t,vd::RuntimeFailure*) noexcept;
 
 void vd_string_literal(void**, const char*, std::size_t, vd::RuntimeFailure*) noexcept;
 void vd_string_concat(void**, void*, void*, vd::RuntimeFailure*) noexcept;

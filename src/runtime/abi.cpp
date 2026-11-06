@@ -197,6 +197,15 @@ bool vd_format_layout(void** out,void* specification,unsigned part,vd::RuntimeFa
     catch(const std::length_error&){failure->message="Format layout extent is unrepresentable";}
     catch(...){std::terminate();}return false;
 }
+bool vd_string_join_encode(void** out,void*** parts,std::size_t count,vd::RuntimeFailure* failure) noexcept {
+    bool encoding=false;
+    try {vd::Runtime::current().string_join_bytes_into(out,parts,count,encoding);}
+    catch(const std::bad_alloc&){failure->message=encoding?"UTF-8 byte allocation failed":"Interpolation allocation failed";}
+    catch(const std::length_error&){failure->message=encoding?"UTF-8 byte conversion failed":"Interpolation extent is unrepresentable";}
+    catch(const std::exception&){failure->message=encoding?"UTF-8 byte conversion failed":"Invalid interpolation storage";}
+    catch(...){std::terminate();}
+    return encoding;
+}
 void vd_string_join(void** out,void*** roots,std::size_t count,vd::RuntimeFailure* failure) noexcept {
     try {auto& runtime=vd::Runtime::current();vd::formatting::Builder builder;
         for(std::size_t i=0;i<count;++i)builder.append(runtime.string_bytes(*roots[i]));

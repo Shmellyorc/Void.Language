@@ -1,0 +1,544 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="63"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="322"
+	timestamp="2026-11-05T22:16:16"
+	>
+	<testcase name="json_readonly" classname="json_readonly" time="2.67116" status="run">
+		<properties/>
+		<system-out>readonly Release: 47/47 checks passed
+</system-out>
+	</testcase>
+	<testcase name="json_dynamic" classname="json_dynamic" time="6.92028" status="run">
+		<properties/>
+		<system-out>grammar Release: 100 vectors in 4 execution modes passed
+</system-out>
+	</testcase>
+	<testcase name="json_numbers" classname="json_numbers" time="10.0023" status="run">
+		<properties/>
+		<system-out>numbers Release: 125 vectors in 4 execution modes passed
+</system-out>
+	</testcase>
+	<testcase name="json_schema" classname="json_schema" time="13.0702" status="run">
+		<properties/>
+		<system-out>schema Release: 14 error/order vectors in four modes and 21 admission/authority negatives passed
+</system-out>
+	</testcase>
+	<testcase name="json_bounds" classname="json_bounds" time="13.7493" status="run">
+		<properties/>
+		<system-out>bounds Release: 56 vectors in 4 execution modes passed
+</system-out>
+	</testcase>
+	<testcase name="json_adversarial" classname="json_adversarial" time="22.2967" status="run">
+		<properties/>
+		<system-out>JSON adversarial: 22 vectors in all four modes passed
+</system-out>
+	</testcase>
+	<testcase name="json_metering" classname="json_metering" time="12.006" status="run">
+		<properties/>
+		<system-out>Frozen JSON budget/order oracle: four modes passed
+</system-out>
+	</testcase>
+	<testcase name="json_execution_validated" classname="json_execution_validated" time="5.11006" status="run">
+		<properties/>
+		<system-out>execution Release: 6/6 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_execution_accessors" classname="json_execution_accessors" time="3.96103" status="run">
+		<properties/>
+		<system-out>execution Release: 6/6 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_execution_dynamic_smoke" classname="json_execution_dynamic_smoke" time="3.39902" status="run">
+		<properties/>
+		<system-out>execution Release: 6/6 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_execution_typed_smoke" classname="json_execution_typed_smoke" time="8.3664" status="run">
+		<properties/>
+		<system-out>execution Release: 6/6 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_execution_shapes" classname="json_execution_shapes" time="13.1973" status="run">
+		<properties/>
+		<system-out>execution Release: 6/6 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_execution_ownership" classname="json_execution_ownership" time="5.13385" status="run">
+		<properties/>
+		<system-out>execution Release: 6/6 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_execution_nested_inference" classname="json_execution_nested_inference" time="4.45611" status="run">
+		<properties/>
+		<system-out>execution Release: 6/6 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_host" classname="json_host" time="51.2923" status="run">
+		<properties/>
+		<system-out>JSON wide const GC O0: 131101178 root observations, 266 managed constructions, 119908 polls
+JSON forced GC O0: 11509238 root observations, 85 managed constructions, 11215 polls
+JSON allocation sweep O0: 2049 injected failures
+JSON wide const GC O2: 131101178 root observations, 266 managed constructions, 119908 polls
+JSON forced GC O2: 11509238 root observations, 85 managed constructions, 11215 polls
+JSON allocation sweep O2: 2049 injected failures
+JSON host: 12337 checks passed
+</system-out>
+	</testcase>
+	<testcase name="json_lsp" classname="json_lsp" time="0.803368" status="run">
+		<properties/>
+		<system-out>JSON LSP: 43 checks passed
+</system-out>
+	</testcase>
+	<testcase name="gc_buffers" classname="gc_buffers" time="0.832029" status="run">
+		<properties/>
+		<system-out>reference sweep before owner teardown: baseline=1 ordinal=-1 sites=11 failed=0 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=1 ordinal=-1 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=0 sites=0 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=0 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=1 sites=1 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=1 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=2 sites=2 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=2 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=3 sites=3 failed=1 released_source=0 native_cou...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="gc_schemas" classname="gc_schemas" time="0.0431763" status="run">
+		<properties/>
+		<system-out>schema admission requested bytes: one=1886, million=1917; cursor next allocations=0
+schema admission allocation-site rollback/retry: 40 sites
+compact GC schemas/shared cursor checks passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_coordination" classname="runtime_coordination" time="2.03351" status="run">
+		<properties/>
+		<system-out>NativeSafe rendezvous baseline (1000, one frozen object): mean 0.120049 us, max 1.25 us
+runtime coordinator: states, nested roots, timeout, competing collectors, NativeSafe and stress passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_generated" classname="runtime_generated" time="0.395191" status="run">
+		<properties/>
+		<system-out>numeric loop normal: 2000003 polls, 100 collections, 6 parks
+numeric loop O2: 2000003 polls, 100 collections, 6 parks
+shared IR JIT roots: normal/O2, nested aggregates, temporaries, parameters, returns, loops, failure cleanup passed
+</system-out>
+	</testcase>
+	<testcase name="fixed_arrays_source" classname="fixed_arrays_source" time="1.37132" status="run">
+		<properties/>
+		<system-out>source array normal: 158 failing allocation budgets, recovery and cleanup passed
+source array O2: 158 failing allocation budgets, recovery and cleanup passed
+Numeric fixed arrays: source execution, roots, publication and failure recovery passed
+</system-out>
+	</testcase>
+	<testcase name="growable_arrays_source" classname="growable_arrays_source" time="1.19761" status="run">
+		<properties/>
+		<system-out>list transaction 0: 13 failing allocation budgets passed
+list transaction 1: 0 failing allocation budgets passed
+list transaction 2: 0 failing allocation budgets passed
+list transaction 3: 8 failing allocation budgets passed
+cold list construction: 46 failing allocation budgets passed
+growable source normal: 19 failing allocation budgets, recovery and cleanup passed
+growable source O2: 19 failing allocation budgets, recovery and cleanup passed
+Growable lists: source, aliases, roots, transactions and failures passed
+</system-out>
+	</testcase>
+	<testcase name="dictionaries_source" classname="dictionaries_source" time="4.22824" status="run">
+		<properties/>
+		<system-out>native dictionary 0: 11 failures; rollback/version/collection passed
+native dictionary 1: 35 failures; rollback/version/collection passed
+native dictionary 2: 1 failures; rollback/version/collection passed
+native dictionary 3: 1 failures; rollback/version/collection passed
+native dictionary 4: 0 failures; rollback/version/collection passed
+native dictionary 5: 0 failures; rollback/version/collection passed
+native dictionary 6: 0 failures; rollback/version/collection passed
+main normal: 394 allocation failures; cleanup/retry passed
+transactions normal: 1419 allocation failures; cleanup/retry passed
+main O2: 394 allocation failures; cleanup/retry passed
+transactions O2: 1419 allocation failures; cleanup/retry passed
+Dictionaries: source/GC/order/readonly/rollback/reload passed
+</system-out>
+	</testcase>
+	<testcase name="advanced_source" classname="advanced_source" time="2.68931" status="run">
+		<properties/>
+		<system-out>normal captures allocation failures: 197
+normal with allocation failures: 196
+normal events allocation failures: 304
+normal fixed_capture allocation failures: 116
+normal with semantic fault=resource-acquisition observed ordinal=2 passed
+normal with semantic fault=first-body-allocation observed ordinal=3 passed
+O2 captures allocation failures: 197
+O2 with allocation failures: 196
+O2 events allocation failures: 304
+O2 fixed_capture allocation failures: 116
+O2 with semantic fault=resource-acquisition observed ordinal=2 passed
+O2 with semantic fault=first-body-allocation observed ordinal=3 passed
+</system-out>
+	</testcase>
+	<testcase name="strings_source" classname="strings_source" time="1.38041" status="run">
+		<properties/>
+		<system-out>Sprint 3 native conversion 0: 26 failures; output/root preservation passed
+Sprint 3 native conversion 1: 11 failures; output/root preservation passed
+Sprint 3 traversal scalars=64 count128_us=27 last_index32_us=31
+Sprint 3 traversal scalars=1024 count128_us=381 last_index32_us=221
+Sprint 3 traversal scalars=4096 count128_us=1590 last_index32_us=802
+Sprint 3 source normal: 69 allocation failures; roots/cleanup/retry/reload passed
+Sprint 3 source O2: 69 allocation failures; roots/cleanup/retry/reload passed
+UTF-8 string source, IR, roots, failures and reload passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_failures" classname="runtime_failures" time="0.0073173" status="run">
+		<properties/>
+		<system-out>deterministic allocation failures: enumeration, partial marking, rollback and recovery passed (7)
+</system-out>
+	</testcase>
+	<testcase name="runtime_aot_normal" classname="runtime_aot_normal" time="0.0357694" status="run">
+		<properties/>
+		<system-out>separately linked AOT precise roots and failure cleanup passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_aot_optimized" classname="runtime_aot_optimized" time="0.0322191" status="run">
+		<properties/>
+		<system-out>separately linked AOT precise roots and failure cleanup passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_invariants" classname="runtime_invariants" time="0.0370387" status="run">
+		<properties/>
+		<system-out>corrupt roots and frame order cannot resume managed execution
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage8" classname="lsp_stage8" time="0.323552" status="run">
+		<properties/>
+		<system-out>Debug cache: hit
+Debug cache: hit
+SKIP: Windows 8.3 coverage requires Windows
+POSIX workspace ancestor alias and descendant rejection checks passed
+Stage 8 compiler-backed LSP discovery/docs/readonly checks passed
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_text" classname="text_encoding_text" time="1.73011" status="run">
+		<properties/>
+		<system-out>PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc check /home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void 0.039s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void --no-opt 0.041s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void 0.040s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void -o /tmp/VOID text encoding execution tidbl_aj/text-aot/application --no-opt 0.704s
+PASS /tmp/VOID text encoding execution tidbl_aj/text-aot/application 0.006s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void -o /tmp/VOID text encoding execution tidbl_aj/text-aot-o2/application 0.847s
+PASS /tmp/VO...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_hex" classname="text_encoding_hex" time="0.651743" status="run">
+		<properties/>
+		<system-out>PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc check /home/shmellyorc/Documents/Void.Language/tests/text_encoding/hex.void 0.016s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/hex.void --no-opt 0.021s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/hex.void 0.019s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/hex.void -o /tmp/VOID text encoding execution h3bwjszy/hex-aot/application --no-opt 0.255s
+PASS /tmp/VOID text encoding execution h3bwjszy/hex-aot/application 0.006s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/hex.void -o /tmp/VOID text encoding execution h3bwjszy/hex-aot-o2/application 0.281s
+PASS /tmp/VOID text ...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_base64" classname="text_encoding_base64" time="1.03197" status="run">
+		<properties/>
+		<system-out>PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc check /home/shmellyorc/Documents/Void.Language/tests/text_encoding/base64.void 0.023s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/base64.void --no-opt 0.030s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/base64.void 0.039s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/base64.void -o /tmp/VOID text encoding execution a4_0gg2n/base64-aot/application --no-opt 0.433s
+PASS /tmp/VOID text encoding execution a4_0gg2n/base64-aot/application 0.006s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/base64.void -o /tmp/VOID text encoding execution a4_0gg2n/base64-aot-o2/application 0.4...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_ascii" classname="text_encoding_ascii" time="0.640629" status="run">
+		<properties/>
+		<system-out>PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc check /home/shmellyorc/Documents/Void.Language/tests/text_encoding/ascii.void 0.016s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/ascii.void --no-opt 0.020s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/ascii.void 0.020s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/ascii.void -o /tmp/VOID text encoding execution 4jr4q7rf/ascii-aot/application --no-opt 0.250s
+PASS /tmp/VOID text encoding execution 4jr4q7rf/ascii-aot/application 0.006s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/ascii.void -o /tmp/VOID text encoding execution 4jr4q7rf/ascii-aot-o2/application 0.277s
+PASS...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_oracles" classname="text_encoding_oracles" time="57.642" status="run">
+		<properties/>
+		<system-out>PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc check /home/shmellyorc/Documents/Void.Language/tests/text_encoding/oracles.void 0.354s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/oracles.void --no-opt 0.490s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/oracles.void 0.446s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/oracles.void -o /tmp/VOID text encoding execution tnosuy1s/oracles-aot/application --no-opt 23.618s
+PASS /tmp/VOID text encoding execution tnosuy1s/oracles-aot/application 0.051s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/oracles.void -o /tmp/VOID text encoding execution tnosuy1s/oracles-aot-o2/applic...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_interop" classname="text_encoding_interop" time="2.5142" status="run">
+		<properties/>
+		<system-out>PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc check /home/shmellyorc/Documents/Void.Language/tests/text_encoding/interop.void 0.137s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/interop.void --no-opt 0.147s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/interop.void 0.153s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/interop.void -o /tmp/VOID text encoding execution d6rjstcj/interop-aot/application --no-opt 0.960s
+PASS /tmp/VOID text encoding execution d6rjstcj/interop-aot/application 0.006s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/interop.void -o /tmp/VOID text encoding execution d6rjstcj/interop-aot-o2/applica...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_large" classname="text_encoding_large" time="13.0594" status="run">
+		<properties/>
+		<system-out>PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc check /home/shmellyorc/Documents/Void.Language/tests/text_encoding/large.void 0.041s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/large.void --no-opt 3.016s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/large.void 2.989s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/large.void -o /tmp/VOID text encoding execution l13qeto4/large-aot/application --no-opt 0.581s
+PASS /tmp/VOID text encoding execution l13qeto4/large-aot/application 2.887s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/large.void -o /tmp/VOID text encoding execution l13qeto4/large-aot-o2/application 0.671s
+PASS...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_errors" classname="text_encoding_errors" time="1.52103" status="run">
+		<properties/>
+		<system-out>PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc check /home/shmellyorc/Documents/Void.Language/tests/text_encoding/errors.void 0.044s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/errors.void --no-opt 0.053s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/errors.void 0.050s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/errors.void -o /tmp/VOID text encoding execution t6xglivd/errors-aot/application --no-opt 0.608s
+PASS /tmp/VOID text encoding execution t6xglivd/errors-aot/application 0.005s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/errors.void -o /tmp/VOID text encoding execution t6xglivd/errors-aot-o2/application 0.7...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="lsp_text_encoding" classname="lsp_text_encoding" time="0.580552" status="run">
+		<properties/>
+		<system-out>54 persistent LSP documentation/completion/recovery checks passed
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_stack" classname="text_encoding_stack" time="1.89846" status="run">
+		<properties/>
+		<system-out>PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc check /home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void 0.038s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void --no-opt 0.043s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void 0.044s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void -o /tmp/VOID text encoding execution w9xoagzm/text-aot/application --no-opt 0.790s
+PASS /tmp/VOID text encoding execution w9xoagzm/text-aot/application 0.009s
+PASS /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void -o /tmp/VOID text encoding execution w9xoagzm/text-aot-o2/application 0.918s
+PASS /tmp/VO...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_depth" classname="text_encoding_depth" time="0.133108" status="run">
+		<properties/>
+		<system-out>1 MiB call depth 32: accepted
+1 MiB call depth 64: checked rejection
+1 MiB call depth 124: checked rejection
+1 MiB call depth 400: checked rejection
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_semantic_depth" classname="text_encoding_semantic_depth" time="0.517075" status="run">
+		<properties/>
+		<system-out>Deep receiver chains: bounded stack, nesting location and later error verified
+Numeric receiver chains: legal depth and recovering rejection fit the unchanged 1 MiB budget
+String index chains: legal depth and recovering rejection fit the unchanged 1 MiB budget
+Recursive type grammar: shallow acceptance, bounded stack, nesting diagnostic and later recovery verified
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_ir" classname="text_encoding_ir" time="0.261814" status="run">
+		<properties/>
+		<system-out>16 independent private Unicode IR rejections passed
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_ownership" classname="text_encoding_ownership" time="2.50222" status="run">
+		<properties/>
+		<system-out>8 translation ABI allocation failures preserved aliased output
+normal scenario 0: 27 failed budgets recovered
+normal scenario 1: 14 failed budgets recovered
+normal scenario 2: 14 failed budgets recovered
+normal scenario 3: 27 failed budgets recovered
+normal scenario 4: 114 failed budgets recovered
+normal scenario 5: 90 failed budgets recovered
+normal scenario 6: 124 failed budgets recovered
+normal scenario 7: 81 failed budgets recovered
+normal scenario 8: 44 failed budgets recovered
+normal scenario 9: 125 failed budgets recovered
+normal scenario 10: 38 failed budgets recovered
+normal scenario 11: 24 failed budgets recovered
+normal scenario 12: 31 failed budgets recovered
+normal scenario 13: 24 failed budgets recovered
+normal scenario 14: 13 failed budgets recovered
+normal scenario 15: 16 failed budgets recovered
+normal scenario 16: 35 failed budgets recovered
+normal scenario 17: 38 failed budgets recovered
+normal scenario 18: 31 failed budgets recovered
+normal scenario 19: 37 failed budgets recovered
+normal: ...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage7" classname="lsp_stage7" time="0.161891" status="run">
+		<properties/>
+		<system-out>Stage 7: completion/recovery, signatures, hover, bindings, symbols, guarded rename, formatting, refresh, batching, cancellation passed
+</system-out>
+	</testcase>
+	<testcase name="log_native" classname="log_native" time="110.624" status="run">
+		<properties/>
+		<system-out>native stack soft=1048576 hard=1048576
+startup optimize=0 close_before_shutdown=1 close_after_shutdown=1 passed
+reload optimize=0 pending_native_write preserved_global_file_identity passed
+transport optimize=0 partial_boundaries=18 native_closes=43 passed
+rotation optimize=0 native_identity_and_replacement_boundaries passed
+allocation optimize=0 acquisition_failures=72 post_effect_faults=1 passed
+cancel optimize=0 native_operation=14 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=14 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=15 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=15 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=18 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=18 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=30 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=30 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=24 completion...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="log_execution" classname="log_execution" time="72.3114" status="run">
+		<properties/>
+		<system-out>Logging execution: 32 checks; hard stack=1048576
+</system-out>
+	</testcase>
+	<testcase name="log_probe_normal" classname="log_probe_normal" time="0.394424" status="run">
+		<properties/>
+		<system-out>native stack soft=1048576 hard=1048576
+transport optimize=0 partial_boundaries=18 native_closes=43 passed
+rotation optimize=0 native_identity_and_replacement_boundaries passed
+allocation optimize=0 acquisition_failures=72 post_effect_faults=1 passed
+cancel optimize=0 native_operation=14 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=14 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=15 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=15 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=18 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=18 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=30 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=30 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=24 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=24 completion_race=1 closes=1 passed
+default replacement cancellation optimize=0 closes=1 p...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="log_probe_optimized" classname="log_probe_optimized" time="0.380461" status="run">
+		<properties/>
+		<system-out>native stack soft=1048576 hard=1048576
+transport optimize=1 partial_boundaries=18 native_closes=43 passed
+rotation optimize=1 native_identity_and_replacement_boundaries passed
+allocation optimize=1 acquisition_failures=72 post_effect_faults=1 passed
+cancel optimize=1 native_operation=14 completion_race=0 closes=1 passed
+cancel optimize=1 native_operation=14 completion_race=1 closes=1 passed
+cancel optimize=1 native_operation=15 completion_race=0 closes=1 passed
+cancel optimize=1 native_operation=15 completion_race=1 closes=1 passed
+cancel optimize=1 native_operation=18 completion_race=0 closes=1 passed
+cancel optimize=1 native_operation=18 completion_race=1 closes=1 passed
+cancel optimize=1 native_operation=30 completion_race=0 closes=1 passed
+cancel optimize=1 native_operation=30 completion_race=1 closes=1 passed
+cancel optimize=1 native_operation=24 completion_race=0 closes=1 passed
+cancel optimize=1 native_operation=24 completion_race=1 closes=1 passed
+default replacement cancellation optimize=1 closes=1 p...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_host" classname="collections_stdlib_host" time="20.4716" status="run">
+		<properties/>
+		<system-out>operation=1 optimized=0 injected_allocation_failures=212
+operation=2 optimized=0 injected_allocation_failures=42
+operation=3 optimized=0 injected_allocation_failures=55
+operation=4 optimized=0 injected_allocation_failures=219
+operation=5 optimized=0 injected_allocation_failures=176
+operation=6 optimized=0 injected_allocation_failures=138
+operation=7 optimized=0 injected_allocation_failures=182
+operation=8 optimized=0 injected_allocation_failures=79
+map publication optimized=0 partial_effect_failures=42 passed
+collections cache/reload/captures/active leases optimized=0 passed
+operation=1 optimized=1 injected_allocation_failures=212
+operation=2 optimized=1 injected_allocation_failures=42
+operation=3 optimized=1 injected_allocation_failures=55
+operation=4 optimized=1 injected_allocation_failures=219
+operation=5 optimized=1 injected_allocation_failures=176
+operation=6 optimized=1 injected_allocation_failures=138
+operation=7 optimized=1 injected_allocation_failures=182
+operation=8 optimized=1 injected_allocation_f...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_execution" classname="collections_stdlib_execution" time="48.4266" status="run">
+		<properties/>
+		<system-out>Collections: 56 JIT/emit/link/native checks; hard stack=default
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_failures" classname="collections_stdlib_failures" time="31.2827" status="run">
+		<properties/>
+		<system-out>Collections expected invalidation and early-return execution passed in JIT/O2/linked AOT/O2
+</system-out>
+	</testcase>
+	<testcase name="lsp_collections_stdlib" classname="lsp_collections_stdlib" time="0.198859" status="run">
+		<properties/>
+		<system-out>Collections LSP: 40 checks passed
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_oracles" classname="collections_stdlib_oracles" time="9.77023" status="run">
+		<properties/>
+		<system-out>Collections independent oracles: 48 numeric distributions, 240 bounds and stable tagged duplicates; invalid comparators bounded
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_stack" classname="collections_stdlib_stack" time="49.2192" status="run">
+		<properties/>
+		<system-out>Collections: 56 JIT/emit/link/native checks; hard stack=1048576
+</system-out>
+	</testcase>
+	<testcase name="io_ownership" classname="io_ownership" time="9.73464" status="run">
+		<properties/>
+		<system-out>149 I/O/path public declarations documented
+sync Debug: 198 checked allocation failures recovered
+sync O2: 198 checked allocation failures recovered
+149 I/O/path public declarations documented
+async Debug: 500 checked allocation failures recovered
+async O2: 500 checked allocation failures recovered
+5047 I/O ownership/documentation checks passed
+</system-out>
+	</testcase>
+	<testcase name="async_source" classname="async_source" time="4.45113" status="run">
+		<properties/>
+		<system-out>async activations passed
+</system-out>
+	</testcase>
+	<testcase name="async_parallel" classname="async_parallel" time="0.871058" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_lifecycle" classname="async_lifecycle" time="1.61601" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="tooling" classname="tooling" time="0.302445" status="run">
+		<properties/>
+		<system-out>queries: aliased/direct definitions, 2 callers, root/local constants, byte spans and retained snapshots
+plan: /leaf.void -&gt; /middle.void::wrapper -&gt; /main.void::entry; validated 53 -&gt; 61, const restart required
+tooling: passed
+</system-out>
+	</testcase>
+	<testcase name="async_retention_sprint5" classname="async_retention_sprint5" time="8.59553" status="run">
+		<properties/>
+		<system-out>Sprint 5 retention: 16 successful process measurements; no suite-count multiplication
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage10_intelligence" classname="lsp_stage10_intelligence" time="0.155041" status="run">
+		<properties/>
+		<system-out>170 Stage 10 LSP intelligence checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage10_source_formatting" classname="lsp_stage10_source_formatting" time="0.224358" status="run">
+		<properties/>
+		<system-out>144 source formatting LSP/revision/diagnostic checks passed
+</system-out>
+	</testcase>
+</testsuite>

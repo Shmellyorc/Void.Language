@@ -28,9 +28,22 @@ Runtime::DictionaryLayout Runtime::dictionary_layout(const NativeDictionary& d) 
     const auto& hash=d.entry->fields[d.entry->count-1];if(hash.kind!=7 || hash.offset!=d.hash_offset || hash.nullable || hash.extent)throw std::invalid_argument("invalid dictionary hash field");
     for(std::size_t i=0;i<d.key->count;++i){const auto& a=d.entry->fields[i];const auto& b=d.key->fields[i];if(a.offset!=b.offset || a.kind!=b.kind || a.nullable!=b.nullable || a.extent!=b.extent || !a.target || !b.target || std::string_view(a.target)!=b.target)throw std::invalid_argument("dictionary key does not match entry prefix");}
     for(std::size_t i=d.key->count;i+1<d.entry->count;++i)if(d.entry->fields[i].offset<d.value_offset || d.entry->fields[i].offset>=d.hash_offset)throw std::invalid_argument("invalid dictionary value fields");
-    auto entries=native_array_layout(*d.entry,0),key=native_array_layout(*d.key,0);{std::lock_guard lock(mutex_);if(types_)validate_dictionary_key_schema(*types_,*key->schema());}auto identity="void.dict.v1/"+std::string(d.entry->key);std::shared_ptr<const NominalDescriptor> header;{std::lock_guard lock(mutex_);if(types_){auto found=types_->types.find(identity);if(found!=types_->types.end())header=found->second;}}
-    if(!header){Native native(*this);NominalDescriptor spec{identity,"","dictionary-v1",{sizeof(DictionaryHeader),{offsetof(DictionaryHeader,entries),offsetof(DictionaryHeader,buckets)}}};admit_types({&spec,1});header=descriptor(identity);}
-    if(header->layout.size!=sizeof(DictionaryHeader) || header->layout.references!=std::vector<std::size_t>{offsetof(DictionaryHeader,entries),offsetof(DictionaryHeader,buckets)})throw std::invalid_argument("invalid dictionary header descriptor");
+    auto entries=native_array_layout(*d.entry,0),key=native_array_layout(*d.key,0);
+    std::shared_ptr<const NominalDescriptor> header;
+    {std::lock_guard lock(mutex_);
+        if(types_)validate_dictionary_key_schema(*types_,*key->schema());
+        auto found=collection_metadata_.find(entries->schema().get());
+        if(found!=collection_metadata_.end())header=found->second.dictionary_header;
+    }
+    if(!header) {
+        auto identity="void.dict.v1/"+std::string(d.entry->key);
+        {std::lock_guard lock(mutex_);if(types_){auto found=types_->types.find(identity);if(found!=types_->types.end())header=found->second;}}
+        if(!header){Native native(*this);NominalDescriptor spec{identity,"","dictionary-v1",{sizeof(DictionaryHeader),{offsetof(DictionaryHeader,entries),offsetof(DictionaryHeader,buckets)}}};admit_types({&spec,1});header=descriptor(identity);}
+    }
+    const auto& references=header->layout.references;
+    if(header->layout.size!=sizeof(DictionaryHeader) || references.size()!=2 || references[0]!=offsetof(DictionaryHeader,entries) || references[1]!=offsetof(DictionaryHeader,buckets))throw std::invalid_argument("invalid dictionary header descriptor");
+    {std::lock_guard lock(mutex_);auto found=collection_metadata_.find(entries->schema().get());
+        if(found!=collection_metadata_.end())found->second.dictionary_header=header;}
     return {entries,key,header};
 }
 Runtime::DictionaryHeader& Runtime::dictionary_header(RegisteredRootWord source,const DictionaryLayout& l) const {

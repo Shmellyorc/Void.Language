@@ -1,17 +1,67 @@
 #pragma once
 #include "void/frontend.hpp"
 #include <map>
+#include <iterator>
+#include <span>
 namespace vd {
 // Owns the successful analysis. Query results are copies with owning source spans.
 class ToolingIndex {
     std::shared_ptr<const ValidatedAnalysis> analysis_;
-    std::vector<AnalyzedDeclaration> all_declarations_;
-    std::vector<AnalyzedReference> all_references_;
     std::map<std::string,std::size_t> declarations_;
     std::map<std::string,std::vector<std::size_t>> modules_, incoming_, positions_;
 public:
-    const auto& declarations() const { return all_declarations_; }
-    const auto& references() const { return all_references_; }
+    // Ordinary records precede editor records, exactly as in the former copied
+    // vectors. Views and their iterators retain the immutable backing analysis.
+    template<class T> class Records {
+        friend class ToolingIndex;
+        std::shared_ptr<const ValidatedAnalysis> owner_;
+        std::span<const T> first_,second_;
+        Records(std::shared_ptr<const ValidatedAnalysis> owner,const std::vector<T>& first,const std::vector<T>& second)
+            :owner_(std::move(owner)),first_(first),second_(second) {}
+    public:
+        std::size_t size() const {return first_.size()+second_.size();}
+        bool empty() const {return !size();}
+        const T& operator[](std::size_t n) const {return n<first_.size()?first_[n]:second_[n-first_.size()];}
+        class iterator {
+            friend class Records;
+            std::shared_ptr<const ValidatedAnalysis> owner_;
+            const T* current_=nullptr;
+            const T* limit_=nullptr;
+            const T* next_=nullptr;
+            const T* next_limit_=nullptr;
+            iterator(const Records& view,bool at_end):owner_(view.owner_) {
+                auto end=[](auto span){return span.empty()?span.data():span.data()+span.size();};
+                if(at_end){current_=view.second_.empty()?end(view.first_):end(view.second_);return;}
+                if(view.first_.empty()) {
+                    current_=view.second_.empty()?view.first_.data():view.second_.data();
+                    limit_=view.second_.empty()?current_:end(view.second_);
+                } else {
+                    current_=view.first_.data();limit_=end(view.first_);
+                    if(!view.second_.empty()){next_=view.second_.data();next_limit_=end(view.second_);}
+                }
+            }
+        public:
+            using iterator_category=std::forward_iterator_tag;
+            using value_type=T;
+            using difference_type=std::ptrdiff_t;
+            using pointer=const T*;
+            using reference=const T&;
+            iterator()=default;
+            reference operator*() const {return *current_;}
+            pointer operator->() const {return current_;}
+            iterator& operator++(){
+                ++current_;
+                if(current_==limit_ && next_){current_=next_;limit_=next_limit_;next_=nullptr;}
+                return *this;
+            }
+            iterator operator++(int){auto old=*this;++*this;return old;}
+            bool operator==(const iterator& other) const {return current_==other.current_;}
+        };
+        iterator begin() const {return iterator(*this,false);}
+        iterator end() const {return iterator(*this,true);}
+    };
+    auto declarations() const {return Records<AnalyzedDeclaration>(analysis_,analysis_->declarations(),analysis_->editor_declarations());}
+    auto references() const {return Records<AnalyzedReference>(analysis_,analysis_->references(),analysis_->editor_references());}
     explicit ToolingIndex(std::shared_ptr<const ValidatedAnalysis> analysis);
     std::optional<AnalyzedDeclaration> declaration(const std::string& identity) const;
     std::vector<AnalyzedDeclaration> definitions_at(const std::string& module, std::size_t byte_offset) const;

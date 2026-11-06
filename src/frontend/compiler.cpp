@@ -391,6 +391,7 @@ struct Statement {
     unsigned slot = 0, flow = 0;
     bool readonly = false, invalid = false, using_field = false, event = false, task_group = false;
     std::string visibility = "public";
+    std::string cleanup_target; // Selected nonvirtual destructor for the compiler-owned with handler.
     Statement(Kind k, Token t) : kind(k), token(std::move(t)) {}
 };
 struct Parameter {
@@ -3110,6 +3111,7 @@ class Semantics {
             for (unsigned n = 0; n < os::operations.size(); ++n)
                 if (e.token.text == os::operations[n].name) return os_call(e, n);
         }
+        if (unit.identity == filesystem::source_module && e.qualifier.empty() && e.token.text=="_io_write_bytes_checked")return filesystem_call(e,static_cast<unsigned>(filesystem::Operation::write_bytes),false,true);
         if (unit.identity == filesystem::source_module && e.qualifier.empty()) {
             for (unsigned n = 0; n < filesystem::source_operations.size(); ++n) {
                 auto name = filesystem::source_operations[n].name;
@@ -3530,7 +3532,12 @@ class Semantics {
             auto cell=unit.make_capture_record(current->symbol+"::$cell$"+std::to_string(s.slot),type,true);auto initial=type;initial.nullable=true;std::const_pointer_cast<ir::ValueType>(cell.definition)->fields[0].type=initial;current->captured_locals.emplace(s.slot,cell);
             Function lambda;lambda.anonymous=true;lambda.token=s.token;lambda.token.text="$with$"+std::to_string(current->lambdas.size());lambda.visibility="private";
             Statement invoke(Statement::Kind::expression,s.token);invoke.expression=std::make_unique<Expr>(Expr::Kind::method_call,Token{TokenKind::name,"deinit",s.token.offset});invoke.expression->parts.push_back(std::make_unique<Expr>(Expr::Kind::name,s.binder));lambda.body.push_back(std::move(invoke));
-            s.selection=std::make_unique<Expr>(Expr::Kind::lambda,s.token);s.selection->slot=current->lambdas.size();current->lambdas.push_back(std::move(lambda));expression(*s.selection);current->cleanup_type=unit.make_cleanup();flow=sequence(s.body,false);scopes.pop_back();break;
+            s.selection=std::make_unique<Expr>(Expr::Kind::lambda,s.token);s.selection->slot=current->lambdas.size();current->lambdas.push_back(std::move(lambda));expression(*s.selection);
+            for(const auto& selected:unit.functions)if(selected.symbol==s.selection->target && selected.body.size()==1 && selected.body[0].expression){
+                const auto& dispose=*selected.body[0].expression;
+                if(dispose.kind==Expr::Kind::method_call && dispose.token.text=="deinit" && dispose.type==Type::none && dispose.virtual_slot.empty() && !dispose.interface_call && dispose.native_symbol.empty() && dispose.parts.size()==1 && dispose.parts[0]->type==current->locals[s.slot])s.cleanup_target=dispose.target;
+            }
+            current->cleanup_type=unit.make_cleanup();flow=sequence(s.body,false);scopes.pop_back();break;
         }
         case K::deferred:
             if(!current)error(source,s.token,Code::invalid_value,"defer requires a function activation.");
@@ -3920,7 +3927,38 @@ class Lowering {
     const ConstructionContext* context=nullptr;
     std::map<unsigned,unsigned> cells;
     std::optional<unsigned> cleanup_head,return_slot;
-    struct WithScope {unsigned slot;bool group=false;std::optional<unsigned> owned_group={};};
+    struct LocalCleanup {unsigned binding,active;std::string callee;};
+    std::map<unsigned,std::string> local_cleanup_targets;
+    std::vector<LocalCleanup> local_cleanups;
+    std::set<std::string> elided_cleanup_handlers;
+    bool select_local_cleanups(const Function& f) {
+        local_cleanup_targets.clear();local_cleanups.clear();elided_cleanup_handlers.clear();
+        if(f.asynchronous || f.deferred)return false;
+        std::vector<const Statement*> pending;for(const auto& s:f.body)pending.push_back(&s);
+        std::vector<const Statement*> scopes;std::vector<const Statement*> assignments;
+        while(!pending.empty()) {
+            auto* s=pending.back();pending.pop_back();
+            if(s->kind==Statement::Kind::deferred || s->task_group)return false;
+            if(s->kind==Statement::Kind::scoped)scopes.push_back(s);
+            if(s->kind==Statement::Kind::assignment)assignments.push_back(s);
+            for(const auto& child:s->body)pending.push_back(&child);
+            for(const auto& child:s->otherwise)pending.push_back(&child);
+        }
+        if(scopes.empty() || f.lambdas.size()!=scopes.size())return false;
+        std::set<std::string> handlers;std::map<unsigned,std::string> targets;
+        for(auto* scope:scopes) {
+            if(scope->cleanup_target.empty() || !scope->selection || scope->selection->kind!=Expr::Kind::function_reference || scope->selection->parts.size()!=1)return false;
+            const auto& capture=*scope->selection->parts[0];
+            if(capture.kind!=Expr::Kind::capture_reference || capture.slot!=scope->slot || capture.implicit)return false;
+            for(auto* assignment:assignments)if(assignment->slot==scope->slot)return false;
+            targets.emplace(scope->slot,scope->cleanup_target);handlers.insert(scope->selection->target);
+        }
+        local_cleanup_targets=std::move(targets);elided_cleanup_handlers=std::move(handlers);return true;
+    }
+    void dispose_local(const LocalCleanup& cleanup,const Token& token) {
+        ir::Instruction call{ir::Op::local_cleanup,cleanup.binding,cleanup.active};call.callee=cleanup.callee;call.type=Type::none;call.receiver=ir::Place{cleanup.binding,{}};emit(call,token);
+    }
+    struct WithScope {unsigned slot;bool group=false;std::optional<unsigned> owned_group={};bool local=false;};
     std::vector<WithScope> with_scopes;
     std::vector<std::size_t> loop_with_depth;
     unsigned register_cleanup(unsigned handler,bool active,const Token& token){
@@ -3930,6 +3968,9 @@ class Lowering {
     void leave_with(WithScope scope,const Token& token,bool cancel=true){
         if(scope.group){join_group(scope.slot,cancel,token);return;}
         if(scope.owned_group)join_group(*scope.owned_group,cancel,token);
+        if(scope.local) {
+            dispose_local(local_cleanups[scope.slot],token);return;
+        }
         auto slot=scope.slot;
         auto owner=emit({ir::Op::load,slot},token);ir::Instruction deactivate{ir::Op::gc_write,owner,constant(Type::boolean,{0,{}},token)};deactivate.immediate=2;emit(deactivate,token);
         auto handler=extract_managed(owner,1,token);emit({ir::Op::function_call,handler},token);
@@ -3982,7 +4023,7 @@ class Lowering {
             i.op == ir::Op::console_native ||
             i.op == ir::Op::console_print ||
             i.op == ir::Op::dict_new ||
-            i.op == ir::Op::string_join ||
+            i.op == ir::Op::string_join || i.op == ir::Op::string_join_encode || i.op == ir::Op::local_cleanup || i.op == ir::Op::filesystem_write ||
             i.op == ir::Op::format_unwrap ||
             i.op == ir::Op::format_layout ||
             i.op == ir::Op::text_case || i.op == ir::Op::text_translate ||
@@ -4480,6 +4521,12 @@ class Lowering {
                 for (auto slot : slots) operation.arguments.push_back(emit({ir::Op::load, slot}, e.token));
                 return emit(operation, e.token);
             }
+            if(e.target=="$io.write.checked") {
+                std::vector<unsigned> slots(e.parts.size());
+                for(unsigned n=0;n<e.parts.size();++n)slots[e.argument_indexes.at(n)]=snapshot(expression(*e.parts[n]),expression_type(*e.parts[n]),e.parts[n]->token);
+                ir::Instruction call{ir::Op::filesystem_write};call.type=e.type;call.immediate=static_cast<unsigned>(filesystem::Operation::write_bytes);
+                for(auto slot:slots)call.arguments.push_back(emit({ir::Op::load,slot},e.token));return emit(call,e.token);
+            }
             if (e.target.starts_with("$io.")) {
                 bool asynchronous = e.target.starts_with("$io.async.");
                 std::vector<unsigned> slots(e.parts.size());
@@ -4642,6 +4689,9 @@ class Lowering {
                 return emit(i,e.token);
             });
             if(e.target.starts_with("$safe."))return safe_collection(e);
+            // Keep ordinary interpolation followed by encoding. The experimental
+            // rooted segment operation has no generally profitable source class;
+            // automatic fusion must not guess from logger identity or byte length.
             if(e.target=="$text.to_utf8" || e.target=="$text.from_utf8"){ir::Instruction i{e.target=="$text.to_utf8"?ir::Op::string_encode:ir::Op::string_decode,expression(*e.parts[0])};i.type=e.type;return emit(i,e.token);}
             if(e.target=="$event.emit")return event_emit(e);
             if(e.target.starts_with("$dict.")) return frontend_case([&]() -> unsigned {
@@ -4793,6 +4843,15 @@ class Lowering {
         }
         case K::scoped:{
             if(s.task_group){emit({ir::Op::store,s.slot,emit({ir::Op::async_group_enter},s.token)},s.token);with_scopes.push_back({s.slot,true});sequence(s.body);if(current)join_group(s.slot,false,s.token);with_scopes.pop_back();break;}
+            if(auto selected=local_cleanup_targets.find(s.slot);selected!=local_cleanup_targets.end()) {
+                auto active=static_cast<unsigned>(output.locals.size());output.locals.push_back(Type::boolean);
+                local_cleanups.push_back({s.slot,active,selected->second});auto index=static_cast<unsigned>(local_cleanups.size()-1);
+                emit({ir::Op::store,active,constant(Type::boolean,{0,{}},s.token)},s.token);
+                emit({ir::Op::store,s.slot,expression(*s.expression)},s.token);
+                emit({ir::Op::store,active,constant(Type::boolean,{1,{}},s.token)},s.token);
+                with_scopes.push_back({index,false,{},true});sequence(s.body);
+                if(current)leave_with(with_scopes.back(),s.token,false);with_scopes.pop_back();break;
+            }
             std::optional<unsigned> group;
             auto home=cells.at(s.slot);auto cell=output.locals.at(home);auto field=ir::field_type(cell,0);ir::Instruction construct{ir::Op::gc_construct};construct.type=cell;construct.arguments={constant(field,{0,{}},s.token)};emit({ir::Op::store,home,emit(construct,s.token)},s.token);
             auto node=register_cleanup(expression(*s.selection),false,s.token);
@@ -4949,15 +5008,17 @@ class Lowering {
     }
 public:
     explicit Lowering(const SourceFile& s, ir::Module& m, StringPool& p) : source(s), module(m), strings(p) {}
+    const std::set<std::string>& elided_handlers() const {return elided_cleanup_handlers;}
     ir::Function lower(const Function& f, const ConstructionContext* construction=nullptr) {
         context=construction;normal_return=!f.body.empty() && f.body.back().kind==Statement::Kind::returned?&f.body.back():nullptr;
         output = {}; output.name = f.symbol; output.source_name = f.concrete_name.empty() ? f.token.text : f.concrete_name; output.display_name=f.display_name; output.source = source.location(f.token.offset);
         output.asynchronous=f.asynchronous;output.task=f.task;output.lexical_owner=f.receiver?Type::key(f.receiver->type):f.lexical_owner;output.lexical_parent=f.lexical_parent;output.operator_owner=f.operator_owner;output.operator_glyph=f.operator_glyph;
         output.bound_receiver=f.bound_receiver;output.closure=f.anonymous;cells.clear();cleanup_head.reset();return_slot.reset();cleanup_jumps.clear();with_scopes.clear();loop_with_depth.clear();
         output.parameters.clear(); output.result = f.result; output.locals = f.locals; current = block();
+        const bool rooted_cleanup=select_local_cleanups(f);
         if(f.cleanup_type!=Type::none){cleanup_head=output.locals.size();auto head=f.cleanup_type;head.nullable=true;output.locals.push_back(head);}
         if((cleanup_head || f.asynchronous) && f.result!=Type::none){return_slot=output.locals.size();output.locals.push_back(f.result);}
-        for(const auto& [slot,type]:f.captured_locals){cells.emplace(slot,static_cast<unsigned>(output.locals.size()));output.locals.push_back(type);}
+        for(const auto& [slot,type]:f.captured_locals){if(rooted_cleanup && local_cleanup_targets.contains(slot))continue;cells.emplace(slot,static_cast<unsigned>(output.locals.size()));output.locals.push_back(type);}
         for(const auto& [slot,field]:f.capture_inputs){
             auto environment=emit({ir::Op::argument,0},f.token);ir::Instruction read{ir::Op::gc_read,environment};read.immediate=field;
             emit({ir::Op::store,cells.at(slot),emit(read,f.token)},f.token);
@@ -5000,7 +5061,8 @@ public:
         if(cleanup_head || f.asynchronous){
             auto entry=block();output.cleanup_entry=entry;for(auto from:cleanup_jumps)output.blocks[from].end.yes=entry;current=entry;
             if(f.asynchronous)emit({ir::Op::async_drain},f.token);
-            if(cleanup_head){
+            for(auto i=local_cleanups.rbegin();i!=local_cleanups.rend();++i)dispose_local(*i,f.token);
+            if(cleanup_head && !rooted_cleanup){
             // A separate loop entry prevents executing the structured drain again.
             auto loop=block();jump(loop);current=loop;
             auto head=output.locals[*cleanup_head];auto node=head;node.nullable=false;
@@ -5976,9 +6038,11 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
     for(const auto& [id,u]:units) {auto& imports=module.source_imports[id];for(const auto& i:u->imports) if(!i.target.empty()) imports.insert(i.target);}
     module.source_path = units.at(entry)->source.path();
     generic_provenance(module,units);
+    std::set<std::string> elided_handlers;
     for (auto& [id, unit] : units) {
         Lowering lowering(unit->source,module,strings);
         for (const auto& f : unit->functions) {
+            if(elided_handlers.contains(f.symbol))continue;
             if(!f.native_symbol.empty()){module.native_library=std::string(native_provider(f.native_symbol));module.coordinated=true;continue;}
             if(f.interface_requirement) {
                 ir::Function requirement;requirement.name=f.symbol;requirement.parameters={f.receiver->type};
@@ -5987,7 +6051,7 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
                 module.interface_requirements.push_back(std::move(requirement));continue;
             }
             if (!f.initializer || f.receiver->type.kind!=Type::managed_ref) {
-                auto lowered = lowering.lower(f); lowered.module_identity = id;
+                auto lowered = lowering.lower(f); lowered.module_identity = id;elided_handlers.insert(lowering.elided_handlers().begin(),lowering.elided_handlers().end());
                 if (f.global_initializer) {
                     auto value = std::find_if(unit->globals.begin(), unit->globals.end(), [&](const auto& g) { return g.initializer == &f; });
                     lowered.result = value->cell;
@@ -6005,7 +6069,7 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
                 module.functions.push_back(std::move(lowered));
             }
             for (const auto& [mask,context]:f.construction_contexts) {
-                auto lowered=lowering.lower(f,&context); lowered.module_identity=id;
+                auto lowered=lowering.lower(f,&context); lowered.module_identity=id;elided_handlers.insert(lowering.elided_handlers().begin(),lowering.elided_handlers().end());
                 module.functions.push_back(std::move(lowered));
             }
         }

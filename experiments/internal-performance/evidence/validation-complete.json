@@ -1,0 +1,65 @@
+{
+  "final_frame_bytes": 40,
+  "token_bytes": 88,
+  "root_location_cache": "removed after representative text regressions",
+  "Release_checks": 63,
+  "strict_checks": 16,
+  "Debug_Runtime_checks": 5,
+  "stack_soft_hard_bytes": 1048576,
+  "qualification_receipts": {
+    "llvm23-release-combined-ctest-attempt2": {
+      "label": "llvm23-release-combined-ctest-attempt2",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+        "--output-on-failure",
+        "-j2",
+        "-R",
+        "^(json_readonly|json_dynamic|json_numbers|json_schema|json_bounds|json_adversarial|json_metering|json_execution_validated|json_execution_accessors|json_execution_dynamic_smoke|json_execution_typed_smoke|json_execution_shapes|json_execution_ownership|json_execution_nested_inference|json_host|json_lsp|gc_buffers|gc_schemas|runtime_coordination|runtime_generated|fixed_arrays_source|growable_arrays_source|dictionaries_source|advanced_source|strings_source|runtime_failures|runtime_aot_normal|runtime_aot_optimized|runtime_invariants|lsp_stage8|text_encoding_text|text_encoding_hex|text_encoding_base64|text_encoding_ascii|text_encoding_oracles|text_encoding_interop|text_encoding_large|text_encoding_errors|lsp_text_encoding|text_encoding_stack|text_encoding_depth|text_encoding_semantic_depth|text_encoding_ir|text_encoding_ownership|lsp_stage7|log_native|log_execution|log_probe_normal|log_probe_optimized|collections_stdlib_host|collections_stdlib_execution|collections_stdlib_failures|lsp_collections_stdlib|collections_stdlib_oracles|collections_stdlib_stack|io_ownership|async_source|async_parallel|async_lifecycle|tooling|async_retention_sprint5|lsp_stage10_intelligence|lsp_stage10_source_formatting)$"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "returncode": 0,
+      "wall": 427.6013967990875,
+      "cpu": 842.3758359999999,
+      "stack": 1048576,
+      "start": 1793937549.4750373
+    },
+    "strict-retained-combined-native": {
+      "label": "strict-retained-combined-native",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict",
+        "--output-on-failure",
+        "-j2",
+        "-R",
+        "^(gc_buffers|gc_schemas|runtime_coordination|runtime_failures|runtime_invariants|tooling|json_host|collections_stdlib_host|text_encoding_ownership|io_ownership|async_source|async_parallel|async_lifecycle|log_native|log_probe_normal|log_probe_optimized)$"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "returncode": 0,
+      "wall": 467.1979250907898,
+      "cpu": 877.6220020000001,
+      "stack": 1048576,
+      "start": 1793937550.6118982
+    },
+    "debug-retained-focused-runtime": {
+      "label": "debug-retained-focused-runtime",
+      "args": [
+        "ctest",
+        "--test-dir",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+        "--output-on-failure",
+        "-j2",
+        "-R",
+        "^(runtime_coordination|runtime_failures|runtime_invariants|gc_schemas|gc_buffers)$"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language",
+      "returncode": 0,
+      "wall": 9.93189787864685,
+      "cpu": 10.77811399999986,
+      "stack": 1048576,
+      "start": 1793938017.8100502
+    }
+  }
+}

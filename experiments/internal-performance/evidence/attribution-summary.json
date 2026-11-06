@@ -1,0 +1,3890 @@
+[
+  {
+    "case": "dictionary-keys",
+    "metrics": {
+      "allocations": {
+        "baseline": 58835.0,
+        "candidate": 254.0
+      },
+      "requested_bytes": {
+        "baseline": 2345956.0,
+        "candidate": 36784.0
+      },
+      "managed_constructions": {
+        "baseline": 40.0,
+        "candidate": 40.0
+      },
+      "layout_creations": {
+        "baseline": 15477.0,
+        "candidate": 3144.0
+      },
+      "scalar_accesses": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "search_slots": {
+        "baseline": 62212.0,
+        "candidate": 28054.0
+      },
+      "search_frames": {
+        "baseline": 34487.0,
+        "candidate": 21986.0
+      },
+      "search_offsets": {
+        "baseline": 627314.0,
+        "candidate": 141838.0
+      },
+      "location_checks": {
+        "baseline": 0.0,
+        "candidate": 9309.0
+      },
+      "cache_hits": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "root_words": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "collections": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "selected_copy_bytes": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "live_requested_bytes": {
+        "baseline": 35209.0,
+        "candidate": 35209.0
+      },
+      "peak_requested_bytes": {
+        "baseline": 35219.0,
+        "candidate": 35219.0
+      }
+    },
+    "phases": {
+      "roots": {
+        "baseline_exclusive_cpu_ms": 23.11683,
+        "candidate_exclusive_cpu_ms": 11.471343,
+        "baseline_inclusive_cpu_ms": 28.6814815,
+        "candidate_inclusive_cpu_ms": 11.471343,
+        "baseline_calls": 27974.0,
+        "candidate_calls": 18665.0
+      },
+      "metadata": {
+        "baseline_exclusive_cpu_ms": 54.3188755,
+        "candidate_exclusive_cpu_ms": 48.4670625,
+        "baseline_inclusive_cpu_ms": 106.404323,
+        "candidate_inclusive_cpu_ms": 91.6234845,
+        "baseline_calls": 43224.0,
+        "candidate_calls": 43224.0
+      },
+      "payload": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "gc": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "repeat": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "split": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "join": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "replace": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "hex": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "base64": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_write": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_duplicate": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_clone": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "discovery_read": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "check": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "analysis_metadata": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "index": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "invalidation": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "serialization": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "total": {
+        "baseline_exclusive_cpu_ms": 21.094508,
+        "candidate_exclusive_cpu_ms": 22.2852825,
+        "baseline_inclusive_cpu_ms": 98.497414,
+        "candidate_inclusive_cpu_ms": 82.197906,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      }
+    }
+  },
+  {
+    "case": "json-config-parse",
+    "metrics": {
+      "allocations": {
+        "baseline": 41190.5,
+        "candidate": 15110.5
+      },
+      "requested_bytes": {
+        "baseline": 1752904.0,
+        "candidate": 878464.0
+      },
+      "managed_constructions": {
+        "baseline": 1520.0,
+        "candidate": 1520.0
+      },
+      "layout_creations": {
+        "baseline": 24480.0,
+        "candidate": 16780.0
+      },
+      "scalar_accesses": {
+        "baseline": 3260.0,
+        "candidate": 3260.0
+      },
+      "search_slots": {
+        "baseline": 932300.0,
+        "candidate": 460040.0
+      },
+      "search_frames": {
+        "baseline": 68360.0,
+        "candidate": 45520.0
+      },
+      "search_offsets": {
+        "baseline": 8582240.0,
+        "candidate": 1115700.0
+      },
+      "location_checks": {
+        "baseline": 0.0,
+        "candidate": 19080.0
+      },
+      "cache_hits": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "root_words": {
+        "baseline": 4388.0,
+        "candidate": 4388.0
+      },
+      "collections": {
+        "baseline": 6.0,
+        "candidate": 6.0
+      },
+      "selected_copy_bytes": {
+        "baseline": 1880.0,
+        "candidate": 1880.0
+      },
+      "live_requested_bytes": {
+        "baseline": 37938.0,
+        "candidate": 37938.0
+      },
+      "peak_requested_bytes": {
+        "baseline": 59958.0,
+        "candidate": 59958.0
+      }
+    },
+    "phases": {
+      "roots": {
+        "baseline_exclusive_cpu_ms": 56.372282,
+        "candidate_exclusive_cpu_ms": 25.687369,
+        "baseline_inclusive_cpu_ms": 70.227404,
+        "candidate_inclusive_cpu_ms": 25.687369,
+        "baseline_calls": 58640.0,
+        "candidate_calls": 39560.0
+      },
+      "metadata": {
+        "baseline_exclusive_cpu_ms": 53.506202,
+        "candidate_exclusive_cpu_ms": 45.989889,
+        "baseline_inclusive_cpu_ms": 125.604396,
+        "candidate_inclusive_cpu_ms": 62.757516,
+        "baseline_calls": 42940.0,
+        "candidate_calls": 42940.0
+      },
+      "payload": {
+        "baseline_exclusive_cpu_ms": 5.3713695,
+        "candidate_exclusive_cpu_ms": 5.570227,
+        "baseline_inclusive_cpu_ms": 22.7044205,
+        "candidate_inclusive_cpu_ms": 17.1643965,
+        "baseline_calls": 3520.0,
+        "candidate_calls": 3520.0
+      },
+      "gc": {
+        "baseline_exclusive_cpu_ms": 0.781578,
+        "candidate_exclusive_cpu_ms": 0.7880125,
+        "baseline_inclusive_cpu_ms": 1.497118,
+        "candidate_inclusive_cpu_ms": 1.514628,
+        "baseline_calls": 12.0,
+        "candidate_calls": 12.0
+      },
+      "repeat": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "split": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "join": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "replace": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "hex": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "base64": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_parse": {
+        "baseline_exclusive_cpu_ms": 34.6303845,
+        "candidate_exclusive_cpu_ms": 39.3203925,
+        "baseline_inclusive_cpu_ms": 169.1114395,
+        "candidate_inclusive_cpu_ms": 137.1171445,
+        "baseline_calls": 20.0,
+        "candidate_calls": 20.0
+      },
+      "json_write": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_duplicate": {
+        "baseline_exclusive_cpu_ms": 18.6062215,
+        "candidate_exclusive_cpu_ms": 19.9037005,
+        "baseline_inclusive_cpu_ms": 50.274335,
+        "candidate_inclusive_cpu_ms": 42.004822,
+        "baseline_calls": 13680.0,
+        "candidate_calls": 13680.0
+      },
+      "json_clone": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "discovery_read": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "check": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "analysis_metadata": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "index": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "invalidation": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "serialization": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "total": {
+        "baseline_exclusive_cpu_ms": 0.199674,
+        "candidate_exclusive_cpu_ms": 0.1844185,
+        "baseline_inclusive_cpu_ms": 169.462187,
+        "candidate_inclusive_cpu_ms": 137.444009,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      }
+    }
+  },
+  {
+    "case": "json-config-stringify",
+    "metrics": {
+      "allocations": {
+        "baseline": 61219.0,
+        "candidate": 25859.0
+      },
+      "requested_bytes": {
+        "baseline": 2604164.0,
+        "candidate": 1413144.0
+      },
+      "managed_constructions": {
+        "baseline": 2860.0,
+        "candidate": 2860.0
+      },
+      "layout_creations": {
+        "baseline": 33020.0,
+        "candidate": 21280.0
+      },
+      "scalar_accesses": {
+        "baseline": 1440.0,
+        "candidate": 1440.0
+      },
+      "search_slots": {
+        "baseline": 743280.0,
+        "candidate": 381980.0
+      },
+      "search_frames": {
+        "baseline": 88680.0,
+        "candidate": 60140.0
+      },
+      "search_offsets": {
+        "baseline": 6127820.0,
+        "candidate": 868720.0
+      },
+      "location_checks": {
+        "baseline": 0.0,
+        "candidate": 23480.0
+      },
+      "cache_hits": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "root_words": {
+        "baseline": 6361.5,
+        "candidate": 6361.5
+      },
+      "collections": {
+        "baseline": 11.0,
+        "candidate": 11.0
+      },
+      "selected_copy_bytes": {
+        "baseline": 1440.0,
+        "candidate": 1440.0
+      },
+      "live_requested_bytes": {
+        "baseline": 16900.0,
+        "candidate": 16900.0
+      },
+      "peak_requested_bytes": {
+        "baseline": 56678.5,
+        "candidate": 56642.5
+      }
+    },
+    "phases": {
+      "roots": {
+        "baseline_exclusive_cpu_ms": 66.428455,
+        "candidate_exclusive_cpu_ms": 32.45408,
+        "baseline_inclusive_cpu_ms": 82.2158315,
+        "candidate_inclusive_cpu_ms": 32.45408,
+        "baseline_calls": 74440.0,
+        "candidate_calls": 50960.0
+      },
+      "metadata": {
+        "baseline_exclusive_cpu_ms": 67.0415595,
+        "candidate_exclusive_cpu_ms": 56.582711,
+        "baseline_inclusive_cpu_ms": 143.7796105,
+        "candidate_inclusive_cpu_ms": 74.6254235,
+        "baseline_calls": 56000.0,
+        "candidate_calls": 56000.0
+      },
+      "payload": {
+        "baseline_exclusive_cpu_ms": 7.451471,
+        "candidate_exclusive_cpu_ms": 7.961716,
+        "baseline_inclusive_cpu_ms": 20.611928,
+        "candidate_inclusive_cpu_ms": 17.872776,
+        "baseline_calls": 2040.0,
+        "candidate_calls": 2040.0
+      },
+      "gc": {
+        "baseline_exclusive_cpu_ms": 1.076567,
+        "candidate_exclusive_cpu_ms": 1.2145365,
+        "baseline_inclusive_cpu_ms": 2.063613,
+        "candidate_inclusive_cpu_ms": 2.3381585,
+        "baseline_calls": 22.0,
+        "candidate_calls": 22.0
+      },
+      "repeat": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "split": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "join": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "replace": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "hex": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "base64": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_write": {
+        "baseline_exclusive_cpu_ms": 31.2121755,
+        "candidate_exclusive_cpu_ms": 36.4478095,
+        "baseline_inclusive_cpu_ms": 133.9372905,
+        "candidate_inclusive_cpu_ms": 109.29756,
+        "baseline_calls": 20.0,
+        "candidate_calls": 20.0
+      },
+      "json_duplicate": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_clone": {
+        "baseline_exclusive_cpu_ms": 14.4709785,
+        "candidate_exclusive_cpu_ms": 18.2205595,
+        "baseline_inclusive_cpu_ms": 52.5677485,
+        "candidate_inclusive_cpu_ms": 42.648054,
+        "baseline_calls": 20.0,
+        "candidate_calls": 20.0
+      },
+      "discovery_read": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "check": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "analysis_metadata": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "index": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "invalidation": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "serialization": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "total": {
+        "baseline_exclusive_cpu_ms": 0.7447865,
+        "candidate_exclusive_cpu_ms": 0.8272635,
+        "baseline_inclusive_cpu_ms": 188.490246,
+        "candidate_inclusive_cpu_ms": 153.674191,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      }
+    }
+  },
+  {
+    "case": "json-deep64-parse",
+    "metrics": {
+      "allocations": {
+        "baseline": 227464.5,
+        "candidate": 104864.5
+      },
+      "requested_bytes": {
+        "baseline": 10148508.0,
+        "candidate": 5936668.0
+      },
+      "managed_constructions": {
+        "baseline": 9360.0,
+        "candidate": 9360.0
+      },
+      "layout_creations": {
+        "baseline": 113680.0,
+        "candidate": 63540.0
+      },
+      "scalar_accesses": {
+        "baseline": 9120.0,
+        "candidate": 9120.0
+      },
+      "search_slots": {
+        "baseline": 5737440.0,
+        "candidate": 2934000.0
+      },
+      "search_frames": {
+        "baseline": 279060.0,
+        "candidate": 186620.0
+      },
+      "search_offsets": {
+        "baseline": 52237760.0,
+        "candidate": 7275700.0
+      },
+      "location_checks": {
+        "baseline": 0.0,
+        "candidate": 75820.0
+      },
+      "cache_hits": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "root_words": {
+        "baseline": 27067.0,
+        "candidate": 27067.0
+      },
+      "collections": {
+        "baseline": 36.5,
+        "candidate": 36.5
+      },
+      "selected_copy_bytes": {
+        "baseline": 2580.0,
+        "candidate": 2580.0
+      },
+      "live_requested_bytes": {
+        "baseline": 96432.5,
+        "candidate": 96432.5
+      },
+      "peak_requested_bytes": {
+        "baseline": 120665.0,
+        "candidate": 120665.0
+      }
+    },
+    "phases": {
+      "roots": {
+        "baseline_exclusive_cpu_ms": 251.813248,
+        "candidate_exclusive_cpu_ms": 106.787342,
+        "baseline_inclusive_cpu_ms": 314.5458455,
+        "candidate_inclusive_cpu_ms": 106.787342,
+        "baseline_calls": 235300.0,
+        "candidate_calls": 159480.0
+      },
+      "metadata": {
+        "baseline_exclusive_cpu_ms": 224.2035195,
+        "candidate_exclusive_cpu_ms": 186.6599185,
+        "baseline_inclusive_cpu_ms": 483.866983,
+        "candidate_inclusive_cpu_ms": 244.8363675,
+        "baseline_calls": 186180.0,
+        "candidate_calls": 186180.0
+      },
+      "payload": {
+        "baseline_exclusive_cpu_ms": 11.555922,
+        "candidate_exclusive_cpu_ms": 11.5184585,
+        "baseline_inclusive_cpu_ms": 56.427101,
+        "candidate_inclusive_cpu_ms": 40.591194,
+        "baseline_calls": 9160.0,
+        "candidate_calls": 9160.0
+      },
+      "gc": {
+        "baseline_exclusive_cpu_ms": 8.479665,
+        "candidate_exclusive_cpu_ms": 8.694814,
+        "baseline_inclusive_cpu_ms": 16.6586555,
+        "candidate_inclusive_cpu_ms": 17.081929,
+        "baseline_calls": 73.0,
+        "candidate_calls": 73.0
+      },
+      "repeat": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "split": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "join": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "replace": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "hex": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "base64": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_parse": {
+        "baseline_exclusive_cpu_ms": 159.57949,
+        "candidate_exclusive_cpu_ms": 190.694106,
+        "baseline_inclusive_cpu_ms": 654.7714825,
+        "candidate_inclusive_cpu_ms": 504.4195455,
+        "baseline_calls": 20.0,
+        "candidate_calls": 20.0
+      },
+      "json_write": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_duplicate": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_clone": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "discovery_read": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "check": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "analysis_metadata": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "index": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "invalidation": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "serialization": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "total": {
+        "baseline_exclusive_cpu_ms": 0.214098,
+        "candidate_exclusive_cpu_ms": 0.2186535,
+        "baseline_inclusive_cpu_ms": 655.0604625,
+        "candidate_inclusive_cpu_ms": 504.7241915,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      }
+    }
+  },
+  {
+    "case": "json-deep64-stringify",
+    "metrics": {
+      "allocations": {
+        "baseline": 447681.5,
+        "candidate": 220701.5
+      },
+      "requested_bytes": {
+        "baseline": 19499468.0,
+        "candidate": 11716468.0
+      },
+      "managed_constructions": {
+        "baseline": 22600.0,
+        "candidate": 22600.0
+      },
+      "layout_creations": {
+        "baseline": 209440.0,
+        "candidate": 116700.0
+      },
+      "scalar_accesses": {
+        "baseline": 2580.0,
+        "candidate": 2580.0
+      },
+      "search_slots": {
+        "baseline": 5715320.0,
+        "candidate": 2958800.0
+      },
+      "search_frames": {
+        "baseline": 501100.0,
+        "candidate": 343340.0
+      },
+      "search_offsets": {
+        "baseline": 48953820.0,
+        "candidate": 6875500.0
+      },
+      "location_checks": {
+        "baseline": 0.0,
+        "candidate": 132120.0
+      },
+      "cache_hits": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "root_words": {
+        "baseline": 54243.5,
+        "candidate": 54243.5
+      },
+      "collections": {
+        "baseline": 88.5,
+        "candidate": 88.5
+      },
+      "selected_copy_bytes": {
+        "baseline": 2580.0,
+        "candidate": 2580.0
+      },
+      "live_requested_bytes": {
+        "baseline": 64130.0,
+        "candidate": 64130.0
+      },
+      "peak_requested_bytes": {
+        "baseline": 102903.0,
+        "candidate": 102903.0
+      }
+    },
+    "phases": {
+      "roots": {
+        "baseline_exclusive_cpu_ms": 391.2973995,
+        "candidate_exclusive_cpu_ms": 189.0602555,
+        "baseline_inclusive_cpu_ms": 484.0000205,
+        "candidate_inclusive_cpu_ms": 189.0602555,
+        "baseline_calls": 426120.0,
+        "candidate_calls": 294000.0
+      },
+      "metadata": {
+        "baseline_exclusive_cpu_ms": 401.873147,
+        "candidate_exclusive_cpu_ms": 328.711697,
+        "baseline_inclusive_cpu_ms": 795.597595,
+        "candidate_inclusive_cpu_ms": 423.5068375,
+        "baseline_calls": 338600.0,
+        "candidate_calls": 338600.0
+      },
+      "payload": {
+        "baseline_exclusive_cpu_ms": 28.512616,
+        "candidate_exclusive_cpu_ms": 29.82187,
+        "baseline_inclusive_cpu_ms": 71.9885785,
+        "candidate_inclusive_cpu_ms": 63.023353,
+        "baseline_calls": 5180.0,
+        "candidate_calls": 5180.0
+      },
+      "gc": {
+        "baseline_exclusive_cpu_ms": 21.8408035,
+        "candidate_exclusive_cpu_ms": 19.8968385,
+        "baseline_inclusive_cpu_ms": 43.011204,
+        "candidate_inclusive_cpu_ms": 39.148632,
+        "baseline_calls": 177.0,
+        "candidate_calls": 177.0
+      },
+      "repeat": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "split": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "join": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "replace": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "hex": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "base64": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_write": {
+        "baseline_exclusive_cpu_ms": 158.3276985,
+        "candidate_exclusive_cpu_ms": 187.2605405,
+        "baseline_inclusive_cpu_ms": 672.947444,
+        "candidate_inclusive_cpu_ms": 542.043488,
+        "baseline_calls": 20.0,
+        "candidate_calls": 20.0
+      },
+      "json_duplicate": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_clone": {
+        "baseline_exclusive_cpu_ms": 129.2104275,
+        "candidate_exclusive_cpu_ms": 155.1686,
+        "baseline_inclusive_cpu_ms": 453.0871405,
+        "candidate_inclusive_cpu_ms": 366.4847205,
+        "baseline_calls": 20.0,
+        "candidate_calls": 20.0
+      },
+      "discovery_read": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "check": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "analysis_metadata": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "index": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "invalidation": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "serialization": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "total": {
+        "baseline_exclusive_cpu_ms": 0.8203655,
+        "candidate_exclusive_cpu_ms": 0.8643825,
+        "baseline_inclusive_cpu_ms": 1127.365538,
+        "candidate_inclusive_cpu_ms": 910.4985755,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      }
+    }
+  },
+  {
+    "case": "json-save-parse",
+    "metrics": {
+      "allocations": {
+        "baseline": 56717.5,
+        "candidate": 19977.5
+      },
+      "requested_bytes": {
+        "baseline": 2417720.0,
+        "candidate": 1184520.0
+      },
+      "managed_constructions": {
+        "baseline": 1920.0,
+        "candidate": 1920.0
+      },
+      "layout_creations": {
+        "baseline": 34840.0,
+        "candidate": 24080.0
+      },
+      "scalar_accesses": {
+        "baseline": 5080.0,
+        "candidate": 5080.0
+      },
+      "search_slots": {
+        "baseline": 1310460.0,
+        "candidate": 641240.0
+      },
+      "search_frames": {
+        "baseline": 95900.0,
+        "candidate": 63840.0
+      },
+      "search_offsets": {
+        "baseline": 12278320.0,
+        "candidate": 1604880.0
+      },
+      "location_checks": {
+        "baseline": 0.0,
+        "candidate": 27140.0
+      },
+      "cache_hits": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "root_words": {
+        "baseline": 6817.5,
+        "candidate": 6817.5
+      },
+      "collections": {
+        "baseline": 7.5,
+        "candidate": 7.5
+      },
+      "selected_copy_bytes": {
+        "baseline": 2680.0,
+        "candidate": 2680.0
+      },
+      "live_requested_bytes": {
+        "baseline": 24084.0,
+        "candidate": 24084.0
+      },
+      "peak_requested_bytes": {
+        "baseline": 63344.0,
+        "candidate": 63344.0
+      }
+    },
+    "phases": {
+      "roots": {
+        "baseline_exclusive_cpu_ms": 80.323707,
+        "candidate_exclusive_cpu_ms": 35.75696,
+        "baseline_inclusive_cpu_ms": 100.1955875,
+        "candidate_inclusive_cpu_ms": 35.75696,
+        "baseline_calls": 83040.0,
+        "candidate_calls": 55900.0
+      },
+      "metadata": {
+        "baseline_exclusive_cpu_ms": 76.1332585,
+        "candidate_exclusive_cpu_ms": 64.288719,
+        "baseline_inclusive_cpu_ms": 180.429649,
+        "candidate_inclusive_cpu_ms": 87.9844665,
+        "baseline_calls": 60700.0,
+        "candidate_calls": 60700.0
+      },
+      "payload": {
+        "baseline_exclusive_cpu_ms": 8.212562,
+        "candidate_exclusive_cpu_ms": 8.3361375,
+        "baseline_inclusive_cpu_ms": 34.987327,
+        "candidate_inclusive_cpu_ms": 25.924862,
+        "baseline_calls": 5440.0,
+        "candidate_calls": 5440.0
+      },
+      "gc": {
+        "baseline_exclusive_cpu_ms": 1.042944,
+        "candidate_exclusive_cpu_ms": 0.972415,
+        "baseline_inclusive_cpu_ms": 2.000062,
+        "candidate_inclusive_cpu_ms": 1.8616545,
+        "baseline_calls": 15.0,
+        "candidate_calls": 15.0
+      },
+      "repeat": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "split": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "join": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "replace": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "hex": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "base64": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_parse": {
+        "baseline_exclusive_cpu_ms": 55.809428,
+        "candidate_exclusive_cpu_ms": 60.846434,
+        "baseline_inclusive_cpu_ms": 249.400051,
+        "candidate_inclusive_cpu_ms": 199.1409275,
+        "baseline_calls": 20.0,
+        "candidate_calls": 20.0
+      },
+      "json_write": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_duplicate": {
+        "baseline_exclusive_cpu_ms": 28.0628895,
+        "candidate_exclusive_cpu_ms": 29.2410345,
+        "baseline_inclusive_cpu_ms": 65.633309,
+        "candidate_inclusive_cpu_ms": 54.720829,
+        "baseline_calls": 27040.0,
+        "candidate_calls": 27040.0
+      },
+      "json_clone": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "discovery_read": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "check": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "analysis_metadata": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "index": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "invalidation": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "serialization": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "total": {
+        "baseline_exclusive_cpu_ms": 0.216124,
+        "candidate_exclusive_cpu_ms": 0.199448,
+        "baseline_inclusive_cpu_ms": 249.701952,
+        "candidate_inclusive_cpu_ms": 199.419373,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      }
+    }
+  },
+  {
+    "case": "json-save-stringify",
+    "metrics": {
+      "allocations": {
+        "baseline": 79744.5,
+        "candidate": 32964.5
+      },
+      "requested_bytes": {
+        "baseline": 3411868.0,
+        "candidate": 1835428.0
+      },
+      "managed_constructions": {
+        "baseline": 3560.0,
+        "candidate": 3560.0
+      },
+      "layout_creations": {
+        "baseline": 43880.0,
+        "candidate": 28540.0
+      },
+      "scalar_accesses": {
+        "baseline": 2080.0,
+        "candidate": 2080.0
+      },
+      "search_slots": {
+        "baseline": 963280.0,
+        "candidate": 494860.0
+      },
+      "search_frames": {
+        "baseline": 117000.0,
+        "candidate": 79220.0
+      },
+      "search_offsets": {
+        "baseline": 8005740.0,
+        "candidate": 1159000.0
+      },
+      "location_checks": {
+        "baseline": 0.0,
+        "candidate": 31280.0
+      },
+      "cache_hits": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "root_words": {
+        "baseline": 7777.0,
+        "candidate": 7777.0
+      },
+      "collections": {
+        "baseline": 14.0,
+        "candidate": 14.0
+      },
+      "selected_copy_bytes": {
+        "baseline": 2080.0,
+        "candidate": 2080.0
+      },
+      "live_requested_bytes": {
+        "baseline": 41609.0,
+        "candidate": 41609.0
+      },
+      "peak_requested_bytes": {
+        "baseline": 57810.0,
+        "candidate": 57738.0
+      }
+    },
+    "phases": {
+      "roots": {
+        "baseline_exclusive_cpu_ms": 88.65355,
+        "candidate_exclusive_cpu_ms": 42.4098775,
+        "baseline_inclusive_cpu_ms": 109.8024135,
+        "candidate_inclusive_cpu_ms": 42.4098775,
+        "baseline_calls": 98880.0,
+        "candidate_calls": 67600.0
+      },
+      "metadata": {
+        "baseline_exclusive_cpu_ms": 90.1788735,
+        "candidate_exclusive_cpu_ms": 74.5309735,
+        "baseline_inclusive_cpu_ms": 194.225914,
+        "candidate_inclusive_cpu_ms": 98.4525785,
+        "baseline_calls": 74480.0,
+        "candidate_calls": 74480.0
+      },
+      "payload": {
+        "baseline_exclusive_cpu_ms": 10.2098935,
+        "candidate_exclusive_cpu_ms": 10.8146835,
+        "baseline_inclusive_cpu_ms": 28.4627545,
+        "candidate_inclusive_cpu_ms": 24.364463,
+        "baseline_calls": 2880.0,
+        "candidate_calls": 2880.0
+      },
+      "gc": {
+        "baseline_exclusive_cpu_ms": 1.4757555,
+        "candidate_exclusive_cpu_ms": 1.6400195,
+        "baseline_inclusive_cpu_ms": 2.8347795,
+        "candidate_inclusive_cpu_ms": 3.1610315,
+        "baseline_calls": 28.0,
+        "candidate_calls": 28.0
+      },
+      "repeat": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "split": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "join": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "replace": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "hex": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "base64": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_write": {
+        "baseline_exclusive_cpu_ms": 41.658593,
+        "candidate_exclusive_cpu_ms": 47.8253315,
+        "baseline_inclusive_cpu_ms": 181.1377145,
+        "candidate_inclusive_cpu_ms": 145.278476,
+        "baseline_calls": 20.0,
+        "candidate_calls": 20.0
+      },
+      "json_duplicate": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_clone": {
+        "baseline_exclusive_cpu_ms": 18.7667815,
+        "candidate_exclusive_cpu_ms": 23.387358,
+        "baseline_inclusive_cpu_ms": 68.5456665,
+        "candidate_inclusive_cpu_ms": 54.509072,
+        "baseline_calls": 20.0,
+        "candidate_calls": 20.0
+      },
+      "discovery_read": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "check": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "analysis_metadata": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "index": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "invalidation": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "serialization": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "total": {
+        "baseline_exclusive_cpu_ms": 0.7636515,
+        "candidate_exclusive_cpu_ms": 0.8511955,
+        "baseline_inclusive_cpu_ms": 251.557937,
+        "candidate_inclusive_cpu_ms": 201.608255,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      }
+    }
+  },
+  {
+    "case": "json-wide128-parse",
+    "metrics": {
+      "allocations": {
+        "baseline": 2139193.5,
+        "candidate": 729653.5
+      },
+      "requested_bytes": {
+        "baseline": 96117320.0,
+        "candidate": 46484700.0
+      },
+      "managed_constructions": {
+        "baseline": 20660.0,
+        "candidate": 20660.0
+      },
+      "layout_creations": {
+        "baseline": 1393560.0,
+        "candidate": 787820.0
+      },
+      "scalar_accesses": {
+        "baseline": 65120.0,
+        "candidate": 65120.0
+      },
+      "search_slots": {
+        "baseline": 67862020.0,
+        "candidate": 29936680.0
+      },
+      "search_frames": {
+        "baseline": 2947860.0,
+        "candidate": 1912120.0
+      },
+      "search_offsets": {
+        "baseline": 647973280.0,
+        "candidate": 69640160.0
+      },
+      "location_checks": {
+        "baseline": 0.0,
+        "candidate": 977040.0
+      },
+      "cache_hits": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "root_words": {
+        "baseline": 78904.5,
+        "candidate": 78904.5
+      },
+      "collections": {
+        "baseline": 81.0,
+        "candidate": 81.0
+      },
+      "selected_copy_bytes": {
+        "baseline": 28900.0,
+        "candidate": 28900.0
+      },
+      "live_requested_bytes": {
+        "baseline": 107487.5,
+        "candidate": 107487.5
+      },
+      "peak_requested_bytes": {
+        "baseline": 159271.0,
+        "candidate": 159271.0
+      }
+    },
+    "phases": {
+      "roots": {
+        "baseline_exclusive_cpu_ms": 3027.3557245,
+        "candidate_exclusive_cpu_ms": 1209.2074345,
+        "baseline_inclusive_cpu_ms": 3833.018777,
+        "candidate_inclusive_cpu_ms": 1209.2074345,
+        "baseline_calls": 2791400.0,
+        "candidate_calls": 1814360.0
+      },
+      "metadata": {
+        "baseline_exclusive_cpu_ms": 2647.144227,
+        "candidate_exclusive_cpu_ms": 2131.563609,
+        "baseline_inclusive_cpu_ms": 5495.270967,
+        "candidate_inclusive_cpu_ms": 2754.847026,
+        "baseline_calls": 2189840.0,
+        "candidate_calls": 2189840.0
+      },
+      "payload": {
+        "baseline_exclusive_cpu_ms": 104.316583,
+        "candidate_exclusive_cpu_ms": 105.964773,
+        "baseline_inclusive_cpu_ms": 453.4025085,
+        "candidate_inclusive_cpu_ms": 331.586338,
+        "baseline_calls": 70260.0,
+        "candidate_calls": 70260.0
+      },
+      "gc": {
+        "baseline_exclusive_cpu_ms": 29.135,
+        "candidate_exclusive_cpu_ms": 29.314562,
+        "baseline_inclusive_cpu_ms": 57.1677835,
+        "candidate_inclusive_cpu_ms": 57.5518955,
+        "baseline_calls": 162.0,
+        "candidate_calls": 162.0
+      },
+      "repeat": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "split": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "join": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "replace": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "hex": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "base64": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_parse": {
+        "baseline_exclusive_cpu_ms": 7101.3700695,
+        "candidate_exclusive_cpu_ms": 7112.743825,
+        "baseline_inclusive_cpu_ms": 20446.300927,
+        "candidate_inclusive_cpu_ms": 18449.6246795,
+        "baseline_calls": 20.0,
+        "candidate_calls": 20.0
+      },
+      "json_write": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_duplicate": {
+        "baseline_exclusive_cpu_ms": 7600.776376,
+        "candidate_exclusive_cpu_ms": 7861.029939,
+        "baseline_inclusive_cpu_ms": 11898.704061,
+        "candidate_inclusive_cpu_ms": 10385.1067265,
+        "baseline_calls": 10823680.0,
+        "candidate_calls": 10823680.0
+      },
+      "json_clone": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "discovery_read": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "check": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "analysis_metadata": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "index": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "invalidation": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "serialization": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "total": {
+        "baseline_exclusive_cpu_ms": 0.2493835,
+        "candidate_exclusive_cpu_ms": 0.238612,
+        "baseline_inclusive_cpu_ms": 20446.80926,
+        "candidate_inclusive_cpu_ms": 18450.2705275,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      }
+    }
+  },
+  {
+    "case": "json-wide128-stringify",
+    "metrics": {
+      "allocations": {
+        "baseline": 893668.5,
+        "candidate": 363648.5
+      },
+      "requested_bytes": {
+        "baseline": 37708108.0,
+        "candidate": 19844588.0
+      },
+      "managed_constructions": {
+        "baseline": 31600.0,
+        "candidate": 31600.0
+      },
+      "layout_creations": {
+        "baseline": 499280.0,
+        "candidate": 331840.0
+      },
+      "scalar_accesses": {
+        "baseline": 23780.0,
+        "candidate": 23780.0
+      },
+      "search_slots": {
+        "baseline": 9949820.0,
+        "candidate": 5135300.0
+      },
+      "search_frames": {
+        "baseline": 1248040.0,
+        "candidate": 848500.0
+      },
+      "search_offsets": {
+        "baseline": 81735280.0,
+        "candidate": 12366640.0
+      },
+      "location_checks": {
+        "baseline": 0.0,
+        "candidate": 353600.0
+      },
+      "cache_hits": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "root_words": {
+        "baseline": 72346.0,
+        "candidate": 72346.0
+      },
+      "collections": {
+        "baseline": 123.5,
+        "candidate": 123.5
+      },
+      "selected_copy_bytes": {
+        "baseline": 23780.0,
+        "candidate": 23780.0
+      },
+      "live_requested_bytes": {
+        "baseline": 42995.0,
+        "candidate": 42995.0
+      },
+      "peak_requested_bytes": {
+        "baseline": 94229.0,
+        "candidate": 94193.0
+      }
+    },
+    "phases": {
+      "roots": {
+        "baseline_exclusive_cpu_ms": 980.3965615,
+        "candidate_exclusive_cpu_ms": 472.359174,
+        "baseline_inclusive_cpu_ms": 1214.487375,
+        "candidate_inclusive_cpu_ms": 472.359174,
+        "baseline_calls": 1112500.0,
+        "candidate_calls": 758900.0
+      },
+      "metadata": {
+        "baseline_exclusive_cpu_ms": 1026.1353885,
+        "candidate_exclusive_cpu_ms": 850.6068945,
+        "baseline_inclusive_cpu_ms": 2242.593308,
+        "candidate_inclusive_cpu_ms": 1129.901313,
+        "baseline_calls": 851620.0,
+        "candidate_calls": 851620.0
+      },
+      "payload": {
+        "baseline_exclusive_cpu_ms": 130.0192205,
+        "candidate_exclusive_cpu_ms": 134.706488,
+        "baseline_inclusive_cpu_ms": 369.508351,
+        "candidate_inclusive_cpu_ms": 315.4214805,
+        "baseline_calls": 34060.0,
+        "candidate_calls": 34060.0
+      },
+      "gc": {
+        "baseline_exclusive_cpu_ms": 38.582665,
+        "candidate_exclusive_cpu_ms": 36.090691,
+        "baseline_inclusive_cpu_ms": 76.102233,
+        "candidate_inclusive_cpu_ms": 71.144978,
+        "baseline_calls": 247.0,
+        "candidate_calls": 247.0
+      },
+      "repeat": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "split": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "join": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "replace": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "hex": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "base64": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_write": {
+        "baseline_exclusive_cpu_ms": 474.190762,
+        "candidate_exclusive_cpu_ms": 541.289496,
+        "baseline_inclusive_cpu_ms": 2125.6661255,
+        "candidate_inclusive_cpu_ms": 1707.2671895,
+        "baseline_calls": 20.0,
+        "candidate_calls": 20.0
+      },
+      "json_duplicate": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_clone": {
+        "baseline_exclusive_cpu_ms": 188.9595485,
+        "candidate_exclusive_cpu_ms": 238.698819,
+        "baseline_inclusive_cpu_ms": 707.736507,
+        "candidate_inclusive_cpu_ms": 565.1237115,
+        "baseline_calls": 20.0,
+        "candidate_calls": 20.0
+      },
+      "discovery_read": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "check": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "analysis_metadata": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "index": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "invalidation": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "serialization": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "total": {
+        "baseline_exclusive_cpu_ms": 0.8707775,
+        "candidate_exclusive_cpu_ms": 0.924388,
+        "baseline_inclusive_cpu_ms": 2839.1893385,
+        "candidate_inclusive_cpu_ms": 2274.352894,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      }
+    }
+  },
+  {
+    "case": "sort-1024-mixed",
+    "metrics": {
+      "allocations": {
+        "baseline": 155445.5,
+        "candidate": 435.5
+      },
+      "requested_bytes": {
+        "baseline": 4914566.0,
+        "candidate": 109300.0
+      },
+      "managed_constructions": {
+        "baseline": 68.0,
+        "candidate": 68.0
+      },
+      "layout_creations": {
+        "baseline": 155082.0,
+        "candidate": 155068.0
+      },
+      "scalar_accesses": {
+        "baseline": 85308.0,
+        "candidate": 85308.0
+      },
+      "search_slots": {
+        "baseline": 1996054.0,
+        "candidate": 930410.0
+      },
+      "search_frames": {
+        "baseline": 519226.0,
+        "candidate": 337306.0
+      },
+      "search_offsets": {
+        "baseline": 29249284.0,
+        "candidate": 4801934.0
+      },
+      "location_checks": {
+        "baseline": 0.0,
+        "candidate": 175558.0
+      },
+      "cache_hits": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "root_words": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "collections": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "selected_copy_bytes": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "live_requested_bytes": {
+        "baseline": 106545.0,
+        "candidate": 106545.0
+      },
+      "peak_requested_bytes": {
+        "baseline": 106559.0,
+        "candidate": 106559.0
+      }
+    },
+    "phases": {
+      "roots": {
+        "baseline_exclusive_cpu_ms": 442.060559,
+        "candidate_exclusive_cpu_ms": 203.5307215,
+        "baseline_inclusive_cpu_ms": 554.2223355,
+        "candidate_inclusive_cpu_ms": 203.5307215,
+        "baseline_calls": 506276.0,
+        "candidate_calls": 330718.0
+      },
+      "metadata": {
+        "baseline_exclusive_cpu_ms": 407.5254525,
+        "candidate_exclusive_cpu_ms": 366.0370885,
+        "baseline_inclusive_cpu_ms": 1142.3384845,
+        "candidate_inclusive_cpu_ms": 535.691282,
+        "baseline_calls": 310072.0,
+        "candidate_calls": 310072.0
+      },
+      "payload": {
+        "baseline_exclusive_cpu_ms": 104.707778,
+        "candidate_exclusive_cpu_ms": 104.5860975,
+        "baseline_inclusive_cpu_ms": 505.147097,
+        "candidate_inclusive_cpu_ms": 375.4767575,
+        "baseline_calls": 85308.0,
+        "candidate_calls": 85308.0
+      },
+      "gc": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "repeat": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "split": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "join": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "replace": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "hex": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "base64": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_write": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_duplicate": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_clone": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "discovery_read": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "check": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "analysis_metadata": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "index": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "invalidation": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "serialization": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "total": {
+        "baseline_exclusive_cpu_ms": 246.567611,
+        "candidate_exclusive_cpu_ms": 263.574059,
+        "baseline_inclusive_cpu_ms": 1201.828328,
+        "candidate_inclusive_cpu_ms": 937.959654,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      }
+    }
+  },
+  {
+    "case": "sort-16384-mixed",
+    "metrics": {
+      "allocations": {
+        "baseline": 1769701.5,
+        "candidate": 308.5
+      },
+      "requested_bytes": {
+        "baseline": 55586010.0,
+        "candidate": 734849.0
+      },
+      "managed_constructions": {
+        "baseline": 48.0,
+        "candidate": 48.0
+      },
+      "layout_creations": {
+        "baseline": 1769453.0,
+        "candidate": 1769446.0
+      },
+      "scalar_accesses": {
+        "baseline": 1015694.0,
+        "candidate": 1015694.0
+      },
+      "search_slots": {
+        "baseline": 22707923.0,
+        "candidate": 10616653.0
+      },
+      "search_frames": {
+        "baseline": 5865941.0,
+        "candidate": 3817805.0
+      },
+      "search_offsets": {
+        "baseline": 334463974.0,
+        "candidate": 55193959.0
+      },
+      "location_checks": {
+        "baseline": 0.0,
+        "candidate": 1998827.0
+      },
+      "cache_hits": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "root_words": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "collections": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "selected_copy_bytes": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "live_requested_bytes": {
+        "baseline": 732867.0,
+        "candidate": 732867.0
+      },
+      "peak_requested_bytes": {
+        "baseline": 732882.0,
+        "candidate": 732882.0
+      }
+    },
+    "phases": {
+      "roots": {
+        "baseline_exclusive_cpu_ms": 4989.8351765,
+        "candidate_exclusive_cpu_ms": 2316.056581,
+        "baseline_inclusive_cpu_ms": 6256.1045525,
+        "candidate_inclusive_cpu_ms": 2316.056581,
+        "baseline_calls": 5767162.0,
+        "candidate_calls": 3768335.0
+      },
+      "metadata": {
+        "baseline_exclusive_cpu_ms": 4655.4134245,
+        "candidate_exclusive_cpu_ms": 4179.7341215,
+        "baseline_inclusive_cpu_ms": 13042.5895045,
+        "candidate_inclusive_cpu_ms": 6151.8885215,
+        "baseline_calls": 3538836.0,
+        "candidate_calls": 3538836.0
+      },
+      "payload": {
+        "baseline_exclusive_cpu_ms": 1246.380406,
+        "candidate_exclusive_cpu_ms": 1239.835529,
+        "baseline_inclusive_cpu_ms": 5976.068318,
+        "candidate_inclusive_cpu_ms": 4447.6432585,
+        "baseline_calls": 1015694.0,
+        "candidate_calls": 1015694.0
+      },
+      "gc": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "repeat": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "split": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "join": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "replace": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "hex": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "base64": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_write": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_duplicate": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_clone": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "discovery_read": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "check": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "analysis_metadata": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "index": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "invalidation": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "serialization": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "total": {
+        "baseline_exclusive_cpu_ms": 2773.838074,
+        "candidate_exclusive_cpu_ms": 2943.2832135,
+        "baseline_inclusive_cpu_ms": 13634.699221,
+        "candidate_inclusive_cpu_ms": 10676.313715,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      }
+    }
+  },
+  {
+    "case": "sort-fixed-256KiB",
+    "metrics": {
+      "allocations": {
+        "baseline": 657.5,
+        "candidate": 344.5
+      },
+      "requested_bytes": {
+        "baseline": 10514679.0,
+        "candidate": 10504128.0
+      },
+      "managed_constructions": {
+        "baseline": 52.0,
+        "candidate": 52.0
+      },
+      "layout_creations": {
+        "baseline": 321.0,
+        "candidate": 227.0
+      },
+      "scalar_accesses": {
+        "baseline": 20.0,
+        "candidate": 20.0
+      },
+      "search_slots": {
+        "baseline": 5621.0,
+        "candidate": 2763.0
+      },
+      "search_frames": {
+        "baseline": 1325.0,
+        "candidate": 935.0
+      },
+      "search_offsets": {
+        "baseline": 46296.0,
+        "candidate": 6398.0
+      },
+      "location_checks": {
+        "baseline": 0.0,
+        "candidate": 319.0
+      },
+      "cache_hits": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "root_words": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "collections": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "selected_copy_bytes": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "live_requested_bytes": {
+        "baseline": 10496073.0,
+        "candidate": 10496073.0
+      },
+      "peak_requested_bytes": {
+        "baseline": 10496083.0,
+        "candidate": 10496083.0
+      }
+    },
+    "phases": {
+      "roots": {
+        "baseline_exclusive_cpu_ms": 0.909402,
+        "candidate_exclusive_cpu_ms": 0.5012175,
+        "baseline_inclusive_cpu_ms": 1.110694,
+        "candidate_inclusive_cpu_ms": 0.5012175,
+        "baseline_calls": 1004.0,
+        "candidate_calls": 685.0
+      },
+      "metadata": {
+        "baseline_exclusive_cpu_ms": 0.69486,
+        "candidate_exclusive_cpu_ms": 0.5771925,
+        "baseline_inclusive_cpu_ms": 1.285477,
+        "candidate_inclusive_cpu_ms": 0.756231,
+        "baseline_calls": 487.0,
+        "candidate_calls": 487.0
+      },
+      "payload": {
+        "baseline_exclusive_cpu_ms": 0.0266795,
+        "candidate_exclusive_cpu_ms": 0.026489,
+        "baseline_inclusive_cpu_ms": 0.142037,
+        "candidate_inclusive_cpu_ms": 0.1099505,
+        "baseline_calls": 20.0,
+        "candidate_calls": 20.0
+      },
+      "gc": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "repeat": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "split": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "join": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "replace": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "hex": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "base64": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_write": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_duplicate": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_clone": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "discovery_read": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "check": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "analysis_metadata": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "index": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "invalidation": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "serialization": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "total": {
+        "baseline_exclusive_cpu_ms": 431.1785715,
+        "candidate_exclusive_cpu_ms": 434.824602,
+        "baseline_inclusive_cpu_ms": 432.7924055,
+        "candidate_inclusive_cpu_ms": 435.931315,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      }
+    }
+  },
+  {
+    "case": "sort-text",
+    "metrics": {
+      "allocations": {
+        "baseline": 33468.0,
+        "candidate": 8529.0
+      },
+      "requested_bytes": {
+        "baseline": 1174304.0,
+        "candidate": 377231.0
+      },
+      "managed_constructions": {
+        "baseline": 1021.0,
+        "candidate": 1021.0
+      },
+      "layout_creations": {
+        "baseline": 23529.0,
+        "candidate": 20001.0
+      },
+      "scalar_accesses": {
+        "baseline": 8112.0,
+        "candidate": 8112.0
+      },
+      "search_slots": {
+        "baseline": 234906.0,
+        "candidate": 115866.0
+      },
+      "search_frames": {
+        "baseline": 67922.0,
+        "candidate": 46274.0
+      },
+      "search_offsets": {
+        "baseline": 2197702.0,
+        "candidate": 358162.0
+      },
+      "location_checks": {
+        "baseline": 0.0,
+        "candidate": 21114.0
+      },
+      "cache_hits": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "root_words": {
+        "baseline": 908.0,
+        "candidate": 908.0
+      },
+      "collections": {
+        "baseline": 4.0,
+        "candidate": 4.0
+      },
+      "selected_copy_bytes": {
+        "baseline": 6720.0,
+        "candidate": 6720.0
+      },
+      "live_requested_bytes": {
+        "baseline": 11311.0,
+        "candidate": 11311.0
+      },
+      "peak_requested_bytes": {
+        "baseline": 58724.0,
+        "candidate": 58688.0
+      }
+    },
+    "phases": {
+      "roots": {
+        "baseline_exclusive_cpu_ms": 54.0646485,
+        "candidate_exclusive_cpu_ms": 26.2290505,
+        "baseline_inclusive_cpu_ms": 67.154022,
+        "candidate_inclusive_cpu_ms": 26.2290505,
+        "baseline_calls": 64742.0,
+        "candidate_calls": 43628.0
+      },
+      "metadata": {
+        "baseline_exclusive_cpu_ms": 56.3692015,
+        "candidate_exclusive_cpu_ms": 50.739955,
+        "baseline_inclusive_cpu_ms": 147.468896,
+        "candidate_inclusive_cpu_ms": 73.3681315,
+        "baseline_calls": 44457.0,
+        "candidate_calls": 44457.0
+      },
+      "payload": {
+        "baseline_exclusive_cpu_ms": 14.617338,
+        "candidate_exclusive_cpu_ms": 14.7989785,
+        "baseline_inclusive_cpu_ms": 56.906442,
+        "candidate_inclusive_cpu_ms": 44.377326,
+        "baseline_calls": 8592.0,
+        "candidate_calls": 8592.0
+      },
+      "gc": {
+        "baseline_exclusive_cpu_ms": 0.449784,
+        "candidate_exclusive_cpu_ms": 0.472925,
+        "baseline_inclusive_cpu_ms": 0.8750595,
+        "candidate_inclusive_cpu_ms": 0.921725,
+        "baseline_calls": 8.0,
+        "candidate_calls": 8.0
+      },
+      "repeat": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "split": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "join": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "replace": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "hex": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "base64": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_write": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_duplicate": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_clone": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "discovery_read": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "check": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "analysis_metadata": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "index": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "invalidation": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "serialization": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "total": {
+        "baseline_exclusive_cpu_ms": 30.5080145,
+        "candidate_exclusive_cpu_ms": 32.60015,
+        "baseline_inclusive_cpu_ms": 156.0060365,
+        "candidate_inclusive_cpu_ms": 124.852403,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      }
+    }
+  },
+  {
+    "case": "text-16384",
+    "metrics": {
+      "allocations": {
+        "baseline": 6612625.0,
+        "candidate": 4214910.0
+      },
+      "requested_bytes": {
+        "baseline": 337794715.0,
+        "candidate": 262253167.0
+      },
+      "managed_constructions": {
+        "baseline": 82057.0,
+        "candidate": 82057.0
+      },
+      "layout_creations": {
+        "baseline": 2299503.0,
+        "candidate": 2102850.0
+      },
+      "scalar_accesses": {
+        "baseline": 972128.0,
+        "candidate": 972128.0
+      },
+      "search_slots": {
+        "baseline": 22061937.0,
+        "candidate": 10755162.0
+      },
+      "search_frames": {
+        "baseline": 7943308.0,
+        "candidate": 5228220.0
+      },
+      "search_offsets": {
+        "baseline": 168961375.0,
+        "candidate": 28405972.0
+      },
+      "location_checks": {
+        "baseline": 0.0,
+        "candidate": 2168452.0
+      },
+      "cache_hits": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "root_words": {
+        "baseline": 59930.0,
+        "candidate": 59930.0
+      },
+      "collections": {
+        "baseline": 320.5,
+        "candidate": 320.5
+      },
+      "selected_copy_bytes": {
+        "baseline": 278626.0,
+        "candidate": 278626.0
+      },
+      "live_requested_bytes": {
+        "baseline": 2679364.0,
+        "candidate": 2679364.0
+      },
+      "peak_requested_bytes": {
+        "baseline": 3286978.5,
+        "candidate": 3286942.5
+      }
+    },
+    "phases": {
+      "roots": {
+        "baseline_exclusive_cpu_ms": 5461.1106965,
+        "candidate_exclusive_cpu_ms": 2729.604284,
+        "baseline_inclusive_cpu_ms": 6772.9123115,
+        "candidate_inclusive_cpu_ms": 2729.604284,
+        "baseline_calls": 6652976.0,
+        "candidate_calls": 4484524.0
+      },
+      "metadata": {
+        "baseline_exclusive_cpu_ms": 5521.6925725,
+        "candidate_exclusive_cpu_ms": 4845.197324,
+        "baseline_inclusive_cpu_ms": 14318.701442,
+        "candidate_inclusive_cpu_ms": 6870.3819875,
+        "baseline_calls": 4435015.0,
+        "candidate_calls": 4435015.0
+      },
+      "payload": {
+        "baseline_exclusive_cpu_ms": 1430.03978,
+        "candidate_exclusive_cpu_ms": 1447.0926255,
+        "baseline_inclusive_cpu_ms": 6996.6139025,
+        "candidate_inclusive_cpu_ms": 5588.312219,
+        "baseline_calls": 1004914.0,
+        "candidate_calls": 1004914.0
+      },
+      "gc": {
+        "baseline_exclusive_cpu_ms": 1476.866839,
+        "candidate_exclusive_cpu_ms": 1495.2646555,
+        "baseline_inclusive_cpu_ms": 2951.885693,
+        "candidate_inclusive_cpu_ms": 2988.7371475,
+        "baseline_calls": 641.0,
+        "candidate_calls": 641.0
+      },
+      "repeat": {
+        "baseline_exclusive_cpu_ms": 281.794906,
+        "candidate_exclusive_cpu_ms": 320.591535,
+        "baseline_inclusive_cpu_ms": 1163.3132745,
+        "candidate_inclusive_cpu_ms": 932.3390825,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      },
+      "split": {
+        "baseline_exclusive_cpu_ms": 815.008781,
+        "candidate_exclusive_cpu_ms": 862.568412,
+        "baseline_inclusive_cpu_ms": 4182.131702,
+        "candidate_inclusive_cpu_ms": 3511.785338,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      },
+      "join": {
+        "baseline_exclusive_cpu_ms": 574.612003,
+        "candidate_exclusive_cpu_ms": 682.462699,
+        "baseline_inclusive_cpu_ms": 3475.530271,
+        "candidate_inclusive_cpu_ms": 3041.04575,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      },
+      "replace": {
+        "baseline_exclusive_cpu_ms": 752.019789,
+        "candidate_exclusive_cpu_ms": 798.265151,
+        "baseline_inclusive_cpu_ms": 3666.361983,
+        "candidate_inclusive_cpu_ms": 2984.2793995,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      },
+      "hex": {
+        "baseline_exclusive_cpu_ms": 628.62311,
+        "candidate_exclusive_cpu_ms": 711.6273115,
+        "baseline_inclusive_cpu_ms": 2818.87709,
+        "candidate_inclusive_cpu_ms": 2263.3036345,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      },
+      "base64": {
+        "baseline_exclusive_cpu_ms": 446.2317205,
+        "candidate_exclusive_cpu_ms": 505.1537175,
+        "baseline_inclusive_cpu_ms": 2050.1203355,
+        "candidate_inclusive_cpu_ms": 1654.3200355,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      },
+      "json_parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_write": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_duplicate": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_clone": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "discovery_read": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "check": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "analysis_metadata": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "index": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "invalidation": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "serialization": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "total": {
+        "baseline_exclusive_cpu_ms": 0.0471775,
+        "candidate_exclusive_cpu_ms": 0.0430235,
+        "baseline_inclusive_cpu_ms": 17374.514979,
+        "candidate_inclusive_cpu_ms": 14390.881492,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      }
+    }
+  },
+  {
+    "case": "text-256",
+    "metrics": {
+      "allocations": {
+        "baseline": 47560.0,
+        "candidate": 9909.0
+      },
+      "requested_bytes": {
+        "baseline": 1658149.0,
+        "candidate": 472057.0
+      },
+      "managed_constructions": {
+        "baseline": 1381.0,
+        "candidate": 1381.0
+      },
+      "layout_creations": {
+        "baseline": 36135.0,
+        "candidate": 33018.0
+      },
+      "scalar_accesses": {
+        "baseline": 15200.0,
+        "candidate": 15200.0
+      },
+      "search_slots": {
+        "baseline": 347307.0,
+        "candidate": 169428.0
+      },
+      "search_frames": {
+        "baseline": 125752.0,
+        "candidate": 82824.0
+      },
+      "search_offsets": {
+        "baseline": 2651431.0,
+        "candidate": 445222.0
+      },
+      "location_checks": {
+        "baseline": 0.0,
+        "candidate": 34090.0
+      },
+      "cache_hits": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "root_words": {
+        "baseline": 1042.0,
+        "candidate": 1042.0
+      },
+      "collections": {
+        "baseline": 5.5,
+        "candidate": 5.5
+      },
+      "selected_copy_bytes": {
+        "baseline": 4450.0,
+        "candidate": 4450.0
+      },
+      "live_requested_bytes": {
+        "baseline": 71460.5,
+        "candidate": 71460.5
+      },
+      "peak_requested_bytes": {
+        "baseline": 89685.0,
+        "candidate": 89649.0
+      }
+    },
+    "phases": {
+      "roots": {
+        "baseline_exclusive_cpu_ms": 84.956979,
+        "candidate_exclusive_cpu_ms": 43.022422,
+        "baseline_inclusive_cpu_ms": 105.343096,
+        "candidate_inclusive_cpu_ms": 43.022422,
+        "baseline_calls": 104714.0,
+        "candidate_calls": 70624.0
+      },
+      "metadata": {
+        "baseline_exclusive_cpu_ms": 85.9769995,
+        "candidate_exclusive_cpu_ms": 75.945361,
+        "baseline_inclusive_cpu_ms": 222.1439965,
+        "candidate_inclusive_cpu_ms": 107.590312,
+        "baseline_calls": 69631.0,
+        "candidate_calls": 69631.0
+      },
+      "payload": {
+        "baseline_exclusive_cpu_ms": 22.160213,
+        "candidate_exclusive_cpu_ms": 22.677493,
+        "baseline_inclusive_cpu_ms": 95.438931,
+        "candidate_inclusive_cpu_ms": 73.711054,
+        "baseline_calls": 15730.0,
+        "candidate_calls": 15730.0
+      },
+      "gc": {
+        "baseline_exclusive_cpu_ms": 0.819447,
+        "candidate_exclusive_cpu_ms": 0.759859,
+        "baseline_inclusive_cpu_ms": 1.608791,
+        "candidate_inclusive_cpu_ms": 1.493284,
+        "baseline_calls": 11.0,
+        "candidate_calls": 11.0
+      },
+      "repeat": {
+        "baseline_exclusive_cpu_ms": 4.417142,
+        "candidate_exclusive_cpu_ms": 5.1250145,
+        "baseline_inclusive_cpu_ms": 18.1775845,
+        "candidate_inclusive_cpu_ms": 14.83847,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      },
+      "split": {
+        "baseline_exclusive_cpu_ms": 12.598151,
+        "candidate_exclusive_cpu_ms": 13.548524,
+        "baseline_inclusive_cpu_ms": 56.339848,
+        "candidate_inclusive_cpu_ms": 46.392176,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      },
+      "join": {
+        "baseline_exclusive_cpu_ms": 8.9464595,
+        "candidate_exclusive_cpu_ms": 10.7281745,
+        "baseline_inclusive_cpu_ms": 40.572399,
+        "candidate_inclusive_cpu_ms": 33.7828675,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      },
+      "replace": {
+        "baseline_exclusive_cpu_ms": 11.7816045,
+        "candidate_exclusive_cpu_ms": 12.5454255,
+        "baseline_inclusive_cpu_ms": 57.504866,
+        "candidate_inclusive_cpu_ms": 46.905128,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      },
+      "hex": {
+        "baseline_exclusive_cpu_ms": 9.8325365,
+        "candidate_exclusive_cpu_ms": 11.2330905,
+        "baseline_inclusive_cpu_ms": 43.8373515,
+        "candidate_inclusive_cpu_ms": 35.5988335,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      },
+      "base64": {
+        "baseline_exclusive_cpu_ms": 7.0463115,
+        "candidate_exclusive_cpu_ms": 7.9942375,
+        "baseline_inclusive_cpu_ms": 32.0202225,
+        "candidate_inclusive_cpu_ms": 25.9563235,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      },
+      "json_parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_write": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_duplicate": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_clone": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "discovery_read": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "check": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "analysis_metadata": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "index": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "invalidation": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "serialization": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "total": {
+        "baseline_exclusive_cpu_ms": 0.0290845,
+        "candidate_exclusive_cpu_ms": 0.0297785,
+        "baseline_inclusive_cpu_ms": 248.5292435,
+        "candidate_inclusive_cpu_ms": 203.5565275,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      }
+    }
+  },
+  {
+    "case": "text-4096",
+    "metrics": {
+      "allocations": {
+        "baseline": 963740.5,
+        "candidate": 364169.5
+      },
+      "requested_bytes": {
+        "baseline": 39762361.0,
+        "candidate": 20872589.0
+      },
+      "managed_constructions": {
+        "baseline": 20605.0,
+        "candidate": 20605.0
+      },
+      "layout_creations": {
+        "baseline": 575063.0,
+        "candidate": 525866.0
+      },
+      "scalar_accesses": {
+        "baseline": 243040.0,
+        "candidate": 243040.0
+      },
+      "search_slots": {
+        "baseline": 5517871.0,
+        "candidate": 2690008.0
+      },
+      "search_frames": {
+        "baseline": 1987440.0,
+        "candidate": 1308160.0
+      },
+      "search_offsets": {
+        "baseline": 42250487.0,
+        "candidate": 7102618.0
+      },
+      "location_checks": {
+        "baseline": 0.0,
+        "candidate": 542310.0
+      },
+      "cache_hits": {
+        "baseline": 0.0,
+        "candidate": 0.0
+      },
+      "root_words": {
+        "baseline": 15034.5,
+        "candidate": 15034.5
+      },
+      "collections": {
+        "baseline": 80.5,
+        "candidate": 80.5
+      },
+      "selected_copy_bytes": {
+        "baseline": 69730.0,
+        "candidate": 69730.0
+      },
+      "live_requested_bytes": {
+        "baseline": 768388.0,
+        "candidate": 768388.0
+      },
+      "peak_requested_bytes": {
+        "baseline": 812093.0,
+        "candidate": 812093.0
+      }
+    },
+    "phases": {
+      "roots": {
+        "baseline_exclusive_cpu_ms": 1358.6982065,
+        "candidate_exclusive_cpu_ms": 683.781686,
+        "baseline_inclusive_cpu_ms": 1684.5656845,
+        "candidate_inclusive_cpu_ms": 683.781686,
+        "baseline_calls": 1663950.0,
+        "candidate_calls": 1121640.0
+      },
+      "metadata": {
+        "baseline_exclusive_cpu_ms": 1374.319721,
+        "candidate_exclusive_cpu_ms": 1204.701618,
+        "baseline_inclusive_cpu_ms": 3562.7553705,
+        "candidate_inclusive_cpu_ms": 1708.3606115,
+        "baseline_calls": 1109039.0,
+        "candidate_calls": 1109039.0
+      },
+      "payload": {
+        "baseline_exclusive_cpu_ms": 355.1038935,
+        "candidate_exclusive_cpu_ms": 360.9409805,
+        "baseline_inclusive_cpu_ms": 1574.4330065,
+        "candidate_inclusive_cpu_ms": 1220.6582205,
+        "baseline_calls": 251250.0,
+        "candidate_calls": 251250.0
+      },
+      "gc": {
+        "baseline_exclusive_cpu_ms": 90.033732,
+        "candidate_exclusive_cpu_ms": 90.677914,
+        "baseline_inclusive_cpu_ms": 179.6492955,
+        "candidate_inclusive_cpu_ms": 180.9370155,
+        "baseline_calls": 161.0,
+        "candidate_calls": 161.0
+      },
+      "repeat": {
+        "baseline_exclusive_cpu_ms": 70.111255,
+        "candidate_exclusive_cpu_ms": 81.3852835,
+        "baseline_inclusive_cpu_ms": 289.3704525,
+        "candidate_inclusive_cpu_ms": 236.089107,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      },
+      "split": {
+        "baseline_exclusive_cpu_ms": 202.039499,
+        "candidate_exclusive_cpu_ms": 213.658284,
+        "baseline_inclusive_cpu_ms": 934.595036,
+        "candidate_inclusive_cpu_ms": 762.347987,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      },
+      "join": {
+        "baseline_exclusive_cpu_ms": 142.8492555,
+        "candidate_exclusive_cpu_ms": 169.7383285,
+        "baseline_inclusive_cpu_ms": 695.519032,
+        "candidate_inclusive_cpu_ms": 580.284073,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      },
+      "replace": {
+        "baseline_exclusive_cpu_ms": 188.5629415,
+        "candidate_exclusive_cpu_ms": 199.4528145,
+        "baseline_inclusive_cpu_ms": 917.853257,
+        "candidate_inclusive_cpu_ms": 743.9488715,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      },
+      "hex": {
+        "baseline_exclusive_cpu_ms": 155.9509485,
+        "candidate_exclusive_cpu_ms": 177.6388425,
+        "baseline_inclusive_cpu_ms": 699.755292,
+        "candidate_inclusive_cpu_ms": 565.2646685,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      },
+      "base64": {
+        "baseline_exclusive_cpu_ms": 111.7557105,
+        "candidate_exclusive_cpu_ms": 125.9811895,
+        "baseline_inclusive_cpu_ms": 511.9974115,
+        "candidate_inclusive_cpu_ms": 411.991491,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      },
+      "json_parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_write": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_duplicate": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "json_clone": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "discovery_read": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "parse": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "check": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "analysis_metadata": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "index": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "invalidation": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "serialization": {
+        "baseline_exclusive_cpu_ms": 0.0,
+        "candidate_exclusive_cpu_ms": 0.0,
+        "baseline_inclusive_cpu_ms": 0.0,
+        "candidate_inclusive_cpu_ms": 0.0,
+        "baseline_calls": 0.0,
+        "candidate_calls": 0.0
+      },
+      "total": {
+        "baseline_exclusive_cpu_ms": 0.036309,
+        "candidate_exclusive_cpu_ms": 0.041014,
+        "baseline_inclusive_cpu_ms": 4054.8661005,
+        "candidate_inclusive_cpu_ms": 3310.870624,
+        "baseline_calls": 1.0,
+        "candidate_calls": 1.0
+      }
+    }
+  }
+]

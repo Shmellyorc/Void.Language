@@ -1,0 +1,9 @@
+{
+  "all_pass": true,
+  "core_hosts": 17,
+  "advanced_original": "preserved_expected_failure",
+  "advanced_semantic": "pass",
+  "io_ownership": "pass",
+  "cache_variants": 3,
+  "ir": "verified"
+}

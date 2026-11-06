@@ -24,6 +24,20 @@ std::size_t at(const vd::ValidatedAnalysis& a,const std::string& module,const st
 }
 void queries(const fs::path& root) {
     project(root); auto a=analyze(root); vd::ToolingIndex index(a);
+    auto declarations=index.declarations();auto references=index.references();
+    check(declarations.size()==a->declarations().size()+a->editor_declarations().size(),"declaration view population");
+    check(references.size()==a->references().size()+a->editor_references().size(),"reference view population");
+    auto verify_cursor=[](const auto& view){
+        std::size_t n=0;for(const auto& record:view){check(n<view.size() && &record==&view[n],"record cursor changed concatenation order");++n;}
+        check(n==view.size() && static_cast<std::size_t>(std::distance(view.begin(),view.end()))==view.size(),"record cursor crossed its end");
+    };
+    verify_cursor(declarations);verify_cursor(references);
+    auto blank=vd::analyze_source({"blank.void",""});check(blank.succeeded(),"empty tooling analysis");
+    vd::ToolingIndex blank_index(blank.program);verify_cursor(blank_index.declarations());verify_cursor(blank_index.references());
+
+    for(std::size_t n=0;n<declarations.size();++n)check(&declarations[n]==(n<a->declarations().size()?&a->declarations()[n]:&a->editor_declarations()[n-a->declarations().size()]),"declaration record copied or reordered");
+    for(std::size_t n=0;n<references.size();++n)check(&references[n]==(n<a->references().size()?&a->references()[n]:&a->editor_references()[n-a->references().size()]),"reference record copied or reordered");
+
     auto d=index.declaration("/leaf.void::calculate");
     check(d && d->module=="/leaf.void" && d->visibility=="internal" && d->parameters==std::vector<vd::ir::Type>{vd::ir::Type::i32} && d->type==vd::ir::Type::i32,"signature/visibility");
     auto refs=index.references_to(d->identity); check(refs.size()==2,"multiple modules/callers");
@@ -70,6 +84,20 @@ void queries(const fs::path& root) {
     check(fresh.declaration(d->identity)->source.source->text()=="# moved\n\n"+leaf(),"second index lifetime");
     try { vd::ToolingIndex invalid(nullptr); throw std::logic_error("failed analysis indexed"); } catch(const std::invalid_argument&) {}
     std::cout<<"queries: aliased/direct definitions, 2 callers, root/local constants, byte spans and retained snapshots\n";
+}
+void borrowed_lifetimes() {
+    std::weak_ptr<const vd::ValidatedAnalysis> weak;
+    std::optional<vd::AnalyzedDeclaration> owned;
+    {
+        auto view=[&]{auto a=vd::analyze_source({"view.void","func entry(x: i32) -> i32:\n    return x\n"});
+            check(a.succeeded(),"borrowed view fixture");weak=a.program;vd::ToolingIndex index(a.program);
+            owned=index.declaration("view.void::entry");return index.declarations();}();
+        check(!weak.expired() && !view.empty(),"view lost analysis owner");
+        auto iterator=[&]{vd::ToolingIndex temporary(weak.lock());return temporary.declarations().begin();}();
+        check(iterator->identity==view[0].identity,"iterator lost temporary view owner");
+    }
+    check(weak.expired(),"index view leaked analysis");
+    check(owned && owned->source.source && owned->source.source->text().find("return x")!=std::string::npos,"outward result borrowed dead source");
 }
 void planning(const fs::path& root) {
     project(root); auto a=analyze(root);
@@ -346,4 +374,4 @@ void documentation_tests(const fs::path& root) {
 }
 
 }
-void tooling_tests(const fs::path& output) { documentation_tests(output/"documentation"); discovery(output/"discovery"); queries(output/"queries"); planning(output/"planning"); cycles(output/"cycles"); containment(output/"containment"); editor_metadata(output/"editor"); }
+void tooling_tests(const fs::path& output) { borrowed_lifetimes(); documentation_tests(output/"documentation"); discovery(output/"discovery"); queries(output/"queries"); planning(output/"planning"); cycles(output/"cycles"); containment(output/"containment"); editor_metadata(output/"editor"); }

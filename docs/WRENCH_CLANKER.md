@@ -1,5 +1,20 @@
 # 🔧🤖 THE WRENCH CLANKER
 
+## Current integrated performance handoff — 5 November 2026
+
+Boss authorizes consolidated local qualification of the already integrated
+logging/internal repairs and documentation of future automatic SIMD.
+[Qualification and review handoff](compiler-health/INTEGRATED_PERFORMANCE_QUALIFICATION.md)
+is the current performance checkpoint. Retain the dated evidence below; its
+older FILE200-based automatic release HOLD is superseded by Boss's clarification:
+the strict 10 ms aim is not a mandatory release requirement and is not claimed
+passed. Performance regressions and historical incidents remain visible.
+
+The [SIMD strategy](DEVELOPMENT_STRATEGY.md#future-optimization-automatic-simd--boss-direction-5-november-2026)
+is future optional investigation only, after integration is settled and Boss and
+Golden Wrench select it. Stop for their review after this local handoff. No Git
+mutation, hosted CI or release publication is authorized by this sprint.
+
 ## MIT licensing handoff — Golden Wrench review
 
 Boss authorized applying MIT to VOID-original code and repairing the known
@@ -7,8 +22,8 @@ component-install notice omissions. [Implementation/results](release/LICENSING_I
 record separate Linux compiler/tooling installs and Windows notice-rule checks,
 with native platform and GNU compliance limits explicit. No compiler/Runtime
 behavior change, SDK bundle, package, CI or Git action. Review the uncommitted
-scope, exact notice provenance and focused evidence. LOG-PERF remains OPEN /
-release HOLD; accepted installation/HTTP work and historical failures stay closed
+scope, exact notice provenance and focused evidence. Current performance
+disposition is recorded above; accepted installation/HTTP work and historical failures stay closed
 or preserved in their recorded scope. Stop before commit/push; no next task.
 
 ## Current Boss checkpoint and HTTP authorization, 30 October 2026
@@ -250,7 +265,7 @@ Earlier dated statuses below remain history. No next stage is authorized.
 No routine seven-job CI after small edits or individual features. Development
 native-platform checks need a concrete reason and Boss authorization. Boss alone
 controls Git operations, hosted CI and release; root README stays protected.
-Preserve the single frontend/typed IR, LLVM 19.1.7, Runtime precise GC, generation
+Preserve the single frontend/typed IR, LLVM/Clang/LLD 23.1.4, Runtime precise GC, generation
 leases and compiler-owned editor contracts. No speculative framework or weakened
 test may replace an incomplete feature.
 
@@ -359,7 +374,8 @@ below; historical evidence does not itself authorize another sprint or hosted ru
   except when Boss specifically authorizes targeted verification. Native claims
   need native evidence; Linux success never substitutes for Windows/macOS.
 - Work in substantial authorized sprints with KISS/DRY, existing frontend/VFS,
-  typed IR, pinned LLVM/Clang **19.1.7**, Runtime and precise GC. Preserve actual
+  typed IR, pinned LLVM/Clang/LLD **23.1.4**, Runtime and precise GC. The
+  [LLVM23 migration](llvm23/IMPLEMENTATION.md) supersedes the former 19.1.7 pin. Preserve actual
   safety/correctness guarantees. Avoid speculative verification frameworks,
   unnecessary complexity, artificial tiny gates or blanket final-byte certification.
 - **Do not defer a confirmed blocking defect merely by listing it in known issues.**

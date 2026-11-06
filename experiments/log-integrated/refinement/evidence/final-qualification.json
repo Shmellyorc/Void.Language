@@ -1,0 +1,104 @@
+[
+  {
+    "host": "release-native",
+    "status": "pass",
+    "last_line": "86 native checks; failing allocation ordinals=23; bytes=100010; GC budget=1",
+    "executable_sha256": "a10710da88f72ff61c0e54cfd5282193b8f45f40972ee0f65304933c7f425a72"
+  },
+  {
+    "host": "debug-native",
+    "status": "pass",
+    "last_line": "86 native checks; failing allocation ordinals=23; bytes=100010; GC budget=1",
+    "executable_sha256": "4d17930b3db8e928a69a40b7315531c2a6d83b106e6864574f74b41151c162d6"
+  },
+  {
+    "host": "san-native",
+    "status": "pass",
+    "last_line": "86 native checks; failing allocation ordinals=23; bytes=100010; GC budget=1",
+    "executable_sha256": "bc7425effacd202804442384f1ca90da6b41d55320f3059b6e1c18d15ee1b244"
+  },
+  {
+    "host": "release-cleanup",
+    "status": "pass",
+    "last_line": "64 cleanup checks passed",
+    "executable_sha256": "f8dc939b77288163bd714df181097e916e3b792ac1c09b7c2cbf97d6105c040f"
+  },
+  {
+    "host": "debug-cleanup",
+    "status": "pass",
+    "last_line": "64 cleanup checks passed",
+    "executable_sha256": "dc6e8fe717aefcabce9fa3eb01ccecf27c96788a6201fd0920cbb6b3e8f1b845"
+  },
+  {
+    "host": "san-cleanup",
+    "status": "pass",
+    "last_line": "64 cleanup checks passed",
+    "executable_sha256": "53c95f5d1146fcfd019ce8d7d4c80b4cb77268bab535fa767704bc66f974f28c"
+  },
+  {
+    "host": "release-host",
+    "status": "pass",
+    "last_line": "1690 logging native checks passed",
+    "executable_sha256": "5fc0f0a0e80a87e9bd14009bfc5f5806890cf1833d154876b0b98a42903ad366"
+  },
+  {
+    "host": "debug-host",
+    "status": "pass",
+    "last_line": "1690 logging native checks passed",
+    "executable_sha256": "99eb425c7e5d348b8de5e16417169efe62bfb2c4872412910b26fd0d529a1c12"
+  },
+  {
+    "host": "release-aot-log-normal",
+    "status": "pass",
+    "last_line": "828 logging native checks passed",
+    "executable_sha256": "3b0a18b9737f62e5aeabbadca4213a1b3a2964917641a0ebaf4178284ecb6145"
+  },
+  {
+    "host": "san-aot-log-normal",
+    "status": "pass",
+    "last_line": "828 logging native checks passed",
+    "executable_sha256": "f39383dab80fa94ad55c0ed144d31def304a2c63fde3b7a57d6424764c7b973c"
+  },
+  {
+    "host": "release-aot-log-optimized",
+    "status": "pass",
+    "last_line": "828 logging native checks passed",
+    "executable_sha256": "a53371f3ba3c6cf33dccf36f2b5692ad2c285edfc8fea65cf51e0e0ee9a7cb91"
+  },
+  {
+    "host": "san-aot-log-optimized",
+    "status": "pass",
+    "last_line": "828 logging native checks passed",
+    "executable_sha256": "8b4ff55a77d8939faf356e34f205c8eca649f79b7e2769b11cc72b25f4401056"
+  },
+  {
+    "host": "release-aot-cleanup-normal",
+    "status": "pass",
+    "last_line": "28 cleanup checks passed",
+    "executable_sha256": "869c9d891c5bce06360339b1ad1df4305f439c655deaf9360dcaab5160edeede"
+  },
+  {
+    "host": "san-aot-cleanup-normal",
+    "status": "pass",
+    "last_line": "28 cleanup checks passed",
+    "executable_sha256": "80f9fb8dcbd81671fa1fc2a4825826f48c5ef49cac0e267636319c03bb133dd9"
+  },
+  {
+    "host": "release-aot-cleanup-optimized",
+    "status": "pass",
+    "last_line": "28 cleanup checks passed",
+    "executable_sha256": "321bb8c402fd3a70fa144b195b059b00d1cc556370d1e7592bc4e8fe87f7b773"
+  },
+  {
+    "host": "san-aot-cleanup-optimized",
+    "status": "pass",
+    "last_line": "28 cleanup checks passed",
+    "executable_sha256": "111f0b99def48dc586bb5325200d9c1c54b5c62fde63e718a6f41df36fa51f48"
+  },
+  {
+    "host": "san-host",
+    "status": "pass",
+    "last_line": "1690 logging native checks passed",
+    "executable_sha256": "93eaa9aaaec81781e053bf6e04fe27f94d2a7ad10c55a15dc2628f960bdefb0d"
+  }
+]

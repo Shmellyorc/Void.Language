@@ -1,0 +1,288 @@
+{
+  "scope": "Link-only publication changes; original documents and excluded artifacts remain local. No source/test/measurement change.",
+  "documents": [
+    {
+      "path": "docs/compiler-health/INTEGRATED_PERFORMANCE_QUALIFICATION.md",
+      "original_sha256": "dc988f8228dd2ee775acf5bea9082f18e8057d2b141c8af5fdd1a6c4c52af21a",
+      "preserved_local_path": "experiments/staging-preparation/original-documents/docs/compiler-health/INTEGRATED_PERFORMANCE_QUALIFICATION.md",
+      "published_sha256": "3a0fb0b353c764cfc14b1191e8f014234d44f2a9bb245923b4e54ef3f8f2ee8b"
+    },
+    {
+      "path": "docs/compiler-health/INTERNAL_PERFORMANCE_REPAIR_RESULT.md",
+      "original_sha256": "2fd91f85a4d30d55a5c1ec23dd2fab79c1244cd1c24b158868501ade9e614917",
+      "preserved_local_path": "experiments/staging-preparation/original-documents/docs/compiler-health/INTERNAL_PERFORMANCE_REPAIR_RESULT.md",
+      "published_sha256": "2b8ed9f0b7d7c648ad7cbfa3d08c205b388dba390e3869198239ec61a51c6eba"
+    },
+    {
+      "path": "docs/log/HANDOFF.md",
+      "original_sha256": "af09e112ccf5da42a4eddafbf3908e0c5b58cfb5e04d435a6dfe1591c3509bc3",
+      "preserved_local_path": "experiments/staging-preparation/original-documents/docs/log/HANDOFF.md",
+      "published_sha256": "c9c876b1534f7a8740348d83fca9e7e87f455356844b820b1b456821e60a77a2"
+    },
+    {
+      "path": "docs/log/INTEGRATED_LOGGING_REFINEMENT_RESULT.md",
+      "original_sha256": "3c1b65d2da6a0ee112392639b1b25b997880ce4592abd63578647f0b53465431",
+      "preserved_local_path": "experiments/staging-preparation/original-documents/docs/log/INTEGRATED_LOGGING_REFINEMENT_RESULT.md",
+      "published_sha256": "06cac4f77592b6391de9e861970094169ecac9633804de8aec405feb914ff755"
+    },
+    {
+      "path": "experiments/integration-qualification/README.md",
+      "original_sha256": "3ee9215530823cb2cd4573ebe858f0ea2244fe8a4bd2c5dd9af55b24a97cf3e8",
+      "preserved_local_path": "experiments/staging-preparation/original-documents/experiments/integration-qualification/README.md",
+      "published_sha256": "a63b19fe73f8663eb1ace8cbf7d0b9965e30848a63af83a81dc7a2d9bb3f419c"
+    },
+    {
+      "path": "experiments/log-integrated/refinement/REPRODUCE.md",
+      "original_sha256": "421a4d781812ba9d2445a5a682d588cd95986a34d8af08f66127f80332a5c183",
+      "preserved_local_path": "experiments/staging-preparation/original-documents/experiments/log-integrated/refinement/REPRODUCE.md",
+      "published_sha256": "5207f80c6ca23a43927ccba84afc6cea2684e5cfdf3ce5f6e189fed2a2c3908c"
+    }
+  ],
+  "local_artifacts": [
+    {
+      "id": "local-artifact-1",
+      "path": "experiments/log-integrated/candidate/include/void/filesystem_abi.hpp",
+      "bytes": 1460,
+      "sha256": "d1192c147aee8d650092a0c8d89b76e1fd8998d9775dec6c716a16af8baa77ab",
+      "reason": "Historical candidate source snapshot"
+    },
+    {
+      "id": "local-artifact-2",
+      "path": "experiments/log-integrated/candidate/include/void/ir.hpp",
+      "bytes": 15441,
+      "sha256": "7ca79371b2e9378836e23f0765db4003c0cf95c353893f1887150087de7a4725",
+      "reason": "Historical candidate source snapshot"
+    },
+    {
+      "id": "local-artifact-3",
+      "path": "experiments/log-integrated/candidate/include/void/runtime.hpp",
+      "bytes": 20243,
+      "sha256": "6fc4568cb22de1108a2e5540b108e288be16d327de64a55fb8a60abc1a57d1c3",
+      "reason": "Historical candidate source snapshot"
+    },
+    {
+      "id": "local-artifact-4",
+      "path": "experiments/log-integrated/candidate/include/void/runtime_abi.hpp",
+      "bytes": 9768,
+      "sha256": "9a31be262b39f36879ea06c1decb8bd628df44901a4c96e2aaffc0936a09cf98",
+      "reason": "Historical candidate source snapshot"
+    },
+    {
+      "id": "local-artifact-5",
+      "path": "experiments/log-integrated/candidate/src/backend/llvm/backend.cpp",
+      "bytes": 215470,
+      "sha256": "5cd38005b0fecb78fc01a1623c5d21acce6a058cb8b0b7fff07be4d3567cfbd7",
+      "reason": "Historical candidate source snapshot"
+    },
+    {
+      "id": "local-artifact-6",
+      "path": "experiments/log-integrated/candidate/src/backend/llvm/filesystem.inc",
+      "bytes": 6998,
+      "sha256": "81bdb2546d73eaff5ed5480d354bf8fd1114dc73568c37c87d0c85c23d1727bb",
+      "reason": "Historical candidate source snapshot"
+    },
+    {
+      "id": "local-artifact-7",
+      "path": "experiments/log-integrated/candidate/src/frontend/capabilities.inc",
+      "bytes": 52673,
+      "sha256": "c96983ec1704593bdbc7b97992094d5179f6e94f39b6121d5c59b62686112d0e",
+      "reason": "Historical candidate source snapshot"
+    },
+    {
+      "id": "local-artifact-8",
+      "path": "experiments/log-integrated/candidate/src/frontend/compiler.cpp",
+      "bytes": 545863,
+      "sha256": "d9c37ed1ec3214d4483b9dd68c3e5c6341251db9bc4f0dbbd7cedf33f06131ac",
+      "reason": "Historical candidate source snapshot"
+    },
+    {
+      "id": "local-artifact-9",
+      "path": "experiments/log-integrated/candidate/src/frontend/filesystem.inc",
+      "bytes": 2171,
+      "sha256": "a1c89150ab0a7999c765530f4285209feab5af1f979ab620583ff88756168ce5",
+      "reason": "Historical candidate source snapshot"
+    },
+    {
+      "id": "local-artifact-10",
+      "path": "experiments/log-integrated/candidate/src/ir/filesystem.inc",
+      "bytes": 6437,
+      "sha256": "3a2c76e2cfd76d6e9bc15ad9143ab0181e69be9062d36faa4931d12254a4e925",
+      "reason": "Historical candidate source snapshot"
+    },
+    {
+      "id": "local-artifact-11",
+      "path": "experiments/log-integrated/candidate/src/ir/local_cleanup.inc",
+      "bytes": 2513,
+      "sha256": "3d217d9e16d2c430fa8034f05934858c0c05d97f65bb4e2742016ff8f933506a",
+      "reason": "Historical candidate source snapshot"
+    },
+    {
+      "id": "local-artifact-12",
+      "path": "experiments/log-integrated/candidate/src/ir/module.cpp",
+      "bytes": 136103,
+      "sha256": "64ac2619ef446273e14cf7bead0e1d0c08a13e8f80218bdfccbeaf2205cfb58b",
+      "reason": "Historical candidate source snapshot"
+    },
+    {
+      "id": "local-artifact-13",
+      "path": "experiments/log-integrated/candidate/src/ir/reference_capabilities.inc",
+      "bytes": 25859,
+      "sha256": "86a8b9282c9d162223d8073b894e488826706701d9d1fd971d1c5f32a49e79b9",
+      "reason": "Historical candidate source snapshot"
+    },
+    {
+      "id": "local-artifact-14",
+      "path": "experiments/log-integrated/candidate/src/runtime/abi.cpp",
+      "bytes": 25585,
+      "sha256": "61af197d18c550cf3034c20aeb5ecd4317184c296973046e4ce504644e02d11f",
+      "reason": "Historical candidate source snapshot"
+    },
+    {
+      "id": "local-artifact-15",
+      "path": "experiments/log-integrated/candidate/src/runtime/array.cpp",
+      "bytes": 30679,
+      "sha256": "0bad6a2be76b4a62d5bf68fc5ed5371cc22dd7cfaa2b991ae1be8f0cad939231",
+      "reason": "Historical candidate source snapshot"
+    },
+    {
+      "id": "local-artifact-16",
+      "path": "experiments/log-integrated/candidate/src/runtime/buffer.cpp",
+      "bytes": 34858,
+      "sha256": "6c778751fb400a2fe025832681d2ec4d708a7a6e582cb02aa0a93a0b530a53f6",
+      "reason": "Historical candidate source snapshot"
+    },
+    {
+      "id": "local-artifact-17",
+      "path": "experiments/log-integrated/candidate/src/runtime/filesystem_abi.cpp",
+      "bytes": 22053,
+      "sha256": "e48d3c3efe1f158b1daf51918328823cce2ef2f90965cc00fd43defb83989323",
+      "reason": "Historical candidate source snapshot"
+    },
+    {
+      "id": "local-artifact-18",
+      "path": "experiments/log-integrated/candidate/stdlib/io.void",
+      "bytes": 71581,
+      "sha256": "3e22822f57761a486702919774c8d4e8bafe23d0ecef2c37c8e23fe7173e6ad4",
+      "reason": "Historical candidate source snapshot"
+    },
+    {
+      "id": "local-artifact-19",
+      "path": "experiments/log-integrated/candidate/tests/advanced/tests.cpp",
+      "bytes": 9934,
+      "sha256": "57b13f99b2e236542f6479f2f376f518f6a845c417a042a42185bae80dc1c2cc",
+      "reason": "Historical candidate source snapshot"
+    },
+    {
+      "id": "local-artifact-20",
+      "path": "experiments/log-integrated/refinement/evidence/identity.json",
+      "bytes": 9903975,
+      "sha256": "a421d57f58213a70d73aa6f5b2955d7b33ad7583d43077107aaa0f60780d741d",
+      "reason": "Full starting inventory (69,094 protected entries)"
+    },
+    {
+      "id": "local-artifact-21",
+      "path": "experiments/log-integrated/refinement/original-integrated-source.tar.gz",
+      "bytes": 72740523,
+      "sha256": "38ca2519da5fd44972d8936783e4d7a2c06eb56ed20525d5e470f1222c09526b",
+      "reason": "Full local source archive"
+    }
+  ],
+  "redirects": {
+    "experiments/log-integrated/candidate/include/void/filesystem_abi.hpp": [
+      "docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md",
+      "local-artifact-1"
+    ],
+    "experiments/log-integrated/candidate/include/void/ir.hpp": [
+      "docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md",
+      "local-artifact-2"
+    ],
+    "experiments/log-integrated/candidate/include/void/runtime.hpp": [
+      "docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md",
+      "local-artifact-3"
+    ],
+    "experiments/log-integrated/candidate/include/void/runtime_abi.hpp": [
+      "docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md",
+      "local-artifact-4"
+    ],
+    "experiments/log-integrated/candidate/src/backend/llvm/backend.cpp": [
+      "docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md",
+      "local-artifact-5"
+    ],
+    "experiments/log-integrated/candidate/src/backend/llvm/filesystem.inc": [
+      "docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md",
+      "local-artifact-6"
+    ],
+    "experiments/log-integrated/candidate/src/frontend/capabilities.inc": [
+      "docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md",
+      "local-artifact-7"
+    ],
+    "experiments/log-integrated/candidate/src/frontend/compiler.cpp": [
+      "docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md",
+      "local-artifact-8"
+    ],
+    "experiments/log-integrated/candidate/src/frontend/filesystem.inc": [
+      "docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md",
+      "local-artifact-9"
+    ],
+    "experiments/log-integrated/candidate/src/ir/filesystem.inc": [
+      "docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md",
+      "local-artifact-10"
+    ],
+    "experiments/log-integrated/candidate/src/ir/local_cleanup.inc": [
+      "docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md",
+      "local-artifact-11"
+    ],
+    "experiments/log-integrated/candidate/src/ir/module.cpp": [
+      "docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md",
+      "local-artifact-12"
+    ],
+    "experiments/log-integrated/candidate/src/ir/reference_capabilities.inc": [
+      "docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md",
+      "local-artifact-13"
+    ],
+    "experiments/log-integrated/candidate/src/runtime/abi.cpp": [
+      "docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md",
+      "local-artifact-14"
+    ],
+    "experiments/log-integrated/candidate/src/runtime/array.cpp": [
+      "docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md",
+      "local-artifact-15"
+    ],
+    "experiments/log-integrated/candidate/src/runtime/buffer.cpp": [
+      "docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md",
+      "local-artifact-16"
+    ],
+    "experiments/log-integrated/candidate/src/runtime/filesystem_abi.cpp": [
+      "docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md",
+      "local-artifact-17"
+    ],
+    "experiments/log-integrated/candidate/stdlib/io.void": [
+      "docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md",
+      "local-artifact-18"
+    ],
+    "experiments/log-integrated/candidate/tests/advanced/tests.cpp": [
+      "docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md",
+      "local-artifact-19"
+    ],
+    "experiments/log-integrated/refinement/evidence/identity.json": [
+      "docs/compiler-health/evidence/integrated-performance/logging-refinement-starting-identity.json",
+      ""
+    ],
+    "experiments/log-integrated/refinement/original-integrated-source.tar.gz": [
+      "docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md",
+      "local-artifact-21"
+    ],
+    "docs/log/evidence/performance-repair/acceptance-debug/LastTest.log": [
+      "docs/compiler-health/evidence/integrated-performance/historical-logging-debug-LastTest.txt",
+      ""
+    ],
+    "docs/log/evidence/performance-repair/acceptance-release/LastTest.log": [
+      "docs/compiler-health/evidence/integrated-performance/historical-logging-release-LastTest.txt",
+      ""
+    ],
+    "docs/log/evidence/performance-repair/acceptance-strict/LastTest.log": [
+      "docs/compiler-health/evidence/integrated-performance/historical-logging-strict-LastTest.txt",
+      ""
+    ]
+  }
+}

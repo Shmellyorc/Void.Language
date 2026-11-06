@@ -29,10 +29,14 @@ void store_bits(void* p,std::uint64_t bits,std::size_t width) {
 
 }
 Runtime::ListHeader& Runtime::list_header(RegisteredRootWord source,ScalarEncoding encoding) const {
-    auto key="void.fixed.scalar.v1/"+std::to_string(static_cast<unsigned>(encoding));
+    // Invalid encodings retain the metadata/schema error ordering of this
+    // checked-header boundary; scalar construction validates its own enum.
     if(!types_)throw std::invalid_argument("missing list metadata");
+    if(static_cast<unsigned>(encoding)>static_cast<unsigned>(ScalarEncoding::boolean))throw std::invalid_argument("missing list scalar schema");
+    auto key=scalar_identity(encoding);
     auto found=types_->schemas.find(key);if(found==types_->schemas.end())throw std::invalid_argument("missing list scalar schema");
-    return list_header(source,found->second);
+    static constexpr std::string_view lists[]={"void.list.v1/0","void.list.v1/1","void.list.v1/2","void.list.v1/3","void.list.v1/4","void.list.v1/5","void.list.v1/6","void.list.v1/7","void.list.v1/8","void.list.v1/9","void.list.v1/10"};
+    return list_header(reference_source(source),found->second,lists[static_cast<unsigned>(encoding)]);
 }
 void Runtime::list_into(void** out,ScalarEncoding encoding,std::uint64_t count) {array_new(out,fixed_scalar_layout(encoding,count),true,true);}
 std::uint64_t Runtime::list_count(RegisteredRootWord source,ScalarEncoding encoding) const {require_managed();std::lock_guard lock(mutex_);return list_header(source,encoding).count;}

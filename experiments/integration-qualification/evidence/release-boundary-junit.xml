@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="22"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="184"
+	timestamp="2026-11-05T22:22:11"
+	>
+	<testcase name="http_reload" classname="http_reload" time="21.9991" status="run">
+		<properties/>
+		<system-out>Public HTTP held-request reload passed
+</system-out>
+	</testcase>
+	<testcase name="http_timeouts" classname="http_timeouts" time="6.08205" status="run">
+		<properties/>
+		<system-out>TLS/proxy phases, resumed producers, blocked writes and Digest header deadlines passed
+</system-out>
+	</testcase>
+	<testcase name="http_source_faults" classname="http_source_faults" time="174.139" status="run">
+		<properties/>
+		<system-out>Public HTTP source: 2 analysis/JIT/native-link checks passed
+</system-out>
+	</testcase>
+	<testcase name="debug_cache_processes" classname="debug_cache_processes" time="2.20692" status="run">
+		<properties/>
+		<system-out>Fresh processes, corruption, concurrent publication, imports, diagnostics and large arrays passed
+</system-out>
+	</testcase>
+	<testcase name="automatic_cache_processes" classname="automatic_cache_processes" time="0.463132" status="run">
+		<properties/>
+		<system-out>Automatic O2/no-IR-O2 caching, bypass, fresh globals and diagnostics passed
+</system-out>
+	</testcase>
+	<testcase name="log_frontend" classname="log_frontend" time="3.99709" status="run">
+		<properties/>
+		<system-out>Logging frontend: 16 visibility/readonly/worker/default/surface checks
+</system-out>
+	</testcase>
+	<testcase name="log_files" classname="log_files" time="22.7079" status="run">
+		<properties/>
+		<system-out>Logging filesystem: 244 native source/oracle checks; exact 0/1/3/32 retention, holes, preflight, adoption, count/path/bound reconfiguration
+</system-out>
+	</testcase>
+	<testcase name="log_oracles" classname="log_oracles" time="40.8064" status="run">
+		<properties/>
+		<system-out>Logging independent byte/UTC oracles: 15 executions/emit/link checks; thresholds=30, all specified Unicode controls, 8 budgets, 9 invalid configurations, 8 fixed instants
+</system-out>
+	</testcase>
+	<testcase name="log_cache" classname="log_cache" time="11.4375" status="run">
+		<properties/>
+		<system-out>Logging cache: 6 miss/hit/bypass executions with fresh Runtime defaults
+</system-out>
+	</testcase>
+	<testcase name="log_console" classname="log_console" time="23.5543" status="run">
+		<properties/>
+		<system-out>Logging actual console: 16 redirected/live-UTC/closed-peer/file-independence observations
+</system-out>
+	</testcase>
+	<testcase name="io_execution" classname="io_execution" time="18.3717" status="run">
+		<properties/>
+		<system-out>18 public source/file checks passed; 42 numeric vectors, both byte orders, JIT/O2/linked AOT; 1 MiB stack=False
+</system-out>
+	</testcase>
+	<testcase name="io_async_execution" classname="io_async_execution" time="16.1667" status="run">
+		<properties/>
+		<system-out>42 numeric vectors, both byte orders and filesystem APIs passed async JIT/O2
+</system-out>
+	</testcase>
+	<testcase name="io_wire_normal" classname="io_wire_normal" time="0.0528669" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="io_wire_optimized" classname="io_wire_optimized" time="0.0558095" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="io_native_close_failure" classname="io_native_close_failure" time="4.47758" status="run">
+		<properties/>
+		<system-out>JIT: recoverable close failure retained its diagnostic, retired once and released roots
+O2: recoverable close failure retained its diagnostic, retired once and released roots
+</system-out>
+	</testcase>
+	<testcase name="io_native_shutdown" classname="io_native_shutdown" time="4.41414" status="run">
+		<properties/>
+		<system-out>JIT: forgotten-file shutdown failure retained its diagnostic, retired once and released roots
+O2: forgotten-file shutdown failure retained its diagnostic, retired once and released roots
+</system-out>
+	</testcase>
+	<testcase name="io_native_opening_shutdown" classname="io_native_opening_shutdown" time="4.70493" status="run">
+		<properties/>
+		<system-out>JIT: Runtime shutdown drained an entered open and retired its acquisition once
+O2: Runtime shutdown drained an entered open and retired its acquisition once
+</system-out>
+	</testcase>
+	<testcase name="io_native_whole_shutdown" classname="io_native_whole_shutdown" time="4.61611" status="run">
+		<properties/>
+		<system-out>JIT: Runtime shutdown drained an entered open and retired its acquisition once
+O2: Runtime shutdown drained an entered open and retired its acquisition once
+</system-out>
+	</testcase>
+	<testcase name="io_native_cancelled" classname="io_native_cancelled" time="4.52026" status="run">
+		<properties/>
+		<system-out>JIT: owner ran another ready activation while a real file read was held on the single bounded worker
+O2: owner ran another ready activation while a real file read was held on the single bounded worker
+</system-out>
+	</testcase>
+	<testcase name="io_async_acquisition" classname="io_async_acquisition" time="0.130715" status="run">
+		<properties/>
+		<system-out>Debug source execution passed
+O2 source execution passed
+</system-out>
+	</testcase>
+	<testcase name="io_ir" classname="io_ir" time="0.377977" status="run">
+		<properties/>
+		<system-out>11 independent filesystem IR authority, arity, reply and opcode rejections passed
+</system-out>
+	</testcase>
+	<testcase name="async_ir" classname="async_ir" time="0.0437326" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+</testsuite>

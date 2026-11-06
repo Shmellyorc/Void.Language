@@ -1,0 +1,5 @@
+{
+  "reason": "Unexpected EOF in original L-baseline-editor during startup; capture child exit, stderr, fixtures, actual limits and raw timed checkpoints.",
+  "bound": "One baseline replay and one candidate diagnostic; no retries selected by timing.",
+  "time": 1793940038.970841
+}

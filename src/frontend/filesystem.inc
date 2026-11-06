@@ -1,4 +1,4 @@
-    VOID_SEMANTIC_HANDLER Type filesystem_call(Expr& expression, unsigned operation, bool asynchronous) {
+    VOID_SEMANTIC_HANDLER Type filesystem_call(Expr& expression, unsigned operation, bool asynchronous, bool compact = false) {
         if (!current || (asynchronous && !current->asynchronous)) {
             error(source, expression.token, Code::unsupported_type,
                   "Native file jobs require an owning async activation; filesystem calls require runtime evaluation.");
@@ -11,6 +11,7 @@
         target.token = expression.token;
         target.symbol = std::string(asynchronous ? "$io.async." : "$io.sync.") + std::to_string(operation);
         target.result = Type(unit.structure_names.at("_reply")->definition);
+        if(compact){target.result=unit.make_result(Type::i64,target.result);target.symbol="$io.write.checked";}
         if (operation >= filesystem::claim_operation) {
             target.result = operation == filesystem::claim_operation ? Type::i64 : Type::none;
         }

@@ -1,5 +1,20 @@
 # VOID documentation
 
+## Integrated performance qualification and future SIMD — 5 November 2026
+
+[Integrated source review and local qualification](compiler-health/INTEGRATED_PERFORMANCE_QUALIFICATION.md)
+consolidate refined logging, checked roots, Runtime metadata and analysis-backed
+LSP storage. The original measurements and failures remain in the
+[logging refinement](log/INTEGRATED_LOGGING_REFINEMENT_RESULT.md) and
+[internal repair result](compiler-health/INTERNAL_PERFORMANCE_REPAIR_RESULT.md).
+FILE200's historical 10 ms aim is not a Boss release requirement; unfavorable
+measurements remain recorded. Git, hosted CI and release decisions remain with Boss.
+
+[Future automatic SIMD in the development strategy](DEVELOPMENT_STRATEGY.md#future-optimization-automatic-simd--boss-direction-5-november-2026)
+and the [detailed roadmap](VOIDC_AUTOMATIC_SIMD_ROADMAP.md) record automatic safe,
+profitable SIMD with scalar fallback and ordinary source types. SIMD is deferred;
+no implementation or SIMD benchmarking is part of this qualification.
+
 ## MIT licensing implementation — Golden Wrench review
 
 Owner-selected MIT is applied to VOID-original code; compiler/tooling installs
@@ -7,8 +22,8 @@ include MIT and the audit's missing known third-party notices. The
 [implementation and focused results](release/LICENSING_IMPLEMENTATION.md),
 [scope](release/LICENSING_SCOPE.md) and [component inventory](release/NOTICE_INVENTORY.json)
 record exact coverage and remaining rights/GNU/platform questions. Uncommitted;
-no release clearance. LOG-PERF remains OPEN / release HOLD. Accepted installation
-and HTTP qualification are unchanged.
+no release clearance. Current performance disposition is in the integrated
+qualification above; accepted installation and HTTP qualification are unchanged.
 
 ## HTTP/HTTPS accepted — 4 November 2026
 

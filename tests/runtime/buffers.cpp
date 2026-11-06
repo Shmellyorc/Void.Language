@@ -923,6 +923,56 @@ void output_alias_collection_order() {
         check(!scratch.value,"empty-buffer alias fast path failed");
     }
 }
+// Registration proofs must not survive descriptor or frame lifetime changes.
+void registration_locations() {
+    Runtime r;Runtime::Attachment a(r);Runtime::Managed m(r);
+    auto empty=r.fixed_scalar_layout(ScalarEncoding::i32,0);
+    std::array<void*,8> homes{};std::array<std::size_t,9> offsets{56,0,40,16,48,8,32,24,56};
+    Runtime::Slot slot{homes.data(),sizeof(homes),offsets.data(),offsets.size()};
+    Runtime::Frame frame(r,&slot,1);
+    for(unsigned round=0;round<3;++round)for(auto& home:homes) {
+        auto token=r.root_word(&home);
+        check(r.fixed_scalar_layout(token,ScalarEncoding::i32,0)==empty,"checked root location lost registration");
+    }
+    auto token=r.root_word(&homes[7]);
+    auto original=slot;
+    --slot.count;reject([&]{r.fixed_scalar_layout(token,ScalarEncoding::i32,0);});slot=original;
+    slot.size-=sizeof(void*);reject([&]{r.fixed_scalar_layout(token,ScalarEncoding::i32,0);});reject([&]{r.root_word(&homes[7]);});slot=original;
+    auto other_offsets=offsets;slot.offsets=other_offsets.data();reject([&]{r.fixed_scalar_layout(token,ScalarEncoding::i32,0);});slot=original;
+    offsets[0]=0;reject([&]{r.fixed_scalar_layout(token,ScalarEncoding::i32,0);});offsets[0]=56;
+    std::atomic<bool> foreign_rejected=false;
+    std::thread worker([&]{Runtime::Attachment attached(r);Runtime::Managed managed(r);
+        try{r.fixed_scalar_layout(token,ScalarEncoding::i32,0);}catch(const std::invalid_argument&){foreign_rejected=true;}});
+    worker.join();check(foreign_rejected,"foreign thread accepted root proof");
+    alignas(Runtime::Frame) std::byte storage[sizeof(Runtime::Frame)];
+    auto* first=new(storage) Runtime::Frame(r,&slot,1);auto expired=r.root_word(&homes[7]);first->~Frame();
+    auto* second=new(storage) Runtime::Frame(r,&slot,1);
+    reject([&]{r.fixed_scalar_layout(expired,ScalarEncoding::i32,0);});
+    check(r.fixed_scalar_layout(token,ScalarEncoding::i32,0)==empty,"overlap invalidated older frame");
+    auto current=r.root_word(&homes[7]);check(r.fixed_scalar_layout(current,ScalarEncoding::i32,0)==empty,"reused frame rejected new proof");second->~Frame();
+    reject([&]{r.fixed_scalar_layout(current,ScalarEncoding::i32,0);});
+    fail_after=0;try{for(auto& home:homes)(void)r.root_word(&home);}catch(...){fail_after=-1;throw;}fail_after=-1;
+    check(r.collect()==Runtime::Collection::completed,"checked registration broke collection");
+}
+void canonical_collection_metadata() {
+    Runtime r;Runtime::Attachment a(r);Runtime::Managed m(r);
+    for(unsigned n=0;n<=10;++n) {
+        auto encoding=static_cast<ScalarEncoding>(n);auto empty=r.fixed_scalar_layout(encoding,0);
+        check(r.fixed_scalar_layout(encoding,0)==empty,"zero scalar metadata not reused");
+        NativeArrayField field{"",0,0,n,0};auto key=empty->schema()->identity();NativeArrayElement native{key.c_str(),empty->schema()->bytes(),empty->alignment(),1,&field};
+        check(r.native_array_layout(native,0)==empty,"native zero scalar metadata not canonical");
+        auto nonempty=r.fixed_scalar_layout(encoding,2);check(nonempty!=empty && nonempty->capacity()==2,"capacity metadata aliased");
+        native.bytes+=1;reject([&]{r.native_array_layout(native,0);});native.bytes-=1;
+    }
+    ElementSchemaRef fresh;
+    {Runtime::Native native(r);fresh=admit(r,spec("cache-insertion-fallback",{SchemaScalar{ScalarEncoding::u8}}));}
+    // Layout allocation and its shared owner succeed; optional map insertion fails.
+    fail_after=2;BufferLayoutRef uncached;try{uncached=r.buffer_layout(fresh,0);}catch(...){fail_after=-1;throw;}fail_after=-1;
+    check(uncached && uncached->schema()==fresh,"optional cache failure escaped");
+    auto cached=r.buffer_layout(fresh,0);check(cached==r.buffer_layout(fresh,0),"cache retry failed");
+    {Runtime::Native native(r);auto repeated=spec("cache-insertion-fallback",{SchemaScalar{ScalarEncoding::u8}});r.admit_buffer_schemas({&repeated,1});}
+    check(r.buffer_layout(fresh,0)==cached,"compatible admission invalidated canonical metadata");
+}
 void source_layout_reuse() {
     Runtime r(1);Runtime::Attachment a(r);Runtime::Managed m(r);Output source(r),out(r);
     auto layout=r.fixed_scalar_layout(ScalarEncoding::i32,3);
@@ -1255,7 +1305,7 @@ void measure() {
 int main(int argc,char** argv) {
     try {
         if(argc>1) {if(std::string_view(argv[1])=="--measure")measure();else if(std::string_view(argv[1])=="--measure-reference")measure_references();else if(std::string_view(argv[1])=="reference-leak-bytes")checked_reference_transaction(-1,true,37);else if(std::string_view(argv[1])=="reference-leak-zero")checked_reference_transaction(-1,true,0);else fatal(argv[1]);}
-        else {layouts();byte_oracles();scalar_and_deep_oracles();empty_aligned_and_negatives();failures();native_and_chunk_collections();reference_buffers();object_table_lifetime();reference_failures();buffer_copy_bytes();check(!stats[3].live && !stats[3].live_calls,"byte copy native allocations outlived Runtime");nested_copy_and_collections();copy_negatives();copy_compactness();copy_failures();foundation_acceptance_stress();output_alias_bounds();output_alias_collection_order();source_layout_reuse();fixed_values();fixed_poll_and_roots();fixed_failures();fixed_private_bridge();reference_poll_reacquisition();
+        else {layouts();byte_oracles();scalar_and_deep_oracles();empty_aligned_and_negatives();failures();native_and_chunk_collections();reference_buffers();object_table_lifetime();reference_failures();buffer_copy_bytes();check(!stats[3].live && !stats[3].live_calls,"byte copy native allocations outlived Runtime");nested_copy_and_collections();copy_negatives();copy_compactness();copy_failures();foundation_acceptance_stress();output_alias_bounds();output_alias_collection_order();registration_locations();canonical_collection_metadata();source_layout_reuse();fixed_values();fixed_poll_and_roots();fixed_failures();fixed_private_bridge();reference_poll_reacquisition();
 #ifdef VD_BUFFER_WRAP_COLLECT
             reference_poll_reacquisition(true);
 #endif

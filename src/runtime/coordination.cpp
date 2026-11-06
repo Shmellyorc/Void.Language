@@ -195,15 +195,39 @@ Runtime::Collection Runtime::collect(std::chrono::milliseconds timeout) {
     changed_.notify_all();
     return result;
 }
-Runtime::Frame* Runtime::require_output(void** slot) const {
+namespace {
+bool root_offset(const Runtime::Slot& slot,void** word,std::size_t& offset) {
+    if(!slot.storage || !slot.offsets)return false;
+    const auto storage=reinterpret_cast<std::uintptr_t>(slot.storage),address=reinterpret_cast<std::uintptr_t>(word);
+    if(address<storage)return false;
+    offset=address-storage;
+    return offset<=slot.size && slot.size-offset>=sizeof(void*);
+}
+}
+bool Runtime::registered_at(const Frame& frame,std::size_t i,std::size_t j,void** word) {
+    if(i>=frame.count_ || !frame.slots_)return false;
+    const auto& slot=frame.slots_[i];
+    std::size_t offset;
+    return j<slot.count && root_offset(slot,word,offset) && slot.offsets[j]==offset;
+}
+Runtime::RootLocation Runtime::locate_root(void** slot) const {
     require_managed();
     if (!slot) throw std::invalid_argument("null allocation output");
-    for (auto* f = thread().frames; f; f = f->previous_)
-        for (std::size_t i = 0; i < f->count_; ++i)
-            for (std::size_t j = 0; j < f->slots_[i].count; ++j)
-                if (static_cast<const char*>(f->slots_[i].storage) + f->slots_[i].offsets[j] == reinterpret_cast<const char*>(slot)) return f;
+    for (auto* f = thread().frames; f; f = f->previous_) {
+        for (std::size_t i = 0; i < f->count_; ++i) {
+            const auto& descriptor=f->slots_[i];std::size_t offset;
+            if(!root_offset(descriptor,slot,offset))continue;
+            // Containment only filters impossible Slots. Exact offset identity
+            // is still required, including unsorted and duplicate descriptors.
+            for (std::size_t j = 0; j < descriptor.count; ++j)
+                if (descriptor.offsets[j]==offset) {
+                    return {f,i,j};
+                }
+        }
+    }
     throw std::invalid_argument("allocation output is not a registered precise root");
 }
+Runtime::Frame* Runtime::require_output(void** slot) const {return locate_root(slot).frame;}
 std::string_view Runtime::string_bytes(void* object) const {
     require_managed();
     std::lock_guard lock(mutex_);
@@ -378,7 +402,7 @@ console::Error Runtime::close() {
     return error;
 }
 Runtime::Frame::Frame(Runtime& r, const Slot* slots, std::size_t count)
-    : runtime_(r), previous_(nullptr), slots_(slots), count_(count) {
+    : runtime_(r), previous_(nullptr), slots_(slots), count_(count),identity_(0) {
     r.require_managed();
     if (count && !slots) throw std::invalid_argument("null root frame slots");
     for (std::size_t i = 0; i < count; ++i) {
@@ -387,6 +411,13 @@ Runtime::Frame::Frame(Runtime& r, const Slot* slots, std::size_t count)
         for (std::size_t j = 0; j < s.count; ++j)
             if (s.offsets[j] > s.size || s.size - s.offsets[j] < sizeof(void*)) throw std::invalid_argument("invalid root offset");
     }
+    // Process-wide, nonwrapping identities also distinguish attachment/thread
+    // and Runtime address reuse. Reserve only after descriptor validation.
+    static std::atomic<std::uint64_t> next{1};
+    auto identity=next.load(std::memory_order_relaxed);
+    do {if(identity==std::numeric_limits<std::uint64_t>::max())throw std::overflow_error("root frame identity exhausted");}
+    while(!next.compare_exchange_weak(identity,identity+1,std::memory_order_relaxed));
+    identity_=identity;
     previous_ = r.thread().frames;
     r.thread().frames = this;
 }

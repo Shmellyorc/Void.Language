@@ -1,0 +1,56 @@
+--- original/array.cpp
++++ attempt/array.cpp
+@@ -1,5 +1,6 @@
+ #include "void/runtime.hpp"
+ #include "void/utf8.hpp"
++#include "void/format.hpp"
+ #include <algorithm>
+ #include <cstring>
+ #include <limits>
+@@ -314,23 +315,29 @@
+     string_into(out,text.substr(offset,utf8_scalar_bytes(text,offset)));
+ }
+ void Runtime::string_join_bytes_into(void** out,void*** parts,std::size_t count,bool& encoding) {
+-    require_managed();(void)root_word(out);encoding=false;std::size_t total=0;
+-    for(std::size_t i=0;i<count;++i){
+-        if(!(i%64))poll();auto part=root_word(parts[i]);
+-        std::lock_guard lock(mutex_);auto bytes=heap_.string_bytes(reference_source(part));
+-        if(bytes.size()>std::string{}.max_size()-total)throw std::length_error("joined UTF-8 extent");total+=bytes.size();
+-        (void)string_payload_size(total,0);
+-    }
+-    encoding=true;auto layout=fixed_scalar_layout(ScalarEncoding::u8,total);
+-    void* backing=nullptr;void* result=nullptr;constexpr std::size_t zero=0;
+-    Slot slots[]={{&backing,sizeof(backing),&zero,1},{&result,sizeof(result),&zero,1}};Frame roots(*this,slots,2);
+-    if(total){BufferBuilder builder(*this,layout,total,quota);
+-        for(std::size_t i=0;i<count;++i){if(!(i%64))poll();builder.write_string(root_word(parts[i]));}
+-        builder.finish_into(&backing);
+-    }
+-    array_new(&result,fixed_scalar_layout(ScalarEncoding::u8,0),true);
+-    auto root=root_word(&result);std::lock_guard lock(mutex_);require_buffer_output(out);heap_.validate_output_address(out);
+-    auto& header=list_header(root,layout->schema());header.backing=backing;header.count=header.capacity=total;*out=result;
++    require_managed();(void)root_word(out);encoding=false;
++    // Reuse the ordinary interpolation builder. Own each bounded borrow before
++    // polling, then use the existing atomic byte-array publication path.
++    formatting::Builder builder;
++    std::size_t remaining=0,segments=0;
++    for(std::size_t i=0;i<count;++i) {
++        auto part=root_word(parts[i]);std::size_t offset=0;bool complete=false;
++        do {
++            if(!remaining || segments==64) {poll();remaining=quota.bytes;segments=0;}
++            {
++                std::lock_guard lock(mutex_);
++                auto bytes=heap_.string_bytes(reference_source(part));
++                if(offset>bytes.size())throw std::logic_error("immutable string extent changed");
++                const auto amount=std::min(remaining,bytes.size()-offset);
++                builder.append(bytes.substr(offset,amount));
++                (void)string_payload_size(builder.size(),0);
++                offset+=amount;remaining-=amount;complete=offset==bytes.size();
++            }
++        }while(!complete);
++        ++segments;
++    }
++    auto owned=std::move(builder).finish();encoding=true;
++    bytes_into(out,owned);
+ }
+ void Runtime::string_encode_into(void** out,void* source) {
+     bytes_into(out,string_bytes(source));

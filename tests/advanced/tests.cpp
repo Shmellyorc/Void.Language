@@ -51,11 +51,20 @@ void run(const std::filesystem::path& root,bool optimized) {
         managed_test::Probe probe;probe.inspect_roots=true;probe.collect_before=true;probe.frames.reserve(256);
         {managed_test::Observe observe(probe);if(code->invoke(7)!=answer)throw std::runtime_error(std::string("advanced source result: ")+name);}
         require(probe.frames.empty() && probe.roots_valid && probe.commits_valid,"advanced roots/publication/collection");empty(*runtime);
-        if(std::string(name)=="with_transaction")for(unsigned construction:{5u,6u}){
-            managed_test::Probe failed;failed.inspect_roots=true;failed.capture=true;failed.fail_construction=construction;failed.fail_allocation=0;failed.frames.reserve(256);bool raised=false;
+        if(std::string(name)=="with_transaction")for(bool inside:{false,true}){
+            managed_test::Probe failed;failed.inspect_roots=true;failed.capture=true;failed.frames.reserve(256);bool raised=false;unsigned target_hits=0;
+            failed.before_construct=[&](std::size_t ordinal,const void* payload,std::size_t size){
+                bool target=false;
+                if(!inside && failed.retained && size==sizeof(void*)) {void* value=nullptr;std::memcpy(&value,payload,size);target=value==failed.retained->get();}
+                if(inside && size==sizeof(std::int32_t)) {std::int32_t value;std::memcpy(&value,payload,size);target=value==7;}
+                if(target) {++target_hits;failed.fail_construction=ordinal;failed.fail_allocation=0;}
+            };
             {managed_test::Observe observe(failed);try{code->invoke(7);}catch(const std::runtime_error&){raised=true;}}
+            require(target_hits==1 && failed.fail_construction>0 && failed.constructions==failed.fail_construction,"with semantic allocation fault target not reached exactly once");
             require(raised && failed.retained && failed.frames.empty() && failed.roots_valid && failed.commits_valid,"with allocation failure/root publication");
-            {Runtime::Attachment attachment(*runtime);Runtime::Managed managed(*runtime);std::int32_t total;std::memcpy(&total,failed.retained->get(),sizeof(total));require(total==(construction==5?0:1),"with lost an acquired resource during allocation failure");}failed.retained.reset();empty(*runtime);
+            {Runtime::Attachment attachment(*runtime);Runtime::Managed managed(*runtime);std::int32_t total;std::memcpy(&total,failed.retained->get(),sizeof(total));require(total==(inside?1:0),"with lost an acquired resource during allocation failure");}
+            std::cout<<(optimized?"O2":"normal")<<" with semantic fault="<<(inside?"first-body-allocation":"resource-acquisition")<<" observed ordinal="<<failed.fail_construction<<" passed\n";
+            failed.retained.reset();empty(*runtime);
         }
         if(std::string(name)=="combined"){require(code->invoke(-1)==-3,"combined propagation cleanup");empty(*runtime);}
         if(std::string(name)=="propagation"){require(code->invoke(0)==-10,"Err bypassed defer");empty(*runtime);}

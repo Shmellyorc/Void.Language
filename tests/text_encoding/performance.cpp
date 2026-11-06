@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <ctime>
 #include <iostream>
 #include <stdexcept>
 #include <vector>
@@ -23,12 +24,14 @@ int main(int argc, char** argv) {
             for (int count : {256, 1024, 4096, 16384}) {
                 std::vector<double> samples;
                 for (unsigned repetition = 0; repetition < 3; ++repetition) {
+                    const auto cpu = std::clock();
                     const auto start = std::chrono::steady_clock::now();
                     if (code->invoke(count) != 1) {
                         throw std::runtime_error("benchmark correctness invariant failed");
                     }
                     samples.push_back(std::chrono::duration<double, std::milli>(
                         std::chrono::steady_clock::now() - start).count());
+                    std::cerr << "RAW," << optimized << ',' << count*4 << ',' << repetition << ',' << samples.back() << ',' << 1000.0*(std::clock()-cpu)/CLOCKS_PER_SEC << '\n';
                 }
                 std::sort(samples.begin(), samples.end());
                 std::cout << (optimized ? "O2" : "normal") << ',' << count * 4 << ','

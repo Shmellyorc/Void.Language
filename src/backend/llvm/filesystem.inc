@@ -8,10 +8,11 @@
                         static_cast<llvm::Value*>(llvm::UndefValue::get(b.getInt8Ty())) : result;
                     break;
                 }
+                case Op::filesystem_write:
                 case Op::filesystem_native:
                 case Op::filesystem_async: {
                     bool asynchronous = instruction.op == Op::filesystem_async;
-                    auto reply = asynchronous ? ir::field_type(instruction.type, 1) : instruction.type;
+                    auto reply = asynchronous ? ir::field_type(instruction.type, 1) : instruction.op==Op::filesystem_write ? ir::field_type(instruction.type,2) : instruction.type;
                     auto* reply_type = type(reply);
                     auto* payload = asynchronous ? type(ir::Type(instruction.type.definition)) : nullptr;
                     auto* offsets_type = llvm::ArrayType::get(size_type, 10);
@@ -63,6 +64,16 @@
                     }
                     auto* output = value_roots[n].at(values.size());
                     b.CreateStore(llvm::Constant::getNullValue(type(instruction.type)), output);
+                    if(instruction.op==Op::filesystem_write) {
+                        auto* error=b.CreateStructGEP(type(instruction.type),output,2);
+                        auto call=module->getOrInsertFunction("vd_filesystem_write_checked",b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy());
+                        auto* completed=b.CreateCall(call,{error,record,references,numbers,failure});selected_failure();
+                        auto* failed=llvm::BasicBlock::Create(context,"write.domain.failure",fn);auto* success=llvm::BasicBlock::Create(context,"write.completed",fn);auto* done=llvm::BasicBlock::Create(context,"write.checked",fn);
+                        b.CreateCondBr(b.CreateICmpSLT(completed,b.getInt64(0)),failed,success);
+                        b.SetInsertPoint(failed);b.CreateStore(b.getInt32(1),b.CreateStructGEP(type(instruction.type),output,0));b.CreateBr(done);
+                        b.SetInsertPoint(success);b.CreateStore(completed,b.CreateStructGEP(type(instruction.type),output,1));b.CreateBr(done);
+                        b.SetInsertPoint(done);v=b.CreateLoad(type(instruction.type),output);break;
+                    }
                     auto call = module->getOrInsertFunction("vd_filesystem_call", b.getVoidTy(),
                         b.getPtrTy(), b.getPtrTy(), b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(),
                         b.getPtrTy(), b.getInt1Ty(), b.getPtrTy());

@@ -60,7 +60,10 @@ std::set<unsigned> validate_reference_initialization(const Function& f) {
         };
         for(const auto& i:f.blocks[block].instructions) {
             if(i.op==Op::load) require(i.a);
-            if(i.receiver) require(i.receiver->slot);
+            // local_cleanup's receiver is read only when its dedicated flag is
+            // active. local_cleanup.inc proves every activation follows the
+            // binding store; ordinary loads/receivers keep definite-init checks.
+            if(i.receiver && i.op!=Op::local_cleanup) require(i.receiver->slot);
             if(i.op==Op::store) state.insert(i.a);else if(i.op==Op::array_capture)state.insert(static_cast<unsigned>(i.immediate));
         }
     }
@@ -196,6 +199,7 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                         }
                         break;
                     }
+                    case Op::filesystem_write:
                     case Op::filesystem_control:
                     case Op::filesystem_native:
                     case Op::filesystem_async: {
@@ -237,7 +241,7 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                             if (found->second.readonly) fail("write through readonly reference");
                         }
                         retain(values[i.b],field_type(types[function][block][i.a],static_cast<unsigned>(i.immediate))); value={}; break;
-                    case Op::async_call: case Op::interface_call: case Op::call: case Op::virtual_call: case Op::base_init: {
+                    case Op::local_cleanup: case Op::async_call: case Op::interface_call: case Op::call: case Op::virtual_call: case Op::base_init: {
                         if(i.op==Op::base_init && i.callee.empty()) { for(auto argument:i.arguments) retain(values[argument]); break; }
                         auto found=indexes.find(i.callee);
                         if (found==indexes.end()) break; // Existing trusted scalar ABI.

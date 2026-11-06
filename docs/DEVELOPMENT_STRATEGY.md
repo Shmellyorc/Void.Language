@@ -1,5 +1,43 @@
 # VOID 2.0: Development Strategy and Compiler Architecture Roadmap
 
+## Integrated performance qualification — 5 November 2026
+
+Refined logging and the shared internal repairs are already combined in the
+working tree. [Current qualification](compiler-health/INTEGRATED_PERFORMANCE_QUALIFICATION.md)
+records the local integration review, exact platform limits and retained
+performance regressions. Earlier dated checkpoints below preserve their original
+scope. The old FILE200 10 ms aim is not a Boss-mandated release requirement.
+
+## Future optimization: automatic SIMD — Boss direction, 5 November 2026
+
+**Automatic SIMD wherever safe and profitable; ordinary scalar fallback otherwise.
+No new source keywords or mandatory SIMD array types.** This is future work only,
+for ordinary numeric variables, arrays and loops. Golden Wrench and Boss may
+select it as the next optional compiler investigation after the current
+integration is settled. No SIMD implementation or benchmark is authorized in
+this qualification sprint.
+
+The [detailed automatic SIMD roadmap](VOIDC_AUTOMATIC_SIMD_ROADMAP.md) preserves
+the approved direction. A future investigation must:
+
+- Establish actual LLVM/Clang/LLD **23.1.4** behavior. The current shared O2
+  `PassBuilder` has no `TargetMachine`; the [captured pipeline](llvm23/IMPLEMENTATION.md#sdk-and-first-integrated-checks)
+  documents disabled SLP in that configuration. Inspect LLVM loop/SLP
+  vectorization and target-aware machine code separately; this observation
+  alone proves neither absence of vectorization nor a profitable change.
+- Preserve integer overflow/wrapping and floating-point semantics, aliasing,
+  evaluation/error ordering, bounds and mutation checks, ownership, precise GC
+  roots and safepoints. Do not silently enable fast-math or suppress failures.
+- Verify x86-64 and ARM64 feature compatibility and scalar fallback, including
+  normal/O2 JIT, independently linked AOT, reload and target/feature/cache
+  identities. Host detection and portable AOT feature policy require explicit
+  examination.
+- Inspect optimized IR and machine code, then compare matched scalar/vectorized
+  execution with equivalent outputs across eligible and dependent loops,
+  numeric edge cases, checked arrays, sizes and alignments. Retain wall/CPU
+  samples and regressions. Make no unverified speedup claims and impose no
+  arbitrary performance threshold.
+
 ## LLVM 23.1.4 migration — 28 October 2026
 
 Boss authorizes a complete migration using the existing compiler/Runtime

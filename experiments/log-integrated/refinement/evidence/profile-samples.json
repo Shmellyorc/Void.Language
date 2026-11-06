@@ -1,0 +1,1316 @@
+[
+  {
+    "optimized": 1,
+    "command": 11,
+    "sample": 0,
+    "compile_ns": 9089527926,
+    "preparation_ns": 9089527926,
+    "wall_ns": 18564734,
+    "cpu_seconds": 0.012879,
+    "managed_constructions": 1839,
+    "output_retained_bytes": 15000,
+    "console_calls": 0,
+    "file_writes": 200,
+    "flushes": 1,
+    "metadata": 4,
+    "moves": 0,
+    "deletes": 0,
+    "heap_before": 2294,
+    "heap_transient_after_root": 7736,
+    "heap_after_gc": 2294,
+    "handles_before": 5,
+    "handles_after": 5,
+    "process_high_water_rss_kib": 174232,
+    "block": 0,
+    "version": "v1",
+    "instrumented": true,
+    "gc_collections": 17,
+    "metrics": {
+      "allocation_calls": 25022,
+      "requested_bytes": 1239656,
+      "snapshot_bytes": 15000,
+      "scalar_inspections": 15000,
+      "range_checks": 0,
+      "joined_bytes": 15530,
+      "encoding_owned_bytes": 15000,
+      "final_byte_copies": 15000,
+      "write_bytes": 15000,
+      "identity_misses": 0,
+      "phases": {
+        "join": {
+          "calls": 207,
+          "inclusive_ns": 202739,
+          "exclusive_ns": 144279
+        },
+        "encode": {
+          "calls": 201,
+          "inclusive_ns": 828526,
+          "exclusive_ns": 616156
+        },
+        "fused": {
+          "calls": 0,
+          "inclusive_ns": 0,
+          "exclusive_ns": 0
+        },
+        "snapshot": {
+          "calls": 200,
+          "inclusive_ns": 871705,
+          "exclusive_ns": 871705
+        },
+        "reply": {
+          "calls": 209,
+          "inclusive_ns": 947448,
+          "exclusive_ns": 633969
+        },
+        "managed": {
+          "calls": 4311,
+          "inclusive_ns": 2835848,
+          "exclusive_ns": 2119954
+        },
+        "gc": {
+          "calls": 17,
+          "inclusive_ns": 821224,
+          "exclusive_ns": 821224
+        },
+        "write": {
+          "calls": 200,
+          "inclusive_ns": 1627558,
+          "exclusive_ns": 1627558
+        },
+        "fsync": {
+          "calls": 1,
+          "inclusive_ns": 5637747,
+          "exclusive_ns": 5637747
+        }
+      },
+      "identities": {
+        "/@stdlib/io.void::$cleanup": 204,
+        "/@stdlib/io.void::_acquisition": 1,
+        "/@stdlib/io.void::_lease": 203,
+        "/@stdlib/io.void::error": 4,
+        "/@stdlib/io.void::file": 1,
+        "/@stdlib/io.void::file::method::close::$cell$1": 1,
+        "/@stdlib/io.void::file::method::close::$lambda$0::$captures": 1,
+        "/@stdlib/io.void::file::method::flush::$cell$1": 1,
+        "/@stdlib/io.void::file::method::flush::$lambda$0::$captures": 1,
+        "/@stdlib/io.void::file::method::length::$cell$1": 1,
+        "/@stdlib/io.void::file::method::length::$lambda$0::$captures": 1,
+        "/@stdlib/io.void::file::method::write_bytes::$cell$2": 200,
+        "/@stdlib/io.void::file::method::write_bytes::$lambda$0::$captures": 200,
+        "/@stdlib/io.void::open::$cell$4": 1,
+        "/@stdlib/io.void::open::$lambda$0::$captures": 1,
+        "/@stdlib/log.void::$cleanup": 203,
+        "/@stdlib/log.void::_guard": 203,
+        "/@stdlib/log.void::_receipt": 202,
+        "/@stdlib/log.void::logger": 1,
+        "/@stdlib/log.void::logger::method::close::$cell$1": 2,
+        "/@stdlib/log.void::logger::method::close::$lambda$0::$captures": 2,
+        "/@stdlib/log.void::logger::method::write::$cell$3": 200,
+        "/@stdlib/log.void::logger::method::write::$lambda$0::$captures": 200,
+        "/@stdlib/log.void::open::$cell$3": 1,
+        "/@stdlib/log.void::open::$lambda$0::$captures": 1,
+        "/benchmark.void::$cleanup": 1,
+        "/benchmark.void::enabled::$cell$11": 1,
+        "/benchmark.void::enabled::$lambda$1::$captures": 1
+      }
+    },
+    "outside_sync_ns": 12926987
+  },
+  {
+    "optimized": 1,
+    "command": 11,
+    "sample": 1,
+    "compile_ns": 9089527926,
+    "preparation_ns": 9089527926,
+    "wall_ns": 18530155,
+    "cpu_seconds": 0.012977,
+    "managed_constructions": 1839,
+    "output_retained_bytes": 15000,
+    "console_calls": 0,
+    "file_writes": 200,
+    "flushes": 1,
+    "metadata": 4,
+    "moves": 0,
+    "deletes": 0,
+    "heap_before": 2294,
+    "heap_transient_after_root": 7736,
+    "heap_after_gc": 2294,
+    "handles_before": 5,
+    "handles_after": 5,
+    "process_high_water_rss_kib": 174232,
+    "block": 0,
+    "version": "v1",
+    "instrumented": true,
+    "gc_collections": 17,
+    "metrics": {
+      "allocation_calls": 25022,
+      "requested_bytes": 1239656,
+      "snapshot_bytes": 15000,
+      "scalar_inspections": 15000,
+      "range_checks": 0,
+      "joined_bytes": 15530,
+      "encoding_owned_bytes": 15000,
+      "final_byte_copies": 15000,
+      "write_bytes": 15000,
+      "identity_misses": 0,
+      "phases": {
+        "join": {
+          "calls": 207,
+          "inclusive_ns": 207370,
+          "exclusive_ns": 142890
+        },
+        "encode": {
+          "calls": 201,
+          "inclusive_ns": 842904,
+          "exclusive_ns": 624686
+        },
+        "fused": {
+          "calls": 0,
+          "inclusive_ns": 0,
+          "exclusive_ns": 0
+        },
+        "snapshot": {
+          "calls": 200,
+          "inclusive_ns": 867175,
+          "exclusive_ns": 867175
+        },
+        "reply": {
+          "calls": 209,
+          "inclusive_ns": 951323,
+          "exclusive_ns": 631326
+        },
+        "managed": {
+          "calls": 4311,
+          "inclusive_ns": 3013300,
+          "exclusive_ns": 2242821
+        },
+        "gc": {
+          "calls": 17,
+          "inclusive_ns": 882218,
+          "exclusive_ns": 882218
+        },
+        "write": {
+          "calls": 200,
+          "inclusive_ns": 1575612,
+          "exclusive_ns": 1575612
+        },
+        "fsync": {
+          "calls": 1,
+          "inclusive_ns": 5589088,
+          "exclusive_ns": 5589088
+        }
+      },
+      "identities": {
+        "/@stdlib/io.void::$cleanup": 204,
+        "/@stdlib/io.void::_acquisition": 1,
+        "/@stdlib/io.void::_lease": 203,
+        "/@stdlib/io.void::error": 4,
+        "/@stdlib/io.void::file": 1,
+        "/@stdlib/io.void::file::method::close::$cell$1": 1,
+        "/@stdlib/io.void::file::method::close::$lambda$0::$captures": 1,
+        "/@stdlib/io.void::file::method::flush::$cell$1": 1,
+        "/@stdlib/io.void::file::method::flush::$lambda$0::$captures": 1,
+        "/@stdlib/io.void::file::method::length::$cell$1": 1,
+        "/@stdlib/io.void::file::method::length::$lambda$0::$captures": 1,
+        "/@stdlib/io.void::file::method::write_bytes::$cell$2": 200,
+        "/@stdlib/io.void::file::method::write_bytes::$lambda$0::$captures": 200,
+        "/@stdlib/io.void::open::$cell$4": 1,
+        "/@stdlib/io.void::open::$lambda$0::$captures": 1,
+        "/@stdlib/log.void::$cleanup": 203,
+        "/@stdlib/log.void::_guard": 203,
+        "/@stdlib/log.void::_receipt": 202,
+        "/@stdlib/log.void::logger": 1,
+        "/@stdlib/log.void::logger::method::close::$cell$1": 2,
+        "/@stdlib/log.void::logger::method::close::$lambda$0::$captures": 2,
+        "/@stdlib/log.void::logger::method::write::$cell$3": 200,
+        "/@stdlib/log.void::logger::method::write::$lambda$0::$captures": 200,
+        "/@stdlib/log.void::open::$cell$3": 1,
+        "/@stdlib/log.void::open::$lambda$0::$captures": 1,
+        "/benchmark.void::$cleanup": 1,
+        "/benchmark.void::enabled::$cell$11": 1,
+        "/benchmark.void::enabled::$lambda$1::$captures": 1
+      }
+    },
+    "outside_sync_ns": 12941067
+  },
+  {
+    "optimized": 1,
+    "command": 11,
+    "sample": 2,
+    "compile_ns": 9089527926,
+    "preparation_ns": 9089527926,
+    "wall_ns": 18349836,
+    "cpu_seconds": 0.012669,
+    "managed_constructions": 1839,
+    "output_retained_bytes": 15000,
+    "console_calls": 0,
+    "file_writes": 200,
+    "flushes": 1,
+    "metadata": 4,
+    "moves": 0,
+    "deletes": 0,
+    "heap_before": 2294,
+    "heap_transient_after_root": 7736,
+    "heap_after_gc": 2294,
+    "handles_before": 5,
+    "handles_after": 5,
+    "process_high_water_rss_kib": 174232,
+    "block": 0,
+    "version": "v1",
+    "instrumented": true,
+    "gc_collections": 17,
+    "metrics": {
+      "allocation_calls": 25022,
+      "requested_bytes": 1239656,
+      "snapshot_bytes": 15000,
+      "scalar_inspections": 15000,
+      "range_checks": 0,
+      "joined_bytes": 15530,
+      "encoding_owned_bytes": 15000,
+      "final_byte_copies": 15000,
+      "write_bytes": 15000,
+      "identity_misses": 0,
+      "phases": {
+        "join": {
+          "calls": 207,
+          "inclusive_ns": 207279,
+          "exclusive_ns": 148899
+        },
+        "encode": {
+          "calls": 201,
+          "inclusive_ns": 807796,
+          "exclusive_ns": 604057
+        },
+        "fused": {
+          "calls": 0,
+          "inclusive_ns": 0,
+          "exclusive_ns": 0
+        },
+        "snapshot": {
+          "calls": 200,
+          "inclusive_ns": 857555,
+          "exclusive_ns": 857555
+        },
+        "reply": {
+          "calls": 209,
+          "inclusive_ns": 947481,
+          "exclusive_ns": 638133
+        },
+        "managed": {
+          "calls": 4311,
+          "inclusive_ns": 2760105,
+          "exclusive_ns": 2065340
+        },
+        "gc": {
+          "calls": 17,
+          "inclusive_ns": 795484,
+          "exclusive_ns": 795484
+        },
+        "write": {
+          "calls": 200,
+          "inclusive_ns": 1588930,
+          "exclusive_ns": 1588930
+        },
+        "fsync": {
+          "calls": 1,
+          "inclusive_ns": 5660157,
+          "exclusive_ns": 5660157
+        }
+      },
+      "identities": {
+        "/@stdlib/io.void::$cleanup": 204,
+        "/@stdlib/io.void::_acquisition": 1,
+        "/@stdlib/io.void::_lease": 203,
+        "/@stdlib/io.void::error": 4,
+        "/@stdlib/io.void::file": 1,
+        "/@stdlib/io.void::file::method::close::$cell$1": 1,
+        "/@stdlib/io.void::file::method::close::$lambda$0::$captures": 1,
+        "/@stdlib/io.void::file::method::flush::$cell$1": 1,
+        "/@stdlib/io.void::file::method::flush::$lambda$0::$captures": 1,
+        "/@stdlib/io.void::file::method::length::$cell$1": 1,
+        "/@stdlib/io.void::file::method::length::$lambda$0::$captures": 1,
+        "/@stdlib/io.void::file::method::write_bytes::$cell$2": 200,
+        "/@stdlib/io.void::file::method::write_bytes::$lambda$0::$captures": 200,
+        "/@stdlib/io.void::open::$cell$4": 1,
+        "/@stdlib/io.void::open::$lambda$0::$captures": 1,
+        "/@stdlib/log.void::$cleanup": 203,
+        "/@stdlib/log.void::_guard": 203,
+        "/@stdlib/log.void::_receipt": 202,
+        "/@stdlib/log.void::logger": 1,
+        "/@stdlib/log.void::logger::method::close::$cell$1": 2,
+        "/@stdlib/log.void::logger::method::close::$lambda$0::$captures": 2,
+        "/@stdlib/log.void::logger::method::write::$cell$3": 200,
+        "/@stdlib/log.void::logger::method::write::$lambda$0::$captures": 200,
+        "/@stdlib/log.void::open::$cell$3": 1,
+        "/@stdlib/log.void::open::$lambda$0::$captures": 1,
+        "/benchmark.void::$cleanup": 1,
+        "/benchmark.void::enabled::$cell$11": 1,
+        "/benchmark.void::enabled::$lambda$1::$captures": 1
+      }
+    },
+    "outside_sync_ns": 12689679
+  },
+  {
+    "optimized": 1,
+    "command": 11,
+    "sample": 0,
+    "compile_ns": 8837850642,
+    "preparation_ns": 8837850642,
+    "wall_ns": 15526932,
+    "cpu_seconds": 0.00989,
+    "managed_constructions": 621,
+    "output_retained_bytes": 15000,
+    "console_calls": 0,
+    "file_writes": 200,
+    "flushes": 1,
+    "metadata": 4,
+    "moves": 0,
+    "deletes": 0,
+    "heap_before": 2294,
+    "heap_transient_after_root": 5639,
+    "heap_after_gc": 2294,
+    "handles_before": 5,
+    "handles_after": 5,
+    "process_high_water_rss_kib": 174468,
+    "block": 1,
+    "version": "candidate",
+    "instrumented": true,
+    "gc_collections": 11,
+    "metrics": {
+      "allocation_calls": 15327,
+      "requested_bytes": 890280,
+      "snapshot_bytes": 15000,
+      "scalar_inspections": 0,
+      "range_checks": 200,
+      "joined_bytes": 15551,
+      "encoding_owned_bytes": 15000,
+      "final_byte_copies": 15000,
+      "write_bytes": 15000,
+      "identity_misses": 0,
+      "phases": {
+        "join": {
+          "calls": 207,
+          "inclusive_ns": 311289,
+          "exclusive_ns": 135350
+        },
+        "encode": {
+          "calls": 201,
+          "inclusive_ns": 727756,
+          "exclusive_ns": 589827
+        },
+        "fused": {
+          "calls": 0,
+          "inclusive_ns": 0,
+          "exclusive_ns": 0
+        },
+        "snapshot": {
+          "calls": 200,
+          "inclusive_ns": 230939,
+          "exclusive_ns": 230939
+        },
+        "reply": {
+          "calls": 9,
+          "inclusive_ns": 84799,
+          "exclusive_ns": 70460
+        },
+        "managed": {
+          "calls": 2693,
+          "inclusive_ns": 1895809,
+          "exclusive_ns": 1307932
+        },
+        "gc": {
+          "calls": 11,
+          "inclusive_ns": 587877,
+          "exclusive_ns": 587877
+        },
+        "write": {
+          "calls": 200,
+          "inclusive_ns": 1542440,
+          "exclusive_ns": 1542440
+        },
+        "fsync": {
+          "calls": 1,
+          "inclusive_ns": 5632848,
+          "exclusive_ns": 5632848
+        }
+      },
+      "identities": {
+        "/@stdlib/io.void::$cleanup": 1,
+        "/@stdlib/io.void::_acquisition": 1,
+        "/@stdlib/io.void::_lease": 203,
+        "/@stdlib/io.void::error": 4,
+        "/@stdlib/io.void::file": 1,
+        "/@stdlib/io.void::open::$cell$4": 1,
+        "/@stdlib/io.void::open::$lambda$0::$captures": 1,
+        "/@stdlib/log.void::$cleanup": 1,
+        "/@stdlib/log.void::_guard": 203,
+        "/@stdlib/log.void::_receipt": 202,
+        "/@stdlib/log.void::logger": 1,
+        "/@stdlib/log.void::open::$cell$3": 1,
+        "/@stdlib/log.void::open::$lambda$0::$captures": 1
+      }
+    },
+    "outside_sync_ns": 9894084
+  },
+  {
+    "optimized": 1,
+    "command": 11,
+    "sample": 1,
+    "compile_ns": 8837850642,
+    "preparation_ns": 8837850642,
+    "wall_ns": 15399442,
+    "cpu_seconds": 0.009902,
+    "managed_constructions": 621,
+    "output_retained_bytes": 15000,
+    "console_calls": 0,
+    "file_writes": 200,
+    "flushes": 1,
+    "metadata": 4,
+    "moves": 0,
+    "deletes": 0,
+    "heap_before": 2294,
+    "heap_transient_after_root": 5639,
+    "heap_after_gc": 2294,
+    "handles_before": 5,
+    "handles_after": 5,
+    "process_high_water_rss_kib": 174468,
+    "block": 1,
+    "version": "candidate",
+    "instrumented": true,
+    "gc_collections": 11,
+    "metrics": {
+      "allocation_calls": 15327,
+      "requested_bytes": 890280,
+      "snapshot_bytes": 15000,
+      "scalar_inspections": 0,
+      "range_checks": 200,
+      "joined_bytes": 15551,
+      "encoding_owned_bytes": 15000,
+      "final_byte_copies": 15000,
+      "write_bytes": 15000,
+      "identity_misses": 0,
+      "phases": {
+        "join": {
+          "calls": 207,
+          "inclusive_ns": 308269,
+          "exclusive_ns": 135380
+        },
+        "encode": {
+          "calls": 201,
+          "inclusive_ns": 749567,
+          "exclusive_ns": 594197
+        },
+        "fused": {
+          "calls": 0,
+          "inclusive_ns": 0,
+          "exclusive_ns": 0
+        },
+        "snapshot": {
+          "calls": 200,
+          "inclusive_ns": 230569,
+          "exclusive_ns": 230569
+        },
+        "reply": {
+          "calls": 9,
+          "inclusive_ns": 80580,
+          "exclusive_ns": 65920
+        },
+        "managed": {
+          "calls": 2693,
+          "inclusive_ns": 1942595,
+          "exclusive_ns": 1332227
+        },
+        "gc": {
+          "calls": 11,
+          "inclusive_ns": 610368,
+          "exclusive_ns": 610368
+        },
+        "write": {
+          "calls": 200,
+          "inclusive_ns": 1523793,
+          "exclusive_ns": 1523793
+        },
+        "fsync": {
+          "calls": 1,
+          "inclusive_ns": 5555458,
+          "exclusive_ns": 5555458
+        }
+      },
+      "identities": {
+        "/@stdlib/io.void::$cleanup": 1,
+        "/@stdlib/io.void::_acquisition": 1,
+        "/@stdlib/io.void::_lease": 203,
+        "/@stdlib/io.void::error": 4,
+        "/@stdlib/io.void::file": 1,
+        "/@stdlib/io.void::open::$cell$4": 1,
+        "/@stdlib/io.void::open::$lambda$0::$captures": 1,
+        "/@stdlib/log.void::$cleanup": 1,
+        "/@stdlib/log.void::_guard": 203,
+        "/@stdlib/log.void::_receipt": 202,
+        "/@stdlib/log.void::logger": 1,
+        "/@stdlib/log.void::open::$cell$3": 1,
+        "/@stdlib/log.void::open::$lambda$0::$captures": 1
+      }
+    },
+    "outside_sync_ns": 9843984
+  },
+  {
+    "optimized": 1,
+    "command": 11,
+    "sample": 2,
+    "compile_ns": 8837850642,
+    "preparation_ns": 8837850642,
+    "wall_ns": 15942279,
+    "cpu_seconds": 0.00988,
+    "managed_constructions": 621,
+    "output_retained_bytes": 15000,
+    "console_calls": 0,
+    "file_writes": 200,
+    "flushes": 1,
+    "metadata": 4,
+    "moves": 0,
+    "deletes": 0,
+    "heap_before": 2294,
+    "heap_transient_after_root": 5639,
+    "heap_after_gc": 2294,
+    "handles_before": 5,
+    "handles_after": 5,
+    "process_high_water_rss_kib": 174468,
+    "block": 1,
+    "version": "candidate",
+    "instrumented": true,
+    "gc_collections": 11,
+    "metrics": {
+      "allocation_calls": 15327,
+      "requested_bytes": 890280,
+      "snapshot_bytes": 15000,
+      "scalar_inspections": 0,
+      "range_checks": 200,
+      "joined_bytes": 15551,
+      "encoding_owned_bytes": 15000,
+      "final_byte_copies": 15000,
+      "write_bytes": 15000,
+      "identity_misses": 0,
+      "phases": {
+        "join": {
+          "calls": 207,
+          "inclusive_ns": 331386,
+          "exclusive_ns": 137447
+        },
+        "encode": {
+          "calls": 201,
+          "inclusive_ns": 729937,
+          "exclusive_ns": 593687
+        },
+        "fused": {
+          "calls": 0,
+          "inclusive_ns": 0,
+          "exclusive_ns": 0
+        },
+        "snapshot": {
+          "calls": 200,
+          "inclusive_ns": 231749,
+          "exclusive_ns": 231749
+        },
+        "reply": {
+          "calls": 9,
+          "inclusive_ns": 80699,
+          "exclusive_ns": 66079
+        },
+        "managed": {
+          "calls": 2693,
+          "inclusive_ns": 1958178,
+          "exclusive_ns": 1345933
+        },
+        "gc": {
+          "calls": 11,
+          "inclusive_ns": 612245,
+          "exclusive_ns": 612245
+        },
+        "write": {
+          "calls": 200,
+          "inclusive_ns": 1520392,
+          "exclusive_ns": 1520392
+        },
+        "fsync": {
+          "calls": 1,
+          "inclusive_ns": 6070576,
+          "exclusive_ns": 6070576
+        }
+      },
+      "identities": {
+        "/@stdlib/io.void::$cleanup": 1,
+        "/@stdlib/io.void::_acquisition": 1,
+        "/@stdlib/io.void::_lease": 203,
+        "/@stdlib/io.void::error": 4,
+        "/@stdlib/io.void::file": 1,
+        "/@stdlib/io.void::open::$cell$4": 1,
+        "/@stdlib/io.void::open::$lambda$0::$captures": 1,
+        "/@stdlib/log.void::$cleanup": 1,
+        "/@stdlib/log.void::_guard": 203,
+        "/@stdlib/log.void::_receipt": 202,
+        "/@stdlib/log.void::logger": 1,
+        "/@stdlib/log.void::open::$cell$3": 1,
+        "/@stdlib/log.void::open::$lambda$0::$captures": 1
+      }
+    },
+    "outside_sync_ns": 9871703
+  },
+  {
+    "optimized": 1,
+    "command": 11,
+    "sample": 0,
+    "compile_ns": 8982100325,
+    "preparation_ns": 8982100325,
+    "wall_ns": 15835660,
+    "cpu_seconds": 0.009955,
+    "managed_constructions": 621,
+    "output_retained_bytes": 15000,
+    "console_calls": 0,
+    "file_writes": 200,
+    "flushes": 1,
+    "metadata": 4,
+    "moves": 0,
+    "deletes": 0,
+    "heap_before": 2294,
+    "heap_transient_after_root": 5639,
+    "heap_after_gc": 2294,
+    "handles_before": 5,
+    "handles_after": 5,
+    "process_high_water_rss_kib": 176560,
+    "block": 2,
+    "version": "candidate",
+    "instrumented": true,
+    "gc_collections": 11,
+    "metrics": {
+      "allocation_calls": 15327,
+      "requested_bytes": 890280,
+      "snapshot_bytes": 15000,
+      "scalar_inspections": 0,
+      "range_checks": 200,
+      "joined_bytes": 15551,
+      "encoding_owned_bytes": 15000,
+      "final_byte_copies": 15000,
+      "write_bytes": 15000,
+      "identity_misses": 0,
+      "phases": {
+        "join": {
+          "calls": 207,
+          "inclusive_ns": 352807,
+          "exclusive_ns": 151659
+        },
+        "encode": {
+          "calls": 201,
+          "inclusive_ns": 750459,
+          "exclusive_ns": 622090
+        },
+        "fused": {
+          "calls": 0,
+          "inclusive_ns": 0,
+          "exclusive_ns": 0
+        },
+        "snapshot": {
+          "calls": 200,
+          "inclusive_ns": 227088,
+          "exclusive_ns": 227088
+        },
+        "reply": {
+          "calls": 9,
+          "inclusive_ns": 80000,
+          "exclusive_ns": 65090
+        },
+        "managed": {
+          "calls": 2693,
+          "inclusive_ns": 2067017,
+          "exclusive_ns": 1359561
+        },
+        "gc": {
+          "calls": 11,
+          "inclusive_ns": 707456,
+          "exclusive_ns": 707456
+        },
+        "write": {
+          "calls": 200,
+          "inclusive_ns": 1474216,
+          "exclusive_ns": 1474216
+        },
+        "fsync": {
+          "calls": 1,
+          "inclusive_ns": 5872966,
+          "exclusive_ns": 5872966
+        }
+      },
+      "identities": {
+        "/@stdlib/io.void::$cleanup": 1,
+        "/@stdlib/io.void::_acquisition": 1,
+        "/@stdlib/io.void::_lease": 203,
+        "/@stdlib/io.void::error": 4,
+        "/@stdlib/io.void::file": 1,
+        "/@stdlib/io.void::open::$cell$4": 1,
+        "/@stdlib/io.void::open::$lambda$0::$captures": 1,
+        "/@stdlib/log.void::$cleanup": 1,
+        "/@stdlib/log.void::_guard": 203,
+        "/@stdlib/log.void::_receipt": 202,
+        "/@stdlib/log.void::logger": 1,
+        "/@stdlib/log.void::open::$cell$3": 1,
+        "/@stdlib/log.void::open::$lambda$0::$captures": 1
+      }
+    },
+    "outside_sync_ns": 9962694
+  },
+  {
+    "optimized": 1,
+    "command": 11,
+    "sample": 1,
+    "compile_ns": 8982100325,
+    "preparation_ns": 8982100325,
+    "wall_ns": 15506262,
+    "cpu_seconds": 0.009804,
+    "managed_constructions": 621,
+    "output_retained_bytes": 15000,
+    "console_calls": 0,
+    "file_writes": 200,
+    "flushes": 1,
+    "metadata": 4,
+    "moves": 0,
+    "deletes": 0,
+    "heap_before": 2294,
+    "heap_transient_after_root": 5639,
+    "heap_after_gc": 2294,
+    "handles_before": 5,
+    "handles_after": 5,
+    "process_high_water_rss_kib": 176560,
+    "block": 2,
+    "version": "candidate",
+    "instrumented": true,
+    "gc_collections": 11,
+    "metrics": {
+      "allocation_calls": 15327,
+      "requested_bytes": 890280,
+      "snapshot_bytes": 15000,
+      "scalar_inspections": 0,
+      "range_checks": 200,
+      "joined_bytes": 15551,
+      "encoding_owned_bytes": 15000,
+      "final_byte_copies": 15000,
+      "write_bytes": 15000,
+      "identity_misses": 0,
+      "phases": {
+        "join": {
+          "calls": 207,
+          "inclusive_ns": 336315,
+          "exclusive_ns": 149329
+        },
+        "encode": {
+          "calls": 201,
+          "inclusive_ns": 823914,
+          "exclusive_ns": 696294
+        },
+        "fused": {
+          "calls": 0,
+          "inclusive_ns": 0,
+          "exclusive_ns": 0
+        },
+        "snapshot": {
+          "calls": 200,
+          "inclusive_ns": 220978,
+          "exclusive_ns": 220978
+        },
+        "reply": {
+          "calls": 9,
+          "inclusive_ns": 80640,
+          "exclusive_ns": 66630
+        },
+        "managed": {
+          "calls": 2693,
+          "inclusive_ns": 1868280,
+          "exclusive_ns": 1292533
+        },
+        "gc": {
+          "calls": 11,
+          "inclusive_ns": 575747,
+          "exclusive_ns": 575747
+        },
+        "write": {
+          "calls": 200,
+          "inclusive_ns": 1513070,
+          "exclusive_ns": 1513070
+        },
+        "fsync": {
+          "calls": 1,
+          "inclusive_ns": 5697997,
+          "exclusive_ns": 5697997
+        }
+      },
+      "identities": {
+        "/@stdlib/io.void::$cleanup": 1,
+        "/@stdlib/io.void::_acquisition": 1,
+        "/@stdlib/io.void::_lease": 203,
+        "/@stdlib/io.void::error": 4,
+        "/@stdlib/io.void::file": 1,
+        "/@stdlib/io.void::open::$cell$4": 1,
+        "/@stdlib/io.void::open::$lambda$0::$captures": 1,
+        "/@stdlib/log.void::$cleanup": 1,
+        "/@stdlib/log.void::_guard": 203,
+        "/@stdlib/log.void::_receipt": 202,
+        "/@stdlib/log.void::logger": 1,
+        "/@stdlib/log.void::open::$cell$3": 1,
+        "/@stdlib/log.void::open::$lambda$0::$captures": 1
+      }
+    },
+    "outside_sync_ns": 9808265
+  },
+  {
+    "optimized": 1,
+    "command": 11,
+    "sample": 2,
+    "compile_ns": 8982100325,
+    "preparation_ns": 8982100325,
+    "wall_ns": 15475822,
+    "cpu_seconds": 0.009946,
+    "managed_constructions": 621,
+    "output_retained_bytes": 15000,
+    "console_calls": 0,
+    "file_writes": 200,
+    "flushes": 1,
+    "metadata": 4,
+    "moves": 0,
+    "deletes": 0,
+    "heap_before": 2294,
+    "heap_transient_after_root": 5639,
+    "heap_after_gc": 2294,
+    "handles_before": 5,
+    "handles_after": 5,
+    "process_high_water_rss_kib": 176560,
+    "block": 2,
+    "version": "candidate",
+    "instrumented": true,
+    "gc_collections": 11,
+    "metrics": {
+      "allocation_calls": 15327,
+      "requested_bytes": 890280,
+      "snapshot_bytes": 15000,
+      "scalar_inspections": 0,
+      "range_checks": 200,
+      "joined_bytes": 15551,
+      "encoding_owned_bytes": 15000,
+      "final_byte_copies": 15000,
+      "write_bytes": 15000,
+      "identity_misses": 0,
+      "phases": {
+        "join": {
+          "calls": 207,
+          "inclusive_ns": 341499,
+          "exclusive_ns": 167960
+        },
+        "encode": {
+          "calls": 201,
+          "inclusive_ns": 733816,
+          "exclusive_ns": 604477
+        },
+        "fused": {
+          "calls": 0,
+          "inclusive_ns": 0,
+          "exclusive_ns": 0
+        },
+        "snapshot": {
+          "calls": 200,
+          "inclusive_ns": 239410,
+          "exclusive_ns": 239410
+        },
+        "reply": {
+          "calls": 9,
+          "inclusive_ns": 85880,
+          "exclusive_ns": 69960
+        },
+        "managed": {
+          "calls": 2693,
+          "inclusive_ns": 1902835,
+          "exclusive_ns": 1279809
+        },
+        "gc": {
+          "calls": 11,
+          "inclusive_ns": 623026,
+          "exclusive_ns": 623026
+        },
+        "write": {
+          "calls": 200,
+          "inclusive_ns": 1508844,
+          "exclusive_ns": 1508844
+        },
+        "fsync": {
+          "calls": 1,
+          "inclusive_ns": 5581858,
+          "exclusive_ns": 5581858
+        }
+      },
+      "identities": {
+        "/@stdlib/io.void::$cleanup": 1,
+        "/@stdlib/io.void::_acquisition": 1,
+        "/@stdlib/io.void::_lease": 203,
+        "/@stdlib/io.void::error": 4,
+        "/@stdlib/io.void::file": 1,
+        "/@stdlib/io.void::open::$cell$4": 1,
+        "/@stdlib/io.void::open::$lambda$0::$captures": 1,
+        "/@stdlib/log.void::$cleanup": 1,
+        "/@stdlib/log.void::_guard": 203,
+        "/@stdlib/log.void::_receipt": 202,
+        "/@stdlib/log.void::logger": 1,
+        "/@stdlib/log.void::open::$cell$3": 1,
+        "/@stdlib/log.void::open::$lambda$0::$captures": 1
+      }
+    },
+    "outside_sync_ns": 9893964
+  },
+  {
+    "optimized": 1,
+    "command": 11,
+    "sample": 0,
+    "compile_ns": 9105000578,
+    "preparation_ns": 9105000578,
+    "wall_ns": 19198731,
+    "cpu_seconds": 0.013521,
+    "managed_constructions": 1839,
+    "output_retained_bytes": 15000,
+    "console_calls": 0,
+    "file_writes": 200,
+    "flushes": 1,
+    "metadata": 4,
+    "moves": 0,
+    "deletes": 0,
+    "heap_before": 2294,
+    "heap_transient_after_root": 7736,
+    "heap_after_gc": 2294,
+    "handles_before": 5,
+    "handles_after": 5,
+    "process_high_water_rss_kib": 176180,
+    "block": 3,
+    "version": "v1",
+    "instrumented": true,
+    "gc_collections": 17,
+    "metrics": {
+      "allocation_calls": 25022,
+      "requested_bytes": 1239656,
+      "snapshot_bytes": 15000,
+      "scalar_inspections": 15000,
+      "range_checks": 0,
+      "joined_bytes": 15530,
+      "encoding_owned_bytes": 15000,
+      "final_byte_copies": 15000,
+      "write_bytes": 15000,
+      "identity_misses": 0,
+      "phases": {
+        "join": {
+          "calls": 207,
+          "inclusive_ns": 207829,
+          "exclusive_ns": 142579
+        },
+        "encode": {
+          "calls": 201,
+          "inclusive_ns": 876013,
+          "exclusive_ns": 653507
+        },
+        "fused": {
+          "calls": 0,
+          "inclusive_ns": 0,
+          "exclusive_ns": 0
+        },
+        "snapshot": {
+          "calls": 200,
+          "inclusive_ns": 894734,
+          "exclusive_ns": 894734
+        },
+        "reply": {
+          "calls": 209,
+          "inclusive_ns": 998924,
+          "exclusive_ns": 658687
+        },
+        "managed": {
+          "calls": 4311,
+          "inclusive_ns": 3004461,
+          "exclusive_ns": 2204895
+        },
+        "gc": {
+          "calls": 17,
+          "inclusive_ns": 917264,
+          "exclusive_ns": 917264
+        },
+        "write": {
+          "calls": 200,
+          "inclusive_ns": 1886422,
+          "exclusive_ns": 1886422
+        },
+        "fsync": {
+          "calls": 1,
+          "inclusive_ns": 5641588,
+          "exclusive_ns": 5641588
+        }
+      },
+      "identities": {
+        "/@stdlib/io.void::$cleanup": 204,
+        "/@stdlib/io.void::_acquisition": 1,
+        "/@stdlib/io.void::_lease": 203,
+        "/@stdlib/io.void::error": 4,
+        "/@stdlib/io.void::file": 1,
+        "/@stdlib/io.void::file::method::close::$cell$1": 1,
+        "/@stdlib/io.void::file::method::close::$lambda$0::$captures": 1,
+        "/@stdlib/io.void::file::method::flush::$cell$1": 1,
+        "/@stdlib/io.void::file::method::flush::$lambda$0::$captures": 1,
+        "/@stdlib/io.void::file::method::length::$cell$1": 1,
+        "/@stdlib/io.void::file::method::length::$lambda$0::$captures": 1,
+        "/@stdlib/io.void::file::method::write_bytes::$cell$2": 200,
+        "/@stdlib/io.void::file::method::write_bytes::$lambda$0::$captures": 200,
+        "/@stdlib/io.void::open::$cell$4": 1,
+        "/@stdlib/io.void::open::$lambda$0::$captures": 1,
+        "/@stdlib/log.void::$cleanup": 203,
+        "/@stdlib/log.void::_guard": 203,
+        "/@stdlib/log.void::_receipt": 202,
+        "/@stdlib/log.void::logger": 1,
+        "/@stdlib/log.void::logger::method::close::$cell$1": 2,
+        "/@stdlib/log.void::logger::method::close::$lambda$0::$captures": 2,
+        "/@stdlib/log.void::logger::method::write::$cell$3": 200,
+        "/@stdlib/log.void::logger::method::write::$lambda$0::$captures": 200,
+        "/@stdlib/log.void::open::$cell$3": 1,
+        "/@stdlib/log.void::open::$lambda$0::$captures": 1,
+        "/benchmark.void::$cleanup": 1,
+        "/benchmark.void::enabled::$cell$11": 1,
+        "/benchmark.void::enabled::$lambda$1::$captures": 1
+      }
+    },
+    "outside_sync_ns": 13557143
+  },
+  {
+    "optimized": 1,
+    "command": 11,
+    "sample": 1,
+    "compile_ns": 9105000578,
+    "preparation_ns": 9105000578,
+    "wall_ns": 19346140,
+    "cpu_seconds": 0.013573,
+    "managed_constructions": 1839,
+    "output_retained_bytes": 15000,
+    "console_calls": 0,
+    "file_writes": 200,
+    "flushes": 1,
+    "metadata": 4,
+    "moves": 0,
+    "deletes": 0,
+    "heap_before": 2294,
+    "heap_transient_after_root": 7736,
+    "heap_after_gc": 2294,
+    "handles_before": 5,
+    "handles_after": 5,
+    "process_high_water_rss_kib": 176180,
+    "block": 3,
+    "version": "v1",
+    "instrumented": true,
+    "gc_collections": 17,
+    "metrics": {
+      "allocation_calls": 25022,
+      "requested_bytes": 1239656,
+      "snapshot_bytes": 15000,
+      "scalar_inspections": 15000,
+      "range_checks": 0,
+      "joined_bytes": 15530,
+      "encoding_owned_bytes": 15000,
+      "final_byte_copies": 15000,
+      "write_bytes": 15000,
+      "identity_misses": 0,
+      "phases": {
+        "join": {
+          "calls": 207,
+          "inclusive_ns": 393256,
+          "exclusive_ns": 332558
+        },
+        "encode": {
+          "calls": 201,
+          "inclusive_ns": 836075,
+          "exclusive_ns": 632266
+        },
+        "fused": {
+          "calls": 0,
+          "inclusive_ns": 0,
+          "exclusive_ns": 0
+        },
+        "snapshot": {
+          "calls": 200,
+          "inclusive_ns": 892210,
+          "exclusive_ns": 892210
+        },
+        "reply": {
+          "calls": 209,
+          "inclusive_ns": 1000077,
+          "exclusive_ns": 676868
+        },
+        "managed": {
+          "calls": 4311,
+          "inclusive_ns": 3092568,
+          "exclusive_ns": 2220293
+        },
+        "gc": {
+          "calls": 17,
+          "inclusive_ns": 968384,
+          "exclusive_ns": 968384
+        },
+        "write": {
+          "calls": 200,
+          "inclusive_ns": 1820346,
+          "exclusive_ns": 1820346
+        },
+        "fsync": {
+          "calls": 1,
+          "inclusive_ns": 5587918,
+          "exclusive_ns": 5587918
+        }
+      },
+      "identities": {
+        "/@stdlib/io.void::$cleanup": 204,
+        "/@stdlib/io.void::_acquisition": 1,
+        "/@stdlib/io.void::_lease": 203,
+        "/@stdlib/io.void::error": 4,
+        "/@stdlib/io.void::file": 1,
+        "/@stdlib/io.void::file::method::close::$cell$1": 1,
+        "/@stdlib/io.void::file::method::close::$lambda$0::$captures": 1,
+        "/@stdlib/io.void::file::method::flush::$cell$1": 1,
+        "/@stdlib/io.void::file::method::flush::$lambda$0::$captures": 1,
+        "/@stdlib/io.void::file::method::length::$cell$1": 1,
+        "/@stdlib/io.void::file::method::length::$lambda$0::$captures": 1,
+        "/@stdlib/io.void::file::method::write_bytes::$cell$2": 200,
+        "/@stdlib/io.void::file::method::write_bytes::$lambda$0::$captures": 200,
+        "/@stdlib/io.void::open::$cell$4": 1,
+        "/@stdlib/io.void::open::$lambda$0::$captures": 1,
+        "/@stdlib/log.void::$cleanup": 203,
+        "/@stdlib/log.void::_guard": 203,
+        "/@stdlib/log.void::_receipt": 202,
+        "/@stdlib/log.void::logger": 1,
+        "/@stdlib/log.void::logger::method::close::$cell$1": 2,
+        "/@stdlib/log.void::logger::method::close::$lambda$0::$captures": 2,
+        "/@stdlib/log.void::logger::method::write::$cell$3": 200,
+        "/@stdlib/log.void::logger::method::write::$lambda$0::$captures": 200,
+        "/@stdlib/log.void::open::$cell$3": 1,
+        "/@stdlib/log.void::open::$lambda$0::$captures": 1,
+        "/benchmark.void::$cleanup": 1,
+        "/benchmark.void::enabled::$cell$11": 1,
+        "/benchmark.void::enabled::$lambda$1::$captures": 1
+      }
+    },
+    "outside_sync_ns": 13758222
+  },
+  {
+    "optimized": 1,
+    "command": 11,
+    "sample": 2,
+    "compile_ns": 9105000578,
+    "preparation_ns": 9105000578,
+    "wall_ns": 18833513,
+    "cpu_seconds": 0.013007,
+    "managed_constructions": 1839,
+    "output_retained_bytes": 15000,
+    "console_calls": 0,
+    "file_writes": 200,
+    "flushes": 1,
+    "metadata": 4,
+    "moves": 0,
+    "deletes": 0,
+    "heap_before": 2294,
+    "heap_transient_after_root": 7736,
+    "heap_after_gc": 2294,
+    "handles_before": 5,
+    "handles_after": 5,
+    "process_high_water_rss_kib": 176180,
+    "block": 3,
+    "version": "v1",
+    "instrumented": true,
+    "gc_collections": 17,
+    "metrics": {
+      "allocation_calls": 25022,
+      "requested_bytes": 1239656,
+      "snapshot_bytes": 15000,
+      "scalar_inspections": 15000,
+      "range_checks": 0,
+      "joined_bytes": 15530,
+      "encoding_owned_bytes": 15000,
+      "final_byte_copies": 15000,
+      "write_bytes": 15000,
+      "identity_misses": 0,
+      "phases": {
+        "join": {
+          "calls": 207,
+          "inclusive_ns": 207820,
+          "exclusive_ns": 142370
+        },
+        "encode": {
+          "calls": 201,
+          "inclusive_ns": 798144,
+          "exclusive_ns": 597796
+        },
+        "fused": {
+          "calls": 0,
+          "inclusive_ns": 0,
+          "exclusive_ns": 0
+        },
+        "snapshot": {
+          "calls": 200,
+          "inclusive_ns": 960036,
+          "exclusive_ns": 960036
+        },
+        "reply": {
+          "calls": 209,
+          "inclusive_ns": 959491,
+          "exclusive_ns": 650025
+        },
+        "managed": {
+          "calls": 4311,
+          "inclusive_ns": 2751791,
+          "exclusive_ns": 2044969
+        },
+        "gc": {
+          "calls": 17,
+          "inclusive_ns": 806741,
+          "exclusive_ns": 806741
+        },
+        "write": {
+          "calls": 200,
+          "inclusive_ns": 1732097,
+          "exclusive_ns": 1732097
+        },
+        "fsync": {
+          "calls": 1,
+          "inclusive_ns": 5790536,
+          "exclusive_ns": 5790536
+        }
+      },
+      "identities": {
+        "/@stdlib/io.void::$cleanup": 204,
+        "/@stdlib/io.void::_acquisition": 1,
+        "/@stdlib/io.void::_lease": 203,
+        "/@stdlib/io.void::error": 4,
+        "/@stdlib/io.void::file": 1,
+        "/@stdlib/io.void::file::method::close::$cell$1": 1,
+        "/@stdlib/io.void::file::method::close::$lambda$0::$captures": 1,
+        "/@stdlib/io.void::file::method::flush::$cell$1": 1,
+        "/@stdlib/io.void::file::method::flush::$lambda$0::$captures": 1,
+        "/@stdlib/io.void::file::method::length::$cell$1": 1,
+        "/@stdlib/io.void::file::method::length::$lambda$0::$captures": 1,
+        "/@stdlib/io.void::file::method::write_bytes::$cell$2": 200,
+        "/@stdlib/io.void::file::method::write_bytes::$lambda$0::$captures": 200,
+        "/@stdlib/io.void::open::$cell$4": 1,
+        "/@stdlib/io.void::open::$lambda$0::$captures": 1,
+        "/@stdlib/log.void::$cleanup": 203,
+        "/@stdlib/log.void::_guard": 203,
+        "/@stdlib/log.void::_receipt": 202,
+        "/@stdlib/log.void::logger": 1,
+        "/@stdlib/log.void::logger::method::close::$cell$1": 2,
+        "/@stdlib/log.void::logger::method::close::$lambda$0::$captures": 2,
+        "/@stdlib/log.void::logger::method::write::$cell$3": 200,
+        "/@stdlib/log.void::logger::method::write::$lambda$0::$captures": 200,
+        "/@stdlib/log.void::open::$cell$3": 1,
+        "/@stdlib/log.void::open::$lambda$0::$captures": 1,
+        "/benchmark.void::$cleanup": 1,
+        "/benchmark.void::enabled::$cell$11": 1,
+        "/benchmark.void::enabled::$lambda$1::$captures": 1
+      }
+    },
+    "outside_sync_ns": 13042977
+  }
+]

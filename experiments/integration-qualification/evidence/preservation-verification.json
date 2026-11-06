@@ -1,0 +1,15 @@
+{
+  "source_files_verified": 180,
+  "production_files": 23,
+  "fixture_files": 5,
+  "original_internal_artifacts_verified": 2641,
+  "original_internal_issues": [],
+  "protected_refinement_artifacts_verified": 769,
+  "refinement_issues": [],
+  "README_unchanged": true,
+  "existing_SIMD_note_unchanged": true,
+  "HEAD_unchanged": true,
+  "index_unchanged": true,
+  "host": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+  "local_doc_links_checked": 69
+}

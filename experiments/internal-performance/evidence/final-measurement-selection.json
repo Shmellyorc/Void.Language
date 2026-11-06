@@ -1,0 +1,18 @@
+{
+  "Runtime_blocks": [
+    "E",
+    "F",
+    "G",
+    "H"
+  ],
+  "editor_blocks": [
+    "I",
+    "J",
+    "K",
+    "L"
+  ],
+  "Runtime_archive_equivalence_proof": "cursor-runtime-archive-equivalence.json",
+  "superseded_editor_samples": "indexed-view-final-whole-workload-raw.json",
+  "baseline_replay": "One L baseline startup EOF was preserved; one preserving replay succeeded. Startup timing from that diagnostic includes fixture capture and is not used for a speedup claim.",
+  "reason": "Only LSP iterator code changed; linked compiler/backend/Runtime archives are byte-identical. No unaffected Runtime workload was rerun."
+}

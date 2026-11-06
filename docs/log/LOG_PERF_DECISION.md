@@ -1,5 +1,18 @@
 # Logging performance release gate decision memorandum
 
+## Current Boss disposition — 5 November 2026
+
+The refined logging patch is already integrated with the shared internal repairs.
+[Consolidated qualification and review handoff](../compiler-health/INTEGRATED_PERFORMANCE_QUALIFICATION.md)
+is the active status. **The historical FILE200 strict 10 ms aim is not a
+Boss-mandated release requirement or an automatic release blocker. It is not
+claimed passed.** Retained improvements, regressions and real durability are
+reported with their original measurement cohorts. Release authority remains Boss's.
+
+The dated memorandum/handoff below is historical evidence, including its former
+release-HOLD wording; that requirement interpretation is superseded above.
+Original samples, rejected candidates and failures remain intact.
+
 4 November 2026 · Owner-authorized documentation handoff.
 
 **LOG-PERF OPEN / release HOLD.** Preserve the original

@@ -1,0 +1,2210 @@
+Start testing: Oct 28 08:35 PDT
+----------------------------------------------------------
+39/368 Testing: gc_buffers
+39/368 Test: gc_buffers
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/runtime/buffers.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_gc_buffers"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"gc_buffers" start time: Oct 28 08:35 PDT
+Output:
+----------------------------------------------------------
+reference sweep before owner teardown: baseline=1 ordinal=-1 sites=11 failed=0 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=1 ordinal=-1 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=0 sites=0 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=0 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=1 sites=1 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=1 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=2 sites=2 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=2 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=3 sites=3 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=3 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=4 sites=4 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=4 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=5 sites=5 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=5 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=6 sites=6 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=6 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=7 sites=7 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=7 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=8 sites=8 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=8 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=9 sites=9 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=9 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=10 sites=10 failed=1 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=10 native_count=0 native_bytes=0
+buffer allocation-site sweep budget=0: 4 sites
+buffer allocation-site sweep budget=1: 6 sites
+Managed partial-buffer request: completed_collections=1 cooperative_parks=1
+NativeSafe reservation/zeroing, private adoption and deterministic chunk collection passed
+typed managed/string/interface buffers, capacity oracle and million-reference scans passed
+object-table ownership witness: initial=0 buckets=1->13 heap_retained_count=1 heap_retained_bytes=104 bucket_retained_count=1 bucket_retained_bytes=104 after_owners_count=0 after_owners_bytes=0
+object-table ownership witness: initial=2 buckets=13->13 heap_retained_count=0 heap_retained_bytes=0 bucket_retained_count=0 bucket_retained_bytes=0 after_owners_count=0 after_owners_bytes=0
+reference construction/partial-mark failure sweep: 11 sites
+byte copy allocation_calls=4 requested_bytes=3145976 copy_finish_ms=0.336558
+independent byte copy bytes=3145728 elapsed_ms=126.657 (includes oracle/GC/conflict checks; no latency claim)
+reference copy capacity=1 payload_bytes=8 allocation_calls=4 metadata_requested=208 copy_finish_ms=0.00161 two_live_buffers_gc_ms=0.00105
+reference copy capacity=131072 payload_bytes=1048576 allocation_calls=4 metadata_requested=208 copy_finish_ms=25.7953 two_live_buffers_gc_ms=9.52116
+copy/partial-mark allocation failure sweep budget=0: 17 sites
+copy/partial-mark allocation failure sweep budget=1: 29 sites
+foundation acceptance: 32 budgeted lease/copy/abort/recovery cycles, two post-copy collections each passed
+fixed scalar values: 4 MiB content oracle, independent/self copy, all encodings, typed empty/zero-footprint and negatives passed
+fixed Managed store: genuine request/poll/park, rooted source and post-GC copy passed
+fixed value allocation sweep operation=0 budget=0: 4 sites
+fixed value allocation sweep operation=1 budget=0: 4 sites
+fixed value allocation sweep operation=2 budget=0: 4 sites
+fixed value allocation sweep operation=3 budget=0: 4 sites
+fixed value allocation sweep operation=4 budget=0: 4 sites
+fixed value allocation sweep operation=5 budget=0: 4 sites
+fixed value allocation sweep operation=0 budget=1: 8 sites
+fixed value allocation sweep operation=1 budget=1: 8 sites
+fixed value allocation sweep operation=2 budget=1: 10 sites
+fixed value allocation sweep operation=3 budget=1: 8 sites
+fixed value allocation sweep operation=4 budget=1: 8 sites
+fixed value allocation sweep operation=5 budget=1: 10 sites
+private scalar bridge: six caller homes, GC, ordered snapshots, independent result and failure preservation passed
+reference partial-element poll: one collection/park, source slot reacquired at verified Heap boundary
+reference post-poll wrong-type rejection preserved previous output
+private rooted byte/reference buffer checks passed
+private buffer roots/edges cannot bypass publication
+post-owner native leak checks reject bytes and zero-byte allocations
+<end of output>
+Test time =   0.89 sec
+----------------------------------------------------------
+Test Passed.
+"gc_buffers" end time: Oct 28 08:35 PDT
+"gc_buffers" time elapsed: 00:00:00
+----------------------------------------------------------
+
+53/368 Testing: runtime_coordination
+53/368 Test: runtime_coordination
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_runtime_tests"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"runtime_coordination" start time: Oct 28 08:35 PDT
+Output:
+----------------------------------------------------------
+NativeSafe rendezvous baseline (1000, one frozen object): mean 0.233679 us, max 1.89 us
+runtime coordinator: states, nested roots, timeout, competing collectors, NativeSafe and stress passed
+<end of output>
+Test time =   2.04 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_coordination" end time: Oct 28 08:35 PDT
+"runtime_coordination" time elapsed: 00:00:02
+----------------------------------------------------------
+
+55/368 Testing: fixed_arrays_source
+55/368 Test: fixed_arrays_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_fixed_arrays_tests" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"fixed_arrays_source" start time: Oct 28 08:35 PDT
+Output:
+----------------------------------------------------------
+source array normal: 222 failing allocation budgets, recovery and cleanup passed
+source array O2: 222 failing allocation budgets, recovery and cleanup passed
+Numeric fixed arrays: source execution, roots, publication and failure recovery passed
+<end of output>
+Test time =   1.73 sec
+----------------------------------------------------------
+Test Passed.
+"fixed_arrays_source" end time: Oct 28 08:35 PDT
+"fixed_arrays_source" time elapsed: 00:00:01
+----------------------------------------------------------
+
+56/368 Testing: growable_arrays_source
+56/368 Test: growable_arrays_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_growable_arrays_tests" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"growable_arrays_source" start time: Oct 28 08:35 PDT
+Output:
+----------------------------------------------------------
+list transaction 0: 14 failing allocation budgets passed
+list transaction 1: 1 failing allocation budgets passed
+list transaction 2: 1 failing allocation budgets passed
+list transaction 3: 12 failing allocation budgets passed
+cold list construction: 48 failing allocation budgets passed
+growable source normal: 34 failing allocation budgets, recovery and cleanup passed
+growable source O2: 34 failing allocation budgets, recovery and cleanup passed
+Growable lists: source, aliases, roots, transactions and failures passed
+<end of output>
+Test time =   1.36 sec
+----------------------------------------------------------
+Test Passed.
+"growable_arrays_source" end time: Oct 28 08:35 PDT
+"growable_arrays_source" time elapsed: 00:00:01
+----------------------------------------------------------
+
+57/368 Testing: arrays_source
+57/368 Test: arrays_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_arrays_source" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"arrays_source" start time: Oct 28 08:35 PDT
+Output:
+----------------------------------------------------------
+reference transaction 0: 19 failing budgets passed
+reference transaction 1: 4 failing budgets passed
+reference transaction 2: 3 failing budgets passed
+cold reference construction: 62 failing budgets passed
+failures source normal: 265 failing allocation budgets; cleanup/retry passed
+defaults source normal: 246 failing allocation budgets; cleanup/retry passed
+failures source O2: 265 failing allocation budgets; cleanup/retry passed
+defaults source O2: 246 failing allocation budgets; cleanup/retry passed
+Phase 23 arrays/ranges: source, GC, readonly, publication and failure checks passed
+<end of output>
+Test time =   3.19 sec
+----------------------------------------------------------
+Test Passed.
+"arrays_source" end time: Oct 28 08:35 PDT
+"arrays_source" time elapsed: 00:00:03
+----------------------------------------------------------
+
+68/368 Testing: advanced_source
+68/368 Test: advanced_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_advanced_tests" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"advanced_source" start time: Oct 28 08:35 PDT
+Output:
+----------------------------------------------------------
+normal captures allocation failures: 226
+normal with allocation failures: 210
+normal events allocation failures: 388
+normal fixed_capture allocation failures: 133
+O2 captures allocation failures: 226
+O2 with allocation failures: 210
+O2 events allocation failures: 388
+O2 fixed_capture allocation failures: 133
+<end of output>
+Test time =   2.96 sec
+----------------------------------------------------------
+Test Passed.
+"advanced_source" end time: Oct 28 08:35 PDT
+"advanced_source" time elapsed: 00:00:02
+----------------------------------------------------------
+
+167/368 Testing: text_encoding_text
+167/368 Test: text_encoding_text
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc" "text"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"text_encoding_text" start time: Oct 28 08:35 PDT
+Output:
+----------------------------------------------------------
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc check /home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void 0.028s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void --no-opt 0.647s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void 0.805s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void -o /tmp/VOID text encoding execution mkkhnnve/text-aot/application --no-opt 0.684s
+PASS /tmp/VOID text encoding execution mkkhnnve/text-aot/application 0.004s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void -o /tmp/VOID text encoding execution mkkhnnve/text-aot-o2/application 0.829s
+PASS /tmp/VOID text encoding execution mkkhnnve/text-aot-o2/application 0.006s
+{
+  "checks": 7,
+  "small_stack": false,
+  "measurements": [
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "check",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void"
+      ],
+      "seconds": 0.028209011012222618
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void",
+        "--no-opt"
+      ],
+      "seconds": 0.6466094010393135
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void"
+      ],
+      "seconds": 0.8051131370011717
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void",
+        "-o",
+        "/tmp/VOID text encoding execution mkkhnnve/text-aot/application",
+        "--no-opt"
+      ],
+      "seconds": 0.6839237110107206
+    },
+    {
+      "command": [
+        "/tmp/VOID text encoding execution mkkhnnve/text-aot/application"
+      ],
+      "seconds": 0.004450514039490372
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void",
+        "-o",
+        "/tmp/VOID text encoding execution mkkhnnve/text-aot-o2/application"
+      ],
+      "seconds": 0.8287472929805517
+    },
+    {
+      "command": [
+        "/tmp/VOID text encoding execution mkkhnnve/text-aot-o2/application"
+      ],
+      "seconds": 0.00589970697183162
+    }
+  ]
+}
+<end of output>
+Test time =   3.06 sec
+----------------------------------------------------------
+Test Passed.
+"text_encoding_text" end time: Oct 28 08:35 PDT
+"text_encoding_text" time elapsed: 00:00:03
+----------------------------------------------------------
+
+168/368 Testing: text_encoding_hex
+168/368 Test: text_encoding_hex
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc" "hex"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"text_encoding_hex" start time: Oct 28 08:35 PDT
+Output:
+----------------------------------------------------------
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc check /home/shmellyorc/Documents/Void.Language/tests/text_encoding/hex.void 0.015s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/hex.void --no-opt 0.224s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/hex.void 0.235s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/hex.void -o /tmp/VOID text encoding execution xkgrtygc/hex-aot/application --no-opt 0.255s
+PASS /tmp/VOID text encoding execution xkgrtygc/hex-aot/application 0.007s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/hex.void -o /tmp/VOID text encoding execution xkgrtygc/hex-aot-o2/application 0.265s
+PASS /tmp/VOID text encoding execution xkgrtygc/hex-aot-o2/application 0.005s
+{
+  "checks": 7,
+  "small_stack": false,
+  "measurements": [
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "check",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/hex.void"
+      ],
+      "seconds": 0.015195883985143155
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/hex.void",
+        "--no-opt"
+      ],
+      "seconds": 0.2236087680212222
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/hex.void"
+      ],
+      "seconds": 0.23454931704327464
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/hex.void",
+        "-o",
+        "/tmp/VOID text encoding execution xkgrtygc/hex-aot/application",
+        "--no-opt"
+      ],
+      "seconds": 0.2545463329879567
+    },
+    {
+      "command": [
+        "/tmp/VOID text encoding execution xkgrtygc/hex-aot/application"
+      ],
+      "seconds": 0.006600282969884574
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/hex.void",
+        "-o",
+        "/tmp/VOID text encoding execution xkgrtygc/hex-aot-o2/application"
+      ],
+      "seconds": 0.2652805329998955
+    },
+    {
+      "command": [
+        "/tmp/VOID text encoding execution xkgrtygc/hex-aot-o2/application"
+      ],
+      "seconds": 0.005455128964968026
+    }
+  ]
+}
+<end of output>
+Test time =   1.05 sec
+----------------------------------------------------------
+Test Passed.
+"text_encoding_hex" end time: Oct 28 08:35 PDT
+"text_encoding_hex" time elapsed: 00:00:01
+----------------------------------------------------------
+
+169/368 Testing: text_encoding_base64
+169/368 Test: text_encoding_base64
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc" "base64"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"text_encoding_base64" start time: Oct 28 08:35 PDT
+Output:
+----------------------------------------------------------
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc check /home/shmellyorc/Documents/Void.Language/tests/text_encoding/base64.void 0.025s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/base64.void --no-opt 0.410s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/base64.void 0.478s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/base64.void -o /tmp/VOID text encoding execution 3p3rbkzv/base64-aot/application --no-opt 0.438s
+PASS /tmp/VOID text encoding execution 3p3rbkzv/base64-aot/application 0.005s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/base64.void -o /tmp/VOID text encoding execution 3p3rbkzv/base64-aot-o2/application 0.479s
+PASS /tmp/VOID text encoding execution 3p3rbkzv/base64-aot-o2/application 0.005s
+{
+  "checks": 7,
+  "small_stack": false,
+  "measurements": [
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "check",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/base64.void"
+      ],
+      "seconds": 0.02548342599766329
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/base64.void",
+        "--no-opt"
+      ],
+      "seconds": 0.4096374480286613
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/base64.void"
+      ],
+      "seconds": 0.4779848430189304
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/base64.void",
+        "-o",
+        "/tmp/VOID text encoding execution 3p3rbkzv/base64-aot/application",
+        "--no-opt"
+      ],
+      "seconds": 0.4384383460273966
+    },
+    {
+      "command": [
+        "/tmp/VOID text encoding execution 3p3rbkzv/base64-aot/application"
+      ],
+      "seconds": 0.005003261030651629
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/base64.void",
+        "-o",
+        "/tmp/VOID text encoding execution 3p3rbkzv/base64-aot-o2/application"
+      ],
+      "seconds": 0.478898097993806
+    },
+    {
+      "command": [
+        "/tmp/VOID text encoding execution 3p3rbkzv/base64-aot-o2/application"
+      ],
+      "seconds": 0.0048447930021211505
+    }
+  ]
+}
+<end of output>
+Test time =   1.88 sec
+----------------------------------------------------------
+Test Passed.
+"text_encoding_base64" end time: Oct 28 08:35 PDT
+"text_encoding_base64" time elapsed: 00:00:01
+----------------------------------------------------------
+
+170/368 Testing: text_encoding_ascii
+170/368 Test: text_encoding_ascii
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc" "ascii"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"text_encoding_ascii" start time: Oct 28 08:35 PDT
+Output:
+----------------------------------------------------------
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc check /home/shmellyorc/Documents/Void.Language/tests/text_encoding/ascii.void 0.017s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/ascii.void --no-opt 0.186s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/ascii.void 0.221s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/ascii.void -o /tmp/VOID text encoding execution vkhtad4g/ascii-aot/application --no-opt 0.243s
+PASS /tmp/VOID text encoding execution vkhtad4g/ascii-aot/application 0.006s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/ascii.void -o /tmp/VOID text encoding execution vkhtad4g/ascii-aot-o2/application 0.259s
+PASS /tmp/VOID text encoding execution vkhtad4g/ascii-aot-o2/application 0.006s
+{
+  "checks": 7,
+  "small_stack": false,
+  "measurements": [
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "check",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ascii.void"
+      ],
+      "seconds": 0.01744049199623987
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ascii.void",
+        "--no-opt"
+      ],
+      "seconds": 0.1856447319732979
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ascii.void"
+      ],
+      "seconds": 0.2211725120432675
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ascii.void",
+        "-o",
+        "/tmp/VOID text encoding execution vkhtad4g/ascii-aot/application",
+        "--no-opt"
+      ],
+      "seconds": 0.24321801704354584
+    },
+    {
+      "command": [
+        "/tmp/VOID text encoding execution vkhtad4g/ascii-aot/application"
+      ],
+      "seconds": 0.005500589031726122
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ascii.void",
+        "-o",
+        "/tmp/VOID text encoding execution vkhtad4g/ascii-aot-o2/application"
+      ],
+      "seconds": 0.25908421800704673
+    },
+    {
+      "command": [
+        "/tmp/VOID text encoding execution vkhtad4g/ascii-aot-o2/application"
+      ],
+      "seconds": 0.006141195946838707
+    }
+  ]
+}
+<end of output>
+Test time =   0.98 sec
+----------------------------------------------------------
+Test Passed.
+"text_encoding_ascii" end time: Oct 28 08:35 PDT
+"text_encoding_ascii" time elapsed: 00:00:00
+----------------------------------------------------------
+
+171/368 Testing: text_encoding_oracles
+171/368 Test: text_encoding_oracles
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc" "oracles"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"text_encoding_oracles" start time: Oct 28 08:35 PDT
+Output:
+----------------------------------------------------------
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc check /home/shmellyorc/Documents/Void.Language/tests/text_encoding/oracles.void 0.345s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/oracles.void --no-opt 32.085s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/oracles.void 47.350s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/oracles.void -o /tmp/VOID text encoding execution si3ptjv4/oracles-aot/application --no-opt 29.758s
+PASS /tmp/VOID text encoding execution si3ptjv4/oracles-aot/application 0.081s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/oracles.void -o /tmp/VOID text encoding execution si3ptjv4/oracles-aot-o2/application 42.807s
+PASS /tmp/VOID text encoding execution si3ptjv4/oracles-aot-o2/application 0.082s
+{
+  "checks": 7,
+  "small_stack": false,
+  "measurements": [
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "check",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/oracles.void"
+      ],
+      "seconds": 0.344978234032169
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/oracles.void",
+        "--no-opt"
+      ],
+      "seconds": 32.0847410109709
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/oracles.void"
+      ],
+      "seconds": 47.34990391496103
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/oracles.void",
+        "-o",
+        "/tmp/VOID text encoding execution si3ptjv4/oracles-aot/application",
+        "--no-opt"
+      ],
+      "seconds": 29.757943795004394
+    },
+    {
+      "command": [
+        "/tmp/VOID text encoding execution si3ptjv4/oracles-aot/application"
+      ],
+      "seconds": 0.08063698798650876
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/oracles.void",
+        "-o",
+        "/tmp/VOID text encoding execution si3ptjv4/oracles-aot-o2/application"
+      ],
+      "seconds": 42.80690645496361
+    },
+    {
+      "command": [
+        "/tmp/VOID text encoding execution si3ptjv4/oracles-aot-o2/application"
+      ],
+      "seconds": 0.08215341198956594
+    }
+  ]
+}
+<end of output>
+Test time = 152.56 sec
+----------------------------------------------------------
+Test Passed.
+"text_encoding_oracles" end time: Oct 28 08:37 PDT
+"text_encoding_oracles" time elapsed: 00:02:32
+----------------------------------------------------------
+
+172/368 Testing: text_encoding_interop
+172/368 Test: text_encoding_interop
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc" "interop"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"text_encoding_interop" start time: Oct 28 08:37 PDT
+Output:
+----------------------------------------------------------
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc check /home/shmellyorc/Documents/Void.Language/tests/text_encoding/interop.void 0.144s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/interop.void --no-opt 1.071s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/interop.void 1.261s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/interop.void -o /tmp/VOID text encoding execution vw3mh0mk/interop-aot/application --no-opt 1.078s
+PASS /tmp/VOID text encoding execution vw3mh0mk/interop-aot/application 0.006s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/interop.void -o /tmp/VOID text encoding execution vw3mh0mk/interop-aot-o2/application 1.220s
+PASS /tmp/VOID text encoding execution vw3mh0mk/interop-aot-o2/application 0.005s
+{
+  "checks": 7,
+  "small_stack": false,
+  "measurements": [
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "check",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/interop.void"
+      ],
+      "seconds": 0.14387633296428248
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/interop.void",
+        "--no-opt"
+      ],
+      "seconds": 1.070626559027005
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/interop.void"
+      ],
+      "seconds": 1.260845821001567
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/interop.void",
+        "-o",
+        "/tmp/VOID text encoding execution vw3mh0mk/interop-aot/application",
+        "--no-opt"
+      ],
+      "seconds": 1.077927625970915
+    },
+    {
+      "command": [
+        "/tmp/VOID text encoding execution vw3mh0mk/interop-aot/application"
+      ],
+      "seconds": 0.005612484994344413
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/interop.void",
+        "-o",
+        "/tmp/VOID text encoding execution vw3mh0mk/interop-aot-o2/application"
+      ],
+      "seconds": 1.2204690600046888
+    },
+    {
+      "command": [
+        "/tmp/VOID text encoding execution vw3mh0mk/interop-aot-o2/application"
+      ],
+      "seconds": 0.005132867023348808
+    }
+  ]
+}
+<end of output>
+Test time =   4.83 sec
+----------------------------------------------------------
+Test Passed.
+"text_encoding_interop" end time: Oct 28 08:38 PDT
+"text_encoding_interop" time elapsed: 00:00:04
+----------------------------------------------------------
+
+173/368 Testing: text_encoding_large
+173/368 Test: text_encoding_large
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc" "large"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"text_encoding_large" start time: Oct 28 08:38 PDT
+Output:
+----------------------------------------------------------
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc check /home/shmellyorc/Documents/Void.Language/tests/text_encoding/large.void 0.038s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/large.void --no-opt 5.269s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/large.void 5.439s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/large.void -o /tmp/VOID text encoding execution jx2ep2z5/large-aot/application --no-opt 0.660s
+PASS /tmp/VOID text encoding execution jx2ep2z5/large-aot/application 4.407s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/large.void -o /tmp/VOID text encoding execution jx2ep2z5/large-aot-o2/application 0.758s
+PASS /tmp/VOID text encoding execution jx2ep2z5/large-aot-o2/application 4.431s
+{
+  "checks": 7,
+  "small_stack": false,
+  "measurements": [
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "check",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/large.void"
+      ],
+      "seconds": 0.03774140204768628
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/large.void",
+        "--no-opt"
+      ],
+      "seconds": 5.268908390018623
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/large.void"
+      ],
+      "seconds": 5.438578433997463
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/large.void",
+        "-o",
+        "/tmp/VOID text encoding execution jx2ep2z5/large-aot/application",
+        "--no-opt"
+      ],
+      "seconds": 0.6595538230030797
+    },
+    {
+      "command": [
+        "/tmp/VOID text encoding execution jx2ep2z5/large-aot/application"
+      ],
+      "seconds": 4.406911581987515
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/large.void",
+        "-o",
+        "/tmp/VOID text encoding execution jx2ep2z5/large-aot-o2/application"
+      ],
+      "seconds": 0.7583616159972735
+    },
+    {
+      "command": [
+        "/tmp/VOID text encoding execution jx2ep2z5/large-aot-o2/application"
+      ],
+      "seconds": 4.431263745005708
+    }
+  ]
+}
+<end of output>
+Test time =  21.05 sec
+----------------------------------------------------------
+Test Passed.
+"text_encoding_large" end time: Oct 28 08:38 PDT
+"text_encoding_large" time elapsed: 00:00:21
+----------------------------------------------------------
+
+174/368 Testing: text_encoding_errors
+174/368 Test: text_encoding_errors
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc" "errors"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"text_encoding_errors" start time: Oct 28 08:38 PDT
+Output:
+----------------------------------------------------------
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc check /home/shmellyorc/Documents/Void.Language/tests/text_encoding/errors.void 0.045s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/errors.void --no-opt 0.694s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/errors.void 0.796s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/errors.void -o /tmp/VOID text encoding execution f6n79_yh/errors-aot/application --no-opt 0.680s
+PASS /tmp/VOID text encoding execution f6n79_yh/errors-aot/application 0.004s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/errors.void -o /tmp/VOID text encoding execution f6n79_yh/errors-aot-o2/application 0.802s
+PASS /tmp/VOID text encoding execution f6n79_yh/errors-aot-o2/application 0.004s
+{
+  "checks": 7,
+  "small_stack": false,
+  "measurements": [
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "check",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/errors.void"
+      ],
+      "seconds": 0.04472942900611088
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/errors.void",
+        "--no-opt"
+      ],
+      "seconds": 0.6938821750227362
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/errors.void"
+      ],
+      "seconds": 0.7963586729601957
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/errors.void",
+        "-o",
+        "/tmp/VOID text encoding execution f6n79_yh/errors-aot/application",
+        "--no-opt"
+      ],
+      "seconds": 0.6799010640243068
+    },
+    {
+      "command": [
+        "/tmp/VOID text encoding execution f6n79_yh/errors-aot/application"
+      ],
+      "seconds": 0.0040284740389324725
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/errors.void",
+        "-o",
+        "/tmp/VOID text encoding execution f6n79_yh/errors-aot-o2/application"
+      ],
+      "seconds": 0.8017308699782006
+    },
+    {
+      "command": [
+        "/tmp/VOID text encoding execution f6n79_yh/errors-aot-o2/application"
+      ],
+      "seconds": 0.004250252968631685
+    }
+  ]
+}
+<end of output>
+Test time =   3.07 sec
+----------------------------------------------------------
+Test Passed.
+"text_encoding_errors" end time: Oct 28 08:38 PDT
+"text_encoding_errors" time elapsed: 00:00:03
+----------------------------------------------------------
+
+178/368 Testing: text_encoding_stack
+178/368 Test: text_encoding_stack
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/execution.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc" "text" "--small-stack"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"text_encoding_stack" start time: Oct 28 08:38 PDT
+Output:
+----------------------------------------------------------
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc check /home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void 0.031s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void --no-opt 0.035s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc run /home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void 0.038s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void -o /tmp/VOID text encoding execution gnjab6or/text-aot/application --no-opt 0.648s
+PASS /tmp/VOID text encoding execution gnjab6or/text-aot/application 0.007s
+PASS /home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc build /home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void -o /tmp/VOID text encoding execution gnjab6or/text-aot-o2/application 0.798s
+PASS /tmp/VOID text encoding execution gnjab6or/text-aot-o2/application 0.007s
+{
+  "checks": 7,
+  "small_stack": true,
+  "measurements": [
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "check",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void"
+      ],
+      "seconds": 0.031480033008847386
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void",
+        "--no-opt"
+      ],
+      "seconds": 0.03529660898493603
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void"
+      ],
+      "seconds": 0.03807331097777933
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void",
+        "-o",
+        "/tmp/VOID text encoding execution gnjab6or/text-aot/application",
+        "--no-opt"
+      ],
+      "seconds": 0.6480112549616024
+    },
+    {
+      "command": [
+        "/tmp/VOID text encoding execution gnjab6or/text-aot/application"
+      ],
+      "seconds": 0.006814118009060621
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/text.void",
+        "-o",
+        "/tmp/VOID text encoding execution gnjab6or/text-aot-o2/application"
+      ],
+      "seconds": 0.7977022560080513
+    },
+    {
+      "command": [
+        "/tmp/VOID text encoding execution gnjab6or/text-aot-o2/application"
+      ],
+      "seconds": 0.007314863963983953
+    }
+  ]
+}
+<end of output>
+Test time =   1.61 sec
+----------------------------------------------------------
+Test Passed.
+"text_encoding_stack" end time: Oct 28 08:38 PDT
+"text_encoding_stack" time elapsed: 00:00:01
+----------------------------------------------------------
+
+182/368 Testing: text_encoding_ir
+182/368 Test: text_encoding_ir
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/process.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_text_audit" "--ir" "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ownership.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"text_encoding_ir" start time: Oct 28 08:38 PDT
+Output:
+----------------------------------------------------------
+11 independent private Unicode IR rejections passed
+<end of output>
+Test time =   0.22 sec
+----------------------------------------------------------
+Test Passed.
+"text_encoding_ir" end time: Oct 28 08:38 PDT
+"text_encoding_ir" time elapsed: 00:00:00
+----------------------------------------------------------
+
+184/368 Testing: text_encoding_ownership
+184/368 Test: text_encoding_ownership
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/process.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_text_ownership" "/home/shmellyorc/Documents/Void.Language/tests/text_encoding/ownership.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"text_encoding_ownership" start time: Oct 28 08:38 PDT
+Output:
+----------------------------------------------------------
+normal scenario 0: 101 failed budgets recovered
+normal scenario 1: 14 failed budgets recovered
+normal scenario 2: 14 failed budgets recovered
+normal scenario 3: 57 failed budgets recovered
+normal scenario 4: 255 failed budgets recovered
+normal scenario 5: 220 failed budgets recovered
+normal scenario 6: 236 failed budgets recovered
+normal scenario 7: 172 failed budgets recovered
+normal scenario 8: 80 failed budgets recovered
+normal scenario 9: 250 failed budgets recovered
+normal scenario 10: 72 failed budgets recovered
+normal scenario 11: 48 failed budgets recovered
+normal scenario 12: 59 failed budgets recovered
+normal scenario 13: 44 failed budgets recovered
+normal scenario 14: 24 failed budgets recovered
+normal scenario 15: 29 failed budgets recovered
+normal scenario 16: 48 failed budgets recovered
+normal scenario 17: 72 failed budgets recovered
+normal scenario 18: 59 failed budgets recovered
+normal: 1854 allocation failures recovered
+O2 scenario 0: 101 failed budgets recovered
+O2 scenario 1: 14 failed budgets recovered
+O2 scenario 2: 14 failed budgets recovered
+O2 scenario 3: 57 failed budgets recovered
+O2 scenario 4: 255 failed budgets recovered
+O2 scenario 5: 220 failed budgets recovered
+O2 scenario 6: 236 failed budgets recovered
+O2 scenario 7: 172 failed budgets recovered
+O2 scenario 8: 80 failed budgets recovered
+O2 scenario 9: 250 failed budgets recovered
+O2 scenario 10: 72 failed budgets recovered
+O2 scenario 11: 48 failed budgets recovered
+O2 scenario 12: 59 failed budgets recovered
+O2 scenario 13: 44 failed budgets recovered
+O2 scenario 14: 24 failed budgets recovered
+O2 scenario 15: 29 failed budgets recovered
+O2 scenario 16: 48 failed budgets recovered
+O2 scenario 17: 72 failed budgets recovered
+O2 scenario 18: 59 failed budgets recovered
+O2: 1854 allocation failures recovered
+30382 ownership/root checks passed
+<end of output>
+Test time =   3.40 sec
+----------------------------------------------------------
+Test Passed.
+"text_encoding_ownership" end time: Oct 28 08:38 PDT
+"text_encoding_ownership" time elapsed: 00:00:03
+----------------------------------------------------------
+
+190/368 Testing: stage11_globals
+190/368 Test: stage11_globals
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_globals" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/stage11 native fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"stage11_globals" start time: Oct 28 08:38 PDT
+Output:
+----------------------------------------------------------
+107 global checks passed
+<end of output>
+Test time =   0.75 sec
+----------------------------------------------------------
+Test Passed.
+"stage11_globals" end time: Oct 28 08:38 PDT
+"stage11_globals" time elapsed: 00:00:00
+----------------------------------------------------------
+
+191/368 Testing: log_native
+191/368 Test: log_native
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/log/host.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_log_host"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"log_native" start time: Oct 28 08:38 PDT
+Output:
+----------------------------------------------------------
+native stack soft=1048576 hard=1048576
+startup optimize=0 close_before_shutdown=1 close_after_shutdown=1 passed
+reload optimize=0 pending_native_write preserved_global_file_identity passed
+transport optimize=0 partial_boundaries=18 native_closes=43 passed
+rotation optimize=0 native_identity_and_replacement_boundaries passed
+allocation optimize=0 acquisition_failures=71 post_effect_faults=2 passed
+cancel optimize=0 native_operation=14 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=14 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=15 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=15 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=18 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=18 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=30 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=30 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=24 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=24 completion_race=1 closes=1 passed
+default replacement cancellation optimize=0 closes=1 passed
+startup optimize=1 close_before_shutdown=1 close_after_shutdown=1 passed
+reload optimize=1 pending_native_write preserved_global_file_identity passed
+transport optimize=1 partial_boundaries=18 native_closes=43 passed
+rotation optimize=1 native_identity_and_replacement_boundaries passed
+allocation optimize=1 acquisition_failures=71 post_effect_faults=2 passed
+cancel optimize=1 native_operation=14 completion_race=0 closes=1 passed
+cancel optimize=1 native_operation=14 completion_race=1 closes=1 passed
+cancel optimize=1 native_operation=15 completion_race=0 closes=1 passed
+cancel optimize=1 native_operation=15 completion_race=1 closes=1 passed
+cancel optimize=1 native_operation=18 completion_race=0 closes=1 passed
+cancel optimize=1 native_operation=18 completion_race=1 closes=1 passed
+cancel optimize=1 native_operation=30 completion_race=0 closes=1 passed
+cancel optimize=1 native_operation=30 completion_race=1 closes=1 passed
+cancel optimize=1 native_operation=24 completion_race=0 closes=1 passed
+cancel optimize=1 native_operation=24 completion_race=1 closes=1 passed
+default replacement cancellation optimize=1 closes=1 passed
+1686 logging native checks passed
+<end of output>
+Test time = 130.04 sec
+----------------------------------------------------------
+Test Passed.
+"log_native" end time: Oct 28 08:40 PDT
+"log_native" time elapsed: 00:02:10
+----------------------------------------------------------
+
+192/368 Testing: log_execution
+192/368 Test: log_execution
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/log/execution.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc" "--small-stack"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"log_execution" start time: Oct 28 08:40 PDT
+Output:
+----------------------------------------------------------
+Logging execution: 32 checks; hard stack=1048576
+<end of output>
+Test time =  83.76 sec
+----------------------------------------------------------
+Test Passed.
+"log_execution" end time: Oct 28 08:42 PDT
+"log_execution" time elapsed: 00:01:23
+----------------------------------------------------------
+
+193/368 Testing: log_frontend
+193/368 Test: log_frontend
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/log/frontend.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"log_frontend" start time: Oct 28 08:42 PDT
+Output:
+----------------------------------------------------------
+Logging frontend: 16 visibility/readonly/worker/default/surface checks
+<end of output>
+Test time =   3.38 sec
+----------------------------------------------------------
+Test Passed.
+"log_frontend" end time: Oct 28 08:42 PDT
+"log_frontend" time elapsed: 00:00:03
+----------------------------------------------------------
+
+194/368 Testing: log_files
+194/368 Test: log_files
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/log/files.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"log_files" start time: Oct 28 08:42 PDT
+Output:
+----------------------------------------------------------
+Logging filesystem: 244 native source/oracle checks; exact 0/1/3/32 retention, holes, preflight, adoption, count/path/bound reconfiguration
+<end of output>
+Test time =  24.82 sec
+----------------------------------------------------------
+Test Passed.
+"log_files" end time: Oct 28 08:42 PDT
+"log_files" time elapsed: 00:00:24
+----------------------------------------------------------
+
+195/368 Testing: log_oracles
+195/368 Test: log_oracles
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/log/oracles.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"log_oracles" start time: Oct 28 08:42 PDT
+Output:
+----------------------------------------------------------
+Logging independent byte/UTC oracles: 15 executions/emit/link checks; thresholds=30, all specified Unicode controls, 8 budgets, 9 invalid configurations, 8 fixed instants
+<end of output>
+Test time =  46.53 sec
+----------------------------------------------------------
+Test Passed.
+"log_oracles" end time: Oct 28 08:43 PDT
+"log_oracles" time elapsed: 00:00:46
+----------------------------------------------------------
+
+196/368 Testing: log_cache
+196/368 Test: log_cache
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/log/cache.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"log_cache" start time: Oct 28 08:43 PDT
+Output:
+----------------------------------------------------------
+Logging cache: 6 miss/hit/bypass executions with fresh Runtime defaults
+<end of output>
+Test time =  12.85 sec
+----------------------------------------------------------
+Test Passed.
+"log_cache" end time: Oct 28 08:43 PDT
+"log_cache" time elapsed: 00:00:12
+----------------------------------------------------------
+
+197/368 Testing: log_install
+197/368 Test: log_install
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/log/install.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"log_install" start time: Oct 28 08:43 PDT
+Output:
+----------------------------------------------------------
+Logging installation: 15 relocated check/JIT/O2/build/independent-AOT/LSP checks
+<end of output>
+Test time =  31.09 sec
+----------------------------------------------------------
+Test Passed.
+"log_install" end time: Oct 28 08:44 PDT
+"log_install" time elapsed: 00:00:31
+----------------------------------------------------------
+
+198/368 Testing: log_console
+198/368 Test: log_console
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/log/console.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"log_console" start time: Oct 28 08:44 PDT
+Output:
+----------------------------------------------------------
+Logging actual console: 16 redirected/live-UTC/closed-peer/file-independence observations
+<end of output>
+Test time =  26.37 sec
+----------------------------------------------------------
+Test Passed.
+"log_console" end time: Oct 28 08:44 PDT
+"log_console" time elapsed: 00:00:26
+----------------------------------------------------------
+
+199/368 Testing: lsp_log
+199/368 Test: lsp_log
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/log/lsp.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"lsp_log" start time: Oct 28 08:44 PDT
+Output:
+----------------------------------------------------------
+Logging LSP: 38 checks passed
+<end of output>
+Test time =   2.07 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_log" end time: Oct 28 08:44 PDT
+"lsp_log" time elapsed: 00:00:02
+----------------------------------------------------------
+
+200/368 Testing: log_probe_normal
+200/368 Test: log_probe_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/log/host.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_log_probe_normal"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"log_probe_normal" start time: Oct 28 08:44 PDT
+Output:
+----------------------------------------------------------
+native stack soft=1048576 hard=1048576
+transport optimize=0 partial_boundaries=18 native_closes=43 passed
+rotation optimize=0 native_identity_and_replacement_boundaries passed
+allocation optimize=0 acquisition_failures=71 post_effect_faults=2 passed
+cancel optimize=0 native_operation=14 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=14 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=15 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=15 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=18 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=18 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=30 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=30 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=24 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=24 completion_race=1 closes=1 passed
+default replacement cancellation optimize=0 closes=1 passed
+826 logging native checks passed
+<end of output>
+Test time =   0.23 sec
+----------------------------------------------------------
+Test Passed.
+"log_probe_normal" end time: Oct 28 08:44 PDT
+"log_probe_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+201/368 Testing: log_probe_optimized
+201/368 Test: log_probe_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/log/host.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_log_probe_optimized"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"log_probe_optimized" start time: Oct 28 08:44 PDT
+Output:
+----------------------------------------------------------
+native stack soft=1048576 hard=1048576
+transport optimize=1 partial_boundaries=18 native_closes=43 passed
+rotation optimize=1 native_identity_and_replacement_boundaries passed
+allocation optimize=1 acquisition_failures=71 post_effect_faults=2 passed
+cancel optimize=1 native_operation=14 completion_race=0 closes=1 passed
+cancel optimize=1 native_operation=14 completion_race=1 closes=1 passed
+cancel optimize=1 native_operation=15 completion_race=0 closes=1 passed
+cancel optimize=1 native_operation=15 completion_race=1 closes=1 passed
+cancel optimize=1 native_operation=18 completion_race=0 closes=1 passed
+cancel optimize=1 native_operation=18 completion_race=1 closes=1 passed
+cancel optimize=1 native_operation=30 completion_race=0 closes=1 passed
+cancel optimize=1 native_operation=30 completion_race=1 closes=1 passed
+cancel optimize=1 native_operation=24 completion_race=0 closes=1 passed
+cancel optimize=1 native_operation=24 completion_race=1 closes=1 passed
+default replacement cancellation optimize=1 closes=1 passed
+826 logging native checks passed
+<end of output>
+Test time =   0.22 sec
+----------------------------------------------------------
+Test Passed.
+"log_probe_optimized" end time: Oct 28 08:44 PDT
+"log_probe_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+218/368 Testing: stage10_console_source
+218/368 Test: stage10_console_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_console_source"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"stage10_console_source" start time: Oct 28 08:44 PDT
+Output:
+----------------------------------------------------------
+source console checks: 4492
+<end of output>
+Test time =  43.67 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_console_source" end time: Oct 28 08:45 PDT
+"stage10_console_source" time elapsed: 00:00:43
+----------------------------------------------------------
+
+239/368 Testing: io_ownership
+239/368 Test: io_ownership
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_ownership" "/home/shmellyorc/Documents/Void.Language/tests/io/ownership.void" "/home/shmellyorc/Documents/Void.Language/tests/io/ownership_async.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_ownership" start time: Oct 28 08:45 PDT
+Output:
+----------------------------------------------------------
+149 I/O/path public declarations documented
+sync Debug: 412 checked allocation failures recovered
+sync O2: 412 checked allocation failures recovered
+149 I/O/path public declarations documented
+async Debug: 617 checked allocation failures recovered
+async O2: 617 checked allocation failures recovered
+7033 I/O ownership/documentation checks passed
+<end of output>
+Test time =  13.36 sec
+----------------------------------------------------------
+Test Passed.
+"io_ownership" end time: Oct 28 08:45 PDT
+"io_ownership" time elapsed: 00:00:13
+----------------------------------------------------------
+
+249/368 Testing: io_native_responsiveness
+249/368 Test: io_native_responsiveness
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_native" "/home/shmellyorc/Documents/Void.Language/tests/io/responsive.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release/io responsive
+"io_native_responsiveness" start time: Oct 28 08:45 PDT
+Output:
+----------------------------------------------------------
+JIT: owner ran another ready activation while a real file read was held on the single bounded worker
+O2: owner ran another ready activation while a real file read was held on the single bounded worker
+<end of output>
+Test time =   5.67 sec
+----------------------------------------------------------
+Test Passed.
+"io_native_responsiveness" end time: Oct 28 08:45 PDT
+"io_native_responsiveness" time elapsed: 00:00:05
+----------------------------------------------------------
+
+250/368 Testing: io_native_close_failure
+250/368 Test: io_native_close_failure
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_native" "--close-failure" "/home/shmellyorc/Documents/Void.Language/tests/io/close_failure.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_native_close_failure" start time: Oct 28 08:45 PDT
+Output:
+----------------------------------------------------------
+JIT: recoverable close failure retained its diagnostic, retired once and released roots
+O2: recoverable close failure retained its diagnostic, retired once and released roots
+<end of output>
+Test time =   5.78 sec
+----------------------------------------------------------
+Test Passed.
+"io_native_close_failure" end time: Oct 28 08:45 PDT
+"io_native_close_failure" time elapsed: 00:00:05
+----------------------------------------------------------
+
+251/368 Testing: io_native_shutdown
+251/368 Test: io_native_shutdown
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_native" "--shutdown" "/home/shmellyorc/Documents/Void.Language/tests/io/shutdown.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_native_shutdown" start time: Oct 28 08:45 PDT
+Output:
+----------------------------------------------------------
+JIT: forgotten-file shutdown failure retained its diagnostic, retired once and released roots
+O2: forgotten-file shutdown failure retained its diagnostic, retired once and released roots
+<end of output>
+Test time =   5.71 sec
+----------------------------------------------------------
+Test Passed.
+"io_native_shutdown" end time: Oct 28 08:45 PDT
+"io_native_shutdown" time elapsed: 00:00:05
+----------------------------------------------------------
+
+252/368 Testing: io_native_opening_shutdown
+252/368 Test: io_native_opening_shutdown
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_native" "--opening-shutdown" "/home/shmellyorc/Documents/Void.Language/tests/io/opening.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_native_opening_shutdown" start time: Oct 28 08:45 PDT
+Output:
+----------------------------------------------------------
+JIT: Runtime shutdown drained an entered open and retired its acquisition once
+O2: Runtime shutdown drained an entered open and retired its acquisition once
+<end of output>
+Test time =   5.93 sec
+----------------------------------------------------------
+Test Passed.
+"io_native_opening_shutdown" end time: Oct 28 08:45 PDT
+"io_native_opening_shutdown" time elapsed: 00:00:05
+----------------------------------------------------------
+
+253/368 Testing: io_native_whole_shutdown
+253/368 Test: io_native_whole_shutdown
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_native" "--opening-shutdown" "/home/shmellyorc/Documents/Void.Language/tests/io/opening_whole.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_native_whole_shutdown" start time: Oct 28 08:45 PDT
+Output:
+----------------------------------------------------------
+JIT: Runtime shutdown drained an entered open and retired its acquisition once
+O2: Runtime shutdown drained an entered open and retired its acquisition once
+<end of output>
+Test time =   5.93 sec
+----------------------------------------------------------
+Test Passed.
+"io_native_whole_shutdown" end time: Oct 28 08:45 PDT
+"io_native_whole_shutdown" time elapsed: 00:00:05
+----------------------------------------------------------
+
+254/368 Testing: io_native_pending_close
+254/368 Test: io_native_pending_close
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_native" "/home/shmellyorc/Documents/Void.Language/tests/io/pending.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release/io pending
+"io_native_pending_close" start time: Oct 28 08:45 PDT
+Output:
+----------------------------------------------------------
+JIT: owner ran another ready activation while a real file read was held on the single bounded worker
+O2: owner ran another ready activation while a real file read was held on the single bounded worker
+<end of output>
+Test time =   5.87 sec
+----------------------------------------------------------
+Test Passed.
+"io_native_pending_close" end time: Oct 28 08:46 PDT
+"io_native_pending_close" time elapsed: 00:00:05
+----------------------------------------------------------
+
+255/368 Testing: io_native_cancelled
+255/368 Test: io_native_cancelled
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_native" "/home/shmellyorc/Documents/Void.Language/tests/io/cancelled.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release/io cancelled
+"io_native_cancelled" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+JIT: owner ran another ready activation while a real file read was held on the single bounded worker
+O2: owner ran another ready activation while a real file read was held on the single bounded worker
+<end of output>
+Test time =   5.78 sec
+----------------------------------------------------------
+Test Passed.
+"io_native_cancelled" end time: Oct 28 08:46 PDT
+"io_native_cancelled" time elapsed: 00:00:05
+----------------------------------------------------------
+
+258/368 Testing: io_async_source
+258/368 Test: io_async_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_runner" "--async" "/home/shmellyorc/Documents/Void.Language/tests/io/async.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_async_source" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+Debug source execution passed
+O2 source execution passed
+<end of output>
+Test time =   7.54 sec
+----------------------------------------------------------
+Test Passed.
+"io_async_source" end time: Oct 28 08:46 PDT
+"io_async_source" time elapsed: 00:00:07
+----------------------------------------------------------
+
+260/368 Testing: io_errors_async
+260/368 Test: io_errors_async
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_runner" "--async" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/io-errors-async.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release/io async errors
+"io_errors_async" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+Debug source execution passed
+O2 source execution passed
+<end of output>
+Test time =   7.57 sec
+----------------------------------------------------------
+Test Passed.
+"io_errors_async" end time: Oct 28 08:46 PDT
+"io_errors_async" time elapsed: 00:00:07
+----------------------------------------------------------
+
+262/368 Testing: io_async_acquisition
+262/368 Test: io_async_acquisition
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_runner" "--async" "/home/shmellyorc/Documents/Void.Language/tests/io/acquisition.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_async_acquisition" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+Debug source execution passed
+O2 source execution passed
+<end of output>
+Test time =   0.16 sec
+----------------------------------------------------------
+Test Passed.
+"io_async_acquisition" end time: Oct 28 08:46 PDT
+"io_async_acquisition" time elapsed: 00:00:00
+----------------------------------------------------------
+
+265/368 Testing: io_native_jobs
+265/368 Test: io_native_jobs
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_native_jobs"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_native_jobs" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+native jobs: result, blocked-owner progress, queued/pending cancellation, publication failure, acquisition rollback, nested cancellation drain and cleanup diagnostics passed (7 scenarios)
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"io_native_jobs" end time: Oct 28 08:46 PDT
+"io_native_jobs" time elapsed: 00:00:00
+----------------------------------------------------------
+
+266/368 Testing: io_kernel
+266/368 Test: io_kernel
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_io_kernel" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/io kernel fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"io_kernel" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+native filesystem kernel: paths, modes, cursor/read-ahead, EOF, lines, growth, metadata, filtered recursion, copy/move/delete, symlinks, budgets and 3 MiB streaming passed
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"io_kernel" end time: Oct 28 08:46 PDT
+"io_kernel" time elapsed: 00:00:00
+----------------------------------------------------------
+
+269/368 Testing: async_source
+269/368 Test: async_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_tests" "/home/shmellyorc/Documents/Void.Language" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/async fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_source" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+async activations passed
+<end of output>
+Test time =   4.97 sec
+----------------------------------------------------------
+Test Passed.
+"async_source" end time: Oct 28 08:46 PDT
+"async_source" time elapsed: 00:00:04
+----------------------------------------------------------
+
+270/368 Testing: async_syntax_source
+270/368 Test: async_syntax_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_tests" "--syntax" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_syntax_source" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+await error allocation sweep: 224 injected failures passed; O2=0
+await error allocation sweep: 224 injected failures passed; O2=1
+await syntax: 14 positive source/CFG checks, 12 rejected cases, 6 recovery checks, 20 JIT/GC executions passed; stack=default
+<end of output>
+Test time =   3.34 sec
+----------------------------------------------------------
+Test Passed.
+"async_syntax_source" end time: Oct 28 08:46 PDT
+"async_syntax_source" time elapsed: 00:00:03
+----------------------------------------------------------
+
+271/368 Testing: async_syntax_stack
+271/368 Test: async_syntax_stack
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_tests" "--syntax-stack" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_syntax_stack" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+await error allocation sweep: 224 injected failures passed; O2=0
+await error allocation sweep: 224 injected failures passed; O2=1
+await syntax: 14 positive source/CFG checks, 12 rejected cases, 6 recovery checks, 20 JIT/GC executions passed; stack=1048576/1048576
+<end of output>
+Test time =   3.34 sec
+----------------------------------------------------------
+Test Passed.
+"async_syntax_stack" end time: Oct 28 08:46 PDT
+"async_syntax_stack" time elapsed: 00:00:03
+----------------------------------------------------------
+
+272/368 Testing: async_ir
+272/368 Test: async_ir
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_tests" "--ir"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_ir" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"async_ir" end time: Oct 28 08:46 PDT
+"async_ir" time elapsed: 00:00:00
+----------------------------------------------------------
+
+273/368 Testing: async_parallel
+273/368 Test: async_parallel
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_tests" "--parallel" "/home/shmellyorc/Documents/Void.Language" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/async parallel fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_parallel" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   1.12 sec
+----------------------------------------------------------
+Test Passed.
+"async_parallel" end time: Oct 28 08:46 PDT
+"async_parallel" time elapsed: 00:00:01
+----------------------------------------------------------
+
+274/368 Testing: async_lifecycle
+274/368 Test: async_lifecycle
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_tests" "--lifecycle" "/home/shmellyorc/Documents/Void.Language" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/async lifecycle fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_lifecycle" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   2.15 sec
+----------------------------------------------------------
+Test Passed.
+"async_lifecycle" end time: Oct 28 08:46 PDT
+"async_lifecycle" time elapsed: 00:00:02
+----------------------------------------------------------
+
+275/368 Testing: async_aot_spawn_normal
+275/368 Test: async_aot_spawn_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_spawn_normal" "126"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_spawn_normal" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_spawn_normal" end time: Oct 28 08:46 PDT
+"async_aot_spawn_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+276/368 Testing: async_aot_spawn_optimized
+276/368 Test: async_aot_spawn_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_spawn_optimized" "126"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_spawn_optimized" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_spawn_optimized" end time: Oct 28 08:46 PDT
+"async_aot_spawn_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+277/368 Testing: async_aot_spawn_cancel_normal
+277/368 Test: async_aot_spawn_cancel_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_spawn_cancel_normal" "failure:Async task cancelled"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_spawn_cancel_normal" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_spawn_cancel_normal" end time: Oct 28 08:46 PDT
+"async_aot_spawn_cancel_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+278/368 Testing: async_aot_spawn_cancel_optimized
+278/368 Test: async_aot_spawn_cancel_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_spawn_cancel_optimized" "failure:Async task cancelled"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_spawn_cancel_optimized" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_spawn_cancel_optimized" end time: Oct 28 08:46 PDT
+"async_aot_spawn_cancel_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+279/368 Testing: async_aot_spawn_failure_normal
+279/368 Test: async_aot_spawn_failure_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_spawn_failure_normal" "failure:Division by zero"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_spawn_failure_normal" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_spawn_failure_normal" end time: Oct 28 08:46 PDT
+"async_aot_spawn_failure_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+280/368 Testing: async_aot_spawn_failure_optimized
+280/368 Test: async_aot_spawn_failure_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_spawn_failure_optimized" "failure:Division by zero"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_spawn_failure_optimized" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_spawn_failure_optimized" end time: Oct 28 08:46 PDT
+"async_aot_spawn_failure_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+281/368 Testing: async_aot_activation_normal
+281/368 Test: async_aot_activation_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_activation_normal" "17"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_activation_normal" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_activation_normal" end time: Oct 28 08:46 PDT
+"async_aot_activation_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+282/368 Testing: async_aot_activation_optimized
+282/368 Test: async_aot_activation_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_activation_optimized" "17"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_activation_optimized" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_activation_optimized" end time: Oct 28 08:46 PDT
+"async_aot_activation_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+283/368 Testing: async_aot_managed_normal
+283/368 Test: async_aot_managed_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_managed_normal" "343"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_managed_normal" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_managed_normal" end time: Oct 28 08:46 PDT
+"async_aot_managed_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+284/368 Testing: async_aot_managed_optimized
+284/368 Test: async_aot_managed_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_managed_optimized" "343"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_managed_optimized" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_managed_optimized" end time: Oct 28 08:46 PDT
+"async_aot_managed_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+285/368 Testing: async_aot_large_normal
+285/368 Test: async_aot_large_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_large_normal" "27"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_large_normal" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   1.28 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_large_normal" end time: Oct 28 08:46 PDT
+"async_aot_large_normal" time elapsed: 00:00:01
+----------------------------------------------------------
+
+286/368 Testing: async_aot_large_optimized
+286/368 Test: async_aot_large_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_large_optimized" "27"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_large_optimized" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   1.31 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_large_optimized" end time: Oct 28 08:46 PDT
+"async_aot_large_optimized" time elapsed: 00:00:01
+----------------------------------------------------------
+
+287/368 Testing: async_aot_closures_normal
+287/368 Test: async_aot_closures_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_closures_normal" "16"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_closures_normal" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_closures_normal" end time: Oct 28 08:46 PDT
+"async_aot_closures_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+288/368 Testing: async_aot_closures_optimized
+288/368 Test: async_aot_closures_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_closures_optimized" "16"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_closures_optimized" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_closures_optimized" end time: Oct 28 08:46 PDT
+"async_aot_closures_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+289/368 Testing: async_aot_loops_normal
+289/368 Test: async_aot_loops_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_loops_normal" "25"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_loops_normal" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_loops_normal" end time: Oct 28 08:46 PDT
+"async_aot_loops_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+290/368 Testing: async_aot_loops_optimized
+290/368 Test: async_aot_loops_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_loops_optimized" "25"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_loops_optimized" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_loops_optimized" end time: Oct 28 08:46 PDT
+"async_aot_loops_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+291/368 Testing: async_aot_values_normal
+291/368 Test: async_aot_values_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_values_normal" "39"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_values_normal" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_values_normal" end time: Oct 28 08:46 PDT
+"async_aot_values_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+292/368 Testing: async_aot_values_optimized
+292/368 Test: async_aot_values_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_values_optimized" "39"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_values_optimized" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_values_optimized" end time: Oct 28 08:46 PDT
+"async_aot_values_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+293/368 Testing: async_aot_methods_normal
+293/368 Test: async_aot_methods_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_methods_normal" "129"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_methods_normal" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_methods_normal" end time: Oct 28 08:46 PDT
+"async_aot_methods_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+294/368 Testing: async_aot_methods_optimized
+294/368 Test: async_aot_methods_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_methods_optimized" "129"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_methods_optimized" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_methods_optimized" end time: Oct 28 08:46 PDT
+"async_aot_methods_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+295/368 Testing: async_aot_lifecycle_normal
+295/368 Test: async_aot_lifecycle_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_lifecycle_normal" "8"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_lifecycle_normal" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_lifecycle_normal" end time: Oct 28 08:46 PDT
+"async_aot_lifecycle_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+296/368 Testing: async_aot_lifecycle_optimized
+296/368 Test: async_aot_lifecycle_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_lifecycle_optimized" "8"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_lifecycle_optimized" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_lifecycle_optimized" end time: Oct 28 08:46 PDT
+"async_aot_lifecycle_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+297/368 Testing: async_aot_lifecycle_exits_normal
+297/368 Test: async_aot_lifecycle_exits_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_lifecycle_exits_normal" "14"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_lifecycle_exits_normal" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_lifecycle_exits_normal" end time: Oct 28 08:46 PDT
+"async_aot_lifecycle_exits_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+298/368 Testing: async_aot_lifecycle_exits_optimized
+298/368 Test: async_aot_lifecycle_exits_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_lifecycle_exits_optimized" "14"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_lifecycle_exits_optimized" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_lifecycle_exits_optimized" end time: Oct 28 08:46 PDT
+"async_aot_lifecycle_exits_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+299/368 Testing: async_aot_lifecycle_cancelled_normal
+299/368 Test: async_aot_lifecycle_cancelled_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_lifecycle_cancelled_normal" "failure:Async task cancelled"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_lifecycle_cancelled_normal" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_lifecycle_cancelled_normal" end time: Oct 28 08:46 PDT
+"async_aot_lifecycle_cancelled_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+300/368 Testing: async_aot_lifecycle_cancelled_optimized
+300/368 Test: async_aot_lifecycle_cancelled_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_lifecycle_cancelled_optimized" "failure:Async task cancelled"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_lifecycle_cancelled_optimized" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_lifecycle_cancelled_optimized" end time: Oct 28 08:46 PDT
+"async_aot_lifecycle_cancelled_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+301/368 Testing: async_aot_lifecycle_failures_normal
+301/368 Test: async_aot_lifecycle_failures_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_lifecycle_failures_normal" "failure:Additional unobserved task failure"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_lifecycle_failures_normal" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_lifecycle_failures_normal" end time: Oct 28 08:46 PDT
+"async_aot_lifecycle_failures_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+302/368 Testing: async_aot_lifecycle_failures_optimized
+302/368 Test: async_aot_lifecycle_failures_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_lifecycle_failures_optimized" "failure:Additional unobserved task failure"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_lifecycle_failures_optimized" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_lifecycle_failures_optimized" end time: Oct 28 08:46 PDT
+"async_aot_lifecycle_failures_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+303/368 Testing: async_aot_lifecycle_primary_normal
+303/368 Test: async_aot_lifecycle_primary_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_lifecycle_primary_normal" "failure:Additional failure during defer"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_lifecycle_primary_normal" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_lifecycle_primary_normal" end time: Oct 28 08:46 PDT
+"async_aot_lifecycle_primary_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+304/368 Testing: async_aot_lifecycle_primary_optimized
+304/368 Test: async_aot_lifecycle_primary_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_lifecycle_primary_optimized" "failure:Additional failure during defer"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_lifecycle_primary_optimized" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_lifecycle_primary_optimized" end time: Oct 28 08:46 PDT
+"async_aot_lifecycle_primary_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+305/368 Testing: async_aot_lifecycle_resources_normal
+305/368 Test: async_aot_lifecycle_resources_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_lifecycle_resources_normal" "30"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_lifecycle_resources_normal" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_lifecycle_resources_normal" end time: Oct 28 08:46 PDT
+"async_aot_lifecycle_resources_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+306/368 Testing: async_aot_lifecycle_resources_optimized
+306/368 Test: async_aot_lifecycle_resources_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_lifecycle_resources_optimized" "30"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_lifecycle_resources_optimized" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_lifecycle_resources_optimized" end time: Oct 28 08:46 PDT
+"async_aot_lifecycle_resources_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+307/368 Testing: async_aot_lifecycle_values_normal
+307/368 Test: async_aot_lifecycle_values_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_lifecycle_values_normal" "17"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_lifecycle_values_normal" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_lifecycle_values_normal" end time: Oct 28 08:46 PDT
+"async_aot_lifecycle_values_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+308/368 Testing: async_aot_lifecycle_values_optimized
+308/368 Test: async_aot_lifecycle_values_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_async_aot_lifecycle_values_optimized" "17"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_aot_lifecycle_values_optimized" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_aot_lifecycle_values_optimized" end time: Oct 28 08:46 PDT
+"async_aot_lifecycle_values_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+334/368 Testing: async_retention_sprint5
+334/368 Test: async_retention_sprint5
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage8/sprint5/measure.py" "--current" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_retention_current" "--sources" "/home/shmellyorc/Documents/Void.Language/tests/stage8/sprint5" "--output" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/sprint5-measurements"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_retention_sprint5" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+Sprint 5 retention: 16 successful process measurements; no suite-count multiplication
+<end of output>
+Test time =  10.03 sec
+----------------------------------------------------------
+Test Passed.
+"async_retention_sprint5" end time: Oct 28 08:46 PDT
+"async_retention_sprint5" time elapsed: 00:00:10
+----------------------------------------------------------
+
+335/368 Testing: async_retention_aot_growth_normal
+335/368 Test: async_retention_aot_growth_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage8/sprint5/measure.py" "--aot" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_retention_aot_growth_normal" "--output" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/sprint5-aot-growth-normal"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_retention_aot_growth_normal" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+Sprint 5 retention: 3 successful process measurements; no suite-count multiplication
+<end of output>
+Test time =   0.36 sec
+----------------------------------------------------------
+Test Passed.
+"async_retention_aot_growth_normal" end time: Oct 28 08:46 PDT
+"async_retention_aot_growth_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+336/368 Testing: async_retention_aot_growth_optimized
+336/368 Test: async_retention_aot_growth_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage8/sprint5/measure.py" "--aot" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_retention_aot_growth_optimized" "--output" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/sprint5-aot-growth-optimized"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_retention_aot_growth_optimized" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+Sprint 5 retention: 3 successful process measurements; no suite-count multiplication
+<end of output>
+Test time =   0.39 sec
+----------------------------------------------------------
+Test Passed.
+"async_retention_aot_growth_optimized" end time: Oct 28 08:46 PDT
+"async_retention_aot_growth_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+337/368 Testing: async_retention_aot_workers_normal
+337/368 Test: async_retention_aot_workers_normal
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage8/sprint5/measure.py" "--aot" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_retention_aot_workers_normal" "--output" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/sprint5-aot-workers-normal"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_retention_aot_workers_normal" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+Sprint 5 retention: 3 successful process measurements; no suite-count multiplication
+<end of output>
+Test time =   0.49 sec
+----------------------------------------------------------
+Test Passed.
+"async_retention_aot_workers_normal" end time: Oct 28 08:46 PDT
+"async_retention_aot_workers_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+338/368 Testing: async_retention_aot_workers_optimized
+338/368 Test: async_retention_aot_workers_optimized
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage8/sprint5/measure.py" "--aot" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/void_retention_aot_workers_optimized" "--output" "/home/shmellyorc/Documents/Void.Language/build/ci-official-release/sprint5-aot-workers-optimized"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-official-release
+"async_retention_aot_workers_optimized" start time: Oct 28 08:46 PDT
+Output:
+----------------------------------------------------------
+Sprint 5 retention: 3 successful process measurements; no suite-count multiplication
+<end of output>
+Test time =   0.53 sec
+----------------------------------------------------------
+Test Passed.
+"async_retention_aot_workers_optimized" end time: Oct 28 08:46 PDT
+"async_retention_aot_workers_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 28 08:46 PDT

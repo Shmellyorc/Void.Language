@@ -1,0 +1,15 @@
+{
+  "advanced_original": {
+    "status": "expected_historical_failure",
+    "stderr": "with allocation failure/root publication\n"
+  },
+  "advanced-semantic": {
+    "status": "pass",
+    "stdout": "normal captures allocation failures: 226\nnormal with allocation failures: 210\nnormal events allocation failures: 388\nnormal fixed_capture allocation failures: 133\nnormal with semantic fault=resource-acquisition observed ordinal=2 passed\nnormal with semantic fault=first-body-allocation observed ordinal=3 passed\nO2 captures allocation failures: 226\nO2 with allocation failures: 210\nO2 events allocation failures: 388\nO2 fixed_capture allocation failures: 133\nO2 with semantic fault=resource-acquisition observed ordinal=2 passed\nO2 with semantic fault=first-body-allocation observed ordinal=3 passed\n"
+  },
+  "io-ownership": {
+    "status": "pass",
+    "stdout": "149 I/O/path public declarations documented\nsync Debug: 307 checked allocation failures recovered\nsync O2: 307 checked allocation failures recovered\n149 I/O/path public declarations documented\nasync Debug: 629 checked allocation failures recovered\nasync O2: 629 checked allocation failures recovered\n6475 I/O ownership/documentation checks passed\n"
+  },
+  "cache": "pass"
+}

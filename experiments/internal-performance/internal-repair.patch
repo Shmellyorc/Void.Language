@@ -1,0 +1,454 @@
+--- a/src/frontend/tooling.cpp
++++ b/src/frontend/tooling.cpp
+@@ -7,11 +7,7 @@
+ namespace vd {
+ ToolingIndex::ToolingIndex(std::shared_ptr<const ValidatedAnalysis> analysis) : analysis_(std::move(analysis)) {
+     if (!analysis_) throw std::invalid_argument("tooling index requires successful analysis");
+-    all_declarations_ = analysis_->declarations();
+-    all_declarations_.insert(all_declarations_.end(),analysis_->editor_declarations().begin(),analysis_->editor_declarations().end());
+-    all_references_ = analysis_->references();
+-    all_references_.insert(all_references_.end(),analysis_->editor_references().begin(),analysis_->editor_references().end());
+-    const auto& declarations = all_declarations_;
++    const auto declarations = this->declarations();
+     for (std::size_t i=0; i<declarations.size(); ++i) {
+         declarations_.emplace(declarations[i].identity,i);
+         modules_[declarations[i].module].push_back(i);
+@@ -20,7 +16,7 @@
+         (void)module;
+         std::sort(indices.begin(),indices.end(),[&](auto a,auto b) { return declarations[a].identity < declarations[b].identity; });
+     }
+-    const auto& references = all_references_;
++    const auto references = this->references();
+     for (std::size_t i=0; i<references.size(); ++i) {
+         if (!references[i].implicit) {
+             incoming_[references[i].to].push_back(i);
+@@ -39,19 +35,19 @@
+ std::optional<AnalyzedDeclaration> ToolingIndex::declaration(const std::string& identity) const {
+     auto found=declarations_.find(identity);
+     if (found==declarations_.end()) return {};
+-    return all_declarations_[found->second];
++    return declarations()[found->second];
+ }
+ std::vector<AnalyzedDeclaration> ToolingIndex::definitions_at(const std::string& module,std::size_t offset) const {
+     std::vector<AnalyzedDeclaration> result;
+     auto found=positions_.find(module);
+     if(found==positions_.end())return result;
+     const auto& indices=found->second;
+-    auto next=std::upper_bound(indices.begin(),indices.end(),offset,[&](auto at,auto i){return at<all_references_[i].source.begin;});
++    auto next=std::upper_bound(indices.begin(),indices.end(),offset,[&](auto at,auto i){return at<references()[i].source.begin;});
+     if(next==indices.begin())return result;
+-    auto begin=all_references_[*std::prev(next)].source.begin;
++    auto begin=references()[*std::prev(next)].source.begin;
+     std::set<std::string> seen;
+     while(next!=indices.begin()) {
+-        const auto& ref=all_references_[*--next];if(ref.source.begin!=begin)break;
++        const auto& ref=references()[*--next];if(ref.source.begin!=begin)break;
+         if(offset>=ref.source.end || !seen.insert(ref.to).second)continue;
+         if(auto d=declaration(ref.to)){if(!ref.signature.empty())d->signature=ref.signature;result.push_back(std::move(*d));}
+     }
+@@ -74,13 +70,13 @@
+ std::vector<AnalyzedReference> ToolingIndex::references_to(const std::string& identity) const {
+     std::vector<AnalyzedReference> result;
+     auto found=incoming_.find(identity);
+-    if (found!=incoming_.end()) for(auto i:found->second) result.push_back(all_references_[i]);
++    if (found!=incoming_.end()) for(auto i:found->second) result.push_back(references()[i]);
+     return result;
+ }
+ std::vector<AnalyzedDeclaration> ToolingIndex::declarations_in(const std::string& module) const {
+     std::vector<AnalyzedDeclaration> result;
+     auto found=modules_.find(module);
+-    if(found!=modules_.end()) for(auto i:found->second) result.push_back(all_declarations_[i]);
++    if(found!=modules_.end()) for(auto i:found->second) result.push_back(declarations()[i]);
+     return result;
+ }
+ namespace {
+--- a/src/runtime/coordination.cpp
++++ b/src/runtime/coordination.cpp
+@@ -195,15 +195,39 @@
+     changed_.notify_all();
+     return result;
+ }
+-Runtime::Frame* Runtime::require_output(void** slot) const {
++namespace {
++bool root_offset(const Runtime::Slot& slot,void** word,std::size_t& offset) {
++    if(!slot.storage || !slot.offsets)return false;
++    const auto storage=reinterpret_cast<std::uintptr_t>(slot.storage),address=reinterpret_cast<std::uintptr_t>(word);
++    if(address<storage)return false;
++    offset=address-storage;
++    return offset<=slot.size && slot.size-offset>=sizeof(void*);
++}
++}
++bool Runtime::registered_at(const Frame& frame,std::size_t i,std::size_t j,void** word) {
++    if(i>=frame.count_ || !frame.slots_)return false;
++    const auto& slot=frame.slots_[i];
++    std::size_t offset;
++    return j<slot.count && root_offset(slot,word,offset) && slot.offsets[j]==offset;
++}
++Runtime::RootLocation Runtime::locate_root(void** slot) const {
+     require_managed();
+     if (!slot) throw std::invalid_argument("null allocation output");
+-    for (auto* f = thread().frames; f; f = f->previous_)
+-        for (std::size_t i = 0; i < f->count_; ++i)
+-            for (std::size_t j = 0; j < f->slots_[i].count; ++j)
+-                if (static_cast<const char*>(f->slots_[i].storage) + f->slots_[i].offsets[j] == reinterpret_cast<const char*>(slot)) return f;
++    for (auto* f = thread().frames; f; f = f->previous_) {
++        for (std::size_t i = 0; i < f->count_; ++i) {
++            const auto& descriptor=f->slots_[i];std::size_t offset;
++            if(!root_offset(descriptor,slot,offset))continue;
++            // Containment only filters impossible Slots. Exact offset identity
++            // is still required, including unsorted and duplicate descriptors.
++            for (std::size_t j = 0; j < descriptor.count; ++j)
++                if (descriptor.offsets[j]==offset) {
++                    return {f,i,j};
++                }
++        }
++    }
+     throw std::invalid_argument("allocation output is not a registered precise root");
+ }
++Runtime::Frame* Runtime::require_output(void** slot) const {return locate_root(slot).frame;}
+ std::string_view Runtime::string_bytes(void* object) const {
+     require_managed();
+     std::lock_guard lock(mutex_);
+@@ -378,7 +402,7 @@
+     return error;
+ }
+ Runtime::Frame::Frame(Runtime& r, const Slot* slots, std::size_t count)
+-    : runtime_(r), previous_(nullptr), slots_(slots), count_(count) {
++    : runtime_(r), previous_(nullptr), slots_(slots), count_(count),identity_(0) {
+     r.require_managed();
+     if (count && !slots) throw std::invalid_argument("null root frame slots");
+     for (std::size_t i = 0; i < count; ++i) {
+@@ -387,6 +411,13 @@
+         for (std::size_t j = 0; j < s.count; ++j)
+             if (s.offsets[j] > s.size || s.size - s.offsets[j] < sizeof(void*)) throw std::invalid_argument("invalid root offset");
+     }
++    // Process-wide, nonwrapping identities also distinguish attachment/thread
++    // and Runtime address reuse. Reserve only after descriptor validation.
++    static std::atomic<std::uint64_t> next{1};
++    auto identity=next.load(std::memory_order_relaxed);
++    do {if(identity==std::numeric_limits<std::uint64_t>::max())throw std::overflow_error("root frame identity exhausted");}
++    while(!next.compare_exchange_weak(identity,identity+1,std::memory_order_relaxed));
++    identity_=identity;
+     previous_ = r.thread().frames;
+     r.thread().frames = this;
+ }
+--- a/src/runtime/buffer.cpp
++++ b/src/runtime/buffer.cpp
+@@ -82,7 +82,15 @@
+ }
+ BufferLayoutRef Runtime::buffer_layout(ElementSchemaRef schema,std::uint64_t capacity,std::size_t base,std::size_t stride) const {
+     reference_shape(schema); // Exact catalog pointer membership, not just equal keys.
+-    return BufferLayoutRef(new BufferLayout(std::move(schema),capacity,base,stride));
++    if(capacity || base || stride)return BufferLayoutRef(new BufferLayout(std::move(schema),capacity,base,stride));
++    std::lock_guard lock(mutex_);
++    auto found=collection_metadata_.find(schema.get());
++    if(found!=collection_metadata_.end())return found->second.empty;
++    BufferLayoutRef layout(new BufferLayout(schema,0,0,0));
++    // Optional indexing must not turn successful layout construction into a
++    // failed operation. Insertion is the only allocation permitted to fail here.
++    try {collection_metadata_.emplace(schema.get(),CollectionMetadata{layout,{}});}catch(const std::bad_alloc&) {}
++    return layout;
+ }
+ void Runtime::validate_buffer_layout(const BufferLayoutRef& layout) const {
+     if(!layout || !types_) throw std::invalid_argument("missing buffer layout");
+@@ -102,8 +110,11 @@
+ }
+ Runtime::Frame* Runtime::require_buffer_output(void** output) const {
+     auto* frame=require_output(output);
++    require_public_root(output);
++    return frame;
++}
++void Runtime::require_public_root(void** output) const {
+     for(auto* root=thread().private_roots;root;root=root->previous_) if(output==&root->value_) throw std::invalid_argument("publication into private builder root");
+-    return frame;
+ }
+ Runtime::BufferBuilder::BufferBuilder(Runtime& r,BufferLayoutRef layout,std::uint64_t live,BufferWorkQuota quota)
+     :runtime_(r),layout_(std::move(layout)),quota_(quota),root_(r),owner_(std::this_thread::get_id()),requested_(live) {
+@@ -217,18 +228,19 @@
+ }
+ Runtime::RegisteredRootWord Runtime::root_word(void** slot) const {
+     require_managed();std::lock_guard lock(mutex_);
+-    return RegisteredRootWord(this,require_buffer_output(slot),slot);
++    auto location=locate_root(slot);require_public_root(slot);
++    return RegisteredRootWord(this,location,slot);
+ }
+ void* Runtime::reference_source(const RegisteredRootWord& token) const {
+     require_managed();
+     if(token.runtime_!=this || token.owner_!=std::this_thread::get_id()) throw std::invalid_argument("foreign reference root token");
+     bool linked=false;for(auto* f=thread().frames;f;f=f->previous_) if(f==token.frame_) {linked=true;break;}
+-    if(!linked) throw std::invalid_argument("expired reference root token");
+-    require_buffer_output(token.slot_);
+-    bool exact=false;
+-    for(std::size_t i=0;i<token.frame_->count_ && !exact;++i)for(std::size_t j=0;j<token.frame_->slots_[i].count && !exact;++j)
+-        if(static_cast<const char*>(token.frame_->slots_[i].storage)+token.frame_->slots_[i].offsets[j]==reinterpret_cast<const char*>(token.slot_))exact=true;
+-    if(!exact)throw std::invalid_argument("reference source registration changed");
++    if(!linked || token.frame_->identity_!=token.identity_) throw std::invalid_argument("expired reference root token");
++    require_public_root(token.slot_);
++    if(!registered_at(*token.frame_,token.slot_index_,token.offset_index_,token.slot_))throw std::invalid_argument("reference source registration changed");
++    const auto& current=token.frame_->slots_[token.slot_index_];const auto& original=token.descriptor_;
++    if(current.storage!=original.storage || current.size!=original.size || current.offsets!=original.offsets || current.count!=original.count)
++        throw std::invalid_argument("reference source registration changed");
+     void* value=nullptr;std::memcpy(&value,token.slot_,sizeof(value));
+     if(value && !heap_.contains(value)) throw std::invalid_argument("untracked or private reference source");
+     return value;
+@@ -377,16 +389,24 @@
+        (schema.bytes() || schema.has_references() || !schema.zero_data_complete()))
+         throw std::invalid_argument("fixed runtime proof requires scalar or zero-footprint element");
+ }
++std::string_view Runtime::scalar_identity(ScalarEncoding encoding) {
++    static constexpr std::string_view keys[]={
++        "void.fixed.scalar.v1/0","void.fixed.scalar.v1/1","void.fixed.scalar.v1/2",
++        "void.fixed.scalar.v1/3","void.fixed.scalar.v1/4","void.fixed.scalar.v1/5",
++        "void.fixed.scalar.v1/6","void.fixed.scalar.v1/7","void.fixed.scalar.v1/8",
++        "void.fixed.scalar.v1/9","void.fixed.scalar.v1/10"};
++    if(static_cast<unsigned>(encoding)>static_cast<unsigned>(ScalarEncoding::boolean))
++        throw std::invalid_argument("invalid fixed scalar encoding");
++    return keys[static_cast<unsigned>(encoding)];
++}
+ ElementSchemaRef Runtime::fixed_scalar_schema(ScalarEncoding encoding) {
+     require_managed();
+-    if(static_cast<unsigned>(encoding)>static_cast<unsigned>(ScalarEncoding::boolean))
+-        throw std::invalid_argument("invalid fixed scalar encoding");
+-    const auto key="void.fixed.scalar.v1/"+std::to_string(static_cast<unsigned>(encoding));
++    const auto key=scalar_identity(encoding);
+     ElementSchemaRef schema;
+     {std::lock_guard lock(mutex_);if(types_) {auto i=types_->schemas.find(key);if(i!=types_->schemas.end()) schema=i->second;}}
+     if(!schema) {
+         Native native(*this);
+-        ElementSchemaSpec spec{key,"mutable",key,StorageDomain::native(),0,{SchemaScalar{encoding}}};
++        ElementSchemaSpec spec{std::string(key),"mutable",std::string(key),StorageDomain::native(),0,{SchemaScalar{encoding}}};
+         admit_buffer_schemas({&spec,1});schema=buffer_schema(key);
+     }
+     return schema;
+--- a/src/runtime/list.cpp
++++ b/src/runtime/list.cpp
+@@ -29,10 +29,14 @@
+ 
+ }
+ Runtime::ListHeader& Runtime::list_header(RegisteredRootWord source,ScalarEncoding encoding) const {
+-    auto key="void.fixed.scalar.v1/"+std::to_string(static_cast<unsigned>(encoding));
++    // Invalid encodings retain the metadata/schema error ordering of this
++    // checked-header boundary; scalar construction validates its own enum.
+     if(!types_)throw std::invalid_argument("missing list metadata");
++    if(static_cast<unsigned>(encoding)>static_cast<unsigned>(ScalarEncoding::boolean))throw std::invalid_argument("missing list scalar schema");
++    auto key=scalar_identity(encoding);
+     auto found=types_->schemas.find(key);if(found==types_->schemas.end())throw std::invalid_argument("missing list scalar schema");
+-    return list_header(source,found->second);
++    static constexpr std::string_view lists[]={"void.list.v1/0","void.list.v1/1","void.list.v1/2","void.list.v1/3","void.list.v1/4","void.list.v1/5","void.list.v1/6","void.list.v1/7","void.list.v1/8","void.list.v1/9","void.list.v1/10"};
++    return list_header(reference_source(source),found->second,lists[static_cast<unsigned>(encoding)]);
+ }
+ void Runtime::list_into(void** out,ScalarEncoding encoding,std::uint64_t count) {array_new(out,fixed_scalar_layout(encoding,count),true,true);}
+ std::uint64_t Runtime::list_count(RegisteredRootWord source,ScalarEncoding encoding) const {require_managed();std::lock_guard lock(mutex_);return list_header(source,encoding).count;}
+--- a/src/runtime/array.cpp
++++ b/src/runtime/array.cpp
+@@ -14,7 +14,10 @@
+     return schema->identity().starts_with(scalar) ? "void.list.v1/"+schema->identity().substr(scalar.size()) : "void.list.v2/"+schema->identity();
+ }
+ Runtime::ListHeader& Runtime::list_header(RegisteredRootWord source,const ElementSchemaRef& schema) const {
+-    auto* object=reference_source(source);const auto key=list_identity(schema);
++    auto* object=reference_source(source);
++    return list_header(object,schema,list_identity(schema));
++}
++Runtime::ListHeader& Runtime::list_header(void* object,const ElementSchemaRef& schema,std::string_view key) const {
+     if(!types_)throw std::invalid_argument("missing list catalog");
+     auto admitted=types_->schemas.find(schema->identity());if(admitted==types_->schemas.end() || admitted->second!=schema)throw std::invalid_argument("foreign list schema");
+     auto type=types_->types.find(key);
+@@ -30,7 +33,7 @@
+ }
+ BufferLayoutRef Runtime::native_array_layout(const NativeArrayElement& element,std::uint64_t capacity) {
+     require_managed();if(!element.key || (element.count && !element.fields))throw std::invalid_argument("missing native element metadata");
+-    if(element.count==1 && element.fields[0].offset==0 && element.fields[0].kind<=10 && std::string_view(element.key)=="void.fixed.scalar.v1/"+std::to_string(element.fields[0].kind)) {
++    if(element.count==1 && element.fields[0].offset==0 && element.fields[0].kind<=10 && std::string_view(element.key)==scalar_identity(static_cast<ScalarEncoding>(element.fields[0].kind))) {
+         auto result=fixed_scalar_layout(static_cast<ScalarEncoding>(element.fields[0].kind),capacity);if(result->schema()->bytes()!=element.bytes || result->alignment()!=element.alignment)throw std::invalid_argument("invalid native scalar geometry");return result;
+     }
+     ElementSchemaRef schema;
+@@ -82,7 +85,7 @@
+         const auto key=list_identity(layout->schema());
+         {std::lock_guard lock(mutex_);if(types_) {auto found=types_->types.find(key);if(found!=types_->types.end())type=found->second;}}
+         if(!type) {Native native(*this);NominalDescriptor spec{key,"","array-list-v2",{sizeof(ListHeader),{offsetof(ListHeader,backing)}}};admit_types({&spec,1});type=descriptor(key);}
+-        if(type->layout.size!=sizeof(ListHeader) || type->layout.references!=std::vector<std::size_t>{offsetof(ListHeader,backing)})throw std::invalid_argument("invalid list descriptor");
++        if(type->layout.size!=sizeof(ListHeader) || type->layout.references.size()!=1 || type->layout.references[0]!=offsetof(ListHeader,backing))throw std::invalid_argument("invalid list descriptor");
+     }
+     void* backing=nullptr;constexpr std::size_t zero=0;Slot slot{&backing,sizeof(backing),&zero,1};Frame roots(*this,&slot,1);
+     auto live=zero_live ? layout->capacity() : 0;
+--- a/src/runtime/dictionary.cpp
++++ b/src/runtime/dictionary.cpp
+@@ -28,9 +28,22 @@
+     const auto& hash=d.entry->fields[d.entry->count-1];if(hash.kind!=7 || hash.offset!=d.hash_offset || hash.nullable || hash.extent)throw std::invalid_argument("invalid dictionary hash field");
+     for(std::size_t i=0;i<d.key->count;++i){const auto& a=d.entry->fields[i];const auto& b=d.key->fields[i];if(a.offset!=b.offset || a.kind!=b.kind || a.nullable!=b.nullable || a.extent!=b.extent || !a.target || !b.target || std::string_view(a.target)!=b.target)throw std::invalid_argument("dictionary key does not match entry prefix");}
+     for(std::size_t i=d.key->count;i+1<d.entry->count;++i)if(d.entry->fields[i].offset<d.value_offset || d.entry->fields[i].offset>=d.hash_offset)throw std::invalid_argument("invalid dictionary value fields");
+-    auto entries=native_array_layout(*d.entry,0),key=native_array_layout(*d.key,0);{std::lock_guard lock(mutex_);if(types_)validate_dictionary_key_schema(*types_,*key->schema());}auto identity="void.dict.v1/"+std::string(d.entry->key);std::shared_ptr<const NominalDescriptor> header;{std::lock_guard lock(mutex_);if(types_){auto found=types_->types.find(identity);if(found!=types_->types.end())header=found->second;}}
+-    if(!header){Native native(*this);NominalDescriptor spec{identity,"","dictionary-v1",{sizeof(DictionaryHeader),{offsetof(DictionaryHeader,entries),offsetof(DictionaryHeader,buckets)}}};admit_types({&spec,1});header=descriptor(identity);}
+-    if(header->layout.size!=sizeof(DictionaryHeader) || header->layout.references!=std::vector<std::size_t>{offsetof(DictionaryHeader,entries),offsetof(DictionaryHeader,buckets)})throw std::invalid_argument("invalid dictionary header descriptor");
++    auto entries=native_array_layout(*d.entry,0),key=native_array_layout(*d.key,0);
++    std::shared_ptr<const NominalDescriptor> header;
++    {std::lock_guard lock(mutex_);
++        if(types_)validate_dictionary_key_schema(*types_,*key->schema());
++        auto found=collection_metadata_.find(entries->schema().get());
++        if(found!=collection_metadata_.end())header=found->second.dictionary_header;
++    }
++    if(!header) {
++        auto identity="void.dict.v1/"+std::string(d.entry->key);
++        {std::lock_guard lock(mutex_);if(types_){auto found=types_->types.find(identity);if(found!=types_->types.end())header=found->second;}}
++        if(!header){Native native(*this);NominalDescriptor spec{identity,"","dictionary-v1",{sizeof(DictionaryHeader),{offsetof(DictionaryHeader,entries),offsetof(DictionaryHeader,buckets)}}};admit_types({&spec,1});header=descriptor(identity);}
++    }
++    const auto& references=header->layout.references;
++    if(header->layout.size!=sizeof(DictionaryHeader) || references.size()!=2 || references[0]!=offsetof(DictionaryHeader,entries) || references[1]!=offsetof(DictionaryHeader,buckets))throw std::invalid_argument("invalid dictionary header descriptor");
++    {std::lock_guard lock(mutex_);auto found=collection_metadata_.find(entries->schema().get());
++        if(found!=collection_metadata_.end())found->second.dictionary_header=header;}
+     return {entries,key,header};
+ }
+ Runtime::DictionaryHeader& Runtime::dictionary_header(RegisteredRootWord source,const DictionaryLayout& l) const {
+--- a/src/backend/llvm/backend.cpp
++++ b/src/backend/llvm/backend.cpp
+@@ -2069,7 +2069,7 @@
+     try {
+     identity="VOID-native-object-v2";
+     auto field=[&](std::string_view value){llvm_backend::cache_field(identity,value);};
+-    field(impl_->cache.build_identity);field("integrated-log-v1;rooted-local-cleanup;join-utf8;compact-sync-write");field(formatting::abi_version);field(temporal::abi_version);field(impl_->target_identity);field(analysis.entry_identity());field(async_root?"async-root-v1":"sync-root");
++    field(impl_->cache.build_identity);field("integrated-log-v1;rooted-local-cleanup;join-utf8;compact-sync-write");field("checked-root-location-v2");field(std::to_string(sizeof(Runtime::Frame)));field(formatting::abi_version);field(temporal::abi_version);field(impl_->target_identity);field(analysis.entry_identity());field(async_root?"async-root-v1":"sync-root");
+     field(optimize?"ir-O2":"no-ir-O2");
+     field(impl_->emission==ir::Emission::entry?"entry-emission-v1":"all-exports");
+     field(analysis.compatibility_contract());field(analysis.constant_contract());field(runtime ? "forced-runtime" : "automatic-runtime");
+--- a/include/void/tooling.hpp
++++ b/include/void/tooling.hpp
+@@ -1,17 +1,67 @@
+ #pragma once
+ #include "void/frontend.hpp"
+ #include <map>
++#include <iterator>
++#include <span>
+ namespace vd {
+ // Owns the successful analysis. Query results are copies with owning source spans.
+ class ToolingIndex {
+     std::shared_ptr<const ValidatedAnalysis> analysis_;
+-    std::vector<AnalyzedDeclaration> all_declarations_;
+-    std::vector<AnalyzedReference> all_references_;
+     std::map<std::string,std::size_t> declarations_;
+     std::map<std::string,std::vector<std::size_t>> modules_, incoming_, positions_;
+ public:
+-    const auto& declarations() const { return all_declarations_; }
+-    const auto& references() const { return all_references_; }
++    // Ordinary records precede editor records, exactly as in the former copied
++    // vectors. Views and their iterators retain the immutable backing analysis.
++    template<class T> class Records {
++        friend class ToolingIndex;
++        std::shared_ptr<const ValidatedAnalysis> owner_;
++        std::span<const T> first_,second_;
++        Records(std::shared_ptr<const ValidatedAnalysis> owner,const std::vector<T>& first,const std::vector<T>& second)
++            :owner_(std::move(owner)),first_(first),second_(second) {}
++    public:
++        std::size_t size() const {return first_.size()+second_.size();}
++        bool empty() const {return !size();}
++        const T& operator[](std::size_t n) const {return n<first_.size()?first_[n]:second_[n-first_.size()];}
++        class iterator {
++            friend class Records;
++            std::shared_ptr<const ValidatedAnalysis> owner_;
++            const T* current_=nullptr;
++            const T* limit_=nullptr;
++            const T* next_=nullptr;
++            const T* next_limit_=nullptr;
++            iterator(const Records& view,bool at_end):owner_(view.owner_) {
++                auto end=[](auto span){return span.empty()?span.data():span.data()+span.size();};
++                if(at_end){current_=view.second_.empty()?end(view.first_):end(view.second_);return;}
++                if(view.first_.empty()) {
++                    current_=view.second_.empty()?view.first_.data():view.second_.data();
++                    limit_=view.second_.empty()?current_:end(view.second_);
++                } else {
++                    current_=view.first_.data();limit_=end(view.first_);
++                    if(!view.second_.empty()){next_=view.second_.data();next_limit_=end(view.second_);}
++                }
++            }
++        public:
++            using iterator_category=std::forward_iterator_tag;
++            using value_type=T;
++            using difference_type=std::ptrdiff_t;
++            using pointer=const T*;
++            using reference=const T&;
++            iterator()=default;
++            reference operator*() const {return *current_;}
++            pointer operator->() const {return current_;}
++            iterator& operator++(){
++                ++current_;
++                if(current_==limit_ && next_){current_=next_;limit_=next_limit_;next_=nullptr;}
++                return *this;
++            }
++            iterator operator++(int){auto old=*this;++*this;return old;}
++            bool operator==(const iterator& other) const {return current_==other.current_;}
++        };
++        iterator begin() const {return iterator(*this,false);}
++        iterator end() const {return iterator(*this,true);}
++    };
++    auto declarations() const {return Records<AnalyzedDeclaration>(analysis_,analysis_->declarations(),analysis_->editor_declarations());}
++    auto references() const {return Records<AnalyzedReference>(analysis_,analysis_->references(),analysis_->editor_references());}
+     explicit ToolingIndex(std::shared_ptr<const ValidatedAnalysis> analysis);
+     std::optional<AnalyzedDeclaration> declaration(const std::string& identity) const;
+     std::vector<AnalyzedDeclaration> definitions_at(const std::string& module, std::size_t byte_offset) const;
+--- a/include/void/runtime.hpp
++++ b/include/void/runtime.hpp
+@@ -199,11 +199,16 @@
+     static thread_local Thread* current_thread_;
+     Thread& thread() const;
+     void require_managed() const;
++    struct RootLocation { Frame* frame; std::size_t slot, offset; };
++    RootLocation locate_root(void**) const;
++    static bool registered_at(const Frame&,std::size_t,std::size_t,void**);
++    void require_public_root(void**) const;
+     Frame* require_output(void**) const;
+     void string_parts_into(void**,std::string_view,std::string_view);
+     void validate_descriptor(const TypeLayout&) const; // Caller holds mutex_.
+     void validate_buffer_layout(const BufferLayoutRef&) const; // mutex_ held
+     ElementSchemaRef fixed_scalar_schema(ScalarEncoding);
++    static std::string_view scalar_identity(ScalarEncoding);
+     void validate_fixed_layout(const BufferLayoutRef&) const; // mutex_ held
+     void validate_dictionary_key_schema(const RuntimeMetadata&,const ElementSchema&) const;
+     struct DictionaryHeader {void* entries;void* buckets;std::uint64_t count,capacity,version;};
+@@ -218,6 +223,7 @@
+     void array_write_value(RegisteredRootWord,const ElementSchemaRef&,const BufferLayout*,std::uint64_t,const void*,bool,std::optional<std::uint64_t>);
+     static std::string list_identity(const ElementSchemaRef&);
+     ListHeader& list_header(RegisteredRootWord,const ElementSchemaRef&) const;
++    ListHeader& list_header(void*,const ElementSchemaRef&,std::string_view) const;
+     ListHeader& list_header(RegisteredRootWord,ScalarEncoding) const; // mutex_ held
+     void validate_native_element(const void*,DataCursor&,const ElementSchemaRef&) const;
+     void append_native(BufferBuilder&,const BufferLayoutRef&,const void*);
+@@ -234,6 +240,13 @@
+     using NominalCatalog=std::map<std::string,std::shared_ptr<const NominalDescriptor>,std::less<>>;
+     using TypeCatalog=RuntimeMetadata;
+     std::shared_ptr<const TypeCatalog> types_ = {};
++    // At most one default zero-capacity layout per admitted schema. No payloads
++    // or caller ABI descriptors; exact catalog membership is checked on every use.
++    struct CollectionMetadata {
++        BufferLayoutRef empty;
++        std::shared_ptr<const NominalDescriptor> dictionary_header;
++    };
++    mutable std::map<const ElementSchema*,CollectionMetadata> collection_metadata_;
+     std::vector<Thread*> threads_;
+     std::vector<Handle*> handles_;
+     std::vector<std::unique_ptr<Handle>> globals_;
+@@ -297,6 +310,7 @@
+     Frame* previous_;
+     const Slot* slots_;
+     std::size_t count_;
++    std::uint64_t identity_;
+ };
+ class Runtime::Handle {
+ public:
+@@ -334,11 +348,17 @@
+ class Runtime::RegisteredRootWord {
+ private:
+     friend class Runtime;
+-    RegisteredRootWord(const Runtime* r,Frame* f,void** p) : runtime_(r),frame_(f),slot_(p),owner_(std::this_thread::get_id()) {}
++    RegisteredRootWord(const Runtime* r,RootLocation location,void** p)
++        : runtime_(r),frame_(location.frame),slot_(p),owner_(std::this_thread::get_id()),
++          identity_(location.frame->identity_),slot_index_(location.slot),offset_index_(location.offset),
++          descriptor_(location.frame->slots_[location.slot]) {}
+     const Runtime* runtime_;
+     Frame* frame_;
+     void** slot_;
+     std::thread::id owner_;
++    std::uint64_t identity_;
++    std::size_t slot_index_,offset_index_;
++    Slot descriptor_;
+ };
+ struct Runtime::RootedInterfaceSource {
+     RegisteredRootWord object;

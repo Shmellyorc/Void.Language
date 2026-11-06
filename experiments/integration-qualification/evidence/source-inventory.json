@@ -1,0 +1,114 @@
+{
+  "include/void/filesystem_abi.hpp": {
+    "sha256": "d1192c147aee8d650092a0c8d89b76e1fd8998d9775dec6c716a16af8baa77ab",
+    "kind": "production"
+  },
+  "include/void/ir.hpp": {
+    "sha256": "7ca79371b2e9378836e23f0765db4003c0cf95c353893f1887150087de7a4725",
+    "kind": "production"
+  },
+  "include/void/runtime.hpp": {
+    "sha256": "01ecae6ad504a7a655f12788ee7636ca002ad66af8ad818ba68e352295e4a424",
+    "kind": "production"
+  },
+  "include/void/runtime_abi.hpp": {
+    "sha256": "9a31be262b39f36879ea06c1decb8bd628df44901a4c96e2aaffc0936a09cf98",
+    "kind": "production"
+  },
+  "include/void/tooling.hpp": {
+    "sha256": "01c1196315aef3662189d8cee881a429631252327272bd38bd538f316cb3d877",
+    "kind": "production"
+  },
+  "src/backend/llvm/backend.cpp": {
+    "sha256": "dd67d152fe28f025499f56cced2b0c39187bfdf80a47aa1e87c31e408c53b39d",
+    "kind": "production"
+  },
+  "src/backend/llvm/filesystem.inc": {
+    "sha256": "81bdb2546d73eaff5ed5480d354bf8fd1114dc73568c37c87d0c85c23d1727bb",
+    "kind": "production"
+  },
+  "src/frontend/capabilities.inc": {
+    "sha256": "c96983ec1704593bdbc7b97992094d5179f6e94f39b6121d5c59b62686112d0e",
+    "kind": "production"
+  },
+  "src/frontend/compiler.cpp": {
+    "sha256": "d9c37ed1ec3214d4483b9dd68c3e5c6341251db9bc4f0dbbd7cedf33f06131ac",
+    "kind": "production"
+  },
+  "src/frontend/filesystem.inc": {
+    "sha256": "a1c89150ab0a7999c765530f4285209feab5af1f979ab620583ff88756168ce5",
+    "kind": "production"
+  },
+  "src/frontend/tooling.cpp": {
+    "sha256": "7288709cf2824a68fc952f390a9ca4ec380664fc33d22087809488c8fdc1a840",
+    "kind": "production"
+  },
+  "src/ir/filesystem.inc": {
+    "sha256": "3a2c76e2cfd76d6e9bc15ad9143ab0181e69be9062d36faa4931d12254a4e925",
+    "kind": "production"
+  },
+  "src/ir/module.cpp": {
+    "sha256": "64ac2619ef446273e14cf7bead0e1d0c08a13e8f80218bdfccbeaf2205cfb58b",
+    "kind": "production"
+  },
+  "src/ir/reference_capabilities.inc": {
+    "sha256": "86a8b9282c9d162223d8073b894e488826706701d9d1fd971d1c5f32a49e79b9",
+    "kind": "production"
+  },
+  "src/runtime/abi.cpp": {
+    "sha256": "61af197d18c550cf3034c20aeb5ecd4317184c296973046e4ce504644e02d11f",
+    "kind": "production"
+  },
+  "src/runtime/array.cpp": {
+    "sha256": "533f1474c77c97e4e9885af690ae5aae1d15fa61c6b9976077e801299fefebb1",
+    "kind": "production"
+  },
+  "src/runtime/buffer.cpp": {
+    "sha256": "c69a37995fe77aace3174b5626b7797b8405e28440f8ca13e5078f8edf55acf5",
+    "kind": "production"
+  },
+  "src/runtime/coordination.cpp": {
+    "sha256": "7be0f8cf1aa00b411c3c693d3e88a861612b4547132882849d1274127f69e732",
+    "kind": "production"
+  },
+  "src/runtime/dictionary.cpp": {
+    "sha256": "c83644a5a492ca83ad739568e27300cd951da9ba7f6c1b5c4b1fe51ef611623e",
+    "kind": "production"
+  },
+  "src/runtime/filesystem_abi.cpp": {
+    "sha256": "e48d3c3efe1f158b1daf51918328823cce2ef2f90965cc00fd43defb83989323",
+    "kind": "production"
+  },
+  "src/runtime/list.cpp": {
+    "sha256": "36366b6ee6a3a600158e0e648b38fd8803ddfa45ab01025afc3d6e959bda9c87",
+    "kind": "production"
+  },
+  "stdlib/io.void": {
+    "sha256": "3e22822f57761a486702919774c8d4e8bafe23d0ecef2c37c8e23fe7173e6ad4",
+    "kind": "production"
+  },
+  "tests/advanced/tests.cpp": {
+    "sha256": "57b13f99b2e236542f6479f2f376f518f6a845c417a042a42185bae80dc1c2cc",
+    "kind": "fixture"
+  },
+  "tests/runtime/buffers.cpp": {
+    "sha256": "2ad330c1cec4c9a94009e86c41daa9c80f25bd4cea1c41de8faac715be3c3f21",
+    "kind": "fixture"
+  },
+  "tests/runtime/root_lookup_measure.cpp": {
+    "sha256": "32685b0663f1804fd5e6af13f533d75dac4df3285ed0c76d7e8ef06ba24105fb",
+    "kind": "fixture"
+  },
+  "tests/text_encoding/performance.cpp": {
+    "sha256": "24db6e5192638fc6ffeb1186b5e6ccc0833fdb5846aa99ca7bc7ca1da83d75bd",
+    "kind": "fixture"
+  },
+  "tests/tooling/tests.cpp": {
+    "sha256": "605ae3774fad642871b6e7c7629a7af4f99e51ee9a671f62dea83320caf92e72",
+    "kind": "fixture"
+  },
+  "src/ir/local_cleanup.inc": {
+    "sha256": "3d217d9e16d2c430fa8034f05934858c0c05d97f65bb4e2742016ff8f933506a",
+    "kind": "production"
+  }
+}

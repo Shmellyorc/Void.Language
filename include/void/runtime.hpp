@@ -85,6 +85,7 @@ public:
                           RegisteredRootWord replacements, const NativeArrayElement& strings,
                           std::int64_t max_bytes);
     void string_encode_into(void**, void*);
+    void string_join_bytes_into(void**,void***,std::size_t,bool& encoding);
     bool string_decode_into(void**, RegisteredRootWord);
 
     static std::size_t string_payload_size(std::size_t left, std::size_t right);
@@ -198,11 +199,16 @@ private:
     static thread_local Thread* current_thread_;
     Thread& thread() const;
     void require_managed() const;
+    struct RootLocation { Frame* frame; std::size_t slot, offset; };
+    RootLocation locate_root(void**) const;
+    static bool registered_at(const Frame&,std::size_t,std::size_t,void**);
+    void require_public_root(void**) const;
     Frame* require_output(void**) const;
     void string_parts_into(void**,std::string_view,std::string_view);
     void validate_descriptor(const TypeLayout&) const; // Caller holds mutex_.
     void validate_buffer_layout(const BufferLayoutRef&) const; // mutex_ held
     ElementSchemaRef fixed_scalar_schema(ScalarEncoding);
+    static std::string_view scalar_identity(ScalarEncoding);
     void validate_fixed_layout(const BufferLayoutRef&) const; // mutex_ held
     void validate_dictionary_key_schema(const RuntimeMetadata&,const ElementSchema&) const;
     struct DictionaryHeader {void* entries;void* buckets;std::uint64_t count,capacity,version;};
@@ -217,6 +223,7 @@ private:
     void array_write_value(RegisteredRootWord,const ElementSchemaRef&,const BufferLayout*,std::uint64_t,const void*,bool,std::optional<std::uint64_t>);
     static std::string list_identity(const ElementSchemaRef&);
     ListHeader& list_header(RegisteredRootWord,const ElementSchemaRef&) const;
+    ListHeader& list_header(void*,const ElementSchemaRef&,std::string_view) const;
     ListHeader& list_header(RegisteredRootWord,ScalarEncoding) const; // mutex_ held
     void validate_native_element(const void*,DataCursor&,const ElementSchemaRef&) const;
     void append_native(BufferBuilder&,const BufferLayoutRef&,const void*);
@@ -233,6 +240,13 @@ private:
     using NominalCatalog=std::map<std::string,std::shared_ptr<const NominalDescriptor>,std::less<>>;
     using TypeCatalog=RuntimeMetadata;
     std::shared_ptr<const TypeCatalog> types_ = {};
+    // At most one default zero-capacity layout per admitted schema. No payloads
+    // or caller ABI descriptors; exact catalog membership is checked on every use.
+    struct CollectionMetadata {
+        BufferLayoutRef empty;
+        std::shared_ptr<const NominalDescriptor> dictionary_header;
+    };
+    mutable std::map<const ElementSchema*,CollectionMetadata> collection_metadata_;
     std::vector<Thread*> threads_;
     std::vector<Handle*> handles_;
     std::vector<std::unique_ptr<Handle>> globals_;
@@ -296,6 +310,7 @@ private:
     Frame* previous_;
     const Slot* slots_;
     std::size_t count_;
+    std::uint64_t identity_;
 };
 class Runtime::Handle {
 public:
@@ -333,11 +348,17 @@ private:
 class Runtime::RegisteredRootWord {
 private:
     friend class Runtime;
-    RegisteredRootWord(const Runtime* r,Frame* f,void** p) : runtime_(r),frame_(f),slot_(p),owner_(std::this_thread::get_id()) {}
+    RegisteredRootWord(const Runtime* r,RootLocation location,void** p)
+        : runtime_(r),frame_(location.frame),slot_(p),owner_(std::this_thread::get_id()),
+          identity_(location.frame->identity_),slot_index_(location.slot),offset_index_(location.offset),
+          descriptor_(location.frame->slots_[location.slot]) {}
     const Runtime* runtime_;
     Frame* frame_;
     void** slot_;
     std::thread::id owner_;
+    std::uint64_t identity_;
+    std::size_t slot_index_,offset_index_;
+    Slot descriptor_;
 };
 struct Runtime::RootedInterfaceSource {
     RegisteredRootWord object;
@@ -356,6 +377,7 @@ public:
     std::uint64_t count() const {return count_;}
 private:
     friend class Runtime::BufferBuilder;
+    friend class Runtime;
     void validate() const; // Runtime mutex held, Managed owner thread
     Runtime& runtime_;
     BufferLayoutRef layout_;
@@ -376,6 +398,7 @@ public:
     BufferBuilder& operator=(BufferBuilder&&)=delete;
     void write_scalar(std::uint64_t bits);
     void write_bytes(std::span<const std::byte> native_input);
+    void write_string(RegisteredRootWord);
     void write_reference(RegisteredRootWord source);
     void write_interface(const RootedInterfaceSource& source);
     void zero_elements(std::uint64_t count);

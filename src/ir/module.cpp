@@ -934,6 +934,13 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     for(unsigned n=0;n<i.type.definition->call_parameters.size();++n)if(target->second.parameters[n+(target->second.closure?1:0)]!=Type(i.type.definition->call_parameters[n]) || capability_key(target->second.parameters[n+(target->second.closure?1:0)])!=capability_key(i.type.definition->call_parameters[n]))fail("function reference parameter authority mismatch");
                     if(!capability_assignable(target->second.result,*i.type.definition->call_result))fail("function reference discards result authority");result=i.type;break;
                 }
+                case Op::local_cleanup: {
+                    auto target=functions.find(i.callee);
+                    if(!m.coordinated || f.asynchronous || !f.cleanup_entry || i.a>=f.locals.size() || i.b>=f.locals.size() || i.a==i.b || f.locals[i.a].kind!=Type::managed_ref || f.locals[i.a].nullable || f.locals[i.b]!=Type::boolean || i.type!=Type::none || !i.receiver || i.receiver->slot!=i.a || !i.receiver->fields.empty() || !i.arguments.empty() || i.immediate || i.initialization || i.array_repeat || target==functions.end())fail("invalid rooted local cleanup");
+                    const auto& callee=*target->second;
+                    if(!callee.receiver || callee.asynchronous || callee.closure || callee.initializer || !callee.virtual_slot.empty() || callee.method_name!="deinit" || callee.parameters.size()!=1 || callee.parameters[0]!=f.locals[i.a] || callee.result!=Type::none)fail("invalid local destructor authority");
+                    result=Type::none;break;
+                }
                 case Op::cleanup_call:
                     if(!operand(i.a).definition || !operand(i.a).definition->callable || !operand(i.a).definition->call_parameters.empty() || Type(*operand(i.a).definition->call_result)!=Type::none || !f.cleanup_entry || static_cast<unsigned>(&b-f.blocks.data())<*f.cleanup_entry || !i.arguments.empty() || i.receiver || !i.callee.empty())fail("invalid cleanup call");result=Type::none;break;
                 case Op::function_call: {
@@ -1088,6 +1095,10 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     else {auto owner=operand(i.a);if((owner.kind!=Type::growable_array && owner.kind!=Type::dictionary) || owner.nullable || owner.construction)fail("invalid collection display owner");result=i.op==Op::collection_enter?Type::boolean:Type::none;}
                     if(i.type!=result)fail("invalid collection display result");break;
                 }
+                case Op::string_join_encode:
+                    valid_type(i.type);
+                    if(!m.coordinated || i.a || i.b || i.receiver || !i.callee.empty() || i.initialization || i.array_repeat || i.immediate || i.type.kind!=Type::growable_array || array_element(i.type)!=Type::u8 || i.type.readonly)fail("invalid fused UTF-8 join");
+                    for(auto value:i.arguments)if(operand(value)!=Type::string)fail("invalid fused UTF-8 part");result=i.type;break;
                 case Op::string_join:
                     if(!m.coordinated || i.a || i.b || i.type!=Type::string || i.receiver || !i.callee.empty() || i.initialization || i.array_repeat || i.immediate)fail("invalid interpolation join");
                     for(auto value:i.arguments)if(operand(value)!=Type::string)fail("invalid interpolation text");result=Type::string;break;
@@ -1407,6 +1418,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         if(f.asynchronous){
 #include "async_validation.inc"
         }
+#include "local_cleanup.inc"
         validate_construction(f,m,body_types);
         validate_fixed_ownership(f,m,body_types);
     }
@@ -1425,7 +1437,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 case Op::native_call:
                     if (native_binding(instruction.callee).name == "register") fail("native callback registration during global startup");
                     break;
-                case Op::call: case Op::base_init:
+                case Op::local_cleanup: case Op::call: case Op::base_init:
                     pending.push_back(instruction.callee); break;
                 case Op::function_call: case Op::cleanup_call: {
                     auto function_index = static_cast<std::size_t>(&function - m.functions.data());
@@ -1490,10 +1502,10 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 case Op::global_cell:fail("worker cannot access runtime globals");break;
                 case Op::os_query:fail("worker cannot perform OS queries");break;
                 case Op::http_control:case Op::http_native:case Op::http_async:case Op::url_native:fail("worker cannot perform URL operations");break;
-                case Op::filesystem_control:case Op::filesystem_native:case Op::filesystem_async:case Op::console_print:case Op::console_native:fail("worker cannot perform console I/O");break;
+                case Op::filesystem_write:case Op::filesystem_control:case Op::filesystem_native:case Op::filesystem_async:case Op::console_print:case Op::console_native:fail("worker cannot perform console I/O");break;
                 case Op::temporal_native:if(temporal::operations.at(i.immediate).clock)fail("worker cannot read Runtime clocks");break;
                 case Op::native_call:case Op::async_call:case Op::async_cancel:case Op::async_cancel_children:case Op::async_group_enter:case Op::async_group_join:case Op::await:case Op::function_call:case Op::interface_call:case Op::virtual_call:fail("unsupported worker task/indirect effect");break;
-                case Op::call:case Op::base_init:case Op::function_reference:{auto target=functions.find(i.callee);if(target==functions.end())fail("worker has unknown native effect");graph.push_back(target->second);break;}
+                case Op::local_cleanup:case Op::call:case Op::base_init:case Op::function_reference:{auto target=functions.find(i.callee);if(target==functions.end())fail("worker has unknown native effect");graph.push_back(target->second);break;}
                 default:break;
                 }
             }

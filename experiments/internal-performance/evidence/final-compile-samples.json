@@ -1,0 +1,1038 @@
+[
+  {
+    "workload": "collections/bounds-1024",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 546.7959999999999,
+    "cpu_ms": 543.194
+  },
+  {
+    "workload": "collections/dictionary-copy_dictionary",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 528.028,
+    "cpu_ms": 524.498
+  },
+  {
+    "workload": "collections/dictionary-keys",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 557.2139999999999,
+    "cpu_ms": 553.044
+  },
+  {
+    "workload": "collections/dictionary-values",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 535.793,
+    "cpu_ms": 531.952
+  },
+  {
+    "workload": "collections/filter-loop",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 512.629,
+    "cpu_ms": 509.4030000000001
+  },
+  {
+    "workload": "collections/filter",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 535.446,
+    "cpu_ms": 531.609
+  },
+  {
+    "workload": "collections/fold-loop",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 520.3149999999999,
+    "cpu_ms": 516.726
+  },
+  {
+    "workload": "collections/fold",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 544.224,
+    "cpu_ms": 539.242
+  },
+  {
+    "workload": "collections/map-loop",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 549.836,
+    "cpu_ms": 544.9739999999999
+  },
+  {
+    "workload": "collections/map",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 527.5459999999999,
+    "cpu_ms": 522.6650000000001
+  },
+  {
+    "workload": "collections/sort-0-duplicates",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 559.341,
+    "cpu_ms": 555.32
+  },
+  {
+    "workload": "collections/sort-0-mixed",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 593.538,
+    "cpu_ms": 589.1840000000001
+  },
+  {
+    "workload": "collections/sort-0-ordered",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 612.7080000000001,
+    "cpu_ms": 580.549
+  },
+  {
+    "workload": "collections/sort-0-reverse",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 601.782,
+    "cpu_ms": 597.485
+  },
+  {
+    "workload": "collections/sort-1-duplicates",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 585.1220000000001,
+    "cpu_ms": 580.083
+  },
+  {
+    "workload": "collections/sort-1-mixed",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 590.0609999999999,
+    "cpu_ms": 586.198
+  },
+  {
+    "workload": "collections/sort-1-ordered",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 589.814,
+    "cpu_ms": 585.394
+  },
+  {
+    "workload": "collections/sort-1-reverse",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 592.299,
+    "cpu_ms": 588.0
+  },
+  {
+    "workload": "collections/sort-1024-duplicates",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 602.819,
+    "cpu_ms": 597.552
+  },
+  {
+    "workload": "collections/sort-1024-mixed",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 592.426,
+    "cpu_ms": 588.1070000000001
+  },
+  {
+    "workload": "collections/sort-1024-ordered",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 568.078,
+    "cpu_ms": 564.001
+  },
+  {
+    "workload": "collections/sort-1024-reverse",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 601.094,
+    "cpu_ms": 596.675
+  },
+  {
+    "workload": "collections/sort-16384-duplicates",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 592.982,
+    "cpu_ms": 586.7189999999999
+  },
+  {
+    "workload": "collections/sort-16384-mixed",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 588.474,
+    "cpu_ms": 580.648
+  },
+  {
+    "workload": "collections/sort-16384-ordered",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 608.388,
+    "cpu_ms": 602.456
+  },
+  {
+    "workload": "collections/sort-16384-reverse",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 589.958,
+    "cpu_ms": 584.0490000000001
+  },
+  {
+    "workload": "collections/sort-32-duplicates",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 581.812,
+    "cpu_ms": 577.8100000000001
+  },
+  {
+    "workload": "collections/sort-32-mixed",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 614.5260000000001,
+    "cpu_ms": 609.4159999999999
+  },
+  {
+    "workload": "collections/sort-32-ordered",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 593.75,
+    "cpu_ms": 587.174
+  },
+  {
+    "workload": "collections/sort-32-reverse",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 601.923,
+    "cpu_ms": 597.346
+  },
+  {
+    "workload": "collections/sort-fixed-256KiB",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 658.179,
+    "cpu_ms": 653.4799999999999
+  },
+  {
+    "workload": "collections/sort-references",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 642.405,
+    "cpu_ms": 637.4300000000001
+  },
+  {
+    "workload": "collections/sort-text",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 623.731,
+    "cpu_ms": 619.071
+  },
+  {
+    "workload": "logging",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 8883.665657,
+    "cpu_ms": null
+  },
+  {
+    "workload": "logging",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 8883.665657,
+    "cpu_ms": null
+  },
+  {
+    "workload": "logging",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 8883.665657,
+    "cpu_ms": null
+  },
+  {
+    "workload": "logging",
+    "variant": "baseline",
+    "block": "E",
+    "wall_ms": 8883.665657,
+    "cpu_ms": null
+  },
+  {
+    "workload": "collections/bounds-1024",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 552.339,
+    "cpu_ms": 548.667
+  },
+  {
+    "workload": "collections/dictionary-copy_dictionary",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 541.132,
+    "cpu_ms": 537.418
+  },
+  {
+    "workload": "collections/dictionary-keys",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 526.375,
+    "cpu_ms": 522.8779999999999
+  },
+  {
+    "workload": "collections/dictionary-values",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 536.764,
+    "cpu_ms": 532.783
+  },
+  {
+    "workload": "collections/filter-loop",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 534.695,
+    "cpu_ms": 530.674
+  },
+  {
+    "workload": "collections/filter",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 539.9659999999999,
+    "cpu_ms": 536.241
+  },
+  {
+    "workload": "collections/fold-loop",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 523.248,
+    "cpu_ms": 519.267
+  },
+  {
+    "workload": "collections/fold",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 552.751,
+    "cpu_ms": 548.234
+  },
+  {
+    "workload": "collections/map-loop",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 537.234,
+    "cpu_ms": 532.65
+  },
+  {
+    "workload": "collections/map",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 546.716,
+    "cpu_ms": 541.738
+  },
+  {
+    "workload": "collections/sort-0-duplicates",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 588.832,
+    "cpu_ms": 584.781
+  },
+  {
+    "workload": "collections/sort-0-mixed",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 588.6949999999999,
+    "cpu_ms": 583.7280000000001
+  },
+  {
+    "workload": "collections/sort-0-ordered",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 599.846,
+    "cpu_ms": 568.1270000000001
+  },
+  {
+    "workload": "collections/sort-0-reverse",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 607.0790000000001,
+    "cpu_ms": 602.252
+  },
+  {
+    "workload": "collections/sort-1-duplicates",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 574.217,
+    "cpu_ms": 569.89
+  },
+  {
+    "workload": "collections/sort-1-mixed",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 618.4960000000001,
+    "cpu_ms": 613.347
+  },
+  {
+    "workload": "collections/sort-1-ordered",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 588.3000000000001,
+    "cpu_ms": 583.994
+  },
+  {
+    "workload": "collections/sort-1-reverse",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 596.727,
+    "cpu_ms": 592.408
+  },
+  {
+    "workload": "collections/sort-1024-duplicates",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 606.194,
+    "cpu_ms": 597.1840000000001
+  },
+  {
+    "workload": "collections/sort-1024-mixed",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 594.889,
+    "cpu_ms": 590.241
+  },
+  {
+    "workload": "collections/sort-1024-ordered",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 572.945,
+    "cpu_ms": 569.264
+  },
+  {
+    "workload": "collections/sort-1024-reverse",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 585.491,
+    "cpu_ms": 581.346
+  },
+  {
+    "workload": "collections/sort-16384-duplicates",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 647.864,
+    "cpu_ms": 642.0749999999999
+  },
+  {
+    "workload": "collections/sort-16384-mixed",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 585.3530000000001,
+    "cpu_ms": 581.317
+  },
+  {
+    "workload": "collections/sort-16384-ordered",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 588.1560000000001,
+    "cpu_ms": 584.005
+  },
+  {
+    "workload": "collections/sort-16384-reverse",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 599.12,
+    "cpu_ms": 594.255
+  },
+  {
+    "workload": "collections/sort-32-duplicates",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 600.869,
+    "cpu_ms": 595.896
+  },
+  {
+    "workload": "collections/sort-32-mixed",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 586.192,
+    "cpu_ms": 582.191
+  },
+  {
+    "workload": "collections/sort-32-ordered",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 581.524,
+    "cpu_ms": 577.159
+  },
+  {
+    "workload": "collections/sort-32-reverse",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 592.558,
+    "cpu_ms": 587.645
+  },
+  {
+    "workload": "collections/sort-fixed-256KiB",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 652.3910000000001,
+    "cpu_ms": 644.813
+  },
+  {
+    "workload": "collections/sort-references",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 614.9559999999999,
+    "cpu_ms": 610.566
+  },
+  {
+    "workload": "collections/sort-text",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 612.33,
+    "cpu_ms": 607.665
+  },
+  {
+    "workload": "logging",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 9192.146962,
+    "cpu_ms": null
+  },
+  {
+    "workload": "logging",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 9192.146962,
+    "cpu_ms": null
+  },
+  {
+    "workload": "logging",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 9192.146962,
+    "cpu_ms": null
+  },
+  {
+    "workload": "logging",
+    "variant": "candidate",
+    "block": "F",
+    "wall_ms": 9192.146962,
+    "cpu_ms": null
+  },
+  {
+    "workload": "collections/bounds-1024",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 548.061,
+    "cpu_ms": 544.4449999999999
+  },
+  {
+    "workload": "collections/dictionary-copy_dictionary",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 541.417,
+    "cpu_ms": 537.383
+  },
+  {
+    "workload": "collections/dictionary-keys",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 527.8199999999999,
+    "cpu_ms": 524.336
+  },
+  {
+    "workload": "collections/dictionary-values",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 540.639,
+    "cpu_ms": 536.2059999999999
+  },
+  {
+    "workload": "collections/filter-loop",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 512.297,
+    "cpu_ms": 508.787
+  },
+  {
+    "workload": "collections/filter",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 545.586,
+    "cpu_ms": 539.397
+  },
+  {
+    "workload": "collections/fold-loop",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 554.357,
+    "cpu_ms": 549.55
+  },
+  {
+    "workload": "collections/fold",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 544.399,
+    "cpu_ms": 539.629
+  },
+  {
+    "workload": "collections/map-loop",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 554.3280000000001,
+    "cpu_ms": 547.08
+  },
+  {
+    "workload": "collections/map",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 540.793,
+    "cpu_ms": 535.2470000000001
+  },
+  {
+    "workload": "collections/sort-0-duplicates",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 586.275,
+    "cpu_ms": 582.083
+  },
+  {
+    "workload": "collections/sort-0-mixed",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 602.0759999999999,
+    "cpu_ms": 597.972
+  },
+  {
+    "workload": "collections/sort-0-ordered",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 592.804,
+    "cpu_ms": 588.613
+  },
+  {
+    "workload": "collections/sort-0-reverse",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 606.874,
+    "cpu_ms": 602.441
+  },
+  {
+    "workload": "collections/sort-1-duplicates",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 566.626,
+    "cpu_ms": 563.168
+  },
+  {
+    "workload": "collections/sort-1-mixed",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 591.9140000000001,
+    "cpu_ms": 587.742
+  },
+  {
+    "workload": "collections/sort-1-ordered",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 589.918,
+    "cpu_ms": 585.24
+  },
+  {
+    "workload": "collections/sort-1-reverse",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 612.49,
+    "cpu_ms": 605.534
+  },
+  {
+    "workload": "collections/sort-1024-duplicates",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 574.079,
+    "cpu_ms": 569.74
+  },
+  {
+    "workload": "collections/sort-1024-mixed",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 588.431,
+    "cpu_ms": 584.3660000000001
+  },
+  {
+    "workload": "collections/sort-1024-ordered",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 582.761,
+    "cpu_ms": 578.477
+  },
+  {
+    "workload": "collections/sort-1024-reverse",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 613.226,
+    "cpu_ms": 608.6310000000001
+  },
+  {
+    "workload": "collections/sort-16384-duplicates",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 579.391,
+    "cpu_ms": 575.47
+  },
+  {
+    "workload": "collections/sort-16384-mixed",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 587.92,
+    "cpu_ms": 583.472
+  },
+  {
+    "workload": "collections/sort-16384-ordered",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 587.019,
+    "cpu_ms": 581.47
+  },
+  {
+    "workload": "collections/sort-16384-reverse",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 583.9060000000001,
+    "cpu_ms": 579.196
+  },
+  {
+    "workload": "collections/sort-32-duplicates",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 611.8789999999999,
+    "cpu_ms": 604.8670000000001
+  },
+  {
+    "workload": "collections/sort-32-mixed",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 622.168,
+    "cpu_ms": 615.417
+  },
+  {
+    "workload": "collections/sort-32-ordered",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 603.7679999999999,
+    "cpu_ms": 598.861
+  },
+  {
+    "workload": "collections/sort-32-reverse",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 592.482,
+    "cpu_ms": 588.495
+  },
+  {
+    "workload": "collections/sort-fixed-256KiB",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 629.464,
+    "cpu_ms": 624.8979999999999
+  },
+  {
+    "workload": "collections/sort-references",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 623.249,
+    "cpu_ms": 618.48
+  },
+  {
+    "workload": "collections/sort-text",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 609.332,
+    "cpu_ms": 602.526
+  },
+  {
+    "workload": "logging",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 8973.623337,
+    "cpu_ms": null
+  },
+  {
+    "workload": "logging",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 8973.623337,
+    "cpu_ms": null
+  },
+  {
+    "workload": "logging",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 8973.623337,
+    "cpu_ms": null
+  },
+  {
+    "workload": "logging",
+    "variant": "candidate",
+    "block": "G",
+    "wall_ms": 8973.623337,
+    "cpu_ms": null
+  },
+  {
+    "workload": "collections/bounds-1024",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 566.483,
+    "cpu_ms": 562.789
+  },
+  {
+    "workload": "collections/dictionary-copy_dictionary",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 532.695,
+    "cpu_ms": 528.614
+  },
+  {
+    "workload": "collections/dictionary-keys",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 526.6809999999999,
+    "cpu_ms": 523.053
+  },
+  {
+    "workload": "collections/dictionary-values",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 531.104,
+    "cpu_ms": 527.437
+  },
+  {
+    "workload": "collections/filter-loop",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 512.251,
+    "cpu_ms": 509.071
+  },
+  {
+    "workload": "collections/filter",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 547.4630000000001,
+    "cpu_ms": 541.787
+  },
+  {
+    "workload": "collections/fold-loop",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 518.473,
+    "cpu_ms": 515.1759999999999
+  },
+  {
+    "workload": "collections/fold",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 540.514,
+    "cpu_ms": 534.805
+  },
+  {
+    "workload": "collections/map-loop",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 521.147,
+    "cpu_ms": 517.452
+  },
+  {
+    "workload": "collections/map",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 528.065,
+    "cpu_ms": 524.7429999999999
+  },
+  {
+    "workload": "collections/sort-0-duplicates",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 563.249,
+    "cpu_ms": 559.697
+  },
+  {
+    "workload": "collections/sort-0-mixed",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 592.492,
+    "cpu_ms": 587.418
+  },
+  {
+    "workload": "collections/sort-0-ordered",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 587.318,
+    "cpu_ms": 583.121
+  },
+  {
+    "workload": "collections/sort-0-reverse",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 589.392,
+    "cpu_ms": 585.071
+  },
+  {
+    "workload": "collections/sort-1-duplicates",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 549.845,
+    "cpu_ms": 546.3599999999999
+  },
+  {
+    "workload": "collections/sort-1-mixed",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 584.247,
+    "cpu_ms": 579.12
+  },
+  {
+    "workload": "collections/sort-1-ordered",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 567.789,
+    "cpu_ms": 564.3679999999999
+  },
+  {
+    "workload": "collections/sort-1-reverse",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 601.829,
+    "cpu_ms": 596.082
+  },
+  {
+    "workload": "collections/sort-1024-duplicates",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 595.487,
+    "cpu_ms": 590.7090000000001
+  },
+  {
+    "workload": "collections/sort-1024-mixed",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 603.956,
+    "cpu_ms": 595.956
+  },
+  {
+    "workload": "collections/sort-1024-ordered",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 635.625,
+    "cpu_ms": 629.364
+  },
+  {
+    "workload": "collections/sort-1024-reverse",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 610.524,
+    "cpu_ms": 600.291
+  },
+  {
+    "workload": "collections/sort-16384-duplicates",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 582.167,
+    "cpu_ms": 577.412
+  },
+  {
+    "workload": "collections/sort-16384-mixed",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 562.801,
+    "cpu_ms": 559.194
+  },
+  {
+    "workload": "collections/sort-16384-ordered",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 601.479,
+    "cpu_ms": 595.247
+  },
+  {
+    "workload": "collections/sort-16384-reverse",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 580.3040000000001,
+    "cpu_ms": 576.53
+  },
+  {
+    "workload": "collections/sort-32-duplicates",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 606.024,
+    "cpu_ms": 599.186
+  },
+  {
+    "workload": "collections/sort-32-mixed",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 587.196,
+    "cpu_ms": 583.127
+  },
+  {
+    "workload": "collections/sort-32-ordered",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 574.646,
+    "cpu_ms": 570.794
+  },
+  {
+    "workload": "collections/sort-32-reverse",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 614.81,
+    "cpu_ms": 607.7289999999999
+  },
+  {
+    "workload": "collections/sort-fixed-256KiB",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 622.66,
+    "cpu_ms": 618.953
+  },
+  {
+    "workload": "collections/sort-references",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 615.184,
+    "cpu_ms": 610.5110000000001
+  },
+  {
+    "workload": "collections/sort-text",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 610.197,
+    "cpu_ms": 606.004
+  },
+  {
+    "workload": "logging",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 8978.211015,
+    "cpu_ms": null
+  },
+  {
+    "workload": "logging",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 8978.211015,
+    "cpu_ms": null
+  },
+  {
+    "workload": "logging",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 8978.211015,
+    "cpu_ms": null
+  },
+  {
+    "workload": "logging",
+    "variant": "baseline",
+    "block": "H",
+    "wall_ms": 8978.211015,
+    "cpu_ms": null
+  }
+]

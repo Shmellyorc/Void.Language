@@ -7,11 +7,7 @@
 namespace vd {
 ToolingIndex::ToolingIndex(std::shared_ptr<const ValidatedAnalysis> analysis) : analysis_(std::move(analysis)) {
     if (!analysis_) throw std::invalid_argument("tooling index requires successful analysis");
-    all_declarations_ = analysis_->declarations();
-    all_declarations_.insert(all_declarations_.end(),analysis_->editor_declarations().begin(),analysis_->editor_declarations().end());
-    all_references_ = analysis_->references();
-    all_references_.insert(all_references_.end(),analysis_->editor_references().begin(),analysis_->editor_references().end());
-    const auto& declarations = all_declarations_;
+    const auto declarations = this->declarations();
     for (std::size_t i=0; i<declarations.size(); ++i) {
         declarations_.emplace(declarations[i].identity,i);
         modules_[declarations[i].module].push_back(i);
@@ -20,7 +16,7 @@ ToolingIndex::ToolingIndex(std::shared_ptr<const ValidatedAnalysis> analysis) : 
         (void)module;
         std::sort(indices.begin(),indices.end(),[&](auto a,auto b) { return declarations[a].identity < declarations[b].identity; });
     }
-    const auto& references = all_references_;
+    const auto references = this->references();
     for (std::size_t i=0; i<references.size(); ++i) {
         if (!references[i].implicit) {
             incoming_[references[i].to].push_back(i);
@@ -39,19 +35,19 @@ ToolingIndex::ToolingIndex(std::shared_ptr<const ValidatedAnalysis> analysis) : 
 std::optional<AnalyzedDeclaration> ToolingIndex::declaration(const std::string& identity) const {
     auto found=declarations_.find(identity);
     if (found==declarations_.end()) return {};
-    return all_declarations_[found->second];
+    return declarations()[found->second];
 }
 std::vector<AnalyzedDeclaration> ToolingIndex::definitions_at(const std::string& module,std::size_t offset) const {
     std::vector<AnalyzedDeclaration> result;
     auto found=positions_.find(module);
     if(found==positions_.end())return result;
     const auto& indices=found->second;
-    auto next=std::upper_bound(indices.begin(),indices.end(),offset,[&](auto at,auto i){return at<all_references_[i].source.begin;});
+    auto next=std::upper_bound(indices.begin(),indices.end(),offset,[&](auto at,auto i){return at<references()[i].source.begin;});
     if(next==indices.begin())return result;
-    auto begin=all_references_[*std::prev(next)].source.begin;
+    auto begin=references()[*std::prev(next)].source.begin;
     std::set<std::string> seen;
     while(next!=indices.begin()) {
-        const auto& ref=all_references_[*--next];if(ref.source.begin!=begin)break;
+        const auto& ref=references()[*--next];if(ref.source.begin!=begin)break;
         if(offset>=ref.source.end || !seen.insert(ref.to).second)continue;
         if(auto d=declaration(ref.to)){if(!ref.signature.empty())d->signature=ref.signature;result.push_back(std::move(*d));}
     }
@@ -74,13 +70,13 @@ std::optional<AnalyzedDeclaration> ToolingIndex::definition_at(const std::string
 std::vector<AnalyzedReference> ToolingIndex::references_to(const std::string& identity) const {
     std::vector<AnalyzedReference> result;
     auto found=incoming_.find(identity);
-    if (found!=incoming_.end()) for(auto i:found->second) result.push_back(all_references_[i]);
+    if (found!=incoming_.end()) for(auto i:found->second) result.push_back(references()[i]);
     return result;
 }
 std::vector<AnalyzedDeclaration> ToolingIndex::declarations_in(const std::string& module) const {
     std::vector<AnalyzedDeclaration> result;
     auto found=modules_.find(module);
-    if(found!=modules_.end()) for(auto i:found->second) result.push_back(all_declarations_[i]);
+    if(found!=modules_.end()) for(auto i:found->second) result.push_back(declarations()[i]);
     return result;
 }
 namespace {

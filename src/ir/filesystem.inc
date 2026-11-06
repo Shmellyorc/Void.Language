@@ -1,3 +1,4 @@
+                case Op::filesystem_write:
                 case Op::filesystem_control:
                 case Op::filesystem_native:
                 case Op::filesystem_async: {
@@ -46,6 +47,10 @@
                     if (i.immediate >= filesystem::claim_operation) fail("file control requires control opcode");
                     valid_type(i.type);
                     auto reply = i.type;
+                    if(i.op==Op::filesystem_write) {
+                        if(f.asynchronous || i.immediate!=static_cast<unsigned>(filesystem::Operation::write_bytes) || reply.kind!=Type::aggregate || !reply.definition || !reply.definition->result_type || reply.definition->fields.size()!=3 || field_type(reply,1)!=Type::i64)fail("invalid compact write result");
+                        reply=field_type(reply,2);
+                    }
                     if (asynchronous) {
                         if (reply.kind != Type::managed_ref || !reply.definition ||
                             !reply.definition->task_result || reply.nullable || reply.readonly) {

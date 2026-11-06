@@ -1157,6 +1157,24 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     else v = b.CreateStore(stored,address);
                     break;
                 }
+                case Op::local_cleanup:{
+                    auto* invoke=llvm::BasicBlock::Create(context,"local.cleanup.active",fn);
+                    auto* done=llvm::BasicBlock::Create(context,"local.cleanup.done",fn);
+                    b.CreateCondBr(b.CreateLoad(b.getInt1Ty(),slots[instruction.b]),invoke,done);b.SetInsertPoint(invoke);
+                    b.CreateStore(b.getFalse(),slots[instruction.b]);
+                    llvm::IRBuilder<> allocations(&*fn->getEntryBlock().begin());
+                    auto* secondary=home(allocations.CreateAlloca(failure_type),StorageRole::known_abi,llvm_backend::HomeKind::value);
+                    b.CreateStore(llvm::Constant::getNullValue(failure_type),secondary);
+                    b.CreateCall(module->getOrInsertFunction("vd_async_cleanup_enter",b.getVoidTy()));
+                    auto* target=functions.at(instruction.callee);
+                    b.CreateCall(target,{b.CreateLoad(type(f.locals[instruction.a]),slots[instruction.a]),secondary});
+                    b.CreateCall(module->getOrInsertFunction("vd_async_cleanup_leave",b.getVoidTy()));
+                    b.CreateStore(llvm::Constant::getNullValue(type(f.locals[instruction.a])),slots[instruction.a]);
+                    b.CreateCall(module->getOrInsertFunction("vd_cleanup_failure",b.getVoidTy(),b.getPtrTy(),b.getPtrTy()),{failure,secondary});
+                    b.CreateBr(done);b.SetInsertPoint(done);
+                    if(active_block<*f.cleanup_entry)selected_failure();
+                    v=llvm::UndefValue::get(b.getInt8Ty());break;
+                }
                 case Op::cleanup_call:{
                     llvm::IRBuilder<> entry_builder(&*fn->getEntryBlock().begin());auto* secondary=home(entry_builder.CreateAlloca(failure_type),StorageRole::known_abi,llvm_backend::HomeKind::value);
                     b.CreateStore(llvm::Constant::getNullValue(failure_type),secondary);
@@ -1290,14 +1308,18 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     else {auto name=instruction.op==Op::collection_enter?"vd_collection_enter":instruction.op==Op::collection_leave?"vd_collection_leave":"vd_collection_append";auto* call=b.CreateCall(module->getOrInsertFunction(name,instruction.op==Op::collection_enter?b.getInt1Ty():b.getVoidTy(),b.getPtrTy(),b.getPtrTy()),{values[instruction.a],failure});fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),"Collection display failed");if(instruction.op==Op::collection_enter)v=call;}
                     break;
                 }
+                case Op::string_join_encode:
                 case Op::string_join: {
                     auto* storage=value_roots[n].at(values.size());
                     auto* pointers=llvm::ArrayType::get(b.getPtrTy(),instruction.arguments.size());
                     llvm::IRBuilder<> allocations(&*fn->getEntryBlock().begin());
                     auto* inputs=home(allocations.CreateAlloca(pointers),StorageRole::known_abi,llvm_backend::HomeKind::value);
                     for(unsigned k=0;k<instruction.arguments.size();++k)b.CreateStore(value_roots[n].at(instruction.arguments[k]),b.CreateInBoundsGEP(pointers,inputs,{b.getInt32(0),b.getInt32(k)}));
-                    b.CreateCall(module->getOrInsertFunction("vd_string_join",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy()),{storage,inputs,llvm::ConstantInt::get(size_type,instruction.arguments.size()),failure});
-                    fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),"Interpolation failed");v=b.CreateLoad(b.getPtrTy(),storage);break;
+                    const bool fused=instruction.op==Op::string_join_encode;
+                    auto* phase=b.CreateCall(module->getOrInsertFunction(fused?"vd_string_join_encode":"vd_string_join",fused?b.getInt1Ty():b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy()),{storage,inputs,llvm::ConstantInt::get(size_type,instruction.arguments.size()),failure});
+                    auto* failed=b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure));
+                    if(fused)fail_if(b.CreateAnd(failed,phase),"UTF-8 text operation failed");
+                    fail_if(failed,"Interpolation failed");v=b.CreateLoad(b.getPtrTy(),storage);break;
                 }
                 case Op::format_unwrap: {
                     auto result=values[instruction.a];auto* bad=llvm::BasicBlock::Create(context,"format_rejected",fn);auto* ready=llvm::BasicBlock::Create(context,"format_accepted",fn);
@@ -1901,7 +1923,7 @@ Jit::Jit(DebugCache cache,ir::Emission emission) : impl_(std::make_shared<Impl>(
     bind("pow",static_cast<double(*)(double,double)>(std::pow));
     bind("powf",static_cast<float(*)(float,float)>(std::pow));
     bind("vd_random_seed", vd_random_seed);
-    bind("vd_filesystem_call", vd_filesystem_call);
+    bind("vd_filesystem_call", vd_filesystem_call);bind("vd_filesystem_write_checked",vd_filesystem_write_checked);
     bind("vd_url_call", vd_url_call);
     bind("vd_http_call", vd_http_call);
     bind("vd_http_cleanup", vd_http_cleanup);
@@ -1910,7 +1932,7 @@ Jit::Jit(DebugCache cache,ir::Emission emission) : impl_(std::make_shared<Impl>(
     bind("vd_console_v2",vd_console_v2);bind("vd_console_print",vd_console_print);
     bind("vd_temporal",vd_temporal);bind("vd_format_layout",vd_format_layout);bind("vd_display_enter",vd_display_enter);bind("vd_display_leave",vd_display_leave);bind("vd_display_error",vd_display_error);
     bind("vd_collection_scope",vd_collection_scope);bind("vd_collection_scope_leave",vd_collection_scope_leave);bind("vd_collection_enter",vd_collection_enter);bind("vd_collection_leave",vd_collection_leave);bind("vd_collection_append",vd_collection_append);bind("vd_collection_finish",vd_collection_finish);
-    bind("vd_scalar_display",vd_scalar_display);bind("vd_string_join",vd_string_join);
+    bind("vd_scalar_display",vd_scalar_display);bind("vd_string_join",vd_string_join);bind("vd_string_join_encode",vd_string_join_encode);
     bind("vd_text_case", vd_text_case);
     bind("vd_text_translate", vd_text_translate);
     bind("vd_string_count",vd_string_count);bind("vd_string_index",vd_string_index);bind("vd_string_encode",vd_string_encode);bind("vd_string_decode",vd_string_decode);
@@ -2047,7 +2069,7 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
     try {
     identity="VOID-native-object-v2";
     auto field=[&](std::string_view value){llvm_backend::cache_field(identity,value);};
-    field(impl_->cache.build_identity);field(formatting::abi_version);field(temporal::abi_version);field(impl_->target_identity);field(analysis.entry_identity());field(async_root?"async-root-v1":"sync-root");
+    field(impl_->cache.build_identity);field("integrated-log-v1;rooted-local-cleanup;join-utf8;compact-sync-write");field("checked-root-location-v2");field(std::to_string(sizeof(Runtime::Frame)));field(formatting::abi_version);field(temporal::abi_version);field(impl_->target_identity);field(analysis.entry_identity());field(async_root?"async-root-v1":"sync-root");
     field(optimize?"ir-O2":"no-ir-O2");
     field(impl_->emission==ir::Emission::entry?"entry-emission-v1":"all-exports");
     field(analysis.compatibility_contract());field(analysis.constant_contract());field(runtime ? "forced-runtime" : "automatic-runtime");

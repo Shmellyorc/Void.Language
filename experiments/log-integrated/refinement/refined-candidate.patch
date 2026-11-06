@@ -1,0 +1,728 @@
+--- a/src/backend/llvm/backend.cpp
++++ b/src/backend/llvm/backend.cpp
+@@ -1157,6 +1157,24 @@
+                     else v = b.CreateStore(stored,address);
+                     break;
+                 }
++                case Op::local_cleanup:{
++                    auto* invoke=llvm::BasicBlock::Create(context,"local.cleanup.active",fn);
++                    auto* done=llvm::BasicBlock::Create(context,"local.cleanup.done",fn);
++                    b.CreateCondBr(b.CreateLoad(b.getInt1Ty(),slots[instruction.b]),invoke,done);b.SetInsertPoint(invoke);
++                    b.CreateStore(b.getFalse(),slots[instruction.b]);
++                    llvm::IRBuilder<> allocations(&*fn->getEntryBlock().begin());
++                    auto* secondary=home(allocations.CreateAlloca(failure_type),StorageRole::known_abi,llvm_backend::HomeKind::value);
++                    b.CreateStore(llvm::Constant::getNullValue(failure_type),secondary);
++                    b.CreateCall(module->getOrInsertFunction("vd_async_cleanup_enter",b.getVoidTy()));
++                    auto* target=functions.at(instruction.callee);
++                    b.CreateCall(target,{b.CreateLoad(type(f.locals[instruction.a]),slots[instruction.a]),secondary});
++                    b.CreateCall(module->getOrInsertFunction("vd_async_cleanup_leave",b.getVoidTy()));
++                    b.CreateStore(llvm::Constant::getNullValue(type(f.locals[instruction.a])),slots[instruction.a]);
++                    b.CreateCall(module->getOrInsertFunction("vd_cleanup_failure",b.getVoidTy(),b.getPtrTy(),b.getPtrTy()),{failure,secondary});
++                    b.CreateBr(done);b.SetInsertPoint(done);
++                    if(active_block<*f.cleanup_entry)selected_failure();
++                    v=llvm::UndefValue::get(b.getInt8Ty());break;
++                }
+                 case Op::cleanup_call:{
+                     llvm::IRBuilder<> entry_builder(&*fn->getEntryBlock().begin());auto* secondary=home(entry_builder.CreateAlloca(failure_type),StorageRole::known_abi,llvm_backend::HomeKind::value);
+                     b.CreateStore(llvm::Constant::getNullValue(failure_type),secondary);
+@@ -1290,14 +1308,18 @@
+                     else {auto name=instruction.op==Op::collection_enter?"vd_collection_enter":instruction.op==Op::collection_leave?"vd_collection_leave":"vd_collection_append";auto* call=b.CreateCall(module->getOrInsertFunction(name,instruction.op==Op::collection_enter?b.getInt1Ty():b.getVoidTy(),b.getPtrTy(),b.getPtrTy()),{values[instruction.a],failure});fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),"Collection display failed");if(instruction.op==Op::collection_enter)v=call;}
+                     break;
+                 }
++                case Op::string_join_encode:
+                 case Op::string_join: {
+                     auto* storage=value_roots[n].at(values.size());
+                     auto* pointers=llvm::ArrayType::get(b.getPtrTy(),instruction.arguments.size());
+                     llvm::IRBuilder<> allocations(&*fn->getEntryBlock().begin());
+                     auto* inputs=home(allocations.CreateAlloca(pointers),StorageRole::known_abi,llvm_backend::HomeKind::value);
+                     for(unsigned k=0;k<instruction.arguments.size();++k)b.CreateStore(value_roots[n].at(instruction.arguments[k]),b.CreateInBoundsGEP(pointers,inputs,{b.getInt32(0),b.getInt32(k)}));
+-                    b.CreateCall(module->getOrInsertFunction("vd_string_join",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy()),{storage,inputs,llvm::ConstantInt::get(size_type,instruction.arguments.size()),failure});
+-                    fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),"Interpolation failed");v=b.CreateLoad(b.getPtrTy(),storage);break;
++                    const bool fused=instruction.op==Op::string_join_encode;
++                    auto* phase=b.CreateCall(module->getOrInsertFunction(fused?"vd_string_join_encode":"vd_string_join",fused?b.getInt1Ty():b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy()),{storage,inputs,llvm::ConstantInt::get(size_type,instruction.arguments.size()),failure});
++                    auto* failed=b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure));
++                    if(fused)fail_if(b.CreateAnd(failed,phase),"UTF-8 text operation failed");
++                    fail_if(failed,"Interpolation failed");v=b.CreateLoad(b.getPtrTy(),storage);break;
+                 }
+                 case Op::format_unwrap: {
+                     auto result=values[instruction.a];auto* bad=llvm::BasicBlock::Create(context,"format_rejected",fn);auto* ready=llvm::BasicBlock::Create(context,"format_accepted",fn);
+@@ -1901,7 +1923,7 @@
+     bind("pow",static_cast<double(*)(double,double)>(std::pow));
+     bind("powf",static_cast<float(*)(float,float)>(std::pow));
+     bind("vd_random_seed", vd_random_seed);
+-    bind("vd_filesystem_call", vd_filesystem_call);
++    bind("vd_filesystem_call", vd_filesystem_call);bind("vd_filesystem_write_checked",vd_filesystem_write_checked);
+     bind("vd_url_call", vd_url_call);
+     bind("vd_http_call", vd_http_call);
+     bind("vd_http_cleanup", vd_http_cleanup);
+@@ -1910,7 +1932,7 @@
+     bind("vd_console_v2",vd_console_v2);bind("vd_console_print",vd_console_print);
+     bind("vd_temporal",vd_temporal);bind("vd_format_layout",vd_format_layout);bind("vd_display_enter",vd_display_enter);bind("vd_display_leave",vd_display_leave);bind("vd_display_error",vd_display_error);
+     bind("vd_collection_scope",vd_collection_scope);bind("vd_collection_scope_leave",vd_collection_scope_leave);bind("vd_collection_enter",vd_collection_enter);bind("vd_collection_leave",vd_collection_leave);bind("vd_collection_append",vd_collection_append);bind("vd_collection_finish",vd_collection_finish);
+-    bind("vd_scalar_display",vd_scalar_display);bind("vd_string_join",vd_string_join);
++    bind("vd_scalar_display",vd_scalar_display);bind("vd_string_join",vd_string_join);bind("vd_string_join_encode",vd_string_join_encode);
+     bind("vd_text_case", vd_text_case);
+     bind("vd_text_translate", vd_text_translate);
+     bind("vd_string_count",vd_string_count);bind("vd_string_index",vd_string_index);bind("vd_string_encode",vd_string_encode);bind("vd_string_decode",vd_string_decode);
+@@ -2047,7 +2069,7 @@
+     try {
+     identity="VOID-native-object-v2";
+     auto field=[&](std::string_view value){llvm_backend::cache_field(identity,value);};
+-    field(impl_->cache.build_identity);field(formatting::abi_version);field(temporal::abi_version);field(impl_->target_identity);field(analysis.entry_identity());field(async_root?"async-root-v1":"sync-root");
++    field(impl_->cache.build_identity);field("integrated-log-v1;rooted-local-cleanup;join-utf8;compact-sync-write");field(formatting::abi_version);field(temporal::abi_version);field(impl_->target_identity);field(analysis.entry_identity());field(async_root?"async-root-v1":"sync-root");
+     field(optimize?"ir-O2":"no-ir-O2");
+     field(impl_->emission==ir::Emission::entry?"entry-emission-v1":"all-exports");
+     field(analysis.compatibility_contract());field(analysis.constant_contract());field(runtime ? "forced-runtime" : "automatic-runtime");
+--- a/src/backend/llvm/filesystem.inc
++++ b/src/backend/llvm/filesystem.inc
+@@ -8,10 +8,11 @@
+                         static_cast<llvm::Value*>(llvm::UndefValue::get(b.getInt8Ty())) : result;
+                     break;
+                 }
++                case Op::filesystem_write:
+                 case Op::filesystem_native:
+                 case Op::filesystem_async: {
+                     bool asynchronous = instruction.op == Op::filesystem_async;
+-                    auto reply = asynchronous ? ir::field_type(instruction.type, 1) : instruction.type;
++                    auto reply = asynchronous ? ir::field_type(instruction.type, 1) : instruction.op==Op::filesystem_write ? ir::field_type(instruction.type,2) : instruction.type;
+                     auto* reply_type = type(reply);
+                     auto* payload = asynchronous ? type(ir::Type(instruction.type.definition)) : nullptr;
+                     auto* offsets_type = llvm::ArrayType::get(size_type, 10);
+@@ -63,6 +64,16 @@
+                     }
+                     auto* output = value_roots[n].at(values.size());
+                     b.CreateStore(llvm::Constant::getNullValue(type(instruction.type)), output);
++                    if(instruction.op==Op::filesystem_write) {
++                        auto* error=b.CreateStructGEP(type(instruction.type),output,2);
++                        auto call=module->getOrInsertFunction("vd_filesystem_write_checked",b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy());
++                        auto* completed=b.CreateCall(call,{error,record,references,numbers,failure});selected_failure();
++                        auto* failed=llvm::BasicBlock::Create(context,"write.domain.failure",fn);auto* success=llvm::BasicBlock::Create(context,"write.completed",fn);auto* done=llvm::BasicBlock::Create(context,"write.checked",fn);
++                        b.CreateCondBr(b.CreateICmpSLT(completed,b.getInt64(0)),failed,success);
++                        b.SetInsertPoint(failed);b.CreateStore(b.getInt32(1),b.CreateStructGEP(type(instruction.type),output,0));b.CreateBr(done);
++                        b.SetInsertPoint(success);b.CreateStore(completed,b.CreateStructGEP(type(instruction.type),output,1));b.CreateBr(done);
++                        b.SetInsertPoint(done);v=b.CreateLoad(type(instruction.type),output);break;
++                    }
+                     auto call = module->getOrInsertFunction("vd_filesystem_call", b.getVoidTy(),
+                         b.getPtrTy(), b.getPtrTy(), b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(),
+                         b.getPtrTy(), b.getInt1Ty(), b.getPtrTy());
+--- a/src/frontend/capabilities.inc
++++ b/src/frontend/capabilities.inc
+@@ -306,7 +306,7 @@
+                 }
+                 if (e.target.starts_with("$io.")) {
+                     bool asynchronous = e.target.starts_with("$io.async.");
+-                    auto operation = std::stoul(e.target.substr(asynchronous ? 10 : 9));
++                    auto operation = e.target=="$io.write.checked" ? static_cast<unsigned>(filesystem::Operation::write_bytes) : std::stoul(e.target.substr(asynchronous ? 10 : 9));
+                     const auto& contract = filesystem::source_operations.at(operation);
+                     for (unsigned n = 0; n < arguments.size(); ++n) {
+                         if (contract.arguments[n] != 'F') continue;
+--- a/src/frontend/compiler.cpp
++++ b/src/frontend/compiler.cpp
+@@ -391,6 +391,7 @@
+     unsigned slot = 0, flow = 0;
+     bool readonly = false, invalid = false, using_field = false, event = false, task_group = false;
+     std::string visibility = "public";
++    std::string cleanup_target; // Selected nonvirtual destructor for the compiler-owned with handler.
+     Statement(Kind k, Token t) : kind(k), token(std::move(t)) {}
+ };
+ struct Parameter {
+@@ -3110,6 +3111,7 @@
+             for (unsigned n = 0; n < os::operations.size(); ++n)
+                 if (e.token.text == os::operations[n].name) return os_call(e, n);
+         }
++        if (unit.identity == filesystem::source_module && e.qualifier.empty() && e.token.text=="_io_write_bytes_checked")return filesystem_call(e,static_cast<unsigned>(filesystem::Operation::write_bytes),false,true);
+         if (unit.identity == filesystem::source_module && e.qualifier.empty()) {
+             for (unsigned n = 0; n < filesystem::source_operations.size(); ++n) {
+                 auto name = filesystem::source_operations[n].name;
+@@ -3530,7 +3532,12 @@
+             auto cell=unit.make_capture_record(current->symbol+"::$cell$"+std::to_string(s.slot),type,true);auto initial=type;initial.nullable=true;std::const_pointer_cast<ir::ValueType>(cell.definition)->fields[0].type=initial;current->captured_locals.emplace(s.slot,cell);
+             Function lambda;lambda.anonymous=true;lambda.token=s.token;lambda.token.text="$with$"+std::to_string(current->lambdas.size());lambda.visibility="private";
+             Statement invoke(Statement::Kind::expression,s.token);invoke.expression=std::make_unique<Expr>(Expr::Kind::method_call,Token{TokenKind::name,"deinit",s.token.offset});invoke.expression->parts.push_back(std::make_unique<Expr>(Expr::Kind::name,s.binder));lambda.body.push_back(std::move(invoke));
+-            s.selection=std::make_unique<Expr>(Expr::Kind::lambda,s.token);s.selection->slot=current->lambdas.size();current->lambdas.push_back(std::move(lambda));expression(*s.selection);current->cleanup_type=unit.make_cleanup();flow=sequence(s.body,false);scopes.pop_back();break;
++            s.selection=std::make_unique<Expr>(Expr::Kind::lambda,s.token);s.selection->slot=current->lambdas.size();current->lambdas.push_back(std::move(lambda));expression(*s.selection);
++            for(const auto& selected:unit.functions)if(selected.symbol==s.selection->target && selected.body.size()==1 && selected.body[0].expression){
++                const auto& dispose=*selected.body[0].expression;
++                if(dispose.kind==Expr::Kind::method_call && dispose.token.text=="deinit" && dispose.type==Type::none && dispose.virtual_slot.empty() && !dispose.interface_call && dispose.native_symbol.empty() && dispose.parts.size()==1 && dispose.parts[0]->type==current->locals[s.slot])s.cleanup_target=dispose.target;
++            }
++            current->cleanup_type=unit.make_cleanup();flow=sequence(s.body,false);scopes.pop_back();break;
+         }
+         case K::deferred:
+             if(!current)error(source,s.token,Code::invalid_value,"defer requires a function activation.");
+@@ -3920,7 +3927,38 @@
+     const ConstructionContext* context=nullptr;
+     std::map<unsigned,unsigned> cells;
+     std::optional<unsigned> cleanup_head,return_slot;
+-    struct WithScope {unsigned slot;bool group=false;std::optional<unsigned> owned_group={};};
++    struct LocalCleanup {unsigned binding,active;std::string callee;};
++    std::map<unsigned,std::string> local_cleanup_targets;
++    std::vector<LocalCleanup> local_cleanups;
++    std::set<std::string> elided_cleanup_handlers;
++    bool select_local_cleanups(const Function& f) {
++        local_cleanup_targets.clear();local_cleanups.clear();elided_cleanup_handlers.clear();
++        if(f.asynchronous || f.deferred)return false;
++        std::vector<const Statement*> pending;for(const auto& s:f.body)pending.push_back(&s);
++        std::vector<const Statement*> scopes;std::vector<const Statement*> assignments;
++        while(!pending.empty()) {
++            auto* s=pending.back();pending.pop_back();
++            if(s->kind==Statement::Kind::deferred || s->task_group)return false;
++            if(s->kind==Statement::Kind::scoped)scopes.push_back(s);
++            if(s->kind==Statement::Kind::assignment)assignments.push_back(s);
++            for(const auto& child:s->body)pending.push_back(&child);
++            for(const auto& child:s->otherwise)pending.push_back(&child);
++        }
++        if(scopes.empty() || f.lambdas.size()!=scopes.size())return false;
++        std::set<std::string> handlers;std::map<unsigned,std::string> targets;
++        for(auto* scope:scopes) {
++            if(scope->cleanup_target.empty() || !scope->selection || scope->selection->kind!=Expr::Kind::function_reference || scope->selection->parts.size()!=1)return false;
++            const auto& capture=*scope->selection->parts[0];
++            if(capture.kind!=Expr::Kind::capture_reference || capture.slot!=scope->slot || capture.implicit)return false;
++            for(auto* assignment:assignments)if(assignment->slot==scope->slot)return false;
++            targets.emplace(scope->slot,scope->cleanup_target);handlers.insert(scope->selection->target);
++        }
++        local_cleanup_targets=std::move(targets);elided_cleanup_handlers=std::move(handlers);return true;
++    }
++    void dispose_local(const LocalCleanup& cleanup,const Token& token) {
++        ir::Instruction call{ir::Op::local_cleanup,cleanup.binding,cleanup.active};call.callee=cleanup.callee;call.type=Type::none;call.receiver=ir::Place{cleanup.binding,{}};emit(call,token);
++    }
++    struct WithScope {unsigned slot;bool group=false;std::optional<unsigned> owned_group={};bool local=false;};
+     std::vector<WithScope> with_scopes;
+     std::vector<std::size_t> loop_with_depth;
+     unsigned register_cleanup(unsigned handler,bool active,const Token& token){
+@@ -3930,6 +3968,9 @@
+     void leave_with(WithScope scope,const Token& token,bool cancel=true){
+         if(scope.group){join_group(scope.slot,cancel,token);return;}
+         if(scope.owned_group)join_group(*scope.owned_group,cancel,token);
++        if(scope.local) {
++            dispose_local(local_cleanups[scope.slot],token);return;
++        }
+         auto slot=scope.slot;
+         auto owner=emit({ir::Op::load,slot},token);ir::Instruction deactivate{ir::Op::gc_write,owner,constant(Type::boolean,{0,{}},token)};deactivate.immediate=2;emit(deactivate,token);
+         auto handler=extract_managed(owner,1,token);emit({ir::Op::function_call,handler},token);
+@@ -3982,7 +4023,7 @@
+             i.op == ir::Op::console_native ||
+             i.op == ir::Op::console_print ||
+             i.op == ir::Op::dict_new ||
+-            i.op == ir::Op::string_join ||
++            i.op == ir::Op::string_join || i.op == ir::Op::string_join_encode || i.op == ir::Op::local_cleanup || i.op == ir::Op::filesystem_write ||
+             i.op == ir::Op::format_unwrap ||
+             i.op == ir::Op::format_layout ||
+             i.op == ir::Op::text_case || i.op == ir::Op::text_translate ||
+@@ -4480,6 +4521,12 @@
+                 for (auto slot : slots) operation.arguments.push_back(emit({ir::Op::load, slot}, e.token));
+                 return emit(operation, e.token);
+             }
++            if(e.target=="$io.write.checked") {
++                std::vector<unsigned> slots(e.parts.size());
++                for(unsigned n=0;n<e.parts.size();++n)slots[e.argument_indexes.at(n)]=snapshot(expression(*e.parts[n]),expression_type(*e.parts[n]),e.parts[n]->token);
++                ir::Instruction call{ir::Op::filesystem_write};call.type=e.type;call.immediate=static_cast<unsigned>(filesystem::Operation::write_bytes);
++                for(auto slot:slots)call.arguments.push_back(emit({ir::Op::load,slot},e.token));return emit(call,e.token);
++            }
+             if (e.target.starts_with("$io.")) {
+                 bool asynchronous = e.target.starts_with("$io.async.");
+                 std::vector<unsigned> slots(e.parts.size());
+@@ -4642,6 +4689,9 @@
+                 return emit(i,e.token);
+             });
+             if(e.target.starts_with("$safe."))return safe_collection(e);
++            // Keep ordinary interpolation followed by encoding. The experimental
++            // rooted segment operation has no generally profitable source class;
++            // automatic fusion must not guess from logger identity or byte length.
+             if(e.target=="$text.to_utf8" || e.target=="$text.from_utf8"){ir::Instruction i{e.target=="$text.to_utf8"?ir::Op::string_encode:ir::Op::string_decode,expression(*e.parts[0])};i.type=e.type;return emit(i,e.token);}
+             if(e.target=="$event.emit")return event_emit(e);
+             if(e.target.starts_with("$dict.")) return frontend_case([&]() -> unsigned {
+@@ -4793,6 +4843,15 @@
+         }
+         case K::scoped:{
+             if(s.task_group){emit({ir::Op::store,s.slot,emit({ir::Op::async_group_enter},s.token)},s.token);with_scopes.push_back({s.slot,true});sequence(s.body);if(current)join_group(s.slot,false,s.token);with_scopes.pop_back();break;}
++            if(auto selected=local_cleanup_targets.find(s.slot);selected!=local_cleanup_targets.end()) {
++                auto active=static_cast<unsigned>(output.locals.size());output.locals.push_back(Type::boolean);
++                local_cleanups.push_back({s.slot,active,selected->second});auto index=static_cast<unsigned>(local_cleanups.size()-1);
++                emit({ir::Op::store,active,constant(Type::boolean,{0,{}},s.token)},s.token);
++                emit({ir::Op::store,s.slot,expression(*s.expression)},s.token);
++                emit({ir::Op::store,active,constant(Type::boolean,{1,{}},s.token)},s.token);
++                with_scopes.push_back({index,false,{},true});sequence(s.body);
++                if(current)leave_with(with_scopes.back(),s.token,false);with_scopes.pop_back();break;
++            }
+             std::optional<unsigned> group;
+             auto home=cells.at(s.slot);auto cell=output.locals.at(home);auto field=ir::field_type(cell,0);ir::Instruction construct{ir::Op::gc_construct};construct.type=cell;construct.arguments={constant(field,{0,{}},s.token)};emit({ir::Op::store,home,emit(construct,s.token)},s.token);
+             auto node=register_cleanup(expression(*s.selection),false,s.token);
+@@ -4949,15 +5008,17 @@
+     }
+ public:
+     explicit Lowering(const SourceFile& s, ir::Module& m, StringPool& p) : source(s), module(m), strings(p) {}
++    const std::set<std::string>& elided_handlers() const {return elided_cleanup_handlers;}
+     ir::Function lower(const Function& f, const ConstructionContext* construction=nullptr) {
+         context=construction;normal_return=!f.body.empty() && f.body.back().kind==Statement::Kind::returned?&f.body.back():nullptr;
+         output = {}; output.name = f.symbol; output.source_name = f.concrete_name.empty() ? f.token.text : f.concrete_name; output.display_name=f.display_name; output.source = source.location(f.token.offset);
+         output.asynchronous=f.asynchronous;output.task=f.task;output.lexical_owner=f.receiver?Type::key(f.receiver->type):f.lexical_owner;output.lexical_parent=f.lexical_parent;output.operator_owner=f.operator_owner;output.operator_glyph=f.operator_glyph;
+         output.bound_receiver=f.bound_receiver;output.closure=f.anonymous;cells.clear();cleanup_head.reset();return_slot.reset();cleanup_jumps.clear();with_scopes.clear();loop_with_depth.clear();
+         output.parameters.clear(); output.result = f.result; output.locals = f.locals; current = block();
++        const bool rooted_cleanup=select_local_cleanups(f);
+         if(f.cleanup_type!=Type::none){cleanup_head=output.locals.size();auto head=f.cleanup_type;head.nullable=true;output.locals.push_back(head);}
+         if((cleanup_head || f.asynchronous) && f.result!=Type::none){return_slot=output.locals.size();output.locals.push_back(f.result);}
+-        for(const auto& [slot,type]:f.captured_locals){cells.emplace(slot,static_cast<unsigned>(output.locals.size()));output.locals.push_back(type);}
++        for(const auto& [slot,type]:f.captured_locals){if(rooted_cleanup && local_cleanup_targets.contains(slot))continue;cells.emplace(slot,static_cast<unsigned>(output.locals.size()));output.locals.push_back(type);}
+         for(const auto& [slot,field]:f.capture_inputs){
+             auto environment=emit({ir::Op::argument,0},f.token);ir::Instruction read{ir::Op::gc_read,environment};read.immediate=field;
+             emit({ir::Op::store,cells.at(slot),emit(read,f.token)},f.token);
+@@ -5000,7 +5061,8 @@
+         if(cleanup_head || f.asynchronous){
+             auto entry=block();output.cleanup_entry=entry;for(auto from:cleanup_jumps)output.blocks[from].end.yes=entry;current=entry;
+             if(f.asynchronous)emit({ir::Op::async_drain},f.token);
+-            if(cleanup_head){
++            for(auto i=local_cleanups.rbegin();i!=local_cleanups.rend();++i)dispose_local(*i,f.token);
++            if(cleanup_head && !rooted_cleanup){
+             // A separate loop entry prevents executing the structured drain again.
+             auto loop=block();jump(loop);current=loop;
+             auto head=output.locals[*cleanup_head];auto node=head;node.nullable=false;
+@@ -5976,9 +6038,11 @@
+     for(const auto& [id,u]:units) {auto& imports=module.source_imports[id];for(const auto& i:u->imports) if(!i.target.empty()) imports.insert(i.target);}
+     module.source_path = units.at(entry)->source.path();
+     generic_provenance(module,units);
++    std::set<std::string> elided_handlers;
+     for (auto& [id, unit] : units) {
+         Lowering lowering(unit->source,module,strings);
+         for (const auto& f : unit->functions) {
++            if(elided_handlers.contains(f.symbol))continue;
+             if(!f.native_symbol.empty()){module.native_library=std::string(native_provider(f.native_symbol));module.coordinated=true;continue;}
+             if(f.interface_requirement) {
+                 ir::Function requirement;requirement.name=f.symbol;requirement.parameters={f.receiver->type};
+@@ -5987,7 +6051,7 @@
+                 module.interface_requirements.push_back(std::move(requirement));continue;
+             }
+             if (!f.initializer || f.receiver->type.kind!=Type::managed_ref) {
+-                auto lowered = lowering.lower(f); lowered.module_identity = id;
++                auto lowered = lowering.lower(f); lowered.module_identity = id;elided_handlers.insert(lowering.elided_handlers().begin(),lowering.elided_handlers().end());
+                 if (f.global_initializer) {
+                     auto value = std::find_if(unit->globals.begin(), unit->globals.end(), [&](const auto& g) { return g.initializer == &f; });
+                     lowered.result = value->cell;
+@@ -6005,7 +6069,7 @@
+                 module.functions.push_back(std::move(lowered));
+             }
+             for (const auto& [mask,context]:f.construction_contexts) {
+-                auto lowered=lowering.lower(f,&context); lowered.module_identity=id;
++                auto lowered=lowering.lower(f,&context); lowered.module_identity=id;elided_handlers.insert(lowering.elided_handlers().begin(),lowering.elided_handlers().end());
+                 module.functions.push_back(std::move(lowered));
+             }
+         }
+--- a/src/frontend/filesystem.inc
++++ b/src/frontend/filesystem.inc
+@@ -1,4 +1,4 @@
+-    VOID_SEMANTIC_HANDLER Type filesystem_call(Expr& expression, unsigned operation, bool asynchronous) {
++    VOID_SEMANTIC_HANDLER Type filesystem_call(Expr& expression, unsigned operation, bool asynchronous, bool compact = false) {
+         if (!current || (asynchronous && !current->asynchronous)) {
+             error(source, expression.token, Code::unsupported_type,
+                   "Native file jobs require an owning async activation; filesystem calls require runtime evaluation.");
+@@ -11,6 +11,7 @@
+         target.token = expression.token;
+         target.symbol = std::string(asynchronous ? "$io.async." : "$io.sync.") + std::to_string(operation);
+         target.result = Type(unit.structure_names.at("_reply")->definition);
++        if(compact){target.result=unit.make_result(Type::i64,target.result);target.symbol="$io.write.checked";}
+         if (operation >= filesystem::claim_operation) {
+             target.result = operation == filesystem::claim_operation ? Type::i64 : Type::none;
+         }
+--- a/src/ir/filesystem.inc
++++ b/src/ir/filesystem.inc
+@@ -1,3 +1,4 @@
++                case Op::filesystem_write:
+                 case Op::filesystem_control:
+                 case Op::filesystem_native:
+                 case Op::filesystem_async: {
+@@ -46,6 +47,10 @@
+                     if (i.immediate >= filesystem::claim_operation) fail("file control requires control opcode");
+                     valid_type(i.type);
+                     auto reply = i.type;
++                    if(i.op==Op::filesystem_write) {
++                        if(f.asynchronous || i.immediate!=static_cast<unsigned>(filesystem::Operation::write_bytes) || reply.kind!=Type::aggregate || !reply.definition || !reply.definition->result_type || reply.definition->fields.size()!=3 || field_type(reply,1)!=Type::i64)fail("invalid compact write result");
++                        reply=field_type(reply,2);
++                    }
+                     if (asynchronous) {
+                         if (reply.kind != Type::managed_ref || !reply.definition ||
+                             !reply.definition->task_result || reply.nullable || reply.readonly) {
+--- /dev/null
++++ b/src/ir/local_cleanup.inc
+@@ -0,0 +1,31 @@
++// Private rooted-cleanup slots have dedicated activation storage. Check this
++// independently of source selection: no activation without a completed binding,
++// no reassignments, and one reverse-ordered unwind visit per registered pair.
++{
++    struct Cleanup {unsigned binding;std::string callee;};
++    std::map<unsigned,Cleanup> cleanups;
++    for(const auto& block:f.blocks)for(const auto& i:block.instructions)if(i.op==Op::local_cleanup){
++        auto [entry,added]=cleanups.emplace(i.b,Cleanup{i.a,i.callee});
++        if(!added && (entry->second.binding!=i.a || entry->second.callee!=i.callee))fail("inconsistent rooted cleanup slot authority");
++    }
++    if(!cleanups.empty()) {
++        std::set<unsigned> bindings,activated,unwound;unsigned previous=~0u;
++        for(const auto& [flag,cleanup]:cleanups)if(!bindings.insert(cleanup.binding).second)fail("aliased rooted cleanup binding");
++        for(unsigned b=0;b<f.blocks.size();++b)for(unsigned n=0;n<f.blocks[b].instructions.size();++n){
++            const auto& block=f.blocks[b];const auto& i=block.instructions[n];
++            if(i.op==Op::cleanup_call)fail("dynamic cleanup mixed with local cleanup");
++            if(i.op==Op::store && cleanups.contains(i.a)){
++                if(i.b>=n)fail("invalid rooted cleanup activation source");const auto& value=block.instructions[i.b];
++                if(value.op!=Op::constant || value.type!=Type::boolean || (value.immediate!=0 && value.immediate!=1))fail("forged rooted cleanup activation");
++                if(value.immediate==1){if(n<2 || i.b!=n-1 || block.instructions[n-2].op!=Op::store || block.instructions[n-2].a!=cleanups.at(i.a).binding)fail("cleanup activated before completed binding");activated.insert(i.a);}
++            }
++            if(i.op==Op::store && bindings.contains(i.a)){
++                if(n+2>=block.instructions.size() || block.instructions[n+1].op!=Op::constant || block.instructions[n+2].op!=Op::store || !cleanups.contains(block.instructions[n+2].a) || cleanups.at(block.instructions[n+2].a).binding!=i.a || block.instructions[n+2].b!=n+1 || block.instructions[n+1].immediate!=1)fail("reassigned rooted cleanup binding");
++            }
++            if(i.op==Op::local_cleanup && b>=*f.cleanup_entry){
++                if(i.b>=previous || !unwound.insert(i.b).second)fail("invalid local cleanup unwind order");previous=i.b;
++            }
++        }
++        if(activated.size()!=cleanups.size() || unwound.size()!=cleanups.size())fail("incomplete rooted cleanup lifecycle");
++    }
++}
+--- a/src/ir/module.cpp
++++ b/src/ir/module.cpp
+@@ -934,6 +934,13 @@
+                     for(unsigned n=0;n<i.type.definition->call_parameters.size();++n)if(target->second.parameters[n+(target->second.closure?1:0)]!=Type(i.type.definition->call_parameters[n]) || capability_key(target->second.parameters[n+(target->second.closure?1:0)])!=capability_key(i.type.definition->call_parameters[n]))fail("function reference parameter authority mismatch");
+                     if(!capability_assignable(target->second.result,*i.type.definition->call_result))fail("function reference discards result authority");result=i.type;break;
+                 }
++                case Op::local_cleanup: {
++                    auto target=functions.find(i.callee);
++                    if(!m.coordinated || f.asynchronous || !f.cleanup_entry || i.a>=f.locals.size() || i.b>=f.locals.size() || i.a==i.b || f.locals[i.a].kind!=Type::managed_ref || f.locals[i.a].nullable || f.locals[i.b]!=Type::boolean || i.type!=Type::none || !i.receiver || i.receiver->slot!=i.a || !i.receiver->fields.empty() || !i.arguments.empty() || i.immediate || i.initialization || i.array_repeat || target==functions.end())fail("invalid rooted local cleanup");
++                    const auto& callee=*target->second;
++                    if(!callee.receiver || callee.asynchronous || callee.closure || callee.initializer || !callee.virtual_slot.empty() || callee.method_name!="deinit" || callee.parameters.size()!=1 || callee.parameters[0]!=f.locals[i.a] || callee.result!=Type::none)fail("invalid local destructor authority");
++                    result=Type::none;break;
++                }
+                 case Op::cleanup_call:
+                     if(!operand(i.a).definition || !operand(i.a).definition->callable || !operand(i.a).definition->call_parameters.empty() || Type(*operand(i.a).definition->call_result)!=Type::none || !f.cleanup_entry || static_cast<unsigned>(&b-f.blocks.data())<*f.cleanup_entry || !i.arguments.empty() || i.receiver || !i.callee.empty())fail("invalid cleanup call");result=Type::none;break;
+                 case Op::function_call: {
+@@ -1088,6 +1095,10 @@
+                     else {auto owner=operand(i.a);if((owner.kind!=Type::growable_array && owner.kind!=Type::dictionary) || owner.nullable || owner.construction)fail("invalid collection display owner");result=i.op==Op::collection_enter?Type::boolean:Type::none;}
+                     if(i.type!=result)fail("invalid collection display result");break;
+                 }
++                case Op::string_join_encode:
++                    valid_type(i.type);
++                    if(!m.coordinated || i.a || i.b || i.receiver || !i.callee.empty() || i.initialization || i.array_repeat || i.immediate || i.type.kind!=Type::growable_array || array_element(i.type)!=Type::u8 || i.type.readonly)fail("invalid fused UTF-8 join");
++                    for(auto value:i.arguments)if(operand(value)!=Type::string)fail("invalid fused UTF-8 part");result=i.type;break;
+                 case Op::string_join:
+                     if(!m.coordinated || i.a || i.b || i.type!=Type::string || i.receiver || !i.callee.empty() || i.initialization || i.array_repeat || i.immediate)fail("invalid interpolation join");
+                     for(auto value:i.arguments)if(operand(value)!=Type::string)fail("invalid interpolation text");result=Type::string;break;
+@@ -1407,6 +1418,7 @@
+         if(f.asynchronous){
+ #include "async_validation.inc"
+         }
++#include "local_cleanup.inc"
+         validate_construction(f,m,body_types);
+         validate_fixed_ownership(f,m,body_types);
+     }
+@@ -1425,7 +1437,7 @@
+                 case Op::native_call:
+                     if (native_binding(instruction.callee).name == "register") fail("native callback registration during global startup");
+                     break;
+-                case Op::call: case Op::base_init:
++                case Op::local_cleanup: case Op::call: case Op::base_init:
+                     pending.push_back(instruction.callee); break;
+                 case Op::function_call: case Op::cleanup_call: {
+                     auto function_index = static_cast<std::size_t>(&function - m.functions.data());
+@@ -1490,10 +1502,10 @@
+                 case Op::global_cell:fail("worker cannot access runtime globals");break;
+                 case Op::os_query:fail("worker cannot perform OS queries");break;
+                 case Op::http_control:case Op::http_native:case Op::http_async:case Op::url_native:fail("worker cannot perform URL operations");break;
+-                case Op::filesystem_control:case Op::filesystem_native:case Op::filesystem_async:case Op::console_print:case Op::console_native:fail("worker cannot perform console I/O");break;
++                case Op::filesystem_write:case Op::filesystem_control:case Op::filesystem_native:case Op::filesystem_async:case Op::console_print:case Op::console_native:fail("worker cannot perform console I/O");break;
+                 case Op::temporal_native:if(temporal::operations.at(i.immediate).clock)fail("worker cannot read Runtime clocks");break;
+                 case Op::native_call:case Op::async_call:case Op::async_cancel:case Op::async_cancel_children:case Op::async_group_enter:case Op::async_group_join:case Op::await:case Op::function_call:case Op::interface_call:case Op::virtual_call:fail("unsupported worker task/indirect effect");break;
+-                case Op::call:case Op::base_init:case Op::function_reference:{auto target=functions.find(i.callee);if(target==functions.end())fail("worker has unknown native effect");graph.push_back(target->second);break;}
++                case Op::local_cleanup:case Op::call:case Op::base_init:case Op::function_reference:{auto target=functions.find(i.callee);if(target==functions.end())fail("worker has unknown native effect");graph.push_back(target->second);break;}
+                 default:break;
+                 }
+             }
+--- a/src/ir/reference_capabilities.inc
++++ b/src/ir/reference_capabilities.inc
+@@ -60,7 +60,10 @@
+         };
+         for(const auto& i:f.blocks[block].instructions) {
+             if(i.op==Op::load) require(i.a);
+-            if(i.receiver) require(i.receiver->slot);
++            // local_cleanup's receiver is read only when its dedicated flag is
++            // active. local_cleanup.inc proves every activation follows the
++            // binding store; ordinary loads/receivers keep definite-init checks.
++            if(i.receiver && i.op!=Op::local_cleanup) require(i.receiver->slot);
+             if(i.op==Op::store) state.insert(i.a);else if(i.op==Op::array_capture)state.insert(static_cast<unsigned>(i.immediate));
+         }
+     }
+@@ -196,6 +199,7 @@
+                         }
+                         break;
+                     }
++                    case Op::filesystem_write:
+                     case Op::filesystem_control:
+                     case Op::filesystem_native:
+                     case Op::filesystem_async: {
+@@ -237,7 +241,7 @@
+                             if (found->second.readonly) fail("write through readonly reference");
+                         }
+                         retain(values[i.b],field_type(types[function][block][i.a],static_cast<unsigned>(i.immediate))); value={}; break;
+-                    case Op::async_call: case Op::interface_call: case Op::call: case Op::virtual_call: case Op::base_init: {
++                    case Op::local_cleanup: case Op::async_call: case Op::interface_call: case Op::call: case Op::virtual_call: case Op::base_init: {
+                         if(i.op==Op::base_init && i.callee.empty()) { for(auto argument:i.arguments) retain(values[argument]); break; }
+                         auto found=indexes.find(i.callee);
+                         if (found==indexes.end()) break; // Existing trusted scalar ABI.
+--- a/src/runtime/abi.cpp
++++ b/src/runtime/abi.cpp
+@@ -196,6 +196,15 @@
+     }catch(const std::bad_alloc&){failure->message="Format layout allocation failed";}
+     catch(const std::length_error&){failure->message="Format layout extent is unrepresentable";}
+     catch(...){std::terminate();}return false;
++}
++bool vd_string_join_encode(void** out,void*** parts,std::size_t count,vd::RuntimeFailure* failure) noexcept {
++    bool encoding=false;
++    try {vd::Runtime::current().string_join_bytes_into(out,parts,count,encoding);}
++    catch(const std::bad_alloc&){failure->message=encoding?"UTF-8 byte allocation failed":"Interpolation allocation failed";}
++    catch(const std::length_error&){failure->message=encoding?"UTF-8 byte conversion failed":"Interpolation extent is unrepresentable";}
++    catch(const std::exception&){failure->message=encoding?"UTF-8 byte conversion failed":"Invalid interpolation storage";}
++    catch(...){std::terminate();}
++    return encoding;
+ }
+ void vd_string_join(void** out,void*** roots,std::size_t count,vd::RuntimeFailure* failure) noexcept {
+     try {auto& runtime=vd::Runtime::current();vd::formatting::Builder builder;
+--- a/src/runtime/array.cpp
++++ b/src/runtime/array.cpp
+@@ -313,6 +313,25 @@
+     // string_into stages the complete bytes before its first safepoint.
+     string_into(out,text.substr(offset,utf8_scalar_bytes(text,offset)));
+ }
++void Runtime::string_join_bytes_into(void** out,void*** parts,std::size_t count,bool& encoding) {
++    require_managed();(void)root_word(out);encoding=false;std::size_t total=0;
++    for(std::size_t i=0;i<count;++i){
++        if(!(i%64))poll();auto part=root_word(parts[i]);
++        std::lock_guard lock(mutex_);auto bytes=heap_.string_bytes(reference_source(part));
++        if(bytes.size()>std::string{}.max_size()-total)throw std::length_error("joined UTF-8 extent");total+=bytes.size();
++        (void)string_payload_size(total,0);
++    }
++    encoding=true;auto layout=fixed_scalar_layout(ScalarEncoding::u8,total);
++    void* backing=nullptr;void* result=nullptr;constexpr std::size_t zero=0;
++    Slot slots[]={{&backing,sizeof(backing),&zero,1},{&result,sizeof(result),&zero,1}};Frame roots(*this,slots,2);
++    if(total){BufferBuilder builder(*this,layout,total,quota);
++        for(std::size_t i=0;i<count;++i){if(!(i%64))poll();builder.write_string(root_word(parts[i]));}
++        builder.finish_into(&backing);
++    }
++    array_new(&result,fixed_scalar_layout(ScalarEncoding::u8,0),true);
++    auto root=root_word(&result);std::lock_guard lock(mutex_);require_buffer_output(out);heap_.validate_output_address(out);
++    auto& header=list_header(root,layout->schema());header.backing=backing;header.count=header.capacity=total;*out=result;
++}
+ void Runtime::string_encode_into(void** out,void* source) {
+     bytes_into(out,string_bytes(source));
+ }
+@@ -341,7 +360,15 @@
+     {std::lock_guard lock(mutex_);const auto& header=list_header(source,schema);count=header.count;backing=header.backing;if(backing)layout=heap_.buffer_state(backing).layout;}
+     std::string bytes;
+     if(count){BufferReadLease lease(*this,root_word(&backing),layout);bytes.resize(count);
+-        for(std::uint64_t i=0;i<count;++i)bytes[i]=static_cast<char>(buffer_byte(backing,layout,i,0));}
++        if(layout->schema()==schema && layout->stride()==1){
++            for(std::uint64_t offset=0;offset<count;){
++                auto size=static_cast<std::size_t>(std::min<std::uint64_t>(count-offset,quota.bytes));poll();
++                {std::lock_guard lock(mutex_);lease.validate();
++                    if(offset>lease.count_ || size>lease.count_-offset)throw std::out_of_range("byte snapshot live extent");
++                    std::memcpy(bytes.data()+offset,static_cast<const char*>(lease.value_)+layout->element_offset(offset),size);}
++                offset+=size;
++            }
++        }else for(std::uint64_t i=0;i<count;++i)bytes[i]=static_cast<char>(buffer_byte(backing,layout,i,0));}
+     return bytes;
+ }
+ bool Runtime::string_decode_into(void** out,RegisteredRootWord source) {
+--- a/src/runtime/buffer.cpp
++++ b/src/runtime/buffer.cpp
+@@ -172,6 +172,23 @@
+             in_element_=true;consumed_+=width;if(consumed_==event_->bytes) {consumed_=0;event_.reset();}}
+         normalize();
+     } catch(...) {failed_=true;throw;}
++}
++void Runtime::BufferBuilder::write_string(RegisteredRootWord source) {
++    try {
++        require_active();
++        if(!cursor_.dense_u8() || layout_->stride()!=1 || in_element_)throw std::invalid_argument("string append requires dense byte builder");
++        std::size_t size;
++        {std::lock_guard lock(runtime_.mutex_);size=runtime_.heap_.string_bytes(runtime_.reference_source(source)).size();}
++        if(size>requested_-prefix_)throw std::out_of_range("string append beyond requested prefix");
++        for(std::size_t offset=0;offset<size;) {
++            auto count=std::min(size-offset,quota_.bytes);runtime_.poll();
++            {std::lock_guard lock(runtime_.mutex_);validate_private();
++                auto bytes=runtime_.heap_.string_bytes(runtime_.reference_source(source));
++                if(bytes.size()!=size)throw std::logic_error("immutable string extent changed");
++                std::memcpy(static_cast<char*>(root_.value_)+layout_->element_offset(prefix_),bytes.data()+offset,count);prefix_+=count;offset+=count;}
++        }
++        event_.reset();consumed_=0;cursor_.reset();
++    }catch(...){failed_=true;throw;}
+ }
+ void Runtime::BufferBuilder::write_bytes(std::span<const std::byte> input) {
+     try {
+--- a/src/runtime/filesystem_abi.cpp
++++ b/src/runtime/filesystem_abi.cpp
+@@ -391,14 +391,27 @@
+ }
+ }
+ 
+-extern "C" void vd_filesystem_call(void* output, const vd::filesystem::ReplyLayout* layout,
++static std::int64_t filesystem_call_impl(void* output, const vd::filesystem::ReplyLayout* layout,
+     unsigned operation, void* const* references, const std::int64_t* numbers,
+-    const void* generation, bool asynchronous, vd::RuntimeFailure* failure) noexcept {
++    const void* generation, bool asynchronous, bool compact, vd::RuntimeFailure* failure) noexcept {
+     using namespace vd;
+     using namespace vd::filesystem;
+     std::shared_ptr<Job> job;
+     try {
+         auto& runtime = Runtime::current();
++        if(compact) {
++            if(!output || !layout || operation!=static_cast<unsigned>(Operation::write_bytes) || asynchronous || !layout->entry)throw std::logic_error("Invalid compact write layout");
++            for(unsigned n=0;n<10;++n) {
++                auto bytes=n==6?sizeof(bool):n<6?sizeof(std::int64_t):sizeof(void*);
++                if(layout->fields[n]>layout->size || bytes>layout->size-layout->fields[n])throw std::logic_error("Invalid compact reply extent");
++                for(unsigned j=0;j<n;++j){auto prior=j==6?sizeof(bool):j<6?sizeof(std::int64_t):sizeof(void*);if(layout->fields[n]<layout->fields[j]+prior && layout->fields[j]<layout->fields[n]+bytes)throw std::logic_error("Overlapping compact reply fields");}
++                if(n>=7) {
++                    auto* word=reinterpret_cast<void**>(static_cast<char*>(output)+layout->fields[n]);
++                    if(reinterpret_cast<std::uintptr_t>(word)%alignof(void*))throw std::logic_error("Unaligned compact output");
++                    (void)runtime.root_word(word);
++                }
++            }
++        }
+         job = prepare(runtime, *layout, operation, references, numbers);
+         if (asynchronous) {
+             TypeLayout task{layout->task_size, {}};
+@@ -408,12 +421,12 @@
+             }
+             task.descriptor = runtime.descriptor(layout->task_key);
+             async_submit_native(static_cast<void**>(output), task, generation, job);
+-            return;
++            return -1;
+         }
+         if (operation == cleanup_operation) {
+             if (job->result.error != ErrorKind::success) {
+                 failure->message = "File deinit cannot close a busy resource";
+-                return;
++                return -1;
+             }
+             job->request.operation = Operation::close;
+         }
+@@ -429,8 +442,9 @@
+                 job->abandon(&cleanup);
+                 if (cleanup.message) vd_cleanup_failure(failure, &cleanup);
+             }
+-            return;
+-        }
++            return -1;
++        }
++        if(compact && job->result.error==ErrorKind::success)return job->result.completed;
+         Reply reply(runtime, *layout);
+         reply.build(runtime, job->result);
+         if (job->opening && job->acquisition) {
+@@ -460,6 +474,14 @@
+         job->abandon(&cleanup);
+         if (cleanup.message) vd_cleanup_failure(failure, &cleanup);
+     }
++    return -1;
++}
++
++extern "C" void vd_filesystem_call(void* output,const vd::filesystem::ReplyLayout* layout,unsigned operation,void* const* references,const std::int64_t* numbers,const void* generation,bool asynchronous,vd::RuntimeFailure* failure) noexcept {
++    (void)filesystem_call_impl(output,layout,operation,references,numbers,generation,asynchronous,false,failure);
++}
++extern "C" std::int64_t vd_filesystem_write_checked(void* error,const vd::filesystem::ReplyLayout* layout,void* const* references,const std::int64_t* numbers,vd::RuntimeFailure* failure) noexcept {
++    return filesystem_call_impl(error,layout,static_cast<unsigned>(vd::filesystem::Operation::write_bytes),references,numbers,nullptr,false,true,failure);
+ }
+ 
+ extern "C" std::int64_t vd_file_control(unsigned operation, void* identity,
+--- a/include/void/filesystem_abi.hpp
++++ b/include/void/filesystem_abi.hpp
+@@ -35,4 +35,6 @@
+     unsigned, void* const*, const std::int64_t*, const void*, bool,
+     vd::RuntimeFailure*) noexcept;
+ 
++extern "C" std::int64_t vd_filesystem_write_checked(void*,const vd::filesystem::ReplyLayout*,void* const*,const std::int64_t*,vd::RuntimeFailure*) noexcept;
++
+ extern "C" std::int64_t vd_file_control(unsigned, void*, vd::RuntimeFailure*) noexcept;
+--- a/include/void/ir.hpp
++++ b/include/void/ir.hpp
+@@ -128,7 +128,7 @@
+     remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate, aggregate, extract, insert,
+     stage_begin, gc_construct, gc_allocate, gc_read, gc_write, gc_collect, gc_poll, gc_alive,
+     upcast, virtual_call, base_init, stage_prefix, interface_pack, interface_prepare, interface_call, string_literal, string_concat, string_equal, string_count, string_index, string_encode, string_decode, text_case, scalar_display, scalar_format, format_unwrap, format_layout, scalar_parse, result_unwrap, memory_write, temporal_result, temporal_native, string_join, collection_enter, collection_leave, collection_append, collection_finish, os_query, url_native, http_native, http_async, http_control, console_endpoint, console_native, console_print, filesystem_native, filesystem_async, filesystem_control,
+-    fixed_array, array_get, array_set, fixed_snapshot, fixed_select, fixed_commit, array_count, list_push, list_remove, list_index, list_version, list_commit, list_check, array_capture, array_allocate, array_initialize, list_insert, list_clear, array_slice, dict_new, dict_get, dict_set, dict_contains, dict_remove, dict_clear, dict_count, dict_version, dict_check, dict_entry, text_translate };
++    fixed_array, array_get, array_set, fixed_snapshot, fixed_select, fixed_commit, array_count, list_push, list_remove, list_index, list_version, list_commit, list_check, array_capture, array_allocate, array_initialize, list_insert, list_clear, array_slice, dict_new, dict_get, dict_set, dict_contains, dict_remove, dict_clear, dict_count, dict_version, dict_check, dict_entry, text_translate, string_join_encode, local_cleanup, filesystem_write };
+ // A validated local aggregate storage path; never a source-visible reference.
+ struct Place { std::uint32_t slot = 0; std::vector<unsigned> fields; };
+ struct Instruction {
+--- a/include/void/runtime.hpp
++++ b/include/void/runtime.hpp
+@@ -85,6 +85,7 @@
+                           RegisteredRootWord replacements, const NativeArrayElement& strings,
+                           std::int64_t max_bytes);
+     void string_encode_into(void**, void*);
++    void string_join_bytes_into(void**,void***,std::size_t,bool& encoding);
+     bool string_decode_into(void**, RegisteredRootWord);
+ 
+     static std::size_t string_payload_size(std::size_t left, std::size_t right);
+@@ -356,6 +357,7 @@
+     std::uint64_t count() const {return count_;}
+ private:
+     friend class Runtime::BufferBuilder;
++    friend class Runtime;
+     void validate() const; // Runtime mutex held, Managed owner thread
+     Runtime& runtime_;
+     BufferLayoutRef layout_;
+@@ -376,6 +378,7 @@
+     BufferBuilder& operator=(BufferBuilder&&)=delete;
+     void write_scalar(std::uint64_t bits);
+     void write_bytes(std::span<const std::byte> native_input);
++    void write_string(RegisteredRootWord);
+     void write_reference(RegisteredRootWord source);
+     void write_interface(const RootedInterfaceSource& source);
+     void zero_elements(std::uint64_t count);
+--- a/include/void/runtime_abi.hpp
++++ b/include/void/runtime_abi.hpp
+@@ -43,6 +43,7 @@
+ bool vd_string_decode(void**,void**,vd::RuntimeFailure*) noexcept;
+ bool vd_format_layout(void**,void*,unsigned,vd::RuntimeFailure*) noexcept;
+ void vd_string_join(void**,void***,std::size_t,vd::RuntimeFailure*) noexcept;
++bool vd_string_join_encode(void**,void***,std::size_t,vd::RuntimeFailure*) noexcept;
+ 
+ void vd_string_literal(void**, const char*, std::size_t, vd::RuntimeFailure*) noexcept;
+ void vd_string_concat(void**, void*, void*, vd::RuntimeFailure*) noexcept;
+--- a/stdlib/io.void
++++ b/stdlib/io.void
+@@ -576,12 +576,11 @@
+ ## @return Ok with bytes written, or Err with actual progress; earlier writes are not rolled back.
+ func (self file) write_bytes(const bytes: [u8]) -> result<i64, error>:
+     with _reserve(self, "write_bytes")? as lease:
+-        var reply = _io_write_bytes(self, bytes)
+-
+-        if reply.kind != 0:
+-            return Err(_error("write_bytes", self._path, "", reply))
+-
+-        return Ok(reply.completed)
++        match _io_write_bytes_checked(self, bytes):
++            Err(var reply):
++                return Err(_error("write_bytes", self._path, "", reply))
++            Ok(var completed):
++                return Ok(completed)
+ 
+ 
+ ## Write owned input bytes at the shared cursor, looping over short native transfers.
+--- a/tests/advanced/tests.cpp
++++ b/tests/advanced/tests.cpp
+@@ -51,11 +51,20 @@
+         managed_test::Probe probe;probe.inspect_roots=true;probe.collect_before=true;probe.frames.reserve(256);
+         {managed_test::Observe observe(probe);if(code->invoke(7)!=answer)throw std::runtime_error(std::string("advanced source result: ")+name);}
+         require(probe.frames.empty() && probe.roots_valid && probe.commits_valid,"advanced roots/publication/collection");empty(*runtime);
+-        if(std::string(name)=="with_transaction")for(unsigned construction:{5u,6u}){
+-            managed_test::Probe failed;failed.inspect_roots=true;failed.capture=true;failed.fail_construction=construction;failed.fail_allocation=0;failed.frames.reserve(256);bool raised=false;
++        if(std::string(name)=="with_transaction")for(bool inside:{false,true}){
++            managed_test::Probe failed;failed.inspect_roots=true;failed.capture=true;failed.frames.reserve(256);bool raised=false;unsigned target_hits=0;
++            failed.before_construct=[&](std::size_t ordinal,const void* payload,std::size_t size){
++                bool target=false;
++                if(!inside && failed.retained && size==sizeof(void*)) {void* value=nullptr;std::memcpy(&value,payload,size);target=value==failed.retained->get();}
++                if(inside && size==sizeof(std::int32_t)) {std::int32_t value;std::memcpy(&value,payload,size);target=value==7;}
++                if(target) {++target_hits;failed.fail_construction=ordinal;failed.fail_allocation=0;}
++            };
+             {managed_test::Observe observe(failed);try{code->invoke(7);}catch(const std::runtime_error&){raised=true;}}
++            require(target_hits==1 && failed.fail_construction>0 && failed.constructions==failed.fail_construction,"with semantic allocation fault target not reached exactly once");
+             require(raised && failed.retained && failed.frames.empty() && failed.roots_valid && failed.commits_valid,"with allocation failure/root publication");
+-            {Runtime::Attachment attachment(*runtime);Runtime::Managed managed(*runtime);std::int32_t total;std::memcpy(&total,failed.retained->get(),sizeof(total));require(total==(construction==5?0:1),"with lost an acquired resource during allocation failure");}failed.retained.reset();empty(*runtime);
++            {Runtime::Attachment attachment(*runtime);Runtime::Managed managed(*runtime);std::int32_t total;std::memcpy(&total,failed.retained->get(),sizeof(total));require(total==(inside?1:0),"with lost an acquired resource during allocation failure");}
++            std::cout<<(optimized?"O2":"normal")<<" with semantic fault="<<(inside?"first-body-allocation":"resource-acquisition")<<" observed ordinal="<<failed.fail_construction<<" passed\n";
++            failed.retained.reset();empty(*runtime);
+         }
+         if(std::string(name)=="combined"){require(code->invoke(-1)==-3,"combined propagation cleanup");empty(*runtime);}
+         if(std::string(name)=="propagation"){require(code->invoke(0)==-10,"Err bypassed defer");empty(*runtime);}

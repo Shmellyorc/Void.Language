@@ -5,6 +5,10 @@
 #include <array>
 #include <chrono>
 #include <cstdlib>
+#include <ctime>
+#if defined(__unix__)
+#include <sys/resource.h>
+#endif
 #include <iostream>
 #include <iomanip>
 #include <new>
@@ -18,7 +22,8 @@ std::uint64_t checksum=0;
 template<class F> void measure(const char* name,unsigned size,unsigned iterations,F work) {
     for(unsigned i=0;i<100;++i)checksum+=work();
     std::array<double,5> samples;
-    for(auto& ns:samples){auto start=std::chrono::steady_clock::now();for(unsigned i=0;i<iterations;++i)checksum+=work();auto end=std::chrono::steady_clock::now();ns=std::chrono::duration<double,std::nano>(end-start).count()/iterations;}
+    unsigned sample=0;
+    for(auto& ns:samples){auto cpu=std::clock();auto start=std::chrono::steady_clock::now();for(unsigned i=0;i<iterations;++i)checksum+=work();auto end=std::chrono::steady_clock::now();ns=std::chrono::duration<double,std::nano>(end-start).count()/iterations;std::cerr<<"SAMPLE,"<<name<<','<<size<<','<<sample++<<','<<ns<<','<<1e9*double(std::clock()-cpu)/CLOCKS_PER_SEC/iterations<<'\n';}
     allocations=bytes=0;counting=true;for(unsigned i=0;i<100;++i)checksum+=work();counting=false;
     std::sort(samples.begin(),samples.end());
     std::cout<<name<<','<<size<<','<<iterations<<','<<samples[2]<<','<<samples.front()<<','<<samples.back()<<','<<double(allocations)/100<<','<<double(bytes)/100<<'\n';
@@ -34,6 +39,10 @@ void* operator new(std::size_t n,std::align_val_t a){account(n);void* p=nullptr;
 void operator delete(void* p,std::align_val_t) noexcept {std::free(p);}
 void operator delete(void* p,std::size_t,std::align_val_t) noexcept {std::free(p);}
 int main(){
+#if defined(__unix__)
+    rlimit limits{};if(getrlimit(RLIMIT_STACK,&limits))std::abort();std::cerr<<"STACK_BYTES,"<<limits.rlim_cur<<','<<limits.rlim_max<<'\n';
+#endif
+    std::cerr<<"FRAME_BYTES,"<<sizeof(Runtime::Frame)<<",TOKEN_BYTES,"<<sizeof(Runtime::RegisteredRootWord)<<'\n';
     std::cout<<std::setprecision(12)<<"case,size,iterations,median_ns,min_ns,max_ns,allocations_per_op,requested_bytes_per_op\n";
     constexpr std::size_t zero=0;constexpr BufferWorkQuota quota{16384,256,4096};
     for(unsigned count:{8u,128u,1024u}){
@@ -44,8 +53,30 @@ int main(){
         Runtime::Frame f(r,slots.data(),count);
         measure("root_word_last",count,20000,[&]{auto token=r.root_word(&homes.back());(void)token;return 1u;});
     }
+    for(bool packed:{false,true})for(unsigned count:{8u,128u,1024u,16384u}) {
+        Runtime r;Runtime::Attachment a(r);Runtime::Managed m(r);
+        std::vector<void*> homes(count);std::vector<Runtime::Slot> slots(count);std::vector<std::size_t> offsets(count);
+        for(unsigned i=0;i<count;++i){slots[i]={&homes[i],sizeof(void*),&zero,1};offsets[i]=i*sizeof(void*);}
+        Runtime::Slot group{homes.data(),homes.size()*sizeof(void*),offsets.data(),offsets.size()};
+        Runtime::Frame frame(r,packed?&group:slots.data(),packed?1:count);
+        for(unsigned pattern=0;pattern<4;++pattern){unsigned state=7;
+            auto name=std::string(packed?"packed_":"slots_")+std::array{"first","last","random","hot4"}[pattern];
+            measure(name.c_str(),count,5000,[&]{state=state*1664525+1013904223;auto i=pattern==0?0:pattern==1?count-1:pattern==2?state%count:count-1-(state%4);auto token=r.root_word(&homes[i]);(void)token;return 1u;});
+        }
+        auto layout=r.fixed_scalar_layout(ScalarEncoding::i32,0);auto token=r.root_word(&homes.back());
+        measure(packed?"packed_reused_token":"slots_reused_token",count,5000,[&]{return r.fixed_scalar_layout(token,ScalarEncoding::i32,0)->capacity()+1;});
+        measure(packed?"packed_temporary_frame":"slots_temporary_frame",count,5000,[&]{void* temporary=nullptr;Runtime::Slot s{&temporary,sizeof(void*),&zero,1};Runtime::Frame nested(r,&s,1);auto t=r.root_word(&homes.back());(void)t;return 1u;});
+    }
+    {
+        Runtime r;Runtime::Attachment a(r);Runtime::Managed m(r);
+        std::array<void*,64> homes{};std::array<Runtime::Slot,64> slots;std::array<std::optional<Runtime::Frame>,64> frames;
+        for(unsigned i=0;i<64;++i){slots[i]={&homes[i],sizeof(void*),&zero,1};frames[i].emplace(r,&slots[i],1);}
+        measure("deep64_outer",64,5000,[&]{auto t=r.root_word(&homes[0]);(void)t;return 1u;});
+        for(unsigned i=64;i--;)frames[i].reset();
+    }
     {
         Runtime r;Runtime::Attachment a(r);Runtime::Managed m(r);auto l=r.fixed_scalar_layout(ScalarEncoding::i32,16);
+        measure("scalar_layout_zero",0,50000,[&]{return r.fixed_scalar_layout(ScalarEncoding::i32,0)->capacity()+1;});
         measure("scalar_layout",16,50000,[&]{return r.fixed_scalar_layout(ScalarEncoding::i32,16)->capacity();});
     }
     for(unsigned count:{1u,128u,1024u}){

@@ -1,5 +1,23 @@
 # VOID logging — mandatory performance repair handoff
 
+> Publication note: this commit keeps selected text evidence. Full local archives,
+> binaries, candidate trees and disposable runs remain excluded and preserved;
+> see the [artifact scope and original-document hashes](../compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md).
+> Measurements and conclusions below are unchanged; artifact links are portable.
+
+## Current Boss disposition — 5 November 2026
+
+The refined logging patch is already integrated with the shared internal repairs.
+[Consolidated qualification and review handoff](../compiler-health/INTEGRATED_PERFORMANCE_QUALIFICATION.md)
+is the active status. **The historical FILE200 strict 10 ms aim is not a
+Boss-mandated release requirement or an automatic release blocker. It is not
+claimed passed.** Retained improvements, regressions and real durability are
+reported with their original measurement cohorts. Release authority remains Boss's.
+
+The dated memorandum/handoff below is historical evidence, including its former
+release-HOLD wording; that requirement interpretation is superseded above.
+Original samples, rejected candidates and failures remain intact.
+
 ## Release gate decision — 4 November 2026 (documentation handoff authorized)
 
 **LOG-PERF OPEN / release HOLD.** The [decision memorandum](LOG_PERF_DECISION.md)
@@ -481,9 +499,9 @@ or require further work; the engineering result does not close that gate.
 
 The [fresh acceptance index](evidence/performance-repair/acceptance-index.json)
 contains all 263 outcomes and executable/library hashes. Full logs and exact
-source freezes are in [Release](evidence/performance-repair/acceptance-release/LastTest.log),
-[Debug](evidence/performance-repair/acceptance-debug/LastTest.log) and
-[strict](evidence/performance-repair/acceptance-strict/LastTest.log).
+source freezes are in [Release](../compiler-health/evidence/integrated-performance/historical-logging-release-LastTest.txt),
+[Debug](../compiler-health/evidence/integrated-performance/historical-logging-debug-LastTest.txt) and
+[strict](../compiler-health/evidence/integrated-performance/historical-logging-strict-LastTest.txt).
 All 299 source files match across the three profiles and the current tree; the
 measured source matched the Release freeze before and after isolated measurements.
 The raw Debug/strict manifests additionally include 16/32 generated text-encoding

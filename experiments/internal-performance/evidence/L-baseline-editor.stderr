@@ -1,0 +1,24 @@
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/docs/research/stage7/measure_baseline.py", line 174, in <module>
+    main()
+    ~~~~^^
+  File "/home/shmellyorc/Documents/Void.Language/docs/research/stage7/measure_baseline.py", line 168, in main
+    cases[name] = benchmark(build, entry, text, args.repetitions)
+                  ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/docs/research/stage7/measure_baseline.py", line 80, in benchmark
+    client.initialize()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/home/shmellyorc/Documents/Void.Language/tools/lsp_client.py", line 118, in initialize
+    return self.sync()
+           ~~~~~~~~~^^
+  File "/home/shmellyorc/Documents/Void.Language/tools/lsp_client.py", line 105, in sync
+    response, notifications = self.request("void/barrier")
+                              ~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tools/lsp_client.py", line 91, in request
+    return self.response(request_id)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tools/lsp_client.py", line 96, in response
+    message = self.receive()
+  File "/home/shmellyorc/Documents/Void.Language/tools/lsp_client.py", line 80, in receive
+    raise item
+EOFError: Server stdout closed

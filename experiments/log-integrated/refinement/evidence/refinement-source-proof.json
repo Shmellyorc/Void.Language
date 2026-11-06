@@ -1,0 +1,31 @@
+{
+  "changed_since_first_candidate": [
+    "src/frontend/compiler.cpp"
+  ],
+  "changed_tests": [
+    "tests/advanced/tests.cpp"
+  ],
+  "all_other_source_header_stdlib_files_identical": true,
+  "files_changed_from_v1": [
+    "src/backend/llvm/backend.cpp",
+    "src/backend/llvm/filesystem.inc",
+    "src/frontend/capabilities.inc",
+    "src/frontend/compiler.cpp",
+    "src/frontend/filesystem.inc",
+    "src/ir/filesystem.inc",
+    "src/ir/local_cleanup.inc",
+    "src/ir/module.cpp",
+    "src/ir/reference_capabilities.inc",
+    "src/runtime/abi.cpp",
+    "src/runtime/array.cpp",
+    "src/runtime/buffer.cpp",
+    "src/runtime/filesystem_abi.cpp",
+    "include/void/filesystem_abi.hpp",
+    "include/void/ir.hpp",
+    "include/void/runtime.hpp",
+    "include/void/runtime_abi.hpp",
+    "stdlib/io.void",
+    "tests/advanced/tests.cpp"
+  ],
+  "candidate_source_sha256": "60ca2861c5aa084c978ff738231de65cd00abb0cb3681669a02f0e5a802b3f4f"
+}

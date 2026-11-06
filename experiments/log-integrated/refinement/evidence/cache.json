@@ -1,0 +1,26 @@
+[
+  {
+    "version": "v1",
+    "stdout": "CACHE 0 miss\nCACHE 1 hit\nBUILD 3ef7a2bea468e0fde2d3664d2e9645187cbc111309a370d76e9e5ba88af031d2\n"
+  },
+  {
+    "version": "original-integrated",
+    "stdout": "CACHE 0 miss\nCACHE 1 hit\nBUILD integrated-c4ba7f4af7273a5c127966b0d445b5568dcd49d249d6bea08dc02d9c36e8a051\n"
+  },
+  {
+    "version": "candidate",
+    "stdout": "CACHE 0 miss\nCACHE 1 hit\nBUILD integrated-60ca2861c5aa084c978ff738231de65cd00abb0cb3681669a02f0e5a802b3f4f\n"
+  },
+  {
+    "version": "v1",
+    "stdout": "CACHE 0 hit\nCACHE 1 hit\nBUILD 3ef7a2bea468e0fde2d3664d2e9645187cbc111309a370d76e9e5ba88af031d2\n"
+  },
+  {
+    "version": "original-integrated",
+    "stdout": "CACHE 0 hit\nCACHE 1 hit\nBUILD integrated-c4ba7f4af7273a5c127966b0d445b5568dcd49d249d6bea08dc02d9c36e8a051\n"
+  },
+  {
+    "version": "candidate",
+    "stdout": "CACHE 0 hit\nCACHE 1 hit\nBUILD integrated-60ca2861c5aa084c978ff738231de65cd00abb0cb3681669a02f0e5a802b3f4f\n"
+  }
+]

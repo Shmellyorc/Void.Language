@@ -35,4 +35,6 @@ extern "C" void vd_filesystem_call(void*, const vd::filesystem::ReplyLayout*,
     unsigned, void* const*, const std::int64_t*, const void*, bool,
     vd::RuntimeFailure*) noexcept;
 
+extern "C" std::int64_t vd_filesystem_write_checked(void*,const vd::filesystem::ReplyLayout*,void* const*,const std::int64_t*,vd::RuntimeFailure*) noexcept;
+
 extern "C" std::int64_t vd_file_control(unsigned, void*, vd::RuntimeFailure*) noexcept;

@@ -1,0 +1,22 @@
+{
+  "libvoid_runtime.a": {
+    "previous": "f6523b5c01d5b264febdd11d780f4e71e6e411bf0732e3d712de5ce3db3ab6c3",
+    "current": "f6523b5c01d5b264febdd11d780f4e71e6e411bf0732e3d712de5ce3db3ab6c3",
+    "identical": true
+  },
+  "libvoid_core.a": {
+    "previous": "df62c8294c48b4bc6054f71a9085326f9619cde20a7c6c4e1f2a7ab72ca6e958",
+    "current": "df62c8294c48b4bc6054f71a9085326f9619cde20a7c6c4e1f2a7ab72ca6e958",
+    "identical": true
+  },
+  "libvoid_llvm.a": {
+    "previous": "ac9fbcf4417fac2db6cf34012035ebdb3c94150fc675cbe5c669d2b53f154376",
+    "current": "ac9fbcf4417fac2db6cf34012035ebdb3c94150fc675cbe5c669d2b53f154376",
+    "identical": true
+  },
+  "libvoid_cache_identity.a": {
+    "previous": "e0c6ede14d75bcac23cd69097fd10bc30b44a961beef79b4b48bca25c8fb0191",
+    "current": "e0c6ede14d75bcac23cd69097fd10bc30b44a961beef79b4b48bca25c8fb0191",
+    "identical": true
+  }
+}
