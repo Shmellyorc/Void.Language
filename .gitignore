@@ -1,3 +1,31 @@
+# Local VOIDC experiment and generated test evidence
+/experiments/
+/docs/collections/evidence/run-*/
+/docs/log/evidence/run-*/
+
+# Generated JSON test receipts
+/docs/json/evidence/implementation/*-Debug-[0-9]*.json
+/docs/json/evidence/implementation/*-Release-[0-9]*.json
+/docs/json/evidence/implementation/*-RelWithDebInfo-[0-9]*.json
+
+# Temporary collections/LSP test runs
+/docs/collections/evidence/lsp-llvm23-*/
+
+# Generated Math test receipts
+/docs/math/evidence/compiler-identity-*.json
+/docs/math/evidence/execution-llvm23-*-prior-*.json
+
+# Local historical FILE200 reports and evidence
+/docs/log/BUFFERED_DELIVERY_FEASIBILITY.md
+/docs/log/CHECKED_IO_DELIVERY_INVESTIGATION.md
+/docs/log/FILE200_ARCHITECTURE_REVIEW.md
+/docs/log/FILE200_REMAINING_OVERHEAD.md
+/docs/log/INTEGRATED_LOGGING_ENGINEERING_HANDOFF.md
+/docs/log/INTEGRATED_LOGGING_ENGINEERING_RESULT.md
+/docs/log/SYNCHRONOUS_PATH_EXPERIMENT.md
+/docs/log/evidence/file200-remaining-f3cf240e.json
+
+
 # Build products and generated output
 /build*/
 /out/
