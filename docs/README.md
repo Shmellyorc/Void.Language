@@ -1,5 +1,12 @@
 # VOID documentation
 
+Start here: [Install](install/README.md) · [First program](FIRST_PROGRAM.md) ·
+[CLI commands](CLI.md) · [Editor setup](EDITOR_INTEGRATION.md) ·
+[Troubleshooting](TROUBLESHOOTING.md).
+
+[Wiki drafts](wiki/Home.md) organize these canonical guides by task; publication
+requires Boss approval. [Developer-experience implementation/review report](developer-experience/REPORT.md).
+
 ## Integrated performance qualification and AOT-only SIMD — 6 November 2026
 
 [Integrated source review and local qualification](compiler-health/INTEGRATED_PERFORMANCE_QUALIFICATION.md)
@@ -16,8 +23,10 @@ and the [roadmap](VOIDC_AUTOMATIC_SIMD_ROADMAP.md) distinguish the
 the [retained AOT-only candidate](compiler-health/AUTOMATIC_SIMD_AOT_ONLY_QUALIFICATION.md).
 Only native AOT O2 receives target-aware analysis. JIT/ORC/logical cache policy
 remain unchanged, SLP stays off, and checked arrays retain their checks.
-[Exact staged scope and Boss CI instructions](compiler-health/AUTOMATIC_SIMD_AOT_STAGING.md)
-prepare the seven-job cross-platform qualification; no hosted run has been sent.
+[Accepted seven-job qualification](https://github.com/Shmellyorc/Void.Language/actions/runs/42231556437)
+passed at `175c08c8` on Linux Debug/Release/Sanitizers, Windows Debug/Release and
+macOS ARM64 Debug/Release. The [staging record](compiler-health/AUTOMATIC_SIMD_AOT_STAGING.md)
+preserves pre-CI instructions.
 
 ## MIT licensing implementation — Golden Wrench review
 

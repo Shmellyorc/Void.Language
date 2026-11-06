@@ -3,6 +3,7 @@
 #include "void/path.hpp"
 #include "void/native_build.hpp"
 #include <llvm/Support/FileSystem.h>
+#include <llvm/Config/llvm-config.h>
 #include <cerrno>
 #include <cstdlib>
 #include <iostream>
@@ -10,6 +11,65 @@
 #include <vector>
 namespace {
 struct UsageError : std::invalid_argument {using std::invalid_argument::invalid_argument;};
+bool known_command(const std::string& command) {
+    return command=="check" || command=="run" || command=="build" || command=="emit";
+}
+void usage(std::ostream& out, const std::string& command={}) {
+    if(command.empty() || command=="check")out<<"Usage: voidc check <file-or-directory> [--no-opt]\n";
+    if(command.empty() || command=="run")out<<"Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache]\n";
+    if(command.empty() || command=="build")out<<"Usage: voidc build [file-or-directory] [-o executable] [--no-opt]\n";
+    if(command.empty() || command=="emit")out<<"Usage: voidc emit <file-or-directory> -o <object> [--no-opt]\n";
+}
+void help(const std::string& command={}) {
+    std::cout<<"VOID Language Compiler v"<<VOID_COMPILER_VERSION<<" (development)\nLLVM "<<LLVM_VERSION_STRING<<"\n\n";
+    usage(std::cout,command);
+    if(command.empty()) {
+        std::cout<<"\nCommands:\n"
+          "  check   Analyze source and imports without executing startup code.\n"
+          "  run     Execute through the JIT.\n"
+          "  build   Compile and link a native executable with the matching Runtime.\n"
+          "  emit    Write a native object for manual linking.\n"
+          "\nOptions:\n"
+          "  -h, --help  Show help; use <command> --help for examples.\n"
+          "  --version   Show compiler, LLVM, target and build identity.\n"
+          "  --no-opt    Disable O2 (accepted as a no-op by check).\n"
+          "  --cache     Select Debug code and report cache status (run only).\n"
+          "  --no-cache  Disable disk caching (run only).\n"
+          "  -o PATH     Set output path (build/emit only; required by emit).\n"
+          "  --          End options before a source path.\n";
+    }
+    if(command=="check")std::cout<<"\nCheck source and imported modules; no application entry is required.\n"
+      "--no-opt is accepted for compatibility and has no effect on checking.\n"
+      "Example: voidc check main.void\n";
+    if(command=="run")std::cout<<"\nRun a synchronous application; its return value is the process status.\n"
+      "Legacy entry(i32) -> i32 accepts one decimal i32 (default 0), prints its\n"
+      "result, and exits 0. Application entries do not accept that input.\n"
+      "  --no-opt    Disable O2; eligible Debug code uses the automatic disk cache.\n"
+      "  --cache     Select Debug code and print cache status.\n"
+      "  --no-cache  Disable disk caching; does not disable O2.\n"
+      "Examples: voidc run .\n"
+      "          voidc run calculation.void 10 --no-cache\n";
+    if(command=="build")std::cout<<"\nLink an executable using the installed Runtime, dependency archives and\n"
+      "void-native.txt beside voidc. The original Clang/LLD 23.1.4 SDK and host\n"
+      "development libraries must remain available; this is a source installation.\n"
+      "  -o PATH     Output file; default: <entry-directory>/build/<entry-stem>\n"
+      "              (with .exe on Windows). Missing parent directories are created.\n"
+      "  --no-opt    Disable O2.\n"
+      "Examples: voidc build .\n"
+      "          voidc build main.void -o \"output folder/hello\"\n";
+    if(command=="emit")std::cout<<"\nWrite a host-native object, not an executable. Manual linking must supply\n"
+      "the matching Runtime and dependencies; prefer build for an application.\n"
+      "  -o PATH     Required output object path (.o on Unix, .obj on Windows).\n"
+      "  --no-opt    Disable O2.\n"
+      "Example: voidc emit main.void -o main.o\n";
+    std::cout<<"\nA directory selects main.void. run/build default to the current directory.\n"
+      "Application entry selection is automatic (main or executable top-level code);\n"
+      "--app has been removed. Use -- before a source path beginning with '-'.\n"
+      "Quote paths containing spaces. Options may precede or follow operands.\n"
+      "Exit status: 0 success; 1 compilation/toolchain failure; 2 invocation error.\n"
+      "run propagates an application's process status.\n"
+      "Documentation: https://voidlang.com/docs/compiler-workflow/\n";
+}
 std::int32_t input(const char* text) {
     char* end = nullptr; errno = 0;
     auto value = std::strtoll(text, &end, 10);
@@ -19,9 +79,21 @@ std::int32_t input(const char* text) {
 }
 }
 static int run_cli(int argc, char** argv) {
+    std::string command;
     try {
-        vd::configure_standard_library_root(vd::utf8_path(llvm::sys::fs::getMainExecutable(argv[0],reinterpret_cast<void*>(&run_cli))));
         for(int i=1;i<argc;++i)if(std::string(argv[i])=="--app")throw UsageError("--app has been removed; entry selection is automatic.");
+        if(argc==2 && (std::string(argv[1])=="--help" || std::string(argv[1])=="-h")) {help();return 0;}
+        if(argc==2 && std::string(argv[1])=="--version") {
+            std::cout<<"VOID Language Compiler v"<<VOID_COMPILER_VERSION<<" (development)\nLLVM "<<LLVM_VERSION_STRING
+              <<"\nTarget: "<<LLVM_DEFAULT_TARGET_TRIPLE<<"\nBuild identity: "<<vd::compiler_build_identity()<<'\n';
+            return 0;
+        }
+        if(argc>=2 && std::string(argv[1])=="help") {
+            if(argc==2) {help();return 0;}
+            if(argc!=3 || !known_command(argv[2]))throw UsageError("Expected help [check|run|build|emit].");
+            help(argv[2]);return 0;
+        }
+        vd::configure_standard_library_root(vd::utf8_path(llvm::sys::fs::getMainExecutable(argv[0],reinterpret_cast<void*>(&run_cli))));
         if(argc==3 && std::string(argv[1])=="--emit-proof") {
             vd::emit_object(vd::ir::architecture_proof(),vd::utf8_path(argv[2]),true);
             std::cout<<"Wrote native architecture proof object\n";return 0;
@@ -31,14 +103,18 @@ static int run_cli(int argc, char** argv) {
             auto result=code->invoke(0);std::cout<<result<<'\n';return result==42?0:1;
         }
         if(argc<2)throw UsageError("Expected a command.");
-        const std::string command=argv[1];
-        if(command!="check" && command!="run" && command!="emit" && command!="build")
+        command=argv[1];
+        if(!known_command(command))
             throw UsageError("Unknown command: "+command);
+        if(argc==3 && (std::string(argv[2])=="--help" || std::string(argv[2])=="-h")) {help(command);return 0;}
         bool optimize=true,cache=false,no_cache=false,no_opt=false;
+        bool positional_only=false;
         std::vector<std::string> operands;std::optional<std::filesystem::path> output;
         for(int i=2;i<argc;++i) {
             const std::string arg=argv[i];
-            if(arg=="--no-opt") {if(no_opt)throw UsageError("Duplicate --no-opt.");no_opt=true;optimize=false;}
+            if(positional_only)operands.push_back(arg);
+            else if(arg=="--")positional_only=true;
+            else if(arg=="--no-opt") {if(no_opt)throw UsageError("Duplicate --no-opt.");no_opt=true;optimize=false;}
             else if(arg=="--cache") {if(cache)throw UsageError("Duplicate --cache.");cache=true;optimize=false;}
             else if(arg=="--no-cache") {if(no_cache)throw UsageError("Duplicate --no-cache.");no_cache=true;}
             else if(arg=="-o") {
@@ -93,10 +169,10 @@ static int run_cli(int argc, char** argv) {
         }
         return 0;
     } catch(const UsageError& error) {
-        std::cerr<<"Invalid invocation: "<<error.what()<<"\nUsage: voidc check <file-or-directory>\n"
-          "       voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache]\n"
-          "       voidc build [file-or-directory] [-o executable] [--no-opt]\n"
-          "       voidc emit <file-or-directory> -o <object> [--no-opt]\n";return 2;
+        std::cerr<<"Invalid invocation: "<<error.what()<<'\n';
+        usage(std::cerr,known_command(command)?command:std::string{});
+        std::cerr<<"Try 'voidc "<<(known_command(command)?command+" ":std::string{})<<"--help' for examples.\n";
+        return 2;
     } catch(const std::exception& error) {std::cerr<<error.what()<<'\n';return 1;}
 }
 

@@ -1,0 +1,3 @@
+usage: check_licenses.py [-h] --build-dir BUILD_DIR
+                         --evidence-dir EVIDENCE_DIR
+check_licenses.py: error: the following arguments are required: --build-dir, --evidence-dir

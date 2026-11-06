@@ -1,0 +1,29 @@
+{
+  "website_paths_unchanged_and_excluded": [
+    "website/dist/docs/compiler-workflow/index.html",
+    "website/dist/docs/modules/index.html",
+    "website/dist/getting-started/index.html",
+    "website/dist/roadmap/index.html",
+    "website/public/docs/compiler-workflow/index.html",
+    "website/public/docs/modules/index.html",
+    "website/public/getting-started/index.html",
+    "website/public/roadmap/index.html",
+    "website/scripts/check.py",
+    "website/scripts/test_check.py"
+  ],
+  "original_evidence_files_unchanged": 47,
+  "ignored_experiment_and_evidence_paths_unchanged_size_mtime": 18930,
+  "ignored_inventory_sha256": "170209a4ebdd513b62e1ecb5533263ad35c002ad0217791d801ffbe6512af659",
+  "protected_groups_unchanged": [
+    "src/runtime",
+    "src/frontend",
+    "src/backend",
+    "include",
+    "stdlib",
+    ".github",
+    ".gitignore"
+  ],
+  "head": "d517459d7ad89843f1b5a09bf6b53a782a68a9e1",
+  "branch": "main",
+  "scope": "Ignored-file size/mtime preservation; no claim of content hashing build products or SDK caches. All 108 accepted review files have before/after content hashes in QUALIFIED_COMPARISON.json."
+}

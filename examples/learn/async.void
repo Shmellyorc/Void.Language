@@ -1,0 +1,8 @@
+async func ticket_total(ticket_count: i32) -> i32:
+    return ticket_count * 12
+
+async func entry(ticket_count: i32) -> i32:
+    var pending_total = ticket_total(ticket_count)
+    var booking_fee = 3
+    var tickets = await pending_total
+    return tickets + booking_fee

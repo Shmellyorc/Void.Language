@@ -1,0 +1,8 @@
+{
+  "CMakeLists.txt": "886cfd47412526391edf836c2e5c598509ee959796a0a62a73740f0e70c47c64",
+  "src/main.cpp": "ee589ed41131181e4c3dde59e4eb5fd96a5204d0b1e7df8109cce36c54420751",
+  "src/native_build.cpp": "939bea01e8fa52457591d704cec5a54f65b64a12413274b43ae9499f437779d0",
+  "tools/install.py": "9403a2bb886a986766287fc0ab2300e78c760569413c38f903ed36cf0d2d654e",
+  "tools/verify_install.py": "69bbbbe3aebfde0caa696a52aa867df991a120fa5a0496f3bd20c3a472c77ab8",
+  "tools/ci/llvm_sdk.py": "6d4005b9bb6e9a6ae0a8f4cfe1670922d100c2481c3fea2718cb146559475dca"
+}

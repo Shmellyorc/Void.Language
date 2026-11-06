@@ -1,0 +1,6 @@
+/tmp/VOID DX installed é # %/bin/voidc
+/tmp/VOID DX installed é # %/bin/voidls
+voidc 0.1.0 (development)
+LLVM 23.1.4
+Target: x86_64-unknown-linux-gnu
+Build identity: 037ede6099a8b599e3488732e1924dca9dbc17d6187ae1bd106486f47a38c0de

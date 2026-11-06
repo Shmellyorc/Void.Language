@@ -1,0 +1,131 @@
+{
+  "system": "Linux",
+  "architecture": "x86_64",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "configuration": "Release",
+  "prefix": "/opt/void",
+  "commands": [
+    {
+      "label": "http-setup",
+      "argv": [
+        "/usr/bin/python3",
+        "/src/void/tools/setup_http_deps.py",
+        "--profile",
+        "Release",
+        "--jobs",
+        "3"
+      ],
+      "exit_code": 0,
+      "log": "/src/void/build/source-release/http-setup.log",
+      "seconds": 188.65624846698483
+    },
+    {
+      "label": "http-verify",
+      "argv": [
+        "/usr/bin/python3",
+        "/src/void/tools/verify_http_dependencies.py",
+        "/src/void/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release",
+        "Release",
+        "Linux"
+      ],
+      "exit_code": 0,
+      "log": "/src/void/build/source-release/http-verify.log",
+      "seconds": 0.21772621700074524
+    },
+    {
+      "label": "configure",
+      "argv": [
+        "cmake",
+        "-S",
+        "/src/void",
+        "-B",
+        "/src/void/build/source-release",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DBUILD_TESTING=OFF",
+        "-DVOID_SANITIZERS=OFF",
+        "-DVOID_LLVM_RESEARCH=OFF",
+        "-DPython3_EXECUTABLE=/usr/bin/python3",
+        "-DVOID_HTTP_DEPS_ROOT=/src/void/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release",
+        "-DCMAKE_C_COMPILER=/src/void/.toolchains/llvm-23.1.4/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/src/void/.toolchains/llvm-23.1.4/bin/clang++",
+        "-DLLVM_DIR=/src/void/.toolchains/llvm-23.1.4/lib/cmake/llvm",
+        "-DVOID_CLANG=/src/void/.toolchains/llvm-23.1.4/bin/clang",
+        "-DVOID_LINKER=/src/void/.toolchains/llvm-23.1.4/bin/ld.lld",
+        "-DCMAKE_EXE_LINKER_FLAGS=--ld-path=\"/src/void/.toolchains/llvm-23.1.4/bin/ld.lld\""
+      ],
+      "exit_code": 0,
+      "log": "/src/void/build/source-release/configure.log",
+      "seconds": 15.28103293402819
+    },
+    {
+      "label": "build",
+      "argv": [
+        "cmake",
+        "--build",
+        "/src/void/build/source-release",
+        "--target",
+        "voidc",
+        "voidls",
+        "--parallel",
+        "3"
+      ],
+      "exit_code": 0,
+      "log": "/src/void/build/source-release/build.log",
+      "seconds": 88.07362319296226
+    },
+    {
+      "label": "install-compiler",
+      "argv": [
+        "cmake",
+        "--install",
+        "/src/void/build/source-release",
+        "--config",
+        "Release",
+        "--prefix",
+        "/opt/void",
+        "--component",
+        "compiler"
+      ],
+      "exit_code": 0,
+      "log": "/src/void/build/source-release/install-compiler.log",
+      "seconds": 0.23929529503220692
+    },
+    {
+      "label": "install-tooling",
+      "argv": [
+        "cmake",
+        "--install",
+        "/src/void/build/source-release",
+        "--config",
+        "Release",
+        "--prefix",
+        "/opt/void",
+        "--component",
+        "tooling"
+      ],
+      "exit_code": 0,
+      "log": "/src/void/build/source-release/install-tooling.log",
+      "seconds": 0.03004654700635001
+    },
+    {
+      "label": "verify-install",
+      "argv": [
+        "/usr/bin/python3",
+        "/src/void/tools/verify_install.py",
+        "/opt/void"
+      ],
+      "exit_code": 0,
+      "log": "/src/void/build/source-release/verify-install.log",
+      "seconds": 0.5973662009928375
+    }
+  ],
+  "status": "PASS",
+  "sdk": {
+    "version": "23.1.4",
+    "asset": "LLVM-23.1.4-Linux-X64.tar.xz",
+    "sha256": "25d814fda50d5fb0084b42be09605d8b1595d49d5e2e03a3345d7e112ff6f9f3",
+    "url": "https://github.com/llvm/llvm-project/releases/download/llvmorg-23.1.4/LLVM-23.1.4-Linux-X64.tar.xz"
+  }
+}

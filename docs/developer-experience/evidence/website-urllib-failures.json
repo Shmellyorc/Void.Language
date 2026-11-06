@@ -1,0 +1,262 @@
+[
+  {
+    "source": "website/public/404.html",
+    "url": "https://voidlang.com/404.html",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/async/index.html",
+    "url": "https://voidlang.com/docs/async/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/binary-memory/index.html",
+    "url": "https://voidlang.com/docs/binary-memory/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/calendar-time/index.html",
+    "url": "https://voidlang.com/docs/calendar-time/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/callables/index.html",
+    "url": "https://voidlang.com/docs/callables/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/channels/index.html",
+    "url": "https://voidlang.com/docs/channels/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/cleanup/index.html",
+    "url": "https://voidlang.com/docs/cleanup/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/closures/index.html",
+    "url": "https://voidlang.com/docs/closures/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/collection-tools/index.html",
+    "url": "https://voidlang.com/docs/collection-tools/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/collections/index.html",
+    "url": "https://voidlang.com/docs/collections/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/compiler-workflow/index.html",
+    "url": "https://voidlang.com/docs/compiler-workflow/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/composition/index.html",
+    "url": "https://voidlang.com/docs/composition/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/console-output/index.html",
+    "url": "https://voidlang.com/docs/console-output/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/control-flow/index.html",
+    "url": "https://voidlang.com/docs/control-flow/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/dictionaries/index.html",
+    "url": "https://voidlang.com/docs/dictionaries/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/editor-tooling/index.html",
+    "url": "https://voidlang.com/docs/editor-tooling/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/errors/index.html",
+    "url": "https://voidlang.com/docs/errors/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/events/index.html",
+    "url": "https://voidlang.com/docs/events/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/files-paths/index.html",
+    "url": "https://voidlang.com/docs/files-paths/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/functions/index.html",
+    "url": "https://voidlang.com/docs/functions/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/generics/index.html",
+    "url": "https://voidlang.com/docs/generics/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/index.html",
+    "url": "https://voidlang.com/docs/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/inheritance/index.html",
+    "url": "https://voidlang.com/docs/inheritance/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/initialization/index.html",
+    "url": "https://voidlang.com/docs/initialization/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/interfaces/index.html",
+    "url": "https://voidlang.com/docs/interfaces/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/json-data/index.html",
+    "url": "https://voidlang.com/docs/json-data/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/live-development/index.html",
+    "url": "https://voidlang.com/docs/live-development/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/logging/index.html",
+    "url": "https://voidlang.com/docs/logging/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/math-random/index.html",
+    "url": "https://voidlang.com/docs/math-random/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/methods/index.html",
+    "url": "https://voidlang.com/docs/methods/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/modules/index.html",
+    "url": "https://voidlang.com/docs/modules/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/native-integration/index.html",
+    "url": "https://voidlang.com/docs/native-integration/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/nullable/index.html",
+    "url": "https://voidlang.com/docs/nullable/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/os-directories/index.html",
+    "url": "https://voidlang.com/docs/os-directories/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/parallelism/index.html",
+    "url": "https://voidlang.com/docs/parallelism/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/patterns/index.html",
+    "url": "https://voidlang.com/docs/patterns/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/properties/index.html",
+    "url": "https://voidlang.com/docs/properties/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/strings/index.html",
+    "url": "https://voidlang.com/docs/strings/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/structs/index.html",
+    "url": "https://voidlang.com/docs/structs/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/syntax/index.html",
+    "url": "https://voidlang.com/docs/syntax/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/task-groups/index.html",
+    "url": "https://voidlang.com/docs/task-groups/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/text-encoding/index.html",
+    "url": "https://voidlang.com/docs/text-encoding/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/types/index.html",
+    "url": "https://voidlang.com/docs/types/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/url-http/index.html",
+    "url": "https://voidlang.com/docs/url-http/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/docs/variables/index.html",
+    "url": "https://voidlang.com/docs/variables/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/examples/index.html",
+    "url": "https://voidlang.com/examples/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/features/index.html",
+    "url": "https://voidlang.com/features/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/getting-started/index.html",
+    "url": "https://voidlang.com/getting-started/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/github/index.html",
+    "url": "https://voidlang.com/github/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/index.html",
+    "url": "https://voidlang.com/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/roadmap/index.html",
+    "url": "https://voidlang.com/roadmap/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "source": "website/public/why-void/index.html",
+    "url": "https://voidlang.com/why-void/",
+    "error": "HTTP Error 403: Forbidden"
+  }
+]

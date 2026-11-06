@@ -1,8 +1,10 @@
 # Future optimization: Automatic SIMD vectorization
 
-**Current owner decision: 6 November 2026 — retain AOT-only target-aware O2 for
-cross-platform qualification; Git staging is authorized. Commit, push and hosted
-CI remain Boss-controlled.**
+**Accepted baseline — 6 November 2026:** commit `175c08c8a0cab0b701ba71365ffcc398a0c9bcf3`
+passed [all seven jobs in run 42231556437](https://github.com/Shmellyorc/Void.Language/actions/runs/42231556437): Linux Debug, Release and Sanitizers;
+Windows Debug/Release; macOS ARM64 Debug/Release. The following preparation/local
+measurements are preserved as dated evidence. This compiler CI does not qualify
+the new source-install wrapper or independently portable packages.
 
 The [feasibility report](compiler-health/AUTOMATIC_SIMD_FEASIBILITY.md) led to a
 [global JIT+AOT candidate](compiler-health/AUTOMATIC_SIMD_QUALIFICATION.md), which
@@ -14,9 +16,9 @@ whole-compiler build fingerprinting remains intact. SLP remains off. Checked arr
 retain their bounds, mutation, ownership, roots and safepoint checks; this is not
 general checked-array SIMD.
 
-Local Linux results and platform limits are recorded in that report. Native
-Windows/macOS/ARM64 acceptance is pending the Boss-controlled
-[seven-job qualification](compiler-health/AUTOMATIC_SIMD_AOT_STAGING.md).
+Local Linux results and platform limits are recorded in that report. The
+[staging record](compiler-health/AUTOMATIC_SIMD_AOT_STAGING.md) links the accepted
+seven-job qualification.
 The original 5 November investigation direction and deferred broader scope follow.
 
 ## Goal

@@ -1,0 +1,442 @@
+{
+  "changed_since_accepted_handoff": [
+    "docs/CLI.md",
+    "src/main.cpp",
+    "tests/cli/contract.py"
+  ],
+  "reason": "Required full-name/version-first help and consistent --version header, metadata return before stdlib setup, associated regression and CLI documentation; all other handoff files unchanged.",
+  "paths": {
+    "CMakeLists.txt": {
+      "qualified_handoff_sha256": "7fdceafec4681e99968c3f1ef7e877d7572e6a137fd5ac13bdca00b99f521ec8",
+      "current_sha256": "7fdceafec4681e99968c3f1ef7e877d7572e6a137fd5ac13bdca00b99f521ec8"
+    },
+    "README.md": {
+      "qualified_handoff_sha256": "f21e6822e36bfcde1c3631bde88171c5eb8c529620c3d6b270795e146ecba2bb",
+      "current_sha256": "f21e6822e36bfcde1c3631bde88171c5eb8c529620c3d6b270795e146ecba2bb"
+    },
+    "cmake/CurlProvider.cmake": {
+      "qualified_handoff_sha256": "7a0fd3f14097dc22794059d48261d6dd00ec7856e353a0499d907808c742be73",
+      "current_sha256": "7a0fd3f14097dc22794059d48261d6dd00ec7856e353a0499d907808c742be73"
+    },
+    "docs/CLI.md": {
+      "qualified_handoff_sha256": "098de67e13bd401a3a2e42a84e5670ae0843cde3b22995dc2f4c8c694db449b7",
+      "current_sha256": "45204ae2ad4627fdb439015be9b98ac98157909a5dc6791ea7e6b9aac159376c"
+    },
+    "docs/EDITOR_INTEGRATION.md": {
+      "qualified_handoff_sha256": "b9d61b426030c6d9bfc39c49b5fc412e69090a02a7a82b5538733b6d01d85241",
+      "current_sha256": "b9d61b426030c6d9bfc39c49b5fc412e69090a02a7a82b5538733b6d01d85241"
+    },
+    "docs/FIRST_PROGRAM.md": {
+      "qualified_handoff_sha256": "4f50d75c059cfc726c12a39a2fb4071fa9eba1b53d03ec50580362bbd8e6b35b",
+      "current_sha256": "4f50d75c059cfc726c12a39a2fb4071fa9eba1b53d03ec50580362bbd8e6b35b"
+    },
+    "docs/README.md": {
+      "qualified_handoff_sha256": "850d0d9be3ab20d87cd2052a59dde7d1a2c9dabbd01158b0eea72df3ed7ed248",
+      "current_sha256": "850d0d9be3ab20d87cd2052a59dde7d1a2c9dabbd01158b0eea72df3ed7ed248"
+    },
+    "docs/SOURCE_COMPILER.md": {
+      "qualified_handoff_sha256": "d59a0136caf39574b086eef71ae5353b3bdefdd75397e3254cb07f5dd54498f5",
+      "current_sha256": "d59a0136caf39574b086eef71ae5353b3bdefdd75397e3254cb07f5dd54498f5"
+    },
+    "docs/STAGE9_APPLICATION_WORKFLOW.md": {
+      "qualified_handoff_sha256": "06151009fc91a00e4c398f55aac3cefa8a3a099ad6a6b0a56909cd2a6b0454c2",
+      "current_sha256": "06151009fc91a00e4c398f55aac3cefa8a3a099ad6a6b0a56909cd2a6b0454c2"
+    },
+    "docs/TROUBLESHOOTING.md": {
+      "qualified_handoff_sha256": "9476d2b111d69a02180314737683484f28b817461c5d30c8df956e34fc6b4762",
+      "current_sha256": "9476d2b111d69a02180314737683484f28b817461c5d30c8df956e34fc6b4762"
+    },
+    "docs/VOIDC_AUTOMATIC_SIMD_ROADMAP.md": {
+      "qualified_handoff_sha256": "4b88860151d543296b872e6cff238fc095fc6f76758d506b7f76e0a9c24c334c",
+      "current_sha256": "4b88860151d543296b872e6cff238fc095fc6f76758d506b7f76e0a9c24c334c"
+    },
+    "docs/compiler-health/AUTOMATIC_SIMD_AOT_ONLY_QUALIFICATION.md": {
+      "qualified_handoff_sha256": "4880c8b23609cd14030ee427881e97a184d8ad0933177fc41d9b0004862c7070",
+      "current_sha256": "4880c8b23609cd14030ee427881e97a184d8ad0933177fc41d9b0004862c7070"
+    },
+    "docs/compiler-health/AUTOMATIC_SIMD_AOT_STAGING.md": {
+      "qualified_handoff_sha256": "5d473788f8d19ded327e97600ca3f6babf8bd68ea0548cc115037e44a55e972a",
+      "current_sha256": "5d473788f8d19ded327e97600ca3f6babf8bd68ea0548cc115037e44a55e972a"
+    },
+    "docs/compiler-health/AUTOMATIC_SIMD_FEASIBILITY.md": {
+      "qualified_handoff_sha256": "21be9dfb4ff9609fd1550e0f81336af3f579806fbe78684ae241cceb25fd0ca9",
+      "current_sha256": "21be9dfb4ff9609fd1550e0f81336af3f579806fbe78684ae241cceb25fd0ca9"
+    },
+    "docs/developer-experience/REPORT.md": {
+      "qualified_handoff_sha256": "ce251d4b75efbc89f02d0e418c4a54269bb774382a30cb06f5f76235dd32fa1d",
+      "current_sha256": "ce251d4b75efbc89f02d0e418c4a54269bb774382a30cb06f5f76235dd32fa1d"
+    },
+    "docs/developer-experience/evidence/README.md": {
+      "qualified_handoff_sha256": "d4238798c279a547de4b1bba03a06fc3c5cba5cbe102f587f138d0e602c9dbb2",
+      "current_sha256": "d4238798c279a547de4b1bba03a06fc3c5cba5cbe102f587f138d0e602c9dbb2"
+    },
+    "docs/developer-experience/evidence/accepted-simd-ci.json": {
+      "qualified_handoff_sha256": "383588409fdb5f206f28c0c94186c1c87038d14a22d61926a618e5cddf70fca1",
+      "current_sha256": "383588409fdb5f206f28c0c94186c1c87038d14a22d61926a618e5cddf70fca1"
+    },
+    "docs/developer-experience/evidence/changed-paths.txt": {
+      "qualified_handoff_sha256": "d921d67e7aaf43d1448d59d095088cd84162b973d0976660ffed8c7a47b7ba52",
+      "current_sha256": "d921d67e7aaf43d1448d59d095088cd84162b973d0976660ffed8c7a47b7ba52"
+    },
+    "docs/developer-experience/evidence/debug-cli.txt": {
+      "qualified_handoff_sha256": "e28c4c45fc18ed1eefe46d610bd5451eb32b15b451f1d505c41d7d8ea340b6e7",
+      "current_sha256": "e28c4c45fc18ed1eefe46d610bd5451eb32b15b451f1d505c41d7d8ea340b6e7"
+    },
+    "docs/developer-experience/evidence/debug-install-final.txt": {
+      "qualified_handoff_sha256": "270307597a3a216bcec6d85b030fc977abd1b1490547e4341839c87c8a67306b",
+      "current_sha256": "270307597a3a216bcec6d85b030fc977abd1b1490547e4341839c87c8a67306b"
+    },
+    "docs/developer-experience/evidence/debug-workflow-rerun.txt": {
+      "qualified_handoff_sha256": "3bb95270b0af0dbb7ae800f1a4c2524a45c2c46e01cd9d961b49b196b275e0d6",
+      "current_sha256": "3bb95270b0af0dbb7ae800f1a4c2524a45c2c46e01cd9d961b49b196b275e0d6"
+    },
+    "docs/developer-experience/evidence/initial-debug-ctest.txt": {
+      "qualified_handoff_sha256": "c2f3da2ac7bdd43b14fc3f1718c07258ec1487754c13c99b98a103d1ea345b82",
+      "current_sha256": "c2f3da2ac7bdd43b14fc3f1718c07258ec1487754c13c99b98a103d1ea345b82"
+    },
+    "docs/developer-experience/evidence/initial-license-harness-usage.txt": {
+      "qualified_handoff_sha256": "809903f3a53bb61728a98d1847bac19e533c1429181d7800c1efd7f966f79f83",
+      "current_sha256": "809903f3a53bb61728a98d1847bac19e533c1429181d7800c1efd7f966f79f83"
+    },
+    "docs/developer-experience/evidence/initial-release-ctest.txt": {
+      "qualified_handoff_sha256": "9fb124fd9c6eb371ebc2a3c55a21825d8e53481813548bc106f0763ed2b82621",
+      "current_sha256": "9fb124fd9c6eb371ebc2a3c55a21825d8e53481813548bc106f0763ed2b82621"
+    },
+    "docs/developer-experience/evidence/initial-strict-ctest.txt": {
+      "qualified_handoff_sha256": "0aa9158025c8cb95b6fa6ec3a5f7023433f33a952ef6e099d6ee2021f7c79edd",
+      "current_sha256": "0aa9158025c8cb95b6fa6ec3a5f7023433f33a952ef6e099d6ee2021f7c79edd"
+    },
+    "docs/developer-experience/evidence/install-dependency-tests.txt": {
+      "qualified_handoff_sha256": "8a830603be6ec5b4575117fb9225651aef2ca6be4c7c7ee29b6ace5e76fc3b91",
+      "current_sha256": "8a830603be6ec5b4575117fb9225651aef2ca6be4c7c7ee29b6ace5e76fc3b91"
+    },
+    "docs/developer-experience/evidence/install-layout-tests.txt": {
+      "qualified_handoff_sha256": "6ffdc7e9ffb56d219c5841c34e195454b14ba1ca2a8a3b7d27dfc632fc97c9dc",
+      "current_sha256": "6ffdc7e9ffb56d219c5841c34e195454b14ba1ca2a8a3b7d27dfc632fc97c9dc"
+    },
+    "docs/developer-experience/evidence/installer-errors.json": {
+      "qualified_handoff_sha256": "01ab87cc6432b7d80b9af19983c11492bd436a426641f4fece51d1318ceda6a6",
+      "current_sha256": "01ab87cc6432b7d80b9af19983c11492bd436a426641f4fece51d1318ceda6a6"
+    },
+    "docs/developer-experience/evidence/learning-examples.txt": {
+      "qualified_handoff_sha256": "9597c8bd586414286ab87459b71bd3ab84df2d8deec9148731b01680cab3d5fb",
+      "current_sha256": "9597c8bd586414286ab87459b71bd3ab84df2d8deec9148731b01680cab3d5fb"
+    },
+    "docs/developer-experience/evidence/license-validation.json": {
+      "qualified_handoff_sha256": "42202cd18a084a5ada956cbad2676e08546d9bd6d77d8c3a163a883d50369784",
+      "current_sha256": "42202cd18a084a5ada956cbad2676e08546d9bd6d77d8c3a163a883d50369784"
+    },
+    "docs/developer-experience/evidence/local-fresh-build-install.txt": {
+      "qualified_handoff_sha256": "d1042f2fdcf55d8acb37b72808475fd6419a81c0d9e9466930f2273047987191",
+      "current_sha256": "d1042f2fdcf55d8acb37b72808475fd6419a81c0d9e9466930f2273047987191"
+    },
+    "docs/developer-experience/evidence/local-installed-loader.json": {
+      "qualified_handoff_sha256": "8a2cac25f11342930feed25649f4b6e1e356aad8a627c115bfd9bfc1940ea833",
+      "current_sha256": "8a2cac25f11342930feed25649f4b6e1e356aad8a627c115bfd9bfc1940ea833"
+    },
+    "docs/developer-experience/evidence/local-source-install.json": {
+      "qualified_handoff_sha256": "17909b16f45b8f99af34542d16d53e44244d4ac5e20bf66b016462a32c17f1b8",
+      "current_sha256": "17909b16f45b8f99af34542d16d53e44244d4ac5e20bf66b016462a32c17f1b8"
+    },
+    "docs/developer-experience/evidence/local-warm-install.txt": {
+      "qualified_handoff_sha256": "6bc68aa46244b40318d8d06848601402e1d115a930718da7ddfa107c37583464",
+      "current_sha256": "6bc68aa46244b40318d8d06848601402e1d115a930718da7ddfa107c37583464"
+    },
+    "docs/developer-experience/evidence/original-failures.json": {
+      "qualified_handoff_sha256": "2f6b7a82a151a841879c1ee3c7bab7ebdd34e3bfe39fc1e9c28947c839f43e4d",
+      "current_sha256": "2f6b7a82a151a841879c1ee3c7bab7ebdd34e3bfe39fc1e9c28947c839f43e4d"
+    },
+    "docs/developer-experience/evidence/path-discovery.txt": {
+      "qualified_handoff_sha256": "22336778a55695e313aad33c4aa79c20b937a6e7ff78075318cd48fd88c13e74",
+      "current_sha256": "22336778a55695e313aad33c4aa79c20b937a6e7ff78075318cd48fd88c13e74"
+    },
+    "docs/developer-experience/evidence/release-cli.txt": {
+      "qualified_handoff_sha256": "e28c4c45fc18ed1eefe46d610bd5451eb32b15b451f1d505c41d7d8ea340b6e7",
+      "current_sha256": "e28c4c45fc18ed1eefe46d610bd5451eb32b15b451f1d505c41d7d8ea340b6e7"
+    },
+    "docs/developer-experience/evidence/release-install-final.txt": {
+      "qualified_handoff_sha256": "f14a796690a5711313746406d45e6d906e2e793638ea7628a8c896512efc5157",
+      "current_sha256": "f14a796690a5711313746406d45e6d906e2e793638ea7628a8c896512efc5157"
+    },
+    "docs/developer-experience/evidence/release-workflow-rerun.txt": {
+      "qualified_handoff_sha256": "761f95568222078458307e8f102693c86fc21072a44b0608a77c06986a60fc55",
+      "current_sha256": "761f95568222078458307e8f102693c86fc21072a44b0608a77c06986a60fc55"
+    },
+    "docs/developer-experience/evidence/sdk-local.txt": {
+      "qualified_handoff_sha256": "99fd9e22f4de69dcf2f2febb7fecdb44eefe5d1b36395f69867b2c9ac9d44a8c",
+      "current_sha256": "99fd9e22f4de69dcf2f2febb7fecdb44eefe5d1b36395f69867b2c9ac9d44a8c"
+    },
+    "docs/developer-experience/evidence/strict-cli.txt": {
+      "qualified_handoff_sha256": "e28c4c45fc18ed1eefe46d610bd5451eb32b15b451f1d505c41d7d8ea340b6e7",
+      "current_sha256": "e28c4c45fc18ed1eefe46d610bd5451eb32b15b451f1d505c41d7d8ea340b6e7"
+    },
+    "docs/developer-experience/evidence/strict-install-final.txt": {
+      "qualified_handoff_sha256": "e65be00b68e91989216b5829bf49c89a00ea44a8a6ee3f90c84999f3fe3559e9",
+      "current_sha256": "e65be00b68e91989216b5829bf49c89a00ea44a8a6ee3f90c84999f3fe3559e9"
+    },
+    "docs/developer-experience/evidence/strict-workflow-rerun.txt": {
+      "qualified_handoff_sha256": "7475d19a5554b0aa14addaebf632ed57a9fa0fc174366b7e6f5727ee4c6eae50",
+      "current_sha256": "7475d19a5554b0aa14addaebf632ed57a9fa0fc174366b7e6f5727ee4c6eae50"
+    },
+    "docs/developer-experience/evidence/ubuntu-cli.txt": {
+      "qualified_handoff_sha256": "e28c4c45fc18ed1eefe46d610bd5451eb32b15b451f1d505c41d7d8ea340b6e7",
+      "current_sha256": "e28c4c45fc18ed1eefe46d610bd5451eb32b15b451f1d505c41d7d8ea340b6e7"
+    },
+    "docs/developer-experience/evidence/ubuntu-container.txt": {
+      "qualified_handoff_sha256": "f695223ab53ecd87a483bdc25c36c0f076b4a7ebd88bae7a3d1b203555dd103e",
+      "current_sha256": "f695223ab53ecd87a483bdc25c36c0f076b4a7ebd88bae7a3d1b203555dd103e"
+    },
+    "docs/developer-experience/evidence/ubuntu-final-host.json": {
+      "qualified_handoff_sha256": "35c11f53c97abb5f7330c75fd51d279857e7c66b38df4677ea8e4a85a195a94f",
+      "current_sha256": "35c11f53c97abb5f7330c75fd51d279857e7c66b38df4677ea8e4a85a195a94f"
+    },
+    "docs/developer-experience/evidence/ubuntu-final-install.txt": {
+      "qualified_handoff_sha256": "097f2ccc79363b47ffa7add503798ba76d7ebcb62564373c63a71f1eecdddcb6",
+      "current_sha256": "097f2ccc79363b47ffa7add503798ba76d7ebcb62564373c63a71f1eecdddcb6"
+    },
+    "docs/developer-experience/evidence/ubuntu-final-source-install.json": {
+      "qualified_handoff_sha256": "100fac8ee64c80c620b937528eba5b874ffd316232321ebf497dca47fb0dff37",
+      "current_sha256": "100fac8ee64c80c620b937528eba5b874ffd316232321ebf497dca47fb0dff37"
+    },
+    "docs/developer-experience/evidence/ubuntu-fresh-input-hashes.json": {
+      "qualified_handoff_sha256": "4b3890393e98452f46c18cf8d0f548d10a33f737d4cbdd0e81e35144fbfe82b8",
+      "current_sha256": "4b3890393e98452f46c18cf8d0f548d10a33f737d4cbdd0e81e35144fbfe82b8"
+    },
+    "docs/developer-experience/evidence/ubuntu-fresh-install.txt": {
+      "qualified_handoff_sha256": "0351ee8a8afc027407e142d3944af8d186752a56cc2a2de37951ebfb32acf08d",
+      "current_sha256": "0351ee8a8afc027407e142d3944af8d186752a56cc2a2de37951ebfb32acf08d"
+    },
+    "docs/developer-experience/evidence/ubuntu-fresh-source-install.json": {
+      "qualified_handoff_sha256": "fa1ffe33858264273e9e47c9890f2c0dbc320dac8c39979fe63bdca06fe07a06",
+      "current_sha256": "fa1ffe33858264273e9e47c9890f2c0dbc320dac8c39979fe63bdca06fe07a06"
+    },
+    "docs/developer-experience/evidence/ubuntu-http-dependencies.json": {
+      "qualified_handoff_sha256": "a42143046bf846d4b30386e316835d31710d94e2695defcab4f842d2260e3484",
+      "current_sha256": "a42143046bf846d4b30386e316835d31710d94e2695defcab4f842d2260e3484"
+    },
+    "docs/developer-experience/evidence/ubuntu-install-regression.txt": {
+      "qualified_handoff_sha256": "5e58464cf5b375bbd45eec726dcfd327939a86726ed4236ac838b0959cbee54d",
+      "current_sha256": "5e58464cf5b375bbd45eec726dcfd327939a86726ed4236ac838b0959cbee54d"
+    },
+    "docs/developer-experience/evidence/ubuntu-prerequisites-summary.json": {
+      "qualified_handoff_sha256": "c1ab0ba6d152c68a8c30e48ab94398af2aa90fc670228b90f0bcd3961ea796fb",
+      "current_sha256": "c1ab0ba6d152c68a8c30e48ab94398af2aa90fc670228b90f0bcd3961ea796fb"
+    },
+    "docs/developer-experience/evidence/ubuntu-sdk-identity.json": {
+      "qualified_handoff_sha256": "7db99b86a6b68f7f98ed5efadf134a4e08b032ca523e39c095e1443094c3b88a",
+      "current_sha256": "7db99b86a6b68f7f98ed5efadf134a4e08b032ca523e39c095e1443094c3b88a"
+    },
+    "docs/developer-experience/evidence/verification.json": {
+      "qualified_handoff_sha256": "37cd2b939476adc9b255ef30008c19fc91f9900fde9cec70a5579eb47042a8c9",
+      "current_sha256": "37cd2b939476adc9b255ef30008c19fc91f9900fde9cec70a5579eb47042a8c9"
+    },
+    "docs/developer-experience/evidence/website-check.txt": {
+      "qualified_handoff_sha256": "5ebbb2002e72ab13207e24d0cb89b9ac2bc49f62670ead6917577eec0f65a8cb",
+      "current_sha256": "5ebbb2002e72ab13207e24d0cb89b9ac2bc49f62670ead6917577eec0f65a8cb"
+    },
+    "docs/developer-experience/evidence/website-dist-check.txt": {
+      "qualified_handoff_sha256": "5ebbb2002e72ab13207e24d0cb89b9ac2bc49f62670ead6917577eec0f65a8cb",
+      "current_sha256": "5ebbb2002e72ab13207e24d0cb89b9ac2bc49f62670ead6917577eec0f65a8cb"
+    },
+    "docs/developer-experience/evidence/website-examples.txt": {
+      "qualified_handoff_sha256": "15bfea7a2057231060b18d4530988bb572070103d423c1bfde7d4e7e19e8885b",
+      "current_sha256": "15bfea7a2057231060b18d4530988bb572070103d423c1bfde7d4e7e19e8885b"
+    },
+    "docs/developer-experience/evidence/website-live.json": {
+      "qualified_handoff_sha256": "eb75c79eebcf898405904adeef6b731003c4208600f3c23c8641df6de2484587",
+      "current_sha256": "eb75c79eebcf898405904adeef6b731003c4208600f3c23c8641df6de2484587"
+    },
+    "docs/developer-experience/evidence/website-tests.txt": {
+      "qualified_handoff_sha256": "93b93d7d2a2a41ed49341ab1374e08456725b1ec4c04457990ac1c6c4234adf4",
+      "current_sha256": "93b93d7d2a2a41ed49341ab1374e08456725b1ec4c04457990ac1c6c4234adf4"
+    },
+    "docs/developer-experience/evidence/website-urllib-failures.json": {
+      "qualified_handoff_sha256": "fc8ff48b33d91d3017a3f035ca2e1ca2c86b3bdb736230e2ae54a6045f825e13",
+      "current_sha256": "fc8ff48b33d91d3017a3f035ca2e1ca2c86b3bdb736230e2ae54a6045f825e13"
+    },
+    "docs/install/README.md": {
+      "qualified_handoff_sha256": "1bb245f32d72cb1c90de9500346a612df27bdf9c563e6c62f24176148255b4f4",
+      "current_sha256": "1bb245f32d72cb1c90de9500346a612df27bdf9c563e6c62f24176148255b4f4"
+    },
+    "docs/install/linux.md": {
+      "qualified_handoff_sha256": "2652a43cb7db36d0d86f72fc324e6ab8f0060b8003627999769a1e2c02a01452",
+      "current_sha256": "2652a43cb7db36d0d86f72fc324e6ab8f0060b8003627999769a1e2c02a01452"
+    },
+    "docs/install/macos.md": {
+      "qualified_handoff_sha256": "9fbbe7509cb2f4c8710d9e06a8e02a10bd26ce59f6031fc8744f63846092a6f4",
+      "current_sha256": "9fbbe7509cb2f4c8710d9e06a8e02a10bd26ce59f6031fc8744f63846092a6f4"
+    },
+    "docs/install/windows.md": {
+      "qualified_handoff_sha256": "9f63a79516b55e945c47290e66172a2ce94c710bf2ee52a41cb6b93573fa24ac",
+      "current_sha256": "9f63a79516b55e945c47290e66172a2ce94c710bf2ee52a41cb6b93573fa24ac"
+    },
+    "docs/wiki/Async.md": {
+      "qualified_handoff_sha256": "2e6e86fda56f2e4ccef358775268b537da13b3671a2657da25a769563636e141",
+      "current_sha256": "2e6e86fda56f2e4ccef358775268b537da13b3671a2657da25a769563636e141"
+    },
+    "docs/wiki/CLI-commands.md": {
+      "qualified_handoff_sha256": "d4ccaf2a69291bfb8bea9d65c57fdfed54312c580dbcc418136e1ca77a261921",
+      "current_sha256": "d4ccaf2a69291bfb8bea9d65c57fdfed54312c580dbcc418136e1ca77a261921"
+    },
+    "docs/wiki/Collections.md": {
+      "qualified_handoff_sha256": "39a84cf15d6a75197c3c9baf4847c1662e2f255eb068900407b6e01131429bf2",
+      "current_sha256": "39a84cf15d6a75197c3c9baf4847c1662e2f255eb068900407b6e01131429bf2"
+    },
+    "docs/wiki/Editor-setup.md": {
+      "qualified_handoff_sha256": "bf8f742fce98a6d7d761e0a4aa40bf6a72170cff108d60087182bb1c4f4033d6",
+      "current_sha256": "bf8f742fce98a6d7d761e0a4aa40bf6a72170cff108d60087182bb1c4f4033d6"
+    },
+    "docs/wiki/First-program.md": {
+      "qualified_handoff_sha256": "862d25a65a36d5a04ed466080d211093e374036c7864eee251a165df01256d67",
+      "current_sha256": "862d25a65a36d5a04ed466080d211093e374036c7864eee251a165df01256d67"
+    },
+    "docs/wiki/Functions.md": {
+      "qualified_handoff_sha256": "c85dd33f0cbdf5629fd13d7ba2ecda0657f73ab0026200b853d38c95868eda0a",
+      "current_sha256": "c85dd33f0cbdf5629fd13d7ba2ecda0657f73ab0026200b853d38c95868eda0a"
+    },
+    "docs/wiki/Home.md": {
+      "qualified_handoff_sha256": "8c3d5c10be3c79d01bc1f2c64c03d57c445ffc502dc09fe5355b20997929c773",
+      "current_sha256": "8c3d5c10be3c79d01bc1f2c64c03d57c445ffc502dc09fe5355b20997929c773"
+    },
+    "docs/wiki/Installation.md": {
+      "qualified_handoff_sha256": "884a858729346034e8cc9bb5b59a2e74140244787f1c2cb24a801388c316656c",
+      "current_sha256": "884a858729346034e8cc9bb5b59a2e74140244787f1c2cb24a801388c316656c"
+    },
+    "docs/wiki/Language-basics.md": {
+      "qualified_handoff_sha256": "f0ec6f2326cffaeeed51cacf59974d6f5bc14a015376dcfbbf7e58499c656a6c",
+      "current_sha256": "f0ec6f2326cffaeeed51cacf59974d6f5bc14a015376dcfbbf7e58499c656a6c"
+    },
+    "docs/wiki/Managed-memory.md": {
+      "qualified_handoff_sha256": "3a7625f37ecebc73330a447056d1e21cdc54689d8952cc2deea0647227eb35b8",
+      "current_sha256": "3a7625f37ecebc73330a447056d1e21cdc54689d8952cc2deea0647227eb35b8"
+    },
+    "docs/wiki/Native-compilation.md": {
+      "qualified_handoff_sha256": "96c4e3ba61467c800b78b85e5391da59d7ba00e39aa0a00fb9c2db9b97501d54",
+      "current_sha256": "96c4e3ba61467c800b78b85e5391da59d7ba00e39aa0a00fb9c2db9b97501d54"
+    },
+    "docs/wiki/README.md": {
+      "qualified_handoff_sha256": "88338772f678bd5e5dc13cf1fc73b6a29585a085a21ce5ace1fe8f999be02726",
+      "current_sha256": "88338772f678bd5e5dc13cf1fc73b6a29585a085a21ce5ace1fe8f999be02726"
+    },
+    "docs/wiki/Troubleshooting.md": {
+      "qualified_handoff_sha256": "a26d42c97912d47c0a54a1db9e170e55a33645b5a927bd21a41b02a0d9b32586",
+      "current_sha256": "a26d42c97912d47c0a54a1db9e170e55a33645b5a927bd21a41b02a0d9b32586"
+    },
+    "docs/wiki/Types.md": {
+      "qualified_handoff_sha256": "ca02573fbdebe937d2d5f1e044b817369bee5601df7f362226a40beeaa68c8b7",
+      "current_sha256": "ca02573fbdebe937d2d5f1e044b817369bee5601df7f362226a40beeaa68c8b7"
+    },
+    "docs/wiki/_Footer.md": {
+      "qualified_handoff_sha256": "0b3e6358e66013def608e573a8394afd2e5bd00dc0cbfe54532f82edf674fb91",
+      "current_sha256": "0b3e6358e66013def608e573a8394afd2e5bd00dc0cbfe54532f82edf674fb91"
+    },
+    "docs/wiki/_Sidebar.md": {
+      "qualified_handoff_sha256": "719aa12207169ab8812234f734a4d40f8282acd022cd7d067265bb9efae2730c",
+      "current_sha256": "719aa12207169ab8812234f734a4d40f8282acd022cd7d067265bb9efae2730c"
+    },
+    "examples/hello/main.void": {
+      "qualified_handoff_sha256": "d89d7140f3b13a11020cb9f1a731b4735e9de23648c36c2e3eb6c72782c734d4",
+      "current_sha256": "d89d7140f3b13a11020cb9f1a731b4735e9de23648c36c2e3eb6c72782c734d4"
+    },
+    "examples/learn/async.void": {
+      "qualified_handoff_sha256": "044bb8753e70db35636978ae8306af7a8f004ba382dd94019917adc9b8afb21e",
+      "current_sha256": "044bb8753e70db35636978ae8306af7a8f004ba382dd94019917adc9b8afb21e"
+    },
+    "examples/learn/basics.void": {
+      "qualified_handoff_sha256": "931512b424b81c0d336d72a5df69ac07ab1c0082adff7cd20e31b8103df31cc6",
+      "current_sha256": "931512b424b81c0d336d72a5df69ac07ab1c0082adff7cd20e31b8103df31cc6"
+    },
+    "examples/learn/collections.void": {
+      "qualified_handoff_sha256": "f2b5fa2e86b27e0b7e51d16f4a8b2542ac79b9a367475dcad8ffab62513ddd9a",
+      "current_sha256": "f2b5fa2e86b27e0b7e51d16f4a8b2542ac79b9a367475dcad8ffab62513ddd9a"
+    },
+    "examples/learn/functions.void": {
+      "qualified_handoff_sha256": "813c78bcf01ce5ed2dbe99450fb2f8b63c16b8bf855b88faa9e3dcc52e78a830",
+      "current_sha256": "813c78bcf01ce5ed2dbe99450fb2f8b63c16b8bf855b88faa9e3dcc52e78a830"
+    },
+    "examples/learn/memory.void": {
+      "qualified_handoff_sha256": "3dbb49080c936f72f4fb141b61fc8ba3b18654811448a7c0030925690d9ec9eb",
+      "current_sha256": "3dbb49080c936f72f4fb141b61fc8ba3b18654811448a7c0030925690d9ec9eb"
+    },
+    "examples/learn/types.void": {
+      "qualified_handoff_sha256": "0bb634659fd5e855894964aa448b6bff6fd681bff419c9bc6c627e5cf8bb4579",
+      "current_sha256": "0bb634659fd5e855894964aa448b6bff6fd681bff419c9bc6c627e5cf8bb4579"
+    },
+    "src/main.cpp": {
+      "qualified_handoff_sha256": "ee589ed41131181e4c3dde59e4eb5fd96a5204d0b1e7df8109cce36c54420751",
+      "current_sha256": "756e50bee5173e9a48cf04c9e0aae420a8de531f020906937e65579c5f5a9348"
+    },
+    "src/native_build.cpp": {
+      "qualified_handoff_sha256": "939bea01e8fa52457591d704cec5a54f65b64a12413274b43ae9499f437779d0",
+      "current_sha256": "939bea01e8fa52457591d704cec5a54f65b64a12413274b43ae9499f437779d0"
+    },
+    "tests/cli/contract.py": {
+      "qualified_handoff_sha256": "25c6ad35b895f051c20e8c6baac99610889fc277c4bd7595f21f7a37b1b8c15e",
+      "current_sha256": "a760dfb536308390ac4c480491b373347b3a676c0ba791a95b822a9b1db92afc"
+    },
+    "tests/cli/install.py": {
+      "qualified_handoff_sha256": "ed9c3ed4af5fb44423f4ee43af9cd29642e2711ae7a5bc17bda3fae2e7ca8301",
+      "current_sha256": "ed9c3ed4af5fb44423f4ee43af9cd29642e2711ae7a5bc17bda3fae2e7ca8301"
+    },
+    "tests/cli/learning.py": {
+      "qualified_handoff_sha256": "7dc311019289e749f6a83b70d0e4fee5f84a83db8a11863797ea30f8b63586f6",
+      "current_sha256": "7dc311019289e749f6a83b70d0e4fee5f84a83db8a11863797ea30f8b63586f6"
+    },
+    "tests/stage9/workflow.py": {
+      "qualified_handoff_sha256": "6a54c5d690796781ee4030a969c38ecd9bc77915b7f80c0b5316bdb3a7b2c202",
+      "current_sha256": "6a54c5d690796781ee4030a969c38ecd9bc77915b7f80c0b5316bdb3a7b2c202"
+    },
+    "tools/ci/llvm_sdk.py": {
+      "qualified_handoff_sha256": "a043f5c82a80a747b1417d1635804b2195f002d92617188513b79a846659b355",
+      "current_sha256": "a043f5c82a80a747b1417d1635804b2195f002d92617188513b79a846659b355"
+    },
+    "tools/install.py": {
+      "qualified_handoff_sha256": "9f755a9cd5b50a9ca6536373a55c8135086ae7e1029a9d15906222428bab8ffd",
+      "current_sha256": "9f755a9cd5b50a9ca6536373a55c8135086ae7e1029a9d15906222428bab8ffd"
+    },
+    "tools/verify_install.py": {
+      "qualified_handoff_sha256": "f02f418623278a7c741c2037daafcd28c5d05e39434cc988e4b92be2b6bc5e3a",
+      "current_sha256": "f02f418623278a7c741c2037daafcd28c5d05e39434cc988e4b92be2b6bc5e3a"
+    },
+    "website/dist/docs/compiler-workflow/index.html": {
+      "qualified_handoff_sha256": "f117435fcfbe11327aa5c994e87e016b52974bf5384193dfea4f5b72884f2784",
+      "current_sha256": "f117435fcfbe11327aa5c994e87e016b52974bf5384193dfea4f5b72884f2784"
+    },
+    "website/dist/docs/modules/index.html": {
+      "qualified_handoff_sha256": "d613a18e3d379271e718b9ba0f42540a589acd056bc3590b7c94811735b8fc85",
+      "current_sha256": "d613a18e3d379271e718b9ba0f42540a589acd056bc3590b7c94811735b8fc85"
+    },
+    "website/dist/getting-started/index.html": {
+      "qualified_handoff_sha256": "d3a2bc0c82ccaa4284cf8192e8480b5e716a0ef0251a306db383017637d211b5",
+      "current_sha256": "d3a2bc0c82ccaa4284cf8192e8480b5e716a0ef0251a306db383017637d211b5"
+    },
+    "website/dist/roadmap/index.html": {
+      "qualified_handoff_sha256": "a8bf0620e062c11f1dcbe5038de97d678513f52d89ee03463a87b880fca58d03",
+      "current_sha256": "a8bf0620e062c11f1dcbe5038de97d678513f52d89ee03463a87b880fca58d03"
+    },
+    "website/public/docs/compiler-workflow/index.html": {
+      "qualified_handoff_sha256": "f117435fcfbe11327aa5c994e87e016b52974bf5384193dfea4f5b72884f2784",
+      "current_sha256": "f117435fcfbe11327aa5c994e87e016b52974bf5384193dfea4f5b72884f2784"
+    },
+    "website/public/docs/modules/index.html": {
+      "qualified_handoff_sha256": "d613a18e3d379271e718b9ba0f42540a589acd056bc3590b7c94811735b8fc85",
+      "current_sha256": "d613a18e3d379271e718b9ba0f42540a589acd056bc3590b7c94811735b8fc85"
+    },
+    "website/public/getting-started/index.html": {
+      "qualified_handoff_sha256": "d3a2bc0c82ccaa4284cf8192e8480b5e716a0ef0251a306db383017637d211b5",
+      "current_sha256": "d3a2bc0c82ccaa4284cf8192e8480b5e716a0ef0251a306db383017637d211b5"
+    },
+    "website/public/roadmap/index.html": {
+      "qualified_handoff_sha256": "a8bf0620e062c11f1dcbe5038de97d678513f52d89ee03463a87b880fca58d03",
+      "current_sha256": "a8bf0620e062c11f1dcbe5038de97d678513f52d89ee03463a87b880fca58d03"
+    },
+    "website/scripts/check.py": {
+      "qualified_handoff_sha256": "debe72c095a618c7dceafbca55b84503b78f2cff084987574a3cbc849e52a6a8",
+      "current_sha256": "debe72c095a618c7dceafbca55b84503b78f2cff084987574a3cbc849e52a6a8"
+    },
+    "website/scripts/test_check.py": {
+      "qualified_handoff_sha256": "55eb3c1bbd18fb36e10fa0971ae92cd30632eded6bb0e851302e1e8baa5e7972",
+      "current_sha256": "55eb3c1bbd18fb36e10fa0971ae92cd30632eded6bb0e851302e1e8baa5e7972"
+    }
+  }
+}

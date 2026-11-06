@@ -1,0 +1,878 @@
+clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)
+Target: x86_64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin
+
+LLD 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5) (compatible with GNU linkers)
+
+Running: /usr/bin/python3 /home/shmellyorc/Documents/Void.Language/tools/verify_http_dependencies.py /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release Release Linux
+HTTP dependency prefix verified: Release; 167 files
+Running: cmake -S /home/shmellyorc/Documents/Void.Language -B /home/shmellyorc/Documents/Void.Language/build/source-release -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DVOID_SANITIZERS=OFF -DVOID_LLVM_RESEARCH=OFF -DPython3_EXECUTABLE=/usr/bin/python3 -DVOID_HTTP_DEPS_ROOT=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release -DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++ -DLLVM_DIR=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm -DVOID_CLANG=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -DVOID_LINKER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld -DCMAKE_EXE_LINKER_FLAGS=--ld-path=\"/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld\"
+-- The C compiler identification is Clang 23.1.4
+-- The CXX compiler identification is Clang 23.1.4
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found ZLIB: /usr/lib/x86_64-linux-gnu/libz.so (found version "1.3.2")
+-- Found zstd: /usr/lib/x86_64-linux-gnu/libzstd.so
+-- Found LibXml2: /usr/lib/x86_64-linux-gnu/libxml2.so (found version "2.15.4")
+-- VOID LLVM: 23.1.4 at /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- Found Python3: /usr/bin/python3 (found suitable version "3.14.8", minimum required is "3.12") found components: Interpreter
+-- curl 8.23.0: 1586 files verified; four private corrections
+
+-- HTTP dependency prefix verified: Release; 167 files
+
+-- Using CMake version 4.3.4
+-- curl version=[8.23.0]
+-- CMake platform flags: UNIX LLVM-CLANG
+-- Picky compiler options: -Werror-implicit-function-declaration -Wextra -Wall -Wpedantic -Wbad-function-cast -Wconversion -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-long-long -Wno-multichar -Wpointer-arith -Wshadow -Wsign-compare -Wundef -Wunused -Wwrite-strings -Waddress -Wattributes -Wcast-align -Wcast-qual -Wdeclaration-after-statement -Wdiv-by-zero -Wempty-body -Wendif-labels -Wfloat-equal -Wformat-security -Wignored-qualifiers -Wmissing-field-initializers -Wmissing-noreturn -Wno-padded -Wno-sign-conversion -Wno-switch-default -Wno-switch-enum -Wno-system-headers -Wold-style-definition -Wredundant-decls -Wstrict-prototypes -Wtype-limits -Wunreachable-code -Wunused-parameter -Wvla -Wconditional-uninitialized -Wno-used-but-marked-unused -Wshift-sign-overflow -Wshorten-64-to-32 -Wformat=2 -Wlanguage-extension-token -Wno-covered-switch-default -Wno-disabled-macro-expansion -Wformat-non-iso -Wenum-conversion -Wmissing-variable-declarations -Wno-documentation-unknown-command -Wsometimes-uninitialized -Wdouble-promotion -Wheader-guard -Wpragmas -Wunused-const-variable -Wcomma -Wassign-enum -Wextra-semi-stmt -Wimplicit-fallthrough -Wxor-used-as-pow -Wcast-function-type -Wreserved-identifier -Wno-reserved-macro-identifier -Wno-unsafe-buffer-usage -Wcast-function-type-strict -Wformat-signedness -Warray-compare -Wc++-hidden-decl -Wimplicit-int-enum-cast -Wjump-misses-init -Wno-implicit-void-ptr-cast -Wtentative-definition-compat -Wc++-keyword
+-- Found Cares: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/include (found version "1.34.9")
+-- Found Perl: /usr/bin/perl (found version "5.42.3")
+-- Looking for connect in socket
+-- Looking for connect in socket - not found
+-- Performing Test HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID
+-- Performing Test HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID - Success
+-- Performing Test HAVE_SOCKADDR_IN6_SIN6_ADDR
+-- Performing Test HAVE_SOCKADDR_IN6_SIN6_ADDR - Success
+-- Found OpenSSL: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/lib/libcrypto.a (found version "1.1.1g")
+-- Looking for OPENSSL_IS_AWSLC
+-- Looking for OPENSSL_IS_AWSLC - found
+-- Looking for DES_ecb_encrypt
+-- Looking for DES_ecb_encrypt - found
+-- Looking for SSL_set0_wbio
+-- Looking for SSL_set0_wbio - found
+-- Found NGHTTP2: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/include (found version "1.70.0")
+-- Found Libidn2: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/include (found version "2.3.8")
+-- Found Libpsl: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/include (found version "0.21.5")
+-- Found CA bundle: /etc/ssl/certs/ca-certificates.crt
+-- Found CA path: /etc/ssl/certs
+-- Looking for sys/eventfd.h
+-- Looking for sys/eventfd.h - found
+-- Looking for sys/filio.h
+-- Looking for sys/filio.h - not found
+-- Looking for sys/ioctl.h
+-- Looking for sys/ioctl.h - found
+-- Looking for sys/param.h
+-- Looking for sys/param.h - found
+-- Looking for sys/poll.h
+-- Looking for sys/poll.h - found
+-- Looking for sys/resource.h
+-- Looking for sys/resource.h - found
+-- Looking for 3 include files sys/socket.h, ..., sys/select.h
+-- Looking for 3 include files sys/socket.h, ..., sys/select.h - found
+-- Looking for sys/sockio.h
+-- Looking for sys/sockio.h - not found
+-- Looking for 4 include files sys/socket.h, ..., sys/types.h
+-- Looking for 4 include files sys/socket.h, ..., sys/types.h - found
+-- Looking for sys/un.h
+-- Looking for sys/un.h - found
+-- Looking for 5 include files sys/socket.h, ..., sys/utime.h
+-- Looking for 5 include files sys/socket.h, ..., sys/utime.h - not found
+-- Looking for 5 include files sys/socket.h, ..., arpa/inet.h
+-- Looking for 5 include files sys/socket.h, ..., arpa/inet.h - found
+-- Looking for fcntl.h
+-- Looking for fcntl.h - found
+-- Looking for 6 include files sys/socket.h, ..., ifaddrs.h
+-- Looking for 6 include files sys/socket.h, ..., ifaddrs.h - found
+-- Looking for io.h
+-- Looking for io.h - not found
+-- Looking for 7 include files sys/socket.h, ..., libgen.h
+-- Looking for 7 include files sys/socket.h, ..., libgen.h - found
+-- Looking for linux/tcp.h
+-- Looking for linux/tcp.h - found
+-- Looking for locale.h
+-- Looking for locale.h - found
+-- Looking for 8 include files sys/socket.h, ..., net/if.h
+-- Looking for 8 include files sys/socket.h, ..., net/if.h - found
+-- Looking for 9 include files sys/socket.h, ..., netdb.h
+-- Looking for 9 include files sys/socket.h, ..., netdb.h - found
+-- Looking for 10 include files sys/socket.h, ..., netinet/in.h
+-- Looking for 10 include files sys/socket.h, ..., netinet/in.h - found
+-- Looking for netinet/in6.h
+-- Looking for netinet/in6.h - not found
+-- Looking for netinet/ip.h
+-- Looking for netinet/ip.h - found
+-- Looking for 11 include files sys/socket.h, ..., netinet/tcp.h
+-- Looking for 11 include files sys/socket.h, ..., netinet/tcp.h - found
+-- Looking for 12 include files sys/socket.h, ..., netinet/udp.h
+-- Looking for 12 include files sys/socket.h, ..., netinet/udp.h - found
+-- Looking for poll.h
+-- Looking for poll.h - found
+-- Looking for pwd.h
+-- Looking for pwd.h - found
+-- Looking for stdatomic.h
+-- Looking for stdatomic.h - found
+-- Looking for stdbool.h
+-- Looking for stdbool.h - found
+-- Looking for strings.h
+-- Looking for strings.h - found
+-- Looking for stropts.h
+-- Looking for stropts.h - not found
+-- Looking for termio.h
+-- Looking for termio.h - not found
+-- Looking for termios.h
+-- Looking for termios.h - found
+-- Looking for 13 include files sys/socket.h, ..., unistd.h
+-- Looking for 13 include files sys/socket.h, ..., unistd.h - found
+-- Looking for utime.h
+-- Looking for utime.h - found
+-- Looking for stdint.h
+-- Looking for stdint.h - found
+-- Looking for stddef.h
+-- Looking for stddef.h - found
+-- Check size of size_t
+-- Check size of size_t - done
+-- Check size of ssize_t
+-- Check size of ssize_t - done
+-- Check size of long
+-- Check size of long - done
+-- Check size of int
+-- Check size of int - done
+-- Check size of __int64
+-- Check size of __int64 - failed
+-- Check size of time_t
+-- Check size of time_t - done
+-- Check size of suseconds_t
+-- Check size of suseconds_t - done
+-- Looking for accept4
+-- Looking for accept4 - found
+-- Looking for fnmatch
+-- Looking for fnmatch - found
+-- Looking for basename
+-- Looking for basename - found
+-- Looking for poll
+-- Looking for poll - found
+-- Looking for socket
+-- Looking for socket - found
+-- Looking for socketpair
+-- Looking for socketpair - found
+-- Looking for recv
+-- Looking for recv - found
+-- Looking for send
+-- Looking for send - found
+-- Looking for sendmsg
+-- Looking for sendmsg - found
+-- Looking for sendmmsg
+-- Looking for sendmmsg - found
+-- Looking for memrchr
+-- Looking for memrchr - found
+-- Looking for alarm
+-- Looking for alarm - found
+-- Looking for fcntl
+-- Looking for fcntl - found
+-- Looking for getppid
+-- Looking for getppid - found
+-- Looking for utimes
+-- Looking for utimes - found
+-- Looking for closesocket
+-- Looking for closesocket - not found
+-- Looking for sigsetjmp
+-- Looking for sigsetjmp - found
+-- Looking for getpass_r
+-- Looking for getpass_r - not found
+-- Looking for getpwuid
+-- Looking for getpwuid - found
+-- Looking for getpwuid_r
+-- Looking for getpwuid_r - found
+-- Looking for geteuid
+-- Looking for geteuid - found
+-- Looking for utime
+-- Looking for utime - found
+-- Looking for gmtime_r
+-- Looking for gmtime_r - found
+-- Looking for localtime_r
+-- Looking for localtime_r - found
+-- Looking for gethostbyname_r
+-- Looking for gethostbyname_r - found
+-- Looking for gethostname
+-- Looking for gethostname - found
+-- Looking for signal
+-- Looking for signal - found
+-- Looking for strerror_r
+-- Looking for strerror_r - found
+-- Looking for sigaction
+-- Looking for sigaction - found
+-- Looking for siginterrupt
+-- Looking for siginterrupt - found
+-- Looking for getaddrinfo
+-- Looking for getaddrinfo - found
+-- Looking for getifaddrs
+-- Looking for getifaddrs - found
+-- Looking for freeaddrinfo
+-- Looking for freeaddrinfo - found
+-- Looking for pipe
+-- Looking for pipe - found
+-- Looking for eventfd
+-- Looking for eventfd - found
+-- Looking for getpeername
+-- Looking for getpeername - found
+-- Looking for getsockname
+-- Looking for getsockname - found
+-- Looking for getrlimit
+-- Looking for getrlimit - found
+-- Looking for setlocale
+-- Looking for setlocale - found
+-- Looking for setrlimit
+-- Looking for setrlimit - found
+-- Looking for pipe2
+-- Looking for pipe2 - found
+-- Looking for dirent.h
+-- Looking for dirent.h - found
+-- Looking for fchmod
+-- Looking for fchmod - found
+-- Looking for gettimeofday
+-- Looking for gettimeofday - found
+-- Looking for if_nametoindex
+-- Looking for if_nametoindex - found
+-- Looking for realpath
+-- Looking for realpath - found
+-- Looking for sched_yield
+-- Looking for sched_yield - found
+-- Looking for opendir
+-- Looking for opendir - found
+-- Looking for strcasecmp
+-- Looking for strcasecmp - found
+-- Looking for stricmp
+-- Looking for stricmp - not found
+-- Looking for strcmpi
+-- Looking for strcmpi - not found
+-- Looking for memset_s
+-- Looking for memset_s - not found
+-- Looking for memset_explicit
+-- Looking for memset_explicit - found
+-- Looking for fsetxattr
+-- Looking for fsetxattr - found
+-- Performing Test HAVE_FSETXATTR_5
+-- Performing Test HAVE_FSETXATTR_5 - Success
+-- Performing Test HAVE_FSETXATTR_6
+-- Performing Test HAVE_FSETXATTR_6 - Failed
+-- Check size of sa_family_t
+-- Check size of sa_family_t - done
+-- Performing Test HAVE_FCNTL_O_NONBLOCK
+-- Performing Test HAVE_FCNTL_O_NONBLOCK - Success
+-- Performing Test HAVE_IOCTLSOCKET
+-- Performing Test HAVE_IOCTLSOCKET - Failed
+-- Performing Test HAVE_IOCTLSOCKET_CAMEL
+-- Performing Test HAVE_IOCTLSOCKET_CAMEL - Failed
+-- Performing Test HAVE_IOCTLSOCKET_CAMEL_FIONBIO
+-- Performing Test HAVE_IOCTLSOCKET_CAMEL_FIONBIO - Failed
+-- Performing Test HAVE_IOCTLSOCKET_FIONBIO
+-- Performing Test HAVE_IOCTLSOCKET_FIONBIO - Failed
+-- Performing Test HAVE_IOCTL_FIONBIO
+-- Performing Test HAVE_IOCTL_FIONBIO - Success
+-- Performing Test HAVE_IOCTL_SIOCGIFADDR
+-- Performing Test HAVE_IOCTL_SIOCGIFADDR - Success
+-- Performing Test HAVE_SETSOCKOPT_SO_NONBLOCK
+-- Performing Test HAVE_SETSOCKOPT_SO_NONBLOCK - Failed
+-- Performing Test HAVE_GETHOSTBYNAME_R_3
+-- Performing Test HAVE_GETHOSTBYNAME_R_3 - Failed
+-- Performing Test HAVE_GETHOSTBYNAME_R_5
+-- Performing Test HAVE_GETHOSTBYNAME_R_5 - Failed
+-- Performing Test HAVE_GETHOSTBYNAME_R_6
+-- Performing Test HAVE_GETHOSTBYNAME_R_6 - Success
+-- Performing Test HAVE_BOOL_T
+-- Performing Test HAVE_BOOL_T - Success
+-- Performing Test HAVE_ATOMIC
+-- Performing Test HAVE_ATOMIC - Success
+-- Performing Test HAVE_GETHOSTBYNAME_R_3_REENTRANT
+-- Performing Test HAVE_GETHOSTBYNAME_R_3_REENTRANT - Failed
+-- Performing Test HAVE_GETHOSTBYNAME_R_5_REENTRANT
+-- Performing Test HAVE_GETHOSTBYNAME_R_5_REENTRANT - Failed
+-- Performing Test HAVE_GETHOSTBYNAME_R_6_REENTRANT
+-- Performing Test HAVE_GETHOSTBYNAME_R_6_REENTRANT - Success
+-- Performing Test HAVE_FILE_OFFSET_BITS
+-- Performing Test HAVE_FILE_OFFSET_BITS - Success
+-- Check size of off_t
+-- Check size of off_t - done
+-- Looking for fseeko
+-- Looking for fseeko - found
+-- Check size of curl_off_t
+-- Check size of curl_off_t - done
+-- Check size of curl_socket_t
+-- Check size of curl_socket_t - done
+-- Performing Test HAVE_WRITABLE_ARGV
+-- Performing Test HAVE_WRITABLE_ARGV - Success
+-- Performing Test HAVE_TIME_T_UNSIGNED
+-- Performing Test HAVE_TIME_T_UNSIGNED - Failed
+-- Performing Test HAVE_GLIBC_STRERROR_R
+-- Performing Test HAVE_GLIBC_STRERROR_R - Success
+-- Performing Test HAVE_POSIX_STRERROR_R
+-- Performing Test HAVE_POSIX_STRERROR_R - Failed
+-- Performing Test HAVE_CLOCK_GETTIME_MONOTONIC
+-- Performing Test HAVE_CLOCK_GETTIME_MONOTONIC - Success
+-- Check size of struct sockaddr_storage
+-- Check size of struct sockaddr_storage - done
+-- Performing Test HAVE_STRUCT_TIMEVAL
+-- Performing Test HAVE_STRUCT_TIMEVAL - Success
+-- Performing Test HAVE_H_ERRNO
+-- Performing Test HAVE_H_ERRNO - Success
+-- Performing Test HAVE_CLOCK_GETTIME_MONOTONIC_RAW
+-- Performing Test HAVE_CLOCK_GETTIME_MONOTONIC_RAW - Success
+-- Protocols: http https
+-- Features: AsynchDNS HTTP2 HTTPS-proxy IDN IPv6 Largefile PSL SSL threadsafe
+-- Enabled SSL backends: AWS-LC
+-- Performing Test VOID_LLVM_ORC_RUNS
+-- Performing Test VOID_LLVM_ORC_RUNS - Success
+-- Configuring done (18.6s)
+-- Generating done (0.1s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/build/source-release
+Running: cmake --build /home/shmellyorc/Documents/Void.Language/build/source-release --target voidc voidls --parallel 3
+[  0%] Building CXX object CMakeFiles/void_zone_objects.dir/third_party/date/src/tz.cpp.o
+[  0%] Building C object CMakeFiles/void_native_fixture.dir/src/native/fixture.c.o
+[  0%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/altsvc.c.o
+[  1%] Building C object CMakeFiles/void_native_fixture.dir/src/native/sink.c.o
+[  2%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/amigaos.c.o
+[  2%] Linking C static library libvoid_native_fixture.a
+[  2%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/api.c.o
+[  2%] Built target void_native_fixture
+[  2%] Building CXX object CMakeFiles/void_format_objects.dir/src/format.cpp.o
+[  2%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/bufq.c.o
+[  3%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/bufref.c.o
+[  3%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-h1-proxy.c.o
+[  4%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-h2-proxy.c.o
+[  4%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-haproxy.c.o
+[  4%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-https-connect.c.o
+[  5%] Building C object CMakeFiles/void_format_objects.dir/third_party/ryu/ryu/d2s.c.o
+[  6%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-ip-happy.c.o
+[  6%] Building C object CMakeFiles/void_format_objects.dir/third_party/ryu/ryu/f2s.c.o
+In file included from /home/shmellyorc/Documents/Void.Language/third_party/date/src/tz.cpp:86:
+In file included from /home/shmellyorc/Documents/Void.Language/third_party/date/include/date/tz_private.h:31:
+In file included from /home/shmellyorc/Documents/Void.Language/third_party/date/include/date/tz.h:99:
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:966:34: warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  966 | CONSTCD11 date::day  operator "" _d(unsigned long long d) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_d
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:967:34: warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  967 | CONSTCD11 date::year operator "" _y(unsigned long long y) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_y
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:1975:13: warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1975 | operator "" _d(unsigned long long d) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_d
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:1983:13: warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1983 | operator "" _y(unsigned long long y) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_y
+[  6%] Building C object CMakeFiles/void_format_objects.dir/third_party/ryu/ryu/d2fixed.c.o
+[  6%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-recvbuf.c.o
+[  6%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-setup.c.o
+[  6%] Built target void_format_objects
+[  7%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-socket.c.o
+[  7%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cfilters.c.o
+[  8%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/conncache.c.o
+[  8%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/connect.c.o
+[  8%] Building CXX object CMakeFiles/void_zone_objects.dir/src/temporal.cpp.o
+[  8%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/content_encoding.c.o
+[  9%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cookie.c.o
+/home/shmellyorc/Documents/Void.Language/third_party/date/src/tz.cpp:201:23: warning: unused variable 'folder_delimiter' [-Wunused-const-variable]
+  201 | static CONSTDATA char folder_delimiter = '/';
+      |                       ^~~~~~~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/third_party/date/src/tz.cpp:318:1: warning: unused function 'get_download_folder' [-Wunused-function]
+  318 | get_download_folder()
+      | ^~~~~~~~~~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/third_party/date/src/tz.cpp:458:1: warning: unused function 'get_install' [-Wunused-function]
+  458 | get_install()
+      | ^~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/third_party/date/src/tz.cpp:3728:1: warning: unused function 'get_version' [-Wunused-function]
+ 3728 | get_version(const std::string& path)
+      | ^~~~~~~~~~~
+[  9%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/creds.c.o
+[  9%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cshutdn.c.o
+[ 10%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_addrinfo.c.o
+[ 10%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_endian.c.o
+[ 11%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_fnmatch.c.o
+[ 11%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_fopen.c.o
+[ 11%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_get_line.c.o
+[ 12%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_gethostname.c.o
+[ 12%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_gssapi.c.o
+In file included from /home/shmellyorc/Documents/Void.Language/src/temporal.cpp:3:
+In file included from /home/shmellyorc/Documents/Void.Language/third_party/date/include/date/tz.h:99:
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:966:34: warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  966 | CONSTCD11 date::day  operator "" _d(unsigned long long d) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_d
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:967:34: warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  967 | CONSTCD11 date::year operator "" _y(unsigned long long y) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_y
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:1975:13: warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1975 | operator "" _d(unsigned long long d) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_d
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:1983:13: warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1983 | operator "" _y(unsigned long long y) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_y
+[ 12%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_memrchr.c.o
+[ 13%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_ntlm_core.c.o
+[ 13%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_range.c.o
+[ 14%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_sasl.c.o
+[ 14%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_sha512_256.c.o
+[ 14%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_share.c.o
+[ 15%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_sspi.c.o
+[ 15%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_threads.c.o
+[ 15%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_trc.c.o
+[ 16%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cw-out.c.o
+4 warnings generated.
+[ 16%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cw-pause.c.o
+[ 16%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/dict.c.o
+[ 17%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/dynhds.c.o
+[ 17%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/easy.c.o
+[ 18%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/easygetopt.c.o
+[ 18%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/easyoptions.c.o
+[ 18%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/escape.c.o
+[ 19%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/fake_addrinfo.c.o
+[ 19%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/file.c.o
+[ 19%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/fileinfo.c.o
+[ 20%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/formdata.c.o
+[ 20%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ftp.c.o
+[ 21%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ftplistparser.c.o
+[ 21%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/getenv.c.o
+8 warnings generated.
+[ 21%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/getinfo.c.o
+[ 21%] Built target void_zone_objects
+[ 22%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/gopher.c.o
+[ 22%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/hash.c.o
+[ 22%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/headers.c.o
+[ 22%] Building CXX object CMakeFiles/void_core.dir/src/frontend/source.cpp.o
+[ 23%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/hmac.c.o
+[ 23%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/hsts.c.o
+[ 24%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http.c.o
+[ 25%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[ 25%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http1.c.o
+[ 25%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http2.c.o
+[ 26%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_aws_sigv4.c.o
+[ 26%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_httpsig.c.o
+[ 26%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_ed25519.c.o
+[ 27%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_chunks.c.o
+[ 27%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_digest.c.o
+[ 28%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_negotiate.c.o
+[ 28%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_ntlm.c.o
+[ 28%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_proxy.c.o
+[ 29%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/idn.c.o
+[ 29%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/if2ip.c.o
+[ 29%] Building CXX object CMakeFiles/void_core.dir/src/frontend/tooling.cpp.o
+[ 29%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/imap.c.o
+[ 30%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ldap.c.o
+[ 30%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/llist.c.o
+[ 30%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/macos.c.o
+[ 31%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/md4.c.o
+[ 31%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/md5.c.o
+[ 32%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/memdebug.c.o
+[ 32%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/mime.c.o
+[ 32%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/mprintf.c.o
+[ 34%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/mqtt.c.o
+[ 34%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/multi.c.o
+[ 34%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/multi_ev.c.o
+[ 35%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/multi_ntfy.c.o
+[ 35%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/netrc.c.o
+[ 36%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/openldap.c.o
+[ 36%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/parsedate.c.o
+[ 36%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/peer.c.o
+[ 37%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/pingpong.c.o
+[ 37%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/pop3.c.o
+[ 37%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/progress.c.o
+[ 38%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/protocol.c.o
+[ 38%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/proxy.c.o
+[ 39%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/psl.c.o
+[ 39%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ptrarray.c.o
+[ 39%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/rand.c.o
+[ 40%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ratelimit.c.o
+[ 40%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/request.c.o
+[ 40%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/rtsp.c.o
+[ 41%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/select.c.o
+[ 41%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/sendf.c.o
+[ 42%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/setopt.c.o
+[ 42%] Building CXX object CMakeFiles/void_core.dir/src/numeric.cpp.o
+[ 42%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/sha256.c.o
+[ 42%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/slist.c.o
+[ 43%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/smtp.c.o
+[ 43%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/socketpair.c.o
+[ 43%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/socks.c.o
+[ 44%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/socks_gssapi.c.o
+[ 44%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/socks_sspi.c.o
+[ 45%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/splay.c.o
+[ 45%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/strcase.c.o
+[ 45%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/strequal.c.o
+[ 46%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/strerror.c.o
+[ 46%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/telnet.c.o
+[ 46%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/tftp.c.o
+[ 47%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/thrdpool.c.o
+[ 47%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/thrdqueue.c.o
+[ 47%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/transfer.c.o
+[ 48%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/u8_strset.c.o
+[ 48%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/u32_ptrset.c.o
+[ 49%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/uint-bset.c.o
+[ 49%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/uint-spbset.c.o
+[ 49%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/uint-table.c.o
+[ 50%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/url.c.o
+[ 50%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/urlapi.c.o
+[ 51%] Building CXX object CMakeFiles/void_core.dir/src/ir/module.cpp.o
+[ 51%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/version.c.o
+[ 52%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ws.c.o
+[ 52%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/cleartext.c.o
+[ 53%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/cram.c.o
+[ 53%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/digest.c.o
+[ 53%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/digest_sspi.c.o
+[ 54%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/gsasl.c.o
+[ 54%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/krb5_gssapi.c.o
+[ 54%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/krb5_sspi.c.o
+[ 55%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/ntlm.c.o
+[ 55%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/ntlm_sspi.c.o
+[ 56%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/oauth2.c.o
+[ 56%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/spnego_gssapi.c.o
+[ 56%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/spnego_sspi.c.o
+[ 57%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/vauth.c.o
+[ 57%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/asyn-ares.c.o
+[ 57%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/asyn-base.c.o
+[ 58%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/asyn-thrdd.c.o
+[ 58%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/cf-dns.c.o
+[ 59%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/dnscache.c.o
+[ 59%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/doh.c.o
+[ 59%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/hostip.c.o
+[ 60%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/hostip4.c.o
+[ 60%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/hostip6.c.o
+[ 60%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/httpsrr.c.o
+[ 61%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/apple.c.o
+[ 61%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/cipher_suite.c.o
+[ 61%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/gtls.c.o
+[ 62%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/hostcheck.c.o
+[ 62%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/mbedtls.c.o
+[ 63%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/openssl.c.o
+[ 63%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/rustls.c.o
+[ 63%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/schannel.c.o
+[ 64%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/schannel_verify.c.o
+[ 64%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/vtls.c.o
+[ 64%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/vtls_config.c.o
+[ 65%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/vtls_scache.c.o
+[ 65%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/vtls_spack.c.o
+[ 67%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/wolfssl.c.o
+[ 67%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/x509asn1.c.o
+[ 67%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/capsule.c.o
+[ 68%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-capsule.c.o
+[ 68%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-ngtcp2.c.o
+[ 68%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-ngtcp2-cmn.c.o
+[ 69%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-ngtcp2-proxy.c.o
+[ 69%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-quiche.c.o
+[ 70%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/vquic.c.o
+[ 70%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/vquic-tls.c.o
+[ 70%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vssh/libssh.c.o
+[ 71%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vssh/libssh2.c.o
+[ 71%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vssh/vssh.c.o
+[ 71%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/base64.c.o
+[ 72%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/basename.c.o
+[ 72%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/dynbuf.c.o
+[ 73%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/win32-fopen.c.o
+[ 73%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/inet_ntop.c.o
+[ 73%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/inet_pton.c.o
+[ 74%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/multibyte.c.o
+[ 74%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/nonblock.c.o
+[ 74%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/snprintf.c.o
+[ 75%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/strcopy.c.o
+[ 75%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/strdup.c.o
+[ 76%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/strerr.c.o
+[ 76%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/strparse.c.o
+[ 76%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/timediff.c.o
+[ 77%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/timeval.c.o
+[ 77%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/version_win32.c.o
+[ 77%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/wait.c.o
+[ 78%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/warnless.c.o
+[ 78%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/winapi.c.o
+[ 78%] Building C object curl/lib/CMakeFiles/libcurl_static.dir/__/__/__/src/runtime/curl_keylog_disabled.c.o
+[ 79%] Linking C static library libcurl.a
+[ 79%] Built target libcurl_static
+[ 79%] Building CXX object CMakeFiles/void_core.dir/src/ir/native_storage.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_core.dir/src/ir/native_binding.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/os.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/os_abi.cpp.o
+[ 81%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/random.cpp.o
+[ 81%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem_abi.cpp.o
+[ 81%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem.cpp.o
+[ 82%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_resource.cpp.o
+[ 82%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_binding.cpp.o
+[ 82%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/temporal_abi.cpp.o
+[ 83%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/conversion.cpp.o
+[ 83%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/text_case.cpp.o
+[ 84%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/buffer.cpp.o
+[ 84%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/list.cpp.o
+[ 84%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/array.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/dictionary.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/fixed_abi.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/gc_schema.cpp.o
+[ 86%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/heap.cpp.o
+[ 86%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/coordination.cpp.o
+[ 87%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:669:137: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  669 |                 if(data.key && !request.keys && (!data.key->down || data.key->repeat!=1))return {-1,false,false,{ErrorKind::unsupported}};
+      |                                                                                                                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:672:69: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  672 |                 if(data.after)return {-1,false,false,data.after,true};
+      |                                                                     ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:675:41: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  675 |             if(queue.eof)return {-1,true};
+      |                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:676:44: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  676 |             if(!fetch)return {-1,false,true};
+      |                                            ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:677:91: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  677 |             if(auto error=stopped(request,op.adapter());error)return {-1,false,false,error};
+      |                                                                                           ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:690:137: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  690 |                 if(poll && !native.completed && native.error.kind==ErrorKind::would_block){queue.blocks.pop_back();return {-1,false,true};}
+      |                                                                                                                                         ^
+6 warnings generated.
+[ 87%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console_abi.cpp.o
+[ 87%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/callback.cpp.o
+[ 88%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/abi.cpp.o
+[ 88%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/reload.cpp.o
+[ 88%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native.cpp.o
+[ 89%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/async.cpp.o
+[ 89%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_provider.cpp.o
+[ 90%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/url.cpp.o
+[ 90%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/url_abi.cpp.o
+[ 90%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http.cpp.o
+[ 91%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_bulk.cpp.o
+[ 91%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_resource.cpp.o
+[ 91%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_file.cpp.o
+[ 92%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_abi.cpp.o
+[ 92%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_work.cpp.o
+[ 93%] Linking CXX static library libvoid_runtime.a
+[ 93%] Built target void_runtime
+[ 94%] Generating void-native-resources.txt, native-resources-install-Release.txt
+[ 94%] Built target void_native_inventory
+[ 94%] Linking CXX static library libvoid_core.a
+[ 94%] Built target void_core
+[ 94%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/native_cache.cpp.o
+[ 95%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+[ 96%] Linking CXX static library libvoid_llvm.a
+[ 96%] Built target void_llvm
+[ 97%] Building CXX object CMakeFiles/voidc_objects.dir/src/main.cpp.o
+[ 97%] Building CXX object CMakeFiles/voidc_objects.dir/examples/proof.cpp.o
+[ 97%] Building CXX object CMakeFiles/voidc_objects.dir/src/native_build.cpp.o
+/home/shmellyorc/Documents/Void.Language/examples/proof.cpp:7:46: warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+    7 |         {Terminator::Kind::return_value, 2}}}};
+      |                                              ^
+/home/shmellyorc/Documents/Void.Language/examples/proof.cpp:13:6: warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+   13 |     }};
+      |      ^
+2 warnings generated.
+[ 97%] Built target voidc_objects
+[ 97%] Generating cache-identity-Release.cpp
+[ 98%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Release.cpp.o
+[ 98%] Linking CXX static library libvoid_cache_identity.a
+[ 98%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[ 20%] Built target void_format_objects
+[ 20%] Built target void_zone_objects
+[ 80%] Built target void_core
+[ 80%] Building CXX object CMakeFiles/void_lsp.dir/src/lsp/positions.cpp.o
+[ 80%] Linking CXX static library libvoid_lsp.a
+[ 80%] Built target void_lsp
+[ 80%] Building CXX object CMakeFiles/voidls.dir/src/lsp/main.cpp.o
+[100%] Linking CXX executable voidls
+[100%] Built target voidls
+Running: cmake --install /home/shmellyorc/Documents/Void.Language/build/source-release --config Release --prefix /tmp/void-dx-install --component compiler
+-- Installing: /tmp/void-dx-install/share/void/licenses/VOID-MIT-LICENSE.txt
+-- Installing: /tmp/void-dx-install/share/void/licenses/LICENSING_SCOPE.md
+-- Installing: /tmp/void-dx-install/share/void/licenses/REDISTRIBUTION.txt
+-- Installing: /tmp/void-dx-install/share/void/licenses/NOTICE_INVENTORY.json
+-- Installing: /tmp/void-dx-install/share/void/licenses/llvm-23.1.4
+-- Installing: /tmp/void-dx-install/share/void/licenses/llvm-23.1.4/LICENSE.TXT
+-- Installing: /tmp/void-dx-install/share/void/licenses/llvm-23.1.4/ConvertUTF-NOTICES.txt
+-- Installing: /tmp/void-dx-install/share/void/licenses/llvm-23.1.4/xxhash-NOTICES.txt
+-- Installing: /tmp/void-dx-install/share/void/licenses/llvm-23.1.4/BLAKE3-LICENSE.txt
+-- Installing: /tmp/void-dx-install/share/void/licenses/llvm-23.1.4/Support-NOTICES.txt
+-- Installing: /tmp/void-dx-install/share/void/licenses/zstd-1.5.7
+-- Installing: /tmp/void-dx-install/share/void/licenses/zstd-1.5.7/LICENSE
+-- Installing: /tmp/void-dx-install/share/void/licenses/zstd-1.5.7/EMBEDDED-NOTICES.txt
+-- Installing: /tmp/void-dx-install/share/void/licenses/zlib-1.3.2/LICENSE
+-- Installing: /tmp/void-dx-install/share/void/licenses/UNICODE-LICENSE.txt
+-- Installing: /tmp/void-dx-install/share/void/stdlib
+-- Installing: /tmp/void-dx-install/share/void/stdlib/time.void
+-- Installing: /tmp/void-dx-install/share/void/stdlib/console.void
+-- Installing: /tmp/void-dx-install/share/void/stdlib/encoding
+-- Installing: /tmp/void-dx-install/share/void/stdlib/encoding/binary.void
+-- Installing: /tmp/void-dx-install/share/void/stdlib/encoding/hex.void
+-- Installing: /tmp/void-dx-install/share/void/stdlib/encoding/base64.void
+-- Installing: /tmp/void-dx-install/share/void/stdlib/encoding/ascii.void
+-- Installing: /tmp/void-dx-install/share/void/stdlib/io
+-- Installing: /tmp/void-dx-install/share/void/stdlib/io/memory.void
+-- Installing: /tmp/void-dx-install/share/void/stdlib/error.void
+-- Installing: /tmp/void-dx-install/share/void/stdlib/convert.void
+-- Installing: /tmp/void-dx-install/share/void/stdlib/io.void
+-- Installing: /tmp/void-dx-install/share/void/stdlib/path.void
+-- Installing: /tmp/void-dx-install/share/void/stdlib/text.void
+-- Installing: /tmp/void-dx-install/share/void/stdlib/random.void
+-- Installing: /tmp/void-dx-install/share/void/stdlib/math.void
+-- Installing: /tmp/void-dx-install/share/void/stdlib/json.void
+-- Installing: /tmp/void-dx-install/share/void/stdlib/channel.void
+-- Installing: /tmp/void-dx-install/share/void/stdlib/os.void
+-- Installing: /tmp/void-dx-install/share/void/stdlib/collections.void
+-- Installing: /tmp/void-dx-install/share/void/stdlib/log.void
+-- Installing: /tmp/void-dx-install/share/void/stdlib/url.void
+-- Installing: /tmp/void-dx-install/share/void/stdlib/net
+-- Installing: /tmp/void-dx-install/share/void/stdlib/net/http.void
+-- Installing: /tmp/void-dx-install/share/void/licenses/LICENSE-Boost
+-- Installing: /tmp/void-dx-install/share/void/licenses/LICENSE.txt
+-- Installing: /tmp/void-dx-install/share/void/licenses/NOTICE
+-- Installing: /tmp/void-dx-install/share/void/licenses/LICENSE
+-- Installing: /tmp/void-dx-install/share/void/licenses/stage10-versions.json
+-- Installing: /tmp/void-dx-install/bin/voidc
+-- Set non-toolchain portion of runtime path of "/tmp/void-dx-install/bin/voidc" to "$ORIGIN/../lib/void"
+-- Installing: /tmp/void-dx-install/lib/void/libvoid_runtime.a
+-- Installing: /tmp/void-dx-install/lib/void/libvoid_native_fixture.a
+-- Installing: /tmp/void-dx-install/lib/void/libcurl.a
+-- Installing: /tmp/void-dx-install/lib/void/libpsl.a
+-- Installing: /tmp/void-dx-install/lib/void/libnghttp2.a
+-- Installing: /tmp/void-dx-install/lib/void/libssl.a
+-- Installing: /tmp/void-dx-install/lib/void/libcrypto.a
+-- Installing: /tmp/void-dx-install/lib/void/libcares.a
+-- Installing: /tmp/void-dx-install/lib/void/libz.a
+-- Up-to-date: /tmp/void-dx-install/lib/void
+-- Installing: /tmp/void-dx-install/lib/void/cmake
+-- Installing: /tmp/void-dx-install/lib/void/cmake/nghttp2
+-- Installing: /tmp/void-dx-install/lib/void/cmake/c-ares
+-- Installing: /tmp/void-dx-install/lib/void/cmake/zlib
+-- Installing: /tmp/void-dx-install/lib/void/pkgconfig
+-- Installing: /tmp/void-dx-install/lib/void/crypto
+-- Installing: /tmp/void-dx-install/lib/void/crypto/cmake
+-- Installing: /tmp/void-dx-install/lib/void/crypto/cmake/static
+-- Installing: /tmp/void-dx-install/lib/void/ssl
+-- Installing: /tmp/void-dx-install/lib/void/ssl/cmake
+-- Installing: /tmp/void-dx-install/lib/void/ssl/cmake/static
+-- Installing: /tmp/void-dx-install/lib/void/libunistring.so.5
+-- Installing: /tmp/void-dx-install/lib/void/libunistring.so
+-- Installing: /tmp/void-dx-install/lib/void/libidn2.so.0
+-- Installing: /tmp/void-dx-install/lib/void/libidn2.so
+-- Installing: /tmp/void-dx-install/lib/void/libunistring.so.5.2.2
+-- Installing: /tmp/void-dx-install/lib/void/libidn2.so.0.4.0
+-- Installing: /tmp/void-dx-install/share/void/licenses/http
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/nghttp2-1.70.0
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/nghttp2-1.70.0/COPYING
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/nghttp2-1.70.0/README
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/c-ares-1.34.9
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/c-ares-1.34.9/LICENSE.md
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/zlib-1.3.2
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/zlib-1.3.2/LICENSE
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/zlib-1.3.2/README
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/openssl-3.5.9
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/openssl-3.5.9/LICENSE.txt
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/libidn2-2.3.8
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/libidn2-2.3.8/COPYING
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/libidn2-2.3.8/COPYING.LESSERv3
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/libidn2-2.3.8/COPYING.unicode
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/libidn2-2.3.8/COPYINGv2
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/libidn2-2.3.8/README
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/libpsl-0.21.5
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/libpsl-0.21.5/README
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/libpsl-0.21.5/COPYING
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/libpsl-0.21.5/LICENSE
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/libpsl-0.21.5/LICENSE.chromium
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/libunistring-1.5
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/libunistring-1.5/COPYING.LIB
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/libunistring-1.5/README
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/libunistring-1.5/COPYING
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/aws-lc-5.12.0
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/aws-lc-5.12.0/LICENSE
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/aws-lc-5.12.0/NOTICE
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/aws-lc-5.12.0/UPSTREAM.json
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/COPYING
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/NOTICE
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/VOID-PROVENANCE.json
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/http-versions.json
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/publicsuffix
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/publicsuffix/public_suffix_list.dat
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/publicsuffix/UPSTREAM.json
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/publicsuffix/LICENSE
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/corresponding-source/libidn2-2.3.8.tar.gz
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/corresponding-source/libunistring-1.5.tar.xz
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/corresponding-source/setup_http_deps.py
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/corresponding-source/setup_http_deps_native.py
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/corresponding-source/http_archive.py
+-- Installing: /tmp/void-dx-install/share/void/licenses/http/VOID-HTTP-DEPENDENCIES.json
+-- Installing: /tmp/void-dx-install/bin/void-native.txt
+-- Installing: /tmp/void-dx-install/bin/void-native-resources.txt
+Running: cmake --install /home/shmellyorc/Documents/Void.Language/build/source-release --config Release --prefix /tmp/void-dx-install --component tooling
+-- Installing: /tmp/void-dx-install/bin/voidls
+-- Up-to-date: /tmp/void-dx-install/share/void/licenses/VOID-MIT-LICENSE.txt
+-- Up-to-date: /tmp/void-dx-install/share/void/licenses/LICENSING_SCOPE.md
+-- Up-to-date: /tmp/void-dx-install/share/void/licenses/REDISTRIBUTION.txt
+-- Up-to-date: /tmp/void-dx-install/share/void/licenses/NOTICE_INVENTORY.json
+-- Up-to-date: /tmp/void-dx-install/share/void/licenses/llvm-23.1.4
+-- Up-to-date: /tmp/void-dx-install/share/void/licenses/llvm-23.1.4/LICENSE.TXT
+-- Up-to-date: /tmp/void-dx-install/share/void/licenses/llvm-23.1.4/ConvertUTF-NOTICES.txt
+-- Up-to-date: /tmp/void-dx-install/share/void/licenses/llvm-23.1.4/xxhash-NOTICES.txt
+-- Up-to-date: /tmp/void-dx-install/share/void/licenses/llvm-23.1.4/BLAKE3-LICENSE.txt
+-- Up-to-date: /tmp/void-dx-install/share/void/licenses/llvm-23.1.4/Support-NOTICES.txt
+-- Up-to-date: /tmp/void-dx-install/share/void/licenses/zstd-1.5.7
+-- Up-to-date: /tmp/void-dx-install/share/void/licenses/zstd-1.5.7/LICENSE
+-- Up-to-date: /tmp/void-dx-install/share/void/licenses/zstd-1.5.7/EMBEDDED-NOTICES.txt
+-- Up-to-date: /tmp/void-dx-install/share/void/licenses/zlib-1.3.2/LICENSE
+-- Up-to-date: /tmp/void-dx-install/share/void/licenses/UNICODE-LICENSE.txt
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/time.void
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/console.void
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/encoding
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/encoding/binary.void
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/encoding/hex.void
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/encoding/base64.void
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/encoding/ascii.void
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/io
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/io/memory.void
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/error.void
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/convert.void
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/io.void
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/path.void
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/text.void
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/random.void
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/math.void
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/json.void
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/channel.void
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/os.void
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/collections.void
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/log.void
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/url.void
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/net
+-- Up-to-date: /tmp/void-dx-install/share/void/stdlib/net/http.void
+-- Up-to-date: /tmp/void-dx-install/share/void/licenses/LICENSE-Boost
+-- Up-to-date: /tmp/void-dx-install/share/void/licenses/LICENSE.txt
+-- Up-to-date: /tmp/void-dx-install/share/void/licenses/NOTICE
+-- Up-to-date: /tmp/void-dx-install/share/void/licenses/LICENSE
+-- Up-to-date: /tmp/void-dx-install/share/void/licenses/stage10-versions.json
+-- Installing: /tmp/void-dx-install/share/void/vim
+-- Installing: /tmp/void-dx-install/share/void/vim/ftdetect
+-- Installing: /tmp/void-dx-install/share/void/vim/ftdetect/void.vim
+-- Installing: /tmp/void-dx-install/share/void/vim/ftplugin
+-- Installing: /tmp/void-dx-install/share/void/vim/ftplugin/void.vim
+-- Installing: /tmp/void-dx-install/share/void/vim/syntax
+-- Installing: /tmp/void-dx-install/share/void/vim/syntax/void.vim
+-- Installing: /tmp/void-dx-install/share/void/vim/indent
+-- Installing: /tmp/void-dx-install/share/void/vim/indent/void.vim
+-- Installing: /tmp/void-dx-install/share/void/vim/autoload
+-- Installing: /tmp/void-dx-install/share/void/vim/autoload/void.vim
+-- Installing: /tmp/void-dx-install/share/void/vim/autoload/void_format.vim
+-- Installing: /tmp/void-dx-install/share/void/neovim
+-- Installing: /tmp/void-dx-install/share/void/neovim/lua
+-- Installing: /tmp/void-dx-install/share/void/neovim/lua/void.lua
+Running: /usr/bin/python3 /home/shmellyorc/Documents/Void.Language/tools/verify_install.py /tmp/void-dx-install
+voidc 0.1.0 (development)
+LLVM 23.1.4
+Target: x86_64-unknown-linux-gnu
+Build identity: 037ede6099a8b599e3488732e1924dca9dbc17d6187ae1bd106486f47a38c0de
+PASS: installed stdlib check, optimized/Debug run, native build/run, resource hashes and LSP handshake
+Installed and verified VOID in /tmp/void-dx-install
+Add /tmp/void-dx-install/bin to PATH.
+Receipt: /home/shmellyorc/Documents/Void.Language/build/source-release/source-install.json

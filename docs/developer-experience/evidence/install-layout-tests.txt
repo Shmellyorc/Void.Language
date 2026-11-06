@@ -1,0 +1,20 @@
+test_dangling_linker_option_is_rejected (__main__.LayoutTests.test_dangling_linker_option_is_rejected) ... ok
+test_hashed_resource_omitted_from_link_manifest_is_rejected (__main__.LayoutTests.test_hashed_resource_omitted_from_link_manifest_is_rejected) ... ok
+test_inventory_cannot_escape_private_prefix (__main__.LayoutTests.test_inventory_cannot_escape_private_prefix) ... ok
+test_inventory_version_and_install_relative_paths_are_preserved (__main__.LayoutTests.test_inventory_version_and_install_relative_paths_are_preserved) ... ok
+test_linked_shared_library_without_inventory_entry_is_rejected (__main__.LayoutTests.test_linked_shared_library_without_inventory_entry_is_rejected) ... ok
+test_linux_exclusion_list_is_not_a_file_resource (__main__.LayoutTests.test_linux_exclusion_list_is_not_a_file_resource) ... ok
+test_linux_layout_accepts_shared_resources_and_linker_operands (__main__.LayoutTests.test_linux_layout_accepts_shared_resources_and_linker_operands) ... ok
+test_linux_shared_aliases_and_versioned_files_are_resources (__main__.LayoutTests.test_linux_shared_aliases_and_versioned_files_are_resources) ... ok
+test_macos_layout_accepts_archives_frameworks_and_sdk_operands (__main__.LayoutTests.test_macos_layout_accepts_archives_frameworks_and_sdk_operands) ... ok
+test_missing_resource_is_rejected_on_all_platform_representations (__main__.LayoutTests.test_missing_resource_is_rejected_on_all_platform_representations) ... ok
+test_native_manifest_and_static_crt_checks_are_preserved (__main__.LayoutTests.test_native_manifest_and_static_crt_checks_are_preserved) ... ok
+test_resource_corruption_is_rejected_on_all_platform_representations (__main__.LayoutTests.test_resource_corruption_is_rejected_on_all_platform_representations) ... ok
+test_shared_library_symlink_cannot_escape_private_prefix (__main__.LayoutTests.test_shared_library_symlink_cannot_escape_private_prefix) ... ok
+test_unhashed_file_argument_is_rejected_before_and_after_flags (__main__.LayoutTests.test_unhashed_file_argument_is_rejected_before_and_after_flags) ... ok
+test_windows_layout_accepts_lib_resources_and_system_libraries (__main__.LayoutTests.test_windows_layout_accepts_lib_resources_and_system_libraries) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.160s
+
+OK

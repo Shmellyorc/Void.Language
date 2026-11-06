@@ -1,0 +1,13 @@
+test_install_smoke_opts_in_only_on_macos (__main__.DependencyCommandTests.test_install_smoke_opts_in_only_on_macos) ... ok
+test_installation_changes_only_aws_tool_selection (__main__.DependencyCommandTests.test_installation_changes_only_aws_tool_selection) ... ok
+test_linux_forwarder_rejects_macos_option (__main__.DependencyCommandTests.test_linux_forwarder_rejects_macos_option) ... ok
+test_macos_default_retains_tools_and_static_ssl_crypto (__main__.DependencyCommandTests.test_macos_default_retains_tools_and_static_ssl_crypto) ... ok
+test_macos_forwarder_preserves_explicit_and_default_arguments (__main__.DependencyCommandTests.test_macos_forwarder_preserves_explicit_and_default_arguments) ... ok
+test_native_option_rejected_outside_macos_before_work (__main__.DependencyCommandTests.test_native_option_rejected_outside_macos_before_work) ... ok
+test_required_macos_archive_and_header_contract (__main__.DependencyCommandTests.test_required_macos_archive_and_header_contract) ... ok
+test_windows_default_preserves_schannel_dependency_selection (__main__.DependencyCommandTests.test_windows_default_preserves_schannel_dependency_selection) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.113s
+
+OK

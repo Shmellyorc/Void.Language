@@ -1,0 +1,13 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start   1: cli_contract
+1/4 Test   #1: cli_contract .....................   Passed    2.12 sec
+    Start   2: cli_install
+2/4 Test   #2: cli_install ......................   Passed    0.92 sec
+    Start  61: application_workflow_stage9
+3/4 Test  #61: application_workflow_stage9 ......   Passed    4.58 sec
+    Start 296: onboarding_examples
+4/4 Test #296: onboarding_examples ..............   Passed    0.37 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   8.01 sec

@@ -1,0 +1,117 @@
+{
+  "system": "Linux",
+  "architecture": "x86_64",
+  "python": "3.14.8 (main, Oct  1 2026, 19:55:55) [GCC 16.2.0]",
+  "configuration": "Release",
+  "prefix": "/tmp/VOID DX installed \u00e9 # %",
+  "commands": [
+    {
+      "label": "http-verify",
+      "argv": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tools/verify_http_dependencies.py",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release",
+        "Release",
+        "Linux"
+      ],
+      "exit_code": 0,
+      "log": "/home/shmellyorc/Documents/Void.Language/build/source-release/http-verify.log",
+      "seconds": 0.23129174701170996
+    },
+    {
+      "label": "configure",
+      "argv": [
+        "cmake",
+        "-S",
+        "/home/shmellyorc/Documents/Void.Language",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/build/source-release",
+        "-G",
+        "Unix Makefiles",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DBUILD_TESTING=OFF",
+        "-DVOID_SANITIZERS=OFF",
+        "-DVOID_LLVM_RESEARCH=OFF",
+        "-DPython3_EXECUTABLE=/usr/bin/python3",
+        "-DVOID_HTTP_DEPS_ROOT=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release",
+        "-DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+        "-DLLVM_DIR=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm",
+        "-DVOID_CLANG=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-DVOID_LINKER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+        "-DCMAKE_EXE_LINKER_FLAGS=--ld-path=\"/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld\""
+      ],
+      "exit_code": 0,
+      "log": "/home/shmellyorc/Documents/Void.Language/build/source-release/configure.log",
+      "seconds": 5.489773925975896
+    },
+    {
+      "label": "build",
+      "argv": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/build/source-release",
+        "--target",
+        "voidc",
+        "voidls",
+        "--parallel",
+        "3"
+      ],
+      "exit_code": 0,
+      "log": "/home/shmellyorc/Documents/Void.Language/build/source-release/build.log",
+      "seconds": 0.7411845860187896
+    },
+    {
+      "label": "install-compiler",
+      "argv": [
+        "cmake",
+        "--install",
+        "/home/shmellyorc/Documents/Void.Language/build/source-release",
+        "--config",
+        "Release",
+        "--prefix",
+        "/tmp/VOID DX installed \u00e9 # %",
+        "--component",
+        "compiler"
+      ],
+      "exit_code": 0,
+      "log": "/home/shmellyorc/Documents/Void.Language/build/source-release/install-compiler.log",
+      "seconds": 0.11565148696536198
+    },
+    {
+      "label": "install-tooling",
+      "argv": [
+        "cmake",
+        "--install",
+        "/home/shmellyorc/Documents/Void.Language/build/source-release",
+        "--config",
+        "Release",
+        "--prefix",
+        "/tmp/VOID DX installed \u00e9 # %",
+        "--component",
+        "tooling"
+      ],
+      "exit_code": 0,
+      "log": "/home/shmellyorc/Documents/Void.Language/build/source-release/install-tooling.log",
+      "seconds": 0.023736489994917065
+    },
+    {
+      "label": "verify-install",
+      "argv": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tools/verify_install.py",
+        "/tmp/VOID DX installed \u00e9 # %"
+      ],
+      "exit_code": 0,
+      "log": "/home/shmellyorc/Documents/Void.Language/build/source-release/verify-install.log",
+      "seconds": 0.4200512639945373
+    }
+  ],
+  "status": "PASS",
+  "sdk": {
+    "version": "23.1.4",
+    "asset": "LLVM-23.1.4-Linux-X64.tar.xz",
+    "sha256": "25d814fda50d5fb0084b42be09605d8b1595d49d5e2e03a3345d7e112ff6f9f3",
+    "url": "https://github.com/llvm/llvm-project/releases/download/llvmorg-23.1.4/LLVM-23.1.4-Linux-X64.tar.xz"
+  }
+}

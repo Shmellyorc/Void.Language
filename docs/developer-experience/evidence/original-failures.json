@@ -1,0 +1,36 @@
+[
+  {
+    "kind": "initial installer prototype",
+    "exit_code": 2,
+    "observed": "Missing prerequisite: ninja; see docs/install/linux.md",
+    "resolution": "Select Ninja when available, Unix Makefiles on Linux/macOS otherwise; Windows still requires Ninja.",
+    "evidence": "Tool output captured during implementation; initial log was replaced by the successful retry."
+  },
+  {
+    "kind": "fresh container start",
+    "exit_code": 125,
+    "observed": "could not find pasta, the network namespace cannot be configured: exec: \"pasta\": executable file not found in $PATH",
+    "resolution": "Preserved created container; created separate -host container with host networking. Fresh userspace; shared host kernel and network."
+  },
+  {
+    "kind": "web tool access",
+    "observed": "web open returned inaccessible; urllib returned HTTP 403 on 52 official pages",
+    "resolution": "curl returned HTTP 200 on all 52 official pages; both curl audit and urllib failures retained."
+  },
+  {
+    "kind": "existing workflow regression expectation",
+    "observed": "application_workflow_stage9 expected voidc --version to fail; it now succeeds with a non-Clang identity",
+    "resolution": "Assert Clang identity rejection; also probe a native application that rejects --version to retain the failed-probe control. All three native Linux configurations passed rerun."
+  },
+  {
+    "kind": "license harness invocation",
+    "exit_code": 2,
+    "observed": "Required --build-dir and --evidence-dir arguments missing",
+    "resolution": "Reinvoked with required paths; all five validation groups passed."
+  },
+  {
+    "kind": "installer preflight test harness",
+    "observed": "Expected source-prefix-specific error but overlap guard correctly ran first",
+    "resolution": "Use an external build-dir to isolate the source-prefix guard. Three actual error cases passed without setup/build mutation."
+  }
+]

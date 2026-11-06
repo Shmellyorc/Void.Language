@@ -1,0 +1,188 @@
+{
+  "release": {
+    "cli_contract": {
+      "backtrace": 1,
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/cli/contract.py",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc"
+      ],
+      "name": "cli_contract",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release"
+        }
+      ]
+    },
+    "cli_install": {
+      "backtrace": 3,
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/cli/install.py",
+        "/usr/bin/cmake",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+        "Release"
+      ],
+      "name": "cli_install",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 240.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release"
+        }
+      ]
+    },
+    "onboarding_examples": {
+      "backtrace": 619,
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/cli/learning.py",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release"
+      ],
+      "name": "onboarding_examples",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 240.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release"
+        }
+      ]
+    }
+  },
+  "debug": {
+    "cli_contract": {
+      "backtrace": 1,
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/cli/contract.py",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc"
+      ],
+      "name": "cli_contract",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug"
+        }
+      ]
+    },
+    "cli_install": {
+      "backtrace": 3,
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/cli/install.py",
+        "/usr/bin/cmake",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+        "Debug"
+      ],
+      "name": "cli_install",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 240.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug"
+        }
+      ]
+    },
+    "onboarding_examples": {
+      "backtrace": 645,
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/cli/learning.py",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug"
+      ],
+      "name": "onboarding_examples",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 240.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug"
+        }
+      ]
+    }
+  },
+  "strict": {
+    "cli_contract": {
+      "backtrace": 1,
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/cli/contract.py",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc"
+      ],
+      "name": "cli_contract",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict"
+        }
+      ]
+    },
+    "cli_install": {
+      "backtrace": 3,
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/cli/install.py",
+        "/usr/bin/cmake",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict",
+        "RelWithDebInfo"
+      ],
+      "name": "cli_install",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 240.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict"
+        }
+      ]
+    },
+    "onboarding_examples": {
+      "backtrace": 599,
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/cli/learning.py",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict"
+      ],
+      "name": "onboarding_examples",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 240.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict"
+        }
+      ]
+    }
+  }
+}

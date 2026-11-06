@@ -1,6 +1,14 @@
 # AOT-only SIMD staging and Boss CI preparation
 
-6 November 2026. **Boss verdict: RETAIN FOR CROSS-PLATFORM QUALIFICATION.**
+**Accepted baseline — 6 November 2026:** commit `175c08c8a0cab0b701ba71365ffcc398a0c9bcf3`
+passed [all seven jobs in run 42231556437](https://github.com/Shmellyorc/Void.Language/actions/runs/42231556437): Linux Debug, Release and Sanitizers;
+Windows Debug/Release; macOS ARM64 Debug/Release. The following preparation/local
+measurements are preserved as dated evidence. This compiler CI does not qualify
+the new source-install wrapper or independently portable packages.
+
+## Historical preparation before the accepted CI run
+
+6 November 2026. **Preparation-time Boss verdict: RETAIN FOR CROSS-PLATFORM QUALIFICATION.**
 This preparation stages the approved AOT-only repair; it does not commit, push,
 reset, delete, branch or dispatch CI. Suggested commit title:
 
@@ -55,7 +63,8 @@ its cold-start regression and original failures remain recorded. The
 [AOT-only qualification](AUTOMATIC_SIMD_AOT_ONLY_QUALIFICATION.md) is retained:
 local generic-x86-64 integer controls improved about 2.7×, with explicit compile
 and size costs. It does not claim general checked-array SIMD or application-wide
-gains. Native Windows/macOS/ARM64 acceptance remains pending Boss-controlled CI.
+gains. Native Windows/macOS/ARM64 acceptance subsequently passed the seven-job
+run linked above; the preparation-time instructions below remain historical.
 
 ## Evidence, links and exclusions
 
@@ -124,7 +133,7 @@ were force-added individually; no ignore rule or unrelated file was staged.
 **Staging blockers:** none. Cross-platform qualification is
 not yet complete and is the next Boss-controlled action, not a new release hold.
 
-## Boss CI instructions
+## Historical Boss CI instructions (completed by accepted run)
 
 After Boss reviews, **commits and pushes**, manually dispatch
 [**Compiler link experiment**](../../.github/workflows/ci-link-experiment.yml)

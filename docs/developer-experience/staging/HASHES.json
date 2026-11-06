@@ -1,0 +1,25 @@
+{
+  "algorithm": "SHA-256",
+  "source_and_regression_files": {
+    "CMakeLists.txt": "7fdceafec4681e99968c3f1ef7e877d7572e6a137fd5ac13bdca00b99f521ec8",
+    "cmake/CurlProvider.cmake": "7a0fd3f14097dc22794059d48261d6dd00ec7856e353a0499d907808c742be73",
+    "src/main.cpp": "756e50bee5173e9a48cf04c9e0aae420a8de531f020906937e65579c5f5a9348",
+    "src/native_build.cpp": "939bea01e8fa52457591d704cec5a54f65b64a12413274b43ae9499f437779d0",
+    "tools/ci/llvm_sdk.py": "a043f5c82a80a747b1417d1635804b2195f002d92617188513b79a846659b355",
+    "tools/install.py": "9f755a9cd5b50a9ca6536373a55c8135086ae7e1029a9d15906222428bab8ffd",
+    "tools/verify_install.py": "f02f418623278a7c741c2037daafcd28c5d05e39434cc988e4b92be2b6bc5e3a",
+    "tests/cli/contract.py": "a760dfb536308390ac4c480491b373347b3a676c0ba791a95b822a9b1db92afc",
+    "tests/cli/install.py": "ed9c3ed4af5fb44423f4ee43af9cd29642e2711ae7a5bc17bda3fae2e7ca8301",
+    "tests/cli/learning.py": "7dc311019289e749f6a83b70d0e4fee5f84a83db8a11863797ea30f8b63586f6",
+    "tests/stage9/workflow.py": "6a54c5d690796781ee4030a969c38ecd9bc77915b7f80c0b5316bdb3a7b2c202"
+  },
+  "fixtures": {
+    "examples/hello/main.void": "d89d7140f3b13a11020cb9f1a731b4735e9de23648c36c2e3eb6c72782c734d4",
+    "examples/learn/async.void": "044bb8753e70db35636978ae8306af7a8f004ba382dd94019917adc9b8afb21e",
+    "examples/learn/basics.void": "931512b424b81c0d336d72a5df69ac07ab1c0082adff7cd20e31b8103df31cc6",
+    "examples/learn/collections.void": "f2b5fa2e86b27e0b7e51d16f4a8b2542ac79b9a367475dcad8ffab62513ddd9a",
+    "examples/learn/functions.void": "813c78bcf01ce5ed2dbe99450fb2f8b63c16b8bf855b88faa9e3dcc52e78a830",
+    "examples/learn/memory.void": "3dbb49080c936f72f4fb141b61fc8ba3b18654811448a7c0030925690d9ec9eb",
+    "examples/learn/types.void": "0bb634659fd5e855894964aa448b6bff6fd681bff419c9bc6c627e5cf8bb4579"
+  }
+}

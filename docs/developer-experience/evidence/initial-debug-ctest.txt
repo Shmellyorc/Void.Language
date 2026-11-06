@@ -1,0 +1,40 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+      Start   1: cli_contract
+ 1/11 Test   #1: cli_contract .....................   Passed    6.83 sec
+      Start   2: cli_install
+ 2/11 Test   #2: cli_install ......................   Passed    3.36 sec
+      Start  61: application_workflow_stage9
+ 3/11 Test  #61: application_workflow_stage9 ......***Failed   11.50 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage9/workflow.py", line 246, in <module>
+    run([installed,'build',source,'-o',output],1,diagnostic=diagnostic,env=environment if os.name=='nt' else None)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage9/workflow.py", line 15, in run
+    if diagnostic: assert diagnostic in p.stderr,(args,p.stdout,p.stderr)
+                          ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ([PosixPath('/tmp/VOID Stage9 é 🎮 # % x3sgb9n2/relocated # % é/bin/voidc'), 'build', PosixPath('/tmp/VOID Stage9 é 🎮 # % x3sgb9n2/game # % é/main.void'), '-o', PosixPath('/tmp/VOID Stage9 é 🎮 # % x3sgb9n2/game # % é/output # % é')], '', 'Native toolchain requires matching LLVM/Clang/LLD 23.1.4: /tmp/VOID Stage9 é 🎮 # % x3sgb9n2/relocated # % é/bin/voidc\n')
+
+      Start  62: native_output_paths_ci88
+ 4/11 Test  #62: native_output_paths_ci88 .........   Passed    2.73 sec
+      Start 104: debug_cache_processes
+ 5/11 Test #104: debug_cache_processes ............   Passed   17.64 sec
+      Start 105: automatic_cache_processes
+ 6/11 Test #105: automatic_cache_processes ........   Passed    0.57 sec
+      Start 150: lsp_protocol
+ 7/11 Test #150: lsp_protocol .....................   Passed    0.53 sec
+      Start 309: onboarding_examples
+ 8/11 Test #309: onboarding_examples ..............   Passed    0.55 sec
+      Start 371: numeric
+ 9/11 Test #371: numeric ..........................   Passed    4.96 sec
+      Start 372: frontend
+10/11 Test #372: frontend .........................   Passed    9.07 sec
+      Start 403: source_cli
+11/11 Test #403: source_cli .......................   Passed    6.98 sec
+
+91% tests passed, 1 tests failed out of 11
+
+Total Test time (real) =  64.73 sec
+
+The following tests FAILED:
+	 61 - application_workflow_stage9 (Failed)
+Errors while running CTest

@@ -1,0 +1,244 @@
+clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)
+Target: x86_64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin
+
+LLD 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5) (compatible with GNU linkers)
+
+Running: /usr/bin/python3 /home/shmellyorc/Documents/Void.Language/tools/verify_http_dependencies.py /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release Release Linux
+HTTP dependency prefix verified: Release; 167 files
+Running: cmake -S /home/shmellyorc/Documents/Void.Language -B /home/shmellyorc/Documents/Void.Language/build/source-release -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DVOID_SANITIZERS=OFF -DVOID_LLVM_RESEARCH=OFF -DPython3_EXECUTABLE=/usr/bin/python3 -DVOID_HTTP_DEPS_ROOT=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release -DCMAKE_C_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -DCMAKE_CXX_COMPILER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++ -DLLVM_DIR=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm -DVOID_CLANG=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -DVOID_LINKER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld -DCMAKE_EXE_LINKER_FLAGS=--ld-path=\"/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld\"
+-- VOID LLVM: 23.1.4 at /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- curl 8.23.0: 1586 files verified; four private corrections
+
+-- HTTP dependency prefix verified: Release; 167 files
+
+-- Using CMake version 4.3.4
+-- curl version=[8.23.0]
+-- CMake platform flags: UNIX LLVM-CLANG
+-- Picky compiler options: -Werror-implicit-function-declaration -Wextra -Wall -Wpedantic -Wbad-function-cast -Wconversion -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-long-long -Wno-multichar -Wpointer-arith -Wshadow -Wsign-compare -Wundef -Wunused -Wwrite-strings -Waddress -Wattributes -Wcast-align -Wcast-qual -Wdeclaration-after-statement -Wdiv-by-zero -Wempty-body -Wendif-labels -Wfloat-equal -Wformat-security -Wignored-qualifiers -Wmissing-field-initializers -Wmissing-noreturn -Wno-padded -Wno-sign-conversion -Wno-switch-default -Wno-switch-enum -Wno-system-headers -Wold-style-definition -Wredundant-decls -Wstrict-prototypes -Wtype-limits -Wunreachable-code -Wunused-parameter -Wvla -Wconditional-uninitialized -Wno-used-but-marked-unused -Wshift-sign-overflow -Wshorten-64-to-32 -Wformat=2 -Wlanguage-extension-token -Wno-covered-switch-default -Wno-disabled-macro-expansion -Wformat-non-iso -Wenum-conversion -Wmissing-variable-declarations -Wno-documentation-unknown-command -Wsometimes-uninitialized -Wdouble-promotion -Wheader-guard -Wpragmas -Wunused-const-variable -Wcomma -Wassign-enum -Wextra-semi-stmt -Wimplicit-fallthrough -Wxor-used-as-pow -Wcast-function-type -Wreserved-identifier -Wno-reserved-macro-identifier -Wno-unsafe-buffer-usage -Wcast-function-type-strict -Wformat-signedness -Warray-compare -Wc++-hidden-decl -Wimplicit-int-enum-cast -Wjump-misses-init -Wno-implicit-void-ptr-cast -Wtentative-definition-compat -Wc++-keyword
+-- Found CA bundle: /etc/ssl/certs/ca-certificates.crt
+-- Found CA path: /etc/ssl/certs
+-- Protocols: http https
+-- Features: AsynchDNS HTTP2 HTTPS-proxy IDN IPv6 Largefile PSL SSL threadsafe
+-- Enabled SSL backends: AWS-LC
+-- Performing Test VOID_LLVM_ORC_RUNS
+-- Performing Test VOID_LLVM_ORC_RUNS - Success
+-- Configuring done (5.5s)
+-- Generating done (0.1s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/build/source-release
+Running: cmake --build /home/shmellyorc/Documents/Void.Language/build/source-release --target voidc voidls --parallel 3
+[  1%] Built target void_native_fixture
+[  2%] Built target void_format_objects
+[  2%] Built target void_zone_objects
+[  5%] Built target void_core
+[ 80%] Built target libcurl_static
+[ 93%] Built target void_runtime
+[ 95%] Built target void_llvm
+[ 96%] Built target void_native_inventory
+[ 96%] Building CXX object CMakeFiles/voidc_objects.dir/src/main.cpp.o
+[ 97%] Built target voidc_objects
+[ 97%] Generating cache-identity-Release.cpp
+[ 98%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Release.cpp.o
+[ 98%] Linking CXX static library libvoid_cache_identity.a
+[ 98%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[  0%] Built target void_zone_objects
+[ 20%] Built target void_format_objects
+[ 80%] Built target void_core
+[ 80%] Built target void_lsp
+[100%] Built target voidls
+Running: cmake --install /home/shmellyorc/Documents/Void.Language/build/source-release --config Release --prefix "/tmp/VOID DX staged install é" --component compiler
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/VOID-MIT-LICENSE.txt
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/LICENSING_SCOPE.md
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/REDISTRIBUTION.txt
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/NOTICE_INVENTORY.json
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/llvm-23.1.4
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/llvm-23.1.4/LICENSE.TXT
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/llvm-23.1.4/ConvertUTF-NOTICES.txt
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/llvm-23.1.4/xxhash-NOTICES.txt
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/llvm-23.1.4/BLAKE3-LICENSE.txt
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/llvm-23.1.4/Support-NOTICES.txt
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/zstd-1.5.7
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/zstd-1.5.7/LICENSE
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/zstd-1.5.7/EMBEDDED-NOTICES.txt
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/zlib-1.3.2/LICENSE
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/UNICODE-LICENSE.txt
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/time.void
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/console.void
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/encoding
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/encoding/binary.void
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/encoding/hex.void
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/encoding/base64.void
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/encoding/ascii.void
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/io
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/io/memory.void
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/error.void
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/convert.void
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/io.void
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/path.void
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/text.void
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/random.void
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/math.void
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/json.void
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/channel.void
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/os.void
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/collections.void
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/log.void
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/url.void
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/net
+-- Installing: /tmp/VOID DX staged install é/share/void/stdlib/net/http.void
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/LICENSE-Boost
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/LICENSE.txt
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/NOTICE
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/LICENSE
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/stage10-versions.json
+-- Installing: /tmp/VOID DX staged install é/bin/voidc
+-- Set non-toolchain portion of runtime path of "/tmp/VOID DX staged install é/bin/voidc" to "$ORIGIN/../lib/void"
+-- Installing: /tmp/VOID DX staged install é/lib/void/libvoid_runtime.a
+-- Installing: /tmp/VOID DX staged install é/lib/void/libvoid_native_fixture.a
+-- Installing: /tmp/VOID DX staged install é/lib/void/libcurl.a
+-- Installing: /tmp/VOID DX staged install é/lib/void/libpsl.a
+-- Installing: /tmp/VOID DX staged install é/lib/void/libnghttp2.a
+-- Installing: /tmp/VOID DX staged install é/lib/void/libssl.a
+-- Installing: /tmp/VOID DX staged install é/lib/void/libcrypto.a
+-- Installing: /tmp/VOID DX staged install é/lib/void/libcares.a
+-- Installing: /tmp/VOID DX staged install é/lib/void/libz.a
+-- Up-to-date: /tmp/VOID DX staged install é/lib/void
+-- Installing: /tmp/VOID DX staged install é/lib/void/cmake
+-- Installing: /tmp/VOID DX staged install é/lib/void/cmake/nghttp2
+-- Installing: /tmp/VOID DX staged install é/lib/void/cmake/c-ares
+-- Installing: /tmp/VOID DX staged install é/lib/void/cmake/zlib
+-- Installing: /tmp/VOID DX staged install é/lib/void/pkgconfig
+-- Installing: /tmp/VOID DX staged install é/lib/void/crypto
+-- Installing: /tmp/VOID DX staged install é/lib/void/crypto/cmake
+-- Installing: /tmp/VOID DX staged install é/lib/void/crypto/cmake/static
+-- Installing: /tmp/VOID DX staged install é/lib/void/ssl
+-- Installing: /tmp/VOID DX staged install é/lib/void/ssl/cmake
+-- Installing: /tmp/VOID DX staged install é/lib/void/ssl/cmake/static
+-- Installing: /tmp/VOID DX staged install é/lib/void/libunistring.so.5
+-- Installing: /tmp/VOID DX staged install é/lib/void/libunistring.so
+-- Installing: /tmp/VOID DX staged install é/lib/void/libidn2.so.0
+-- Installing: /tmp/VOID DX staged install é/lib/void/libidn2.so
+-- Installing: /tmp/VOID DX staged install é/lib/void/libunistring.so.5.2.2
+-- Installing: /tmp/VOID DX staged install é/lib/void/libidn2.so.0.4.0
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/nghttp2-1.70.0
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/nghttp2-1.70.0/COPYING
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/nghttp2-1.70.0/README
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/c-ares-1.34.9
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/c-ares-1.34.9/LICENSE.md
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/zlib-1.3.2
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/zlib-1.3.2/LICENSE
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/zlib-1.3.2/README
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/openssl-3.5.9
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/openssl-3.5.9/LICENSE.txt
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/libidn2-2.3.8
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/libidn2-2.3.8/COPYING
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/libidn2-2.3.8/COPYING.LESSERv3
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/libidn2-2.3.8/COPYING.unicode
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/libidn2-2.3.8/COPYINGv2
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/libidn2-2.3.8/README
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/libpsl-0.21.5
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/libpsl-0.21.5/README
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/libpsl-0.21.5/COPYING
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/libpsl-0.21.5/LICENSE
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/libpsl-0.21.5/LICENSE.chromium
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/libunistring-1.5
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/libunistring-1.5/COPYING.LIB
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/libunistring-1.5/README
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/libunistring-1.5/COPYING
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/aws-lc-5.12.0
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/aws-lc-5.12.0/LICENSE
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/aws-lc-5.12.0/NOTICE
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/aws-lc-5.12.0/UPSTREAM.json
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/COPYING
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/NOTICE
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/VOID-PROVENANCE.json
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/http-versions.json
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/publicsuffix
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/publicsuffix/public_suffix_list.dat
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/publicsuffix/UPSTREAM.json
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/publicsuffix/LICENSE
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/corresponding-source/libidn2-2.3.8.tar.gz
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/corresponding-source/libunistring-1.5.tar.xz
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/corresponding-source/setup_http_deps.py
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/corresponding-source/setup_http_deps_native.py
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/corresponding-source/http_archive.py
+-- Installing: /tmp/VOID DX staged install é/share/void/licenses/http/VOID-HTTP-DEPENDENCIES.json
+-- Installing: /tmp/VOID DX staged install é/bin/void-native.txt
+-- Installing: /tmp/VOID DX staged install é/bin/void-native-resources.txt
+Running: cmake --install /home/shmellyorc/Documents/Void.Language/build/source-release --config Release --prefix "/tmp/VOID DX staged install é" --component tooling
+-- Installing: /tmp/VOID DX staged install é/bin/voidls
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/licenses/VOID-MIT-LICENSE.txt
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/licenses/LICENSING_SCOPE.md
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/licenses/REDISTRIBUTION.txt
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/licenses/NOTICE_INVENTORY.json
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/licenses/llvm-23.1.4
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/licenses/llvm-23.1.4/LICENSE.TXT
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/licenses/llvm-23.1.4/ConvertUTF-NOTICES.txt
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/licenses/llvm-23.1.4/xxhash-NOTICES.txt
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/licenses/llvm-23.1.4/BLAKE3-LICENSE.txt
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/licenses/llvm-23.1.4/Support-NOTICES.txt
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/licenses/zstd-1.5.7
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/licenses/zstd-1.5.7/LICENSE
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/licenses/zstd-1.5.7/EMBEDDED-NOTICES.txt
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/licenses/zlib-1.3.2/LICENSE
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/licenses/UNICODE-LICENSE.txt
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/time.void
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/console.void
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/encoding
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/encoding/binary.void
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/encoding/hex.void
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/encoding/base64.void
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/encoding/ascii.void
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/io
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/io/memory.void
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/error.void
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/convert.void
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/io.void
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/path.void
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/text.void
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/random.void
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/math.void
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/json.void
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/channel.void
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/os.void
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/collections.void
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/log.void
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/url.void
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/net
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/stdlib/net/http.void
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/licenses/LICENSE-Boost
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/licenses/LICENSE.txt
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/licenses/NOTICE
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/licenses/LICENSE
+-- Up-to-date: /tmp/VOID DX staged install é/share/void/licenses/stage10-versions.json
+-- Installing: /tmp/VOID DX staged install é/share/void/vim
+-- Installing: /tmp/VOID DX staged install é/share/void/vim/ftdetect
+-- Installing: /tmp/VOID DX staged install é/share/void/vim/ftdetect/void.vim
+-- Installing: /tmp/VOID DX staged install é/share/void/vim/ftplugin
+-- Installing: /tmp/VOID DX staged install é/share/void/vim/ftplugin/void.vim
+-- Installing: /tmp/VOID DX staged install é/share/void/vim/syntax
+-- Installing: /tmp/VOID DX staged install é/share/void/vim/syntax/void.vim
+-- Installing: /tmp/VOID DX staged install é/share/void/vim/indent
+-- Installing: /tmp/VOID DX staged install é/share/void/vim/indent/void.vim
+-- Installing: /tmp/VOID DX staged install é/share/void/vim/autoload
+-- Installing: /tmp/VOID DX staged install é/share/void/vim/autoload/void.vim
+-- Installing: /tmp/VOID DX staged install é/share/void/vim/autoload/void_format.vim
+-- Installing: /tmp/VOID DX staged install é/share/void/neovim
+-- Installing: /tmp/VOID DX staged install é/share/void/neovim/lua
+-- Installing: /tmp/VOID DX staged install é/share/void/neovim/lua/void.lua
+Running: /usr/bin/python3 /home/shmellyorc/Documents/Void.Language/tools/verify_install.py "/tmp/VOID DX staged install é"
+voidc 0.1.0 (development)
+LLVM 23.1.4
+Target: x86_64-unknown-linux-gnu
+Build identity: 3629087a653065a2cf01b12d571496632e565319508c207eded17785c3e73e91
+PASS: installed stdlib check, optimized/Debug run, native build/run, resource hashes and LSP handshake
+Installed and verified VOID in /tmp/VOID DX staged install é
+Add /tmp/VOID DX staged install é/bin to PATH.
+Receipt: /home/shmellyorc/Documents/Void.Language/build/source-release/source-install.json

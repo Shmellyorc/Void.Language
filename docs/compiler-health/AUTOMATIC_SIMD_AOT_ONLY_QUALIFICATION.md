@@ -1,9 +1,15 @@
 # Automatic SIMD — AOT-only implementation and qualification
 
-**6 November 2026 status: Boss verdict — retained for cross-platform qualification.**
+**Accepted baseline — 6 November 2026:** commit `175c08c8a0cab0b701ba71365ffcc398a0c9bcf3`
+passed [all seven jobs in run 42231556437](https://github.com/Shmellyorc/Void.Language/actions/runs/42231556437): Linux Debug, Release and Sanitizers;
+Windows Debug/Release; macOS ARM64 Debug/Release. The following preparation/local
+measurements are preserved as dated evidence. This compiler CI does not qualify
+the new source-install wrapper or independently portable packages.
 
-Boss approved Git/CI preparation of this AOT-only candidate. This is local Linux
-qualification, not completed Windows/macOS/native-ARM64 acceptance. The
+**6 November 2026 status: accepted after seven-job cross-platform qualification.**
+
+Boss approved this AOT-only candidate and its subsequent seven-job qualification.
+The measurements below are local Linux qualification. The
 [staging review and Boss CI instructions](AUTOMATIC_SIMD_AOT_STAGING.md) record
 the exact prepared scope. JIT target analysis remains unchanged; no general
 checked-array SIMD is claimed.
@@ -13,7 +19,7 @@ Inputs: [feasibility](AUTOMATIC_SIMD_FEASIBILITY.md),
 [reverted global candidate](AUTOMATIC_SIMD_QUALIFICATION.md),
 [roadmap](../VOIDC_AUTOMATIC_SIMD_ROADMAP.md).
 
-**Recommendation: RETAIN the AOT-only candidate for Golden Wrench/Boss review.**
+**Original local recommendation (subsequently accepted): RETAIN the AOT-only candidate.**
 The guarded and conditional integer programs execute **2.69× / 2.72× faster**
 under the existing portable generic AOT policy. The guarded complete build plus
 first execution improves **254.303→187.310 ms**, including its compilation cost.

@@ -1,0 +1,38 @@
+[
+  {
+    "argv": [
+      "python3",
+      "tools/install.py",
+      "--prefix",
+      "/tmp/void-dx-noop",
+      "--jobs",
+      "0"
+    ],
+    "exit_code": 2,
+    "stderr": "usage: install.py [-h] --prefix PREFIX [--configuration {Release,Debug}]\n                  [--build-dir BUILD_DIR] [--jobs JOBS]\ninstall.py: error: argument --jobs: must be at least 1\n"
+  },
+  {
+    "argv": [
+      "python3",
+      "tools/install.py",
+      "--prefix",
+      "/home/shmellyorc/Documents/Void.Language",
+      "--build-dir",
+      "/tmp/void-dx-preflight-build"
+    ],
+    "exit_code": 2,
+    "stderr": "usage: install.py [-h] --prefix PREFIX [--configuration {Release,Debug}]\n                  [--build-dir BUILD_DIR] [--jobs JOBS]\ninstall.py: error: The installation prefix cannot contain the source checkout\n"
+  },
+  {
+    "argv": [
+      "python3",
+      "tools/install.py",
+      "--prefix",
+      "/tmp/void-dx-test",
+      "--build-dir",
+      "/tmp/void-dx-test/build"
+    ],
+    "exit_code": 2,
+    "stderr": "usage: install.py [-h] --prefix PREFIX [--configuration {Release,Debug}]\n                  [--build-dir BUILD_DIR] [--jobs JOBS]\ninstall.py: error: Build and installation directories must be separate\n"
+  }
+]

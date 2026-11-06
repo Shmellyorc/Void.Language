@@ -1,0 +1,7 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-strict
+    Start 61: application_workflow_stage9
+1/1 Test #61: application_workflow_stage9 ......   Passed   27.19 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =  27.20 sec

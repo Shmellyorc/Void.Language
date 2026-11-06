@@ -1,4 +1,9 @@
-# First real source compiler
+# Source compiler and engineering build guide
+
+For onboarding, start with [source installation](install/README.md),
+[your first program](FIRST_PROGRAM.md) and the [current CLI reference](CLI.md).
+The manual build commands and dated implementation records below remain useful
+for engineering; current feature guides supersede historical exclusions.
 
 ## Stage 11 shared runtime globals
 
@@ -65,9 +70,9 @@ on a developer VM. Neither establishes independent-machine portability.
 clean-host procedure and remaining review gates. These are private source-install
 instructions, not a public binary package or redistribution authorization.
 
-The protected root README still contains older setup/CLI wording. This build
-section supersedes those commands; a separate README correction is proposed for
-Boss review. Historical LLVM19 feature and acceptance notes below remain history.
+The [root README](../README.md) now introduces the consolidated source-install
+entry point. These explicit commands remain available for engineering. Historical
+LLVM19 feature and acceptance notes below remain history.
 See the [migration record](llvm23/IMPLEMENTATION.md) for that transition.
 
 ### Linux dependencies and build

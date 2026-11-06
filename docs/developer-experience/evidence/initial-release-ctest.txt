@@ -1,0 +1,42 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+      Start   1: cli_contract
+ 1/12 Test   #1: cli_contract .....................   Passed    1.87 sec
+      Start   2: cli_install
+ 2/12 Test   #2: cli_install ......................   Passed    0.85 sec
+      Start  12: http_ci_policy
+ 3/12 Test  #12: http_ci_policy ...................   Passed    4.40 sec
+      Start  61: application_workflow_stage9
+ 4/12 Test  #61: application_workflow_stage9 ......***Failed    4.40 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage9/workflow.py", line 246, in <module>
+    run([installed,'build',source,'-o',output],1,diagnostic=diagnostic,env=environment if os.name=='nt' else None)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage9/workflow.py", line 15, in run
+    if diagnostic: assert diagnostic in p.stderr,(args,p.stdout,p.stderr)
+                          ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ([PosixPath('/tmp/VOID Stage9 é 🎮 # % s1pldze_/relocated # % é/bin/voidc'), 'build', PosixPath('/tmp/VOID Stage9 é 🎮 # % s1pldze_/game # % é/main.void'), '-o', PosixPath('/tmp/VOID Stage9 é 🎮 # % s1pldze_/game # % é/output # % é')], '', 'Native toolchain requires matching LLVM/Clang/LLD 23.1.4: /tmp/VOID Stage9 é 🎮 # % s1pldze_/relocated # % é/bin/voidc\n')
+
+      Start  62: native_output_paths_ci88
+ 5/12 Test  #62: native_output_paths_ci88 .........   Passed    0.92 sec
+      Start  91: debug_cache_processes
+ 6/12 Test  #91: debug_cache_processes ............   Passed    2.26 sec
+      Start  92: automatic_cache_processes
+ 7/12 Test  #92: automatic_cache_processes ........   Passed    0.45 sec
+      Start 137: lsp_protocol
+ 8/12 Test #137: lsp_protocol .....................   Passed    2.10 sec
+      Start 296: onboarding_examples
+ 9/12 Test #296: onboarding_examples ..............   Passed    0.37 sec
+      Start 358: numeric
+10/12 Test #358: numeric ..........................   Passed    1.83 sec
+      Start 359: frontend
+11/12 Test #359: frontend .........................   Passed    4.93 sec
+      Start 390: source_cli
+12/12 Test #390: source_cli .......................   Passed    3.49 sec
+
+92% tests passed, 1 tests failed out of 12
+
+Total Test time (real) =  27.87 sec
+
+The following tests FAILED:
+	 61 - application_workflow_stage9 (Failed)
+Errors while running CTest

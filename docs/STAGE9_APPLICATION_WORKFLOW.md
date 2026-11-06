@@ -19,6 +19,9 @@ Boss-controlled native hosted verification.
 
 ## Commands
 
+See the [current CLI reference](CLI.md) for help/version, `--no-cache`,
+operand delimiters, examples and installation diagnostics.
+
 ```text
 voidc check <file-or-directory>
 voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--cache]
@@ -47,7 +50,7 @@ main is never selected. No source scanning or separate parser chooses the mode.
 ## Native artifacts and resources
 
 Build emits the existing source object and links the existing static Runtime and
-fixture/sink archive through configured Clang **19.1.7**, using argv process
+fixture/sink archive through configured Clang **23.1.4**, using argv process
 execution. Linux's configured matching LLD retains its version gate. Windows uses
 the active SDK/MSVC/UCRT environment and the selected LLVM SDK's CRT policy
 (LLVM 23.1.4 requires release `/MT`; see [the repair record](llvm23/CROSS_PLATFORM_REPAIR.md)); macOS receives the

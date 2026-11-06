@@ -214,7 +214,14 @@ void publish_object(const ValidatedAnalysis& analysis,const fs::path& requested,
     output_path(analysis,output);publish(object,output);
 }
 void build_executable(const ValidatedAnalysis& analysis,const fs::path& requested,bool optimize,const char* argv0) {
-    auto config=resources(argv0);
+    auto config=[&] {
+        try {return resources(argv0);}
+        catch(const std::exception& error) {
+            throw std::runtime_error(std::string(error.what())+
+              "\nReinstall the matching CMake compiler component; keep bin/void-native*.txt, lib/void, "
+              "and the original LLVM/Clang/LLD 23.1.4 SDK together. See docs/install/README.md.");
+        }
+    }();
     auto output=output_path(analysis,requested);Staging stage(output);
 #ifdef _WIN32
     auto root=native_windows::temporary_root();exact_path(root);
@@ -250,7 +257,8 @@ void build_executable(const ValidatedAnalysis& analysis,const fs::path& requeste
     args.push_back("-ldl"); // Optional system terminfo binding in the Runtime archive.
 #endif
     auto status=execute(args);
-    if(status!=0)throw std::runtime_error("Native linker failed (status "+std::to_string(status)+").");
+    if(status!=0)throw std::runtime_error("Native linker failed (status "+std::to_string(status)+
+      "). Driver: "+path_utf8(config.driver)+"\nCheck the linker diagnostics above and host C/C++ development libraries. See docs/install/README.md.");
     if(!fs::is_regular_file(executable) || fs::file_size(executable)==0 || !llvm::sys::fs::can_execute(path_utf8(executable)))
         throw std::runtime_error("Native linker did not produce a usable executable.");
 #ifdef _WIN32

@@ -241,7 +241,9 @@ with tempfile.TemporaryDirectory(prefix='VOID Stage9 é 🎮 # % ') as temporary
     assert lines[3].startswith('../lib/void/') and lines[4].startswith('../lib/void/')
     write('return 7\n');run([installed,'build',source,'-o',output]);run([output],7,'')
     saved=output.read_bytes()
-    for row,change,diagnostic in [(1,str(root/'absent clang'),'resource missing'),(3,str(root/'absent runtime'),'resource missing'),(0,'invalid','resources missing'),(1,str(installed),'version check failed')]:
+    # voidc now supports --version successfully, but is still not a Clang driver.
+    # The application rejects --version, preserving a real failed-probe control.
+    for row,change,diagnostic in [(1,str(root/'absent clang'),'resource missing'),(3,str(root/'absent runtime'),'resource missing'),(0,'invalid','resources missing'),(1,str(installed),'requires matching'),(1,str(output),'version check failed')]:
         broken=lines.copy();broken[row]=change;config.write_text('\n'.join(broken)+'\n',encoding='utf-8')
         run([installed,'build',source,'-o',output],1,diagnostic=diagnostic,env=environment if os.name=='nt' else None)
         assert output.read_bytes()==saved

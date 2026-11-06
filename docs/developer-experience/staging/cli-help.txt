@@ -1,0 +1,30 @@
+VOID Language Compiler v0.1.0 (development)
+LLVM 23.1.4
+
+Usage: voidc check <file-or-directory> [--no-opt]
+Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache]
+Usage: voidc build [file-or-directory] [-o executable] [--no-opt]
+Usage: voidc emit <file-or-directory> -o <object> [--no-opt]
+
+Commands:
+  check   Analyze source and imports without executing startup code.
+  run     Execute through the JIT.
+  build   Compile and link a native executable with the matching Runtime.
+  emit    Write a native object for manual linking.
+
+Options:
+  -h, --help  Show help; use <command> --help for examples.
+  --version   Show compiler, LLVM, target and build identity.
+  --no-opt    Disable O2 (accepted as a no-op by check).
+  --cache     Select Debug code and report cache status (run only).
+  --no-cache  Disable disk caching (run only).
+  -o PATH     Set output path (build/emit only; required by emit).
+  --          End options before a source path.
+
+A directory selects main.void. run/build default to the current directory.
+Application entry selection is automatic (main or executable top-level code);
+--app has been removed. Use -- before a source path beginning with '-'.
+Quote paths containing spaces. Options may precede or follow operands.
+Exit status: 0 success; 1 compilation/toolchain failure; 2 invocation error.
+run propagates an application's process status.
+Documentation: https://voidlang.com/docs/compiler-workflow/

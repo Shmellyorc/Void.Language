@@ -6,7 +6,7 @@ function(void_add_curl_provider profile)
   if(TARGET libcurl_static)
     message(FATAL_ERROR "VOID curl provider already configured")
   endif()
-  find_package(Python3 REQUIRED COMPONENTS Interpreter)
+  find_package(Python3 3.12 REQUIRED COMPONENTS Interpreter)
   execute_process(COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../tools/verify_curl_source.py"
     RESULT_VARIABLE verified OUTPUT_VARIABLE verification ERROR_VARIABLE verification_error)
   if(NOT verified EQUAL 0)

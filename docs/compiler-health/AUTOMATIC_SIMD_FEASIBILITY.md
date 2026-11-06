@@ -3,9 +3,10 @@
 **6 November 2026 status: Historical research record.**
 
 This feasibility pass preceded both implementation trials. The global target-aware
-candidate was later rejected/reverted; Boss has retained the
-[AOT-only candidate](AUTOMATIC_SIMD_AOT_ONLY_QUALIFICATION.md) for cross-platform
-qualification. JIT target analysis, SLP default enablement and checked-array SIMD
+candidate was later rejected/reverted; Boss accepted the
+[AOT-only candidate](AUTOMATIC_SIMD_AOT_ONLY_QUALIFICATION.md) after
+[seven green jobs](AUTOMATIC_SIMD_AOT_STAGING.md). JIT target analysis, SLP default
+enablement and checked-array SIMD
 are not part of the retained change.
 
 6 November 2026. Research only; stop for Golden Wrench architecture review and

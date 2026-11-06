@@ -1,4 +1,4 @@
-"""Install the complete official LLVM 23.1.4 archive for GitHub-hosted runners.
+"""Install the complete official LLVM 23.1.4 archive for CI and source builds.
 
 This helper never installs a compiler-only Windows .exe: the SDK must contain
 headers, static development libraries, clang, and LLVMConfig.cmake together.
@@ -68,8 +68,8 @@ def install(destination: Path) -> None:
         shutil.move(str(sdk), destination)
 
 
-def main() -> None:
-    destination = Path(".toolchains") / f"llvm-{VERSION}"
+def prepare(destination: Path) -> dict:
+    """Prepare the existing pinned SDK recipe for CI or a local source build."""
     destination = destination.resolve()
     install(destination)
     suffix = ".exe" if os.name == "nt" else ""
@@ -112,6 +112,16 @@ def main() -> None:
         values["VOID_LINKER"] = linker
     if platform.system() == "Darwin":
         values["SDKROOT"] = subprocess.check_output(["xcrun", "--show-sdk-path"], text=True).strip()
+    return {key: str(value) for key, value in values.items()}
+
+
+def main() -> None:
+    destination = (Path(".toolchains") / f"llvm-{VERSION}").resolve()
+    values = prepare(destination)
+    if not os.environ.get("GITHUB_ENV") or not os.environ.get("GITHUB_PATH"):
+        print(json.dumps(values, indent=2))
+        print("Local source installation: python3 tools/install.py --help")
+        return
     with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env:
         for key, value in values.items():
             env.write(f"{key}={value}\n")

@@ -1,0 +1,7 @@
+func entry(latest_score: i32) -> i32:
+    var scores: [i32] = [10, 20]
+    scores.push(latest_score)
+    var total = 0
+    for score in scores:
+        total += score
+    return total

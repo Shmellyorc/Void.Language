@@ -1,0 +1,62 @@
+{
+  "platform": "Linux-7.2.11-pikaos-x86_64-with-glibc2.39",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "os_release": "PRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.5 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+  "source_sha256": {
+    "CMakeLists.txt": "7fdceafec4681e99968c3f1ef7e877d7572e6a137fd5ac13bdca00b99f521ec8",
+    "src/main.cpp": "ee589ed41131181e4c3dde59e4eb5fd96a5204d0b1e7df8109cce36c54420751",
+    "src/native_build.cpp": "939bea01e8fa52457591d704cec5a54f65b64a12413274b43ae9499f437779d0",
+    "tools/install.py": "9f755a9cd5b50a9ca6536373a55c8135086ae7e1029a9d15906222428bab8ffd",
+    "tools/verify_install.py": "f02f418623278a7c741c2037daafcd28c5d05e39434cc988e4b92be2b6bc5e3a",
+    "tools/ci/llvm_sdk.py": "a043f5c82a80a747b1417d1635804b2195f002d92617188513b79a846659b355",
+    "tests/cli/contract.py": "25c6ad35b895f051c20e8c6baac99610889fc277c4bd7595f21f7a37b1b8c15e",
+    "tests/cli/install.py": "ed9c3ed4af5fb44423f4ee43af9cd29642e2711ae7a5bc17bda3fae2e7ca8301"
+  },
+  "tools": [
+    {
+      "argv": [
+        "cmake",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "cmake version 3.28.3\n\nCMake suite maintained and supported by Kitware (kitware.com/cmake).\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "ninja",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "1.11.1\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "make",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "GNU Make 4.3\nBuilt for x86_64-pc-linux-gnu\nCopyright (C) 1988-2020 Free Software Foundation, Inc.\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "perl",
+        "-v"
+      ],
+      "exit_code": 0,
+      "stdout": "\nThis is perl 5, version 38, subversion 2 (v5.38.2) built for x86_64-linux-gnu-thread-multi\n(with 67 registered patches, see perl -V for more detail)\n\nCopyright 1987-2023, Larry Wall\n\nPerl may be copied only under the terms of either the Artistic License or the\nGNU General Public License, which may be found in the Perl 5 source kit.\n\nComplete documentation for Perl, including FAQ lists, should be found on\nthis system using \"man perl\" or \"perldoc perl\".  If you have access to the\nInternet, point your browser at https://www.perl.org/, the Perl Home Page.\n\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "ldd",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "ldd (Ubuntu GLIBC 2.39-0ubuntu8.9) 2.39\nCopyright (C) 2024 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\nWritten by Roland McGrath and Ulrich Drepper.\n",
+      "stderr": ""
+    }
+  ]
+}

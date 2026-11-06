@@ -1,0 +1,7 @@
+PASS: basics input 5 => 9 in both JIT modes
+PASS: types input 2 => 120 in both JIT modes
+PASS: functions input 3 => 36 in both JIT modes
+PASS: collections input 5 => 35 in both JIT modes
+PASS: memory input 2 => 19 in both JIT modes
+PASS: async input 2 => 27 in normal and optimized AOT modes
+PASS: 9 README/first-program/Wiki blocks match canonical examples; 12 execution cases

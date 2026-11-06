@@ -1,0 +1,4 @@
+VOID Language Compiler v0.1.0 (development)
+LLVM 23.1.4
+Target: x86_64-unknown-linux-gnu
+Build identity: cbc95fce599e38f5bda210e257c1b70869d3f745c63e184c8551d623657a7def

@@ -9,6 +9,9 @@ no hosted lock is implied. Existing snapshot, UTF-16, rename and native safety
 contracts remain in force.
 
 
+For installing `voidls` with the compiler, start with the
+[source-install guide](install/README.md).
+
 ## Stage 7 setup — current instructions (20 October 2026)
 
 Production engineering is authorized. This section and
@@ -30,9 +33,9 @@ Vim accepts `call void#setup('/absolute/voidls', '', '/project')`.
 Their workspace defaults to cwd, so select it deliberately. Neovim restart retains
 its selected graph; start a fresh adapter/editor session with the intended setup to reselect. Vim
 setup selects before its LSP client starts; reconfigure a fresh editor session to
-reselect. `VOID_STDLIB_ROOT` must be an
-absolute matching source directory for relocated installations. No real standard
-module catalog is supplied. See [the contract](STAGE8_DISCOVERY.md) for import
+reselect. Installed tools discover matching standard sources under `share/void/stdlib`
+relative to their actual executable. `VOID_STDLIB_ROOT` is an optional absolute
+matching-source override; remove stale overrides after installation. See [the contract](STAGE8_DISCOVERY.md) for import
 spelling, source docs, known-root navigation and readonly installed sources.
 
 ### VS Code / VSCodium

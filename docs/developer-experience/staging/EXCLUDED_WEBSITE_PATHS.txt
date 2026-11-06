@@ -1,0 +1,10 @@
+website/dist/docs/compiler-workflow/index.html
+website/dist/docs/modules/index.html
+website/dist/getting-started/index.html
+website/dist/roadmap/index.html
+website/public/docs/compiler-workflow/index.html
+website/public/docs/modules/index.html
+website/public/getting-started/index.html
+website/public/roadmap/index.html
+website/scripts/check.py
+website/scripts/test_check.py
