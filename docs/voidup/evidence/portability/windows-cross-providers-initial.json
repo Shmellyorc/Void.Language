@@ -1,0 +1,133 @@
+{
+  "scope": "Windows x64 MinGW cross compilation/link only; no native acceptance",
+  "commands": [
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/configure",
+        "--host=x86_64-w64-mingw32",
+        "--prefix=/home/shmellyorc/Documents/Void.Language/build/voidup-cross/providers",
+        "--enable-static",
+        "--disable-shared",
+        "--enable-minimal",
+        "--disable-dependency-tracking"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium",
+      "status": 0,
+      "seconds": 11.432000246015377
+    },
+    {
+      "command": [
+        "make",
+        "-j6"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium",
+      "status": 0,
+      "seconds": 12.23018241598038
+    },
+    {
+      "command": [
+        "make",
+        "install"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium",
+      "status": 0,
+      "seconds": 0.25531423301436007
+    },
+    {
+      "command": [
+        "cmake",
+        "-S",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/http/build/linux-aws-lc-5.12.0/Release/source/zlib-1.3.2",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/zlib",
+        "-G",
+        "Ninja",
+        "-DCMAKE_SYSTEM_NAME=Windows",
+        "-DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc",
+        "-DCMAKE_RC_COMPILER=x86_64-w64-mingw32-windres",
+        "-DCMAKE_INSTALL_PREFIX=/home/shmellyorc/Documents/Void.Language/build/voidup-cross/providers",
+        "-DCMAKE_INSTALL_LIBDIR=lib",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DBUILD_SHARED_LIBS=OFF",
+        "-DZLIB_BUILD_SHARED=OFF",
+        "-DZLIB_BUILD_STATIC=ON",
+        "-DZLIB_BUILD_TESTING=OFF"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build",
+      "status": 0,
+      "seconds": 0.8068425400415435
+    },
+    {
+      "command": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/zlib",
+        "-j6"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build",
+      "status": 0,
+      "seconds": 0.8509468620177358
+    },
+    {
+      "command": [
+        "cmake",
+        "--install",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/zlib"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build",
+      "status": 0,
+      "seconds": 0.013385098020080477
+    },
+    {
+      "command": [
+        "cmake",
+        "-S",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libarchive-3.8.11",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/archive",
+        "-G",
+        "Ninja",
+        "-DCMAKE_SYSTEM_NAME=Windows",
+        "-DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc",
+        "-DCMAKE_RC_COMPILER=x86_64-w64-mingw32-windres",
+        "-DCMAKE_INSTALL_PREFIX=/home/shmellyorc/Documents/Void.Language/build/voidup-cross/providers",
+        "-DCMAKE_INSTALL_LIBDIR=lib",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DBUILD_SHARED_LIBS=OFF",
+        "-DENABLE_ZLIB=ON",
+        "-DZLIB_INCLUDE_DIR=/home/shmellyorc/Documents/Void.Language/build/voidup-cross/providers/include",
+        "-DZLIB_LIBRARY=/home/shmellyorc/Documents/Void.Language/build/voidup-cross/providers/lib/libzs.a",
+        "-DENABLE_WERROR=OFF",
+        "-DENABLE_MBEDTLS=OFF",
+        "-DENABLE_NETTLE=OFF",
+        "-DENABLE_OPENSSL=OFF",
+        "-DENABLE_MD=OFF",
+        "-DENABLE_LIBB2=OFF",
+        "-DENABLE_LZ4=OFF",
+        "-DENABLE_LZO=OFF",
+        "-DENABLE_LZMA=OFF",
+        "-DENABLE_ZSTD=OFF",
+        "-DENABLE_BZip2=OFF",
+        "-DENABLE_LIBXML2=OFF",
+        "-DENABLE_BSDXML=OFF",
+        "-DENABLE_EXPAT=OFF",
+        "-DENABLE_WIN32_XMLLITE=OFF",
+        "-DENABLE_PCREPOSIX=OFF",
+        "-DENABLE_PCRE2POSIX=OFF",
+        "-DENABLE_LIBGCC=OFF",
+        "-DENABLE_CNG=OFF",
+        "-DENABLE_TAR=OFF",
+        "-DENABLE_CPIO=OFF",
+        "-DENABLE_CAT=OFF",
+        "-DENABLE_UNZIP=OFF",
+        "-DENABLE_XATTR=OFF",
+        "-DENABLE_ACL=OFF",
+        "-DENABLE_ICONV=OFF",
+        "-DENABLE_TEST=OFF"
+      ],
+      "cwd": "/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build",
+      "status": 1,
+      "seconds": 44.642540261964314
+    }
+  ]
+}

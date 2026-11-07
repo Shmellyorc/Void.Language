@@ -1,0 +1,6 @@
+{
+  "profile": "Debug",
+  "prefix": ".toolchains/host/prefix/Debug",
+  "manifest_sha256": "46896fce8b9e70831cf037987a4f21c9fd281ce7959b83b02b13766e31a8c3fd",
+  "zlib_sha256": "a115fc0856eb712ad6828dac9be805345529da80a15bfa8c3d396f23f7417243"
+}

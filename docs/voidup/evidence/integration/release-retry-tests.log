@@ -1,0 +1,9 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start  1: voidup_smoke
+1/2 Test  #1: voidup_smoke .....................   Passed    0.34 sec
+    Start 18: http_ir
+2/2 Test #18: http_ir ..........................   Passed    2.57 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   2.92 sec

@@ -1,0 +1,37 @@
+use "./support.void" as support
+use "./cli.void" as cli
+use "./manager.void" as manager
+use os
+use console
+use json as codec
+
+func up_report(failure: support.up_error) -> i32:
+    if codec.stringify(failure) is Ok(var diagnostic):
+        var reported = console.stderr.write(diagnostic + "\n")
+    else:
+        var reported = console.stderr.write("VOIDUP failed to render a structured diagnostic\n")
+    if failure.code == 2:
+        return 2
+    return 1
+
+func main() -> i32:
+    var operands = os.args()
+    if operands is Err(var cause):
+        return up_report(support.up_error(message = cause.message, operation = cause.operation, native_code = cause.os_code))
+    if operands is Ok(var values):
+        var parsed = cli.up_parse(values)
+        if parsed is Err(var cause):
+            return up_report(cause)
+        if parsed is Ok(var options):
+            if options.command == "--help":
+                var written = console.stdout.write(cli.up_help())
+                return 0
+            if options.command == "--version":
+                var written = console.stdout.write("VOIDUP 0.1.0 engineering; schema=1; private 2-of-3 test trust; no production publishing keys\n")
+                return 0
+            var outcome = manager.up_execute(options)
+            if outcome is Ok(var status):
+                return status
+            else if outcome is Err(var cause):
+                return up_report(cause)
+    return 1

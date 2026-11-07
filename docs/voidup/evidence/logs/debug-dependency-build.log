@@ -1,0 +1,1559 @@
+checking build system type... x86_64-pc-linux-gnu
+checking host system type... x86_64-pc-linux-gnu
+checking target system type... x86_64-pc-linux-gnu
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether sleep supports fractional seconds... yes
+checking filesystem timestamp resolution... 0.01
+checking whether build environment is sane... yes
+checking for a race-free mkdir -p... /usr/bin/mkdir -p
+checking for gawk... gawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+checking xargs -n works... yes
+checking whether UID '1000' is supported by ustar format... yes
+checking whether GID '1000' is supported by ustar format... yes
+checking how to create a ustar tar archive... gnutar
+checking whether to enable maintainer-specific portions of Makefiles... no
+checking for gcc... /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables... 
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether the compiler supports GNU C... yes
+checking whether /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang accepts -g... yes
+checking for /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang option to enable C23 features... -std=gnu23
+checking whether /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -std=gnu23 understands -c and -o together... yes
+checking whether make supports the include directive... yes (GNU style)
+checking dependency style of /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -std=gnu23... none
+checking dependency style of /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -std=gnu23... none
+checking for stdio.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for strings.h... yes
+checking for sys/stat.h... yes
+checking for sys/types.h... yes
+checking for unistd.h... yes
+checking for wchar.h... yes
+checking for minix/config.h... no
+checking whether it is safe to define __EXTENSIONS__... yes
+checking whether _XOPEN_SOURCE should be defined... no
+checking if we are using FilC... no
+checking for a sed that does not truncate output... /usr/bin/sed
+checking how to run the C preprocessor... /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -std=gnu23 -E
+checking for egrep -e... /usr/bin/grep -E
+checking whether /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -std=gnu23 is Clang... yes
+checking whether pthreads work with "-pthread" and "-lpthread"... yes
+checking whether Clang needs flag to prevent "argument unused" warning when linking with -pthread... no
+checking for joinable pthread attribute... PTHREAD_CREATE_JOINABLE
+checking whether more special flags are required for pthreads... no
+checking for PTHREAD_PRIO_INHERIT... yes
+checking for variable-length arrays... yes
+checking for __wasi__ defined... no
+checking whether C compiler accepts -Werror... yes
+checking whether to add -D_FORTIFY_SOURCE=3 to CPPFLAGS... yes
+checking whether C compiler accepts -fvisibility=hidden... yes
+checking whether C compiler accepts -fPIC... yes
+checking whether C compiler accepts -fPIE... yes
+checking whether the linker accepts -pie... yes
+checking whether C compiler accepts -fno-strict-aliasing... yes
+checking whether C compiler accepts -fno-strict-overflow... yes
+checking whether C compiler accepts -fstack-protector... yes
+checking whether the linker accepts -fstack-protector... yes
+checking whether C compiler accepts -g -O0 -pthread -fvisibility=hidden -fPIC -fPIE -fno-strict-aliasing -fno-strict-overflow -fstack-protector -Wall... yes
+checking whether C compiler accepts -g -O0 -pthread -fvisibility=hidden -fPIC -fPIE -fno-strict-aliasing -fno-strict-overflow -fstack-protector -Wno-deprecated-declarations... yes
+checking whether C compiler accepts -g -O0 -pthread -fvisibility=hidden -fPIC -fPIE -fno-strict-aliasing -fno-strict-overflow -fstack-protector -Wno-deprecated-declarations -Wno-unknown-pragmas... yes
+checking for clang... yes
+checking whether C compiler accepts -g -O0 -pthread -fvisibility=hidden -fPIC -fPIE -fno-strict-aliasing -fno-strict-overflow -fstack-protector -Wall -Wno-unknown-warning-option... yes
+checking whether C compiler accepts -g -O0 -pthread -fvisibility=hidden -fPIC -fPIE -fno-strict-aliasing -fno-strict-overflow -fstack-protector -Wall -Wno-unknown-warning-option -Wextra... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond -Wfloat-equal... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond -Wfloat-equal -Wformat=2... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond -Wfloat-equal -Wformat=2 -Wlogical-op... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond -Wfloat-equal -Wformat=2 -Wlogical-op -Wmaybe-uninitialized... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond -Wfloat-equal -Wformat=2 -Wlogical-op -Wmaybe-uninitialized -Wmisleading-indentation... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond -Wfloat-equal -Wformat=2 -Wlogical-op -Wmaybe-uninitialized -Wmisleading-indentation -Wmissing-declarations... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond -Wfloat-equal -Wformat=2 -Wlogical-op -Wmaybe-uninitialized -Wmisleading-indentation -Wmissing-declarations -Wmissing-prototypes... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond -Wfloat-equal -Wformat=2 -Wlogical-op -Wmaybe-uninitialized -Wmisleading-indentation -Wmissing-declarations -Wmissing-prototypes -Wnested-externs... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond -Wfloat-equal -Wformat=2 -Wlogical-op -Wmaybe-uninitialized -Wmisleading-indentation -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-type-limits... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond -Wfloat-equal -Wformat=2 -Wlogical-op -Wmaybe-uninitialized -Wmisleading-indentation -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-type-limits -Wno-unknown-pragmas... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond -Wfloat-equal -Wformat=2 -Wlogical-op -Wmaybe-uninitialized -Wmisleading-indentation -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-type-limits -Wno-unknown-pragmas -Wnormalized=id... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond -Wfloat-equal -Wformat=2 -Wlogical-op -Wmaybe-uninitialized -Wmisleading-indentation -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-type-limits -Wno-unknown-pragmas -Wnormalized=id -Wnull-dereference... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond -Wfloat-equal -Wformat=2 -Wlogical-op -Wmaybe-uninitialized -Wmisleading-indentation -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-type-limits -Wno-unknown-pragmas -Wnormalized=id -Wnull-dereference -Wold-style-declaration... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond -Wfloat-equal -Wformat=2 -Wlogical-op -Wmaybe-uninitialized -Wmisleading-indentation -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-type-limits -Wno-unknown-pragmas -Wnormalized=id -Wnull-dereference -Wold-style-declaration -Wpointer-arith... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond -Wfloat-equal -Wformat=2 -Wlogical-op -Wmaybe-uninitialized -Wmisleading-indentation -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-type-limits -Wno-unknown-pragmas -Wnormalized=id -Wnull-dereference -Wold-style-declaration -Wpointer-arith -Wredundant-decls... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond -Wfloat-equal -Wformat=2 -Wlogical-op -Wmaybe-uninitialized -Wmisleading-indentation -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-type-limits -Wno-unknown-pragmas -Wnormalized=id -Wnull-dereference -Wold-style-declaration -Wpointer-arith -Wredundant-decls -Wrestrict... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond -Wfloat-equal -Wformat=2 -Wlogical-op -Wmaybe-uninitialized -Wmisleading-indentation -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-type-limits -Wno-unknown-pragmas -Wnormalized=id -Wnull-dereference -Wold-style-declaration -Wpointer-arith -Wredundant-decls -Wrestrict -Wshorten-64-to-32... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond -Wfloat-equal -Wformat=2 -Wlogical-op -Wmaybe-uninitialized -Wmisleading-indentation -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-type-limits -Wno-unknown-pragmas -Wnormalized=id -Wnull-dereference -Wold-style-declaration -Wpointer-arith -Wredundant-decls -Wrestrict -Wshorten-64-to-32 -Wsometimes-uninitialized... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond -Wfloat-equal -Wformat=2 -Wlogical-op -Wmaybe-uninitialized -Wmisleading-indentation -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-type-limits -Wno-unknown-pragmas -Wnormalized=id -Wnull-dereference -Wold-style-declaration -Wpointer-arith -Wredundant-decls -Wrestrict -Wshorten-64-to-32 -Wsometimes-uninitialized -Wstrict-prototypes... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond -Wfloat-equal -Wformat=2 -Wlogical-op -Wmaybe-uninitialized -Wmisleading-indentation -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-type-limits -Wno-unknown-pragmas -Wnormalized=id -Wnull-dereference -Wold-style-declaration -Wpointer-arith -Wredundant-decls -Wrestrict -Wshorten-64-to-32 -Wsometimes-uninitialized -Wstrict-prototypes -Wswitch-enum... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond -Wfloat-equal -Wformat=2 -Wlogical-op -Wmaybe-uninitialized -Wmisleading-indentation -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-type-limits -Wno-unknown-pragmas -Wnormalized=id -Wnull-dereference -Wold-style-declaration -Wpointer-arith -Wredundant-decls -Wrestrict -Wshorten-64-to-32 -Wsometimes-uninitialized -Wstrict-prototypes -Wswitch-enum -Wvariable-decl... yes
+checking whether C compiler accepts  -Wextra -Warray-bounds -Wbad-function-cast -Wcast-qual -Wdiv-by-zero -Wduplicated-branches -Wduplicated-cond -Wfloat-equal -Wformat=2 -Wlogical-op -Wmaybe-uninitialized -Wmisleading-indentation -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-type-limits -Wno-unknown-pragmas -Wnormalized=id -Wnull-dereference -Wold-style-declaration -Wpointer-arith -Wredundant-decls -Wrestrict -Wshorten-64-to-32 -Wsometimes-uninitialized -Wstrict-prototypes -Wswitch-enum -Wvariable-decl -Wwrite-strings... yes
+checking whether the linker accepts -Wl,-z,relro... yes
+checking whether the linker accepts -Wl,-z,now... yes
+checking whether the linker accepts -Wl,-z,noexecstack... yes
+checking whether segmentation violations can be caught... yes
+checking whether SIGABRT can be caught... no
+configure: WARNING: On this platform, SIGABRT cannot be caught using signal handlers.
+checking for thread local storage (TLS) class... thread_local
+thread local storage is supported
+checking whether C compiler accepts -ftls-model=global-dynamic... yes
+checking how to print strings... printf
+checking for a sed that does not truncate output... (cached) /usr/bin/sed
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking for fgrep... /usr/bin/grep -F
+checking for ld used by /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -std=gnu23... /usr/bin/ld
+checking if the linker (/usr/bin/ld) is GNU ld... yes
+checking for BSD- or MS-compatible name lister (nm)... /usr/bin/nm -B
+checking the name lister (/usr/bin/nm -B) interface... BSD nm
+checking whether ln -s works... yes
+checking the maximum length of command line arguments... 1572864
+checking how to convert x86_64-pc-linux-gnu file names to x86_64-pc-linux-gnu format... func_convert_file_noop
+checking how to convert x86_64-pc-linux-gnu file names to toolchain format... func_convert_file_noop
+checking for /usr/bin/ld option to reload object files... -r
+checking for file... file
+checking for objdump... objdump
+checking how to recognize dependent libraries... pass_all
+checking for dlltool... no
+checking how to associate runtime and link libraries... printf %s\n
+checking for ranlib... ranlib
+checking for ar... ar
+checking for archiver @FILE support... @
+checking for strip... strip
+checking command to parse /usr/bin/nm -B output from /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -std=gnu23 object... ok
+checking for sysroot... no
+checking for a working dd... /usr/bin/dd
+checking how to truncate binary pipes... /usr/bin/dd bs=4096 count=1
+checking for mt... no
+checking if : is a manifest tool... no
+checking for dlfcn.h... yes
+checking for objdir... .libs
+checking if /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -std=gnu23 supports -fno-rtti -fno-exceptions... yes
+checking for /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -std=gnu23 option to produce PIC... -fPIC -DPIC
+checking if /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -std=gnu23 PIC flag -fPIC -DPIC works... yes
+checking if /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -std=gnu23 static flag -static works... no
+checking if /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -std=gnu23 supports -c -o file.o... yes
+checking if /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -std=gnu23 supports -c -o file.o... (cached) yes
+checking whether the /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -std=gnu23 linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking dynamic linker characteristics... GNU/Linux ld.so
+checking how to hardcode library paths into programs... immediate
+checking whether stripping libraries is possible... yes
+checking if libtool supports shared libraries... yes
+checking whether to build shared libraries... no
+checking whether to build static libraries... yes
+checking if we are using CompCert... no
+checking for ar... (cached) ar
+checking for ARM64 target... no
+checking whether C compiler accepts -mmmx... yes
+checking for MMX instructions set... yes
+checking whether C compiler accepts -mmmx... (cached) yes
+checking whether C compiler accepts -msse2... yes
+checking for SSE2 instructions set... yes
+checking whether C compiler accepts -msse2... (cached) yes
+checking whether C compiler accepts -msse3... yes
+checking for SSE3 instructions set... yes
+checking whether C compiler accepts -msse3... (cached) yes
+checking whether C compiler accepts -mssse3... yes
+checking for SSSE3 instructions set... yes
+checking whether C compiler accepts -mssse3... (cached) yes
+checking whether C compiler accepts -msse4.1... yes
+checking for SSE4.1 instructions set... yes
+checking whether C compiler accepts -msse4.1... (cached) yes
+checking whether C compiler accepts -mavx... yes
+checking for AVX instructions set... yes
+checking whether C compiler accepts -mavx... (cached) yes
+checking whether C compiler accepts -mavx2... yes
+checking for AVX2 instructions set... yes
+checking whether C compiler accepts -mavx2... (cached) yes
+checking if _mm256_broadcastsi128_si256 is correctly defined... yes
+checking whether C compiler accepts -mavx512f... yes
+checking for AVX512F instructions set... yes
+checking whether C compiler accepts -mavx512f... (cached) yes
+checking whether C compiler accepts -maes... yes
+checking whether C compiler accepts -mpclmul... yes
+checking for AESNI instructions set and PCLMULQDQ... yes
+checking whether C compiler accepts -maes... (cached) yes
+checking whether C compiler accepts -mpclmul... (cached) yes
+checking whether C compiler accepts -mrdrnd... yes
+checking for RDRAND... yes
+checking whether C compiler accepts -mrdrnd... (cached) yes
+checking for sys/mman.h... yes
+checking for sys/param.h... yes
+checking for sys/random.h... yes
+checking for intrin.h... no
+checking for sys/auxv.h... yes
+checking for CommonCrypto/CommonRandom.h... no
+checking for cet.h... yes
+checking for threads.h... yes
+checking if _xgetbv() is available... no
+checking for inline... inline
+checking whether byte ordering is bigendian... (cached) no
+checking whether __STDC_LIMIT_MACROS is required... no
+checking whether we can use inline asm code... yes
+no
+checking whether we can use x86_64 asm code... yes
+checking whether we can assemble AVX opcodes... yes
+checking for 128-bit arithmetic... yes
+checking for cpuid instruction... yes
+checking if the .private_extern asm directive is supported... no
+checking if the .hidden asm directive is supported... yes
+checking if weak symbols are supported... yes
+checking if atomic operations are supported... yes
+checking if C11 memory fences are supported... yes
+checking if gcc memory fences are supported... yes
+checking for size_t... yes
+checking for working alloca.h... yes
+checking for alloca... yes
+checking for arc4random... yes
+checking for arc4random_buf... yes
+checking for mmap... yes
+checking for mlock... yes
+checking for madvise... yes
+checking for mprotect... yes
+checking for raise... yes
+checking for sysconf... yes
+checking for getrandom with a standard API... yes
+checking for getrandom... yes
+checking for getentropy with a standard API... yes
+checking for getentropy... yes
+checking for getpid... yes
+checking for getauxval... yes
+checking for elf_aux_info... no
+checking for posix_memalign... yes
+checking for nanosleep... yes
+checking for clock_gettime... yes
+checking for memset_s... no
+checking for explicit_bzero... yes
+checking for memset_explicit... yes
+checking for explicit_memset... no
+checking if gcc/ld supports -Wl,--output-def... not needed, shared libraries are disabled
+checking that generated files are newer than configure... done
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating builds/Makefile
+config.status: creating contrib/Makefile
+config.status: creating dist-build/Makefile
+config.status: creating libsodium.pc
+config.status: creating libsodium-uninstalled.pc
+config.status: creating src/Makefile
+config.status: creating src/libsodium/Makefile
+config.status: creating src/libsodium/include/Makefile
+config.status: creating src/libsodium/include/sodium/version.h
+config.status: creating test/default/Makefile
+config.status: creating test/Makefile
+config.status: executing depfiles commands
+config.status: executing libtool commands
+Making all in builds
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/builds'
+make[1]: Nothing to be done for 'all'.
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/builds'
+Making all in contrib
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/contrib'
+make[1]: Nothing to be done for 'all'.
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/contrib'
+Making all in dist-build
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/dist-build'
+make[1]: Nothing to be done for 'all'.
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/dist-build'
+Making all in src
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src'
+Making all in libsodium
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src/libsodium'
+Making all in include
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src/libsodium/include'
+make[3]: Nothing to be done for 'all'.
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src/libsodium/include'
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src/libsodium'
+  CC       crypto_aead/aegis128l/libaesni_la-aegis128l_aesni.lo
+  CC       crypto_aead/aegis256/libaesni_la-aegis256_aesni.lo
+  CC       crypto_ipcrypt/libaesni_la-ipcrypt_aesni.lo
+  CC       crypto_aead/aegis128l/libarmcrypto_la-aegis128l_armcrypto.lo
+  CC       crypto_aead/aegis256/libarmcrypto_la-aegis256_armcrypto.lo
+  CC       crypto_ipcrypt/libarmcrypto_la-ipcrypt_armcrypto.lo
+  CC       crypto_pwhash/argon2/libarmcrypto_la-argon2-fill-block-neon.lo
+  CC       crypto_generichash/blake2b/ref/libssse3_la-blake2b-compress-ssse3.lo
+  CC       crypto_pwhash/argon2/libssse3_la-argon2-fill-block-ssse3.lo
+  CC       crypto_generichash/blake2b/ref/libsse41_la-blake2b-compress-sse41.lo
+  CC       crypto_generichash/blake2b/ref/libavx2_la-blake2b-compress-avx2.lo
+  CC       crypto_pwhash/argon2/libavx2_la-argon2-fill-block-avx2.lo
+  CC       crypto_stream/chacha20/dolbeau/libavx2_la-chacha20_dolbeau-avx2.lo
+  CC       crypto_pwhash/argon2/libavx512f_la-argon2-fill-block-avx512f.lo
+  CC       crypto_aead/aegis128l/libsodium_la-aead_aegis128l.lo
+  CC       crypto_aead/aegis128l/libsodium_la-aegis128l_soft.lo
+  CC       crypto_aead/aegis256/libsodium_la-aead_aegis256.lo
+  CC       crypto_aead/aegis256/libsodium_la-aegis256_soft.lo
+  CC       crypto_aead/aes256gcm/libsodium_la-aead_aes256gcm.lo
+  CC       crypto_aead/chacha20poly1305/libsodium_la-aead_chacha20poly1305.lo
+  CC       crypto_aead/xchacha20poly1305/libsodium_la-aead_xchacha20poly1305.lo
+  CC       crypto_auth/libsodium_la-crypto_auth.lo
+  CC       crypto_auth/hmacsha256/libsodium_la-auth_hmacsha256.lo
+  CC       crypto_auth/hmacsha512/libsodium_la-auth_hmacsha512.lo
+  CC       crypto_auth/hmacsha512256/libsodium_la-auth_hmacsha512256.lo
+  CC       crypto_box/libsodium_la-crypto_box.lo
+  CC       crypto_box/libsodium_la-crypto_box_easy.lo
+  CC       crypto_box/libsodium_la-crypto_box_seal.lo
+  CC       crypto_box/curve25519xsalsa20poly1305/libsodium_la-box_curve25519xsalsa20poly1305.lo
+  CC       crypto_core/ed25519/ref10/libsodium_la-ed25519_ref10.lo
+  CC       crypto_core/hchacha20/libsodium_la-core_hchacha20.lo
+  CC       crypto_core/hsalsa20/ref2/libsodium_la-core_hsalsa20_ref2.lo
+  CC       crypto_core/hsalsa20/libsodium_la-core_hsalsa20.lo
+  CC       crypto_core/keccak1600/libsodium_la-keccak1600.lo
+  CC       crypto_core/keccak1600/ref/libsodium_la-keccak1600_ref.lo
+  CC       crypto_core/keccak1600/armsha3/libsodium_la-keccak1600_armsha3.lo
+  CC       crypto_core/salsa/ref/libsodium_la-core_salsa_ref.lo
+  CC       crypto_core/softaes/libsodium_la-softaes.lo
+  CC       crypto_generichash/libsodium_la-crypto_generichash.lo
+  CC       crypto_generichash/blake2b/libsodium_la-generichash_blake2.lo
+  CC       crypto_generichash/blake2b/ref/libsodium_la-blake2b-compress-ref.lo
+  CC       crypto_generichash/blake2b/ref/libsodium_la-blake2b-ref.lo
+  CC       crypto_generichash/blake2b/ref/libsodium_la-generichash_blake2b.lo
+  CC       crypto_hash/libsodium_la-crypto_hash.lo
+  CC       crypto_hash/sha256/libsodium_la-hash_sha256.lo
+  CC       crypto_hash/sha256/cp/libsodium_la-hash_sha256_cp.lo
+  CC       crypto_hash/sha512/libsodium_la-hash_sha512.lo
+  CC       crypto_hash/sha512/cp/libsodium_la-hash_sha512_cp.lo
+  CC       crypto_hash/sha3/libsodium_la-hash_sha3.lo
+  CC       crypto_ipcrypt/libsodium_la-crypto_ipcrypt.lo
+  CC       crypto_ipcrypt/libsodium_la-ipcrypt_soft.lo
+  CC       crypto_kdf/blake2b/libsodium_la-kdf_blake2b.lo
+  CC       crypto_kdf/libsodium_la-crypto_kdf.lo
+  CC       crypto_kdf/hkdf/libsodium_la-kdf_hkdf_sha256.lo
+  CC       crypto_kdf/hkdf/libsodium_la-kdf_hkdf_sha512.lo
+  CC       crypto_kem/libsodium_la-crypto_kem.lo
+  CC       crypto_kem/mlkem768/libsodium_la-kem_mlkem768.lo
+  CC       crypto_kem/mlkem768/ref/libsodium_la-kem_mlkem768_ref.lo
+  CC       crypto_kem/xwing/libsodium_la-kem_xwing.lo
+  CC       crypto_kx/libsodium_la-crypto_kx.lo
+  CC       crypto_onetimeauth/libsodium_la-crypto_onetimeauth.lo
+  CC       crypto_onetimeauth/poly1305/libsodium_la-onetimeauth_poly1305.lo
+  CC       crypto_onetimeauth/poly1305/donna/libsodium_la-poly1305_donna.lo
+  CC       crypto_pwhash/argon2/libsodium_la-argon2-core.lo
+  CC       crypto_pwhash/argon2/libsodium_la-argon2-encoding.lo
+  CC       crypto_pwhash/argon2/libsodium_la-argon2-fill-block-ref.lo
+  CC       crypto_pwhash/argon2/libsodium_la-argon2-fill-block-wasm32.lo
+  CC       crypto_pwhash/argon2/libsodium_la-argon2.lo
+  CC       crypto_pwhash/argon2/libsodium_la-blake2b-long.lo
+  CC       crypto_pwhash/argon2/libsodium_la-pwhash_argon2i.lo
+  CC       crypto_pwhash/argon2/libsodium_la-pwhash_argon2id.lo
+  CC       crypto_pwhash/libsodium_la-crypto_pwhash.lo
+  CC       crypto_scalarmult/libsodium_la-crypto_scalarmult.lo
+  CC       crypto_scalarmult/curve25519/ref10/libsodium_la-x25519_ref10.lo
+  CC       crypto_scalarmult/curve25519/libsodium_la-scalarmult_curve25519.lo
+  CC       crypto_secretbox/libsodium_la-crypto_secretbox.lo
+  CC       crypto_secretbox/libsodium_la-crypto_secretbox_easy.lo
+  CC       crypto_secretbox/xsalsa20poly1305/libsodium_la-secretbox_xsalsa20poly1305.lo
+  CC       crypto_secretstream/xchacha20poly1305/libsodium_la-secretstream_xchacha20poly1305.lo
+  CC       crypto_shorthash/libsodium_la-crypto_shorthash.lo
+  CC       crypto_shorthash/siphash24/libsodium_la-shorthash_siphash24.lo
+  CC       crypto_shorthash/siphash24/ref/libsodium_la-shorthash_siphash24_ref.lo
+  CC       crypto_sign/libsodium_la-crypto_sign.lo
+  CC       crypto_sign/ed25519/libsodium_la-sign_ed25519.lo
+  CC       crypto_sign/ed25519/ref10/libsodium_la-keypair.lo
+  CC       crypto_sign/ed25519/ref10/libsodium_la-open.lo
+  CC       crypto_sign/ed25519/ref10/libsodium_la-sign.lo
+  CC       crypto_stream/chacha20/libsodium_la-stream_chacha20.lo
+  CC       crypto_stream/chacha20/ref/libsodium_la-chacha20_ref.lo
+  CC       crypto_stream/libsodium_la-crypto_stream.lo
+  CC       crypto_stream/salsa20/libsodium_la-stream_salsa20.lo
+  CC       crypto_stream/xsalsa20/libsodium_la-stream_xsalsa20.lo
+  CC       crypto_verify/libsodium_la-verify.lo
+  CC       crypto_xof/shake128/libsodium_la-xof_shake128.lo
+  CC       crypto_xof/shake128/ref/libsodium_la-shake128_ref.lo
+  CC       crypto_xof/shake256/libsodium_la-xof_shake256.lo
+  CC       crypto_xof/shake256/ref/libsodium_la-shake256_ref.lo
+  CC       crypto_xof/turboshake128/libsodium_la-xof_turboshake128.lo
+  CC       crypto_xof/turboshake128/ref/libsodium_la-turboshake128_ref.lo
+  CC       crypto_xof/turboshake256/libsodium_la-xof_turboshake256.lo
+  CC       crypto_xof/turboshake256/ref/libsodium_la-turboshake256_ref.lo
+  CC       randombytes/libsodium_la-randombytes.lo
+  CC       sodium/libsodium_la-codecs.lo
+  CC       sodium/libsodium_la-core.lo
+  CC       sodium/libsodium_la-runtime.lo
+  CC       sodium/libsodium_la-utils.lo
+  CC       sodium/libsodium_la-version.lo
+  CPPAS    crypto_stream/salsa20/xmm6/libsodium_la-salsa20_xmm6-asm.lo
+  CC       crypto_stream/salsa20/xmm6/libsodium_la-salsa20_xmm6.lo
+  CC       crypto_scalarmult/curve25519/sandy2x/libsodium_la-curve25519_sandy2x.lo
+  CC       crypto_scalarmult/curve25519/sandy2x/libsodium_la-fe51_invert.lo
+  CC       crypto_scalarmult/curve25519/sandy2x/libsodium_la-fe_frombytes_sandy2x.lo
+  CPPAS    crypto_scalarmult/curve25519/sandy2x/libsodium_la-sandy2x.lo
+  CC       randombytes/sysrandom/libsodium_la-randombytes_sysrandom.lo
+  CC       crypto_aead/aes256gcm/aesni/libaesni_la-aead_aes256gcm_aesni.lo
+  CC       crypto_aead/aes256gcm/armcrypto/libarmcrypto_la-aead_aes256gcm_armcrypto.lo
+  CC       crypto_onetimeauth/poly1305/sse2/libsse2_la-poly1305_sse2.lo
+  CC       crypto_stream/chacha20/dolbeau/libssse3_la-chacha20_dolbeau-ssse3.lo
+  CCLD     libsse41.la
+  CC       crypto_stream/salsa20/xmm6int/libavx2_la-salsa20_xmm6int-avx2.lo
+libtool: warning: '-version-info/-version-number' is ignored for convenience libraries
+  CCLD     libavx512f.la
+  CC       randombytes/internal/librdrand_la-randombytes_internal_random.lo
+libtool: warning: '-version-info/-version-number' is ignored for convenience libraries
+  CCLD     libaesni.la
+libtool: warning: '-version-info/-version-number' is ignored for convenience libraries
+  CCLD     libarmcrypto.la
+libtool: warning: '-version-info/-version-number' is ignored for convenience libraries
+  CCLD     libsse2.la
+  CCLD     libssse3.la
+libtool: warning: '-version-info/-version-number' is ignored for convenience libraries
+  CCLD     libavx2.la
+libtool: warning: '-version-info/-version-number' is ignored for convenience libraries
+libtool: warning: '-version-info/-version-number' is ignored for convenience libraries
+  CCLD     librdrand.la
+libtool: warning: '-version-info/-version-number' is ignored for convenience libraries
+  CCLD     libsodium.la
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src/libsodium'
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src/libsodium'
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src'
+make[2]: Nothing to be done for 'all-am'.
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src'
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src'
+Making all in test
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test'
+Making all in default
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test/default'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test/default'
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test'
+make[2]: Nothing to be done for 'all-am'.
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test'
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test'
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium'
+make[1]: Nothing to be done for 'all-am'.
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium'
+Making check in builds
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/builds'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/builds'
+Making check in contrib
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/contrib'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/contrib'
+Making check in dist-build
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/dist-build'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/dist-build'
+Making check in src
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src'
+Making check in libsodium
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src/libsodium'
+Making check in include
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src/libsodium/include'
+make[3]: Nothing to be done for 'check'.
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src/libsodium/include'
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src/libsodium'
+make[3]: Nothing to be done for 'check-am'.
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src/libsodium'
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src/libsodium'
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src'
+make[2]: Nothing to be done for 'check-am'.
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src'
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src'
+Making check in test
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test'
+Making check in default
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test/default'
+make  aead_aegis128l aead_aegis256 aead_aes256gcm aead_aes256gcm2 aead_chacha20poly1305 aead_chacha20poly13052 aead_xchacha20poly1305 auth auth2 auth3 auth5 auth6 auth7 box box2 box7 box8 box_easy box_easy2 box_seal box_seed chacha20 codecs codecs2 codecs3 core_keccak1600 core1 core2 core3 core4 core5 core6 ed25519_convert generichash generichash2 generichash3 hash hash3 hash_sha3256 hash_sha3512 ipcrypt kdf kem kem_mlkem768 kem_xwing keygen kx metamorphic misuse onetimeauth onetimeauth2 onetimeauth7 pwhash_argon2i pwhash_argon2id pwhash_argon2id2 randombytes scalarmult scalarmult2 scalarmult5 scalarmult6 scalarmult7 scalarmult8 secretbox secretbox2 secretbox7 secretbox8 secretbox_easy secretbox_easy2 secretstream_xchacha20poly1305 shorthash sign sodium_core sodium_utils sodium_version stream stream2 stream3 stream4 verify1 xof_shake128 xof_shake256 xof_turboshake128 xof_turboshake256 xof2 sodium_utils2 sodium_utils3 sodium_utils4 
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test/default'
+  CC       aead_aegis256.o
+  CC       aead_aegis128l.o
+  CC       aead_aes256gcm.o
+  CC       aead_aes256gcm2.o
+  CC       aead_chacha20poly1305.o
+  CC       aead_chacha20poly13052.o
+  CC       aead_xchacha20poly1305.o
+  CC       auth.o
+  CC       auth2.o
+  CC       auth3.o
+  CC       auth5.o
+  CC       auth6.o
+  CC       auth7.o
+  CC       box.o
+  CC       box2.o
+  CC       box7.o
+  CC       box8.o
+  CC       box_easy.o
+  CC       box_easy2.o
+  CC       box_seal.o
+  CC       box_seed.o
+  CC       chacha20.o
+  CC       codecs.o
+  CC       codecs2.o
+  CC       codecs3.o
+  CC       core_keccak1600.o
+  CC       core1.o
+  CC       core2.o
+  CC       core3.o
+  CC       core4.o
+  CC       core5.o
+  CC       core6.o
+  CC       ed25519_convert.o
+  CC       generichash.o
+  CC       generichash2.o
+  CC       generichash3.o
+  CC       hash.o
+  CC       hash3.o
+  CC       hash_sha3256.o
+  CC       hash_sha3512.o
+  CC       ipcrypt.o
+  CC       kdf.o
+  CC       kem.o
+  CC       kem_mlkem768.o
+  CC       kem_xwing.o
+  CC       keygen.o
+  CC       kx.o
+  CC       metamorphic.o
+  CC       misuse.o
+  CC       onetimeauth.o
+  CC       onetimeauth2.o
+  CC       onetimeauth7.o
+  CC       pwhash_argon2i.o
+  CC       pwhash_argon2id.o
+  CC       pwhash_argon2id2.o
+  CC       randombytes.o
+  CC       scalarmult.o
+  CC       scalarmult2.o
+  CC       scalarmult5.o
+  CC       scalarmult6.o
+  CC       scalarmult7.o
+  CC       scalarmult8.o
+  CC       secretbox.o
+  CC       secretbox2.o
+  CC       secretbox7.o
+  CC       secretbox8.o
+  CC       secretbox_easy.o
+  CC       secretbox_easy2.o
+  CC       secretstream_xchacha20poly1305.o
+  CC       shorthash.o
+  CC       sign.o
+  CC       sodium_core.o
+  CC       sodium_utils.o
+  CC       sodium_version.o
+  CC       stream.o
+  CC       stream2.o
+  CC       stream3.o
+  CC       stream4.o
+  CC       verify1.o
+  CC       xof_shake128.o
+  CC       xof_shake256.o
+  CC       xof_turboshake128.o
+  CC       xof_turboshake256.o
+  CC       xof2.o
+  CC       sodium_utils2.o
+  CC       sodium_utils3.o
+  CC       sodium_utils4.o
+  CCLD     aead_aegis128l
+  CCLD     aead_aegis256
+  CCLD     aead_aes256gcm
+  CCLD     aead_aes256gcm2
+  CCLD     aead_chacha20poly1305
+  CCLD     aead_chacha20poly13052
+  CCLD     aead_xchacha20poly1305
+  CCLD     auth
+  CCLD     auth2
+  CCLD     auth3
+  CCLD     auth5
+  CCLD     auth6
+  CCLD     auth7
+  CCLD     box
+  CCLD     box2
+  CCLD     box7
+  CCLD     box8
+  CCLD     box_easy
+  CCLD     box_easy2
+  CCLD     box_seal
+  CCLD     box_seed
+  CCLD     chacha20
+  CCLD     codecs
+  CCLD     codecs2
+  CCLD     codecs3
+  CCLD     core_keccak1600
+  CCLD     core1
+  CCLD     core2
+  CCLD     core3
+  CCLD     core4
+  CCLD     core5
+  CCLD     core6
+  CCLD     ed25519_convert
+  CCLD     generichash
+  CCLD     generichash2
+  CCLD     generichash3
+  CCLD     hash
+  CCLD     hash3
+  CCLD     hash_sha3256
+  CCLD     hash_sha3512
+  CCLD     ipcrypt
+  CCLD     kdf
+  CCLD     kem
+  CCLD     kem_mlkem768
+  CCLD     kem_xwing
+  CCLD     keygen
+  CCLD     kx
+  CCLD     metamorphic
+  CCLD     misuse
+  CCLD     onetimeauth
+  CCLD     onetimeauth2
+  CCLD     onetimeauth7
+  CCLD     pwhash_argon2i
+  CCLD     pwhash_argon2id
+  CCLD     pwhash_argon2id2
+  CCLD     randombytes
+  CCLD     scalarmult
+  CCLD     scalarmult2
+  CCLD     scalarmult5
+  CCLD     scalarmult6
+  CCLD     scalarmult7
+  CCLD     scalarmult8
+  CCLD     secretbox
+  CCLD     secretbox2
+  CCLD     secretbox7
+  CCLD     secretbox8
+  CCLD     secretbox_easy
+  CCLD     secretbox_easy2
+  CCLD     secretstream_xchacha20poly1305
+  CCLD     shorthash
+  CCLD     sign
+  CCLD     sodium_core
+  CCLD     sodium_utils
+  CCLD     sodium_version
+  CCLD     stream
+  CCLD     stream2
+  CCLD     stream3
+  CCLD     stream4
+  CCLD     verify1
+  CCLD     xof_shake128
+  CCLD     xof_shake256
+  CCLD     xof_turboshake128
+  CCLD     xof_turboshake256
+  CCLD     xof2
+  CCLD     sodium_utils2
+  CCLD     sodium_utils3
+  CCLD     sodium_utils4
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test/default'
+make  check-TESTS
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test/default'
+make[4]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test/default'
+PASS: aead_aes256gcm2
+PASS: aead_aegis256
+PASS: aead_chacha20poly1305
+PASS: aead_aegis128l
+PASS: aead_xchacha20poly1305
+PASS: auth
+PASS: auth2
+PASS: aead_chacha20poly13052
+PASS: auth3
+PASS: auth6
+PASS: box
+PASS: box2
+PASS: auth7
+PASS: aead_aes256gcm
+PASS: box_easy
+PASS: auth5
+PASS: box_easy2
+PASS: box_seal
+PASS: box_seed
+PASS: box7
+PASS: codecs2
+PASS: codecs3
+PASS: chacha20
+PASS: codecs
+PASS: core_keccak1600
+PASS: core1
+PASS: core2
+PASS: core4
+PASS: core5
+PASS: core6
+PASS: generichash
+PASS: generichash2
+PASS: generichash3
+PASS: hash
+PASS: hash3
+PASS: hash_sha3256
+PASS: hash_sha3512
+PASS: box8
+PASS: kdf
+PASS: ed25519_convert
+PASS: kem
+PASS: core3
+PASS: kem_mlkem768
+PASS: keygen
+PASS: kem_xwing
+PASS: kx
+PASS: misuse
+PASS: onetimeauth
+PASS: onetimeauth2
+PASS: onetimeauth7
+PASS: metamorphic
+PASS: pwhash_argon2id2
+PASS: randombytes
+PASS: scalarmult
+PASS: scalarmult2
+PASS: scalarmult5
+PASS: scalarmult6
+PASS: scalarmult7
+PASS: scalarmult8
+PASS: secretbox
+PASS: secretbox2
+PASS: secretbox7
+PASS: ipcrypt
+PASS: secretbox_easy
+PASS: secretbox_easy2
+PASS: secretstream_xchacha20poly1305
+PASS: shorthash
+PASS: secretbox8
+PASS: sodium_core
+PASS: sodium_utils
+PASS: sodium_version
+PASS: stream
+PASS: stream2
+PASS: stream3
+PASS: stream4
+PASS: sign
+PASS: xof_shake128
+PASS: xof_shake256
+PASS: verify1
+PASS: xof_turboshake128
+PASS: xof_turboshake256
+PASS: xof2
+PASS: sodium_utils3
+PASS: sodium_utils4
+PASS: sodium_utils2
+PASS: pwhash_argon2i
+PASS: pwhash_argon2id
+============================================================================
+Testsuite summary for libsodium 1.0.22
+============================================================================
+# TOTAL: 87
+# PASS:  87
+# SKIP:  0
+# XFAIL: 0
+# FAIL:  0
+# XPASS: 0
+# ERROR: 0
+============================================================================
+make[4]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test/default'
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test/default'
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test/default'
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test'
+make[2]: Nothing to be done for 'check-am'.
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test'
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test'
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium'
+make[1]: Nothing to be done for 'check-am'.
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium'
+Making install in builds
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/builds'
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/builds'
+make[2]: Nothing to be done for 'install-exec-am'.
+make[2]: Nothing to be done for 'install-data-am'.
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/builds'
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/builds'
+Making install in contrib
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/contrib'
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/contrib'
+make[2]: Nothing to be done for 'install-exec-am'.
+make[2]: Nothing to be done for 'install-data-am'.
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/contrib'
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/contrib'
+Making install in dist-build
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/dist-build'
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/dist-build'
+make[2]: Nothing to be done for 'install-exec-am'.
+make[2]: Nothing to be done for 'install-data-am'.
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/dist-build'
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/dist-build'
+Making install in src
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src'
+Making install in libsodium
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src/libsodium'
+Making install in include
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src/libsodium/include'
+make[4]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src/libsodium/include'
+make[4]: Nothing to be done for 'install-exec-am'.
+ /usr/bin/mkdir -p '/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/include'
+ /usr/bin/mkdir -p '/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/include/sodium'
+ /usr/bin/install -c -m 644  /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/core.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_aead_aes256gcm.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_aead_aegis128l.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_aead_aegis256.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_aead_chacha20poly1305.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_aead_xchacha20poly1305.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_auth.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_auth_hmacsha256.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_auth_hmacsha512.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_auth_hmacsha512256.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_box.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_box_curve25519xchacha20poly1305.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_box_curve25519xsalsa20poly1305.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_core_ed25519.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_core_ristretto255.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_core_hchacha20.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_core_hsalsa20.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_core_keccak1600.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_core_salsa20.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_core_salsa2012.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_core_salsa208.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_generichash.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_generichash_blake2b.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_hash.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_hash_sha256.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_hash_sha3.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_hash_sha512.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_ipcrypt.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_kdf.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_kdf_hkdf_sha256.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_kdf_hkdf_sha512.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_kdf_blake2b.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_kem.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_kem_mlkem768.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_kem_xwing.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_kx.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_onetimeauth.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_onetimeauth_poly1305.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_pwhash.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_pwhash_argon2i.h '/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/include/sodium'
+ /usr/bin/mkdir -p '/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/include/sodium'
+ /usr/bin/install -c -m 644  /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_pwhash_argon2id.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_pwhash_scryptsalsa208sha256.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_scalarmult.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_scalarmult_curve25519.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_scalarmult_ed25519.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_scalarmult_ristretto255.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_secretbox.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_secretbox_xchacha20poly1305.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_secretbox_xsalsa20poly1305.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_secretstream_xchacha20poly1305.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_shorthash.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_shorthash_siphash24.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_sign.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_sign_ed25519.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_sign_edwards25519sha512batch.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_stream.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_stream_chacha20.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_stream_salsa20.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_stream_salsa2012.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_stream_salsa208.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_stream_xchacha20.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_stream_xsalsa20.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_verify_16.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_verify_32.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_verify_64.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_xof_shake128.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_xof_shake256.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_xof_turboshake128.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/crypto_xof_turboshake256.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/export.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/randombytes.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/randombytes_internal_random.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/randombytes_sysrandom.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/runtime.h /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium/utils.h '/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/include/sodium'
+ /usr/bin/install -c -m 644  /home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/src/libsodium/include/sodium.h '/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/include/.'
+ /usr/bin/mkdir -p '/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/include'
+ /usr/bin/mkdir -p '/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/include/sodium'
+ /usr/bin/install -c -m 644  sodium/version.h '/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/include/sodium'
+make[4]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src/libsodium/include'
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src/libsodium/include'
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src/libsodium'
+make[4]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src/libsodium'
+ /usr/bin/mkdir -p '/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/lib'
+ /bin/bash ../../libtool   --mode=install /usr/bin/install -c   libsodium.la '/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/lib'
+libtool: install: /usr/bin/install -c .libs/libsodium.lai /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/lib/libsodium.la
+libtool: install: /usr/bin/install -c .libs/libsodium.a /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/lib/libsodium.a
+libtool: install: chmod 644 /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/lib/libsodium.a
+libtool: install: ranlib /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/lib/libsodium.a
+libtool: finish: PATH="/opt/wine-devel/bin:/opt/wine-staging/bin:/opt/wine-stable/bin:/usr/local/sbin:/usr/local/bin:/usr/local/libexec:/usr/sbin:/usr/bin:/sbin:/bin:/usr/libexec:/usr/local/games:/usr/games:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/home/shmellyorc/.dotnet/tools:/sbin" ldconfig -n /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/lib
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/lib
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the '-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the 'LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the 'LD_RUN_PATH' environment variable
+     during linking
+   - use the '-Wl,-rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to '/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+make[4]: Nothing to be done for 'install-data-am'.
+make[4]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src/libsodium'
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src/libsodium'
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src/libsodium'
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src'
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src'
+make[3]: Nothing to be done for 'install-exec-am'.
+make[3]: Nothing to be done for 'install-data-am'.
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src'
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src'
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/src'
+Making install in test
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test'
+Making install in default
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test/default'
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test/default'
+make[3]: Nothing to be done for 'install-exec-am'.
+make[3]: Nothing to be done for 'install-data-am'.
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test/default'
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test/default'
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test'
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test'
+make[3]: Nothing to be done for 'install-exec-am'.
+make[3]: Nothing to be done for 'install-data-am'.
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test'
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test'
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium/test'
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium'
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium'
+make[2]: Nothing to be done for 'install-exec-am'.
+ /usr/bin/mkdir -p '/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/lib/pkgconfig'
+ /usr/bin/install -c -m 644 libsodium.pc '/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/lib/pkgconfig'
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium'
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/sodium'
+-- The C compiler identification is Clang 23.1.4
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Could NOT find PkgConfig (missing: PKG_CONFIG_EXECUTABLE) 
+-- Found ZLIB: /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Debug/lib/libz.a (found suitable version "1.3.2", minimum required is "1.2.1")
+-- Performing Test HAVE_DIRENT_H
+-- Performing Test HAVE_DIRENT_H - Success
+-- Looking for include file sys/types.h
+-- Looking for include file sys/types.h - found
+-- Looking for include files sys/types.h, acl/libacl.h
+-- Looking for include files sys/types.h, acl/libacl.h - not found
+-- Looking for include files sys/types.h, attr/xattr.h
+-- Looking for include files sys/types.h, attr/xattr.h - not found
+-- Looking for include files sys/types.h, ctype.h
+-- Looking for include files sys/types.h, ctype.h - found
+-- Looking for 3 include files sys/types.h, ..., copyfile.h
+-- Looking for 3 include files sys/types.h, ..., copyfile.h - not found
+-- Looking for 3 include files sys/types.h, ..., direct.h
+-- Looking for 3 include files sys/types.h, ..., direct.h - not found
+-- Looking for 3 include files sys/types.h, ..., dlfcn.h
+-- Looking for 3 include files sys/types.h, ..., dlfcn.h - found
+-- Looking for 4 include files sys/types.h, ..., errno.h
+-- Looking for 4 include files sys/types.h, ..., errno.h - found
+-- Looking for 5 include files sys/types.h, ..., ext2fs/ext2_fs.h
+-- Looking for 5 include files sys/types.h, ..., ext2fs/ext2_fs.h - not found
+-- Performing Test HAVE_WORKING_EXT2_IOC_GETFLAGS
+-- Performing Test HAVE_WORKING_EXT2_IOC_GETFLAGS - Failed
+-- Looking for 5 include files sys/types.h, ..., fcntl.h
+-- Looking for 5 include files sys/types.h, ..., fcntl.h - found
+-- Looking for 6 include files sys/types.h, ..., fnmatch.h
+-- Looking for 6 include files sys/types.h, ..., fnmatch.h - found
+-- Looking for 7 include files sys/types.h, ..., grp.h
+-- Looking for 7 include files sys/types.h, ..., grp.h - found
+-- Looking for 8 include files sys/types.h, ..., inttypes.h
+-- Looking for 8 include files sys/types.h, ..., inttypes.h - found
+-- Looking for 9 include files sys/types.h, ..., io.h
+-- Looking for 9 include files sys/types.h, ..., io.h - not found
+-- Looking for 9 include files sys/types.h, ..., langinfo.h
+-- Looking for 9 include files sys/types.h, ..., langinfo.h - found
+-- Looking for 10 include files sys/types.h, ..., limits.h
+-- Looking for 10 include files sys/types.h, ..., limits.h - found
+-- Looking for 11 include files sys/types.h, ..., linux/types.h
+-- Looking for 11 include files sys/types.h, ..., linux/types.h - found
+-- Looking for 12 include files sys/types.h, ..., linux/fiemap.h
+-- Looking for 12 include files sys/types.h, ..., linux/fiemap.h - found
+-- Looking for 13 include files sys/types.h, ..., linux/fs.h
+-- Looking for 13 include files sys/types.h, ..., linux/fs.h - found
+-- Performing Test HAVE_WORKING_FS_IOC_GETFLAGS
+-- Performing Test HAVE_WORKING_FS_IOC_GETFLAGS - Success
+-- Looking for 14 include files sys/types.h, ..., intsafe.h
+-- Looking for 14 include files sys/types.h, ..., intsafe.h - not found
+-- Looking for 14 include files sys/types.h, ..., linux/magic.h
+-- Looking for 14 include files sys/types.h, ..., linux/magic.h - found
+-- Looking for 15 include files sys/types.h, ..., locale.h
+-- Looking for 15 include files sys/types.h, ..., locale.h - found
+-- Looking for 16 include files sys/types.h, ..., membership.h
+-- Looking for 16 include files sys/types.h, ..., membership.h - not found
+-- Looking for 16 include files sys/types.h, ..., paths.h
+-- Looking for 16 include files sys/types.h, ..., paths.h - found
+-- Looking for 17 include files sys/types.h, ..., poll.h
+-- Looking for 17 include files sys/types.h, ..., poll.h - found
+-- Looking for 18 include files sys/types.h, ..., process.h
+-- Looking for 18 include files sys/types.h, ..., process.h - not found
+-- Looking for 18 include files sys/types.h, ..., pthread.h
+-- Looking for 18 include files sys/types.h, ..., pthread.h - found
+-- Looking for 19 include files sys/types.h, ..., pwd.h
+-- Looking for 19 include files sys/types.h, ..., pwd.h - found
+-- Looking for 20 include files sys/types.h, ..., readpassphrase.h
+-- Looking for 20 include files sys/types.h, ..., readpassphrase.h - not found
+-- Looking for 20 include files sys/types.h, ..., regex.h
+-- Looking for 20 include files sys/types.h, ..., regex.h - found
+-- Looking for 21 include files sys/types.h, ..., signal.h
+-- Looking for 21 include files sys/types.h, ..., signal.h - found
+-- Looking for 22 include files sys/types.h, ..., spawn.h
+-- Looking for 22 include files sys/types.h, ..., spawn.h - found
+-- Looking for 23 include files sys/types.h, ..., stdarg.h
+-- Looking for 23 include files sys/types.h, ..., stdarg.h - found
+-- Looking for 24 include files sys/types.h, ..., stdckdint.h
+-- Looking for 24 include files sys/types.h, ..., stdckdint.h - found
+-- Looking for 25 include files sys/types.h, ..., stdint.h
+-- Looking for 25 include files sys/types.h, ..., stdint.h - found
+-- Looking for 26 include files sys/types.h, ..., stdio.h
+-- Looking for 26 include files sys/types.h, ..., stdio.h - found
+-- Looking for 27 include files sys/types.h, ..., stdlib.h
+-- Looking for 27 include files sys/types.h, ..., stdlib.h - found
+-- Looking for 28 include files sys/types.h, ..., string.h
+-- Looking for 28 include files sys/types.h, ..., string.h - found
+-- Looking for 29 include files sys/types.h, ..., strings.h
+-- Looking for 29 include files sys/types.h, ..., strings.h - found
+-- Looking for 30 include files sys/types.h, ..., sys/acl.h
+-- Looking for 30 include files sys/types.h, ..., sys/acl.h - not found
+-- Looking for 30 include files sys/types.h, ..., sys/cdefs.h
+-- Looking for 30 include files sys/types.h, ..., sys/cdefs.h - found
+-- Looking for 31 include files sys/types.h, ..., sys/extattr.h
+-- Looking for 31 include files sys/types.h, ..., sys/extattr.h - not found
+-- Looking for 31 include files sys/types.h, ..., sys/ioctl.h
+-- Looking for 31 include files sys/types.h, ..., sys/ioctl.h - found
+-- Looking for 32 include files sys/types.h, ..., sys/mkdev.h
+-- Looking for 32 include files sys/types.h, ..., sys/mkdev.h - not found
+-- Looking for 32 include files sys/types.h, ..., sys/mount.h
+-- Looking for 32 include files sys/types.h, ..., sys/mount.h - found
+-- Looking for 33 include files sys/types.h, ..., sys/param.h
+-- Looking for 33 include files sys/types.h, ..., sys/param.h - found
+-- Looking for 34 include files sys/types.h, ..., sys/poll.h
+-- Looking for 34 include files sys/types.h, ..., sys/poll.h - found
+-- Looking for 35 include files sys/types.h, ..., sys/richacl.h
+-- Looking for 35 include files sys/types.h, ..., sys/richacl.h - not found
+-- Looking for 35 include files sys/types.h, ..., sys/select.h
+-- Looking for 35 include files sys/types.h, ..., sys/select.h - found
+-- Looking for 36 include files sys/types.h, ..., sys/single_threaded.h
+-- Looking for 36 include files sys/types.h, ..., sys/single_threaded.h - found
+-- Looking for 37 include files sys/types.h, ..., sys/stat.h
+-- Looking for 37 include files sys/types.h, ..., sys/stat.h - found
+-- Looking for 38 include files sys/types.h, ..., sys/statfs.h
+-- Looking for 38 include files sys/types.h, ..., sys/statfs.h - found
+-- Looking for 39 include files sys/types.h, ..., sys/statvfs.h
+-- Looking for 39 include files sys/types.h, ..., sys/statvfs.h - found
+-- Looking for 40 include files sys/types.h, ..., sys/sysctl.h
+-- Looking for 40 include files sys/types.h, ..., sys/sysctl.h - not found
+-- Looking for 40 include files sys/types.h, ..., sys/sysmacros.h
+-- Looking for 40 include files sys/types.h, ..., sys/sysmacros.h - found
+-- Looking for 41 include files sys/types.h, ..., sys/time.h
+-- Looking for 41 include files sys/types.h, ..., sys/time.h - found
+-- Looking for 42 include files sys/types.h, ..., sys/utime.h
+-- Looking for 42 include files sys/types.h, ..., sys/utime.h - not found
+-- Looking for 42 include files sys/types.h, ..., sys/utsname.h
+-- Looking for 42 include files sys/types.h, ..., sys/utsname.h - found
+-- Looking for 43 include files sys/types.h, ..., sys/vfs.h
+-- Looking for 43 include files sys/types.h, ..., sys/vfs.h - found
+-- Looking for 44 include files sys/types.h, ..., sys/wait.h
+-- Looking for 44 include files sys/types.h, ..., sys/wait.h - found
+-- Looking for 45 include files sys/types.h, ..., sys/xattr.h
+-- Looking for 45 include files sys/types.h, ..., sys/xattr.h - found
+-- Looking for 46 include files sys/types.h, ..., time.h
+-- Looking for 46 include files sys/types.h, ..., time.h - found
+-- Looking for 47 include files sys/types.h, ..., unistd.h
+-- Looking for 47 include files sys/types.h, ..., unistd.h - found
+-- Looking for 48 include files sys/types.h, ..., utime.h
+-- Looking for 48 include files sys/types.h, ..., utime.h - found
+-- Looking for 49 include files sys/types.h, ..., wchar.h
+-- Looking for 49 include files sys/types.h, ..., wchar.h - found
+-- Looking for 50 include files sys/types.h, ..., wctype.h
+-- Looking for 50 include files sys/types.h, ..., wctype.h - found
+-- Looking for 51 include files sys/types.h, ..., windows.h
+-- Looking for 51 include files sys/types.h, ..., windows.h - not found
+-- Looking for 51 include files sys/types.h, ..., bcrypt.h
+-- Looking for 51 include files sys/types.h, ..., bcrypt.h - not found
+-- Looking for 51 include files sys/types.h, ..., winioctl.h
+-- Looking for 51 include files sys/types.h, ..., winioctl.h - not found
+-- Performing Test SAFE_TO_DEFINE_EXTENSIONS
+-- Performing Test SAFE_TO_DEFINE_EXTENSIONS - Success
+-- Looking for regcomp
+-- Looking for regcomp - found
+-- Looking for _CrtSetReportMode
+-- Looking for _CrtSetReportMode - not found
+-- Looking for arc4random_buf
+-- Looking for arc4random_buf - found
+-- Looking for chown
+-- Looking for chown - found
+-- Looking for chroot
+-- Looking for chroot - found
+-- Looking for closefrom
+-- Looking for closefrom - found
+-- Looking for close_range
+-- Looking for close_range - found
+-- Looking for ctime_r
+-- Looking for ctime_r - found
+-- Looking for explicit_bzero
+-- Looking for explicit_bzero - found
+-- Looking for fchdir
+-- Looking for fchdir - found
+-- Looking for fchmod
+-- Looking for fchmod - found
+-- Looking for fchown
+-- Looking for fchown - found
+-- Looking for fcntl
+-- Looking for fcntl - found
+-- Looking for fdopendir
+-- Looking for fdopendir - found
+-- Looking for fnmatch
+-- Looking for fnmatch - found
+-- Looking for fork
+-- Looking for fork - found
+-- Looking for fstat
+-- Looking for fstat - found
+-- Looking for fstatat
+-- Looking for fstatat - found
+-- Looking for fstatfs
+-- Looking for fstatfs - found
+-- Looking for fstatvfs
+-- Looking for fstatvfs - found
+-- Looking for ftruncate
+-- Looking for ftruncate - found
+-- Looking for futimens
+-- Looking for futimens - found
+-- Looking for futimes
+-- Looking for futimes - found
+-- Looking for futimesat
+-- Looking for futimesat - found
+-- Looking for getegid
+-- Looking for getegid - found
+-- Looking for geteuid
+-- Looking for geteuid - found
+-- Looking for getgrgid_r
+-- Looking for getgrgid_r - found
+-- Looking for getgrnam_r
+-- Looking for getgrnam_r - found
+-- Looking for getline
+-- Looking for getline - found
+-- Looking for getpid
+-- Looking for getpid - found
+-- Looking for getpwnam_r
+-- Looking for getpwnam_r - found
+-- Looking for getpwuid_r
+-- Looking for getpwuid_r - found
+-- Looking for getresgid
+-- Looking for getresgid - found
+-- Looking for getresuid
+-- Looking for getresuid - found
+-- Looking for gettimeofday
+-- Looking for gettimeofday - found
+-- Looking for getvfsbyname
+-- Looking for getvfsbyname - not found
+-- Looking for gmtime_r
+-- Looking for gmtime_r - found
+-- Looking for issetugid
+-- Looking for issetugid - not found
+-- Looking for lchflags
+-- Looking for lchflags - not found
+-- Looking for lchmod
+-- Looking for lchmod - found
+-- Looking for lchown
+-- Looking for lchown - found
+-- Looking for link
+-- Looking for link - found
+-- Looking for linkat
+-- Looking for linkat - found
+-- Looking for localtime_r
+-- Looking for localtime_r - found
+-- Looking for lstat
+-- Looking for lstat - found
+-- Looking for lutimes
+-- Looking for lutimes - found
+-- Looking for mbrtowc
+-- Looking for mbrtowc - found
+-- Looking for memmove
+-- Looking for memmove - found
+-- Looking for memset_explicit
+-- Looking for memset_explicit - found
+-- Looking for mkdir
+-- Looking for mkdir - found
+-- Looking for mkfifo
+-- Looking for mkfifo - found
+-- Looking for mknod
+-- Looking for mknod - found
+-- Looking for mkstemp
+-- Looking for mkstemp - found
+-- Looking for nl_langinfo
+-- Looking for nl_langinfo - found
+-- Looking for openat
+-- Looking for openat - found
+-- Looking for pipe
+-- Looking for pipe - found
+-- Looking for poll
+-- Looking for poll - found
+-- Looking for posix_spawn
+-- Looking for posix_spawn - found
+-- Looking for posix_spawnp
+-- Looking for posix_spawnp - found
+-- Looking for readlink
+-- Looking for readlink - found
+-- Looking for readpassphrase
+-- Looking for readpassphrase - not found
+-- Looking for select
+-- Looking for select - found
+-- Looking for setenv
+-- Looking for setenv - found
+-- Looking for setlocale
+-- Looking for setlocale - found
+-- Looking for sigaction
+-- Looking for sigaction - found
+-- Looking for statfs
+-- Looking for statfs - found
+-- Looking for statvfs
+-- Looking for statvfs - found
+-- Looking for strchr
+-- Looking for strchr - found
+-- Looking for strdup
+-- Looking for strdup - found
+-- Looking for strerror
+-- Looking for strerror - found
+-- Looking for strncpy_s
+-- Looking for strncpy_s - not found
+-- Looking for strnlen
+-- Looking for strnlen - found
+-- Looking for strrchr
+-- Looking for strrchr - found
+-- Looking for symlink
+-- Looking for symlink - found
+-- Looking for sysconf
+-- Looking for sysconf - found
+-- Looking for tcgetattr
+-- Looking for tcgetattr - found
+-- Looking for tcsetattr
+-- Looking for tcsetattr - found
+-- Looking for timegm
+-- Looking for timegm - found
+-- Looking for tzset
+-- Looking for tzset - found
+-- Looking for unlinkat
+-- Looking for unlinkat - found
+-- Looking for unsetenv
+-- Looking for unsetenv - found
+-- Looking for utime
+-- Looking for utime - found
+-- Looking for utimes
+-- Looking for utimes - found
+-- Looking for utimensat
+-- Looking for utimensat - found
+-- Looking for vfork
+-- Looking for vfork - found
+-- Looking for wcrtomb
+-- Looking for wcrtomb - found
+-- Looking for wcscmp
+-- Looking for wcscmp - found
+-- Looking for wcscpy
+-- Looking for wcscpy - found
+-- Looking for wcslen
+-- Looking for wcslen - found
+-- Looking for wctomb
+-- Looking for wctomb - found
+-- Looking for _fseeki64
+-- Looking for _fseeki64 - not found
+-- Looking for _get_timezone
+-- Looking for _get_timezone - not found
+-- Looking for ctime_s
+-- Looking for ctime_s - not found
+-- Looking for gmtime_s
+-- Looking for gmtime_s - not found
+-- Looking for localtime_s
+-- Looking for localtime_s - not found
+-- Looking for _mkgmtime
+-- Looking for _mkgmtime - not found
+-- Looking for cygwin_conv_path
+-- Looking for cygwin_conv_path - not found
+-- Looking for fseeko
+-- Looking for fseeko - found
+-- Looking for strerror_r
+-- Looking for strerror_r - found
+-- Looking for strftime
+-- Looking for strftime - found
+-- Looking for vprintf
+-- Looking for vprintf - found
+-- Looking for waitpid
+-- Looking for waitpid - found
+-- Looking for wmemcmp
+-- Looking for wmemcmp - found
+-- Looking for wmemcpy
+-- Looking for wmemcpy - found
+-- Looking for wmemmove
+-- Looking for wmemmove - found
+-- Performing Test HAVE_STRUCT_VFSCONF
+-- Performing Test HAVE_STRUCT_VFSCONF - Failed
+-- Performing Test HAVE_STRUCT_XVFSCONF
+-- Performing Test HAVE_STRUCT_XVFSCONF - Failed
+-- Performing Test HAVE_STRUCT_STATFS
+-- Performing Test HAVE_STRUCT_STATFS - Failed
+-- Performing Test HAVE_DIRFD
+-- Performing Test HAVE_DIRFD - Success
+-- Performing Test HAVE_READLINKAT
+-- Performing Test HAVE_READLINKAT - Success
+-- Performing Test MAJOR_IN_MKDEV
+-- Performing Test MAJOR_IN_MKDEV - Failed
+-- Performing Test MAJOR_IN_SYSMACROS
+-- Performing Test MAJOR_IN_SYSMACROS - Success
+-- Looking for EFTYPE
+-- Looking for EFTYPE - found
+-- Looking for EILSEQ
+-- Looking for EILSEQ - found
+-- Looking for D_MD_ORDER
+-- Looking for D_MD_ORDER - not found
+-- Looking for INT32_MAX
+-- Looking for INT32_MAX - found
+-- Looking for INT32_MIN
+-- Looking for INT32_MIN - found
+-- Looking for INT64_MAX
+-- Looking for INT64_MAX - found
+-- Looking for INT64_MIN
+-- Looking for INT64_MIN - found
+-- Looking for INTMAX_MAX
+-- Looking for INTMAX_MAX - found
+-- Looking for INTMAX_MIN
+-- Looking for INTMAX_MIN - found
+-- Looking for UINT32_MAX
+-- Looking for UINT32_MAX - found
+-- Looking for UINT64_MAX
+-- Looking for UINT64_MAX - found
+-- Looking for UINTMAX_MAX
+-- Looking for UINTMAX_MAX - found
+-- Looking for SIZE_MAX
+-- Looking for SIZE_MAX - found
+-- Looking for SSIZE_MAX
+-- Looking for SSIZE_MAX - found
+-- Performing Test HAVE_STRUCT_TM_TM_GMTOFF
+-- Performing Test HAVE_STRUCT_TM_TM_GMTOFF - Success
+-- Performing Test HAVE_STRUCT_TM___TM_GMTOFF
+-- Performing Test HAVE_STRUCT_TM___TM_GMTOFF - Failed
+-- Performing Test HAVE_STRUCT_STAT_ST_BIRTHTIME
+-- Performing Test HAVE_STRUCT_STAT_ST_BIRTHTIME - Failed
+-- Performing Test HAVE_STRUCT_STAT_ST_BIRTHTIMESPEC_TV_NSEC
+-- Performing Test HAVE_STRUCT_STAT_ST_BIRTHTIMESPEC_TV_NSEC - Failed
+-- Performing Test HAVE_STRUCT_STAT_ST_MTIMESPEC_TV_NSEC
+-- Performing Test HAVE_STRUCT_STAT_ST_MTIMESPEC_TV_NSEC - Failed
+-- Performing Test HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC
+-- Performing Test HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC - Success
+-- Performing Test HAVE_STRUCT_STAT_ST_MTIME_N
+-- Performing Test HAVE_STRUCT_STAT_ST_MTIME_N - Failed
+-- Performing Test HAVE_STRUCT_STAT_ST_UMTIME
+-- Performing Test HAVE_STRUCT_STAT_ST_UMTIME - Failed
+-- Performing Test HAVE_STRUCT_STAT_ST_MTIME_USEC
+-- Performing Test HAVE_STRUCT_STAT_ST_MTIME_USEC - Failed
+-- Performing Test HAVE_STRUCT_STAT_ST_BLKSIZE
+-- Performing Test HAVE_STRUCT_STAT_ST_BLKSIZE - Success
+-- Performing Test HAVE_STRUCT_STAT_ST_FLAGS
+-- Performing Test HAVE_STRUCT_STAT_ST_FLAGS - Failed
+-- Performing Test HAVE_STRUCT_STATVFS_F_IOSIZE
+-- Performing Test HAVE_STRUCT_STATVFS_F_IOSIZE - Failed
+-- Looking for stddef.h
+-- Looking for stddef.h - found
+-- Check size of short
+-- Check size of short - done
+-- Check size of int
+-- Check size of int - done
+-- Check size of long
+-- Check size of long - done
+-- Check size of long long
+-- Check size of long long - done
+-- Check size of unsigned short
+-- Check size of unsigned short - done
+-- Check size of unsigned
+-- Check size of unsigned - done
+-- Check size of unsigned long
+-- Check size of unsigned long - done
+-- Check size of unsigned long long
+-- Check size of unsigned long long - done
+-- Check size of __int64
+-- Check size of __int64 - failed
+-- Check size of unsigned __int64
+-- Check size of unsigned __int64 - failed
+-- Check size of int16_t
+-- Check size of int16_t - done
+-- Check size of int32_t
+-- Check size of int32_t - done
+-- Check size of int64_t
+-- Check size of int64_t - done
+-- Check size of intmax_t
+-- Check size of intmax_t - done
+-- Check size of uint8_t
+-- Check size of uint8_t - done
+-- Check size of uint16_t
+-- Check size of uint16_t - done
+-- Check size of uint32_t
+-- Check size of uint32_t - done
+-- Check size of uint64_t
+-- Check size of uint64_t - done
+-- Check size of uintmax_t
+-- Check size of uintmax_t - done
+-- Check size of dev_t
+-- Check size of dev_t - done
+-- Check size of gid_t
+-- Check size of gid_t - done
+-- Check size of id_t
+-- Check size of id_t - done
+-- Check size of mode_t
+-- Check size of mode_t - done
+-- Check size of off_t
+-- Check size of off_t - done
+-- Check size of size_t
+-- Check size of size_t - done
+-- Check size of ssize_t
+-- Check size of ssize_t - done
+-- Check size of uid_t
+-- Check size of uid_t - done
+-- Check size of pid_t
+-- Check size of pid_t - done
+-- Check size of intptr_t
+-- Check size of intptr_t - done
+-- Check size of uintptr_t
+-- Check size of uintptr_t - done
+-- Check size of wchar_t
+-- Check size of wchar_t - done
+-- Checking _FILE_OFFSET_BITS for large files
+-- Checking _FILE_OFFSET_BITS for large files - not needed
+-- Checking support for ARCHIVE_CRYPTO_MD5_LIBC
+-- Checking support for ARCHIVE_CRYPTO_MD5_LIBC -- not found
+-- Checking support for ARCHIVE_CRYPTO_RMD160_LIBC
+-- Checking support for ARCHIVE_CRYPTO_RMD160_LIBC -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA1_LIBC
+-- Checking support for ARCHIVE_CRYPTO_SHA1_LIBC -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA256_LIBC
+-- Checking support for ARCHIVE_CRYPTO_SHA256_LIBC -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA384_LIBC
+-- Checking support for ARCHIVE_CRYPTO_SHA384_LIBC -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA512_LIBC
+-- Checking support for ARCHIVE_CRYPTO_SHA512_LIBC -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA256_LIBC2
+-- Checking support for ARCHIVE_CRYPTO_SHA256_LIBC2 -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA384_LIBC2
+-- Checking support for ARCHIVE_CRYPTO_SHA384_LIBC2 -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA512_LIBC2
+-- Checking support for ARCHIVE_CRYPTO_SHA512_LIBC2 -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA256_LIBC3
+-- Checking support for ARCHIVE_CRYPTO_SHA256_LIBC3 -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA384_LIBC3
+-- Checking support for ARCHIVE_CRYPTO_SHA384_LIBC3 -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA512_LIBC3
+-- Checking support for ARCHIVE_CRYPTO_SHA512_LIBC3 -- not found
+-- Checking support for ARCHIVE_CRYPTO_MD5_LIBMD
+-- Checking support for ARCHIVE_CRYPTO_MD5_LIBMD -- not found
+-- Checking support for ARCHIVE_CRYPTO_RMD160_LIBMD
+-- Checking support for ARCHIVE_CRYPTO_RMD160_LIBMD -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA1_LIBMD
+-- Checking support for ARCHIVE_CRYPTO_SHA1_LIBMD -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA256_LIBMD
+-- Checking support for ARCHIVE_CRYPTO_SHA256_LIBMD -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA512_LIBMD
+-- Checking support for ARCHIVE_CRYPTO_SHA512_LIBMD -- not found
+-- Performing Test HAVE_VISIBILITY_ATTR
+-- Performing Test HAVE_VISIBILITY_ATTR - Success
+-- Configuring done (33.6s)
+-- Generating done (0.1s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug/archive
+[  3%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_cmdline.c.o
+[  3%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_check_magic.c.o
+[  3%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_acl.c.o
+[  3%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_crc32.c.o
+[  4%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_cryptor.c.o
+[  4%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_digest.c.o
+[  5%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_entry.c.o
+[  6%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_entry_copy_stat.c.o
+[  7%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_entry_sparse.c.o
+[  7%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_entry_link_resolver.c.o
+[  8%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_entry_stat.c.o
+[  9%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_entry_strmode.c.o
+[ 10%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_entry_xattr.c.o
+[ 11%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_hmac.c.o
+[ 11%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_match.c.o
+[ 13%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_options.c.o
+[ 13%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_pack_dev.c.o
+[ 14%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_parse_date.c.o
+[ 15%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_pathmatch.c.o
+[ 15%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_ppmd8.c.o
+[ 17%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_random.c.o
+[ 17%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_ppmd7.c.o
+[ 18%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_rb.c.o
+[ 19%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read.c.o
+[ 19%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_add_passphrase.c.o
+[ 20%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_append_filter.c.o
+[ 21%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_data_into_fd.c.o
+[ 22%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_disk_entry_from_file.c.o
+[ 23%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_disk_posix.c.o
+[ 24%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_extract.c.o
+[ 24%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_disk_set_standard_lookup.c.o
+[ 25%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_extract2.c.o
+[ 26%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_open_fd.c.o
+[ 26%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_open_file.c.o
+[ 27%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_open_filename.c.o
+[ 28%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_open_memory.c.o
+[ 29%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_set_format.c.o
+[ 30%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_set_options.c.o
+[ 30%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_filter_all.c.o
+[ 31%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_filter_bzip2.c.o
+[ 32%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_filter_by_code.c.o
+[ 33%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_filter_compress.c.o
+[ 34%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_filter_gzip.c.o
+[ 35%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_filter_grzip.c.o
+[ 35%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_filter_lrzip.c.o
+[ 36%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_filter_lz4.c.o
+[ 37%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_filter_lzop.c.o
+[ 38%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_filter_none.c.o
+[ 38%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_filter_program.c.o
+[ 39%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_filter_rpm.c.o
+[ 40%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_filter_uu.c.o
+[ 41%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_filter_xz.c.o
+[ 42%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_filter_zstd.c.o
+[ 42%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_format_7zip.c.o
+[ 43%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_format_all.c.o
+[ 44%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_format_ar.c.o
+[ 45%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_format_by_code.c.o
+[ 46%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_format_cab.c.o
+[ 46%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_format_cpio.c.o
+[ 47%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_format_empty.c.o
+[ 48%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_format_iso9660.c.o
+[ 49%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_format_lha.c.o
+[ 50%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_format_mtree.c.o
+[ 50%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_format_rar.c.o
+[ 51%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_format_rar5.c.o
+[ 53%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_format_raw.c.o
+[ 53%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_format_tar.c.o
+[ 53%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_format_warc.c.o
+[ 54%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_format_xar.c.o
+[ 55%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_read_support_format_zip.c.o
+[ 56%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_string.c.o
+[ 57%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_string_sprintf.c.o
+[ 57%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_time.c.o
+[ 58%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_umask.c.o
+[ 59%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_util.c.o
+[ 60%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_version_details.c.o
+[ 61%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_virtual.c.o
+[ 61%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write.c.o
+[ 62%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_disk_posix.c.o
+[ 63%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_disk_set_standard_lookup.c.o
+[ 64%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_open_fd.c.o
+[ 65%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_open_file.c.o
+[ 65%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_open_filename.c.o
+[ 66%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_open_memory.c.o
+[ 67%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_add_filter.c.o
+[ 68%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_add_filter_b64encode.c.o
+[ 69%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_add_filter_by_name.c.o
+[ 69%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_add_filter_bzip2.c.o
+[ 70%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_add_filter_compress.c.o
+[ 71%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_add_filter_grzip.c.o
+[ 72%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_add_filter_gzip.c.o
+[ 73%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_add_filter_lrzip.c.o
+[ 73%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_add_filter_lz4.c.o
+[ 74%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_add_filter_lzop.c.o
+[ 75%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_add_filter_none.c.o
+[ 76%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_add_filter_program.c.o
+[ 76%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_add_filter_uuencode.c.o
+[ 78%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_add_filter_zstd.c.o
+[ 78%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_add_filter_xz.c.o
+[ 79%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_set_format.c.o
+[ 80%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_set_format_7zip.c.o
+[ 80%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_set_format_ar.c.o
+[ 81%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_set_format_by_name.c.o
+[ 82%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_set_format_cpio.c.o
+[ 83%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_set_format_cpio_binary.c.o
+[ 84%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_set_format_cpio_newc.c.o
+[ 84%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_set_format_cpio_odc.c.o
+[ 85%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_set_format_filter_by_ext.c.o
+[ 86%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_set_format_gnutar.c.o
+[ 87%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_set_format_iso9660.c.o
+[ 88%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_set_format_pax.c.o
+[ 88%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_set_format_mtree.c.o
+[ 89%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_set_format_raw.c.o
+[ 90%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_set_format_shar.c.o
+[ 91%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_set_format_ustar.c.o
+[ 92%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_set_format_v7tar.c.o
+[ 92%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_set_format_warc.c.o
+[ 93%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_set_format_xar.c.o
+[ 94%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_set_format_zip.c.o
+[ 95%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_set_options.c.o
+[ 96%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_write_set_passphrase.c.o
+[ 96%] Building C object libarchive/CMakeFiles/archive_static.dir/filter_fork_posix.c.o
+[ 97%] Building C object libarchive/CMakeFiles/archive_static.dir/xxhash.c.o
+[ 98%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_blake2s_ref.c.o
+[ 99%] Building C object libarchive/CMakeFiles/archive_static.dir/archive_blake2sp_ref.c.o
+[100%] Linking C static library libarchive.a
+[100%] Built target archive_static
+-- Install configuration: "Debug"
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/lib/pkgconfig/libarchive.pc
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/lib/libarchive.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_entry.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_entry_acl.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_entry_linkify.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_entry_misc.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_entry_paths.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_entry_perms.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_entry_stat.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_entry_time.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_read.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_read_add_passphrase.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_read_data.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_read_disk.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_read_extract.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_read_filter.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_read_format.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_read_free.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_read_header.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_read_new.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_read_open.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_read_set_options.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_util.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_write.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_write_blocksize.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_write_data.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_write_disk.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_write_filter.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_write_finish_entry.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_write_format.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_write_free.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_write_header.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_write_new.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_write_open.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_write_set_options.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/archive_write_set_passphrase.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man5/cpio.5
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/libarchive.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/libarchive_changes.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man3/libarchive_internals.3
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man5/libarchive-formats.5
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man5/mtree.5
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/share/man/man5/tar.5
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/include/archive.h
+-- Installing: /home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug/include/archive_entry.h

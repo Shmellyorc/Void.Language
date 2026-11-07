@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "root": "/tmp/VOIDUP deadline \u96ea # % z720rgx1/private",
+  "diagnostic": {
+    "message": "HTTP download failed",
+    "operation": "download",
+    "kind": "/@stdlib/net/http.void::error_kind.timeout",
+    "phase": "/@stdlib/net/http.void::failure_phase.download",
+    "status": 200,
+    "code": 1,
+    "native_domain": "",
+    "native_code": 0,
+    "cleanup_code": 0,
+    "progress": 1048576,
+    "published": false,
+    "durable": false
+  },
+  "retained_partial_bytes": 1048576,
+  "lock_reusable_after_timeout": true
+}

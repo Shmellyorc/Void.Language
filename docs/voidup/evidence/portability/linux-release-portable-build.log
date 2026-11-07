@@ -1,0 +1,43 @@
+[  0%] Built target void_native_fixture
+[  0%] Built target void_zone_objects
+[  7%] Built target void_format_objects
+[ 14%] Built target void_core
+[ 85%] Built target libcurl_static
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_process_windows.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_directory_windows.cpp.o
+[ 85%] Linking CXX static library libvoid_runtime.a
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Generating cache-identity-Release.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Release.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_host_portable.dir/tests/host_capabilities/portable.cpp.o
+/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable.cpp:27:17: warning: 'u8path<char *, std::filesystem::path, char>' is deprecated: use 'path((const char8_t*)&*source)' instead [-Wdeprecated-declarations]
+   27 |   auto work=fs::u8path(argv[1]);auto executable=fs::u8path(argv[2]);
+      |                 ^
+/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/fs_path.h:845:5: note: 'u8path<char *, std::filesystem::path, char>' has been explicitly marked deprecated here
+  845 |     _GLIBCXX20_DEPRECATED_SUGGEST("path((const char8_t*)&*source)")
+      |     ^
+/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/x86_64-linux-gnu/c++/16/bits/c++config.h:144:45: note: expanded from macro '_GLIBCXX20_DEPRECATED_SUGGEST'
+  144 | # define _GLIBCXX20_DEPRECATED_SUGGEST(ALT) _GLIBCXX_DEPRECATED_SUGGEST(ALT)
+      |                                             ^
+/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/x86_64-linux-gnu/c++/16/bits/c++config.h:112:19: note: expanded from macro '_GLIBCXX_DEPRECATED_SUGGEST'
+  112 |   __attribute__ ((__deprecated__ ("use '" ALT "' instead")))
+      |                   ^
+/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable.cpp:27:53: warning: 'u8path<char *, std::filesystem::path, char>' is deprecated: use 'path((const char8_t*)&*source)' instead [-Wdeprecated-declarations]
+   27 |   auto work=fs::u8path(argv[1]);auto executable=fs::u8path(argv[2]);
+      |                                                     ^
+/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/fs_path.h:845:5: note: 'u8path<char *, std::filesystem::path, char>' has been explicitly marked deprecated here
+  845 |     _GLIBCXX20_DEPRECATED_SUGGEST("path((const char8_t*)&*source)")
+      |     ^
+/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/x86_64-linux-gnu/c++/16/bits/c++config.h:144:45: note: expanded from macro '_GLIBCXX20_DEPRECATED_SUGGEST'
+  144 | # define _GLIBCXX20_DEPRECATED_SUGGEST(ALT) _GLIBCXX_DEPRECATED_SUGGEST(ALT)
+      |                                             ^
+/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/x86_64-linux-gnu/c++/16/bits/c++config.h:112:19: note: expanded from macro '_GLIBCXX_DEPRECATED_SUGGEST'
+  112 |   __attribute__ ((__deprecated__ ("use '" ALT "' instead")))
+      |                   ^
+2 warnings generated.
+[100%] Linking CXX executable void_host_portable
+[100%] Built target void_host_portable

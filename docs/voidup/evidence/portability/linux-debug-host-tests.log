@@ -1,0 +1,15 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+    Start 166: host_capabilities
+1/5 Test #166: host_capabilities ................   Passed  163.01 sec
+    Start 167: host_capabilities_stack
+2/5 Test #167: host_capabilities_stack ..........   Passed  153.61 sec
+    Start 168: host_capabilities_frontend
+3/5 Test #168: host_capabilities_frontend .......   Passed   12.37 sec
+    Start 169: host_capabilities_lsp
+4/5 Test #169: host_capabilities_lsp ............   Passed    2.51 sec
+    Start 170: host_capabilities_native
+5/5 Test #170: host_capabilities_native .........   Passed    0.32 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) = 331.83 sec

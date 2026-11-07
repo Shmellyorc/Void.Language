@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="11"
+	failures="1"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="455"
+	timestamp="2026-11-06T20:12:46"
+	>
+	<testcase name="voidup_smoke" classname="voidup_smoke" time="0.282434" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/voidup/smoke.py", line 36, in &lt;module&gt;
+    failure=run(['--invalid-雪'],2);assert json.loads(failure.stderr)['operation']=='arguments'
+                                           ~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/json/__init__.py", line 352, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/usr/lib/python3.14/json/decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/json/decoder.py", line 363, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+</system-out>
+	</testcase>
+	<testcase name="voidup_ci_integration" classname="voidup_ci_integration" time="0.118108" status="run">
+		<properties/>
+		<system-out>test_disk_preflight_checks_both_volumes (__main__.Integration.test_disk_preflight_checks_both_volumes) ... ok
+test_missing_disabled_and_private_tests_rejected (__main__.Integration.test_missing_disabled_and_private_tests_rejected) ... ok
+test_native_profile_layouts (__main__.Integration.test_native_profile_layouts) ... ok
+test_selected_workflow_order_and_no_credentials (__main__.Integration.test_selected_workflow_order_and_no_credentials) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.004s
+
+OK
+Host/VOIDUP test registration verified: 11 required tests
+</system-out>
+	</testcase>
+	<testcase name="host_capabilities_dependencies" classname="host_capabilities_dependencies" time="0.14824" status="run">
+		<properties/>
+		<system-out>Pinned host provider receipt: 9 admission/rejection checks passed
+</system-out>
+	</testcase>
+	<testcase name="host_capabilities_portable" classname="host_capabilities_portable" time="0.0759382" status="run">
+		<properties/>
+		<system-out>Portable host providers: 50 checks passed
+</system-out>
+	</testcase>
+	<testcase name="host_capabilities_portable_source" classname="host_capabilities_portable_source" time="91.3725" status="run">
+		<properties/>
+		<system-out>30 portable source invocations; normal/O2 JIT and independent AOT passed
+</system-out>
+	</testcase>
+	<testcase name="host_capabilities" classname="host_capabilities" time="154.353" status="run">
+		<properties/>
+		<system-out>54 processes; 28 ZIP cases per normal/O2 JIT/AOT; stack_1MiB=False; receipt=/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/host-capabilities-evidence/llvm23-debug.json
+</system-out>
+	</testcase>
+	<testcase name="host_capabilities_stack" classname="host_capabilities_stack" time="156.634" status="run">
+		<properties/>
+		<system-out>54 processes; 28 ZIP cases per normal/O2 JIT/AOT; stack_1MiB=True; receipt=/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/host-capabilities-evidence/llvm23-debug-stack.json
+</system-out>
+	</testcase>
+	<testcase name="host_capabilities_frontend" classname="host_capabilities_frontend" time="12.4767" status="run">
+		<properties/>
+		<system-out>23 frontend/authority checks; real 1 MiB stack
+</system-out>
+	</testcase>
+	<testcase name="host_capabilities_lsp" classname="host_capabilities_lsp" time="2.51454" status="run">
+		<properties/>
+		<system-out>31 new API declarations: compiler-owned hover and navigation passed
+</system-out>
+	</testcase>
+	<testcase name="host_capabilities_native" classname="host_capabilities_native" time="0.363033" status="run">
+		<properties/>
+		<system-out>Host boundary/GC/allocation/publication/process/ZIP/IR: 305 checks passed
+</system-out>
+	</testcase>
+	<testcase name="host_capabilities_install" classname="host_capabilities_install" time="37.1712" status="run">
+		<properties/>
+		<system-out>Installed and relocated native providers, notices and modules; normal/O2 JIT and isolated AOT passed on 1 MiB stacks
+</system-out>
+	</testcase>
+</testsuite>

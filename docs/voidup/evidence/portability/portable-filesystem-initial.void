@@ -1,0 +1,32 @@
+use os
+use io
+use convert
+
+func main():
+    var operands = convert.unwrap(os.args())
+    with convert.unwrap(io.create_private_directory(operands[0])) as directory:
+        print(directory.create_file("../escape") is Err(var rejected))
+        with convert.unwrap(directory.lock("writer.lock")) as held:
+            print(directory.lock("writer.lock") is Err(var busy))
+        with convert.unwrap(directory.create_directory("stage")) as stage:
+            with convert.unwrap(stage.create_file("data")) as output:
+                print(convert.unwrap(output.write_bytes("payload".to_utf8())))
+                print(convert.unwrap(output.flush()))
+                print(convert.unwrap(output.private_mode(false)))
+            var outcome = stage.publish(directory, "release")
+            print(outcome.published)
+            if outcome.durable:
+                print(true)
+            else:
+                print(outcome.os_code != 0)
+            with convert.unwrap(stage.open_file("data")) as input_file:
+                print(convert.unwrap(input_file.read_bytes(100)).count)
+        with convert.unwrap(directory.create_file("control.new")) as control:
+            print(convert.unwrap(control.write_bytes("current".to_utf8())))
+            var publication = directory.publish_file(control, "control.new", directory, "control.json")
+            print(publication.published)
+            if publication.durable:
+                print(true)
+            else:
+                print(publication.os_code != 0)
+        print(convert.unwrap(directory.close()))

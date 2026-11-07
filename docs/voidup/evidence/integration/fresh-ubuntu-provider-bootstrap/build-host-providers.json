@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "/usr/bin/python3",
+    "/home/shmellyorc/Documents/Void.Language/build/voidup-integration-ubuntu-bootstrap/tools/setup_host_deps.py",
+    "--profile",
+    "Release",
+    "--jobs",
+    "3"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 72.92424328799825
+}

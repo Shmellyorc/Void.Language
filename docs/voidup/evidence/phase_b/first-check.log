@@ -1,0 +1,91 @@
+/home/shmellyorc/Documents/Void.Language/apps/voidup/support.void:24:37: error: Result propagation requires exactly matching error types.
+    code: VOID2001
+
+ 24 |     return Ok(string.from_utf8(data)?)
+    |                                     ^
+    Module: /support.void
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/support.void:27:5: error: with requires a non-nullable managed resource with deinit.
+    code: VOID2001
+
+ 27 |     with crypto.sha256()? as state:
+    |     ^^^^
+    Module: /support.void
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/support.void:27:25: error: Result propagation requires exactly matching error types.
+    code: VOID2001
+
+ 27 |     with crypto.sha256()? as state:
+    |                         ^
+    Module: /support.void
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/support.void:34:37: error: Result propagation requires exactly matching error types.
+    code: VOID2001
+
+ 34 |     var initial = input_file.seek(0)?
+    |                                     ^
+    Module: /support.void
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/support.void:35:27: error: Result propagation requires exactly matching error types.
+    code: VOID2001
+
+ 35 |     if input_file.length()? != expected_size:
+    |                           ^
+    Module: /support.void
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/support.void:37:5: error: with requires a non-nullable managed resource with deinit.
+    code: VOID2001
+
+ 37 |     with crypto.sha256()? as state:
+    |     ^^^^
+    Module: /support.void
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/support.void:37:25: error: Result propagation requires exactly matching error types.
+    code: VOID2001
+
+ 37 |     with crypto.sha256()? as state:
+    |                         ^
+    Module: /support.void
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/support.void:52:5: error: with requires a non-nullable managed resource with deinit.
+    code: VOID2001
+
+ 52 |     with directory.open_file(name)? as input_file:
+    |     ^^^^
+    Module: /support.void
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/support.void:52:35: error: Result propagation requires exactly matching error types.
+    code: VOID2001
+
+ 52 |     with directory.open_file(name)? as input_file:
+    |                                   ^
+    Module: /support.void
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/support.void:67:5: error: with requires a non-nullable managed resource with deinit.
+    code: VOID2001
+
+ 67 |     with directory.create_file(name)? as output_file:
+    |     ^^^^
+    Module: /support.void
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/support.void:67:37: error: Result propagation requires exactly matching error types.
+    code: VOID2001
+
+ 67 |     with directory.create_file(name)? as output_file:
+    |                                     ^
+    Module: /support.void
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/support.void:95:43: error: Result propagation requires exactly matching error types.
+    code: VOID2001
+
+ 95 |     var parts = text.split(value, "/", 17)?
+    |                                           ^
+    Module: /support.void
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/support.void:98:5: error: Iteration requires an array, dictionary or integer range.
+    code: VOID1105
+
+ 98 |     for part in parts:
+    |     ^^^
+    Module: /support.void
+

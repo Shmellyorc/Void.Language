@@ -1,0 +1,1 @@
+/home/shmellyorc/Documents/Void.Language/build/voidup-bootstrap/bin/voidup: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.42' not found (required by /home/shmellyorc/Documents/Void.Language/build/voidup-bootstrap/bin/voidup)

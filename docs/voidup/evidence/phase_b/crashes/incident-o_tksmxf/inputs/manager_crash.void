@@ -1,0 +1,295 @@
+use "./support.void" as support
+use "./model.void" as model
+use "./cli.void" as cli
+use "./storage.void" as storage
+use "./inventory.void" as inventory
+use "./trust.void" as trust
+use "./transport.void" as transport
+use io
+use net/http as http
+use console
+use os
+use process
+use time
+use text
+use json as codec
+
+struct up_context:
+    options: cli.up_options
+    root_cap: io.private_directory
+    versions_cap: io.private_directory
+    metadata_cap: io.private_directory
+    transactions_cap: io.private_directory
+    control_state: model.up_control
+
+func up_say(message: string) -> result<bool, support.up_error>:
+    if console.stdout.write(message + "\n") is Err(var cause):
+        return Err(support.up_error(message = cause.message, operation = "stdout", native_domain = "console", native_code = cause.os_code, progress = cause.bytes_transferred))
+    return Ok(true)
+
+func up_cached_catalog(context: up_context, digest: string) -> result<model.up_catalog, support.up_error>:
+    if not support.up_sha_text(digest):
+        return Err(support.up_fail("invalid cached catalog identity", "metadata"))
+    with support.up_io(context.metadata_cap.open_directory("c-" + digest))? as proof:
+        var raw_catalog = support.up_read_owned(proof, "catalog.json")?
+        var raw_signatures = support.up_read_owned(proof, "catalog.sig", 4096)?
+        if support.up_digest(raw_catalog)? != digest:
+            return Err(support.up_fail("cached catalog digest mismatch", "metadata"))
+        return trust.up_authenticate(raw_catalog, raw_signatures)
+
+func up_check_retained(context: up_context) -> result<bool, support.up_error>:
+    var state = context.control_state
+    if state.serial == 0:
+        return Ok(true)
+    var retained = up_cached_catalog(context, state.catalog_digest)?
+    if retained.serial != state.serial or retained.revoked.count != state.revoked.count:
+        return Err(support.up_fail("control trust floor differs from authenticated metadata", "control"))
+    for revoked_id in retained.revoked:
+        if not model.up_is_revoked(state.revoked, revoked_id):
+            return Err(support.up_fail("control lost an authenticated revocation", "control"))
+    return Ok(true)
+
+func up_stage(context: up_context) -> result<io.private_directory, support.up_error>:
+    var transaction_entries = support.up_io(io.entries(context.options.root_path + "/transactions", max_entries = 1024))?
+    if transaction_entries.count >= 256:
+        return Err(support.up_fail("retained transaction limit reached; no automatic deletion is performed", "transaction"))
+    for attempt in 0..<16:
+        var name = storage.up_nonce()?
+        var created = context.transactions_cap.create_directory(name)
+        if created is Ok(var directory):
+            return Ok(directory)
+        if created is Err(var cause):
+            if not (cause.kind is io.error_kind.already_exists):
+                return Err(support.up_error(message = cause.message, operation = cause.operation, native_domain = "filesystem", native_code = cause.os_code))
+    return Err(support.up_fail("exclusive transaction name collisions", "transaction"))
+
+func up_cache_catalog(context: up_context, digest: string, const raw_catalog: [u8], const raw_signatures: [u8]) -> result<bool, support.up_error>:
+    var found = context.metadata_cap.open_directory("c-" + digest)
+    if found is Ok(var existing):
+        with existing as proof:
+            var stored = support.up_read_owned(proof, "catalog.json")?
+            if support.up_digest(stored)? != digest:
+                return Err(support.up_fail("conflicting cached catalog", "metadata"))
+            var checked = trust.up_authenticate(stored, support.up_read_owned(proof, "catalog.sig", 4096)?)?
+            return Ok(true)
+    if found is Err(var cause):
+        if not (cause.kind is io.error_kind.not_found):
+            return Err(support.up_error(message = cause.message, operation = cause.operation, native_domain = "filesystem", native_code = cause.os_code))
+    with up_stage(context)? as pending:
+        var first = support.up_write_new(pending, "catalog.json", raw_catalog)?
+        var second = support.up_write_new(pending, "catalog.sig", raw_signatures)?
+        return support.up_publication(pending.publish(context.metadata_cap, "c-" + digest), "catalog-publication")
+
+func up_cache_inventory(context: up_context, release: model.up_release, const raw_inventory: [u8]) -> result<bool, support.up_error>:
+    var checked = model.up_inventory_parse(raw_inventory, release)?
+    var found = context.metadata_cap.open_directory("i-" + release.inventory_sha256)
+    if found is Ok(var existing):
+        with existing as proof:
+            var retained = model.up_inventory_parse(support.up_read_owned(proof, "inventory.json")?, release)?
+            return Ok(true)
+    if found is Err(var cause):
+        if not (cause.kind is io.error_kind.not_found):
+            return Err(support.up_error(message = cause.message, operation = cause.operation, native_domain = "filesystem", native_code = cause.os_code))
+    with up_stage(context)? as pending:
+        var written = support.up_write_new(pending, "inventory.json", raw_inventory)?
+        return support.up_publication(pending.publish(context.metadata_cap, "i-" + release.inventory_sha256), "inventory-publication")
+
+func up_fetch_catalog(context: up_context) -> result<model.up_catalog, support.up_error>:
+    if context.options.catalog_url == "":
+        return Err(support.up_fail("this command requires an explicit private --catalog HTTPS URL", "arguments", 2))
+    var checked_origin = transport.up_same_origin(context.options.catalog_url, context.options.catalog_url)?
+    with transport.up_client(context.options.ca_file)? as client:
+        var raw_catalog = transport.up_fetch(client, context.options.catalog_url, context.options.catalog_url, support.up_metadata_limit, context.options.timeout_ms)?
+        var raw_signatures = transport.up_fetch(client, context.options.catalog_url, context.options.catalog_url + ".sig", 4096, context.options.timeout_ms)?
+        var document = trust.up_authenticate(raw_catalog, raw_signatures)?
+        var digest = support.up_digest(raw_catalog)?
+        var now = support.up_clock(time.now_utc())?.seconds
+        var freshness = trust.up_fresh(document, context.control_state, digest, now)?
+        for revoked_id in context.control_state.revoked:
+            if not model.up_is_revoked(document.revoked, revoked_id):
+                return Err(support.up_fail("catalog attempts to remove a retained revocation", "freshness"))
+        var retained = up_cache_catalog(context, digest, raw_catalog, raw_signatures)?
+        context.control_state.serial = document.serial
+        context.control_state.catalog_digest = digest
+        context.control_state.last_time = now
+        context.control_state.revoked = document.revoked
+        # Commit trust before a package/inventory transfer can fail or be killed.
+        var saved = storage.up_write_control(context.root_cap, context.control_state)?
+        return Ok(document)
+
+func up_record(context: up_context, release_id: string) -> result<model.up_installed, support.up_error>:
+    if model.up_is_revoked(context.control_state.revoked, release_id):
+        return Err(support.up_fail("release is revoked by retained authenticated metadata", "select"))
+    for item in context.control_state.installed:
+        if item.release.id == release_id:
+            return Ok(item)
+    return Err(support.up_fail("release is not installed", "select"))
+
+func up_equivalent(first: model.up_release, second: model.up_release) -> bool:
+    return first.id == second.id and first.host == second.host and first.build_identity == second.build_identity and first.artifact_bytes == second.artifact_bytes and first.artifact_sha256 == second.artifact_sha256 and first.inventory_bytes == second.inventory_bytes and first.inventory_sha256 == second.inventory_sha256
+
+func up_installed_manifest(context: up_context, record: model.up_installed) -> result<model.up_inventory, support.up_error>:
+    var proof = up_cached_catalog(context, record.catalog_digest)?
+    if proof.serial != record.catalog_serial:
+        return Err(support.up_fail("installation catalog serial mismatch", "verify"))
+    var authenticated = model.up_find_release(proof, record.release.id)?
+    if not up_equivalent(authenticated, record.release):
+        return Err(support.up_fail("installation identity differs from signed catalog", "verify"))
+    with support.up_io(context.metadata_cap.open_directory("i-" + record.release.inventory_sha256))? as inventory_cap:
+        return model.up_inventory_parse(support.up_read_owned(inventory_cap, "inventory.json")?, authenticated)
+
+func up_verify_version(context: up_context, release_id: string) -> result<model.up_inventory, support.up_error>:
+    var record = up_record(context, release_id)?
+    var manifest = up_installed_manifest(context, record)?
+    with support.up_io(context.versions_cap.open_directory(release_id))? as prefix_cap:
+        var verified = inventory.up_verify_prefix(prefix_cap, context.options.root_path + "/toolchains/" + release_id, record.release, manifest)?
+    return Ok(manifest)
+
+func up_activate(context: up_context, release_id: string) -> result<bool, support.up_error>:
+    var verified = up_verify_version(context, release_id)?
+    if context.control_state.current != release_id:
+        context.control_state.previous = context.control_state.current
+        context.control_state.current = release_id
+        context.control_state.last_time = support.up_clock(time.now_utc())?.seconds
+        var saved = storage.up_write_control(context.root_cap, context.control_state)?
+    return up_say("default {release_id}")
+
+func up_install(context: up_context) -> result<bool, support.up_error>:
+    var catalog = up_fetch_catalog(context)?
+    var release = model.up_find_release(catalog, context.options.release_id)?
+    if model.up_is_revoked(context.control_state.revoked, release.id):
+        return Err(support.up_fail("requested release is revoked", "install"))
+    var raw_inventory: [u8] = []
+    with transport.up_client(context.options.ca_file)? as client:
+        var target = transport.up_remote(context.options.catalog_url, release.inventory_url)?
+        raw_inventory = transport.up_fetch(client, context.options.catalog_url, target, release.inventory_bytes, context.options.timeout_ms)?
+    var manifest = model.up_inventory_parse(raw_inventory, release)?
+    var cached = up_cache_inventory(context, release, raw_inventory)?
+    for item in context.control_state.installed:
+        if item.release.id == release.id and not up_equivalent(item.release, release):
+            return Err(support.up_fail("installed release ID has conflicting authenticated content", "install"))
+    var existing = context.versions_cap.open_directory(release.id)
+    if existing is Ok(var prefix_cap):
+        with prefix_cap as retained:
+            var checked = inventory.up_verify_prefix(retained, context.options.root_path + "/toolchains/" + release.id, release, manifest)?
+    else:
+        if existing is Err(var cause):
+            if not (cause.kind is io.error_kind.not_found):
+                return Err(support.up_error(message = cause.message, operation = cause.operation, native_domain = "filesystem", native_code = cause.os_code))
+        with up_stage(context)? as transaction:
+            with support.up_io(transaction.create_directory("payload"))? as payload:
+                with support.up_io(transaction.create_file("package.zip"))? as package:
+                    with transport.up_client(context.options.ca_file)? as client:
+                        var target = transport.up_remote(context.options.catalog_url, release.artifact_url)?
+                        var downloaded = transport.up_download(client, context.options.catalog_url, target, package, release.artifact_bytes, context.options.timeout_ms)?
+                    var extracted = inventory.up_extract(package, payload, release, manifest)?
+                # All exact signed members have been hashed and ZIP CRC-checked.
+                var published = support.up_publication(payload.publish(context.versions_cap, release.id), "toolchain-publication")?
+    var registered = false
+    for item in context.control_state.installed:
+        if item.release.id == release.id:
+            registered = true
+    if not registered:
+        if context.control_state.installed.count >= 64:
+            return Err(support.up_fail("installed release count reached local limit", "install"))
+        context.control_state.installed.push(model.up_installed(release = release, catalog_digest = context.control_state.catalog_digest, catalog_serial = catalog.serial))
+        var saved = storage.up_write_control(context.root_cap, context.control_state)?
+    var announced = up_say("installed {release.id} build {release.build_identity}")?
+    if context.options.activate:
+        return up_activate(context, release.id)
+    return Ok(true)
+
+func up_environment(context: up_context, release_id: string) -> [string]:
+    var environment: [string] = []
+    for name in ["HOME", "USERPROFILE", "SYSTEMROOT", "WINDIR", "TMPDIR", "TMP", "TEMP", "LANG", "LC_ALL", "TERM"]:
+        if os.env(name) is Ok(var item):
+            environment.push(name + "=" + item)
+    # Compiler/loader overrides and caller PATH never select executables or SDKs.
+    if os.platform() == "windows":
+        environment.push("PATH=" + context.options.root_path + "/toolchains/" + release_id + "/sdk/bin")
+    else:
+        environment.push("PATH=" + context.options.root_path + "/toolchains/" + release_id + "/sdk/bin:/usr/bin:/bin")
+    return environment
+
+func up_run(context: up_context, writer: io.directory_lock) -> result<i32, support.up_error>:
+    var selected_id = context.options.release_id
+    if selected_id == "default":
+        selected_id = context.control_state.current
+    if selected_id == "":
+        return Err(support.up_fail("no default toolchain is selected", "run"))
+    var manifest = up_verify_version(context, selected_id)?
+    var tool_name = context.options.tool
+    if os.platform() == "windows":
+        tool_name += ".exe"
+    var relative_executable = "bin/" + tool_name
+    var expected_digest = ""
+    var expected_size: i64 = -1
+    for member in manifest.members:
+        if member.name == relative_executable and member.executable:
+            expected_digest = member.sha256
+            expected_size = member.size
+    if expected_size < 0:
+        return Err(support.up_fail("tool is not an inventoried executable", "run"))
+    with support.up_io(context.versions_cap.open_directory(selected_id))? as prefix_cap:
+        with storage.up_file_beneath(prefix_cap, relative_executable)? as verified_executable:
+            if support.up_hash_file(verified_executable, expected_size)? != expected_digest:
+                return Err(support.up_fail("tool changed after prefix verification", "run"))
+            var released = support.up_io(writer.close())?
+            var absolute_executable = context.options.root_path + "/toolchains/" + selected_id + "/" + relative_executable
+            with support.up_sys(process.start(absolute_executable, context.options.forwarded, up_environment(context, selected_id), context.options.working_directory))? as running:
+                var status = support.up_sys(running.wait())?
+                if status.signaled:
+                    return Ok((128 + status.signal) as i32)
+                return Ok(status.code as i32)
+
+func up_dispatch(context: up_context, writer: io.directory_lock) -> result<i32, support.up_error>:
+    var command_name = context.options.command
+    if command_name == "run":
+        return up_run(context, writer)
+    if command_name == "install":
+        var installed = up_install(context)?
+    else if command_name == "default":
+        var changed = up_activate(context, context.options.release_id)?
+    else if command_name == "rollback":
+        if context.control_state.previous == "":
+            return Err(support.up_fail("no previous selection is retained", "rollback"))
+        var changed = up_activate(context, context.control_state.previous)?
+    else if command_name == "verify":
+        var checked = up_verify_version(context, context.options.release_id)?
+        var printed = up_say("verified " + context.options.release_id)?
+    else if command_name == "which":
+        var selected_id = context.control_state.current
+        if selected_id == "":
+            return Err(support.up_fail("no default toolchain is selected", "which"))
+        var checked = up_verify_version(context, selected_id)?
+        var suffix = ""
+        if os.platform() == "windows":
+            suffix = ".exe"
+        var printed = up_say(context.options.root_path + "/toolchains/" + selected_id + "/bin/" + context.options.tool + suffix)?
+    else if command_name == "list":
+        if context.options.available:
+            var catalog = up_fetch_catalog(context)?
+            for item in catalog.releases:
+                if item.host == model.up_host():
+                    var printed = up_say("{item.id} {item.build_identity} revoked={model.up_is_revoked(context.control_state.revoked, item.id)}")?
+        else:
+            for item in context.control_state.installed:
+                var printed = up_say("{item.release.id} {item.release.build_identity} current={item.release.id == context.control_state.current} previous={item.release.id == context.control_state.previous} revoked={model.up_is_revoked(context.control_state.revoked, item.release.id)}")?
+    else if command_name == "doctor":
+        for item in context.control_state.installed:
+            if not model.up_is_revoked(context.control_state.revoked, item.release.id):
+                var checked = up_verify_version(context, item.release.id)?
+        var pending = support.up_io(io.entries(context.options.root_path + "/transactions", max_entries = 1024))?
+        var synchronized = support.up_io(context.root_cap.sync())?
+        var printed = up_say("VOIDUP root verified; host={model.up_host()} trust=2-of-3-private-test-keys serial={context.control_state.serial} current={context.control_state.current} previous={context.control_state.previous} retained-transactions={pending.count}; native linking requires the declared host development SDK")?
+    return Ok(0)
+
+func up_execute(options: cli.up_options) -> result<i32, support.up_error>:
+    with storage.up_root(options.root_path)? as root_cap:
+        with support.up_io(root_cap.lock("writer.lock"))? as writer:
+            with support.up_io(root_cap.open_directory("toolchains"))? as versions_cap:
+                with support.up_io(root_cap.open_directory("metadata"))? as metadata_cap:
+                    with support.up_io(root_cap.open_directory("transactions"))? as transactions_cap:
+                        var context = up_context(options = options, root_cap = root_cap, versions_cap = versions_cap, metadata_cap = metadata_cap, transactions_cap = transactions_cap, control_state = storage.up_read_control(root_cap)?)
+                        var retained = up_check_retained(context)?
+                        return up_dispatch(context, writer)

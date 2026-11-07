@@ -1,0 +1,10 @@
+test_disk_preflight_checks_both_volumes (__main__.Integration.test_disk_preflight_checks_both_volumes) ... ok
+test_missing_disabled_and_private_tests_rejected (__main__.Integration.test_missing_disabled_and_private_tests_rejected) ... ok
+test_native_profile_layouts (__main__.Integration.test_native_profile_layouts) ... ok
+test_selected_workflow_order_and_no_credentials (__main__.Integration.test_selected_workflow_order_and_no_credentials) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.004s
+
+OK
+Host/VOIDUP test registration verified: 10 required tests

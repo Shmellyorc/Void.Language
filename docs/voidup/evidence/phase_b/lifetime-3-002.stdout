@@ -1,0 +1,11 @@
+VOIDUP root verified; host=linux-x86_64-ubuntu24.04 trust=2-of-3-private-test-keys serial=10 current= previous= retained-transactions=0; native linking requires the declared host development SDK
+{"budget":0,"status":-1,"exception":true,"constructions":0,"checked_roots":966,"gc_allocation_failures":0}
+{"budget":1,"status":-1,"exception":true,"constructions":0,"checked_roots":966,"gc_allocation_failures":0}
+{"budget":4,"status":-1,"exception":true,"constructions":0,"checked_roots":1362,"gc_allocation_failures":0}
+{"budget":16,"status":-1,"exception":true,"constructions":0,"checked_roots":1758,"gc_allocation_failures":0}
+{"budget":64,"status":-1,"exception":true,"constructions":0,"checked_roots":10847,"gc_allocation_failures":0}
+{"budget":256,"status":-1,"exception":true,"constructions":1,"checked_roots":427614,"gc_allocation_failures":0}
+VOIDUP root verified; host=linux-x86_64-ubuntu24.04 trust=2-of-3-private-test-keys serial=10 current= previous= retained-transactions=0; native linking requires the declared host development SDK
+{"budget":1024,"status":-1,"exception":true,"constructions":14,"checked_roots":4261488,"gc_allocation_failures":0}
+{"budget":4096,"status":0,"exception":false,"constructions":175,"checked_roots":197987581,"gc_allocation_failures":1}
+{"source_voidup":true,"one_runtime":true,"workers":1,"completed_epoch":196,"failures":7,"successes":1,"handles_after_close":0}

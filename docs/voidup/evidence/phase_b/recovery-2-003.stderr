@@ -1,0 +1,1 @@
+{"message":"namespace publication committed; durability is uncertain; re-open and verify state","operation":"control","code":1,"native_domain":"filesystem","native_code":5,"cleanup_code":5,"progress":0,"published":true,"durable":false}

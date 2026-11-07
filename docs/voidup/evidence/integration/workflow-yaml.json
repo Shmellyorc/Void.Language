@@ -1,0 +1,42 @@
+{
+  "workflow": ".github/workflows/ci-link-experiment.yml",
+  "jobs": [
+    {
+      "os": "ubuntu-24.04",
+      "platform": "Ubuntu 24.04",
+      "configuration": "Debug"
+    },
+    {
+      "os": "ubuntu-24.04",
+      "platform": "Ubuntu 24.04",
+      "configuration": "Release"
+    },
+    {
+      "os": "ubuntu-24.04",
+      "platform": "Ubuntu 24.04",
+      "configuration": "Sanitizers"
+    },
+    {
+      "os": "windows-2022",
+      "platform": "Windows 2022",
+      "configuration": "Debug"
+    },
+    {
+      "os": "windows-2022",
+      "platform": "Windows 2022",
+      "configuration": "Release"
+    },
+    {
+      "os": "macos-latest",
+      "platform": "macOS ARM64",
+      "configuration": "Debug"
+    },
+    {
+      "os": "macos-latest",
+      "platform": "macOS ARM64",
+      "configuration": "Release"
+    }
+  ],
+  "parsed": true,
+  "note": "YAML syntax and local wiring only; no hosted dispatch"
+}

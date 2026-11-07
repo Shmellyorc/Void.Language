@@ -29,6 +29,7 @@ public:
     virtual std::shared_ptr<File> file() const noexcept = 0;
 };
 std::shared_ptr<FileBorrow> borrow_file(Runtime&, void*, ErrorKind&);
+void publish_file(Runtime&, void* identity, std::shared_ptr<File>);
 }
 
 extern "C" void vd_filesystem_call(void*, const vd::filesystem::ReplyLayout*,

@@ -1,0 +1,26 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start 153: host_capabilities_dependencies
+1/3 Test #153: host_capabilities_dependencies ......   Passed    0.17 sec
+    Start 154: host_capabilities_portable
+2/3 Test #154: host_capabilities_portable ..........   Passed    0.07 sec
+    Start 155: host_capabilities_portable_source
+3/3 Test #155: host_capabilities_portable_source ...***Failed    1.73 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_source.py", line 35, in <module>
+    run([compiler,'build',process_source,'-o',process_binary,*flags],work)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_source.py", line 13, in run
+    result=h.run(command,work,native_text(expected) if expected is not None else None,small=os.name!='nt',sources=(source,))
+  File "/home/shmellyorc/Documents/Void.Language/tests/random/harness.py", line 28, in run
+    assert result.returncode == status, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc', 'build', '/tmp/VOID portable source 雪 # % 7d79qlnf/process.void', '-o', '/tmp/VOID portable source 雪 # % 7d79qlnf/process-False', '--no-opt'], 1, b'', b'/tmp/VOID portable source \xe9\x9b\xaa # % 7d79qlnf/process.void:5:9: error: Duplicate declaration or shadowing of \'args\'.\n    code: VOID2005\n\n 5 |     var args = convert.unwrap(os.args())\n   |         ^^^^\n    Module: /process.void\n    Previously declared at /home/shmellyorc/Documents/Void.Language/stdlib/os.void:316:6\n\n 316 | func args() -> result<[string], error>:\n     |      ^^^^\n    Module: /@stdlib/os.void\n    Hint: Assign to the existing variable, or choose a distinct name.\n\n/tmp/VOID portable source \xe9\x9b\xaa # % 7d79qlnf/process.void:6:5: error: with requires a non-nullable managed resource with deinit.\n    code: VOID2001\n\n 6 |     with convert.unwrap(process.start(args[0], ["--verify-args", "", "two words", "\\"quote\\"", "tail\\\\", "\xe9\x9b\xaa\xf0\x9f\x98\x80"], ["VOID_CHILD=\xe9\x9b\xaa=value"], args[1])) as child:\n   |     ^^^^\n    Module: /process.void\n\n/tmp/VOID portable source \xe9\x9b\xaa # % 7d79qlnf/process.void:6:43: error: Indexing requires an array or dictionary.\n    code: VOID1103\n\n 6 |     with convert.unwrap(process.start(args[0], ["--verify-args", "", "two words", "\\"quote\\"", "tail\\\\", "\xe9\x9b\xaa\xf0\x9f\x98\x80"], ["VOID_CHILD=\xe9\x9b\xaa=value"], args[1])) as child:\n   |                                           ^\n    Module: /process.void\n\n/tmp/VOID portable source \xe9\x9b\xaa # % 7d79qlnf/process.void:6:141: error: Indexing requires an array or dictionary.\n    code: VOID1103\n\n 6 |     with convert.unwrap(process.start(args[0], ["--verify-args", "", "two words", "\\"quote\\"", "tail\\\\", "\xe9\x9b\xaa\xf0\x9f\x98\x80"], ["VOID_CHILD=\xe9\x9b\xaa=value"], args[1])) as child:\n   |                                                                                                                                             ^\n    Module: /process.void\n\n')
+
+
+67% tests passed, 1 tests failed out of 3
+
+Total Test time (real) =   1.97 sec
+
+The following tests FAILED:
+	155 - host_capabilities_portable_source (Failed)
+Errors while running CTest

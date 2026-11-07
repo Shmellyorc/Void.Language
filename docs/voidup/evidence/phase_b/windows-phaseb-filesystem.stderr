@@ -1,0 +1,11 @@
+/home/shmellyorc/Documents/Void.Language/src/runtime/filesystem.cpp:20: warning: "NOMINMAX" redefined
+   20 | #define NOMINMAX
+      | 
+In file included from /usr/lib/gcc/x86_64-w64-mingw32/13-posix/include/c++/x86_64-w64-mingw32/bits/c++config.h:679,
+                 from /usr/lib/gcc/x86_64-w64-mingw32/13-posix/include/c++/bits/atomic_base.h:35,
+                 from /usr/lib/gcc/x86_64-w64-mingw32/13-posix/include/c++/atomic:41,
+                 from include/void/filesystem.hpp:3,
+                 from /home/shmellyorc/Documents/Void.Language/src/runtime/filesystem.cpp:1:
+/usr/lib/gcc/x86_64-w64-mingw32/13-posix/include/c++/x86_64-w64-mingw32/bits/os_defines.h:45: note: this is the location of the previous definition
+   45 | #define NOMINMAX 1
+      | 

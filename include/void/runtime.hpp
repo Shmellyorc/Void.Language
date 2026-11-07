@@ -4,6 +4,7 @@
 #include "void/heap.hpp"
 #include "void/buffer.hpp"
 #include "void/console.hpp"
+#include "void/application.hpp"
 #include <optional>
 #include <array>
 #include <chrono>
@@ -51,6 +52,8 @@ public:
     Runtime& operator=(const Runtime&) = delete;
     static Runtime& current(); // Internal generated-code TLS boundary.
     static Runtime* attached() noexcept { return current_runtime_; }
+    void application_arguments(ApplicationArguments);
+    const ApplicationArguments& application_arguments() const { return application_arguments_; }
     bool is_managed() const { return current_runtime_ == this && thread().state == State::managed; }
     // One explicitly admitted application owns these persistent precise roots.
     void admit_globals(std::string_view contract, bool replacement = false, bool commit = true);
@@ -167,6 +170,8 @@ public:
     console::Error console_finish(std::int64_t checkpoint);
     console::Error close(); // Reject new attachments; existing participants must drain.
 private:
+    ApplicationArguments application_arguments_;
+    bool application_arguments_set_ = false;
     friend class CallbackRegistration;
     friend class NativeLibrary;
     friend class NativeWorkers;

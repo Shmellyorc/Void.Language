@@ -1,0 +1,45 @@
+[0/2] Re-checking globbed directories...
+[1/12] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_directory.cpp.o
+[2/12] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem.cpp.o
+[3/12] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_abi.cpp.o
+[4/12] Linking CXX static library libvoid_runtime.a
+[5/12] Generating void-native-resources.txt, native-resources-install-Release.txt
+[6/12] cd /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release && /usr/bin/cmake -E make_directory /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release && /usr/bin/cmake -E copy_if_different /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release/void-native-resources.txt /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release/void-native-resources.txt
+[7/12] Generating cache-identity-Release.cpp
+[8/12] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Release.cpp.o
+[9/12] Linking CXX static library libvoid_cache_identity.a
+[10/12] Linking CXX executable void_host_portable
+[11/12] Linking CXX executable void_host_capabilities
+[12/12] Linking CXX executable voidc
+Internal ctest changing into directory: /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release
+Test project /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release
+      Start   1: cli_contract
+ 1/13 Test   #1: cli_contract .....................   Passed    2.26 sec
+      Start  18: http_source_negative
+ 2/13 Test  #18: http_source_negative .............   Passed    0.87 sec
+      Start  23: http_lsp
+ 3/13 Test  #23: http_lsp .........................   Passed    1.70 sec
+      Start  92: automatic_cache_processes
+ 4/13 Test  #92: automatic_cache_processes ........   Passed    0.59 sec
+      Start 153: host_capabilities_portable
+ 5/13 Test #153: host_capabilities_portable .......   Passed    0.09 sec
+      Start 154: host_capabilities
+ 6/13 Test #154: host_capabilities ................   Passed   47.89 sec
+      Start 155: host_capabilities_stack
+ 7/13 Test #155: host_capabilities_stack ..........   Passed   45.64 sec
+      Start 156: host_capabilities_frontend
+ 8/13 Test #156: host_capabilities_frontend .......   Passed    1.90 sec
+      Start 157: host_capabilities_lsp
+ 9/13 Test #157: host_capabilities_lsp ............   Passed    0.37 sec
+      Start 158: host_capabilities_native
+10/13 Test #158: host_capabilities_native .........   Passed    0.21 sec
+      Start 164: os_errors
+11/13 Test #164: os_errors ........................   Passed    4.50 sec
+      Start 165: os_frontend
+12/13 Test #165: os_frontend ......................   Passed    5.94 sec
+      Start 271: io_execution
+13/13 Test #271: io_execution .....................   Passed   20.00 sec
+
+100% tests passed, 0 tests failed out of 13
+
+Total Test time (real) = 131.98 sec

@@ -1,0 +1,9 @@
+/home/shmellyorc/Documents/Void.Language/apps/voidup/storage.void:84:80: error: Type mismatch: expected /@stdlib/io.void::private_directory, received func(string) -> result<string, /@stdlib/io.void::error>.
+    code: VOID2001
+
+ 84 |         return support.up_publication(root_cap.publish_file(output_file, name, root, "control.json", true), "control")
+    |                                                                                ^^^^
+    Module: /storage.void
+    Expected: /@stdlib/io.void::private_directory
+    Received: func(string) -> result<string, /@stdlib/io.void::error>
+

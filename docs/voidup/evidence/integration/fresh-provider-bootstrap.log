@@ -1,0 +1,21 @@
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/voidup-integration-bootstrap/tools/ci/voidup_bootstrap.py", line 135, in <module>
+    main()
+    ~~~~^^
+  File "/home/shmellyorc/Documents/Void.Language/build/voidup-integration-bootstrap/tools/ci/voidup_bootstrap.py", line 110, in main
+    plan = layout(args.configuration); http.save(evidence, 'identity.json', plan)
+  File "/home/shmellyorc/Documents/Void.Language/build/voidup-integration-bootstrap/tools/ci/voidup_bootstrap.py", line 32, in layout
+    plan = http.make_plan(configuration)  # Share the existing SDK/HTTP profile and native identity.
+  File "/home/shmellyorc/Documents/Void.Language/build/voidup-integration-bootstrap/tools/ci/http_bootstrap.py", line 79, in make_plan
+    fixture_identity = {name: digest(ROOT / name) for name in FIXTURES}
+                              ~~~~~~^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/voidup-integration-bootstrap/tools/ci/http_bootstrap.py", line 36, in digest
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+                          ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 778, in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/Documents/Void.Language/build/voidup-integration-bootstrap/tests/net/http/python-versions.json'

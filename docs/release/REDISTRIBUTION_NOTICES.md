@@ -73,3 +73,17 @@ VS Code/npm/VSIX and experimental installers are outside this distribution scope
 Public release remains **HOLD**. In particular **LOG-PERF is OPEN**: file200
 20.091 ms fails the unchanged <10 ms requirement. Notice installation and MIT
 selection do not clear that gate or the unresolved compliance questions.
+
+
+## Runtime host primitive dependencies
+
+Supported-host builds additionally link the pinned libsodium 1.0.22 and libarchive 3.8.11
+static providers recorded in `third_party/host-versions.json`. Libsodium carries
+ISC, BSD terms for SHA-256 and controlling component notices; libarchive carries BSD and the component
+terms in its COPYING/source files. The compiler component installs these notices,
+per-source notice inventories, exact source archives, dependency receipts and
+build/verification scripts under `share/void/licenses/host`. Libarchive reuses the
+existing pinned zlib; it enables no additional external codec or crypto provider.
+The public APIs expose only SHA-256, detached Ed25519 verification and the bounded
+stored/deflate ZIP profile. These additions do not establish public distribution
+clearance for the complete compiler/SDK closure or native Windows/macOS acceptance.

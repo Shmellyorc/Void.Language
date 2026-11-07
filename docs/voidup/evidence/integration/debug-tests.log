@@ -1,0 +1,45 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+      Start   1: voidup_smoke
+ 1/11 Test   #1: voidup_smoke ........................***Failed    0.28 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/voidup/smoke.py", line 36, in <module>
+    failure=run(['--invalid-雪'],2);assert json.loads(failure.stderr)['operation']=='arguments'
+                                           ~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/json/__init__.py", line 352, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/usr/lib/python3.14/json/decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/json/decoder.py", line 363, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+      Start   2: voidup_ci_integration
+ 2/11 Test   #2: voidup_ci_integration ...............   Passed    0.12 sec
+      Start 168: host_capabilities_dependencies
+ 3/11 Test #168: host_capabilities_dependencies ......   Passed    0.15 sec
+      Start 169: host_capabilities_portable
+ 4/11 Test #169: host_capabilities_portable ..........   Passed    0.08 sec
+      Start 170: host_capabilities_portable_source
+ 5/11 Test #170: host_capabilities_portable_source ...   Passed   91.37 sec
+      Start 171: host_capabilities
+ 6/11 Test #171: host_capabilities ...................   Passed  154.35 sec
+      Start 172: host_capabilities_stack
+ 7/11 Test #172: host_capabilities_stack .............   Passed  156.63 sec
+      Start 173: host_capabilities_frontend
+ 8/11 Test #173: host_capabilities_frontend ..........   Passed   12.48 sec
+      Start 174: host_capabilities_lsp
+ 9/11 Test #174: host_capabilities_lsp ...............   Passed    2.51 sec
+      Start 175: host_capabilities_native
+10/11 Test #175: host_capabilities_native ............   Passed    0.36 sec
+      Start 176: host_capabilities_install
+11/11 Test #176: host_capabilities_install ...........   Passed   37.17 sec
+
+91% tests passed, 1 tests failed out of 11
+
+Total Test time (real) = 455.52 sec
+
+The following tests FAILED:
+	  1 - voidup_smoke (Failed)
+Errors while running CTest

@@ -1,0 +1,27 @@
+[
+  {
+    "name": "source-inventory",
+    "result": "FAIL",
+    "error": "Installed bytes differ: /home/shmellyorc/Documents/Void.Language/docs/release/REDISTRIBUTION_NOTICES.md"
+  },
+  {
+    "name": "linux-compiler-install",
+    "result": "FAIL",
+    "error": "Installed bytes differ: /tmp/VOID license installs 8hd3ofl7/compiler/share/void/licenses/REDISTRIBUTION.txt"
+  },
+  {
+    "name": "linux-tooling-install",
+    "result": "FAIL",
+    "error": "Installed bytes differ: /tmp/VOID license installs 8hd3ofl7/tooling/share/void/licenses/REDISTRIBUTION.txt"
+  },
+  {
+    "name": "windows-notice-rules-compiler",
+    "result": "FAIL",
+    "error": "Installed bytes differ: /tmp/VOID license installs 8hd3ofl7/windows-compiler/share/void/licenses/REDISTRIBUTION.txt"
+  },
+  {
+    "name": "windows-notice-rules-tooling",
+    "result": "FAIL",
+    "error": "Installed bytes differ: /tmp/VOID license installs 8hd3ofl7/windows-tooling/share/void/licenses/REDISTRIBUTION.txt"
+  }
+]

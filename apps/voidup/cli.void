@@ -1,0 +1,93 @@
+use "./support.void" as support
+use os
+use path
+use convert
+
+struct up_options:
+    root_path: string
+    catalog_url: string
+    ca_file: string
+    timeout_ms: i64 = 30000
+    command: string
+    release_id: string
+    tool: string
+    available: bool
+    activate: bool
+    forwarded: [string]
+    working_directory: string
+
+func up_parse(const operands: [string]) -> result<up_options, support.up_error>:
+    var options = up_options(working_directory = support.up_io(path.absolute("."))?)
+    var position: i64 = 0
+    var seen_options: {string: bool}
+    for position < operands.count:
+        var token = operands[position]
+        if token != "--root" and token != "--catalog" and token != "--ca-file" and token != "--timeout-ms":
+            break
+        if position + 1 >= operands.count:
+            return Err(support.up_fail("option requires a value", "arguments", 2))
+        if seen_options.contains(token):
+            return Err(support.up_fail("duplicate global option", "arguments", 2))
+        seen_options[token] = true
+        var operand = operands[position + 1]
+        if token == "--root":
+            options.root_path = operand
+        else if token == "--catalog":
+            options.catalog_url = operand
+        else if token == "--ca-file":
+            options.ca_file = operand
+        else:
+            if convert.parse<i64>(operand) is Ok(var timeout):
+                if timeout < 100 or timeout > 120000:
+                    return Err(support.up_fail("timeout must be 100..120000 milliseconds", "arguments", 2))
+                options.timeout_ms = timeout
+            else:
+                return Err(support.up_fail("timeout is not an integer", "arguments", 2))
+        position += 2
+    if position >= operands.count:
+        return Err(support.up_fail("expected a command; use --help", "arguments", 2))
+    options.command = operands[position]
+    position += 1
+    if options.command == "--help" or options.command == "--version" or options.command == "doctor" or options.command == "rollback":
+        if position != operands.count:
+            return Err(support.up_fail("unexpected command operands", "arguments", 2))
+    else if options.command == "list":
+        if position < operands.count and operands[position] == "--available":
+            options.available = true
+            position += 1
+        if position != operands.count:
+            return Err(support.up_fail("list accepts only --available", "arguments", 2))
+    else if options.command == "which":
+        if position + 1 != operands.count:
+            return Err(support.up_fail("which requires voidc or voidls", "arguments", 2))
+        options.tool = operands[position]
+    else if options.command == "install" or options.command == "default" or options.command == "verify":
+        if position >= operands.count:
+            return Err(support.up_fail("command requires a release ID", "arguments", 2))
+        options.release_id = operands[position]
+        position += 1
+        if options.command == "install" and position < operands.count and operands[position] == "--activate":
+            options.activate = true
+            position += 1
+        if position != operands.count:
+            return Err(support.up_fail("unexpected command operands", "arguments", 2))
+    else if options.command == "run":
+        if position + 2 >= operands.count:
+            return Err(support.up_fail("run requires release/default, tool, and --", "arguments", 2))
+        options.release_id = operands[position]
+        options.tool = operands[position + 1]
+        if operands[position + 2] != "--":
+            return Err(support.up_fail("forwarded arguments must follow --", "arguments", 2))
+        options.forwarded = operands[position + 3..<operands.count]
+    else:
+        return Err(support.up_fail("unknown command", "arguments", 2))
+    if options.tool != "" and options.tool != "voidc" and options.tool != "voidls":
+        return Err(support.up_fail("tool must be voidc or voidls", "arguments", 2))
+    if options.release_id != "" and not support.up_identifier(options.release_id):
+        return Err(support.up_fail("invalid release ID", "arguments", 2))
+    if options.root_path == "" and options.command != "--help" and options.command != "--version":
+        options.root_path = support.up_os(os.data_dir("voidup"))?
+    return Ok(options)
+
+func up_help() -> string:
+    return "VOIDUP 0.1 engineering — private 2-of-3 test trust roots\n\nGlobal options (before command):\n  --root ABSOLUTE-PATH  Dedicated per-user root\n  --catalog HTTPS-URL   Explicit private catalog endpoint\n  --ca-file PEM         Explicit replacement TLS roots\n  --timeout-ms N        100..120000, default 30000\n\nCommands:\n  --help | --version\n  list [--available]\n  install RELEASE [--activate]\n  default RELEASE\n  rollback\n  which <voidc|voidls>\n  verify RELEASE\n  doctor\n  run <RELEASE|default> <voidc|voidls> -- <literal arguments...>\n\nPublished versions are retained. No pruning, self-update, PATH or shell changes.\n"

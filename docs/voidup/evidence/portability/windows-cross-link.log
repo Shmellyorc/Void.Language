@@ -1,0 +1,136 @@
+In file included from include/void/runtime.hpp:6,
+                 from include/void/native_resource.hpp:3,
+                 from src/runtime/host_internal.hpp:3,
+                 from src/runtime/host_directory_windows.cpp:1:
+include/void/console.hpp: In member function 'virtual uint64_t vd::console::Adapter::capabilities(vd::console::Stream)':
+include/void/console.hpp:88:127: warning: enumerated and non-enumerated type in conditional expression [-Wextra]
+   88 |     virtual std::uint64_t capabilities(Stream stream) {auto e=inspect().at(static_cast<unsigned>(stream));return e.available()?(stream==Stream::input?text_input:text_output):0;}
+      |                                                                                                                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/runtime/host_directory_windows.cpp: In function 'vd::host::win::Handle vd::host::{anonymous}::relative(HANDLE, const std::wstring&, bool, bool, bool, vd::host::win::PrivateAccess&, bool, bool)':
+src/runtime/host_directory_windows.cpp:44:15: warning: cast between incompatible function types from 'FARPROC' {aka 'long long int (*)()'} to 'Create' {aka 'long int (*)(void**, long unsigned int, _OBJECT_ATTRIBUTES*, _IO_STATUS_BLOCK*, LARGE_INTEGER*, long unsigned int, long unsigned int, long unsigned int, long unsigned int, void*, long unsigned int)'} [-Wcast-function-type]
+   44 |     auto call=reinterpret_cast<Create>(GetProcAddress(library,"NtCreateFile"));
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/runtime/host_directory_windows.cpp:45:18: warning: cast between incompatible function types from 'FARPROC' {aka 'long long int (*)()'} to 'Convert' {aka 'long unsigned int (*)(long int)'} [-Wcast-function-type]
+   45 |     auto convert=reinterpret_cast<Convert>(GetProcAddress(library,"RtlNtStatusToDosError"));
+      |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/runtime/host_directory_windows.cpp: In function 'std::shared_ptr<vd::host::{anonymous}::Directory> vd::host::{anonymous}::root(const std::string&, bool)':
+src/runtime/host_directory_windows.cpp:75:59: warning: cast between incompatible function types from 'FARPROC' {aka 'long long int (*)()'} to 'Create' {aka 'long int (*)(void**, long unsigned int, _OBJECT_ATTRIBUTES*, _IO_STATUS_BLOCK*, LARGE_INTEGER*, long unsigned int, long unsigned int, long unsigned int, long unsigned int, void*, long unsigned int)'} [-Wcast-function-type]
+   75 |         auto dll=GetModuleHandleW(L"ntdll.dll");auto call=reinterpret_cast<Create>(GetProcAddress(dll,"NtCreateFile"));auto convert=reinterpret_cast<Convert>(GetProcAddress(dll,"RtlNtStatusToDosError"));
+      |                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/runtime/host_directory_windows.cpp:75:133: warning: cast between incompatible function types from 'FARPROC' {aka 'long long int (*)()'} to 'Convert' {aka 'long unsigned int (*)(long int)'} [-Wcast-function-type]
+   75 |         auto dll=GetModuleHandleW(L"ntdll.dll");auto call=reinterpret_cast<Create>(GetProcAddress(dll,"NtCreateFile"));auto convert=reinterpret_cast<Convert>(GetProcAddress(dll,"RtlNtStatusToDosError"));
+      |                                                                                                                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from include/void/runtime.hpp:6,
+                 from include/void/native_resource.hpp:3,
+                 from src/runtime/host_internal.hpp:3,
+                 from src/runtime/host_process_windows.cpp:1:
+include/void/console.hpp: In member function 'virtual uint64_t vd::console::Adapter::capabilities(vd::console::Stream)':
+include/void/console.hpp:88:127: warning: enumerated and non-enumerated type in conditional expression [-Wextra]
+   88 |     virtual std::uint64_t capabilities(Stream stream) {auto e=inspect().at(static_cast<unsigned>(stream));return e.available()?(stream==Stream::input?text_input:text_output):0;}
+      |                                                                                                                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from include/void/runtime.hpp:6,
+                 from include/void/native_resource.hpp:3,
+                 from src/runtime/host_internal.hpp:3,
+                 from src/runtime/host_directory.cpp:1:
+include/void/console.hpp: In member function 'virtual uint64_t vd::console::Adapter::capabilities(vd::console::Stream)':
+include/void/console.hpp:88:127: warning: enumerated and non-enumerated type in conditional expression [-Wextra]
+   88 |     virtual std::uint64_t capabilities(Stream stream) {auto e=inspect().at(static_cast<unsigned>(stream));return e.available()?(stream==Stream::input?text_input:text_output):0;}
+      |                                                                                                                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from include/void/runtime.hpp:6,
+                 from include/void/native_resource.hpp:3,
+                 from src/runtime/host_internal.hpp:3,
+                 from src/runtime/host_process.cpp:4:
+include/void/console.hpp: In member function 'virtual uint64_t vd::console::Adapter::capabilities(vd::console::Stream)':
+include/void/console.hpp:88:127: warning: enumerated and non-enumerated type in conditional expression [-Wextra]
+   88 |     virtual std::uint64_t capabilities(Stream stream) {auto e=inspect().at(static_cast<unsigned>(stream));return e.available()?(stream==Stream::input?text_input:text_output):0;}
+      |                                                                                                                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from include/void/runtime.hpp:6,
+                 from include/void/native_resource.hpp:3,
+                 from src/runtime/host_internal.hpp:3,
+                 from src/runtime/host_abi.cpp:1:
+include/void/console.hpp: In member function 'virtual uint64_t vd::console::Adapter::capabilities(vd::console::Stream)':
+include/void/console.hpp:88:127: warning: enumerated and non-enumerated type in conditional expression [-Wextra]
+   88 |     virtual std::uint64_t capabilities(Stream stream) {auto e=inspect().at(static_cast<unsigned>(stream));return e.available()?(stream==Stream::input?text_input:text_output):0;}
+      |                                                                                                                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from include/void/runtime.hpp:6,
+                 from src/runtime/application.cpp:2:
+include/void/console.hpp: In member function 'virtual uint64_t vd::console::Adapter::capabilities(vd::console::Stream)':
+include/void/console.hpp:88:127: warning: enumerated and non-enumerated type in conditional expression [-Wextra]
+   88 |     virtual std::uint64_t capabilities(Stream stream) {auto e=inspect().at(static_cast<unsigned>(stream));return e.available()?(stream==Stream::input?text_input:text_output):0;}
+      |                                                                                                                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/runtime/filesystem.cpp:20: warning: "NOMINMAX" redefined
+   20 | #define NOMINMAX
+      | 
+In file included from /usr/lib/gcc/x86_64-w64-mingw32/13-posix/include/c++/x86_64-w64-mingw32/bits/c++config.h:679,
+                 from /usr/lib/gcc/x86_64-w64-mingw32/13-posix/include/c++/bits/atomic_base.h:35,
+                 from /usr/lib/gcc/x86_64-w64-mingw32/13-posix/include/c++/atomic:41,
+                 from include/void/filesystem.hpp:3,
+                 from src/runtime/filesystem.cpp:1:
+/usr/lib/gcc/x86_64-w64-mingw32/13-posix/include/c++/x86_64-w64-mingw32/bits/os_defines.h:45: note: this is the location of the previous definition
+   45 | #define NOMINMAX 1
+      | 
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZNK2vd7Runtime10is_managedEv[_ZNK2vd7Runtime10is_managedEv]+0x22): undefined reference to `vd::Runtime::thread() const'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd14NativeResourceC2ERNS_7RuntimeEPv[_ZN2vd14NativeResourceC2ERNS_7RuntimeEPv]+0x48): undefined reference to `vd::Runtime::Handle::Handle(vd::Runtime&, void*)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd14NativeResourceD2Ev[_ZN2vd14NativeResourceD2Ev]+0x26): undefined reference to `vd::Runtime::Handle::~Handle()'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_18Resource5closeEv+0x37): undefined reference to `vd::Runtime::Native::Native(vd::Runtime&)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_18Resource5closeEv+0x54): undefined reference to `vd::Runtime::Native::~Native()'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_18Resource5closeEv+0xb4): undefined reference to `vd::Runtime::Handle::reset(void*)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_18Resource5closeEv+0xd8): undefined reference to `vd::Runtime::Native::~Native()'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_16lookupERNS_7RuntimeEPvc+0x2a): undefined reference to `vd::NativeLibrary::existing(vd::Runtime&)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_16lookupERNS_7RuntimeEPvc+0x76): undefined reference to `vd::NativeLibrary::find(void*, bool)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_16lookupERNS_7RuntimeEPvc+0x137): undefined reference to `vd::NativeResource::own_thread() const'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_113close_failureESt10error_codePNS_14RuntimeFailureE+0x174): undefined reference to `vd::retain_native_failure(vd::RuntimeFailure const&, vd::RuntimeFailure*)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_19AdmissionC2ERNS_7RuntimeE+0x26): undefined reference to `vd::Runtime::begin_native_job()'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_19AdmissionD2Ev+0x17): undefined reference to `vd::Runtime::end_native_job()'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_119AcquisitionRollbackD2Ev+0x34): undefined reference to `vd::Runtime::Native::Native(vd::Runtime&)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_119AcquisitionRollbackD2Ev+0x165): undefined reference to `vd::Runtime::Native::~Native()'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_119AcquisitionRollbackD2Ev+0x177): undefined reference to `vd::Runtime::Native::~Native()'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_17stringsERNS_7RuntimeEPvPKNS_18NativeArrayElementE+0x12a): undefined reference to `vd::Runtime::Frame::Frame(vd::Runtime&, vd::Runtime::Slot const*, unsigned long long)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_17stringsERNS_7RuntimeEPvPKNS_18NativeArrayElementE+0x150): undefined reference to `vd::Runtime::native_array_layout(vd::NativeArrayElement const&, unsigned long long)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_17stringsERNS_7RuntimeEPvPKNS_18NativeArrayElementE+0x170): undefined reference to `vd::Runtime::root_word(void**) const'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_17stringsERNS_7RuntimeEPvPKNS_18NativeArrayElementE+0x20c): undefined reference to `vd::Runtime::array_count(vd::Runtime::RegisteredRootWord, std::shared_ptr<vd::BufferLayout const> const&, bool) const'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_17stringsERNS_7RuntimeEPvPKNS_18NativeArrayElementE+0x2e1): undefined reference to `vd::Runtime::Frame::Frame(vd::Runtime&, vd::Runtime::Slot const*, unsigned long long)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_17stringsERNS_7RuntimeEPvPKNS_18NativeArrayElementE+0x301): undefined reference to `vd::Runtime::root_word(void**) const'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_17stringsERNS_7RuntimeEPvPKNS_18NativeArrayElementE+0x3ac): undefined reference to `vd::Runtime::array_read(void*, vd::Runtime::RegisteredRootWord, std::shared_ptr<vd::BufferLayout const> const&, bool, unsigned long long) const'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_17stringsERNS_7RuntimeEPvPKNS_18NativeArrayElementE+0x3c6): undefined reference to `vd::Runtime::string_bytes(void*) const'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_17stringsERNS_7RuntimeEPvPKNS_18NativeArrayElementE+0x440): undefined reference to `vd::Runtime::Frame::~Frame()'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_17stringsERNS_7RuntimeEPvPKNS_18NativeArrayElementE+0x47b): undefined reference to `vd::Runtime::Frame::~Frame()'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_17stringsERNS_7RuntimeEPvPKNS_18NativeArrayElementE+0x4a2): undefined reference to `vd::Runtime::Frame::~Frame()'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$_ZN2vd4host12_GLOBAL__N_17stringsERNS_7RuntimeEPvPKNS_18NativeArrayElementE+0x4de): undefined reference to `vd::Runtime::Frame::~Frame()'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0x11e): undefined reference to `vd::Runtime::current()'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0x1cf): undefined reference to `vd::Runtime::Frame::Frame(vd::Runtime&, vd::Runtime::Slot const*, unsigned long long)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0x215): undefined reference to `vd::Runtime::bytes_into(void**, std::basic_string_view<char, std::char_traits<char> >)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0x3a0): undefined reference to `vd::Runtime::string_bytes(void*) const'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0x48c): undefined reference to `vd::Runtime::Frame::Frame(vd::Runtime&, vd::Runtime::Slot const*, unsigned long long)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0x4ac): undefined reference to `vd::Runtime::root_word(void**) const'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0x53e): undefined reference to `vd::Runtime::list_count(vd::Runtime::RegisteredRootWord, vd::ScalarEncoding) const'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0x5bb): undefined reference to `vd::Runtime::root_word(void**) const'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0x651): undefined reference to `vd::Runtime::byte_array_bytes[abi:cxx11](vd::Runtime::RegisteredRootWord)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0x68e): undefined reference to `vd::Runtime::Frame::~Frame()'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0x7d3): undefined reference to `vd::NativeLibrary::existing(vd::Runtime&)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0x81c): undefined reference to `vd::NativeLibrary::find(void*, bool)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0x8e6): undefined reference to `vd::filesystem::borrow_file(vd::Runtime&, void*, vd::filesystem::ErrorKind&)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0xb25): undefined reference to `vd::Runtime::Native::Native(vd::Runtime&)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0xd6e): undefined reference to `vd::host::crypto_execute(vd::host::Request&)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0xdb7): undefined reference to `vd::host::zip_execute(vd::host::Request&)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0xe74): undefined reference to `vd::Runtime::Native::~Native()'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0xec1): undefined reference to `vd::NativeLibrary::existing(vd::Runtime&)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0xf0a): undefined reference to `vd::NativeLibrary::erase(void*, vd::NativeResource const*)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0xfc9): undefined reference to `vd::Runtime::string_into(void**, std::basic_string_view<char, std::char_traits<char> >)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0x1034): undefined reference to `vd::Runtime::bytes_into(void**, std::basic_string_view<char, std::char_traits<char> >)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0x109c): undefined reference to `vd::filesystem::publish_file(vd::Runtime&, void*, std::shared_ptr<vd::filesystem::File>)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0x10f5): undefined reference to `vd::NativeLibrary::get(vd::Runtime&, bool)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0x1139): undefined reference to `vd::NativeLibrary::publish(void*, std::shared_ptr<vd::NativeResource>)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0x11ce): undefined reference to `vd::Runtime::Frame::~Frame()'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0x1394): undefined reference to `vd::retain_native_failure(vd::RuntimeFailure const&, vd::RuntimeFailure*)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0x13de): undefined reference to `vd::Runtime::Frame::~Frame()'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0x1510): undefined reference to `vd::Runtime::Native::~Native()'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_call+0x15cb): undefined reference to `vd::Runtime::Frame::~Frame()'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_cleanup+0x97): undefined reference to `vd::Runtime::current()'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_cleanup+0x11b): undefined reference to `vd::Runtime::Native::Native(vd::Runtime&)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_cleanup+0x152): undefined reference to `vd::Runtime::Native::~Native()'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_cleanup+0x162): undefined reference to `vd::NativeLibrary::existing(vd::Runtime&)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_cleanup+0x192): undefined reference to `vd::NativeLibrary::erase(void*, vd::NativeResource const*)'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.text$vd_host_cleanup+0x1f3): undefined reference to `vd::Runtime::Native::~Native()'
+/usr/bin/x86_64-w64-mingw32-ld: build/voidup-cross/host_abi.o:host_abi.cpp:(.rdata$.refptr.__emutls_v._ZN2vd7Runtime16current_runtime_E[.refptr.__emutls_v._ZN2vd7Runtime16current_runtime_E]+0x0): undefined reference to `__emutls_v._ZN2vd7Runtime16current_runtime_E'
+collect2: error: ld returned 1 exit status

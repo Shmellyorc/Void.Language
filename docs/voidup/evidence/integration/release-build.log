@@ -1,0 +1,37 @@
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  6%] Built target void_core
+[ 73%] Built target libcurl_static
+[ 86%] Built target void_runtime
+[ 86%] Built target void_llvm
+[ 86%] Built target void_native_inventory
+[ 86%] Built target voidc_objects
+[ 93%] Built target void_cache_identity
+[ 93%] Built target voidc
+[100%] Generating voidup/voidup
+Built native executable: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidup/voidup
+[100%] Built target voidup
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_zone_objects
+[ 83%] Built target libcurl_static
+[100%] Built target void_runtime
+[100%] Built target void_host_portable
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_managed_test_abi
+[  7%] Built target void_core
+[ 78%] Built target libcurl_static
+[ 92%] Built target void_runtime
+[ 92%] Built target void_llvm
+[ 92%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target void_host_capabilities
+Built target void_host_child
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Built target voidls

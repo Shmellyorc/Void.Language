@@ -1,0 +1,64 @@
+use system_error
+
+private value struct _host_reply:
+    kind: i64
+    os_code: i64
+    number: i64
+    detail: i64
+    flag: bool
+    text: string
+    bytes: [u8]
+
+
+## Owned native child. An un-waited child is killed and reaped on close/deinit.
+## Inherits stdio and the POSIX process group; Windows retains the native process exit code.
+struct child:
+    private _local: bool
+
+private func (self child) init():
+    pass
+
+## Checked termination, distinct from a failure to launch or wait.
+value struct exit_status:
+    ## Normal exit value; zero when signaled. No implicit signal-to-exit mapping.
+    code: i64
+    ## True when POSIX signal termination occurred.
+    signaled: bool
+    ## Original POSIX signal, zero on normal termination.
+    signal: i64
+
+## Launch one explicit executable with literal arguments and a complete environment.
+## No shell, PATH search or script fallback; launch errors do not become exit statuses.
+## @param executable Absolute native executable path, supplied as argv[0].
+## @param arguments Literal arguments excluding argv[0]; at most 4096.
+## @param environment Complete NAME=value entries; unique portable names, no implicit inheritance.
+## Windows names are case insensitive; arguments use the native CRT quoting convention.
+## @param cwd Explicit absolute working directory; parent cwd is unchanged.
+## Windows accepts local drive-absolute paths, checks ancestry, and rejects UNC/device/alias syntax.
+## @return Owned child or checked launch/argument/platform failure; inherited stdio.
+func start(executable: string, const arguments: [string], const environment: [string], cwd: string) -> result<child, system_error.error>:
+    var owner = child()
+    var reply = _host_spawn(owner, executable, arguments, environment, cwd)
+    if reply.kind != 0:
+        return Err(system_error.make("process.start", reply.kind, reply.os_code))
+    return Ok(owner)
+
+## Wait synchronously, draining native process ownership; repeat waits return the same status.
+## @return Exact normal exit or separate signal information; checked waiting errors.
+func (self child) wait() -> result<exit_status, system_error.error>:
+    var reply = _host_wait(self)
+    if reply.kind != 0:
+        return Err(system_error.make("process.wait", reply.kind, reply.os_code))
+    return Ok(exit_status(code = reply.number, signaled = reply.flag, signal = reply.detail))
+
+## Terminate an outstanding child and reap it before returning; idempotent after wait.
+## @return True after the owned direct child is reaped; descendants are not supervised.
+func (self child) close() -> result<bool, system_error.error>:
+    var reply = _host_child_close(self)
+    if reply.kind != 0:
+        return Err(system_error.make("process.close", reply.kind, reply.os_code))
+    return Ok(true)
+
+## Terminate and reap an outstanding child without allocating a checked reply.
+func (self child) deinit():
+    _host_child_cleanup(self)

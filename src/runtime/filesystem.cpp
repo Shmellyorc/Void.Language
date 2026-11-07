@@ -19,8 +19,10 @@
 #ifdef _WIN32
 #define NOMINMAX
 #include <windows.h>
+#include "host_windows.hpp"
 #else
 #include <fcntl.h>
+#include "host_posix.hpp"
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -208,6 +210,7 @@ public:
     OpenMode mode;
     std::shared_ptr<const testing::Hooks> hooks;
     std::int64_t written = 0;
+    bool private_created = false;
     std::vector<char> input = std::vector<char>(transfer_size);
     std::size_t first = 0;
     std::size_t last = 0;
@@ -625,6 +628,113 @@ static std::shared_ptr<File> open_native(const std::string& path, OpenMode mode,
 std::shared_ptr<File> open(const std::string& path, OpenMode mode, Result& result,
                           std::shared_ptr<const testing::Hooks> hooks) {
     return open_native(path, mode, result, std::move(hooks), false);
+}
+
+std::shared_ptr<File> adopt_descriptor(int fd, bool writable) {
+#ifdef _WIN32
+    (void)fd; (void)writable;
+    throw std::logic_error("POSIX descriptor adoption on Windows");
+#else
+    try {
+        auto file = std::make_shared<File>(writable ? OpenMode::read_write : OpenMode::read);
+        file->handle = fd;
+        file->private_created = writable;
+        return file;
+    } catch (...) { ::close(fd); throw; }
+#endif
+}
+int descriptor(const File& file) {
+#ifdef _WIN32
+    (void)file; return -1;
+#else
+    return file.handle;
+#endif
+}
+#ifdef _WIN32
+std::shared_ptr<File> adopt_native_handle(void* handle, bool writable) {
+    try {
+        auto file=std::make_shared<File>(writable?OpenMode::read_write:OpenMode::read);
+        file->handle=handle;file->private_created=writable;return file;
+    } catch(...) {CloseHandle(handle);throw;}
+}
+void* native_handle(const File& file) {return file.handle;}
+#endif
+Result regular_length(File& file) {
+    Result result;
+#ifdef _WIN32
+    BY_HANDLE_FILE_INFORMATION info{};LARGE_INTEGER size{};
+    if(GetFileType(file.handle)!=FILE_TYPE_DISK)fail(result,ErrorKind::unsupported);
+    else if(!GetFileInformationByHandle(file.handle,&info) || !GetFileSizeEx(file.handle,&size))fail(result,native_error());
+    else if((info.dwFileAttributes&(FILE_ATTRIBUTE_DIRECTORY|FILE_ATTRIBUTE_REPARSE_POINT)) || size.QuadPart<0)fail(result,ErrorKind::unsupported);
+    else result.number=size.QuadPart;
+#else
+    struct stat info{};
+    if(::fstat(file.handle,&info))fail(result,native_error());
+    else if(!S_ISREG(info.st_mode) || info.st_size<0)fail(result,ErrorKind::unsupported);
+    else result.number=info.st_size;
+#endif
+    return result;
+}
+Result read_at(File& file,std::uint64_t offset,char* output,std::size_t count) {
+    Result result;
+    if(offset>static_cast<std::uint64_t>(INT64_MAX) || count>static_cast<std::uint64_t>(INT64_MAX)-offset) {fail(result,ErrorKind::invalid_range);return result;}
+#ifdef _WIN32
+    LARGE_INTEGER zero{},saved{},position{};position.QuadPart=static_cast<LONGLONG>(offset);
+    if(!SetFilePointerEx(file.handle,zero,&saved,FILE_CURRENT)) {fail(result,native_error());return result;}
+    if(!SetFilePointerEx(file.handle,position,nullptr,FILE_BEGIN)) {fail(result,native_error());return result;}
+    while(static_cast<std::size_t>(result.completed)<count) {
+        DWORD got=0;auto pending=std::min<std::size_t>(count-result.completed,65536);
+        if(!ReadFile(file.handle,output+result.completed,static_cast<DWORD>(pending),&got,nullptr)) {fail(result,native_error());break;}
+        if(!got){fail(result,ErrorKind::unexpected_eof);break;}result.completed+=got;
+    }
+    if(!SetFilePointerEx(file.handle,saved,nullptr,FILE_BEGIN)) {
+        auto code=GetLastError();if(result.error==ErrorKind::success)fail(result,ErrorKind::io_failure,code);else result.cleanup_code=code;
+        // Never return a reusable IO file with an unknown native/logical cursor.
+        auto retired=close(file);if(retired.os_code && !result.cleanup_code)result.cleanup_code=retired.os_code;
+    }
+#else
+    while(static_cast<std::size_t>(result.completed)<count) {
+        auto got=::pread(file.handle,output+result.completed,count-result.completed,static_cast<off_t>(offset+result.completed));
+        if(got<0 && errno==EINTR)continue;
+        if(got<0){fail(result,native_error());break;}
+        if(!got){fail(result,ErrorKind::unexpected_eof);break;}result.completed+=got;
+    }
+#endif
+    return result;
+}
+Result private_mode(File& file, bool executable) {
+    Result result;
+#ifdef _WIN32
+    (void)executable; // Windows execution is an image/ACL property, not a POSIX bit.
+    if(!file.private_created) {result.error=ErrorKind::permission_denied;return result;}
+    try {
+        host::win::information(file.handle,false);host::win::PrivateAccess access;access.verify(file.handle);
+    } catch(const std::system_error& e) {fail(result,e.code());}
+#else
+    struct stat info{};
+    if (!file.private_created || ::fstat(file.handle,&info) || !S_ISREG(info.st_mode) || info.st_uid!=::geteuid() || info.st_nlink!=1 || (info.st_mode&0077) || !host::safe_acl(file.handle)) {
+        result.error = ErrorKind::permission_denied;
+    } else if (::fchmod(file.handle,executable ? 0700 : 0600)) fail(result,native_error());
+#endif
+    return result;
+}
+
+Result private_mode_matches(File& file, bool executable) {
+    Result result;
+#ifdef _WIN32
+    (void)executable;
+    try {
+        host::win::information(file.handle,false);
+        host::win::PrivateAccess access;access.verify(file.handle);
+        result.number=1;
+    } catch(const std::system_error& e) {fail(result,e.code());}
+#else
+    struct stat info{};
+    if(::fstat(file.handle,&info))fail(result,native_error());
+    else if(!S_ISREG(info.st_mode) || info.st_uid!=::geteuid() || info.st_nlink!=1 || !host::safe_acl(file.handle))fail(result,ErrorKind::permission_denied);
+    else result.number=(info.st_mode&07777)==(executable?0700:0600);
+#endif
+    return result;
 }
 
 Result close(File& file) {

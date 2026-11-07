@@ -1,0 +1,7 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+    Start 1: voidup_smoke
+1/1 Test #1: voidup_smoke .....................   Passed    0.83 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.84 sec

@@ -1,0 +1,7 @@
+{
+  "executable": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_host_capabilities",
+  "sha256": "360a6b242e214f82ef2dcb216474e26fe72710250b39e925f41fbd1f6d0c2baf",
+  "stack_bytes": 1048576,
+  "stdout": "Host boundary/GC/allocation/publication/process/ZIP/IR: 300 checks passed\n",
+  "stderr": ""
+}

@@ -1,0 +1,537 @@
+{
+  "schema": 1,
+  "cases": [
+    {
+      "name": "one-signature",
+      "diagnostic": {
+        "message": "expected a 2-of-3 signature envelope",
+        "operation": "authenticate",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 0
+    },
+    {
+      "name": "duplicate-key",
+      "diagnostic": {
+        "message": "duplicate signing key identity",
+        "operation": "authenticate",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 0
+    },
+    {
+      "name": "wrong-exact-bytes",
+      "diagnostic": {
+        "message": "two distinct trusted signatures are required",
+        "operation": "authenticate",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 0
+    },
+    {
+      "name": "unknown-key",
+      "diagnostic": {
+        "message": "unknown signing key or invalid signature size",
+        "operation": "authenticate",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 0
+    },
+    {
+      "name": "expired",
+      "diagnostic": {
+        "message": "catalog expired or issued in the future",
+        "operation": "freshness",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 0
+    },
+    {
+      "name": "future",
+      "diagnostic": {
+        "message": "catalog expired or issued in the future",
+        "operation": "freshness",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 0
+    },
+    {
+      "name": "unsupported-schema",
+      "diagnostic": {
+        "message": "unsupported catalog schema, domain or LLVM identity",
+        "operation": "catalog",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 0
+    },
+    {
+      "name": "unknown-schema-field",
+      "diagnostic": {
+        "message": "Unknown object property",
+        "operation": "json/unrecognized",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 0
+    },
+    {
+      "name": "minimum-manager",
+      "diagnostic": {
+        "message": "unsupported catalog serial or manager version",
+        "operation": "catalog",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 0
+    },
+    {
+      "name": "duplicate-release",
+      "diagnostic": {
+        "message": "duplicate release identity",
+        "operation": "catalog",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 0
+    },
+    {
+      "name": "revoked",
+      "diagnostic": {
+        "message": "requested release is revoked",
+        "operation": "install",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 10
+    },
+    {
+      "name": "wrong-host",
+      "diagnostic": {
+        "message": "release is absent for this host",
+        "operation": "select",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 10
+    },
+    {
+      "name": "redirect",
+      "diagnostic": {
+        "message": "metadata response status or representation rejected",
+        "operation": "download",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 0
+    },
+    {
+      "name": "metadata-over-limit",
+      "diagnostic": {
+        "message": "HTTP send failed",
+        "operation": "send",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 8388608,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 0
+    },
+    {
+      "name": "cross-origin",
+      "diagnostic": {
+        "message": "download origin differs from the explicitly selected catalog origin",
+        "operation": "download-policy",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 10
+    },
+    {
+      "name": "truncated-package",
+      "diagnostic": {
+        "message": "package status or exact byte count mismatch",
+        "operation": "download",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 10
+    },
+    {
+      "name": "wrong-artifact-hash",
+      "diagnostic": {
+        "message": "package SHA-256 mismatch",
+        "operation": "package",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 10
+    },
+    {
+      "name": "inventory-digest",
+      "diagnostic": {
+        "message": "HTTP send failed",
+        "operation": "send",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 98304,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 10
+    },
+    {
+      "name": "inventory-build-identity",
+      "diagnostic": {
+        "message": "inventory identity differs from catalog",
+        "operation": "inventory",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 10
+    },
+    {
+      "name": "zip-unlisted",
+      "diagnostic": {
+        "message": "archive.open_zip failed; native code 0",
+        "operation": "archive.open_zip",
+        "code": 1,
+        "native_domain": "host",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 10
+    },
+    {
+      "name": "zip-traversal",
+      "diagnostic": {
+        "message": "archive.open_zip failed; native code 0",
+        "operation": "archive.open_zip",
+        "code": 1,
+        "native_domain": "host",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 10
+    },
+    {
+      "name": "zip-duplicate",
+      "diagnostic": {
+        "message": "archive.open_zip failed; native code 0",
+        "operation": "archive.open_zip",
+        "code": 1,
+        "native_domain": "host",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 10
+    },
+    {
+      "name": "member-hash",
+      "diagnostic": {
+        "message": "expanded file digest mismatch",
+        "operation": "extract",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 10
+    },
+    {
+      "name": "inventory-traversal",
+      "diagnostic": {
+        "message": "invalid inventory component",
+        "operation": "policy",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 10
+    },
+    {
+      "name": "inventory-case-collision",
+      "diagnostic": {
+        "message": "duplicate or case-colliding inventory path",
+        "operation": "inventory",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 10
+    },
+    {
+      "name": "expanded-limit",
+      "diagnostic": {
+        "message": "inventory exceeds local limits",
+        "operation": "inventory",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 10
+    },
+    {
+      "name": "payload-build-identity",
+      "diagnostic": {
+        "message": "payload build identity differs from authenticated release",
+        "operation": "verify",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      },
+      "retained_serial": 10
+    },
+    {
+      "name": "replay",
+      "diagnostic": {
+        "message": "catalog serial replay",
+        "operation": "freshness",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      }
+    },
+    {
+      "name": "equivocation",
+      "diagnostic": {
+        "message": "same-serial catalog equivocation",
+        "operation": "freshness",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      }
+    },
+    {
+      "name": "revocation-removal",
+      "diagnostic": {
+        "message": "catalog attempts to remove a retained revocation",
+        "operation": "freshness",
+        "code": 1,
+        "native_domain": "",
+        "native_code": 0,
+        "cleanup_code": 0,
+        "progress": 0,
+        "published": false,
+        "durable": false
+      }
+    }
+  ],
+  "retained_work": "/tmp/VOIDUP rejected \u96ea # % 82_t26hj",
+  "requests": [
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/catalog.json",
+    "/catalog.json",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/inventories/engineering-a.json",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/inventories/engineering-a.json",
+    "/packages/engineering-a.zip",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/inventories/engineering-a.json",
+    "/packages/engineering-a.zip",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/inventories/engineering-a.json",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/inventories/engineering-a.json",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/inventories/engineering-a.json",
+    "/packages/engineering-a.zip",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/inventories/engineering-a.json",
+    "/packages/engineering-a.zip",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/inventories/engineering-a.json",
+    "/packages/engineering-a.zip",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/inventories/engineering-a.json",
+    "/packages/engineering-a.zip",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/inventories/engineering-a.json",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/inventories/engineering-a.json",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/inventories/engineering-a.json",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/inventories/engineering-a.json",
+    "/packages/engineering-a.zip",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/catalog.json",
+    "/catalog.json.sig"
+  ]
+}

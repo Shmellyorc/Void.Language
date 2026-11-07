@@ -1,0 +1,13 @@
+{
+  "command": [
+    "podman",
+    "exec",
+    "voidup-portability-ubuntu",
+    "bash",
+    "-lc",
+    "cat /etc/os-release; getconf GNU_LIBC_VERSION; g++ --version | head -1; .toolchains/llvm-23.1.4/bin/clang --version; build/voidup-ubuntu-source/build/ubuntu-release/voidc --version"
+  ],
+  "status": 0,
+  "stdout": "PRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.5 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\nglibc 2.39\ng++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nclang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)\nTarget: x86_64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin\nVOID Language Compiler v0.1.0 (development)\nLLVM 23.1.4\nTarget: x86_64-unknown-linux-gnu\nBuild identity: 75713eaa80bb5382834dba02f52aef71866c67a52088681bf7208fde135b7f47\n",
+  "stderr": ""
+}

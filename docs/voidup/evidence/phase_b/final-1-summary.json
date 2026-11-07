@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "bootstrap": "/tmp/VOIDUP real A B \u96ea # % yfa3ku11/final bootstrap",
+  "root": "/tmp/VOIDUP real A B \u96ea # % yfa3ku11/relocated private root",
+  "checkout_denied": true,
+  "actual_a_b_selection": true,
+  "source_sha256": "622ddebf2c858fc6044ac62e605724729f7c9efa038e19aab01a5369f8fd2c88",
+  "control": {
+    "schema": 1,
+    "generation": 21,
+    "serial": 10,
+    "catalog_digest": "8f121406408343e3b0b7af619fa0fabdf88f068b582adc995656d4e3685d790c",
+    "last_time": 1794019060,
+    "current": "engineering-a",
+    "previous": "engineering-b",
+    "revoked": [],
+    "installed": [
+      {
+        "release": {
+          "id": "engineering-a",
+          "host": "linux-x86_64-ubuntu24.04",
+          "build_identity": "f529be5c7e5f3961f808e10d8655534fd8b6ac1a836d8ce43f47749e0cad5ce6",
+          "artifact_url": "packages/engineering-a.zip",
+          "artifact_bytes": 261542177,
+          "artifact_sha256": "5d2a8de806742c5cfe1f817b3ab8bb42bba1a606ffe6aa333e1bc062d6545963",
+          "inventory_url": "inventories/engineering-a.json",
+          "inventory_bytes": 108200,
+          "inventory_sha256": "4585efd0bf643b1067267579012a99b55f40fc7f31daca43af5bd6a7f57d3bab"
+        },
+        "catalog_digest": "8f121406408343e3b0b7af619fa0fabdf88f068b582adc995656d4e3685d790c",
+        "catalog_serial": 10
+      },
+      {
+        "release": {
+          "id": "engineering-b",
+          "host": "linux-x86_64-ubuntu24.04",
+          "build_identity": "eda4afd06b406fb62654d7853d51dc0fa078d88d2c72c6e6c905e39ef9bc9613",
+          "artifact_url": "packages/engineering-b.zip",
+          "artifact_bytes": 260919495,
+          "artifact_sha256": "d429c3758fc030ac35b5ab455724ee12fecd6b1a559a5646a1b08ada3489495f",
+          "inventory_url": "inventories/engineering-b.json",
+          "inventory_bytes": 108200,
+          "inventory_sha256": "c056bd6627dbe42883eecaa0691a2edf8b1061449a6646537fee3df971003e15"
+        },
+        "catalog_digest": "8f121406408343e3b0b7af619fa0fabdf88f068b582adc995656d4e3685d790c",
+        "catalog_serial": 10
+      }
+    ]
+  }
+}

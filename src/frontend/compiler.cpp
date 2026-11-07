@@ -8,6 +8,7 @@
 #include "void/url_ops.hpp"
 #include "void/http_ops.hpp"
 #include "void/os.hpp"
+#include "void/host_ops.hpp"
 #include "void/temporal.hpp"
 #include "void/reference_capabilities.hpp"
 #include <algorithm>
@@ -3063,6 +3064,7 @@ class Semantics {
 #include "url.inc"
 #include "http.inc"
 #include "os.inc"
+#include "host.inc"
 #include "binary_codec.inc"
 #include "stdlib_conversion.inc"
 #include "math.inc"
@@ -3107,6 +3109,8 @@ class Semantics {
             if (const auto* operation = math::operation(e.token.text); operation && math_private_selected(e))
                 return math_private_call(e, *operation);
         }
+        if(e.qualifier.empty())for(unsigned n=0;n<host::operations.size();++n)
+            if(unit.identity==host::operations[n].module && e.token.text==host::operations[n].name)return host_call(e,n);
         if (unit.identity == os::source_module && e.qualifier.empty()) {
             for (unsigned n = 0; n < os::operations.size(); ++n)
                 if (e.token.text == os::operations[n].name) return os_call(e, n);
@@ -4014,7 +4018,7 @@ class Lowering {
             i.op == ir::Op::collection_leave ||
             i.op == ir::Op::collection_append ||
             i.op == ir::Op::collection_finish ||
-            i.op == ir::Op::os_query ||
+            i.op == ir::Op::os_query || i.op == ir::Op::host_native ||
             i.op == ir::Op::url_native ||
             i.op == ir::Op::http_native || i.op == ir::Op::http_async || i.op == ir::Op::http_control ||
             i.op == ir::Op::filesystem_native ||
@@ -4494,6 +4498,13 @@ class Lowering {
                 for(unsigned n=0;n<rendered.size();++n){if(n)join.arguments.push_back(emit({ir::Op::load,*sep},e.token));join.arguments.push_back(emit({ir::Op::load,rendered[n]},e.token));}join.arguments.push_back(emit({ir::Op::load,*end},e.token));
                 ir::Instruction print{ir::Op::console_print,emit(join,e.token),flush?emit({ir::Op::load,*flush},e.token):constant(Type::boolean,{0,{}},e.token)};print.type=Type::none;if(file)print.arguments.push_back(emit({ir::Op::load,*file},e.token));return emit(print,e.token);
             });
+            if (e.target.starts_with("$host.")) {
+                std::vector<unsigned> slots(e.parts.size());
+                for(unsigned n=0;n<e.parts.size();++n)slots[e.argument_indexes.at(n)]=snapshot(expression(*e.parts[n]),expression_type(*e.parts[n]),e.parts[n]->token);
+                ir::Instruction operation{ir::Op::host_native};operation.type=e.type;operation.immediate=std::stoul(e.target.substr(6));
+                for(auto slot:slots)operation.arguments.push_back(emit({ir::Op::load,slot},e.token));
+                return emit(operation,e.token);
+            }
             if (e.target.starts_with("$os.")) {
                 ir::Instruction operation{ir::Op::os_query};
                 operation.type = e.type;
@@ -6123,7 +6134,7 @@ struct AnalysisAccess {
             result->editor_declarations_.push_back(std::move(record));
         }
         for(const auto& [id,u]:units)for(const auto& [symbol,record]:u->builtins)if(std::none_of(result->editor_declarations_.begin(),result->editor_declarations_.end(),[&](const auto& d){return d.identity==symbol;}))result->editor_declarations_.push_back(record);
-        result->contract_="18:numeric-prelude-v1:20:text-collections-v1:unicode-case-16-v1:display-v1:console-v2:terminal-v2:application-v1:"+result->entry_symbol_;
+        result->contract_="18:numeric-prelude-v1:20:text-collections-v1:unicode-case-16-v1:display-v1:console-v2:terminal-v2:application-args-v2:host-primitives-v1:"+result->entry_symbol_;
         for(const auto& [id,u]:units)for(const auto& f:u->functions)if(!f.native_symbol.empty())result->contract_+=":"+id+":"+f.native_symbol;
 
         result->contract_+=std::string(formatting::abi_version)+"|"+std::string(temporal::abi_version);

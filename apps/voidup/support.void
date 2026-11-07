@@ -1,0 +1,201 @@
+use io
+use crypto
+use encoding/hex as hex
+use text
+use json as codec
+use system_error
+use os
+use time
+use url
+use net/http as http
+
+struct up_error:
+    message: string
+    operation: string
+    kind: string = "policy"
+    phase: string
+    status: i32
+    code: i32 = 1
+    native_domain: string
+    native_code: i64
+    cleanup_code: i64
+    progress: i64
+    published: bool
+    durable: bool
+
+const up_manager_version: i64 = 1
+const up_metadata_limit: i64 = 8388608
+const up_file_limit: i64 = 1073741824
+const up_package_limit: i64 = 2147483648
+const up_expanded_limit: i64 = 4294967296
+const up_count_limit: i64 = 20000
+
+func up_fail(message: string, operation: string = "policy", code: i32 = 1) -> up_error:
+    return up_error(message = message, operation = operation, code = code)
+
+func up_json_budget() -> codec.limits:
+    return codec.limits(max_input_bytes = up_metadata_limit, max_output_bytes = up_metadata_limit,
+        max_depth = 16, max_nodes = 262144, max_string_bytes = 16384,
+        max_number_bytes = 32, max_object_members = 64, max_work = 536870912)
+
+func up_text(const data: [u8]) -> result<string, up_error>:
+    if string.from_utf8(data) is Ok(var decoded):
+        return Ok(decoded)
+    return Err(up_fail("metadata is not strict UTF-8", "decode"))
+
+func up_digest(const data: [u8]) -> result<string, up_error>:
+    with up_sys(crypto.sha256())? as state:
+        var changed = up_sys(state.update(data))?
+        return Ok(hex.encode(up_sys(state.finish())?))
+
+func up_hash_file(input_file: io.file, expected_size: i64) -> result<string, up_error>:
+    if expected_size < 0 or expected_size > up_package_limit:
+        return Err(up_fail("file size exceeds local limit"))
+    var initial = up_io(input_file.seek(0))?
+    if up_io(input_file.length())? != expected_size:
+        return Err(up_fail("file length differs from signed inventory"))
+    with up_sys(crypto.sha256())? as state:
+        var consumed: i64 = 0
+        for true:
+            var block = up_io(input_file.read_bytes(262144))?
+            if block.count == 0:
+                break
+            if block.count > expected_size - consumed:
+                return Err(up_fail("file grew while hashing"))
+            consumed += block.count
+            var changed = up_sys(state.update(block))?
+        if consumed != expected_size:
+            return Err(up_fail("file truncated while hashing"))
+        return Ok(hex.encode(up_sys(state.finish())?))
+
+func up_read_owned(directory: io.private_directory, name: string, maximum: i64 = up_metadata_limit) -> result<[u8], up_error>:
+    with up_io(directory.open_file(name))? as input_file:
+        var extent = up_io(input_file.length())?
+        if extent < 0 or extent > maximum:
+            return Err(up_fail("owned metadata exceeds local limit", name))
+        var output = up_io(input_file.read_exact(extent))?
+        if up_io(input_file.read_bytes(1))?.count != 0:
+            return Err(up_fail("owned metadata grew beyond its declared extent", name))
+        return Ok(output)
+
+func up_write_new(directory: io.private_directory, name: string, const data: [u8]) -> result<bool, up_error>:
+    with up_io(directory.create_file(name))? as output_file:
+        var written = up_io(output_file.write_bytes(data))?
+        if written != data.count:
+            return Err(up_fail("incomplete owned write", name))
+        var flushed = up_io(output_file.flush())?
+        var closed = up_io(output_file.close())?
+    return Ok(true)
+
+func up_identifier(value: string) -> bool:
+    var encoded = value.to_utf8()
+    if encoded.count < 1 or encoded.count > 80:
+        return false
+    for byte in encoded:
+        if not ((byte >= 97 and byte <= 122) or (byte >= 65 and byte <= 90) or (byte >= 48 and byte <= 57) or byte == 45 or byte == 95 or byte == 46):
+            return false
+    return value != "." and value != ".." and not text.starts_with(value, ".")
+
+func up_sha_text(value: string) -> bool:
+    if value.to_utf8().count != 64:
+        return false
+    for byte in value.to_utf8():
+        if not ((byte >= 48 and byte <= 57) or (byte >= 97 and byte <= 102)):
+            return false
+    return true
+
+func up_path_parts(value: string) -> result<[string], up_error>:
+    if value.to_utf8().count < 1 or value.to_utf8().count > 4096:
+        return Err(up_fail("invalid inventory path length"))
+    var parts = up_txt(text.split(value, "/", 17))?
+    if parts.count > 16:
+        return Err(up_fail("inventory path depth exceeds 16"))
+    for part in parts:
+        if part == "" or part == "." or part == ".." or text.ends_with(part, ".") or text.ends_with(part, " "):
+            return Err(up_fail("invalid inventory component"))
+        if part.to_utf8().count > 255:
+            return Err(up_fail("inventory component exceeds 255 bytes"))
+        for byte in part.to_utf8():
+            if byte < 33 or byte >= 127 or byte == 92 or byte == 58 or byte == 63 or byte == 42 or byte == 34 or byte == 60 or byte == 62 or byte == 124:
+                return Err(up_fail("nonportable inventory component"))
+        var stem_parts = up_txt(text.split(text.to_lower(part), ".", 255))?
+        var stem = stem_parts[0]
+        if stem == "con" or stem == "prn" or stem == "aux" or stem == "nul" or stem == "conin$" or stem == "conout$":
+            return Err(up_fail("reserved inventory component"))
+        if stem.to_utf8().count == 4:
+            if (text.starts_with(stem, "com") or text.starts_with(stem, "lpt")) and stem.to_utf8()[3] >= 48 and stem.to_utf8()[3] <= 57:
+                return Err(up_fail("reserved inventory component"))
+    return Ok(parts)
+
+func up_io<t>(outcome: result<t, io.error>) -> result<t, up_error>:
+    if outcome is Ok(var item):
+        return Ok(item)
+    if outcome is Err(var cause):
+        return Err(up_error(message = cause.message, operation = cause.operation, kind = string(cause.kind), native_domain = "filesystem", native_code = cause.os_code, cleanup_code = cause.cleanup_code, progress = cause.bytes_transferred))
+    return Err(up_fail("invalid result adapter"))
+
+func up_sys<t>(outcome: result<t, system_error.error>) -> result<t, up_error>:
+    if outcome is Ok(var item):
+        return Ok(item)
+    if outcome is Err(var cause):
+        return Err(up_error(message = cause.message, operation = cause.operation, kind = string(cause.kind), native_domain = "host", native_code = cause.os_code))
+    return Err(up_fail("invalid result adapter"))
+
+func up_txt<t>(outcome: result<t, text.error>) -> result<t, up_error>:
+    if outcome is Ok(var item):
+        return Ok(item)
+    if outcome is Err(var cause):
+        return Err(up_fail(cause.message, "text"))
+    return Err(up_fail("invalid result adapter"))
+
+func up_json<t>(outcome: result<t, codec.error>) -> result<t, up_error>:
+    if outcome is Ok(var item):
+        return Ok(item)
+    if outcome is Err(var cause):
+        return Err(up_fail(cause.message, "json" + cause.path))
+    return Err(up_fail("invalid result adapter"))
+
+func up_os<t>(outcome: result<t, os.error>) -> result<t, up_error>:
+    if outcome is Ok(var item):
+        return Ok(item)
+    if outcome is Err(var cause):
+        return Err(up_error(message = cause.message, operation = cause.operation, kind = string(cause.kind), native_domain = cause.native_domain, native_code = cause.os_code))
+    return Err(up_fail("invalid result adapter"))
+
+func up_clock<t>(outcome: result<t, time.error>) -> result<t, up_error>:
+    if outcome is Ok(var item):
+        return Ok(item)
+    if outcome is Err(var cause):
+        return Err(up_fail(cause.message, cause.operation))
+    return Err(up_fail("invalid result adapter"))
+
+func up_url<t>(outcome: result<t, url.error>) -> result<t, up_error>:
+    if outcome is Ok(var item):
+        return Ok(item)
+    if outcome is Err(var cause):
+        return Err(up_fail(cause.message, "url"))
+    return Err(up_fail("invalid result adapter"))
+
+func up_http<t>(outcome: result<t, http.error>) -> result<t, up_error>:
+    if outcome is Ok(var item):
+        return Ok(item)
+    if outcome is Err(var cause):
+        return Err(up_error(message = cause.message, operation = cause.operation, kind = string(cause.kind), phase = string(cause.phase), status = cause.status, native_domain = cause.native_domain, native_code = cause.native_code, cleanup_code = cause.cleanup_code, progress = cause.downloaded))
+    return Err(up_fail("invalid result adapter"))
+
+func up_hex<t>(outcome: result<t, hex.error>) -> result<t, up_error>:
+    if outcome is Ok(var item):
+        return Ok(item)
+    if outcome is Err(var cause):
+        return Err(up_fail(cause.message, "hex"))
+    return Err(up_fail("invalid result adapter"))
+
+func up_publication(outcome: io.publication, operation: string) -> result<bool, up_error>:
+    if outcome.durable and outcome.published:
+        return Ok(true)
+    var detail = "namespace publication failed before commit"
+    if outcome.published:
+        detail = "namespace publication committed; durability is uncertain; re-open and verify state"
+    return Err(up_error(message = detail, operation = operation, native_domain = "filesystem",
+        native_code = outcome.os_code, cleanup_code = outcome.cleanup_code,
+        published = outcome.published, durable = outcome.durable))

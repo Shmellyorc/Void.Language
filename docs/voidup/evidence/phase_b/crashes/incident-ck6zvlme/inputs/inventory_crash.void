@@ -1,0 +1,106 @@
+use "./support.void" as support
+use "./model.void" as model
+use "./storage.void" as storage
+use io
+use path
+use text
+use crypto
+use archive
+use json as codec
+use encoding/hex as hex
+
+func up_identity(prefix_cap: io.private_directory, release: model.up_release) -> result<bool, support.up_error>:
+    var raw_identity = support.up_read_owned(prefix_cap, "toolchain.json", 16384)?
+    var identity = support.up_json(codec.parse_as<model.up_toolchain_identity>(support.up_text(raw_identity)?, support.up_json_budget()))?
+    if identity.schema != 1 or identity.release_id != release.id or identity.host != release.host or identity.build_identity != release.build_identity or identity.llvm_version != "23.1.4":
+        return Err(support.up_fail("payload build identity differs from authenticated release", "verify"))
+    return Ok(true)
+
+func up_verify_prefix(prefix_cap: io.private_directory, absolute_prefix: string, release: model.up_release, manifest: model.up_inventory) -> result<bool, support.up_error>:
+    var expected: {string: model.up_member}
+    for member in manifest.members:
+        expected[member.name] = member
+        var relative_name = model.up_member_path(member)?
+        if member.directory:
+            var parts = support.up_path_parts(relative_name)?
+            with storage.up_walk(prefix_cap, parts, parts.count)? as directories:
+                pass
+        else:
+            with storage.up_file_beneath(prefix_cap, relative_name)? as input_file:
+                if not support.up_io(input_file.private_mode_matches(member.executable))?:
+                    return Err(support.up_fail("installed file permission classification mismatch: " + member.name, "verify"))
+                if support.up_hash_file(input_file, member.size)? != member.sha256:
+                    return Err(support.up_fail("installed file digest mismatch: " + member.name, "verify"))
+    # Enumeration diagnoses extra objects. Every trusted read above used held
+    # no-follow capabilities, not these pathname metadata observations.
+    var actual = support.up_io(io.entries(absolute_prefix, recursive = true, max_entries = support.up_count_limit))?
+    if actual.count != manifest.members.count:
+        return Err(support.up_fail("installed prefix contains missing or extra objects", "verify"))
+    for item in actual:
+        var relative_name = support.up_io(path.relative(item.path, absolute_prefix))?
+        relative_name = support.up_txt(text.replace(relative_name, "\\", "/"))?
+        if item.kind is io.entry_kind.directory:
+            relative_name += "/"
+        else if not (item.kind is io.entry_kind.file):
+            return Err(support.up_fail("installed prefix contains a link or special object", "verify"))
+        if not expected.contains(relative_name):
+            return Err(support.up_fail("unlisted installed object", "verify"))
+        var expected_member = expected[relative_name]
+        if expected_member.directory != (item.kind is io.entry_kind.directory):
+            return Err(support.up_fail("installed object kind changed", "verify"))
+    return up_identity(prefix_cap, release)
+
+func up_extract(package: io.file, prefix_cap: io.private_directory, release: model.up_release, manifest: model.up_inventory) -> result<bool, support.up_error>:
+    if support.up_hash_file(package, release.artifact_bytes)? != release.artifact_sha256:
+        return Err(support.up_fail("package SHA-256 mismatch", "package"))
+    var expected: {string: model.up_member}
+    for member in manifest.members:
+        expected[member.name] = member
+    var consumed: {string: bool}
+    var expanded: i64 = 0
+    with support.up_sys(archive.open_zip(package, archive.zip_limits(archive_bytes = release.artifact_bytes, entries = manifest.members.count, expanded_bytes = manifest.expanded_bytes)))? as reader:
+        for true:
+            var header = support.up_sys(reader.next())?
+            if header.eof:
+                break
+            if not expected.contains(header.name) or consumed.contains(header.name):
+                return Err(support.up_fail("ZIP member is missing from inventory or repeated", "extract"))
+            var member = expected[header.name]
+            if header.size != member.size or header.directory != member.directory:
+                return Err(support.up_fail("ZIP metadata differs from inventory", "extract"))
+            consumed[header.name] = true
+            var relative_name = model.up_member_path(member)?
+            if header.directory:
+                var created = storage.up_new_directory_beneath(prefix_cap, relative_name)?
+            else:
+                with storage.up_new_file_beneath(prefix_cap, relative_name)? as output_file:
+                    with support.up_sys(crypto.sha256())? as state:
+                        var written: i64 = 0
+                        for true:
+                            var block = support.up_sys(reader.read(262144))?
+                            if block.count == 0:
+                                break
+                            if block.count > member.size - written or block.count > support.up_expanded_limit - expanded:
+                                return Err(support.up_fail("expanded data exceeds signed/local bounds", "extract"))
+                            var accepted = support.up_io(output_file.write_bytes(block))?
+                            if accepted != block.count:
+                                return Err(support.up_fail("short extraction write", "extract"))
+                            var updated = support.up_sys(state.update(block))?
+                            written += block.count
+                            expanded += block.count
+                        if written != member.size or hex.encode(support.up_sys(state.finish())?) != member.sha256:
+                            return Err(support.up_fail("expanded file digest mismatch", "extract"))
+                    # Only a file verified against the signed inventory receives
+                    # its executable classification. Nothing is executed here.
+                    var classified = support.up_io(output_file.private_mode(member.executable))?
+                    var flushed = support.up_io(output_file.flush())?
+    if consumed.count != manifest.members.count or expanded != manifest.expanded_bytes:
+        return Err(support.up_fail("ZIP does not contain the complete signed inventory", "extract"))
+    # Files were flushed above. Persist every directory's entries before the
+    # root namespace publication; syncing only the payload root is insufficient.
+    for member in reverse manifest.members:
+        if member.directory:
+            var parts = support.up_path_parts(model.up_member_path(member)?)?
+            with storage.up_walk(prefix_cap, parts, parts.count)? as directories:
+                var synced = support.up_io(directories.current.sync())?
+    return up_identity(prefix_cap, release)

@@ -1,0 +1,185 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+      Start   1: voidup_smoke
+ 1/16 Test   #1: voidup_smoke ........................***Failed    0.16 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/voidup/smoke.py", line 36, in <module>
+    failure=run(['--invalid-雪'],2);assert json.loads(failure.stderr)['operation']=='arguments'
+                                           ~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/json/__init__.py", line 352, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/usr/lib/python3.14/json/decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/json/decoder.py", line 363, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+      Start   2: voidup_ci_integration
+ 2/16 Test   #2: voidup_ci_integration ...............   Passed    0.11 sec
+      Start   3: cli_contract
+ 3/16 Test   #3: cli_contract ........................   Passed    2.09 sec
+      Start   6: http_native
+ 4/16 Test   #6: http_native .........................   Passed   17.13 sec
+      Start  12: url_native
+ 5/16 Test  #12: url_native ..........................   Passed    0.06 sec
+      Start  14: http_ci_policy
+ 6/16 Test  #14: http_ci_policy ......................   Passed    4.36 sec
+      Start  18: http_ir
+ 7/16 Test  #18: http_ir .............................***Failed    0.07 sec
+/home/shmellyorc/Documents/Void.Language/stdlib/io.void:1757:17: error: Unknown function '_host_dir_create'.
+    code: VOID2003
+
+ 1757 |     var reply = _host_dir_create(owner, path)
+      |                 ^^^^^^^^^^^^^^^^
+    Module: /@stdlib/io.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/io.void:1767:17: error: Unknown function '_host_dir_admit'.
+    code: VOID2003
+
+ 1767 |     var reply = _host_dir_admit(owner, path)
+      |                 ^^^^^^^^^^^^^^^
+    Module: /@stdlib/io.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/io.void:1777:17: error: Unknown function '_host_dir_child'.
+    code: VOID2003
+
+ 1777 |     var reply = _host_dir_child(self, owner, name)
+      |                 ^^^^^^^^^^^^^^^
+    Module: /@stdlib/io.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/io.void:1787:17: error: Unknown function '_host_dir_open'.
+    code: VOID2003
+
+ 1787 |     var reply = _host_dir_open(self, owner, name)
+      |                 ^^^^^^^^^^^^^^
+    Module: /@stdlib/io.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/io.void:1798:17: error: Unknown function '_host_dir_file'.
+    code: VOID2003
+
+ 1798 |     var reply = _host_dir_file(self, owner, name, 1)
+      |                 ^^^^^^^^^^^^^^
+    Module: /@stdlib/io.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/io.void:1808:17: error: Unknown function '_host_dir_file'.
+    code: VOID2003
+
+ 1808 |     var reply = _host_dir_file(self, owner, name, 0)
+      |                 ^^^^^^^^^^^^^^
+    Module: /@stdlib/io.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/io.void:1818:17: error: Unknown function '_host_dir_lock'.
+    code: VOID2003
+
+ 1818 |     var reply = _host_dir_lock(self, owner, name)
+      |                 ^^^^^^^^^^^^^^
+    Module: /@stdlib/io.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/io.void:1826:50: error: Unknown function '_host_dir_sync'.
+    code: VOID2003
+
+ 1826 |     return _host_ok("io.private_directory.sync", _host_dir_sync(self))
+      |                                                  ^^^^^^^^^^^^^^
+    Module: /@stdlib/io.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/io.void:1854:25: error: Unknown function '_host_dir_publish'.
+    code: VOID2003
+
+ 1854 |     return _publication(_host_dir_publish(self, target, name))
+      |                         ^^^^^^^^^^^^^^^^^
+    Module: /@stdlib/io.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/io.void:1864:25: error: Unknown function '_host_dir_replace'.
+    code: VOID2003
+
+ 1864 |     return _publication(_host_dir_replace(self, input_file, source, target, name, _flag(replace)))
+      |                         ^^^^^^^^^^^^^^^^^
+    Module: /@stdlib/io.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/io.void:1871:45: error: Unknown function '_host_file_mode'.
+    code: VOID2003
+
+ 1871 |     return _host_ok("io.file.private_mode", _host_file_mode(self, _flag(executable)))
+      |                                             ^^^^^^^^^^^^^^^
+    Module: /@stdlib/io.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/io.void:1876:51: error: Unknown function '_host_dir_close'.
+    code: VOID2003
+
+ 1876 |     return _host_ok("io.private_directory.close", _host_dir_close(self))
+      |                                                   ^^^^^^^^^^^^^^^
+    Module: /@stdlib/io.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/io.void:1881:48: error: Unknown function '_host_lock_close'.
+    code: VOID2003
+
+ 1881 |     return _host_ok("io.directory_lock.close", _host_lock_close(self))
+      |                                                ^^^^^^^^^^^^^^^^
+    Module: /@stdlib/io.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/io.void:1885:5: error: Unknown function '_host_dir_cleanup'.
+    code: VOID2003
+
+ 1885 |     _host_dir_cleanup(self)
+      |     ^^^^^^^^^^^^^^^^^
+    Module: /@stdlib/io.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/io.void:1889:5: error: Unknown function '_host_lock_cleanup'.
+    code: VOID2003
+
+ 1889 |     _host_lock_cleanup(self)
+      |     ^^^^^^^^^^^^^^^^^^
+    Module: /@stdlib/io.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/io.void:1896:17: error: Unknown function '_host_file_mode_matches'.
+    code: VOID2003
+
+ 1896 |     var reply = _host_file_mode_matches(self, _flag(executable))
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^
+    Module: /@stdlib/io.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+
+      Start 155: host_capabilities_dependencies
+ 8/16 Test #155: host_capabilities_dependencies ......   Passed    0.16 sec
+      Start 156: host_capabilities_portable
+ 9/16 Test #156: host_capabilities_portable ..........   Passed    0.07 sec
+      Start 157: host_capabilities_portable_source
+10/16 Test #157: host_capabilities_portable_source ...   Passed   23.72 sec
+      Start 158: host_capabilities
+11/16 Test #158: host_capabilities ...................   Passed   45.10 sec
+      Start 159: host_capabilities_stack
+12/16 Test #159: host_capabilities_stack .............   Passed   45.46 sec
+      Start 160: host_capabilities_frontend
+13/16 Test #160: host_capabilities_frontend ..........   Passed    1.77 sec
+      Start 161: host_capabilities_lsp
+14/16 Test #161: host_capabilities_lsp ...............   Passed    0.39 sec
+      Start 162: host_capabilities_native
+15/16 Test #162: host_capabilities_native ............   Passed    0.18 sec
+      Start 163: host_capabilities_install
+16/16 Test #163: host_capabilities_install ...........   Passed   10.86 sec
+
+88% tests passed, 2 tests failed out of 16
+
+Total Test time (real) = 151.70 sec
+
+The following tests FAILED:
+	  1 - voidup_smoke (Failed)
+	 18 - http_ir (Failed)
+Errors while running CTest

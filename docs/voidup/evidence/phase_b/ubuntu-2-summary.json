@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "scope": "actual Ubuntu 24.04 container userspace on native PikaOS Linux kernel",
+  "root": "/tmp/voidup-phase-b-1794018404/private",
+  "container": "voidup-portability-ubuntu",
+  "hard_stack_bytes": 1048576,
+  "actual_signed_a_b": true,
+  "normal_o2_jit_and_independent_aot": true
+}

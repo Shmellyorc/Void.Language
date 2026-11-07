@@ -1,0 +1,7 @@
+use "./storage.void" as storage
+use "./trust.void" as trust
+use "./transport.void" as transport
+use "./inventory.void" as inventory
+use "./cli.void" as cli
+func main():
+    pass

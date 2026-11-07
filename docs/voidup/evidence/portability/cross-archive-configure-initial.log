@@ -1,0 +1,171 @@
+-- The C compiler identification is GNU 13.0.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/x86_64-w64-mingw32-gcc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Found PkgConfig: /usr/bin/pkg-config (found version "1.8.1") 
+-- Found ZLIB: /home/shmellyorc/Documents/Void.Language/build/voidup-cross/providers/lib/libzs.a (found suitable version "1.3.2", minimum required is "1.2.1")  
+CMake Warning at CMakeLists.txt:438 (MESSAGE):
+  Cannot test run "ZLIB_WINAPI" when cross-compiling
+Call Stack (most recent call first):
+  CMakeLists.txt:508 (TRY_MACRO_FOR_LIBRARY)
+
+
+-- Performing Test ZLIB_DLL
+-- Performing Test ZLIB_DLL - Failed
+-- Performing Test WITHOUT_ZLIB_DLL
+-- Performing Test WITHOUT_ZLIB_DLL - Success
+-- Performing Test HAVE_DIRENT_H
+-- Performing Test HAVE_DIRENT_H - Success
+-- Looking for include file sys/types.h
+-- Looking for include file sys/types.h - found
+-- Looking for include files sys/types.h, acl/libacl.h
+-- Looking for include files sys/types.h, acl/libacl.h - not found
+-- Looking for include files sys/types.h, attr/xattr.h
+-- Looking for include files sys/types.h, attr/xattr.h - not found
+-- Looking for include files sys/types.h, ctype.h
+-- Looking for include files sys/types.h, ctype.h - found
+-- Looking for 3 include files sys/types.h, ..., copyfile.h
+-- Looking for 3 include files sys/types.h, ..., copyfile.h - not found
+-- Looking for 3 include files sys/types.h, ..., direct.h
+-- Looking for 3 include files sys/types.h, ..., direct.h - found
+-- Looking for 4 include files sys/types.h, ..., dlfcn.h
+-- Looking for 4 include files sys/types.h, ..., dlfcn.h - not found
+-- Looking for 4 include files sys/types.h, ..., errno.h
+-- Looking for 4 include files sys/types.h, ..., errno.h - found
+-- Looking for 5 include files sys/types.h, ..., ext2fs/ext2_fs.h
+-- Looking for 5 include files sys/types.h, ..., ext2fs/ext2_fs.h - not found
+-- Performing Test HAVE_WORKING_EXT2_IOC_GETFLAGS
+-- Performing Test HAVE_WORKING_EXT2_IOC_GETFLAGS - Failed
+-- Looking for 5 include files sys/types.h, ..., fcntl.h
+-- Looking for 5 include files sys/types.h, ..., fcntl.h - found
+-- Looking for 6 include files sys/types.h, ..., fnmatch.h
+-- Looking for 6 include files sys/types.h, ..., fnmatch.h - not found
+-- Looking for 6 include files sys/types.h, ..., grp.h
+-- Looking for 6 include files sys/types.h, ..., grp.h - not found
+-- Looking for 6 include files sys/types.h, ..., inttypes.h
+-- Looking for 6 include files sys/types.h, ..., inttypes.h - found
+-- Looking for 7 include files sys/types.h, ..., io.h
+-- Looking for 7 include files sys/types.h, ..., io.h - found
+-- Looking for 8 include files sys/types.h, ..., langinfo.h
+-- Looking for 8 include files sys/types.h, ..., langinfo.h - not found
+-- Looking for 8 include files sys/types.h, ..., limits.h
+-- Looking for 8 include files sys/types.h, ..., limits.h - found
+-- Looking for 9 include files sys/types.h, ..., linux/types.h
+-- Looking for 9 include files sys/types.h, ..., linux/types.h - not found
+-- Looking for 9 include files sys/types.h, ..., linux/fiemap.h
+-- Looking for 9 include files sys/types.h, ..., linux/fiemap.h - not found
+-- Looking for 9 include files sys/types.h, ..., linux/fs.h
+-- Looking for 9 include files sys/types.h, ..., linux/fs.h - not found
+-- Performing Test HAVE_WORKING_FS_IOC_GETFLAGS
+-- Performing Test HAVE_WORKING_FS_IOC_GETFLAGS - Failed
+-- Looking for 9 include files sys/types.h, ..., intsafe.h
+-- Looking for 9 include files sys/types.h, ..., intsafe.h - found
+-- Looking for 10 include files sys/types.h, ..., linux/magic.h
+-- Looking for 10 include files sys/types.h, ..., linux/magic.h - not found
+-- Looking for 10 include files sys/types.h, ..., locale.h
+-- Looking for 10 include files sys/types.h, ..., locale.h - found
+-- Looking for 11 include files sys/types.h, ..., membership.h
+-- Looking for 11 include files sys/types.h, ..., membership.h - not found
+-- Looking for 11 include files sys/types.h, ..., paths.h
+-- Looking for 11 include files sys/types.h, ..., paths.h - not found
+-- Looking for 11 include files sys/types.h, ..., poll.h
+-- Looking for 11 include files sys/types.h, ..., poll.h - not found
+-- Looking for 11 include files sys/types.h, ..., process.h
+-- Looking for 11 include files sys/types.h, ..., process.h - found
+-- Looking for 12 include files sys/types.h, ..., pthread.h
+-- Looking for 12 include files sys/types.h, ..., pthread.h - found
+-- Looking for 13 include files sys/types.h, ..., pwd.h
+-- Looking for 13 include files sys/types.h, ..., pwd.h - not found
+-- Looking for 13 include files sys/types.h, ..., readpassphrase.h
+-- Looking for 13 include files sys/types.h, ..., readpassphrase.h - not found
+-- Looking for 13 include files sys/types.h, ..., regex.h
+-- Looking for 13 include files sys/types.h, ..., regex.h - not found
+-- Looking for 13 include files sys/types.h, ..., signal.h
+-- Looking for 13 include files sys/types.h, ..., signal.h - found
+-- Looking for 14 include files sys/types.h, ..., spawn.h
+-- Looking for 14 include files sys/types.h, ..., spawn.h - not found
+-- Looking for 14 include files sys/types.h, ..., stdarg.h
+-- Looking for 14 include files sys/types.h, ..., stdarg.h - found
+-- Looking for 15 include files sys/types.h, ..., stdckdint.h
+-- Looking for 15 include files sys/types.h, ..., stdckdint.h - not found
+-- Looking for 15 include files sys/types.h, ..., stdint.h
+-- Looking for 15 include files sys/types.h, ..., stdint.h - found
+-- Looking for 16 include files sys/types.h, ..., stdio.h
+-- Looking for 16 include files sys/types.h, ..., stdio.h - found
+-- Looking for 17 include files sys/types.h, ..., stdlib.h
+-- Looking for 17 include files sys/types.h, ..., stdlib.h - found
+-- Looking for 18 include files sys/types.h, ..., string.h
+-- Looking for 18 include files sys/types.h, ..., string.h - found
+-- Looking for 19 include files sys/types.h, ..., strings.h
+-- Looking for 19 include files sys/types.h, ..., strings.h - found
+-- Looking for 20 include files sys/types.h, ..., sys/acl.h
+-- Looking for 20 include files sys/types.h, ..., sys/acl.h - not found
+-- Looking for 20 include files sys/types.h, ..., sys/cdefs.h
+-- Looking for 20 include files sys/types.h, ..., sys/cdefs.h - found
+-- Looking for 21 include files sys/types.h, ..., sys/extattr.h
+-- Looking for 21 include files sys/types.h, ..., sys/extattr.h - not found
+-- Looking for 21 include files sys/types.h, ..., sys/ioctl.h
+-- Looking for 21 include files sys/types.h, ..., sys/ioctl.h - not found
+-- Looking for 21 include files sys/types.h, ..., sys/mkdev.h
+-- Looking for 21 include files sys/types.h, ..., sys/mkdev.h - not found
+-- Looking for 21 include files sys/types.h, ..., sys/mount.h
+-- Looking for 21 include files sys/types.h, ..., sys/mount.h - not found
+-- Looking for 21 include files sys/types.h, ..., sys/param.h
+-- Looking for 21 include files sys/types.h, ..., sys/param.h - found
+-- Looking for 22 include files sys/types.h, ..., sys/poll.h
+-- Looking for 22 include files sys/types.h, ..., sys/poll.h - not found
+-- Looking for 22 include files sys/types.h, ..., sys/richacl.h
+-- Looking for 22 include files sys/types.h, ..., sys/richacl.h - not found
+-- Looking for 22 include files sys/types.h, ..., sys/select.h
+-- Looking for 22 include files sys/types.h, ..., sys/select.h - not found
+-- Looking for 22 include files sys/types.h, ..., sys/single_threaded.h
+-- Looking for 22 include files sys/types.h, ..., sys/single_threaded.h - not found
+-- Looking for 22 include files sys/types.h, ..., sys/stat.h
+-- Looking for 22 include files sys/types.h, ..., sys/stat.h - found
+-- Looking for 23 include files sys/types.h, ..., sys/statfs.h
+-- Looking for 23 include files sys/types.h, ..., sys/statfs.h - not found
+-- Looking for 23 include files sys/types.h, ..., sys/statvfs.h
+-- Looking for 23 include files sys/types.h, ..., sys/statvfs.h - not found
+-- Looking for 23 include files sys/types.h, ..., sys/sysctl.h
+-- Looking for 23 include files sys/types.h, ..., sys/sysctl.h - not found
+-- Looking for 23 include files sys/types.h, ..., sys/sysmacros.h
+-- Looking for 23 include files sys/types.h, ..., sys/sysmacros.h - not found
+-- Looking for 23 include files sys/types.h, ..., sys/time.h
+-- Looking for 23 include files sys/types.h, ..., sys/time.h - found
+-- Looking for 24 include files sys/types.h, ..., sys/utime.h
+-- Looking for 24 include files sys/types.h, ..., sys/utime.h - found
+-- Looking for 25 include files sys/types.h, ..., sys/utsname.h
+-- Looking for 25 include files sys/types.h, ..., sys/utsname.h - not found
+-- Looking for 25 include files sys/types.h, ..., sys/vfs.h
+-- Looking for 25 include files sys/types.h, ..., sys/vfs.h - not found
+-- Looking for 25 include files sys/types.h, ..., sys/wait.h
+-- Looking for 25 include files sys/types.h, ..., sys/wait.h - not found
+-- Looking for 25 include files sys/types.h, ..., sys/xattr.h
+-- Looking for 25 include files sys/types.h, ..., sys/xattr.h - not found
+-- Looking for 25 include files sys/types.h, ..., time.h
+-- Looking for 25 include files sys/types.h, ..., time.h - found
+-- Looking for 26 include files sys/types.h, ..., unistd.h
+-- Looking for 26 include files sys/types.h, ..., unistd.h - found
+-- Looking for 27 include files sys/types.h, ..., utime.h
+-- Looking for 27 include files sys/types.h, ..., utime.h - found
+-- Looking for 28 include files sys/types.h, ..., wchar.h
+-- Looking for 28 include files sys/types.h, ..., wchar.h - found
+-- Looking for 29 include files sys/types.h, ..., wctype.h
+-- Looking for 29 include files sys/types.h, ..., wctype.h - found
+-- Looking for 30 include files sys/types.h, ..., windows.h
+-- Looking for 30 include files sys/types.h, ..., windows.h - found
+-- Looking for 31 include files sys/types.h, ..., bcrypt.h
+-- Looking for 31 include files sys/types.h, ..., bcrypt.h - found
+-- Looking for 32 include files sys/types.h, ..., winioctl.h
+-- Looking for 32 include files sys/types.h, ..., winioctl.h - found
+-- Performing Test SAFE_TO_DEFINE_EXTENSIONS
+-- Performing Test SAFE_TO_DEFINE_EXTENSIONS - Success
+-- Looking for regcomp
+-- Looking for regcomp - not found
+CMake Error at CMakeLists.txt:1357 (MESSAGE):
+  libgcc not found.
+
+
+-- Configuring incomplete, errors occurred!

@@ -1,0 +1,6 @@
+use os
+func main() -> i32:
+    if os.args() is Ok(var values):
+        for value in values:
+            print(value)
+    return 17

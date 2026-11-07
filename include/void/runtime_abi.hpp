@@ -92,6 +92,7 @@ void vd_runtime_admit_metadata(vd::Runtime*,const vd::RuntimeTypeRecord*,std::si
 const void* vd_gc_witness(const char*) noexcept;
 std::int64_t vd_gc_interface_binding(void*,const void*,const char* const*,std::size_t) noexcept;
 std::int32_t vd_runtime_entry_metadata(vd::NativeCode::CheckedEntry,std::int32_t,vd::RuntimeFailure*,const vd::RuntimeTypeRecord*,std::size_t,const vd::RuntimeWitnessRecord*,std::size_t) noexcept;
+std::int32_t vd_runtime_entry_application(vd::NativeCode::CheckedEntry,vd::RuntimeFailure*,const vd::RuntimeTypeRecord*,std::size_t,const vd::RuntimeWitnessRecord*,std::size_t,int,const void*,bool) noexcept;
 std::int64_t vd_gc_dynamic_type(void*,const char* const*,std::size_t) noexcept;
 std::int32_t vd_runtime_entry(vd::NativeCode::CheckedEntry, std::int32_t, vd::RuntimeFailure*) noexcept;
 std::int32_t vd_runtime_entry_typed(vd::NativeCode::CheckedEntry,std::int32_t,vd::RuntimeFailure*,const vd::RuntimeTypeRecord*,std::size_t) noexcept;

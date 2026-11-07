@@ -82,5 +82,19 @@ Result read_regular(const std::string&, std::int64_t max_bytes);
 std::shared_ptr<File> open(const std::string&, OpenMode, Result&,
                            std::shared_ptr<const testing::Hooks> = {});
 Result close(File&);
+// Internal held-descriptor bridge for admitted directory capabilities only.
+// adopt_descriptor consumes descriptor even if allocation fails.
+std::shared_ptr<File> adopt_descriptor(int descriptor, bool writable);
+int descriptor(const File&);
+Result private_mode(File&, bool executable);
+Result private_mode_matches(File&, bool executable);
+// Exclusive FileBorrow required. Positioned access preserves the ordinary IO
+// cursor and read buffer on every platform; never wraps a CRT fd around HANDLE.
+Result read_at(File&, std::uint64_t offset, char* output, std::size_t count);
+Result regular_length(File&);
+#ifdef _WIN32
+std::shared_ptr<File> adopt_native_handle(void* handle, bool writable);
+void* native_handle(const File&);
+#endif
 
 } // namespace vd::filesystem

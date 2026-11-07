@@ -1,0 +1,488 @@
+{
+  "schema": 2,
+  "date": "2026-11-06",
+  "recommendation": "REVISE",
+  "scope": "VOIDUP Phase A portability; no TCP/UDP or Phase B implementation",
+  "platforms": {
+    "PikaOS Linux x64": "Release/Debug/strict qualified within the recorded selected suites",
+    "Ubuntu 24.04 Linux x64 userspace": "Release build, JIT/AOT, source/native/install qualified on the PikaOS kernel",
+    "Windows x64": "UNQUALIFIED; MinGW source and pinned-provider cross-build/link evidence only",
+    "macOS ARM64": "UNQUALIFIED; source integration only; no Apple SDK or native execution"
+  },
+  "baseline": {
+    "report": "REPORT-before.md",
+    "index": "INDEX-before.json",
+    "all_prior_evidence_files_unchanged": 181
+  },
+  "profiles": {
+    "release": {
+      "compiler_sha256": "2d9c95d1e2f455d844d4e760f1eb0b3dd36ac5b4cbce91ebe8642ccf65428604",
+      "runtime_sha256": "33f34c821c2cdcd6e03b85f4f4176b2ff009ba6b827043926880b33aad7eada6",
+      "native_manifest_sha256": "61b159d589876e1afe15dbf35025b76f1a72479d73160a344e7c494001fe4553",
+      "native_resources_sha256": "e0c51c83c1c1641820ae1986448253c3545fcc4add048702c1d98ff9a4993d52",
+      "reviewed_suites": {
+        "log": "linux-release-review-tests.log",
+        "passed": 6,
+        "failed": 0
+      },
+      "source_suite": {
+        "receipt": "portable-source-llvm23-release.json",
+        "invocations": 30,
+        "recorded_compiler_sha256": "f9dcc2d452c1a561745d0881ad2cca4e923820306012708b0a8bc57180bb8043"
+      },
+      "provider_fixture": {
+        "platform": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_host_portable",
+          "/tmp/VOID portable \u96ea # % bllno7se",
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_host_portable"
+        ],
+        "status": 0,
+        "stdout": "Portable host providers: 50 checks passed\n",
+        "stderr": "VOID_TEST_STACK {\"inherited\": [8388608, -1], \"observed\": [1048576, 1048576]}\n",
+        "sha256": "46fa499ffd8b6b254d704b13fb777c18264b6c154767d336cceb1959d4a85536",
+        "hard_main_stack_bytes": 1048576
+      },
+      "native_disk": {
+        "executable": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_host_capabilities",
+        "sha256": "3e46f54368190ef00b4eeb99165ff5f88fb01e4eac8e2cc178cf1a5825340445",
+        "stack_bytes": 1048576,
+        "filesystem": "xfs",
+        "stdout": "Host boundary/GC/allocation/publication/process/ZIP/IR: 300 checks passed\n",
+        "stderr": ""
+      },
+      "final_identity_tests": {
+        "log": "linux-release-final-source-tests.log",
+        "passed": 2,
+        "failed": 0
+      },
+      "installed_receipt": "installed-host-capabilities.json"
+    },
+    "debug": {
+      "compiler_sha256": "4dac207e8fc4938974f120177b35c21945366a28b68a828ab33e08f666259f03",
+      "runtime_sha256": "06704dc97eef781cd75d0447039c29eb571b7b01134b987730366c288a91e98c",
+      "native_manifest_sha256": "74c83815523e424a3030da07a5ab1d3a04e337e942cff1e5e56c43fe3b32eca0",
+      "native_resources_sha256": "28dc750cc5a2f2c3b40cfec4d7c113e8ee7b47cea9fd5610b5fca62cbf9b71bc",
+      "reviewed_suites": {
+        "log": "linux-debug-reviewed-tests.log",
+        "passed": 6,
+        "failed": 0
+      },
+      "source_suite": {
+        "receipt": "portable-source-llvm23-debug.json",
+        "invocations": 30,
+        "recorded_compiler_sha256": "d8d6d24aedcb932c4443a8a6d8d1640e95aae974a76de0f7b9b1c636486e65f5"
+      },
+      "provider_fixture": {
+        "platform": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_host_portable",
+          "/tmp/VOID portable \u96ea # % 5aaepqv9",
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_host_portable"
+        ],
+        "status": 0,
+        "stdout": "Portable host providers: 50 checks passed\n",
+        "stderr": "VOID_TEST_STACK {\"inherited\": [8388608, -1], \"observed\": [1048576, 1048576]}\n",
+        "sha256": "c0f33d18dfdcc6cc12da11438ee8a47344f37463b55764580a8f3a64f127fb0e",
+        "hard_main_stack_bytes": 1048576
+      },
+      "native_disk": {
+        "executable": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_host_capabilities",
+        "sha256": "c86385f34818b45a3e8f27ac9524c966c104734fbc4f4728ae795f2f89200a26",
+        "stack_bytes": 1048576,
+        "filesystem": "xfs",
+        "stdout": "Host boundary/GC/allocation/publication/process/ZIP/IR: 300 checks passed\n",
+        "stderr": ""
+      },
+      "final_identity_tests": {
+        "log": "linux-debug-final-source-tests.log",
+        "passed": 2,
+        "failed": 0
+      },
+      "installed_receipt": "debug-installed/installed-host-capabilities.json"
+    },
+    "strict": {
+      "compiler_sha256": "e5305a1aa36bceb38f140a3fbc4f476df6983952f6fd4baedcbf618d9611bba9",
+      "runtime_sha256": "91caf2349c293ee24432910b4ef096dd3440d98c1fd8dc0543f679ca7d36e30d",
+      "native_manifest_sha256": "716e28fc76a49690abb7441c3229d85385acd1251680ea7188a5af934c66569b",
+      "native_resources_sha256": "64c6de749d7e1bff812ee780a5c47178aab63a068441913cab120018d0ae54a7",
+      "reviewed_suites": {
+        "log": "linux-strict-reviewed-tests.log",
+        "passed": 6,
+        "failed": 0
+      },
+      "source_suite": {
+        "receipt": "portable-source-llvm23-strict.json",
+        "invocations": 30,
+        "recorded_compiler_sha256": "b8cf81654da752bb1141eb0e6aeaf49a59d1b72b81ae827470135166625000c6"
+      },
+      "provider_fixture": {
+        "platform": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_host_portable",
+          "/tmp/VOID portable \u96ea # % oulv7gsy",
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_host_portable"
+        ],
+        "status": 0,
+        "stdout": "Portable host providers: 50 checks passed\n",
+        "stderr": "VOID_TEST_STACK {\"inherited\": [8388608, -1], \"observed\": [1048576, 1048576]}\n",
+        "sha256": "915b2f648724fdbf2207f4c19d69330b1b97991fb8365a9f61dc389484e4e524",
+        "hard_main_stack_bytes": 1048576
+      },
+      "native_disk": {
+        "executable": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_host_capabilities",
+        "sha256": "a275876b14171dfcee4660132fcbb607e29f6ee7155c9e1568bc4c004958dd02",
+        "stack_bytes": 1048576,
+        "filesystem": "xfs",
+        "stdout": "Host boundary/GC/allocation/publication/process/ZIP/IR: 300 checks passed\n",
+        "stderr": ""
+      },
+      "final_identity_tests": {
+        "log": "linux-strict-final-source-tests.log",
+        "passed": 2,
+        "failed": 0
+      },
+      "installed_receipt": "strict-installed/installed-host-capabilities.json"
+    }
+  },
+  "ubuntu": {
+    "selected_suites_passed": 13,
+    "reviewed_suites_passed": 6,
+    "final_portable_suites_passed": 3,
+    "native_provider_checks": 50,
+    "source_invocations": 30,
+    "native_checks_tmpfs": 300,
+    "native_checks_disk": 300,
+    "upstream_sodium_tests": 87,
+    "container": "ubuntu-container.json",
+    "dependency_files": [
+      "ubuntu/http-dependencies.json",
+      "ubuntu/host-dependencies.json"
+    ],
+    "installed": "ubuntu/installed-host-capabilities.json"
+  },
+  "windows": {
+    "scope": "cross compile and link; zero native assertions executed",
+    "source": "windows-cross.json",
+    "cross_providers": "windows-cross-providers.json",
+    "link": "windows-cross-all-providers-link.log"
+  },
+  "protected_readme_unchanged": true,
+  "preexisting_website_paths_preserved": [
+    "website/dist/assets/style.css",
+    "website/dist/getting-started/index.html",
+    "website/public/assets/style.css",
+    "website/public/getting-started/index.html",
+    "website/scripts/check.py",
+    "website/scripts/test_check.py"
+  ],
+  "implementation_files": {
+    "CMakeLists.txt": "35ea6bcea014e97b27254065aeb6f773b7a0a21feb6c06ad6533c6fea233c1e0",
+    "cmake/CurlProvider.cmake": "7d3a6f704fac914e067a06b66a6bb64284412c5e71e9f220a7487bc69f1a82a6",
+    "cmake/HostDependencies.cmake": "74960d2c41b3e864ff97d671059a43eddd0f281689f55273bac204ea8fed27fa",
+    "cmake/InstallLicenses.cmake": "cfa901e44d8db8b70aaecb6dcad486a37cbe92a8328a3f585a026c7079f2a273",
+    "cmake/NativeBuild.cmake": "9296b466e833d4f1ce5ca769b52f9d1e212fcf14db49703fbdabaea162103e74",
+    "cmake/host-sodium.targets": "e135c04c65bf2b4bec78704d7d3dac9cd973ea335ad65438532a6c20374c733f",
+    "docs/release/NOTICE_INVENTORY.json": "b7dc19922e77e0308296ac5a4c7b4c697a295caeb60301a17b8fc123f9dd203f",
+    "docs/release/REDISTRIBUTION_NOTICES.md": "f24043da34f903133153f0fa3c579021070de4b09ef4c1afcc06f75a67a84f97",
+    "docs/voidup/REPORT.md": "ae735152cb86be9d127dbce0a5272d1bd8ae6fc99cb4421c294ff7ea68ff5562",
+    "include/void/application.hpp": "b6a6d79b6ded57c89ba509e4814ad7fa12cca404b05180aa0e0523ea5ab4bc86",
+    "include/void/filesystem.hpp": "60960eb1602dd321b01b91df8a8a38fa058fa44d25d380e15a75f33e5b558248",
+    "include/void/filesystem_abi.hpp": "9f061ea77a994071e0174a9db123e642321129f476a7c2a69bf53323ad819d3f",
+    "include/void/host_abi.hpp": "9f4b441e557c07de47dcb1a176dc123b0c7a965b7fc20b09582ef01b47a0a089",
+    "include/void/host_ops.hpp": "0044f230cda64d92f47299ae9664525a94bf8e8c3977fcfc03ca6aaea7b220ae",
+    "include/void/ir.hpp": "5fec7f4ed9f975df5b396e1adf41307f40525c0af6437b4835d9db6ac8481b54",
+    "include/void/runtime.hpp": "e7c238cc41f1caf275e67ab41bb834d957beb13b5cf9ed35b93763fe768151a0",
+    "include/void/runtime_abi.hpp": "fb8f23260f9815a50fe04ee01059f562f46f48c20879f05e7b0707fb9354cb62",
+    "src/backend/llvm/backend.cpp": "e0b2924572277cbcd7afef48c9c6efa0fb4f068c498c91c523902d8a2a167d4d",
+    "src/backend/llvm/host.inc": "624fa27a0144915bea50aa6d83ab2cba5d6f197282874492e4383b3b684b5665",
+    "src/frontend/compiler.cpp": "2ca58d1b2a414e418c67ebfb1dabc58214deea6886637c7e3abd4474cd85e402",
+    "src/frontend/host.inc": "253b153bf4f089df72dca0e276b749c527ce2dd07de8dc5d0c18be9c2ef86d81",
+    "src/ir/host.inc": "37a12584e19fb3f3044e91bb5d5462b7d42aa025fff2b9472d97c66f8606d7c2",
+    "src/ir/module.cpp": "bdf7f3c71fe632d1b398d413f3f92088a90b7343ad3e824299f65dcc645f4291",
+    "src/main.cpp": "2067a7672eef5eeeeb7b3b4de41429e6074a9f86252927001bc448be193704ae",
+    "src/runtime/abi.cpp": "5ec5010ea22b086e97c37f57f2ff6ad35b296001727006271683a339dbc84f48",
+    "src/runtime/application.cpp": "8bb9491be9c3e649080bf1016521141a90fee541eb6802df12a63ad2e0edd699",
+    "src/runtime/filesystem.cpp": "8c5a60ffe891d46cb8d236d50284124b72ebb8b618b6266828aed91061470071",
+    "src/runtime/filesystem_abi.cpp": "7a105bd70daa04b663fee62169db37c7b87c529a004305cd05bcbd1cb5aa0803",
+    "src/runtime/host_abi.cpp": "8463027dcac72095a87846582785897e7a3439a8ab4a52d520a5432d151b9d5e",
+    "src/runtime/host_archive.cpp": "0f72ba76b1fbd2cd358d954882bdf0716e55241176063f596ceee75f932cb45b",
+    "src/runtime/host_crypto.cpp": "10ceb2da6c8ae78068cabe0203b7cb45829da2fddde2fbb3cec2585f5baa1c43",
+    "src/runtime/host_directory.cpp": "6d300eff68f9a9810ea2f8d659efda125d0d857dfa77c5719c987ce18511bb05",
+    "src/runtime/host_directory_windows.cpp": "1a4ba759acdd038f2735a2ccdd1f3c6d8b0bf3a4402a106015e6bf23e1c882fb",
+    "src/runtime/host_error.cpp": "13babf15055fdb52af5a858624cfcc34e6d2946c4c15473323283ff1c6e5c187",
+    "src/runtime/host_internal.hpp": "b7db70a382a1038af8d1c76c6ac8c526e4ff41d6b2f56ba8124fc11967caf052",
+    "src/runtime/host_posix.hpp": "fb3f0c1cd6da20742eb1725a5734d1f206b20d0f7a02ddafa96f22f5c47a799e",
+    "src/runtime/host_process.cpp": "84c76c37a06c40c4bee24ffd6c5af48bf53c2a884cc43aff0df195cc5a553835",
+    "src/runtime/host_process_windows.cpp": "231ccd1a0027dc31b6397630bb1b574fa4061714f1caa5af46a06efe931e62c5",
+    "src/runtime/host_windows.hpp": "f12611046beabf0fa0b184cf25be2cfd640312d9e1b55daaa9a57b1f602211fd",
+    "stdlib/archive.void": "018eddcccabee03a9b0dbff76158534e9774a6cd4337fb6b1d20f58500a27df0",
+    "stdlib/crypto.void": "721e73a8a598074f137963d7f7af466341cf1a7348f75c3de6952f5054e7e807",
+    "stdlib/io.void": "452b61c491e3ff81efd0dc283ce811f6f1cc25108407d0d65c0a1fd8b664c700",
+    "stdlib/os.void": "a05158eb5978aea445715c3c6cc173ec84b7c97a3335a1332a80aa58c7726d20",
+    "stdlib/process.void": "69bdbf5944e270b8e6a304431019fbb95b9be7af47941ee0bab89225568dd3f6",
+    "stdlib/system_error.void": "d68bcbe9a88cd4b8e5930199848683c41c1f6b2646c9f906c1b3414614c397ed",
+    "tests/host_capabilities/acceptance.py": "122a73cb7c2405e9510dd46b91c1839afa6df953c19aaddc91051fba77d1e8d1",
+    "tests/host_capabilities/child.c": "7212f7eeb18e1b839ff9d2b97bbc5df94608cd4f9bf3d103467a247460233e78",
+    "tests/host_capabilities/dependencies.py": "8d48ca77cc9a98af9c488831c0a75b075db78cf82d018916eb9ae9534f63a8c7",
+    "tests/host_capabilities/frontend.py": "1d42eb0729ba42db52d2f061b131937e1c4087fd906fb683d01f9e7b8b85e83a",
+    "tests/host_capabilities/install.py": "bb9c3196cf1c285de62604c5afd972c289e15952efc1bf1ffcb2246105c60b1f",
+    "tests/host_capabilities/isolated_exec.py": "da77384f662ab4707201d8a755472df11728d6d0e1d3d80a839b2da0baddc68b",
+    "tests/host_capabilities/lsp.py": "08215c7fcc521b70303a27aa65c87cdc926fc81ee02cb77e5026c371ffc6fdf8",
+    "tests/host_capabilities/native.cpp": "9c2293b009f6497ccbb27f120c3ea054aca463e204794d2b17414079587ed053",
+    "tests/host_capabilities/native.py": "fdf514acf1033ef5ed1699cd02d070e8670a6aa3a58f59e2c256e07fb9e44982",
+    "tests/host_capabilities/portable.cpp": "01570c8ce1eff3a26bcf01f3ccc36f76c9d205cbbd58e1527ad25234630073c6",
+    "tests/host_capabilities/portable.py": "365ee5329aa3a0ee16db4f701cc6e498f9515bd90a0c758b44a4583526bb43af",
+    "tests/host_capabilities/portable_filesystem.void": "7a53a29ac5634c639adb2e084084652a39d445e8a8af987ceb3d332466448681",
+    "tests/host_capabilities/portable_process.void": "98bafae213c95b4ac9924fe0c77544cd0a244800b7ed59b57c5d8b5029ba703d",
+    "tests/host_capabilities/portable_source.py": "fc4317c4114ab6a9d5b3519e7b12c38dc14f034f15288b9ed9e297ba00b5953a",
+    "tests/host_capabilities/smoke.void": "7fbb72581a65063fde5995eb8a6e6efdb491f046909daaba18f9bbf3dd358cc3",
+    "tests/host_capabilities/support.py": "3b3a0a5e7bfcfad0fd9fc1f0b0ded2a658de97451aec4bf1e48d5be7ccb729ea",
+    "third_party/host-licenses/libarchive/COPYING": "30e556b3959e3985d66efefec5eaac51d4995053caa1d3cffe6eb916f146f229",
+    "third_party/host-licenses/libarchive/SOURCE-NOTICES.json": "95140e030f1a0a898d1da253d7e8ce29642ea5cb5dac7f3b1a1ba4b6f73f2fe5",
+    "third_party/host-licenses/libsodium/LICENSE": "508a76d186356c0dd807a670ef510964f8724557024796a2c426c6c0e19ab683",
+    "third_party/host-licenses/libsodium/SOURCE-NOTICES.json": "a5e68e81b2cb75ed7baa282dd73fb938a7aed48c962fa6b64c2c5fd3c71b7fa0",
+    "third_party/host-versions.json": "dea223fa0debd0d2e666e66f14508964f3204340c00fec0a57dcdf20d20656ca",
+    "tools/install.py": "d27d2050dc7816522ab2f82ee5d65a6185d304d33e291db8331641d66e7080ef",
+    "tools/setup_host_deps.py": "5651b938638ab5a0f4f2b82ef059b08880dcdee562767cc15762a47be55fac3e",
+    "tools/setup_host_deps_native.py": "e111cc3f656d306de8cce52062e0595e7173e6713ab6fead02c80fbcbf2c1d3d",
+    "tools/verify_host_deps.py": "b2209e38d2b0a0dcc39e021f95bc6c0f26ee504037672c550b53b9556b7378fc"
+  },
+  "changed_preexisting_phase_a_files": {
+    "CMakeLists.txt": {
+      "before": "f2edfad62df47f1189de5291ff33159f8bda95ce633824b078cbb385b1e5ec19",
+      "after": "35ea6bcea014e97b27254065aeb6f773b7a0a21feb6c06ad6533c6fea233c1e0"
+    },
+    "cmake/HostDependencies.cmake": {
+      "before": "aba80b8d1084dae2787b5d5d727c723460337c8326a90bcef4666f6f160898cf",
+      "after": "74960d2c41b3e864ff97d671059a43eddd0f281689f55273bac204ea8fed27fa"
+    },
+    "cmake/InstallLicenses.cmake": {
+      "before": "9b43fab916953b7e7d9cc23c37ff6a7e99375516c5d147090b06d2a6fe2cf3e2",
+      "after": "cfa901e44d8db8b70aaecb6dcad486a37cbe92a8328a3f585a026c7079f2a273"
+    },
+    "cmake/NativeBuild.cmake": {
+      "before": "0fc2144e5df65653557da3aa4a42504342144be1efdc716d30fd22678f12f4e4",
+      "after": "9296b466e833d4f1ce5ca769b52f9d1e212fcf14db49703fbdabaea162103e74"
+    },
+    "docs/release/NOTICE_INVENTORY.json": {
+      "before": "b3ebfa05ecebc3665212244be8ef4b44d89aee96e2cdd46e6637b08af71d8081",
+      "after": "b7dc19922e77e0308296ac5a4c7b4c697a295caeb60301a17b8fc123f9dd203f"
+    },
+    "docs/release/REDISTRIBUTION_NOTICES.md": {
+      "before": "faf26ca323e98e98cb10174c577e9d83829ae9a85c87baada22374be9356717b",
+      "after": "f24043da34f903133153f0fa3c579021070de4b09ef4c1afcc06f75a67a84f97"
+    },
+    "docs/voidup/REPORT.md": {
+      "before": "64f8ed165e4f6b945924f3beedcf51fde97ab62e0df20fa66b2503e212607119",
+      "after": "ae735152cb86be9d127dbce0a5272d1bd8ae6fc99cb4421c294ff7ea68ff5562"
+    },
+    "include/void/filesystem.hpp": {
+      "before": "292d52affbccbe5163ddc2e999136ba35a99c043d568e28fb33cc8b8156e4287",
+      "after": "60960eb1602dd321b01b91df8a8a38fa058fa44d25d380e15a75f33e5b558248"
+    },
+    "src/runtime/filesystem.cpp": {
+      "before": "dab5c93b72b6963aa37fe63815165198965eebed0a19d8c49a694f50b3566218",
+      "after": "8c5a60ffe891d46cb8d236d50284124b72ebb8b618b6266828aed91061470071"
+    },
+    "src/runtime/host_abi.cpp": {
+      "before": "2fbe8c6d74663285e36c678d79382f5c43df32961ed7261e00113617dc7aac2b",
+      "after": "8463027dcac72095a87846582785897e7a3439a8ab4a52d520a5432d151b9d5e"
+    },
+    "src/runtime/host_archive.cpp": {
+      "before": "62e31e4f166670a7ba740ee6a8d195b3db2bbbc79b6949f126643e4d7e791a09",
+      "after": "0f72ba76b1fbd2cd358d954882bdf0716e55241176063f596ceee75f932cb45b"
+    },
+    "src/runtime/host_directory.cpp": {
+      "before": "09855aab4ed1f4c68c6f184148e9b794f4dafd76f955143fdf909e1479fcbb74",
+      "after": "6d300eff68f9a9810ea2f8d659efda125d0d857dfa77c5719c987ce18511bb05"
+    },
+    "src/runtime/host_internal.hpp": {
+      "before": "2757949b2c6d4e1c6d267484956ff73e5a8342ae460e55696e0a9d5170c21dd7",
+      "after": "b7db70a382a1038af8d1c76c6ac8c526e4ff41d6b2f56ba8124fc11967caf052"
+    },
+    "src/runtime/host_process.cpp": {
+      "before": "0b4e32e6130dc29957be3890ce324c052801a3717dc5a1f1dc05f897a87bb113",
+      "after": "84c76c37a06c40c4bee24ffd6c5af48bf53c2a884cc43aff0df195cc5a553835"
+    },
+    "stdlib/io.void": {
+      "before": "7586670b989d527c327021a359fad8e4404aa8d9b825895e190166ebab554c70",
+      "after": "452b61c491e3ff81efd0dc283ce811f6f1cc25108407d0d65c0a1fd8b664c700"
+    },
+    "stdlib/process.void": {
+      "before": "7c4c21a6914dd6026cfddfc96bccad642d0fb845de61423569ea2ded641f461b",
+      "after": "69bdbf5944e270b8e6a304431019fbb95b9be7af47941ee0bab89225568dd3f6"
+    },
+    "tests/host_capabilities/acceptance.py": {
+      "before": "f7c741e3f344ea015597332a8cb1319659445c67ecddcd378b3a051b4f0ff681",
+      "after": "122a73cb7c2405e9510dd46b91c1839afa6df953c19aaddc91051fba77d1e8d1"
+    },
+    "tests/host_capabilities/install.py": {
+      "before": "423035a2d4b19d13a2a706abe17c5e60b97800cebdbb6dc883ae7b0a309b27fe",
+      "after": "bb9c3196cf1c285de62604c5afd972c289e15952efc1bf1ffcb2246105c60b1f"
+    },
+    "tests/host_capabilities/native.py": {
+      "before": "459a36a57010b7c88356187429ee2f06ad2d849348e2b0a6791445c7f33cb1c9",
+      "after": "fdf514acf1033ef5ed1699cd02d070e8670a6aa3a58f59e2c256e07fb9e44982"
+    },
+    "tools/setup_host_deps.py": {
+      "before": "266805c04d1fabf06b566505b99ce0b6baf87ab418f35362531dfdd5d90374ae",
+      "after": "5651b938638ab5a0f4f2b82ef059b08880dcdee562767cc15762a47be55fac3e"
+    },
+    "tools/verify_host_deps.py": {
+      "before": "7e95c9ef890edb90a78fa650f858f7dd53fbbe108385afa868cdb21979ecc364",
+      "after": "b2209e38d2b0a0dcc39e021f95bc6c0f26ee504037672c550b53b9556b7378fc"
+    }
+  },
+  "evidence_files": {
+    "INDEX-before.json": "8e21f48b0951d6ae3bbf61f91ca00c889abf5ccc94db49788fe48644a8354031",
+    "REPORT-before.md": "64f8ed165e4f6b945924f3beedcf51fde97ab62e0df20fa66b2503e212607119",
+    "baseline.json": "d5349216b3db8a27a9ae5ec644a76c6199fdf983d24ac72fd440fc22c8b5f345",
+    "cross-archive-build.log": "1708e57e983d3c1364eddc7ca1790d3e160280cc7277f10cb2a635f0fe7d5344",
+    "cross-archive-configure-initial.log": "4ac3c2b678a85cdc1d86e275c0a478f29d9f311855ce6a22b3e3bd04af66983c",
+    "cross-archive-configure.log": "e4324c591928bd871f4de7ec87335334d450e1c812bef53b3bc75a29cb5ca446",
+    "cross-archive-install.log": "501f0b20c23a7500ea54bb0ca3c9d4ce8787b33b170abbe90bb1b907455a7e5f",
+    "cross-sodium-build.log": "fc96cdfa18966396ccafb24b1eb6016386fb658d84bf7ebc192153df51219102",
+    "cross-sodium-configure.log": "b8892082927725958f30e35b79fd72007ad6fdeecc8027c332677deed8dcc8ea",
+    "cross-sodium-install.log": "a98dbda5585991a026e93d7e53dabf9f0e43a6cb0b5c9ff699a03c1581892dc2",
+    "cross-zlib-build.log": "8c35b1682f73592d30612d7b0fabdb384fcfff35cb5a076cb48b85b1368aa794",
+    "cross-zlib-configure.log": "9da9dc9d2f44ef03d2b936481cc309bdc2e92fb5bf218a27d13448ba446914cc",
+    "cross-zlib-install.log": "2d25f9d0e1df6d0d1d8167ec5b0473852bd93683739514ced071a280c295be9a",
+    "debug-installed/installed-host-capabilities.json": "def3556e5f19be1610fdd8b3d311f281c8f604f4f21b4b3c1ec37082c28a12d3",
+    "dependency-rejection-tests.log": "29f8744c2ddd84e9f5b072e16e5c9fdfab4dedbf2470d0703d4e5e81f9061932",
+    "installed-host-capabilities.json": "7c6273498372ba001962eff79e7422963f3f6ba718bb1ab6ba6333dec9f8cef7",
+    "license-qualification-final.log": "8289b41af7776b02410474c0e429ae37d8174404613e2c95bec22da9896333a6",
+    "license-qualification.log": "f06eb7b21fb710bfda8497a1ddae9f5f7a12241452ff97a0ef89bb0a4ecde09c",
+    "licenses/linux-compiler.log": "59bdb7d4ff43064c30f5ba548c2949263ae59965184f9322dd588741fb430db4",
+    "licenses/linux-tooling.log": "8c26d85e8b9abb3215809d7f948f4d21c103afd488a560696daadada00295a9b",
+    "licenses/validation.json": "c9584a5d2c43604a0c3122872c168fc28c1c70d692b7f6a5b2e4a137c8db7274",
+    "licenses/windows-rules-compiler.log": "e59a487da636198c00639058abe92575f0c70401b33a6f8a647f92be7f1e6d86",
+    "licenses/windows-rules-configure.log": "4f89e7d991526b9fd245dc9cda52dfd244a41f7a8763bbb3d7f48cd0cf9b3656",
+    "licenses/windows-rules-tooling.log": "26c4ceb68b7ed27371aad98bac0370bb5de167bdd813fb3d745e2ff67b4272cf",
+    "licenses-final/linux-compiler.log": "b4117a0ddd822fed0a74c7a083d7d05b38c381e9191f9857d036e31af33f75e3",
+    "licenses-final/linux-tooling.log": "3a5facb25966208cc8dcb7f844d7666b5d0b9f7c1e8292cf092fdf1f5d8fd1a1",
+    "licenses-final/validation.json": "52ebcaa26fc68e2ab0b1ffa73148d62bdb54da785dfb1101ef9f55354db54663",
+    "licenses-final/windows-rules-compiler.log": "16ab0c5fb42794a78f35d410adb46a1c752ec70d09a2efe1d068a41df1e1136b",
+    "licenses-final/windows-rules-configure.log": "e936318e2b1af90bc5e85546ed8bb7db90d0c24f0193bf51686c239b9ac8598a",
+    "licenses-final/windows-rules-tooling.log": "dc08537022d9264c33e04acead5ef66a7cc563cc1b56ba6c5fcfba03c6041617",
+    "linux-debug-build.log": "36e02d2f99e1029b0ba7aeb6d1d57dd97688b77aa6e7e850507f3734293a3404",
+    "linux-debug-final-build.log": "9abd8e6ebd6e9750dd35072679c8a7f6742079535d3034c73942b881fb83004e",
+    "linux-debug-final-identity-build.log": "b55336e23d3421dcba1ffcaa23b2cd52a00f0e4a2e19673d90555e536dea284b",
+    "linux-debug-final-identity-tests.log": "e5eb6fd9e9b1cce29fc1131ccbfab8bbc9548ba46530428190c1fb5991107964",
+    "linux-debug-final-source-build.log": "c94260b86af8676d9a634c4b5da9afbbf454e8c36fc006431233c5b7342be119",
+    "linux-debug-final-source-tests.log": "3f15cf60e8b141799c6d0c54bbc59a58e97e6f1f2090b8f0202bbdc167158865",
+    "linux-debug-final-tests.log": "b9bc71bc106a8d5b77c08ec8e410758abeaa7aed455593b83171850d6880ffa5",
+    "linux-debug-host-tests.log": "5c27d6ecc680c33fcfe51908f24866b2acae0d598758eba2c1174113589ace90",
+    "linux-debug-installed.log": "e07dac5cf38b60ac399c8008cc018686bb6ccd7814c4dab7ae5e686116a84866",
+    "linux-debug-native-disk.log": "0997cbae676894bb93665a465d1feb9139291317f613e44293d9ecbb4e1eeb13",
+    "linux-debug-portable-build.log": "9d9add0bfc58f67dc5893d9ce5744a6b365dc22a7d3bc3a4e1351c09fa2f74a0",
+    "linux-debug-portable-filesystem-final.log": "17bb10935a1b5134675fae720244271f6aeafe8f4a1b1c0c26a5cb63d9fb1304",
+    "linux-debug-portable-filesystem-retry.log": "226ee2c4ba1bf401cd17eb7de6e1ebb4d03c49d1ad5b4c3a15e9a083c9daf05e",
+    "linux-debug-portable-filesystem.log": "28beeafde3702de1c41d16efce9efd07468314e4002ca7b53d92215c64f8004f",
+    "linux-debug-portable-frozen-build.log": "e85ba9adf6f41c4142b09459f2e181b1316dc6f8e4de8794789b9e5cc217aea5",
+    "linux-debug-provider-build.log": "0676d3fe786b6021fc989e806a1f32844b750d84c4fadb337134ffc09cddcf2f",
+    "linux-debug-provider-test.log": "269e6a9b22f00cdec8f5753d6eeda2ea98e457e09343a5b59fa168b1ee3b1be9",
+    "linux-debug-reviewed-build.log": "78867a88765525bf1c550366010a54274fddf73dcadefe6e832717dfa89b972e",
+    "linux-debug-reviewed-tests.log": "38c3d3f6228dac690a6272d88828b5616d995f72604472f4c7c422531520a7b7",
+    "linux-release-build-final.log": "22dac0d29a3227b1a6cd19c66cfc80dba6e758d5cbf37348026321943272dc3e",
+    "linux-release-build-retry.log": "0bd3fc69dab7507cb28ee04171a915f6f445e35bf219b85bf1636c0391d50a89",
+    "linux-release-build.log": "395aa6c686db4e0443159bc87e8a7b3c6c396031c969829341c181eddb900ac3",
+    "linux-release-error-link-build.log": "3b4ca593bf318f0d464ab45367f0d5e71bb500bf8b92ace27f93ecb0d49a5fd3",
+    "linux-release-final-build.log": "95a003fb5da4f9bb7b02f0bd20b76c4107ed7c8815639fa12be8a4d272863905",
+    "linux-release-final-identity-build.log": "ae0324f8fbe9142d11693e4545362c5ec04f817bf4beb9cb050234022a547525",
+    "linux-release-final-identity-tests.log": "8981499a4f989e8f45de8ea83c0d83515f836cf66cd08e76a7c5e8af77f2c72f",
+    "linux-release-final-source-build.log": "ee2bc998b9eeb4acc2d304c741152e089bad4ea18737fb49a1fd4b01a17a66dc",
+    "linux-release-final-source-tests.log": "ddea5de376b8c861e4922ed8cdd8cdd2b23d5c4f20fcc91fd79bc3a417843309",
+    "linux-release-final-tests.log": "10bce4f2f71c11cd692aec276210bb5682ce8350e860f3babb9c5ff046993a1d",
+    "linux-release-frozen-build.log": "6ae098574c6937e25224f0d157179344f989531bb41bb649a52c00c072d01bc9",
+    "linux-release-host-tests.log": "f359b044fd75b2b25ba9199d990a7b3ed950872673a7d807dd2ea40cec5d5a9b",
+    "linux-release-installed.log": "e07dac5cf38b60ac399c8008cc018686bb6ccd7814c4dab7ae5e686116a84866",
+    "linux-release-native-disk.log": "0997cbae676894bb93665a465d1feb9139291317f613e44293d9ecbb4e1eeb13",
+    "linux-release-portable-build.log": "e8ee704c467ef75861ee724d526eecd783758e34c497056e9493a7478951688c",
+    "linux-release-portable-filesystem-final.log": "8525b742c6792a52959427290c235d22cb54230ac60c51aae02c6ce433ce02ee",
+    "linux-release-portable-filesystem-retry.log": "86e7604aeca2d4ae4f2fd62c8714ba3efea7575c34504d04850212d449c8e79b",
+    "linux-release-portable-filesystem.log": "4c258d2c6414722c2973c94a06e4ca544817d9686faddb6dca29d4c74d5be60e",
+    "linux-release-portable-tests-retry.log": "f579e1f9334b51b33bc368b59185e4d2ee03abfdef9598d781a710e8a9ddbade",
+    "linux-release-portable-tests.log": "0de7bbc936a9203ed0f222a723b6046ce60226a7133659b6498e3701c2cbaca4",
+    "linux-release-provider-build.log": "5080c0b6d7754f83895f179d6a883e3caa4b87c150c23b845b0eeabeda6bdfaa",
+    "linux-release-provider-test.log": "87c2713cfdbf5e3f4cc9abf9f7473b3df817b1bcd4e78399bc51d948c2a3a77d",
+    "linux-release-review-tests.log": "e70620207c1713f0e8c2a58ef4ba2ec7dbe591b3ff116ebe69d7a243473104e2",
+    "linux-release-reviewed-installed.log": "e07dac5cf38b60ac399c8008cc018686bb6ccd7814c4dab7ae5e686116a84866",
+    "linux-strict-build.log": "bb15ab5e9c8856f5c4482c09b9b85bf29f286ba4a24d8a33a360e2632fd470dd",
+    "linux-strict-final-build.log": "dbea893de053c7c877c4f20080f92ec001afb6e245403675416b431f70e35b31",
+    "linux-strict-final-identity-build.log": "aea5ebba690a068d2c155224376bbf6fed5c50b645ef7b6e0e36422e6ce34756",
+    "linux-strict-final-identity-tests.log": "ba6962bb1ffb60adae1221c722825205939d0f11fbd1cbee46bf1eda69a38259",
+    "linux-strict-final-source-build.log": "3c2ee3feba95a981c850eb75cbeeff95de352ba9bca4afac3a75df72894dad70",
+    "linux-strict-final-source-tests.log": "1cba9c33162415ec9142a05a17ce20713306239420518125bc2aade557fcfb77",
+    "linux-strict-final-tests.log": "e6bc50530b040ea2cc66bef4869227c373b7593d6ba733d27082d0a5c3d1e562",
+    "linux-strict-installed.log": "e07dac5cf38b60ac399c8008cc018686bb6ccd7814c4dab7ae5e686116a84866",
+    "linux-strict-native-disk.log": "0997cbae676894bb93665a465d1feb9139291317f613e44293d9ecbb4e1eeb13",
+    "linux-strict-portable-filesystem-final.log": "4caf3213c8b0633d67f94bbae37d10a0323ced82a5c08ddf8c66563c9e21bcab",
+    "linux-strict-portable-filesystem-retry.log": "830bc8ad721a4b17bf35f9c634a5cf349dbeb9a609a038e6e1e042632fba24b5",
+    "linux-strict-portable-filesystem.log": "bbf0cbe99d2d7422a635f8677138788c7c0721af858aae7299d72df98f4a5474",
+    "linux-strict-provider-build.log": "503f34beeed832f6d9fa868a42c32826893c439fdb2f6e1afd450e3fa3891eac",
+    "linux-strict-provider-test.log": "e3c96fbf2783befe14b2bd5c50fa3df171b002c54a117e450f341df729eed836",
+    "linux-strict-reviewed-build.log": "fcf06c0f302caa340963ef2bbe81577527d4156f3df59dc6231d0f2b3d3aa998",
+    "linux-strict-reviewed-tests.log": "49225593a62a0ae1fbdd239dea697d47a83604cc50f4dff7eb08378e045a32ad",
+    "llvm23-debug-native-disk.json": "8680e9709e243a9a75d3d836c7ace0f0bd4cef93f9e0b76a95bd7a5884948168",
+    "llvm23-debug-native.json": "a672f8d9a697dd77e939183655338767eb9b568c7f4f70f7dce26851a4407d50",
+    "llvm23-debug-stack.json": "8425ddcba35661656a0f25d9600dc670d29c914d40a160fbaac82ff8af0f96a9",
+    "llvm23-debug.json": "bab174c5de0e1ba42f2a47f088e52d485fa52c52588f737a70e04bfce228335a",
+    "llvm23-release-native-disk.json": "f907b86c49ef67fc71f93cf318944447952b1e0b5e743f4f47d83e3c00cab8fd",
+    "llvm23-release-native.json": "4ceea9170889f8e9d4f7fcfd195ae85fb85b9b41b0dbb1eb4d1cbaf0fe6a614d",
+    "llvm23-release-stack.json": "ff6f7eec51e78a3bd72c71a3a2d2b8276bcff67c30873b2e9ff683e39c884f67",
+    "llvm23-release.json": "054c5a0b1339aaea0f7dc31521b7bdb0c5eee436a6531c9bec1888422856019a",
+    "llvm23-strict-native-disk.json": "ed4b8e79e5763f4d32a080f55fcec2b20b68e35039ce228eb572efc5eb0cfc34",
+    "llvm23-strict-native.json": "17a97cf84a6c3872b1749e4633a662fa5f629fade09a87d4ae072952f1b5a89c",
+    "llvm23-strict-stack.json": "089f396f91c142a217080283e63f9e0b2a12ad51dbfc4e1b50edefe71f5ae9a5",
+    "llvm23-strict.json": "84c96a168053f15a7f856f57336eecaeaa67e887ee11dc6822117b603687a0ba",
+    "pinned-linux-providers.json": "83e4bc65b51a2b9f66bd88af0477f3427b675790e492a4217e0da95339017895",
+    "portable-filesystem-initial.void": "2045b17308877e5d4dfeec7be7561750f03ddd0be3bae65bccbb4a5cf50b10cd",
+    "portable-llvm23-debug.json": "fc6822d78ad874b943ae9ac405b036945d11061f5db1631a91448b252d1dfb31",
+    "portable-llvm23-release.json": "a54e828e5c016000d40204b231a14007c77a780681773fb0d7cb4078236b5f84",
+    "portable-llvm23-strict.json": "15b7ad28f580901bc69b992df9d6ff2a23b7aaadfd452000ece77fc454d0c0d0",
+    "portable-process-initial.void": "4e0e9a71a18b1f66400ecb5f0ce566877048764a1a0ed7262ea84c03abbbe4ce",
+    "portable-source-llvm23-debug.json": "ca4d91dce972f9ab4e43c87899f0f9e013dc4e85a96878eb434b861c5d2a437f",
+    "portable-source-llvm23-release.json": "fddfce685d00d44813c28184df61bc3aade1d4a81bb88e63a58d8c08d1eca1b1",
+    "portable-source-llvm23-strict.json": "2c1c0dc3b3da6a2323510789aed788985ce03e3e9e0fe8cb7c15e81eccdba0e3",
+    "source-installer-help.log": "645b04ba02513c7c69165b6b78a9ad14352be95e59fa946a1cbe6616180e3869",
+    "strict-installed/installed-host-capabilities.json": "0d36140d98edfc71d280391f2ca3ffa40ffde78d182482d89076ab5fe51432bf",
+    "ubuntu/host-dependencies.json": "c828e1899ed6093b988d9d3ca782ad690bb02c5d7c57d10951c0c24569d61b51",
+    "ubuntu/http-dependencies.json": "39384ae0809b5bbca1b9252cc38abf30cb368e3980fd9b98a747fb9a39dbe2ee",
+    "ubuntu/installed-host-capabilities.json": "d14f76b8cda26b989c79103bf25ab5c2e4887df1c44c370aa337ab8796ff80b9",
+    "ubuntu/portable-source-ubuntu-release.json": "74e414a777bd7124be75a420d026fc0ec21376b40154f2e6ade0c42992de3dca",
+    "ubuntu/portable-ubuntu-release.json": "f4d403c2dc2d7c65fe3d37163ad0d9b0914782e4fc059484d86c1f537e8fccdd",
+    "ubuntu/ubuntu-release-native-disk.json": "ea9ab1ba04250c15b1d9915c1332b9b1bbc80c008d4b24d8308db3f48698f87d",
+    "ubuntu/ubuntu-release-native.json": "ea9ab1ba04250c15b1d9915c1332b9b1bbc80c008d4b24d8308db3f48698f87d",
+    "ubuntu/ubuntu-release-stack.json": "3a99e478e343ae0e1d63c52f3143758da8e8036283d0189b4772b587c1dc5a2f",
+    "ubuntu/ubuntu-release.json": "c997166c9030c5dead107b2605f1480a80d151e8aca5ee3350f26d2ed6dd5c59",
+    "ubuntu-container.json": "917513388da36b726da69985d860014748a6d2c7fe435832473f7546b2831787",
+    "ubuntu-elf-closure.json": "db5945d6d61080cd962cf34b78944f432b6c1882a59d0b67259c54b12022a625",
+    "ubuntu-environment.json": "4e9dd84e91aecffc59f61b6bc94996209a23af12df4a44b606cefef3f2876492",
+    "ubuntu-final-provider-source.log": "6ee04e25eae708e9fbdaf004c62b0851d6ad2030c0d755640b5d1fc75550b297",
+    "ubuntu-host-binary-failure.json": "5b9796d6d95dc7bfa2b7ffa70664bcef8c47dfc88c98675927dca562005e5e5d",
+    "ubuntu-host-dependencies.log": "0ca44b84c0093bd38db0a240078223510d25b77bcedce905e54256f929df6ace",
+    "ubuntu-http-dependencies-retry.log": "407b29ddb2726750ce742cf14e43776e5a62bdbb8a80a8376c5306a5d8929184",
+    "ubuntu-http-dependencies.log": "2e2542eb08906a07bb4b4be5517f1ccceba49671275c22f963173e2bd8780dcb",
+    "ubuntu-packages.log": "67c0bc4cd77476f71980b921a13e45d8464edf5389a435fffc1b2eee8c62f67d",
+    "ubuntu-release-build-retry.log": "a3873bd74ad81f603e2d1372acac9358fcf0b4264804fd70a0a0b94741726072",
+    "ubuntu-release-build.log": "836f61931d7ef109fe27a4f0be61bedea45e0117aefbdadbfda33b53b280f57f",
+    "ubuntu-release-final-tests.log": "73b665ac6c86c24425d08ecd7e430a5652778ddbf641640168423574414b84ed",
+    "ubuntu-release-portable-installed.log": "b244fd6732b4402424e44077dbde8f51da023da9c252082c5307a49b76f224bc",
+    "ubuntu-reviewed-tests-installed.log": "45f4c9411877ad8801a61fddd1eb8314d0d4b965c49ba399c564055028d5c9bb",
+    "windows-cross-all-providers-link.log": "f463444706a801bce365875341bea4dcd5e631286840ae9463a8d8179f4d22c5",
+    "windows-cross-final-source-link.log": "83d6dd24ea5c88eadcd1e736147ae56416227319509af03b09ee87dca4150c04",
+    "windows-cross-final.log": "ffddef2de8d9ed903985b5bd13e62de829c7bfabc152bbc8d4346055ac40a50c",
+    "windows-cross-initial.log": "3e6aaa11b95a20c0fe51fea1871a86bd8f74bde3f1aefdc37ef1793109cb4d56",
+    "windows-cross-link-retry.log": "db0f220f49a75bb93d2a000f671eb559073423719151e7899faf810544e76f0c",
+    "windows-cross-link.log": "f2b45a6a9b93db610ff4c38f687689dc17b18c5d55e2765f21f80b8e1ea33347",
+    "windows-cross-providers-initial.json": "0ad81a05ce9ddf7136249c98c89e7ff0a221b548f56f1b0a9f9694e37596b464",
+    "windows-cross-providers-summary-retry.log": "3bae3cbbf2e945918ebb2a5da81218de91c3297bb416f62890aaeb9f56bbd34e",
+    "windows-cross-providers-summary.log": "858eb93c0a9e514225a36e08c378b73ced93029cf2041d27b7187cc563b4e01a",
+    "windows-cross-providers.json": "a6f59317ca2e4e7d1229147001c412da4e6908796b03cdfb869e2212934d81d6",
+    "windows-cross-qualified-source.log": "4eb04d4131ebb517eb0da82eda3e857805ce5d059d96ff9933da4709594d9c06",
+    "windows-cross-reviewed.log": "4eb04d4131ebb517eb0da82eda3e857805ce5d059d96ff9933da4709594d9c06",
+    "windows-cross.json": "b7599fd0b9498df130df24fb0f243049c69292291ec92d61605a7e36f5cdd5e3",
+    "windows_cross_build.py": "865967f11e4c1465ff1e7c25dcc376f32166c0f9ee232d520f6c4325636ca4d9"
+  }
+}

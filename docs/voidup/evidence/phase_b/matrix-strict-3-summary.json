@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "compiler": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+  "work": "/tmp/VOIDUP matrix \u96ea # % 3bqvds61",
+  "normal_o2_jit_and_independently_linked_aot": true,
+  "hard_stack_bytes": 1048576,
+  "requests": [
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/catalog.json",
+    "/catalog.json.sig",
+    "/catalog.json",
+    "/catalog.json.sig"
+  ]
+}

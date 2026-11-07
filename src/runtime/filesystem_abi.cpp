@@ -378,6 +378,11 @@ std::shared_ptr<Job> prepare(Runtime& runtime, const ReplyLayout& layout, unsign
 } // namespace vd::filesystem
 
 namespace vd::filesystem {
+void publish_file(Runtime& runtime, void* identity, std::shared_ptr<File> file) {
+    auto resource=std::make_shared<FileResource>(runtime,identity);
+    resource->file=std::move(file);
+    NativeLibrary::get(runtime)->publish(identity,resource);
+}
 std::shared_ptr<FileBorrow> borrow_file(Runtime& runtime, void* identity, ErrorKind& error) {
     auto resource = lookup(runtime, identity);
     if (!resource) { error = ErrorKind::closed; return {}; }

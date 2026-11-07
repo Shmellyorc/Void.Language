@@ -1,0 +1,8 @@
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/voidup/evidence/phase_b/crashes/incident-duh_cu1n
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/voidup/ubuntu.py", line 15, in <module>
+    runner.run([*base,'install',release,'--activate'],timeout=900)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/voidup/support.py", line 46, in run
+    raise AssertionError((receipt,result.stdout[-3000:],result.stderr[-6000:]))
+AssertionError: ({'command': ['podman', 'exec', 'voidup-portability-ubuntu', '/usr/bin/prlimit', '--stack=1048576:1048576', '/home/shmellyorc/Documents/Void.Language/build/voidup-bootstrap/bin/voidup', '--root', '/tmp/voidup-phase-b-1794018339/private', '--catalog', 'https://127.0.0.1:39821/catalog.json', '--ca-file', '/home/shmellyorc/Documents/Void.Language/build/voidup-fixtures/tls/ca.pem', '--timeout-ms', '120000', 'install', 'engineering-a', '--activate'], 'cwd': '/home/shmellyorc/Documents/Void.Language', 'status': 1, 'expected': 0, 'wall_seconds': 0.19569994998164475, 'hard_stack_bytes': 1048576, 'stdout': 'ubuntu-1-003.stdout', 'stderr': 'ubuntu-1-003.stderr', 'input_sha256': None}, b'', b"/home/shmellyorc/Documents/Void.Language/build/voidup-bootstrap/bin/voidup: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.42' not found (required by /home/shmellyorc/Documents/Void.Language/build/voidup-bootstrap/bin/voidup)\n")

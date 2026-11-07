@@ -18,6 +18,10 @@ BUILD_BYTES = {'Release': 5822873600, 'Debug': 13522292736, 'Sanitizers': 196564
 # Largest current provider build + installed prefix + downloaded archives;
 # includes source trees within the provider build directory.
 DEPS_BYTES = 898060288 + 173666304 + 229257216
+# Additional host providers (sources/build/prefix) and application scratch.
+# Conservative reservations, not measured Windows/macOS or hosted peak sizes.
+HOST_BYTES = 2 * GIB
+VOIDUP_BYTES = 512 * 1024**2
 THINLTO_BYTES = 132422080  # largest retained hosted build cache receipt
 EDITOR_BYTES = 156200960
 ARCHIVE_BYTES = 3 * GIB  # ceil(2.71 GiB reported cache); official xz is 2017061664
@@ -27,12 +31,12 @@ CLEANUP = ('/usr/local/lib/android', '/usr/share/dotnet', '/opt/ghc',
 
 
 def requirements(configuration, phase):
-    build = BUILD_BYTES[configuration] + THINLTO_BYTES + EDITOR_BYTES
+    build = BUILD_BYTES[configuration] + THINLTO_BYTES + EDITOR_BYTES + VOIDUP_BYTES
     # Explicit 25% estimation margin for hosted link scratch, fixtures/artifact
     # compression and differences from local build sizes. Not a measured peak.
-    margin = (SDK_BYTES + DEPS_BYTES + build + 3) // 4
+    margin = (SDK_BYTES + DEPS_BYTES + HOST_BYTES + build + 3) // 4
     if phase == 'before-restore':
-        return SDK_BYTES + ARCHIVE_BYTES + DEPS_BYTES + build + margin
+        return SDK_BYTES + ARCHIVE_BYTES + DEPS_BYTES + HOST_BYTES + build + margin
     if phase == 'before-build':
         return build + margin
     raise ValueError(phase)
@@ -63,7 +67,7 @@ def snapshot(label, evidence):
     workspace = Path.cwd()
     scratch = Path(os.environ['RUNNER_TEMP'])
     paths = [workspace, scratch, Path('/'), *map(Path, CLEANUP),
-             workspace / '.toolchains/llvm-23.1.4', workspace / '.toolchains/http',
+             workspace / '.toolchains/llvm-23.1.4', workspace / '.toolchains/http', workspace / '.toolchains/host',
              workspace / 'build', Path(os.environ['THINLTO_CACHE_DIR'])]
     paths = list(dict.fromkeys(p for p in paths if p.exists()))
     df = subprocess.check_output(['df', '-B1', '--', *map(str, paths)], text=True)

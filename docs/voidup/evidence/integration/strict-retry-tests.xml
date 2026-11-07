@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="2"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="16"
+	timestamp="2026-11-06T20:21:54"
+	>
+	<testcase name="voidup_smoke" classname="voidup_smoke" time="1.43225" status="run">
+		<properties/>
+		<system-out>VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOIDUP native smoke passed; no signing keys, catalog or network used; installation qualification remains separate
+</system-out>
+	</testcase>
+	<testcase name="http_ir" classname="http_ir" time="15.3966" status="run">
+		<properties/>
+		<system-out>43 HTTP IR module/type/arity/authority/worker/effect rejections passed
+</system-out>
+	</testcase>
+</testsuite>

@@ -1,0 +1,44 @@
+[0/2] Re-checking globbed directories...
+[1/2] Re-running CMake...
+-- VOID LLVM: 23.1.4 at /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/lib/cmake/llvm
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- Found Python3: /usr/bin/python3 (found suitable version "3.12.3", minimum required is "3.12") found components: Interpreter 
+-- curl 8.23.0: 1586 files verified; four private corrections
+
+-- HTTP dependency prefix verified: Release; 167 files
+
+-- Using CMake version 3.28.3
+-- curl version=[8.23.0]
+-- CMake platform flags: UNIX LLVM-CLANG
+-- Picky compiler options: -Werror-implicit-function-declaration -Wextra -Wall -Wpedantic -Wbad-function-cast -Wconversion -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-long-long -Wno-multichar -Wpointer-arith -Wshadow -Wsign-compare -Wundef -Wunused -Wwrite-strings -Waddress -Wattributes -Wcast-align -Wcast-qual -Wdeclaration-after-statement -Wdiv-by-zero -Wempty-body -Wendif-labels -Wfloat-equal -Wformat-security -Wignored-qualifiers -Wmissing-field-initializers -Wmissing-noreturn -Wno-padded -Wno-sign-conversion -Wno-switch-default -Wno-switch-enum -Wno-system-headers -Wold-style-definition -Wredundant-decls -Wstrict-prototypes -Wtype-limits -Wunreachable-code -Wunused-parameter -Wvla -Wconditional-uninitialized -Wno-used-but-marked-unused -Wshift-sign-overflow -Wshorten-64-to-32 -Wformat=2 -Wlanguage-extension-token -Wno-covered-switch-default -Wno-disabled-macro-expansion -Wformat-non-iso -Wenum-conversion -Wmissing-variable-declarations -Wno-documentation-unknown-command -Wsometimes-uninitialized -Wdouble-promotion -Wheader-guard -Wpragmas -Wunused-const-variable -Wcomma -Wassign-enum -Wextra-semi-stmt -Wimplicit-fallthrough -Wxor-used-as-pow -Wcast-function-type -Wreserved-identifier -Wno-reserved-macro-identifier -Wno-unsafe-buffer-usage -Wcast-function-type-strict -Wformat-signedness -Warray-compare -Wc++-hidden-decl -Wimplicit-int-enum-cast -Wjump-misses-init -Wno-implicit-void-ptr-cast -Wtentative-definition-compat -Wc++-keyword
+-- Found CA bundle: /etc/ssl/certs/ca-certificates.crt
+-- Found CA path: /etc/ssl/certs
+-- Protocols: http https
+-- Features: AsynchDNS HTTP2 HTTPS-proxy IDN IPv6 Largefile PSL SSL threadsafe
+-- Enabled SSL backends: AWS-LC
+-- Verified pinned Linux host providers: Release; 125 files
+
+-- Performing Test VOID_LLVM_ORC_RUNS
+-- Performing Test VOID_LLVM_ORC_RUNS - Success
+-- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter 
+-- Configuring done (6.1s)
+-- Generating done (0.9s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release
+[0/2] Re-checking globbed directories...
+[1/3] cd /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release && /usr/bin/cmake -E make_directory /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release && /usr/bin/cmake -E copy_if_different /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release/void-native-resources.txt /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release/void-native-resources.txt
+[2/3] Building CXX object CMakeFiles/void_host_portable.dir/tests/host_capabilities/portable.cpp.o
+[3/3] Linking CXX executable void_host_portable
+Internal ctest changing into directory: /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release
+Test project /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release
+    Start 153: host_capabilities_dependencies
+1/3 Test #153: host_capabilities_dependencies ......   Passed    0.20 sec
+    Start 154: host_capabilities_portable
+2/3 Test #154: host_capabilities_portable ..........   Passed    0.09 sec
+    Start 155: host_capabilities_portable_source
+3/3 Test #155: host_capabilities_portable_source ...   Passed   21.39 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =  21.69 sec
+Installed and relocated native providers, notices and modules; normal/O2 JIT and isolated AOT passed on 1 MiB stacks
+Host boundary/GC/allocation/publication/process/ZIP/IR: 300 checks passed

@@ -115,9 +115,10 @@ VD_DISPLAY_ENCODING(u8);VD_DISPLAY_ENCODING(u16);VD_DISPLAY_ENCODING(u32);VD_DIS
 VD_DISPLAY_ENCODING(f32);VD_DISPLAY_ENCODING(f64);
 #undef VD_DISPLAY_ENCODING
 static_assert(static_cast<unsigned>(vd::ScalarEncoding::boolean)==10);
-std::int32_t runtime_entry(vd::NativeCode::CheckedEntry entry,std::int32_t value,vd::RuntimeFailure* failure,const vd::RuntimeTypeRecord* records,std::size_t count,const vd::RuntimeWitnessRecord* witnesses=nullptr,std::size_t witness_count=0) noexcept {
+std::int32_t runtime_entry(vd::NativeCode::CheckedEntry entry,std::int32_t value,vd::RuntimeFailure* failure,const vd::RuntimeTypeRecord* records,std::size_t count,const vd::RuntimeWitnessRecord* witnesses=nullptr,std::size_t witness_count=0,int argc=0,const void* argv=nullptr,bool wide=false) noexcept {
     try {
         vd::Runtime runtime(256);
+        runtime.application_arguments(argc ? vd::capture_application_arguments(argc, argv, wide) : vd::checked_application_arguments({}));
         vd::Runtime::Attachment attachment(runtime);
         if(count || witness_count) {vd_runtime_admit_metadata(&runtime,records,count,witnesses,witness_count,failure);if(failure->message) return 0;}
         auto checkpoint=runtime.console_checkpoint();vd::NativeCode::LeaseScope native_failures(vd::NativeCode::active_lease());std::int32_t result;
@@ -144,6 +145,9 @@ void construct(void** slot,std::size_t size,const std::size_t* offsets,std::size
 }
 }
 extern "C" {
+std::int32_t vd_runtime_entry_application(vd::NativeCode::CheckedEntry entry,vd::RuntimeFailure* failure,const vd::RuntimeTypeRecord* records,std::size_t count,const vd::RuntimeWitnessRecord* witnesses,std::size_t witness_count,int argc,const void* argv,bool wide) noexcept {
+    return runtime_entry(entry,0,failure,records,count,witnesses,witness_count,argc,argv,wide);
+}
 void vd_display_enter(const char* hook,void* identity,vd::RuntimeFailure* failure) noexcept {
     try{vd::Runtime::current().display_enter(hook,identity);}
     catch(const std::length_error&){failure->message="Display hook nesting limit exceeded";}

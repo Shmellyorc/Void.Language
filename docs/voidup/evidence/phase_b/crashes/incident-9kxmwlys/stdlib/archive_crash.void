@@ -1,0 +1,81 @@
+use io
+use system_error
+
+private value struct _host_reply:
+    kind: i64
+    os_code: i64
+    number: i64
+    detail: i64
+    flag: bool
+    text: string
+    bytes: [u8]
+
+
+## Independent local ceilings; signed metadata cannot remove the native hard limits.
+value struct zip_limits:
+    ## Maximum compressed input bytes; native ceiling 16 GiB.
+    archive_bytes: i64 = 1073741824
+    ## Maximum members; native ceiling 100000 and 16 MiB combined metadata.
+    entries: i64 = 10000
+    ## Maximum combined decoded bytes; native ceiling 64 GiB.
+    expanded_bytes: i64 = 4294967296
+
+## Owned header. The reader writes no filesystem paths.
+value struct zip_entry:
+    ## Portable ASCII relative name; directory names retain their terminal slash.
+    name: string
+    ## Exact declared expanded byte size.
+    size: i64
+    ## True for a regular directory, otherwise a regular file.
+    directory: bool
+    ## True only when no more headers remain.
+    eof: bool
+
+## Restricted stored/deflate ZIP/ZIP64 stream; use with or explicit close.
+## Borrows the same IO file identity exclusively until close, without changing its position.
+struct zip_reader:
+    private _local: bool
+
+private func (self zip_reader) init():
+    pass
+
+## Open a held regular IO file; preflight bounded metadata before provider allocation.
+## Rejects encryption, other codecs, links, devices, duplicate names and path aliases.
+## @param input_file Stable file capability; other operations return busy while borrowed.
+## @param limits Independent local compressed/member/expanded ceilings.
+## @return Owned reader or checked profile/limit/IO error; never extracts automatically.
+func open_zip(input_file: io.file, limits: zip_limits = zip_limits()) -> result<zip_reader, system_error.error>:
+    var reader = zip_reader()
+    var reply = _host_zip_open(reader, input_file, limits.archive_bytes, limits.entries, limits.expanded_bytes)
+    if reply.kind != 0:
+        return Err(system_error.make("archive.open_zip", reply.kind, reply.os_code))
+    return Ok(reader)
+
+## Read the next owned header after fully reading the current file to EOF.
+## @return Header or eof; busy if current data was not drained and verified.
+func (self zip_reader) next() -> result<zip_entry, system_error.error>:
+    var reply = _host_zip_next(self)
+    if reply.kind != 0:
+        return Err(system_error.make("archive.next", reply.kind, reply.os_code))
+    return Ok(zip_entry(name = reply.text, size = reply.number, directory = reply.detail == 1, eof = reply.flag))
+
+## Decode at most one bounded chunk, checking declared and combined expanded sizes.
+## @param max_bytes Chunk size from 1 through 1048576.
+## @return Owned bytes; an empty chunk means verified entry EOF, with CRC failures checked.
+func (self zip_reader) read(max_bytes: i64 = 65536) -> result<[u8], system_error.error>:
+    var reply = _host_zip_read(self, max_bytes)
+    if reply.kind != 0:
+        return Err(system_error.make("archive.read", reply.kind, reply.os_code))
+    return Ok(reply.bytes)
+
+## Free the provider and release the IO borrow.
+## @return True after idempotent checked close; does not assert unread data integrity.
+func (self zip_reader) close() -> result<bool, system_error.error>:
+    var reply = _host_zip_close(self)
+    if reply.kind != 0:
+        return Err(system_error.make("archive.close", reply.kind, reply.os_code))
+    return Ok(true)
+
+## Free this reader and release its input borrow without allocating a checked reply.
+func (self zip_reader) deinit():
+    _host_zip_cleanup(self)

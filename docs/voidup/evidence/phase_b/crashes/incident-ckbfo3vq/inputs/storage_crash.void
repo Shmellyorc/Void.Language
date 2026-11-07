@@ -1,0 +1,132 @@
+use "./support.void" as support
+use "./model.void" as model
+use io
+use path
+use text
+use json as codec
+use random
+use time
+
+struct up_directories:
+    current: io.private_directory
+    held: [io.private_directory]
+
+func (self up_directories) deinit():
+    for capability in reverse self.held:
+        capability.deinit()
+    self.held.clear()
+
+func up_walk(base: io.private_directory, const parts: [string], count: i64) -> result<up_directories, support.up_error>:
+    var result_dirs = up_directories(current = base)
+    for index in 0..<count:
+        var opened = result_dirs.current.open_directory(parts[index])
+        if opened is Ok(var child):
+            result_dirs.held.push(child)
+            result_dirs.current = child
+        else if opened is Err(var cause):
+            result_dirs.deinit()
+            return Err(support.up_error(message = cause.message, operation = cause.operation, native_domain = "filesystem", native_code = cause.os_code))
+    return Ok(result_dirs)
+
+func up_file_beneath(base: io.private_directory, relative_name: string) -> result<io.file, support.up_error>:
+    var parts = support.up_path_parts(relative_name)?
+    with up_walk(base, parts, parts.count - 1)? as directories:
+        return support.up_io(directories.current.open_file(parts[-1]))
+
+func up_new_file_beneath(base: io.private_directory, relative_name: string) -> result<io.file, support.up_error>:
+    var parts = support.up_path_parts(relative_name)?
+    with up_walk(base, parts, parts.count - 1)? as directories:
+        return support.up_io(directories.current.create_file(parts[-1]))
+
+func up_new_directory_beneath(base: io.private_directory, relative_name: string) -> result<bool, support.up_error>:
+    var parts = support.up_path_parts(relative_name)?
+    with up_walk(base, parts, parts.count - 1)? as directories:
+        with support.up_io(directories.current.create_directory(parts[-1]))? as child:
+            return Ok(true)
+
+func up_nonce() -> result<string, support.up_error>:
+    if random.from_entropy() is Ok(var source):
+        # Only collision avoidance. Exclusive creation is the authority; this
+        # gameplay generator is never used for signing keys or authentication.
+        return Ok("txn-{source.rand_u64()}-{source.rand_u64()}")
+    return Err(support.up_fail("OS entropy is unavailable", "transaction-name"))
+
+func up_parents_for(root_path: string) -> result<bool, support.up_error>:
+    var missing: [string] = []
+    var candidate = support.up_io(path.parent(root_path))?
+    for index in 0..<32:
+        if support.up_io(io.exists(candidate))?:
+            break
+        missing.push(candidate)
+        var next = support.up_io(path.parent(candidate))?
+        if next == candidate or next == "":
+            return Err(support.up_fail("no admitted ancestor for root", "root"))
+        candidate = next
+    if missing.count >= 32:
+        return Err(support.up_fail("root ancestor depth exceeds limit", "root"))
+    for missing_path in reverse missing:
+        with support.up_io(io.create_private_directory(missing_path))? as created:
+            var synced = support.up_io(created.sync())?
+    return Ok(true)
+
+func up_write_control(root_cap: io.private_directory, state: model.up_control) -> result<bool, support.up_error>:
+    if state.generation >= 9223372036854775806:
+        return Err(support.up_fail("control generation exhausted", "control"))
+    state.generation += 1
+    var bytes = support.up_json(codec.stringify(state, support.up_json_budget()))?.to_utf8()
+    var name = up_nonce()?
+    with support.up_io(root_cap.create_file(name))? as output_file:
+        var written = support.up_io(output_file.write_bytes(bytes))?
+        if written != bytes.count:
+            return Err(support.up_fail("incomplete control write", "control"))
+        var flushed = support.up_io(output_file.flush())?
+        # Never delete or try to roll back after a published uncertain outcome.
+        return support.up_publication(root_cap.publish_file(output_file, name, root_cap, "control.json", true), "control")
+
+func up_root(root_path: string) -> result<io.private_directory, support.up_error>:
+    if not support.up_io(path.is_absolute(root_path))? or text.contains(root_path, "\n") or text.contains(root_path, "\r"):
+        return Err(support.up_fail("root must be an absolute representable native path", "root", 2))
+    if support.up_io(io.exists(root_path))?:
+        var existing = support.up_io(io.open_private_directory(root_path))?
+        var marker_bytes = support.up_read_owned(existing, "voidup-root.json", 4096)
+        if marker_bytes is Err(var reason):
+            existing.deinit()
+            return Err(support.up_fail("existing root is not an initialized dedicated VOIDUP root", "root"))
+        if marker_bytes is Ok(var raw_marker):
+            var decoded = support.up_json(codec.parse_as<model.up_marker>(support.up_text(raw_marker)?, support.up_json_budget()))?
+            if decoded.schema != 1 or decoded.application != "VOIDUP-private-v1":
+                existing.deinit()
+                return Err(support.up_fail("root marker does not identify VOIDUP", "root"))
+        return Ok(existing)
+    var parents = up_parents_for(root_path)?
+    var created_root = support.up_io(io.create_private_directory(root_path))?
+    for leaf in ["toolchains", "transactions", "metadata"]:
+        with support.up_io(created_root.create_directory(leaf))? as child:
+            var synced = support.up_io(child.sync())?
+    var initialized = up_write_control(created_root, model.up_control())?
+    var marker = support.up_json(codec.stringify(model.up_marker(schema = 1, application = "VOIDUP-private-v1")))?.to_utf8()
+    var marked = support.up_write_new(created_root, "voidup-root.json", marker)?
+    var synced = support.up_io(created_root.sync())?
+    return Ok(created_root)
+
+func up_read_control(root_cap: io.private_directory) -> result<model.up_control, support.up_error>:
+    var raw_control = support.up_read_owned(root_cap, "control.json")?
+    var state = support.up_json(codec.parse_as<model.up_control>(support.up_text(raw_control)?, support.up_json_budget()))?
+    if state.schema != 1 or state.generation < 1 or state.serial < 0 or state.installed.count > 64 or state.revoked.count > 1024:
+        return Err(support.up_fail("invalid control state", "control"))
+    if state.serial == 0:
+        if state.catalog_digest != "" or state.current != "" or state.previous != "" or state.installed.count != 0 or state.revoked.count != 0:
+            return Err(support.up_fail("inconsistent empty control state", "control"))
+    else if not support.up_sha_text(state.catalog_digest):
+        return Err(support.up_fail("invalid retained catalog digest", "control"))
+    var known: {string: bool}
+    for item in state.installed:
+        if not support.up_identifier(item.release.id) or item.release.host != model.up_host() or not support.up_sha_text(item.catalog_digest) or item.catalog_serial < 1 or item.catalog_serial > state.serial or known.contains(item.release.id):
+            return Err(support.up_fail("invalid installed selection record", "control"))
+        known[item.release.id] = true
+    if (state.current != "" and not known.contains(state.current)) or (state.previous != "" and not known.contains(state.previous)):
+        return Err(support.up_fail("selection names an unknown installation", "control"))
+    var now = support.up_clock(time.now_utc())?.seconds
+    if now < state.last_time:
+        return Err(support.up_fail("clock moved behind retained trusted time", "control"))
+    return Ok(state)

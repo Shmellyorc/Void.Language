@@ -1,0 +1,186 @@
+use "./support.void" as support
+use json as codec
+use text
+use os
+
+struct up_signature:
+    key_id: string
+    signature: string
+
+struct up_signature_envelope:
+    schema: i64
+    signatures: [up_signature]
+
+struct up_release:
+    id: string
+    host: string
+    build_identity: string
+    artifact_url: string
+    artifact_bytes: i64
+    artifact_sha256: string
+    inventory_url: string
+    inventory_bytes: i64
+    inventory_sha256: string
+
+struct up_catalog:
+    schema: i64
+    domain: string
+    serial: i64
+    issued: i64
+    expires: i64
+    min_manager: i64
+    llvm_version: string
+    revoked: [string]
+    releases: [up_release]
+
+struct up_member:
+    name: string
+    size: i64
+    sha256: string
+    executable: bool
+    directory: bool
+
+struct up_inventory:
+    schema: i64
+    release_id: string
+    host: string
+    build_identity: string
+    expanded_bytes: i64
+    members: [up_member]
+
+struct up_toolchain_identity:
+    schema: i64
+    release_id: string
+    host: string
+    build_identity: string
+    llvm_version: string
+
+struct up_installed:
+    release: up_release
+    catalog_digest: string
+    catalog_serial: i64
+
+struct up_control:
+    schema: i64 = 1
+    generation: i64
+    serial: i64
+    catalog_digest: string
+    last_time: i64
+    current: string
+    previous: string
+    revoked: [string]
+    installed: [up_installed]
+
+struct up_marker:
+    schema: i64
+    application: string
+
+func up_host() -> string:
+    var platform_name = os.platform()
+    var architecture_name = os.architecture()
+    if platform_name == "linux" and architecture_name == "x86_64":
+        return "linux-x86_64-ubuntu24.04"
+    if platform_name == "windows" and architecture_name == "x86_64":
+        return "windows-x86_64"
+    if platform_name == "macos" and architecture_name == "aarch64":
+        return "macos-aarch64-14.0"
+    return "unqualified-{platform_name}-{architecture_name}"
+
+func up_is_revoked(const revoked_ids: [string], release_id: string) -> bool:
+    for item in revoked_ids:
+        if item == release_id:
+            return true
+    return false
+
+func up_catalog_shape(document: up_catalog) -> result<bool, support.up_error>:
+    if document.schema != 1 or document.domain != "voidup-catalog-v1" or document.llvm_version != "23.1.4":
+        return Err(support.up_fail("unsupported catalog schema, domain or LLVM identity", "catalog"))
+    if document.serial < 1 or document.min_manager < 1 or document.min_manager > support.up_manager_version:
+        return Err(support.up_fail("unsupported catalog serial or manager version", "catalog"))
+    if document.issued < 1 or document.expires <= document.issued or document.expires - document.issued > 2592000:
+        return Err(support.up_fail("catalog validity interval is invalid", "catalog"))
+    if document.releases.count < 1 or document.releases.count > 64 or document.revoked.count > 1024:
+        return Err(support.up_fail("catalog cardinality exceeds local limit", "catalog"))
+    var identities: {string: bool}
+    for item in document.releases:
+        if not support.up_identifier(item.id) or not support.up_sha_text(item.build_identity) or not support.up_identifier(item.host):
+            return Err(support.up_fail("invalid release identity", "catalog"))
+        var combined = item.host + "/" + item.id
+        if identities.contains(combined):
+            return Err(support.up_fail("duplicate release identity", "catalog"))
+        identities[combined] = true
+        if item.artifact_bytes < 22 or item.artifact_bytes > support.up_package_limit or item.inventory_bytes < 1 or item.inventory_bytes > support.up_metadata_limit:
+            return Err(support.up_fail("signed length exceeds local limit", "catalog"))
+        if not support.up_sha_text(item.artifact_sha256) or not support.up_sha_text(item.inventory_sha256):
+            return Err(support.up_fail("invalid signed digest", "catalog"))
+    var revoked_seen: {string: bool}
+    for item in document.revoked:
+        if not support.up_identifier(item) or revoked_seen.contains(item):
+            return Err(support.up_fail("invalid or duplicate revocation", "catalog"))
+        revoked_seen[item] = true
+    return Ok(true)
+
+func up_find_release(document: up_catalog, release_id: string) -> result<up_release, support.up_error>:
+    for item in document.releases:
+        if item.id == release_id and item.host == up_host():
+            return Ok(item)
+    return Err(support.up_fail("release is absent for this host", "select"))
+
+func up_member_path(member: up_member) -> result<string, support.up_error>:
+    if member.directory:
+        if not text.ends_with(member.name, "/"):
+            return Err(support.up_fail("directory inventory name lacks slash", "inventory"))
+        return support.up_txt(text.substring(member.name, 0, member.name.to_utf8().count - 1))
+    return Ok(member.name)
+
+func up_inventory_parse(const raw_inventory: [u8], release: up_release) -> result<up_inventory, support.up_error>:
+    if raw_inventory.count != release.inventory_bytes or support.up_digest(raw_inventory)? != release.inventory_sha256:
+        return Err(support.up_fail("inventory digest or length mismatch", "inventory"))
+    var document = support.up_json(codec.parse_as<up_inventory>(support.up_text(raw_inventory)?, support.up_json_budget()))?
+    if document.schema != 1 or document.release_id != release.id or document.host != release.host or document.build_identity != release.build_identity:
+        return Err(support.up_fail("inventory identity differs from catalog", "inventory"))
+    if document.expanded_bytes < 0 or document.expanded_bytes > support.up_expanded_limit or document.members.count < 4 or document.members.count > support.up_count_limit:
+        return Err(support.up_fail("inventory exceeds local limits", "inventory"))
+    var names: {string: bool}
+    var directories: {string: bool}
+    var file_names: {string: bool}
+    var total: i64 = 0
+    for member in document.members:
+        var relative_name = up_member_path(member)?
+        var parts = support.up_path_parts(relative_name)?
+        var canonical = text.to_lower(relative_name)
+        if names.contains(canonical):
+            return Err(support.up_fail("duplicate or case-colliding inventory path", "inventory"))
+        names[canonical] = true
+        if member.directory:
+            if member.size != 0 or member.executable or member.sha256 != "":
+                return Err(support.up_fail("directory has file metadata", "inventory"))
+            directories[relative_name] = true
+        else:
+            if member.size < 0 or member.size > support.up_file_limit or not support.up_sha_text(member.sha256):
+                return Err(support.up_fail("invalid file metadata", "inventory"))
+            if member.size > support.up_expanded_limit - total:
+                return Err(support.up_fail("expanded size overflow", "inventory"))
+            total += member.size
+            file_names[relative_name] = member.executable
+    for member in document.members:
+        var parts = support.up_path_parts(up_member_path(member)?)?
+        var ancestor = ""
+        for index in 0..<parts.count - 1:
+            if index != 0:
+                ancestor += "/"
+            ancestor += parts[index]
+            if not directories.contains(ancestor):
+                return Err(support.up_fail("inventory ancestor is not a declared directory", "inventory"))
+    if total != document.expanded_bytes:
+        return Err(support.up_fail("expanded size does not match inventory", "inventory"))
+    var required_executables = ["bin/voidc", "bin/voidls", "sdk/bin/clang", "sdk/bin/ld.lld"]
+    if os.platform() == "windows":
+        required_executables = ["bin/voidc.exe", "bin/voidls.exe", "sdk/bin/clang.exe", "sdk/bin/lld-link.exe"]
+    for executable_name in required_executables:
+        if not file_names.contains(executable_name) or not file_names[executable_name]:
+            return Err(support.up_fail("required executable absent from inventory", "inventory"))
+    for required_name in ["toolchain.json", "bin/void-native.txt", "bin/void-native-resources.txt", "share/void/stdlib/io.void"]:
+        if not file_names.contains(required_name):
+            return Err(support.up_fail("required toolchain resource absent from inventory", "inventory"))
+    return Ok(document)

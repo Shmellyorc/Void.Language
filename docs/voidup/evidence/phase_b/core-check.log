@@ -1,0 +1,101 @@
+/home/shmellyorc/Documents/Void.Language/apps/voidup/storage.void:72:23: error: Duplicate declaration or shadowing of 'root'.
+    code: VOID2005
+
+ 72 | func up_write_control(root: io.private_directory, state: model.up_control) -> result<bool, support.up_error>:
+    |                       ^^^^
+    Module: /storage.void
+    Previously declared at /home/shmellyorc/Documents/Void.Language/stdlib/path.void:62:6
+
+ 62 | func root(value: string) -> result<string, io.error>:
+    |      ^^^^
+    Module: /@stdlib/path.void
+    Hint: Assign to the existing variable, or choose a distinct name.
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/storage.void:78:5: error: with requires a non-nullable managed resource with deinit.
+    code: VOID2001
+
+ 78 |     with support.up_io(root.create_file(name))? as output_file:
+    |     ^^^^
+    Module: /storage.void
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/storage.void:78:18: error: Cannot infer generic parameter 't'; supply explicit type arguments.
+    code: VOID2001
+
+ 78 |     with support.up_io(root.create_file(name))? as output_file:
+    |                  ^^^^^
+    Module: /storage.void
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/storage.void:78:24: error: Unknown import qualifier 'root'.
+    code: VOID3003
+
+ 78 |     with support.up_io(root.create_file(name))? as output_file:
+    |                        ^^^^
+    Module: /storage.void
+    Hint: Import the module with this alias before calling it.
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/storage.void:78:47: error: ? requires a result value in a result-returning function.
+    code: VOID2001
+
+ 78 |     with support.up_io(root.create_file(name))? as output_file:
+    |                                               ^
+    Module: /storage.void
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/storage.void:112:22: error: Duplicate declaration or shadowing of 'root'.
+    code: VOID2005
+
+ 112 | func up_read_control(root: io.private_directory) -> result<model.up_control, support.up_error>:
+     |                      ^^^^
+    Module: /storage.void
+    Previously declared at /home/shmellyorc/Documents/Void.Language/stdlib/path.void:62:6
+
+ 62 | func root(value: string) -> result<string, io.error>:
+    |      ^^^^
+    Module: /@stdlib/path.void
+    Hint: Assign to the existing variable, or choose a distinct name.
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/storage.void:113:45: error: Type mismatch: expected /@stdlib/io.void::private_directory, received func(string) -> result<string, /@stdlib/io.void::error>.
+    code: VOID2001
+
+ 113 |     var raw_control = support.up_read_owned(root, "control.json")?
+     |                                             ^^^^
+    Module: /storage.void
+    Expected: /@stdlib/io.void::private_directory
+    Received: func(string) -> result<string, /@stdlib/io.void::error>
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/storage.void:113:66: error: ? requires a result value in a result-returning function.
+    code: VOID2001
+
+ 113 |     var raw_control = support.up_read_owned(root, "control.json")?
+     |                                                                  ^
+    Module: /storage.void
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/storage.void:114:94: error: ? requires a result value in a result-returning function.
+    code: VOID2001
+
+ 114 |     var state = support.up_json(codec.parse_as<model.up_control>(support.up_text(raw_control)?, support.up_json_budget()))?
+     |                                                                                              ^
+    Module: /storage.void
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/storage.void:114:123: error: ? requires a result value in a result-returning function.
+    code: VOID2001
+
+ 114 |     var state = support.up_json(codec.parse_as<model.up_control>(support.up_text(raw_control)?, support.up_json_budget()))?
+     |                                                                                                                           ^
+    Module: /storage.void
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/storage.void:123:5: error: Iteration requires an array, dictionary or integer range.
+    code: VOID1105
+
+ 123 |     for item in state.installed:
+     |     ^^^
+    Module: /storage.void
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/trust.void:35:28: error: Type mismatch: expected i64, received i32.
+    code: VOID2001
+
+ 35 |                 selected = index
+    |                            ^^^^^
+    Module: /trust.void
+    Expected: i64
+    Received: i32
+

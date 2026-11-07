@@ -1,0 +1,17 @@
+{
+  "command": [
+    "podman",
+    "run",
+    "--rm",
+    "--network=none",
+    "-v",
+    "/home/shmellyorc/Documents/Void.Language:/work:ro",
+    "docker.io/library/ubuntu:24.04",
+    "bash",
+    "-lc",
+    "cat /etc/os-release; /work/build/llvm23-release/voidc --version"
+  ],
+  "status": 1,
+  "stdout": "PRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.5 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+  "stderr": "/work/build/llvm23-release/voidc: /lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.35' not found (required by /work/build/llvm23-release/voidc)\n/work/build/llvm23-release/voidc: /lib/x86_64-linux-gnu/libm.so.6: version `GLIBC_2.43' not found (required by /work/build/llvm23-release/voidc)\n/work/build/llvm23-release/voidc: /lib/x86_64-linux-gnu/libm.so.6: version `GLIBC_2.44' not found (required by /work/build/llvm23-release/voidc)\n/work/build/llvm23-release/voidc: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.42' not found (required by /work/build/llvm23-release/voidc)\n/work/build/llvm23-release/voidc: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.43' not found (required by /work/build/llvm23-release/voidc)\n"
+}

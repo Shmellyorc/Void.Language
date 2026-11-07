@@ -1,0 +1,87 @@
+In file included from include/void/runtime.hpp:6,
+                 from include/void/native_resource.hpp:3,
+                 from src/runtime/host_internal.hpp:3,
+                 from src/runtime/host_directory_windows.cpp:1:
+include/void/console.hpp: In member function 'virtual uint64_t vd::console::Adapter::capabilities(vd::console::Stream)':
+include/void/console.hpp:88:127: warning: enumerated and non-enumerated type in conditional expression [-Wextra]
+   88 |     virtual std::uint64_t capabilities(Stream stream) {auto e=inspect().at(static_cast<unsigned>(stream));return e.available()?(stream==Stream::input?text_input:text_output):0;}
+      |                                                                                                                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/runtime/host_directory_windows.cpp: In function 'vd::host::win::Handle vd::host::{anonymous}::relative(HANDLE, const std::wstring&, bool, bool, bool, vd::host::win::PrivateAccess&, bool, bool)':
+src/runtime/host_directory_windows.cpp:44:15: warning: cast between incompatible function types from 'FARPROC' {aka 'long long int (*)()'} to 'Create' {aka 'long int (*)(void**, long unsigned int, _OBJECT_ATTRIBUTES*, _IO_STATUS_BLOCK*, LARGE_INTEGER*, long unsigned int, long unsigned int, long unsigned int, long unsigned int, void*, long unsigned int)'} [-Wcast-function-type]
+   44 |     auto call=reinterpret_cast<Create>(GetProcAddress(library,"NtCreateFile"));
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/runtime/host_directory_windows.cpp:45:18: warning: cast between incompatible function types from 'FARPROC' {aka 'long long int (*)()'} to 'Convert' {aka 'long unsigned int (*)(long int)'} [-Wcast-function-type]
+   45 |     auto convert=reinterpret_cast<Convert>(GetProcAddress(library,"RtlNtStatusToDosError"));
+      |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/runtime/host_directory_windows.cpp: In function 'std::shared_ptr<vd::host::{anonymous}::Directory> vd::host::{anonymous}::root(const std::string&, bool)':
+src/runtime/host_directory_windows.cpp:75:59: warning: cast between incompatible function types from 'FARPROC' {aka 'long long int (*)()'} to 'Create' {aka 'long int (*)(void**, long unsigned int, _OBJECT_ATTRIBUTES*, _IO_STATUS_BLOCK*, LARGE_INTEGER*, long unsigned int, long unsigned int, long unsigned int, long unsigned int, void*, long unsigned int)'} [-Wcast-function-type]
+   75 |         auto dll=GetModuleHandleW(L"ntdll.dll");auto call=reinterpret_cast<Create>(GetProcAddress(dll,"NtCreateFile"));auto convert=reinterpret_cast<Convert>(GetProcAddress(dll,"RtlNtStatusToDosError"));
+      |                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/runtime/host_directory_windows.cpp:75:133: warning: cast between incompatible function types from 'FARPROC' {aka 'long long int (*)()'} to 'Convert' {aka 'long unsigned int (*)(long int)'} [-Wcast-function-type]
+   75 |         auto dll=GetModuleHandleW(L"ntdll.dll");auto call=reinterpret_cast<Create>(GetProcAddress(dll,"NtCreateFile"));auto convert=reinterpret_cast<Convert>(GetProcAddress(dll,"RtlNtStatusToDosError"));
+      |                                                                                                                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from include/void/runtime.hpp:6,
+                 from include/void/native_resource.hpp:3,
+                 from src/runtime/host_internal.hpp:3,
+                 from src/runtime/host_process_windows.cpp:1:
+include/void/console.hpp: In member function 'virtual uint64_t vd::console::Adapter::capabilities(vd::console::Stream)':
+include/void/console.hpp:88:127: warning: enumerated and non-enumerated type in conditional expression [-Wextra]
+   88 |     virtual std::uint64_t capabilities(Stream stream) {auto e=inspect().at(static_cast<unsigned>(stream));return e.available()?(stream==Stream::input?text_input:text_output):0;}
+      |                                                                                                                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from include/void/runtime.hpp:6,
+                 from include/void/native_resource.hpp:3,
+                 from src/runtime/host_internal.hpp:3,
+                 from src/runtime/host_directory.cpp:1:
+include/void/console.hpp: In member function 'virtual uint64_t vd::console::Adapter::capabilities(vd::console::Stream)':
+include/void/console.hpp:88:127: warning: enumerated and non-enumerated type in conditional expression [-Wextra]
+   88 |     virtual std::uint64_t capabilities(Stream stream) {auto e=inspect().at(static_cast<unsigned>(stream));return e.available()?(stream==Stream::input?text_input:text_output):0;}
+      |                                                                                                                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from include/void/runtime.hpp:6,
+                 from include/void/native_resource.hpp:3,
+                 from src/runtime/host_internal.hpp:3,
+                 from src/runtime/host_process.cpp:4:
+include/void/console.hpp: In member function 'virtual uint64_t vd::console::Adapter::capabilities(vd::console::Stream)':
+include/void/console.hpp:88:127: warning: enumerated and non-enumerated type in conditional expression [-Wextra]
+   88 |     virtual std::uint64_t capabilities(Stream stream) {auto e=inspect().at(static_cast<unsigned>(stream));return e.available()?(stream==Stream::input?text_input:text_output):0;}
+      |                                                                                                                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from include/void/runtime.hpp:6,
+                 from include/void/native_resource.hpp:3,
+                 from src/runtime/host_internal.hpp:3,
+                 from src/runtime/host_archive.cpp:1:
+include/void/console.hpp: In member function 'virtual uint64_t vd::console::Adapter::capabilities(vd::console::Stream)':
+include/void/console.hpp:88:127: warning: enumerated and non-enumerated type in conditional expression [-Wextra]
+   88 |     virtual std::uint64_t capabilities(Stream stream) {auto e=inspect().at(static_cast<unsigned>(stream));return e.available()?(stream==Stream::input?text_input:text_output):0;}
+      |                                                                                                                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from include/void/runtime.hpp:6,
+                 from include/void/native_resource.hpp:3,
+                 from src/runtime/host_internal.hpp:3,
+                 from src/runtime/host_crypto.cpp:1:
+include/void/console.hpp: In member function 'virtual uint64_t vd::console::Adapter::capabilities(vd::console::Stream)':
+include/void/console.hpp:88:127: warning: enumerated and non-enumerated type in conditional expression [-Wextra]
+   88 |     virtual std::uint64_t capabilities(Stream stream) {auto e=inspect().at(static_cast<unsigned>(stream));return e.available()?(stream==Stream::input?text_input:text_output):0;}
+      |                                                                                                                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from include/void/runtime.hpp:6,
+                 from include/void/native_resource.hpp:3,
+                 from src/runtime/host_internal.hpp:3,
+                 from src/runtime/host_abi.cpp:1:
+include/void/console.hpp: In member function 'virtual uint64_t vd::console::Adapter::capabilities(vd::console::Stream)':
+include/void/console.hpp:88:127: warning: enumerated and non-enumerated type in conditional expression [-Wextra]
+   88 |     virtual std::uint64_t capabilities(Stream stream) {auto e=inspect().at(static_cast<unsigned>(stream));return e.available()?(stream==Stream::input?text_input:text_output):0;}
+      |                                                                                                                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from include/void/runtime.hpp:6,
+                 from src/runtime/application.cpp:2:
+include/void/console.hpp: In member function 'virtual uint64_t vd::console::Adapter::capabilities(vd::console::Stream)':
+include/void/console.hpp:88:127: warning: enumerated and non-enumerated type in conditional expression [-Wextra]
+   88 |     virtual std::uint64_t capabilities(Stream stream) {auto e=inspect().at(static_cast<unsigned>(stream));return e.available()?(stream==Stream::input?text_input:text_output):0;}
+      |                                                                                                                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/runtime/filesystem.cpp:20: warning: "NOMINMAX" redefined
+   20 | #define NOMINMAX
+      | 
+In file included from /usr/lib/gcc/x86_64-w64-mingw32/13-posix/include/c++/x86_64-w64-mingw32/bits/c++config.h:679,
+                 from /usr/lib/gcc/x86_64-w64-mingw32/13-posix/include/c++/bits/atomic_base.h:35,
+                 from /usr/lib/gcc/x86_64-w64-mingw32/13-posix/include/c++/atomic:41,
+                 from include/void/filesystem.hpp:3,
+                 from src/runtime/filesystem.cpp:1:
+/usr/lib/gcc/x86_64-w64-mingw32/13-posix/include/c++/x86_64-w64-mingw32/bits/os_defines.h:45: note: this is the location of the previous definition
+   45 | #define NOMINMAX 1
+      | 

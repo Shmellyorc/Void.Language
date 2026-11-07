@@ -1,0 +1,387 @@
+CMake Warning at CMakeLists.txt:438 (MESSAGE):
+  Cannot test run "ZLIB_WINAPI" when cross-compiling
+Call Stack (most recent call first):
+  CMakeLists.txt:508 (TRY_MACRO_FOR_LIBRARY)
+
+
+-- Looking for _CrtSetReportMode
+-- Looking for _CrtSetReportMode - found
+-- Looking for arc4random_buf
+-- Looking for arc4random_buf - not found
+-- Looking for chflags
+-- Looking for chflags - not found
+-- Looking for chown
+-- Looking for chown - not found
+-- Looking for chroot
+-- Looking for chroot - not found
+-- Looking for closefrom
+-- Looking for closefrom - not found
+-- Looking for close_range
+-- Looking for close_range - not found
+-- Looking for ctime_r
+-- Looking for ctime_r - not found
+-- Looking for explicit_bzero
+-- Looking for explicit_bzero - not found
+-- Looking for fchdir
+-- Looking for fchdir - not found
+-- Looking for fchflags
+-- Looking for fchflags - not found
+-- Looking for fchmod
+-- Looking for fchmod - not found
+-- Looking for fchown
+-- Looking for fchown - not found
+-- Looking for fcntl
+-- Looking for fcntl - not found
+-- Looking for fdopendir
+-- Looking for fdopendir - not found
+-- Looking for fnmatch
+-- Looking for fnmatch - not found
+-- Looking for fork
+-- Looking for fork - not found
+-- Looking for fstat
+-- Looking for fstat - found
+-- Looking for fstatat
+-- Looking for fstatat - not found
+-- Looking for fstatfs
+-- Looking for fstatfs - not found
+-- Looking for fstatvfs
+-- Looking for fstatvfs - not found
+-- Looking for ftruncate
+-- Looking for ftruncate - found
+-- Looking for futimens
+-- Looking for futimens - not found
+-- Looking for futimes
+-- Looking for futimes - not found
+-- Looking for futimesat
+-- Looking for futimesat - not found
+-- Looking for getegid
+-- Looking for getegid - not found
+-- Looking for geteuid
+-- Looking for geteuid - not found
+-- Looking for getgrgid_r
+-- Looking for getgrgid_r - not found
+-- Looking for getgrnam_r
+-- Looking for getgrnam_r - not found
+-- Looking for getline
+-- Looking for getline - not found
+-- Looking for getpid
+-- Looking for getpid - found
+-- Looking for getpwnam_r
+-- Looking for getpwnam_r - not found
+-- Looking for getpwuid_r
+-- Looking for getpwuid_r - not found
+-- Looking for getresgid
+-- Looking for getresgid - not found
+-- Looking for getresuid
+-- Looking for getresuid - not found
+-- Looking for gettimeofday
+-- Looking for gettimeofday - found
+-- Looking for getvfsbyname
+-- Looking for getvfsbyname - not found
+-- Looking for gmtime_r
+-- Looking for gmtime_r - not found
+-- Looking for issetugid
+-- Looking for issetugid - not found
+-- Looking for lchflags
+-- Looking for lchflags - not found
+-- Looking for lchmod
+-- Looking for lchmod - not found
+-- Looking for lchown
+-- Looking for lchown - not found
+-- Looking for link
+-- Looking for link - not found
+-- Looking for linkat
+-- Looking for linkat - not found
+-- Looking for localtime_r
+-- Looking for localtime_r - not found
+-- Looking for lstat
+-- Looking for lstat - not found
+-- Looking for lutimes
+-- Looking for lutimes - not found
+-- Looking for mbrtowc
+-- Looking for mbrtowc - found
+-- Looking for memmove
+-- Looking for memmove - found
+-- Looking for memset_explicit
+-- Looking for memset_explicit - not found
+-- Looking for mkdir
+-- Looking for mkdir - found
+-- Looking for mkfifo
+-- Looking for mkfifo - not found
+-- Looking for mknod
+-- Looking for mknod - not found
+-- Looking for mkstemp
+-- Looking for mkstemp - found
+-- Looking for nl_langinfo
+-- Looking for nl_langinfo - not found
+-- Looking for openat
+-- Looking for openat - not found
+-- Looking for pipe
+-- Looking for pipe - not found
+-- Looking for poll
+-- Looking for poll - not found
+-- Looking for posix_spawn
+-- Looking for posix_spawn - not found
+-- Looking for posix_spawnp
+-- Looking for posix_spawnp - not found
+-- Looking for readlink
+-- Looking for readlink - not found
+-- Looking for readpassphrase
+-- Looking for readpassphrase - not found
+-- Looking for select
+-- Looking for select - not found
+-- Looking for setenv
+-- Looking for setenv - not found
+-- Looking for setlocale
+-- Looking for setlocale - found
+-- Looking for sigaction
+-- Looking for sigaction - not found
+-- Looking for statfs
+-- Looking for statfs - not found
+-- Looking for statvfs
+-- Looking for statvfs - not found
+-- Looking for strchr
+-- Looking for strchr - found
+-- Looking for strdup
+-- Looking for strdup - found
+-- Looking for strerror
+-- Looking for strerror - found
+-- Looking for strncpy_s
+-- Looking for strncpy_s - found
+-- Looking for strnlen
+-- Looking for strnlen - found
+-- Looking for strrchr
+-- Looking for strrchr - found
+-- Looking for symlink
+-- Looking for symlink - not found
+-- Looking for sysconf
+-- Looking for sysconf - not found
+-- Looking for tcgetattr
+-- Looking for tcgetattr - not found
+-- Looking for tcsetattr
+-- Looking for tcsetattr - not found
+-- Looking for timegm
+-- Looking for timegm - not found
+-- Looking for tzset
+-- Looking for tzset - found
+-- Looking for unlinkat
+-- Looking for unlinkat - not found
+-- Looking for unsetenv
+-- Looking for unsetenv - not found
+-- Looking for utime
+-- Looking for utime - found
+-- Looking for utimes
+-- Looking for utimes - not found
+-- Looking for utimensat
+-- Looking for utimensat - not found
+-- Looking for vfork
+-- Looking for vfork - not found
+-- Looking for wcrtomb
+-- Looking for wcrtomb - found
+-- Looking for wcscmp
+-- Looking for wcscmp - found
+-- Looking for wcscpy
+-- Looking for wcscpy - found
+-- Looking for wcslen
+-- Looking for wcslen - found
+-- Looking for wctomb
+-- Looking for wctomb - found
+-- Looking for _fseeki64
+-- Looking for _fseeki64 - found
+-- Looking for _get_timezone
+-- Looking for _get_timezone - not found
+-- Looking for ctime_s
+-- Looking for ctime_s - found
+-- Looking for gmtime_s
+-- Looking for gmtime_s - found
+-- Looking for localtime_s
+-- Looking for localtime_s - found
+-- Looking for _mkgmtime
+-- Looking for _mkgmtime - found
+-- Looking for cygwin_conv_path
+-- Looking for cygwin_conv_path - not found
+-- Looking for fseeko
+-- Looking for fseeko - found
+-- Looking for strerror_r
+-- Looking for strerror_r - not found
+-- Looking for strftime
+-- Looking for strftime - found
+-- Looking for vprintf
+-- Looking for vprintf - found
+-- Looking for waitpid
+-- Looking for waitpid - not found
+-- Looking for wmemcmp
+-- Looking for wmemcmp - found
+-- Looking for wmemcpy
+-- Looking for wmemcpy - found
+-- Looking for wmemmove
+-- Looking for wmemmove - found
+-- Performing Test HAVE_STRUCT_VFSCONF
+-- Performing Test HAVE_STRUCT_VFSCONF - Failed
+-- Performing Test HAVE_STRUCT_XVFSCONF
+-- Performing Test HAVE_STRUCT_XVFSCONF - Failed
+-- Performing Test HAVE_STRUCT_STATFS
+-- Performing Test HAVE_STRUCT_STATFS - Failed
+-- Performing Test HAVE_DIRFD
+-- Performing Test HAVE_DIRFD - Failed
+-- Performing Test HAVE_READLINKAT
+-- Performing Test HAVE_READLINKAT - Failed
+-- Performing Test MAJOR_IN_MKDEV
+-- Performing Test MAJOR_IN_MKDEV - Failed
+-- Performing Test MAJOR_IN_SYSMACROS
+-- Performing Test MAJOR_IN_SYSMACROS - Failed
+-- Looking for EFTYPE
+-- Looking for EFTYPE - not found
+-- Looking for EILSEQ
+-- Looking for EILSEQ - found
+-- Looking for D_MD_ORDER
+-- Looking for D_MD_ORDER - not found
+-- Looking for INT32_MAX
+-- Looking for INT32_MAX - found
+-- Looking for INT32_MIN
+-- Looking for INT32_MIN - found
+-- Looking for INT64_MAX
+-- Looking for INT64_MAX - found
+-- Looking for INT64_MIN
+-- Looking for INT64_MIN - found
+-- Looking for INTMAX_MAX
+-- Looking for INTMAX_MAX - found
+-- Looking for INTMAX_MIN
+-- Looking for INTMAX_MIN - found
+-- Looking for UINT32_MAX
+-- Looking for UINT32_MAX - found
+-- Looking for UINT64_MAX
+-- Looking for UINT64_MAX - found
+-- Looking for UINTMAX_MAX
+-- Looking for UINTMAX_MAX - found
+-- Looking for SIZE_MAX
+-- Looking for SIZE_MAX - found
+-- Looking for SSIZE_MAX
+-- Looking for SSIZE_MAX - found
+-- Performing Test HAVE_STRUCT_TM_TM_GMTOFF
+-- Performing Test HAVE_STRUCT_TM_TM_GMTOFF - Failed
+-- Performing Test HAVE_STRUCT_TM___TM_GMTOFF
+-- Performing Test HAVE_STRUCT_TM___TM_GMTOFF - Failed
+-- Performing Test HAVE_STRUCT_STAT_ST_BIRTHTIME
+-- Performing Test HAVE_STRUCT_STAT_ST_BIRTHTIME - Failed
+-- Performing Test HAVE_STRUCT_STAT_ST_BIRTHTIMESPEC_TV_NSEC
+-- Performing Test HAVE_STRUCT_STAT_ST_BIRTHTIMESPEC_TV_NSEC - Failed
+-- Performing Test HAVE_STRUCT_STAT_ST_MTIMESPEC_TV_NSEC
+-- Performing Test HAVE_STRUCT_STAT_ST_MTIMESPEC_TV_NSEC - Failed
+-- Performing Test HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC
+-- Performing Test HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC - Failed
+-- Performing Test HAVE_STRUCT_STAT_ST_MTIME_N
+-- Performing Test HAVE_STRUCT_STAT_ST_MTIME_N - Failed
+-- Performing Test HAVE_STRUCT_STAT_ST_UMTIME
+-- Performing Test HAVE_STRUCT_STAT_ST_UMTIME - Failed
+-- Performing Test HAVE_STRUCT_STAT_ST_MTIME_USEC
+-- Performing Test HAVE_STRUCT_STAT_ST_MTIME_USEC - Failed
+-- Performing Test HAVE_STRUCT_STAT_ST_BLKSIZE
+-- Performing Test HAVE_STRUCT_STAT_ST_BLKSIZE - Failed
+-- Performing Test HAVE_STRUCT_STAT_ST_FLAGS
+-- Performing Test HAVE_STRUCT_STAT_ST_FLAGS - Failed
+-- Looking for stddef.h
+-- Looking for stddef.h - found
+-- Check size of short
+-- Check size of short - done
+-- Check size of int
+-- Check size of int - done
+-- Check size of long
+-- Check size of long - done
+-- Check size of long long
+-- Check size of long long - done
+-- Check size of unsigned short
+-- Check size of unsigned short - done
+-- Check size of unsigned
+-- Check size of unsigned - done
+-- Check size of unsigned long
+-- Check size of unsigned long - done
+-- Check size of unsigned long long
+-- Check size of unsigned long long - done
+-- Check size of __int64
+-- Check size of __int64 - done
+-- Check size of unsigned __int64
+-- Check size of unsigned __int64 - done
+-- Check size of int16_t
+-- Check size of int16_t - done
+-- Check size of int32_t
+-- Check size of int32_t - done
+-- Check size of int64_t
+-- Check size of int64_t - done
+-- Check size of intmax_t
+-- Check size of intmax_t - done
+-- Check size of uint8_t
+-- Check size of uint8_t - done
+-- Check size of uint16_t
+-- Check size of uint16_t - done
+-- Check size of uint32_t
+-- Check size of uint32_t - done
+-- Check size of uint64_t
+-- Check size of uint64_t - done
+-- Check size of uintmax_t
+-- Check size of uintmax_t - done
+-- Check size of dev_t
+-- Check size of dev_t - done
+-- Check size of gid_t
+-- Check size of gid_t - failed
+-- Check size of id_t
+-- Check size of id_t - failed
+-- Check size of mode_t
+-- Check size of mode_t - done
+-- Check size of off_t
+-- Check size of off_t - done
+-- Check size of size_t
+-- Check size of size_t - done
+-- Check size of ssize_t
+-- Check size of ssize_t - done
+-- Check size of uid_t
+-- Check size of uid_t - failed
+-- Check size of pid_t
+-- Check size of pid_t - done
+-- Check size of intptr_t
+-- Check size of intptr_t - done
+-- Check size of uintptr_t
+-- Check size of uintptr_t - done
+-- Check size of wchar_t
+-- Check size of wchar_t - done
+-- Checking _FILE_OFFSET_BITS for large files
+-- Checking _FILE_OFFSET_BITS for large files - needed
+-- Checking support for ARCHIVE_CRYPTO_MD5_LIBC
+-- Checking support for ARCHIVE_CRYPTO_MD5_LIBC -- not found
+-- Checking support for ARCHIVE_CRYPTO_RMD160_LIBC
+-- Checking support for ARCHIVE_CRYPTO_RMD160_LIBC -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA1_LIBC
+-- Checking support for ARCHIVE_CRYPTO_SHA1_LIBC -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA256_LIBC
+-- Checking support for ARCHIVE_CRYPTO_SHA256_LIBC -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA384_LIBC
+-- Checking support for ARCHIVE_CRYPTO_SHA384_LIBC -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA512_LIBC
+-- Checking support for ARCHIVE_CRYPTO_SHA512_LIBC -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA256_LIBC2
+-- Checking support for ARCHIVE_CRYPTO_SHA256_LIBC2 -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA384_LIBC2
+-- Checking support for ARCHIVE_CRYPTO_SHA384_LIBC2 -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA512_LIBC2
+-- Checking support for ARCHIVE_CRYPTO_SHA512_LIBC2 -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA256_LIBC3
+-- Checking support for ARCHIVE_CRYPTO_SHA256_LIBC3 -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA384_LIBC3
+-- Checking support for ARCHIVE_CRYPTO_SHA384_LIBC3 -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA512_LIBC3
+-- Checking support for ARCHIVE_CRYPTO_SHA512_LIBC3 -- not found
+-- Checking support for ARCHIVE_CRYPTO_MD5_LIBMD
+-- Checking support for ARCHIVE_CRYPTO_MD5_LIBMD -- not found
+-- Checking support for ARCHIVE_CRYPTO_RMD160_LIBMD
+-- Checking support for ARCHIVE_CRYPTO_RMD160_LIBMD -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA1_LIBMD
+-- Checking support for ARCHIVE_CRYPTO_SHA1_LIBMD -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA256_LIBMD
+-- Checking support for ARCHIVE_CRYPTO_SHA256_LIBMD -- not found
+-- Checking support for ARCHIVE_CRYPTO_SHA512_LIBMD
+-- Checking support for ARCHIVE_CRYPTO_SHA512_LIBMD -- not found
+-- Performing Test HAVE_VISIBILITY_ATTR
+-- Performing Test HAVE_VISIBILITY_ATTR - Success
+-- Configuring done (31.6s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/archive

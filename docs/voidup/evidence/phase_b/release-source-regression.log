@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_source.py", line 36, in <module>
+    for base in ([compiler,'run',process_source,*flags,'--no-cache','--'],[process_binary]):run([*base,child,work],work,'23 false\ntrue\n')
+                                                                                            ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_source.py", line 13, in run
+    result=h.run(command,work,native_text(expected) if expected is not None else None,small=os.name!='nt',sources=(source,))
+  File "/home/shmellyorc/Documents/Void.Language/tests/random/harness.py", line 31, in run
+    assert result.stdout == expected, (args, result.stdout[:4000], expected[:4000], result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc', 'run', '/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_process.void', '--no-opt', '--no-cache', '--', '/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_host_child', '/tmp/VOID portable source 雪 # % 4o648zmh'], b'child\n2d2d7665726966792d61726773\n\n74776f20776f726473\n2271756f746522\n7461696c5c\ne99baaf09f9880\ne99baa3d76616c7565\nenvironment 1 1\ncwd\n2f746d702f564f494420706f727461626c6520736f7572636520e99baa2023202520346f3634387a6d68\nleaked 0\n23 false\ntrue\n', b'23 false\ntrue\n', b'')

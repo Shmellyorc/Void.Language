@@ -1,0 +1,355 @@
+[0/2] Re-checking globbed directories...
+[1/276] Building C object CMakeFiles/void_format_objects.dir/third_party/ryu/ryu/f2s.c.o
+[2/276] Building C object CMakeFiles/void_format_objects.dir/third_party/ryu/ryu/d2s.c.o
+[3/276] Building C object CMakeFiles/void_format_objects.dir/third_party/ryu/ryu/d2fixed.c.o
+[4/276] Building CXX object CMakeFiles/void_format_objects.dir/src/format.cpp.o
+[5/276] Building CXX object CMakeFiles/void_zone_objects.dir/src/temporal.cpp.o
+In file included from /home/shmellyorc/Documents/Void.Language/src/temporal.cpp:3:
+In file included from /home/shmellyorc/Documents/Void.Language/third_party/date/include/date/tz.h:99:
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:966:34: warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  966 | CONSTCD11 date::day  operator "" _d(unsigned long long d) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_d
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:967:34: warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  967 | CONSTCD11 date::year operator "" _y(unsigned long long y) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_y
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:1975:13: warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1975 | operator "" _d(unsigned long long d) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_d
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:1983:13: warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1983 | operator "" _y(unsigned long long y) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_y
+4 warnings generated.
+[6/276] Building CXX object CMakeFiles/void_core.dir/src/frontend/source.cpp.o
+[7/276] Building CXX object CMakeFiles/void_zone_objects.dir/third_party/date/src/tz.cpp.o
+In file included from /home/shmellyorc/Documents/Void.Language/third_party/date/src/tz.cpp:86:
+In file included from /home/shmellyorc/Documents/Void.Language/third_party/date/include/date/tz_private.h:31:
+In file included from /home/shmellyorc/Documents/Void.Language/third_party/date/include/date/tz.h:99:
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:966:34: warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  966 | CONSTCD11 date::day  operator "" _d(unsigned long long d) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_d
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:967:34: warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  967 | CONSTCD11 date::year operator "" _y(unsigned long long y) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_y
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:1975:13: warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1975 | operator "" _d(unsigned long long d) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_d
+/home/shmellyorc/Documents/Void.Language/third_party/date/include/date/date.h:1983:13: warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1983 | operator "" _y(unsigned long long y) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_y
+/home/shmellyorc/Documents/Void.Language/third_party/date/src/tz.cpp:201:23: warning: unused variable 'folder_delimiter' [-Wunused-const-variable]
+  201 | static CONSTDATA char folder_delimiter = '/';
+      |                       ^~~~~~~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/third_party/date/src/tz.cpp:318:1: warning: unused function 'get_download_folder' [-Wunused-function]
+  318 | get_download_folder()
+      | ^~~~~~~~~~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/third_party/date/src/tz.cpp:458:1: warning: unused function 'get_install' [-Wunused-function]
+  458 | get_install()
+      | ^~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/third_party/date/src/tz.cpp:3728:1: warning: unused function 'get_version' [-Wunused-function]
+ 3728 | get_version(const std::string& path)
+      | ^~~~~~~~~~~
+8 warnings generated.
+[8/276] Building CXX object CMakeFiles/void_core.dir/src/frontend/tooling.cpp.o
+[9/276] Building CXX object CMakeFiles/void_core.dir/src/numeric.cpp.o
+[10/276] Building CXX object CMakeFiles/void_core.dir/src/ir/native_storage.cpp.o
+[11/276] Building CXX object CMakeFiles/void_core.dir/src/ir/native_binding.cpp.o
+[12/276] Building C object CMakeFiles/void_native_fixture.dir/src/native/fixture.c.o
+[13/276] Building C object CMakeFiles/void_native_fixture.dir/src/native/sink.c.o
+[14/276] Linking C static library libvoid_native_fixture.a
+[15/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/application.cpp.o
+[16/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/os.cpp.o
+[17/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/os_abi.cpp.o
+[18/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/random.cpp.o
+[19/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem_abi.cpp.o
+[20/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem.cpp.o
+[21/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_resource.cpp.o
+[22/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_binding.cpp.o
+[23/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/temporal_abi.cpp.o
+[24/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/conversion.cpp.o
+[25/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/text_case.cpp.o
+[26/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/buffer.cpp.o
+[27/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/list.cpp.o
+[28/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/array.cpp.o
+[29/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/dictionary.cpp.o
+[30/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/fixed_abi.cpp.o
+[31/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/gc_schema.cpp.o
+[32/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/heap.cpp.o
+[33/276] Building CXX object CMakeFiles/void_core.dir/src/ir/module.cpp.o
+[34/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/coordination.cpp.o
+[35/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:669:137: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  669 |                 if(data.key && !request.keys && (!data.key->down || data.key->repeat!=1))return {-1,false,false,{ErrorKind::unsupported}};
+      |                                                                                                                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:672:69: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  672 |                 if(data.after)return {-1,false,false,data.after,true};
+      |                                                                     ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:675:41: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  675 |             if(queue.eof)return {-1,true};
+      |                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:676:44: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  676 |             if(!fetch)return {-1,false,true};
+      |                                            ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:677:91: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  677 |             if(auto error=stopped(request,op.adapter());error)return {-1,false,false,error};
+      |                                                                                           ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:690:137: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  690 |                 if(poll && !native.completed && native.error.kind==ErrorKind::would_block){queue.blocks.pop_back();return {-1,false,true};}
+      |                                                                                                                                         ^
+6 warnings generated.
+[36/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console_abi.cpp.o
+[37/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/callback.cpp.o
+[38/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/abi.cpp.o
+[39/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/reload.cpp.o
+[40/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native.cpp.o
+[41/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_abi.cpp.o
+[42/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/async.cpp.o
+[43/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_error.cpp.o
+[44/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_crypto.cpp.o
+[45/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_archive.cpp.o
+[46/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_directory.cpp.o
+[47/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_process_windows.cpp.o
+[48/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_process.cpp.o
+[49/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_provider.cpp.o
+[50/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_directory_windows.cpp.o
+[51/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/url.cpp.o
+[52/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/url_abi.cpp.o
+[53/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_bulk.cpp.o
+[54/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http.cpp.o
+[55/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_resource.cpp.o
+[56/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_file.cpp.o
+[57/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_work.cpp.o
+[58/276] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_abi.cpp.o
+[59/276] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[60/276] Linking CXX static library libvoid_core.a
+[61/276] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/native_cache.cpp.o
+[62/276] Building CXX object CMakeFiles/void_lsp.dir/src/lsp/positions.cpp.o
+[63/276] Linking CXX static library libvoid_lsp.a
+[64/276] Building CXX object CMakeFiles/voidc_objects.dir/src/main.cpp.o
+[65/276] Building CXX object CMakeFiles/voidls.dir/src/lsp/main.cpp.o
+[66/276] Linking CXX executable voidls
+[67/276] Building CXX object CMakeFiles/voidc_objects.dir/src/native_build.cpp.o
+[68/276] Building CXX object CMakeFiles/voidc_objects.dir/examples/proof.cpp.o
+/home/shmellyorc/Documents/Void.Language/examples/proof.cpp:7:46: warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+    7 |         {Terminator::Kind::return_value, 2}}}};
+      |                                              ^
+/home/shmellyorc/Documents/Void.Language/examples/proof.cpp:13:6: warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+   13 |     }};
+      |      ^
+2 warnings generated.
+[69/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/altsvc.c.o
+[70/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/amigaos.c.o
+[71/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/api.c.o
+[72/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/bufq.c.o
+[73/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/bufref.c.o
+[74/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-h1-proxy.c.o
+[75/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-h2-proxy.c.o
+[76/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-haproxy.c.o
+[77/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-https-connect.c.o
+[78/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-ip-happy.c.o
+[79/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-recvbuf.c.o
+[80/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-setup.c.o
+[81/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-socket.c.o
+[82/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cfilters.c.o
+[83/276] Building CXX object CMakeFiles/void_host_portable.dir/tests/host_capabilities/portable.cpp.o
+[84/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/connect.c.o
+[85/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/conncache.c.o
+[86/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/content_encoding.c.o
+[87/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/creds.c.o
+[88/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cookie.c.o
+[89/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cshutdn.c.o
+[90/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_addrinfo.c.o
+[91/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_endian.c.o
+[92/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_fnmatch.c.o
+[93/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_fopen.c.o
+[94/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_get_line.c.o
+[95/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_gssapi.c.o
+[96/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_gethostname.c.o
+[97/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_memrchr.c.o
+[98/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_ntlm_core.c.o
+[99/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_sasl.c.o
+[100/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_range.c.o
+[101/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_sha512_256.c.o
+[102/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_share.c.o
+[103/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_sspi.c.o
+[104/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_threads.c.o
+[105/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_trc.c.o
+[106/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cw-out.c.o
+[107/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/dict.c.o
+[108/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cw-pause.c.o
+[109/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/dynhds.c.o
+[110/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/easygetopt.c.o
+[111/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/easy.c.o
+[112/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/easyoptions.c.o
+[113/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/fake_addrinfo.c.o
+[114/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/escape.c.o
+[115/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/fileinfo.c.o
+[116/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/file.c.o
+[117/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ftp.c.o
+[118/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ftplistparser.c.o
+[119/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/formdata.c.o
+[120/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/getenv.c.o
+[121/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/gopher.c.o
+[122/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/getinfo.c.o
+[123/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/hash.c.o
+[124/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/headers.c.o
+[125/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/hmac.c.o
+[126/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/hsts.c.o
+[127/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http1.c.o
+[128/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http2.c.o
+[129/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http.c.o
+[130/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_aws_sigv4.c.o
+[131/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_httpsig.c.o
+[132/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_ed25519.c.o
+[133/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_digest.c.o
+[134/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_chunks.c.o
+[135/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_negotiate.c.o
+[136/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_ntlm.c.o
+[137/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/idn.c.o
+[138/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_proxy.c.o
+[139/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/if2ip.c.o
+[140/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/imap.c.o
+[141/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ldap.c.o
+[142/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/llist.c.o
+[143/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/macos.c.o
+[144/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/md4.c.o
+[145/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/md5.c.o
+[146/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/memdebug.c.o
+[147/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/mprintf.c.o
+[148/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/mime.c.o
+[149/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/mqtt.c.o
+[150/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/multi_ev.c.o
+[151/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/multi_ntfy.c.o
+[152/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/netrc.c.o
+[153/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/openldap.c.o
+[154/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/parsedate.c.o
+[155/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/peer.c.o
+[156/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/multi.c.o
+[157/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/pingpong.c.o
+[158/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/pop3.c.o
+[159/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/progress.c.o
+[160/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/protocol.c.o
+[161/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/psl.c.o
+[162/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/proxy.c.o
+[163/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ptrarray.c.o
+[164/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/rand.c.o
+[165/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ratelimit.c.o
+[166/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/request.c.o
+[167/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/rtsp.c.o
+[168/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/select.c.o
+[169/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/sendf.c.o
+[170/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/sha256.c.o
+[171/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/slist.c.o
+[172/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/setopt.c.o
+[173/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/smtp.c.o
+[174/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/socketpair.c.o
+[175/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/socks_gssapi.c.o
+[176/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/socks_sspi.c.o
+[177/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/socks.c.o
+[178/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/splay.c.o
+[179/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/strcase.c.o
+[180/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/strequal.c.o
+[181/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/strerror.c.o
+[182/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/telnet.c.o
+[183/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/tftp.c.o
+[184/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/thrdpool.c.o
+[185/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/thrdqueue.c.o
+[186/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/u8_strset.c.o
+[187/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/transfer.c.o
+[188/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/u32_ptrset.c.o
+[189/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/uint-bset.c.o
+[190/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/uint-spbset.c.o
+[191/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/uint-table.c.o
+[192/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/url.c.o
+[193/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/version.c.o
+[194/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/urlapi.c.o
+[195/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ws.c.o
+[196/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/cleartext.c.o
+[197/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/cram.c.o
+[198/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/digest_sspi.c.o
+[199/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/gsasl.c.o
+[200/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/digest.c.o
+[201/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/krb5_gssapi.c.o
+[202/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/krb5_sspi.c.o
+[203/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/ntlm.c.o
+[204/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/ntlm_sspi.c.o
+[205/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/oauth2.c.o
+[206/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/spnego_gssapi.c.o
+[207/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/spnego_sspi.c.o
+[208/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/vauth.c.o
+[209/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/asyn-ares.c.o
+[210/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/asyn-base.c.o
+[211/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/asyn-thrdd.c.o
+[212/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/cf-dns.c.o
+[213/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/doh.c.o
+[214/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/dnscache.c.o
+[215/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/hostip4.c.o
+[216/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/hostip6.c.o
+[217/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/hostip.c.o
+[218/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/httpsrr.c.o
+[219/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/apple.c.o
+[220/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/cipher_suite.c.o
+[221/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/gtls.c.o
+[222/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/hostcheck.c.o
+[223/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/mbedtls.c.o
+[224/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/rustls.c.o
+[225/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/schannel.c.o
+[226/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/schannel_verify.c.o
+[227/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/vtls.c.o
+[228/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/openssl.c.o
+[229/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/vtls_config.c.o
+[230/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/vtls_spack.c.o
+[231/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/wolfssl.c.o
+[232/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/vtls_scache.c.o
+[233/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/x509asn1.c.o
+[234/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/capsule.c.o
+[235/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-capsule.c.o
+[236/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-ngtcp2.c.o
+[237/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-ngtcp2-cmn.c.o
+[238/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-ngtcp2-proxy.c.o
+[239/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-quiche.c.o
+[240/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/vquic.c.o
+[241/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/vquic-tls.c.o
+[242/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vssh/libssh.c.o
+[243/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vssh/libssh2.c.o
+[244/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vssh/vssh.c.o
+[245/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/base64.c.o
+[246/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/basename.c.o
+[247/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/dynbuf.c.o
+[248/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/win32-fopen.c.o
+[249/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/inet_pton.c.o
+[250/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/inet_ntop.c.o
+[251/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/multibyte.c.o
+[252/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/nonblock.c.o
+[253/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/snprintf.c.o
+[254/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/strcopy.c.o
+[255/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/strdup.c.o
+[256/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/strerr.c.o
+[257/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/timediff.c.o
+[258/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/strparse.c.o
+[259/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/timeval.c.o
+[260/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/version_win32.c.o
+[261/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/wait.c.o
+[262/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/warnless.c.o
+[263/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/winapi.c.o
+[264/276] Building C object curl/lib/CMakeFiles/libcurl_static.dir/__/__/__/src/runtime/curl_keylog_disabled.c.o
+[265/276] Linking C static library curl/lib/libcurl.a
+[266/276] Linking CXX static library libvoid_runtime.a
+[267/276] Generating void-native-resources.txt, native-resources-install-Release.txt
+[268/276] Linking CXX executable void_host_portable
+[269/276] cd /home/shmellyorc/Documents/Void.Language/build/voidup-integration-ubuntu && /usr/bin/cmake -E make_directory /home/shmellyorc/Documents/Void.Language/build/voidup-integration-ubuntu && /usr/bin/cmake -E copy_if_different /home/shmellyorc/Documents/Void.Language/build/voidup-integration-ubuntu/void-native-resources.txt /home/shmellyorc/Documents/Void.Language/build/voidup-integration-ubuntu/void-native-resources.txt
+[270/276] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+[271/276] Linking CXX static library libvoid_llvm.a
+[272/276] Generating cache-identity-Release.cpp
+[273/276] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Release.cpp.o
+[274/276] Linking CXX static library libvoid_cache_identity.a
+[275/276] Linking CXX executable voidc
+[276/276] Generating voidup/voidup
+Built native executable: /home/shmellyorc/Documents/Void.Language/build/voidup-integration-ubuntu/voidup/voidup

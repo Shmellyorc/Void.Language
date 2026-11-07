@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "bootstrap": "/tmp/VOIDUP real A B \u96ea # % yfa3ku11/relocated bootstrap",
+  "root": "/tmp/VOIDUP real A B \u96ea # % yfa3ku11/relocated private root",
+  "checkout_denied": true,
+  "relocated": true,
+  "caller_path_and_stdlib_override_ignored": true,
+  "independently_linked_aot_toolchains_denied": true,
+  "hard_stack_bytes": 1048576
+}

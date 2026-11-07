@@ -16,12 +16,14 @@
 #include "void/console_ops.hpp"
 #include "void/filesystem_ops.hpp"
 #include "void/os.hpp"
+#include "void/host_ops.hpp"
 #include "void/filesystem_abi.hpp"
 #include "void/url_ops.hpp"
 #include "void/http_ops.hpp"
 #include "void/url_abi.hpp"
 #include "void/http_abi.hpp"
 #include "void/os_abi.hpp"
+#include "void/host_abi.hpp"
 #include "void/format.hpp"
 #include "void/temporal.hpp"
 #include "void/runtime_abi.hpp"
@@ -1339,6 +1341,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
 #include "url.inc"
 #include "http.inc"
 #include "os.inc"
+#include "host.inc"
                 case Op::console_native: {
                     auto* storage=value_roots[n].at(values.size());b.CreateStore(llvm::Constant::getNullValue(type(instruction.type)),storage);
                     llvm::IRBuilder<> allocations(&*fn->getEntryBlock().begin());auto* words_type=llvm::ArrayType::get(b.getInt64Ty(),8);
@@ -1930,6 +1933,7 @@ Jit::Jit(DebugCache cache,ir::Emission emission) : impl_(std::make_shared<Impl>(
     bind("vd_http_call", vd_http_call);
     bind("vd_http_cleanup", vd_http_cleanup);
     bind("vd_os_call", vd_os_call);
+    bind("vd_host_call",vd_host_call);bind("vd_host_cleanup",vd_host_cleanup);
     bind("vd_file_control", vd_file_control);
     bind("vd_console_v2",vd_console_v2);bind("vd_console_print",vd_console_print);
     bind("vd_temporal",vd_temporal);bind("vd_format_layout",vd_format_layout);bind("vd_display_enter",vd_display_enter);bind("vd_display_leave",vd_display_leave);bind("vd_display_error",vd_display_error);
@@ -2247,9 +2251,7 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
     }
     if(source_program && input.application) {
         input_value=b.getInt32(0);
-        auto* valid=llvm::BasicBlock::Create(context,"app_run",main);auto* invalid=llvm::BasicBlock::Create(context,"app_arguments",main);
-        b.CreateCondBr(b.CreateICmpEQ(main->getArg(0),b.getInt32(1)),valid,invalid);
-        b.SetInsertPoint(invalid);b.CreateRet(b.getInt32(2));b.SetInsertPoint(valid);
+        if (llvm::Triple(module->getTargetTriple()).isOSWindows()) main->setName("wmain");
     }
     std::vector<llvm::Value*> arguments{input_value};
     llvm::Value* failure = nullptr;
@@ -2268,7 +2270,9 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
         auto* count=module->getNamedGlobal("__vd_type_count"+(source_program ? std::string("__void") : std::string{}));
         auto* size_type=b.getIntNTy(module->getDataLayout().getPointerSizeInBits());
         auto* witnesses=module->getNamedGlobal("__vd_witnesses"+(source_program ? std::string("__void") : std::string{}));auto* witness_count=module->getNamedGlobal("__vd_witness_count"+(source_program ? std::string("__void") : std::string{}));
-        result=b.CreateCall(module->getOrInsertFunction("vd_runtime_entry_metadata",b.getInt32Ty(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy(),size_type),{entry,input_value,failure,catalog,b.CreateLoad(size_type,count),witnesses,b.CreateLoad(size_type,witness_count)});
+        if (source_program && input.application)
+            result=b.CreateCall(module->getOrInsertFunction("vd_runtime_entry_application",b.getInt32Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy(),size_type,b.getInt32Ty(),b.getPtrTy(),b.getInt1Ty()),{entry,failure,catalog,b.CreateLoad(size_type,count),witnesses,b.CreateLoad(size_type,witness_count),main->getArg(0),main->getArg(1),b.getInt1(llvm::Triple(module->getTargetTriple()).isOSWindows())});
+        else result=b.CreateCall(module->getOrInsertFunction("vd_runtime_entry_metadata",b.getInt32Ty(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy(),size_type),{entry,input_value,failure,catalog,b.CreateLoad(size_type,count),witnesses,b.CreateLoad(size_type,witness_count)});
     }
     else result=b.CreateCall(entry, arguments);
     if (failure) {

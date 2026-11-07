@@ -1,0 +1,390 @@
+{
+  "platform": "linux",
+  "compiler_sha256": "6d90e9cc7814c2dd2ec4bc81d6ac9fc027bc0da6596396e23c7f69f898082b97",
+  "hard_main_stack_bytes": 1048576,
+  "independently_linked_aot": true,
+  "checkout_denied": false,
+  "records": [
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_filesystem.void",
+        "-o",
+        "/tmp/VOID portable source \u96ea # % ar4i7end/filesystem-False",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID portable source \u96ea # % ar4i7end/filesystem-False\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/smoke.void",
+        "-o",
+        "/tmp/VOID portable source \u96ea # % ar4i7end/application-False",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID portable source \u96ea # % ar4i7end/application-False\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_process.void",
+        "-o",
+        "/tmp/VOID portable source \u96ea # % ar4i7end/process-False",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID portable source \u96ea # % ar4i7end/process-False\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/smoke.void",
+        "--no-opt",
+        "--no-cache",
+        "--",
+        "args",
+        "",
+        "two words",
+        "\"quote\"",
+        "tail\\",
+        "\u96ea\ud83d\ude00",
+        "--app"
+      ],
+      "status": 0,
+      "stdout": "61726773\n\n74776f20776f726473\n2271756f746522\n7461696c5c\ne99baaf09f9880\n2d2d617070\nargs\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/smoke.void",
+        "--no-opt",
+        "--no-cache",
+        "--",
+        "crypto"
+      ],
+      "status": 0,
+      "stdout": "true\ntrue\ntrue\nba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\ntrue true\ntrue true\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\ntrue\nfalse\nfalse\ntrue\ntrue\nfalse\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/smoke.void",
+        "--no-opt",
+        "--no-cache",
+        "--",
+        "zip",
+        "/tmp/VOID portable source \u96ea # % ar4i7end/package.zip"
+      ],
+      "status": 0,
+      "stdout": "opened true\nentry data 3 false\nundrained true\nba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\neof true\ntrue true\nreleased true\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/smoke.void",
+        "--no-opt",
+        "--no-cache",
+        "--",
+        "zip",
+        "/tmp/VOID portable source \u96ea # % ar4i7end/hostile.zip"
+      ],
+      "status": 0,
+      "stdout": "rejected\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/VOID portable source \u96ea # % ar4i7end/application-False",
+        "args",
+        "",
+        "two words",
+        "\"quote\"",
+        "tail\\",
+        "\u96ea\ud83d\ude00",
+        "--app"
+      ],
+      "status": 0,
+      "stdout": "61726773\n\n74776f20776f726473\n2271756f746522\n7461696c5c\ne99baaf09f9880\n2d2d617070\nargs\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/VOID portable source \u96ea # % ar4i7end/application-False",
+        "crypto"
+      ],
+      "status": 0,
+      "stdout": "true\ntrue\ntrue\nba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\ntrue true\ntrue true\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\ntrue\nfalse\nfalse\ntrue\ntrue\nfalse\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/VOID portable source \u96ea # % ar4i7end/application-False",
+        "zip",
+        "/tmp/VOID portable source \u96ea # % ar4i7end/package.zip"
+      ],
+      "status": 0,
+      "stdout": "opened true\nentry data 3 false\nundrained true\nba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\neof true\ntrue true\nreleased true\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/VOID portable source \u96ea # % ar4i7end/application-False",
+        "zip",
+        "/tmp/VOID portable source \u96ea # % ar4i7end/hostile.zip"
+      ],
+      "status": 0,
+      "stdout": "rejected\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_process.void",
+        "--no-opt",
+        "--no-cache",
+        "--",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_host_portable",
+        "/tmp/VOID portable source \u96ea # % ar4i7end"
+      ],
+      "status": 0,
+      "stdout": "23 false\ntrue\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/VOID portable source \u96ea # % ar4i7end/process-False",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_host_portable",
+        "/tmp/VOID portable source \u96ea # % ar4i7end"
+      ],
+      "status": 0,
+      "stdout": "23 false\ntrue\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_filesystem.void",
+        "--no-opt",
+        "--no-cache",
+        "--",
+        "/tmp/VOID portable source \u96ea # % ar4i7end/private-False-0"
+      ],
+      "status": 0,
+      "stdout": "true\ntrue\n7\n0\ntrue\ntrue\ntrue\n7\n7\ntrue\ntrue\ntrue\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/VOID portable source \u96ea # % ar4i7end/filesystem-False",
+        "/tmp/VOID portable source \u96ea # % ar4i7end/private-False-1"
+      ],
+      "status": 0,
+      "stdout": "true\ntrue\n7\n0\ntrue\ntrue\ntrue\n7\n7\ntrue\ntrue\ntrue\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_filesystem.void",
+        "-o",
+        "/tmp/VOID portable source \u96ea # % ar4i7end/filesystem-True"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID portable source \u96ea # % ar4i7end/filesystem-True\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/smoke.void",
+        "-o",
+        "/tmp/VOID portable source \u96ea # % ar4i7end/application-True"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID portable source \u96ea # % ar4i7end/application-True\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "build",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_process.void",
+        "-o",
+        "/tmp/VOID portable source \u96ea # % ar4i7end/process-True"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID portable source \u96ea # % ar4i7end/process-True\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/smoke.void",
+        "--no-cache",
+        "--",
+        "args",
+        "",
+        "two words",
+        "\"quote\"",
+        "tail\\",
+        "\u96ea\ud83d\ude00",
+        "--app"
+      ],
+      "status": 0,
+      "stdout": "61726773\n\n74776f20776f726473\n2271756f746522\n7461696c5c\ne99baaf09f9880\n2d2d617070\nargs\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/smoke.void",
+        "--no-cache",
+        "--",
+        "crypto"
+      ],
+      "status": 0,
+      "stdout": "true\ntrue\ntrue\nba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\ntrue true\ntrue true\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\ntrue\nfalse\nfalse\ntrue\ntrue\nfalse\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/smoke.void",
+        "--no-cache",
+        "--",
+        "zip",
+        "/tmp/VOID portable source \u96ea # % ar4i7end/package.zip"
+      ],
+      "status": 0,
+      "stdout": "opened true\nentry data 3 false\nundrained true\nba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\neof true\ntrue true\nreleased true\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/smoke.void",
+        "--no-cache",
+        "--",
+        "zip",
+        "/tmp/VOID portable source \u96ea # % ar4i7end/hostile.zip"
+      ],
+      "status": 0,
+      "stdout": "rejected\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/VOID portable source \u96ea # % ar4i7end/application-True",
+        "args",
+        "",
+        "two words",
+        "\"quote\"",
+        "tail\\",
+        "\u96ea\ud83d\ude00",
+        "--app"
+      ],
+      "status": 0,
+      "stdout": "61726773\n\n74776f20776f726473\n2271756f746522\n7461696c5c\ne99baaf09f9880\n2d2d617070\nargs\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/VOID portable source \u96ea # % ar4i7end/application-True",
+        "crypto"
+      ],
+      "status": 0,
+      "stdout": "true\ntrue\ntrue\nba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\ntrue true\ntrue true\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\ntrue\nfalse\nfalse\ntrue\ntrue\nfalse\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/VOID portable source \u96ea # % ar4i7end/application-True",
+        "zip",
+        "/tmp/VOID portable source \u96ea # % ar4i7end/package.zip"
+      ],
+      "status": 0,
+      "stdout": "opened true\nentry data 3 false\nundrained true\nba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\neof true\ntrue true\nreleased true\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/VOID portable source \u96ea # % ar4i7end/application-True",
+        "zip",
+        "/tmp/VOID portable source \u96ea # % ar4i7end/hostile.zip"
+      ],
+      "status": 0,
+      "stdout": "rejected\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_process.void",
+        "--no-cache",
+        "--",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_host_portable",
+        "/tmp/VOID portable source \u96ea # % ar4i7end"
+      ],
+      "status": 0,
+      "stdout": "23 false\ntrue\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/VOID portable source \u96ea # % ar4i7end/process-True",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_host_portable",
+        "/tmp/VOID portable source \u96ea # % ar4i7end"
+      ],
+      "status": 0,
+      "stdout": "23 false\ntrue\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_filesystem.void",
+        "--no-cache",
+        "--",
+        "/tmp/VOID portable source \u96ea # % ar4i7end/private-True-0"
+      ],
+      "status": 0,
+      "stdout": "true\ntrue\n7\n0\ntrue\ntrue\ntrue\n7\n7\ntrue\ntrue\ntrue\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/VOID portable source \u96ea # % ar4i7end/filesystem-True",
+        "/tmp/VOID portable source \u96ea # % ar4i7end/private-True-1"
+      ],
+      "status": 0,
+      "stdout": "true\ntrue\n7\n0\ntrue\ntrue\ntrue\n7\n7\ntrue\ntrue\ntrue\n",
+      "stderr": ""
+    }
+  ]
+}

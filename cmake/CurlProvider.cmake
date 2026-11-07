@@ -76,6 +76,7 @@ function(void_add_curl_provider profile)
     target_link_libraries(libcurl_static PUBLIC ${VOID_HTTP_SYSTEM_LINK_LIBRARIES})
     set(VOID_HTTP_LINK_FILES "$<TARGET_FILE:libcurl_static>;${VOID_HTTP_LINK_FILES}" PARENT_SCOPE)
     set(VOID_HTTP_DEPS_ROOT "${VOID_HTTP_DEPS_ROOT}" PARENT_SCOPE)
+    set(VOID_HTTP_ZLIB "${VOID_HTTP_ZLIB}" PARENT_SCOPE)
     set(VOID_HTTP_SYSTEM_LINK_LIBRARIES "${VOID_HTTP_SYSTEM_LINK_LIBRARIES}" PARENT_SCOPE)
     add_library(void_http_compression STATIC IMPORTED GLOBAL)
     set_target_properties(void_http_compression PROPERTIES

@@ -1,0 +1,37 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+      Start   1: cli_contract
+ 1/16 Test   #1: cli_contract .....................   Passed    2.15 sec
+      Start  18: http_source_negative
+ 2/16 Test  #18: http_source_negative .............   Passed    0.84 sec
+      Start  23: http_lsp
+ 3/16 Test  #23: http_lsp .........................   Passed    1.57 sec
+      Start  92: automatic_cache_processes
+ 4/16 Test  #92: automatic_cache_processes ........   Passed    0.47 sec
+      Start 153: host_capabilities_portable
+ 5/16 Test #153: host_capabilities_portable .......   Passed    0.07 sec
+      Start 154: host_capabilities
+ 6/16 Test #154: host_capabilities ................   Passed   44.78 sec
+      Start 155: host_capabilities_stack
+ 7/16 Test #155: host_capabilities_stack ..........   Passed   44.80 sec
+      Start 156: host_capabilities_frontend
+ 8/16 Test #156: host_capabilities_frontend .......   Passed    1.87 sec
+      Start 157: host_capabilities_lsp
+ 9/16 Test #157: host_capabilities_lsp ............   Passed    0.39 sec
+      Start 158: host_capabilities_native
+10/16 Test #158: host_capabilities_native .........   Passed    0.16 sec
+      Start 164: os_errors
+11/16 Test #164: os_errors ........................   Passed    4.36 sec
+      Start 165: os_frontend
+12/16 Test #165: os_frontend ......................   Passed    5.49 sec
+      Start 271: io_execution
+13/16 Test #271: io_execution .....................   Passed   19.56 sec
+      Start 293: io_async_acquisition
+14/16 Test #293: io_async_acquisition .............   Passed    0.27 sec
+      Start 296: io_native_jobs
+15/16 Test #296: io_native_jobs ...................   Passed    0.01 sec
+      Start 298: async_external
+16/16 Test #298: async_external ...................   Passed    0.37 sec
+
+100% tests passed, 0 tests failed out of 16
+
+Total Test time (real) = 127.17 sec

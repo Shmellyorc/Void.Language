@@ -1,0 +1,46 @@
+[
+  {
+    "name": "source-inventory",
+    "result": "PASS",
+    "detail": {
+      "verified_inventory_entries": 51,
+      "editor_original_license_metadata": "MIT"
+    }
+  },
+  {
+    "name": "linux-compiler-install",
+    "result": "PASS",
+    "detail": {
+      "verified_license_entries": 49,
+      "stdlib_sources": 25,
+      "scope": "Linux existing component install; no requalification"
+    }
+  },
+  {
+    "name": "linux-tooling-install",
+    "result": "PASS",
+    "detail": {
+      "verified_license_entries": 17,
+      "stdlib_sources": 25,
+      "scope": "Linux existing component install; no requalification"
+    }
+  },
+  {
+    "name": "windows-notice-rules-compiler",
+    "result": "PASS",
+    "detail": {
+      "verified_license_entries": 17,
+      "stdlib_sources": 0,
+      "scope": "Windows file rules only; no native execution"
+    }
+  },
+  {
+    "name": "windows-notice-rules-tooling",
+    "result": "PASS",
+    "detail": {
+      "verified_license_entries": 13,
+      "stdlib_sources": 0,
+      "scope": "Windows file rules only; no native execution"
+    }
+  }
+]

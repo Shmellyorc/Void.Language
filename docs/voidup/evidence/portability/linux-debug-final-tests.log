@@ -1,0 +1,55 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+      Start   1: cli_contract
+ 1/13 Test   #1: cli_contract ........................   Passed    7.24 sec
+      Start  18: http_source_negative
+ 2/13 Test  #18: http_source_negative ................   Passed    6.02 sec
+      Start  23: http_lsp
+ 3/13 Test  #23: http_lsp ............................   Passed   11.76 sec
+      Start 105: automatic_cache_processes
+ 4/13 Test #105: automatic_cache_processes ...........   Passed    0.59 sec
+      Start 166: host_capabilities_dependencies
+ 5/13 Test #166: host_capabilities_dependencies ......   Passed    0.15 sec
+      Start 167: host_capabilities_portable
+ 6/13 Test #167: host_capabilities_portable ..........***Failed    0.07 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable.py", line 11, in <module>
+    result=subprocess.run(command,cwd=work,capture_output=True,preexec_fn=small_stack if os.name!='nt' else None,timeout=120)
+  File "/usr/lib/python3.14/subprocess.py", line 555, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/subprocess.py", line 1039, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/subprocess.py", line 1990, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_host_portable'
+
+      Start 168: host_capabilities_portable_source
+ 7/13 Test #168: host_capabilities_portable_source ...   Passed   75.40 sec
+      Start 171: host_capabilities_frontend
+ 8/13 Test #171: host_capabilities_frontend ..........   Passed   12.65 sec
+      Start 172: host_capabilities_lsp
+ 9/13 Test #172: host_capabilities_lsp ...............   Passed    2.52 sec
+      Start 173: host_capabilities_native
+10/13 Test #173: host_capabilities_native ............   Passed    0.32 sec
+      Start 179: os_errors
+11/13 Test #179: os_errors ...........................   Passed   20.50 sec
+      Start 180: os_frontend
+12/13 Test #180: os_frontend .........................   Passed   41.85 sec
+      Start 286: io_execution
+13/13 Test #286: io_execution ........................   Passed   47.94 sec
+
+92% tests passed, 1 tests failed out of 13
+
+Total Test time (real) = 227.02 sec
+
+The following tests FAILED:
+	167 - host_capabilities_portable (Failed)
+Errors while running CTest

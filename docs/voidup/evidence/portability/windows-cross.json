@@ -1,0 +1,49 @@
+{
+  "scope": "Windows x64 MinGW source/COFF link checks only; not native Windows acceptance",
+  "compiler": "x86_64-w64-mingw32-g++ (GCC) 13-posix\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+  "production_native_recipes_executed": false,
+  "source_sha256": {
+    "src/runtime/host_abi.cpp": "8463027dcac72095a87846582785897e7a3439a8ab4a52d520a5432d151b9d5e",
+    "src/runtime/host_archive.cpp": "0f72ba76b1fbd2cd358d954882bdf0716e55241176063f596ceee75f932cb45b",
+    "src/runtime/host_crypto.cpp": "10ceb2da6c8ae78068cabe0203b7cb45829da2fddde2fbb3cec2585f5baa1c43",
+    "src/runtime/host_directory.cpp": "6d300eff68f9a9810ea2f8d659efda125d0d857dfa77c5719c987ce18511bb05",
+    "src/runtime/host_directory_windows.cpp": "1a4ba759acdd038f2735a2ccdd1f3c6d8b0bf3a4402a106015e6bf23e1c882fb",
+    "src/runtime/host_error.cpp": "13babf15055fdb52af5a858624cfcc34e6d2946c4c15473323283ff1c6e5c187",
+    "src/runtime/host_internal.hpp": "b7db70a382a1038af8d1c76c6ac8c526e4ff41d6b2f56ba8124fc11967caf052",
+    "src/runtime/host_posix.hpp": "fb3f0c1cd6da20742eb1725a5734d1f206b20d0f7a02ddafa96f22f5c47a799e",
+    "src/runtime/host_process.cpp": "84c76c37a06c40c4bee24ffd6c5af48bf53c2a884cc43aff0df195cc5a553835",
+    "src/runtime/host_process_windows.cpp": "231ccd1a0027dc31b6397630bb1b574fa4061714f1caa5af46a06efe931e62c5",
+    "src/runtime/host_windows.hpp": "f12611046beabf0fa0b184cf25be2cfd640312d9e1b55daaa9a57b1f602211fd",
+    "src/runtime/application.cpp": "8bb9491be9c3e649080bf1016521141a90fee541eb6802df12a63ad2e0edd699",
+    "src/runtime/filesystem.cpp": "8c5a60ffe891d46cb8d236d50284124b72ebb8b618b6266828aed91061470071",
+    "include/void/filesystem.hpp": "60960eb1602dd321b01b91df8a8a38fa058fa44d25d380e15a75f33e5b558248",
+    "tests/host_capabilities/portable.cpp": "01570c8ce1eff3a26bcf01f3ccc36f76c9d205cbbd58e1527ad25234630073c6"
+  },
+  "objects": {
+    "build/voidup-cross/host_abi.o": "6a1c7e42888981f50898bc88caa8e149a9460d133e9a03474f25591ad8d87cdb",
+    "build/voidup-cross/host_directory_windows.o": "673548fd1e1f37e738d0a19316b17f6a0964b71238ab45fc9728a11554940580",
+    "build/voidup-cross/host_process_windows.o": "68f15e48ae0d4ef9eef48612351759992b55debbe30ca253d87bc22db84fec83",
+    "build/voidup-cross/host_directory.o": "87aa174afeb79694709aef280e6bb57acdeb262d6bdc7a185ae8e48497abc1c8",
+    "build/voidup-cross/host_process.o": "0786f8b1466ba05bbea50f5e7785c4454454ff6cbdf08f01eae4274cc59969c9",
+    "build/voidup-cross/host_error.o": "2ae154470a423d2f038f6d59591e30c0b6108d1a6dbf6975e37aa462a6d3acd3",
+    "build/voidup-cross/application.o": "05caa7b81265402b2863da450fca577e82d5e8e3b70dcb045e5279510b09e4f1",
+    "build/voidup-cross/filesystem.o": "6c3f5b47890736fb21b6159fe56868f863f20dffeff2b1e433d8478c7afc99e5",
+    "build/voidup-cross/host_archive.o": "b35e279794c13af86e69dd67af65dbe9651a76fe277504fd20cb4d3ab928f169",
+    "build/voidup-cross/host_crypto.o": "3b957a2120cc88f87016ec02eff273ab4eaeb5d1dafe3691a4018a80826ebca2",
+    "build/voidup-cross/portable.o": "0786f920597d812071775e3f35a3a3bd3d95b2073b46f1840ddec3378432b040"
+  },
+  "linked_provider_fixture": {
+    "path": "build/voidup-cross/portable-providers.exe",
+    "sha256": "20af8b9bd5adb72c4beea437819af12b643cd94df5bbfb309bb2b4c5184796c2",
+    "executed": false,
+    "stack_reserve_bytes": 1048576,
+    "native_assertions_executed": 0
+  },
+  "missing": [
+    "native Windows kernel and NTFS",
+    "MSVC/Windows SDK build and native CRT integration",
+    "native source JIT/AOT, GC/fault/cleanup and install qualification"
+  ],
+  "cross_provider_build": "windows-cross-providers.json",
+  "complete_provider_link": "windows-cross-all-providers-link.log"
+}

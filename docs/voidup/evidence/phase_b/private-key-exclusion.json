@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "scope": "exact randomly generated engineering private seeds, raw and hex, scanned across final app and every expanded ZIP file; no private material recorded",
+  "results": [
+    {
+      "path": "build/voidup-final/bin/voidup",
+      "sha256": "f69cd30c998251eb72c60df519e313041fc06f8d16a9cd5f4d1c0888ba1576bd",
+      "test_private_seed_present": false
+    },
+    {
+      "path": "apps/voidup/trust_keys.void",
+      "sha256": "43b2e1a92e02cd71448ef1abf552ff9ef10ea379885f44f7067aa5d5f0b4b2a7",
+      "test_private_seed_present": false
+    },
+    {
+      "package": "engineering-a",
+      "members": 621,
+      "test_private_seed_present": false
+    },
+    {
+      "package": "engineering-b",
+      "members": 621,
+      "test_private_seed_present": false
+    }
+  ]
+}

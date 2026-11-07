@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/voidup-integration-bootstrap/tools/ci/voidup_bootstrap.py", line 135, in <module>
+    main()
+    ~~~~^^
+  File "/home/shmellyorc/Documents/Void.Language/build/voidup-integration-bootstrap/tools/ci/voidup_bootstrap.py", line 115, in main
+    preflight(plan, evidence)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/voidup-integration-bootstrap/tools/ci/voidup_bootstrap.py", line 56, in preflight
+    raise RuntimeError(f'Host provider prerequisite missing: {tools}')
+RuntimeError: Host provider prerequisite missing: {'cmake': '/usr/bin/cmake', 'ninja': None, 'make': '/usr/bin/make'}

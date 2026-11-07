@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/voidup/timeout.py", line 14, in <module>
+    assert diagnostic['native_code']!=0 and diagnostic['native_domain'],diagnostic
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'message': 'HTTP download failed', 'operation': 'download', 'code': 1, 'native_domain': '', 'native_code': 0, 'cleanup_code': 0, 'progress': 1048576, 'published': False, 'durable': False}

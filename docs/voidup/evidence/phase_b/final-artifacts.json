@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "application": "/home/shmellyorc/Documents/Void.Language/build/voidup-final-3/bin/voidup",
+  "sha256": "c42b6748e45f4e904666bb386283f83053abd654b82a6d0189893ad0b28f0772",
+  "source_hashes": {
+    "apps/voidup/support.void": "cb6802dcb214bb5d61fce903234b76925283cd33487ad064a817d79d29de2b2f",
+    "apps/voidup/main.void": "da478f1893f481686347b0da7c93ba778701a53c5ac39b71a4c7a75a21972b22",
+    "apps/voidup/model.void": "e7f250a0ed95cc4e5f992114cd6e89dc7fe4daa9d5f960e434ad6cc03e61ea3d",
+    "apps/voidup/trust_keys.void": "43b2e1a92e02cd71448ef1abf552ff9ef10ea379885f44f7067aa5d5f0b4b2a7",
+    "apps/voidup/trust.void": "8aea64ef4e050df496a7ac79bf27b7438ca31e206a5b56a84b201eace4deede2",
+    "apps/voidup/transport.void": "dfb1b27b85b38232b4a5dcd6baec8ea636a9dcc8584251b885ff8bf11987ca86",
+    "apps/voidup/storage.void": "279d79a2c7f34332cfe92f3a7e8125632513e695b21a40cb61d9f82819280b2b",
+    "apps/voidup/inventory.void": "9402e3e7335c84129d5ae3a632386bb60fb88d3f969c6f9739eaa96b609dbd98",
+    "apps/voidup/cli.void": "17f7bfbfa7f113fee186f618c1142376c84046084fab0a4591888d4525552d51",
+    "apps/voidup/manager.void": "3cbf88a29122a322402327db34682ba1ee79239107ffc38f0b8411e889b85d0a",
+    "tests/voidup/support.py": "58ffb576df882dfd9430c67815230c278223a8164523a73eb27cf59ae59d76fe",
+    "tests/voidup/acceptance.py": "4461eff9e6c940a45d7aa2c09b3125e5f03a6891ee330e721ec3d1b5c316d2ba",
+    "tests/voidup/rejection.py": "604e56bb12f760d9b424c20940f566c820d6faef0710f81941345e91d99dfc21",
+    "tests/voidup/fsync_fault.c": "fc8bdb7b23749c87a50975ad01d15102b5566a1a354418f1631b2b081ca944b4",
+    "tests/voidup/source_runner.cpp": "6b6cf49e6b24cd0e42af7d35f65c7ee5dbc1b88700af3db969e2a481e8052117",
+    "tests/voidup/matrix.py": "f2c0f29fd601d34f5b0eb84edbb7aa66aedc117e83e20a644f637265db42469c",
+    "tests/voidup/lifetime.py": "8bb15a8e843d97fbc926c59649016972e737828d48e9bf3616364bc77a7554dd",
+    "tests/voidup/recovery.py": "644bfec1db5c57c22492083bc956dc395c43721838088d41aa09768e46865c11",
+    "tests/voidup/ubuntu.py": "e52a9b0f9982f67ed45aaca12953419343a21b3a5dd8652ba41c0f863a36dbb9",
+    "tests/voidup/windows_cross.py": "25e03286c77e7e272c606cc07a718b5e258f6484142fea2ea1e6b90429b9de51",
+    "tests/voidup/installed.py": "651246c6907efe350437222f12adabefae780e175fa733f770e6f523654f058b",
+    "tests/voidup/interruption.py": "db7f8d9c6336ff749e73c6b0c7c1361a56cec5d3c508a4e7470617077c020f04",
+    "tests/voidup/profile_install.py": "874cda9321943cac76d6e1d6f46a2ce40ae05f3ae278e5837407b36060c46e6e",
+    "tests/voidup/arguments.void": "c05e7d39b596f6fc13e99de29c0a3562f3a3348c36d33913ff3e05226fc753d4",
+    "tests/voidup/final.py": "1ac20327f23fdfa651bf997b88bbab3a66150ec04516eea4ed930c68924af40b",
+    "tests/voidup/timeout.py": "d2aa9cd98342df561952f662b76a69ac21d3d4cdae1af332f2aa524edd0b7432",
+    "tests/voidup/evidence.py": "ca18574697b727aaeaf8a7b4031b130cb989ab5a7003c328e3a2e0388a4a7d8f"
+  },
+  "source_language": "VOID",
+  "compiler": "/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release/voidc",
+  "compiler_sha256": "16d313a2e4728c4d2a34fc8519c3f3d700c6098640e54927dc9da41a923568f9",
+  "actual_platform": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+  "native_platforms_unqualified": [
+    "Windows x64",
+    "macOS ARM64"
+  ]
+}

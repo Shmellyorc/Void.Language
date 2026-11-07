@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "build": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+  "stack_bytes": 1048576,
+  "installed_and_relocated": true,
+  "aot_checkout_and_installed_compiler_inaccessible": true,
+  "records": [
+    {
+      "command": [
+        "cmake",
+        "--install",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+        "--component",
+        "compiler"
+      ],
+      "stdout_sha256": "f015f32c49672cd8c17c975ed953530fc40725c5379db39df16e9dc0b620886e"
+    },
+    {
+      "command": [
+        "/tmp/VOID host installed \u96ea # % s292h9gd/relocated/bin/voidc",
+        "run",
+        "/tmp/VOID host installed \u96ea # % s292h9gd/main.void",
+        "--no-opt",
+        "--no-cache",
+        "--",
+        "args"
+      ],
+      "stdout": "61726773\nargs\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/VOID host installed \u96ea # % s292h9gd/relocated/bin/voidc",
+        "run",
+        "/tmp/VOID host installed \u96ea # % s292h9gd/main.void",
+        "--no-opt",
+        "--no-cache",
+        "--",
+        "crypto"
+      ],
+      "stdout": "true\ntrue\ntrue\nba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\ntrue true\ntrue true\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\ntrue\nfalse\nfalse\ntrue\ntrue\nfalse\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/VOID host installed \u96ea # % s292h9gd/relocated/bin/voidc",
+        "build",
+        "/tmp/VOID host installed \u96ea # % s292h9gd/main.void",
+        "-o",
+        "/tmp/VOID host installed \u96ea # % s292h9gd/aot-normal/application",
+        "--no-opt"
+      ],
+      "stdout": "Built native executable: /tmp/VOID host installed \u96ea # % s292h9gd/aot-normal/application\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/isolated_exec.py",
+        "/tmp/VOID host installed \u96ea # % s292h9gd/aot-normal",
+        "/tmp/VOID host installed \u96ea # % s292h9gd/aot-normal/application",
+        "args"
+      ],
+      "stdout": "61726773\nargs\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/isolated_exec.py",
+        "/tmp/VOID host installed \u96ea # % s292h9gd/aot-normal",
+        "/tmp/VOID host installed \u96ea # % s292h9gd/aot-normal/application",
+        "crypto"
+      ],
+      "stdout": "true\ntrue\ntrue\nba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\ntrue true\ntrue true\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\ntrue\nfalse\nfalse\ntrue\ntrue\nfalse\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/VOID host installed \u96ea # % s292h9gd/relocated/bin/voidc",
+        "run",
+        "/tmp/VOID host installed \u96ea # % s292h9gd/main.void",
+        "--no-cache",
+        "--",
+        "args"
+      ],
+      "stdout": "61726773\nargs\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/VOID host installed \u96ea # % s292h9gd/relocated/bin/voidc",
+        "run",
+        "/tmp/VOID host installed \u96ea # % s292h9gd/main.void",
+        "--no-cache",
+        "--",
+        "crypto"
+      ],
+      "stdout": "true\ntrue\ntrue\nba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\ntrue true\ntrue true\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\ntrue\nfalse\nfalse\ntrue\ntrue\nfalse\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/VOID host installed \u96ea # % s292h9gd/relocated/bin/voidc",
+        "build",
+        "/tmp/VOID host installed \u96ea # % s292h9gd/main.void",
+        "-o",
+        "/tmp/VOID host installed \u96ea # % s292h9gd/aot-o2/application"
+      ],
+      "stdout": "Built native executable: /tmp/VOID host installed \u96ea # % s292h9gd/aot-o2/application\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/isolated_exec.py",
+        "/tmp/VOID host installed \u96ea # % s292h9gd/aot-o2",
+        "/tmp/VOID host installed \u96ea # % s292h9gd/aot-o2/application",
+        "args"
+      ],
+      "stdout": "61726773\nargs\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/isolated_exec.py",
+        "/tmp/VOID host installed \u96ea # % s292h9gd/aot-o2",
+        "/tmp/VOID host installed \u96ea # % s292h9gd/aot-o2/application",
+        "crypto"
+      ],
+      "stdout": "true\ntrue\ntrue\nba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\ntrue true\ntrue true\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\ntrue\nfalse\nfalse\ntrue\ntrue\nfalse\n",
+      "stderr": ""
+    }
+  ]
+}

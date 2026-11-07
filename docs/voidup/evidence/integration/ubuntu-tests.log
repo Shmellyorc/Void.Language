@@ -1,0 +1,16 @@
+Internal ctest changing into directory: /home/shmellyorc/Documents/Void.Language/build/voidup-integration-ubuntu
+Test project /home/shmellyorc/Documents/Void.Language/build/voidup-integration-ubuntu
+    Start   1: voidup_smoke
+1/5 Test   #1: voidup_smoke ........................   Passed    0.42 sec
+    Start   2: voidup_ci_integration
+2/5 Test   #2: voidup_ci_integration ...............   Passed    0.13 sec
+    Start 155: host_capabilities_dependencies
+3/5 Test #155: host_capabilities_dependencies ......   Passed    0.19 sec
+    Start 156: host_capabilities_portable
+4/5 Test #156: host_capabilities_portable ..........   Passed    0.08 sec
+    Start 157: host_capabilities_portable_source
+5/5 Test #157: host_capabilities_portable_source ...   Passed   23.72 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) =  24.56 sec

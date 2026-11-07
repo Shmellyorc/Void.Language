@@ -1,0 +1,7 @@
+VOIDUP root verified; host=linux-x86_64-ubuntu24.04 trust=2-of-3-private-test-keys serial=10 current= previous= retained-transactions=0; native linking requires the declared host development SDK
+{"budget":0,"status":-1,"exception":true,"constructions":0,"checked_roots":966}
+{"budget":1,"status":-1,"exception":true,"constructions":0,"checked_roots":966}
+{"budget":4,"status":-1,"exception":true,"constructions":0,"checked_roots":1362}
+{"budget":16,"status":-1,"exception":true,"constructions":0,"checked_roots":1758}
+{"budget":64,"status":-1,"exception":true,"constructions":0,"checked_roots":10847}
+{"budget":256,"status":-1,"exception":true,"constructions":1,"checked_roots":427614}

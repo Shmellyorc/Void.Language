@@ -1,0 +1,217 @@
+{
+  "schema": 1,
+  "native_execution": false,
+  "scope": "MinGW x64 source compile only; no Windows VOIDUP JIT/AOT acceptance",
+  "commands": [
+    {
+      "command": [
+        "x86_64-w64-mingw32-g++",
+        "-std=c++20",
+        "-O2",
+        "-D_WIN32_WINNT=0x0A00",
+        "-DNOMINMAX",
+        "-DWIN32_LEAN_AND_MEAN",
+        "-Iinclude",
+        "-Isrc/runtime",
+        "-Ibuild/voidup-cross/providers/include",
+        "-c",
+        "/home/shmellyorc/Documents/Void.Language/src/runtime/host_abi.cpp",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-phaseb-cross/host_abi.o"
+      ],
+      "status": 0,
+      "seconds": 2.8087736379820853,
+      "source_sha256": "f7ec0b0c64fe8035ce93852fea850a199a0e4846d0cd69fcc08f9e34932d782c",
+      "object_sha256": "9cb77567e30eacf9427d35190caf3d6e3a277edaeacda7826f34079bbe2c48f0"
+    },
+    {
+      "command": [
+        "x86_64-w64-mingw32-g++",
+        "-std=c++20",
+        "-O2",
+        "-D_WIN32_WINNT=0x0A00",
+        "-DNOMINMAX",
+        "-DWIN32_LEAN_AND_MEAN",
+        "-Iinclude",
+        "-Isrc/runtime",
+        "-Ibuild/voidup-cross/providers/include",
+        "-c",
+        "/home/shmellyorc/Documents/Void.Language/src/runtime/host_directory.cpp",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-phaseb-cross/host_directory.o"
+      ],
+      "status": 0,
+      "seconds": 1.8716059639700688,
+      "source_sha256": "bf6280ffa9bbb37571f151e68de8219a9c27ecae68a7ac3540f0fabca58aeda8",
+      "object_sha256": "8f1b5c8ce28ced30680e5bde6353026b3c44fb17e80d38b61f3e2fe5d9d24a8f"
+    },
+    {
+      "command": [
+        "x86_64-w64-mingw32-g++",
+        "-std=c++20",
+        "-O2",
+        "-D_WIN32_WINNT=0x0A00",
+        "-DNOMINMAX",
+        "-DWIN32_LEAN_AND_MEAN",
+        "-Iinclude",
+        "-Isrc/runtime",
+        "-Ibuild/voidup-cross/providers/include",
+        "-c",
+        "/home/shmellyorc/Documents/Void.Language/src/runtime/host_directory_windows.cpp",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-phaseb-cross/host_directory_windows.o"
+      ],
+      "status": 0,
+      "seconds": 4.65240703697782,
+      "source_sha256": "83a0efc2a00367dd90988a4c0f640e738f37a0718eac128ac92c01021b0a5e49",
+      "object_sha256": "f6a0e7e9d6dfb2f58dccb305e09346bcdb74b26515d67e28f0d0fdd54f1e6ce3"
+    },
+    {
+      "command": [
+        "x86_64-w64-mingw32-g++",
+        "-std=c++20",
+        "-O2",
+        "-D_WIN32_WINNT=0x0A00",
+        "-DNOMINMAX",
+        "-DWIN32_LEAN_AND_MEAN",
+        "-Iinclude",
+        "-Isrc/runtime",
+        "-Ibuild/voidup-cross/providers/include",
+        "-c",
+        "/home/shmellyorc/Documents/Void.Language/src/runtime/host_process.cpp",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-phaseb-cross/host_process.o"
+      ],
+      "status": 0,
+      "seconds": 1.7730294989887625,
+      "source_sha256": "84c76c37a06c40c4bee24ffd6c5af48bf53c2a884cc43aff0df195cc5a553835",
+      "object_sha256": "928ebb884fecd6bdf95f779fca0af7f54288debe99bc069e81bc3ec5f7a6dc50"
+    },
+    {
+      "command": [
+        "x86_64-w64-mingw32-g++",
+        "-std=c++20",
+        "-O2",
+        "-D_WIN32_WINNT=0x0A00",
+        "-DNOMINMAX",
+        "-DWIN32_LEAN_AND_MEAN",
+        "-Iinclude",
+        "-Isrc/runtime",
+        "-Ibuild/voidup-cross/providers/include",
+        "-c",
+        "/home/shmellyorc/Documents/Void.Language/src/runtime/host_process_windows.cpp",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-phaseb-cross/host_process_windows.o"
+      ],
+      "status": 0,
+      "seconds": 5.0446432050084695,
+      "source_sha256": "231ccd1a0027dc31b6397630bb1b574fa4061714f1caa5af46a06efe931e62c5",
+      "object_sha256": "dc098993938e6d67f32346cdb2e76775a42947041059ef6af5906bb0a3569dee"
+    },
+    {
+      "command": [
+        "x86_64-w64-mingw32-g++",
+        "-std=c++20",
+        "-O2",
+        "-D_WIN32_WINNT=0x0A00",
+        "-DNOMINMAX",
+        "-DWIN32_LEAN_AND_MEAN",
+        "-Iinclude",
+        "-Isrc/runtime",
+        "-Ibuild/voidup-cross/providers/include",
+        "-c",
+        "/home/shmellyorc/Documents/Void.Language/src/runtime/host_archive.cpp",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-phaseb-cross/host_archive.o"
+      ],
+      "status": 0,
+      "seconds": 4.159514428989496,
+      "source_sha256": "0f72ba76b1fbd2cd358d954882bdf0716e55241176063f596ceee75f932cb45b",
+      "object_sha256": "cfc88f64e62dd3eac8ee7f41cc29a2895fb264b05b7ea10629f0546fa7f7ac9e"
+    },
+    {
+      "command": [
+        "x86_64-w64-mingw32-g++",
+        "-std=c++20",
+        "-O2",
+        "-D_WIN32_WINNT=0x0A00",
+        "-DNOMINMAX",
+        "-DWIN32_LEAN_AND_MEAN",
+        "-Iinclude",
+        "-Isrc/runtime",
+        "-Ibuild/voidup-cross/providers/include",
+        "-c",
+        "/home/shmellyorc/Documents/Void.Language/src/runtime/host_crypto.cpp",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-phaseb-cross/host_crypto.o"
+      ],
+      "status": 0,
+      "seconds": 1.952640523959417,
+      "source_sha256": "10ceb2da6c8ae78068cabe0203b7cb45829da2fddde2fbb3cec2585f5baa1c43",
+      "object_sha256": "bc8ff346f108b2e17dddee66aa68011e91f9b4418c15c4ab5b24b3adeb81b354"
+    },
+    {
+      "command": [
+        "x86_64-w64-mingw32-g++",
+        "-std=c++20",
+        "-O2",
+        "-D_WIN32_WINNT=0x0A00",
+        "-DNOMINMAX",
+        "-DWIN32_LEAN_AND_MEAN",
+        "-Iinclude",
+        "-Isrc/runtime",
+        "-Ibuild/voidup-cross/providers/include",
+        "-c",
+        "/home/shmellyorc/Documents/Void.Language/src/runtime/host_error.cpp",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-phaseb-cross/host_error.o"
+      ],
+      "status": 0,
+      "seconds": 2.736829900997691,
+      "source_sha256": "13babf15055fdb52af5a858624cfcc34e6d2946c4c15473323283ff1c6e5c187",
+      "object_sha256": "bc25fb0c4edd5284aafd1d79ab76a3de46461ae7e2a1188013f3cf5f62faf6fd"
+    },
+    {
+      "command": [
+        "x86_64-w64-mingw32-g++",
+        "-std=c++20",
+        "-O2",
+        "-D_WIN32_WINNT=0x0A00",
+        "-DNOMINMAX",
+        "-DWIN32_LEAN_AND_MEAN",
+        "-Iinclude",
+        "-Isrc/runtime",
+        "-Ibuild/voidup-cross/providers/include",
+        "-c",
+        "/home/shmellyorc/Documents/Void.Language/src/runtime/application.cpp",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-phaseb-cross/application.o"
+      ],
+      "status": 0,
+      "seconds": 3.0651695710257627,
+      "source_sha256": "8bb9491be9c3e649080bf1016521141a90fee541eb6802df12a63ad2e0edd699",
+      "object_sha256": "5abcfeed98d47485a79e6621d0ccd1b0a02ccb7b6473beb048a02a8e9025201e"
+    },
+    {
+      "command": [
+        "x86_64-w64-mingw32-g++",
+        "-std=c++20",
+        "-O2",
+        "-D_WIN32_WINNT=0x0A00",
+        "-DNOMINMAX",
+        "-DWIN32_LEAN_AND_MEAN",
+        "-Iinclude",
+        "-Isrc/runtime",
+        "-Ibuild/voidup-cross/providers/include",
+        "-c",
+        "/home/shmellyorc/Documents/Void.Language/src/runtime/filesystem.cpp",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-phaseb-cross/filesystem.o"
+      ],
+      "status": 0,
+      "seconds": 5.885283629002515,
+      "source_sha256": "0ccceb77a0546b6ff854a2e8aa3f9e9ed15d03ded2103d13847516db7fcc84ac",
+      "object_sha256": "61e590d32b9940261c4459a558e1f9b8b0ef339b361c2be9160e9bdda1782acd"
+    }
+  ]
+}

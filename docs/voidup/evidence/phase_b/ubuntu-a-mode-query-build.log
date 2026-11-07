@@ -1,0 +1,29 @@
+[0/2] Re-checking globbed directories...
+[1/28] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem_abi.cpp.o
+[2/28] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem.cpp.o
+[3/28] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_error.cpp.o
+[4/28] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_abi.cpp.o
+[5/28] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_crypto.cpp.o
+[6/28] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_archive.cpp.o
+[7/28] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_directory.cpp.o
+[8/28] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_process.cpp.o
+[9/28] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_process_windows.cpp.o
+[10/28] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_directory_windows.cpp.o
+[11/28] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_bulk.cpp.o
+[12/28] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http.cpp.o
+[13/28] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_resource.cpp.o
+[14/28] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_file.cpp.o
+[15/28] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_abi.cpp.o
+[16/28] Linking CXX static library libvoid_runtime.a
+[17/28] Generating void-native-resources.txt, native-resources-install-Release.txt
+[18/28] cd /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release && /usr/bin/cmake -E make_directory /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release && /usr/bin/cmake -E copy_if_different /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release/void-native-resources.txt /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release/void-native-resources.txt
+[19/28] Building CXX object CMakeFiles/void_core.dir/src/ir/module.cpp.o
+[20/28] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+[21/28] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[22/28] Linking CXX static library libvoid_core.a
+[23/28] Linking CXX static library libvoid_llvm.a
+[24/28] Linking CXX executable voidls
+[25/28] Generating cache-identity-Release.cpp
+[26/28] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Release.cpp.o
+[27/28] Linking CXX static library libvoid_cache_identity.a
+[28/28] Linking CXX executable voidc

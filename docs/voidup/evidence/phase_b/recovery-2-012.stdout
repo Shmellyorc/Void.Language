@@ -1,0 +1,1 @@
+VOIDUP root verified; host=linux-x86_64-ubuntu24.04 trust=2-of-3-private-test-keys serial=11 current=engineering-a previous=engineering-b retained-transactions=3; native linking requires the declared host development SDK

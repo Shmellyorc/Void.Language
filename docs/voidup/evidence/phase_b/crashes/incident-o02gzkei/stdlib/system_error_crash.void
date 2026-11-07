@@ -1,0 +1,73 @@
+use error as core
+
+## Recoverable failures from bounded cryptographic, ZIP and process primitives.
+enum error_kind:
+    ## A named input is absent.
+    not_found
+    ## Native access or ownership was denied.
+    permission_denied
+    ## An exclusive name already exists.
+    already_exists
+    ## An absolute path or relative component is invalid.
+    invalid_path
+    ## A count or cryptographic key/signature size is invalid.
+    invalid_range
+    ## The resource is closed or finalized.
+    closed
+    ## An operation still owns the resource.
+    busy
+    ## This native platform has not qualified the facility.
+    unsupported
+    ## A local independent resource limit was exceeded.
+    limit_exceeded
+    ## A native operation failed.
+    system_failure
+    ## The ZIP violates the restricted profile.
+    invalid_format
+    ## ZIP data failed integrity checks.
+    integrity_failure
+    ## Arguments or environment entries are invalid.
+    invalid_argument
+
+## Checked native failure without input contents in its diagnostic message.
+struct error extends core.error:
+    ## Public primitive operation that failed.
+    operation: string
+    ## Portable category.
+    kind: error_kind
+    ## Original native code, zero for validation failures.
+    os_code: i64
+
+## Adapt the private primitive reply without exposing native state.
+## @param operation Public operation name.
+## @param code Private portable ordinal.
+## @param native Original native diagnostic.
+## @return An owned error retaining the category and native code.
+internal func make(operation: string, code: i64, native: i64) -> error:
+    var kind = error_kind.system_failure
+    if code == 1:
+        kind = error_kind.not_found
+    else if code == 2:
+        kind = error_kind.permission_denied
+    else if code == 3:
+        kind = error_kind.already_exists
+    else if code == 4:
+        kind = error_kind.invalid_path
+    else if code == 6:
+        kind = error_kind.invalid_range
+    else if code == 7:
+        kind = error_kind.closed
+    else if code == 8:
+        kind = error_kind.busy
+    else if code == 11:
+        kind = error_kind.unsupported
+    else if code == 12:
+        kind = error_kind.limit_exceeded
+    else if code == 18:
+        kind = error_kind.invalid_format
+    else if code == 19:
+        kind = error_kind.integrity_failure
+    else if code == 20:
+        kind = error_kind.invalid_argument
+    return error(message = "{operation} failed; native code {native}", code = code as i32,
+        operation = operation, kind = kind, os_code = native)

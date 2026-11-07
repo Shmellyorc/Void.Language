@@ -1711,3 +1711,189 @@ internal func _path_separator() -> result<string, error>:
         return Err(_error("path.separator", "", "", reply))
 
     return Ok(reply.text)
+
+
+private value struct _host_reply:
+    kind: i64
+    os_code: i64
+    number: i64
+    detail: i64
+    flag: bool
+    text: string
+    bytes: [u8]
+
+
+## Held private directory capability; names are single literal UTF-8 components.
+## Admission checks no-follow ancestry and private ownership or a protected Windows DACL.
+struct private_directory:
+    private _local: bool
+
+private func (self private_directory) init():
+    pass
+
+## Held nonblocking interprocess writer lock; lock-file existence is not ownership.
+struct directory_lock:
+    private _local: bool
+
+private func (self directory_lock) init():
+    pass
+
+private func _host_error(operation: string, reply: _host_reply) -> error:
+    return error(message = "{operation} failed; native code {reply.os_code}", operation = operation,
+        code = reply.kind as i32, kind = _kind(reply.kind), os_code = reply.os_code,
+        cleanup_code = reply.detail)
+
+private func _host_ok(operation: string, reply: _host_reply) -> result<bool, error>:
+    if reply.kind != 0:
+        return Err(_host_error(operation, reply))
+    return Ok(true)
+
+## Exclusively create a private directory below checked no-follow ancestors; never adopts an existing name.
+## Unix uses 0700; Windows uses a protected current-user DACL.
+## @param path Absolute UTF-8 path with no dot components or symbolic ancestors.
+## @return Held capability or checked ownership, path or native failure.
+func create_private_directory(path: string) -> result<private_directory, error>:
+    var owner = private_directory()
+    var reply = _host_dir_create(owner, path)
+    if reply.kind != 0:
+        return Err(_host_error("io.create_private_directory", reply))
+    return Ok(owner)
+
+## Admit an existing private user-owned directory; never repairs permissions or DACLs.
+## @param path Absolute UTF-8 path with checked no-follow ancestry.
+## @return Held capability or ownership/path/platform failure.
+func open_private_directory(path: string) -> result<private_directory, error>:
+    var owner = private_directory()
+    var reply = _host_dir_admit(owner, path)
+    if reply.kind != 0:
+        return Err(_host_error("io.open_private_directory", reply))
+    return Ok(owner)
+
+## Exclusively create a private child relative to this held private_directory.
+## @param name One literal nonempty component excluding dot, dot-dot, separators and NUL.
+## @return New held private_directory; never follows a link or adopts an existing object.
+func (self private_directory) create_directory(name: string) -> result<private_directory, error>:
+    var owner = private_directory()
+    var reply = _host_dir_child(self, owner, name)
+    if reply.kind != 0:
+        return Err(_host_error("io.private_directory.create_directory", reply))
+    return Ok(owner)
+
+## Open one existing private real child private_directory without following links.
+## @param name One literal child component.
+## @return Held identity; ancestor namespace changes cannot redirect later child operations.
+func (self private_directory) open_directory(name: string) -> result<private_directory, error>:
+    var owner = private_directory()
+    var reply = _host_dir_open(self, owner, name)
+    if reply.kind != 0:
+        return Err(_host_error("io.private_directory.open_directory", reply))
+    return Ok(owner)
+
+## Exclusively create a private read/write file relative to this directory, without following links.
+## Unix uses 0600; Windows uses a protected current-user DACL.
+## @param name One literal child component.
+## @return Ordinary IO file resource retaining the same native identity through verification.
+func (self private_directory) create_file(name: string) -> result<file, error>:
+    var owner = file(value = name, order = binary.byte_order.little)
+    var reply = _host_dir_file(self, owner, name, 1)
+    if reply.kind != 0:
+        return Err(_host_error("io.private_directory.create_file", reply))
+    return Ok(owner)
+
+## Open a private single-link regular child for reading, without following links.
+## @param name One literal child component.
+## @return Ordinary held IO file; rejects links, devices, other owners and shared permissions.
+func (self private_directory) open_file(name: string) -> result<file, error>:
+    var owner = file(value = name, order = binary.byte_order.little)
+    var reply = _host_dir_file(self, owner, name, 0)
+    if reply.kind != 0:
+        return Err(_host_error("io.private_directory.open_file", reply))
+    return Ok(owner)
+
+## Acquire a nonblocking exclusive OS-held lock on a private regular child.
+## @param name Stable literal lock-file name; the file remains after release.
+## @return Held lock or busy; never infers ownership from a PID or filename.
+func (self private_directory) lock(name: string) -> result<directory_lock, error>:
+    var owner = directory_lock()
+    var reply = _host_dir_lock(self, owner, name)
+    if reply.kind != 0:
+        return Err(_host_error("io.private_directory.lock", reply))
+    return Ok(owner)
+
+## Synchronize this held directory's namespace metadata. Native inability to flush is an error.
+## @return True only after successful native synchronization; unsupported storage fails explicitly.
+func (self private_directory) sync() -> result<bool, error>:
+    return _host_ok("io.private_directory.sync", _host_dir_sync(self))
+
+## Allocation-free namespace outcome, including uncertain commits after a successful rename.
+## Failure reporting allocates no managed error after a namespace mutation.
+value struct publication:
+    ## True once the rename happened, including a later synchronization failure.
+    published: bool
+    ## True only after rename and required native directory synchronization succeeded.
+    durable: bool
+    ## Portable failure category; meaningful only when durable is false.
+    kind: error_kind
+    ## Portable IO error ordinal, zero on success.
+    code: i64
+    ## Original native error code, or zero for validation failures.
+    os_code: i64
+    ## Secondary source-parent synchronization failure accompanying a target-parent failure.
+    cleanup_code: i64
+
+private func _publication(reply: _host_reply) -> publication:
+    return publication(published = reply.flag, durable = reply.kind == 0,
+        kind = _kind(reply.kind), code = reply.kind, os_code = reply.os_code, cleanup_code = reply.detail)
+
+## Publish this held directory under a private target using same-volume no-replace rename.
+## @param target Held private destination directory.
+## @param name New literal component; an existing destination is never replaced.
+## @return Allocation-free outcome; published true with durable false is an uncertain commit.
+## A native directory flush failure remains uncertain, including on Windows.
+func (self private_directory) publish(target: private_directory, name: string) -> publication:
+    return _publication(_host_dir_publish(self, target, name))
+
+## Publish the same held regular file after flush; optionally replace a single control-record name.
+## @param input_file Held source file whose inode must match the named source child.
+## @param source One literal existing source component.
+## @param target Held destination directory on the same volume.
+## @param name Literal destination component.
+## @param replace Allow atomic replacement of the single destination directory entry.
+## @return Allocation-free outcome; published distinguishes post-rename durability failure.
+func (self private_directory) publish_file(input_file: file, source: string, target: private_directory, name: string, replace: bool = false) -> publication:
+    return _publication(_host_dir_replace(self, input_file, source, target, name, _flag(replace)))
+
+## Apply private data/executable mode only to a file created by a private_directory capability.
+## @param executable Unix selects 0700 or 0600; Windows verifies the private DACL for either value.
+## Never repairs adopted files; Windows has no POSIX executable-mode bit.
+## @return True after held-file permission application, or checked failure.
+func (self file) private_mode(executable: bool) -> result<bool, error>:
+    return _host_ok("io.file.private_mode", _host_file_mode(self, _flag(executable)))
+
+## Release this private_directory capability; children retain their independently held authority.
+## @return True after idempotent checked close.
+func (self private_directory) close() -> result<bool, error>:
+    return _host_ok("io.private_directory.close", _host_dir_close(self))
+
+## Release the held OS lock; the stable lock-file name remains.
+## @return True after checked close, including native close failures.
+func (self directory_lock) close() -> result<bool, error>:
+    return _host_ok("io.directory_lock.close", _host_lock_close(self))
+
+## Release this private_directory capability without allocating a checked reply.
+func (self private_directory) deinit():
+    _host_dir_cleanup(self)
+
+## Release this OS lock without allocating a checked reply.
+func (self directory_lock) deinit():
+    _host_lock_cleanup(self)
+
+## Inspect the same held private regular file without changing its permissions.
+## @param executable Require exact Unix 0700 or 0600; special/shared permissions fail the comparison.
+## Windows validates the protected current-user DACL for either classification.
+## @return True when the private classification matches; checked native failures retain details.
+func (self file) private_mode_matches(executable: bool) -> result<bool, error>:
+    var reply = _host_file_mode_matches(self, _flag(executable))
+    if reply.kind != 0:
+        return Err(_host_error("io.file.private_mode_matches", reply))
+    return Ok(reply.number != 0)

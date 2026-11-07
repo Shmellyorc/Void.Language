@@ -1,0 +1,251 @@
+In file included from include/void/runtime.hpp:6,
+                 from include/void/native_resource.hpp:3,
+                 from src/runtime/host_internal.hpp:3,
+                 from src/runtime/host_directory_windows.cpp:1:
+include/void/console.hpp: In member function 'virtual uint64_t vd::console::Adapter::capabilities(vd::console::Stream)':
+include/void/console.hpp:88:127: warning: enumerated and non-enumerated type in conditional expression [-Wextra]
+   88 |     virtual std::uint64_t capabilities(Stream stream) {auto e=inspect().at(static_cast<unsigned>(stream));return e.available()?(stream==Stream::input?text_input:text_output):0;}
+      |                                                                                                                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from src/runtime/host_directory_windows.cpp:3:
+src/runtime/host_windows.hpp: In function 'std::wstring vd::host::win::wide(std::string_view)':
+src/runtime/host_windows.hpp:36:5: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+   36 |     if(!count)fail();std::wstring out(count,0);
+      |     ^~
+src/runtime/host_windows.hpp:36:22: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+   36 |     if(!count)fail();std::wstring out(count,0);
+      |                      ^~~
+src/runtime/host_windows.hpp:37:5: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+   37 |     if(!MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,text.data(),static_cast<int>(text.size()),out.data(),count))fail();return out;
+      |     ^~
+src/runtime/host_windows.hpp:37:125: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+   37 |     if(!MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,text.data(),static_cast<int>(text.size()),out.data(),count))fail();return out;
+      |                                                                                                                             ^~~~~~
+src/runtime/host_windows.hpp: In member function 'void vd::host::win::PrivateAccess::verify(HANDLE, bool) const':
+src/runtime/host_windows.hpp:91:9: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+   91 |         if(!ConvertStringSidToSidW(L"S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464",&installer))fail();Free installer_memory{installer};
+      |         ^~
+src/runtime/host_windows.hpp:91:121: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+   91 |         if(!ConvertStringSidToSidW(L"S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464",&installer))fail();Free installer_memory{installer};
+      |                                                                                                                         ^~~~
+src/runtime/host_directory_windows.cpp: In member function 'virtual std::error_code vd::host::{anonymous}::Directory::close()':
+src/runtime/host_directory_windows.cpp:23:9: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+   23 |         if(node && node.use_count()==1)result=node->handle.close();node.reset();
+      |         ^~
+src/runtime/host_directory_windows.cpp:23:68: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+   23 |         if(node && node.use_count()==1)result=node->handle.close();node.reset();
+      |                                                                    ^~~~
+src/runtime/host_directory_windows.cpp: In function 'vd::host::win::Handle vd::host::{anonymous}::relative(HANDLE, const std::wstring&, bool, bool, bool, vd::host::win::PrivateAccess&, bool, bool)':
+src/runtime/host_directory_windows.cpp:44:15: warning: cast between incompatible function types from 'FARPROC' {aka 'long long int (*)()'} to 'Create' {aka 'long int (*)(void**, long unsigned int, _OBJECT_ATTRIBUTES*, _IO_STATUS_BLOCK*, LARGE_INTEGER*, long unsigned int, long unsigned int, long unsigned int, long unsigned int, void*, long unsigned int)'} [-Wcast-function-type]
+   44 |     auto call=reinterpret_cast<Create>(GetProcAddress(library,"NtCreateFile"));
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/runtime/host_directory_windows.cpp:45:18: warning: cast between incompatible function types from 'FARPROC' {aka 'long long int (*)()'} to 'Convert' {aka 'long unsigned int (*)(long int)'} [-Wcast-function-type]
+   45 |     auto convert=reinterpret_cast<Convert>(GetProcAddress(library,"RtlNtStatusToDosError"));
+      |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/runtime/host_directory_windows.cpp: In function 'std::shared_ptr<vd::host::{anonymous}::Directory> vd::host::{anonymous}::root(const std::string&, bool)':
+src/runtime/host_directory_windows.cpp:75:59: warning: cast between incompatible function types from 'FARPROC' {aka 'long long int (*)()'} to 'Create' {aka 'long int (*)(void**, long unsigned int, _OBJECT_ATTRIBUTES*, _IO_STATUS_BLOCK*, LARGE_INTEGER*, long unsigned int, long unsigned int, long unsigned int, long unsigned int, void*, long unsigned int)'} [-Wcast-function-type]
+   75 |         auto dll=GetModuleHandleW(L"ntdll.dll");auto call=reinterpret_cast<Create>(GetProcAddress(dll,"NtCreateFile"));auto convert=reinterpret_cast<Convert>(GetProcAddress(dll,"RtlNtStatusToDosError"));
+      |                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/runtime/host_directory_windows.cpp:75:133: warning: cast between incompatible function types from 'FARPROC' {aka 'long long int (*)()'} to 'Convert' {aka 'long unsigned int (*)(long int)'} [-Wcast-function-type]
+   75 |         auto dll=GetModuleHandleW(L"ntdll.dll");auto call=reinterpret_cast<Create>(GetProcAddress(dll,"NtCreateFile"));auto convert=reinterpret_cast<Convert>(GetProcAddress(dll,"RtlNtStatusToDosError"));
+      |                                                                                                                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/runtime/host_directory_windows.cpp:78:9: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+   78 |         if(status<0)win::fail(convert(status));win::Handle next(raw);win::information(raw,true);
+      |         ^~
+src/runtime/host_directory_windows.cpp:78:48: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+   78 |         if(status<0)win::fail(convert(status));win::Handle next(raw);win::information(raw,true);
+      |                                                ^~~
+src/runtime/host_directory_windows.cpp: In function 'vd::host::Result vd::host::{anonymous}::published(vd::host::Result, HANDLE, HANDLE)':
+src/runtime/host_directory_windows.cpp:101:5: warning: this 'else' clause does not guard... [-Wmisleading-indentation]
+  101 |     else if(second.kind){result.kind=second.kind;result.code=second.code;}return result;
+      |     ^~~~
+src/runtime/host_directory_windows.cpp:101:75: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'else'
+  101 |     else if(second.kind){result.kind=second.kind;result.code=second.code;}return result;
+      |                                                                           ^~~~~~
+src/runtime/host_directory_windows.cpp: In function 'vd::host::Result vd::host::windows_directory_execute(Request&)':
+src/runtime/host_directory_windows.cpp:119:13: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+  119 |             if(q.numbers[0]!=0 && q.numbers[0]!=1)return error(6);bool create=q.numbers[0]==1;
+      |             ^~
+src/runtime/host_directory_windows.cpp:119:67: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+  119 |             if(q.numbers[0]!=0 && q.numbers[0]!=1)return error(6);bool create=q.numbers[0]==1;
+      |                                                                   ^~~~
+In file included from include/void/runtime.hpp:6,
+                 from include/void/native_resource.hpp:3,
+                 from src/runtime/host_internal.hpp:3,
+                 from src/runtime/host_process_windows.cpp:1:
+include/void/console.hpp: In member function 'virtual uint64_t vd::console::Adapter::capabilities(vd::console::Stream)':
+include/void/console.hpp:88:127: warning: enumerated and non-enumerated type in conditional expression [-Wextra]
+   88 |     virtual std::uint64_t capabilities(Stream stream) {auto e=inspect().at(static_cast<unsigned>(stream));return e.available()?(stream==Stream::input?text_input:text_output):0;}
+      |                                                                                                                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from src/runtime/host_process_windows.cpp:3:
+src/runtime/host_windows.hpp: In function 'std::wstring vd::host::win::wide(std::string_view)':
+src/runtime/host_windows.hpp:36:5: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+   36 |     if(!count)fail();std::wstring out(count,0);
+      |     ^~
+src/runtime/host_windows.hpp:36:22: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+   36 |     if(!count)fail();std::wstring out(count,0);
+      |                      ^~~
+src/runtime/host_windows.hpp:37:5: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+   37 |     if(!MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,text.data(),static_cast<int>(text.size()),out.data(),count))fail();return out;
+      |     ^~
+src/runtime/host_windows.hpp:37:125: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+   37 |     if(!MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,text.data(),static_cast<int>(text.size()),out.data(),count))fail();return out;
+      |                                                                                                                             ^~~~~~
+src/runtime/host_windows.hpp: In member function 'void vd::host::win::PrivateAccess::verify(HANDLE, bool) const':
+src/runtime/host_windows.hpp:91:9: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+   91 |         if(!ConvertStringSidToSidW(L"S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464",&installer))fail();Free installer_memory{installer};
+      |         ^~
+src/runtime/host_windows.hpp:91:121: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+   91 |         if(!ConvertStringSidToSidW(L"S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464",&installer))fail();Free installer_memory{installer};
+      |                                                                                                                         ^~~~
+src/runtime/host_process_windows.cpp: In function 'std::wstring vd::host::{anonymous}::quote(std::wstring_view)':
+src/runtime/host_process_windows.cpp:53:9: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+   53 |         if(c==L'"')out.push_back(L'\\');out.push_back(c);
+      |         ^~
+src/runtime/host_process_windows.cpp:53:41: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+   53 |         if(c==L'"')out.push_back(L'\\');out.push_back(c);
+      |                                         ^~~
+src/runtime/host_process_windows.cpp: In function 'vd::host::Result vd::host::windows_process_execute(Request&)':
+src/runtime/host_process_windows.cpp:76:9: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+   76 |         if(image.value==INVALID_HANDLE_VALUE)win::fail();win::information(image.value,false);
+      |         ^~
+src/runtime/host_process_windows.cpp:76:58: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+   76 |         if(image.value==INVALID_HANDLE_VALUE)win::fail();win::information(image.value,false);
+      |                                                          ^~~
+src/runtime/host_process_windows.cpp:78:9: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+   78 |         if(directory.value==INVALID_HANDLE_VALUE)win::fail();win::information(directory.value,true);
+      |         ^~
+src/runtime/host_process_windows.cpp:78:62: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+   78 |         if(directory.value==INVALID_HANDLE_VALUE)win::fail();win::information(directory.value,true);
+      |                                                              ^~~
+src/runtime/host_process_windows.cpp:86:13: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+   86 |             if(!names.insert(key).second)return error(20);entries.push_back(win::wide(entry));
+      |             ^~
+src/runtime/host_process_windows.cpp:86:59: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+   86 |             if(!names.insert(key).second)return error(20);entries.push_back(win::wide(entry));
+      |                                                           ^~~~~~~
+src/runtime/host_process_windows.cpp:91:9: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+   91 |         if(environment.empty())environment.push_back(0);environment.push_back(0);
+      |         ^~
+src/runtime/host_process_windows.cpp:91:57: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+   91 |         if(environment.empty())environment.push_back(0);environment.push_back(0);
+      |                                                         ^~~~~~~~~~~
+src/runtime/host_process_windows.cpp:109:13: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+  109 |             if(!InitializeProcThreadAttributeList(list,1,0,&count))win::fail();attributes.list=list;
+      |             ^~
+src/runtime/host_process_windows.cpp:109:80: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+  109 |             if(!InitializeProcThreadAttributeList(list,1,0,&count))win::fail();attributes.list=list;
+      |                                                                                ^~~~~~~~~~
+In file included from include/void/runtime.hpp:6,
+                 from include/void/native_resource.hpp:3,
+                 from src/runtime/host_internal.hpp:3,
+                 from src/runtime/host_process.cpp:4:
+include/void/console.hpp: In member function 'virtual uint64_t vd::console::Adapter::capabilities(vd::console::Stream)':
+include/void/console.hpp:88:127: warning: enumerated and non-enumerated type in conditional expression [-Wextra]
+   88 |     virtual std::uint64_t capabilities(Stream stream) {auto e=inspect().at(static_cast<unsigned>(stream));return e.available()?(stream==Stream::input?text_input:text_output):0;}
+      |                                                                                                                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from include/void/runtime.hpp:6,
+                 from include/void/native_resource.hpp:3,
+                 from src/runtime/host_internal.hpp:3,
+                 from src/runtime/host_archive.cpp:1:
+include/void/console.hpp: In member function 'virtual uint64_t vd::console::Adapter::capabilities(vd::console::Stream)':
+include/void/console.hpp:88:127: warning: enumerated and non-enumerated type in conditional expression [-Wextra]
+   88 |     virtual std::uint64_t capabilities(Stream stream) {auto e=inspect().at(static_cast<unsigned>(stream));return e.available()?(stream==Stream::input?text_input:text_output):0;}
+      |                                                                                                                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/runtime/host_archive.cpp: In function 'bool vd::host::{anonymous}::extra(const std::string&, uint64_t&, uint64_t&, uint64_t&, bool)':
+src/runtime/host_archive.cpp:85:9: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+   85 |         if(fields.size()-n<4)return false;auto tag=u16(fields.data()+n),count=u16(fields.data()+n+2);n+=4;
+      |         ^~
+src/runtime/host_archive.cpp:85:43: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+   85 |         if(fields.size()-n<4)return false;auto tag=u16(fields.data()+n),count=u16(fields.data()+n+2);n+=4;
+      |                                           ^~~~
+src/runtime/host_archive.cpp:86:9: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+   86 |         if(count>fields.size()-n)return false;auto* data=fields.data()+n;
+      |         ^~
+src/runtime/host_archive.cpp:86:47: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+   86 |         if(count>fields.size()-n)return false;auto* data=fields.data()+n;
+      |                                               ^~~~
+src/runtime/host_archive.cpp:88:13: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+   88 |             if(zip64)return false;zip64=true;std::size_t pos=0;
+      |             ^~
+src/runtime/host_archive.cpp:88:35: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+   88 |             if(zip64)return false;zip64=true;std::size_t pos=0;
+      |                                   ^~~~~
+src/runtime/host_archive.cpp:90:17: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+   90 |                 if(count-pos<8)return false;*pair.second=u64(data+pos);pos+=8;
+      |                 ^~
+src/runtime/host_archive.cpp:90:45: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+   90 |                 if(count-pos<8)return false;*pair.second=u64(data+pos);pos+=8;
+      |                                             ^
+src/runtime/host_archive.cpp: In function 'vd::host::Result vd::host::{anonymous}::preflight(Zip&, uint64_t)':
+src/runtime/host_archive.cpp:140:9: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+  140 |         if(m.size>z.limit-total)return error(12);total+=m.size;
+      |         ^~
+src/runtime/host_archive.cpp:140:50: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+  140 |         if(m.size>z.limit-total)return error(12);total+=m.size;
+      |                                                  ^~~~~
+src/runtime/host_archive.cpp:151:9: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+  151 |         if(data>central || m.compressed>central-data)return error(18);m.data_end=data+m.compressed;
+      |         ^~
+src/runtime/host_archive.cpp:151:71: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+  151 |         if(data>central || m.compressed>central-data)return error(18);m.data_end=data+m.compressed;
+      |                                                                       ^
+src/runtime/host_archive.cpp:156:13: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+  156 |             if(!z.at(m.data_end,descriptor.data(),length))return error(18);auto* d=descriptor.data()+(signature?4:0);
+      |             ^~
+src/runtime/host_archive.cpp:156:76: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+  156 |             if(!z.at(m.data_end,descriptor.data(),length))return error(18);auto* d=descriptor.data()+(signature?4:0);
+      |                                                                            ^~~~
+In file included from include/void/runtime.hpp:6,
+                 from include/void/native_resource.hpp:3,
+                 from src/runtime/host_internal.hpp:3,
+                 from src/runtime/host_crypto.cpp:1:
+include/void/console.hpp: In member function 'virtual uint64_t vd::console::Adapter::capabilities(vd::console::Stream)':
+include/void/console.hpp:88:127: warning: enumerated and non-enumerated type in conditional expression [-Wextra]
+   88 |     virtual std::uint64_t capabilities(Stream stream) {auto e=inspect().at(static_cast<unsigned>(stream));return e.available()?(stream==Stream::input?text_input:text_output):0;}
+      |                                                                                                                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from include/void/runtime.hpp:6,
+                 from include/void/native_resource.hpp:3,
+                 from src/runtime/host_internal.hpp:3,
+                 from src/runtime/host_abi.cpp:1:
+include/void/console.hpp: In member function 'virtual uint64_t vd::console::Adapter::capabilities(vd::console::Stream)':
+include/void/console.hpp:88:127: warning: enumerated and non-enumerated type in conditional expression [-Wextra]
+   88 |     virtual std::uint64_t capabilities(Stream stream) {auto e=inspect().at(static_cast<unsigned>(stream));return e.available()?(stream==Stream::input?text_input:text_output):0;}
+      |                                                                                                                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from include/void/runtime.hpp:6,
+                 from src/runtime/application.cpp:2:
+include/void/console.hpp: In member function 'virtual uint64_t vd::console::Adapter::capabilities(vd::console::Stream)':
+include/void/console.hpp:88:127: warning: enumerated and non-enumerated type in conditional expression [-Wextra]
+   88 |     virtual std::uint64_t capabilities(Stream stream) {auto e=inspect().at(static_cast<unsigned>(stream));return e.available()?(stream==Stream::input?text_input:text_output):0;}
+      |                                                                                                                  ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/runtime/filesystem.cpp:20: warning: "NOMINMAX" redefined
+   20 | #define NOMINMAX
+      | 
+In file included from /usr/lib/gcc/x86_64-w64-mingw32/13-posix/include/c++/x86_64-w64-mingw32/bits/c++config.h:679,
+                 from /usr/lib/gcc/x86_64-w64-mingw32/13-posix/include/c++/bits/atomic_base.h:35,
+                 from /usr/lib/gcc/x86_64-w64-mingw32/13-posix/include/c++/atomic:41,
+                 from include/void/filesystem.hpp:3,
+                 from src/runtime/filesystem.cpp:1:
+/usr/lib/gcc/x86_64-w64-mingw32/13-posix/include/c++/x86_64-w64-mingw32/bits/os_defines.h:45: note: this is the location of the previous definition
+   45 | #define NOMINMAX 1
+      | 
+In file included from src/runtime/filesystem.cpp:22:
+src/runtime/host_windows.hpp: In function 'std::wstring vd::host::win::wide(std::string_view)':
+src/runtime/host_windows.hpp:36:5: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+   36 |     if(!count)fail();std::wstring out(count,0);
+      |     ^~
+src/runtime/host_windows.hpp:36:22: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+   36 |     if(!count)fail();std::wstring out(count,0);
+      |                      ^~~
+src/runtime/host_windows.hpp:37:5: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+   37 |     if(!MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,text.data(),static_cast<int>(text.size()),out.data(),count))fail();return out;
+      |     ^~
+src/runtime/host_windows.hpp:37:125: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+   37 |     if(!MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,text.data(),static_cast<int>(text.size()),out.data(),count))fail();return out;
+      |                                                                                                                             ^~~~~~
+src/runtime/host_windows.hpp: In member function 'void vd::host::win::PrivateAccess::verify(HANDLE, bool) const':
+src/runtime/host_windows.hpp:91:9: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+   91 |         if(!ConvertStringSidToSidW(L"S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464",&installer))fail();Free installer_memory{installer};
+      |         ^~
+src/runtime/host_windows.hpp:91:121: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+   91 |         if(!ConvertStringSidToSidW(L"S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464",&installer))fail();Free installer_memory{installer};
+      |                                                                                                                         ^~~~

@@ -1,0 +1,22 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-strict
+    Start 155: host_capabilities_portable_source
+1/1 Test #155: host_capabilities_portable_source ...***Failed   45.74 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_source.py", line 38, in <module>
+    run([*base,work/('private-'+str(optimize)+'-'+str(index))],work,'true\ntrue\n7\n0\ntrue\ntrue\ntrue\n7\n7\ntrue\ntrue\ntrue\n')
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_source.py", line 13, in run
+    result=h.run(command,work,native_text(expected) if expected is not None else None,small=os.name!='nt',sources=(source,))
+  File "/home/shmellyorc/Documents/Void.Language/tests/random/harness.py", line 31, in run
+    assert result.stdout == expected, (args, result.stdout[:4000], expected[:4000], result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc', 'run', '/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_filesystem.void', '--no-opt', '--no-cache', '--', '/tmp/VOID portable source 雪 # % ik19n1ci/private-False-0'], b'true\ntrue\n7\n0\ntrue\ntrue\ntrue\n7\n7\ntrue\ntrue\ntrue\n', b'true\ntrue\n7\ntrue\ntrue\ntrue\ntrue\n7\n7\ntrue\ntrue\ntrue\n', b'')
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =  45.75 sec
+
+The following tests FAILED:
+	155 - host_capabilities_portable_source (Failed)
+Errors while running CTest

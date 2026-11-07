@@ -1,0 +1,16 @@
+{
+  "root": "/home/shmellyorc/Documents/Void.Language/build/voidup-integration-ubuntu-bootstrap",
+  "copied": [
+    "tools",
+    "cmake",
+    "third_party",
+    "tests/net/http/python-versions.json"
+  ],
+  "read_only_reused_inputs": [
+    "LLVM SDK",
+    "verified Ubuntu HTTP prefix",
+    "verified corresponding source archives"
+  ],
+  "host_prefix_existed": false,
+  "native_userspace": "Ubuntu 24.04 container, PikaOS kernel"
+}

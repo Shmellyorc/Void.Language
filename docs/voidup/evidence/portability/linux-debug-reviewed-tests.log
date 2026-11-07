@@ -1,0 +1,17 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+    Start 166: host_capabilities_dependencies
+1/6 Test #166: host_capabilities_dependencies ......   Passed    0.15 sec
+    Start 167: host_capabilities_portable
+2/6 Test #167: host_capabilities_portable ..........   Passed    0.06 sec
+    Start 168: host_capabilities_portable_source
+3/6 Test #168: host_capabilities_portable_source ...   Passed   76.06 sec
+    Start 171: host_capabilities_frontend
+4/6 Test #171: host_capabilities_frontend ..........   Passed   12.40 sec
+    Start 172: host_capabilities_lsp
+5/6 Test #172: host_capabilities_lsp ...............   Passed    2.51 sec
+    Start 173: host_capabilities_native
+6/6 Test #173: host_capabilities_native ............   Passed    0.31 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Total Test time (real) =  91.51 sec

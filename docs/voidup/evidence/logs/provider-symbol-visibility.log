@@ -1,0 +1,3 @@
+ 14145: 0000000002817760   120 FUNC    LOCAL  DEFAULT   14 archive_read_new
+ 14393: 000000000282a1c0   926 FUNC    LOCAL  DEFAULT   14 crypto_hash_sha256_update
+ 14397: 000000000282b320     5 FUNC    LOCAL  DEFAULT   14 crypto_sign_verify_detached

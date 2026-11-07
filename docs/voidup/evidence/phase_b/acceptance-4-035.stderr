@@ -1,0 +1,8 @@
+/tmp/VOIDUP real A B 雪 # % yfa3ku11/absent.void:1:1: error: Cannot find imported file '/absent.void'.
+    code: VOID3002
+
+ 1 | 
+   | ^
+    Module: /absent.void
+    Hint: Check this path relative to the importing file or virtual project root.
+

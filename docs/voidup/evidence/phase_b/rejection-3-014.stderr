@@ -1,0 +1,1 @@
+{"message":"HTTP send failed","operation":"send","kind":"/@stdlib/net/http.void::error_kind.limit_exceeded","phase":"/@stdlib/net/http.void::failure_phase.download","status":200,"code":1,"native_domain":"","native_code":0,"cleanup_code":0,"progress":8388608,"published":false,"durable":false}

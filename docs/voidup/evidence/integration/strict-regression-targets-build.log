@@ -1,0 +1,26 @@
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 76%] Built target libcurl_static
+[ 92%] Built target void_runtime
+[ 92%] Building CXX object CMakeFiles/void_http_native.dir/tests/net/http/runtime.cpp.o
+[100%] Building CXX object CMakeFiles/void_http_native.dir/tests/net/http/native.cpp.o
+/home/shmellyorc/Documents/Void.Language/tests/net/http/runtime.cpp:473:51: warning: missing field 'client' initializer [-Wmissing-field-initializers]
+  473 |         Context context{runtime, base, mode, count}; current = &context;
+      |                                                   ^
+1 warning generated.
+[100%] Linking CXX executable void_http_native
+[100%] Built target void_http_native
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Building CXX object CMakeFiles/void_http_ir.dir/tests/net/http/http_ir.cpp.o
+[100%] Linking CXX executable void_http_ir
+[100%] Built target void_http_ir
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 83%] Built target libcurl_static
+[100%] Built target void_runtime
+[100%] Linking CXX executable void_url_native
+[100%] Built target void_url_native

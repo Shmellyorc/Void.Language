@@ -1,0 +1,96 @@
+{
+  "scope": "Focused licensing checks, not platform/installation qualification",
+  "commands": [
+    {
+      "argv": [
+        "cmake",
+        "--install",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+        "--prefix",
+        "/tmp/VOID license installs 52_sm_lv/compiler",
+        "--component",
+        "compiler"
+      ],
+      "exit_code": 0,
+      "log": "linux-compiler.log"
+    },
+    {
+      "argv": [
+        "cmake",
+        "--install",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+        "--prefix",
+        "/tmp/VOID license installs 52_sm_lv/tooling",
+        "--component",
+        "tooling"
+      ],
+      "exit_code": 0,
+      "log": "linux-tooling.log"
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/tmp/VOID license installs 52_sm_lv/windows-notice-rules",
+        "-B",
+        "/tmp/VOID license installs 52_sm_lv/windows-notice-rules/build"
+      ],
+      "exit_code": 0,
+      "log": "windows-rules-configure.log"
+    },
+    {
+      "argv": [
+        "cmake",
+        "--install",
+        "/tmp/VOID license installs 52_sm_lv/windows-notice-rules/build",
+        "--prefix",
+        "/tmp/VOID license installs 52_sm_lv/windows-compiler",
+        "--component",
+        "compiler"
+      ],
+      "exit_code": 0,
+      "log": "windows-rules-compiler.log"
+    },
+    {
+      "argv": [
+        "cmake",
+        "--install",
+        "/tmp/VOID license installs 52_sm_lv/windows-notice-rules/build",
+        "--prefix",
+        "/tmp/VOID license installs 52_sm_lv/windows-tooling",
+        "--component",
+        "tooling"
+      ],
+      "exit_code": 0,
+      "log": "windows-rules-tooling.log"
+    }
+  ],
+  "results": [
+    {
+      "name": "source-inventory",
+      "result": "FAIL",
+      "error": "Installed bytes differ: /home/shmellyorc/Documents/Void.Language/docs/release/REDISTRIBUTION_NOTICES.md"
+    },
+    {
+      "name": "linux-compiler-install",
+      "result": "FAIL",
+      "error": "Installed bytes differ: /tmp/VOID license installs 52_sm_lv/compiler/share/void/licenses/REDISTRIBUTION.txt"
+    },
+    {
+      "name": "linux-tooling-install",
+      "result": "FAIL",
+      "error": "Installed bytes differ: /tmp/VOID license installs 52_sm_lv/tooling/share/void/licenses/REDISTRIBUTION.txt"
+    },
+    {
+      "name": "windows-notice-rules-compiler",
+      "result": "FAIL",
+      "error": "Installed bytes differ: /tmp/VOID license installs 52_sm_lv/windows-compiler/share/void/licenses/REDISTRIBUTION.txt"
+    },
+    {
+      "name": "windows-notice-rules-tooling",
+      "result": "FAIL",
+      "error": "Installed bytes differ: /tmp/VOID license installs 52_sm_lv/windows-tooling/share/void/licenses/REDISTRIBUTION.txt"
+    }
+  ],
+  "native_windows_macos": "NOT RUN / UNKNOWN"
+}

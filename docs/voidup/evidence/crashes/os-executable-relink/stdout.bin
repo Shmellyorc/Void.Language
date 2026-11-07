@@ -1,0 +1,14 @@
+data 3 os.data_dir  0
+config 3 os.config_dir  0
+cache 3 os.cache_dir  0
+state 3 os.state_dir  0
+home 3 os.home_dir  0
+temp ok [47, 116, 109, 112]
+env ok [32, 32, 233, 155, 170, 240, 159, 152, 128, 10, 61, 97, 61, 98, 32, 32]
+missing 1 os.env  0
+image false
+resources true
+pid true
+platform linux
+arch x86_64
+bundle false

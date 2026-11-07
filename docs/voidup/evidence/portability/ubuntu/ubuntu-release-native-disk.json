@@ -1,0 +1,8 @@
+{
+  "executable": "/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release/void_host_capabilities",
+  "sha256": "fa56d13134c9f4ff7dc2ac4c6bc1e8284db1db975300de0a792bc8780f93e402",
+  "stack_bytes": 1048576,
+  "filesystem": "overlayfs",
+  "stdout": "Host boundary/GC/allocation/publication/process/ZIP/IR: 300 checks passed\n",
+  "stderr": ""
+}

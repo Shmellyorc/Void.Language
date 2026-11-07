@@ -1,0 +1,7 @@
+/home/shmellyorc/Documents/Void.Language/apps/voidup/support.void:78:20: error: Unsupported compound assignment operand types.
+    code: VOID2001
+
+ 78 |             output += block
+    |                    ^^
+    Module: /support.void
+

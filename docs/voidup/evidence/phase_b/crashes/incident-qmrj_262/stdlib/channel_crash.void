@@ -1,0 +1,100 @@
+## Opaque identity for one subscription. Copies identify the same registration.
+## Dropping a handle does not disconnect; retaining it retains no router or callback.
+struct subscription:
+    private const _identity: bool
+
+private func (self subscription) init():
+    pass
+
+private struct _topic<t>:
+    event delivered: func(const t)
+
+private func (self _topic<t>) _emit(const payload: t):
+    self.delivered.emit(payload)
+
+# The public handle never points back to this record or its callback graph.
+# Null wrapper means inert preparation/removal metadata, never a live subscription.
+private struct _registration<t>:
+    topic: string
+    bucket: _topic<t>
+    wrapper: (func(const t))?
+
+private struct _state<t>:
+    topics: {string: _topic<t>}
+    registrations: {subscription: _registration<t>}
+
+private func (self _state<t>) _topic_for(topic: string) -> _topic<t>:
+    if self.topics.get(topic) is Ok(var found):
+        return found
+    var created = _topic<t>()
+    self.topics[topic] = created
+    return created
+
+## Synchronous ordered string-topic routing for one exact payload type.
+## Construct with router<t>(); aliases share this managed instance.
+## Use on the owning application thread. Managed storage grants no thread safety.
+struct router<t>:
+    private _state: _state<t>?
+
+## Append a strong callback and return its unique subscription handle.
+## Duplicate callbacks are separate registrations. Pending metadata after allocation
+## failure is inert and retains no failed callback; existing registrations remain valid.
+## @param topic Exact UTF-8 bytes, including empty strings and embedded NUL; no wildcards.
+## @param handler Synchronous callback with readonly payload authority and no result.
+## @return Opaque handle for explicit unsubscribe; dropping it does not disconnect.
+func (self router<t>) subscribe(topic: string, handler: func(const t)) -> subscription:
+    var token = subscription()
+    var wrapper = func(const payload: t):
+        handler(payload)
+    if self._state == null:
+        self._state = _state<t>()
+    var state = self._state as _state<t>
+    var bucket = state._topic_for(topic)
+    var record = _registration<t>(topic = topic, bucket = bucket)
+    state.registrations[token] = record
+    
+    # Final fallible publication. Do not add helpers, lookups, allocations or
+    # deferred cleanup after this append. Commit to the already held record.
+    bucket.delivered += wrapper
+    record.wrapper = wrapper
+    return token
+
+## Disconnect exactly one live registration belonging to this router.
+## An active emission keeps its captured snapshot. Removal precedes fallible index
+## cleanup; a cleanup failure may leave inert metadata, safe to retry or clear.
+## @param token Handle returned by subscribe, including a copied or readonly handle.
+## @return True if disconnected; false for foreign, stale or already removed handles.
+func (self router<t>) unsubscribe(const token: subscription) -> bool:
+    if self._state is Ok(var state):
+        if state.registrations.get(token) is Ok(var record):
+            var removed = false
+            if record.wrapper is Ok(var wrapper):
+                record.bucket.delivered -= wrapper
+                record.wrapper = null
+                removed = true
+            state.registrations.remove(token)
+            var occupied = false
+            for remaining in state.registrations:
+                if remaining.topic == record.topic and remaining.wrapper != null:
+                    occupied = true
+                    break
+            if not occupied:
+                state.topics.remove(record.topic)
+            return removed
+    return false
+
+## Deliver synchronously in subscription order using the existing event snapshot.
+## Nested emits take fresh routing state and run depth-first. Unknown topics create
+## no routing state. Readonly payloads retain ordinary reference identity/value copies.
+## @param topic Exact topic bytes to select; slash has no hierarchy or wildcard meaning.
+## @param payload Message observed with readonly authority; captured application state may mutate.
+func (self router<t>) emit(topic: string, const payload: t):
+    if self._state is Ok(var state):
+        if state.topics.get(topic) is Ok(var bucket):
+            bucket._emit(payload)
+
+## Remove all registrations by detaching state; this router remains reusable.
+## Active snapshots finish. Old handles become inactive. No callback, source deinit
+## or native resource destruction runs; reclamation follows ordinary GC lifetimes.
+func (self router<t>) clear():
+    self._state = null

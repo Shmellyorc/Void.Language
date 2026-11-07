@@ -1,0 +1,6 @@
+{
+  "profile": "strict",
+  "prefix": ".toolchains/host/prefix/strict",
+  "manifest_sha256": "cf53e93c6595aeea49aea3906b3473f97909686ddc97dff312af2721b090f1a3",
+  "zlib_sha256": "79e67ee74f26632d95d3fbc2a06de91b214c8289c7fcdc54f0c7e470e30a7279"
+}

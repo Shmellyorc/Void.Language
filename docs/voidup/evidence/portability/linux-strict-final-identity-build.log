@@ -1,0 +1,21 @@
+[  6%] Built target void_native_fixture
+[  6%] Built target void_zone_objects
+[  6%] Built target void_format_objects
+[ 13%] Built target void_core
+[ 80%] Built target libcurl_static
+[ 93%] Built target void_runtime
+[ 93%] Built target void_llvm
+[ 93%] Built target void_native_inventory
+[ 93%] Built target voidc_objects
+[100%] Generating cache-identity-RelWithDebInfo.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-RelWithDebInfo.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[  0%] Built target void_native_fixture
+[  7%] Built target void_format_objects
+[  7%] Built target void_zone_objects
+[ 84%] Built target libcurl_static
+[100%] Built target void_runtime
+[100%] Built target void_host_portable

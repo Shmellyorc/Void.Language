@@ -1,0 +1,1 @@
+{"message":"HTTP send failed","operation":"send","kind":"/@stdlib/net/http.void::error_kind.tls_verification","phase":"/@stdlib/net/http.void::failure_phase.tls","status":0,"code":1,"native_domain":"curl","native_code":60,"cleanup_code":0,"progress":0,"published":false,"durable":false}

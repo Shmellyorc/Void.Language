@@ -40,7 +40,7 @@ def main():
     required = ['cmake']
     generator = 'Ninja' if shutil.which('ninja') else 'Unix Makefiles'
     if system == 'Windows':
-        required.append('ninja')
+        required += ['ninja', 'msbuild']
     if system in ('Linux', 'Darwin'):
         required += ['make', 'perl']
     if system == 'Windows' and os.environ.get('VSCMD_ARG_TGT_ARCH', '').lower() not in ('x64', 'amd64'):
@@ -106,10 +106,17 @@ def main():
         if system != 'Linux':
             command.append(arch)
         run('http-verify', command)
+        host_bundle = {'Linux': '', 'Windows': 'windows-x86_64', 'Darwin': 'macos-arm64'}[system]
+        host = ROOT / '.toolchains/host/prefix' / host_bundle / args.configuration
+        if not (host / 'VOID-HOST-DEPENDENCIES.json').exists():
+            run('host-setup', [sys.executable, ROOT / 'tools/setup_host_deps.py', '--profile', args.configuration, '--jobs', args.jobs])
+        run('host-verify', [sys.executable, ROOT / 'tools/verify_host_deps.py', '--prefix', host,
+                            '--profile', args.configuration, '--platform', system, '--architecture', arch])
         command = ['cmake', '-S', ROOT, '-B', build, '-G', generator,
                    '-DCMAKE_BUILD_TYPE=' + args.configuration, '-DBUILD_TESTING=OFF',
                    '-DVOID_SANITIZERS=OFF', '-DVOID_LLVM_RESEARCH=OFF',
-                   '-DPython3_EXECUTABLE=' + sys.executable, '-DVOID_HTTP_DEPS_ROOT=' + str(http)]
+                   '-DPython3_EXECUTABLE=' + sys.executable, '-DVOID_HTTP_DEPS_ROOT=' + str(http),
+                   '-DVOID_HOST_DEPS_ROOT=' + str(host)]
         for name, key in (('CMAKE_C_COMPILER', 'CC'), ('CMAKE_CXX_COMPILER', 'CXX'),
                           ('LLVM_DIR', 'LLVM_DIR'), ('VOID_CLANG', 'VOID_CLANG'), ('VOID_LINKER', 'VOID_LINKER')):
             command.append('-D' + name + '=' + environment[key])

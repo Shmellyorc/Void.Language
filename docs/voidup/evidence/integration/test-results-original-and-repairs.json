@@ -1,0 +1,100 @@
+{
+  "release-tests": {
+    "tests": 16,
+    "failed": [
+      "voidup_smoke",
+      "http_ir"
+    ],
+    "passed": [
+      "voidup_ci_integration",
+      "cli_contract",
+      "http_native",
+      "url_native",
+      "http_ci_policy",
+      "host_capabilities_dependencies",
+      "host_capabilities_portable",
+      "host_capabilities_portable_source",
+      "host_capabilities",
+      "host_capabilities_stack",
+      "host_capabilities_frontend",
+      "host_capabilities_lsp",
+      "host_capabilities_native",
+      "host_capabilities_install"
+    ]
+  },
+  "release-retry-tests": {
+    "tests": 2,
+    "failed": [],
+    "passed": [
+      "voidup_smoke",
+      "http_ir"
+    ]
+  },
+  "debug-tests": {
+    "tests": 11,
+    "failed": [
+      "voidup_smoke"
+    ],
+    "passed": [
+      "voidup_ci_integration",
+      "host_capabilities_dependencies",
+      "host_capabilities_portable",
+      "host_capabilities_portable_source",
+      "host_capabilities",
+      "host_capabilities_stack",
+      "host_capabilities_frontend",
+      "host_capabilities_lsp",
+      "host_capabilities_native",
+      "host_capabilities_install"
+    ]
+  },
+  "debug-retry-tests": {
+    "tests": 1,
+    "failed": [],
+    "passed": [
+      "voidup_smoke"
+    ]
+  },
+  "strict-tests": {
+    "tests": 16,
+    "failed": [
+      "voidup_smoke",
+      "http_ir"
+    ],
+    "passed": [
+      "voidup_ci_integration",
+      "cli_contract",
+      "http_native",
+      "url_native",
+      "http_ci_policy",
+      "host_capabilities_dependencies",
+      "host_capabilities_portable",
+      "host_capabilities_portable_source",
+      "host_capabilities",
+      "host_capabilities_stack",
+      "host_capabilities_frontend",
+      "host_capabilities_lsp",
+      "host_capabilities_native",
+      "host_capabilities_install"
+    ]
+  },
+  "ubuntu-tests": {
+    "tests": 5,
+    "failed": [],
+    "passed": [
+      "voidup_smoke",
+      "voidup_ci_integration",
+      "host_capabilities_dependencies",
+      "host_capabilities_portable",
+      "host_capabilities_portable_source"
+    ]
+  },
+  "strict-retry-tests": {
+    "tests": 2,
+    "failed": [],
+    "passed": [
+      "voidup_smoke",
+      "http_ir"
+    ]
+  }
+}

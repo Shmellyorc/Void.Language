@@ -38,7 +38,7 @@ set(native_header "VOID native 23.1.4 v2\n${VOID_CLANG}\n${VOID_LINKER}\n")
 set(native_http_build "")
 set(native_http_install "")
 set(native_inventory "$<TARGET_FILE:void_runtime>\n@VOID_NATIVE_DIR@/../lib/void/$<TARGET_FILE_NAME:void_runtime>\n$<TARGET_FILE:void_native_fixture>\n@VOID_NATIVE_DIR@/../lib/void/$<TARGET_FILE_NAME:void_native_fixture>\n")
-foreach(library IN LISTS VOID_HTTP_LINK_FILES)
+foreach(library IN LISTS VOID_HOST_LINK_FILES VOID_HTTP_LINK_FILES)
   string(APPEND native_http_build "${library}\n")
   if(library MATCHES "^\\$<TARGET_FILE:")
     set(library_name "$<TARGET_FILE_NAME:libcurl_static>")
@@ -59,7 +59,7 @@ add_custom_command(OUTPUT "${native_resources_output}/void-native-resources.txt"
     "-DBUILD_OUTPUT=${native_resources_output}/void-native-resources.txt"
     "-DINSTALL_OUTPUT=${CMAKE_CURRENT_BINARY_DIR}/native-resources-install-$<CONFIG>.txt"
     -P "${CMAKE_CURRENT_LIST_DIR}/NativeInventory.cmake"
-  DEPENDS void_runtime void_native_fixture libcurl_static ${VOID_HTTP_LINK_FILES}
+  DEPENDS void_runtime void_native_fixture libcurl_static ${VOID_HTTP_LINK_FILES} ${VOID_HOST_LINK_FILES}
     "${CMAKE_CURRENT_BINARY_DIR}/native-inventory-inputs-$<CONFIG>.txt"
     "${CMAKE_CURRENT_LIST_DIR}/NativeInventory.cmake"
   VERBATIM)
@@ -71,7 +71,7 @@ add_custom_target(void_native_inventory
   VERBATIM)
 add_dependencies(voidc void_native_inventory)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  string(APPEND native_flags "-Xlinker\n--exclude-libs\n-Xlinker\nlibcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a\n")
+  string(APPEND native_flags "-Xlinker\n--exclude-libs\n-Xlinker\nlibcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a:libarchive.a:libsodium.a\n")
   string(APPEND native_http_build "-Xlinker\n-rpath\n-Xlinker\n${VOID_HTTP_DEPS_ROOT}/lib\n")
   string(APPEND native_http_install "-Xlinker\n-rpath\n-Xlinker\n@VOID_NATIVE_DIR@/../lib/void\n")
 endif()
@@ -82,7 +82,7 @@ file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/native-install-$<CONFIG>.txt"
 install(TARGETS voidc RUNTIME DESTINATION bin COMPONENT compiler)
 install(TARGETS void_runtime void_native_fixture ARCHIVE DESTINATION lib/void COMPONENT compiler)
 install(TARGETS libcurl_static ARCHIVE DESTINATION lib/void COMPONENT compiler)
-foreach(library IN LISTS VOID_HTTP_LINK_FILES)
+foreach(library IN LISTS VOID_HOST_LINK_FILES VOID_HTTP_LINK_FILES)
   if(NOT library MATCHES "^\\$<" AND library MATCHES "\\.(a|lib)$")
     install(FILES "${library}" DESTINATION lib/void COMPONENT compiler)
   endif()
@@ -111,3 +111,8 @@ install(FILES "${VOID_HTTP_DEPS_ROOT}/VOID-HTTP-DEPENDENCIES.json"
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/native-install-$<CONFIG>.txt" DESTINATION bin RENAME void-native.txt COMPONENT compiler)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/native-resources-install-$<CONFIG>.txt"
   DESTINATION bin RENAME void-native-resources.txt COMPONENT compiler)
+
+if(VOID_HOST_DEPS_ROOT)
+  install(FILES "${VOID_HOST_DEPS_ROOT}/VOID-HOST-DEPENDENCIES.json" DESTINATION share/void/licenses/host COMPONENT compiler)
+  install(DIRECTORY "${PROJECT_SOURCE_DIR}/.toolchains/host/downloads/" DESTINATION share/void/licenses/host/corresponding-source COMPONENT compiler FILES_MATCHING PATTERN "libsodium-1.0.22.tar.gz" PATTERN "libarchive-3.8.11.tar.xz")
+endif()

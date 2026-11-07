@@ -1,0 +1,44 @@
+/home/shmellyorc/Documents/Void.Language/apps/voidup/manager.void:52:9: error: Duplicate declaration or shadowing of 'entries'.
+    code: VOID2005
+
+ 52 |     var entries = support.up_io(io.entries(context.options.root_path + "/transactions", max_entries = 1024))?
+    |         ^^^^^^^
+    Module: /manager.void
+    Previously declared at /home/shmellyorc/Documents/Void.Language/stdlib/io.void:1085:6
+
+ 1085 | func entries(value: string, pattern: string = "*", recursive: bool = false, max_entries: i64 = 100000) -> result<[entry], error>:
+      |      ^^^^^^^
+    Module: /@stdlib/io.void
+    Hint: Assign to the existing variable, or choose a distinct name.
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/manager.void:53:16: error: Function values are invoked directly; their representation is private.
+    code: VOID2001
+
+ 53 |     if entries.count >= 256:
+    |                ^^^^^
+    Module: /manager.void
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/manager.void:100:5: error: Member 'deinit' is not accessible from this lexical context.
+    code: VOID3003
+
+ 100 |     with transport.up_client(context.options.ca_file)? as client:
+     |     ^^^^^^
+    Module: /manager.void
+    Hint: Use an accessible owner operation; stored-field privacy belongs to its declaring struct.
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/manager.void:162:5: error: Member 'deinit' is not accessible from this lexical context.
+    code: VOID3003
+
+ 162 |     with transport.up_client(context.options.ca_file)? as client:
+     |     ^^^^^^
+    Module: /manager.void
+    Hint: Use an accessible owner operation; stored-field privacy belongs to its declaring struct.
+
+/home/shmellyorc/Documents/Void.Language/apps/voidup/manager.void:181:21: error: Member 'deinit' is not accessible from this lexical context.
+    code: VOID3003
+
+ 181 |                     with transport.up_client(context.options.ca_file)? as client:
+     |                     ^^^^^^
+    Module: /manager.void
+    Hint: Use an accessible owner operation; stored-field privacy belongs to its declaring struct.
+

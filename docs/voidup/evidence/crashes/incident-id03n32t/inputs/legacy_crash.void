@@ -1,0 +1,4 @@
+use os
+use convert
+func entry(n: i32) -> i32:
+    return n + (convert.unwrap(os.args()).count as i32)

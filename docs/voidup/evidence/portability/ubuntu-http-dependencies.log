@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/tools/setup_http_deps.py", line 42, in <module>
+    receipt.mkdir()
+  File "/usr/lib/python3.12/pathlib.py", line 1313, in mkdir
+    os.mkdir(self, mode)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/docs/net/http/evidence/dependencies-Release-20261107T004104814650Z'

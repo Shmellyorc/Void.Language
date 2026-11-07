@@ -2,6 +2,7 @@
 #include "void/frontend.hpp"
 #include "void/path.hpp"
 #include "void/native_build.hpp"
+#include "void/runtime.hpp"
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Config/llvm-config.h>
 #include <cerrno>
@@ -16,7 +17,7 @@ bool known_command(const std::string& command) {
 }
 void usage(std::ostream& out, const std::string& command={}) {
     if(command.empty() || command=="check")out<<"Usage: voidc check <file-or-directory> [--no-opt]\n";
-    if(command.empty() || command=="run")out<<"Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache]\n";
+    if(command.empty() || command=="run")out<<"Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\n";
     if(command.empty() || command=="build")out<<"Usage: voidc build [file-or-directory] [-o executable] [--no-opt]\n";
     if(command.empty() || command=="emit")out<<"Usage: voidc emit <file-or-directory> -o <object> [--no-opt]\n";
 }
@@ -43,12 +44,14 @@ void help(const std::string& command={}) {
       "Example: voidc check main.void\n";
     if(command=="run")std::cout<<"\nRun a synchronous application; its return value is the process status.\n"
       "Legacy entry(i32) -> i32 accepts one decimal i32 (default 0), prints its\n"
-      "result, and exits 0. Application entries do not accept that input.\n"
+      "result, and exits 0. Applications read os.args() after an explicit source\n"
+      "and -- separator; subsequent tokens are literal application arguments.\n"
       "  --no-opt    Disable O2; eligible Debug code uses the automatic disk cache.\n"
       "  --cache     Select Debug code and print cache status.\n"
       "  --no-cache  Disable disk caching; does not disable O2.\n"
       "Examples: voidc run .\n"
-      "          voidc run calculation.void 10 --no-cache\n";
+      "          voidc run calculation.void 10 --no-cache\n"
+      "          voidc run main.void -- --help \"two words\"\n";
     if(command=="build")std::cout<<"\nLink an executable using the installed Runtime, dependency archives and\n"
       "void-native.txt beside voidc. The original Clang/LLD 23.1.4 SDK and host\n"
       "development libraries must remain available; this is a source installation.\n"
@@ -81,7 +84,22 @@ std::int32_t input(const char* text) {
 static int run_cli(int argc, char** argv) {
     std::string command;
     try {
-        for(int i=1;i<argc;++i)if(std::string(argv[i])=="--app")throw UsageError("--app has been removed; entry selection is automatic.");
+        // Preserve the established early removed-option diagnostic, but never
+        // scan the explicit application's forwarded argument region.
+        bool source_seen=false, source_only=false, output_operand=false;
+        for(int i=1;i<argc;++i) {
+            const std::string argument=argv[i];
+            if(i>=2 && std::string(argv[1])=="run") {
+                if(argument=="--" && source_seen)break;
+                if(argument=="--"){source_only=true;continue;}
+                if(argument=="--app")throw UsageError("--app has been removed; entry selection is automatic.");
+                if(output_operand){output_operand=false;continue;}
+                if(argument=="-o" && !source_only){output_operand=true;continue;}
+                if(source_only || !argument.starts_with("-") ||
+                   (argument.size()>1 && argument[1]>='0' && argument[1]<='9'))source_seen=true;
+            }
+            if(argument=="--app")throw UsageError("--app has been removed; entry selection is automatic.");
+        }
         if(argc==2 && (std::string(argv[1])=="--help" || std::string(argv[1])=="-h")) {help();return 0;}
         if(argc==2 && std::string(argv[1])=="--version") {
             std::cout<<"VOID Language Compiler v"<<VOID_COMPILER_VERSION<<" (development)\nLLVM "<<LLVM_VERSION_STRING
@@ -104,14 +122,24 @@ static int run_cli(int argc, char** argv) {
         }
         if(argc<2)throw UsageError("Expected a command.");
         command=argv[1];
+        if(command=="--app")throw UsageError("--app has been removed; entry selection is automatic.");
         if(!known_command(command))
             throw UsageError("Unknown command: "+command);
         if(argc==3 && (std::string(argv[2])=="--help" || std::string(argv[2])=="-h")) {help(command);return 0;}
         bool optimize=true,cache=false,no_cache=false,no_opt=false;
         bool positional_only=false;
+        bool forwarded=false;
+        std::vector<std::string> application_arguments;
         std::vector<std::string> operands;std::optional<std::filesystem::path> output;
         for(int i=2;i<argc;++i) {
             const std::string arg=argv[i];
+            if(arg=="--" && command=="run" && !operands.empty()) {
+                if(operands.size()!=1)throw UsageError("Application arguments require one explicit source operand.");
+                forwarded=true;
+                for(++i;i<argc;++i)application_arguments.emplace_back(argv[i]);
+                break;
+            }
+            if(arg=="--app" && !positional_only)throw UsageError("--app has been removed; entry selection is automatic.");
             if(positional_only)operands.push_back(arg);
             else if(arg=="--")positional_only=true;
             else if(arg=="--no-opt") {if(no_opt)throw UsageError("Duplicate --no-opt.");no_opt=true;optimize=false;}
@@ -140,6 +168,11 @@ static int run_cli(int argc, char** argv) {
         for(const auto& warning:analysis.program->warnings())std::cerr<<vd::render_diagnostic(warning)<<'\n';
         if(command=="check") {std::cout<<"Source checked successfully\n";return 0;}
         const bool application=analysis.program->application();
+        if(forwarded && !application) {
+            if(application_arguments.size()>1)throw UsageError("Legacy entry accepts one optional decimal i32 input.");
+            value=application_arguments.empty()?0:input(application_arguments[0].c_str());
+            application_arguments.clear();
+        }
         if(application && operands.size()==2)throw UsageError("Application entries do not accept arguments.");
         vd::require_source_entry(*analysis.program);
         if(command=="run") {
@@ -147,6 +180,8 @@ static int run_cli(int argc, char** argv) {
             if(!no_cache)jit=std::make_unique<vd::Jit>(vd::DebugCache{std::filesystem::canonical(selected.parent_path().empty()?std::filesystem::path("."):selected.parent_path()),std::string(vd::compiler_build_identity())},vd::ir::Emission::entry);
             else jit=std::make_unique<vd::Jit>(vd::DebugCache{},vd::ir::Emission::entry);
             auto code=jit->compile(*analysis.program,optimize);
+            if(auto runtime=code->runtime_owner())
+                runtime->application_arguments(vd::checked_application_arguments(std::move(application_arguments)));
             if(cache)std::cerr<<"Debug cache: "<<jit->cache_status()<<'\n';
             auto status=code->invoke(value);
             if(application)return status;

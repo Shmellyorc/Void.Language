@@ -1,0 +1,7 @@
+use os
+var captured = os.args()
+func main():
+    if captured is Err(var reason):
+        print(reason.code, reason.operation)
+    else:
+        print("unexpected")

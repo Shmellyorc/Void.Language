@@ -1,0 +1,6 @@
+{
+  "profile": "Release",
+  "prefix": ".toolchains/host/prefix/Release",
+  "manifest_sha256": "41902abaac48543a18e1e58d777bcb58f11e071fe8f6961acd858a9b8d5b4b34",
+  "zlib_sha256": "da59c9da952cf3d6215e4d279e362d02fbc2b046407c62c5017d3d7e8a42c457"
+}

@@ -16,6 +16,10 @@ function(void_install_licenses component)
   # LLVM may use zlib independently of the compiler's HTTP dependency closure.
   install(FILES "${root}/third_party/http-licenses/zlib-1.3.2/LICENSE"
     DESTINATION share/void/licenses/zlib-1.3.2 COMPONENT ${component})
+  if(component STREQUAL "compiler")
+    install(DIRECTORY "${root}/third_party/host-licenses/" DESTINATION share/void/licenses/host COMPONENT ${component})
+    install(FILES "${root}/third_party/host-versions.json" "${root}/tools/setup_host_deps.py" "${root}/tools/setup_host_deps_native.py" "${root}/cmake/host-sodium.targets" "${root}/tools/verify_host_deps.py" DESTINATION share/void/licenses/host COMPONENT ${component})
+  endif()
   if(WIN32)
     install(DIRECTORY "${root}/third_party/llvm-dependency-licenses/libxml2-2.15.4/"
       DESTINATION share/void/licenses/libxml2-2.15.4 COMPONENT ${component})

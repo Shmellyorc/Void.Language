@@ -1,0 +1,22 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-strict
+    Start 155: host_capabilities_portable_source
+1/1 Test #155: host_capabilities_portable_source ...***Failed    0.26 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_source.py", line 27, in <module>
+    run([compiler,'build',filesystem_source,'-o',filesystem_binary,*flags],work)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_source.py", line 13, in run
+    result=h.run(command,work,native_text(expected) if expected is not None else None,small=os.name!='nt',sources=(source,))
+  File "/home/shmellyorc/Documents/Void.Language/tests/random/harness.py", line 28, in run
+    assert result.returncode == status, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc', 'build', '/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_filesystem.void', '-o', '/tmp/VOID portable source 雪 # % sbqh4eyq/filesystem-False', '--no-opt'], 1, b'', b'/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_filesystem.void:26:17: error: Duplicate declaration or shadowing of \'publication\'.\n    code: VOID2005\n\n 26 |             var publication = directory.publish_file(control, "control.new", directory, "control.json")\n    |                 ^^^^^^^^^^^\n    Module: /portable_filesystem.void\n    Hint: Assign to the existing variable, or choose a distinct name.\n\n/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_filesystem.void:27:19: error: Unknown identifier \'publication\'.\n    code: VOID2002\n\n 27 |             print(publication.published)\n    |                   ^^^^^^^^^^^\n    Module: /portable_filesystem.void\n    Hint: Declare it with var before use.\n\n/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_filesystem.void:28:16: error: Unknown identifier \'publication\'.\n    code: VOID2002\n\n 28 |             if publication.durable:\n    |                ^^^^^^^^^^^\n    Module: /portable_filesystem.void\n    Hint: Declare it with var before use.\n\n/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_filesystem.void:31:23: error: Unknown identifier \'publication\'.\n    code: VOID2002\n\n 31 |                 print(publication.os_code != 0)\n    |                       ^^^^^^^^^^^\n    Module: /portable_filesystem.void\n    Hint: Declare it with var before use.\n\n')
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   0.26 sec
+
+The following tests FAILED:
+	155 - host_capabilities_portable_source (Failed)
+Errors while running CTest

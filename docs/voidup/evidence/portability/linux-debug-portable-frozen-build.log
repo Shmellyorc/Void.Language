@@ -1,0 +1,12 @@
+[  0%] Built target void_native_fixture
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_core
+[ 76%] Built target libcurl_static
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_host_portable.dir/tests/host_capabilities/portable.cpp.o
+[100%] Linking CXX executable void_host_portable
+[100%] Built target void_host_portable

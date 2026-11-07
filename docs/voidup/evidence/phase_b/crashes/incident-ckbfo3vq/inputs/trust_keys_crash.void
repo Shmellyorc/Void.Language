@@ -1,0 +1,2 @@
+# Private engineering trust roots: public test keys only. Not production trust.
+const up_public_test_keys: [string] = ["2aa33431eaa65e21d90afa4c4122c99e2ac6621e92b6dc352ce93d5b7fc8ce41", "1c9e5765d0551be6526933fbe1a498f1854b7b2717432f9c3041edda9a794cb9", "9c1860571170cd9aedd56ac3c3dc3b015c8afeeaaeb9235c1ce58a39a4eb9dbf"]

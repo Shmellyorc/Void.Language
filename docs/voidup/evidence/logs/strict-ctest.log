@@ -1,0 +1,29 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-strict
+      Start 154: host_capabilities_stack
+      Start 153: host_capabilities
+      Start 263: io_execution
+ 1/12 Test #263: io_execution .....................   Passed   67.35 sec
+      Start 164: os_frontend
+ 2/12 Test #164: os_frontend ......................   Passed   47.25 sec
+      Start 162: os_host
+ 3/12 Test #162: os_host ..........................   Passed   34.65 sec
+      Start 163: os_errors
+ 4/12 Test #163: os_errors ........................   Passed   21.64 sec
+      Start 155: host_capabilities_frontend
+ 5/12 Test #154: host_capabilities_stack ..........   Passed  180.93 sec
+      Start 165: lsp_os
+ 6/12 Test #153: host_capabilities ................   Passed  181.08 sec
+      Start   1: cli_contract
+ 7/12 Test #155: host_capabilities_frontend .......   Passed   12.31 sec
+      Start 156: host_capabilities_lsp
+ 8/12 Test #156: host_capabilities_lsp ............   Passed    2.17 sec
+      Start 157: host_capabilities_native
+ 9/12 Test #157: host_capabilities_native .........   Passed    0.38 sec
+      Start  92: automatic_cache_processes
+10/12 Test  #92: automatic_cache_processes ........   Passed    1.51 sec
+11/12 Test #165: lsp_os ...........................   Passed    6.87 sec
+12/12 Test   #1: cli_contract .....................   Passed   11.69 sec
+
+100% tests passed, 0 tests failed out of 12
+
+Total Test time (real) = 192.78 sec

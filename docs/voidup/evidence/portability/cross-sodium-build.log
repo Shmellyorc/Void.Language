@@ -1,0 +1,41 @@
+Making all in builds
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium/builds'
+make[1]: Nothing to be done for 'all'.
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium/builds'
+Making all in contrib
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium/contrib'
+make[1]: Nothing to be done for 'all'.
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium/contrib'
+Making all in dist-build
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium/dist-build'
+make[1]: Nothing to be done for 'all'.
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium/dist-build'
+Making all in src
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium/src'
+Making all in libsodium
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium/src/libsodium'
+Making all in include
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium/src/libsodium/include'
+make[3]: Nothing to be done for 'all'.
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium/src/libsodium/include'
+make[3]: Entering directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium/src/libsodium'
+make[3]: Nothing to be done for 'all-am'.
+make[3]: Leaving directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium/src/libsodium'
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium/src/libsodium'
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium/src'
+make[2]: Nothing to be done for 'all-am'.
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium/src'
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium/src'
+Making all in test
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium/test'
+Making all in default
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium/test/default'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium/test/default'
+make[2]: Entering directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium/test'
+make[2]: Nothing to be done for 'all-am'.
+make[2]: Leaving directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium/test'
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium/test'
+make[1]: Entering directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium'
+make[1]: Nothing to be done for 'all-am'.
+make[1]: Leaving directory '/home/shmellyorc/Documents/Void.Language/build/voidup-cross/provider-build/sodium'

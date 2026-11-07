@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "time_unix": 1794019082.9396844,
+  "scope": "one live /proc sample; VmHWM is this process high-water RSS, not whole-run profile maximum or performance acceptance",
+  "processes": [
+    {
+      "pid": 1605654,
+      "command": [
+        "/tmp/VOIDUP matrix \u96ea # % wc2gv6_q/voidup-o2",
+        "--root",
+        "/home/shmellyorc/VOIDUP profile \u96ea # % a1g3gup9/private",
+        "--catalog",
+        "https://127.0.0.1:40267/catalog.json",
+        "--ca-file",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-fixtures/tls/ca.pem",
+        "--timeout-ms",
+        "120000",
+        "install",
+        "engineering-b",
+        "--activate"
+      ],
+      "status": {
+        "VmPeak": "364580 kB",
+        "VmHWM": "24136 kB",
+        "VmRSS": "24136 kB",
+        "Threads": "6"
+      },
+      "limits": [
+        "Max stack size            1048576              1048576              bytes     "
+      ]
+    },
+    {
+      "pid": 1607340,
+      "command": [
+        "/tmp/VOIDUP matrix \u96ea # % ixgjj_9h/voidup-o2",
+        "--root",
+        "/home/shmellyorc/VOIDUP profile \u96ea # % ezcfuc0n/private",
+        "--catalog",
+        "https://127.0.0.1:45173/catalog.json",
+        "--ca-file",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-fixtures/tls/ca.pem",
+        "--timeout-ms",
+        "120000",
+        "rollback"
+      ],
+      "status": {
+        "VmPeak": "21474947688 kB",
+        "VmHWM": "860932 kB",
+        "VmRSS": "635184 kB",
+        "Threads": "1"
+      },
+      "limits": [
+        "Max stack size            1048576              1048576              bytes     "
+      ]
+    }
+  ]
+}

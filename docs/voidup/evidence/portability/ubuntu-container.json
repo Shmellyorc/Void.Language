@@ -1,0 +1,5 @@
+{
+  "image_id": "d9b8c34d61a9b9a3c44cab883d7d2f2619d674966ab520186f799cf32e3e0377",
+  "qualification": "Ubuntu 24.04 userspace on the PikaOS Linux kernel; no other native platform acceptance",
+  "network": "host for prerequisite installation; no public Internet dependency in the host-capability suites"
+}

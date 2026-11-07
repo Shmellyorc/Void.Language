@@ -1,0 +1,30 @@
+use os
+use path
+func show(label: string, value: result<string, os.error>):
+    if value is Ok(var text):
+        print(label, "ok", text.to_utf8())
+    else if value is Err(var reason):
+        print(label, reason.code, reason.operation, reason.native_domain, reason.os_code)
+func expected(name: string) -> string:
+    if os.env(name) is Ok(var value):
+        return value
+    return ""
+func main():
+    show("data", os.data_dir("com.studio.game"))
+    show("config", os.config_dir("com.studio.game"))
+    show("cache", os.cache_dir("com.studio.game"))
+    show("state", os.state_dir("com.studio.game"))
+    show("home", os.home_dir())
+    show("temp", os.temp_dir())
+    show("env", os.env("VOID_OS_VALUE"))
+    show("missing", os.env("VOID_OS_MISSING"))
+    if os.executable_path() is Ok(var image):
+        print("image", image == expected("VOID_OS_EXPECT_IMAGE"))
+    if os.resource_dir() is Ok(var resources):
+        if path.parent(expected("VOID_OS_EXPECT_IMAGE")) is Ok(var folder):
+            print("resources", resources == folder)
+    print("pid", "{os.process_id()}" == expected("VOID_OS_EXPECT_PID"))
+    print("platform", os.platform())
+    print("arch", os.architecture())
+    if os.is_bundle() is Ok(var bundled):
+        print("bundle", bundled)

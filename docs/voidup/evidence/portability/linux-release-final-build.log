@@ -1,0 +1,49 @@
+[  0%] Built target void_native_fixture
+[  7%] Built target void_format_objects
+[  7%] Built target void_zone_objects
+[ 14%] Built target void_core
+[ 85%] Built target libcurl_static
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_directory.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_process_windows.cpp.o
+[ 85%] Linking CXX static library libvoid_runtime.a
+[100%] Built target void_runtime
+[100%] Generating void-native-resources.txt, native-resources-install-Release.txt
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Generating cache-identity-Release.cpp
+[100%] Built target void_native_inventory
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Release.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[ 33%] Built target void_format_objects
+[ 33%] Built target void_zone_objects
+[ 66%] Built target void_core
+[ 66%] Built target void_lsp
+[100%] Built target voidls
+[  0%] Built target void_native_fixture
+[  0%] Built target void_zone_objects
+[  7%] Built target void_format_objects
+[  7%] Built target void_managed_test_abi
+[ 14%] Built target void_core
+[ 85%] Built target libcurl_static
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable void_host_capabilities
+[100%] Built target void_host_capabilities
+[  0%] Built target void_native_fixture
+[  0%] Built target void_zone_objects
+[  7%] Built target void_format_objects
+[ 14%] Built target void_core
+[ 85%] Built target libcurl_static
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_host_portable.dir/tests/host_capabilities/portable.cpp.o
+[100%] Linking CXX executable void_host_portable
+[100%] Built target void_host_portable

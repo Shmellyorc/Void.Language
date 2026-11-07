@@ -389,7 +389,7 @@
       ],
       "platform": "all",
       "license": "component index and unresolved obligations",
-      "sha256": "19fc7fa896dee764d38c22553305db6e11d29cf2d1d71591d86fc9384d260211",
+      "sha256": "f24043da34f903133153f0fa3c579021070de4b09ef4c1afcc06f75a67a84f97",
       "sources": []
     },
     {
@@ -403,6 +403,74 @@
       "license": "Zlib",
       "sha256": "e32ff4e00d9d94930537635291da39e7e612703334bf6fde8c7f1686fe8a45a2",
       "sources": []
+    },
+    {
+      "repository_path": "third_party/host-licenses/libsodium/LICENSE",
+      "installed_path": "share/void/licenses/host/libsodium/LICENSE",
+      "components": [
+        "compiler"
+      ],
+      "platform": "all",
+      "license": "ISC; BSD-2-Clause for the SHA-256 component; other controlling source headers retained",
+      "sha256": "508a76d186356c0dd807a670ef510964f8724557024796a2c426c6c0e19ab683",
+      "sources": [
+        {
+          "url": "https://download.libsodium.org/libsodium/releases/libsodium-1.0.22.tar.gz",
+          "extraction": "Pinned archive controlling source notices; full corresponding archive installed alongside"
+        }
+      ],
+      "qualification": "Pinned-source notices installed on Linux, Windows and macOS; Windows/macOS native provider qualification remains pending."
+    },
+    {
+      "repository_path": "third_party/host-licenses/libsodium/SOURCE-NOTICES.json",
+      "installed_path": "share/void/licenses/host/libsodium/SOURCE-NOTICES.json",
+      "components": [
+        "compiler"
+      ],
+      "platform": "all",
+      "license": "ISC; BSD-2-Clause for the SHA-256 component; other controlling source headers retained",
+      "sha256": "a5e68e81b2cb75ed7baa282dd73fb938a7aed48c962fa6b64c2c5fd3c71b7fa0",
+      "sources": [
+        {
+          "url": "https://download.libsodium.org/libsodium/releases/libsodium-1.0.22.tar.gz",
+          "extraction": "Pinned archive controlling source notices; full corresponding archive installed alongside"
+        }
+      ],
+      "qualification": "Pinned-source notices installed on Linux, Windows and macOS; Windows/macOS native provider qualification remains pending."
+    },
+    {
+      "repository_path": "third_party/host-licenses/libarchive/COPYING",
+      "installed_path": "share/void/licenses/host/libarchive/COPYING",
+      "components": [
+        "compiler"
+      ],
+      "platform": "all",
+      "license": "BSD-2-Clause and component terms in COPYING and source",
+      "sha256": "30e556b3959e3985d66efefec5eaac51d4995053caa1d3cffe6eb916f146f229",
+      "sources": [
+        {
+          "url": "https://github.com/libarchive/libarchive/releases/download/v3.8.11/libarchive-3.8.11.tar.xz",
+          "extraction": "Pinned archive controlling source notices; full corresponding archive installed alongside"
+        }
+      ],
+      "qualification": "Pinned-source notices installed on Linux, Windows and macOS; Windows/macOS native provider qualification remains pending."
+    },
+    {
+      "repository_path": "third_party/host-licenses/libarchive/SOURCE-NOTICES.json",
+      "installed_path": "share/void/licenses/host/libarchive/SOURCE-NOTICES.json",
+      "components": [
+        "compiler"
+      ],
+      "platform": "all",
+      "license": "BSD-2-Clause and component terms in COPYING and source",
+      "sha256": "95140e030f1a0a898d1da253d7e8ce29642ea5cb5dac7f3b1a1ba4b6f73f2fe5",
+      "sources": [
+        {
+          "url": "https://github.com/libarchive/libarchive/releases/download/v3.8.11/libarchive-3.8.11.tar.xz",
+          "extraction": "Pinned archive controlling source notices; full corresponding archive installed alongside"
+        }
+      ],
+      "qualification": "Pinned-source notices installed on Linux, Windows and macOS; Windows/macOS native provider qualification remains pending."
     }
   ],
   "retained_entries": [

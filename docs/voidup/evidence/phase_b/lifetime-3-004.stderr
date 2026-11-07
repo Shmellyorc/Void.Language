@@ -1,0 +1,115 @@
+budget 0: Host boundary allocation failedCalled from /@stdlib/os.void::args
+/home/shmellyorc/Documents/Void.Language/stdlib/os.void:317:17: source call
+    var count = _host_args_count()
+                ^
+Called from /main.void::main
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:18:23: source call
+    var operands = os.args()
+                      ^
+Called from /main.void::$app_adapter
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:17:6: source call
+
+budget 1: Host boundary allocation failedCalled from /@stdlib/os.void::args
+/home/shmellyorc/Documents/Void.Language/stdlib/os.void:317:17: source call
+    var count = _host_args_count()
+                ^
+Called from /main.void::main
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:18:23: source call
+    var operands = os.args()
+                      ^
+Called from /main.void::$app_adapter
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:17:6: source call
+
+budget 4: /home/shmellyorc/Documents/Void.Language/stdlib/os.void:320:28: runtime error: Array operation failed
+In function /@stdlib/os.void::args
+Called from /main.void::main
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:18:23: source call
+    var operands = os.args()
+                      ^
+Called from /main.void::$app_adapter
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:17:6: source call
+
+budget 16: Host boundary allocation failedCalled from /@stdlib/os.void::args
+/home/shmellyorc/Documents/Void.Language/stdlib/os.void:323:20: source call
+        var item = _host_arg(index)
+                   ^
+Called from /main.void::main
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:18:23: source call
+    var operands = os.args()
+                      ^
+Called from /main.void::$app_adapter
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:17:6: source call
+
+budget 64: Filesystem native allocation failedCalled from /@stdlib/io.void::_path_absolute
+/home/shmellyorc/Documents/Void.Language/stdlib/io.void:1690:17: source call
+    var reply = _io_path_absolute(value, base)
+                ^
+Called from /@stdlib/path.void::absolute
+/home/shmellyorc/Documents/Void.Language/stdlib/path.void:92:15: source call
+    return io._path_absolute(value, base)
+              ^
+Called from /cli.void::up_parse
+/home/shmellyorc/Documents/Void.Language/apps/voidup/cli.void:20:69: source call
+    var options = up_options(working_directory = support.up_io(path.absolute("."))?)
+                                                                    ^
+Called from /main.void::main
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:22:26: source call
+        var parsed = cli.up_parse(values)
+                         ^
+Called from /main.void::$app_adapter
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:17:6: source call
+
+budget 256: /home/shmellyorc/Documents/Void.Language/stdlib/text.void:198:25: runtime error: UTF-8 text operation failed
+    var needle = search.to_utf8()
+                        ^
+In function /@stdlib/text.void::_index
+Called from /@stdlib/text.void::index_of
+/home/shmellyorc/Documents/Void.Language/stdlib/text.void:218:12: source call
+    return _index(value, search, false)
+           ^
+Called from /@stdlib/text.void::contains
+/home/shmellyorc/Documents/Void.Language/stdlib/text.void:234:12: source call
+    return index_of(value, search) >= 0
+           ^
+Called from /storage.void::up_root
+/home/shmellyorc/Documents/Void.Language/apps/voidup/storage.void:87:98: source call
+    if not support.up_io(path.is_absolute(root_path))? or text.contains(root_path, "\n") or text.contains(root_path, "\r"):
+                                                                                                 ^
+Called from /manager.void::up_execute
+/home/shmellyorc/Documents/Void.Language/apps/voidup/manager.void:288:18: source call
+    with storage.up_root(options.root_path)? as root_cap:
+                 ^
+Called from /main.void::main
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:32:35: source call
+            var outcome = manager.up_execute(options)
+                                  ^
+Called from /main.void::$app_adapter
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:17:6: source call
+
+budget 1024: /home/shmellyorc/Documents/Void.Language/stdlib/json.void:1050:15: runtime error: Managed construction allocation failed
+    return Ok(_decode_frame(node = node, depth = depth + 1, count = count))
+              ^
+In function /@stdlib/json.void::_read_container
+Called from /@stdlib/json.void::<JSON decode /model.void::up_marker>
+/home/shmellyorc/Documents/Void.Language/stdlib/json.void:1110:12: source call
+    return _json_from_value<t>(node, context, unknown)
+           ^
+Called from /@stdlib/json.void::parse_as
+/home/shmellyorc/Documents/Void.Language/stdlib/json.void:1110:12: source call
+    return _json_from_value<t>(node, context, unknown)
+           ^
+Called from /storage.void::up_root
+/home/shmellyorc/Documents/Void.Language/apps/voidup/storage.void:96:49: source call
+            var decoded = support.up_json(codec.parse_as<model.up_marker>(support.up_text(raw_marker)?, support.up_json_budget()))?
+                                                ^
+Called from /manager.void::up_execute
+/home/shmellyorc/Documents/Void.Language/apps/voidup/manager.void:288:18: source call
+    with storage.up_root(options.root_path)? as root_cap:
+                 ^
+Called from /main.void::main
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:32:35: source call
+            var outcome = manager.up_execute(options)
+                                  ^
+Called from /main.void::$app_adapter
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:17:6: source call
+

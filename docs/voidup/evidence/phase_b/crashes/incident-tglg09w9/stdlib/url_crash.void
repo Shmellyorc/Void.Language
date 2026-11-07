@@ -1,0 +1,158 @@
+use error as core
+
+
+## Recoverable URL and percent/query construction failures.
+enum error_kind:
+    invalid_url
+    invalid_encoding
+    invalid_utf8
+    unsupported_scheme
+    limit_exceeded
+
+
+## Safe diagnostics omit the URL, userinfo and query contents.
+struct error extends core.error:
+    kind: error_kind
+    operation: string
+    offset: i64 = -1
+
+
+## One ordered query pair; has_value distinguishes flag from flag=.
+value struct query_item:
+    name: string
+    value: string
+    has_value: bool = true
+
+
+private value struct _reply:
+    kind: i64
+    offset: i64 = -1
+    text: string
+    scheme: string
+    host: string
+    port: i64
+    path: string
+    query: string
+    fragment: string
+    has_query: bool
+    has_fragment: bool
+    bytes: [u8]
+    items: [query_item]
+
+
+## Immutable parsed HTTP(S) address; encoded path/query/fragment are retained.
+struct address:
+    const scheme: string
+    const host: string
+    const port: i32
+    const path: string
+    const query: string
+    const fragment: string
+    const has_query: bool
+    const has_fragment: bool
+    private const _text: string
+
+
+private func (self address) init(reply: _reply):
+    self.scheme = reply.scheme
+    self.host = reply.host
+    self.port = reply.port as i32
+    self.path = reply.path
+    self.query = reply.query
+    self.fragment = reply.fragment
+    self.has_query = reply.has_query
+    self.has_fragment = reply.has_fragment
+    self._text = reply.text
+
+
+## Canonical lowercase authority, without an explicit default port.
+## @return Owned immutable canonical text; fragments remain inspectable.
+func (self address) to_string() -> string:
+    return self._text
+
+
+private func _error(operation: string, reply: _reply) -> error:
+    var kind = error_kind.invalid_url
+    if reply.kind == 2:
+        kind = error_kind.invalid_encoding
+    else if reply.kind == 3:
+        kind = error_kind.invalid_utf8
+    else if reply.kind == 4:
+        kind = error_kind.unsupported_scheme
+    else if reply.kind == 5:
+        kind = error_kind.limit_exceeded
+    return error(message = "URL operation rejected its input", code = reply.kind as i32,
+        kind = kind, operation = operation, offset = reply.offset)
+
+
+private func _address(operation: string, reply: _reply) -> result<address, error>:
+    if reply.kind != 0:
+        return Err(_error(operation, reply))
+    return Ok(address(reply))
+
+
+private func _text(operation: string, reply: _reply) -> result<string, error>:
+    if reply.kind != 0:
+        return Err(_error(operation, reply))
+    return Ok(reply.text)
+
+
+## Parse an explicit HTTP(S) URL without DNS, network or file access.
+## @param value At most 16 KiB; userinfo, zones, controls and malformed escapes are invalid.
+## @return Immutable address preserving encoded path dots and ordered query text.
+func parse(value: string) -> result<address, error>:
+    return _address("parse", _url_parse(value, false))
+
+
+## Resolve a relative reference through the same CURLU parser/security profile.
+## @return Immutable resolved HTTP(S) address, or a safe recoverable error.
+func resolve(base: string, reference: string) -> result<address, error>:
+    return _address("resolve", _url_resolve(base, reference))
+
+
+## Canonicalize authority; path dot removal is an explicit option.
+## @return Canonical encoded URL without changing reserved escapes or query order.
+func normalize(value: string, remove_dot_segments: bool = false) -> result<string, error>:
+    return _text("normalize", _url_parse(value, remove_dot_segments))
+
+
+## Encode UTF-8 bytes, preserving only ASCII unreserved bytes.
+## @return Uppercase percent escapes; space is %20 and literal plus is %2B.
+func encode_component(value: string) -> string:
+    return _url_encode(value, false).text
+
+
+## Decode strict percent triplets; literal plus remains plus.
+## @return Strict UTF-8 text, allowing decoded NUL as ordinary string data.
+func decode_component(value: string) -> result<string, error>:
+    return _text("decode_component", _url_decode(value, false, true))
+
+
+## Decode percent triplets into arbitrary owned bytes.
+## @return Independent bytes, or an error with an attributable escape offset.
+func decode_bytes(value: string) -> result<[u8], error>:
+    var reply = _url_decode(value, false, false)
+    if reply.kind != 0:
+        return Err(_error("decode_bytes", reply))
+    return Ok(reply.bytes)
+
+
+## Encode ordered query pairs once; form mode maps spaces to plus.
+## @return At most 16 KiB of encoded query text, retaining duplicates/bare flags.
+func encode_query(const items: [query_item], form: bool = false) -> result<string, error>:
+    return _text("encode_query", _url_encode_query(items, form))
+
+
+## Split encoded separators before strict percent and UTF-8 decoding.
+## @return Owned ordered pairs; an empty query yields an empty list.
+func parse_query(value: string, form: bool = false, max_items: i64 = 1024) -> result<[query_item], error>:
+    var reply = _url_parse_query(value, form, max_items)
+    if reply.kind != 0:
+        return Err(_error("parse_query", reply))
+    return Ok(reply.items)
+
+
+## Replace a validated URL's query, preserving path and fragment.
+## @return Canonical URL with exactly one query encoding; empty items remove query.
+func with_query(value: string, const items: [query_item]) -> result<string, error>:
+    return _text("with_query", _url_with_query(value, items))

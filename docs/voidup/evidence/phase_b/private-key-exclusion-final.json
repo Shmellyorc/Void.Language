@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "application": "build/voidup-final-3/bin/voidup",
+  "sha256": "c42b6748e45f4e904666bb386283f83053abd654b82a6d0189893ad0b28f0772",
+  "exact_offline_private_seeds_raw_and_hex_absent": true,
+  "unchanged_package_scan": "private-key-exclusion.json"
+}

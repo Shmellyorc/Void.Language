@@ -1,0 +1,14 @@
+{
+  "root": "/home/shmellyorc/Documents/Void.Language/build/voidup-integration-bootstrap",
+  "copied": [
+    "tools",
+    "cmake",
+    "third_party"
+  ],
+  "read_only_reused_inputs": [
+    "LLVM SDK",
+    "verified existing HTTP prefixes and source archives"
+  ],
+  "host_prefix_existed": false,
+  "note": "All newly built host outputs and notices stay in this isolated source root; no existing provider prefix is overwritten"
+}

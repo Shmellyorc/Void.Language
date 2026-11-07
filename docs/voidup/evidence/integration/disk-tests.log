@@ -1,0 +1,12 @@
+test_cleanup_exact_allowlist (__main__.DiskTests.test_cleanup_exact_allowlist) ... ok
+test_developer_execution_refused_before_cleanup (__main__.DiskTests.test_developer_execution_refused_before_cleanup) ... ok
+test_preflight_boundaries_all_configurations (__main__.DiskTests.test_preflight_boundaries_all_configurations) ... ok
+test_separate_temp_filesystem_must_fit_archive (__main__.DiskTests.test_separate_temp_filesystem_must_fit_archive) ... before-restore: required=41007181872 available=41007181872 bytes
+before-restore: required=41007181872 available=41007181872 bytes
+ok
+test_workflow_preserves_order_and_matrix (__main__.DiskTests.test_workflow_preserves_order_and_matrix) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.004s
+
+OK

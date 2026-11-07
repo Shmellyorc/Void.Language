@@ -1,0 +1,10 @@
+[  0%] Built target void_native_fixture
+[  7%] Built target void_zone_objects
+[  7%] Built target void_format_objects
+[ 84%] Built target libcurl_static
+[ 84%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_process_windows.cpp.o
+[ 84%] Linking CXX static library libvoid_runtime.a
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_host_portable.dir/tests/host_capabilities/portable.cpp.o
+[100%] Linking CXX executable void_host_portable
+[100%] Built target void_host_portable

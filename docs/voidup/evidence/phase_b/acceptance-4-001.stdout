@@ -1,0 +1,20 @@
+VOIDUP 0.1 engineering — private 2-of-3 test trust roots
+
+Global options (before command):
+  --root ABSOLUTE-PATH  Dedicated per-user root
+  --catalog HTTPS-URL   Explicit private catalog endpoint
+  --ca-file PEM         Explicit replacement TLS roots
+  --timeout-ms N        100..120000, default 30000
+
+Commands:
+  --help | --version
+  list [--available]
+  install RELEASE [--activate]
+  default RELEASE
+  rollback
+  which <voidc|voidls>
+  verify RELEASE
+  doctor
+  run <RELEASE|default> <voidc|voidls> -- <literal arguments...>
+
+Published versions are retained. No pruning, self-update, PATH or shell changes.

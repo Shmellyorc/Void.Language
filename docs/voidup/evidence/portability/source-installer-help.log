@@ -1,0 +1,15 @@
+usage: install.py [-h] --prefix PREFIX [--configuration {Release,Debug}]
+                  [--build-dir BUILD_DIR] [--jobs JOBS]
+
+Build and install VOID from this checkout using its existing pinned recipes.
+Prepare platform prerequisites first: docs/install/README.md. No sudo, system
+package installation, shell profile changes or binary packaging is performed.
+
+options:
+  -h, --help            show this help message and exit
+  --prefix PREFIX       Installation directory (use a user-owned prefix)
+  --configuration {Release,Debug}
+  --build-dir BUILD_DIR
+                        Separate CMake build directory; default
+                        build/source-<configuration>
+  --jobs JOBS           Parallel build jobs (default 3)

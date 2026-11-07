@@ -1,0 +1,5 @@
+{
+  "schema": 1,
+  "libsodium": {"version":"1.0.22","revision":"77e1ce5d6dee871c49ef211222ba18ef0c486bda","url":"https://download.libsodium.org/libsodium/releases/libsodium-1.0.22.tar.gz","sha256":"adbdd8f16149e81ac6078a03aca6fc03b592b89ef7b5ed83841c086191be3349","license":"ISC"},
+  "libarchive": {"version":"3.8.11","revision":"03036ffa409a2aa1c5bbad35be2202641a040fda","url":"https://github.com/libarchive/libarchive/releases/download/v3.8.11/libarchive-3.8.11.tar.xz","sha256":"a3dc0872b1b39da34dc18ef1b944f0f11ffd37425d70ae04be679279f1cf43d2","license":"BSD-2-Clause; component notices in COPYING and source"}
+}

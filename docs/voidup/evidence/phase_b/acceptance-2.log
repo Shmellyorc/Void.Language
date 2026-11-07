@@ -1,0 +1,10 @@
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/voidup/evidence/phase_b/crashes/incident-o02gzkei
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/voidup/acceptance.py", line 29, in <module>
+    result=run('run',release,'voidc','--','run',fixture,*flags,'--no-cache','--',*forwarded,expected=17)
+  File "/home/shmellyorc/Documents/Void.Language/tests/voidup/acceptance.py", line 17, in run
+    def run(*args,**kwargs):return runner.run([*base,*args],**kwargs)
+                                   ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/voidup/support.py", line 46, in run
+    raise AssertionError((receipt,result.stdout[-3000:],result.stderr[-6000:]))
+AssertionError: ({'command': ['/home/shmellyorc/Documents/Void.Language/build/voidup-development', '--root', '/tmp/VOIDUP real A B 雪 # % 7k2ws9dt/private root', '--catalog', 'https://127.0.0.1:44971/catalog.json', '--ca-file', '/home/shmellyorc/Documents/Void.Language/build/voidup-fixtures/tls/ca.pem', '--timeout-ms', '120000', 'run', 'engineering-a', 'voidc', '--', 'run', '/tmp/VOIDUP real A B 雪 # % 7k2ws9dt/arguments.void', '--no-opt', '--no-cache', '--', '', 'two words', '"quote"', 'tail\\', '雪😀', '--looks-like-option', '$(touch SHOULD_NOT_EXIST)'], 'cwd': '/home/shmellyorc/Documents/Void.Language', 'status': 1, 'expected': 17, 'wall_seconds': 8.102093832043465, 'hard_stack_bytes': 1048576, 'stdout': 'acceptance-2-015.stdout', 'stderr': 'acceptance-2-015.stderr', 'input_sha256': None}, b'', b"/tmp/VOIDUP real A B \xe9\x9b\xaa # % 7k2ws9dt/arguments.void:7:21: error: Unknown imported function 'console.writeln'.\n    code: VOID2003\n\n 7 |             console.writeln(hex.encode(value.to_utf8()))\n   |                     ^^^^^^^\n    Module: /arguments.void\n\n")

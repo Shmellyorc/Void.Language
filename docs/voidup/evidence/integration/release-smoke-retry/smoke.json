@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "application": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidup/voidup",
+  "sha256": "de6bc0af302ba2cfac80a0ccc038491cb8c6c69daf5f87963ca106424e166a32",
+  "records": [
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidup/voidup",
+        "--version"
+      ],
+      "status": 0,
+      "expected": 0,
+      "stdout": "VOIDUP 0.1.0 engineering; schema=1; private 2-of-3 test trust; no production publishing keys\n",
+      "stderr": "VOID_TEST_STACK {\"inherited\": [8388608, -1], \"observed\": [1048576, 1048576]}\n"
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidup/voidup",
+        "--help"
+      ],
+      "status": 0,
+      "expected": 0,
+      "stdout": "VOIDUP 0.1 engineering \u2014 private 2-of-3 test trust roots\n\nGlobal options (before command):\n  --root ABSOLUTE-PATH  Dedicated per-user root\n  --catalog HTTPS-URL   Explicit private catalog endpoint\n  --ca-file PEM         Explicit replacement TLS roots\n  --timeout-ms N        100..120000, default 30000\n\nCommands:\n  --help | --version\n  list [--available]\n  install RELEASE [--activate]\n  default RELEASE\n  rollback\n  which <voidc|voidls>\n  verify RELEASE\n  doctor\n  run <RELEASE|default> <voidc|voidls> -- <literal arguments...>\n\nPublished versions are retained. No pruning, self-update, PATH or shell changes.\n",
+      "stderr": "VOID_TEST_STACK {\"inherited\": [8388608, -1], \"observed\": [1048576, 1048576]}\n"
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidup/voidup",
+        "--invalid-\u96ea"
+      ],
+      "status": 2,
+      "expected": 2,
+      "stdout": "",
+      "stderr": "VOID_TEST_STACK {\"inherited\": [8388608, -1], \"observed\": [1048576, 1048576]}\n{\"message\":\"unknown command\",\"operation\":\"arguments\",\"kind\":\"policy\",\"phase\":\"\",\"status\":0,\"code\":2,\"native_domain\":\"\",\"native_code\":0,\"cleanup_code\":0,\"progress\":0,\"published\":false,\"durable\":false}\n"
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidup/voidup",
+        "run",
+        "default",
+        "voidc",
+        "missing-separator"
+      ],
+      "status": 2,
+      "expected": 2,
+      "stdout": "",
+      "stderr": "VOID_TEST_STACK {\"inherited\": [8388608, -1], \"observed\": [1048576, 1048576]}\n{\"message\":\"forwarded arguments must follow --\",\"operation\":\"arguments\",\"kind\":\"policy\",\"phase\":\"\",\"status\":0,\"code\":2,\"native_domain\":\"\",\"native_code\":0,\"cleanup_code\":0,\"progress\":0,\"published\":false,\"durable\":false}\n"
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidup/voidup",
+        "--root",
+        "/tmp/VOIDUP CI \u96ea # % 5460fp6r/private",
+        "doctor"
+      ],
+      "status": 0,
+      "expected": 0,
+      "stdout": "VOIDUP root verified; host=linux-x86_64-ubuntu24.04 trust=2-of-3-private-test-keys serial=0 current= previous= retained-transactions=0; native linking requires the declared host development SDK\n",
+      "stderr": "VOID_TEST_STACK {\"inherited\": [8388608, -1], \"observed\": [1048576, 1048576]}\n"
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidup/voidup",
+        "--root",
+        "/tmp/VOIDUP CI \u96ea # % 5460fp6r/private",
+        "list"
+      ],
+      "status": 0,
+      "expected": 0,
+      "stdout": "",
+      "stderr": "VOID_TEST_STACK {\"inherited\": [8388608, -1], \"observed\": [1048576, 1048576]}\n"
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidup/voidup",
+        "--root",
+        "/tmp/VOIDUP CI \u96ea # % 5460fp6r/private",
+        "doctor"
+      ],
+      "status": 0,
+      "expected": 0,
+      "stdout": "VOIDUP root verified; host=linux-x86_64-ubuntu24.04 trust=2-of-3-private-test-keys serial=0 current= previous= retained-transactions=0; native linking requires the declared host development SDK\n",
+      "stderr": "VOID_TEST_STACK {\"inherited\": [8388608, -1], \"observed\": [1048576, 1048576]}\n"
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidup/voidup",
+        "--root",
+        "/tmp/VOIDUP CI \u96ea # % 5460fp6r/private",
+        "which",
+        "voidc"
+      ],
+      "status": 1,
+      "expected": 1,
+      "stdout": "",
+      "stderr": "VOID_TEST_STACK {\"inherited\": [8388608, -1], \"observed\": [1048576, 1048576]}\n{\"message\":\"no default toolchain is selected\",\"operation\":\"which\",\"kind\":\"policy\",\"phase\":\"\",\"status\":0,\"code\":1,\"native_domain\":\"\",\"native_code\":0,\"cleanup_code\":0,\"progress\":0,\"published\":false,\"durable\":false}\n"
+    }
+  ],
+  "hard_stack_bytes": 1048576,
+  "private_credentials": false,
+  "private_filesystem_exercised": true,
+  "native_installation_qualified": false
+}

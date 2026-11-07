@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "baseline_files": 326,
+  "missing_original_files": [],
+  "changed_original_files": [
+    "CMakeLists.txt",
+    "include/void/filesystem.hpp",
+    "src/runtime/filesystem.cpp",
+    "stdlib/io.void",
+    "include/void/host_ops.hpp",
+    "src/runtime/host_abi.cpp",
+    "src/runtime/host_directory.cpp",
+    "src/runtime/host_directory_windows.cpp",
+    "tests/host_capabilities/native.cpp"
+  ],
+  "all_other_original_hashes_unchanged": true,
+  "phase_a_records_and_evidence_unchanged": true,
+  "unrelated_website_hashes_unchanged": true,
+  "root_readme_git_diff_empty": true,
+  "verified_preserved_crash_source_copies": 446,
+  "qualification": {
+    "acceptance-4": {
+      "invocations": 35,
+      "summary": "acceptance-4-summary.json",
+      "summary_sha256": "afac7738922436319475f438e74fefba02489853a386514e65a71f362ca70cea"
+    },
+    "ubuntu-2": {
+      "invocations": 23,
+      "summary": "ubuntu-2-summary.json",
+      "summary_sha256": "bba028e6244d9fc6d54ac3e7449eda348370bcff7d51c7496a1a2b418da19643"
+    },
+    "rejection-3": {
+      "invocations": 34,
+      "summary": "rejection-3-summary.json",
+      "summary_sha256": "e05400621a748d18d56ba7e435fc4962c773575c96601e993f87c9ae46eb552b"
+    },
+    "recovery-2": {
+      "invocations": 16,
+      "summary": "recovery-2-summary.json",
+      "summary_sha256": "6bd6cc9608928107179796c75d25e50920212d7a38f7dbd051e5070c6ea7bf8f"
+    },
+    "interruption-1": {
+      "invocations": 4,
+      "summary": "interruption-1-summary.json",
+      "summary_sha256": "8123bc7280e3bdde4665973c33971e41a897d796c1d4403643fd090d1d269d55"
+    },
+    "timeout-3": {
+      "invocations": 2,
+      "summary": "timeout-3-summary.json",
+      "summary_sha256": "d1e16a38a9c6f5f6dc6fede5db4bb55ea359e7c4d4c210760a8295eb542e8817"
+    },
+    "installed-1": {
+      "invocations": 19,
+      "summary": "installed-1-summary.json",
+      "summary_sha256": "b2fa9b62d2914d58155fa9144cb5c5fae947fb6190dcf8f94b4bbd0e877f7a83"
+    },
+    "final-2": {
+      "invocations": 7,
+      "summary": "final-2-summary.json",
+      "summary_sha256": "ab3f21bad10a2e194715fd262000f99a8f8bb349130ec5d25afafaff92eefb36"
+    },
+    "final-ubuntu-2": {
+      "invocations": 4,
+      "summary": "final-ubuntu-2-summary.json",
+      "summary_sha256": "c683cd750fb83182475d2e03613ff8166dfd21eff6c8245bf77d31ccfb2a8c52"
+    },
+    "lifetime-5": {
+      "invocations": 4,
+      "summary": "lifetime-5-summary.json",
+      "summary_sha256": "737b952a6367ca6a6a2f25d712c50799bcf024d6b9decf3559961b685770a0d6"
+    },
+    "debug-install-1": {
+      "invocations": 8,
+      "summary": "debug-install-1-summary.json",
+      "summary_sha256": "28036cf2f7f8cb312c9753f8d170369f8772f0f7d204f31de486b697b3e42682"
+    },
+    "strict-install-1": {
+      "invocations": 8,
+      "summary": "strict-install-1-summary.json",
+      "summary_sha256": "ff6a2532895bea73a464873b118587164ffbaa16e998ca7f4ef3919ce6fd220e"
+    },
+    "matrix-release-3": {
+      "invocations": 12,
+      "summary": "matrix-release-3-summary.json",
+      "summary_sha256": "8b79b2f427b5fac4ee54a58cf8fba7749f433e41c673408f9e798145c4f67539"
+    },
+    "matrix-debug-3": {
+      "invocations": 12,
+      "summary": "matrix-debug-3-summary.json",
+      "summary_sha256": "15dd3f89b725ef676473523e109a5ce8a8576ad07c853b597f2d79e8e521a52a"
+    },
+    "matrix-strict-3": {
+      "invocations": 12,
+      "summary": "matrix-strict-3-summary.json",
+      "summary_sha256": "7b3244d3fad23204bff68d576b2a23868d40826e402473834e12b0ac405354b9"
+    }
+  }
+}

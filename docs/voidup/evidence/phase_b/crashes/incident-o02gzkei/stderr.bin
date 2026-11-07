@@ -1,0 +1,7 @@
+/tmp/VOIDUP real A B 雪 # % 7k2ws9dt/arguments.void:7:21: error: Unknown imported function 'console.writeln'.
+    code: VOID2003
+
+ 7 |             console.writeln(hex.encode(value.to_utf8()))
+   |                     ^^^^^^^
+    Module: /arguments.void
+

@@ -1,0 +1,45 @@
+use "./support.void" as support
+use net/http as http
+use url
+use io
+
+func up_same_origin(base: string, destination: string) -> result<bool, support.up_error>:
+    var first = support.up_url(url.parse(base))?
+    var second = support.up_url(url.parse(destination))?
+    if first.scheme != "https" or second.scheme != "https" or second.has_fragment or second.has_query:
+        return Err(support.up_fail("HTTPS without query/fragment is required", "download-policy"))
+    if first.host != second.host or first.port != second.port:
+        return Err(support.up_fail("download origin differs from the explicitly selected catalog origin", "download-policy"))
+    return Ok(true)
+
+func up_remote(base: string, reference: string) -> result<string, support.up_error>:
+    var destination = support.up_url(url.resolve(base, reference))?
+    var checked = up_same_origin(base, destination.to_string())?
+    return Ok(destination.to_string())
+
+func up_client(ca_file: string) -> result<http.client, support.up_error>:
+    if ca_file != "":
+        return support.up_http(http.open_client(http.client_options(tls = http.tls_options(trust = http.trust_source.pem_bundle(ca_file)), user_agent = "VOIDUP/0.1 engineering")))
+    return support.up_http(http.open_client(http.client_options(user_agent = "VOIDUP/0.1 engineering")))
+
+func up_request_options(maximum: i64, timeout: i64) -> http.request_options:
+    return http.request_options(redirects = http.redirect_policy.none, max_redirects = 0,
+        decoding = http.content_decoding.raw, max_encoded_bytes = maximum,
+        max_decoded_bytes = maximum, max_buffer_bytes = maximum,
+        connect_timeout_ms = timeout, header_timeout_ms = timeout,
+        read_timeout_ms = timeout, total_timeout_ms = timeout)
+
+func up_fetch(client: http.client, base: string, target: string, maximum: i64, timeout: i64) -> result<[u8], support.up_error>:
+    var checked = up_same_origin(base, target)?
+    var response = support.up_http(client.get(target, up_request_options(maximum, timeout)))?
+    if response.info.status != 200 or response.info.content_decoded or response.bytes.count > maximum:
+        return Err(support.up_error(message = "metadata response status or representation rejected", operation = "download", kind = "response_rejected", status = response.info.status, progress = response.bytes.count))
+    return Ok(response.bytes)
+
+func up_download(client: http.client, base: string, target: string, output_file: io.file, size: i64, timeout: i64) -> result<bool, support.up_error>:
+    var checked = up_same_origin(base, target)?
+    var outcome = support.up_http(client.download(http.request(target = target), output_file, up_request_options(size, timeout)))?
+    if outcome.info.status != 200 or outcome.info.content_decoded or outcome.downloaded != size or outcome.downloaded_encoded != size:
+        return Err(support.up_error(message = "package status or exact byte count mismatch", operation = "download", kind = "response_rejected", status = outcome.info.status, progress = outcome.downloaded))
+    var flushed = support.up_io(output_file.flush())?
+    return Ok(true)

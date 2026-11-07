@@ -1,0 +1,13 @@
+{
+  "system": "Linux",
+  "tools": {
+    "cmake": "/usr/bin/cmake",
+    "ninja": "/usr/bin/ninja",
+    "make": "/usr/bin/make"
+  },
+  "workspace_free_bytes": 342917308416,
+  "temp_free_bytes": 342917275648,
+  "required_workspace_bytes": 2684354560,
+  "required_temp_bytes": 2147483648,
+  "note": "Additional host/application reservation only; existing Linux preflight covers SDK/full build. Native Windows/macOS total peaks remain unmeasured."
+}

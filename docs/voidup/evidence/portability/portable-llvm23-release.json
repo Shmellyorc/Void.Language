@@ -1,0 +1,13 @@
+{
+  "platform": "Linux-7.2.11-pikaos-x86_64-with-glibc2.44",
+  "command": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_host_portable",
+    "/tmp/VOID portable \u96ea # % bllno7se",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_host_portable"
+  ],
+  "status": 0,
+  "stdout": "Portable host providers: 50 checks passed\n",
+  "stderr": "VOID_TEST_STACK {\"inherited\": [8388608, -1], \"observed\": [1048576, 1048576]}\n",
+  "sha256": "46fa499ffd8b6b254d704b13fb777c18264b6c154767d336cceb1959d4a85536",
+  "hard_main_stack_bytes": 1048576
+}

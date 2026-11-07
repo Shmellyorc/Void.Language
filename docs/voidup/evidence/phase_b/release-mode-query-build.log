@@ -1,0 +1,64 @@
+[  6%] Built target void_native_fixture
+[  6%] Built target void_format_objects
+[  6%] Built target void_zone_objects
+[  6%] Building CXX object CMakeFiles/void_core.dir/src/ir/module.cpp.o
+[  6%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[ 73%] Built target libcurl_static
+[ 73%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem.cpp.o
+[ 73%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem_abi.cpp.o
+[ 73%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_abi.cpp.o
+[ 73%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_error.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_crypto.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_archive.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_directory.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_process.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_process_windows.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_directory_windows.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_bulk.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_resource.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_file.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_abi.cpp.o
+[ 80%] Linking CXX static library libvoid_runtime.a
+[ 86%] Built target void_runtime
+[ 86%] Generating void-native-resources.txt, native-resources-install-Release.txt
+[ 86%] Built target void_native_inventory
+[ 86%] Linking CXX static library libvoid_core.a
+[ 93%] Built target void_core
+[ 93%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+[ 93%] Linking CXX static library libvoid_llvm.a
+[ 93%] Built target void_llvm
+[ 93%] Built target voidc_objects
+[100%] Generating cache-identity-Release.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Release.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[  0%] Built target void_zone_objects
+[ 33%] Built target void_format_objects
+[ 66%] Built target void_core
+[ 66%] Built target void_lsp
+[100%] Linking CXX executable voidls
+[100%] Built target voidls
+[  7%] Built target void_format_objects
+[  0%] Built target void_native_fixture
+[  7%] Built target void_zone_objects
+[ 84%] Built target libcurl_static
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_host_portable.dir/tests/host_capabilities/portable.cpp.o
+[100%] Linking CXX executable void_host_portable
+[100%] Built target void_host_portable
+[  6%] Built target void_native_fixture
+[  6%] Built target void_format_objects
+[  6%] Built target void_zone_objects
+[  6%] Built target void_managed_test_abi
+[ 13%] Built target void_core
+[ 80%] Built target libcurl_static
+[ 93%] Built target void_runtime
+[ 93%] Built target void_llvm
+[ 93%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_host_capabilities.dir/tests/host_capabilities/native.cpp.o
+[100%] Linking CXX executable void_host_capabilities
+[100%] Built target void_host_capabilities

@@ -1,0 +1,9 @@
+use os
+use console
+use encoding/hex as hex
+func main() -> i32:
+    if os.args() is Ok(var values):
+        for value in values:
+            console.writeln(hex.encode(value.to_utf8()))
+        return 17
+    return 2

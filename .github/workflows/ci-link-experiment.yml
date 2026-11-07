@@ -232,7 +232,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y ninja-build libffi-dev libedit-dev libxml2-dev libzstd-dev zlib1g-dev libtinfo-dev
+          sudo apt-get install -y build-essential ninja-build libffi-dev libedit-dev libxml2-dev libzstd-dev zlib1g-dev libtinfo-dev
       - name: Windows native SDK environment
         if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1
@@ -307,6 +307,8 @@ jobs:
             .toolchains/http/test-certificates
             .toolchains/http/test-certificates-tools
           key: ${{ steps.http.outputs.fixtures-key }}
+      - name: Bootstrap and verify pinned VOIDUP host providers
+        run: python tools/ci/voidup_bootstrap.py bootstrap
       - name: Configure ${{ matrix.configuration }}
         run: python "${{ env.LINK_EXPERIMENT_HELPER }}" configure
       - name: Check Linux build disk headroom
@@ -316,6 +318,8 @@ jobs:
         run: python "${{ env.LINK_EXPERIMENT_HELPER }}" build
       - name: Verify HTTP and URL acceptance registration
         run: python tools/ci/http_bootstrap.py test-plan
+      - name: Verify native host and VOIDUP smoke registration
+        run: python tools/ci/voidup_bootstrap.py test-plan
       - name: Execute ${{ matrix.configuration }} tests
         run: ctest --test-dir build/${{ matrix.configuration }} --output-on-failure --output-junit ctest-results.xml
       - name: Frontend Debug and Release small-stack regression
@@ -386,6 +390,8 @@ jobs:
             build/**/Testing/
             build/**/http-*-evidence/
             build/**/url-*-evidence/
+            build/**/host-capabilities-evidence/
+            build/**/voidup-smoke-evidence/
           if-no-files-found: ignore
       - name: Preserve test results
         if: always()

@@ -1,0 +1,11 @@
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/voidup/evidence/phase_b/crashes/incident-tglg09w9
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/voidup/acceptance.py", line 19, in <module>
+    run('doctor');run('list');run('list','--available')
+    ~~~^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/voidup/acceptance.py", line 17, in run
+    def run(*args,**kwargs):return runner.run([*base,*args],**kwargs)
+                                   ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/voidup/support.py", line 46, in run
+    raise AssertionError((receipt,result.stdout[-3000:],result.stderr[-6000:]))
+AssertionError: ({'command': ['/home/shmellyorc/Documents/Void.Language/build/voidup-development', '--root', '/home/shmellyorc/Documents/Void.Language/build/VOIDUP real A B 雪 # % ne3fjhe3/private root', '--catalog', 'https://127.0.0.1:33207/catalog.json', '--ca-file', '/home/shmellyorc/Documents/Void.Language/build/voidup-fixtures/tls/ca.pem', '--timeout-ms', '120000', 'doctor'], 'cwd': '/home/shmellyorc/Documents/Void.Language', 'status': 1, 'expected': 0, 'wall_seconds': 0.020015102985780686, 'hard_stack_bytes': 1048576, 'stdout': 'acceptance-1-003.stdout', 'stderr': 'acceptance-1-003.stderr', 'input_sha256': None}, b'', b'{"message":"io.create_private_directory failed; native code 0","operation":"io.create_private_directory","code":1,"native_domain":"filesystem","native_code":0,"cleanup_code":0,"progress":0}\n')

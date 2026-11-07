@@ -8,7 +8,7 @@ enum error_kind:
     ## The requested environment variable is absent.
     not_found
 
-    ## The application ID or environment name violates the portable contract.
+    ## An OS query input or application argument snapshot violates its contract.
     invalid_argument
 
     ## A configured directory is relative or violates host path rules.
@@ -76,7 +76,7 @@ private func _description(code: i64) -> string:
     if code == 1:
         return "environment variable is absent"
     if code == 2:
-        return "application ID or environment name is invalid"
+        return "OS query input or application argument snapshot is invalid"
     if code == 3:
         return "configured directory must be an absolute native path"
     if code == 4:
@@ -84,7 +84,7 @@ private func _description(code: i64) -> string:
     if code == 5:
         return "native discovery access was denied"
     if code == 6:
-        return "native location or bundle classification is unavailable"
+        return "native application context, location or bundle classification is unavailable"
     if code == 7:
         return "host facility is unsupported"
     return "native discovery failed"
@@ -297,3 +297,32 @@ func is_bundle() -> result<bool, error>:
     if reply.kind != 0:
         return Err(_error("os.is_bundle", reply))
     return Ok(reply.flag)
+
+
+private value struct _host_reply:
+    kind: i64
+    os_code: i64
+    number: i64
+    detail: i64
+    flag: bool
+    text: string
+    bytes: [u8]
+
+
+## Copy application arguments, excluding the executable, into a fresh owned list.
+## Context is admitted before globals; preserves empty strings and strict UTF-8.
+## Limits: 4096 arguments and 1 MiB total UTF-8; embedding without context is unavailable.
+## @return Owned snapshot or invalid_argument/invalid_utf8/unavailable; never compiler operands.
+func args() -> result<[string], error>:
+    var count = _host_args_count()
+    if count.kind != 0:
+        return Err(_error("os.args", _reply(kind = count.kind)))
+    var values: [string] = []
+    var index: i64 = 0
+    for index < count.number:
+        var item = _host_arg(index)
+        if item.kind != 0:
+            return Err(_error("os.args", _reply(kind = item.kind)))
+        values.push(item.text)
+        index += 1
+    return Ok(values)

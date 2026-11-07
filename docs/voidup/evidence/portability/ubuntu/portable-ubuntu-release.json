@@ -1,0 +1,13 @@
+{
+  "platform": "Linux-7.2.11-pikaos-x86_64-with-glibc2.39",
+  "command": [
+    "/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release/void_host_portable",
+    "/tmp/VOID portable \u96ea # % fozou3g3",
+    "/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release/void_host_portable"
+  ],
+  "status": 0,
+  "stdout": "Portable host providers: 50 checks passed\n",
+  "stderr": "VOID_TEST_STACK {\"inherited\": [8388608, -1], \"observed\": [1048576, 1048576]}\n",
+  "sha256": "89210bad850bd0d0fc870abbc76df7d0a53ff69c3a96e9e635680b4676282f95",
+  "hard_main_stack_bytes": 1048576
+}

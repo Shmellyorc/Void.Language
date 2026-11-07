@@ -1,0 +1,20 @@
+[0/2] Re-checking globbed directories...
+[1/7] cd /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release && /usr/bin/cmake -E make_directory /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release && /usr/bin/cmake -E copy_if_different /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release/void-native-resources.txt /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release/void-native-resources.txt
+[2/7] Generating cache-identity-Release.cpp
+[3/7] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Release.cpp.o
+[4/7] Linking CXX static library libvoid_cache_identity.a
+[5/7] Linking CXX executable voidc
+[6/7] Building CXX object CMakeFiles/void_host_portable.dir/tests/host_capabilities/portable.cpp.o
+[7/7] Linking CXX executable void_host_portable
+Internal ctest changing into directory: /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release
+Test project /home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/build/ubuntu-release
+    Start 153: host_capabilities_dependencies
+1/3 Test #153: host_capabilities_dependencies ......   Passed    0.19 sec
+    Start 154: host_capabilities_portable
+2/3 Test #154: host_capabilities_portable ..........   Passed    0.09 sec
+    Start 155: host_capabilities_portable_source
+3/3 Test #155: host_capabilities_portable_source ...   Passed   23.95 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =  24.25 sec

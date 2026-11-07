@@ -1,0 +1,85 @@
+-- VOID LLVM: 23.1.4 at /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- curl 8.23.0: 1586 files verified; four private corrections
+
+-- HTTP dependency prefix verified: Release; 167 files
+
+-- Using CMake version 4.3.4
+-- curl version=[8.23.0]
+-- CMake platform flags: UNIX LLVM-CLANG
+-- Picky compiler options: -Werror-implicit-function-declaration -Wextra -Wall -Wpedantic -Wbad-function-cast -Wconversion -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-long-long -Wno-multichar -Wpointer-arith -Wshadow -Wsign-compare -Wundef -Wunused -Wwrite-strings -Waddress -Wattributes -Wcast-align -Wcast-qual -Wdeclaration-after-statement -Wdiv-by-zero -Wempty-body -Wendif-labels -Wfloat-equal -Wformat-security -Wignored-qualifiers -Wmissing-field-initializers -Wmissing-noreturn -Wno-padded -Wno-sign-conversion -Wno-switch-default -Wno-switch-enum -Wno-system-headers -Wold-style-definition -Wredundant-decls -Wstrict-prototypes -Wtype-limits -Wunreachable-code -Wunused-parameter -Wvla -Wconditional-uninitialized -Wno-used-but-marked-unused -Wshift-sign-overflow -Wshorten-64-to-32 -Wformat=2 -Wlanguage-extension-token -Wno-covered-switch-default -Wno-disabled-macro-expansion -Wformat-non-iso -Wenum-conversion -Wmissing-variable-declarations -Wno-documentation-unknown-command -Wsometimes-uninitialized -Wdouble-promotion -Wheader-guard -Wpragmas -Wunused-const-variable -Wcomma -Wassign-enum -Wextra-semi-stmt -Wimplicit-fallthrough -Wxor-used-as-pow -Wcast-function-type -Wreserved-identifier -Wno-reserved-macro-identifier -Wno-unsafe-buffer-usage -Wcast-function-type-strict -Wformat-signedness -Warray-compare -Wc++-hidden-decl -Wimplicit-int-enum-cast -Wjump-misses-init -Wno-implicit-void-ptr-cast -Wtentative-definition-compat -Wc++-keyword
+-- Found CA bundle: /etc/ssl/certs/ca-certificates.crt
+-- Found CA path: /etc/ssl/certs
+-- Protocols: http https
+-- Features: AsynchDNS HTTP2 HTTPS-proxy IDN IPv6 Largefile PSL SSL threadsafe
+-- Enabled SSL backends: AWS-LC
+-- Verified pinned Linux host providers: Release; 125 files
+
+-- Performing Test VOID_LLVM_ORC_RUNS
+-- Performing Test VOID_LLVM_ORC_RUNS - Success
+-- Found Python3: /usr/bin/python3 (found version "3.14.8") found components: Interpreter
+-- Configuring done (6.2s)
+-- Generating done (2.1s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+[  0%] Built target void_native_fixture
+[  7%] Built target void_format_objects
+[  7%] Built target void_zone_objects
+[  7%] Building CXX object CMakeFiles/void_core.dir/src/ir/module.cpp.o
+[  7%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[ 78%] Built target libcurl_static
+[ 78%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem.cpp.o
+[ 78%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem_abi.cpp.o
+[ 78%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_abi.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_crypto.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_archive.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_directory.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_process.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_process_windows.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_directory_windows.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_bulk.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_resource.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_file.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_abi.cpp.o
+[ 85%] Linking CXX static library libvoid_runtime.a
+[ 92%] Built target void_runtime
+[ 92%] Generating void-native-resources.txt, native-resources-install-Release.txt
+[ 92%] Built target void_native_inventory
+[ 92%] Linking CXX static library libvoid_core.a
+[100%] Built target void_core
+[100%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+[100%] Linking CXX static library libvoid_llvm.a
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Generating cache-identity-Release.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Release.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[  0%] Built target void_zone_objects
+[ 33%] Built target void_format_objects
+[ 66%] Built target void_core
+[ 66%] Built target void_lsp
+[100%] Linking CXX executable voidls
+[100%] Built target voidls
+[  7%] Built target void_native_fixture
+[  7%] Built target void_format_objects
+[  7%] Built target void_zone_objects
+[  7%] Built target void_managed_test_abi
+[ 14%] Built target void_core
+[ 85%] Built target libcurl_static
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_directory.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_process_windows.cpp.o
+[ 85%] Linking CXX static library libvoid_runtime.a
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Generating cache-identity-Release.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Release.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_host_capabilities.dir/tests/host_capabilities/native.cpp.o
+[100%] Linking CXX executable void_host_capabilities
+[100%] Built target void_host_capabilities
+Built target void_host_child

@@ -1,0 +1,58 @@
+use "./support.void" as support
+use "./model.void" as model
+use "./trust_keys.void" as roots
+use crypto
+use json as codec
+use encoding/hex as hex
+use io/memory as memory
+
+private func up_memory<t>(outcome: result<t, memory.error>) -> result<t, support.up_error>:
+    if outcome is Ok(var item):
+        return Ok(item)
+    if outcome is Err(var cause):
+        return Err(support.up_fail(cause.message, "signed-bytes"))
+    return Err(support.up_fail("invalid memory result"))
+
+func up_authenticate(const catalog_bytes: [u8], const envelope_bytes: [u8]) -> result<model.up_catalog, support.up_error>:
+    if catalog_bytes.count < 1 or catalog_bytes.count > support.up_metadata_limit or envelope_bytes.count > 4096:
+        return Err(support.up_fail("signature input exceeds local bounds", "authenticate"))
+    var envelope = support.up_json(codec.parse_as<model.up_signature_envelope>(support.up_text(envelope_bytes)?, support.up_json_budget()))?
+    if envelope.schema != 1 or envelope.signatures.count < 2 or envelope.signatures.count > 3:
+        return Err(support.up_fail("expected a 2-of-3 signature envelope", "authenticate"))
+    var buffer = memory.stream()
+    var prefix_written = up_memory(buffer.write_bytes("VOIDUP CATALOG v1\n".to_utf8()))?
+    var body_written = up_memory(buffer.write_bytes(catalog_bytes))?
+    var message_bytes = buffer.to_bytes()
+    var seen: {string: bool}
+    var valid: i64 = 0
+    for endorsement in envelope.signatures:
+        if seen.contains(endorsement.key_id):
+            return Err(support.up_fail("duplicate signing key identity", "authenticate"))
+        seen[endorsement.key_id] = true
+        var selected: i64 = -1
+        for index in 0..<3:
+            if endorsement.key_id == "test-{index + 1}":
+                selected = index as i64
+        if selected < 0 or endorsement.signature.to_utf8().count != 128:
+            return Err(support.up_fail("unknown signing key or invalid signature size", "authenticate"))
+        var public_key = support.up_hex(hex.decode(roots.up_public_test_keys[selected]))?
+        var signature_bytes = support.up_hex(hex.decode(endorsement.signature))?
+        if support.up_sys(crypto.verify_ed25519(public_key, signature_bytes, message_bytes))?:
+            valid += 1
+    if valid < 2:
+        return Err(support.up_fail("two distinct trusted signatures are required", "authenticate"))
+    # Catalog decoding happens only after authenticating these exact bytes.
+    var document = support.up_json(codec.parse_as<model.up_catalog>(support.up_text(catalog_bytes)?, support.up_json_budget()))?
+    var checked = model.up_catalog_shape(document)?
+    return Ok(document)
+
+func up_fresh(document: model.up_catalog, previous: model.up_control, digest: string, now: i64) -> result<bool, support.up_error>:
+    if now < 1 or now < previous.last_time:
+        return Err(support.up_fail("clock moved behind the retained trust floor", "freshness"))
+    if document.expires <= now or document.issued > now + 300:
+        return Err(support.up_fail("catalog expired or issued in the future", "freshness"))
+    if document.serial < previous.serial:
+        return Err(support.up_fail("catalog serial replay", "freshness"))
+    if document.serial == previous.serial and previous.catalog_digest != digest:
+        return Err(support.up_fail("same-serial catalog equivocation", "freshness"))
+    return Ok(true)

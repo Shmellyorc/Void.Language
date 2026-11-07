@@ -1,0 +1,7 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start 155: host_capabilities_portable_source
+1/1 Test #155: host_capabilities_portable_source ...   Passed   24.84 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =  24.85 sec

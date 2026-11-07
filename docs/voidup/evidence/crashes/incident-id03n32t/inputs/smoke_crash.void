@@ -1,0 +1,144 @@
+use os
+use crypto
+use archive
+use process
+use io
+use convert
+use encoding/hex
+
+var startup = os.args()
+
+func decode(text: string) -> [u8]:
+    return convert.unwrap(hex.decode(text))
+
+func cryptography():
+    with convert.unwrap(crypto.sha256()) as state:
+        print(convert.unwrap(state.update("a".to_utf8())))
+        print(convert.unwrap(state.update([])))
+        print(convert.unwrap(state.update("bc".to_utf8())))
+        print(hex.encode(convert.unwrap(state.finish())))
+        print(state.finish() is Err(var ignored_0), state.update([]) is Err(var ignored_1))
+        print(convert.unwrap(state.close()), convert.unwrap(state.close()))
+    with convert.unwrap(crypto.sha256()) as empty:
+        print(hex.encode(convert.unwrap(empty.finish())))
+    var key = decode("d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a")
+    var signature = decode("e5564300c360ac729086e2cc806e828a84877f1eb8e5d974d873e065224901555fb8821590a33bacc61e39701cf9b46bd25bf5f0595bbe24655141438e7a100b")
+    print(convert.unwrap(crypto.verify_ed25519(key, signature, [])))
+    print(convert.unwrap(crypto.verify_ed25519(key, signature, [1])))
+    signature[63] = 255
+    print(convert.unwrap(crypto.verify_ed25519(key, signature, [])))
+    print(crypto.verify_ed25519([], signature, []) is Err(var ignored_2))
+    print(crypto.verify_ed25519(key, [], []) is Err(var ignored_3))
+    print(convert.unwrap(crypto.verify_ed25519([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], signature, [])))
+
+func filesystem(root: string):
+    with convert.unwrap(io.create_private_directory(root)) as directory:
+        print(io.create_private_directory(root) is Err(var ignored_4))
+        with convert.unwrap(directory.lock("writer.lock")) as lock:
+            print(directory.lock("writer.lock") is Err(var ignored_5))
+            print(convert.unwrap(lock.close()))
+        with convert.unwrap(directory.lock("writer.lock")) as again:
+            print(directory.create_file("../escape") is Err(var ignored_6))
+            print(directory.create_directory("..") is Err(var ignored_7))
+            with convert.unwrap(directory.create_directory("stage")) as stage:
+                with convert.unwrap(stage.create_file("data 雪 # %")) as handle:
+                    print(convert.unwrap(handle.write_bytes("payload".to_utf8())))
+                    print(convert.unwrap(handle.flush()))
+                    print(convert.unwrap(handle.private_mode(false)))
+                    print(stage.create_file("data 雪 # %") is Err(var ignored_8))
+                print(convert.unwrap(stage.sync()))
+                print(stage.publish(directory, "release").durable)
+                print(not stage.publish(directory, "release").published)
+                with convert.unwrap(stage.open_file("data 雪 # %")) as handle:
+                    print(hex.encode(convert.unwrap(handle.read_bytes(100))))
+                    print(handle.private_mode(true) is Err(var ignored_10))
+            with convert.unwrap(directory.create_file("control.new")) as control:
+                print(convert.unwrap(control.write_bytes("current".to_utf8())))
+                print(directory.publish_file(control, "control.new", directory, "control.json", true).durable)
+            print(convert.unwrap(directory.sync()))
+        print(convert.unwrap(directory.close()), convert.unwrap(directory.close()))
+
+func zip(path: string, ceiling: i64):
+    with convert.unwrap(io.open(path, io.open_mode.read)) as handle:
+        if archive.open_zip(handle, archive.zip_limits(expanded_bytes = ceiling)) is Ok(var reader):
+            with reader as stream:
+                print("opened", handle.read_bytes(1) is Err(var ignored_11))
+                for true:
+                    var header = convert.unwrap(reader.next())
+                    if header.eof:
+                        break
+                    print("entry", header.name, header.size, header.directory)
+                    if not header.directory:
+                        print("undrained", reader.next() is Err(var ignored_12))
+                        with convert.unwrap(crypto.sha256()) as hash:
+                            for true:
+                                if reader.read(17) is Ok(var chunk):
+                                    if chunk.count == 0:
+                                        break
+                                    var updated = convert.unwrap(hash.update(chunk))
+                                else:
+                                    print("corrupt")
+                                    return
+                            print(hex.encode(convert.unwrap(hash.finish())))
+                print("eof", convert.unwrap(reader.next()).eof)
+                print(convert.unwrap(reader.close()), convert.unwrap(reader.close()))
+            print("released", handle.read_bytes(1) is Ok(var ignored_13))
+        else:
+            print("rejected")
+
+func launch(executable: string, cwd: string):
+    with convert.unwrap(process.start(executable, ["", "two words", "\"quote\"", "tail\\", "雪😀", "#/%", "--app", ";touch NEVER"], ["VOID_CHILD=雪=value"], cwd)) as running:
+        var status = convert.unwrap(running.wait())
+        print("status", status.code, status.signaled, status.signal)
+        print("repeat", convert.unwrap(running.wait()).code)
+        print(convert.unwrap(running.close()), convert.unwrap(running.close()))
+    print("relative", process.start("relative", [], [], cwd) is Err(var ignored_14))
+    print("missing", process.start("/no/such/executable", [], [], cwd) is Err(var ignored_15))
+    print("environment", process.start(executable, [], ["X=1", "X=2"], cwd) is Err(var ignored_16))
+
+func main() -> i32:
+    var operands = convert.unwrap(startup)
+    if operands.count == 0:
+        return 2
+    if operands[0] == "args":
+        for arg in operands:
+            print(hex.encode(arg.to_utf8()))
+        var fresh = convert.unwrap(os.args())
+        fresh[0] = "changed"
+        print(convert.unwrap(os.args())[0])
+    else if operands[0] == "crypto":
+        cryptography()
+    else if operands[0] == "fs":
+        filesystem(operands[1])
+    else if operands[0] == "zip":
+        zip(operands[1], 1048576)
+    else if operands[0] == "zip-many":
+        for index in 1..<operands.count:
+            print("case", index)
+            zip(operands[index], 1048576)
+    else if operands[0] == "zip-limit":
+        zip(operands[1], 1)
+    else if operands[0] == "probe":
+        for index in 1..<operands.count:
+            if io.open_private_directory(operands[index]) is Err(var reason):
+                print("denied", reason.code)
+            else:
+                print("admitted")
+    else if operands[0] == "lock":
+        with convert.unwrap(io.open_private_directory(operands[1])) as directory:
+            if directory.lock("writer.lock") is Ok(var held):
+                with held as reservation:
+                    print("locked", flush = true)
+                    with convert.unwrap(process.start("/bin/sleep", ["1"], [], "/tmp")) as running:
+                        var termination = convert.unwrap(running.wait())
+            else:
+                print("busy")
+    else if operands[0] == "signal":
+        with convert.unwrap(process.start(operands[1], ["--signal"], [], "/tmp")) as running:
+            var status = convert.unwrap(running.wait())
+            print(status.code, status.signaled, status.signal)
+    else if operands[0] == "process":
+        launch(operands[1], operands[2])
+    else if operands[0] == "args-error":
+        return 3
+    return 0

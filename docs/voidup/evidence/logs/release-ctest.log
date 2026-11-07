@@ -1,0 +1,75 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+      Start 153: host_capabilities
+      Start 154: host_capabilities_stack
+      Start 158: os_execution
+ 1/35 Test #158: os_execution .....................   Passed   27.37 sec
+      Start 270: io_execution
+ 2/35 Test #270: io_execution .....................   Passed   22.38 sec
+      Start 272: io_async_execution
+ 3/35 Test #154: host_capabilities_stack ..........   Passed   54.88 sec
+      Start 269: io_ownership
+ 4/35 Test #153: host_capabilities ................   Passed   56.51 sec
+      Start 283: io_native_whole_shutdown
+ 5/35 Test #283: io_native_whole_shutdown .........   Passed    6.19 sec
+      Start 284: io_native_pending_close
+ 6/35 Test #269: io_ownership .....................   Passed   13.26 sec
+      Start 282: io_native_opening_shutdown
+ 7/35 Test #284: io_native_pending_close ..........   Passed    6.24 sec
+      Start 164: os_frontend
+ 8/35 Test #272: io_async_execution ...............   Passed   22.28 sec
+      Start 281: io_native_shutdown
+ 9/35 Test #282: io_native_opening_shutdown .......   Passed    5.92 sec
+      Start 285: io_native_cancelled
+10/35 Test #164: os_frontend ......................   Passed    6.70 sec
+      Start 280: io_native_close_failure
+11/35 Test #281: io_native_shutdown ...............   Passed    5.57 sec
+      Start 279: io_native_responsiveness
+12/35 Test #285: io_native_cancelled ..............   Passed    5.87 sec
+      Start 162: os_host
+13/35 Test #280: io_native_close_failure ..........   Passed    6.07 sec
+      Start 378: stage11_globals_aot
+14/35 Test #279: io_native_responsiveness .........   Passed    6.13 sec
+      Start 251: stage6_integrated
+15/35 Test #378: stage11_globals_aot ..............   Passed    4.51 sec
+      Start 166: os_cache
+16/35 Test #162: os_host ..........................   Passed    6.43 sec
+      Start 163: os_errors
+17/35 Test #251: stage6_integrated ................   Passed    3.84 sec
+      Start 160: os_edges
+18/35 Test #166: os_cache .........................   Passed    3.89 sec
+      Start 155: host_capabilities_frontend
+19/35 Test #160: os_edges .........................   Passed    4.50 sec
+      Start  90: debug_cache
+20/35 Test #163: os_errors ........................   Passed    5.80 sec
+      Start  23: http_lsp
+21/35 Test #155: host_capabilities_frontend .......   Passed    2.47 sec
+      Start   1: cli_contract
+22/35 Test  #90: debug_cache ......................   Passed    1.64 sec
+      Start 165: lsp_os
+23/35 Test  #23: http_lsp .........................   Passed    1.85 sec
+      Start 220: stage11_globals
+24/35 Test #220: stage11_globals ..................   Passed    0.76 sec
+      Start  91: debug_cache_processes
+25/35 Test   #1: cli_contract .....................   Passed    2.70 sec
+      Start  18: http_source_negative
+26/35 Test #165: lsp_os ...........................   Passed    1.74 sec
+      Start 156: host_capabilities_lsp
+27/35 Test #156: host_capabilities_lsp ............   Passed    0.44 sec
+      Start 157: host_capabilities_native
+28/35 Test #157: host_capabilities_native .........   Passed    0.18 sec
+      Start   2: cli_install
+29/35 Test  #18: http_source_negative .............   Passed    1.05 sec
+      Start  92: automatic_cache_processes
+30/35 Test  #92: automatic_cache_processes ........   Passed    0.55 sec
+      Start 292: io_async_acquisition
+31/35 Test #292: io_async_acquisition .............   Passed    0.18 sec
+      Start 295: io_native_jobs
+32/35 Test #295: io_native_jobs ...................   Passed    0.01 sec
+33/35 Test   #2: cli_install ......................   Passed    1.15 sec
+34/35 Test  #91: debug_cache_processes ............   Passed    2.89 sec
+      Start 169: os_install
+35/35 Test #169: os_install .......................   Passed    9.87 sec
+
+100% tests passed, 0 tests failed out of 35
+
+Total Test time (real) = 107.54 sec

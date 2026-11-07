@@ -1,0 +1,10 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- Imported after upstream project metadata. Match VOID and LLVM's /MT ABI
+       even for Debug. The source project and its generated version stay intact. -->
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalOptions Condition="'$(VoidHostStrict)' == 'true'">/clang:-fsanitize=address,undefined /clang:-fno-omit-frame-pointer %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+</Project>

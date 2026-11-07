@@ -1,0 +1,12 @@
+use os
+func snapshot_size(text: string) -> i64:
+    return text.byte_length
+async func entry(input: i32) -> i32:
+    if os.process_id() <= 0:
+        return -1
+    if os.home_dir() is Ok(var home):
+        var job = spawn snapshot_size(home)
+        var length = await job
+        if length > 0:
+            return input
+    return -1

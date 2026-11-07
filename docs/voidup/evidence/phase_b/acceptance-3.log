@@ -1,0 +1,10 @@
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/docs/voidup/evidence/phase_b/crashes/incident-9kxmwlys
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/voidup/acceptance.py", line 40, in <module>
+    lsp=run('run',release,'voidls','--',input=payload)
+  File "/home/shmellyorc/Documents/Void.Language/tests/voidup/acceptance.py", line 17, in run
+    def run(*args,**kwargs):return runner.run([*base,*args],**kwargs)
+                                   ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/voidup/support.py", line 46, in run
+    raise AssertionError((receipt,result.stdout[-3000:],result.stderr[-6000:]))
+AssertionError: ({'command': ['/home/shmellyorc/Documents/Void.Language/build/voidup-bootstrap/bin/voidup', '--root', '/tmp/VOIDUP real A B 雪 # % yfa3ku11/private root', '--catalog', 'https://127.0.0.1:35203/catalog.json', '--ca-file', '/home/shmellyorc/Documents/Void.Language/build/voidup-fixtures/tls/ca.pem', '--timeout-ms', '120000', 'run', 'engineering-a', 'voidls', '--'], 'cwd': '/home/shmellyorc/Documents/Void.Language', 'status': 2, 'expected': 0, 'wall_seconds': 8.06327241595136, 'hard_stack_bytes': 1048576, 'stdout': 'acceptance-3-021.stdout', 'stderr': 'acceptance-3-021.stderr', 'input_sha256': '3038b571c0edc9adb2d86e046d70c81b8403de9e72319b66e20f7eb515453053'}, b'', b'voidls: Usage: voidls --entry <project entry.void>\n')

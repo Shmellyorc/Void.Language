@@ -1,0 +1,296 @@
+{
+  "required": [
+    "host_capabilities",
+    "host_capabilities_dependencies",
+    "host_capabilities_frontend",
+    "host_capabilities_install",
+    "host_capabilities_lsp",
+    "host_capabilities_native",
+    "host_capabilities_portable",
+    "host_capabilities_portable_source",
+    "host_capabilities_stack",
+    "voidup_ci_integration",
+    "voidup_smoke"
+  ],
+  "tests": [
+    {
+      "backtrace": 1,
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/voidup/smoke.py",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidup/voidup",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidup-smoke-evidence"
+      ],
+      "name": "voidup_smoke",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 240.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 3,
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/voidup/ci_integration.py"
+      ],
+      "name": "voidup_ci_integration",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 337,
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/dependencies.py",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Release",
+        "Release",
+        "Linux",
+        "x86_64"
+      ],
+      "name": "host_capabilities_dependencies",
+      "properties": [
+        {
+          "name": "ENVIRONMENT",
+          "value": [
+            "VOID_HOST_EVIDENCE_DIR=/home/shmellyorc/Documents/Void.Language/build/llvm23-release/host-capabilities-evidence",
+            "VOID_CRASH_EVIDENCE=/home/shmellyorc/Documents/Void.Language/build/llvm23-release/host-capabilities-evidence/crashes"
+          ]
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 339,
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable.py",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_host_portable"
+      ],
+      "name": "host_capabilities_portable",
+      "properties": [
+        {
+          "name": "ENVIRONMENT",
+          "value": [
+            "VOID_HOST_EVIDENCE_DIR=/home/shmellyorc/Documents/Void.Language/build/llvm23-release/host-capabilities-evidence",
+            "VOID_CRASH_EVIDENCE=/home/shmellyorc/Documents/Void.Language/build/llvm23-release/host-capabilities-evidence/crashes"
+          ]
+        },
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 341,
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable_source.py",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_host_portable"
+      ],
+      "name": "host_capabilities_portable_source",
+      "properties": [
+        {
+          "name": "ENVIRONMENT",
+          "value": [
+            "VOID_HOST_EVIDENCE_DIR=/home/shmellyorc/Documents/Void.Language/build/llvm23-release/host-capabilities-evidence",
+            "VOID_CRASH_EVIDENCE=/home/shmellyorc/Documents/Void.Language/build/llvm23-release/host-capabilities-evidence/crashes"
+          ]
+        },
+        {
+          "name": "TIMEOUT",
+          "value": 1200.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 343,
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/acceptance.py",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_host_child"
+      ],
+      "name": "host_capabilities",
+      "properties": [
+        {
+          "name": "ENVIRONMENT",
+          "value": [
+            "VOID_HOST_EVIDENCE_DIR=/home/shmellyorc/Documents/Void.Language/build/llvm23-release/host-capabilities-evidence",
+            "VOID_CRASH_EVIDENCE=/home/shmellyorc/Documents/Void.Language/build/llvm23-release/host-capabilities-evidence/crashes"
+          ]
+        },
+        {
+          "name": "TIMEOUT",
+          "value": 1200.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 345,
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/acceptance.py",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_host_child",
+        "--small-stack"
+      ],
+      "name": "host_capabilities_stack",
+      "properties": [
+        {
+          "name": "ENVIRONMENT",
+          "value": [
+            "VOID_HOST_EVIDENCE_DIR=/home/shmellyorc/Documents/Void.Language/build/llvm23-release/host-capabilities-evidence",
+            "VOID_CRASH_EVIDENCE=/home/shmellyorc/Documents/Void.Language/build/llvm23-release/host-capabilities-evidence/crashes"
+          ]
+        },
+        {
+          "name": "TIMEOUT",
+          "value": 1200.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 347,
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/frontend.py",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc"
+      ],
+      "name": "host_capabilities_frontend",
+      "properties": [
+        {
+          "name": "ENVIRONMENT",
+          "value": [
+            "VOID_HOST_EVIDENCE_DIR=/home/shmellyorc/Documents/Void.Language/build/llvm23-release/host-capabilities-evidence",
+            "VOID_CRASH_EVIDENCE=/home/shmellyorc/Documents/Void.Language/build/llvm23-release/host-capabilities-evidence/crashes"
+          ]
+        },
+        {
+          "name": "TIMEOUT",
+          "value": 1200.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 349,
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/lsp.py",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls"
+      ],
+      "name": "host_capabilities_lsp",
+      "properties": [
+        {
+          "name": "ENVIRONMENT",
+          "value": [
+            "VOID_HOST_EVIDENCE_DIR=/home/shmellyorc/Documents/Void.Language/build/llvm23-release/host-capabilities-evidence",
+            "VOID_CRASH_EVIDENCE=/home/shmellyorc/Documents/Void.Language/build/llvm23-release/host-capabilities-evidence/crashes"
+          ]
+        },
+        {
+          "name": "TIMEOUT",
+          "value": 1200.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 351,
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/native.py",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_host_capabilities",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_host_child"
+      ],
+      "name": "host_capabilities_native",
+      "properties": [
+        {
+          "name": "ENVIRONMENT",
+          "value": [
+            "VOID_HOST_EVIDENCE_DIR=/home/shmellyorc/Documents/Void.Language/build/llvm23-release/host-capabilities-evidence",
+            "VOID_CRASH_EVIDENCE=/home/shmellyorc/Documents/Void.Language/build/llvm23-release/host-capabilities-evidence/crashes"
+          ]
+        },
+        {
+          "name": "TIMEOUT",
+          "value": 1200.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release"
+        }
+      ]
+    },
+    {
+      "backtrace": 353,
+      "command": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/install.py",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_host_child"
+      ],
+      "name": "host_capabilities_install",
+      "properties": [
+        {
+          "name": "ENVIRONMENT",
+          "value": [
+            "VOID_HOST_EVIDENCE_DIR=/home/shmellyorc/Documents/Void.Language/build/llvm23-release/host-capabilities-evidence",
+            "VOID_CRASH_EVIDENCE=/home/shmellyorc/Documents/Void.Language/build/llvm23-release/host-capabilities-evidence/crashes"
+          ]
+        },
+        {
+          "name": "RUN_SERIAL",
+          "value": true
+        },
+        {
+          "name": "TIMEOUT",
+          "value": 1200.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release"
+        }
+      ]
+    }
+  ],
+  "execution": "Existing unfiltered CTest invocation; no exclusions added",
+  "private_signing_credentials": false
+}

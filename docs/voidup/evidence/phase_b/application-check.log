@@ -1,0 +1,9 @@
+/home/shmellyorc/Documents/Void.Language/apps/voidup/inventory.void:39:30: error: Type mismatch: expected string, received result<string, /@stdlib/text.void::error>.
+    code: VOID2001
+
+ 39 |         relative_name = text.replace(relative_name, "\\", "/")
+    |                              ^^^^^^^
+    Module: /inventory.void
+    Expected: string
+    Received: result<string, /@stdlib/text.void::error>
+

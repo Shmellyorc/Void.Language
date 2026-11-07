@@ -1,0 +1,62 @@
+budget 0: Host boundary allocation failedCalled from /@stdlib/os.void::args
+/home/shmellyorc/Documents/Void.Language/stdlib/os.void:317:17: source call
+    var count = _host_args_count()
+                ^
+Called from /main.void::main
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:18:23: source call
+    var operands = os.args()
+                      ^
+Called from /main.void::$app_adapter
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:17:6: source call
+
+budget 1: Host boundary allocation failedCalled from /@stdlib/os.void::args
+/home/shmellyorc/Documents/Void.Language/stdlib/os.void:317:17: source call
+    var count = _host_args_count()
+                ^
+Called from /main.void::main
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:18:23: source call
+    var operands = os.args()
+                      ^
+Called from /main.void::$app_adapter
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:17:6: source call
+
+budget 4: /home/shmellyorc/Documents/Void.Language/stdlib/os.void:320:28: runtime error: Array operation failed
+In function /@stdlib/os.void::args
+Called from /main.void::main
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:18:23: source call
+    var operands = os.args()
+                      ^
+Called from /main.void::$app_adapter
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:17:6: source call
+
+budget 16: Host boundary allocation failedCalled from /@stdlib/os.void::args
+/home/shmellyorc/Documents/Void.Language/stdlib/os.void:323:20: source call
+        var item = _host_arg(index)
+                   ^
+Called from /main.void::main
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:18:23: source call
+    var operands = os.args()
+                      ^
+Called from /main.void::$app_adapter
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:17:6: source call
+
+budget 64: Host boundary allocation failedCalled from /@stdlib/os.void::args
+/home/shmellyorc/Documents/Void.Language/stdlib/os.void:323:20: source call
+        var item = _host_arg(index)
+                   ^
+Called from /main.void::main
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:18:23: source call
+    var operands = os.args()
+                      ^
+Called from /main.void::$app_adapter
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:17:6: source call
+
+budget 256: /home/shmellyorc/Documents/Void.Language/apps/voidup/cli.void:32:31: runtime error: Array operation failed
+In function /cli.void::up_parse
+Called from /main.void::main
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:22:26: source call
+        var parsed = cli.up_parse(values)
+                         ^
+Called from /main.void::$app_adapter
+/home/shmellyorc/Documents/Void.Language/apps/voidup/main.void:17:6: source call
+

@@ -1,0 +1,106 @@
+use io
+
+
+## Join components using native root and drive replacement rules without checking existence.
+## @param parts Ordered UTF-8 components; empty input returns empty text and embedded NUL is invalid.
+## @return Ok with an owned joined path, or Err(invalid_path) for invalid components.
+func join(const parts: [string]) -> result<string, io.error>:
+    var joined = ""
+
+    for part in parts:
+        joined = io._path_join(joined, part)?
+
+    return Ok(joined)
+
+
+## Lexically simplify redundant separators, dot components and cancellable parents.
+## @param value UTF-8 path; normalization does not check existence or resolve symbolic links.
+## @return Ok with normalized text, or Err(invalid_path); empty input stays empty.
+func normalize(value: string) -> result<string, io.error>:
+    return io._path_normalize(value)
+
+
+## Extract the final filename component without touching the filesystem.
+## @param value UTF-8 path; a trailing separator produces an empty filename.
+## @return Ok with the final component or empty text, or Err for invalid input.
+func filename(value: string) -> result<string, io.error>:
+    return io._path_filename(value)
+
+
+## Extract the filename without its final extension.
+## @param value UTF-8 path; a leading-dot filename alone is retained as its stem.
+## @return Ok with the stem, or Err(invalid_path).
+func stem(value: string) -> result<string, io.error>:
+    return io._path_stem(value)
+
+
+## Extract the final extension including its leading dot.
+## @param value UTF-8 path; dotfiles alone have no extension and trailing-dot names return a dot.
+## @return Ok with extension text or empty text when absent, or Err(invalid_path).
+func extension(value: string) -> result<string, io.error>:
+    return io._path_extension(value)
+
+
+## Replace or remove the final filename extension without checking existence.
+## @param value UTF-8 path whose last filename extension is replaced.
+## @param new_extension Replacement extension, with or without a leading dot; empty removes the extension.
+## @return Ok with changed path text, or Err(invalid_path).
+func change_extension(value: string, new_extension: string) -> result<string, io.error>:
+    return io._path_change_extension(value, new_extension)
+
+
+## Extract the lexical parent directory while retaining native roots.
+## @param value UTF-8 path; a bare filename has an empty parent and a root remains its own parent.
+## @return Ok with parent text, or Err(invalid_path); no symbolic link is resolved.
+func parent(value: string) -> result<string, io.error>:
+    return io._path_parent(value)
+
+
+## Extract the native filesystem root, including a Windows drive or UNC share.
+## @param value UTF-8 host path whose native root is inspected.
+## @return Ok with root text or empty text when unrooted, or Err(invalid_path).
+func root(value: string) -> result<string, io.error>:
+    return io._path_root(value)
+
+
+## Check whether a path is fully qualified under native host rules.
+## @param value UTF-8 path; Windows drive-relative names are not fully absolute.
+## @return Ok with the native absolute-path predicate, or Err(invalid_path).
+func is_absolute(value: string) -> result<bool, io.error>:
+    return io._path_is_absolute(value)
+
+
+## Check whether a path is not fully absolute under native host rules.
+## @param value UTF-8 host path to inspect without checking existence.
+## @return Ok with the complement of is_absolute, or Err(invalid_path).
+func is_relative(value: string) -> result<bool, io.error>:
+    return io._path_is_relative(value)
+
+
+## Check whether a native root name or root directory is present.
+## @param value UTF-8 path; Windows drive-relative paths can be rooted without being absolute.
+## @return Ok with whether a root exists, or Err(invalid_path).
+func is_rooted(value: string) -> result<bool, io.error>:
+    return io._path_is_rooted(value)
+
+
+## Resolve and normalize against an explicit absolute base or one cwd snapshot.
+## @param value UTF-8 path; empty denotes the selected base and absolute inputs retain their root.
+## @param base Absolute base path, or empty to snapshot cwd; no operation changes process cwd.
+## @return Ok with an absolute lexical path, or Err for invalid input or cwd failure; links are not resolved.
+func absolute(value: string, base: string = "") -> result<string, io.error>:
+    return io._path_absolute(value, base)
+
+
+## Calculate a lexical relative path between compatible native roots.
+## @param value Target path; absolute targets are used directly and relative targets resolve against the chosen base.
+## @param base Absolute base path, or empty for one cwd snapshot; incompatible roots return Err.
+## @return Ok with relative path text, or Err for invalid input, incompatible roots or cwd failure.
+func relative(value: string, base: string = "") -> result<string, io.error>:
+    return io._path_relative(value, base)
+
+
+## Return the preferred native path separator as owned text.
+## @return Ok with the preferred separator; allocation failures retain ordinary Runtime behavior.
+func separator() -> result<string, io.error>:
+    return io._path_separator()

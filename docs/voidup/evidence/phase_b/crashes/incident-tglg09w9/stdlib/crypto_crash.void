@@ -1,0 +1,68 @@
+use system_error
+
+private value struct _host_reply:
+    kind: i64
+    os_code: i64
+    number: i64
+    detail: i64
+    flag: bool
+    text: string
+    bytes: [u8]
+
+
+## Incremental SHA-256 native state. Copies alias the same owner; use with or close.
+struct sha256_state:
+    private _local: bool
+
+private func (self sha256_state) init():
+    pass
+
+## Begin an incremental SHA-256 digest; each update accepts at most 16 MiB.
+## @return A checked owned hashing state; no managed input pointer is retained.
+func sha256() -> result<sha256_state, system_error.error>:
+    var state = sha256_state()
+    var reply = _host_hash_open(state)
+    if reply.kind != 0:
+        return Err(system_error.make("crypto.sha256", reply.kind, reply.os_code))
+    return Ok(state)
+
+## Append an independent byte snapshot; total input cannot wrap SHA-256's bit count.
+## @param bytes Bytes to incorporate, including an empty chunk.
+## @return True on success; closed after finish/close, or a checked size failure.
+func (self sha256_state) update(const bytes: [u8]) -> result<bool, system_error.error>:
+    var reply = _host_hash_update(self, bytes)
+    if reply.kind != 0:
+        return Err(system_error.make("crypto.sha256.update", reply.kind, reply.os_code))
+    return Ok(true)
+
+## Finalize once, erase the native state and return the 32-byte digest.
+## @return Owned SHA-256 bytes; repeated finish/update returns closed.
+func (self sha256_state) finish() -> result<[u8], system_error.error>:
+    var reply = _host_hash_final(self)
+    if reply.kind != 0:
+        return Err(system_error.make("crypto.sha256.finish", reply.kind, reply.os_code))
+    return Ok(reply.bytes)
+
+## Erase and release this state. Aliases observe the closed resource.
+## @return True after checked idempotent close.
+func (self sha256_state) close() -> result<bool, system_error.error>:
+    var reply = _host_hash_close(self)
+    if reply.kind != 0:
+        return Err(system_error.make("crypto.sha256.close", reply.kind, reply.os_code))
+    return Ok(true)
+
+## Release native state deterministically without allocating a checked reply.
+func (self sha256_state) deinit():
+    _host_hash_cleanup(self)
+
+## Verify a detached ordinary Ed25519 signature over the exact message bytes.
+## This is Ed25519, not Ed25519ph; rejects noncanonical signatures and invalid points.
+## @param public_key Exactly 32 bytes.
+## @param signature Exactly 64 bytes.
+## @param message Complete signed bytes, bounded independently to 16 MiB.
+## @return Ok(false) for an invalid signature; Err for invalid sizes or native failure.
+func verify_ed25519(const public_key: [u8], const signature: [u8], const message: [u8]) -> result<bool, system_error.error>:
+    var reply = _host_verify(public_key, signature, message)
+    if reply.kind != 0:
+        return Err(system_error.make("crypto.verify_ed25519", reply.kind, reply.os_code))
+    return Ok(reply.flag)

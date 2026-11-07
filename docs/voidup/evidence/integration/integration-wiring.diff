@@ -1,0 +1,206 @@
+diff --git a/.github/workflows/ci-link-experiment.yml b/.github/workflows/ci-link-experiment.yml
+index c915eb60..09f5d083 100644
+--- a/.github/workflows/ci-link-experiment.yml
++++ b/.github/workflows/ci-link-experiment.yml
+@@ -232,7 +232,7 @@ jobs:
+         if: runner.os == 'Linux'
+         run: |
+           sudo apt-get update
+-          sudo apt-get install -y ninja-build libffi-dev libedit-dev libxml2-dev libzstd-dev zlib1g-dev libtinfo-dev
++          sudo apt-get install -y build-essential ninja-build libffi-dev libedit-dev libxml2-dev libzstd-dev zlib1g-dev libtinfo-dev
+       - name: Windows native SDK environment
+         if: runner.os == 'Windows'
+         uses: ilammy/msvc-dev-cmd@v1
+@@ -307,6 +307,8 @@ jobs:
+             .toolchains/http/test-certificates
+             .toolchains/http/test-certificates-tools
+           key: ${{ steps.http.outputs.fixtures-key }}
++      - name: Bootstrap and verify pinned VOIDUP host providers
++        run: python tools/ci/voidup_bootstrap.py bootstrap
+       - name: Configure ${{ matrix.configuration }}
+         run: python "${{ env.LINK_EXPERIMENT_HELPER }}" configure
+       - name: Check Linux build disk headroom
+@@ -316,6 +318,8 @@ jobs:
+         run: python "${{ env.LINK_EXPERIMENT_HELPER }}" build
+       - name: Verify HTTP and URL acceptance registration
+         run: python tools/ci/http_bootstrap.py test-plan
++      - name: Verify native host and VOIDUP smoke registration
++        run: python tools/ci/voidup_bootstrap.py test-plan
+       - name: Execute ${{ matrix.configuration }} tests
+         run: ctest --test-dir build/${{ matrix.configuration }} --output-on-failure --output-junit ctest-results.xml
+       - name: Frontend Debug and Release small-stack regression
+@@ -386,6 +390,8 @@ jobs:
+             build/**/Testing/
+             build/**/http-*-evidence/
+             build/**/url-*-evidence/
++            build/**/host-capabilities-evidence/
++            build/**/voidup-smoke-evidence/
+           if-no-files-found: ignore
+       - name: Preserve test results
+         if: always()
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index a2a71ca0..9ebd9fc7 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -102,18 +102,20 @@ target_compile_definitions(void_core PRIVATE VOID_STDLIB_ROOT="${VOID_STDLIB_ROO
+ target_link_libraries(void_core PUBLIC void_options Threads::Threads)
+ add_library(void_native_fixture STATIC src/native/fixture.c src/native/sink.c)
+ target_link_libraries(void_native_fixture PRIVATE void_options)
+-add_library(void_runtime STATIC src/runtime/os.cpp src/runtime/os_abi.cpp src/runtime/random.cpp src/runtime/filesystem_abi.cpp src/runtime/filesystem.cpp src/runtime/native_resource.cpp src/runtime/native_binding.cpp src/runtime/temporal_abi.cpp src/runtime/conversion.cpp src/runtime/text_case.cpp src/runtime/buffer.cpp src/runtime/list.cpp src/runtime/array.cpp src/runtime/dictionary.cpp src/runtime/fixed_abi.cpp src/runtime/gc_schema.cpp src/runtime/heap.cpp src/runtime/coordination.cpp src/runtime/console.cpp src/runtime/console_abi.cpp src/runtime/callback.cpp src/runtime/abi.cpp src/runtime/reload.cpp src/runtime/native.cpp src/runtime/async.cpp)
++add_library(void_runtime STATIC src/runtime/application.cpp src/runtime/os.cpp src/runtime/os_abi.cpp src/runtime/random.cpp src/runtime/filesystem_abi.cpp src/runtime/filesystem.cpp src/runtime/native_resource.cpp src/runtime/native_binding.cpp src/runtime/temporal_abi.cpp src/runtime/conversion.cpp src/runtime/text_case.cpp src/runtime/buffer.cpp src/runtime/list.cpp src/runtime/array.cpp src/runtime/dictionary.cpp src/runtime/fixed_abi.cpp src/runtime/gc_schema.cpp src/runtime/heap.cpp src/runtime/coordination.cpp src/runtime/console.cpp src/runtime/console_abi.cpp src/runtime/callback.cpp src/runtime/abi.cpp src/runtime/reload.cpp src/runtime/native.cpp src/runtime/async.cpp)
+ target_sources(void_runtime PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects>)
+ target_link_libraries(void_runtime PUBLIC void_options Threads::Threads void_native_fixture ${CMAKE_DL_LIBS})
+ include(cmake/CurlProvider.cmake)
+ void_add_curl_provider(HTTP)
+ target_link_libraries(void_runtime PUBLIC CURL::libcurl_static void_http_compression)
++include(cmake/HostDependencies.cmake)
++target_sources(void_runtime PRIVATE src/runtime/host_abi.cpp src/runtime/host_error.cpp src/runtime/host_crypto.cpp src/runtime/host_archive.cpp src/runtime/host_directory.cpp src/runtime/host_process.cpp src/runtime/host_process_windows.cpp src/runtime/host_directory_windows.cpp)
+ target_sources(void_runtime PRIVATE src/runtime/http_provider.cpp src/runtime/url.cpp src/runtime/url_abi.cpp src/runtime/http.cpp src/runtime/http_bulk.cpp src/runtime/http_resource.cpp src/runtime/http_file.cpp src/runtime/http_abi.cpp src/runtime/native_work.cpp)
+ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+   # Keep bundled provider symbols local when VOID is embedded in a process that
+   # also loads another curl/TLS/DNS/decoder instance.
+   target_link_options(void_runtime INTERFACE
+-    "LINKER:--exclude-libs,libcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a")
++    "LINKER:--exclude-libs,libcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a:libarchive.a:libsodium.a")
+ endif()
+ if(WIN32)
+   target_link_libraries(void_runtime PUBLIC shell32 ole32 uuid)
+@@ -250,7 +252,18 @@ target_include_directories(voidc_objects SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
+ target_link_libraries(voidc_objects PRIVATE void_llvm)
+ set(cache_identity_inputs "$<TARGET_OBJECTS:voidc_objects>;$<TARGET_FILE:void_llvm>;$<TARGET_FILE:void_core>;$<TARGET_FILE:void_runtime>;$<TARGET_FILE:void_native_fixture>")
+ set(cache_identity_deps void_llvm void_core void_runtime void_native_fixture "$<TARGET_OBJECTS:voidc_objects>")
+-list(APPEND cache_identity_inputs ${VOID_HTTP_LINK_FILES}
++set(host_identity_inputs ${VOID_HOST_LINK_FILES}
++  "${PROJECT_SOURCE_DIR}/third_party/host-versions.json"
++  "${PROJECT_SOURCE_DIR}/cmake/HostDependencies.cmake"
++  "${PROJECT_SOURCE_DIR}/cmake/NativeBuild.cmake"
++  "${PROJECT_SOURCE_DIR}/tools/setup_host_deps.py"
++  "${PROJECT_SOURCE_DIR}/tools/setup_host_deps_native.py"
++  "${PROJECT_SOURCE_DIR}/cmake/host-sodium.targets"
++  "${PROJECT_SOURCE_DIR}/tools/verify_host_deps.py")
++if(VOID_HOST_DEPS_ROOT)
++  list(APPEND host_identity_inputs "${VOID_HOST_DEPS_ROOT}/VOID-HOST-DEPENDENCIES.json")
++endif()
++list(APPEND cache_identity_inputs ${host_identity_inputs} ${VOID_HTTP_LINK_FILES}
+   "${PROJECT_SOURCE_DIR}/third_party/curl/VOID-PROVENANCE.json"
+   "${PROJECT_SOURCE_DIR}/third_party/http-versions.json"
+   "${PROJECT_SOURCE_DIR}/third_party/publicsuffix/UPSTREAM.json"
+@@ -259,7 +272,7 @@ list(APPEND cache_identity_inputs ${VOID_HTTP_LINK_FILES}
+   "${PROJECT_SOURCE_DIR}/cmake/HttpDependencies.cmake"
+   "${PROJECT_SOURCE_DIR}/cmake/HttpNativeDependencies.cmake"
+   "${PROJECT_SOURCE_DIR}/cmake/http-psl/CMakeLists.txt")
+-list(APPEND cache_identity_deps libcurl_static ${VOID_HTTP_LINK_FILES})
++list(APPEND cache_identity_deps libcurl_static ${VOID_HTTP_LINK_FILES} ${host_identity_inputs})
+ foreach(library IN LISTS VOID_LLVM_LIBS)
+   if(TARGET ${library})
+     get_target_property(cache_library_type ${library} TYPE)
+@@ -294,8 +307,23 @@ if(WIN32 AND MSVC)
+   endforeach()
+ endif()
+ include(cmake/NativeBuild.cmake)
++# Native application, built by the matching VOID compiler and Runtime resources.
++# No private catalog/signing fixtures participate in the ordinary native build.
++file(GLOB voidup_sources CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/apps/voidup/*.void")
++file(GLOB_RECURSE voidup_stdlib CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/stdlib/*.void")
++set(voidup_application "${CMAKE_CURRENT_BINARY_DIR}/voidup/voidup${CMAKE_EXECUTABLE_SUFFIX}")
++add_custom_command(OUTPUT "${voidup_application}"
++  COMMAND $<TARGET_FILE:voidc> build "${PROJECT_SOURCE_DIR}/apps/voidup/main.void" -o "${voidup_application}"
++  DEPENDS voidc void_runtime void_native_inventory ${voidup_sources} ${voidup_stdlib}
++    "${CMAKE_CURRENT_BINARY_DIR}/void-native.txt" "${CMAKE_CURRENT_BINARY_DIR}/void-native-resources.txt"
++  VERBATIM)
++add_custom_target(voidup ALL DEPENDS "${voidup_application}")
+ include(CTest)
+ if(BUILD_TESTING)
++  add_test(NAME voidup_smoke COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/voidup/smoke.py"
++    "${voidup_application}" "${CMAKE_CURRENT_BINARY_DIR}/voidup-smoke-evidence")
++  set_tests_properties(voidup_smoke PROPERTIES TIMEOUT 240)
++  add_test(NAME voidup_ci_integration COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/voidup/ci_integration.py")
+   find_package(Python3 3.12 REQUIRED COMPONENTS Interpreter)
+   add_test(NAME cli_contract COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/cli/contract.py" "$<TARGET_FILE:voidc>")
+   set_tests_properties(cli_contract PROPERTIES TIMEOUT 180)
+@@ -659,6 +687,9 @@ if(BUILD_TESTING)
+   add_library(void_managed_test_abi OBJECT src/runtime/abi.cpp)
+   target_link_libraries(void_managed_test_abi PRIVATE void_options Threads::Threads)
+   target_compile_definitions(void_managed_test_abi PRIVATE vd_gc_poll=vd_gc_real_poll vd_gc_construct=vd_gc_real_construct vd_gc_construct_typed=vd_gc_real_construct_typed vd_gc_frame_enter=vd_gc_real_frame_enter vd_gc_frame_leave=vd_gc_real_frame_leave)
++  # Explicit qualification target only; no default build/CTest/CI expansion.
++  add_executable(void_voidup_source EXCLUDE_FROM_ALL tests/voidup/source_runner.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
++  target_link_libraries(void_voidup_source PRIVATE void_llvm void_cache_identity)
+   add_executable(void_fixed_arrays_tests tests/fixed_arrays/tests.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
+   target_link_libraries(void_fixed_arrays_tests PRIVATE void_llvm)
+   add_test(NAME fixed_arrays_source COMMAND void_fixed_arrays_tests "${PROJECT_SOURCE_DIR}")
+@@ -898,6 +929,35 @@ if(BUILD_TESTING)
+     add_test(NAME math_frontend_stack COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/math/frontend.py" "$<TARGET_FILE:voidc>" --small-stack)
+     set_tests_properties(math_stack math_frontend_stack PROPERTIES TIMEOUT 1200)
+   endif()
++  add_test(NAME host_capabilities_dependencies COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/host_capabilities/dependencies.py" "${VOID_HOST_DEPS_ROOT}" "${host_profile}" "${CMAKE_SYSTEM_NAME}" "${host_arch}")
++  add_executable(void_host_portable tests/host_capabilities/portable.cpp)
++  target_link_libraries(void_host_portable PRIVATE void_runtime)
++  if(MSVC)
++    target_link_options(void_host_portable PRIVATE /STACK:1048576,1048576)
++  endif()
++  add_test(NAME host_capabilities_portable COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/host_capabilities/portable.py" "$<TARGET_FILE:void_host_portable>")
++  set_tests_properties(host_capabilities_portable PROPERTIES TIMEOUT 180)
++  add_test(NAME host_capabilities_portable_source COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/host_capabilities/portable_source.py" "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_host_portable>")
++  set_tests_properties(host_capabilities_portable_source PROPERTIES TIMEOUT 1200)
++  set(host_capability_tests host_capabilities_dependencies host_capabilities_portable host_capabilities_portable_source)
++  if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
++    add_executable(void_host_child tests/host_capabilities/child.c)
++    add_executable(void_host_capabilities tests/host_capabilities/native.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
++    target_link_libraries(void_host_capabilities PRIVATE void_llvm void_cache_identity)
++    target_link_options(void_host_capabilities PRIVATE "-Wl,--wrap=fsync" "-Wl,--wrap=close")
++    add_test(NAME host_capabilities COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/host_capabilities/acceptance.py" "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_host_child>")
++    add_test(NAME host_capabilities_stack COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/host_capabilities/acceptance.py" "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_host_child>" --small-stack)
++    add_test(NAME host_capabilities_frontend COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/host_capabilities/frontend.py" "$<TARGET_FILE:voidc>")
++    add_test(NAME host_capabilities_lsp COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/host_capabilities/lsp.py" "$<TARGET_FILE:voidls>")
++    add_test(NAME host_capabilities_native COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/host_capabilities/native.py" "$<TARGET_FILE:void_host_capabilities>" "$<TARGET_FILE:void_host_child>")
++    add_test(NAME host_capabilities_install COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/host_capabilities/install.py" "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_host_child>")
++    set_tests_properties(host_capabilities_install PROPERTIES RUN_SERIAL TRUE TIMEOUT 1200)
++    set_tests_properties(host_capabilities host_capabilities_stack host_capabilities_native host_capabilities_frontend host_capabilities_lsp PROPERTIES TIMEOUT 1200)
++    list(APPEND host_capability_tests host_capabilities host_capabilities_stack host_capabilities_native host_capabilities_frontend host_capabilities_lsp host_capabilities_install)
++  endif()
++  file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/host-capabilities-evidence")
++  set_tests_properties(${host_capability_tests} PROPERTIES ENVIRONMENT
++    "VOID_HOST_EVIDENCE_DIR=${CMAKE_CURRENT_BINARY_DIR}/host-capabilities-evidence;VOID_CRASH_EVIDENCE=${CMAKE_CURRENT_BINARY_DIR}/host-capabilities-evidence/crashes")
+   add_executable(void_os_host tests/os/host.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
+   target_link_libraries(void_os_host PRIVATE void_llvm void_cache_identity)
+   if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+diff --git a/tools/ci/linux_disk.py b/tools/ci/linux_disk.py
+index 1ee05993..da65bdb9 100644
+--- a/tools/ci/linux_disk.py
++++ b/tools/ci/linux_disk.py
+@@ -18,6 +18,10 @@ BUILD_BYTES = {'Release': 5822873600, 'Debug': 13522292736, 'Sanitizers': 196564
+ # Largest current provider build + installed prefix + downloaded archives;
+ # includes source trees within the provider build directory.
+ DEPS_BYTES = 898060288 + 173666304 + 229257216
++# Additional host providers (sources/build/prefix) and application scratch.
++# Conservative reservations, not measured Windows/macOS or hosted peak sizes.
++HOST_BYTES = 2 * GIB
++VOIDUP_BYTES = 512 * 1024**2
+ THINLTO_BYTES = 132422080  # largest retained hosted build cache receipt
+ EDITOR_BYTES = 156200960
+ ARCHIVE_BYTES = 3 * GIB  # ceil(2.71 GiB reported cache); official xz is 2017061664
+@@ -27,12 +31,12 @@ CLEANUP = ('/usr/local/lib/android', '/usr/share/dotnet', '/opt/ghc',
+ 
+ 
+ def requirements(configuration, phase):
+-    build = BUILD_BYTES[configuration] + THINLTO_BYTES + EDITOR_BYTES
++    build = BUILD_BYTES[configuration] + THINLTO_BYTES + EDITOR_BYTES + VOIDUP_BYTES
+     # Explicit 25% estimation margin for hosted link scratch, fixtures/artifact
+     # compression and differences from local build sizes. Not a measured peak.
+-    margin = (SDK_BYTES + DEPS_BYTES + build + 3) // 4
++    margin = (SDK_BYTES + DEPS_BYTES + HOST_BYTES + build + 3) // 4
+     if phase == 'before-restore':
+-        return SDK_BYTES + ARCHIVE_BYTES + DEPS_BYTES + build + margin
++        return SDK_BYTES + ARCHIVE_BYTES + DEPS_BYTES + HOST_BYTES + build + margin
+     if phase == 'before-build':
+         return build + margin
+     raise ValueError(phase)
+@@ -63,7 +67,7 @@ def snapshot(label, evidence):
+     workspace = Path.cwd()
+     scratch = Path(os.environ['RUNNER_TEMP'])
+     paths = [workspace, scratch, Path('/'), *map(Path, CLEANUP),
+-             workspace / '.toolchains/llvm-23.1.4', workspace / '.toolchains/http',
++             workspace / '.toolchains/llvm-23.1.4', workspace / '.toolchains/http', workspace / '.toolchains/host',
+              workspace / 'build', Path(os.environ['THINLTO_CACHE_DIR'])]
+     paths = list(dict.fromkeys(p for p in paths if p.exists()))
+     df = subprocess.check_output(['df', '-B1', '--', *map(str, paths)], text=True)

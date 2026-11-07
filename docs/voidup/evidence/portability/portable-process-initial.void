@@ -1,0 +1,9 @@
+use os
+use process
+use convert
+func main():
+    var args = convert.unwrap(os.args())
+    with convert.unwrap(process.start(args[0], ["--verify-args", "", "two words", "\"quote\"", "tail\\", "雪😀"], ["VOID_CHILD=雪=value"], args[1])) as child:
+        var status = convert.unwrap(child.wait())
+        print(status.code, status.signaled)
+        print(convert.unwrap(child.close()))

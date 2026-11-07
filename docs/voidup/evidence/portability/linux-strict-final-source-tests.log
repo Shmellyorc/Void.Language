@@ -1,0 +1,9 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-strict
+    Start  92: automatic_cache_processes
+1/2 Test  #92: automatic_cache_processes ........   Passed    1.42 sec
+    Start 154: host_capabilities_portable
+2/2 Test #154: host_capabilities_portable .......   Passed    0.10 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   1.54 sec
