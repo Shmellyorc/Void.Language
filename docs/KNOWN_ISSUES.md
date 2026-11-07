@@ -1,12 +1,13 @@
 # Known issues and deferred work
 
-## LLVM migration and unresolved optimizer incident — 28 October 2026
+## Current toolchain and historical optimizer incidents
 
 Boss authorizes migration to LLVM/Clang/LLD 23.1.4. Local validation is tracked
 in [acceptance](llvm23/ACCEPTANCE.md): effective Release 368/368, Debug 381/381
 and effective strict 358/358 complete locally, with original failures retained.
-Independent review, native Windows/macOS and hosted seven-job acceptance remain
-pending; no new release lock is claimed. The [LLVM 19 DSE classification](log/CRASH_CLASSIFICATION.md)
+The later [hosted checkpoint](net/http/ACCEPTANCE.md) supersedes migration-era
+pending-hosted status for that recorded scope. Current [VOIDUP CI repair](voidup/INTEGRATION_REPORT.md#llvm-2314-ci-repair)
+retains separate strict-provider and native evidence limitations. No new release lock is claimed. The [LLVM 19 DSE classification](log/CRASH_CLASSIFICATION.md)
 and [input review](log/DSE_INPUT_REVIEW.md) remain unresolved historical incidents.
 Passing LLVM 23 workloads will not prove the original root cause or its repair.
 Historical SDK/checksum statements below describe their dated configurations;
@@ -409,13 +410,13 @@ implementation guards do not override the large-array language commitment.
   the linked program. The user reports commit `4f3688d` passed run #8 on all
   platforms; those earlier failures are resolved. The user reports Phase 6 commit `9b9fdac` passed run #9 on all three platforms. See CI_SANITIZER_ABI.md and
   WORK_LOG.md for evidence and validation.
-- CI retains complete official LLVM 19.1.7 archives, Linux LLD and required
+- Historical CI at this checkpoint retained complete official LLVM 19.1.7 archives, Linux LLD and required
   development dependencies, Windows SDK/DIA discovery and native printf support,
   and the portable thread implementation. All new suites run automatically in
   the existing workflow; none are skipped by platform. Linux sanitizers now halt
   on reports with distinct failure codes, preserving leak detection.
-- Pinned archive URLs lack independent checksum/signature verification, which
-  remains future supply-chain work.
+- Historical limitation: pinned archive URLs then lacked independent checksum/signature
+  verification. The current [SDK recipe](SOURCE_COMPILER.md#active-toolchain) verifies pinned archive hashes.
 
 ## Compiler scope
 

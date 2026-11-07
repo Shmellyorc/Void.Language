@@ -1,0 +1,115 @@
+{
+  "scope": "Focused licensing checks, not platform/installation qualification",
+  "commands": [
+    {
+      "argv": [
+        "cmake",
+        "--install",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-backport-integration/Release",
+        "--prefix",
+        "/tmp/VOID license installs q7df762g/compiler",
+        "--component",
+        "compiler"
+      ],
+      "exit_code": 0,
+      "log": "linux-compiler.log"
+    },
+    {
+      "argv": [
+        "cmake",
+        "--install",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-backport-integration/Release",
+        "--prefix",
+        "/tmp/VOID license installs q7df762g/tooling",
+        "--component",
+        "tooling"
+      ],
+      "exit_code": 0,
+      "log": "linux-tooling.log"
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/tmp/VOID license installs q7df762g/windows-notice-rules",
+        "-B",
+        "/tmp/VOID license installs q7df762g/windows-notice-rules/build"
+      ],
+      "exit_code": 0,
+      "log": "windows-rules-configure.log"
+    },
+    {
+      "argv": [
+        "cmake",
+        "--install",
+        "/tmp/VOID license installs q7df762g/windows-notice-rules/build",
+        "--prefix",
+        "/tmp/VOID license installs q7df762g/windows-compiler",
+        "--component",
+        "compiler"
+      ],
+      "exit_code": 0,
+      "log": "windows-rules-compiler.log"
+    },
+    {
+      "argv": [
+        "cmake",
+        "--install",
+        "/tmp/VOID license installs q7df762g/windows-notice-rules/build",
+        "--prefix",
+        "/tmp/VOID license installs q7df762g/windows-tooling",
+        "--component",
+        "tooling"
+      ],
+      "exit_code": 0,
+      "log": "windows-rules-tooling.log"
+    }
+  ],
+  "results": [
+    {
+      "name": "source-inventory",
+      "result": "PASS",
+      "detail": {
+        "verified_inventory_entries": 53,
+        "editor_original_license_metadata": "MIT"
+      }
+    },
+    {
+      "name": "linux-compiler-install",
+      "result": "PASS",
+      "detail": {
+        "verified_license_entries": 51,
+        "stdlib_sources": 25,
+        "scope": "Linux existing component install; no requalification"
+      }
+    },
+    {
+      "name": "linux-tooling-install",
+      "result": "PASS",
+      "detail": {
+        "verified_license_entries": 17,
+        "stdlib_sources": 25,
+        "scope": "Linux existing component install; no requalification"
+      }
+    },
+    {
+      "name": "windows-notice-rules-compiler",
+      "result": "PASS",
+      "detail": {
+        "verified_license_entries": 17,
+        "stdlib_sources": 0,
+        "scope": "Windows file rules only; no native execution"
+      }
+    },
+    {
+      "name": "windows-notice-rules-tooling",
+      "result": "PASS",
+      "detail": {
+        "verified_license_entries": 13,
+        "stdlib_sources": 0,
+        "scope": "Windows file rules only; no native execution"
+      }
+    }
+  ],
+  "native_windows_macos": "NOT RUN / UNKNOWN"
+}

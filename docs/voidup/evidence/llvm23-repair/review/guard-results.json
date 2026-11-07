@@ -1,0 +1,46 @@
+[
+  {
+    "environment": "guard-only",
+    "pass_count": 83,
+    "failed": [
+      "box_easy2",
+      "box_seal",
+      "secretbox_easy",
+      "secretbox_easy2"
+    ],
+    "test_count": 87,
+    "skips": 0,
+    "diagnostics": {
+      "box_easy2": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-review/guard-experiment/source/src/libsodium/crypto_stream/salsa20/xmm6int/u1.h:187:5: runtime error: load of misaligned address 0x7f42aaca3f2e for type 'const uint32_t' (aka 'const unsigned int'), which requires 4 byte alignment"
+      ],
+      "box_seal": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-review/guard-experiment/source/src/libsodium/crypto_stream/salsa20/xmm6int/u1.h:187:5: runtime error: load of misaligned address 0x7f04b0a60f25 for type 'const uint32_t' (aka 'const unsigned int'), which requires 4 byte alignment"
+      ],
+      "secretbox_easy": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-review/guard-experiment/source/src/libsodium/crypto_stream/salsa20/xmm6int/u1.h:187:5: runtime error: load of misaligned address 0x7ffaca6b7f9d for type 'const uint32_t' (aka 'const unsigned int'), which requires 4 byte alignment"
+      ],
+      "secretbox_easy2": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-review/guard-experiment/source/src/libsodium/crypto_stream/salsa20/xmm6int/u1.h:187:5: runtime error: load of misaligned address 0x7f2205253f3f for type 'const uint32_t' (aka 'const unsigned int'), which requires 4 byte alignment"
+      ]
+    }
+  },
+  {
+    "environment": "ubuntu-guard-only",
+    "pass_count": 85,
+    "failed": [
+      "secretbox_easy",
+      "secretbox_easy2"
+    ],
+    "test_count": 87,
+    "skips": 0,
+    "diagnostics": {
+      "secretbox_easy": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-review/guard-experiment/source/src/libsodium/crypto_stream/salsa20/xmm6int/u1.h:187:5: runtime error: load of misaligned address 0x7fe3bdc78f9d for type 'const uint32_t' (aka 'const unsigned int'), which requires 4 byte alignment"
+      ],
+      "secretbox_easy2": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-review/guard-experiment/source/src/libsodium/crypto_stream/salsa20/xmm6int/u1.h:187:5: runtime error: load of misaligned address 0x7f4622fe6f65 for type 'const uint32_t' (aka 'const unsigned int'), which requires 4 byte alignment"
+      ]
+    }
+  }
+]

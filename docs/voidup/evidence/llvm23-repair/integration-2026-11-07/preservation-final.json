@@ -1,0 +1,144 @@
+{
+  "protected_inputs": 81290,
+  "authorized_changes": [
+    {
+      "path": "CMakeLists.txt",
+      "before": [
+        "file",
+        "0b9e0909c0587d98978a5bdbc6f7801f87ac4873ce2cbc1b6aa2168c59d61e4e"
+      ],
+      "after": [
+        "file",
+        "7113c630cba9bee9bff8abea3b9042c8c8606c0be9b02a75b77a6edd5ae7744e"
+      ]
+    },
+    {
+      "path": "cmake/InstallLicenses.cmake",
+      "before": [
+        "file",
+        "cfa901e44d8db8b70aaecb6dcad486a37cbe92a8328a3f585a026c7079f2a273"
+      ],
+      "after": [
+        "file",
+        "909beaf5cc1cbd2e76c77b41c06737a4a6097643c1ffd1e8ad8e19c146321589"
+      ]
+    },
+    {
+      "path": "docs/ADVANCED_LANGUAGE.md",
+      "before": [
+        "file",
+        "a9f35f16235e15c338fd5f3454b2d25bc567f857f8505e6337c861347bbd0d54"
+      ],
+      "after": [
+        "file",
+        "ecbd2b3917d7915b17faaf9fe2f04c284ac2d44515af022387432738f1e36f73"
+      ]
+    },
+    {
+      "path": "docs/WRENCH_CLANKER.md",
+      "before": [
+        "file",
+        "90286cc8e15b6b629952e9dd6a1012875c2f958a5204b7a8c43d56e27b80ba1f"
+      ],
+      "after": [
+        "file",
+        "044df329162df38e7bcf1fb72bb6b79d1d18f64743cc1ef7c3b21c224e6f28d4"
+      ]
+    },
+    {
+      "path": "docs/release/NOTICE_INVENTORY.json",
+      "before": [
+        "file",
+        "b7dc19922e77e0308296ac5a4c7b4c697a295caeb60301a17b8fc123f9dd203f"
+      ],
+      "after": [
+        "file",
+        "a123f55146b5396016a5549c944efaadb562b12903a2744183b433f9df5a01cf"
+      ]
+    },
+    {
+      "path": "docs/release/REDISTRIBUTION_NOTICES.md",
+      "before": [
+        "file",
+        "f24043da34f903133153f0fa3c579021070de4b09ef4c1afcc06f75a67a84f97"
+      ],
+      "after": [
+        "file",
+        "63a9a55a90f6021abd0e8948f16a5481a1e0ce8486fedd043a3ac3b014f1d39c"
+      ]
+    },
+    {
+      "path": "docs/voidup/INTEGRATION_REPORT.md",
+      "before": [
+        "file",
+        "4b1c118672db1258e93586a1e696524b1eb9de8aa202e7b486ec3b9e689c36cb"
+      ],
+      "after": [
+        "file",
+        "7f2644ea8dfccbd43ece6b9148ac250b878246752c06823acded158d1293ce83"
+      ]
+    },
+    {
+      "path": "tests/host_capabilities/dependencies.py",
+      "before": [
+        "file",
+        "8d48ca77cc9a98af9c488831c0a75b075db78cf82d018916eb9ae9534f63a8c7"
+      ],
+      "after": [
+        "file",
+        "90b19bb50a05395761762b635e625b110a1b584975c4bdc9beb9160389568503"
+      ]
+    },
+    {
+      "path": "tests/host_capabilities/install.py",
+      "before": [
+        "file",
+        "bb9c3196cf1c285de62604c5afd972c289e15952efc1bf1ffcb2246105c60b1f"
+      ],
+      "after": [
+        "file",
+        "096245ad700bb569baa60d9a1381a7260a4bff11abb7e996f8ad167a605cb7f9"
+      ]
+    },
+    {
+      "path": "tools/setup_host_deps.py",
+      "before": [
+        "file",
+        "d5d0f0efcc5b066b8f751efa20337c250a6cf5952996fd28e67c273e48b0b533"
+      ],
+      "after": [
+        "file",
+        "f0337524e09c5d407c6106ebccfb1622a22a858beb0da4f149fad75e7af36b95"
+      ]
+    },
+    {
+      "path": "tools/setup_host_deps_native.py",
+      "before": [
+        "file",
+        "1102e2d95fdea9aa80f778ae81cdeb9a4dc42968840cc975667a2903dafa9e7a"
+      ],
+      "after": [
+        "file",
+        "ebcda35c1a051ae05e0ea2daf4580ad7bc3726325621f70f4e9e35b81994ec6d"
+      ]
+    },
+    {
+      "path": "tools/verify_host_deps.py",
+      "before": [
+        "file",
+        "4c4fcfc3dc63d914c162baf557bfbe17b7476a086f7600f10b455142aa49597a"
+      ],
+      "after": [
+        "file",
+        "f14ab068ed336b275e61fb70fcbfdbd98f53a5f666f74647ce5d339f64d6a94c"
+      ]
+    }
+  ],
+  "unexpected_changes": [],
+  "retained_original_prefix_files": 378,
+  "head": "9521329e7e67f4c8bb5aec38d684fde3f3c887de",
+  "head_unchanged": true,
+  "staged_paths": [],
+  "root_readme_website_archives_pristine_sources_prior_evidence_preserved": true,
+  "windows_selector_implementation_preserved": true
+}

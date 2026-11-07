@@ -1,3 +1,7 @@
+> Current implementation guidance uses [LLVM/Clang/LLD 23.1.4](SOURCE_COMPILER.md#active-toolchain).
+> Dated sprint counts, scheduling restrictions and approvals below retain their
+> historical scope; they do not reopen completed-stage gates.
+
 # Stage 8 Sprint 2 — ordinary calls and numeric prelude
 
 20 October 2026. **IMPLEMENTED / LOCALLY VERIFIED: 429/429 suites; Wrench review pending. Not hosted locked.**
@@ -31,7 +35,7 @@ Git mutation or Sprint 3 progression is authorized. Root README stays unchanged.
 ## Engineering and acceptance
 
 Reuse the existing initializer binder, typed numeric kernel, argument snapshots,
-capability analysis, IR validation and LLVM 19.1.7 lowering. Keep parameter binding
+capability analysis, IR validation and LLVM 23.1.4 lowering. Keep parameter binding
 separate from receiver storage paths. Required verification covers constructor
 parity, evaluation order, generic inference, readonly and construction capabilities,
 constant/runtime boundaries, all ten numeric types, normal/O2 JIT and linked AOT,
@@ -114,7 +118,7 @@ LLVM bitcast. Validation rejects nonnumeric or width-changing forms. It has no
 source syntax and exposes no reference/pointer conversion. Float abs uses this
 representation operation and unsigned remainder by the sign-bit power of two to
 clear exactly the IEEE sign bit; no algorithm-specific abs/clamp opcode, runtime
-provider or duplicate receiver implementation was added. LLVM 19.1.7 and existing
+provider or duplicate receiver implementation was added. LLVM 23.1.4 and existing
 strict floating arithmetic remain authoritative for normal/O2 JIT and AOT.
 
 ## Editor assistance and authority

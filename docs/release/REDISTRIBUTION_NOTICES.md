@@ -78,7 +78,10 @@ selection do not clear that gate or the unresolved compliance questions.
 ## Runtime host primitive dependencies
 
 Supported-host builds additionally link the pinned libsodium 1.0.22 and libarchive 3.8.11
-static providers recorded in `third_party/host-versions.json`. Libsodium carries
+static providers recorded in `third_party/host-versions.json`. The libsodium source
+also includes the approved three-file ASan/alignment backport, separately identified
+in `host/patches/libsodium-1.0.22/PROVENANCE.json` and its exact patch. Original
+archive hashes remain unchanged. Libsodium carries
 ISC, BSD terms for SHA-256 and controlling component notices; libarchive carries BSD and the component
 terms in its COPYING/source files. The compiler component installs these notices,
 per-source notice inventories, exact source archives, dependency receipts and
@@ -87,3 +90,18 @@ existing pinned zlib; it enables no additional external codec or crypto provider
 The public APIs expose only SHA-256, detached Ed25519 verification and the bounded
 stored/deflate ZIP profile. These additions do not establish public distribution
 clearance for the complete compiler/SDK closure or native Windows/macOS acceptance.
+
+The host corresponding-source directory contains the original archives and a
+`repro/` layout with the exact patch/policy, SDK selector, builder and verifier
+inputs. To reconstruct the reviewed sodium source without an SDK or network:
+
+```sh
+python3 <host>/corresponding-source/repro/tools/verify_host_deps.py \
+  --archives <host>/corresponding-source --reconstruct-source <fresh-directory>
+```
+
+This verifies the base hash, applies the approved patch with no Git index/history
+changes, and checks all reviewed source postimages. It does not claim a standalone
+compiler rebuild: native SDKs and the verified HTTP/zlib closure remain external
+build prerequisites. The receipt binds the applied source and exact recipe inputs;
+original per-file notice snapshots describe upstream inputs and are retained.

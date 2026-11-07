@@ -77,7 +77,7 @@ hosted verification remains owner-controlled.
 This implemented the owner-approved G1–G6 in `GC_RUNTIME_PROPOSAL.md`. It is an
 internal runtime/compiler foundation, not source-level managed `struct` support
 or a production managed runtime. Existing source syntax, entry behavior, value
-initialization, LLVM 19.1.7 and code-generation leases remain in place.
+initialization, LLVM 23.1.4 and code-generation leases remain in place.
 
 Phase 23 Stage 2D adds runtime-only reference-bearing private buffers, following
 [ARRAYS_PROPOSAL.md Section 27](ARRAYS_PROPOSAL.md#27-stage-2d-reference-bearing-private-buffer-preparation).
@@ -268,7 +268,7 @@ claims. Windows/macOS require hosted verification; Linux results do not establis
 their ABI/thread scheduling behavior.
 
 
-Local status: all six LLVM 19.1.7 configurations passed 31/31, including strict
+Historical local status: all six LLVM 19.1.7 configurations passed 31/31, including strict
 ASan/UBSan with leaks enabled. Coordinator-only TSan, repeated runtime/regression
 stress, both small-stack runs, four editor unit cases, real VS Code's three workspace
 modes and VSIX packaging passed. See the dated WORK_LOG entry for exact evidence.

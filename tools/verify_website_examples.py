@@ -1,6 +1,10 @@
 """Verify the existing 15 gallery contracts with the existing CLI/async adapters."""
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent / "ci"))
+from llvm_sdk import pinned_cxx
 import argparse,html.parser,json,pathlib,re,subprocess,tempfile
-p=argparse.ArgumentParser();p.add_argument('build');p.add_argument('--compiler',default='clang++-19');p.add_argument('--output',required=True);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('build');p.add_argument('--compiler',default=None);p.add_argument('--output',required=True);a=p.parse_args();a.compiler=pinned_cxx(a.compiler)
 repo=pathlib.Path(__file__).resolve().parents[1];build=pathlib.Path(a.build).resolve()
 class Gallery(html.parser.HTMLParser):
     cases=[]

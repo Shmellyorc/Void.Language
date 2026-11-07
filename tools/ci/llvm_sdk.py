@@ -68,6 +68,56 @@ def install(destination: Path) -> None:
         shutil.move(str(sdk), destination)
 
 
+def windows_clangcl(destination: Path) -> dict:
+    """Validate an existing SDK and derive MSBuild's resource selector from Clang.
+
+    Never installs anything. In particular, LLVMToolsVersion is a resource
+    directory name, not necessarily the full release version.
+    """
+    destination = destination.resolve()
+    receipt = destination / 'void-sdk-identity.json'
+    if not receipt.is_file() or json.loads(receipt.read_text(encoding='utf-8')) != archive_identity():
+        raise RuntimeError('Missing/mismatched verified LLVM SDK identity')
+    header = destination / 'include/llvm/Config/llvm-config.h'
+    if not header.is_file() or f'#define LLVM_VERSION_STRING "{VERSION}"' not in header.read_text(encoding='utf-8'):
+        raise RuntimeError('Missing/mismatched LLVM SDK headers')
+    tools = {name: destination/'bin'/name for name in ('clang-cl.exe', 'lld-link.exe', 'llvm-lib.exe', 'llvm-readobj.exe')}
+    if not all(path.is_file() and path.resolve().parent == destination/'bin' for path in tools.values()) or not (destination/'lib/LLVMCore.lib').is_file():
+        raise RuntimeError('Incomplete pinned Windows LLVM SDK')
+    versions = {}
+    for name, path in tools.items():
+        if name == 'llvm-lib.exe':
+            continue  # llvm-lib has no version switch; archive identity/hash binds it.
+        output = subprocess.check_output([path, '--version'], text=True)
+        if not re.search(r'\b' + re.escape(VERSION) + r'(?:\D|$)', output):
+            raise RuntimeError(f'Mismatched pinned tool version: {name}: {output}')
+        versions[name] = output.strip()
+    resource = Path(subprocess.check_output([tools['clang-cl.exe'], '/clang:-print-resource-dir'], text=True).strip()).resolve()
+    selectors = {'.'.join(VERSION.split('.')[:count]) for count in range(1, 4)}
+    if resource.parent != destination/'lib/clang' or resource.name not in selectors:
+        raise RuntimeError(f'Clang resource directory escapes/mismatches the verified SDK: {resource}')
+    if not (resource/'include/stddef.h').is_file() or not list((resource/'lib/windows').glob('clang_rt*.lib')):
+        raise RuntimeError('Missing pinned compiler resource headers/libraries')
+    return {'identity': archive_identity(), 'sdk': str(destination), 'resource': str(resource),
+            'LLVMToolsVersion': resource.name, 'versions': versions,
+            'tool_sha256': {name: hashlib.sha256(path.read_bytes()).hexdigest() for name,path in tools.items()}}
+
+
+def pinned_cxx(requested=None) -> str:
+    """Select the verified local SDK for standalone engineering probes too."""
+    sdk = Path(__file__).resolve().parents[2] / '.toolchains' / f'llvm-{VERSION}'
+    compiler = sdk / ('bin/clang++.exe' if os.name == 'nt' else 'bin/clang++')
+    if requested is not None and Path(requested).resolve() != compiler.resolve():
+        raise RuntimeError(f'Only the pinned LLVM {VERSION} compiler is permitted: {compiler}')
+    receipt = sdk / 'void-sdk-identity.json'
+    if not receipt.is_file() or json.loads(receipt.read_text(encoding='utf-8')) != archive_identity():
+        raise RuntimeError('Missing/mismatched verified LLVM SDK identity')
+    output = subprocess.check_output([compiler, '--version'], text=True)
+    if not re.search(r'clang version ' + re.escape(VERSION) + r'(?:\D|$)', output):
+        raise RuntimeError(f'Mismatched pinned compiler: {output}')
+    return str(compiler)
+
+
 def prepare(destination: Path) -> dict:
     """Prepare the existing pinned SDK recipe for CI or a local source build."""
     destination = destination.resolve()
@@ -91,6 +141,8 @@ def prepare(destination: Path) -> dict:
     cxx = destination / ("bin/clang-cl.exe" if os.name == "nt" else "bin/clang++")
     values = {"LLVM_DIR": destination / "lib/cmake/llvm", "CC": cc, "CXX": cxx, "VOID_CLANG": clang}
     if platform.system() == "Windows":
+        selected = windows_clangcl(destination)
+        values.update(LLVMInstallDir=str(destination) + os.sep, LLVMToolsVersion=selected['LLVMToolsVersion'])
         # Keep dependency installation outside the verified, immutable SDK cache.
         # All three are real static development libraries built with the SDK's /MT ABI.
         dependencies = destination.with_name(destination.name + "-deps")

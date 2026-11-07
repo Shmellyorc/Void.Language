@@ -1,3 +1,7 @@
+> **Historical plan/record.** Its dated activation gates and earlier toolchain
+> instructions are superseded. Current operations require [LLVM/Clang/LLD 23.1.4](SOURCE_COMPILER.md#active-toolchain);
+> original decisions, results and failures below retain their recorded scope.
+
 # Stage 10: complete console, formatting, field policy and operators
 
 ## Current acceptance pointer — 24 October 2026

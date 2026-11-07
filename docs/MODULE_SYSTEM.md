@@ -59,8 +59,7 @@ See `examples/modules/main.void` for a complete runnable three-file program:
 build/debug/voidc check examples/modules/main.void
 build/debug/voidc run examples/modules/main.void 10
 # 31
-build/debug/voidc emit examples/modules/main.void -o build/debug/modules.o
-clang-19 build/debug/modules.o -o build/debug/modules
+build/debug/voidc build examples/modules/main.void -o build/debug/modules
 build/debug/modules 10
 # 31
 ```

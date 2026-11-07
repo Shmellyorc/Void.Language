@@ -1,6 +1,7 @@
 # Math public API and source audit
 
-26 October 2026. Implementation inventory; local acceptance is recorded separately
+Implementation inventory originated 26 October 2026; active lowering references
+were updated 6 November to LLVM 23.1.4. Original local acceptance is recorded separately
 after execution. This document does not claim hosted or native Windows/macOS
 acceptance. The approved numerical contract remains [DESIGN.md](DESIGN.md).
 
@@ -92,7 +93,7 @@ source shadowing, and uses the existing call binder. The identity stays in typed
 IR. [IR validation](../../src/ir/module.cpp) independently checks the canonical
 owner, closed tag, fixed arity, f32/f64 agreement and unused/malformed fields.
 
-[LLVM lowering](../../src/backend/llvm/backend.cpp) selects matching LLVM 19.1.7
+[LLVM lowering](../../src/backend/llvm/backend.cpp) selects matching LLVM 23.1.4
 intrinsics for floor, sqrt, sin, cos, tan, asin, acos, atan, pow, exp, exp2, log and
 log2. Atan2 uses only the fixed `atan2f`/`atan2` C scalar ABI. Existing `Jit::bind`
 registers the corresponding standard float/double helpers. No Runtime provider,

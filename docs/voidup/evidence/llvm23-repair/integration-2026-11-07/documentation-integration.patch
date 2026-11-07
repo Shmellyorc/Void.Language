@@ -1,0 +1,386 @@
+diff --git a/docs/ADVANCED_LANGUAGE.md b/docs/ADVANCED_LANGUAGE.md
+--- a/docs/ADVANCED_LANGUAGE.md
++++ b/docs/ADVANCED_LANGUAGE.md
+@@ -9,8 +9,10 @@
+ in [DECISIONS.md](DECISIONS.md); hosted CI remains deferred to Stage 8 end.
+ 
+ 
+-Stage 4 extends the production frontend, typed IR, shared LLVM 23.1.4 JIT/AOT
+-lowerer and coordinated Runtime. Properties and callable structs remain as
++Historical Stage 4 used LLVM 19.1.7 with the production frontend, typed IR,
++shared JIT/AOT lowerer and coordinated Runtime. Current operations use
++[LLVM/Clang/LLD 23.1.4 exclusively](SOURCE_COMPILER.md#active-toolchain).
++Properties and callable structs remain as
+ specified in [PROPERTIES.md](PROPERTIES.md). **Stage 4 is hosted-verified and LOCKED** at `483e67e407b65674bdc82d44767f29bd83d73ae8`, [CI #68](https://github.com/Shmellyorc/Void.Language/actions/runs/39174408997): seven successful configurations, 80/80 suites each (560/560 total).
+ Exact local validation and remaining boundaries are recorded in [WORK_LOG.md](WORK_LOG.md).
+ 
+diff --git a/docs/WRENCH_CLANKER.md b/docs/WRENCH_CLANKER.md
+--- a/docs/WRENCH_CLANKER.md
++++ b/docs/WRENCH_CLANKER.md
+@@ -66,9 +66,12 @@
+ 
+ ## Current integration review
+ 
+-Golden Wrench returned **REVISE**. Retain the Windows LLVM 23.1.4 selector
+-candidate for actual native verification. The proposed libsodium correction
+-requires Boss/Wrench approval before any provider or pin change.
++Golden Wrench authorized controlled integration of the exact reviewed three-file
++libsodium backport on 7 November 2026. The original 1.0.22 archive/hash remains
++unchanged. See the [integrated source, receipts and local results](voidup/INTEGRATION_REPORT.md#controlled-libsodium-backport-integration).
++Retain the Windows LLVM 23.1.4 selector repair for actual native verification;
++Windows/macOS execution remains UNQUALIFIED. Return the completed local work for
++independent Golden Wrench/Boss review; integration engineering is not hosted acceptance.
+ 
+ VOIDUP Phase A/B are retained for private Linux engineering. The
+ [CI repair](voidup/INTEGRATION_REPORT.md#llvm-2314-ci-repair) records the Windows selector correction,
+diff --git a/docs/release/NOTICE_INVENTORY.json b/docs/release/NOTICE_INVENTORY.json
+--- a/docs/release/NOTICE_INVENTORY.json
++++ b/docs/release/NOTICE_INVENTORY.json
+@@ -389,7 +389,7 @@
+       ],
+       "platform": "all",
+       "license": "component index and unresolved obligations",
+-      "sha256": "f24043da34f903133153f0fa3c579021070de4b09ef4c1afcc06f75a67a84f97",
++      "sha256": "63a9a55a90f6021abd0e8948f16a5481a1e0ce8486fedd043a3ac3b014f1d39c",
+       "sources": []
+     },
+     {
+@@ -743,6 +743,28 @@
+         "compiler"
+       ],
+       "sha256": "13215bee95300e7fc1538bbf506d1408146a1c2648fba29088f78e7386a44496"
++    },
++    {
++      "repository_path": "third_party/host-patches/libsodium-1.0.22/asan-alignment.patch",
++      "installed_path": "share/void/licenses/host/patches/libsodium-1.0.22/asan-alignment.patch",
++      "components": [
++        "compiler"
++      ],
++      "platform": "all",
++      "license": "ISC upstream source; VOID build/provenance metadata",
++      "sha256": "f0de9004b8129626e14750437f51eb9524f030149607b50bb75ce0b6c998af74",
++      "provenance": "Golden Wrench approved three-file backport; original libsodium archive identity unchanged; upstream alignment commit 11cd77c5cd35fafa2317c36cd7f61de0b9d03cd2"
++    },
++    {
++      "repository_path": "third_party/host-patches/libsodium-1.0.22/PROVENANCE.json",
++      "installed_path": "share/void/licenses/host/patches/libsodium-1.0.22/PROVENANCE.json",
++      "components": [
++        "compiler"
++      ],
++      "platform": "all",
++      "license": "ISC upstream source; VOID build/provenance metadata",
++      "sha256": "4841bfe7f283b250bb2b6fa1872b602416bb91a0e67c5f6179742d8c4bc0c0c8",
++      "provenance": "Golden Wrench approved three-file backport; original libsodium archive identity unchanged; upstream alignment commit 11cd77c5cd35fafa2317c36cd7f61de0b9d03cd2"
+     }
+   ],
+   "source_reconciliation": {
+diff --git a/docs/release/REDISTRIBUTION_NOTICES.md b/docs/release/REDISTRIBUTION_NOTICES.md
+--- a/docs/release/REDISTRIBUTION_NOTICES.md
++++ b/docs/release/REDISTRIBUTION_NOTICES.md
+@@ -78,7 +78,10 @@
+ ## Runtime host primitive dependencies
+ 
+ Supported-host builds additionally link the pinned libsodium 1.0.22 and libarchive 3.8.11
+-static providers recorded in `third_party/host-versions.json`. Libsodium carries
++static providers recorded in `third_party/host-versions.json`. The libsodium source
++also includes the approved three-file ASan/alignment backport, separately identified
++in `host/patches/libsodium-1.0.22/PROVENANCE.json` and its exact patch. Original
++archive hashes remain unchanged. Libsodium carries
+ ISC, BSD terms for SHA-256 and controlling component notices; libarchive carries BSD and the component
+ terms in its COPYING/source files. The compiler component installs these notices,
+ per-source notice inventories, exact source archives, dependency receipts and
+@@ -87,3 +90,18 @@
+ The public APIs expose only SHA-256, detached Ed25519 verification and the bounded
+ stored/deflate ZIP profile. These additions do not establish public distribution
+ clearance for the complete compiler/SDK closure or native Windows/macOS acceptance.
++
++The host corresponding-source directory contains the original archives and a
++`repro/` layout with the exact patch/policy, SDK selector, builder and verifier
++inputs. To reconstruct the reviewed sodium source without an SDK or network:
++
++```sh
++python3 <host>/corresponding-source/repro/tools/verify_host_deps.py \
++  --archives <host>/corresponding-source --reconstruct-source <fresh-directory>
++```
++
++This verifies the base hash, applies the approved patch with no Git index/history
++changes, and checks all reviewed source postimages. It does not claim a standalone
++compiler rebuild: native SDKs and the verified HTTP/zlib closure remain external
++build prerequisites. The receipt binds the applied source and exact recipe inputs;
++original per-file notice snapshots describe upstream inputs and are retained.
+diff --git a/docs/voidup/INTEGRATION_REPORT.md b/docs/voidup/INTEGRATION_REPORT.md
+--- a/docs/voidup/INTEGRATION_REPORT.md
++++ b/docs/voidup/INTEGRATION_REPORT.md
+@@ -1,10 +1,12 @@
+-**Current Golden Wrench review: REVISE — 7 November 2026.** The Windows selector
+-candidate is retained for native verification. A three-file libsodium proposal is
+-[available as an actual source diff](evidence/llvm23-repair/review/libsodium-candidate.patch)
+-and remains unapplied pending Boss/Wrench approval. See the
+-[current investigation](#libsodium-source-correction-proposal) and
+-[revised documentation/diffs](#documentation-review-revision). Earlier inventories
+-and outcomes below retain their original source revision and review scope.
++**Current scope: controlled libsodium backport integration — 7 November 2026.**
++Golden Wrench/Boss authorized permanent integration engineering of the exact
++reviewed three-file candidate. The unchanged base pin, mandatory patch-aware
++receipts and corresponding-source packaging are integrated. See the
++[current source diff and qualification](#controlled-libsodium-backport-integration).
++Windows/macOS native execution and hosted acceptance remain UNQUALIFIED.
++The dated REVISE/proposal-only records below describe their original review
++scope and are superseded for integration authorization, without changing their
++failures, measurements or historical CI identities.
+ 
+ **VOIDUP local integration for Boss review — 2026-11-06/07**
+ 
+@@ -505,3 +507,252 @@
+ protected root README/website/vendor Markdown remain unchanged. The revision
+ patch was checked and applied only to a disposable document snapshot, reproducing
+ the exact revised tree. No Git index, object database or history was modified.
++
++## Controlled libsodium backport integration
++
++7 November 2026. Golden Wrench/Boss authorized permanent integration engineering
++of the accepted isolated candidate. This supersedes the earlier proposal-only
++restriction for this exact patch. **Recommendation: RETAIN the local integration
++for independent source/evidence review; native Windows/macOS and hosted acceptance
++remain UNQUALIFIED.** No compiler/Runtime architecture, public host API, HTTP
++transport, dependency pin or workflow change is part of this delta.
++
++### Integrated source and identity
++
++The [actual integration source diff](evidence/llvm23-repair/integration-2026-11-07/integrated-source.patch),
++[documentation delta](evidence/llvm23-repair/integration-2026-11-07/documentation-integration.patch),
++[exact approved dependency patch](evidence/llvm23-repair/integration-2026-11-07/libsodium-approved.patch)
++and [per-file inventory](evidence/llvm23-repair/integration-2026-11-07/changed-files.json)
++are review artifacts, not summaries in place of source. The two integration diffs
++replay against disposable copies of the preceding reviewed working tree and
++reproduce every resulting byte. Prior Windows/source and documentation review
++diffs remain retained in their original evidence directories.
++
++The original libsodium **1.0.22** archive, recorded upstream revision
++`77e1ce5d6dee871c49ef211222ba18ef0c486bda`, and archive SHA-256
++`adbdd8f16149e81ac6078a03aca6fc03b592b89ef7b5ed83841c086191be3349`
++are unchanged. The exact accepted patch SHA-256 is
++`f0de9004b8129626e14750437f51eb9524f030149607b50bb75ce0b6c998af74`.
++Its proposal-era preamble is retained byte-for-byte; the new provenance manifest
++records the subsequent controlled-integration approval. Libarchive's original
++3.8.11 archive/hash and all HTTP pins are unchanged.
++
++Only three dependency files change in each disposable source copy:
++
++- `test/default/cmptest.h`: ASan uses the existing guarded, nonnull fixture instead
++  of the NULL substitution. Negative assertions and expected outputs remain.
++  The zero-length clearing test now supplies that nonnull fixture; there is no
++  `sodium_memzero` implementation or public-contract change.
++- Salsa20 `xmm6int/u1.h` and `u4.h`: the exact upstream alignment backport from
++  commit `11cd77c5cd35fafa2317c36cd7f61de0b9d03cd2`, using the existing
++  `LOAD32_LE`/`STORE32_LE` helpers. Cipher constants, rounds and counters are unchanged.
++
++The verified pristine source cache is copied, never patched in place. Application
++uses `git apply --no-index`, with a dry-run check, no index/history mutation and
++complete post-application tree verification. No patch fuzz or partial application
++is accepted. The three before/postimage hashes and the complete applied-tree hash
++are required by the existing provider verification module. The applied-tree
++SHA-256 is `e545c52f26e44f16d99db575a382af024100f46708f23f8051042964e0d698dd`.
++Windows alone permits upstream's generated, version-checked `version.h` addition.
++
++| Changed paths | Purpose |
++| --- | --- |
++| `third_party/host-patches/libsodium-1.0.22/{asan-alignment.patch,PROVENANCE.json}` | Exact approved patch, origins, pre/postimages, full 87-test inventory and two known oracle exceptions. |
++| `tools/verify_host_deps.py` | Shared pristine/applied source verification, mandatory schema-3 admission, exact recipe/patch inventory, existing SDK identity, build identity and source-bundle replay. |
++| `tools/setup_host_deps.py` | Fresh Linux disposable patched source, explicit pinned compiler/linker/archiver, all upstream tests, fatal strict checks and schema-3 receipts. |
++| `tools/setup_host_deps_native.py` | Same approved source preparation and receipt identity for Windows/macOS; retained Windows selector, evaluated MSBuild paths and static `/MT` checks. |
++| `CMakeLists.txt` | Include patch and provenance among existing host build/cache identity inputs. |
++| `cmake/InstallLicenses.cmake` | Include patch/provenance and reproducible relative recipe/helper layout in existing compiler source/notice installation. |
++| `tests/host_capabilities/{dependencies,install}.py` | Self-consistent forged-receipt rejection and installed/relocated source reconstruction/tamper checks. |
++| `docs/release/{REDISTRIBUTION_NOTICES.md,NOTICE_INVENTORY.json}` | Describe compiled patched source accurately and bind patch/provenance/updated notice hashes. |
++| `docs/ADVANCED_LANGUAGE.md` | Label Stage 4's LLVM 19.1.7 as historical; current operations require LLVM/Clang/LLD 23.1.4. Original commit and CI identity remain. |
++| `docs/WRENCH_CLANKER.md`, this report | Record controlled-integration authorization, evidence and native limits while preserving Wrench's architecture-review/workshop role and earlier dated records. |
++
++Schema 3 rejects previous unpatched receipts before compiler configuration or
++installation reuse. It requires the exact base and applied source identities,
++all eight recipe/policy/patch hashes, existing verified LLVM 23.1.4 SDK metadata,
++actual selected tool paths/hashes, profile/platform/architecture, static provider
++file hashes, archive feature inventory and HTTP zlib identity. The build-identity
++hash binds those receipt fields, including compilation/link flags and platform
++SDK/CRT details where applicable. Command logs/timings are evidence rather than
++build identity. Non-Windows receipts require all 87 named target outcomes and
++explicit oracle exceptions. Windows explicitly records upstream Unix tests as
++not run; it does not manufacture those test outcomes.
++
++The existing bootstrap still refuses implicit prefix reuse. CMake and installer
++admission reuse the stronger existing verifier; there is no ambient provider
++fallback or second dependency framework. The receipt, static archives, recipes,
++patch and policy feed the existing compiler cache identity. The SDK selector's
++recipe hash is bound through the receipt. Native resource manifests continue to
++bind the actual link archives through existing rules.
++
++Old Release/Debug/strict prefixes and build trees were retained under
++`.toolchains/host/retained/pre-approved-backport-2026-11-07/`, with original receipt
++hashes in [the retention mapping](evidence/llvm23-repair/integration-2026-11-07/retained-original-prefixes.json).
++Fresh default prefixes were built from source. All three old receipts reject;
++a separate CMake probe rejects an old receipt before configuring link dependencies.
++No old archive or evidence was overwritten to obtain a passing result.
++
++### Corresponding-source and installation verification
++
++The existing compiler component now installs the unchanged upstream archives,
++receipt, license notices, exact approved patch/provenance and a `repro/` tree with
++both builders, verifier, shared LLVM SDK helper, MSBuild targets and host/HTTP pins.
++The eight receipt-bound recipe files retain their expected relative paths and
++exact bytes. The original per-file license snapshots describe upstream inputs;
++the applied patch and provenance are separately and explicitly identified.
++
++Installed/relocated tests reconstruct the actual sodium source from the packaged
++base archive and patch outside the checkout, without an SDK or network, and
++check all postimages against the receipt. A corrupted packaged patch must reject.
++The same installed compiler then runs normal/O2 JIT and independent AOT with the
++checkout and installed compiler inaccessible during AOT execution, using real
++1 MiB stacks. This is corresponding-source reconstruction and component
++qualification, not a claim that the package alone supplies the external native
++SDK or complete HTTP build prerequisites. Public redistribution clearance is not
++established by these checks.
++
++The final notice/package audit passes **5/5 groups**: 53 source inventory entries,
++Linux compiler (51 notices/25 stdlib sources), Linux tooling (17/25), Windows
++compiler file rules (17) and Windows tooling file rules (13). The Windows groups
++exercise file installation rules on Linux, **not native Windows execution**.
++See [the exact package audit](evidence/llvm23-repair/integration-2026-11-07/license-package-fixed/validation.json).
++
++### Actual local results
++
++Fresh provider builds and fresh compiler build directories were used for each
++PikaOS profile. LLVM/Clang/LLD **23.1.4 exclusively**; no LLVM 19 installation,
++selection, download or fallback occurred. The existing SDK archive metadata is
++reused; no replacement SDK dependency mechanism was introduced.
++
++| Check | Actual result |
++| --- | --- |
++| PikaOS Release provider bootstrap | PASS; 87/87 upstream targets, 0 failures/0 skips; static libarchive and HTTP/host closure verification. |
++| PikaOS Debug provider bootstrap | PASS; 87/87 upstream targets, 0 failures/0 skips; same closure checks. |
++| PikaOS fatal strict provider bootstrap | PASS; 87/87 upstream targets, 0 failures/0 skips; ASan/UBSan/leak settings retained. |
++| Fresh Release compiler/VOIDUP build and focused CTest | PASS, 11/11. |
++| Fresh Debug compiler/VOIDUP build and focused CTest | PASS, 11/11. |
++| Fresh strict compiler/VOIDUP build and focused CTest | PASS, 11/11; fatal ASan/UBSan/leak settings. |
++| Receipt admission/rejection | PASS, 18 checks per PikaOS profile, including recomputed-build-identity forgeries, missing/wrong patch/postimages/recipes/SDK and old schema. |
++| Old receipt at actual CMake dependency boundary | Rejected as required before link configuration. |
++| Retained Windows selection/rejection unit suite | PASS, 10/10 fixture tests; not native build evidence. |
++| Integrated Ubuntu 24.04.5 Release provider | PASS; 87/87 upstream targets, 0 failures/0 skips, static archive build/install, closure verification and 18 receipt checks. |
++| Installed strict archive supplemental controls | Valid protected guard/nonnull zero-length clear: exit 0; overflow, underflow and guard read: fatal ASan diagnostics, actual exit 86 each. |
++
++The eleven focused tests per compiler profile are `voidup_smoke`,
++`voidup_ci_integration`, `host_capabilities_dependencies`,
++`host_capabilities_portable`, `host_capabilities_portable_source`,
++`host_capabilities`, `host_capabilities_stack`, `host_capabilities_native`,
++`host_capabilities_frontend`, `host_capabilities_lsp`, and
++`host_capabilities_install`. They cover actual crypto/archive/process/filesystem
++host behavior, rejection paths, Unicode entry, resource/GC/failure lifetime,
++normal/O2 JIT, independently linked AOT and hard-stack/relocated installation.
++These are focused checks, not the complete unrelated compiler CTest suite or
++private signed Phase B installation suite.
++
++Ubuntu evidence comes from genuine Ubuntu **24.04.5 userspace / glibc 2.39** in
++the existing rootless container on this PikaOS kernel, not a separately booted
++Ubuntu kernel. The integrated recipes were copied byte-for-byte into a fresh
++source root and built with the verified SDK, original source archives and the
++existing verified Ubuntu HTTP Release closure. The earlier isolated strict
++candidate result remains 87/87 in both userspaces. The present integration adds
++Ubuntu Release provider qualification; it does not claim a new Ubuntu Debug or
++strict whole-compiler run.
++
++**Two upstream oracle limitations remain visible.** In every new provider suite,
++85 `.res` files match `.exp` byte-for-byte. `sodium_utils2` and `sodium_utils3`
++produce empty `.res` files despite 46/43-byte expected files; their unchanged
++handlers call `_exit(0)` and bypass common output comparison/finalization. Under
++ASan they also exclude intentional fault paths. Thus 87 target passes do not mean
++87 output-oracle passes, complete intentional-fault coverage or normal-exit leak
++finalization for those two tests. No test/expected-output list was changed and no
++suppression was added. Existing stream/box/secretbox vectors still match, including
++the affected Salsa20 paths. Supplemental controls against the newly installed
++strict archive separately demonstrate guard mapping, valid zero-length clearing
++and fatal invalid-access rejection; they do not repair the two upstream oracles.
++The combined-runtime fatal exit remains **86**, not an invented distinct ASan 87
++result. All diagnostics are retained.
++
++Strict build/tests preserve:
++
++```text
++ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87
++UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86
++ASAN_SYMBOLIZER_PATH=<verified LLVM 23.1.4 SDK>/bin/llvm-symbolizer
++-fsanitize=address,undefined -fno-omit-frame-pointer
++```
++
++The actual running strict CTest environment was captured in
++[fatal-environment.json](evidence/llvm23-repair/integration-2026-11-07/strict/fatal-environment.json).
++Raw source/vector results, receipt IDs, exact compiler commands/statuses and
++installed reconstruction records are indexed by
++[qualification-summary.json](evidence/llvm23-repair/integration-2026-11-07/qualification-summary.json).
++[Ubuntu commands and raw evidence](evidence/llvm23-repair/integration-2026-11-07/ubuntu-integrated/)
++and [strict fault-control diagnostics](evidence/llvm23-repair/integration-2026-11-07/strict-controls/results.json)
++are separate from the focused CTest counts.
++
++Representative actual commands (the linked command JSON retains full absolute
++SDK paths, flags, output roots, statuses and timing observations):
++
++```text
++PATH="$PWD/.toolchains/ninja-1.13.2:$PATH" python3 tools/ci/voidup_bootstrap.py bootstrap --configuration Release --evidence docs/voidup/evidence/llvm23-repair/integration-2026-11-07/bootstrap-release
++# Matching fresh Debug and Sanitizers bootstraps used their respective evidence roots.
++cmake --build build/voidup-backport-integration/Release --target voidc voidls void_host_portable void_host_capabilities void_host_child voidup --parallel 2
++ctest --test-dir build/voidup-backport-integration/Release -R '^(host_capabilities.*|voidup_.*)$' --output-on-failure
++# Matching fresh Debug and strict builds/tests used explicit pinned SDK paths.
++python3 tests/host_capabilities/dependencies.py .toolchains/host/prefix/strict strict Linux x86_64
++python3 tests/voidup/ci_integration.py
++python3 tests/release/check_licenses.py --build-dir build/voidup-backport-integration/Release --evidence-dir docs/voidup/evidence/llvm23-repair/integration-2026-11-07/license-package-fixed
++podman exec voidup-portability-ubuntu python3 build/voidup-backport-integration/ubuntu-source/tools/setup_host_deps.py --profile Release --jobs 3
++```
++
++Integration setup failures are retained with their repairs. Initial
++bootstrap preflight for each profile rejected Ninja missing from PATH; retry used
++the already installed pinned Ninja, without installing a replacement or bypassing
++preflight. The first notice audit found the stale inventory hash for the changed
++redistribution notice; its exact entry was corrected and all five groups passed
++on retry. The first Ubuntu negative-test invocation imported the checkout's
++verifier instead of the copied source root and correctly rejected the different
++SDK path identity; running the byte-identical test from the copied root passed
++18 checks. See the `*-attempt1-preflight.log`, `license-package/`, and
++`ubuntu-integrated-attempt1-test-root/` records. These failures are not rewritten
++as clean first attempts. The initial generated review diff also lacked new-file
++mode headers; its disposable replay rejected, and the generator was corrected
++before the final replay. A subsequent link audit ran before writing its own
++index files; output generation was reordered and the final audit passes. Both
++audit-attempt diagnostics are retained. The final Markdown check initially mixed
++a tracked-only count with the earlier broader inventory; it was corrected to
++compare the same baseline scope (1,308 tracked Markdown paths, unchanged).
++Original CI 13/87 failures, local 14/87 and 13/87 failures,
++harness-only results and the earlier negative-probe oracle failure remain intact.
++
++### Native limits, preservation and review recommendation
++
++The Windows LLVM 23.1.4 resource-selector repair is retained. The helper and
++MSBuild targets are unchanged by this integration; native source preparation now
++uses the approved backport. No actual native Windows x64 build has run here.
++Successful libsodium compilation, actual MSBuild compiler/linker/resource paths,
++COFF `/MT` directives, provider verification and host behavior remain required
++native evidence, not implied by Linux unit fixtures. macOS ARM64 recipe/source
++integration is present but native compile, SDK/link behavior, tests and filesystem
++semantics remain unverified. Both platforms remain **UNQUALIFIED** until actual
++native execution is reviewed. No hosted seven-job acceptance is declared.
++
++[Preservation validation](evidence/llvm23-repair/integration-2026-11-07/preservation-final.json)
++compares the 81,290 protected inputs from the accepted experiment, accounting for
++378 old-prefix files retained at their new paths. Only the twelve authorized
++tracked integration paths changed; two permanent patch/policy files were added.
++No unexpected original source, evidence, archive, source cache, root README,
++website or workflow change occurred. The current documentation revision is
++retained except these scoped report/toolchain/notice updates; no Markdown files
++were added or removed. The historical Stage 4 CI commit/run identity in
++`ADVANCED_LANGUAGE.md` remains unchanged. The
++[review validation](evidence/llvm23-repair/integration-2026-11-07/review-validation.json)
++records exact diff replay and local link checks.
++
++**RETAIN** this controlled local source/receipt/package integration for Golden
++Wrench/Boss review, with the two upstream oracle limitations and native-platform
++qualification gaps explicit. No staging, commit, branch, push, history change,
++hosted CI dispatch, binary publication, LLVM 19 use, test suppression or test
++removal occurred. Stop here for independent review; Boss retains Git and hosted
++integration controls.

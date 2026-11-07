@@ -389,7 +389,7 @@
       ],
       "platform": "all",
       "license": "component index and unresolved obligations",
-      "sha256": "f24043da34f903133153f0fa3c579021070de4b09ef4c1afcc06f75a67a84f97",
+      "sha256": "63a9a55a90f6021abd0e8948f16a5481a1e0ce8486fedd043a3ac3b014f1d39c",
       "sources": []
     },
     {
@@ -743,6 +743,28 @@
         "compiler"
       ],
       "sha256": "13215bee95300e7fc1538bbf506d1408146a1c2648fba29088f78e7386a44496"
+    },
+    {
+      "repository_path": "third_party/host-patches/libsodium-1.0.22/asan-alignment.patch",
+      "installed_path": "share/void/licenses/host/patches/libsodium-1.0.22/asan-alignment.patch",
+      "components": [
+        "compiler"
+      ],
+      "platform": "all",
+      "license": "ISC upstream source; VOID build/provenance metadata",
+      "sha256": "f0de9004b8129626e14750437f51eb9524f030149607b50bb75ce0b6c998af74",
+      "provenance": "Golden Wrench approved three-file backport; original libsodium archive identity unchanged; upstream alignment commit 11cd77c5cd35fafa2317c36cd7f61de0b9d03cd2"
+    },
+    {
+      "repository_path": "third_party/host-patches/libsodium-1.0.22/PROVENANCE.json",
+      "installed_path": "share/void/licenses/host/patches/libsodium-1.0.22/PROVENANCE.json",
+      "components": [
+        "compiler"
+      ],
+      "platform": "all",
+      "license": "ISC upstream source; VOID build/provenance metadata",
+      "sha256": "4841bfe7f283b250bb2b6fa1872b602416bb91a0e67c5f6179742d8c4bc0c0c8",
+      "provenance": "Golden Wrench approved three-file backport; original libsodium archive identity unchanged; upstream alignment commit 11cd77c5cd35fafa2317c36cd7f61de0b9d03cd2"
     }
   ],
   "source_reconciliation": {

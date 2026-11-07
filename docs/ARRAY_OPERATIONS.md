@@ -12,7 +12,7 @@ in [DECISIONS.md](DECISIONS.md); hosted CI remains deferred to Stage 8 end.
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
 The owner approved the following bounded contract on 18 October 2026. These
-operations use the existing frontend, typed IR, LLVM 19.1.7 JIT/AOT lowerer,
+operations use the existing frontend, typed IR, LLVM 23.1.4 JIT/AOT lowerer,
 typed buffers and coordinated Runtime. No research build is required.
 
 ```typescript

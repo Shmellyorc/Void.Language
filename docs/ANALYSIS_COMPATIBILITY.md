@@ -11,7 +11,7 @@ contracts remain in force.
 
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
-The user reports Phase 6 commit `9b9fdac` passed Actions run #9 on Ubuntu,
+Historical Phase 7 context: the user reports Phase 6 commit `9b9fdac` passed Actions run #9 on Ubuntu,
 Windows and macOS. Phase 7 extends that foundation locally, without changing
 language syntax, numeric semantics, LLVM 19.1.7 or the SDK RTTI correction.
 

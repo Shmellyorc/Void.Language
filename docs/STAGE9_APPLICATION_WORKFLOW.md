@@ -75,8 +75,8 @@ filesystem transaction; frontend captured snapshots remain authoritative.
 LLVM unique-path generation is applied only to a generated temporary **leaf**;
 percent characters in physical ancestors remain literal. Linux/macOS keep the
 existing destination-stage working directory and relative executable output name.
-On Windows, Clang 19.1.7 cannot enter a genuine >260-character destination-stage
-path. Build therefore emits/links in a short private directory under a validated
+Historical motivation: on Windows, Clang 19.1.7 could not enter a genuine
+destination-stage path longer than 260 characters. The retained build strategy emits/links in a short private directory under a validated
 Windows temporary root, using relative `program.o`, `runtime.lib`, `fixture.lib`
 and `program.exe` names. The complete linker path, including NUL, is bounded to
 240 UTF-16 units. Creation is exclusive, collisions retry without adoption, and

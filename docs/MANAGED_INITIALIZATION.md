@@ -157,9 +157,7 @@ numeric, imported private-factory and four failure fixtures. With input 10:
 build/ci-debug/voidc check examples/managed_initialization/main.void
 build/ci-debug/voidc run examples/managed_initialization/main.void 10 --no-opt # 26
 build/ci-debug/voidc run examples/managed_initialization/main.void 10          # 26
-build/ci-debug/voidc emit examples/managed_initialization/main.void -o build/managed-init.o
-clang++-19 build/managed-init.o build/ci-debug/libvoid_runtime.a -pthread \
-  --ld-path=/usr/lib/llvm-19/bin/ld.lld -o build/managed-init
+build/ci-debug/voidc build examples/managed_initialization/main.void -o build/managed-init
 build/managed-init 10                                                      # 26
 ```
 

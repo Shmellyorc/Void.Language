@@ -1,0 +1,303 @@
+{
+  "schema": 1,
+  "scope": "Source control/evidence cleanup only; no rebuild or source repair changes",
+  "before": {
+    "porcelain_entries": 3656,
+    "tracked_modified": 88,
+    "staged_paths": 0,
+    "untracked_visible": 3568,
+    "ignored_untracked": 769617,
+    "status_codes": {
+      " M": 88,
+      "??": 3568
+    }
+  },
+  "after": {
+    "porcelain_entries": 159,
+    "tracked_modified": 89,
+    "staged_paths": 0,
+    "untracked_visible": 70,
+    "ignored_untracked": 773136,
+    "status_codes": {
+      " M": 89,
+      "??": 70
+    },
+    "added": 0,
+    "deleted": 0,
+    "renamed": 0
+  },
+  "old_allowlist_reconciliation": {
+    "unchanged_source_build_patch_documentation_paths": 90,
+    "retained_loose_evidence": 62,
+    "archived_raw_evidence": 5727
+  },
+  "old_ignored_but_force_allowlisted": 2223,
+  "archived_original_loose_files": "All 5727 byte hashes unchanged; none deleted or moved",
+  "archive": {
+    "archive": "docs/voidup/evidence/repair-raw-evidence-2026-11-07.tar.xz",
+    "archive_sha256": "b64fa672db3505eab9b62fea00d4460b0840ab52005785868b85ae035ee16e01",
+    "archive_bytes": 5990576,
+    "restorable_paths": 5727,
+    "unique_payloads": 1005,
+    "original_raw_bytes": 100968237,
+    "full_disposable_restore_and_sha256_verification": "PASS"
+  },
+  "retained_loose_evidence": [
+    "docs/voidup/evidence/ci-42369685905/13572888461.zip",
+    "docs/voidup/evidence/ci-42369685905/13572974619.zip",
+    "docs/voidup/evidence/ci-42369685905/13573022077.zip",
+    "docs/voidup/evidence/ci-42369685905/13573038087.zip",
+    "docs/voidup/evidence/ci-42369685905/13573107430.zip",
+    "docs/voidup/evidence/ci-42369685905/13573114245.zip",
+    "docs/voidup/evidence/ci-42369685905/13573147644.zip",
+    "docs/voidup/evidence/ci-42369685905/13573298656.zip",
+    "docs/voidup/evidence/ci-42369685905/13573641707.zip",
+    "docs/voidup/evidence/ci-42369685905/13573730457.zip",
+    "docs/voidup/evidence/ci-42369685905/13573925101.zip",
+    "docs/voidup/evidence/ci-42369685905/accepted-repairs-present.json",
+    "docs/voidup/evidence/ci-42369685905/artifacts.json",
+    "docs/voidup/evidence/ci-42369685905/ci-summary.json",
+    "docs/voidup/evidence/ci-42369685905/documentation-pending.patch",
+    "docs/voidup/evidence/ci-42369685905/downloads.json",
+    "docs/voidup/evidence/ci-42369685905/integration-repair-pending-source.patch",
+    "docs/voidup/evidence/ci-42369685905/jobs.json",
+    "docs/voidup/evidence/ci-42369685905/license-package/validation.json",
+    "docs/voidup/evidence/ci-42369685905/local-results.json",
+    "docs/voidup/evidence/ci-42369685905/portable-wait.patch",
+    "docs/voidup/evidence/ci-42369685905/run.json",
+    "docs/voidup/evidence/llvm23-repair/active-old-toolchain-scan.txt",
+    "docs/voidup/evidence/llvm23-repair/changed-files.json",
+    "docs/voidup/evidence/llvm23-repair/coff-abi.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/Debug/qualification.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/Release/qualification.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/changed-files.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/documentation-integration.patch",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/integrated-source.patch",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/libsodium-approved.patch",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/license-package-fixed/validation.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/preservation-final.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/qualification-summary.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/retained-original-prefixes.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/review-validation.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/strict-controls/results.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/strict/fatal-environment.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/strict/qualification.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/ubuntu-integrated/qualification.json",
+    "docs/voidup/evidence/llvm23-repair/isolated-candidate-2026-11-07/REPORT.txt",
+    "docs/voidup/evidence/llvm23-repair/isolated-candidate-2026-11-07/negative-probes.json",
+    "docs/voidup/evidence/llvm23-repair/isolated-candidate-2026-11-07/pikaos/existing-vector-results.json",
+    "docs/voidup/evidence/llvm23-repair/isolated-candidate-2026-11-07/qualification-summary.json",
+    "docs/voidup/evidence/llvm23-repair/isolated-candidate-2026-11-07/ubuntu/existing-vector-results.json",
+    "docs/voidup/evidence/llvm23-repair/original-ci/13558638061.zip",
+    "docs/voidup/evidence/llvm23-repair/original-ci/13558653075.zip",
+    "docs/voidup/evidence/llvm23-repair/original-ci/13558802832.zip",
+    "docs/voidup/evidence/llvm23-repair/original-ci/artifacts.json",
+    "docs/voidup/evidence/llvm23-repair/review/changed-files.json",
+    "docs/voidup/evidence/llvm23-repair/review/documentation-final.patch",
+    "docs/voidup/evidence/llvm23-repair/review/documentation-moves.json",
+    "docs/voidup/evidence/llvm23-repair/review/documentation-revision.patch",
+    "docs/voidup/evidence/llvm23-repair/review/documentation-validation.json",
+    "docs/voidup/evidence/llvm23-repair/review/guard-results.json",
+    "docs/voidup/evidence/llvm23-repair/review/libsodium-candidate.patch",
+    "docs/voidup/evidence/llvm23-repair/review/pristine-providers.json",
+    "docs/voidup/evidence/llvm23-repair/review/upstream/alignment-fix.json",
+    "docs/voidup/evidence/llvm23-repair/review/upstream/compared-files.json",
+    "docs/voidup/evidence/llvm23-repair/review/windows-and-build-source.patch",
+    "docs/voidup/evidence/llvm23-repair/sanitizer-failures.json",
+    "docs/voidup/evidence/llvm23-repair/ubuntu-strict/commands.json"
+  ],
+  "accepted_original_modified_paths_preserved_except_report_navigation": true,
+  "accepted_source_patch_pins_packaging_unchanged": true,
+  "protected_unrelated_paths_unchanged": [
+    "docs/net/TCP_UDP_HANDOFF.md",
+    "website/dist/assets/style.css",
+    "website/dist/getting-started/index.html",
+    "website/public/assets/style.css",
+    "website/public/getting-started/index.html",
+    "website/scripts/check.py",
+    "website/scripts/test_check.py",
+    "README.md"
+  ],
+  "unexpected_pending_paths": [],
+  "source_validation": {
+    "checks": [
+      {
+        "check": "source/receipt/SDK/patch verification",
+        "profile": "Release",
+        "status": 0,
+        "build_identity": "9c8b3c681c2312443c6478b349f6956c1f224c8f1c9819df01615938324badcf"
+      },
+      {
+        "check": "qualified portable test / POSIX collision syntax",
+        "profile": "Release",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+          "-DCURL_STATICLIB",
+          "-I/home/shmellyorc/Documents/Void.Language/include",
+          "-I/home/shmellyorc/Documents/Void.Language/third_party/curl/include",
+          "-isystem",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/include",
+          "-O3",
+          "-DNDEBUG",
+          "-std=c++20",
+          "-fno-rtti",
+          "-Wall",
+          "-Wextra",
+          "-Wpedantic",
+          "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable.cpp",
+          "-fsyntax-only",
+          "-include",
+          "sys/wait.h"
+        ],
+        "status": 0
+      },
+      {
+        "check": "source/receipt/SDK/patch verification",
+        "profile": "Debug",
+        "status": 0,
+        "build_identity": "db7e9a7a4d809959da429d435233c6a27aabf050c68b718dc8eecb7610bd4b86"
+      },
+      {
+        "check": "qualified portable test / POSIX collision syntax",
+        "profile": "Debug",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+          "-DCURL_STATICLIB",
+          "-I/home/shmellyorc/Documents/Void.Language/include",
+          "-I/home/shmellyorc/Documents/Void.Language/third_party/curl/include",
+          "-isystem",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Debug/include",
+          "-g",
+          "-std=c++20",
+          "-fno-rtti",
+          "-Wall",
+          "-Wextra",
+          "-Wpedantic",
+          "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable.cpp",
+          "-fsyntax-only",
+          "-include",
+          "sys/wait.h"
+        ],
+        "status": 0
+      },
+      {
+        "check": "source/receipt/SDK/patch verification",
+        "profile": "strict",
+        "status": 0,
+        "build_identity": "8a9649dcf4b0d13bcda6b827ad2aa0c116e349be501a82ace74be5f5b1c16219"
+      },
+      {
+        "check": "qualified portable test / POSIX collision syntax",
+        "profile": "strict",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++",
+          "-DCURL_STATICLIB",
+          "-I/home/shmellyorc/Documents/Void.Language/include",
+          "-I/home/shmellyorc/Documents/Void.Language/third_party/curl/include",
+          "-isystem",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/include",
+          "-O2",
+          "-g",
+          "-DNDEBUG",
+          "-std=c++20",
+          "-fno-rtti",
+          "-Wall",
+          "-Wextra",
+          "-Wpedantic",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "/home/shmellyorc/Documents/Void.Language/tests/host_capabilities/portable.cpp",
+          "-fsyntax-only",
+          "-include",
+          "sys/wait.h"
+        ],
+        "status": 0
+      },
+      {
+        "check": "toolchain-unit",
+        "command": [
+          "/usr/bin/python3",
+          "tests/voidup/ci_integration.py"
+        ],
+        "status": 0,
+        "output": "Host/VOIDUP test registration verified: 11 required tests\ntest_disk_preflight_checks_both_volumes (__main__.Integration.test_disk_preflight_checks_both_volumes) ... ok\ntest_missing_disabled_and_private_tests_rejected (__main__.Integration.test_missing_disabled_and_private_tests_rejected) ... ok\ntest_native_profile_layouts (__main__.Integration.test_native_profile_layouts) ... ok\ntest_selected_workflow_order_and_no_credentials (__main__.Integration.test_selected_workflow_order_and_no_credentials) ... ok\ntest_ambient_probe_override_fails_before_execution (__main__.Toolchain.test_ambient_probe_override_fails_before_execution) ... ok\ntest_mismatched_headers_and_receipt_fail (__main__.Toolchain.test_mismatched_headers_and_receipt_fail) ... ok\ntest_missing_components_fail (__main__.Toolchain.test_missing_components_fail) ... ok\ntest_selector_is_resource_leaf (__main__.Toolchain.test_selector_is_resource_leaf) ... ok\ntest_wrong_or_external_resource_fails (__main__.Toolchain.test_wrong_or_external_resource_fails) ... ok\ntest_wrong_version_fails (__main__.Toolchain.test_wrong_version_fails) ... ok\n\n----------------------------------------------------------------------\nRan 10 tests in 0.017s\n\nOK\n"
+      },
+      {
+        "check": "receipt-Release",
+        "command": [
+          "/usr/bin/python3",
+          "tests/host_capabilities/dependencies.py",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Release",
+          "Release",
+          "Linux",
+          "x86_64"
+        ],
+        "status": 0,
+        "output": "Pinned host provider receipt: 9 admission/rejection checks passed\nApproved backport receipt: 18 admission/rejection checks passed\n"
+      },
+      {
+        "check": "receipt-Debug",
+        "command": [
+          "/usr/bin/python3",
+          "tests/host_capabilities/dependencies.py",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug",
+          "Debug",
+          "Linux",
+          "x86_64"
+        ],
+        "status": 0,
+        "output": "Pinned host provider receipt: 9 admission/rejection checks passed\nApproved backport receipt: 18 admission/rejection checks passed\n"
+      },
+      {
+        "check": "receipt-strict",
+        "command": [
+          "/usr/bin/python3",
+          "tests/host_capabilities/dependencies.py",
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/strict",
+          "strict",
+          "Linux",
+          "x86_64"
+        ],
+        "status": 0,
+        "output": "Pinned host provider receipt: 9 admission/rejection checks passed\nApproved backport receipt: 18 admission/rejection checks passed\n"
+      }
+    ],
+    "source_syntax": "PASS",
+    "full_rebuild": "Not run; no build/source changes made by cleanup",
+    "native_windows_macos": "UNQUALIFIED; no native run performed"
+  },
+  "required_documentation_references_verified_in_projected_commit": 957,
+  "archive_navigation_updates": [
+    {
+      "old": "evidence/llvm23-repair/local-original-strict/",
+      "new": "evidence/repair-raw-evidence-2026-11-07.tar.xz#docs/voidup/evidence/llvm23-repair/local-original-strict"
+    },
+    {
+      "old": "evidence/llvm23-repair/review/guard-only/",
+      "new": "evidence/repair-raw-evidence-2026-11-07.tar.xz#docs/voidup/evidence/llvm23-repair/review/guard-only"
+    },
+    {
+      "old": "evidence/llvm23-repair/review/ubuntu-guard-only/",
+      "new": "evidence/repair-raw-evidence-2026-11-07.tar.xz#docs/voidup/evidence/llvm23-repair/review/ubuntu-guard-only"
+    },
+    {
+      "old": "evidence/ci-42369685905/PENDING_PATHS.txt",
+      "new": "evidence/repair-raw-evidence-2026-11-07.tar.xz#docs/voidup/evidence/ci-42369685905/PENDING_PATHS.txt"
+    },
+    {
+      "old": "evidence/ci-42369685905/PENDING_PATHS.nul",
+      "new": "evidence/repair-raw-evidence-2026-11-07.tar.xz#docs/voidup/evidence/ci-42369685905/PENDING_PATHS.nul"
+    },
+    {
+      "old": "evidence/ci-42369685905/PENDING_INVENTORY.json",
+      "new": "evidence/repair-raw-evidence-2026-11-07.tar.xz#docs/voidup/evidence/ci-42369685905/PENDING_INVENTORY.json"
+    }
+  ],
+  "git_diff_check": "PASS",
+  "head": "9521329e7e67f4c8bb5aec38d684fde3f3c887de",
+  "head_unchanged": true,
+  "staged_paths": [],
+  "files_deleted_or_moved": [],
+  "new_markdown_files": 0,
+  "no_full_rebuild": true
+}

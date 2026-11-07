@@ -216,3 +216,15 @@ macOS still needs a real Apple ARM64 SDK build and native APFS/filesystem, ACL, 
 The original limits concerning network filesystems, real power-loss recovery, filled physical volumes and exhaustive provider allocator failures remain. There is no new async/deadline process API or process-tree supervisor. Namespace and file-flush outcomes retain the existing conditional durability contract. Linux failure/GC/allocation tests do not certify Windows or Darwin equivalents.
 
 Work stops for Golden Wrench/Boss review with native platform acceptance revised as above. TCP/UDP implementation and VOIDUP Phase B remain separate assignments. No throughput or release-performance threshold was invented or evaluated here.
+
+
+## 6 November 2026 CI repair addendum
+
+The [LLVM 23.1.4 CI repair](INTEGRATION_REPORT.md#llvm-2314-ci-repair) preserves run 42334902548 and
+separately reproduces fatal upstream libsodium sanitizer failures. The earlier
+local upstream 87/87 result did not establish fatal UBSan acceptance; recover-mode
+checks can exit successfully after reports. The current strict bootstrap enforces
+fatal settings. Original measurements and qualification records above are retained
+unchanged; focused VOIDUP success does not qualify all upstream provider tests.
+Windows resource selection is corrected in source; native Windows/macOS evidence
+for this repair remains unqualified. No hosted acceptance is claimed.

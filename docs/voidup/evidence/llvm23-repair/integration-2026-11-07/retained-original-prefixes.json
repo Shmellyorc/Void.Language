@@ -1,0 +1,41 @@
+[
+  {
+    "kind": "prefix",
+    "profile": "Release",
+    "old": "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Release",
+    "retained": "/home/shmellyorc/Documents/Void.Language/.toolchains/host/retained/pre-approved-backport-2026-11-07/prefix/Release",
+    "original_receipt_sha256": "992c0bb3f4a2889884214df67842e6f5f6de354a6a98ff5f816764137c8ccac7"
+  },
+  {
+    "kind": "build",
+    "profile": "Release",
+    "old": "/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Release",
+    "retained": "/home/shmellyorc/Documents/Void.Language/.toolchains/host/retained/pre-approved-backport-2026-11-07/build/Release"
+  },
+  {
+    "kind": "prefix",
+    "profile": "Debug",
+    "old": "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Debug",
+    "retained": "/home/shmellyorc/Documents/Void.Language/.toolchains/host/retained/pre-approved-backport-2026-11-07/prefix/Debug",
+    "original_receipt_sha256": "46896fce8b9e70831cf037987a4f21c9fd281ce7959b83b02b13766e31a8c3fd"
+  },
+  {
+    "kind": "build",
+    "profile": "Debug",
+    "old": "/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/Debug",
+    "retained": "/home/shmellyorc/Documents/Void.Language/.toolchains/host/retained/pre-approved-backport-2026-11-07/build/Debug"
+  },
+  {
+    "kind": "prefix",
+    "profile": "strict",
+    "old": "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/strict",
+    "retained": "/home/shmellyorc/Documents/Void.Language/.toolchains/host/retained/pre-approved-backport-2026-11-07/prefix/strict",
+    "original_receipt_sha256": "cf53e93c6595aeea49aea3906b3473f97909686ddc97dff312af2721b090f1a3"
+  },
+  {
+    "kind": "build",
+    "profile": "strict",
+    "old": "/home/shmellyorc/Documents/Void.Language/.toolchains/host/build/strict",
+    "retained": "/home/shmellyorc/Documents/Void.Language/.toolchains/host/retained/pre-approved-backport-2026-11-07/build/strict"
+  }
+]

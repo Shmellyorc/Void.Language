@@ -95,7 +95,7 @@ Exact local commands/results are recorded in the growable-array WORK_LOG entry.
 The additional `arrays_source` and `arrays_cli` suites cover composite/nested
 elements, traversal and ranges described below. Phase 24 adds native generic collections. Phase 25 adds insert/clear/slicing as
 described in ARRAY_OPERATIONS.md; equality and sorting remain outside this feature. Cross-platform
-execution remains for hosted CI; local evidence is Linux LLVM 19.1.7.
+execution remained for hosted CI at that checkpoint; the historical local evidence used Linux LLVM 19.1.7. Current builds require [LLVM 23.1.4](SOURCE_COMPILER.md#active-toolchain).
 
 ## Phase 23: composite elements and traversal
 

@@ -4,6 +4,9 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "ci"))
+from llvm_sdk import pinned_cxx
 import subprocess
 
 from heap_legacy import ROOT, FLAGS, snapshot
@@ -12,10 +15,11 @@ from heap_legacy import ROOT, FLAGS, snapshot
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--baseline', default='cb601b4')
-    parser.add_argument('--compiler', default='/usr/bin/clang++-19')
+    parser.add_argument('--compiler', default=None)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--cpu', type=int)
     args = parser.parse_args()
+    args.compiler = pinned_cxx(args.compiler)
     if args.cpu is not None:
         os.sched_setaffinity(0, {args.cpu})
     output = args.output.resolve()

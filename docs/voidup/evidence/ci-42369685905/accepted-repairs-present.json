@@ -1,0 +1,99 @@
+{
+  "accepted_integration_files_unchanged": {
+    "CMakeLists.txt": "7113c630cba9bee9bff8abea3b9042c8c8606c0be9b02a75b77a6edd5ae7744e",
+    "cmake/InstallLicenses.cmake": "909beaf5cc1cbd2e76c77b41c06737a4a6097643c1ffd1e8ad8e19c146321589",
+    "docs/ADVANCED_LANGUAGE.md": "ecbd2b3917d7915b17faaf9fe2f04c284ac2d44515af022387432738f1e36f73",
+    "docs/WRENCH_CLANKER.md": "044df329162df38e7bcf1fb72bb6b79d1d18f64743cc1ef7c3b21c224e6f28d4",
+    "docs/release/NOTICE_INVENTORY.json": "a123f55146b5396016a5549c944efaadb562b12903a2744183b433f9df5a01cf",
+    "docs/release/REDISTRIBUTION_NOTICES.md": "63a9a55a90f6021abd0e8948f16a5481a1e0ce8486fedd043a3ac3b014f1d39c",
+    "docs/voidup/INTEGRATION_REPORT.md": "7f2644ea8dfccbd43ece6b9148ac250b878246752c06823acded158d1293ce83",
+    "tests/host_capabilities/dependencies.py": "90b19bb50a05395761762b635e625b110a1b584975c4bdc9beb9160389568503",
+    "tests/host_capabilities/install.py": "096245ad700bb569baa60d9a1381a7260a4bff11abb7e996f8ad167a605cb7f9",
+    "third_party/host-patches/libsodium-1.0.22/PROVENANCE.json": "4841bfe7f283b250bb2b6fa1872b602416bb91a0e67c5f6179742d8c4bc0c0c8",
+    "third_party/host-patches/libsodium-1.0.22/asan-alignment.patch": "f0de9004b8129626e14750437f51eb9524f030149607b50bb75ce0b6c998af74",
+    "tools/setup_host_deps.py": "f0337524e09c5d407c6106ebccfb1622a22a858beb0da4f149fad75e7af36b95",
+    "tools/setup_host_deps_native.py": "ebcda35c1a051ae05e0ea2daf4580ad7bc3726325621f70f4e9e35b81994ec6d",
+    "tools/verify_host_deps.py": "f14ab068ed336b275e61fb70fcbfdbd98f53a5f666f74647ce5d339f64d6a94c"
+  },
+  "profiles": [
+    {
+      "profile": "Release",
+      "build_identity": "9c8b3c681c2312443c6478b349f6956c1f224c8f1c9819df01615938324badcf",
+      "upstream_targets": 87,
+      "original_qualified_receipt_sha256": "d58953db7ffd80e4c092af0ebc3f140da8677224fe3a6a65c4f86718d4aeb5a4",
+      "source_provenance": {
+        "policy_sha256": "4841bfe7f283b250bb2b6fa1872b602416bb91a0e67c5f6179742d8c4bc0c0c8",
+        "archive_sha256": "adbdd8f16149e81ac6078a03aca6fc03b592b89ef7b5ed83841c086191be3349",
+        "version": "1.0.22",
+        "upstream_revision": "77e1ce5d6dee871c49ef211222ba18ef0c486bda",
+        "patch": {
+          "path": "third_party/host-patches/libsodium-1.0.22/asan-alignment.patch",
+          "sha256": "f0de9004b8129626e14750437f51eb9524f030149607b50bb75ce0b6c998af74",
+          "upstream_alignment_commit": "11cd77c5cd35fafa2317c36cd7f61de0b9d03cd2"
+        },
+        "postimages": {
+          "test/default/cmptest.h": "fb8b7ad052cd0352cbebc674825a0765a075c86045a089ed05eec8769a8b3650",
+          "src/libsodium/crypto_stream/salsa20/xmm6int/u1.h": "bdf1b537c551e336439f3f312217a76b1821af1c59f5a3e8e189d95cf4f3235d",
+          "src/libsodium/crypto_stream/salsa20/xmm6int/u4.h": "387eb23dc5a60296f07b3e445859a6f26c5fb706ca1540dec3450f5cb42a638a"
+        },
+        "pristine_tree_sha256": "5fb0c3f824c5e4fbcc30186cb94640cc9cd5934c4f7d61c2b72d0099fa0f22d2",
+        "applied_tree_sha256": "e545c52f26e44f16d99db575a382af024100f46708f23f8051042964e0d698dd"
+      },
+      "recipes_unchanged": true
+    },
+    {
+      "profile": "Debug",
+      "build_identity": "db7e9a7a4d809959da429d435233c6a27aabf050c68b718dc8eecb7610bd4b86",
+      "upstream_targets": 87,
+      "original_qualified_receipt_sha256": "76a7f2c19365481736a2afb43889fd4f963ca76e0fa5e226469b98be91c1bc2f",
+      "source_provenance": {
+        "policy_sha256": "4841bfe7f283b250bb2b6fa1872b602416bb91a0e67c5f6179742d8c4bc0c0c8",
+        "archive_sha256": "adbdd8f16149e81ac6078a03aca6fc03b592b89ef7b5ed83841c086191be3349",
+        "version": "1.0.22",
+        "upstream_revision": "77e1ce5d6dee871c49ef211222ba18ef0c486bda",
+        "patch": {
+          "path": "third_party/host-patches/libsodium-1.0.22/asan-alignment.patch",
+          "sha256": "f0de9004b8129626e14750437f51eb9524f030149607b50bb75ce0b6c998af74",
+          "upstream_alignment_commit": "11cd77c5cd35fafa2317c36cd7f61de0b9d03cd2"
+        },
+        "postimages": {
+          "test/default/cmptest.h": "fb8b7ad052cd0352cbebc674825a0765a075c86045a089ed05eec8769a8b3650",
+          "src/libsodium/crypto_stream/salsa20/xmm6int/u1.h": "bdf1b537c551e336439f3f312217a76b1821af1c59f5a3e8e189d95cf4f3235d",
+          "src/libsodium/crypto_stream/salsa20/xmm6int/u4.h": "387eb23dc5a60296f07b3e445859a6f26c5fb706ca1540dec3450f5cb42a638a"
+        },
+        "pristine_tree_sha256": "5fb0c3f824c5e4fbcc30186cb94640cc9cd5934c4f7d61c2b72d0099fa0f22d2",
+        "applied_tree_sha256": "e545c52f26e44f16d99db575a382af024100f46708f23f8051042964e0d698dd"
+      },
+      "recipes_unchanged": true
+    },
+    {
+      "profile": "strict",
+      "build_identity": "8a9649dcf4b0d13bcda6b827ad2aa0c116e349be501a82ace74be5f5b1c16219",
+      "upstream_targets": 87,
+      "original_qualified_receipt_sha256": "6fd6f9c293823dcf077feb6898e40182366a3b9107faba6500c908fcf1777407",
+      "source_provenance": {
+        "policy_sha256": "4841bfe7f283b250bb2b6fa1872b602416bb91a0e67c5f6179742d8c4bc0c0c8",
+        "archive_sha256": "adbdd8f16149e81ac6078a03aca6fc03b592b89ef7b5ed83841c086191be3349",
+        "version": "1.0.22",
+        "upstream_revision": "77e1ce5d6dee871c49ef211222ba18ef0c486bda",
+        "patch": {
+          "path": "third_party/host-patches/libsodium-1.0.22/asan-alignment.patch",
+          "sha256": "f0de9004b8129626e14750437f51eb9524f030149607b50bb75ce0b6c998af74",
+          "upstream_alignment_commit": "11cd77c5cd35fafa2317c36cd7f61de0b9d03cd2"
+        },
+        "postimages": {
+          "test/default/cmptest.h": "fb8b7ad052cd0352cbebc674825a0765a075c86045a089ed05eec8769a8b3650",
+          "src/libsodium/crypto_stream/salsa20/xmm6int/u1.h": "bdf1b537c551e336439f3f312217a76b1821af1c59f5a3e8e189d95cf4f3235d",
+          "src/libsodium/crypto_stream/salsa20/xmm6int/u4.h": "387eb23dc5a60296f07b3e445859a6f26c5fb706ca1540dec3450f5cb42a638a"
+        },
+        "pristine_tree_sha256": "5fb0c3f824c5e4fbcc30186cb94640cc9cd5934c4f7d61c2b72d0099fa0f22d2",
+        "applied_tree_sha256": "e545c52f26e44f16d99db575a382af024100f46708f23f8051042964e0d698dd"
+      },
+      "recipes_unchanged": true
+    }
+  ],
+  "original_archives_and_pristine_sources": "PASS",
+  "hosted_builder_has_explicit_selector": false,
+  "local_builder_has_explicit_selector": true,
+  "native_platform_qualification": "Candidate Windows/macOS execution still UNQUALIFIED"
+}

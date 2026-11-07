@@ -1,0 +1,885 @@
+{
+  "upstream_targets_passed": 87,
+  "failed": 0,
+  "skipped": 0,
+  "output_matches": 85,
+  "output_oracle_exceptions": [
+    {
+      "name": "sodium_utils2",
+      "target_status": "PASS",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected_sha256": "6ffaa008fd914def27eebaf821c4bb18d925bdda8813431aef5ce4b7b5dba28a",
+      "actual_bytes": 0,
+      "expected_bytes": 46,
+      "output_matches": false
+    },
+    {
+      "name": "sodium_utils3",
+      "target_status": "PASS",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected_sha256": "d2266bede02b788fb3d0857a645e5df0d11cb677a89345a16c427e295196777f",
+      "actual_bytes": 0,
+      "expected_bytes": 43,
+      "output_matches": false
+    }
+  ],
+  "tests": [
+    {
+      "name": "aead_aegis128l",
+      "target_status": "PASS",
+      "actual_sha256": "a12b7cb43c9d9134b5bb1b35e9096b66775d9e92e7611d1cc92b02edd6782a87",
+      "expected_sha256": "a12b7cb43c9d9134b5bb1b35e9096b66775d9e92e7611d1cc92b02edd6782a87",
+      "actual_bytes": 3,
+      "expected_bytes": 3,
+      "output_matches": true
+    },
+    {
+      "name": "aead_aegis256",
+      "target_status": "PASS",
+      "actual_sha256": "a12b7cb43c9d9134b5bb1b35e9096b66775d9e92e7611d1cc92b02edd6782a87",
+      "expected_sha256": "a12b7cb43c9d9134b5bb1b35e9096b66775d9e92e7611d1cc92b02edd6782a87",
+      "actual_bytes": 3,
+      "expected_bytes": 3,
+      "output_matches": true
+    },
+    {
+      "name": "aead_aes256gcm",
+      "target_status": "PASS",
+      "actual_sha256": "a12b7cb43c9d9134b5bb1b35e9096b66775d9e92e7611d1cc92b02edd6782a87",
+      "expected_sha256": "a12b7cb43c9d9134b5bb1b35e9096b66775d9e92e7611d1cc92b02edd6782a87",
+      "actual_bytes": 3,
+      "expected_bytes": 3,
+      "output_matches": true
+    },
+    {
+      "name": "aead_aes256gcm2",
+      "target_status": "PASS",
+      "actual_sha256": "a12b7cb43c9d9134b5bb1b35e9096b66775d9e92e7611d1cc92b02edd6782a87",
+      "expected_sha256": "a12b7cb43c9d9134b5bb1b35e9096b66775d9e92e7611d1cc92b02edd6782a87",
+      "actual_bytes": 3,
+      "expected_bytes": 3,
+      "output_matches": true
+    },
+    {
+      "name": "aead_chacha20poly1305",
+      "target_status": "PASS",
+      "actual_sha256": "37faa0bc65fba0cd091cc54e07fd783cd1a1fbe027f0f0932454791d647157e0",
+      "expected_sha256": "37faa0bc65fba0cd091cc54e07fd783cd1a1fbe027f0f0932454791d647157e0",
+      "actual_bytes": 2403,
+      "expected_bytes": 2403,
+      "output_matches": true
+    },
+    {
+      "name": "aead_chacha20poly13052",
+      "target_status": "PASS",
+      "actual_sha256": "a12b7cb43c9d9134b5bb1b35e9096b66775d9e92e7611d1cc92b02edd6782a87",
+      "expected_sha256": "a12b7cb43c9d9134b5bb1b35e9096b66775d9e92e7611d1cc92b02edd6782a87",
+      "actual_bytes": 3,
+      "expected_bytes": 3,
+      "output_matches": true
+    },
+    {
+      "name": "aead_xchacha20poly1305",
+      "target_status": "PASS",
+      "actual_sha256": "44e612e499dd6c89e34390b1d42b1ff3ec660d911f53c242e56be8c3ee8715a4",
+      "expected_sha256": "44e612e499dd6c89e34390b1d42b1ff3ec660d911f53c242e56be8c3ee8715a4",
+      "actual_bytes": 2001,
+      "expected_bytes": 2001,
+      "output_matches": true
+    },
+    {
+      "name": "auth",
+      "target_status": "PASS",
+      "actual_sha256": "566e02c9d46028eb250ee9ee7028920c1678509b32eb8a9c4e6a59c46d6256b5",
+      "expected_sha256": "566e02c9d46028eb250ee9ee7028920c1678509b32eb8a9c4e6a59c46d6256b5",
+      "actual_bytes": 1150,
+      "expected_bytes": 1150,
+      "output_matches": true
+    },
+    {
+      "name": "auth2",
+      "target_status": "PASS",
+      "actual_sha256": "9f3e3800017812059cb70abd9ed4e83689ca5ebab4d329a61d39ebf7ca221716",
+      "expected_sha256": "9f3e3800017812059cb70abd9ed4e83689ca5ebab4d329a61d39ebf7ca221716",
+      "actual_bytes": 164,
+      "expected_bytes": 164,
+      "output_matches": true
+    },
+    {
+      "name": "auth3",
+      "target_status": "PASS",
+      "actual_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "expected_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "actual_bytes": 2,
+      "expected_bytes": 2,
+      "output_matches": true
+    },
+    {
+      "name": "auth5",
+      "target_status": "PASS",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_bytes": 0,
+      "expected_bytes": 0,
+      "output_matches": true
+    },
+    {
+      "name": "auth6",
+      "target_status": "PASS",
+      "actual_sha256": "1980646b3d520b3d1005acc3411a9a71ae9839022ef3bf8e4a4f66ec4a4b1d6c",
+      "expected_sha256": "1980646b3d520b3d1005acc3411a9a71ae9839022ef3bf8e4a4f66ec4a4b1d6c",
+      "actual_bytes": 328,
+      "expected_bytes": 328,
+      "output_matches": true
+    },
+    {
+      "name": "auth7",
+      "target_status": "PASS",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_bytes": 0,
+      "expected_bytes": 0,
+      "output_matches": true
+    },
+    {
+      "name": "box",
+      "target_status": "PASS",
+      "actual_sha256": "aff23c0aa430ab59eeb19af114f5fdafe7479e674af4e431f1ffa55a0f79ef2d",
+      "expected_sha256": "aff23c0aa430ab59eeb19af114f5fdafe7479e674af4e431f1ffa55a0f79ef2d",
+      "actual_bytes": 1508,
+      "expected_bytes": 1508,
+      "output_matches": true
+    },
+    {
+      "name": "box2",
+      "target_status": "PASS",
+      "actual_sha256": "e932ff3ad28f4e8c6f034cb1e9629d862913a40856aecbebe3801977695cb532",
+      "expected_sha256": "e932ff3ad28f4e8c6f034cb1e9629d862913a40856aecbebe3801977695cb532",
+      "actual_bytes": 1344,
+      "expected_bytes": 1344,
+      "output_matches": true
+    },
+    {
+      "name": "box7",
+      "target_status": "PASS",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_bytes": 0,
+      "expected_bytes": 0,
+      "output_matches": true
+    },
+    {
+      "name": "box8",
+      "target_status": "PASS",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_bytes": 0,
+      "expected_bytes": 0,
+      "output_matches": true
+    },
+    {
+      "name": "box_easy",
+      "target_status": "PASS",
+      "actual_sha256": "cd1eab1c0146bfbb965a6ebeb7e3fa9b9d21d16aec450ce12b2178ffa34d9d61",
+      "expected_sha256": "cd1eab1c0146bfbb965a6ebeb7e3fa9b9d21d16aec450ce12b2178ffa34d9d61",
+      "actual_bytes": 908,
+      "expected_bytes": 908,
+      "output_matches": true
+    },
+    {
+      "name": "box_easy2",
+      "target_status": "PASS",
+      "actual_sha256": "895e817ed48f16a93610cdc50d65bf7c7bedd5c85f2aea88d69ec41c30ada73c",
+      "expected_sha256": "895e817ed48f16a93610cdc50d65bf7c7bedd5c85f2aea88d69ec41c30ada73c",
+      "actual_bytes": 15,
+      "expected_bytes": 15,
+      "output_matches": true
+    },
+    {
+      "name": "box_seal",
+      "target_status": "PASS",
+      "actual_sha256": "23eed69ea51943ee68301bdd6e5d773ed42dfb0ae51bb4582f9dfd0756d52fe7",
+      "expected_sha256": "23eed69ea51943ee68301bdd6e5d773ed42dfb0ae51bb4582f9dfd0756d52fe7",
+      "actual_bytes": 22,
+      "expected_bytes": 22,
+      "output_matches": true
+    },
+    {
+      "name": "box_seed",
+      "target_status": "PASS",
+      "actual_sha256": "db41eb0c68e31544ef78d011b28ad60b644185e7d99d724f88a96c6b7da857fc",
+      "expected_sha256": "db41eb0c68e31544ef78d011b28ad60b644185e7d99d724f88a96c6b7da857fc",
+      "actual_bytes": 328,
+      "expected_bytes": 328,
+      "output_matches": true
+    },
+    {
+      "name": "chacha20",
+      "target_status": "PASS",
+      "actual_sha256": "1aaf10d0b91065563ecd471575bb159ad2ef4650cd47e2cc2a0e72fb6275b94f",
+      "expected_sha256": "1aaf10d0b91065563ecd471575bb159ad2ef4650cd47e2cc2a0e72fb6275b94f",
+      "actual_bytes": 20672,
+      "expected_bytes": 20672,
+      "output_matches": true
+    },
+    {
+      "name": "codecs",
+      "target_status": "PASS",
+      "actual_sha256": "02e7ba22d12fc2412cc8ab7cd230c5b2a0a2835e552e4ab15d489dc0895f7fa9",
+      "expected_sha256": "02e7ba22d12fc2412cc8ab7cd230c5b2a0a2835e552e4ab15d489dc0895f7fa9",
+      "actual_bytes": 862,
+      "expected_bytes": 862,
+      "output_matches": true
+    },
+    {
+      "name": "codecs2",
+      "target_status": "PASS",
+      "actual_sha256": "169aa51c8f22274a77401b0fe0235694627688a2d28621a2367e6f20acef32a7",
+      "expected_sha256": "169aa51c8f22274a77401b0fe0235694627688a2d28621a2367e6f20acef32a7",
+      "actual_bytes": 106,
+      "expected_bytes": 106,
+      "output_matches": true
+    },
+    {
+      "name": "codecs3",
+      "target_status": "PASS",
+      "actual_sha256": "8671b2c3e4d49b0b8343e4ecdf2f9d04cebd6ad5d2d19d04b00c03abee082556",
+      "expected_sha256": "8671b2c3e4d49b0b8343e4ecdf2f9d04cebd6ad5d2d19d04b00c03abee082556",
+      "actual_bytes": 372,
+      "expected_bytes": 372,
+      "output_matches": true
+    },
+    {
+      "name": "core1",
+      "target_status": "PASS",
+      "actual_sha256": "58228faa0e7ec755ab98c972e57063f9b0f7f7cfc58c5cc6aed8acc9e0a75aeb",
+      "expected_sha256": "58228faa0e7ec755ab98c972e57063f9b0f7f7cfc58c5cc6aed8acc9e0a75aeb",
+      "actual_bytes": 164,
+      "expected_bytes": 164,
+      "output_matches": true
+    },
+    {
+      "name": "core2",
+      "target_status": "PASS",
+      "actual_sha256": "e9a6c04ec05215e342f77d241c0b57dd4eb3527f5d688d7daee1473b9b69122b",
+      "expected_sha256": "e9a6c04ec05215e342f77d241c0b57dd4eb3527f5d688d7daee1473b9b69122b",
+      "actual_bytes": 164,
+      "expected_bytes": 164,
+      "output_matches": true
+    },
+    {
+      "name": "core3",
+      "target_status": "PASS",
+      "actual_sha256": "dfbf85544d6328fe24656eda167be79371697b8df913c3a02d9494f639a9e5c8",
+      "expected_sha256": "dfbf85544d6328fe24656eda167be79371697b8df913c3a02d9494f639a9e5c8",
+      "actual_bytes": 195,
+      "expected_bytes": 195,
+      "output_matches": true
+    },
+    {
+      "name": "core4",
+      "target_status": "PASS",
+      "actual_sha256": "3121206729c65bc9c8afa095d35d0bf95748220e6bd86ba91f56fa6dc7e54b14",
+      "expected_sha256": "3121206729c65bc9c8afa095d35d0bf95748220e6bd86ba91f56fa6dc7e54b14",
+      "actual_bytes": 264,
+      "expected_bytes": 264,
+      "output_matches": true
+    },
+    {
+      "name": "core5",
+      "target_status": "PASS",
+      "actual_sha256": "88d3018805b5aa6a75343cbf86cc35a8c53d773f5b631392f98ef00435fd1e71",
+      "expected_sha256": "88d3018805b5aa6a75343cbf86cc35a8c53d773f5b631392f98ef00435fd1e71",
+      "actual_bytes": 164,
+      "expected_bytes": 164,
+      "output_matches": true
+    },
+    {
+      "name": "core6",
+      "target_status": "PASS",
+      "actual_sha256": "88d3018805b5aa6a75343cbf86cc35a8c53d773f5b631392f98ef00435fd1e71",
+      "expected_sha256": "88d3018805b5aa6a75343cbf86cc35a8c53d773f5b631392f98ef00435fd1e71",
+      "actual_bytes": 164,
+      "expected_bytes": 164,
+      "output_matches": true
+    },
+    {
+      "name": "core_keccak1600",
+      "target_status": "PASS",
+      "actual_sha256": "83313ddf68feb22dd47b74b87786194b89561bd4c1fc032437b7c3e11dd38246",
+      "expected_sha256": "83313ddf68feb22dd47b74b87786194b89561bd4c1fc032437b7c3e11dd38246",
+      "actual_bytes": 875,
+      "expected_bytes": 875,
+      "output_matches": true
+    },
+    {
+      "name": "ed25519_convert",
+      "target_status": "PASS",
+      "actual_sha256": "3c6566c071d5bc030283b57645118792731673dd8578057e11f23289fc443918",
+      "expected_sha256": "3c6566c071d5bc030283b57645118792731673dd8578057e11f23289fc443918",
+      "actual_bytes": 167,
+      "expected_bytes": 167,
+      "output_matches": true
+    },
+    {
+      "name": "generichash",
+      "target_status": "PASS",
+      "actual_sha256": "9a96ff67a08d9bd9e8ff9a2ea008817a1338acd64b36145ca5918b71641de14c",
+      "expected_sha256": "9a96ff67a08d9bd9e8ff9a2ea008817a1338acd64b36145ca5918b71641de14c",
+      "actual_bytes": 4353,
+      "expected_bytes": 4353,
+      "output_matches": true
+    },
+    {
+      "name": "generichash2",
+      "target_status": "PASS",
+      "actual_sha256": "180fb9a24d8d6def46ac60e139a94a912a6a0d0b17994a239e6886f97fcc3a4e",
+      "expected_sha256": "180fb9a24d8d6def46ac60e139a94a912a6a0d0b17994a239e6886f97fcc3a4e",
+      "actual_bytes": 4224,
+      "expected_bytes": 4224,
+      "output_matches": true
+    },
+    {
+      "name": "generichash3",
+      "target_status": "PASS",
+      "actual_sha256": "71c92d13a11c709dd6526f7515f5a1f1f78425b00c31980cf2d76eb68d7fd14e",
+      "expected_sha256": "71c92d13a11c709dd6526f7515f5a1f1f78425b00c31980cf2d76eb68d7fd14e",
+      "actual_bytes": 5643,
+      "expected_bytes": 5643,
+      "output_matches": true
+    },
+    {
+      "name": "hash",
+      "target_status": "PASS",
+      "actual_sha256": "87681937f8089a14ad8d61bd3d6e9a14b21fb7b672d6a21a20fe880d005b93b6",
+      "expected_sha256": "87681937f8089a14ad8d61bd3d6e9a14b21fb7b672d6a21a20fe880d005b93b6",
+      "actual_bytes": 388,
+      "expected_bytes": 388,
+      "output_matches": true
+    },
+    {
+      "name": "hash3",
+      "target_status": "PASS",
+      "actual_sha256": "2ed2a4c13df8bae775d18684a2477f12eb1d76e79aa0aad9f44b3fdb1b2277e2",
+      "expected_sha256": "2ed2a4c13df8bae775d18684a2477f12eb1d76e79aa0aad9f44b3fdb1b2277e2",
+      "actual_bytes": 129,
+      "expected_bytes": 129,
+      "output_matches": true
+    },
+    {
+      "name": "hash_sha3256",
+      "target_status": "PASS",
+      "actual_sha256": "6f72eac4ba2cdc09342fdea312b5ff56d5ad19345cb557b839859d368e65dcff",
+      "expected_sha256": "6f72eac4ba2cdc09342fdea312b5ff56d5ad19345cb557b839859d368e65dcff",
+      "actual_bytes": 473,
+      "expected_bytes": 473,
+      "output_matches": true
+    },
+    {
+      "name": "hash_sha3512",
+      "target_status": "PASS",
+      "actual_sha256": "5116dbe17f5b1e16b4ba1d6649e715d5220f28fb9cf94a156fd0ea421438e27f",
+      "expected_sha256": "5116dbe17f5b1e16b4ba1d6649e715d5220f28fb9cf94a156fd0ea421438e27f",
+      "actual_bytes": 665,
+      "expected_bytes": 665,
+      "output_matches": true
+    },
+    {
+      "name": "ipcrypt",
+      "target_status": "PASS",
+      "actual_sha256": "02e0ad78442b3f726d2c163a8e5380ea4de9ec52b668fe19681afd5412476ece",
+      "expected_sha256": "02e0ad78442b3f726d2c163a8e5380ea4de9ec52b668fe19681afd5412476ece",
+      "actual_bytes": 2371,
+      "expected_bytes": 2371,
+      "output_matches": true
+    },
+    {
+      "name": "kdf",
+      "target_status": "PASS",
+      "actual_sha256": "52e1e2191e3c9637f493f33d90ca6e5686e3bf3aca0ef106af3cf35e722dd775",
+      "expected_sha256": "52e1e2191e3c9637f493f33d90ca6e5686e3bf3aca0ef106af3cf35e722dd775",
+      "actual_bytes": 6110,
+      "expected_bytes": 6110,
+      "output_matches": true
+    },
+    {
+      "name": "kem",
+      "target_status": "PASS",
+      "actual_sha256": "e715416c849d4313ee8d511a6741032524115c3298d18db0fe2d90bc4492484b",
+      "expected_sha256": "e715416c849d4313ee8d511a6741032524115c3298d18db0fe2d90bc4492484b",
+      "actual_bytes": 80,
+      "expected_bytes": 80,
+      "output_matches": true
+    },
+    {
+      "name": "kem_mlkem768",
+      "target_status": "PASS",
+      "actual_sha256": "878662aa16ca33ae6093e4112948fd42543125b502c4e766453a215b39c846f2",
+      "expected_sha256": "878662aa16ca33ae6093e4112948fd42543125b502c4e766453a215b39c846f2",
+      "actual_bytes": 677,
+      "expected_bytes": 677,
+      "output_matches": true
+    },
+    {
+      "name": "kem_xwing",
+      "target_status": "PASS",
+      "actual_sha256": "2ebbc724b706a1580d656f210a57ea6a180e7c4877e933dcc01910f79217d1c6",
+      "expected_sha256": "2ebbc724b706a1580d656f210a57ea6a180e7c4877e933dcc01910f79217d1c6",
+      "actual_bytes": 543,
+      "expected_bytes": 543,
+      "output_matches": true
+    },
+    {
+      "name": "keygen",
+      "target_status": "PASS",
+      "actual_sha256": "7079e4b4f13ea9e1b7e3730081e9a7aa85e3121b0b01e52f40d7b8e80df5ec36",
+      "expected_sha256": "7079e4b4f13ea9e1b7e3730081e9a7aa85e3121b0b01e52f40d7b8e80df5ec36",
+      "actual_bytes": 14,
+      "expected_bytes": 14,
+      "output_matches": true
+    },
+    {
+      "name": "kx",
+      "target_status": "PASS",
+      "actual_sha256": "1827b8fae3c81534a6e27a27450e05168b7a1e24c4e7bf7c1dea33a2e41850da",
+      "expected_sha256": "1827b8fae3c81534a6e27a27450e05168b7a1e24c4e7bf7c1dea33a2e41850da",
+      "actual_bytes": 478,
+      "expected_bytes": 478,
+      "output_matches": true
+    },
+    {
+      "name": "metamorphic",
+      "target_status": "PASS",
+      "actual_sha256": "a12b7cb43c9d9134b5bb1b35e9096b66775d9e92e7611d1cc92b02edd6782a87",
+      "expected_sha256": "a12b7cb43c9d9134b5bb1b35e9096b66775d9e92e7611d1cc92b02edd6782a87",
+      "actual_bytes": 3,
+      "expected_bytes": 3,
+      "output_matches": true
+    },
+    {
+      "name": "misuse",
+      "target_status": "PASS",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_bytes": 0,
+      "expected_bytes": 0,
+      "output_matches": true
+    },
+    {
+      "name": "onetimeauth",
+      "target_status": "PASS",
+      "actual_sha256": "083a138610f4669e7f1b800f711c48241015d1168cd62f1eadd0a2023bd918c7",
+      "expected_sha256": "083a138610f4669e7f1b800f711c48241015d1168cd62f1eadd0a2023bd918c7",
+      "actual_bytes": 164,
+      "expected_bytes": 164,
+      "output_matches": true
+    },
+    {
+      "name": "onetimeauth2",
+      "target_status": "PASS",
+      "actual_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "expected_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "actual_bytes": 2,
+      "expected_bytes": 2,
+      "output_matches": true
+    },
+    {
+      "name": "onetimeauth7",
+      "target_status": "PASS",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_bytes": 0,
+      "expected_bytes": 0,
+      "output_matches": true
+    },
+    {
+      "name": "pwhash_argon2i",
+      "target_status": "PASS",
+      "actual_sha256": "827438fbec01f3dd205731846eb3cbdb78c3fff7ebde2612f5dfb8c2fa14f28f",
+      "expected_sha256": "827438fbec01f3dd205731846eb3cbdb78c3fff7ebde2612f5dfb8c2fa14f28f",
+      "actual_bytes": 3099,
+      "expected_bytes": 3099,
+      "output_matches": true
+    },
+    {
+      "name": "pwhash_argon2id",
+      "target_status": "PASS",
+      "actual_sha256": "cc71bbb6734516707d61d64944883803688857edc7383bc0d273646fa603beeb",
+      "expected_sha256": "cc71bbb6734516707d61d64944883803688857edc7383bc0d273646fa603beeb",
+      "actual_bytes": 3694,
+      "expected_bytes": 3694,
+      "output_matches": true
+    },
+    {
+      "name": "pwhash_argon2id2",
+      "target_status": "PASS",
+      "actual_sha256": "a5fd437918b2c725e5d06aade1bdd4a529769752ec597950953bf43ffe15cf27",
+      "expected_sha256": "a5fd437918b2c725e5d06aade1bdd4a529769752ec597950953bf43ffe15cf27",
+      "actual_bytes": 237,
+      "expected_bytes": 237,
+      "output_matches": true
+    },
+    {
+      "name": "randombytes",
+      "target_status": "PASS",
+      "actual_sha256": "17bfefb6e28a632c816b8ce63686c1748a02122423b3d3165726d77c0703e8df",
+      "expected_sha256": "17bfefb6e28a632c816b8ce63686c1748a02122423b3d3165726d77c0703e8df",
+      "actual_bytes": 220,
+      "expected_bytes": 220,
+      "output_matches": true
+    },
+    {
+      "name": "scalarmult",
+      "target_status": "PASS",
+      "actual_sha256": "2f4d1f42171fe16eba51825c9cecfdcac7a37f74959a8ed57d81c044714afbf3",
+      "expected_sha256": "2f4d1f42171fe16eba51825c9cecfdcac7a37f74959a8ed57d81c044714afbf3",
+      "actual_bytes": 325,
+      "expected_bytes": 325,
+      "output_matches": true
+    },
+    {
+      "name": "scalarmult2",
+      "target_status": "PASS",
+      "actual_sha256": "40d5247de8c6e96c5681eeb202e3ba79632e166bccd2812758fe508173b8eadf",
+      "expected_sha256": "40d5247de8c6e96c5681eeb202e3ba79632e166bccd2812758fe508173b8eadf",
+      "actual_bytes": 65,
+      "expected_bytes": 65,
+      "output_matches": true
+    },
+    {
+      "name": "scalarmult5",
+      "target_status": "PASS",
+      "actual_sha256": "9b33bb173ec414500534452d82fc4c6a362bfa66d54f398dcef27a89f0b5abe3",
+      "expected_sha256": "9b33bb173ec414500534452d82fc4c6a362bfa66d54f398dcef27a89f0b5abe3",
+      "actual_bytes": 65,
+      "expected_bytes": 65,
+      "output_matches": true
+    },
+    {
+      "name": "scalarmult6",
+      "target_status": "PASS",
+      "actual_sha256": "a1f19397317e98aeaaae853734127522a9bdbd96c95445acdf974b07f94711fc",
+      "expected_sha256": "a1f19397317e98aeaaae853734127522a9bdbd96c95445acdf974b07f94711fc",
+      "actual_bytes": 164,
+      "expected_bytes": 164,
+      "output_matches": true
+    },
+    {
+      "name": "scalarmult7",
+      "target_status": "PASS",
+      "actual_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "expected_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "actual_bytes": 2,
+      "expected_bytes": 2,
+      "output_matches": true
+    },
+    {
+      "name": "scalarmult8",
+      "target_status": "PASS",
+      "actual_sha256": "ab20b49234db8c83447736fc4981ab31c21cfa97062d3e3f203af93a93eda6fb",
+      "expected_sha256": "ab20b49234db8c83447736fc4981ab31c21cfa97062d3e3f203af93a93eda6fb",
+      "actual_bytes": 2215,
+      "expected_bytes": 2215,
+      "output_matches": true
+    },
+    {
+      "name": "secretbox",
+      "target_status": "PASS",
+      "actual_sha256": "aff23c0aa430ab59eeb19af114f5fdafe7479e674af4e431f1ffa55a0f79ef2d",
+      "expected_sha256": "aff23c0aa430ab59eeb19af114f5fdafe7479e674af4e431f1ffa55a0f79ef2d",
+      "actual_bytes": 1508,
+      "expected_bytes": 1508,
+      "output_matches": true
+    },
+    {
+      "name": "secretbox2",
+      "target_status": "PASS",
+      "actual_sha256": "e31d20b82696e0a4c8498002daa3f910f2cfef7b4ecbe4ca3f32a8a846581aae",
+      "expected_sha256": "e31d20b82696e0a4c8498002daa3f910f2cfef7b4ecbe4ca3f32a8a846581aae",
+      "actual_bytes": 672,
+      "expected_bytes": 672,
+      "output_matches": true
+    },
+    {
+      "name": "secretbox7",
+      "target_status": "PASS",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_bytes": 0,
+      "expected_bytes": 0,
+      "output_matches": true
+    },
+    {
+      "name": "secretbox8",
+      "target_status": "PASS",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_bytes": 0,
+      "expected_bytes": 0,
+      "output_matches": true
+    },
+    {
+      "name": "secretbox_easy",
+      "target_status": "PASS",
+      "actual_sha256": "6a447c78e7676ba492842db586d5e5dd29946dd022271b4e525c81c1e1a9a5f6",
+      "expected_sha256": "6a447c78e7676ba492842db586d5e5dd29946dd022271b4e525c81c1e1a9a5f6",
+      "actual_bytes": 4114,
+      "expected_bytes": 4114,
+      "output_matches": true
+    },
+    {
+      "name": "secretbox_easy2",
+      "target_status": "PASS",
+      "actual_sha256": "aeec6cd696078c273d36ddb33500d5af1aeac51b1b65a725363f3ae5728dd8c6",
+      "expected_sha256": "aeec6cd696078c273d36ddb33500d5af1aeac51b1b65a725363f3ae5728dd8c6",
+      "actual_bytes": 10,
+      "expected_bytes": 10,
+      "output_matches": true
+    },
+    {
+      "name": "secretstream_xchacha20poly1305",
+      "target_status": "PASS",
+      "actual_sha256": "a12b7cb43c9d9134b5bb1b35e9096b66775d9e92e7611d1cc92b02edd6782a87",
+      "expected_sha256": "a12b7cb43c9d9134b5bb1b35e9096b66775d9e92e7611d1cc92b02edd6782a87",
+      "actual_bytes": 3,
+      "expected_bytes": 3,
+      "output_matches": true
+    },
+    {
+      "name": "shorthash",
+      "target_status": "PASS",
+      "actual_sha256": "ddfd188704099f5c14c7320d2bd005226d61be4a62a6ee3cb12ab679a0ef0fb0",
+      "expected_sha256": "ddfd188704099f5c14c7320d2bd005226d61be4a62a6ee3cb12ab679a0ef0fb0",
+      "actual_bytes": 1088,
+      "expected_bytes": 1088,
+      "output_matches": true
+    },
+    {
+      "name": "sign",
+      "target_status": "PASS",
+      "actual_sha256": "b4a2400fbce8249e4c48ed1afe2b92d9b40b71e2aed91403173aeaedb9d86ccc",
+      "expected_sha256": "b4a2400fbce8249e4c48ed1afe2b92d9b40b71e2aed91403173aeaedb9d86ccc",
+      "actual_bytes": 512,
+      "expected_bytes": 512,
+      "output_matches": true
+    },
+    {
+      "name": "sodium_core",
+      "target_status": "PASS",
+      "actual_sha256": "aaea2a6c081c4bb36b4d48d63ae70463d410166f7a4984d20e69704309f470cf",
+      "expected_sha256": "aaea2a6c081c4bb36b4d48d63ae70463d410166f7a4984d20e69704309f470cf",
+      "actual_bytes": 17,
+      "expected_bytes": 17,
+      "output_matches": true
+    },
+    {
+      "name": "sodium_utils",
+      "target_status": "PASS",
+      "actual_sha256": "1c1b102f3a0c3ca52b1b398de32fc7b91ff67f49b351ca99533abbf91787a02a",
+      "expected_sha256": "1c1b102f3a0c3ca52b1b398de32fc7b91ff67f49b351ca99533abbf91787a02a",
+      "actual_bytes": 756,
+      "expected_bytes": 756,
+      "output_matches": true
+    },
+    {
+      "name": "sodium_utils2",
+      "target_status": "PASS",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected_sha256": "6ffaa008fd914def27eebaf821c4bb18d925bdda8813431aef5ce4b7b5dba28a",
+      "actual_bytes": 0,
+      "expected_bytes": 46,
+      "output_matches": false
+    },
+    {
+      "name": "sodium_utils3",
+      "target_status": "PASS",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected_sha256": "d2266bede02b788fb3d0857a645e5df0d11cb677a89345a16c427e295196777f",
+      "actual_bytes": 0,
+      "expected_bytes": 43,
+      "output_matches": false
+    },
+    {
+      "name": "sodium_utils4",
+      "target_status": "PASS",
+      "actual_sha256": "9bc870a2aae6f6885dd45cf5405133809e6d59f546187723c2301948cba2b755",
+      "expected_sha256": "9bc870a2aae6f6885dd45cf5405133809e6d59f546187723c2301948cba2b755",
+      "actual_bytes": 145,
+      "expected_bytes": 145,
+      "output_matches": true
+    },
+    {
+      "name": "sodium_version",
+      "target_status": "PASS",
+      "actual_sha256": "ccce065269620747ca153e9a430d44b175cdc1f7e0958741b567250a1d6b1d95",
+      "expected_sha256": "ccce065269620747ca153e9a430d44b175cdc1f7e0958741b567250a1d6b1d95",
+      "actual_bytes": 6,
+      "expected_bytes": 6,
+      "output_matches": true
+    },
+    {
+      "name": "stream",
+      "target_status": "PASS",
+      "actual_sha256": "ae7167bf87acb3b66b27fd308d4d924b23d59333067ce4cdca4cb33762637452",
+      "expected_sha256": "ae7167bf87acb3b66b27fd308d4d924b23d59333067ce4cdca4cb33762637452",
+      "actual_bytes": 43603,
+      "expected_bytes": 43603,
+      "output_matches": true
+    },
+    {
+      "name": "stream2",
+      "target_status": "PASS",
+      "actual_sha256": "b4a5f060a0926dc9cc6dfe37466289b4d630b75f9e3660668622f2cd456b02fe",
+      "expected_sha256": "b4a5f060a0926dc9cc6dfe37466289b4d630b75f9e3660668622f2cd456b02fe",
+      "actual_bytes": 130,
+      "expected_bytes": 130,
+      "output_matches": true
+    },
+    {
+      "name": "stream3",
+      "target_status": "PASS",
+      "actual_sha256": "79bb8c2bc8d7d64a531f15a6d75f8791b993cc0d826155e6ee7dbd4a2c971656",
+      "expected_sha256": "79bb8c2bc8d7d64a531f15a6d75f8791b993cc0d826155e6ee7dbd4a2c971656",
+      "actual_bytes": 164,
+      "expected_bytes": 164,
+      "output_matches": true
+    },
+    {
+      "name": "stream4",
+      "target_status": "PASS",
+      "actual_sha256": "8a58277acfb8d299445c5903486b08497296a770f324b4a7ed8e6d633f722792",
+      "expected_sha256": "8a58277acfb8d299445c5903486b08497296a770f324b4a7ed8e6d633f722792",
+      "actual_bytes": 672,
+      "expected_bytes": 672,
+      "output_matches": true
+    },
+    {
+      "name": "verify1",
+      "target_status": "PASS",
+      "actual_sha256": "3df37de95de2d6178e7c17a0bcb38f78927088befb99aeaa7e6aa7df2f9b8a33",
+      "expected_sha256": "3df37de95de2d6178e7c17a0bcb38f78927088befb99aeaa7e6aa7df2f9b8a33",
+      "actual_bytes": 6,
+      "expected_bytes": 6,
+      "output_matches": true
+    },
+    {
+      "name": "xof2",
+      "target_status": "PASS",
+      "actual_sha256": "33e4d55b3c7042f47d8088bd8ae3a34f39abde9f8af174ac0d2a44921dd119eb",
+      "expected_sha256": "33e4d55b3c7042f47d8088bd8ae3a34f39abde9f8af174ac0d2a44921dd119eb",
+      "actual_bytes": 146,
+      "expected_bytes": 146,
+      "output_matches": true
+    },
+    {
+      "name": "xof_shake128",
+      "target_status": "PASS",
+      "actual_sha256": "24039c3dfae7409d88e1da49b2dbe94801fa9f08bf4f7af25d9634d70d6360dc",
+      "expected_sha256": "24039c3dfae7409d88e1da49b2dbe94801fa9f08bf4f7af25d9634d70d6360dc",
+      "actual_bytes": 27,
+      "expected_bytes": 27,
+      "output_matches": true
+    },
+    {
+      "name": "xof_shake256",
+      "target_status": "PASS",
+      "actual_sha256": "9b0be2e3bf7a7615cf0ebaab4ee34421e2829a8116aaaf5b493c8e21208c76c1",
+      "expected_sha256": "9b0be2e3bf7a7615cf0ebaab4ee34421e2829a8116aaaf5b493c8e21208c76c1",
+      "actual_bytes": 27,
+      "expected_bytes": 27,
+      "output_matches": true
+    },
+    {
+      "name": "xof_turboshake128",
+      "target_status": "PASS",
+      "actual_sha256": "2c38a94e9bc28a91a63c3df7b3674fc9dfa0c33c649855974eebc9152e4f71cc",
+      "expected_sha256": "2c38a94e9bc28a91a63c3df7b3674fc9dfa0c33c649855974eebc9152e4f71cc",
+      "actual_bytes": 32,
+      "expected_bytes": 32,
+      "output_matches": true
+    },
+    {
+      "name": "xof_turboshake256",
+      "target_status": "PASS",
+      "actual_sha256": "fbaa75ce442563117bcf3b809199ab464150d4a05aab63f331bcaed29fecc820",
+      "expected_sha256": "fbaa75ce442563117bcf3b809199ab464150d4a05aab63f331bcaed29fecc820",
+      "actual_bytes": 32,
+      "expected_bytes": 32,
+      "output_matches": true
+    }
+  ],
+  "build_identity": "840bfd1b19f9025f7286c03d321f2de7b19755f7597572a6e87b464c675b42ac",
+  "receipt_sha256": "344e3c3f69db4780ba6e05006c9b6beb6bb229eb724e53a92ca7cd4281d3161d",
+  "source_provenance": {
+    "policy_sha256": "4841bfe7f283b250bb2b6fa1872b602416bb91a0e67c5f6179742d8c4bc0c0c8",
+    "archive_sha256": "adbdd8f16149e81ac6078a03aca6fc03b592b89ef7b5ed83841c086191be3349",
+    "version": "1.0.22",
+    "upstream_revision": "77e1ce5d6dee871c49ef211222ba18ef0c486bda",
+    "patch": {
+      "path": "third_party/host-patches/libsodium-1.0.22/asan-alignment.patch",
+      "sha256": "f0de9004b8129626e14750437f51eb9524f030149607b50bb75ce0b6c998af74",
+      "upstream_alignment_commit": "11cd77c5cd35fafa2317c36cd7f61de0b9d03cd2"
+    },
+    "postimages": {
+      "test/default/cmptest.h": "fb8b7ad052cd0352cbebc674825a0765a075c86045a089ed05eec8769a8b3650",
+      "src/libsodium/crypto_stream/salsa20/xmm6int/u1.h": "bdf1b537c551e336439f3f312217a76b1821af1c59f5a3e8e189d95cf4f3235d",
+      "src/libsodium/crypto_stream/salsa20/xmm6int/u4.h": "387eb23dc5a60296f07b3e445859a6f26c5fb706ca1540dec3450f5cb42a638a"
+    },
+    "pristine_tree_sha256": "5fb0c3f824c5e4fbcc30186cb94640cc9cd5934c4f7d61c2b72d0099fa0f22d2",
+    "applied_tree_sha256": "e545c52f26e44f16d99db575a382af024100f46708f23f8051042964e0d698dd"
+  },
+  "receipt_checks": 18,
+  "commands": [
+    {
+      "command": [
+        "podman",
+        "exec",
+        "voidup-portability-ubuntu",
+        "python3",
+        "-c",
+        "import platform,json;print(json.dumps({\"platform\":platform.platform(),\"libc\":platform.libc_ver(),\"os_release\":open(\"/etc/os-release\").read()}))"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "podman",
+        "exec",
+        "voidup-portability-ubuntu",
+        "python3",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-backport-integration/ubuntu-source/tools/verify_host_deps.py",
+        "--prefix",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-backport-integration/ubuntu-source/.toolchains/host/prefix/Release",
+        "--profile",
+        "Release",
+        "--platform",
+        "Linux",
+        "--architecture",
+        "x86_64"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "podman",
+        "exec",
+        "voidup-portability-ubuntu",
+        "python3",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-backport-integration/ubuntu-source/tests/host_capabilities/dependencies.py",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-backport-integration/ubuntu-source/.toolchains/host/prefix/Release",
+        "Release",
+        "Linux",
+        "x86_64"
+      ],
+      "status": 0
+    }
+  ],
+  "platform_identity": {
+    "platform": "Linux-7.2.11-pikaos-x86_64-with-glibc2.39",
+    "libc": [
+      "glibc",
+      "2.39"
+    ],
+    "os_release": "PRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.5 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n"
+  }
+}

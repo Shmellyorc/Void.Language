@@ -1,0 +1,34 @@
+{
+  "diff_replay": [
+    {
+      "patch": "integrated-source.patch",
+      "paths": [
+        "CMakeLists.txt",
+        "cmake/InstallLicenses.cmake",
+        "tests/host_capabilities/dependencies.py",
+        "tests/host_capabilities/install.py",
+        "third_party/host-patches/libsodium-1.0.22/PROVENANCE.json",
+        "third_party/host-patches/libsodium-1.0.22/asan-alignment.patch",
+        "tools/setup_host_deps.py",
+        "tools/setup_host_deps_native.py",
+        "tools/verify_host_deps.py"
+      ],
+      "check_and_apply_to_disposable_before_snapshot": "PASS",
+      "exact_postimages": "PASS"
+    },
+    {
+      "patch": "documentation-integration.patch",
+      "paths": [
+        "docs/ADVANCED_LANGUAGE.md",
+        "docs/WRENCH_CLANKER.md",
+        "docs/release/NOTICE_INVENTORY.json",
+        "docs/release/REDISTRIBUTION_NOTICES.md",
+        "docs/voidup/INTEGRATION_REPORT.md"
+      ],
+      "check_and_apply_to_disposable_before_snapshot": "PASS",
+      "exact_postimages": "PASS"
+    }
+  ],
+  "local_markdown_references_checked": 77,
+  "broken_links": []
+}

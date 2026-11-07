@@ -1,0 +1,341 @@
+diff --git a/cmake/host-sodium.targets b/cmake/host-sodium.targets
+index 943f28ea..cfadd4ba 100644
+--- a/cmake/host-sodium.targets
++++ b/cmake/host-sodium.targets
+@@ -7,4 +7,10 @@
+       <AdditionalOptions Condition="'$(VoidHostStrict)' == 'true'">/clang:-fsanitize=address,undefined /clang:-fno-omit-frame-pointer %(AdditionalOptions)</AdditionalOptions>
+     </ClCompile>
+   </ItemDefinitionGroup>
++  <Target Name="VoidVerifyPinnedClangCL" BeforeTargets="ClangClFixupCompileOptions;ClCompile;Lib">
++    <Error Condition="'$(PlatformToolset)' != 'ClangCL' Or '$(LLVMToolsVersion)' != '$(VoidPinnedLLVMToolsVersion)' Or '$(VoidPinnedLLVMToolsVersion)' == ''" Text="VOID requires the SDK-derived LLVM 23.1.4 toolset selector." />
++    <Error Condition="!Exists('$(VoidPinnedResourceDir)\include\stddef.h') Or '$(CLToolExe)' != 'clang-cl.exe' Or !Exists('$(CLToolPath)$(CLToolExe)')" Text="Pinned LLVM compiler/resources are missing; ambient fallback is prohibited." />
++    <Error Condition="'$(LinkToolExe)' != 'lld-link.exe' Or !Exists('$(LinkToolPath)$(LinkToolExe)') Or '$(LibToolExe)' != 'llvm-lib.exe' Or !Exists('$(LibToolPath)$(LibToolExe)')" Text="Pinned LLVM linker/librarian are missing; ambient fallback is prohibited." />
++    <Message Importance="high" Text="VOID_PINNED_CLANGCL LLVMToolsVersion=$(LLVMToolsVersion) compiler=$(CLToolPath)$(CLToolExe) resources=$(VoidPinnedResourceDir) linker=$(LinkToolPath)$(LinkToolExe) librarian=$(LibToolPath)$(LibToolExe) RuntimeLibrary=MultiThreaded" />
++  </Target>
+ </Project>
+diff --git a/tests/voidup/ci_integration.py b/tests/voidup/ci_integration.py
+index 6cf59b73..63e5280f 100644
+--- a/tests/voidup/ci_integration.py
++++ b/tests/voidup/ci_integration.py
+@@ -6,6 +6,49 @@ from unittest.mock import patch
+ ROOT=Path(__file__).resolve().parents[2]
+ sys.path.insert(0,str(ROOT/'tools/ci'))
+ import voidup_bootstrap as host
++import llvm_sdk
++
++class Toolchain(unittest.TestCase):
++ def setUp(self):
++  self.scratch=tempfile.TemporaryDirectory();self.addCleanup(self.scratch.cleanup)
++  self.sdk=Path(self.scratch.name)/'sdk';self.resource=self.sdk/'lib/clang/23'
++  identity={'version':llvm_sdk.VERSION,'asset':'fixture','sha256':'fixture'}
++  self.create('void-sdk-identity.json',json.dumps(identity))
++  self.create('include/llvm/Config/llvm-config.h',f'#define LLVM_VERSION_STRING "{llvm_sdk.VERSION}"')
++  for path in ['bin/clang-cl.exe','bin/lld-link.exe','bin/llvm-lib.exe','bin/llvm-readobj.exe','lib/LLVMCore.lib','lib/clang/23/include/stddef.h','lib/clang/23/lib/windows/clang_rt.builtins-x86_64.lib']:self.create(path)
++  self.addCleanup(patch.stopall)
++  patch.object(llvm_sdk,'archive_identity',return_value=identity).start()
++  self.outputs=patch.object(llvm_sdk.subprocess,'check_output',side_effect=self.output).start()
++ def create(self,path,text='fixture'):
++  path=self.sdk/path;path.parent.mkdir(parents=True,exist_ok=True);path.write_text(text)
++ def output(self,command,**kwargs):
++  return str(self.resource) if command[-1]=='/clang:-print-resource-dir' else 'LLVM version '+llvm_sdk.VERSION
++ def test_selector_is_resource_leaf(self):
++  self.assertEqual(llvm_sdk.windows_clangcl(self.sdk)['LLVMToolsVersion'],'23')
++  other=self.resource.with_name('23.1.4');self.resource.rename(other);self.resource=other
++  self.assertEqual(llvm_sdk.windows_clangcl(self.sdk)['LLVMToolsVersion'],'23.1.4')
++  self.assertFalse(any(call.args[0][0].name=='llvm-lib.exe' for call in self.outputs.call_args_list))
++ def test_wrong_version_fails(self):
++  self.outputs.side_effect=lambda *args,**kwargs:'LLVM version 0.0.0'
++  with self.assertRaisesRegex(RuntimeError,'version'):llvm_sdk.windows_clangcl(self.sdk)
++ def test_wrong_or_external_resource_fails(self):
++  for path in [self.resource.with_name('wrong'),self.sdk.parent/'ambient/lib/clang/23']:
++   self.resource=path
++   with self.assertRaisesRegex(RuntimeError,'resource directory'):llvm_sdk.windows_clangcl(self.sdk)
++ def test_missing_components_fail(self):
++  for path in ['bin/clang-cl.exe','bin/lld-link.exe','bin/llvm-lib.exe','bin/llvm-readobj.exe','lib/LLVMCore.lib','lib/clang/23/include/stddef.h','lib/clang/23/lib/windows/clang_rt.builtins-x86_64.lib','include/llvm/Config/llvm-config.h','void-sdk-identity.json']:
++   file=self.sdk/path;before=file.read_bytes();file.unlink()
++   with self.assertRaises(RuntimeError,msg=path):llvm_sdk.windows_clangcl(self.sdk)
++   file.write_bytes(before)
++ def test_mismatched_headers_and_receipt_fail(self):
++  self.create('include/llvm/Config/llvm-config.h','mismatch')
++  with self.assertRaisesRegex(RuntimeError,'headers'):llvm_sdk.windows_clangcl(self.sdk)
++  self.create('void-sdk-identity.json','{}')
++  with self.assertRaisesRegex(RuntimeError,'identity'):llvm_sdk.windows_clangcl(self.sdk)
++ def test_ambient_probe_override_fails_before_execution(self):
++  self.outputs.reset_mock()
++  with self.assertRaisesRegex(RuntimeError,'Only the pinned'):llvm_sdk.pinned_cxx(self.sdk/'bin/clang-cl.exe')
++  self.outputs.assert_not_called()
+ 
+ class Integration(unittest.TestCase):
+  def test_native_profile_layouts(self):
+diff --git a/tools/bench/buffer_preparation.py b/tools/bench/buffer_preparation.py
+index da6b7dfa..1fa095d9 100644
+--- a/tools/bench/buffer_preparation.py
++++ b/tools/bench/buffer_preparation.py
+@@ -4,6 +4,9 @@ import hashlib
+ import json
+ import os
+ from pathlib import Path
++import sys
++sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "ci"))
++from llvm_sdk import pinned_cxx
+ import subprocess
+ 
+ from heap_legacy import ROOT, FLAGS, snapshot
+@@ -12,10 +15,11 @@ from heap_legacy import ROOT, FLAGS, snapshot
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument('--baseline', default='cb601b4')
+-    parser.add_argument('--compiler', default='/usr/bin/clang++-19')
++    parser.add_argument('--compiler', default=None)
+     parser.add_argument('--output', type=Path, required=True)
+     parser.add_argument('--cpu', type=int)
+     args = parser.parse_args()
++    args.compiler = pinned_cxx(args.compiler)
+     if args.cpu is not None:
+         os.sched_setaffinity(0, {args.cpu})
+     output = args.output.resolve()
+diff --git a/tools/bench/heap_legacy.py b/tools/bench/heap_legacy.py
+index d077b5da..c43eb375 100644
+--- a/tools/bench/heap_legacy.py
++++ b/tools/bench/heap_legacy.py
+@@ -6,6 +6,9 @@ import hashlib
+ import json
+ import os
+ from pathlib import Path
++import sys
++sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "ci"))
++from llvm_sdk import pinned_cxx
+ import platform
+ import statistics
+ import subprocess
+@@ -33,13 +36,14 @@ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument('--parent', default='3c69f66')
+     parser.add_argument('--stage2b', default='cb77d62')
+-    parser.add_argument('--compiler', default='/usr/bin/clang++-19')
++    parser.add_argument('--compiler', default=None)
+     parser.add_argument('--output', type=Path, required=True)
+     parser.add_argument('--objects', type=int, default=50000)
+     parser.add_argument('--samples', type=int, default=7)
+     parser.add_argument('--label', default='working')
+     parser.add_argument('--cpu', type=int, help='pin builds and probes to this allowed logical CPU (Linux)')
+     args = parser.parse_args()
++    args.compiler = pinned_cxx(args.compiler)
+     if args.cpu is not None:
+         os.sched_setaffinity(0, {args.cpu})
+     output = args.output.resolve();output.mkdir(parents=True, exist_ok=True)
+diff --git a/tools/ci/llvm_sdk.py b/tools/ci/llvm_sdk.py
+index ee48a4cc..5d9158ac 100644
+--- a/tools/ci/llvm_sdk.py
++++ b/tools/ci/llvm_sdk.py
+@@ -68,6 +68,56 @@ def install(destination: Path) -> None:
+         shutil.move(str(sdk), destination)
+ 
+ 
++def windows_clangcl(destination: Path) -> dict:
++    """Validate an existing SDK and derive MSBuild's resource selector from Clang.
++
++    Never installs anything. In particular, LLVMToolsVersion is a resource
++    directory name, not necessarily the full release version.
++    """
++    destination = destination.resolve()
++    receipt = destination / 'void-sdk-identity.json'
++    if not receipt.is_file() or json.loads(receipt.read_text(encoding='utf-8')) != archive_identity():
++        raise RuntimeError('Missing/mismatched verified LLVM SDK identity')
++    header = destination / 'include/llvm/Config/llvm-config.h'
++    if not header.is_file() or f'#define LLVM_VERSION_STRING "{VERSION}"' not in header.read_text(encoding='utf-8'):
++        raise RuntimeError('Missing/mismatched LLVM SDK headers')
++    tools = {name: destination/'bin'/name for name in ('clang-cl.exe', 'lld-link.exe', 'llvm-lib.exe', 'llvm-readobj.exe')}
++    if not all(path.is_file() and path.resolve().parent == destination/'bin' for path in tools.values()) or not (destination/'lib/LLVMCore.lib').is_file():
++        raise RuntimeError('Incomplete pinned Windows LLVM SDK')
++    versions = {}
++    for name, path in tools.items():
++        if name == 'llvm-lib.exe':
++            continue  # llvm-lib has no version switch; archive identity/hash binds it.
++        output = subprocess.check_output([path, '--version'], text=True)
++        if not re.search(r'\b' + re.escape(VERSION) + r'(?:\D|$)', output):
++            raise RuntimeError(f'Mismatched pinned tool version: {name}: {output}')
++        versions[name] = output.strip()
++    resource = Path(subprocess.check_output([tools['clang-cl.exe'], '/clang:-print-resource-dir'], text=True).strip()).resolve()
++    selectors = {'.'.join(VERSION.split('.')[:count]) for count in range(1, 4)}
++    if resource.parent != destination/'lib/clang' or resource.name not in selectors:
++        raise RuntimeError(f'Clang resource directory escapes/mismatches the verified SDK: {resource}')
++    if not (resource/'include/stddef.h').is_file() or not list((resource/'lib/windows').glob('clang_rt*.lib')):
++        raise RuntimeError('Missing pinned compiler resource headers/libraries')
++    return {'identity': archive_identity(), 'sdk': str(destination), 'resource': str(resource),
++            'LLVMToolsVersion': resource.name, 'versions': versions,
++            'tool_sha256': {name: hashlib.sha256(path.read_bytes()).hexdigest() for name,path in tools.items()}}
++
++
++def pinned_cxx(requested=None) -> str:
++    """Select the verified local SDK for standalone engineering probes too."""
++    sdk = Path(__file__).resolve().parents[2] / '.toolchains' / f'llvm-{VERSION}'
++    compiler = sdk / ('bin/clang++.exe' if os.name == 'nt' else 'bin/clang++')
++    if requested is not None and Path(requested).resolve() != compiler.resolve():
++        raise RuntimeError(f'Only the pinned LLVM {VERSION} compiler is permitted: {compiler}')
++    receipt = sdk / 'void-sdk-identity.json'
++    if not receipt.is_file() or json.loads(receipt.read_text(encoding='utf-8')) != archive_identity():
++        raise RuntimeError('Missing/mismatched verified LLVM SDK identity')
++    output = subprocess.check_output([compiler, '--version'], text=True)
++    if not re.search(r'clang version ' + re.escape(VERSION) + r'(?:\D|$)', output):
++        raise RuntimeError(f'Mismatched pinned compiler: {output}')
++    return str(compiler)
++
++
+ def prepare(destination: Path) -> dict:
+     """Prepare the existing pinned SDK recipe for CI or a local source build."""
+     destination = destination.resolve()
+@@ -91,6 +141,8 @@ def prepare(destination: Path) -> dict:
+     cxx = destination / ("bin/clang-cl.exe" if os.name == "nt" else "bin/clang++")
+     values = {"LLVM_DIR": destination / "lib/cmake/llvm", "CC": cc, "CXX": cxx, "VOID_CLANG": clang}
+     if platform.system() == "Windows":
++        selected = windows_clangcl(destination)
++        values.update(LLVMInstallDir=str(destination) + os.sep, LLVMToolsVersion=selected['LLVMToolsVersion'])
+         # Keep dependency installation outside the verified, immutable SDK cache.
+         # All three are real static development libraries built with the SDK's /MT ABI.
+         dependencies = destination.with_name(destination.name + "-deps")
+diff --git a/tools/ci/voidup_bootstrap.py b/tools/ci/voidup_bootstrap.py
+index 46a4724a..79669780 100644
+--- a/tools/ci/voidup_bootstrap.py
++++ b/tools/ci/voidup_bootstrap.py
+@@ -122,7 +122,7 @@ def main():
+         finally:
+             # Retain native MSBuild/CMake/autoconf diagnostics even on failure.
+             base = ROOT/plan['host_prefix'].replace('/prefix/', '/build/')
+-            for name in ('CMakeCache.txt', 'CMakeConfigureLog.yaml', 'config.log'):
++            for name in ('CMakeCache.txt', 'CMakeConfigureLog.yaml', 'config.log', 'test-suite.log', '*.trs', '*.log'):
+                 for source in base.rglob(name):
+                     target=evidence/'provider-builds'/source.relative_to(base)
+                     target.parent.mkdir(parents=True, exist_ok=True);shutil.copy2(source,target)
+diff --git a/tools/setup_host_deps.py b/tools/setup_host_deps.py
+index b474e908..c6649e8a 100644
+--- a/tools/setup_host_deps.py
++++ b/tools/setup_host_deps.py
+@@ -14,6 +14,10 @@ def main():
+  cc=ROOT/'.toolchains/llvm-23.1.4/bin/clang';flags='-g -O0' if a.profile=='Debug' else '-g -O2'
+  if a.profile=='strict': flags+=' -fsanitize=address,undefined -fno-omit-frame-pointer'
+  env=dict(os.environ,CC=str(cc),CFLAGS=flags,LDFLAGS=('-fsanitize=address,undefined' if a.profile=='strict' else ''))
++ if a.profile=='strict':
++  # A local recover-mode UBSan run must never masquerade as strict acceptance.
++  env['ASAN_OPTIONS']=env.get('ASAN_OPTIONS','')+':detect_leaks=1:halt_on_error=1:exitcode=87'
++  env['UBSAN_OPTIONS']=env.get('UBSAN_OPTIONS','')+':halt_on_error=1:print_stacktrace=1:exitcode=86'
+  sources={}
+  for name in ['libsodium','libarchive']:
+   pin=pins[name];archive=base/'downloads'/pin['url'].rsplit('/',1)[-1];archive.parent.mkdir(parents=True,exist_ok=True)
+diff --git a/tools/setup_host_deps_native.py b/tools/setup_host_deps_native.py
+index dc732ef5..154f820b 100644
+--- a/tools/setup_host_deps_native.py
++++ b/tools/setup_host_deps_native.py
+@@ -1,9 +1,16 @@
+ #!/usr/bin/env python3
+ """Pinned native Windows/macOS host providers. No ambient provider fallback."""
+-import argparse, hashlib, json, os, pathlib, platform, shutil, subprocess, tarfile, time, urllib.request
++import argparse, hashlib, json, os, pathlib, platform, shutil, subprocess, sys, tarfile, time, urllib.request
+ from verify_host_deps import source_tree
+ ROOT=pathlib.Path(__file__).resolve().parents[1]
++sys.path.insert(0,str(ROOT/'tools/ci'))
++from llvm_sdk import windows_clangcl
+ def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
++def verify_static_crt(directives):
++ directives=directives.lower()
++ # C objects use DEFAULTLIB, unlike C++'s optional RuntimeLibrary mismatch tag.
++ if '/defaultlib:libcmt' not in directives or any(value in directives for value in ['md_dynamic','mtd_staticdebug','/defaultlib:msvcrt','/defaultlib:libcmtd']):
++  raise ValueError('libsodium static /MT ABI not established by COFF directives')
+ def main():
+  p=argparse.ArgumentParser(description=__doc__);p.add_argument('--profile',choices=['Release','Debug','strict'],required=True);p.add_argument('--jobs',type=int,default=4);a=p.parse_args()
+  system=platform.system();arch={'amd64':'x86_64','aarch64':'arm64'}.get(platform.machine().lower(),platform.machine().lower())
+@@ -13,7 +20,7 @@ def main():
+  evidence=ROOT/'docs/voidup/evidence'/('dependencies-'+bundle+'-'+a.profile+'-'+str(time.time_ns()));evidence.mkdir(parents=True)
+  pins=json.loads((ROOT/'third_party/host-versions.json').read_text());sources={}
+  report={'schema':2,'platform':system,'architecture':arch,'profile':a.profile,'pins':pins,'commands':[],
+-  'recipe_sha256':{name:sha(ROOT/name) for name in ['tools/setup_host_deps.py','tools/setup_host_deps_native.py','tools/verify_host_deps.py','cmake/host-sodium.targets']}}
++  'recipe_sha256':{name:sha(ROOT/name) for name in ['tools/setup_host_deps.py','tools/setup_host_deps_native.py','tools/verify_host_deps.py','cmake/host-sodium.targets','tools/ci/llvm_sdk.py']}}
+  def run(args,name,cwd=build,env=None):
+   args=list(map(str,args));start=time.monotonic()
+   with (evidence/(name+'.log')).open('wb') as log:r=subprocess.run(args,cwd=cwd,env=env,stdout=log,stderr=subprocess.STDOUT)
+@@ -42,13 +49,39 @@ def main():
+   if os.environ.get('VSCMD_ARG_TGT_ARCH','').lower() not in ['x64','amd64']:raise SystemExit('Use a native x64 Visual Studio developer environment')
+   msbuild=shutil.which('msbuild');
+   if not msbuild:raise SystemExit('MSBuild and the Windows SDK are required')
++  selected=windows_clangcl(cc.parent.parent);report['clangcl_selection']=selected
+   # Upstream MSBuild generates version.h in its source tree. Use an exact
+   # disposable copy so the archive-verified source remains unchanged.
+   sodium=build/'sodium-source'
+   if sodium.exists():shutil.rmtree(sodium)
+   shutil.copytree(sources['libsodium'],sodium)
+   output=build/'sodium-output';intermediate=build/'sodium-objects';output.mkdir(exist_ok=True)
+-  run([msbuild,sodium/'builds/msvc/vs2022/libsodium/libsodium.vcxproj','/m:'+str(a.jobs),'/p:Configuration='+('ReleaseLIB' if a.profile=='Release' else 'DebugLIB'),'/p:Platform=x64','/p:PlatformToolset=ClangCL','/p:LLVMInstallDir='+str(cc.parent.parent)+os.sep,'/p:CLToolPath='+str(cc.parent)+os.sep,'/p:OutDir='+str(output)+os.sep,'/p:IntDir='+str(intermediate)+os.sep,'/p:ForceImportBeforeCppTargets='+str(ROOT/'cmake/host-sodium.targets'),'/p:VoidHostStrict='+str(a.profile=='strict').lower()],'sodium-build')
++  properties=['/p:Configuration='+('ReleaseLIB' if a.profile=='Release' else 'DebugLIB'),'/p:Platform=x64','/p:PlatformToolset=ClangCL',
++   '/p:LLVMInstallDir='+selected['sdk']+os.sep,'/p:LLVMToolsVersion='+selected['LLVMToolsVersion'],
++   '/p:CLToolPath='+str(cc.parent)+os.sep,'/p:CLToolExe=clang-cl.exe',
++   '/p:LinkToolPath='+str(cc.parent)+os.sep,'/p:LinkToolExe=lld-link.exe',
++   '/p:LibToolPath='+str(cc.parent)+os.sep,'/p:LibToolExe=llvm-lib.exe',
++   '/p:VoidPinnedResourceDir='+selected['resource'],'/p:VoidPinnedLLVMToolsVersion='+selected['LLVMToolsVersion'],
++   '/p:OutDir='+str(output)+os.sep,'/p:IntDir='+str(intermediate)+os.sep,
++   '/p:ForceImportBeforeCppTargets='+str(ROOT/'cmake/host-sodium.targets'),'/p:VoidHostStrict='+str(a.profile=='strict').lower()]
++  project=sodium/'builds/msvc/vs2022/libsodium/libsodium.vcxproj'
++  evaluated=['LLVMToolsVersion','LLVMInstallDir','CLToolPath','CLToolExe','LinkToolPath','LinkToolExe','LibToolPath','LibToolExe',
++   'WindowsTargetPlatformVersion','WindowsSdkDir','VCToolsInstallDir','VCToolsVersion','IncludePath','LibraryPath']
++  run([msbuild,project,*properties,'-getProperty:'+','.join(evaluated)],'sodium-properties')
++  actual=json.loads((evidence/'sodium-properties.log').read_text(encoding='utf-8-sig'))['Properties']
++  expected={'LLVMToolsVersion':selected['LLVMToolsVersion'],'LLVMInstallDir':selected['sdk']+os.sep,
++   'CLToolPath':str(cc.parent)+os.sep,'CLToolExe':'clang-cl.exe','LinkToolPath':str(cc.parent)+os.sep,
++   'LinkToolExe':'lld-link.exe','LibToolPath':str(cc.parent)+os.sep,'LibToolExe':'llvm-lib.exe'}
++  if any(actual.get(key)!=value for key,value in expected.items()):raise SystemExit('Evaluated MSBuild toolchain mismatch: '+repr(actual))
++  sdk=pathlib.Path(actual.get('WindowsSdkDir',''));sdk_version=actual.get('WindowsTargetPlatformVersion','')
++  vc=pathlib.Path(actual.get('VCToolsInstallDir',''))
++  if not sdk.is_absolute() or not vc.is_absolute() or not sdk_version or not (sdk/'Include'/sdk_version/'um/Windows.h').is_file() or not (sdk/'Lib'/sdk_version/'um/x64/kernel32.lib').is_file() or not (vc/'include/vcruntime.h').is_file() or not (vc/'lib/x64/libcmt.lib').is_file():
++   raise SystemExit('Evaluated native Windows SDK/VC headers and libraries are incomplete: '+repr(actual))
++  report['msbuild_properties']=actual
++  run([msbuild,project,*properties,'-preprocess:'+str(evidence/'sodium-evaluated.xml')],'sodium-preprocess')
++  run([msbuild,project,*properties,'/t:Rebuild','/m:'+str(a.jobs),'/v:normal','/bl:'+str(evidence/'sodium-build.binlog')],'sodium-build')
++  run([cc.parent/'llvm-readobj.exe','--coff-directives',output/'libsodium.lib'],'sodium-static-abi')
++  verify_static_crt((evidence/'sodium-static-abi.log').read_text())
+   (prefix/'lib').mkdir(parents=True,exist_ok=True);shutil.copy2(output/'libsodium.lib',prefix/'lib/libsodium.lib')
+   shutil.copytree(sodium/'src/libsodium/include',prefix/'include',dirs_exist_ok=True)
+   zlib=http/'lib'/('zs.lib' if a.profile=='Release' else 'zsd.lib')
+diff --git a/tools/verify_discovery_engines.py b/tools/verify_discovery_engines.py
+index b909817b..89b43899 100644
+--- a/tools/verify_discovery_engines.py
++++ b/tools/verify_discovery_engines.py
+@@ -1,6 +1,10 @@
+ """Sprint 1 fixtures through the existing CLI, native engines and Debug cache."""
++import sys
++from pathlib import Path
++sys.path.insert(0, str(Path(__file__).resolve().parent / "ci"))
++from llvm_sdk import pinned_cxx
+ import argparse,json,os,pathlib,subprocess,tempfile
+-p=argparse.ArgumentParser();p.add_argument('build');p.add_argument('--compiler',default='clang++-19');p.add_argument('--output',required=True);a=p.parse_args();build=pathlib.Path(a.build).resolve()
++p=argparse.ArgumentParser();p.add_argument('build');p.add_argument('--compiler',default=None);p.add_argument('--output',required=True);a=p.parse_args();a.compiler=pinned_cxx(a.compiler);build=pathlib.Path(a.build).resolve()
+ with tempfile.TemporaryDirectory(prefix='VOID nested engine fixtures ') as d:
+     root=pathlib.Path(d);project=root/'project';standard=root/'standard'
+     (project/'math').mkdir(parents=True);(standard/'math').mkdir(parents=True)
+diff --git a/tools/verify_host_deps.py b/tools/verify_host_deps.py
+index 11bfc176..a3bb09ff 100644
+--- a/tools/verify_host_deps.py
++++ b/tools/verify_host_deps.py
+@@ -52,7 +52,7 @@ def verify_prefix(prefix,profile,system,architecture):
+   archive=ROOT/'.toolchains/host/downloads'/pin['url'].rsplit('/',1)[-1]
+   if sha(archive)!=pin['sha256']:raise ValueError('provider corresponding source mismatch: '+name)
+  if system!='Linux':
+-  required_recipes={'tools/setup_host_deps.py','tools/setup_host_deps_native.py','tools/verify_host_deps.py','cmake/host-sodium.targets'}
++  required_recipes={'tools/setup_host_deps.py','tools/setup_host_deps_native.py','tools/verify_host_deps.py','cmake/host-sodium.targets','tools/ci/llvm_sdk.py'}
+   if receipt.get('schema')!=2 or set(receipt.get('recipe_sha256',{}))!=required_recipes:raise ValueError('native provider recipe inventory missing')
+   disabled={'LZMA','ZSTD','BZip2','OPENSSL','LIBB2','LIBXML2','EXPAT','ICONV'}|({'CNG'} if system=='Windows' else set())
+   if set(receipt.get('disabled_features',[]))!=disabled:raise ValueError('native provider feature inventory mismatch')
+diff --git a/tools/verify_website_examples.py b/tools/verify_website_examples.py
+index 964fb99a..9327bbc3 100644
+--- a/tools/verify_website_examples.py
++++ b/tools/verify_website_examples.py
+@@ -1,6 +1,10 @@
+ """Verify the existing 15 gallery contracts with the existing CLI/async adapters."""
++import sys
++from pathlib import Path
++sys.path.insert(0, str(Path(__file__).resolve().parent / "ci"))
++from llvm_sdk import pinned_cxx
+ import argparse,html.parser,json,pathlib,re,subprocess,tempfile
+-p=argparse.ArgumentParser();p.add_argument('build');p.add_argument('--compiler',default='clang++-19');p.add_argument('--output',required=True);a=p.parse_args()
++p=argparse.ArgumentParser();p.add_argument('build');p.add_argument('--compiler',default=None);p.add_argument('--output',required=True);a=p.parse_args();a.compiler=pinned_cxx(a.compiler)
+ repo=pathlib.Path(__file__).resolve().parents[1];build=pathlib.Path(a.build).resolve()
+ class Gallery(html.parser.HTMLParser):
+     cases=[]

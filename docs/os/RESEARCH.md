@@ -1,3 +1,7 @@
+> **Historical research/plan.** Earlier toolchain recipes and activation
+> gates below are superseded by [LLVM/Clang/LLD 23.1.4](../SOURCE_COMPILER.md#active-toolchain) and subsequent
+> implementation records. Original findings and measurements retain their scope.
+
 # OS module: source audit and platform research
 
 27 October 2026. Baseline **`0d014e851851203e30d3b376ca99606a67d36a7a`**.

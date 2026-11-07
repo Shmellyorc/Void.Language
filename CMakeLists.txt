@@ -254,6 +254,8 @@ set(cache_identity_inputs "$<TARGET_OBJECTS:voidc_objects>;$<TARGET_FILE:void_ll
 set(cache_identity_deps void_llvm void_core void_runtime void_native_fixture "$<TARGET_OBJECTS:voidc_objects>")
 set(host_identity_inputs ${VOID_HOST_LINK_FILES}
   "${PROJECT_SOURCE_DIR}/third_party/host-versions.json"
+  "${PROJECT_SOURCE_DIR}/third_party/host-patches/libsodium-1.0.22/PROVENANCE.json"
+  "${PROJECT_SOURCE_DIR}/third_party/host-patches/libsodium-1.0.22/asan-alignment.patch"
   "${PROJECT_SOURCE_DIR}/cmake/HostDependencies.cmake"
   "${PROJECT_SOURCE_DIR}/cmake/NativeBuild.cmake"
   "${PROJECT_SOURCE_DIR}/tools/setup_host_deps.py"

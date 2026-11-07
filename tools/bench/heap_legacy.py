@@ -6,6 +6,9 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "ci"))
+from llvm_sdk import pinned_cxx
 import platform
 import statistics
 import subprocess
@@ -33,13 +36,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--parent', default='3c69f66')
     parser.add_argument('--stage2b', default='cb77d62')
-    parser.add_argument('--compiler', default='/usr/bin/clang++-19')
+    parser.add_argument('--compiler', default=None)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--objects', type=int, default=50000)
     parser.add_argument('--samples', type=int, default=7)
     parser.add_argument('--label', default='working')
     parser.add_argument('--cpu', type=int, help='pin builds and probes to this allowed logical CPU (Linux)')
     args = parser.parse_args()
+    args.compiler = pinned_cxx(args.compiler)
     if args.cpu is not None:
         os.sched_setaffinity(0, {args.cpu})
     output = args.output.resolve();output.mkdir(parents=True, exist_ok=True)

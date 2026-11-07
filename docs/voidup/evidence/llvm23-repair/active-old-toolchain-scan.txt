@@ -1,0 +1,2 @@
+tests/log/summarize_benchmarks.py:40:28 October 2026, local Linux x86-64 Release, pinned LLVM/Clang 19.1.7.
+tests/stage8/local_libraries.py:47:        # LLVM 19 lld treats '%' in output-directory templates specially. Keep

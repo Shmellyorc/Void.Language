@@ -1,0 +1,13 @@
+diff --git a/tests/host_capabilities/portable.cpp b/tests/host_capabilities/portable.cpp
+index ffffd5c4..fa6fdc4c 100644
+--- a/tests/host_capabilities/portable.cpp
++++ b/tests/host_capabilities/portable.cpp
+@@ -99,7 +99,7 @@ int portable_main(int argc,char** argv) {
+   auto executable8=executable.u8string(),cwd8=work.u8string();
+   q=request(spawn);q.texts={std::string(executable8.begin(),executable8.end()),std::string(cwd8.begin(),cwd8.end())};q.arrays={{"--exit"},{"VOID_CHILD=owned"}};
+   r=process_execute(q);check(!r.kind && q.acquired,"explicit child launch");auto process=q.acquired;
+-  q=request(wait);q.objects={process};r=process_execute(q);check(!r.kind && r.number==23 && !r.flag,"child exact status");r=process_execute(q);check(!r.kind && r.number==23,"repeat wait");check(!process->close(),"child cleanup");
++  q=request(vd::host::wait);q.objects={process};r=process_execute(q);check(!r.kind && r.number==23 && !r.flag,"child exact status");r=process_execute(q);check(!r.kind && r.number==23,"repeat wait");check(!process->close(),"child cleanup");
+   q=request(spawn);q.texts={"relative",std::string(cwd8.begin(),cwd8.end())};q.arrays={{},{}};r=process_execute(q);check(r.kind!=0,"reject relative executable");
+   auto arguments=vd::checked_application_arguments({"","two words","\"quote\"","tail\\","雪😀"});check(!arguments.error && arguments.values.size()==5,"owned Unicode arguments");
+   check(vd::checked_application_arguments({std::string("a\0b",3)}).error!=0,"reject embedded NUL");

@@ -9,8 +9,10 @@ Wrench review remains pending. Public policies are approved
 in [DECISIONS.md](DECISIONS.md); hosted CI remains deferred to Stage 8 end.
 
 
-Stage 4 extends the production frontend, typed IR, shared LLVM 19.1.7 JIT/AOT
-lowerer and coordinated Runtime. Properties and callable structs remain as
+Historical Stage 4 used LLVM 19.1.7 with the production frontend, typed IR,
+shared JIT/AOT lowerer and coordinated Runtime. Current operations use
+[LLVM/Clang/LLD 23.1.4 exclusively](SOURCE_COMPILER.md#active-toolchain).
+Properties and callable structs remain as
 specified in [PROPERTIES.md](PROPERTIES.md). **Stage 4 is hosted-verified and LOCKED** at `483e67e407b65674bdc82d44767f29bd83d73ae8`, [CI #68](https://github.com/Shmellyorc/Void.Language/actions/runs/39174408997): seven successful configurations, 80/80 suites each (560/560 total).
 Exact local validation and remaining boundaries are recorded in [WORK_LOG.md](WORK_LOG.md).
 

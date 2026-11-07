@@ -1,3 +1,7 @@
+> **Historical research/plan.** Earlier toolchain recipes and activation
+> gates below are superseded by [LLVM/Clang/LLD 23.1.4](../SOURCE_COMPILER.md#active-toolchain) and subsequent
+> implementation records. Original findings and measurements retain their scope.
+
 > Implementation authorization, 26 October 2026: Boss approved all three design
 > bundles and the complete sprint. Golden Wrench additionally requires exact
 > numeric-primitive-only generic specialization, including rejection of nominal

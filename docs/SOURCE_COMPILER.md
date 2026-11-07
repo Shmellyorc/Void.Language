@@ -53,6 +53,21 @@ Phase 17 adds custom managed initialization with checked construction views,
 required-reference readiness, safe helper contexts and complete-object commit; see
 [MANAGED_INITIALIZATION.md](MANAGED_INITIALIZATION.md).
 
+## Active toolchain
+
+VOID.Language uses **LLVM/Clang/LLD 23.1.4 exclusively**. Use the complete SDK
+from the [existing verified archive recipe](../tools/ci/llvm_sdk.py); no ambient
+LLVM selection or older-version fallback is permitted. The platform prerequisites
+and commands below remain authoritative. Historical results retain their actual
+LLVM versions and cannot serve as current build recipes.
+
+For Windows host providers, derive MSBuild's `LLVMToolsVersion` from the pinned
+`clang-cl.exe /clang:-print-resource-dir` result. Its directory leaf can differ
+from the full release version. Pass the verified `LLVMInstallDir` and explicit
+compiler/linker/librarian paths together; preserve `/MT` for Debug and Release.
+Missing or mismatched components fail before compilation. [The integration record](voidup/INTEGRATION_REPORT.md#llvm-2314-ci-repair)
+separates the source correction from unverified native execution.
+
 ## Building the compiler
 
 VOID requires the complete **LLVM/Clang/LLD 23.1.4** development SDK: headers,

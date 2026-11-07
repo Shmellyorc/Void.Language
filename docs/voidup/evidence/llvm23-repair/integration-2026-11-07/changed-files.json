@@ -1,0 +1,28 @@
+{
+  "scope": "Delta from accepted isolated-candidate tree; earlier unrelated/local revisions retained",
+  "changed_or_added": {
+    "CMakeLists.txt": "7113c630cba9bee9bff8abea3b9042c8c8606c0be9b02a75b77a6edd5ae7744e",
+    "cmake/InstallLicenses.cmake": "909beaf5cc1cbd2e76c77b41c06737a4a6097643c1ffd1e8ad8e19c146321589",
+    "docs/ADVANCED_LANGUAGE.md": "ecbd2b3917d7915b17faaf9fe2f04c284ac2d44515af022387432738f1e36f73",
+    "docs/WRENCH_CLANKER.md": "044df329162df38e7bcf1fb72bb6b79d1d18f64743cc1ef7c3b21c224e6f28d4",
+    "docs/release/NOTICE_INVENTORY.json": "a123f55146b5396016a5549c944efaadb562b12903a2744183b433f9df5a01cf",
+    "docs/release/REDISTRIBUTION_NOTICES.md": "63a9a55a90f6021abd0e8948f16a5481a1e0ce8486fedd043a3ac3b014f1d39c",
+    "docs/voidup/INTEGRATION_REPORT.md": "7f2644ea8dfccbd43ece6b9148ac250b878246752c06823acded158d1293ce83",
+    "tests/host_capabilities/dependencies.py": "90b19bb50a05395761762b635e625b110a1b584975c4bdc9beb9160389568503",
+    "tests/host_capabilities/install.py": "096245ad700bb569baa60d9a1381a7260a4bff11abb7e996f8ad167a605cb7f9",
+    "third_party/host-patches/libsodium-1.0.22/PROVENANCE.json": "4841bfe7f283b250bb2b6fa1872b602416bb91a0e67c5f6179742d8c4bc0c0c8",
+    "third_party/host-patches/libsodium-1.0.22/asan-alignment.patch": "f0de9004b8129626e14750437f51eb9524f030149607b50bb75ce0b6c998af74",
+    "tools/setup_host_deps.py": "f0337524e09c5d407c6106ebccfb1622a22a858beb0da4f149fad75e7af36b95",
+    "tools/setup_host_deps_native.py": "ebcda35c1a051ae05e0ea2daf4580ad7bc3726325621f70f4e9e35b81994ec6d",
+    "tools/verify_host_deps.py": "f14ab068ed336b275e61fb70fcbfdbd98f53a5f666f74647ce5d339f64d6a94c"
+  },
+  "new_paths": [
+    "third_party/host-patches/libsodium-1.0.22/PROVENANCE.json",
+    "third_party/host-patches/libsodium-1.0.22/asan-alignment.patch"
+  ],
+  "prior_windows_selector_paths_retained": [
+    "cmake/host-sodium.targets",
+    "tools/ci/llvm_sdk.py"
+  ],
+  "excluded": "build/, .toolchains/, compiled outputs, private signing keys; no change to compiler/Runtime production sources, HTTP recipes/transport, workflows, root README or website"
+}

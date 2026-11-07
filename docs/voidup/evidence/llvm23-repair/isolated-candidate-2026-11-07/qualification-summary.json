@@ -1,0 +1,423 @@
+{
+  "scope": "isolated candidate only; production integration not authorized",
+  "platforms": {
+    "pikaos": {
+      "total": 87,
+      "pass": 87,
+      "fail": 0,
+      "skip": 0,
+      "check_exit": 0,
+      "matching_expected_output_files": 85,
+      "unchanged_upstream_oracle_bypass_cases": [
+        "sodium_utils2",
+        "sodium_utils3"
+      ],
+      "cipher_vector_cases": {
+        "stream": {
+          "expected_exists": true,
+          "actual_exists": true,
+          "expected_sha256": "ae7167bf87acb3b66b27fd308d4d924b23d59333067ce4cdca4cb33762637452",
+          "actual_sha256": "ae7167bf87acb3b66b27fd308d4d924b23d59333067ce4cdca4cb33762637452",
+          "exact_match": true
+        },
+        "stream2": {
+          "expected_exists": true,
+          "actual_exists": true,
+          "expected_sha256": "b4a5f060a0926dc9cc6dfe37466289b4d630b75f9e3660668622f2cd456b02fe",
+          "actual_sha256": "b4a5f060a0926dc9cc6dfe37466289b4d630b75f9e3660668622f2cd456b02fe",
+          "exact_match": true
+        },
+        "stream3": {
+          "expected_exists": true,
+          "actual_exists": true,
+          "expected_sha256": "79bb8c2bc8d7d64a531f15a6d75f8791b993cc0d826155e6ee7dbd4a2c971656",
+          "actual_sha256": "79bb8c2bc8d7d64a531f15a6d75f8791b993cc0d826155e6ee7dbd4a2c971656",
+          "exact_match": true
+        },
+        "stream4": {
+          "expected_exists": true,
+          "actual_exists": true,
+          "expected_sha256": "8a58277acfb8d299445c5903486b08497296a770f324b4a7ed8e6d633f722792",
+          "actual_sha256": "8a58277acfb8d299445c5903486b08497296a770f324b4a7ed8e6d633f722792",
+          "exact_match": true
+        },
+        "box_easy2": {
+          "expected_exists": true,
+          "actual_exists": true,
+          "expected_sha256": "895e817ed48f16a93610cdc50d65bf7c7bedd5c85f2aea88d69ec41c30ada73c",
+          "actual_sha256": "895e817ed48f16a93610cdc50d65bf7c7bedd5c85f2aea88d69ec41c30ada73c",
+          "exact_match": true
+        },
+        "box_seal": {
+          "expected_exists": true,
+          "actual_exists": true,
+          "expected_sha256": "23eed69ea51943ee68301bdd6e5d773ed42dfb0ae51bb4582f9dfd0756d52fe7",
+          "actual_sha256": "23eed69ea51943ee68301bdd6e5d773ed42dfb0ae51bb4582f9dfd0756d52fe7",
+          "exact_match": true
+        },
+        "secretbox_easy": {
+          "expected_exists": true,
+          "actual_exists": true,
+          "expected_sha256": "6a447c78e7676ba492842db586d5e5dd29946dd022271b4e525c81c1e1a9a5f6",
+          "actual_sha256": "6a447c78e7676ba492842db586d5e5dd29946dd022271b4e525c81c1e1a9a5f6",
+          "exact_match": true
+        },
+        "secretbox_easy2": {
+          "expected_exists": true,
+          "actual_exists": true,
+          "expected_sha256": "aeec6cd696078c273d36ddb33500d5af1aeac51b1b65a725363f3ae5728dd8c6",
+          "actual_sha256": "aeec6cd696078c273d36ddb33500d5af1aeac51b1b65a725363f3ae5728dd8c6",
+          "exact_match": true
+        }
+      }
+    },
+    "ubuntu": {
+      "total": 87,
+      "pass": 87,
+      "fail": 0,
+      "skip": 0,
+      "check_exit": 0,
+      "matching_expected_output_files": 85,
+      "unchanged_upstream_oracle_bypass_cases": [
+        "sodium_utils2",
+        "sodium_utils3"
+      ],
+      "cipher_vector_cases": {
+        "stream": {
+          "expected_exists": true,
+          "actual_exists": true,
+          "expected_sha256": "ae7167bf87acb3b66b27fd308d4d924b23d59333067ce4cdca4cb33762637452",
+          "actual_sha256": "ae7167bf87acb3b66b27fd308d4d924b23d59333067ce4cdca4cb33762637452",
+          "exact_match": true
+        },
+        "stream2": {
+          "expected_exists": true,
+          "actual_exists": true,
+          "expected_sha256": "b4a5f060a0926dc9cc6dfe37466289b4d630b75f9e3660668622f2cd456b02fe",
+          "actual_sha256": "b4a5f060a0926dc9cc6dfe37466289b4d630b75f9e3660668622f2cd456b02fe",
+          "exact_match": true
+        },
+        "stream3": {
+          "expected_exists": true,
+          "actual_exists": true,
+          "expected_sha256": "79bb8c2bc8d7d64a531f15a6d75f8791b993cc0d826155e6ee7dbd4a2c971656",
+          "actual_sha256": "79bb8c2bc8d7d64a531f15a6d75f8791b993cc0d826155e6ee7dbd4a2c971656",
+          "exact_match": true
+        },
+        "stream4": {
+          "expected_exists": true,
+          "actual_exists": true,
+          "expected_sha256": "8a58277acfb8d299445c5903486b08497296a770f324b4a7ed8e6d633f722792",
+          "actual_sha256": "8a58277acfb8d299445c5903486b08497296a770f324b4a7ed8e6d633f722792",
+          "exact_match": true
+        },
+        "box_easy2": {
+          "expected_exists": true,
+          "actual_exists": true,
+          "expected_sha256": "895e817ed48f16a93610cdc50d65bf7c7bedd5c85f2aea88d69ec41c30ada73c",
+          "actual_sha256": "895e817ed48f16a93610cdc50d65bf7c7bedd5c85f2aea88d69ec41c30ada73c",
+          "exact_match": true
+        },
+        "box_seal": {
+          "expected_exists": true,
+          "actual_exists": true,
+          "expected_sha256": "23eed69ea51943ee68301bdd6e5d773ed42dfb0ae51bb4582f9dfd0756d52fe7",
+          "actual_sha256": "23eed69ea51943ee68301bdd6e5d773ed42dfb0ae51bb4582f9dfd0756d52fe7",
+          "exact_match": true
+        },
+        "secretbox_easy": {
+          "expected_exists": true,
+          "actual_exists": true,
+          "expected_sha256": "6a447c78e7676ba492842db586d5e5dd29946dd022271b4e525c81c1e1a9a5f6",
+          "actual_sha256": "6a447c78e7676ba492842db586d5e5dd29946dd022271b4e525c81c1e1a9a5f6",
+          "exact_match": true
+        },
+        "secretbox_easy2": {
+          "expected_exists": true,
+          "actual_exists": true,
+          "expected_sha256": "aeec6cd696078c273d36ddb33500d5af1aeac51b1b65a725363f3ae5728dd8c6",
+          "actual_sha256": "aeec6cd696078c273d36ddb33500d5af1aeac51b1b65a725363f3ae5728dd8c6",
+          "exact_match": true
+        }
+      }
+    }
+  },
+  "negative_probes": {
+    "scope": "separate supplemental fault controls; upstream 87 targets/sources/options unchanged",
+    "results": {
+      "pikaos": [
+        {
+          "label": "compile",
+          "command": [
+            "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+            "-O2",
+            "-g",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-I/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/pikaos/extract/libsodium-1.0.22/src/libsodium/include",
+            "/home/shmellyorc/Documents/Void.Language/docs/voidup/evidence/llvm23-repair/isolated-candidate-2026-11-07/negative_coverage_probe.c",
+            "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/pikaos/build/src/libsodium/.libs/libsodium.a",
+            "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+            "-o",
+            "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/pikaos/negative-coverage-probe"
+          ],
+          "status": 0
+        },
+        {
+          "label": "valid",
+          "command": [
+            "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/pikaos/negative-coverage-probe"
+          ],
+          "status": 0,
+          "expected": [
+            0
+          ],
+          "expected_outcome_observed": true
+        },
+        {
+          "label": "overflow",
+          "command": [
+            "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/pikaos/negative-coverage-probe",
+            "overflow"
+          ],
+          "status": 86,
+          "expected": [
+            86,
+            87
+          ],
+          "expected_outcome_observed": true
+        },
+        {
+          "label": "underflow",
+          "command": [
+            "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/pikaos/negative-coverage-probe",
+            "underflow"
+          ],
+          "status": 86,
+          "expected": [
+            86,
+            87
+          ],
+          "expected_outcome_observed": true
+        },
+        {
+          "label": "guard-read",
+          "command": [
+            "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/pikaos/negative-coverage-probe",
+            "guard-read"
+          ],
+          "status": 86,
+          "expected": [
+            86,
+            87
+          ],
+          "expected_outcome_observed": true
+        }
+      ],
+      "ubuntu": [
+        {
+          "label": "compile",
+          "command": [
+            "podman",
+            "exec",
+            "-w",
+            "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/build",
+            "-e",
+            "CC=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang",
+            "-e",
+            "CXX=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang++",
+            "-e",
+            "AR=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-ar",
+            "-e",
+            "RANLIB=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-ranlib",
+            "-e",
+            "LD=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/ld.lld",
+            "-e",
+            "CFLAGS=-g -O2 -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-e",
+            "LDFLAGS=-fsanitize=address,undefined --ld-path=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/ld.lld",
+            "-e",
+            "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87",
+            "-e",
+            "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86",
+            "-e",
+            "ASAN_SYMBOLIZER_PATH=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-symbolizer",
+            "voidup-portability-ubuntu",
+            "/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang",
+            "-O2",
+            "-g",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-I/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/extract/libsodium-1.0.22/src/libsodium/include",
+            "/home/shmellyorc/Documents/Void.Language/docs/voidup/evidence/llvm23-repair/isolated-candidate-2026-11-07/negative_coverage_probe.c",
+            "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/build/src/libsodium/.libs/libsodium.a",
+            "--ld-path=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/ld.lld",
+            "-o",
+            "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/negative-coverage-probe"
+          ],
+          "status": 0
+        },
+        {
+          "label": "valid",
+          "command": [
+            "podman",
+            "exec",
+            "-w",
+            "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/build",
+            "-e",
+            "CC=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang",
+            "-e",
+            "CXX=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang++",
+            "-e",
+            "AR=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-ar",
+            "-e",
+            "RANLIB=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-ranlib",
+            "-e",
+            "LD=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/ld.lld",
+            "-e",
+            "CFLAGS=-g -O2 -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-e",
+            "LDFLAGS=-fsanitize=address,undefined --ld-path=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/ld.lld",
+            "-e",
+            "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87",
+            "-e",
+            "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86",
+            "-e",
+            "ASAN_SYMBOLIZER_PATH=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-symbolizer",
+            "voidup-portability-ubuntu",
+            "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/negative-coverage-probe"
+          ],
+          "status": 0,
+          "expected": [
+            0
+          ],
+          "expected_outcome_observed": true
+        },
+        {
+          "label": "overflow",
+          "command": [
+            "podman",
+            "exec",
+            "-w",
+            "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/build",
+            "-e",
+            "CC=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang",
+            "-e",
+            "CXX=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang++",
+            "-e",
+            "AR=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-ar",
+            "-e",
+            "RANLIB=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-ranlib",
+            "-e",
+            "LD=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/ld.lld",
+            "-e",
+            "CFLAGS=-g -O2 -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-e",
+            "LDFLAGS=-fsanitize=address,undefined --ld-path=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/ld.lld",
+            "-e",
+            "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87",
+            "-e",
+            "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86",
+            "-e",
+            "ASAN_SYMBOLIZER_PATH=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-symbolizer",
+            "voidup-portability-ubuntu",
+            "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/negative-coverage-probe",
+            "overflow"
+          ],
+          "status": 86,
+          "expected": [
+            86,
+            87
+          ],
+          "expected_outcome_observed": true
+        },
+        {
+          "label": "underflow",
+          "command": [
+            "podman",
+            "exec",
+            "-w",
+            "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/build",
+            "-e",
+            "CC=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang",
+            "-e",
+            "CXX=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang++",
+            "-e",
+            "AR=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-ar",
+            "-e",
+            "RANLIB=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-ranlib",
+            "-e",
+            "LD=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/ld.lld",
+            "-e",
+            "CFLAGS=-g -O2 -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-e",
+            "LDFLAGS=-fsanitize=address,undefined --ld-path=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/ld.lld",
+            "-e",
+            "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87",
+            "-e",
+            "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86",
+            "-e",
+            "ASAN_SYMBOLIZER_PATH=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-symbolizer",
+            "voidup-portability-ubuntu",
+            "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/negative-coverage-probe",
+            "underflow"
+          ],
+          "status": 86,
+          "expected": [
+            86,
+            87
+          ],
+          "expected_outcome_observed": true
+        },
+        {
+          "label": "guard-read",
+          "command": [
+            "podman",
+            "exec",
+            "-w",
+            "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/build",
+            "-e",
+            "CC=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang",
+            "-e",
+            "CXX=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang++",
+            "-e",
+            "AR=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-ar",
+            "-e",
+            "RANLIB=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-ranlib",
+            "-e",
+            "LD=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/ld.lld",
+            "-e",
+            "CFLAGS=-g -O2 -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-e",
+            "LDFLAGS=-fsanitize=address,undefined --ld-path=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/ld.lld",
+            "-e",
+            "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87",
+            "-e",
+            "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86",
+            "-e",
+            "ASAN_SYMBOLIZER_PATH=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-symbolizer",
+            "voidup-portability-ubuntu",
+            "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/negative-coverage-probe",
+            "guard-read"
+          ],
+          "status": 86,
+          "expected": [
+            86,
+            87
+          ],
+          "expected_outcome_observed": true
+        }
+      ]
+    }
+  },
+  "upstream_output_exceptions": [
+    "sodium_utils2",
+    "sodium_utils3"
+  ],
+  "limits": [
+    "sodium_utils2/3 retain upstream ASan fault-path exclusions and _exit(0), bypassing buffered output comparison and normal exit finalization",
+    "Supplemental overflow/underflow/guard-read probes verify the relevant fatal mechanisms separately; they do not change the 87-test results",
+    "All supplemental ASan fatal controls actually exited 86 despite ASAN_OPTIONS exitcode=87 and UBSAN_OPTIONS exitcode=86; settings unchanged",
+    "No native Windows/macOS acceptance, permanent provider recipe change, pin change, production install, JIT/AOT/VOIDUP acceptance or hosted result inferred"
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "scope": "Linux SDK Clang 23.1.4 cross-target COFF C objects; no native Windows link/build acceptance",
+  "results": [
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "--target=x86_64-pc-windows-msvc",
+        "--driver-mode=cl",
+        "/MT",
+        "/c",
+        "/Fo/home/shmellyorc/Documents/Void.Language/build/llvm23-repair-checks/abi-MT.obj",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-repair-checks/abi.c"
+      ],
+      "inspection": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-readobj",
+        "--coff-directives",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-repair-checks/abi-MT.obj"
+      ],
+      "status": 0,
+      "abi_accepted": true
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "--target=x86_64-pc-windows-msvc",
+        "--driver-mode=cl",
+        "/MD",
+        "/c",
+        "/Fo/home/shmellyorc/Documents/Void.Language/build/llvm23-repair-checks/abi-MD.obj",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-repair-checks/abi.c"
+      ],
+      "inspection": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-readobj",
+        "--coff-directives",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-repair-checks/abi-MD.obj"
+      ],
+      "status": 0,
+      "abi_accepted": false
+    },
+    {
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "--target=x86_64-pc-windows-msvc",
+        "--driver-mode=cl",
+        "/MTd",
+        "/c",
+        "/Fo/home/shmellyorc/Documents/Void.Language/build/llvm23-repair-checks/abi-MTd.obj",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-repair-checks/abi.c"
+      ],
+      "inspection": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-readobj",
+        "--coff-directives",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-repair-checks/abi-MTd.obj"
+      ],
+      "status": 0,
+      "abi_accepted": false
+    }
+  ]
+}

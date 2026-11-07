@@ -8,10 +8,10 @@ leases; see ADVANCED_LANGUAGE.md. This does not add standalone value erasure or
 arbitrary source downcasts. Earlier phase-only exclusions below are historical.
 
 The owner approved IF1–IF8 in INTERFACES_PROPOSAL.md. This guide describes the
-implemented contract. Both LLVM 19.1.7 SDKs passed Debug, Release and strict sanitizer
+implemented contract. Historical Phase 21 qualification: both LLVM 19.1.7 SDKs passed Debug, Release and strict sanitizer
 configurations (55/55 each), repeated stress and 1 MiB checks. WORK_LOG.md records
 the historical exact results; the current hosted baseline is linked above.
-LLVM remains 19.1.7. The runtime is a tested foundation, not a production GC or a
+The active toolchain is LLVM/Clang/LLD 23.1.4 (see [toolchain requirements](SOURCE_COMPILER.md#active-toolchain)). The runtime is a tested foundation, not a production GC or a
 public managed FFI.
 
 ## Source contract

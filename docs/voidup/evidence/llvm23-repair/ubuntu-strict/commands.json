@@ -1,0 +1,102 @@
+[
+  {
+    "label": "compiler",
+    "command": [
+      "podman",
+      "exec",
+      "-w",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-repair-checks/ubuntu-sodium",
+      "-e",
+      "CC=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang",
+      "-e",
+      "CFLAGS=-g -O2 -fsanitize=address,undefined -fno-omit-frame-pointer",
+      "-e",
+      "LDFLAGS=-fsanitize=address,undefined",
+      "-e",
+      "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87",
+      "-e",
+      "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86",
+      "voidup-portability-ubuntu",
+      "/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang",
+      "--version"
+    ],
+    "status": 0,
+    "seconds": 0.24255874298978597
+  },
+  {
+    "label": "configure",
+    "command": [
+      "podman",
+      "exec",
+      "-w",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-repair-checks/ubuntu-sodium",
+      "-e",
+      "CC=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang",
+      "-e",
+      "CFLAGS=-g -O2 -fsanitize=address,undefined -fno-omit-frame-pointer",
+      "-e",
+      "LDFLAGS=-fsanitize=address,undefined",
+      "-e",
+      "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87",
+      "-e",
+      "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86",
+      "voidup-portability-ubuntu",
+      "/home/shmellyorc/Documents/Void.Language/.toolchains/host/sources/libsodium-1.0.22/configure",
+      "--disable-shared",
+      "--enable-static",
+      "--enable-minimal",
+      "--disable-dependency-tracking"
+    ],
+    "status": 0,
+    "seconds": 38.37860682699829
+  },
+  {
+    "label": "build",
+    "command": [
+      "podman",
+      "exec",
+      "-w",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-repair-checks/ubuntu-sodium",
+      "-e",
+      "CC=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang",
+      "-e",
+      "CFLAGS=-g -O2 -fsanitize=address,undefined -fno-omit-frame-pointer",
+      "-e",
+      "LDFLAGS=-fsanitize=address,undefined",
+      "-e",
+      "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87",
+      "-e",
+      "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86",
+      "voidup-portability-ubuntu",
+      "make",
+      "-j2"
+    ],
+    "status": 0,
+    "seconds": 30.186701212020125
+  },
+  {
+    "label": "check",
+    "command": [
+      "podman",
+      "exec",
+      "-w",
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-repair-checks/ubuntu-sodium",
+      "-e",
+      "CC=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang",
+      "-e",
+      "CFLAGS=-g -O2 -fsanitize=address,undefined -fno-omit-frame-pointer",
+      "-e",
+      "LDFLAGS=-fsanitize=address,undefined",
+      "-e",
+      "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87",
+      "-e",
+      "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86",
+      "voidup-portability-ubuntu",
+      "make",
+      "check",
+      "-j2"
+    ],
+    "status": 2,
+    "seconds": 30.729922736005392
+  }
+]

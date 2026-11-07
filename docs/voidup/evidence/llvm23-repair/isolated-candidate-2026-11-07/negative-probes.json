@@ -1,0 +1,268 @@
+{
+  "scope": "separate supplemental fault controls; upstream 87 targets/sources/options unchanged",
+  "results": {
+    "pikaos": [
+      {
+        "label": "compile",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+          "-O2",
+          "-g",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "-I/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/pikaos/extract/libsodium-1.0.22/src/libsodium/include",
+          "/home/shmellyorc/Documents/Void.Language/docs/voidup/evidence/llvm23-repair/isolated-candidate-2026-11-07/negative_coverage_probe.c",
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/pikaos/build/src/libsodium/.libs/libsodium.a",
+          "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+          "-o",
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/pikaos/negative-coverage-probe"
+        ],
+        "status": 0
+      },
+      {
+        "label": "valid",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/pikaos/negative-coverage-probe"
+        ],
+        "status": 0,
+        "expected": [
+          0
+        ],
+        "expected_outcome_observed": true
+      },
+      {
+        "label": "overflow",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/pikaos/negative-coverage-probe",
+          "overflow"
+        ],
+        "status": 86,
+        "expected": [
+          86,
+          87
+        ],
+        "expected_outcome_observed": true
+      },
+      {
+        "label": "underflow",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/pikaos/negative-coverage-probe",
+          "underflow"
+        ],
+        "status": 86,
+        "expected": [
+          86,
+          87
+        ],
+        "expected_outcome_observed": true
+      },
+      {
+        "label": "guard-read",
+        "command": [
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/pikaos/negative-coverage-probe",
+          "guard-read"
+        ],
+        "status": 86,
+        "expected": [
+          86,
+          87
+        ],
+        "expected_outcome_observed": true
+      }
+    ],
+    "ubuntu": [
+      {
+        "label": "compile",
+        "command": [
+          "podman",
+          "exec",
+          "-w",
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/build",
+          "-e",
+          "CC=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang",
+          "-e",
+          "CXX=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang++",
+          "-e",
+          "AR=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-ar",
+          "-e",
+          "RANLIB=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-ranlib",
+          "-e",
+          "LD=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/ld.lld",
+          "-e",
+          "CFLAGS=-g -O2 -fsanitize=address,undefined -fno-omit-frame-pointer",
+          "-e",
+          "LDFLAGS=-fsanitize=address,undefined --ld-path=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/ld.lld",
+          "-e",
+          "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87",
+          "-e",
+          "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86",
+          "-e",
+          "ASAN_SYMBOLIZER_PATH=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-symbolizer",
+          "voidup-portability-ubuntu",
+          "/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang",
+          "-O2",
+          "-g",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "-I/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/extract/libsodium-1.0.22/src/libsodium/include",
+          "/home/shmellyorc/Documents/Void.Language/docs/voidup/evidence/llvm23-repair/isolated-candidate-2026-11-07/negative_coverage_probe.c",
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/build/src/libsodium/.libs/libsodium.a",
+          "--ld-path=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/ld.lld",
+          "-o",
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/negative-coverage-probe"
+        ],
+        "status": 0
+      },
+      {
+        "label": "valid",
+        "command": [
+          "podman",
+          "exec",
+          "-w",
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/build",
+          "-e",
+          "CC=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang",
+          "-e",
+          "CXX=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang++",
+          "-e",
+          "AR=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-ar",
+          "-e",
+          "RANLIB=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-ranlib",
+          "-e",
+          "LD=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/ld.lld",
+          "-e",
+          "CFLAGS=-g -O2 -fsanitize=address,undefined -fno-omit-frame-pointer",
+          "-e",
+          "LDFLAGS=-fsanitize=address,undefined --ld-path=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/ld.lld",
+          "-e",
+          "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87",
+          "-e",
+          "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86",
+          "-e",
+          "ASAN_SYMBOLIZER_PATH=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-symbolizer",
+          "voidup-portability-ubuntu",
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/negative-coverage-probe"
+        ],
+        "status": 0,
+        "expected": [
+          0
+        ],
+        "expected_outcome_observed": true
+      },
+      {
+        "label": "overflow",
+        "command": [
+          "podman",
+          "exec",
+          "-w",
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/build",
+          "-e",
+          "CC=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang",
+          "-e",
+          "CXX=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang++",
+          "-e",
+          "AR=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-ar",
+          "-e",
+          "RANLIB=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-ranlib",
+          "-e",
+          "LD=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/ld.lld",
+          "-e",
+          "CFLAGS=-g -O2 -fsanitize=address,undefined -fno-omit-frame-pointer",
+          "-e",
+          "LDFLAGS=-fsanitize=address,undefined --ld-path=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/ld.lld",
+          "-e",
+          "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87",
+          "-e",
+          "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86",
+          "-e",
+          "ASAN_SYMBOLIZER_PATH=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-symbolizer",
+          "voidup-portability-ubuntu",
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/negative-coverage-probe",
+          "overflow"
+        ],
+        "status": 86,
+        "expected": [
+          86,
+          87
+        ],
+        "expected_outcome_observed": true
+      },
+      {
+        "label": "underflow",
+        "command": [
+          "podman",
+          "exec",
+          "-w",
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/build",
+          "-e",
+          "CC=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang",
+          "-e",
+          "CXX=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang++",
+          "-e",
+          "AR=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-ar",
+          "-e",
+          "RANLIB=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-ranlib",
+          "-e",
+          "LD=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/ld.lld",
+          "-e",
+          "CFLAGS=-g -O2 -fsanitize=address,undefined -fno-omit-frame-pointer",
+          "-e",
+          "LDFLAGS=-fsanitize=address,undefined --ld-path=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/ld.lld",
+          "-e",
+          "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87",
+          "-e",
+          "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86",
+          "-e",
+          "ASAN_SYMBOLIZER_PATH=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-symbolizer",
+          "voidup-portability-ubuntu",
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/negative-coverage-probe",
+          "underflow"
+        ],
+        "status": 86,
+        "expected": [
+          86,
+          87
+        ],
+        "expected_outcome_observed": true
+      },
+      {
+        "label": "guard-read",
+        "command": [
+          "podman",
+          "exec",
+          "-w",
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/build",
+          "-e",
+          "CC=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang",
+          "-e",
+          "CXX=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/clang++",
+          "-e",
+          "AR=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-ar",
+          "-e",
+          "RANLIB=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-ranlib",
+          "-e",
+          "LD=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/ld.lld",
+          "-e",
+          "CFLAGS=-g -O2 -fsanitize=address,undefined -fno-omit-frame-pointer",
+          "-e",
+          "LDFLAGS=-fsanitize=address,undefined --ld-path=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/ld.lld",
+          "-e",
+          "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87",
+          "-e",
+          "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86",
+          "-e",
+          "ASAN_SYMBOLIZER_PATH=/home/shmellyorc/Documents/Void.Language/build/voidup-ubuntu-source/.toolchains/llvm-23.1.4/bin/llvm-symbolizer",
+          "voidup-portability-ubuntu",
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-isolated-candidate-2026-11-07/ubuntu/negative-coverage-probe",
+          "guard-read"
+        ],
+        "status": 86,
+        "expected": [
+          86,
+          87
+        ],
+        "expected_outcome_observed": true
+      }
+    ]
+  }
+}

@@ -1,6 +1,10 @@
 """Sprint 1 fixtures through the existing CLI, native engines and Debug cache."""
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent / "ci"))
+from llvm_sdk import pinned_cxx
 import argparse,json,os,pathlib,subprocess,tempfile
-p=argparse.ArgumentParser();p.add_argument('build');p.add_argument('--compiler',default='clang++-19');p.add_argument('--output',required=True);a=p.parse_args();build=pathlib.Path(a.build).resolve()
+p=argparse.ArgumentParser();p.add_argument('build');p.add_argument('--compiler',default=None);p.add_argument('--output',required=True);a=p.parse_args();a.compiler=pinned_cxx(a.compiler);build=pathlib.Path(a.build).resolve()
 with tempfile.TemporaryDirectory(prefix='VOID nested engine fixtures ') as d:
     root=pathlib.Path(d);project=root/'project';standard=root/'standard'
     (project/'math').mkdir(parents=True);(standard/'math').mkdir(parents=True)

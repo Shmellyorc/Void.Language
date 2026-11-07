@@ -1,3 +1,7 @@
+> **Historical experiment report, 24 October 2026.** The LLVM 19 pins and
+> stage gates below record that experiment only. The selected workflow now uses
+> [LLVM/Clang/LLD 23.1.4 exclusively](SOURCE_COMPILER.md#active-toolchain); do not follow the old pins.
+
 # CI ThinLTO link experiment — performance evidence and acceptance boundary
 
 **Review date:** 24 October 2026 (UTC).  

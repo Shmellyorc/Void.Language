@@ -230,7 +230,7 @@ support need investigation; this plan does not silently change current settings,
 trust, explicit-entry/root or synchronization contracts.
 
 Measure useful compiler/server/editor performance and setup friction, then repair
-demonstrated bottlenecks. Preserve KISS/DRY and LLVM 19.1.7; do not invent speculative
+demonstrated bottlenecks. Preserve KISS/DRY and LLVM 23.1.4; do not invent speculative
 optimization frameworks, native packages, public FFI, new syntax or automatic
 native hot reload. Research real source and official editor/client documentation
 for architectural or compatibility questions, then use focused development checks
@@ -247,13 +247,15 @@ locked npm dependencies. End users do not need Node/npm separately to install th
 VSIX. The editor extension does not change native CMake requirements or make the
 compiler depend on Node.js.
 
-Build `voidls` separately with complete LLVM/Clang/LLD **19.1.7**. For example:
+Prepare the verified SDK and provider prefixes using the [build guide](SOURCE_COMPILER.md#building-the-compiler).
+Build `voidls` separately with complete LLVM/Clang/LLD **23.1.4**. For example:
 
 ```sh
 cmake -S . -B build/editor -DCMAKE_BUILD_TYPE=Debug \
-  -DLLVM_DIR=/usr/lib/llvm-19/lib/cmake/llvm \
-  -DCMAKE_C_COMPILER=clang-19 -DCMAKE_CXX_COMPILER=clang++-19 \
-  -DVOID_LINKER=/usr/lib/llvm-19/bin/ld.lld
+  -DLLVM_DIR="$PWD/.toolchains/llvm-23.1.4/lib/cmake/llvm" \
+  -DCMAKE_C_COMPILER="$PWD/.toolchains/llvm-23.1.4/bin/clang" \
+  -DCMAKE_CXX_COMPILER="$PWD/.toolchains/llvm-23.1.4/bin/clang++" \
+  -DVOID_LINKER="$PWD/.toolchains/llvm-23.1.4/bin/ld.lld"
 cmake --build build/editor --target voidls -j2
 ```
 

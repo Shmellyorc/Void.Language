@@ -1,3 +1,7 @@
+> **Historical plan/record.** Its dated activation gates and earlier toolchain
+> instructions are superseded. Current operations require [LLVM/Clang/LLD 23.1.4](../SOURCE_COMPILER.md#active-toolchain);
+> original decisions, results and failures below retain their recorded scope.
+
 # Compiler stabilization: ordered engineering roadmap
 
 **STATUS: COMPILER STABILIZATION COMPLETED / STANDARD-LIBRARY DEVELOPMENT HOLD LIFTED BY BOSS.**

@@ -313,8 +313,8 @@ has fixed unary/binary arity and returns that same type. Its kinds are:
 - Identity/type gate: no machine operation; useful for source-only float functions
   because the language has no public floating-point generic constraint.
 - floor, sqrt, sin, cos, tan, asin, acos, atan, pow, exp, exp2, log, log2:
-  select the existing LLVM **19.1.7** intrinsic of matching precision.
-- atan2: select the fixed standard C symbol atan2f or atan2; LLVM 19.1.7 has no
+  select the existing LLVM **23.1.4** intrinsic of matching precision.
+- atan2: select the fixed standard C symbol atan2f or atan2; LLVM 23.1.4 has no
   atan2 intrinsic in this family.
 
 Use private calls such as `_math_float<t>(value)` and `_math_sin<t>(value)` inside

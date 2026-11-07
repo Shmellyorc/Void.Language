@@ -172,8 +172,7 @@ argument/implicit-child/body failures. For main.void, input 10 returns 166:
 build/ci-debug/voidc check examples/initialization/main.void
 build/ci-debug/voidc run examples/initialization/main.void 10 --no-opt
 build/ci-debug/voidc run examples/initialization/main.void 10
-build/ci-debug/voidc emit examples/initialization/main.void -o build/initialization.o
-/usr/lib/llvm-19/bin/clang build/initialization.o --ld-path=/usr/lib/llvm-19/bin/ld.lld -o build/initialization
+build/ci-debug/voidc build examples/initialization/main.void -o build/initialization
 build/initialization 10
 ```
 

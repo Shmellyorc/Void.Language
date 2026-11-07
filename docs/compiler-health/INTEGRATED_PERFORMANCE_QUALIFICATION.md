@@ -279,7 +279,7 @@ The [indexed development-strategy section](../DEVELOPMENT_STRATEGY.md#future-opt
 and [detailed preexisting roadmap](../VOIDC_AUTOMATIC_SIMD_ROADMAP.md) record:
 **automatic SIMD wherever safe and profitable; ordinary scalar fallback
 otherwise; no new source keywords or mandatory SIMD array types.** The
-[documentation index](../README.md#integrated-performance-qualification-and-future-simd--5-november-2026)
+[documentation index](https://github.com/Shmellyorc/Void.Language/blob/82e97f541fab7eec760083383569ab9c9ce8f355/docs/README.md#integrated-performance-qualification-and-aot-only-simd--6-november-2026)
 links both. The future work covers actual LLVM/Clang/LLD 23.1.4, current O2
 PassBuilder without TargetMachine and documented disabled SLP, loop/SLP and
 target codegen, ordinary numeric variables/arrays/loops, all checked semantics,

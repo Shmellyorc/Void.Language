@@ -1,0 +1,18 @@
+[
+  {
+    "pid": 1923693,
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/shmellyorc/Documents/Void.Language/build/voidup-backport-integration/strict",
+      "-R",
+      "^(host_capabilities.*|voidup_.*)$",
+      "--output-on-failure"
+    ],
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+      "ASAN_SYMBOLIZER_PATH": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-symbolizer"
+    }
+  }
+]

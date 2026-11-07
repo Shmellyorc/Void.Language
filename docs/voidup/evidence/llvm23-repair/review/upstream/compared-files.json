@@ -1,0 +1,210 @@
+[
+  {
+    "branch": "master",
+    "commit": "c5717543ad05c70dcc97df7ea08b497d5afc2c86",
+    "path": "ChangeLog",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/c5717543ad05c70dcc97df7ea08b497d5afc2c86/ChangeLog",
+    "sha256": "7c8c468547f6cfa8d8a8f98c6246b144146ed4b0a109541545c36980402aca03",
+    "identical_to_pin": false
+  },
+  {
+    "branch": "master",
+    "commit": "c5717543ad05c70dcc97df7ea08b497d5afc2c86",
+    "path": "src/libsodium/crypto_stream/salsa20/xmm6int/u1.h",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/c5717543ad05c70dcc97df7ea08b497d5afc2c86/src/libsodium/crypto_stream/salsa20/xmm6int/u1.h",
+    "sha256": "bdf1b537c551e336439f3f312217a76b1821af1c59f5a3e8e189d95cf4f3235d",
+    "identical_to_pin": false
+  },
+  {
+    "branch": "master",
+    "commit": "c5717543ad05c70dcc97df7ea08b497d5afc2c86",
+    "path": "src/libsodium/crypto_stream/salsa20/xmm6int/u4.h",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/c5717543ad05c70dcc97df7ea08b497d5afc2c86/src/libsodium/crypto_stream/salsa20/xmm6int/u4.h",
+    "sha256": "387eb23dc5a60296f07b3e445859a6f26c5fb706ca1540dec3450f5cb42a638a",
+    "identical_to_pin": false
+  },
+  {
+    "branch": "master",
+    "commit": "c5717543ad05c70dcc97df7ea08b497d5afc2c86",
+    "path": "src/libsodium/include/sodium/crypto_aead_aegis128l.h",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/c5717543ad05c70dcc97df7ea08b497d5afc2c86/src/libsodium/include/sodium/crypto_aead_aegis128l.h",
+    "sha256": "ded06ba339dfb2e2a5442f8838b7dd1428879828b88c79f20b72c1b3f85782a2",
+    "identical_to_pin": true
+  },
+  {
+    "branch": "master",
+    "commit": "c5717543ad05c70dcc97df7ea08b497d5afc2c86",
+    "path": "src/libsodium/include/sodium/utils.h",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/c5717543ad05c70dcc97df7ea08b497d5afc2c86/src/libsodium/include/sodium/utils.h",
+    "sha256": "c9a2e873da8d4c5fdfd004a821a2ec0550160d8b0bebd67517d53fe29d7269a8",
+    "identical_to_pin": true
+  },
+  {
+    "branch": "master",
+    "commit": "c5717543ad05c70dcc97df7ea08b497d5afc2c86",
+    "path": "src/libsodium/sodium/utils.c",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/c5717543ad05c70dcc97df7ea08b497d5afc2c86/src/libsodium/sodium/utils.c",
+    "sha256": "80803bb1686a87c233de8e7b3f5f05c225e0af497b5507df72bba5ab8c5c56ca",
+    "identical_to_pin": false
+  },
+  {
+    "branch": "master",
+    "commit": "c5717543ad05c70dcc97df7ea08b497d5afc2c86",
+    "path": "test/default/aead_aegis128l.c",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/c5717543ad05c70dcc97df7ea08b497d5afc2c86/test/default/aead_aegis128l.c",
+    "sha256": "9ecd11ac31dbb30d28b31646aca9a2be80b96fdc9d346faa4b6757557a071634",
+    "identical_to_pin": true
+  },
+  {
+    "branch": "master",
+    "commit": "c5717543ad05c70dcc97df7ea08b497d5afc2c86",
+    "path": "test/default/cmptest.h",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/c5717543ad05c70dcc97df7ea08b497d5afc2c86/test/default/cmptest.h",
+    "sha256": "981d08ebce0d729f68cab3e8621848e7160a14dc5eead7e9700e44b7904554c7",
+    "identical_to_pin": true
+  },
+  {
+    "branch": "master",
+    "commit": "c5717543ad05c70dcc97df7ea08b497d5afc2c86",
+    "path": "test/default/codecs.c",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/c5717543ad05c70dcc97df7ea08b497d5afc2c86/test/default/codecs.c",
+    "sha256": "6dd71e892c044b538b879eb786b99dbac8014f6feafaf5b20fde3b6bee513b86",
+    "identical_to_pin": true
+  },
+  {
+    "branch": "master",
+    "commit": "c5717543ad05c70dcc97df7ea08b497d5afc2c86",
+    "path": "test/default/generichash.c",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/c5717543ad05c70dcc97df7ea08b497d5afc2c86/test/default/generichash.c",
+    "sha256": "e706e0a6147346436a1a3bec268762aaeea1983baad003035ef88a40b134efb8",
+    "identical_to_pin": true
+  },
+  {
+    "branch": "master",
+    "commit": "c5717543ad05c70dcc97df7ea08b497d5afc2c86",
+    "path": "test/default/generichash3.c",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/c5717543ad05c70dcc97df7ea08b497d5afc2c86/test/default/generichash3.c",
+    "sha256": "6ffd349d53ddb8b103281a749c858cca8d494622b7ce6d516567184b31ffde8b",
+    "identical_to_pin": true
+  },
+  {
+    "branch": "master",
+    "commit": "c5717543ad05c70dcc97df7ea08b497d5afc2c86",
+    "path": "test/default/misuse.c",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/c5717543ad05c70dcc97df7ea08b497d5afc2c86/test/default/misuse.c",
+    "sha256": "78c0c3758e37dfde9cdfab6eee01cfd07b898088cf22ab1e0d2cae740c9d8d7d",
+    "identical_to_pin": true
+  },
+  {
+    "branch": "master",
+    "commit": "c5717543ad05c70dcc97df7ea08b497d5afc2c86",
+    "path": "test/default/pwhash_argon2id.c",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/c5717543ad05c70dcc97df7ea08b497d5afc2c86/test/default/pwhash_argon2id.c",
+    "sha256": "102145b6b08e33e6ad77609ee095f294665f1f34467b0808e7333823d512d17e",
+    "identical_to_pin": true
+  },
+  {
+    "branch": "stable",
+    "commit": "e85990784cacc03a5909f73114e4ae378a342772",
+    "path": "ChangeLog",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/e85990784cacc03a5909f73114e4ae378a342772/ChangeLog",
+    "sha256": "7c8c468547f6cfa8d8a8f98c6246b144146ed4b0a109541545c36980402aca03",
+    "identical_to_pin": false
+  },
+  {
+    "branch": "stable",
+    "commit": "e85990784cacc03a5909f73114e4ae378a342772",
+    "path": "src/libsodium/crypto_stream/salsa20/xmm6int/u1.h",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/e85990784cacc03a5909f73114e4ae378a342772/src/libsodium/crypto_stream/salsa20/xmm6int/u1.h",
+    "sha256": "f35de0b5967c7f1ce03700f4f2d23783b34441216036aa745b9707305d4e6eae",
+    "identical_to_pin": true
+  },
+  {
+    "branch": "stable",
+    "commit": "e85990784cacc03a5909f73114e4ae378a342772",
+    "path": "src/libsodium/crypto_stream/salsa20/xmm6int/u4.h",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/e85990784cacc03a5909f73114e4ae378a342772/src/libsodium/crypto_stream/salsa20/xmm6int/u4.h",
+    "sha256": "3bf51e537e7fa8ffe3db2dedf87c990ae7d6e90cfc1aa1ca666807ba7a65493b",
+    "identical_to_pin": true
+  },
+  {
+    "branch": "stable",
+    "commit": "e85990784cacc03a5909f73114e4ae378a342772",
+    "path": "src/libsodium/include/sodium/crypto_aead_aegis128l.h",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/e85990784cacc03a5909f73114e4ae378a342772/src/libsodium/include/sodium/crypto_aead_aegis128l.h",
+    "sha256": "ded06ba339dfb2e2a5442f8838b7dd1428879828b88c79f20b72c1b3f85782a2",
+    "identical_to_pin": true
+  },
+  {
+    "branch": "stable",
+    "commit": "e85990784cacc03a5909f73114e4ae378a342772",
+    "path": "src/libsodium/include/sodium/utils.h",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/e85990784cacc03a5909f73114e4ae378a342772/src/libsodium/include/sodium/utils.h",
+    "sha256": "c9a2e873da8d4c5fdfd004a821a2ec0550160d8b0bebd67517d53fe29d7269a8",
+    "identical_to_pin": true
+  },
+  {
+    "branch": "stable",
+    "commit": "e85990784cacc03a5909f73114e4ae378a342772",
+    "path": "src/libsodium/sodium/utils.c",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/e85990784cacc03a5909f73114e4ae378a342772/src/libsodium/sodium/utils.c",
+    "sha256": "ce8d001eeb0aa32207399f8f7fc9cc101238f01000957cb0b9adfd246c6c3efa",
+    "identical_to_pin": false
+  },
+  {
+    "branch": "stable",
+    "commit": "e85990784cacc03a5909f73114e4ae378a342772",
+    "path": "test/default/aead_aegis128l.c",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/e85990784cacc03a5909f73114e4ae378a342772/test/default/aead_aegis128l.c",
+    "sha256": "9ecd11ac31dbb30d28b31646aca9a2be80b96fdc9d346faa4b6757557a071634",
+    "identical_to_pin": true
+  },
+  {
+    "branch": "stable",
+    "commit": "e85990784cacc03a5909f73114e4ae378a342772",
+    "path": "test/default/cmptest.h",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/e85990784cacc03a5909f73114e4ae378a342772/test/default/cmptest.h",
+    "sha256": "981d08ebce0d729f68cab3e8621848e7160a14dc5eead7e9700e44b7904554c7",
+    "identical_to_pin": true
+  },
+  {
+    "branch": "stable",
+    "commit": "e85990784cacc03a5909f73114e4ae378a342772",
+    "path": "test/default/codecs.c",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/e85990784cacc03a5909f73114e4ae378a342772/test/default/codecs.c",
+    "sha256": "6dd71e892c044b538b879eb786b99dbac8014f6feafaf5b20fde3b6bee513b86",
+    "identical_to_pin": true
+  },
+  {
+    "branch": "stable",
+    "commit": "e85990784cacc03a5909f73114e4ae378a342772",
+    "path": "test/default/generichash.c",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/e85990784cacc03a5909f73114e4ae378a342772/test/default/generichash.c",
+    "sha256": "e706e0a6147346436a1a3bec268762aaeea1983baad003035ef88a40b134efb8",
+    "identical_to_pin": true
+  },
+  {
+    "branch": "stable",
+    "commit": "e85990784cacc03a5909f73114e4ae378a342772",
+    "path": "test/default/generichash3.c",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/e85990784cacc03a5909f73114e4ae378a342772/test/default/generichash3.c",
+    "sha256": "6ffd349d53ddb8b103281a749c858cca8d494622b7ce6d516567184b31ffde8b",
+    "identical_to_pin": true
+  },
+  {
+    "branch": "stable",
+    "commit": "e85990784cacc03a5909f73114e4ae378a342772",
+    "path": "test/default/misuse.c",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/e85990784cacc03a5909f73114e4ae378a342772/test/default/misuse.c",
+    "sha256": "78c0c3758e37dfde9cdfab6eee01cfd07b898088cf22ab1e0d2cae740c9d8d7d",
+    "identical_to_pin": true
+  },
+  {
+    "branch": "stable",
+    "commit": "e85990784cacc03a5909f73114e4ae378a342772",
+    "path": "test/default/pwhash_argon2id.c",
+    "url": "https://raw.githubusercontent.com/jedisct1/libsodium/e85990784cacc03a5909f73114e4ae378a342772/test/default/pwhash_argon2id.c",
+    "sha256": "102145b6b08e33e6ad77609ee095f294665f1f34467b0808e7333823d512d17e",
+    "identical_to_pin": true
+  }
+]

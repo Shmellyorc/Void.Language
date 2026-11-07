@@ -2,7 +2,7 @@
 
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
-The user reports Phase 4 commit `d78b6b8`, Actions run #6, passed Linux, Windows
+Historical Phase 5 context: the user reports Phase 4 commit `d78b6b8`, Actions run #6, passed Linux, Windows
 and macOS. Phase 5 preserves that LLVM 19.1.7 foundation and all ten suite names.
 The Language Bible's section 48 examples are illustrative, not previously reserved
 IDs. The assignments below now form the implemented compiler diagnostic contract.
@@ -215,8 +215,7 @@ build/ci-debug/voidc check tests/fixtures/diagnostics/multi/main.void
 # /main.void missing import, with a related root declaration snapshot
 build/ci-debug/voidc run examples/diagnostics/corrected.void 10
 # 52
-build/ci-debug/voidc emit examples/diagnostics/corrected.void -o build/ci-debug/corrected.o
-clang-19 --ld-path=/usr/lib/llvm-19/bin/ld.lld build/ci-debug/corrected.o -o build/ci-debug/corrected
+build/ci-debug/voidc build examples/diagnostics/corrected.void -o build/ci-debug/corrected
 build/ci-debug/corrected 10
 # 52
 ```

@@ -97,8 +97,8 @@ is implied by editor refresh or richer LSP support.
 
 ## Build, start and demonstrate
 
-Build the project normally with the complete LLVM/Clang/LLD **19.1.7** development
-SDK (see README). Tests additionally require Python 3.9+; CI already installs 3.12.
+Build the project normally with the complete LLVM/Clang/LLD **23.1.4** development
+SDK (see the [toolchain requirements](SOURCE_COMPILER.md#active-toolchain)). Tests require Python 3.12+.
 
 ```sh
 cmake --build build/ci-debug -j2

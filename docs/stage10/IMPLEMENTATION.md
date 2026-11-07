@@ -764,7 +764,7 @@ Boss deferred editor observations and Step37 observations remain unchanged.
 
 **Recorded only; separately scheduled after Stage10 completeness unless Boss changes
 priority.** No new stage number; this does not replace the current collection mission.
-The permanent [development strategy](../DEVELOPMENT_STRATEGY.md#future-compiler-usability-and-optimization--boss-direction-23-october-2026)
+The permanent [development strategy](https://github.com/Shmellyorc/Void.Language/blob/82e97f541fab7eec760083383569ab9c9ce8f355/docs/DEVELOPMENT_STRATEGY.md#future-compiler-usability-and-optimization--boss-direction-23-october-2026)
 records all three approved design directions:
 
 - Automatic Debug caching for voidc run using Stage5/LLVM19.1.7/ORC and current
@@ -945,7 +945,7 @@ invalid/dirty/stale/refresh/close/reopen paths and hidden generated helpers.
 Real editor harnesses reuse the shipped VS Code, Neovim and Vim paths. Acceptance
 is in progress; final exact counts/hashes and limitations follow in the handoff.
 
-The Boss-approved [future debugging direction](../DEVELOPMENT_STRATEGY.md#future-source-debugging-and-breakpoints--boss-direction-23-october-2026)
+The Boss-approved [future debugging direction](https://github.com/Shmellyorc/Void.Language/blob/82e97f541fab7eec760083383569ab9c9ce8f355/docs/DEVELOPMENT_STRATEGY.md#future-source-debugging-and-breakpoints--boss-direction-23-october-2026)
 is recorded only: native source debugging first, then JIT generation/lease/GC/async/
 cache integration, and established DAP clients separate from voidls LSP. Actual
 breakpoint/step/value/platform acceptance is required when separately scheduled;

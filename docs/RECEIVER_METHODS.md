@@ -186,8 +186,7 @@ allocation, fallible result construction and cleanup remain future work.
 build/ci-debug/voidc check examples/receiver_methods/main.void
 build/ci-debug/voidc run examples/receiver_methods/main.void 10 --no-opt
 build/ci-debug/voidc run examples/receiver_methods/main.void 10
-build/ci-debug/voidc emit examples/receiver_methods/main.void -o build/receiver-methods.o
-/usr/lib/llvm-19/bin/clang build/receiver-methods.o --ld-path=/usr/lib/llvm-19/bin/ld.lld -o build/receiver-methods
+build/ci-debug/voidc build examples/receiver_methods/main.void -o build/receiver-methods
 build/receiver-methods 10
 ```
 

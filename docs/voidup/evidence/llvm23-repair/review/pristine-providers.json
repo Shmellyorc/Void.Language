@@ -1,0 +1,12 @@
+{
+  "libsodium": {
+    "sha256": "adbdd8f16149e81ac6078a03aca6fc03b592b89ef7b5ed83841c086191be3349",
+    "source_files": 678,
+    "pristine": true
+  },
+  "libarchive": {
+    "sha256": "a3dc0872b1b39da34dc18ef1b944f0f11ffd37425d70ae04be679279f1cf43d2",
+    "source_files": 1796,
+    "pristine": true
+  }
+}

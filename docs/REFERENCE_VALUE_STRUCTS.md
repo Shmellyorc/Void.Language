@@ -4,7 +4,7 @@ Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRA
 
 The owner approved RV1–RV7 in REFERENCE_VALUE_STRUCTS_PROPOSAL.md. This guide
 supersedes historical exclusions of managed references from source value fields.
-The existing frontend, semantic model, IR, LLVM 19.1.7 backend and coordinated
+The existing frontend, semantic model, IR, LLVM 23.1.4 backend and coordinated
 runtime implement this extension. Verification evidence belongs in WORK_LOG.md;
 local Linux results do not establish Windows/macOS acceptance.
 

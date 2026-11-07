@@ -122,7 +122,7 @@ def main():
         finally:
             # Retain native MSBuild/CMake/autoconf diagnostics even on failure.
             base = ROOT/plan['host_prefix'].replace('/prefix/', '/build/')
-            for name in ('CMakeCache.txt', 'CMakeConfigureLog.yaml', 'config.log'):
+            for name in ('CMakeCache.txt', 'CMakeConfigureLog.yaml', 'config.log', 'test-suite.log', '*.trs', '*.log'):
                 for source in base.rglob(name):
                     target=evidence/'provider-builds'/source.relative_to(base)
                     target.parent.mkdir(parents=True, exist_ok=True);shutil.copy2(source,target)

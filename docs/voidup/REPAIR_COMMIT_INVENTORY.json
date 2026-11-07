@@ -1,0 +1,858 @@
+{
+  "schema": 1,
+  "head": "9521329e7e67f4c8bb5aec38d684fde3f3c887de",
+  "scope": "Exact current repair commit, superseding obsolete COMMIT_PATHS/PENDING_PATHS lists; no force-add needed",
+  "intended_count": 159,
+  "intended_paths": [
+    ".gitignore",
+    "CMakeLists.txt",
+    "cmake/InstallLicenses.cmake",
+    "cmake/host-sodium.targets",
+    "docs/ADVANCED_LANGUAGE.md",
+    "docs/ANALYSIS_COMPATIBILITY.md",
+    "docs/ARRAYS_PROPOSAL.md",
+    "docs/ARRAY_OPERATIONS.md",
+    "docs/CI_NODE24_MAINTENANCE.md",
+    "docs/COMPOSITION_PROPOSAL.md",
+    "docs/DEVELOPMENT_STRATEGY.md",
+    "docs/DIAGNOSTICS.md",
+    "docs/DICTIONARIES.md",
+    "docs/DOCUMENTATION_HOVER_ROADMAP.md",
+    "docs/EDITOR_INTEGRATION.md",
+    "docs/FIXED_ARRAYS.md",
+    "docs/GC_RUNTIME.md",
+    "docs/GC_RUNTIME_PROPOSAL.md",
+    "docs/GENERICS.md",
+    "docs/GROWABLE_ARRAYS.md",
+    "docs/INHERITANCE_PROPOSAL.md",
+    "docs/INITIALIZATION.md",
+    "docs/INITIALIZATION_PROPOSAL.md",
+    "docs/INTERFACES.md",
+    "docs/INTERFACES_PROPOSAL.md",
+    "docs/KNOWN_ISSUES.md",
+    "docs/LANGUAGE_BIBLE.md",
+    "docs/LANGUAGE_COMPLETENESS_APPROVALS.md",
+    "docs/LANGUAGE_COMPLETENESS_AUDIT.md",
+    "docs/LANGUAGE_COMPLETENESS_ROADMAP.md",
+    "docs/LANGUAGE_SERVER.md",
+    "docs/MANAGED_INITIALIZATION.md",
+    "docs/MANAGED_INITIALIZATION_PROPOSAL.md",
+    "docs/MANAGED_STRUCTS.md",
+    "docs/MANAGED_STRUCTS_PROPOSAL.md",
+    "docs/MODULE_SYSTEM.md",
+    "docs/README.md",
+    "docs/RECEIVER_METHODS.md",
+    "docs/RECEIVER_METHODS_PROPOSAL.md",
+    "docs/REFERENCE_VALUE_STRUCTS.md",
+    "docs/REFERENCE_VALUE_STRUCTS_PROPOSAL.md",
+    "docs/RESEARCH_CLANKER.md",
+    "docs/SOURCE_COMPILER.md",
+    "docs/STAGE10_DESIGN.md",
+    "docs/STAGE11_ROADMAP.md",
+    "docs/STAGE5_CACHE_PROPOSAL.md",
+    "docs/STAGE6_PROPOSAL.md",
+    "docs/STAGE7_IMPLEMENTATION.md",
+    "docs/STAGE7_ROADMAP.md",
+    "docs/STAGE8_CALLS_NUMERIC.md",
+    "docs/STAGE8_TEXT_COLLECTIONS.md",
+    "docs/STAGE9_APPLICATION_WORKFLOW.md",
+    "docs/STAGE9_RESEARCH.md",
+    "docs/STAGE9_ROADMAP.md",
+    "docs/STRINGS_PROPOSAL.md",
+    "docs/VALUE_STRUCTS.md",
+    "docs/VALUE_STRUCTS_PROPOSAL.md",
+    "docs/VOID_ThinLTO_Report.md",
+    "docs/WRENCH_CLANKER.md",
+    "docs/compiler-health/INTEGRATED_PERFORMANCE_QUALIFICATION.md",
+    "docs/compiler-health/ROADMAP.md",
+    "docs/json/ROADMAP.md",
+    "docs/math/API.md",
+    "docs/math/DESIGN.md",
+    "docs/math/RESEARCH.md",
+    "docs/math/ROADMAP.md",
+    "docs/os/RESEARCH.md",
+    "docs/random/RESEARCH.md",
+    "docs/random/ROADMAP.md",
+    "docs/release/NOTICE_INVENTORY.json",
+    "docs/release/PREVIEW_BLOCKERS.md",
+    "docs/release/REDISTRIBUTION_NOTICES.md",
+    "docs/stage10/IMPLEMENTATION.md",
+    "docs/voidup/INTEGRATION_REPORT.md",
+    "docs/voidup/REPAIR_COMMIT_INVENTORY.json",
+    "docs/voidup/REPAIR_COMMIT_PATHS.nul",
+    "docs/voidup/REPAIR_COMMIT_PATHS.txt",
+    "docs/voidup/REPORT.md",
+    "docs/voidup/evidence/ci-42369685905/13572888461.zip",
+    "docs/voidup/evidence/ci-42369685905/13572974619.zip",
+    "docs/voidup/evidence/ci-42369685905/13573022077.zip",
+    "docs/voidup/evidence/ci-42369685905/13573038087.zip",
+    "docs/voidup/evidence/ci-42369685905/13573107430.zip",
+    "docs/voidup/evidence/ci-42369685905/13573114245.zip",
+    "docs/voidup/evidence/ci-42369685905/13573147644.zip",
+    "docs/voidup/evidence/ci-42369685905/13573298656.zip",
+    "docs/voidup/evidence/ci-42369685905/13573641707.zip",
+    "docs/voidup/evidence/ci-42369685905/13573730457.zip",
+    "docs/voidup/evidence/ci-42369685905/13573925101.zip",
+    "docs/voidup/evidence/ci-42369685905/accepted-repairs-present.json",
+    "docs/voidup/evidence/ci-42369685905/artifacts.json",
+    "docs/voidup/evidence/ci-42369685905/ci-summary.json",
+    "docs/voidup/evidence/ci-42369685905/documentation-pending.patch",
+    "docs/voidup/evidence/ci-42369685905/downloads.json",
+    "docs/voidup/evidence/ci-42369685905/integration-repair-pending-source.patch",
+    "docs/voidup/evidence/ci-42369685905/jobs.json",
+    "docs/voidup/evidence/ci-42369685905/license-package/validation.json",
+    "docs/voidup/evidence/ci-42369685905/local-results.json",
+    "docs/voidup/evidence/ci-42369685905/portable-wait.patch",
+    "docs/voidup/evidence/ci-42369685905/run.json",
+    "docs/voidup/evidence/llvm23-repair/active-old-toolchain-scan.txt",
+    "docs/voidup/evidence/llvm23-repair/changed-files.json",
+    "docs/voidup/evidence/llvm23-repair/coff-abi.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/Debug/qualification.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/Release/qualification.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/changed-files.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/documentation-integration.patch",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/integrated-source.patch",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/libsodium-approved.patch",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/license-package-fixed/validation.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/preservation-final.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/qualification-summary.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/retained-original-prefixes.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/review-validation.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/strict-controls/results.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/strict/fatal-environment.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/strict/qualification.json",
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/ubuntu-integrated/qualification.json",
+    "docs/voidup/evidence/llvm23-repair/isolated-candidate-2026-11-07/REPORT.txt",
+    "docs/voidup/evidence/llvm23-repair/isolated-candidate-2026-11-07/negative-probes.json",
+    "docs/voidup/evidence/llvm23-repair/isolated-candidate-2026-11-07/pikaos/existing-vector-results.json",
+    "docs/voidup/evidence/llvm23-repair/isolated-candidate-2026-11-07/qualification-summary.json",
+    "docs/voidup/evidence/llvm23-repair/isolated-candidate-2026-11-07/ubuntu/existing-vector-results.json",
+    "docs/voidup/evidence/llvm23-repair/original-ci/13558638061.zip",
+    "docs/voidup/evidence/llvm23-repair/original-ci/13558653075.zip",
+    "docs/voidup/evidence/llvm23-repair/original-ci/13558802832.zip",
+    "docs/voidup/evidence/llvm23-repair/original-ci/artifacts.json",
+    "docs/voidup/evidence/llvm23-repair/review/changed-files.json",
+    "docs/voidup/evidence/llvm23-repair/review/documentation-final.patch",
+    "docs/voidup/evidence/llvm23-repair/review/documentation-moves.json",
+    "docs/voidup/evidence/llvm23-repair/review/documentation-revision.patch",
+    "docs/voidup/evidence/llvm23-repair/review/documentation-validation.json",
+    "docs/voidup/evidence/llvm23-repair/review/guard-results.json",
+    "docs/voidup/evidence/llvm23-repair/review/libsodium-candidate.patch",
+    "docs/voidup/evidence/llvm23-repair/review/pristine-providers.json",
+    "docs/voidup/evidence/llvm23-repair/review/upstream/alignment-fix.json",
+    "docs/voidup/evidence/llvm23-repair/review/upstream/compared-files.json",
+    "docs/voidup/evidence/llvm23-repair/review/windows-and-build-source.patch",
+    "docs/voidup/evidence/llvm23-repair/sanitizer-failures.json",
+    "docs/voidup/evidence/llvm23-repair/ubuntu-strict/commands.json",
+    "docs/voidup/evidence/repair-raw-evidence-2026-11-07.json",
+    "docs/voidup/evidence/repair-raw-evidence-2026-11-07.tar.xz",
+    "docs/voidup/evidence/source-control-cleanup-2026-11-07.json",
+    "tests/host_capabilities/dependencies.py",
+    "tests/host_capabilities/install.py",
+    "tests/host_capabilities/portable.cpp",
+    "tests/voidup/ci_integration.py",
+    "third_party/host-patches/libsodium-1.0.22/PROVENANCE.json",
+    "third_party/host-patches/libsodium-1.0.22/asan-alignment.patch",
+    "tools/bench/buffer_preparation.py",
+    "tools/bench/heap_legacy.py",
+    "tools/ci/STORAGE_SHAPE_PROOF.md",
+    "tools/ci/llvm_sdk.py",
+    "tools/ci/voidup_bootstrap.py",
+    "tools/setup_host_deps.py",
+    "tools/setup_host_deps_native.py",
+    "tools/verify_discovery_engines.py",
+    "tools/verify_host_deps.py",
+    "tools/verify_website_examples.py"
+  ],
+  "class_counts": {
+    "4 - bounded generated-evidence exclusion rules": 1,
+    "1 - required build/CI/toolchain/test source": 11,
+    "2 - approved dependency patch/provenance/receipt verification": 7,
+    "3 - necessary documentation and permanent engineering evidence": 140
+  },
+  "files": {
+    ".gitignore": {
+      "category": "4 - bounded generated-evidence exclusion rules",
+      "sha256": "896aef10806c43d0c3ebc67de7d2fa534d99ce2f5d5c669fd7c627299430204b"
+    },
+    "CMakeLists.txt": {
+      "category": "1 - required build/CI/toolchain/test source",
+      "sha256": "7113c630cba9bee9bff8abea3b9042c8c8606c0be9b02a75b77a6edd5ae7744e"
+    },
+    "cmake/InstallLicenses.cmake": {
+      "category": "1 - required build/CI/toolchain/test source",
+      "sha256": "909beaf5cc1cbd2e76c77b41c06737a4a6097643c1ffd1e8ad8e19c146321589"
+    },
+    "cmake/host-sodium.targets": {
+      "category": "2 - approved dependency patch/provenance/receipt verification",
+      "sha256": "34639af7817a33cdee517a41321958ea48271878beaeb48e32c795891e7af57a"
+    },
+    "docs/ADVANCED_LANGUAGE.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "ecbd2b3917d7915b17faaf9fe2f04c284ac2d44515af022387432738f1e36f73"
+    },
+    "docs/ANALYSIS_COMPATIBILITY.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "530f97daf66cbd44f3090c982926b411c306c499dfca862616f524ee73b0edf8"
+    },
+    "docs/ARRAYS_PROPOSAL.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "a770c29bd7cc7dc933f7093cc3f354d53daef9702056239d53934f31c4fb63dc"
+    },
+    "docs/ARRAY_OPERATIONS.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "66e2b1b5a930c48964c0d9297e828d48c69655c31af90cb1dca387cad0de2c13"
+    },
+    "docs/CI_NODE24_MAINTENANCE.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "35e5a078f907f6e00058f1427e6c7e2e5ecbd7b2bcba79370a16b05a86d01c9b"
+    },
+    "docs/COMPOSITION_PROPOSAL.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "61960f407d4329797978f9350281b23ce2da0ba561b963eebba29a8287afb9ce"
+    },
+    "docs/DEVELOPMENT_STRATEGY.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "33f4f1bdbc5e6b47b85047a929fc69072895e5757479eeda6e4c8334d92046b7"
+    },
+    "docs/DIAGNOSTICS.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "48f3d247d83fc0083e69f135df63df7493efdaad1d78592f4cd9b885526914c4"
+    },
+    "docs/DICTIONARIES.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "4f4605e2f9353404636d6ed9d499c72aea5f59e7997273750c01b7a3a405dffb"
+    },
+    "docs/DOCUMENTATION_HOVER_ROADMAP.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "f79e3544ea338b76891aff1fe04d99e743ee1bfc3b6e6341495872dd62591fc9"
+    },
+    "docs/EDITOR_INTEGRATION.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "7651967918ce5f056b95b917551c85b9866df272810b6c5e9b0c2fdfde708101"
+    },
+    "docs/FIXED_ARRAYS.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "13e3aaa6cfe7a5f9da49e03b5092cdad8f5daf54d031962e10c1da6c6ad39864"
+    },
+    "docs/GC_RUNTIME.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "b91cf9db5042cb812cecb5a72154f74e7595b9dc6a31769b84ceb9c561f5fd4d"
+    },
+    "docs/GC_RUNTIME_PROPOSAL.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "2683ed5e3786a48fc87fc7f1eb5189df9f9442cd1f5522c4b7a053f4503a0b79"
+    },
+    "docs/GENERICS.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "9b0c8d85afd94b6d554df4d53956656ee7ace98e4662f32e3c0d51fc96709971"
+    },
+    "docs/GROWABLE_ARRAYS.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "fff632d3ccab20173792a625fe30bf157268dd6c4a654eb1500e85bfffc1a17c"
+    },
+    "docs/INHERITANCE_PROPOSAL.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "0eb63f4079a9dcd5f8aecad8dbc5edc0eeec22702282f42a8d6397cdd2b2231a"
+    },
+    "docs/INITIALIZATION.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "159408688fa97a9843fe74e074a1248ce0665434c8fa6ad948aaf5a0ecd85cf1"
+    },
+    "docs/INITIALIZATION_PROPOSAL.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "a1a0598e1641aab8741c0404a2742a5aad3faf79c2b3a0144d4f72dc8cb3af69"
+    },
+    "docs/INTERFACES.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "f3874479a8d678f3a288d08d15135610c92b774e400cb613a7bda37ecec41540"
+    },
+    "docs/INTERFACES_PROPOSAL.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "2e7951cd562b56895d65297010e8f1a060ec144ba1797475ee15834122b9e7ec"
+    },
+    "docs/KNOWN_ISSUES.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "45e7bdc419bef268755cc3e9df98a52f8b07a2a19dcfa4b5a0751934b83da56a"
+    },
+    "docs/LANGUAGE_BIBLE.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "f7e097ce00cba943d978a7bccfb6dce87302cabfdee94bceb66c68a1fda5def2"
+    },
+    "docs/LANGUAGE_COMPLETENESS_APPROVALS.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "02613756f54d6c08187e8c13b0734c505f10c843fedaec453d1aecde12bc49d9"
+    },
+    "docs/LANGUAGE_COMPLETENESS_AUDIT.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "9d84b1714ac8b878b4ebbe5df09ca14f9f895835c7eed6e1833d5044a4a2c49d"
+    },
+    "docs/LANGUAGE_COMPLETENESS_ROADMAP.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "d46f300719ff31a510de99d38ee5a3c7b85eefd017e86d9e8b78ec20b23bbd5c"
+    },
+    "docs/LANGUAGE_SERVER.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "0cb12f07bab5b95059cb669619cc39cbde8e9562c664b2c1dd97d52bb95e965f"
+    },
+    "docs/MANAGED_INITIALIZATION.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "5464e6de363afab242c9f7e6231b5d5b00e156fef00c34081313c957e544baf0"
+    },
+    "docs/MANAGED_INITIALIZATION_PROPOSAL.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "dcd1f83e3843c6b7d4bbe5d27effe8221df419df44203516e4a41a3bb5a9d2b1"
+    },
+    "docs/MANAGED_STRUCTS.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "240c2ea1e9049cc7d108ef8cf58ce88ea7dc5d3b30cbf61eba56a5c62488f898"
+    },
+    "docs/MANAGED_STRUCTS_PROPOSAL.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "7f27f881d71525d76937423fb04fbffe3f384dacdfd8c67ed8a206cb90fbb7a7"
+    },
+    "docs/MODULE_SYSTEM.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "f967385f9d5f3b292f1168c458bb26cfd39ecdfda162a1c01277fc374cccdff3"
+    },
+    "docs/README.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "39b8588a3514b77a70c690c74c5cb431af2caa7fc79d6699819d86f2e13dff0b"
+    },
+    "docs/RECEIVER_METHODS.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "b9a232696f8f096427eca9470780657b427a49961cd8933cdb3b0ecafcc9bbb5"
+    },
+    "docs/RECEIVER_METHODS_PROPOSAL.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "624d559e59b40a422f8c2cd01057560b95f2bc5e230230fccc735ac5784bf914"
+    },
+    "docs/REFERENCE_VALUE_STRUCTS.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "76f12213b43693a3944ad8b2fcfa46ec4f5007a996f0a8cb9ca86f2359980dcc"
+    },
+    "docs/REFERENCE_VALUE_STRUCTS_PROPOSAL.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "adc1b67414583838db5fcf06beec8abf7ce65601252072df21e02715fe501596"
+    },
+    "docs/RESEARCH_CLANKER.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "b29c52c213e61977d16218e27737f393e510b0ac05c0c1cabc47e37881332edd"
+    },
+    "docs/SOURCE_COMPILER.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "43189101e36b5dc9b700e39b2fff8cd4bb0354ccee2c45620dbc809807ff9bd7"
+    },
+    "docs/STAGE10_DESIGN.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "91edacb1d8caba1b152a80f030178ded112a66fc08358690355ac482d8406aab"
+    },
+    "docs/STAGE11_ROADMAP.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "c1dfa797c29ce07a27be096b4f221a49eb7a734cd1b83652a18d3ead0e524070"
+    },
+    "docs/STAGE5_CACHE_PROPOSAL.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "bfc46d43399c50362aa025fee3463b779b3eb6d60b5643dbc290ba57b5ed428f"
+    },
+    "docs/STAGE6_PROPOSAL.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "9b936a98e08b88548ecb38a34d2f00705ac8f287683b96cfc3008d05f2ac5284"
+    },
+    "docs/STAGE7_IMPLEMENTATION.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "e5cd4d03890c15c80260540dffecc651a6620dc06c99ce10714b27d5c4b9a398"
+    },
+    "docs/STAGE7_ROADMAP.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "206a18977a3183db6ee52c10c2bf33763088624a9a664410215f553c6a1f2e5f"
+    },
+    "docs/STAGE8_CALLS_NUMERIC.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "8d90ff0ada61a533ffd7e06ad16ce500856b1a5875bcdd49ca893e821b33cac1"
+    },
+    "docs/STAGE8_TEXT_COLLECTIONS.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "f36a9490e793bf01d7923c15c62b8d37412d579fff9023eea29a610c4664af84"
+    },
+    "docs/STAGE9_APPLICATION_WORKFLOW.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "76f7910ade15a4b9fef940981ac99daf30d97b148b5e0b0f0a7862a464622aec"
+    },
+    "docs/STAGE9_RESEARCH.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "a44c3e3aa6081e6d12553602df853ecb40f86a234b15eeae1d5551c237eb4d9d"
+    },
+    "docs/STAGE9_ROADMAP.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "efa55c43e6eb2fb90ed3bef2ea1fd913c88e4522d382d39e9151311d13d52010"
+    },
+    "docs/STRINGS_PROPOSAL.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "b6331c8bbf3dd42bb99a45e1a6f659c6925572510c4271e2750ee0403e8ab8dd"
+    },
+    "docs/VALUE_STRUCTS.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "2dd8816cca54b4236475dd241884957d9eea940dda729223ea94ed6c048068cc"
+    },
+    "docs/VALUE_STRUCTS_PROPOSAL.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "e3e0209997a176b3e93752ea50cdf85f0dad8db7d795799f37dfc249119dcba1"
+    },
+    "docs/VOID_ThinLTO_Report.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "09d8511fe02c5b29ffe97d1cba1fab0c8ef411c4f72c642ca116eabe6d35bbe7"
+    },
+    "docs/WRENCH_CLANKER.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "044df329162df38e7bcf1fb72bb6b79d1d18f64743cc1ef7c3b21c224e6f28d4"
+    },
+    "docs/compiler-health/INTEGRATED_PERFORMANCE_QUALIFICATION.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "9c1b138523eb75535ea85ad73d2d2c659d93b4c7bee577d5171d03b36189654c"
+    },
+    "docs/compiler-health/ROADMAP.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "45dab3778dd3563375d3520479a058d3d3bde55e8b82895b354df6f7df8e32fa"
+    },
+    "docs/json/ROADMAP.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "4c6abd95abfd2d7d3b7f7a0c2ed0b30397a9ce2739e76c22ca0495011a2d2175"
+    },
+    "docs/math/API.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "a77bbaf51ca37c934a6f9759765d1f174fecdcb62660c54305066fcbb9e87a77"
+    },
+    "docs/math/DESIGN.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "19127979b34051408bc30e3a410534a1fefe28896c80b5cb5a14d5750b498107"
+    },
+    "docs/math/RESEARCH.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "1f20bcd3aca5db737c0a5289aa4711a05f7708de3b274a5fb1b5974f96f3ed5c"
+    },
+    "docs/math/ROADMAP.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "cee6697929fd732435a748650077d03508c82cddcf46b163c08ba51b9f441728"
+    },
+    "docs/os/RESEARCH.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "970f8cad7e03f51d670c4c0e6fccce751864cc1845c7993f8fc3afc45d74bb72"
+    },
+    "docs/random/RESEARCH.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "8cc776591ebb9ebad6144c15356511e34113ce33dfc46a74eee6505ab79aed65"
+    },
+    "docs/random/ROADMAP.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "26e6fcdca13a996bc1825e4be17b9e277943c8dab5866022fb89912ab017c327"
+    },
+    "docs/release/NOTICE_INVENTORY.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "a123f55146b5396016a5549c944efaadb562b12903a2744183b433f9df5a01cf"
+    },
+    "docs/release/PREVIEW_BLOCKERS.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "f919626f47ce0e7c724e903e9102466a4d2656529e6ac7aeef16c5d1101aeebd"
+    },
+    "docs/release/REDISTRIBUTION_NOTICES.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "63a9a55a90f6021abd0e8948f16a5481a1e0ce8486fedd043a3ac3b014f1d39c"
+    },
+    "docs/stage10/IMPLEMENTATION.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "09d23d936f9fb397b221dfc43b0b3de82cfa634a139ed4c8601b962d79e20b2c"
+    },
+    "docs/voidup/INTEGRATION_REPORT.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "8af15c176187cc62da6831b9f78ad9afc3b9690332dfb89c34b431c1d4500794"
+    },
+    "docs/voidup/REPORT.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "8573ca390dad40d7cd4ddb3fa81e6ca5898abeab2ce6c433535e24ae0ddb6746"
+    },
+    "docs/voidup/evidence/ci-42369685905/13572888461.zip": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "9e83e5d148c6394536f7b20ea0810f8a77a33f26e927cf1d68d2a0788c45e67d"
+    },
+    "docs/voidup/evidence/ci-42369685905/13572974619.zip": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "b06604134ea9a3e16cb9d7e32c19d2da916f40993efe426897d236470e1e7d85"
+    },
+    "docs/voidup/evidence/ci-42369685905/13573022077.zip": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "08eec7efdece095de24c5ae39fe5771fd76380c4837e2ef6498ee793c43a29f4"
+    },
+    "docs/voidup/evidence/ci-42369685905/13573038087.zip": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "84de483ae99aa16a5a6c4d67707652767d8350f68aa10595b48c0c464cb40c86"
+    },
+    "docs/voidup/evidence/ci-42369685905/13573107430.zip": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "b21ee04966bcc99b6304543a669a1dd95a01a8eb517278a44a7074aa94e03e6d"
+    },
+    "docs/voidup/evidence/ci-42369685905/13573114245.zip": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "3d6ff7736ec66a40e93c2a5c43e93996289b7e69445d9b5ba14aa91fdad3a65f"
+    },
+    "docs/voidup/evidence/ci-42369685905/13573147644.zip": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "001544daaa3194c79f3292337ce9c8fb9f14f200957d35df8dd34cbee6127008"
+    },
+    "docs/voidup/evidence/ci-42369685905/13573298656.zip": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "41d2d9881e113d84389388d3248141e6e2a68a8999df3640f85efef3ff21a68d"
+    },
+    "docs/voidup/evidence/ci-42369685905/13573641707.zip": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "5589914fbb50fb4b3d97d15bf7cb1c00e619cab7ec53918fa805060b53c1fea8"
+    },
+    "docs/voidup/evidence/ci-42369685905/13573730457.zip": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "4217a012b37da88800b936b3737af92797e6efca4e507aaf4a61a10d51bc9928"
+    },
+    "docs/voidup/evidence/ci-42369685905/13573925101.zip": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "c6e06c07a6fb53990ea0cee4c300ba7365100813e9af26a9e430c14457a30a9c"
+    },
+    "docs/voidup/evidence/ci-42369685905/accepted-repairs-present.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "11facb24c525b37a0fa5176abf683e88c5851caff3280f00e1a9562d28618f82"
+    },
+    "docs/voidup/evidence/ci-42369685905/artifacts.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "e5bb5b1f8503f4c8c84cf19e1851ab0586a9643308a9748c572a741543577f5b"
+    },
+    "docs/voidup/evidence/ci-42369685905/ci-summary.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "13a7a1edaa2e950f46aa45c3ac8af658da97deaa6215c91679d9f7572090c6ec"
+    },
+    "docs/voidup/evidence/ci-42369685905/documentation-pending.patch": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "c4b6e3c51be7de9fe1bc5f5eccea8dc6ef3ec06984caff6487d67ca5a1f8f2c7"
+    },
+    "docs/voidup/evidence/ci-42369685905/downloads.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "7db4b5238bdcb3772b16a1a6ef6f02886545d9001675195b03bf7358f7746e89"
+    },
+    "docs/voidup/evidence/ci-42369685905/integration-repair-pending-source.patch": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "0a2a81409719629fda9c4b61294c88713b3147260a5fa7abad40f0172447f381"
+    },
+    "docs/voidup/evidence/ci-42369685905/jobs.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "61899e2f3d5848c5963c137951ade7ca371107e3ba990bc18ca9ee8a7f5f192f"
+    },
+    "docs/voidup/evidence/ci-42369685905/license-package/validation.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "1181db2e0dc6174e32d8ace60987ffcfd8f58808c1c7d69fc5d585ae268a267a"
+    },
+    "docs/voidup/evidence/ci-42369685905/local-results.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "925b80ce7bc301aecc4b350e484cfe7d5eebb8c2790712b569859317bf6b7f33"
+    },
+    "docs/voidup/evidence/ci-42369685905/portable-wait.patch": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "7e27058c05a10528c11e890b58280339ad4336f12ae162a9f4b70bc8febbb45f"
+    },
+    "docs/voidup/evidence/ci-42369685905/run.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "b8cec7300b525f92d135541b55491d76c636cbd2d50c16c4529892ba3bc404f6"
+    },
+    "docs/voidup/evidence/llvm23-repair/active-old-toolchain-scan.txt": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "cb386bad3621b3cb54dfffae709e997a24d90eca863352496c9e299be6f7dd4b"
+    },
+    "docs/voidup/evidence/llvm23-repair/changed-files.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "5e0dcbe717938996bda3f2b7612e71b90d8e1f6f1884821d941fc80c85f61f14"
+    },
+    "docs/voidup/evidence/llvm23-repair/coff-abi.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "d32d4a6213dfda6838068acdd8b2afbea171b0f18e6a008e9e2b5268d387438d"
+    },
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/Debug/qualification.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "3cb0aa6cdec21877a4a04f6c44c951bfa43e52aca1f3f867c4b0061759ab5e8a"
+    },
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/Release/qualification.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "4b645b585cb05a02be02605c41300e842612ee3b2cff240a14a750ddf4271db0"
+    },
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/changed-files.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "fa4fd76dcb42fede5ecb99e25c339f5699061270e271c8632ae6b10e890f807b"
+    },
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/documentation-integration.patch": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "aaf65a99f88ac1c07e822af70d6b0bb07c1392225390a26c6ee9e5d8e824a674"
+    },
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/integrated-source.patch": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "9e4781da5cadee32a4e282a6f0237a319cd1a8568fa36f6a3b192b2d9177a6af"
+    },
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/libsodium-approved.patch": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "f0de9004b8129626e14750437f51eb9524f030149607b50bb75ce0b6c998af74"
+    },
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/license-package-fixed/validation.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "ed45e98a7caabfbcc5806aa38a18c0526828b27a1aa5491ad4cfe647183885f7"
+    },
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/preservation-final.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "4b5ef630cb4317ecd56130aa28b546d83fc4d4431fb88171ba392b1b59bb6325"
+    },
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/qualification-summary.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "5682f131bf72903494c8aa113b31c4f7f11b151bae95ec4327c7fda232a9a0b6"
+    },
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/retained-original-prefixes.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "ccc1f7b149960e1d9d9148a7b60f491e8c9edb97d7a067d2cd464be84cd096a0"
+    },
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/review-validation.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "8448a59f03d22aacd66162976ea799fc095e38ab8b57541260c35a3e8b5ebdfa"
+    },
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/strict-controls/results.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "c8e134f958d36e094d84f62f4c8876103bcfbd19f39d86d5616f77cb27df9f8e"
+    },
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/strict/fatal-environment.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "bdfa6647bc0112cfd39a574d190193e08b55e446e83ae47c8263ba48d15b40ab"
+    },
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/strict/qualification.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "3527b0e4a177b356913957f509ca0cb76d2d743a914258b036e4ccc09128d77b"
+    },
+    "docs/voidup/evidence/llvm23-repair/integration-2026-11-07/ubuntu-integrated/qualification.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "fdd658feead13ea20a8bc019f7c36ef7fa57a59d292f7bb6ed463427f6392fb6"
+    },
+    "docs/voidup/evidence/llvm23-repair/isolated-candidate-2026-11-07/REPORT.txt": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "40c5703438c02e140109870c1ea45fc5baa2b477d08f9772be5cf0a5b4a1f9ee"
+    },
+    "docs/voidup/evidence/llvm23-repair/isolated-candidate-2026-11-07/negative-probes.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "d869598e209df099e56a8de7a6e3e73eccbe55995d59800eca09b500d5033f72"
+    },
+    "docs/voidup/evidence/llvm23-repair/isolated-candidate-2026-11-07/pikaos/existing-vector-results.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "edd29b098bb5d936f342bf76f2418c93bbee587074300db7fd387f72e8f6ac17"
+    },
+    "docs/voidup/evidence/llvm23-repair/isolated-candidate-2026-11-07/qualification-summary.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "4ef0d2c8b3d387c91e75a9577f12caa7350364c13a127168f12d60bf8c645bc2"
+    },
+    "docs/voidup/evidence/llvm23-repair/isolated-candidate-2026-11-07/ubuntu/existing-vector-results.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "edd29b098bb5d936f342bf76f2418c93bbee587074300db7fd387f72e8f6ac17"
+    },
+    "docs/voidup/evidence/llvm23-repair/original-ci/13558638061.zip": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "9ee4f916532e9e3763270c421162feca809aed33ff07b33bcd3b9e2226d878a0"
+    },
+    "docs/voidup/evidence/llvm23-repair/original-ci/13558653075.zip": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "8a4dd5d9e49ccd8240d6b18bf1e85af914054c34487cc7938579cc7f9b853d13"
+    },
+    "docs/voidup/evidence/llvm23-repair/original-ci/13558802832.zip": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "65a37d6dd16cc349da545638afa465ef33a64bf8c6ba661a06f69d066e7c3ad4"
+    },
+    "docs/voidup/evidence/llvm23-repair/original-ci/artifacts.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "290b068cbfde2e640b87266bd83dd876b0d521086225517166a2f7fee69367ae"
+    },
+    "docs/voidup/evidence/llvm23-repair/review/changed-files.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "80d36ff865142df6d775c4b3ccd03accdacfbb71db3f676891d2103bf30a3cd9"
+    },
+    "docs/voidup/evidence/llvm23-repair/review/documentation-final.patch": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "e8996301870c3aaf834448b01065ab89cd04f2a891b4cd9cfa4b1733ef14596a"
+    },
+    "docs/voidup/evidence/llvm23-repair/review/documentation-moves.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "8173a0ff16823f1ffabe77eeb35deafab9db9a3fb945d9af04ff69b68502784d"
+    },
+    "docs/voidup/evidence/llvm23-repair/review/documentation-revision.patch": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "ff9b3fbf8f245ce929de22c679895a9d5a4d4dd38b395933e2ff99fb4de0281b"
+    },
+    "docs/voidup/evidence/llvm23-repair/review/documentation-validation.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "941dd9e8a31ceff6c438bcf3576309d7cd2492746051fa1251f398e6e6a10e49"
+    },
+    "docs/voidup/evidence/llvm23-repair/review/guard-results.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "7362f1e28ce373a696cc7a05275156e6013de382245f33ffc724814ec86b1ce4"
+    },
+    "docs/voidup/evidence/llvm23-repair/review/libsodium-candidate.patch": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "f0de9004b8129626e14750437f51eb9524f030149607b50bb75ce0b6c998af74"
+    },
+    "docs/voidup/evidence/llvm23-repair/review/pristine-providers.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "3a8789996415a7d02f51c5def63fa02c0d1b7c7eee6b15fbf3ca8a32f686baf2"
+    },
+    "docs/voidup/evidence/llvm23-repair/review/upstream/alignment-fix.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "df865df579a5cefb0959bfc73a6c53ab8ac914239db9f47d95bcacbdcdcacacb"
+    },
+    "docs/voidup/evidence/llvm23-repair/review/upstream/compared-files.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "181ef77d349bfc8ccfe242c0d8dba7b82060980d08b57b3ff67011b890cdf66b"
+    },
+    "docs/voidup/evidence/llvm23-repair/review/windows-and-build-source.patch": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "e3b2b79c21e2cc5b38edba0db95ddf334bc9c1a604f8dff2ac0d4858954c15d0"
+    },
+    "docs/voidup/evidence/llvm23-repair/sanitizer-failures.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "dda933806bfd6b397de390d9252cf942c3f6fa419e03759f33527b370edf8151"
+    },
+    "docs/voidup/evidence/llvm23-repair/ubuntu-strict/commands.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "bc46455a93f1f806726b8979cb7f5e8b753db98621435d7c400cc3f3512d6805"
+    },
+    "docs/voidup/evidence/repair-raw-evidence-2026-11-07.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "f9a79ab58ec1d320ee0e7ccb2a1106448a0fa36bdcb436f5696d7c28cae36b8b"
+    },
+    "docs/voidup/evidence/repair-raw-evidence-2026-11-07.tar.xz": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "b64fa672db3505eab9b62fea00d4460b0840ab52005785868b85ae035ee16e01"
+    },
+    "docs/voidup/evidence/source-control-cleanup-2026-11-07.json": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "16e2990793a8330a5b240db7722f92fe4cf0cd0bec50735a50be8b436bc116c0"
+    },
+    "tests/host_capabilities/dependencies.py": {
+      "category": "2 - approved dependency patch/provenance/receipt verification",
+      "sha256": "90b19bb50a05395761762b635e625b110a1b584975c4bdc9beb9160389568503"
+    },
+    "tests/host_capabilities/install.py": {
+      "category": "1 - required build/CI/toolchain/test source",
+      "sha256": "096245ad700bb569baa60d9a1381a7260a4bff11abb7e996f8ad167a605cb7f9"
+    },
+    "tests/host_capabilities/portable.cpp": {
+      "category": "1 - required build/CI/toolchain/test source",
+      "sha256": "ec4baa2e240bdc9091786d3be75aab0c8763d8b590c617031a097e426e8999a6"
+    },
+    "tests/voidup/ci_integration.py": {
+      "category": "1 - required build/CI/toolchain/test source",
+      "sha256": "65ff7ef76d60f5fdea126213c06334376609a627e22b71912c73efa4985522d0"
+    },
+    "third_party/host-patches/libsodium-1.0.22/PROVENANCE.json": {
+      "category": "2 - approved dependency patch/provenance/receipt verification",
+      "sha256": "4841bfe7f283b250bb2b6fa1872b602416bb91a0e67c5f6179742d8c4bc0c0c8"
+    },
+    "third_party/host-patches/libsodium-1.0.22/asan-alignment.patch": {
+      "category": "2 - approved dependency patch/provenance/receipt verification",
+      "sha256": "f0de9004b8129626e14750437f51eb9524f030149607b50bb75ce0b6c998af74"
+    },
+    "tools/bench/buffer_preparation.py": {
+      "category": "1 - required build/CI/toolchain/test source",
+      "sha256": "42f1ed82002cbcd96d4006b4ebe8c2c0404850d323aaba473f60b10143a6b554"
+    },
+    "tools/bench/heap_legacy.py": {
+      "category": "1 - required build/CI/toolchain/test source",
+      "sha256": "f2b41280740042ba8fbe4fb600b5572cdf1348a3e7ae72cbf9205e2c2cdcdfbf"
+    },
+    "tools/ci/STORAGE_SHAPE_PROOF.md": {
+      "category": "3 - necessary documentation and permanent engineering evidence",
+      "sha256": "2aff559add3c491d0e578a30442d7ac68951fbb735ba8766f666c7651c129ac6"
+    },
+    "tools/ci/llvm_sdk.py": {
+      "category": "1 - required build/CI/toolchain/test source",
+      "sha256": "7dad9c894eec0d83e6a435013d69a70db87522cc10aef53d9405ab562f70b149"
+    },
+    "tools/ci/voidup_bootstrap.py": {
+      "category": "1 - required build/CI/toolchain/test source",
+      "sha256": "21b83034fc8f00a32a0a138522b149d7a9aaf1dcb0b5c255c4617a6f6b877e1b"
+    },
+    "tools/setup_host_deps.py": {
+      "category": "2 - approved dependency patch/provenance/receipt verification",
+      "sha256": "f0337524e09c5d407c6106ebccfb1622a22a858beb0da4f149fad75e7af36b95"
+    },
+    "tools/setup_host_deps_native.py": {
+      "category": "2 - approved dependency patch/provenance/receipt verification",
+      "sha256": "ebcda35c1a051ae05e0ea2daf4580ad7bc3726325621f70f4e9e35b81994ec6d"
+    },
+    "tools/verify_discovery_engines.py": {
+      "category": "1 - required build/CI/toolchain/test source",
+      "sha256": "3d1a285ea0183ce45e85eed85245cb4c811a3888e167870a506770ab46414e22"
+    },
+    "tools/verify_host_deps.py": {
+      "category": "2 - approved dependency patch/provenance/receipt verification",
+      "sha256": "f14ab068ed336b275e61fb70fcbfdbd98f53a5f666f74647ce5d339f64d6a94c"
+    },
+    "tools/verify_website_examples.py": {
+      "category": "1 - required build/CI/toolchain/test source",
+      "sha256": "90a158f6f0d67ad59765daed33ddd11cc2bd561062718ab6a838a3a7928ec7c2"
+    }
+  },
+  "self_hashes_omitted": [
+    "docs/voidup/REPAIR_COMMIT_INVENTORY.json",
+    "docs/voidup/REPAIR_COMMIT_PATHS.nul",
+    "docs/voidup/REPAIR_COMMIT_PATHS.txt"
+  ],
+  "before_counts": {
+    "porcelain_entries": 3656,
+    "tracked_modified": 88,
+    "staged_paths": 0,
+    "untracked_visible": 3568,
+    "ignored_untracked": 769617,
+    "status_codes": {
+      " M": 88,
+      "??": 3568
+    }
+  },
+  "after_counts": {
+    "porcelain_entries": 159,
+    "tracked_modified": 89,
+    "staged_paths": 0,
+    "untracked_visible": 70,
+    "ignored_untracked": 773136,
+    "status_codes": {
+      " M": 89,
+      "??": 70
+    },
+    "added": 0,
+    "deleted": 0,
+    "renamed": 0
+  },
+  "old_allowlist_reconciliation": {
+    "unchanged_source_build_patch_documentation_paths": 90,
+    "retained_loose_evidence": 62,
+    "archived_raw_evidence": 5727
+  },
+  "excluded_raw_paths_and_hashes": "docs/voidup/evidence/repair-raw-evidence-2026-11-07.json",
+  "excluded_generated_roots": [
+    "build*/",
+    ".toolchains/",
+    "out/",
+    "dist/",
+    "**/__pycache__/",
+    "**/.void/cache/"
+  ],
+  "protected_unrelated_paths": [
+    "docs/net/TCP_UDP_HANDOFF.md",
+    "website/dist/assets/style.css",
+    "website/dist/getting-started/index.html",
+    "website/public/assets/style.css",
+    "website/public/getting-started/index.html",
+    "website/scripts/check.py",
+    "website/scripts/test_check.py",
+    "README.md"
+  ],
+  "unrelated_pending_paths": [],
+  "unexpected_pending_paths": [],
+  "staging_command": "git --literal-pathspecs add --pathspec-from-file=docs/voidup/REPAIR_COMMIT_PATHS.nul --pathspec-file-nul",
+  "suggested_title": "Repair VOIDUP provider provenance, LLVM 23.1.4 selection and host test portability [skip ci]",
+  "staging_performed": false
+}

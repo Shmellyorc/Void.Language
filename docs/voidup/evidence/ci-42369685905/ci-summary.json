@@ -1,0 +1,111 @@
+{
+  "run_id": 42369685905,
+  "commit": "9521329e7e67f4c8bb5aec38d684fde3f3c887de",
+  "status": "completed",
+  "conclusion": "cancelled",
+  "jobs": [
+    {
+      "id": 128395046448,
+      "name": "thinlto-cache / Ubuntu 24.04 / Sanitizers",
+      "status": "completed",
+      "conclusion": "failure",
+      "failed_steps": [
+        "Bootstrap and verify pinned VOIDUP host providers"
+      ]
+    },
+    {
+      "id": 128395046546,
+      "name": "thinlto-cache / Windows 2022 / Release",
+      "status": "completed",
+      "conclusion": "failure",
+      "failed_steps": [
+        "Bootstrap and verify pinned VOIDUP host providers"
+      ]
+    },
+    {
+      "id": 128395046571,
+      "name": "thinlto-cache / Windows 2022 / Debug",
+      "status": "completed",
+      "conclusion": "failure",
+      "failed_steps": [
+        "Bootstrap and verify pinned VOIDUP host providers"
+      ]
+    },
+    {
+      "id": 128395046593,
+      "name": "thinlto-cache / macOS ARM64 / Release",
+      "status": "completed",
+      "conclusion": "failure",
+      "failed_steps": [
+        "Build Release"
+      ]
+    },
+    {
+      "id": 128395046619,
+      "name": "thinlto-cache / Ubuntu 24.04 / Release",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "failed_steps": []
+    },
+    {
+      "id": 128395046667,
+      "name": "thinlto-cache / Ubuntu 24.04 / Debug",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "failed_steps": []
+    },
+    {
+      "id": 128395046673,
+      "name": "thinlto-cache / macOS ARM64 / Debug",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "failed_steps": []
+    }
+  ],
+  "sanitizer_upstream_suite": {
+    "total": 87,
+    "passed": 72,
+    "failed": 15,
+    "skipped": 0,
+    "failed_targets": [
+      "aead_aegis256",
+      "aead_aegis128l",
+      "aead_aes256gcm",
+      "aead_chacha20poly1305",
+      "aead_xchacha20poly1305",
+      "box_easy2",
+      "box_seal",
+      "codecs",
+      "generichash",
+      "generichash3",
+      "misuse",
+      "secretbox_easy",
+      "secretbox_easy2",
+      "sodium_utils",
+      "pwhash_argon2id"
+    ],
+    "individual_test_ubsan_diagnostics": "Not included in this run artifact; preserve names/status and exact captured build-host-providers.log, not inferred per-test diagnostics."
+  },
+  "macos_release_ambiguity": {
+    "128395046593": [
+      "2026-11-07T11:56:48.2735160Z FAILED: [code=1] CMakeFiles/void_host_portable.dir/tests/host_capabilities/portable.cpp.o ",
+      "2026-11-07T11:56:48.2738370Z /Users/runner/work/Void.Language/Void.Language/.toolchains/llvm-23.1.4/bin/clang++ -DCURL_STATICLIB -I/Users/runner/work/Void.Language/Void.Language/include -I/Users/runner/work/Void.Language/Void.Language/third_party/curl/include -isystem /Users/runner/work/Void.Language/Void.Language/.toolchains/http/prefix/macos-aws-lc-5.12.0-arm64/Release/include -stdlib=libc++ -nostdinc++ -isystem \"/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/\" -O3 -DNDEBUG -std=c++20 -arch arm64 -isysroot /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -mmacosx-version-min=14.0 -fno-rtti -Wall -Wextra -Wpedantic -MD -MT CMakeFiles/void_host_portable.dir/tests/host_capabilities/portable.cpp.o -MF CMakeFiles/void_host_portable.dir/tests/host_capabilities/portable.cpp.o.d -o CMakeFiles/void_host_portable.dir/tests/host_capabilities/portable.cpp.o -c /Users/runner/work/Void.Language/Void.Language/tests/host_capabilities/portable.cpp",
+      "2026-11-07T11:56:48.2741720Z /Users/runner/work/Void.Language/Void.Language/tests/host_capabilities/portable.cpp:102:13: error: reference to 'wait' is ambiguous",
+      "2026-11-07T11:56:48.2742600Z   102 |   q=request(wait);q.objects={process};r=process_execute(q);check(!r.kind && r.number==23 && !r.flag,\"child exact status\");r=process_execute(q);check(!r.kind && r.number==23,\"repeat wait\");check(!process->close(),\"child cleanup\");",
+      "2026-11-07T11:56:48.2743250Z       |             ^",
+      "2026-11-07T11:56:48.2743770Z /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/wait.h:246:9: note: candidate found by name lookup is 'wait'",
+      "2026-11-07T11:56:48.2744350Z   246 | pid_t   wait(int *) __DARWIN_ALIAS_C(wait);",
+      "2026-11-07T11:56:48.2744700Z       |         ^",
+      "2026-11-07T11:56:48.2745110Z /Users/runner/work/Void.Language/Void.Language/include/void/host_ops.hpp:32:8: note: candidate found by name lookup is 'vd::host::wait'",
+      "2026-11-07T11:56:48.2745600Z    32 |  spawn,wait,child_close,child_cleanup,file_mode_matches};",
+      "2026-11-07T11:56:48.2745860Z       |        ^",
+      "2026-11-07T11:56:48.2746000Z 1 error generated.",
+      "2026-11-07T11:56:48.5633700Z [1170/1814] Building CXX object CMakeFiles/void_math_ir.dir/tests/math/ir.cpp.o",
+      "2026-11-07T11:56:49.7935030Z [1171/1814] Building CXX object CMakeFiles/void_os_host.dir/tests/os/host.cpp.o",
+      "2026-11-07T11:56:49.7935510Z ninja: build stopped: subcommand failed.",
+      "2026-11-07T11:56:49.8889230Z ##[error]Process completed with exit code 1."
+    ]
+  },
+  "additional_defects_demonstrated": "None found in seven completed job logs and eleven artifacts; cancelled jobs do not establish test acceptance.",
+  "candidate_native_acceptance": "Unverified: hosted commit omits pending selector/backport; macOS old-provider 87/87 is not acceptance of integrated candidate."
+}

@@ -143,9 +143,7 @@ The runtime library has no LLVM dependency.
 build/ci-debug/voidc check examples/managed_structs/main.void
 build/ci-debug/voidc run examples/managed_structs/main.void 10 --no-opt # 23
 build/ci-debug/voidc run examples/managed_structs/main.void 10          # 23 (optimized)
-build/ci-debug/voidc emit examples/managed_structs/main.void -o build/managed.o
-clang++-19 build/managed.o build/ci-debug/libvoid_runtime.a -pthread \
-  --ld-path=/usr/lib/llvm-19/bin/ld.lld -o build/managed
+build/ci-debug/voidc build examples/managed_structs/main.void -o build/managed
 build/managed 10                                                  # 23
 ```
 

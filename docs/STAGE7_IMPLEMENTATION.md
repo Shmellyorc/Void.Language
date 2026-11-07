@@ -1,3 +1,7 @@
+> Current implementation guidance uses [LLVM/Clang/LLD 23.1.4](SOURCE_COMPILER.md#active-toolchain).
+> Dated sprint counts, scheduling restrictions and approvals below retain their
+> historical scope; they do not reopen completed-stage gates.
+
 # Stage 7 implementation and local acceptance
 
 **Superseding owner evidence (20 October 2026): Stage 7 HOSTED LOCKED** at
@@ -15,7 +19,7 @@ Git history, branches, remotes, hosted CI and public publication remain owner-co
 ## Shared compiler service
 
 Every adapter runs the same `voidls`, using the existing frontend, resolver,
-`ToolingIndex` and `ToolingSession`. LLVM/Clang/LLD remains **19.1.7**. There is no
+`ToolingIndex` and `ToolingSession`. LLVM/Clang/LLD requires **23.1.4**. There is no
 editor parser/type checker, worker pool, incremental compiler or persistent
 analysis cache. Runtime/native execution and reload contracts are unchanged.
 

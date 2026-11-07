@@ -1,3 +1,7 @@
+> Current implementation guidance uses [LLVM/Clang/LLD 23.1.4](SOURCE_COMPILER.md#active-toolchain).
+> Dated sprint counts, scheduling restrictions and approvals below retain their
+> historical scope; they do not reopen completed-stage gates.
+
 # Stage 8 Sprint 3 — UTF-8 text and recoverable collections
 
 20 October 2026. **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending.**
@@ -31,7 +35,7 @@ The permanent approval is recorded in [DECISIONS.md](DECISIONS.md):
 ## Implementation contract
 
 The existing immutable UTF-8 payload, Heap, typed buffers, precise Frame/Slot roots,
-source checked failure ABI and LLVM 19.1.7 lowering remain authoritative. There is
+source checked failure ABI and LLVM 23.1.4 lowering remain authoritative. There is
 no second string representation, collector, allocator or per-string index cache.
 
 `length`, `byte_length`, indexing and conversion are runtime operations. They do

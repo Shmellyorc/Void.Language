@@ -1,0 +1,259 @@
+VOIDUP / libsodium three-file candidate — bounded isolated experiment
+7 November 2026 (America/Vancouver). For independent Golden Wrench / Boss review.
+
+RESULT AND SCOPE
+
+RETAIN the candidate as a successful isolated Linux experiment. Do not infer
+approval for permanent integration, native Windows/macOS acceptance, hosted CI,
+or release. No permanent provider recipe, pin, installed prefix, production
+source or existing documentation/evidence was modified.
+
+One reviewed candidate was tested in two fresh disposable source/build trees:
+  PikaOS x64:         87 PASS / 0 FAIL / 0 SKIP / 87; make check exit 0.
+  Ubuntu 24.04.5 x64: 87 PASS / 0 FAIL / 0 SKIP / 87; make check exit 0.
+Ubuntu is genuine Ubuntu userspace in the existing rootless container on this
+PikaOS machine's Linux kernel; it is not a separate physical/native host.
+Observed libc versions: PikaOS glibc 2.44; Ubuntu glibc 2.39.
+
+These are Automake target outcomes, not 87 independent output-oracle passes.
+85 .res files per environment match the existing .exp files byte-for-byte.
+Two unchanged upstream utility tests bypass the common output oracle and retain
+internal ASan fault-path exclusions. This limitation and supplemental checks are
+reported below. No failing/mismatching result file has been discarded.
+
+EXACT CANDIDATE
+
+Original source: libsodium 1.0.22, recorded revision
+77e1ce5d6dee871c49ef211222ba18ef0c486bda.
+Original archive SHA-256 (unchanged):
+adbdd8f16149e81ac6078a03aca6fc03b592b89ef7b5ed83841c086191be3349
+Final reviewed patch SHA-256 (identical to the prior review):
+f0de9004b8129626e14750437f51eb9524f030149607b50bb75ce0b6c998af74
+Actual patch: libsodium-candidate-final.patch.
+
+Only these three files differ from each fresh verified extraction:
+  test/default/cmptest.h
+  src/libsodium/crypto_stream/salsa20/xmm6int/u1.h
+  src/libsodium/crypto_stream/salsa20/xmm6int/u4.h
+
+The harness removes __SANITIZE_ADDRESS__ from the branch that substitutes NULL
+for guard_page; ASan uses the same guarded-allocation branch as non-ASan runs.
+No public nonnull annotations, test assertions, test target lists, expected
+outputs, cipher constants, rounds or counter policy were changed. Emscripten's
+branch is unchanged and is outside this experiment's qualification.
+
+Both provider hunks are the exact reviewed upstream alignment backport:
+https://github.com/jedisct1/libsodium/commit/11cd77c5cd35fafa2317c36cd7f61de0b9d03cd2
+They replace typed unaligned loads/stores with existing LOAD32_LE / STORE32_LE.
+The before/after hashes match the previously reviewed candidate metadata. The
+source tree is checked against the exact archive before applying the patch;
+after application, precisely the reviewed three postimages are required, with
+all other files unchanged. Building must not modify this patched source tree.
+No additional fixes were made after seeing the results.
+
+There is no sodium_memzero implementation change. The existing zero-length
+clearing test now supplies its protected nonnull fixture instead of NULL.
+No broader guarantee about sodium_memzero(NULL, 0) is established or added.
+
+METHOD AND ACTUAL BUILD CONDITIONS
+
+Driver: run_experiment.py. It refuses to overwrite an existing experiment tree,
+extracts independently for each environment, verifies the archive/source and
+reviewed postimages, applies patch --batch --fuzz=0, and never runs make install.
+No build points to the permanent host prefix. NOT-INSTALLED remains absent.
+
+Disposable roots, relative to the checkout:
+  build/llvm23-isolated-candidate-2026-11-07/pikaos/
+  build/llvm23-isolated-candidate-2026-11-07/ubuntu/
+
+Both actual SDKs match the existing verified official LLVM 23.1.4 archive
+identity. Clang, Clang++, LLD, llvm-ar, llvm-ranlib and llvm-symbolizer are explicit
+absolute SDK paths; all report 23.1.4. No ambient LLVM or alternate LLVM version
+is installed, downloaded or selected. Tool paths, versions and binary hashes
+are in each environment's toolchain.json.
+
+Configuration:
+  --disable-shared --enable-static --enable-minimal
+  --disable-dependency-tracking --prefix=<disposable>/NOT-INSTALLED
+  CFLAGS=-g -O2 -fsanitize=address,undefined -fno-omit-frame-pointer
+  LDFLAGS=-fsanitize=address,undefined --ld-path=<verified SDK>/bin/ld.lld
+  CC/CXX/LD/AR/RANLIB and ASAN_SYMBOLIZER_PATH use that verified SDK.
+  ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87
+  UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86
+  make -j3
+  make check -j3
+
+The archive/compiler options retain the previous strict profile. Explicit pinned
+archiver/linker selection is recorded rather than relying on ambient GNU/LLVM
+selection. Both builds are independent, even though they share physical hardware.
+Both complete 87-test lists must exactly equal the prior reviewed list. No TESTS
+filter, sanitizer suppression, altered expected output or annotation relaxation
+is used. Runtime leak/fatal options are unchanged. Full commands, exit statuses,
+configuration, timing observations, compile logs, test-suite logs and every test's
+.log/.trs/.res are retained under pikaos/ and ubuntu/. No throughput or performance
+threshold is introduced.
+
+CRYPTOGRAPHIC BEHAVIOR AND NEGATIVE-COVERAGE LIMITS
+
+All 87 target outcomes are retained individually in the results JSON files.
+The existing-vector-results.json files retain every actual/expected hash and both
+mismatches; qualification-summary.json distinguishes the 85 matches from those
+upstream oracle bypasses. In particular, the existing stream, stream2, stream3,
+stream4, box_easy2, box_seal, secretbox_easy and secretbox_easy2 vectors match on
+both environments. stream2 retains its upstream 4 MiB Salsa20 stream and 4000-byte
+in-place counter/XOR checks. stream retains the XSalsa20 and counter-boundary
+vectors. Inputs, assertions and expected files are unmodified.
+
+This supports the expected cryptographic behavior for the exercised existing
+vectors. It does not constitute independent cryptographic review or exhaustive
+proof of every backend, message length, CPU or platform.
+
+The unchanged sodium_utils2.c and sodium_utils3.c have ASan conditionals that
+avoid their intentional overflow/underflow paths, then invoke a handler that
+calls _exit(0). The common buffered result comparison/finalization is bypassed:
+  sodium_utils2: actual .res is empty; expected .exp is 46 bytes.
+  sodium_utils3: actual .res is empty; expected .exp is 43 bytes.
+Both still report PASS via exit 0. These target passes do not establish those
+fault branches or normal-exit leak finalization. The source also emits upstream
+ASan warning text; build diagnostics are retained. These limitations pre-exist
+the candidate and were not expanded or hidden.
+
+Supplemental probes against each isolated candidate library, under the SAME
+fatal instrumentation/options and without editing either upstream test:
+  valid guard: nonnull, mapped without read/write permission; zero-length clear
+               succeeds and the allocation is freed; exit 0.
+  overflow:    the upstream utils2-style out-of-range clear is rejected fatally.
+  underflow:   the upstream utils3-style canary damage/free is rejected fatally.
+  guard-read:  reading the fixture's protected guard is rejected fatally.
+All six invalid-access subprocesses emit AddressSanitizer diagnostics and actually
+exit 86. These are expected supplemental fatal controls, not upstream test failures
+or extra upstream passes. They verify relevant protection mechanisms separately;
+they do not retroactively turn the two utility tests into full oracle passes.
+
+The initial supplemental probe expected ASan exit 87 and failed its own oracle
+when the overflow correctly died with an ASan report but exit 86. That first
+script, result and diagnostic remain under pikaos/negative-probe-attempt1/.
+The corrected oracle accepts a fatal sanitizer status with an ASan diagnostic;
+no instrumentation, sanitizer flag or provider behavior was changed. Distinct
+ASan-versus-UBSan exit codes are not proven for this combined-runtime invocation.
+Actual statuses, rather than configured-code assumptions, must drive diagnosis.
+
+SOURCE PROVENANCE / RECIPE / CACHE REVIEW — NOT IMPLEMENTED
+
+1. Preserve upstream identity and apply only in a disposable source copy.
+   tools/verify_host_deps.py:source_tree currently verifies exact upstream files;
+   patching the permanent source cache would invalidate that contract. The
+   original archive/hash must remain the original source identity. A reviewed
+   patch identity, order, upstream origin, three before/postimage hashes and an
+   applied-tree digest must be recorded separately. The experiment provides
+   those concrete records in source-provenance.json. Future builder integration
+   must use the same base verification and fail on unexpected files, missing
+   patches or differing postimages. Windows already builds a disposable sodium
+   copy for version-header generation; Linux/macOS currently configure against
+   the pristine source cache and would need the corresponding copy step.
+
+2. Current receipts do NOT require this patch.
+   Read-only verify_prefix checks accept all three existing Linux prefixes under
+   today's unpatched policy; their receipts have no mandatory patch identity.
+   This is recorded in existing-receipt-review.json, not treated as candidate
+   acceptance. A promotion must make expected applied-source policy mandatory
+   and reject old/unpatched receipts before compiler configuration. Merely adding
+   optional JSON fields or checking old binary hashes is insufficient.
+   Linux's legacy receipt does not require recipe_sha256. Native schema 2 requires
+   an exact recipe inventory. Update the existing receipt/verifier scheme across
+   platforms so the patch and relevant builder/verifier recipe hashes are bound
+   and older receipts cannot silently pass. Do not call a patched binary pristine
+   1.0.22 solely because its base version/archive fields still match.
+
+3. Record actual build and profile identity.
+   Keep the exact original pins, compiler/SDK identity, build profile, flags,
+   native SDK/deployment/CRT settings, shared zlib identity and installed-file
+   hashes. Add explicit applied-backport provenance through the current receipt
+   system, not a second dependency manager. Rebuild/reverify affected prefixes;
+   copying the experiment archive or hand-editing a receipt is not integration.
+   No such change is made by this experiment.
+
+4. Existing caches and compiler/native identities have different roles.
+   tools/ci/voidup_bootstrap.py does not cache host prefixes and refuses implicit
+   reuse during bootstrap. tools/install.py does reuse an existing host prefix
+   when a receipt exists, so patch-aware verifier rejection is essential there.
+   CMakeLists.txt already hashes host archives, their receipt and host recipes
+   into compiler build identity; cmake/CacheBuildIdentity.cmake derives that
+   identity from actual inputs. A rebuilt archive/receipt changes the existing
+   compiler object-cache identity. Include the approved patch/policy files among
+   those expected inputs too; do not rely only on a coincidental binary change.
+   cmake/NativeBuild.cmake and NativeInventory.cmake already hash host link
+   archives for build/install native-resource manifests and depend on the actual
+   archives. Regenerate these through the normal build; preserve their checks.
+   The LLVM SDK archive identity remains LLVM 23.1.4 and must not be changed to
+   represent a sodium backport. HTTP's current cache recipe list includes shared
+   files such as NativeBuild.cmake, so a later packaging edit there can cause an
+   existing HTTP cache-key change. No HTTP transport/cache rewrite is needed.
+
+5. Corresponding-source and notice packaging must describe the compiled source.
+   NativeBuild.cmake currently installs the original sodium/libarchive archives
+   and provider receipt. InstallLicenses.cmake installs host notices, pins and a
+   fixed list of builder/verifier files. These rules do not automatically ship
+   this candidate patch or a patch-policy manifest. A patched-provider package
+   needs the unchanged base archive PLUS the exact approved patch, provenance,
+   application order and complete build/verification inputs matching its receipt.
+   Preserve upstream ISC terms/attribution; a copy is included here for review.
+   Update the existing notice/source inventory and installation validation to
+   account for the applied source, without relabeling original archive hashes.
+   The native recipe imports tools/ci/llvm_sdk.py, which is not in the current
+   host license-install file list. A reproducible source handoff must include
+   required shared helpers in their expected layout or document an actual
+   reproducible checkout, rather than presenting relocated scripts as standalone.
+   The existing redistribution audit already records source/rebuild limitations;
+   this experiment neither repairs nor clears them. No package was installed,
+   assembled, published or declared redistributable.
+
+Current policy files and hashes reviewed are recorded in reviewed-policy-inputs.json.
+These findings are an integration review, not hidden recipe/pin modifications.
+
+PRESERVATION AND REVIEW DIFFS
+
+The before/after preservation comparison checks 81,290 existing protected files:
+tracked sources, existing documentation/evidence, original host archives/source
+cache and permanent host prefixes. No differences were found, and the staged
+path list remains empty. This includes the current LLVM 23.1.4 Windows repair and
+all earlier favorable/unfavorable results. A final validation repeats the check
+after reporting/probes. All experiment binaries/objects remain only under build/;
+they are not part of the review evidence inventory.
+
+Actual review artifacts in this directory:
+  libsodium-candidate-final.patch      exact reviewed three-file patch; applied
+                                     ONLY to the two disposable source trees.
+  documentation-current.patch        cumulative existing documentation diff;
+                                     byte-identical to the prior reviewed diff.
+  documentation-experiment-delta.patch
+                                     empty: this experiment changes no existing
+                                     Markdown/documentation revision.
+  build-current.patch                retained cumulative Windows/build diff;
+                                     byte-identical to the prior reviewed diff.
+  experiment-build.patch             actual isolated-driver change from the
+                                     earlier harness-only experiment; not a
+                                     permanent provider recipe change.
+  qualification-summary.json         precise outcomes/oracle limits/negative
+                                     controls; no 87-output-match overclaim.
+  results.json / <platform>/results.json
+                                     every upstream target outcome.
+  preservation-final.json             final protected-file verification.
+  evidence-manifest.json              exact evidence paths/hashes (self omitted).
+
+FINAL RECOMMENDATION
+
+RETAIN this three-file candidate for Golden Wrench / Boss source review based on
+87/87 isolated target passes per Linux userspace, matching exercised cipher
+vectors and explicit supplemental protection checks. Keep the two upstream ASan
+coverage/oracle exceptions and observed exit-code limitation visible.
+
+Do not promote an unpatched receipt, claim installed VOIDUP qualification, or
+claim native Windows/macOS acceptance from these results. Any permanent source,
+receipt/cache or corresponding-source integration remains a separate authorized
+step. Actual Windows compiler/linker/resource and /MT/libsodium/provider evidence
+is still required under the retained Windows selection policy.
+
+No permanent recipe integration, pin/hash change, staging, commit, branch, push,
+hosted CI dispatch, public publication or existing documentation edit occurred.
+Stop for independent Golden Wrench and Boss review.

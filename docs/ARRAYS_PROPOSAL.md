@@ -1,3 +1,8 @@
+> **Historical proposal.** Original decisions, approvals and dated evidence
+> below retain their scope. Earlier toolchain pins and activation gates are
+> superseded; current operations require [LLVM/Clang/LLD 23.1.4](SOURCE_COMPILER.md#active-toolchain).
+> The delivered contract is linked from the [documentation index](README.md).
+
 # Phase 23 proposal: typed arrays, indexing and iteration
 
 **Design/proposal history.** For delivered behavior and superseded activation gates, read the [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status) and the corresponding implementation guide.

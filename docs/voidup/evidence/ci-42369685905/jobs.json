@@ -1,0 +1,2553 @@
+{
+  "total_count": 7,
+  "jobs": [
+    {
+      "id": 128395046448,
+      "run_id": 42369685905,
+      "workflow_name": "Compiler link experiment",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/runs/42369685905",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVES8fs8AAAAd5PDuMA",
+      "head_sha": "9521329e7e67f4c8bb5aec38d684fde3f3c887de",
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/jobs/128395046448",
+      "html_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/42369685905/job/128395046448",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-11-07T11:47:56Z",
+      "started_at": "2026-11-07T11:47:59Z",
+      "completed_at": "2026-11-07T11:51:51Z",
+      "name": "thinlto-cache / Ubuntu 24.04 / Sanitizers",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-07T11:48:00Z",
+          "completed_at": "2026-11-07T11:48:01Z"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-07T11:48:01Z",
+          "completed_at": "2026-11-07T11:48:23Z"
+        },
+        {
+          "name": "Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-07T11:48:23Z",
+          "completed_at": "2026-11-07T11:48:23Z"
+        },
+        {
+          "name": "Prepare isolated link experiment",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-07T11:48:23Z",
+          "completed_at": "2026-11-07T11:48:23Z"
+        },
+        {
+          "name": "Linux development dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-07T11:48:23Z",
+          "completed_at": "2026-11-07T11:48:36Z"
+        },
+        {
+          "name": "Windows native SDK environment",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-11-07T11:48:36Z",
+          "completed_at": "2026-11-07T11:48:36Z"
+        },
+        {
+          "name": "Verify macOS ARM64 runner",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 7,
+          "started_at": "2026-11-07T11:48:36Z",
+          "completed_at": "2026-11-07T11:48:36Z"
+        },
+        {
+          "name": "Reclaim unused Ubuntu SDKs and check disk capacity",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-07T11:48:36Z",
+          "completed_at": "2026-11-07T11:49:39Z"
+        },
+        {
+          "name": "Cache complete official LLVM SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-07T11:49:39Z",
+          "completed_at": "2026-11-07T11:50:50Z"
+        },
+        {
+          "name": "Install and verify LLVM development SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-07T11:50:50Z",
+          "completed_at": "2026-11-07T11:50:51Z"
+        },
+        {
+          "name": "Measure Linux disk after verified SDK extraction",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-07T11:50:51Z",
+          "completed_at": "2026-11-07T11:50:51Z"
+        },
+        {
+          "name": "Identify pinned native HTTP dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-07T11:50:51Z",
+          "completed_at": "2026-11-07T11:50:55Z"
+        },
+        {
+          "name": "Cache verified HTTP source archives",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-07T11:50:55Z",
+          "completed_at": "2026-11-07T11:50:58Z"
+        },
+        {
+          "name": "Cache native HTTP dependency profile",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-07T11:50:58Z",
+          "completed_at": "2026-11-07T11:51:00Z"
+        },
+        {
+          "name": "Cache pinned local HTTP fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-07T11:51:00Z",
+          "completed_at": "2026-11-07T11:51:01Z"
+        },
+        {
+          "name": "Bootstrap and verify HTTP dependencies and fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-11-07T11:51:01Z",
+          "completed_at": "2026-11-07T11:51:02Z"
+        },
+        {
+          "name": "Save verified HTTP source archives",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 17,
+          "started_at": "2026-11-07T11:51:02Z",
+          "completed_at": "2026-11-07T11:51:02Z"
+        },
+        {
+          "name": "Save verified native HTTP dependency profile",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 18,
+          "started_at": "2026-11-07T11:51:02Z",
+          "completed_at": "2026-11-07T11:51:02Z"
+        },
+        {
+          "name": "Save verified local HTTP fixtures",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 19,
+          "started_at": "2026-11-07T11:51:02Z",
+          "completed_at": "2026-11-07T11:51:02Z"
+        },
+        {
+          "name": "Bootstrap and verify pinned VOIDUP host providers",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 20,
+          "started_at": "2026-11-07T11:51:02Z",
+          "completed_at": "2026-11-07T11:51:47Z"
+        },
+        {
+          "name": "Configure Sanitizers",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 21,
+          "started_at": "2026-11-07T11:51:47Z",
+          "completed_at": "2026-11-07T11:51:47Z"
+        },
+        {
+          "name": "Check Linux build disk headroom",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 22,
+          "started_at": "2026-11-07T11:51:47Z",
+          "completed_at": "2026-11-07T11:51:47Z"
+        },
+        {
+          "name": "Build Sanitizers",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 23,
+          "started_at": "2026-11-07T11:51:47Z",
+          "completed_at": "2026-11-07T11:51:47Z"
+        },
+        {
+          "name": "Verify HTTP and URL acceptance registration",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 24,
+          "started_at": "2026-11-07T11:51:47Z",
+          "completed_at": "2026-11-07T11:51:47Z"
+        },
+        {
+          "name": "Verify native host and VOIDUP smoke registration",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 25,
+          "started_at": "2026-11-07T11:51:47Z",
+          "completed_at": "2026-11-07T11:51:47Z"
+        },
+        {
+          "name": "Execute Sanitizers tests",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 26,
+          "started_at": "2026-11-07T11:51:47Z",
+          "completed_at": "2026-11-07T11:51:47Z"
+        },
+        {
+          "name": "Frontend Debug and Release small-stack regression",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 27,
+          "started_at": "2026-11-07T11:51:47Z",
+          "completed_at": "2026-11-07T11:51:47Z"
+        },
+        {
+          "name": "Extension Node.js toolchain",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 28,
+          "started_at": "2026-11-07T11:51:47Z",
+          "completed_at": "2026-11-07T11:51:47Z"
+        },
+        {
+          "name": "Linux editor display dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 29,
+          "started_at": "2026-11-07T11:51:47Z",
+          "completed_at": "2026-11-07T11:51:47Z"
+        },
+        {
+          "name": "Install extension dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 30,
+          "started_at": "2026-11-07T11:51:47Z",
+          "completed_at": "2026-11-07T11:51:47Z"
+        },
+        {
+          "name": "Type-check, build and test extension",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 31,
+          "started_at": "2026-11-07T11:51:47Z",
+          "completed_at": "2026-11-07T11:51:47Z"
+        },
+        {
+          "name": "Real editor integration (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 32,
+          "started_at": "2026-11-07T11:51:47Z",
+          "completed_at": "2026-11-07T11:51:47Z"
+        },
+        {
+          "name": "Real editor integration (Windows and macOS)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 33,
+          "started_at": "2026-11-07T11:51:47Z",
+          "completed_at": "2026-11-07T11:51:47Z"
+        },
+        {
+          "name": "Package local editor extension",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 34,
+          "started_at": "2026-11-07T11:51:47Z",
+          "completed_at": "2026-11-07T11:51:47Z"
+        },
+        {
+          "name": "Preserve local editor package",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 35,
+          "started_at": "2026-11-07T11:51:47Z",
+          "completed_at": "2026-11-07T11:51:47Z"
+        },
+        {
+          "name": "Measure warm voidc relink after acceptance",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 36,
+          "started_at": "2026-11-07T11:51:47Z",
+          "completed_at": "2026-11-07T11:51:47Z"
+        },
+        {
+          "name": "Preserve link experiment diagnostics",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 37,
+          "started_at": "2026-11-07T11:51:47Z",
+          "completed_at": "2026-11-07T11:51:48Z"
+        },
+        {
+          "name": "Preserve test results",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 38,
+          "started_at": "2026-11-07T11:51:48Z",
+          "completed_at": "2026-11-07T11:51:48Z"
+        },
+        {
+          "name": "Post Cache complete official LLVM SDK",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 74,
+          "started_at": "2026-11-07T11:51:48Z",
+          "completed_at": "2026-11-07T11:51:48Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 75,
+          "started_at": "2026-11-07T11:51:48Z",
+          "completed_at": "2026-11-07T11:51:48Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 76,
+          "started_at": "2026-11-07T11:51:48Z",
+          "completed_at": "2026-11-07T11:51:49Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 77,
+          "started_at": "2026-11-07T11:51:49Z",
+          "completed_at": "2026-11-07T11:51:49Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Shmellyorc/Void.Language/check-runs/128395046448",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000000873,
+      "runner_name": "GitHub Actions 1000000873",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 128395046546,
+      "run_id": 42369685905,
+      "workflow_name": "Compiler link experiment",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/runs/42369685905",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVES8fs8AAAAd5PDukg",
+      "head_sha": "9521329e7e67f4c8bb5aec38d684fde3f3c887de",
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/jobs/128395046546",
+      "html_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/42369685905/job/128395046546",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-11-07T11:47:56Z",
+      "started_at": "2026-11-07T11:47:58Z",
+      "completed_at": "2026-11-07T11:50:34Z",
+      "name": "thinlto-cache / Windows 2022 / Release",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-07T11:47:59Z",
+          "completed_at": "2026-11-07T11:48:00Z"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-07T11:48:00Z",
+          "completed_at": "2026-11-07T11:48:42Z"
+        },
+        {
+          "name": "Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-07T11:48:42Z",
+          "completed_at": "2026-11-07T11:48:42Z"
+        },
+        {
+          "name": "Prepare isolated link experiment",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-07T11:48:42Z",
+          "completed_at": "2026-11-07T11:48:43Z"
+        },
+        {
+          "name": "Linux development dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5,
+          "started_at": "2026-11-07T11:48:43Z",
+          "completed_at": "2026-11-07T11:48:43Z"
+        },
+        {
+          "name": "Windows native SDK environment",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-07T11:48:43Z",
+          "completed_at": "2026-11-07T11:48:49Z"
+        },
+        {
+          "name": "Verify macOS ARM64 runner",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 7,
+          "started_at": "2026-11-07T11:48:49Z",
+          "completed_at": "2026-11-07T11:48:49Z"
+        },
+        {
+          "name": "Reclaim unused Ubuntu SDKs and check disk capacity",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 8,
+          "started_at": "2026-11-07T11:48:49Z",
+          "completed_at": "2026-11-07T11:48:49Z"
+        },
+        {
+          "name": "Cache complete official LLVM SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-07T11:48:49Z",
+          "completed_at": "2026-11-07T11:49:16Z"
+        },
+        {
+          "name": "Install and verify LLVM development SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-07T11:49:16Z",
+          "completed_at": "2026-11-07T11:50:14Z"
+        },
+        {
+          "name": "Measure Linux disk after verified SDK extraction",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 11,
+          "started_at": "2026-11-07T11:50:14Z",
+          "completed_at": "2026-11-07T11:50:14Z"
+        },
+        {
+          "name": "Identify pinned native HTTP dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-07T11:50:14Z",
+          "completed_at": "2026-11-07T11:50:15Z"
+        },
+        {
+          "name": "Cache verified HTTP source archives",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-07T11:50:15Z",
+          "completed_at": "2026-11-07T11:50:17Z"
+        },
+        {
+          "name": "Cache native HTTP dependency profile",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-07T11:50:17Z",
+          "completed_at": "2026-11-07T11:50:17Z"
+        },
+        {
+          "name": "Cache pinned local HTTP fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-07T11:50:17Z",
+          "completed_at": "2026-11-07T11:50:18Z"
+        },
+        {
+          "name": "Bootstrap and verify HTTP dependencies and fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-11-07T11:50:18Z",
+          "completed_at": "2026-11-07T11:50:19Z"
+        },
+        {
+          "name": "Save verified HTTP source archives",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 17,
+          "started_at": "2026-11-07T11:50:19Z",
+          "completed_at": "2026-11-07T11:50:19Z"
+        },
+        {
+          "name": "Save verified native HTTP dependency profile",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 18,
+          "started_at": "2026-11-07T11:50:19Z",
+          "completed_at": "2026-11-07T11:50:19Z"
+        },
+        {
+          "name": "Save verified local HTTP fixtures",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 19,
+          "started_at": "2026-11-07T11:50:19Z",
+          "completed_at": "2026-11-07T11:50:19Z"
+        },
+        {
+          "name": "Bootstrap and verify pinned VOIDUP host providers",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 20,
+          "started_at": "2026-11-07T11:50:19Z",
+          "completed_at": "2026-11-07T11:50:30Z"
+        },
+        {
+          "name": "Configure Release",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 21,
+          "started_at": "2026-11-07T11:50:30Z",
+          "completed_at": "2026-11-07T11:50:30Z"
+        },
+        {
+          "name": "Check Linux build disk headroom",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 22,
+          "started_at": "2026-11-07T11:50:30Z",
+          "completed_at": "2026-11-07T11:50:30Z"
+        },
+        {
+          "name": "Build Release",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 23,
+          "started_at": "2026-11-07T11:50:30Z",
+          "completed_at": "2026-11-07T11:50:30Z"
+        },
+        {
+          "name": "Verify HTTP and URL acceptance registration",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 24,
+          "started_at": "2026-11-07T11:50:30Z",
+          "completed_at": "2026-11-07T11:50:30Z"
+        },
+        {
+          "name": "Verify native host and VOIDUP smoke registration",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 25,
+          "started_at": "2026-11-07T11:50:30Z",
+          "completed_at": "2026-11-07T11:50:30Z"
+        },
+        {
+          "name": "Execute Release tests",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 26,
+          "started_at": "2026-11-07T11:50:30Z",
+          "completed_at": "2026-11-07T11:50:30Z"
+        },
+        {
+          "name": "Frontend Debug and Release small-stack regression",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 27,
+          "started_at": "2026-11-07T11:50:30Z",
+          "completed_at": "2026-11-07T11:50:30Z"
+        },
+        {
+          "name": "Extension Node.js toolchain",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 28,
+          "started_at": "2026-11-07T11:50:30Z",
+          "completed_at": "2026-11-07T11:50:30Z"
+        },
+        {
+          "name": "Linux editor display dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 29,
+          "started_at": "2026-11-07T11:50:30Z",
+          "completed_at": "2026-11-07T11:50:30Z"
+        },
+        {
+          "name": "Install extension dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 30,
+          "started_at": "2026-11-07T11:50:30Z",
+          "completed_at": "2026-11-07T11:50:30Z"
+        },
+        {
+          "name": "Type-check, build and test extension",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 31,
+          "started_at": "2026-11-07T11:50:30Z",
+          "completed_at": "2026-11-07T11:50:30Z"
+        },
+        {
+          "name": "Real editor integration (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 32,
+          "started_at": "2026-11-07T11:50:30Z",
+          "completed_at": "2026-11-07T11:50:30Z"
+        },
+        {
+          "name": "Real editor integration (Windows and macOS)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 33,
+          "started_at": "2026-11-07T11:50:30Z",
+          "completed_at": "2026-11-07T11:50:30Z"
+        },
+        {
+          "name": "Package local editor extension",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 34,
+          "started_at": "2026-11-07T11:50:30Z",
+          "completed_at": "2026-11-07T11:50:30Z"
+        },
+        {
+          "name": "Preserve local editor package",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 35,
+          "started_at": "2026-11-07T11:50:30Z",
+          "completed_at": "2026-11-07T11:50:30Z"
+        },
+        {
+          "name": "Measure warm voidc relink after acceptance",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 36,
+          "started_at": "2026-11-07T11:50:30Z",
+          "completed_at": "2026-11-07T11:50:30Z"
+        },
+        {
+          "name": "Preserve link experiment diagnostics",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 37,
+          "started_at": "2026-11-07T11:50:30Z",
+          "completed_at": "2026-11-07T11:50:31Z"
+        },
+        {
+          "name": "Preserve test results",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 38,
+          "started_at": "2026-11-07T11:50:31Z",
+          "completed_at": "2026-11-07T11:50:32Z"
+        },
+        {
+          "name": "Post Cache complete official LLVM SDK",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 74,
+          "started_at": "2026-11-07T11:50:32Z",
+          "completed_at": "2026-11-07T11:50:32Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 75,
+          "started_at": "2026-11-07T11:50:32Z",
+          "completed_at": "2026-11-07T11:50:32Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 76,
+          "started_at": "2026-11-07T11:50:32Z",
+          "completed_at": "2026-11-07T11:50:33Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 77,
+          "started_at": "2026-11-07T11:50:33Z",
+          "completed_at": "2026-11-07T11:50:33Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Shmellyorc/Void.Language/check-runs/128395046546",
+      "labels": [
+        "windows-2022"
+      ],
+      "runner_id": 1000000870,
+      "runner_name": "GitHub Actions 1000000870",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 128395046571,
+      "run_id": 42369685905,
+      "workflow_name": "Compiler link experiment",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/runs/42369685905",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVES8fs8AAAAd5PDuqw",
+      "head_sha": "9521329e7e67f4c8bb5aec38d684fde3f3c887de",
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/jobs/128395046571",
+      "html_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/42369685905/job/128395046571",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-11-07T11:47:56Z",
+      "started_at": "2026-11-07T11:47:58Z",
+      "completed_at": "2026-11-07T11:49:58Z",
+      "name": "thinlto-cache / Windows 2022 / Debug",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-07T11:47:59Z",
+          "completed_at": "2026-11-07T11:48:00Z"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-07T11:48:00Z",
+          "completed_at": "2026-11-07T11:48:29Z"
+        },
+        {
+          "name": "Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-07T11:48:29Z",
+          "completed_at": "2026-11-07T11:48:29Z"
+        },
+        {
+          "name": "Prepare isolated link experiment",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-07T11:48:29Z",
+          "completed_at": "2026-11-07T11:48:30Z"
+        },
+        {
+          "name": "Linux development dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5,
+          "started_at": "2026-11-07T11:48:30Z",
+          "completed_at": "2026-11-07T11:48:30Z"
+        },
+        {
+          "name": "Windows native SDK environment",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-07T11:48:30Z",
+          "completed_at": "2026-11-07T11:48:34Z"
+        },
+        {
+          "name": "Verify macOS ARM64 runner",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 7,
+          "started_at": "2026-11-07T11:48:34Z",
+          "completed_at": "2026-11-07T11:48:34Z"
+        },
+        {
+          "name": "Reclaim unused Ubuntu SDKs and check disk capacity",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 8,
+          "started_at": "2026-11-07T11:48:34Z",
+          "completed_at": "2026-11-07T11:48:34Z"
+        },
+        {
+          "name": "Cache complete official LLVM SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-07T11:48:34Z",
+          "completed_at": "2026-11-07T11:48:58Z"
+        },
+        {
+          "name": "Install and verify LLVM development SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-07T11:48:58Z",
+          "completed_at": "2026-11-07T11:49:40Z"
+        },
+        {
+          "name": "Measure Linux disk after verified SDK extraction",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 11,
+          "started_at": "2026-11-07T11:49:40Z",
+          "completed_at": "2026-11-07T11:49:40Z"
+        },
+        {
+          "name": "Identify pinned native HTTP dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-07T11:49:40Z",
+          "completed_at": "2026-11-07T11:49:40Z"
+        },
+        {
+          "name": "Cache verified HTTP source archives",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-07T11:49:40Z",
+          "completed_at": "2026-11-07T11:49:42Z"
+        },
+        {
+          "name": "Cache native HTTP dependency profile",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-07T11:49:42Z",
+          "completed_at": "2026-11-07T11:49:43Z"
+        },
+        {
+          "name": "Cache pinned local HTTP fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-07T11:49:43Z",
+          "completed_at": "2026-11-07T11:49:44Z"
+        },
+        {
+          "name": "Bootstrap and verify HTTP dependencies and fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-11-07T11:49:44Z",
+          "completed_at": "2026-11-07T11:49:45Z"
+        },
+        {
+          "name": "Save verified HTTP source archives",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 17,
+          "started_at": "2026-11-07T11:49:45Z",
+          "completed_at": "2026-11-07T11:49:45Z"
+        },
+        {
+          "name": "Save verified native HTTP dependency profile",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 18,
+          "started_at": "2026-11-07T11:49:45Z",
+          "completed_at": "2026-11-07T11:49:45Z"
+        },
+        {
+          "name": "Save verified local HTTP fixtures",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 19,
+          "started_at": "2026-11-07T11:49:45Z",
+          "completed_at": "2026-11-07T11:49:45Z"
+        },
+        {
+          "name": "Bootstrap and verify pinned VOIDUP host providers",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 20,
+          "started_at": "2026-11-07T11:49:45Z",
+          "completed_at": "2026-11-07T11:49:54Z"
+        },
+        {
+          "name": "Configure Debug",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 21,
+          "started_at": "2026-11-07T11:49:54Z",
+          "completed_at": "2026-11-07T11:49:54Z"
+        },
+        {
+          "name": "Check Linux build disk headroom",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 22,
+          "started_at": "2026-11-07T11:49:54Z",
+          "completed_at": "2026-11-07T11:49:54Z"
+        },
+        {
+          "name": "Build Debug",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 23,
+          "started_at": "2026-11-07T11:49:54Z",
+          "completed_at": "2026-11-07T11:49:54Z"
+        },
+        {
+          "name": "Verify HTTP and URL acceptance registration",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 24,
+          "started_at": "2026-11-07T11:49:54Z",
+          "completed_at": "2026-11-07T11:49:54Z"
+        },
+        {
+          "name": "Verify native host and VOIDUP smoke registration",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 25,
+          "started_at": "2026-11-07T11:49:54Z",
+          "completed_at": "2026-11-07T11:49:54Z"
+        },
+        {
+          "name": "Execute Debug tests",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 26,
+          "started_at": "2026-11-07T11:49:54Z",
+          "completed_at": "2026-11-07T11:49:54Z"
+        },
+        {
+          "name": "Frontend Debug and Release small-stack regression",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 27,
+          "started_at": "2026-11-07T11:49:54Z",
+          "completed_at": "2026-11-07T11:49:54Z"
+        },
+        {
+          "name": "Extension Node.js toolchain",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 28,
+          "started_at": "2026-11-07T11:49:54Z",
+          "completed_at": "2026-11-07T11:49:54Z"
+        },
+        {
+          "name": "Linux editor display dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 29,
+          "started_at": "2026-11-07T11:49:54Z",
+          "completed_at": "2026-11-07T11:49:54Z"
+        },
+        {
+          "name": "Install extension dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 30,
+          "started_at": "2026-11-07T11:49:54Z",
+          "completed_at": "2026-11-07T11:49:54Z"
+        },
+        {
+          "name": "Type-check, build and test extension",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 31,
+          "started_at": "2026-11-07T11:49:54Z",
+          "completed_at": "2026-11-07T11:49:54Z"
+        },
+        {
+          "name": "Real editor integration (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 32,
+          "started_at": "2026-11-07T11:49:54Z",
+          "completed_at": "2026-11-07T11:49:54Z"
+        },
+        {
+          "name": "Real editor integration (Windows and macOS)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 33,
+          "started_at": "2026-11-07T11:49:54Z",
+          "completed_at": "2026-11-07T11:49:54Z"
+        },
+        {
+          "name": "Package local editor extension",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 34,
+          "started_at": "2026-11-07T11:49:54Z",
+          "completed_at": "2026-11-07T11:49:54Z"
+        },
+        {
+          "name": "Preserve local editor package",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 35,
+          "started_at": "2026-11-07T11:49:54Z",
+          "completed_at": "2026-11-07T11:49:54Z"
+        },
+        {
+          "name": "Measure warm voidc relink after acceptance",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 36,
+          "started_at": "2026-11-07T11:49:54Z",
+          "completed_at": "2026-11-07T11:49:54Z"
+        },
+        {
+          "name": "Preserve link experiment diagnostics",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 37,
+          "started_at": "2026-11-07T11:49:54Z",
+          "completed_at": "2026-11-07T11:49:55Z"
+        },
+        {
+          "name": "Preserve test results",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 38,
+          "started_at": "2026-11-07T11:49:55Z",
+          "completed_at": "2026-11-07T11:49:55Z"
+        },
+        {
+          "name": "Post Cache complete official LLVM SDK",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 74,
+          "started_at": "2026-11-07T11:49:55Z",
+          "completed_at": "2026-11-07T11:49:55Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 75,
+          "started_at": "2026-11-07T11:49:55Z",
+          "completed_at": "2026-11-07T11:49:55Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 76,
+          "started_at": "2026-11-07T11:49:55Z",
+          "completed_at": "2026-11-07T11:49:57Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 77,
+          "started_at": "2026-11-07T11:49:57Z",
+          "completed_at": "2026-11-07T11:49:57Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Shmellyorc/Void.Language/check-runs/128395046571",
+      "labels": [
+        "windows-2022"
+      ],
+      "runner_id": 1000000869,
+      "runner_name": "GitHub Actions 1000000869",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 128395046593,
+      "run_id": 42369685905,
+      "workflow_name": "Compiler link experiment",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/runs/42369685905",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVES8fs8AAAAd5PDuwQ",
+      "head_sha": "9521329e7e67f4c8bb5aec38d684fde3f3c887de",
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/jobs/128395046593",
+      "html_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/42369685905/job/128395046593",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-11-07T11:47:56Z",
+      "started_at": "2026-11-07T11:47:58Z",
+      "completed_at": "2026-11-07T11:56:55Z",
+      "name": "thinlto-cache / macOS ARM64 / Release",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-07T11:47:59Z",
+          "completed_at": "2026-11-07T11:48:00Z"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-07T11:48:00Z",
+          "completed_at": "2026-11-07T11:48:28Z"
+        },
+        {
+          "name": "Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-07T11:48:28Z",
+          "completed_at": "2026-11-07T11:48:28Z"
+        },
+        {
+          "name": "Prepare isolated link experiment",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-07T11:48:28Z",
+          "completed_at": "2026-11-07T11:48:29Z"
+        },
+        {
+          "name": "Linux development dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5,
+          "started_at": "2026-11-07T11:48:29Z",
+          "completed_at": "2026-11-07T11:48:29Z"
+        },
+        {
+          "name": "Windows native SDK environment",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-11-07T11:48:29Z",
+          "completed_at": "2026-11-07T11:48:29Z"
+        },
+        {
+          "name": "Verify macOS ARM64 runner",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-07T11:48:29Z",
+          "completed_at": "2026-11-07T11:48:29Z"
+        },
+        {
+          "name": "Reclaim unused Ubuntu SDKs and check disk capacity",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 8,
+          "started_at": "2026-11-07T11:48:29Z",
+          "completed_at": "2026-11-07T11:48:29Z"
+        },
+        {
+          "name": "Cache complete official LLVM SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-07T11:48:29Z",
+          "completed_at": "2026-11-07T11:48:56Z"
+        },
+        {
+          "name": "Install and verify LLVM development SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-07T11:48:56Z",
+          "completed_at": "2026-11-07T11:48:56Z"
+        },
+        {
+          "name": "Measure Linux disk after verified SDK extraction",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 11,
+          "started_at": "2026-11-07T11:48:56Z",
+          "completed_at": "2026-11-07T11:48:56Z"
+        },
+        {
+          "name": "Identify pinned native HTTP dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-07T11:48:56Z",
+          "completed_at": "2026-11-07T11:48:57Z"
+        },
+        {
+          "name": "Cache verified HTTP source archives",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-07T11:48:57Z",
+          "completed_at": "2026-11-07T11:49:00Z"
+        },
+        {
+          "name": "Cache native HTTP dependency profile",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-07T11:49:00Z",
+          "completed_at": "2026-11-07T11:49:01Z"
+        },
+        {
+          "name": "Cache pinned local HTTP fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-07T11:49:01Z",
+          "completed_at": "2026-11-07T11:49:02Z"
+        },
+        {
+          "name": "Bootstrap and verify HTTP dependencies and fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-11-07T11:49:02Z",
+          "completed_at": "2026-11-07T11:49:02Z"
+        },
+        {
+          "name": "Save verified HTTP source archives",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 17,
+          "started_at": "2026-11-07T11:49:02Z",
+          "completed_at": "2026-11-07T11:49:02Z"
+        },
+        {
+          "name": "Save verified native HTTP dependency profile",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 18,
+          "started_at": "2026-11-07T11:49:02Z",
+          "completed_at": "2026-11-07T11:49:02Z"
+        },
+        {
+          "name": "Save verified local HTTP fixtures",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 19,
+          "started_at": "2026-11-07T11:49:02Z",
+          "completed_at": "2026-11-07T11:49:02Z"
+        },
+        {
+          "name": "Bootstrap and verify pinned VOIDUP host providers",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-07T11:49:02Z",
+          "completed_at": "2026-11-07T11:50:36Z"
+        },
+        {
+          "name": "Configure Release",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-07T11:50:36Z",
+          "completed_at": "2026-11-07T11:51:51Z"
+        },
+        {
+          "name": "Check Linux build disk headroom",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 22,
+          "started_at": "2026-11-07T11:51:51Z",
+          "completed_at": "2026-11-07T11:51:51Z"
+        },
+        {
+          "name": "Build Release",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 23,
+          "started_at": "2026-11-07T11:51:51Z",
+          "completed_at": "2026-11-07T11:56:49Z"
+        },
+        {
+          "name": "Verify HTTP and URL acceptance registration",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 24,
+          "started_at": "2026-11-07T11:56:49Z",
+          "completed_at": "2026-11-07T11:56:49Z"
+        },
+        {
+          "name": "Verify native host and VOIDUP smoke registration",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 25,
+          "started_at": "2026-11-07T11:56:49Z",
+          "completed_at": "2026-11-07T11:56:49Z"
+        },
+        {
+          "name": "Execute Release tests",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 26,
+          "started_at": "2026-11-07T11:56:49Z",
+          "completed_at": "2026-11-07T11:56:49Z"
+        },
+        {
+          "name": "Frontend Debug and Release small-stack regression",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 27,
+          "started_at": "2026-11-07T11:56:49Z",
+          "completed_at": "2026-11-07T11:56:49Z"
+        },
+        {
+          "name": "Extension Node.js toolchain",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 28,
+          "started_at": "2026-11-07T11:56:49Z",
+          "completed_at": "2026-11-07T11:56:49Z"
+        },
+        {
+          "name": "Linux editor display dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 29,
+          "started_at": "2026-11-07T11:56:49Z",
+          "completed_at": "2026-11-07T11:56:49Z"
+        },
+        {
+          "name": "Install extension dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 30,
+          "started_at": "2026-11-07T11:56:49Z",
+          "completed_at": "2026-11-07T11:56:49Z"
+        },
+        {
+          "name": "Type-check, build and test extension",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 31,
+          "started_at": "2026-11-07T11:56:49Z",
+          "completed_at": "2026-11-07T11:56:49Z"
+        },
+        {
+          "name": "Real editor integration (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 32,
+          "started_at": "2026-11-07T11:56:49Z",
+          "completed_at": "2026-11-07T11:56:49Z"
+        },
+        {
+          "name": "Real editor integration (Windows and macOS)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 33,
+          "started_at": "2026-11-07T11:56:49Z",
+          "completed_at": "2026-11-07T11:56:49Z"
+        },
+        {
+          "name": "Package local editor extension",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 34,
+          "started_at": "2026-11-07T11:56:49Z",
+          "completed_at": "2026-11-07T11:56:49Z"
+        },
+        {
+          "name": "Preserve local editor package",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 35,
+          "started_at": "2026-11-07T11:56:49Z",
+          "completed_at": "2026-11-07T11:56:49Z"
+        },
+        {
+          "name": "Measure warm voidc relink after acceptance",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 36,
+          "started_at": "2026-11-07T11:56:49Z",
+          "completed_at": "2026-11-07T11:56:49Z"
+        },
+        {
+          "name": "Preserve link experiment diagnostics",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 37,
+          "started_at": "2026-11-07T11:56:49Z",
+          "completed_at": "2026-11-07T11:56:51Z"
+        },
+        {
+          "name": "Preserve test results",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 38,
+          "started_at": "2026-11-07T11:56:51Z",
+          "completed_at": "2026-11-07T11:56:53Z"
+        },
+        {
+          "name": "Post Cache complete official LLVM SDK",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 74,
+          "started_at": "2026-11-07T11:56:53Z",
+          "completed_at": "2026-11-07T11:56:53Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 75,
+          "started_at": "2026-11-07T11:56:53Z",
+          "completed_at": "2026-11-07T11:56:53Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 76,
+          "started_at": "2026-11-07T11:56:53Z",
+          "completed_at": "2026-11-07T11:56:53Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 77,
+          "started_at": "2026-11-07T11:56:53Z",
+          "completed_at": "2026-11-07T11:56:53Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Shmellyorc/Void.Language/check-runs/128395046593",
+      "labels": [
+        "macos-latest"
+      ],
+      "runner_id": 1000000871,
+      "runner_name": "GitHub Actions 1000000871",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 128395046619,
+      "run_id": 42369685905,
+      "workflow_name": "Compiler link experiment",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/runs/42369685905",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVES8fs8AAAAd5PDu2w",
+      "head_sha": "9521329e7e67f4c8bb5aec38d684fde3f3c887de",
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/jobs/128395046619",
+      "html_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/42369685905/job/128395046619",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "created_at": "2026-11-07T11:47:56Z",
+      "started_at": "2026-11-07T11:47:59Z",
+      "completed_at": "2026-11-07T12:00:08Z",
+      "name": "thinlto-cache / Ubuntu 24.04 / Release",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-07T11:48:00Z",
+          "completed_at": "2026-11-07T11:48:01Z"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-07T11:48:01Z",
+          "completed_at": "2026-11-07T11:48:23Z"
+        },
+        {
+          "name": "Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-07T11:48:23Z",
+          "completed_at": "2026-11-07T11:48:23Z"
+        },
+        {
+          "name": "Prepare isolated link experiment",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-07T11:48:23Z",
+          "completed_at": "2026-11-07T11:48:23Z"
+        },
+        {
+          "name": "Linux development dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-07T11:48:23Z",
+          "completed_at": "2026-11-07T11:48:34Z"
+        },
+        {
+          "name": "Windows native SDK environment",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-11-07T11:48:34Z",
+          "completed_at": "2026-11-07T11:48:34Z"
+        },
+        {
+          "name": "Verify macOS ARM64 runner",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 7,
+          "started_at": "2026-11-07T11:48:34Z",
+          "completed_at": "2026-11-07T11:48:34Z"
+        },
+        {
+          "name": "Reclaim unused Ubuntu SDKs and check disk capacity",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-07T11:48:34Z",
+          "completed_at": "2026-11-07T11:50:33Z"
+        },
+        {
+          "name": "Cache complete official LLVM SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-07T11:50:33Z",
+          "completed_at": "2026-11-07T11:51:48Z"
+        },
+        {
+          "name": "Install and verify LLVM development SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-07T11:51:48Z",
+          "completed_at": "2026-11-07T11:51:49Z"
+        },
+        {
+          "name": "Measure Linux disk after verified SDK extraction",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-07T11:51:49Z",
+          "completed_at": "2026-11-07T11:51:49Z"
+        },
+        {
+          "name": "Identify pinned native HTTP dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-07T11:51:49Z",
+          "completed_at": "2026-11-07T11:51:51Z"
+        },
+        {
+          "name": "Cache verified HTTP source archives",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-07T11:51:51Z",
+          "completed_at": "2026-11-07T11:51:54Z"
+        },
+        {
+          "name": "Cache native HTTP dependency profile",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-07T11:51:54Z",
+          "completed_at": "2026-11-07T11:51:56Z"
+        },
+        {
+          "name": "Cache pinned local HTTP fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-07T11:51:56Z",
+          "completed_at": "2026-11-07T11:51:57Z"
+        },
+        {
+          "name": "Bootstrap and verify HTTP dependencies and fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-11-07T11:51:57Z",
+          "completed_at": "2026-11-07T11:51:58Z"
+        },
+        {
+          "name": "Save verified HTTP source archives",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 17,
+          "started_at": "2026-11-07T11:51:58Z",
+          "completed_at": "2026-11-07T11:51:58Z"
+        },
+        {
+          "name": "Save verified native HTTP dependency profile",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 18,
+          "started_at": "2026-11-07T11:51:58Z",
+          "completed_at": "2026-11-07T11:51:58Z"
+        },
+        {
+          "name": "Save verified local HTTP fixtures",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 19,
+          "started_at": "2026-11-07T11:51:58Z",
+          "completed_at": "2026-11-07T11:51:58Z"
+        },
+        {
+          "name": "Bootstrap and verify pinned VOIDUP host providers",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-07T11:51:58Z",
+          "completed_at": "2026-11-07T11:53:00Z"
+        },
+        {
+          "name": "Configure Release",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-07T11:53:00Z",
+          "completed_at": "2026-11-07T11:53:17Z"
+        },
+        {
+          "name": "Check Linux build disk headroom",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22,
+          "started_at": "2026-11-07T11:53:17Z",
+          "completed_at": "2026-11-07T11:53:18Z"
+        },
+        {
+          "name": "Build Release",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-11-07T11:53:18Z",
+          "completed_at": "2026-11-07T11:57:40Z"
+        },
+        {
+          "name": "Verify HTTP and URL acceptance registration",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24,
+          "started_at": "2026-11-07T11:57:40Z",
+          "completed_at": "2026-11-07T11:57:41Z"
+        },
+        {
+          "name": "Verify native host and VOIDUP smoke registration",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25,
+          "started_at": "2026-11-07T11:57:41Z",
+          "completed_at": "2026-11-07T11:57:41Z"
+        },
+        {
+          "name": "Execute Release tests",
+          "status": "completed",
+          "conclusion": "cancelled",
+          "number": 26,
+          "started_at": "2026-11-07T11:57:41Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Frontend Debug and Release small-stack regression",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 27,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Extension Node.js toolchain",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 28,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Linux editor display dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 29,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Install extension dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 30,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Type-check, build and test extension",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 31,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Real editor integration (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 32,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Real editor integration (Windows and macOS)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 33,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Package local editor extension",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 34,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Preserve local editor package",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 35,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Measure warm voidc relink after acceptance",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 36,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Preserve link experiment diagnostics",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 37,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:03Z"
+        },
+        {
+          "name": "Preserve test results",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 38,
+          "started_at": "2026-11-07T12:00:03Z",
+          "completed_at": "2026-11-07T12:00:05Z"
+        },
+        {
+          "name": "Post Cache complete official LLVM SDK",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 74,
+          "started_at": "2026-11-07T12:00:05Z",
+          "completed_at": "2026-11-07T12:00:05Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 75,
+          "started_at": "2026-11-07T12:00:05Z",
+          "completed_at": "2026-11-07T12:00:05Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 76,
+          "started_at": "2026-11-07T12:00:05Z",
+          "completed_at": "2026-11-07T12:00:06Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 77,
+          "started_at": "2026-11-07T12:00:06Z",
+          "completed_at": "2026-11-07T12:00:06Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Shmellyorc/Void.Language/check-runs/128395046619",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000000874,
+      "runner_name": "GitHub Actions 1000000874",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 128395046667,
+      "run_id": 42369685905,
+      "workflow_name": "Compiler link experiment",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/runs/42369685905",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVES8fs8AAAAd5PDvCw",
+      "head_sha": "9521329e7e67f4c8bb5aec38d684fde3f3c887de",
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/jobs/128395046667",
+      "html_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/42369685905/job/128395046667",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "created_at": "2026-11-07T11:47:56Z",
+      "started_at": "2026-11-07T11:47:58Z",
+      "completed_at": "2026-11-07T12:00:07Z",
+      "name": "thinlto-cache / Ubuntu 24.04 / Debug",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-07T11:47:59Z",
+          "completed_at": "2026-11-07T11:48:01Z"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-07T11:48:01Z",
+          "completed_at": "2026-11-07T11:48:23Z"
+        },
+        {
+          "name": "Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-07T11:48:23Z",
+          "completed_at": "2026-11-07T11:48:23Z"
+        },
+        {
+          "name": "Prepare isolated link experiment",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-07T11:48:23Z",
+          "completed_at": "2026-11-07T11:48:23Z"
+        },
+        {
+          "name": "Linux development dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-07T11:48:23Z",
+          "completed_at": "2026-11-07T11:48:33Z"
+        },
+        {
+          "name": "Windows native SDK environment",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-11-07T11:48:33Z",
+          "completed_at": "2026-11-07T11:48:33Z"
+        },
+        {
+          "name": "Verify macOS ARM64 runner",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 7,
+          "started_at": "2026-11-07T11:48:33Z",
+          "completed_at": "2026-11-07T11:48:33Z"
+        },
+        {
+          "name": "Reclaim unused Ubuntu SDKs and check disk capacity",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-07T11:48:33Z",
+          "completed_at": "2026-11-07T11:49:58Z"
+        },
+        {
+          "name": "Cache complete official LLVM SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-07T11:49:58Z",
+          "completed_at": "2026-11-07T11:50:40Z"
+        },
+        {
+          "name": "Install and verify LLVM development SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-07T11:50:40Z",
+          "completed_at": "2026-11-07T11:50:43Z"
+        },
+        {
+          "name": "Measure Linux disk after verified SDK extraction",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-07T11:50:43Z",
+          "completed_at": "2026-11-07T11:50:43Z"
+        },
+        {
+          "name": "Identify pinned native HTTP dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-07T11:50:43Z",
+          "completed_at": "2026-11-07T11:50:44Z"
+        },
+        {
+          "name": "Cache verified HTTP source archives",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-07T11:50:44Z",
+          "completed_at": "2026-11-07T11:50:46Z"
+        },
+        {
+          "name": "Cache native HTTP dependency profile",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-07T11:50:46Z",
+          "completed_at": "2026-11-07T11:50:47Z"
+        },
+        {
+          "name": "Cache pinned local HTTP fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-07T11:50:47Z",
+          "completed_at": "2026-11-07T11:50:48Z"
+        },
+        {
+          "name": "Bootstrap and verify HTTP dependencies and fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-11-07T11:50:48Z",
+          "completed_at": "2026-11-07T11:50:50Z"
+        },
+        {
+          "name": "Save verified HTTP source archives",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 17,
+          "started_at": "2026-11-07T11:50:50Z",
+          "completed_at": "2026-11-07T11:50:50Z"
+        },
+        {
+          "name": "Save verified native HTTP dependency profile",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 18,
+          "started_at": "2026-11-07T11:50:50Z",
+          "completed_at": "2026-11-07T11:50:50Z"
+        },
+        {
+          "name": "Save verified local HTTP fixtures",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 19,
+          "started_at": "2026-11-07T11:50:50Z",
+          "completed_at": "2026-11-07T11:50:50Z"
+        },
+        {
+          "name": "Bootstrap and verify pinned VOIDUP host providers",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-07T11:50:50Z",
+          "completed_at": "2026-11-07T11:51:54Z"
+        },
+        {
+          "name": "Configure Debug",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-07T11:51:54Z",
+          "completed_at": "2026-11-07T11:52:12Z"
+        },
+        {
+          "name": "Check Linux build disk headroom",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22,
+          "started_at": "2026-11-07T11:52:12Z",
+          "completed_at": "2026-11-07T11:52:12Z"
+        },
+        {
+          "name": "Build Debug",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-11-07T11:52:12Z",
+          "completed_at": "2026-11-07T11:58:25Z"
+        },
+        {
+          "name": "Verify HTTP and URL acceptance registration",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24,
+          "started_at": "2026-11-07T11:58:25Z",
+          "completed_at": "2026-11-07T11:58:26Z"
+        },
+        {
+          "name": "Verify native host and VOIDUP smoke registration",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25,
+          "started_at": "2026-11-07T11:58:26Z",
+          "completed_at": "2026-11-07T11:58:26Z"
+        },
+        {
+          "name": "Execute Debug tests",
+          "status": "completed",
+          "conclusion": "cancelled",
+          "number": 26,
+          "started_at": "2026-11-07T11:58:26Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Frontend Debug and Release small-stack regression",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 27,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Extension Node.js toolchain",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 28,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Linux editor display dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 29,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Install extension dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 30,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Type-check, build and test extension",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 31,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Real editor integration (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 32,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Real editor integration (Windows and macOS)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 33,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Package local editor extension",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 34,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Preserve local editor package",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 35,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Measure warm voidc relink after acceptance",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 36,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Preserve link experiment diagnostics",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 37,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:03Z"
+        },
+        {
+          "name": "Preserve test results",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 38,
+          "started_at": "2026-11-07T12:00:03Z",
+          "completed_at": "2026-11-07T12:00:05Z"
+        },
+        {
+          "name": "Post Cache complete official LLVM SDK",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 74,
+          "started_at": "2026-11-07T12:00:05Z",
+          "completed_at": "2026-11-07T12:00:05Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 75,
+          "started_at": "2026-11-07T12:00:05Z",
+          "completed_at": "2026-11-07T12:00:05Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 76,
+          "started_at": "2026-11-07T12:00:05Z",
+          "completed_at": "2026-11-07T12:00:05Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 77,
+          "started_at": "2026-11-07T12:00:05Z",
+          "completed_at": "2026-11-07T12:00:05Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Shmellyorc/Void.Language/check-runs/128395046667",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000000875,
+      "runner_name": "GitHub Actions 1000000875",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 128395046673,
+      "run_id": 42369685905,
+      "workflow_name": "Compiler link experiment",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/runs/42369685905",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOVES8fs8AAAAd5PDvEQ",
+      "head_sha": "9521329e7e67f4c8bb5aec38d684fde3f3c887de",
+      "url": "https://api.github.com/repos/Shmellyorc/Void.Language/actions/jobs/128395046673",
+      "html_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/42369685905/job/128395046673",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "created_at": "2026-11-07T11:47:56Z",
+      "started_at": "2026-11-07T11:47:58Z",
+      "completed_at": "2026-11-07T12:00:20Z",
+      "name": "thinlto-cache / macOS ARM64 / Debug",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-07T11:47:58Z",
+          "completed_at": "2026-11-07T11:48:00Z"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-07T11:48:00Z",
+          "completed_at": "2026-11-07T11:48:27Z"
+        },
+        {
+          "name": "Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-07T11:48:27Z",
+          "completed_at": "2026-11-07T11:48:27Z"
+        },
+        {
+          "name": "Prepare isolated link experiment",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-07T11:48:27Z",
+          "completed_at": "2026-11-07T11:48:27Z"
+        },
+        {
+          "name": "Linux development dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5,
+          "started_at": "2026-11-07T11:48:27Z",
+          "completed_at": "2026-11-07T11:48:27Z"
+        },
+        {
+          "name": "Windows native SDK environment",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-11-07T11:48:27Z",
+          "completed_at": "2026-11-07T11:48:27Z"
+        },
+        {
+          "name": "Verify macOS ARM64 runner",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-07T11:48:27Z",
+          "completed_at": "2026-11-07T11:48:28Z"
+        },
+        {
+          "name": "Reclaim unused Ubuntu SDKs and check disk capacity",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 8,
+          "started_at": "2026-11-07T11:48:28Z",
+          "completed_at": "2026-11-07T11:48:28Z"
+        },
+        {
+          "name": "Cache complete official LLVM SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-07T11:48:28Z",
+          "completed_at": "2026-11-07T11:49:01Z"
+        },
+        {
+          "name": "Install and verify LLVM development SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-07T11:49:01Z",
+          "completed_at": "2026-11-07T11:49:01Z"
+        },
+        {
+          "name": "Measure Linux disk after verified SDK extraction",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 11,
+          "started_at": "2026-11-07T11:49:01Z",
+          "completed_at": "2026-11-07T11:49:01Z"
+        },
+        {
+          "name": "Identify pinned native HTTP dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-07T11:49:01Z",
+          "completed_at": "2026-11-07T11:49:05Z"
+        },
+        {
+          "name": "Cache verified HTTP source archives",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-07T11:49:05Z",
+          "completed_at": "2026-11-07T11:49:06Z"
+        },
+        {
+          "name": "Cache native HTTP dependency profile",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-07T11:49:06Z",
+          "completed_at": "2026-11-07T11:49:07Z"
+        },
+        {
+          "name": "Cache pinned local HTTP fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-07T11:49:07Z",
+          "completed_at": "2026-11-07T11:49:07Z"
+        },
+        {
+          "name": "Bootstrap and verify HTTP dependencies and fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-11-07T11:49:07Z",
+          "completed_at": "2026-11-07T11:50:41Z"
+        },
+        {
+          "name": "Save verified HTTP source archives",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 17,
+          "started_at": "2026-11-07T11:50:41Z",
+          "completed_at": "2026-11-07T11:50:41Z"
+        },
+        {
+          "name": "Save verified native HTTP dependency profile",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18,
+          "started_at": "2026-11-07T11:50:41Z",
+          "completed_at": "2026-11-07T11:50:42Z"
+        },
+        {
+          "name": "Save verified local HTTP fixtures",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 19,
+          "started_at": "2026-11-07T11:50:42Z",
+          "completed_at": "2026-11-07T11:50:42Z"
+        },
+        {
+          "name": "Bootstrap and verify pinned VOIDUP host providers",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-11-07T11:50:42Z",
+          "completed_at": "2026-11-07T11:53:00Z"
+        },
+        {
+          "name": "Configure Debug",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-07T11:53:00Z",
+          "completed_at": "2026-11-07T11:56:38Z"
+        },
+        {
+          "name": "Check Linux build disk headroom",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 22,
+          "started_at": "2026-11-07T11:56:38Z",
+          "completed_at": "2026-11-07T11:56:38Z"
+        },
+        {
+          "name": "Build Debug",
+          "status": "completed",
+          "conclusion": "cancelled",
+          "number": 23,
+          "started_at": "2026-11-07T11:56:38Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Verify HTTP and URL acceptance registration",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 24,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Verify native host and VOIDUP smoke registration",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 25,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Execute Debug tests",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 26,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Frontend Debug and Release small-stack regression",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 27,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Extension Node.js toolchain",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 28,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Linux editor display dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 29,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Install extension dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 30,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Type-check, build and test extension",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 31,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Real editor integration (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 32,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Real editor integration (Windows and macOS)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 33,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Package local editor extension",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 34,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:01Z"
+        },
+        {
+          "name": "Preserve local editor package",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 35,
+          "started_at": "2026-11-07T12:00:01Z",
+          "completed_at": "2026-11-07T12:00:03Z"
+        },
+        {
+          "name": "Measure warm voidc relink after acceptance",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 36,
+          "started_at": "2026-11-07T12:00:03Z",
+          "completed_at": "2026-11-07T12:00:03Z"
+        },
+        {
+          "name": "Preserve link experiment diagnostics",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 37,
+          "started_at": "2026-11-07T12:00:03Z",
+          "completed_at": "2026-11-07T12:00:07Z"
+        },
+        {
+          "name": "Preserve test results",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 38,
+          "started_at": "2026-11-07T12:00:07Z",
+          "completed_at": "2026-11-07T12:00:11Z"
+        },
+        {
+          "name": "Post Cache complete official LLVM SDK",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 74,
+          "started_at": "2026-11-07T12:00:11Z",
+          "completed_at": "2026-11-07T12:00:11Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 75,
+          "started_at": "2026-11-07T12:00:11Z",
+          "completed_at": "2026-11-07T12:00:11Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 76,
+          "started_at": "2026-11-07T12:00:11Z",
+          "completed_at": "2026-11-07T12:00:13Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 77,
+          "started_at": "2026-11-07T12:00:13Z",
+          "completed_at": "2026-11-07T12:00:19Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Shmellyorc/Void.Language/check-runs/128395046673",
+      "labels": [
+        "macos-latest"
+      ],
+      "runner_id": 1000000872,
+      "runner_name": "GitHub Actions 1000000872",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    }
+  ]
+}

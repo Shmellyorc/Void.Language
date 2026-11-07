@@ -137,8 +137,7 @@ conversion; input 1 reports conversion; inputs 2 and 3 return 5 and 4.
 build/ci-debug/voidc check examples/value_structs/main.void
 build/ci-debug/voidc run examples/value_structs/main.void 10 --no-opt
 build/ci-debug/voidc run examples/value_structs/main.void 10
-build/ci-debug/voidc emit examples/value_structs/main.void -o /tmp/value-structs.o
-/usr/lib/llvm-19/bin/clang /tmp/value-structs.o -fuse-ld=lld -o /tmp/value-structs
+build/ci-debug/voidc build examples/value_structs/main.void -o /tmp/value-structs
 /tmp/value-structs 10
 ```
 

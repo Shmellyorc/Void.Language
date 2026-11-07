@@ -7,4 +7,10 @@
       <AdditionalOptions Condition="'$(VoidHostStrict)' == 'true'">/clang:-fsanitize=address,undefined /clang:-fno-omit-frame-pointer %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
+  <Target Name="VoidVerifyPinnedClangCL" BeforeTargets="ClangClFixupCompileOptions;ClCompile;Lib">
+    <Error Condition="'$(PlatformToolset)' != 'ClangCL' Or '$(LLVMToolsVersion)' != '$(VoidPinnedLLVMToolsVersion)' Or '$(VoidPinnedLLVMToolsVersion)' == ''" Text="VOID requires the SDK-derived LLVM 23.1.4 toolset selector." />
+    <Error Condition="!Exists('$(VoidPinnedResourceDir)\include\stddef.h') Or '$(CLToolExe)' != 'clang-cl.exe' Or !Exists('$(CLToolPath)$(CLToolExe)')" Text="Pinned LLVM compiler/resources are missing; ambient fallback is prohibited." />
+    <Error Condition="'$(LinkToolExe)' != 'lld-link.exe' Or !Exists('$(LinkToolPath)$(LinkToolExe)') Or '$(LibToolExe)' != 'llvm-lib.exe' Or !Exists('$(LibToolPath)$(LibToolExe)')" Text="Pinned LLVM linker/librarian are missing; ambient fallback is prohibited." />
+    <Message Importance="high" Text="VOID_PINNED_CLANGCL LLVMToolsVersion=$(LLVMToolsVersion) compiler=$(CLToolPath)$(CLToolExe) resources=$(VoidPinnedResourceDir) linker=$(LinkToolPath)$(LinkToolExe) librarian=$(LibToolPath)$(LibToolExe) RuntimeLibrary=MultiThreaded" />
+  </Target>
 </Project>

@@ -1,0 +1,64 @@
+{
+  "scope": "Supplemental controls, not additional upstream passes or complete coverage of their two oracle bypasses",
+  "probe_source_sha256": "cef96aaad1f3d0b8eaf2682b6f60c047a8427eb7dbffc4b44dc279de861b8414",
+  "environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+    "ASAN_SYMBOLIZER_PATH": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-symbolizer"
+  },
+  "records": [
+    {
+      "name": "compile",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-O2",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-I/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/strict/include",
+        "/home/shmellyorc/Documents/Void.Language/docs/voidup/evidence/llvm23-repair/isolated-candidate-2026-11-07/negative_coverage_probe.c",
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/strict/lib/libsodium.a",
+        "--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld",
+        "-o",
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-backport-integration/strict-negative-probe"
+      ],
+      "status": 0,
+      "expected_outcome_observed": true
+    },
+    {
+      "name": "valid",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-backport-integration/strict-negative-probe"
+      ],
+      "status": 0,
+      "expected_outcome_observed": true
+    },
+    {
+      "name": "overflow",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-backport-integration/strict-negative-probe",
+        "overflow"
+      ],
+      "status": 86,
+      "expected_outcome_observed": true
+    },
+    {
+      "name": "underflow",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-backport-integration/strict-negative-probe",
+        "underflow"
+      ],
+      "status": 86,
+      "expected_outcome_observed": true
+    },
+    {
+      "name": "guard-read",
+      "command": [
+        "/home/shmellyorc/Documents/Void.Language/build/voidup-backport-integration/strict-negative-probe",
+        "guard-read"
+      ],
+      "status": 86,
+      "expected_outcome_observed": true
+    }
+  ]
+}

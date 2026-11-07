@@ -12,7 +12,7 @@ in [DECISIONS.md](DECISIONS.md); hosted CI remains deferred to Stage 8 end.
 Current status and hosted evidence live in
 [DEVELOPMENT_STRATEGY.md](DEVELOPMENT_STRATEGY.md#current-implementation-status).
 The owner approved this bounded contract on 18 October 2026. It extends the existing
-frontend, typed IR, LLVM 19.1.7 JIT/AOT lowerer and coordinated Runtime.
+frontend, typed IR, LLVM 23.1.4 JIT/AOT lowerer and coordinated Runtime.
 
 ```typescript
 func entry(value: i32) -> i32:

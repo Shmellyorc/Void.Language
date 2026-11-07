@@ -1,11 +1,12 @@
 # VOID 2.0: Language Bible and Compiler Architecture
 
-## Active backend migration — 28 October 2026
+## Active toolchain and migration history
 
-Boss authorizes LLVM/Clang/LLD **23.1.4**, retaining C++20, the single typed IR
+Current operations require [LLVM/Clang/LLD **23.1.4**](SOURCE_COMPILER.md#active-toolchain), retaining C++20, the single typed IR
 and shared verified O2/JIT/AOT lowering. [Migration record](llvm23/IMPLEMENTATION.md)
-and [acceptance](llvm23/ACCEPTANCE.md) record completed local validation and
-pending independent/native/hosted acceptance. Earlier LLVM 19 milestone
+and [acceptance](llvm23/ACCEPTANCE.md) preserve the original local migration results.
+The later [hosted checkpoint](net/http/ACCEPTANCE.md) supersedes the migration-era
+pending-hosted status for its recorded scope. Earlier LLVM 19 milestone
 descriptions remain historical. No source
 language, ownership, GC, reload or numeric semantic change is authorized.
 
@@ -148,7 +149,7 @@ the future concurrency/native-library contracts below.
   structural checks, visibility, effects and readonly rules. No arbitrary external
   C function-pointer ABI promise; preserve native callback/quiescence contracts.
 - Implement necessary enum/function-type foundations through the existing frontend,
-  typed IR, LLVM 19.1.7 lowerer and coordinated Runtime. No second execution engine,
+  typed IR, LLVM 23.1.4 lowerer and coordinated Runtime. No second execution engine,
   collector, type checker or ownership registry. Dictionary `.get()` and list
   `.pop()` remain deferred until exact signatures/error types are approved.
 - Preserve Stage 3, seven CI jobs, strict sanitizers and 180-minute timeout. Stage 5
@@ -3259,7 +3260,7 @@ The next practical activity is **not** to add more language keywords. It is to c
 ## Implementation status addendum: 10 October 2026
 
 The design snapshot above is preserved. The initial compiler foundation now
-provides executable LLVM 19.1.7 AOT/JIT architectural proofs, generation leases
+historically provided executable LLVM 19.1.7 AOT/JIT architectural proofs, generation leases
 for native function replacement, explicit precise root tracking under LLVM O2,
 and a trusted C ABI fixture. These are experimental implementation mechanisms,
 not completion of the designed language, GC or hot reload system. No `.void`

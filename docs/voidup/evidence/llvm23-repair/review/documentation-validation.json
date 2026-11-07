@@ -1,0 +1,188 @@
+{
+  "baseline_markdown_count": 1573,
+  "current_markdown_count": 1573,
+  "net_added_markdown": 0,
+  "added_markdown": [],
+  "removed_baseline_markdown": [],
+  "removed_since_previous_review": [
+    "docs/TOOLCHAIN.md",
+    "docs/DOCUMENTATION_CLEANUP.md",
+    "docs/voidup/LLVM23_CI_REPAIR.md",
+    "docs/history/README_2026-11-06.md",
+    "docs/history/WRENCH_CLANKER_2026-11-06.md",
+    "docs/history/RESEARCH_CLANKER_2026-11-06.md",
+    "docs/history/DEVELOPMENT_STRATEGY_2026-11-06.md",
+    "docs/history/README.md",
+    "docs/history/proposals/ARRAYS_PROPOSAL_2026-11-06.md",
+    "docs/history/proposals/COMPOSITION_PROPOSAL_2026-11-06.md",
+    "docs/history/proposals/GC_RUNTIME_PROPOSAL_2026-11-06.md",
+    "docs/history/proposals/INHERITANCE_PROPOSAL_2026-11-06.md",
+    "docs/history/proposals/INITIALIZATION_PROPOSAL_2026-11-06.md",
+    "docs/history/proposals/INTERFACES_PROPOSAL_2026-11-06.md",
+    "docs/history/proposals/MANAGED_INITIALIZATION_PROPOSAL_2026-11-06.md",
+    "docs/history/proposals/MANAGED_STRUCTS_PROPOSAL_2026-11-06.md",
+    "docs/history/proposals/RECEIVER_METHODS_PROPOSAL_2026-11-06.md",
+    "docs/history/proposals/REFERENCE_VALUE_STRUCTS_PROPOSAL_2026-11-06.md",
+    "docs/history/proposals/STAGE5_CACHE_PROPOSAL_2026-11-06.md",
+    "docs/history/proposals/STAGE6_PROPOSAL_2026-11-06.md",
+    "docs/history/proposals/STRINGS_PROPOSAL_2026-11-06.md",
+    "docs/history/proposals/VALUE_STRUCTS_PROPOSAL_2026-11-06.md"
+  ],
+  "protected_changes": [],
+  "proposal_preservation": [
+    {
+      "path": "docs/ARRAYS_PROPOSAL.md",
+      "original_body_preserved_except_urls": true
+    },
+    {
+      "path": "docs/COMPOSITION_PROPOSAL.md",
+      "original_body_preserved_except_urls": true
+    },
+    {
+      "path": "docs/GC_RUNTIME_PROPOSAL.md",
+      "original_body_preserved_except_urls": true
+    },
+    {
+      "path": "docs/INHERITANCE_PROPOSAL.md",
+      "original_body_preserved_except_urls": true
+    },
+    {
+      "path": "docs/INITIALIZATION_PROPOSAL.md",
+      "original_body_preserved_except_urls": true
+    },
+    {
+      "path": "docs/INTERFACES_PROPOSAL.md",
+      "original_body_preserved_except_urls": true
+    },
+    {
+      "path": "docs/MANAGED_INITIALIZATION_PROPOSAL.md",
+      "original_body_preserved_except_urls": true
+    },
+    {
+      "path": "docs/MANAGED_STRUCTS_PROPOSAL.md",
+      "original_body_preserved_except_urls": true
+    },
+    {
+      "path": "docs/RECEIVER_METHODS_PROPOSAL.md",
+      "original_body_preserved_except_urls": true
+    },
+    {
+      "path": "docs/REFERENCE_VALUE_STRUCTS_PROPOSAL.md",
+      "original_body_preserved_except_urls": true
+    },
+    {
+      "path": "docs/STAGE5_CACHE_PROPOSAL.md",
+      "original_body_preserved_except_urls": true
+    },
+    {
+      "path": "docs/STAGE6_PROPOSAL.md",
+      "original_body_preserved_except_urls": true
+    },
+    {
+      "path": "docs/STRINGS_PROPOSAL.md",
+      "original_body_preserved_except_urls": true
+    },
+    {
+      "path": "docs/VALUE_STRUCTS_PROPOSAL.md",
+      "original_body_preserved_except_urls": true
+    }
+  ],
+  "checkpoint_preservation": [
+    {
+      "path": "docs/README.md",
+      "commit": "82e97f541fab7eec760083383569ab9c9ce8f355",
+      "sha256": "850d0d9be3ab20d87cd2052a59dde7d1a2c9dabbd01158b0eea72df3ed7ed248",
+      "original_available_in_git": true
+    },
+    {
+      "path": "docs/WRENCH_CLANKER.md",
+      "commit": "82e97f541fab7eec760083383569ab9c9ce8f355",
+      "sha256": "54b1f2990bf7877ebb3e020c63cc089993ce83e3f64c3ed6f18db9bcc8505d2d",
+      "original_available_in_git": true
+    },
+    {
+      "path": "docs/RESEARCH_CLANKER.md",
+      "commit": "82e97f541fab7eec760083383569ab9c9ce8f355",
+      "sha256": "50c5b08ced273334acc9efa4a326a71c190e8dd5458bcd53b99d896bd3265680",
+      "original_available_in_git": true
+    },
+    {
+      "path": "docs/DEVELOPMENT_STRATEGY.md",
+      "commit": "82e97f541fab7eec760083383569ab9c9ce8f355",
+      "sha256": "1ad5d8b85940f3509538ee664c6a8b7911d86a516b17c70a465984f718fdf92f",
+      "original_available_in_git": true
+    }
+  ],
+  "fixed_commit_references": [
+    {
+      "source": "docs/README.md",
+      "url": "https://github.com/Shmellyorc/Void.Language/blob/82e97f541fab7eec760083383569ab9c9ce8f355/docs/README.md",
+      "git_target_and_anchor_valid": true
+    },
+    {
+      "source": "docs/README.md",
+      "url": "https://github.com/Shmellyorc/Void.Language/blob/82e97f541fab7eec760083383569ab9c9ce8f355/docs/WRENCH_CLANKER.md",
+      "git_target_and_anchor_valid": true
+    },
+    {
+      "source": "docs/README.md",
+      "url": "https://github.com/Shmellyorc/Void.Language/blob/82e97f541fab7eec760083383569ab9c9ce8f355/docs/RESEARCH_CLANKER.md",
+      "git_target_and_anchor_valid": true
+    },
+    {
+      "source": "docs/README.md",
+      "url": "https://github.com/Shmellyorc/Void.Language/blob/82e97f541fab7eec760083383569ab9c9ce8f355/docs/DEVELOPMENT_STRATEGY.md",
+      "git_target_and_anchor_valid": true
+    },
+    {
+      "source": "docs/DEVELOPMENT_STRATEGY.md",
+      "url": "https://github.com/Shmellyorc/Void.Language/blob/82e97f541fab7eec760083383569ab9c9ce8f355/docs/DEVELOPMENT_STRATEGY.md",
+      "git_target_and_anchor_valid": true
+    },
+    {
+      "source": "docs/DEVELOPMENT_STRATEGY.md",
+      "url": "https://github.com/Shmellyorc/Void.Language/blob/82e97f541fab7eec760083383569ab9c9ce8f355/docs/DEVELOPMENT_STRATEGY.md#owner-workflow-and-stage-7-planning--19-october-2026",
+      "git_target_and_anchor_valid": true
+    },
+    {
+      "source": "docs/RESEARCH_CLANKER.md",
+      "url": "https://github.com/Shmellyorc/Void.Language/blob/82e97f541fab7eec760083383569ab9c9ce8f355/docs/RESEARCH_CLANKER.md",
+      "git_target_and_anchor_valid": true
+    },
+    {
+      "source": "docs/WRENCH_CLANKER.md",
+      "url": "https://github.com/Shmellyorc/Void.Language/blob/82e97f541fab7eec760083383569ab9c9ce8f355/docs/WRENCH_CLANKER.md",
+      "git_target_and_anchor_valid": true
+    },
+    {
+      "source": "docs/stage10/IMPLEMENTATION.md",
+      "url": "https://github.com/Shmellyorc/Void.Language/blob/82e97f541fab7eec760083383569ab9c9ce8f355/docs/DEVELOPMENT_STRATEGY.md#future-compiler-usability-and-optimization--boss-direction-23-october-2026",
+      "git_target_and_anchor_valid": true
+    },
+    {
+      "source": "docs/stage10/IMPLEMENTATION.md",
+      "url": "https://github.com/Shmellyorc/Void.Language/blob/82e97f541fab7eec760083383569ab9c9ce8f355/docs/DEVELOPMENT_STRATEGY.md#future-source-debugging-and-breakpoints--boss-direction-23-october-2026",
+      "git_target_and_anchor_valid": true
+    },
+    {
+      "source": "docs/compiler-health/INTEGRATED_PERFORMANCE_QUALIFICATION.md",
+      "url": "https://github.com/Shmellyorc/Void.Language/blob/82e97f541fab7eec760083383569ab9c9ce8f355/docs/README.md#integrated-performance-qualification-and-aot-only-simd--6-november-2026",
+      "git_target_and_anchor_valid": true
+    }
+  ],
+  "preexisting_maintained_link_problems": [
+    {
+      "source": "docs/LANGUAGE_COMPLETENESS_AUDIT.md",
+      "target": "LANGUAGE_BIBLE.md#entry-point-and-top-level-execution-discussion-12-october-2026-proposed-not-locked",
+      "kind": "missing-anchor"
+    },
+    {
+      "source": "docs/compiler-health/INTEGRATED_PERFORMANCE_QUALIFICATION.md",
+      "target": "../README.md#integrated-performance-qualification-and-future-simd--5-november-2026",
+      "kind": "missing-anchor"
+    }
+  ],
+  "final_maintained_link_problems": [],
+  "introduced_link_problems": [],
+  "scope": "all maintained docs/ inline Markdown local paths/anchors outside fenced code; immutable fixed-commit targets verified in local Git, remote URLs were also fetched; raw evidence unchanged"
+}

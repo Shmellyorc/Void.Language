@@ -1,3 +1,7 @@
+> **Historical plan/record.** Its dated activation gates and earlier toolchain
+> instructions are superseded. Current operations require [LLVM/Clang/LLD 23.1.4](SOURCE_COMPILER.md#active-toolchain);
+> original decisions, results and failures below retain their recorded scope.
+
 # VOID 2.0 language completeness audit
 
 Research date: 20 October 2026. Research only; no compiler, Runtime, editor or
@@ -530,7 +534,7 @@ selection/coexistence rules below remain research recommendations.
 [Bible Section 10](LANGUAGE_BIBLE.md#10-project-entry-point-and-vfs-imports-agreed)
 already discusses main.void, program.void, explicit files and a unique root file
 containing main, but explicitly leaves discovery priority unsettled. Its later
-[entry discussion](LANGUAGE_BIBLE.md#entry-point-and-top-level-execution-discussion-12-october-2026-proposed-not-locked)
+[entry discussion](LANGUAGE_BIBLE.md#historical-entry-point-discussion-12-october-2026-superseded-where-noted)
 prefers main.void and optional top-level execution, proposes rejecting competing
 entry styles, forbids implicit execution on import and leaves signatures/status/
 migration open. The new request establishes the desired simple forms and discovery

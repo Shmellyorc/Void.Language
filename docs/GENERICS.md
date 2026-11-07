@@ -69,7 +69,7 @@ Each original declaration owns its concrete instances within the existing
 compilation context. Identical type arguments reuse one instance, including
 ordinary recursive calls. Nominal identity, type kind and nullability distinguish
 arguments even when layouts match. The same frontend parser, semantic checker,
-typed IR and LLVM 19.1.7 lowerer serve JIT and AOT. There are no generic Runtime
+typed IR and LLVM 23.1.4 lowerer serve JIT and AOT. There are no generic Runtime
 objects or new allocation protocols.
 
 Concrete fields derive their layout, tracing and initialization from existing

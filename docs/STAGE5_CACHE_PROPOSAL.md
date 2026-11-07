@@ -1,3 +1,8 @@
+> **Historical proposal.** Original decisions, approvals and dated evidence
+> below retain their scope. Earlier toolchain pins and activation gates are
+> superseded; current operations require [LLVM/Clang/LLD 23.1.4](SOURCE_COMPILER.md#active-toolchain).
+> The delivered contract is linked from the [documentation index](README.md).
+
 # Stage 5: persistent Debug cache proposal
 
 27 October 2026 stabilization update: ordinary CLI runs now automatically use

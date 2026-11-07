@@ -108,11 +108,11 @@ and numeric's measured hidden-result pointer and written result fields. Failed
 certificate outputs are never executed. The normal-profile witnesses do not imply
 an O2/native Windows/macOS ABI proof or a complete caller/callee charging rule.
 
-The historical pinned MIR observation for the numeric normal fixture is reproducible
-with the preserved LLVM 19.1.7 tools (find its exact record/object path in
-records.jsonl, then use that object's .optimized.ll snapshot):
+Historical MIR command transcript for the numeric normal fixture (record/object
+identity in records.jsonl). Retain as evidence only; do not execute LLVM 19.1.7
+tools in current work. The original observation used its .optimized.ll snapshot:
 
-```sh
+```text
 /path/to/llvm-19.1.7/bin/llc -O2 -relocation-model=pic -mcpu=generic \
   -stop-after=finalize-isel input.o.optimized.ll -o numeric-finalize-isel.mir
 ```

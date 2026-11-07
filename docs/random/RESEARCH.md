@@ -1,3 +1,7 @@
+> **Historical research/plan.** Earlier toolchain recipes and activation
+> gates below are superseded by [LLVM/Clang/LLD 23.1.4](../SOURCE_COMPILER.md#active-toolchain) and subsequent
+> implementation records. Original findings and measurements retain their scope.
+
 > **Boss amendment, 26 October 2026: IMPLEMENTATION AUTHORIZED.** All four
 > decisions in RESEARCH section 8 are approved, with exact numeric names
 > `rand_T()` / `rand_T(maximum)` / `rand_T(lower, upper)` and corresponding

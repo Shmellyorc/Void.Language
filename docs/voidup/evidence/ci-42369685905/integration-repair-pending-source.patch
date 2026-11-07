@@ -1,0 +1,1138 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9ebd9fc7..0b7caddb 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -254,6 +254,8 @@ set(cache_identity_inputs "$<TARGET_OBJECTS:voidc_objects>;$<TARGET_FILE:void_ll
+ set(cache_identity_deps void_llvm void_core void_runtime void_native_fixture "$<TARGET_OBJECTS:voidc_objects>")
+ set(host_identity_inputs ${VOID_HOST_LINK_FILES}
+   "${PROJECT_SOURCE_DIR}/third_party/host-versions.json"
++  "${PROJECT_SOURCE_DIR}/third_party/host-patches/libsodium-1.0.22/PROVENANCE.json"
++  "${PROJECT_SOURCE_DIR}/third_party/host-patches/libsodium-1.0.22/asan-alignment.patch"
+   "${PROJECT_SOURCE_DIR}/cmake/HostDependencies.cmake"
+   "${PROJECT_SOURCE_DIR}/cmake/NativeBuild.cmake"
+   "${PROJECT_SOURCE_DIR}/tools/setup_host_deps.py"
+diff --git a/cmake/InstallLicenses.cmake b/cmake/InstallLicenses.cmake
+index 4c3d43af..2abcc93d 100644
+--- a/cmake/InstallLicenses.cmake
++++ b/cmake/InstallLicenses.cmake
+@@ -18,7 +18,15 @@ function(void_install_licenses component)
+     DESTINATION share/void/licenses/zlib-1.3.2 COMPONENT ${component})
+   if(component STREQUAL "compiler")
+     install(DIRECTORY "${root}/third_party/host-licenses/" DESTINATION share/void/licenses/host COMPONENT ${component})
++    install(DIRECTORY "${root}/third_party/host-patches/" DESTINATION share/void/licenses/host/patches COMPONENT ${component})
+     install(FILES "${root}/third_party/host-versions.json" "${root}/tools/setup_host_deps.py" "${root}/tools/setup_host_deps_native.py" "${root}/cmake/host-sodium.targets" "${root}/tools/verify_host_deps.py" DESTINATION share/void/licenses/host COMPONENT ${component})
++    set(host_repro share/void/licenses/host/corresponding-source/repro)
++    install(FILES "${root}/tools/setup_host_deps.py" "${root}/tools/setup_host_deps_native.py" "${root}/tools/verify_host_deps.py" "${root}/tools/verify_http_dependencies.py"
++      DESTINATION ${host_repro}/tools COMPONENT ${component})
++    install(FILES "${root}/tools/ci/llvm_sdk.py" DESTINATION ${host_repro}/tools/ci COMPONENT ${component})
++    install(FILES "${root}/cmake/host-sodium.targets" DESTINATION ${host_repro}/cmake COMPONENT ${component})
++    install(FILES "${root}/third_party/host-versions.json" "${root}/third_party/http-versions.json" DESTINATION ${host_repro}/third_party COMPONENT ${component})
++    install(DIRECTORY "${root}/third_party/host-patches/" DESTINATION ${host_repro}/third_party/host-patches COMPONENT ${component})
+   endif()
+   if(WIN32)
+     install(DIRECTORY "${root}/third_party/llvm-dependency-licenses/libxml2-2.15.4/"
+diff --git a/cmake/host-sodium.targets b/cmake/host-sodium.targets
+index 943f28ea..cfadd4ba 100644
+--- a/cmake/host-sodium.targets
++++ b/cmake/host-sodium.targets
+@@ -7,4 +7,10 @@
+       <AdditionalOptions Condition="'$(VoidHostStrict)' == 'true'">/clang:-fsanitize=address,undefined /clang:-fno-omit-frame-pointer %(AdditionalOptions)</AdditionalOptions>
+     </ClCompile>
+   </ItemDefinitionGroup>
++  <Target Name="VoidVerifyPinnedClangCL" BeforeTargets="ClangClFixupCompileOptions;ClCompile;Lib">
++    <Error Condition="'$(PlatformToolset)' != 'ClangCL' Or '$(LLVMToolsVersion)' != '$(VoidPinnedLLVMToolsVersion)' Or '$(VoidPinnedLLVMToolsVersion)' == ''" Text="VOID requires the SDK-derived LLVM 23.1.4 toolset selector." />
++    <Error Condition="!Exists('$(VoidPinnedResourceDir)\include\stddef.h') Or '$(CLToolExe)' != 'clang-cl.exe' Or !Exists('$(CLToolPath)$(CLToolExe)')" Text="Pinned LLVM compiler/resources are missing; ambient fallback is prohibited." />
++    <Error Condition="'$(LinkToolExe)' != 'lld-link.exe' Or !Exists('$(LinkToolPath)$(LinkToolExe)') Or '$(LibToolExe)' != 'llvm-lib.exe' Or !Exists('$(LibToolPath)$(LibToolExe)')" Text="Pinned LLVM linker/librarian are missing; ambient fallback is prohibited." />
++    <Message Importance="high" Text="VOID_PINNED_CLANGCL LLVMToolsVersion=$(LLVMToolsVersion) compiler=$(CLToolPath)$(CLToolExe) resources=$(VoidPinnedResourceDir) linker=$(LinkToolPath)$(LinkToolExe) librarian=$(LibToolPath)$(LibToolExe) RuntimeLibrary=MultiThreaded" />
++  </Target>
+ </Project>
+diff --git a/tests/host_capabilities/dependencies.py b/tests/host_capabilities/dependencies.py
+index ad553d7b..ce8ac224 100644
+--- a/tests/host_capabilities/dependencies.py
++++ b/tests/host_capabilities/dependencies.py
+@@ -3,7 +3,7 @@ from pathlib import Path
+ import json,shutil,sys,tempfile
+ ROOT=Path(__file__).resolve().parents[2]
+ sys.path.insert(0,str(ROOT/'tools'))
+-from verify_host_deps import verify_prefix
++from verify_host_deps import verify_prefix, build_identity
+ prefix=Path(sys.argv[1]);profile,system,architecture=sys.argv[2:5]
+ verify_prefix(prefix,profile,system,architecture)
+ checks=1
+@@ -29,3 +29,25 @@ with tempfile.TemporaryDirectory(prefix='VOID provider receipt ') as folder:
+  receipt=json.loads(original);del receipt['files']['lib/libsodium.lib' if system=='Windows' else 'lib/libsodium.a'];put(receipt);rejected(copy)
+  receipt=json.loads(original);receipt['recipe_sha256']={'../outside':'0'*64};put(receipt);rejected(copy)
+ print(f'Pinned host provider receipt: {checks} admission/rejection checks passed')
++
++# Exercise self-consistent forged receipts too: policy validation must reject them
++# even when the receipt's own build-identity checksum is recomputed.
++with tempfile.TemporaryDirectory(prefix='VOID patched receipt negatives ') as folder:
++ copy=Path(folder);original=json.loads((prefix/'VOID-HOST-DEPENDENCIES.json').read_text())
++ for name in original['files']:
++  destination=copy/name;destination.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(prefix/name,destination)
++ for change in ['old-schema','missing-source','wrong-patch','wrong-postimage','wrong-recipe','missing-recipe','wrong-sdk','wrong-build','missing-tests']:
++  receipt=json.loads(json.dumps(original))
++  if change=='old-schema':receipt['schema']=2
++  elif change=='missing-source':del receipt['source_provenance']
++  elif change=='wrong-patch':receipt['source_provenance']['patch']['sha256']='0'*64
++  elif change=='wrong-postimage':receipt['source_provenance']['postimages'][next(iter(receipt['source_provenance']['postimages']))]='0'*64
++  elif change=='wrong-recipe':receipt['recipe_sha256'][next(iter(receipt['recipe_sha256']))]='0'*64
++  elif change=='missing-recipe':receipt['recipe_sha256'].pop(next(iter(receipt['recipe_sha256'])))
++  elif change=='wrong-sdk':receipt['toolchain']['sdk']['version']='invalid'
++  elif change=='missing-tests':receipt['upstream_tests']={}
++  receipt['build_identity']=build_identity(receipt) if change!='wrong-build' else '0'*64
++  (copy/'VOID-HOST-DEPENDENCIES.json').write_text(json.dumps(receipt))
++  if change=='missing-tests' and system=='Windows':continue
++  rejected(copy)
++print(f'Approved backport receipt: {checks} admission/rejection checks passed')
+diff --git a/tests/host_capabilities/install.py b/tests/host_capabilities/install.py
+index be75a030..071bd189 100644
+--- a/tests/host_capabilities/install.py
++++ b/tests/host_capabilities/install.py
+@@ -14,6 +14,26 @@ with tempfile.TemporaryDirectory(prefix='VOID host installed 雪 # % ') as folde
+  for name in ['libarchive.a','libsodium.a']:assert (relocated/'lib/void'/name).is_file()
+  for name in ['crypto','archive','process','system_error']:assert (relocated/'share/void/stdlib'/(name+'.void')).is_file()
+  for name in ['host-versions.json','VOID-HOST-DEPENDENCIES.json','libsodium/LICENSE','libarchive/COPYING','corresponding-source/libsodium-1.0.22.tar.gz','corresponding-source/libarchive-3.8.11.tar.xz']:assert (relocated/'share/void/licenses/host'/name).is_file()
++ # Verify the installed source bundle, including all recipe hashes and exact
++ # offline reconstruction of the approved source, from outside the checkout.
++ sys.path.insert(0,str(h.ROOT/'tools'))
++ from verify_host_deps import RECIPES, sha, source_policy
++ host=relocated/'share/void/licenses/host';bundle=host/'corresponding-source';repro=bundle/'repro'
++ receipt=json.loads((host/'VOID-HOST-DEPENDENCIES.json').read_text())
++ assert receipt['schema']==3 and receipt['source_provenance']==source_policy()
++ for name in RECIPES:assert sha(repro/name)==receipt['recipe_sha256'][name],name
++ for name in ['libsodium','libarchive']:
++  pin=receipt['pins'][name];assert sha(bundle/pin['url'].rsplit('/',1)[-1])==pin['sha256']
++ assert sha(host/'patches/libsodium-1.0.22/asan-alignment.patch')==receipt['source_provenance']['patch']['sha256']
++ reconstructed=work/'reconstructed-source'
++ replay=run([sys.executable,repro/'tools/verify_host_deps.py','--archives',bundle,'--reconstruct-source',reconstructed],work)
++ assert json.loads(replay.stdout)==receipt['source_provenance']
++ for name,digest in receipt['source_provenance']['postimages'].items():assert sha(reconstructed/name)==digest
++ # Corrupt a packaged patch and require reconstruction rejection; no real source/prefix changes.
++ copied=work/'damaged-bundle';shutil.copytree(bundle,copied)
++ patch=copied/'repro/third_party/host-patches/libsodium-1.0.22/asan-alignment.patch';patch.write_bytes(patch.read_bytes()+b'\nchanged\n')
++ rejected=subprocess.run([sys.executable,copied/'repro/tools/verify_host_deps.py','--archives',copied,'--reconstruct-source',work/'must-not-reconstruct'],capture_output=True)
++ assert rejected.returncode!=0 and b'patch policy mismatch' in rejected.stderr
+  fixture=work/'main.void';fixture.write_bytes((h.ROOT/'tests/host_capabilities/smoke.void').read_bytes())
+  env=dict(os.environ);env.pop('VOID_STDLIB_ROOT',None)
+  for flags in (['--no-opt'],[]):
+@@ -26,6 +46,6 @@ with tempfile.TemporaryDirectory(prefix='VOID host installed 雪 # % ') as folde
+   native_env=dict(env,PATH='/hostile',VOID_STDLIB_ROOT='/absent',LD_LIBRARY_PATH=str(lib))
+   for mode,expected in [('args',b'61726773\nargs\n'),('crypto',None)]:
+    run([sys.executable,h.ROOT/'tests/host_capabilities/isolated_exec.py',isolated,binary,mode],isolated,expected,native_env)
+-result={'schema':1,'build':str(build),'stack_bytes':1048576,'installed_and_relocated':True,'aot_checkout_and_installed_compiler_inaccessible':True,'records':records}
++result={'schema':1,'build':str(build),'stack_bytes':1048576,'installed_and_relocated':True,'aot_checkout_and_installed_compiler_inaccessible':True,'approved_source_bundle_reconstructed':True,'tampered_bundle_rejected':True,'records':records}
+ (Path(os.environ.get('VOID_HOST_EVIDENCE_DIR',str(h.ROOT/'docs/voidup/evidence')))/'installed-host-capabilities.json').write_text(json.dumps(result,indent=2)+'\n')
+ print('Installed and relocated native providers, notices and modules; normal/O2 JIT and isolated AOT passed on 1 MiB stacks')
+diff --git a/tests/host_capabilities/portable.cpp b/tests/host_capabilities/portable.cpp
+index ffffd5c4..fa6fdc4c 100644
+--- a/tests/host_capabilities/portable.cpp
++++ b/tests/host_capabilities/portable.cpp
+@@ -99,7 +99,7 @@ int portable_main(int argc,char** argv) {
+   auto executable8=executable.u8string(),cwd8=work.u8string();
+   q=request(spawn);q.texts={std::string(executable8.begin(),executable8.end()),std::string(cwd8.begin(),cwd8.end())};q.arrays={{"--exit"},{"VOID_CHILD=owned"}};
+   r=process_execute(q);check(!r.kind && q.acquired,"explicit child launch");auto process=q.acquired;
+-  q=request(wait);q.objects={process};r=process_execute(q);check(!r.kind && r.number==23 && !r.flag,"child exact status");r=process_execute(q);check(!r.kind && r.number==23,"repeat wait");check(!process->close(),"child cleanup");
++  q=request(vd::host::wait);q.objects={process};r=process_execute(q);check(!r.kind && r.number==23 && !r.flag,"child exact status");r=process_execute(q);check(!r.kind && r.number==23,"repeat wait");check(!process->close(),"child cleanup");
+   q=request(spawn);q.texts={"relative",std::string(cwd8.begin(),cwd8.end())};q.arrays={{},{}};r=process_execute(q);check(r.kind!=0,"reject relative executable");
+   auto arguments=vd::checked_application_arguments({"","two words","\"quote\"","tail\\","雪😀"});check(!arguments.error && arguments.values.size()==5,"owned Unicode arguments");
+   check(vd::checked_application_arguments({std::string("a\0b",3)}).error!=0,"reject embedded NUL");
+diff --git a/tests/voidup/ci_integration.py b/tests/voidup/ci_integration.py
+index 6cf59b73..63e5280f 100644
+--- a/tests/voidup/ci_integration.py
++++ b/tests/voidup/ci_integration.py
+@@ -6,6 +6,49 @@ from unittest.mock import patch
+ ROOT=Path(__file__).resolve().parents[2]
+ sys.path.insert(0,str(ROOT/'tools/ci'))
+ import voidup_bootstrap as host
++import llvm_sdk
++
++class Toolchain(unittest.TestCase):
++ def setUp(self):
++  self.scratch=tempfile.TemporaryDirectory();self.addCleanup(self.scratch.cleanup)
++  self.sdk=Path(self.scratch.name)/'sdk';self.resource=self.sdk/'lib/clang/23'
++  identity={'version':llvm_sdk.VERSION,'asset':'fixture','sha256':'fixture'}
++  self.create('void-sdk-identity.json',json.dumps(identity))
++  self.create('include/llvm/Config/llvm-config.h',f'#define LLVM_VERSION_STRING "{llvm_sdk.VERSION}"')
++  for path in ['bin/clang-cl.exe','bin/lld-link.exe','bin/llvm-lib.exe','bin/llvm-readobj.exe','lib/LLVMCore.lib','lib/clang/23/include/stddef.h','lib/clang/23/lib/windows/clang_rt.builtins-x86_64.lib']:self.create(path)
++  self.addCleanup(patch.stopall)
++  patch.object(llvm_sdk,'archive_identity',return_value=identity).start()
++  self.outputs=patch.object(llvm_sdk.subprocess,'check_output',side_effect=self.output).start()
++ def create(self,path,text='fixture'):
++  path=self.sdk/path;path.parent.mkdir(parents=True,exist_ok=True);path.write_text(text)
++ def output(self,command,**kwargs):
++  return str(self.resource) if command[-1]=='/clang:-print-resource-dir' else 'LLVM version '+llvm_sdk.VERSION
++ def test_selector_is_resource_leaf(self):
++  self.assertEqual(llvm_sdk.windows_clangcl(self.sdk)['LLVMToolsVersion'],'23')
++  other=self.resource.with_name('23.1.4');self.resource.rename(other);self.resource=other
++  self.assertEqual(llvm_sdk.windows_clangcl(self.sdk)['LLVMToolsVersion'],'23.1.4')
++  self.assertFalse(any(call.args[0][0].name=='llvm-lib.exe' for call in self.outputs.call_args_list))
++ def test_wrong_version_fails(self):
++  self.outputs.side_effect=lambda *args,**kwargs:'LLVM version 0.0.0'
++  with self.assertRaisesRegex(RuntimeError,'version'):llvm_sdk.windows_clangcl(self.sdk)
++ def test_wrong_or_external_resource_fails(self):
++  for path in [self.resource.with_name('wrong'),self.sdk.parent/'ambient/lib/clang/23']:
++   self.resource=path
++   with self.assertRaisesRegex(RuntimeError,'resource directory'):llvm_sdk.windows_clangcl(self.sdk)
++ def test_missing_components_fail(self):
++  for path in ['bin/clang-cl.exe','bin/lld-link.exe','bin/llvm-lib.exe','bin/llvm-readobj.exe','lib/LLVMCore.lib','lib/clang/23/include/stddef.h','lib/clang/23/lib/windows/clang_rt.builtins-x86_64.lib','include/llvm/Config/llvm-config.h','void-sdk-identity.json']:
++   file=self.sdk/path;before=file.read_bytes();file.unlink()
++   with self.assertRaises(RuntimeError,msg=path):llvm_sdk.windows_clangcl(self.sdk)
++   file.write_bytes(before)
++ def test_mismatched_headers_and_receipt_fail(self):
++  self.create('include/llvm/Config/llvm-config.h','mismatch')
++  with self.assertRaisesRegex(RuntimeError,'headers'):llvm_sdk.windows_clangcl(self.sdk)
++  self.create('void-sdk-identity.json','{}')
++  with self.assertRaisesRegex(RuntimeError,'identity'):llvm_sdk.windows_clangcl(self.sdk)
++ def test_ambient_probe_override_fails_before_execution(self):
++  self.outputs.reset_mock()
++  with self.assertRaisesRegex(RuntimeError,'Only the pinned'):llvm_sdk.pinned_cxx(self.sdk/'bin/clang-cl.exe')
++  self.outputs.assert_not_called()
+ 
+ class Integration(unittest.TestCase):
+  def test_native_profile_layouts(self):
+diff --git a/tools/bench/buffer_preparation.py b/tools/bench/buffer_preparation.py
+index da6b7dfa..1fa095d9 100644
+--- a/tools/bench/buffer_preparation.py
++++ b/tools/bench/buffer_preparation.py
+@@ -4,6 +4,9 @@ import hashlib
+ import json
+ import os
+ from pathlib import Path
++import sys
++sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "ci"))
++from llvm_sdk import pinned_cxx
+ import subprocess
+ 
+ from heap_legacy import ROOT, FLAGS, snapshot
+@@ -12,10 +15,11 @@ from heap_legacy import ROOT, FLAGS, snapshot
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument('--baseline', default='cb601b4')
+-    parser.add_argument('--compiler', default='/usr/bin/clang++-19')
++    parser.add_argument('--compiler', default=None)
+     parser.add_argument('--output', type=Path, required=True)
+     parser.add_argument('--cpu', type=int)
+     args = parser.parse_args()
++    args.compiler = pinned_cxx(args.compiler)
+     if args.cpu is not None:
+         os.sched_setaffinity(0, {args.cpu})
+     output = args.output.resolve()
+diff --git a/tools/bench/heap_legacy.py b/tools/bench/heap_legacy.py
+index d077b5da..c43eb375 100644
+--- a/tools/bench/heap_legacy.py
++++ b/tools/bench/heap_legacy.py
+@@ -6,6 +6,9 @@ import hashlib
+ import json
+ import os
+ from pathlib import Path
++import sys
++sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "ci"))
++from llvm_sdk import pinned_cxx
+ import platform
+ import statistics
+ import subprocess
+@@ -33,13 +36,14 @@ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument('--parent', default='3c69f66')
+     parser.add_argument('--stage2b', default='cb77d62')
+-    parser.add_argument('--compiler', default='/usr/bin/clang++-19')
++    parser.add_argument('--compiler', default=None)
+     parser.add_argument('--output', type=Path, required=True)
+     parser.add_argument('--objects', type=int, default=50000)
+     parser.add_argument('--samples', type=int, default=7)
+     parser.add_argument('--label', default='working')
+     parser.add_argument('--cpu', type=int, help='pin builds and probes to this allowed logical CPU (Linux)')
+     args = parser.parse_args()
++    args.compiler = pinned_cxx(args.compiler)
+     if args.cpu is not None:
+         os.sched_setaffinity(0, {args.cpu})
+     output = args.output.resolve();output.mkdir(parents=True, exist_ok=True)
+diff --git a/tools/ci/llvm_sdk.py b/tools/ci/llvm_sdk.py
+index ee48a4cc..5d9158ac 100644
+--- a/tools/ci/llvm_sdk.py
++++ b/tools/ci/llvm_sdk.py
+@@ -68,6 +68,56 @@ def install(destination: Path) -> None:
+         shutil.move(str(sdk), destination)
+ 
+ 
++def windows_clangcl(destination: Path) -> dict:
++    """Validate an existing SDK and derive MSBuild's resource selector from Clang.
++
++    Never installs anything. In particular, LLVMToolsVersion is a resource
++    directory name, not necessarily the full release version.
++    """
++    destination = destination.resolve()
++    receipt = destination / 'void-sdk-identity.json'
++    if not receipt.is_file() or json.loads(receipt.read_text(encoding='utf-8')) != archive_identity():
++        raise RuntimeError('Missing/mismatched verified LLVM SDK identity')
++    header = destination / 'include/llvm/Config/llvm-config.h'
++    if not header.is_file() or f'#define LLVM_VERSION_STRING "{VERSION}"' not in header.read_text(encoding='utf-8'):
++        raise RuntimeError('Missing/mismatched LLVM SDK headers')
++    tools = {name: destination/'bin'/name for name in ('clang-cl.exe', 'lld-link.exe', 'llvm-lib.exe', 'llvm-readobj.exe')}
++    if not all(path.is_file() and path.resolve().parent == destination/'bin' for path in tools.values()) or not (destination/'lib/LLVMCore.lib').is_file():
++        raise RuntimeError('Incomplete pinned Windows LLVM SDK')
++    versions = {}
++    for name, path in tools.items():
++        if name == 'llvm-lib.exe':
++            continue  # llvm-lib has no version switch; archive identity/hash binds it.
++        output = subprocess.check_output([path, '--version'], text=True)
++        if not re.search(r'\b' + re.escape(VERSION) + r'(?:\D|$)', output):
++            raise RuntimeError(f'Mismatched pinned tool version: {name}: {output}')
++        versions[name] = output.strip()
++    resource = Path(subprocess.check_output([tools['clang-cl.exe'], '/clang:-print-resource-dir'], text=True).strip()).resolve()
++    selectors = {'.'.join(VERSION.split('.')[:count]) for count in range(1, 4)}
++    if resource.parent != destination/'lib/clang' or resource.name not in selectors:
++        raise RuntimeError(f'Clang resource directory escapes/mismatches the verified SDK: {resource}')
++    if not (resource/'include/stddef.h').is_file() or not list((resource/'lib/windows').glob('clang_rt*.lib')):
++        raise RuntimeError('Missing pinned compiler resource headers/libraries')
++    return {'identity': archive_identity(), 'sdk': str(destination), 'resource': str(resource),
++            'LLVMToolsVersion': resource.name, 'versions': versions,
++            'tool_sha256': {name: hashlib.sha256(path.read_bytes()).hexdigest() for name,path in tools.items()}}
++
++
++def pinned_cxx(requested=None) -> str:
++    """Select the verified local SDK for standalone engineering probes too."""
++    sdk = Path(__file__).resolve().parents[2] / '.toolchains' / f'llvm-{VERSION}'
++    compiler = sdk / ('bin/clang++.exe' if os.name == 'nt' else 'bin/clang++')
++    if requested is not None and Path(requested).resolve() != compiler.resolve():
++        raise RuntimeError(f'Only the pinned LLVM {VERSION} compiler is permitted: {compiler}')
++    receipt = sdk / 'void-sdk-identity.json'
++    if not receipt.is_file() or json.loads(receipt.read_text(encoding='utf-8')) != archive_identity():
++        raise RuntimeError('Missing/mismatched verified LLVM SDK identity')
++    output = subprocess.check_output([compiler, '--version'], text=True)
++    if not re.search(r'clang version ' + re.escape(VERSION) + r'(?:\D|$)', output):
++        raise RuntimeError(f'Mismatched pinned compiler: {output}')
++    return str(compiler)
++
++
+ def prepare(destination: Path) -> dict:
+     """Prepare the existing pinned SDK recipe for CI or a local source build."""
+     destination = destination.resolve()
+@@ -91,6 +141,8 @@ def prepare(destination: Path) -> dict:
+     cxx = destination / ("bin/clang-cl.exe" if os.name == "nt" else "bin/clang++")
+     values = {"LLVM_DIR": destination / "lib/cmake/llvm", "CC": cc, "CXX": cxx, "VOID_CLANG": clang}
+     if platform.system() == "Windows":
++        selected = windows_clangcl(destination)
++        values.update(LLVMInstallDir=str(destination) + os.sep, LLVMToolsVersion=selected['LLVMToolsVersion'])
+         # Keep dependency installation outside the verified, immutable SDK cache.
+         # All three are real static development libraries built with the SDK's /MT ABI.
+         dependencies = destination.with_name(destination.name + "-deps")
+diff --git a/tools/ci/voidup_bootstrap.py b/tools/ci/voidup_bootstrap.py
+index 46a4724a..79669780 100644
+--- a/tools/ci/voidup_bootstrap.py
++++ b/tools/ci/voidup_bootstrap.py
+@@ -122,7 +122,7 @@ def main():
+         finally:
+             # Retain native MSBuild/CMake/autoconf diagnostics even on failure.
+             base = ROOT/plan['host_prefix'].replace('/prefix/', '/build/')
+-            for name in ('CMakeCache.txt', 'CMakeConfigureLog.yaml', 'config.log'):
++            for name in ('CMakeCache.txt', 'CMakeConfigureLog.yaml', 'config.log', 'test-suite.log', '*.trs', '*.log'):
+                 for source in base.rglob(name):
+                     target=evidence/'provider-builds'/source.relative_to(base)
+                     target.parent.mkdir(parents=True, exist_ok=True);shutil.copy2(source,target)
+diff --git a/tools/setup_host_deps.py b/tools/setup_host_deps.py
+index b474e908..a0ddc0b2 100644
+--- a/tools/setup_host_deps.py
++++ b/tools/setup_host_deps.py
+@@ -1,48 +1,59 @@
+ #!/usr/bin/env python3
+-"""Build tooling only: pinned static host primitives. No installation policy."""
+-import argparse, hashlib, json, os, pathlib, platform, shutil, subprocess, sys, tarfile, urllib.request
+-from verify_host_deps import source_tree
++"""Build pinned static host providers with the approved libsodium backport."""
++import argparse, json, os, pathlib, platform, subprocess, sys, tarfile, time, urllib.request
++from verify_host_deps import (SCHEMA, sha, source_tree, prepare_sodium, verify_sodium_copy,
++                              recipe_hashes, toolchain, upstream_results, build_identity)
+ ROOT=pathlib.Path(__file__).resolve().parents[1]
+-def digest(p): return hashlib.sha256(p.read_bytes()).hexdigest()
+-def run(args, cwd, env=None): subprocess.run(list(map(str,args)),cwd=cwd,env=env,check=True)
+ def main():
+  if platform.system() in ('Windows','Darwin'):
+   raise SystemExit(subprocess.call([sys.executable,str(ROOT/'tools/setup_host_deps_native.py'),*sys.argv[1:]]))
+- p=argparse.ArgumentParser();p.add_argument('--profile',choices=['Debug','Release','strict'],required=True);p.add_argument('--jobs',default='4');a=p.parse_args()
+- if os.uname().sysname!='Linux': raise SystemExit('This dependency builder is qualified only on Linux; native Windows/macOS recipes remain required.')
+- pins=json.loads((ROOT/'third_party/host-versions.json').read_text());base=ROOT/'.toolchains/host';prefix=base/'prefix'/a.profile
+- cc=ROOT/'.toolchains/llvm-23.1.4/bin/clang';flags='-g -O0' if a.profile=='Debug' else '-g -O2'
+- if a.profile=='strict': flags+=' -fsanitize=address,undefined -fno-omit-frame-pointer'
+- env=dict(os.environ,CC=str(cc),CFLAGS=flags,LDFLAGS=('-fsanitize=address,undefined' if a.profile=='strict' else ''))
++ p=argparse.ArgumentParser(description=__doc__);p.add_argument('--profile',choices=['Debug','Release','strict'],required=True);p.add_argument('--jobs',default='3');p.add_argument('--prefix',type=pathlib.Path);p.add_argument('--build-dir',type=pathlib.Path);a=p.parse_args()
++ if platform.system()!='Linux' or platform.machine().lower() not in ['x86_64','amd64']:raise SystemExit('Native Linux x64 required')
++ base=ROOT/'.toolchains/host';prefix=(a.prefix or base/'prefix'/a.profile).resolve();build=(a.build_dir or base/'build'/a.profile).resolve()
++ if prefix.exists() or build.exists():raise SystemExit('Clean provider build required; retain the old prefix/build and select fresh paths')
++ evidence=ROOT/'docs/voidup/evidence'/('dependencies-linux-'+a.profile+'-'+str(time.time_ns()));evidence.mkdir(parents=True);build.mkdir(parents=True)
++ pins=json.loads((ROOT/'third_party/host-versions.json').read_text());tools=toolchain();cc=pathlib.Path(tools['tools']['clang']['path']);bin=cc.parent
++ flags='-g -O0' if a.profile=='Debug' else '-g -O2';link='--ld-path='+str(bin/'ld.lld')
++ if a.profile=='strict':flags+=' -fsanitize=address,undefined -fno-omit-frame-pointer';link+=' -fsanitize=address,undefined'
++ env=dict(os.environ,CC=str(cc),AR=str(bin/'llvm-ar'),RANLIB=str(bin/'llvm-ranlib'),LD=str(bin/'ld.lld'),CFLAGS=flags,LDFLAGS=link)
++ if a.profile=='strict':env.update(ASAN_OPTIONS='detect_leaks=1:halt_on_error=1:exitcode=87',UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1:exitcode=86',ASAN_SYMBOLIZER_PATH=str(bin/'llvm-symbolizer'))
++ report={'schema':SCHEMA,'platform':'Linux','architecture':'x86_64','profile':a.profile,'pins':pins,'toolchain':tools,'compiler':str(cc),'compiler_sha256':sha(cc),'recipe_sha256':recipe_hashes(),'flags':flags,'link_flags':link,'commands':[],'build_evidence':str(evidence)}
++ def run(args,label,cwd=build):
++  args=list(map(str,args));start=time.monotonic()
++  with (evidence/(label+'.log')).open('wb') as log:r=subprocess.run(args,cwd=cwd,env=env,stdout=log,stderr=subprocess.STDOUT)
++  report['commands'].append({'command':args,'cwd':str(cwd),'status':r.returncode,'seconds':time.monotonic()-start});(evidence/'commands.json').write_text(json.dumps(report,indent=2)+'\n')
++  if r.returncode:raise SystemExit(label+' failed; retained evidence: '+str(evidence))
+  sources={}
+  for name in ['libsodium','libarchive']:
+   pin=pins[name];archive=base/'downloads'/pin['url'].rsplit('/',1)[-1];archive.parent.mkdir(parents=True,exist_ok=True)
+   if not archive.exists():
+-   with urllib.request.urlopen(pin['url']) as inp: archive.write_bytes(inp.read())
+-  if digest(archive)!=pin['sha256']: raise SystemExit('Source hash mismatch: '+name)
+-  source=base/'sources'/(name+'-'+pin['version']);sources[name]=source
++   with urllib.request.urlopen(pin['url']) as response:archive.write_bytes(response.read())
++  if sha(archive)!=pin['sha256']:raise SystemExit('Source archive hash mismatch: '+name)
++  source=base/'sources'/(name+'-'+pin['version'])
+   if not source.exists():
+    source.parent.mkdir(parents=True,exist_ok=True)
+-   with tarfile.open(archive) as tar: tar.extractall(source.parent,filter='data')
+- for name,source in sources.items():
+-  pin=pins[name];source_tree(base/'downloads'/pin['url'].rsplit('/',1)[-1],source)
+- build=base/'build'/a.profile;build.mkdir(parents=True,exist_ok=True)
+- sodium=build/'sodium';sodium.mkdir(exist_ok=True)
+- run([sources['libsodium']/'configure','--prefix='+str(prefix),'--disable-shared','--enable-static','--enable-minimal','--disable-dependency-tracking'],sodium,env)
+- run(['make','-j'+a.jobs],sodium,env);run(['make','check','-j'+a.jobs],sodium,env);run(['make','install'],sodium,env)
++   with tarfile.open(archive) as package:package.extractall(source.parent,filter='data')
++  source_tree(archive,source);sources[name]=source
++ sodium_source=build/'sodium-source';report['source_provenance']=prepare_sodium(sources['libsodium'],base/'downloads'/pins['libsodium']['url'].rsplit('/',1)[-1],sodium_source)
++ sodium=build/'sodium';sodium.mkdir()
++ run([sodium_source/'configure','--prefix='+str(prefix),'--disable-shared','--enable-static','--enable-minimal','--disable-dependency-tracking'],'sodium-configure',sodium)
++ run(['make','-j'+a.jobs],'sodium-build',sodium)
++ try:run(['make','check','-j'+a.jobs],'sodium-tests',sodium)
++ finally:
++  import shutil
++  for pattern in ['*.log','*.trs','*.res']:
++   for path in (sodium/'test/default').glob(pattern):shutil.copy2(path,evidence/path.name)
++ report['upstream_tests']=upstream_results(sodium);verify_sodium_copy(sodium_source,report['source_provenance'])
++ run(['make','install'],'sodium-install',sodium)
+  archive=build/'archive';zroot=ROOT/'.toolchains/http/prefix/linux-aws-lc-5.12.0'/a.profile
++ run([sys.executable,ROOT/'tools/verify_http_dependencies.py',zroot,a.profile],'http-closure')
+  options=['-DENABLE_'+x+'=OFF' for x in ['WERROR','MBEDTLS','NETTLE','OPENSSL','MD','LIBB2','LZ4','LZO','LZMA','ZSTD','BZip2','LIBXML2','BSDXML','EXPAT','WIN32_XMLLITE','PCREPOSIX','PCRE2POSIX','LIBGCC','CNG','TAR','CPIO','CAT','UNZIP','XATTR','ACL','ICONV','TEST']]
+- run(['cmake','-S',sources['libarchive'],'-B',archive,'-GUnix Makefiles','-DCMAKE_INSTALL_PREFIX='+str(prefix),'-DCMAKE_INSTALL_LIBDIR=lib','-DBUILD_SHARED_LIBS=OFF','-DENABLE_ZLIB=ON','-DZLIB_INCLUDE_DIR='+str(zroot/'include'),'-DZLIB_LIBRARY='+str(zroot/'lib/libz.a'),'-DCMAKE_C_COMPILER='+str(cc),'-DCMAKE_C_FLAGS='+flags,'-DCMAKE_BUILD_TYPE='+('Debug' if a.profile=='Debug' else 'Release'),*options],ROOT)
+- run(['cmake','--build',archive,'-j',a.jobs],ROOT);run(['cmake','--install',archive],ROOT)
+- files={str(f.relative_to(prefix)):digest(f) for f in sorted(prefix.rglob('*')) if f.is_file()}
+- receipt={'pins':pins,'profile':a.profile,'compiler':str(cc),'flags':flags,'zlib':str(zroot/'lib/libz.a'),'zlib_sha256':digest(zroot/'lib/libz.a'),'files':files}
+- (prefix/'VOID-HOST-DEPENDENCIES.json').write_text(json.dumps(receipt,indent=2)+'\n')
+- notices=ROOT/'third_party/host-licenses';notices.mkdir(exist_ok=True)
+- for name,source in sources.items():
+-  dest=notices/name;dest.mkdir(exist_ok=True)
+-  shutil.copy(source/('LICENSE' if name=='libsodium' else 'COPYING'),dest)
+- # Preserve controlling per-file terms for the exact provider source closure.
+- for name,source in sources.items():
+-  records={str(f.relative_to(source)):f.read_text(errors='replace').split('*/',1)[0]+'*/' for f in sorted((source/('src/libsodium' if name=='libsodium' else 'libarchive')).rglob('*')) if f.suffix in ('.c','.h')}
+-  (notices/name/'SOURCE-NOTICES.json').write_text(json.dumps(records,indent=2)+'\n')
+-if __name__=='__main__': main()
++ run(['cmake','-S',sources['libarchive'],'-B',archive,'-GUnix Makefiles','-DCMAKE_INSTALL_PREFIX='+str(prefix),'-DCMAKE_INSTALL_LIBDIR=lib','-DBUILD_SHARED_LIBS=OFF','-DENABLE_ZLIB=ON','-DZLIB_INCLUDE_DIR='+str(zroot/'include'),'-DZLIB_LIBRARY='+str(zroot/'lib/libz.a'),'-DCMAKE_C_COMPILER='+str(cc),'-DCMAKE_AR='+str(bin/'llvm-ar'),'-DCMAKE_RANLIB='+str(bin/'llvm-ranlib'),'-DCMAKE_C_FLAGS='+flags,'-DCMAKE_EXE_LINKER_FLAGS='+link,'-DCMAKE_BUILD_TYPE='+('Debug' if a.profile=='Debug' else 'Release'),*options],'archive-configure')
++ run(['cmake','--build',archive,'-j',a.jobs],'archive-build');run(['cmake','--install',archive],'archive-install')
++ disabled=['LZMA','ZSTD','BZip2','OPENSSL','LIBB2','LIBXML2','EXPAT','ICONV'];cache=(archive/'CMakeCache.txt').read_text()
++ if any('ENABLE_'+name+':BOOL=OFF' not in cache for name in disabled):raise SystemExit('Unapproved archive codec configuration')
++ report.update(disabled_features=disabled,archive_cache_sha256=sha(archive/'CMakeCache.txt'),zlib=str(zroot/'lib/libz.a'),zlib_sha256=sha(zroot/'lib/libz.a'),files={p.relative_to(prefix).as_posix():sha(p) for p in sorted(prefix.rglob('*')) if p.is_file()})
++ report['build_identity']=build_identity(report)
++ (prefix/'VOID-HOST-DEPENDENCIES.json').write_text(json.dumps(report,indent=2)+'\n');(evidence/'commands.json').write_text(json.dumps(report,indent=2)+'\n')
++ print(prefix)
++if __name__=='__main__':main()
+diff --git a/tools/setup_host_deps_native.py b/tools/setup_host_deps_native.py
+index dc732ef5..92ca0898 100644
+--- a/tools/setup_host_deps_native.py
++++ b/tools/setup_host_deps_native.py
+@@ -1,19 +1,28 @@
+ #!/usr/bin/env python3
+ """Pinned native Windows/macOS host providers. No ambient provider fallback."""
+-import argparse, hashlib, json, os, pathlib, platform, shutil, subprocess, tarfile, time, urllib.request
+-from verify_host_deps import source_tree
++import argparse, hashlib, json, os, pathlib, platform, shutil, subprocess, sys, tarfile, time, urllib.request
++from verify_host_deps import source_tree, SCHEMA, prepare_sodium, verify_sodium_copy, recipe_hashes, toolchain, upstream_results, build_identity
+ ROOT=pathlib.Path(__file__).resolve().parents[1]
++sys.path.insert(0,str(ROOT/'tools/ci'))
++from llvm_sdk import windows_clangcl
+ def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
++def verify_static_crt(directives):
++ directives=directives.lower()
++ # C objects use DEFAULTLIB, unlike C++'s optional RuntimeLibrary mismatch tag.
++ if '/defaultlib:libcmt' not in directives or any(value in directives for value in ['md_dynamic','mtd_staticdebug','/defaultlib:msvcrt','/defaultlib:libcmtd']):
++  raise ValueError('libsodium static /MT ABI not established by COFF directives')
+ def main():
+- p=argparse.ArgumentParser(description=__doc__);p.add_argument('--profile',choices=['Release','Debug','strict'],required=True);p.add_argument('--jobs',type=int,default=4);a=p.parse_args()
++ p=argparse.ArgumentParser(description=__doc__);p.add_argument('--profile',choices=['Release','Debug','strict'],required=True);p.add_argument('--jobs',type=int,default=4);p.add_argument('--prefix',type=pathlib.Path);p.add_argument('--build-dir',type=pathlib.Path);a=p.parse_args()
+  system=platform.system();arch={'amd64':'x86_64','aarch64':'arm64'}.get(platform.machine().lower(),platform.machine().lower())
+  if (system,arch) not in [('Windows','x86_64'),('Darwin','arm64')]:raise SystemExit('Native Windows x64 or macOS ARM64 required; no ABI substitution')
+  base=ROOT/'.toolchains/host';bundle=('windows-' if system=='Windows' else 'macos-')+arch
+- prefix=base/'prefix'/bundle/a.profile;build=base/'build'/bundle/a.profile;build.mkdir(parents=True,exist_ok=True)
++ prefix=(a.prefix or base/'prefix'/bundle/a.profile).resolve();build=(a.build_dir or base/'build'/bundle/a.profile).resolve()
++ if prefix.exists() or build.exists():raise SystemExit('Clean provider build required; retain the old prefix/build and select fresh paths')
++ build.mkdir(parents=True)
+  evidence=ROOT/'docs/voidup/evidence'/('dependencies-'+bundle+'-'+a.profile+'-'+str(time.time_ns()));evidence.mkdir(parents=True)
+  pins=json.loads((ROOT/'third_party/host-versions.json').read_text());sources={}
+- report={'schema':2,'platform':system,'architecture':arch,'profile':a.profile,'pins':pins,'commands':[],
+-  'recipe_sha256':{name:sha(ROOT/name) for name in ['tools/setup_host_deps.py','tools/setup_host_deps_native.py','tools/verify_host_deps.py','cmake/host-sodium.targets']}}
++ report={'schema':SCHEMA,'toolchain':toolchain(),'platform':system,'architecture':arch,'profile':a.profile,'pins':pins,'commands':[],
++  'recipe_sha256':recipe_hashes()}
+  def run(args,name,cwd=build,env=None):
+   args=list(map(str,args));start=time.monotonic()
+   with (evidence/(name+'.log')).open('wb') as log:r=subprocess.run(args,cwd=cwd,env=env,stdout=log,stderr=subprocess.STDOUT)
+@@ -38,17 +47,44 @@ def main():
+  report['compiler']=str(cc);report['compiler_sha256']=sha(cc);run([cc,'--version'],'compiler')
+  options=['-DENABLE_'+x+'=OFF' for x in ['WERROR','MBEDTLS','NETTLE','OPENSSL','MD','LIBB2','LZ4','LZO','LZMA','ZSTD','BZip2','LIBXML2','BSDXML','EXPAT','WIN32_XMLLITE','PCREPOSIX','PCRE2POSIX','LIBGCC','CNG','TAR','CPIO','CAT','UNZIP','XATTR','ACL','ICONV','TEST']]
+  common=['-G','Ninja','-DBUILD_SHARED_LIBS=OFF','-DCMAKE_INSTALL_LIBDIR=lib','-DCMAKE_INSTALL_PREFIX='+str(prefix),'-DCMAKE_C_COMPILER='+str(cc),'-DCMAKE_BUILD_TYPE='+('Release' if a.profile=='Release' else 'Debug')]
++ sodium_source=build/'sodium-source';report['source_provenance']=prepare_sodium(sources['libsodium'],base/'downloads'/pins['libsodium']['url'].rsplit('/',1)[-1],sodium_source)
+  if system=='Windows':
+   if os.environ.get('VSCMD_ARG_TGT_ARCH','').lower() not in ['x64','amd64']:raise SystemExit('Use a native x64 Visual Studio developer environment')
+   msbuild=shutil.which('msbuild');
+   if not msbuild:raise SystemExit('MSBuild and the Windows SDK are required')
++  selected=windows_clangcl(cc.parent.parent);report['clangcl_selection']=selected
+   # Upstream MSBuild generates version.h in its source tree. Use an exact
+   # disposable copy so the archive-verified source remains unchanged.
+   sodium=build/'sodium-source'
+-  if sodium.exists():shutil.rmtree(sodium)
+-  shutil.copytree(sources['libsodium'],sodium)
+   output=build/'sodium-output';intermediate=build/'sodium-objects';output.mkdir(exist_ok=True)
+-  run([msbuild,sodium/'builds/msvc/vs2022/libsodium/libsodium.vcxproj','/m:'+str(a.jobs),'/p:Configuration='+('ReleaseLIB' if a.profile=='Release' else 'DebugLIB'),'/p:Platform=x64','/p:PlatformToolset=ClangCL','/p:LLVMInstallDir='+str(cc.parent.parent)+os.sep,'/p:CLToolPath='+str(cc.parent)+os.sep,'/p:OutDir='+str(output)+os.sep,'/p:IntDir='+str(intermediate)+os.sep,'/p:ForceImportBeforeCppTargets='+str(ROOT/'cmake/host-sodium.targets'),'/p:VoidHostStrict='+str(a.profile=='strict').lower()],'sodium-build')
++  properties=['/p:Configuration='+('ReleaseLIB' if a.profile=='Release' else 'DebugLIB'),'/p:Platform=x64','/p:PlatformToolset=ClangCL',
++   '/p:LLVMInstallDir='+selected['sdk']+os.sep,'/p:LLVMToolsVersion='+selected['LLVMToolsVersion'],
++   '/p:CLToolPath='+str(cc.parent)+os.sep,'/p:CLToolExe=clang-cl.exe',
++   '/p:LinkToolPath='+str(cc.parent)+os.sep,'/p:LinkToolExe=lld-link.exe',
++   '/p:LibToolPath='+str(cc.parent)+os.sep,'/p:LibToolExe=llvm-lib.exe',
++   '/p:VoidPinnedResourceDir='+selected['resource'],'/p:VoidPinnedLLVMToolsVersion='+selected['LLVMToolsVersion'],
++   '/p:OutDir='+str(output)+os.sep,'/p:IntDir='+str(intermediate)+os.sep,
++   '/p:ForceImportBeforeCppTargets='+str(ROOT/'cmake/host-sodium.targets'),'/p:VoidHostStrict='+str(a.profile=='strict').lower()]
++  project=sodium/'builds/msvc/vs2022/libsodium/libsodium.vcxproj'
++  evaluated=['LLVMToolsVersion','LLVMInstallDir','CLToolPath','CLToolExe','LinkToolPath','LinkToolExe','LibToolPath','LibToolExe',
++   'WindowsTargetPlatformVersion','WindowsSdkDir','VCToolsInstallDir','VCToolsVersion','IncludePath','LibraryPath']
++  run([msbuild,project,*properties,'-getProperty:'+','.join(evaluated)],'sodium-properties')
++  actual=json.loads((evidence/'sodium-properties.log').read_text(encoding='utf-8-sig'))['Properties']
++  expected={'LLVMToolsVersion':selected['LLVMToolsVersion'],'LLVMInstallDir':selected['sdk']+os.sep,
++   'CLToolPath':str(cc.parent)+os.sep,'CLToolExe':'clang-cl.exe','LinkToolPath':str(cc.parent)+os.sep,
++   'LinkToolExe':'lld-link.exe','LibToolPath':str(cc.parent)+os.sep,'LibToolExe':'llvm-lib.exe'}
++  if any(actual.get(key)!=value for key,value in expected.items()):raise SystemExit('Evaluated MSBuild toolchain mismatch: '+repr(actual))
++  sdk=pathlib.Path(actual.get('WindowsSdkDir',''));sdk_version=actual.get('WindowsTargetPlatformVersion','')
++  vc=pathlib.Path(actual.get('VCToolsInstallDir',''))
++  if not sdk.is_absolute() or not vc.is_absolute() or not sdk_version or not (sdk/'Include'/sdk_version/'um/Windows.h').is_file() or not (sdk/'Lib'/sdk_version/'um/x64/kernel32.lib').is_file() or not (vc/'include/vcruntime.h').is_file() or not (vc/'lib/x64/libcmt.lib').is_file():
++   raise SystemExit('Evaluated native Windows SDK/VC headers and libraries are incomplete: '+repr(actual))
++  report['msbuild_properties']=actual
++  run([msbuild,project,*properties,'-preprocess:'+str(evidence/'sodium-evaluated.xml')],'sodium-preprocess')
++  run([msbuild,project,*properties,'/t:Rebuild','/m:'+str(a.jobs),'/v:normal','/bl:'+str(evidence/'sodium-build.binlog')],'sodium-build')
++  run([cc.parent/'llvm-readobj.exe','--coff-directives',output/'libsodium.lib'],'sodium-static-abi')
++  verify_static_crt((evidence/'sodium-static-abi.log').read_text())
++  verify_sodium_copy(sodium_source,report['source_provenance'],generated_version=True)
++  report['upstream_tests']={'runner':'MSBuild','status':'not-run','scope':'Native Windows builds the static provider; upstream Unix 87-test execution is not claimed'}
+   (prefix/'lib').mkdir(parents=True,exist_ok=True);shutil.copy2(output/'libsodium.lib',prefix/'lib/libsodium.lib')
+   shutil.copytree(sodium/'src/libsodium/include',prefix/'include',dirs_exist_ok=True)
+   zlib=http/'lib'/('zs.lib' if a.profile=='Release' else 'zsd.lib')
+@@ -56,7 +92,7 @@ def main():
+   if a.profile=='strict':flags+=' /clang:-fsanitize=address,undefined /clang:-fno-omit-frame-pointer'
+   # libarchive's separate MSVC_USE_STATIC_CRT option selects MTd in Debug.
+   # Disable that override and explicitly use the project's MT ABI in all modes.
+-  common+=['-DCMAKE_POLICY_DEFAULT_CMP0091=NEW','-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded','-DMSVC_USE_STATIC_CRT=OFF','-DCMAKE_C_FLAGS_DEBUG=/Od /Zi /D_DEBUG','-DCMAKE_C_FLAGS='+flags]
++  common+=['-DCMAKE_LINKER='+str(cc.parent/'lld-link.exe'),'-DCMAKE_AR='+str(cc.parent/'llvm-lib.exe'),'-DCMAKE_POLICY_DEFAULT_CMP0091=NEW','-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded','-DMSVC_USE_STATIC_CRT=OFF','-DCMAKE_C_FLAGS_DEBUG=/Od /Zi /D_DEBUG','-DCMAKE_C_FLAGS='+flags]
+  else:
+   sdk=os.environ.get('SDKROOT') or subprocess.check_output(['xcrun','--show-sdk-path'],text=True).strip();minimum=os.environ.get('MACOSX_DEPLOYMENT_TARGET','14.0')
+   if not pathlib.Path(sdk).is_dir():raise SystemExit('Physical Apple SDK required')
+@@ -64,9 +100,12 @@ def main():
+   flags='-g -O2' if a.profile=='Release' else '-g -O0'
+   if a.profile=='strict':flags+=' -fsanitize=address,undefined -fno-omit-frame-pointer'
+   env=dict(os.environ,CC=str(cc),CFLAGS=flags,LDFLAGS=('-fsanitize=address,undefined' if a.profile=='strict' else ''),SDKROOT=sdk,MACOSX_DEPLOYMENT_TARGET=minimum)
++  if a.profile=='strict':env.update(ASAN_OPTIONS='detect_leaks=1:halt_on_error=1:exitcode=87',UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1:exitcode=86',ASAN_SYMBOLIZER_PATH=str(cc.parent/'llvm-symbolizer'))
+   sodium=build/'sodium';sodium.mkdir(exist_ok=True)
+-  run([sources['libsodium']/'configure','--prefix='+str(prefix),'--disable-shared','--enable-static','--enable-minimal','--disable-dependency-tracking'],'sodium-configure',sodium,env)
+-  run(['make','-j'+str(a.jobs)],'sodium-build',sodium,env);run(['make','check','-j'+str(a.jobs)],'sodium-tests',sodium,env);run(['make','install'],'sodium-install',sodium,env)
++  run([sodium_source/'configure','--prefix='+str(prefix),'--disable-shared','--enable-static','--enable-minimal','--disable-dependency-tracking'],'sodium-configure',sodium,env)
++  run(['make','-j'+str(a.jobs)],'sodium-build',sodium,env);run(['make','check','-j'+str(a.jobs)],'sodium-tests',sodium,env)
++  report['upstream_tests']=upstream_results(sodium);verify_sodium_copy(sodium_source,report['source_provenance'])
++  run(['make','install'],'sodium-install',sodium,env)
+   zlib=http/'lib/libz.a';common+=['-DCMAKE_C_FLAGS='+flags,'-DCMAKE_OSX_SYSROOT='+sdk,'-DCMAKE_OSX_DEPLOYMENT_TARGET='+minimum,'-DCMAKE_OSX_ARCHITECTURES=arm64']
+  run(['cmake','-S',sources['libarchive'],'-B',build/'archive',*common,'-DENABLE_ZLIB=ON','-DPOSIX_REGEX_LIB=NONE','-DZLIB_INCLUDE_DIR='+str(http/'include'),'-DZLIB_LIBRARY='+str(zlib),*options],'archive-configure')
+  run(['cmake','--build',build/'archive','--parallel',a.jobs],'archive-build');run(['cmake','--install',build/'archive'],'archive-install')
+@@ -77,6 +116,7 @@ def main():
+  report.update(disabled_features=disabled,archive_cache_sha256=sha(build/'archive/CMakeCache.txt'))
+  report.update(zlib=str(zlib),zlib_sha256=sha(zlib),flags=flags,
+   files={p.relative_to(prefix).as_posix():sha(p) for folder in ['lib','include'] for p in sorted((prefix/folder).rglob('*')) if p.is_file()})
++ report['build_identity']=build_identity(report)
+  (prefix/'VOID-HOST-DEPENDENCIES.json').write_text(json.dumps(report,indent=2)+'\n');(evidence/'commands.json').write_text(json.dumps(report,indent=2)+'\n')
+  print(prefix)
+ if __name__=='__main__':main()
+diff --git a/tools/verify_discovery_engines.py b/tools/verify_discovery_engines.py
+index b909817b..89b43899 100644
+--- a/tools/verify_discovery_engines.py
++++ b/tools/verify_discovery_engines.py
+@@ -1,6 +1,10 @@
+ """Sprint 1 fixtures through the existing CLI, native engines and Debug cache."""
++import sys
++from pathlib import Path
++sys.path.insert(0, str(Path(__file__).resolve().parent / "ci"))
++from llvm_sdk import pinned_cxx
+ import argparse,json,os,pathlib,subprocess,tempfile
+-p=argparse.ArgumentParser();p.add_argument('build');p.add_argument('--compiler',default='clang++-19');p.add_argument('--output',required=True);a=p.parse_args();build=pathlib.Path(a.build).resolve()
++p=argparse.ArgumentParser();p.add_argument('build');p.add_argument('--compiler',default=None);p.add_argument('--output',required=True);a=p.parse_args();a.compiler=pinned_cxx(a.compiler);build=pathlib.Path(a.build).resolve()
+ with tempfile.TemporaryDirectory(prefix='VOID nested engine fixtures ') as d:
+     root=pathlib.Path(d);project=root/'project';standard=root/'standard'
+     (project/'math').mkdir(parents=True);(standard/'math').mkdir(parents=True)
+diff --git a/tools/verify_host_deps.py b/tools/verify_host_deps.py
+index 11bfc176..dff170c1 100644
+--- a/tools/verify_host_deps.py
++++ b/tools/verify_host_deps.py
+@@ -1,75 +1,132 @@
+ #!/usr/bin/env python3
+-"""Verify exact source trees and installed static provider closure for build tooling."""
+-import hashlib,json,pathlib,subprocess,sys,tarfile
++"""Verify pinned host archives, approved source postimages and provider receipts."""
++import argparse, hashlib, json, os, pathlib, re, shutil, subprocess, sys, tarfile, tempfile
+ ROOT=pathlib.Path(__file__).resolve().parents[1]
+-def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+-def source_tree(archive,source):
++PATCH_ROOT='third_party/host-patches/libsodium-1.0.22'
++RECIPES=('tools/setup_host_deps.py','tools/setup_host_deps_native.py','tools/verify_host_deps.py',
++         'tools/ci/llvm_sdk.py','cmake/host-sodium.targets','third_party/host-versions.json',
++         PATCH_ROOT+'/PROVENANCE.json',PATCH_ROOT+'/asan-alignment.patch')
++SCHEMA=3
++
++def sha(path):
++ with pathlib.Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
++def archive_entries(archive):
+  expected={}
+  with tarfile.open(archive) as tar:
+   for member in tar:
+    pieces=pathlib.PurePosixPath(member.name).parts
+    if not pieces or '..' in pieces or member.name.startswith('/'):raise ValueError('invalid provider source archive path')
+-   relative=pathlib.Path(*pieces[1:])
+-   if member.isfile():expected[str(relative)]=('file',hashlib.sha256(tar.extractfile(member).read()).hexdigest())
+-   elif member.issym():expected[str(relative)]=('symlink',member.linkname)
++   relative=pathlib.Path(*pieces[1:]).as_posix()
++   if member.isfile():expected[relative]=('file',hashlib.sha256(tar.extractfile(member).read()).hexdigest())
++   elif member.issym():expected[relative]=('symlink',member.linkname)
+    elif not member.isdir():raise ValueError('unsupported provider source archive member')
+- actual={}
+- for path in source.rglob('*'):
+-  if path.is_symlink():actual[str(path.relative_to(source))]=('symlink',path.readlink().as_posix())
+-  elif path.is_file():actual[str(path.relative_to(source))]=('file',sha(path))
+- if actual!=expected:
+-  changed=[key for key in actual.keys()|expected.keys() if actual.get(key)!=expected.get(key)]
+-  raise ValueError('provider source tree differs from pinned archive: '+repr(changed[:10]))
++ return expected
++def tree_entries(source):
++ return {p.relative_to(source).as_posix():('symlink',p.readlink().as_posix()) if p.is_symlink() else ('file',sha(p))
++         for p in source.rglob('*') if p.is_symlink() or p.is_file()}
++def tree_digest(entries):return hashlib.sha256(json.dumps(entries,sort_keys=True).encode()).hexdigest()
++def source_tree(archive,source):
++ expected=archive_entries(archive)
++ if tree_entries(source)!=expected:raise ValueError('provider source tree differs from pinned archive')
+  return {key:value[1] for key,value in expected.items()}
+-def qualify(profile):
+- pins=json.loads((ROOT/'third_party/host-versions.json').read_text());base=ROOT/'.toolchains/host';prefix=base/'prefix'/profile
+- receipt=json.loads((prefix/'VOID-HOST-DEPENDENCIES.json').read_text())
+- if receipt['pins']!=pins or receipt['profile']!=profile:raise ValueError('provider pin/profile mismatch')
+- trees={}
+- for name in ['libsodium','libarchive']:
+-  pin=pins[name];archive=base/'downloads'/pin['url'].rsplit('/',1)[-1]
+-  if sha(archive)!=pin['sha256']:raise ValueError('source archive mismatch: '+name)
+-  trees[name]=source_tree(archive,base/'sources'/(name+'-'+pin['version']))
+- for name,digest in receipt['files'].items():
+-  if sha(prefix/name)!=digest:raise ValueError('installed provider file mismatch: '+name)
+- if sha(pathlib.Path(receipt['zlib']))!=receipt['zlib_sha256']:raise ValueError('zlib closure mismatch')
+- members={name:subprocess.check_output(['ar','t',prefix/'lib'/name],text=True).splitlines() for name in ['libsodium.a','libarchive.a']}
+- cmake=(base/'build'/profile/'archive/CMakeCache.txt').read_text()
+- for codec in ['LZMA','ZSTD','BZip2','OPENSSL','LIBB2','LIBXML2','EXPAT','ICONV']:
+-  if 'ENABLE_'+codec+':BOOL=OFF' not in cmake:raise ValueError('unapproved provider feature: '+codec)
+- return {'profile':profile,'pins':pins,'compiler':receipt['compiler'],'compiler_sha256':sha(pathlib.Path(receipt['compiler'])),'flags':receipt['flags'],'zlib_sha256':receipt['zlib_sha256'],'archive_members':members,'source_files':trees,'receipt_sha256':sha(prefix/'VOID-HOST-DEPENDENCIES.json')}
++def source_policy(archive_dir=None):
++ pins=json.loads((ROOT/'third_party/host-versions.json').read_text());pin=pins['libsodium']
++ archive_dir=pathlib.Path(archive_dir) if archive_dir else ROOT/'.toolchains/host/downloads'
++ archive=archive_dir/pin['url'].rsplit('/',1)[-1]
++ if sha(archive)!=pin['sha256']:raise ValueError('libsodium base archive mismatch')
++ metadata=ROOT/PATCH_ROOT/'PROVENANCE.json';policy=json.loads(metadata.read_text());patch=metadata.parent/policy['patch']
++ if not patch.resolve().is_relative_to(metadata.parent.resolve()) or policy['schema']!=1 or policy['provider']!='libsodium' or policy['version']!=pin['version'] or policy['archive_sha256']!=pin['sha256'] or policy['upstream_revision']!=pin['revision'] or sha(patch)!=policy['patch_sha256']:raise ValueError('approved source patch policy mismatch')
++ expected=archive_entries(archive);patched=dict(expected)
++ for name,record in policy['files'].items():
++  if pathlib.PurePosixPath(name).is_absolute() or '..' in pathlib.PurePosixPath(name).parts or expected.get(name)!=('file',record['before_sha256']):raise ValueError('approved source preimage mismatch: '+name)
++  patched[name]=('file',record['after_sha256'])
++ return {'policy_sha256':sha(metadata),'archive_sha256':pin['sha256'],'version':pin['version'],
++         'upstream_revision':pin['revision'],'patch':{'path':patch.relative_to(ROOT).as_posix(),'sha256':sha(patch),'upstream_alignment_commit':policy['upstream_alignment_commit']},
++         'postimages':{name:record['after_sha256'] for name,record in policy['files'].items()},
++         'pristine_tree_sha256':tree_digest(expected),'applied_tree_sha256':tree_digest(patched)}
++def prepare_sodium(source,archive,destination):
++ source_tree(archive,source);policy=source_policy(pathlib.Path(archive).parent)
++ if destination.exists():raise ValueError('refusing to reuse disposable patched source: '+str(destination))
++ shutil.copytree(source,destination,symlinks=True)
++ # Source application only: no index, object or history mutation, including inside a checkout.
++ env=dict(os.environ,GIT_CEILING_DIRECTORIES=str(destination.parent.resolve()))
++ command=['git','-c','core.autocrlf=false','apply','--no-index',str(ROOT/policy['patch']['path'])]
++ subprocess.run(command[:5]+['--check']+command[5:],cwd=destination,env=env,check=True)
++ subprocess.run(command,cwd=destination,env=env,check=True)
++ verify_sodium_copy(destination,policy)
++ return policy
++def verify_sodium_copy(source,policy,generated_version=False):
++ entries=tree_entries(source)
++ if generated_version:
++  header='src/libsodium/include/sodium/version.h'
++  if header in entries:
++   if '#define SODIUM_VERSION_STRING "1.0.22"' not in (source/header).read_text():raise ValueError('generated sodium version mismatch')
++   del entries[header]
++ if tree_digest(entries)!=policy['applied_tree_sha256']:raise ValueError('patched provider source/postimages mismatch')
++def recipe_hashes():return {name:sha(ROOT/name) for name in RECIPES}
++def toolchain():
++ sys.path.insert(0,str(ROOT/'tools/ci'));import llvm_sdk
++ sdk=ROOT/'.toolchains'/('llvm-'+llvm_sdk.VERSION)
++ if json.loads((sdk/'void-sdk-identity.json').read_text())!=llvm_sdk.archive_identity():raise ValueError('host provider SDK identity mismatch')
++ if '#define LLVM_VERSION_STRING "23.1.4"' not in (sdk/'include/llvm/Config/llvm-config.h').read_text():raise ValueError('host provider SDK headers mismatch')
++ windows=os.name=='nt';names=['clang-cl.exe','lld-link.exe','llvm-lib.exe'] if windows else ['clang','ld64.lld' if sys.platform=='darwin' else 'ld.lld','llvm-ar','llvm-ranlib','llvm-symbolizer']
++ tools={}
++ for name in names:
++  path=sdk/'bin'/name
++  if not path.is_file() or path.resolve().parent!= (sdk/'bin').resolve():raise ValueError('pinned host tool missing/escaped: '+name)
++  if name!='llvm-lib.exe':
++   output=subprocess.check_output([path,'--version'],text=True)
++   if not re.search(r'\b23\.1\.4(?:\D|$)',output):raise ValueError('pinned host tool version mismatch: '+name)
++  tools[name]={'path':str(path),'sha256':sha(path)}
++ if windows:llvm_sdk.windows_clangcl(sdk)
++ return {'sdk':json.loads((sdk/'void-sdk-identity.json').read_text()),'tools':tools}
++def upstream_results(build):
++ policy=json.loads((ROOT/PATCH_ROOT/'PROVENANCE.json').read_text());rows={}
++ for path in (build/'test/default').glob('*.trs'):
++  match=re.search(r'^:test-result: (\S+)',path.read_text(),re.M);rows[path.stem]=match[1] if match else 'MISSING'
++ if set(rows)!=set(policy['upstream_test_targets']) or any(value!='PASS' for value in rows.values()):raise ValueError('full upstream 87-test acceptance failed: '+repr(rows))
++ return {'runner':'make check','targets':rows,'total':len(rows),'output_oracle_exceptions':policy['asan_output_oracle_exceptions']}
++def build_identity(record):
++ return hashlib.sha256(json.dumps({k:v for k,v in record.items() if k not in ['build_identity','commands','build_evidence']},sort_keys=True).encode()).hexdigest()
+ def verify_prefix(prefix,profile,system,architecture):
+- prefix=pathlib.Path(prefix).resolve()
+- pins=json.loads((ROOT/'third_party/host-versions.json').read_text())
+- receipt=json.loads((prefix/'VOID-HOST-DEPENDENCIES.json').read_text())
+- if receipt['pins']!=pins or receipt['profile']!=profile:raise ValueError('provider pin/profile mismatch')
+- if receipt.get('platform','Linux')!=system or receipt.get('architecture','x86_64')!=architecture:raise ValueError('provider platform/architecture mismatch')
++ prefix=pathlib.Path(prefix).resolve();pins=json.loads((ROOT/'third_party/host-versions.json').read_text());receipt=json.loads((prefix/'VOID-HOST-DEPENDENCIES.json').read_text())
++ if receipt.get('schema')!=SCHEMA:raise ValueError('unpatched/obsolete host receipt schema; rebuild providers')
++ if receipt['pins']!=pins or receipt['profile']!=profile or receipt['platform']!=system or receipt['architecture']!=architecture:raise ValueError('provider pin/profile/platform/architecture mismatch')
++ if receipt.get('source_provenance')!=source_policy():raise ValueError('provider approved patch/source identity mismatch')
++ if receipt.get('recipe_sha256')!=recipe_hashes():raise ValueError('provider recipe/patch inventory mismatch')
++ if receipt.get('toolchain')!=toolchain():raise ValueError('provider compiler/SDK/tool identity mismatch')
++ if receipt.get('build_identity')!=build_identity(receipt):raise ValueError('provider build identity mismatch')
++ for name in ['libsodium','libarchive']:
++  pin=pins[name];archive=ROOT/'.toolchains/host/downloads'/pin['url'].rsplit('/',1)[-1]
++  if sha(archive)!=pin['sha256']:raise ValueError('provider corresponding source mismatch: '+name)
+  for relative,expected in receipt['files'].items():
+   path=prefix/relative
+   if not path.resolve().is_relative_to(prefix) or not path.is_file() or sha(path)!=expected:raise ValueError('provider file mismatch: '+relative)
+- for name in ['libsodium','libarchive']:
+-  pin=pins[name]
+-  archive=ROOT/'.toolchains/host/downloads'/pin['url'].rsplit('/',1)[-1]
+-  if sha(archive)!=pin['sha256']:raise ValueError('provider corresponding source mismatch: '+name)
+- if system!='Linux':
+-  required_recipes={'tools/setup_host_deps.py','tools/setup_host_deps_native.py','tools/verify_host_deps.py','cmake/host-sodium.targets'}
+-  if receipt.get('schema')!=2 or set(receipt.get('recipe_sha256',{}))!=required_recipes:raise ValueError('native provider recipe inventory missing')
+-  disabled={'LZMA','ZSTD','BZip2','OPENSSL','LIBB2','LIBXML2','EXPAT','ICONV'}|({'CNG'} if system=='Windows' else set())
+-  if set(receipt.get('disabled_features',[]))!=disabled:raise ValueError('native provider feature inventory mismatch')
+- for relative,expected in receipt.get('recipe_sha256',{}).items():
+-  path=ROOT/relative
+-  if not path.resolve().is_relative_to(ROOT) or sha(path)!=expected:raise ValueError('provider recipe mismatch: '+relative)
+  required=['lib/archive.lib','lib/libsodium.lib'] if system=='Windows' else ['lib/libarchive.a','lib/libsodium.a']
+- for relative in required:
+-  if relative not in receipt['files']:raise ValueError('static provider absent from receipt: '+relative)
++ if any(name not in receipt['files'] for name in required):raise ValueError('static provider absent from receipt')
++ if sha(pathlib.Path(receipt['zlib']))!=receipt['zlib_sha256']:raise ValueError('provider zlib closure mismatch')
++ disabled={'LZMA','ZSTD','BZip2','OPENSSL','LIBB2','LIBXML2','EXPAT','ICONV'}|({'CNG'} if system=='Windows' else set())
++ if set(receipt.get('disabled_features',[]))!=disabled:raise ValueError('provider feature inventory mismatch')
++ if system!='Windows':
++  tests=receipt.get('upstream_tests',{});policy=json.loads((ROOT/PATCH_ROOT/'PROVENANCE.json').read_text())
++  if set(tests.get('targets',{}))!=set(policy['upstream_test_targets']) or any(v!='PASS' for v in tests['targets'].values()) or tests.get('output_oracle_exceptions')!=policy['asan_output_oracle_exceptions']:raise ValueError('provider upstream test evidence missing')
+  return receipt
++def qualify(profile):
++ prefix=ROOT/'.toolchains/host/prefix'/profile;receipt=verify_prefix(prefix,profile,'Linux','x86_64')
++ return {'profile':profile,'pins':receipt['pins'],'build_identity':receipt['build_identity'],'source_provenance':receipt['source_provenance'],'receipt_sha256':sha(prefix/'VOID-HOST-DEPENDENCIES.json')}
+ if __name__=='__main__':
+- if '--prefix' in sys.argv:
+-  import argparse
++ if '--reconstruct-source' in sys.argv:
++  parser=argparse.ArgumentParser();parser.add_argument('--reconstruct-source',type=pathlib.Path,required=True);parser.add_argument('--archives',type=pathlib.Path,required=True);args=parser.parse_args()
++  pin=json.loads((ROOT/'third_party/host-versions.json').read_text())['libsodium'];archive=args.archives/pin['url'].rsplit('/',1)[-1]
++  if sha(archive)!=pin['sha256']:raise SystemExit('base archive hash mismatch')
++  with tempfile.TemporaryDirectory() as temporary:
++   with tarfile.open(archive) as package:package.extractall(temporary,filter='data')
++   policy=prepare_sodium(pathlib.Path(temporary)/('libsodium-'+pin['version']),archive,args.reconstruct_source)
++  print(json.dumps(policy,indent=2))
++ elif '--prefix' in sys.argv:
+   parser=argparse.ArgumentParser();parser.add_argument('--prefix',required=True);parser.add_argument('--profile',required=True);parser.add_argument('--platform',required=True);parser.add_argument('--architecture',required=True);args=parser.parse_args()
+   record=verify_prefix(args.prefix,args.profile,args.platform,args.architecture)
+-  print('Verified pinned '+args.platform+' host providers: '+args.profile+'; '+str(len(record['files']))+' files')
++  print('Verified approved patched '+args.platform+' host providers: '+args.profile+'; build '+record['build_identity'])
+  else:
+   results=[qualify(p) for p in (sys.argv[1:] or ['Release','Debug','strict'])]
+-  out=ROOT/'docs/voidup/evidence/dependencies.json';out.write_text(json.dumps(results,indent=2)+'\n')
+-  print('Verified pinned source trees, static members, disabled codecs and installed hashes: '+', '.join(x['profile'] for x in results))
++  print(json.dumps(results,indent=2))
+diff --git a/tools/verify_website_examples.py b/tools/verify_website_examples.py
+index 964fb99a..9327bbc3 100644
+--- a/tools/verify_website_examples.py
++++ b/tools/verify_website_examples.py
+@@ -1,6 +1,10 @@
+ """Verify the existing 15 gallery contracts with the existing CLI/async adapters."""
++import sys
++from pathlib import Path
++sys.path.insert(0, str(Path(__file__).resolve().parent / "ci"))
++from llvm_sdk import pinned_cxx
+ import argparse,html.parser,json,pathlib,re,subprocess,tempfile
+-p=argparse.ArgumentParser();p.add_argument('build');p.add_argument('--compiler',default='clang++-19');p.add_argument('--output',required=True);a=p.parse_args()
++p=argparse.ArgumentParser();p.add_argument('build');p.add_argument('--compiler',default=None);p.add_argument('--output',required=True);a=p.parse_args();a.compiler=pinned_cxx(a.compiler)
+ repo=pathlib.Path(__file__).resolve().parents[1];build=pathlib.Path(a.build).resolve()
+ class Gallery(html.parser.HTMLParser):
+     cases=[]
+diff --git a/third_party/host-patches/libsodium-1.0.22/PROVENANCE.json b/third_party/host-patches/libsodium-1.0.22/PROVENANCE.json
+new file mode 100644
+--- /dev/null
++++ b/third_party/host-patches/libsodium-1.0.22/PROVENANCE.json
+@@ -0,0 +1,122 @@
++{
++  "schema": 1,
++  "provider": "libsodium",
++  "version": "1.0.22",
++  "archive_sha256": "adbdd8f16149e81ac6078a03aca6fc03b592b89ef7b5ed83841c086191be3349",
++  "upstream_revision": "77e1ce5d6dee871c49ef211222ba18ef0c486bda",
++  "patch": "asan-alignment.patch",
++  "patch_sha256": "f0de9004b8129626e14750437f51eb9524f030149607b50bb75ce0b6c998af74",
++  "upstream_alignment_commit": "11cd77c5cd35fafa2317c36cd7f61de0b9d03cd2",
++  "license": "ISC",
++  "approval": "Golden Wrench / Boss controlled integration, 7 November 2026; patch preamble records its earlier proposal status",
++  "files": {
++    "test/default/cmptest.h": {
++      "before_sha256": "981d08ebce0d729f68cab3e8621848e7160a14dc5eead7e9700e44b7904554c7",
++      "after_sha256": "fb8b7ad052cd0352cbebc674825a0765a075c86045a089ed05eec8769a8b3650",
++      "origin": "local test-harness candidate"
++    },
++    "src/libsodium/crypto_stream/salsa20/xmm6int/u1.h": {
++      "before_sha256": "f35de0b5967c7f1ce03700f4f2d23783b34441216036aa745b9707305d4e6eae",
++      "after_sha256": "bdf1b537c551e336439f3f312217a76b1821af1c59f5a3e8e189d95cf4f3235d",
++      "origin": "exact upstream 11cd77c5cd35fafa2317c36cd7f61de0b9d03cd2"
++    },
++    "src/libsodium/crypto_stream/salsa20/xmm6int/u4.h": {
++      "before_sha256": "3bf51e537e7fa8ffe3db2dedf87c990ae7d6e90cfc1aa1ca666807ba7a65493b",
++      "after_sha256": "387eb23dc5a60296f07b3e445859a6f26c5fb706ca1540dec3450f5cb42a638a",
++      "origin": "exact upstream 11cd77c5cd35fafa2317c36cd7f61de0b9d03cd2"
++    }
++  },
++  "upstream_test_targets": [
++    "aead_aegis128l",
++    "aead_aegis256",
++    "aead_aes256gcm",
++    "aead_aes256gcm2",
++    "aead_chacha20poly1305",
++    "aead_chacha20poly13052",
++    "aead_xchacha20poly1305",
++    "auth",
++    "auth2",
++    "auth3",
++    "auth5",
++    "auth6",
++    "auth7",
++    "box",
++    "box2",
++    "box7",
++    "box8",
++    "box_easy",
++    "box_easy2",
++    "box_seal",
++    "box_seed",
++    "chacha20",
++    "codecs",
++    "codecs2",
++    "codecs3",
++    "core1",
++    "core2",
++    "core3",
++    "core4",
++    "core5",
++    "core6",
++    "core_keccak1600",
++    "ed25519_convert",
++    "generichash",
++    "generichash2",
++    "generichash3",
++    "hash",
++    "hash3",
++    "hash_sha3256",
++    "hash_sha3512",
++    "ipcrypt",
++    "kdf",
++    "kem",
++    "kem_mlkem768",
++    "kem_xwing",
++    "keygen",
++    "kx",
++    "metamorphic",
++    "misuse",
++    "onetimeauth",
++    "onetimeauth2",
++    "onetimeauth7",
++    "pwhash_argon2i",
++    "pwhash_argon2id",
++    "pwhash_argon2id2",
++    "randombytes",
++    "scalarmult",
++    "scalarmult2",
++    "scalarmult5",
++    "scalarmult6",
++    "scalarmult7",
++    "scalarmult8",
++    "secretbox",
++    "secretbox2",
++    "secretbox7",
++    "secretbox8",
++    "secretbox_easy",
++    "secretbox_easy2",
++    "secretstream_xchacha20poly1305",
++    "shorthash",
++    "sign",
++    "sodium_core",
++    "sodium_utils",
++    "sodium_utils2",
++    "sodium_utils3",
++    "sodium_utils4",
++    "sodium_version",
++    "stream",
++    "stream2",
++    "stream3",
++    "stream4",
++    "verify1",
++    "xof2",
++    "xof_shake128",
++    "xof_shake256",
++    "xof_turboshake128",
++    "xof_turboshake256"
++  ],
++  "asan_output_oracle_exceptions": [
++    "sodium_utils2",
++    "sodium_utils3"
++  ]
++}
+diff --git a/third_party/host-patches/libsodium-1.0.22/asan-alignment.patch b/third_party/host-patches/libsodium-1.0.22/asan-alignment.patch
+new file mode 100644
+--- /dev/null
++++ b/third_party/host-patches/libsodium-1.0.22/asan-alignment.patch
+@@ -0,0 +1,231 @@
++PROPOSAL ONLY: requires explicit Boss / Golden Wrench approval before application.
++No production provider source, installed library, pin, archive hash or sanitizer setting has been changed.
++Base: libsodium 1.0.22, revision 77e1ce5d6dee871c49ef211222ba18ef0c486bda
++Archive SHA-256: adbdd8f16149e81ac6078a03aca6fc03b592b89ef7b5ed83841c086191be3349
++Alignment: exact source hunks from upstream 11cd77c5cd35fafa2317c36cd7f61de0b9d03cd2 (ISC).
++Test harness: local one-line candidate; upstream uses the same guarded allocation in its non-ASan branch.
++All 87 test targets, assertions and expected outputs remain; no suppressions or annotation changes.
++
++diff --git a/test/default/cmptest.h b/test/default/cmptest.h
++--- a/test/default/cmptest.h
+++++ b/test/default/cmptest.h
++@@ -185,7 +185,7 @@
++     if (sodium_init() != 0) {
++         return 99;
++     }
++-# if defined(__EMSCRIPTEN__) || defined(__SANITIZE_ADDRESS__)
+++# if defined(__EMSCRIPTEN__)
++     guard_page = _guard_page = NULL;
++ #else
++     if ((_guard_page = (unsigned char *) sodium_malloc(0)) == NULL) {
++diff --git a/src/libsodium/crypto_stream/salsa20/xmm6int/u1.h b/src/libsodium/crypto_stream/salsa20/xmm6int/u1.h
++--- a/src/libsodium/crypto_stream/salsa20/xmm6int/u1.h
+++++ b/src/libsodium/crypto_stream/salsa20/xmm6int/u1.h
++@@ -172,14 +172,14 @@
++         diag1          = _mm_shuffle_epi32(diag1, 0x39); \
++         diag2          = _mm_shuffle_epi32(diag2, 0x39); \
++         diag3          = _mm_shuffle_epi32(diag3, 0x39); \
++-        in##A ^= *(const uint32_t *) (m + (A * 4));      \
++-        in##B ^= *(const uint32_t *) (m + (B * 4));      \
++-        in##C ^= *(const uint32_t *) (m + (C * 4));      \
++-        in##D ^= *(const uint32_t *) (m + (D * 4));      \
++-        *(uint32_t *) (c + (A * 4)) = in##A;             \
++-        *(uint32_t *) (c + (B * 4)) = in##B;             \
++-        *(uint32_t *) (c + (C * 4)) = in##C;             \
++-        *(uint32_t *) (c + (D * 4)) = in##D;             \
+++        in##A ^= LOAD32_LE(m + (A * 4));                 \
+++        in##B ^= LOAD32_LE(m + (B * 4));                 \
+++        in##C ^= LOAD32_LE(m + (C * 4));                 \
+++        in##D ^= LOAD32_LE(m + (D * 4));                 \
+++        STORE32_LE(c + (A * 4), in##A);                  \
+++        STORE32_LE(c + (B * 4), in##B);                  \
+++        STORE32_LE(c + (C * 4), in##C);                  \
+++        STORE32_LE(c + (D * 4), in##D);                  \
++     } while (0)
++ 
++ #define ONEQUAD(A, B, C, D) ONEQUAD_SHUFFLE(A, B, C, D)
++diff --git a/src/libsodium/crypto_stream/salsa20/xmm6int/u4.h b/src/libsodium/crypto_stream/salsa20/xmm6int/u4.h
++--- a/src/libsodium/crypto_stream/salsa20/xmm6int/u4.h
+++++ b/src/libsodium/crypto_stream/salsa20/xmm6int/u4.h
++@@ -374,15 +374,15 @@
++     z##C  = _mm_shuffle_epi32(z##C, 0x39); \
++     z##D  = _mm_shuffle_epi32(z##D, 0x39); \
++                                            \
++-    in##A ^= *(uint32_t *) (m + 0);        \
++-    in##B ^= *(uint32_t *) (m + 4);        \
++-    in##C ^= *(uint32_t *) (m + 8);        \
++-    in##D ^= *(uint32_t *) (m + 12);       \
++-                                           \
++-    *(uint32_t *) (c + 0)  = in##A;        \
++-    *(uint32_t *) (c + 4)  = in##B;        \
++-    *(uint32_t *) (c + 8)  = in##C;        \
++-    *(uint32_t *) (c + 12) = in##D;        \
+++    in##A ^= LOAD32_LE(m + 0);             \
+++    in##B ^= LOAD32_LE(m + 4);             \
+++    in##C ^= LOAD32_LE(m + 8);             \
+++    in##D ^= LOAD32_LE(m + 12);            \
+++                                           \
+++    STORE32_LE(c + 0, in##A);              \
+++    STORE32_LE(c + 4, in##B);              \
+++    STORE32_LE(c + 8, in##C);              \
+++    STORE32_LE(c + 12, in##D);             \
++                                            \
++     in##A = _mm_cvtsi128_si32(z##A);       \
++     in##B = _mm_cvtsi128_si32(z##B);       \
++@@ -393,14 +393,14 @@
++     z##C  = _mm_shuffle_epi32(z##C, 0x39); \
++     z##D  = _mm_shuffle_epi32(z##D, 0x39); \
++                                            \
++-    in##A ^= *(uint32_t *) (m + 64);       \
++-    in##B ^= *(uint32_t *) (m + 68);       \
++-    in##C ^= *(uint32_t *) (m + 72);       \
++-    in##D ^= *(uint32_t *) (m + 76);       \
++-    *(uint32_t *) (c + 64) = in##A;        \
++-    *(uint32_t *) (c + 68) = in##B;        \
++-    *(uint32_t *) (c + 72) = in##C;        \
++-    *(uint32_t *) (c + 76) = in##D;        \
+++    in##A ^= LOAD32_LE(m + 64);            \
+++    in##B ^= LOAD32_LE(m + 68);            \
+++    in##C ^= LOAD32_LE(m + 72);            \
+++    in##D ^= LOAD32_LE(m + 76);            \
+++    STORE32_LE(c + 64, in##A);             \
+++    STORE32_LE(c + 68, in##B);             \
+++    STORE32_LE(c + 72, in##C);             \
+++    STORE32_LE(c + 76, in##D);             \
++                                            \
++     in##A = _mm_cvtsi128_si32(z##A);       \
++     in##B = _mm_cvtsi128_si32(z##B);       \
++@@ -411,28 +411,28 @@
++     z##C  = _mm_shuffle_epi32(z##C, 0x39); \
++     z##D  = _mm_shuffle_epi32(z##D, 0x39); \
++                                            \
++-    in##A ^= *(uint32_t *) (m + 128);      \
++-    in##B ^= *(uint32_t *) (m + 132);      \
++-    in##C ^= *(uint32_t *) (m + 136);      \
++-    in##D ^= *(uint32_t *) (m + 140);      \
++-    *(uint32_t *) (c + 128) = in##A;       \
++-    *(uint32_t *) (c + 132) = in##B;       \
++-    *(uint32_t *) (c + 136) = in##C;       \
++-    *(uint32_t *) (c + 140) = in##D;       \
+++    in##A ^= LOAD32_LE(m + 128);           \
+++    in##B ^= LOAD32_LE(m + 132);           \
+++    in##C ^= LOAD32_LE(m + 136);           \
+++    in##D ^= LOAD32_LE(m + 140);           \
+++    STORE32_LE(c + 128, in##A);            \
+++    STORE32_LE(c + 132, in##B);            \
+++    STORE32_LE(c + 136, in##C);            \
+++    STORE32_LE(c + 140, in##D);            \
++                                            \
++     in##A = _mm_cvtsi128_si32(z##A);       \
++     in##B = _mm_cvtsi128_si32(z##B);       \
++     in##C = _mm_cvtsi128_si32(z##C);       \
++     in##D = _mm_cvtsi128_si32(z##D);       \
++                                            \
++-    in##A ^= *(uint32_t *) (m + 192);      \
++-    in##B ^= *(uint32_t *) (m + 196);      \
++-    in##C ^= *(uint32_t *) (m + 200);      \
++-    in##D ^= *(uint32_t *) (m + 204);      \
++-    *(uint32_t *) (c + 192) = in##A;       \
++-    *(uint32_t *) (c + 196) = in##B;       \
++-    *(uint32_t *) (c + 200) = in##C;       \
++-    *(uint32_t *) (c + 204) = in##D
+++    in##A ^= LOAD32_LE(m + 192);           \
+++    in##B ^= LOAD32_LE(m + 196);           \
+++    in##C ^= LOAD32_LE(m + 200);           \
+++    in##D ^= LOAD32_LE(m + 204);           \
+++    STORE32_LE(c + 192, in##A);            \
+++    STORE32_LE(c + 196, in##B);            \
+++    STORE32_LE(c + 200, in##C);            \
+++    STORE32_LE(c + 204, in##D)
++ 
++ /* store data ; this macro replaces shuffle+mov by a direct extract; not much
++  * difference */
++@@ -445,56 +445,56 @@
++     in##B = _mm_cvtsi128_si32(z##B);      \
++     in##C = _mm_cvtsi128_si32(z##C);      \
++     in##D = _mm_cvtsi128_si32(z##D);      \
++-    in##A ^= *(uint32_t *) (m + 0);       \
++-    in##B ^= *(uint32_t *) (m + 4);       \
++-    in##C ^= *(uint32_t *) (m + 8);       \
++-    in##D ^= *(uint32_t *) (m + 12);      \
++-    *(uint32_t *) (c + 0)  = in##A;       \
++-    *(uint32_t *) (c + 4)  = in##B;       \
++-    *(uint32_t *) (c + 8)  = in##C;       \
++-    *(uint32_t *) (c + 12) = in##D;       \
+++    in##A ^= LOAD32_LE(m + 0);            \
+++    in##B ^= LOAD32_LE(m + 4);            \
+++    in##C ^= LOAD32_LE(m + 8);            \
+++    in##D ^= LOAD32_LE(m + 12);           \
+++    STORE32_LE(c + 0, in##A);             \
+++    STORE32_LE(c + 4, in##B);             \
+++    STORE32_LE(c + 8, in##C);             \
+++    STORE32_LE(c + 12, in##D);            \
++                                           \
++     in##A = _mm_extract_epi32(z##A, 1);   \
++     in##B = _mm_extract_epi32(z##B, 1);   \
++     in##C = _mm_extract_epi32(z##C, 1);   \
++     in##D = _mm_extract_epi32(z##D, 1);   \
++                                           \
++-    in##A ^= *(uint32_t *) (m + 64);      \
++-    in##B ^= *(uint32_t *) (m + 68);      \
++-    in##C ^= *(uint32_t *) (m + 72);      \
++-    in##D ^= *(uint32_t *) (m + 76);      \
++-    *(uint32_t *) (c + 64) = in##A;       \
++-    *(uint32_t *) (c + 68) = in##B;       \
++-    *(uint32_t *) (c + 72) = in##C;       \
++-    *(uint32_t *) (c + 76) = in##D;       \
+++    in##A ^= LOAD32_LE(m + 64);           \
+++    in##B ^= LOAD32_LE(m + 68);           \
+++    in##C ^= LOAD32_LE(m + 72);           \
+++    in##D ^= LOAD32_LE(m + 76);           \
+++    STORE32_LE(c + 64, in##A);            \
+++    STORE32_LE(c + 68, in##B);            \
+++    STORE32_LE(c + 72, in##C);            \
+++    STORE32_LE(c + 76, in##D);            \
++                                           \
++     in##A = _mm_extract_epi32(z##A, 2);   \
++     in##B = _mm_extract_epi32(z##B, 2);   \
++     in##C = _mm_extract_epi32(z##C, 2);   \
++     in##D = _mm_extract_epi32(z##D, 2);   \
++                                           \
++-    in##A ^= *(uint32_t *) (m + 128);     \
++-    in##B ^= *(uint32_t *) (m + 132);     \
++-    in##C ^= *(uint32_t *) (m + 136);     \
++-    in##D ^= *(uint32_t *) (m + 140);     \
++-    *(uint32_t *) (c + 128) = in##A;      \
++-    *(uint32_t *) (c + 132) = in##B;      \
++-    *(uint32_t *) (c + 136) = in##C;      \
++-    *(uint32_t *) (c + 140) = in##D;      \
+++    in##A ^= LOAD32_LE(m + 128);          \
+++    in##B ^= LOAD32_LE(m + 132);          \
+++    in##C ^= LOAD32_LE(m + 136);          \
+++    in##D ^= LOAD32_LE(m + 140);          \
+++    STORE32_LE(c + 128, in##A);           \
+++    STORE32_LE(c + 132, in##B);           \
+++    STORE32_LE(c + 136, in##C);           \
+++    STORE32_LE(c + 140, in##D);           \
++                                           \
++     in##A = _mm_extract_epi32(z##A, 3);   \
++     in##B = _mm_extract_epi32(z##B, 3);   \
++     in##C = _mm_extract_epi32(z##C, 3);   \
++     in##D = _mm_extract_epi32(z##D, 3);   \
++                                           \
++-    in##A ^= *(uint32_t *) (m + 192);     \
++-    in##B ^= *(uint32_t *) (m + 196);     \
++-    in##C ^= *(uint32_t *) (m + 200);     \
++-    in##D ^= *(uint32_t *) (m + 204);     \
++-    *(uint32_t *) (c + 192) = in##A;      \
++-    *(uint32_t *) (c + 196) = in##B;      \
++-    *(uint32_t *) (c + 200) = in##C;      \
++-    *(uint32_t *) (c + 204) = in##D
+++    in##A ^= LOAD32_LE(m + 192);          \
+++    in##B ^= LOAD32_LE(m + 196);          \
+++    in##C ^= LOAD32_LE(m + 200);          \
+++    in##D ^= LOAD32_LE(m + 204);          \
+++    STORE32_LE(c + 192, in##A);           \
+++    STORE32_LE(c + 196, in##B);           \
+++    STORE32_LE(c + 200, in##C);           \
+++    STORE32_LE(c + 204, in##D)
++ 
++ /* store data ; this macro first transpose data in-registers, and then store
++  * them in memory. much faster with icc. */
