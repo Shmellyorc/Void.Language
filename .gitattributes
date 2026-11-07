@@ -3,3 +3,6 @@
 /third_party/curl/** -text
 /docs/net/http/evidence/curl-8.23.0-cookie-oom-candidate.patch -text
 /docs/net/http/evidence/curl-8.23.0-http2-window-candidate.patch -text
+
+# Preserve the approved host patch and provenance bytes on every checkout.
+/third_party/host-patches/** -text

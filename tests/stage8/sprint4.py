@@ -36,7 +36,7 @@ with tempfile.TemporaryDirectory(prefix='VOID Sprint 4 ') as directory:
         for mode in ['normal','optimized']:
             obj=root/(f'app{number}-{mode}.obj');exe=root/(f'app{number}-{mode}.exe')
             run([compiler,'emit',source,'-o',obj,*(['--no-opt'] if mode=='normal' else [])])
-            link(obj,exe);run([exe],status,'');run([exe,'7'],2,'')
+            link(obj,exe);run([exe],status,'');run([exe,'7'],status,'')
     for text,diagnostic in [
         ('func main() -> i32:\n    if false:\n        return 1\n','Missing return'),
         ('func main() -> string:\n    return "bad"\n','entry'),

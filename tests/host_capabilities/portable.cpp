@@ -31,6 +31,38 @@ std::shared_ptr<Object> child(const std::shared_ptr<Object>& parent,const char* 
  auto q=request(dir_child);q.objects={parent};q.texts={name};auto result=directory_execute(q);
  check(!result.kind && q.acquired,"private child");return q.acquired;
 }
+#ifdef _WIN32
+void owner_rights_ancestors(const fs::path& work,const fs::path& executable) {
+ struct Local {void* value;~Local(){if(value)LocalFree(value);}};
+ win::PrivateAccess access;LPWSTR owner_text=nullptr;
+ check(ConvertSidToStringSidW(access.sid(),&owner_text),"owner SID text");Local owner_memory{owner_text};
+ const std::wstring owner(owner_text);
+ auto text=[](const fs::path& path){auto bytes=path.u8string();return std::string(bytes.begin(),bytes.end());};
+ struct Case {const wchar_t* name;const wchar_t* aces;bool admitted;};
+ for(auto test:{Case{L"owner-rights",L"(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)(A;OICI;FA;;;OW)",true},
+                Case{L"owner-rights-only",L"(A;OICI;FA;;;OW)",true},
+                Case{L"owner-rights-everyone",L"(A;OICI;FA;;;OW)(A;;0x100;;;WD)",false},
+                Case{L"owner-rights-other",L"(A;OICI;FA;;;OW)(A;;0x100;;;BU)",false}}) {
+  const auto parent=work/test.name,leaf=parent/L"private";
+  const auto sddl=L"O:"+owner+L"D:P"+test.aces;PSECURITY_DESCRIPTOR descriptor=nullptr;
+  check(ConvertStringSecurityDescriptorToSecurityDescriptorW(sddl.c_str(),SDDL_REVISION_1,&descriptor,nullptr),"test ACL descriptor");Local memory{descriptor};
+  SECURITY_ATTRIBUTES security{sizeof(SECURITY_ATTRIBUTES),descriptor,FALSE};
+  check(CreateDirectoryW(parent.c_str(),&security),"exclusive ACL fixture");
+  auto q=request(dir_create);q.texts={text(leaf)};auto r=directory_execute(q);
+  if(test.admitted) {
+   check(!r.kind && q.acquired,"OWNER_RIGHTS ancestor admitted");check(!q.acquired->close(),"OWNER_RIGHTS child cleanup");
+   q=request(dir_admit);q.texts={text(parent)};r=directory_execute(q);
+   check(r.kind==2 && r.code==ERROR_ACCESS_DENIED && !q.acquired,"OWNER_RIGHTS is not a private leaf ACL");
+  } else check(r.kind==2 && r.code==ERROR_ACCESS_DENIED && !q.acquired && !fs::exists(leaf),"untrusted ancestor mutation rejected");
+  q=request(spawn);q.texts={text(executable),text(parent)};q.arrays={{"--exit"},{}};r=process_execute(q);
+  if(test.admitted) {
+   check(!r.kind && q.acquired,"OWNER_RIGHTS working directory admitted");auto process=q.acquired;
+   q=request(vd::host::wait);q.objects={process};r=process_execute(q);
+   check(!r.kind && r.number==23,"OWNER_RIGHTS child status");check(!process->close(),"OWNER_RIGHTS process cleanup");
+  } else check(r.kind==2 && r.code==ERROR_ACCESS_DENIED && !q.acquired,"untrusted working directory rejected");
+ }
+}
+#endif
 }
 int portable_main(int argc,char** argv) {
  try {
@@ -75,6 +107,7 @@ int portable_main(int argc,char** argv) {
   auto q=request(dir_create);q.texts={root};auto r=directory_execute(q);check(!r.kind && q.acquired,"private root");auto directory=q.acquired;
   q=request(dir_admit);q.texts={root};r=directory_execute(q);check(!r.kind,"admit root");check(!q.acquired->close(),"close admitted alias");
   auto stage=child(directory,"stage");
+  q=request(dir_open);q.objects={directory};q.texts={"stage"};r=directory_execute(q);check(!r.kind && q.acquired,"independent source alias");auto source_alias=q.acquired;
   q=request(dir_child);q.objects={directory};q.texts={"../escape"};r=directory_execute(q);check(r.kind!=0,"reject traversal");
   q=request(dir_file);q.objects={stage};q.texts={"data"};q.numbers={1};r=directory_execute(q);check(!r.kind && q.acquired_file,"private file");auto file=q.acquired_file;
   vd::filesystem::Request write(vd::filesystem::Operation::write_bytes);write.file=file;write.bytes="payload";
@@ -88,6 +121,7 @@ int portable_main(int argc,char** argv) {
   q=request(dir_lock);q.objects={directory};q.texts={"writer.lock"};r=directory_execute(q);check(!r.kind && q.acquired,"first lock");auto lock=q.acquired;
   q=request(dir_lock);q.objects={directory};q.texts={"writer.lock"};r=directory_execute(q);check(r.kind!=0,"second lock denied");check(!lock->close(),"release lock");
   q=request(dir_lock);q.objects={directory};q.texts={"writer.lock"};r=directory_execute(q);check(!r.kind,"released lock reacquired");check(!q.acquired->close(),"release second lock");
+  q=request(dir_admit);q.texts={root};r=directory_execute(q);check(!r.kind && q.acquired,"independent publication target alias");auto target_alias=q.acquired;
   q=request(dir_publish);q.objects={stage,directory};q.texts={"release"};r=directory_execute(q);check(r.flag,"exclusive publication");
   // Windows directory FlushFileBuffers can fail. Mutation must remain visible,
   // with the actual durability error, rather than becoming unpublished/success.
@@ -95,7 +129,39 @@ int portable_main(int argc,char** argv) {
   q=request(dir_open);q.objects={directory};q.texts={"release"};r=directory_execute(q);check(!r.kind,"published directory available");check(!q.acquired->close(),"close published alias");
   auto collision=child(directory,"collision");
   q=request(dir_publish);q.objects={collision,directory};q.texts={"release"};r=directory_execute(q);check(r.kind && !r.flag,"publication collision has no mutation");
-  check(!collision->close() && !stage->close() && !directory->close(),"directory cleanup");
+  check(fs::exists(work/"capability-private/collision") && fs::exists(work/"capability-private/release/data"),"collision preserves both directory identities");
+  auto destination=child(directory,"destination");
+  q=request(dir_publish);q.objects={stage,destination};q.texts={"moved"};r=directory_execute(q);
+  check(r.flag && !fs::exists(work/"capability-private/release") && fs::exists(work/"capability-private/destination/moved/data"),"held directory cross-parent publication");
+  auto impostor=child(directory,"stage");
+  q=request(dir_publish);q.objects={source_alias,directory};q.texts={"stale-move"};r=directory_execute(q);
+  check(r.kind && !r.flag && !fs::exists(work/"capability-private/stale-move") && fs::exists(work/"capability-private/stage") && fs::exists(work/"capability-private/destination/moved/data"),"stale source alias rejects replaced old name without mutation");
+  q=request(dir_open);q.objects={destination};q.texts={"moved"};r=directory_execute(q);check(!r.kind && q.acquired,"fresh source alias");auto fresh_alias=q.acquired;
+  q=request(dir_publish);q.objects={fresh_alias,directory};q.texts={"fresh-move"};r=directory_execute(q);
+  check(r.flag && fs::exists(work/"capability-private/fresh-move/data") && !fs::exists(work/"capability-private/destination/moved"),"fresh source alias publishes with current parent");
+  auto create_file=[&](const char* name,const char* content) {
+   auto operation=request(dir_file);operation.objects={directory};operation.texts={name};operation.numbers={1};auto result=directory_execute(operation);
+   check(!result.kind && operation.acquired_file,"publication file creation");auto value=operation.acquired_file;
+   vd::filesystem::Request output(vd::filesystem::Operation::write_bytes);output.file=value;output.bytes=content;
+   check(vd::filesystem::run(output).completed==static_cast<std::int64_t>(output.bytes.size()),"publication file bytes");return value;
+  };
+  auto original=create_file("original","original");
+  q=request(dir_replace);q.objects={directory,destination};q.texts={"original","selected"};q.numbers={0};q.file=std::make_shared<Borrow>(original);r=directory_execute(q);
+  check(r.flag && !fs::exists(work/"capability-private/original") && fs::exists(work/"capability-private/destination/selected"),"exclusive file publication");
+  check(vd::filesystem::close(*original).error==vd::filesystem::ErrorKind::success,"close original publication file");
+  auto replacement=create_file("replacement","replacement");
+  q=request(dir_replace);q.objects={directory,destination};q.texts={"replacement","selected"};q.numbers={0};q.file=std::make_shared<Borrow>(replacement);r=directory_execute(q);
+  check(r.kind && !r.flag && fs::exists(work/"capability-private/replacement"),"exclusive file collision preserves source");
+  q.numbers={1};r=directory_execute(q);check(r.flag && !fs::exists(work/"capability-private/replacement"),"atomic file replacement");
+  char replaced[11]{};auto replaced_read=vd::filesystem::read_at(*replacement,0,replaced,sizeof(replaced));
+  check(replaced_read.error==vd::filesystem::ErrorKind::success && replaced_read.completed==11 && std::string_view(replaced,11)=="replacement","held replacement identity and bytes");
+  check(vd::filesystem::close(*replacement).error==vd::filesystem::ErrorKind::success,"close replacement file");
+  q=request(dir_replace);q.objects={destination,directory};q.texts={"selected","closed-source"};q.numbers={0};q.file=std::make_shared<Borrow>(replacement);r=directory_execute(q);
+  check(r.kind && !r.flag && fs::exists(work/"capability-private/destination/selected") && !fs::exists(work/"capability-private/closed-source"),"closed file publication fails without mutation");
+#ifdef _WIN32
+  check(r.code==ERROR_INVALID_HANDLE,"failed identity query preserves native error");
+#endif
+  check(!fresh_alias->close() && !impostor->close() && !source_alias->close() && !target_alias->close() && !destination->close() && !collision->close() && !stage->close() && !directory->close(),"directory cleanup");
   auto executable8=executable.u8string(),cwd8=work.u8string();
   q=request(spawn);q.texts={std::string(executable8.begin(),executable8.end()),std::string(cwd8.begin(),cwd8.end())};q.arrays={{"--exit"},{"VOID_CHILD=owned"}};
   r=process_execute(q);check(!r.kind && q.acquired,"explicit child launch");auto process=q.acquired;
@@ -107,6 +173,7 @@ int portable_main(int argc,char** argv) {
   wchar_t image[]=L"image",bad[]={static_cast<wchar_t>(0xd800),0};wchar_t* input[]={image,bad};
   check(vd::capture_application_arguments(2,input,true).error==4,"reject invalid UTF16");
   check(!win::component(L"CON.txt") && !win::component(L"file:stream") && !win::component(L"data. ") && !win::component(L"FOO~1"),"reject DOS aliases and streams");
+  owner_rights_ancestors(work,executable);
 #endif
   std::cout<<"Portable host providers: "<<checks<<" checks passed\n";return 0;
  } catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}

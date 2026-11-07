@@ -19,7 +19,8 @@ class Handler(fixture.Handler):
         if self.path=='/held':
             self.server.count+=1;self.server.seen.set()
             self.send_response(200);self.send_header('Content-Length','2');self.end_headers();self.wfile.flush()
-            if self.server.release.wait(60):self.wfile.write(b'ok')
+            # The native fixture releases this response after compatible compilation.
+            self.server.release.wait();self.wfile.write(b'ok')
         elif self.path=='/seen':
             if self.server.seen.wait(60):self.reply(b'ok')
         elif self.path=='/release':self.server.release.set();self.reply(b'ok')
@@ -29,7 +30,7 @@ SOURCE='''use net/http
 async func entry(value: i32) -> i32:
     if http.open_client() is Ok(var owner):
         with owner:
-            if owner.start(http.request(target = "@BASE@/held")) is Ok(var exchange):
+            if owner.start(http.request(target = "@BASE@/held"), http.request_options(read_timeout_ms = 0, total_timeout_ms = 0)) is Ok(var exchange):
                 with exchange:
                     var first = exchange.read_bytes_async()
                     if (await first) is Ok(var block):

@@ -1,0 +1,351 @@
+diff --git a/docs/voidup/INTEGRATION_REPORT.md b/docs/voidup/INTEGRATION_REPORT.md
+index 30a7e3b7..6d87e372 100644
+--- a/docs/voidup/INTEGRATION_REPORT.md
++++ b/docs/voidup/INTEGRATION_REPORT.md
+@@ -1,4 +1,12 @@
+-**Current commit inventory after source-control cleanup:**
++**Active follow-up: [CI #42377496702 cross-platform repair](#ci-42377496702-cross-platform-repair), baseline `799a29e3c0b0e204abecd4dc1f14356bf1df3443`.**
++The earlier integration and cleanup inventories below are retained historical
++records: they were already present in this baseline. They are not the pending
++file list for this follow-up. Native Windows Release/Debug verification is complete
++for the stated local environment; hosted seven-configuration acceptance remains
++unqualified. Use the [current exact allowlist](evidence/ci-42377496702/commit-paths.txt)
++for this repair. Original failures and corrective reruns are separated below.
++
++**Historical commit inventory after the earlier source-control cleanup:**
+ [REPAIR_COMMIT_PATHS.txt](REPAIR_COMMIT_PATHS.txt) and
+ [REPAIR_COMMIT_INVENTORY.json](REPAIR_COMMIT_INVENTORY.json).
+ Earlier `COMMIT_PATHS.*` and `PENDING_PATHS.*` lists describe their historical
+@@ -9,7 +17,7 @@ A link fragment on that archive names the original repository-relative member;
+ extract into a fresh directory to inspect those records. Directly linked retained
+ summaries, source diffs and original CI ZIPs remain individual files.
+ 
+-**Current scope: controlled libsodium backport integration — 7 November 2026.**
++**Earlier scope: controlled libsodium backport integration — 7 November 2026.**
+ Golden Wrench/Boss authorized permanent integration engineering of the exact
+ reviewed three-file candidate. The unchanged base pin, mandatory patch-aware
+ receipts and corresponding-source packaging are integrated. See the
+@@ -1033,3 +1041,323 @@ changes. Suggested title remains:
+ `Repair VOIDUP provider provenance, LLVM 23.1.4 selection and host test portability [skip ci]`.
+ **RETAIN for independent Golden Wrench/Boss review.** No prior result was discarded
+ and no additional compiler, Runtime, dependency or feature change was introduced.
++
++
++## CI #42377496702 cross-platform repair
++
++7 November 2026, follow-up to [run 42377496702](https://github.com/Shmellyorc/Void.Language/actions/runs/42377496702)
++at `799a29e3c0b0e204abecd4dc1f14356bf1df3443`.
++**Recommendation: RETAIN the demonstrated repairs for Golden Wrench review; hosted acceptance remains UNQUALIFIED.** No staging, commit, branch, push or hosted dispatch occurred.
++
++Native Windows Release and Debug completed the provider, compiler and host/VOIDUP
++execution chain. All 350 registered test names were exercised in each profile;
++the original failures, interruptions and explicit corrective reruns remain
++separate records. This is not a claim that either original unfiltered command
++passed, or that the replacement hosted run has passed.
++The indexed `native-effective-test-results.json` reconciles names against the
++original records and passing rerun XML: each profile has 350 effective passes,
++zero remaining failed names and zero remaining skipped names.
++
++### Review artifacts and exact changes
++
++The [source diff](evidence/ci-42377496702/source.patch) contains the following
++eleven source/build/test changes. The [documentation diff](evidence/ci-42377496702/documentation.patch)
++contains this report revision. The [original CI archive](evidence/ci-42377496702/original-ci.tar.gz)
++and [index](evidence/ci-42377496702/original-ci-index.json) preserve all seven job
++logs, twelve diagnostic ZIPs and metadata: 27 members, each read back and
++SHA-256 verified. The [local verification archive](evidence/ci-42377496702/local-verification.tar.gz)
++and [index](evidence/ci-42377496702/local-verification-index.json) preserve actual
++commands, original failures, native probes, receipts, XML results and reruns.
++
++| File | Demonstrated defect and correction |
++| --- | --- |
++| `.gitattributes` | Windows checkout converted the approved patch and provenance JSON to CRLF. Protect `third_party/host-patches/**` with `-text`; preserve existing approved hashes. |
++| `tools/setup_host_deps_native.py` | Query resolved MSBuild `TargetPlatformVersion`, not the `WindowsTargetPlatformVersion=10.0` alias. Pass selected zlib paths to CMake with forward slashes, avoiding the actual `\\U` parsing failure. |
++| `src/runtime/host_directory_windows.cpp` | Add metadata-read rights for ancestor handles; retain directory flush/query/ACL rights without persistent `DELETE`; use a temporary identity-checked source handle and native handle-relative rename; reject stale source aliases before mutation and preserve native metadata-query errors. |
++| `src/runtime/host_windows.hpp` | Recognize `OWNER_RIGHTS` only on ancestors whose owner already passed the existing trust check. Keep exact-current-user-only private-leaf DACL enforcement. |
++| `tests/host_capabilities/portable.cpp` | Exercise OWNER_RIGHTS admission and hostile ACL rejection, controlled process rejection before launch, same/cross-parent publication, collisions, replacement/held data, stale/fresh aliases and native error details. Bound the write-count conversion. Existing `vd::host::wait` qualification remains. |
++| `tests/host_capabilities/portable_source.py` | Compare exact UTF-8/LF output, matching Runtime `WriteFile`; remove the incorrect CRT CRLF expectation without normalizing captured bytes. |
++| `tests/stage8/sprint4.py` | Native applications accept arguments under Phase A. Check the existing program's actual expected status, rather than obsolete argument-rejection exit 2. |
++| `tests/stage9/workflow.py` | Correct the same stale native-argument oracle. Bare CLI and legacy numeric-entry rejection checks remain unchanged. |
++| `tests/voidup/ci_integration.py` | Add forced `core.autocrlf=true` checkout-filter byte/hash regression for the approved host patch and provenance. All 11 integration checks pass. |
++| `tests/net/http/reload.py` | A deliberately held request timed out before Debug replacement compilation finished. Disable read/total deadlines only for that held request and release the peer explicitly. Retain generation/GC/results, cleanup, 180-second subprocess and 240-second CTest bounds. |
++| `CMakeLists.txt` | Set only the aggregate `http_examples` watchdog to 600 seconds after all 19 unchanged checks took over 300 seconds. Keep every individual 120-second bound and all assertions/negative controls. |
++
++The checkout reproduction matched both hosted failures. The approved patch is
++10,830 bytes with SHA-256
++`f0de9004b8129626e14750437f51eb9524f030149607b50bb75ce0b6c998af74`;
++CRLF conversion produced 11,061 bytes and
++`5296d2bd7d55cacc9435b426c824bb0f716c9a4730bb9c8b7678fdf40effdad9`.
++The provenance JSON changed from
++`4841bfe7f283b250bb2b6fa1872b602416bb91a0e67c5f6179742d8c4bc0c0c8`
++to `98a71c6819a75a752f39646708d44e5f95e28592012ac8d8f6170846a8f0373a`.
++Expected hashes were not changed to accommodate converted files.
++
++### LLVM, providers and ownership evidence
++
++The accepted LLVM selector repair was already present at the baseline and was
++retained. Actual installed MSBuild imports show
++`Microsoft.Cpp.Default.props:250` defaulting absent `LLVMToolsVersion` to
++`19.1.5`; ClangCL common properties then derive resource selector `19`.
++VOID explicitly uses the resource selector returned by the pinned compiler:
++**`23`**, under `lib/clang/23`, for release **23.1.4**. Native builds invoked the
++verified SDK's `clang-cl`, `lld-link` and `llvm-lib`. No LLVM 19 compiler was
++installed or selected. Tool hashes and the evaluated property evidence are
++retained in the native records.
++
++Native Release and Debug provider builds passed in 358.38 and 300.46 seconds,
++respectively, using final recipe SHA-256
++`42b30dc4d52bd66d55ad779ed3c2162c0ac0043654b5326011a4eee3a6f67bca`.
++Each passed receipt verification, nine pinned-receipt checks and 17 approved-
++backport admission/rejection checks. Actual
++COFF directives accepted `/MT` and rejected `/MD`, `/MTd`, `/MDd`, and `/MT`
++without default-library directives. Both profiles' libsodium and libarchive
++archives passed the static ABI guard. Actual MSBuild rejected full-release
++resource selector `23.1.4` instead of SDK-derived `23`, and missing resources.
++The earlier nonnumeric selector rejection is preserved separately. The Windows
++MSBuild recipe does not execute or claim the Unix 87-test suite.
++
++Both current receipts bind eight exact recipe inputs, approved source policy,
++tool identities and the physical Windows SDK. Old receipts correctly rejected
++the changed recipe; none were rewritten to claim a rebuild. The original
++libsodium 1.0.22 archive SHA-256 remains
++`adbdd8f16149e81ac6078a03aca6fc03b592b89ef7b5ed83841c086191be3349`.
++The approved patch, all three postimages, applied tree
++`e545c52f26e44f16d99db575a382af024100f46708f23f8051042964e0d698dd`,
++pin/revision, schema 3, cryptographic vectors, verification policy, corresponding
++source rules and LLVM 23.1.4 pins remain unchanged. Production HTTP and its
++dedicated timeout tests remain unchanged.
++
++The initial ancestor failure was native error 5 after a successful
++`NtCreateFile`; adding `FILE_READ_ATTRIBUTES` supplied the documented
++[metadata right](https://learn.microsoft.com/en-us/windows/win32/fileio/file-access-rights-constants).
++Python 3.14's protected temporary-directory ACL uses
++[OWNER_RIGHTS](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/81d92bba-d22b-4a8c-908a-554ab29148ab).
++Its narrow ancestor admission passed, while Everyone/BuiltinUsers mutation and
++OWNER_RIGHTS private-leaf admission still failed before unsafe work.
++
++Publication probes retained Win32 rename error 87, native target-sharing error
++32, and rejected alternatives that lost flush rights or failed `ReOpenFile`
++with error 5. The final native rename uses the held target and a temporary
++source-only delete handle; it verifies volume/file identity and strict DACL,
++closes that temporary handle before parent flush, and preserves published versus
++durable outcomes. No absolute-path reconstruction or release of the held target
++was introduced. The observed Win32 failure is not a claim that its public
++structure universally forbids `RootDirectory`; see the
++[native rename contract](https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/ns-ntifs-_file_rename_information).
++VOIDUP continues to hold `writer.lock` across transaction dispatch. Sequential
++stale aliases are rejected; no broader arbitrary uncoordinated-writer guarantee
++or new internal scheduler was added.
++
++### Native Windows results
++
++| Check | Actual result |
++| --- | --- |
++| HTTP dependency bootstrap and closure | Release and Debug rebuilt and verified natively, 429.5 and 468.0 seconds. |
++| Compiler configuration/build | Real ORC compile/link/run passed in both profiles. Full compiler, host fixtures and VOIDUP built in both profiles. |
++| Release original unfiltered suite | **342 PASS, 7 FAIL, 1 SKIP**, 3,388.94 seconds. Original XML retained. |
++| Release corrective execution | **14/14 PASS**, 189.75 seconds, including all seven original failures and conditional symlink branches. Separate unchanged cross-volume test PASS, 3.14 seconds. |
++| Debug complete name coverage | Attempt 13 completed 316 names: **314 PASS, 2 FAIL**, then interrupted during 317. Attempt 14 ran exactly 317–350: **34/34 PASS**, 1,358.95 seconds. No skipped names. |
++| Corrected HTTP reload / unchanged timeouts | Release **PASS 34.64 / 6.84 seconds**; Debug **PASS 103.36 / 6.86 seconds**. |
++| Corrected examples aggregate budget | All 19 checks PASS under CTest: **Release 90.82 seconds; Debug 303.35 seconds**. |
++| Final portable fixture and source execution | Final fixture bytes passed in both profiles. Source tests exercised 30 normal/O2 JIT and independently linked AOT invocations per profile. |
++| Installed execution | Native `cli_install` passed Unicode relocation, installed compiler/LSP, independent AOT and missing stdlib/Runtime rejection preserving old output. |
++| Stack headers | Actual Release/Debug compiler, portable-host fixture and VOIDUP PE headers reserve **1,048,576 bytes** each. Host fixture commits that amount; compiler/VOIDUP commit 4,096 bytes initially. |
++| Corresponding-source package | Native compiler-component install, eight recipe hashes, original archives, licenses, three reconstructed postimages and tampered-patch rejection PASS. Installed compiler version/help PASS. VOIDUP is a separate built application, not part of that compiler install component. |
++| Editor and control relink | Pinned task-local Node24.19.0/npm11.17.0: `npm ci` PASS65.31s; four unit tests PASS11.07s; actual VSCode1.141.0 trusted/untrusted/multiroot host checks PASS145.46s; local VSIX package PASS23.67s. Control-mode voidc-only relinks PASS: Release6.42s, Debug4.19s, then version/help/PE checks. Prior EXE/PDB retained; no publication. |
++
++Editor dependency inputs remained unchanged. npm reported six existing development-dependency vulnerabilities (four moderate, two high) and install-script notices; diagnostics are retained without audit-fix or pin changes. The relinks used local control-mode flags, not the workflow's ThinLTO-cache configuration; these timings do not establish hosted cache behavior or performance.
++
++The seven original Release failures were two obsolete argument oracles and five
++symlink cases: `log_files`, `io_execution`, `io_async_execution`,
++`io_wire_normal`, `io_wire_optimized`. The existing limited user token returned
++native error 1314. An unchanged-API probe recorded zero progress/cleanup, then
++created the link under the existing same-user elevated token with identical
++source bytes and SID. Standard UAC consent supplied that token; no account,
++password, ACL or security policy was weakened. GitHub documents
++[administrative Windows runners](https://docs.github.com/en/actions/reference/runners/github-hosted-runners#administrative-privileges).
++The separate cross-volume check used NTFS to VBoxSharedFolderFS; it does not
++establish NTFS-to-NTFS behavior.
++
++The original Debug reload failed after 105.59 seconds. The probe proved a
++fixture race: `timeout/download` arrived after
++**30.013 seconds**, before replacement compilation completed after
++**35.426 seconds**. The old activation had legitimately completed; the peer's
++60-second hold had not expired. All generation/GC/repeated-await/return-value
++assertions remain. The first diagnostic probe's invalid enum `==` comparison
++failed before HTTP; its failure and the corrected `is` probe are preserved.
++Both restored exact original fixture bytes and rebuilt before final correction.
++
++Original Debug `http_examples` timed out at 300.01 seconds after 18 recorded
++successful checks totaling 268.364 seconds. Unchanged direct execution then passed **19/19 in 302.5353
++seconds**, with command durations alone totaling **300.3381 seconds**. Streaming,
++normal cancellation and header-timeout negative control remained below their
++individual 120-second limits. Peer events and the expected connection-abort
++diagnostic remain. This justified the aggregate 300 → 600 second adjustment.
++No examples command deadline, assertion or test was removed. The separate
++reload fixture intentionally disables only its held request's read/total deadlines.
++Neither HTTP fixture
++change affects provider recipe hashes or compiler cache-identity inputs.
++
++### Linux and seven-configuration acceptance
++
++Fresh final-recipe PikaOS 4 / glibc 2.44 providers passed in all three profiles.
++Each used a new disposable build tree; prior prefixes and receipts were retained
++under `.toolchains/host/retained/ci-42377496702/`. Existing compiler trees were
++reconfigured and the relevant targets rebuilt/relinked.
++
++| Local profile | Upstream targets | Receipt checks | Focused CTest results |
++| --- | --- | --- | --- |
++| Release | **87/87 PASS**, zero fail/skip; provider build106.57s | Nine pinned-receipt +18 approved-backport checks PASS | Host/VOIDUP11, application2, HTTP3, frontend1: **17 PASS** after the separately retained frontend harness correction. |
++| Debug | **87/87 PASS**, zero fail/skip; provider build94.19s | Same checks PASS | Host/VOIDUP11, application2, HTTP3, frontend1: **17 PASS**. |
++| Fatal strict | **87/87 PASS**, zero fail/skip; provider build168.80s | Same checks PASS | Host/VOIDUP11, application2, HTTP3: **16 PASS**. |
++
++Every listed CTest group ran with both soft and hard stack limits of1,048,576
++bytes. HTTP and VOIDUP dependency-closure and registered-test-plan checks
++passed in each profile. Strict retained
++`ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87`,
++`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86` and the pinned
++LLVM23.1.4 symbolizer. Normal/O2 JIT, independent AOT, install/resource and
++negative checks remained enabled. The initial Release frontend was **Not Run**
++because this task's focused build list omitted `void_tests`; its original XML
++and harness failure remain, followed by an explicit target build and a passing
++3.88-second rerun. No production correction was needed for that harness error.
++
++Executed local harness commands were
++`python3 build/ci-42377496702/run_linux_fresh.py`, followed by the bounded
++`python3 build/ci-42377496702/run_linux_fresh_continue.py` after that missing-
++target correction. The archive includes both exact scripts, per-command argv,
++durations, exit codes, original failure and separate continuation record.
++Fresh Release compiler-component packaging also passed all eight recipe hashes,
++original archive/license checks, offline three-postimage reconstruction and
++rejection of a tampered patch before source-output creation.
++
++Ubuntu24.04.5 / glibc2.39 container userspace passed fresh Release providers
++(**87/87 upstream**, zero fail/skip), nine pinned-receipt plus18 backport
++checks, real LLVM ORC configure, Runtime build and **2/2 native host tests**
++under a hard1MiB stack. Provider build took108.92s; aligned configure19.92s,
++Runtime build100.40s and CTest5.08s. This is Ubuntu userspace on the PikaOS
++kernel, not a full Ubuntu compiler/JIT/AOT/Debug/strict or hosted-job pass.
++
++The first Ubuntu CMake configuration correctly rejected five differing logical
++SDK tool paths: providers were built under the copied source tree, while the
++harness configured the original checkout. SDK identity and all five tool hashes
++matched. A separate source-context continuation completed the exact disposable
++source copy and configured it in `build-aligned`; the receipt hash remained
++unchanged. The original failed configure is retained. No receipt rewrite,
++verification bypass, dependency or production-source change was needed.
++Actual commands were `python3 build/ci-42377496702/run_ubuntu_fresh.py` and its
++`run_ubuntu_fresh_continue.py` continuation. The existing container was restored
++to its original exited state; Podman's retained stop log reports its10-second
++SIGTERM timeout and container SIGKILL. This did not operate the Windows VM.
++
++The two previously documented strict ASan output-oracle limitations remain
++explicit: `sodium_utils2` and `sodium_utils3` execute under fatal instrumentation,
++but their output comparisons are limited by the existing upstream sanitizer
++path. **87 passing test targets are not 87 output comparisons.** The remaining
++85 comparisons and all original failure/control evidence are retained.
++
++| Configuration | Original hosted result / last established point | Subsequent verification and outstanding hosted acceptance |
++| --- | --- | --- |
++| Ubuntu Release (`128417991849`) | **UNQUALIFIED**: canceled during HTTP libunistring build. | Ubuntu24.04.5 container Release providers87/87, ORC configure and native host2/2 passed as scoped above. Complete hosted dependency/compiler/application/test chain remains outstanding. |
++| Ubuntu Debug (`128417991924`) | **UNQUALIFIED**: HTTP bootstrap and 167-file closure passed; canceled at cache save. | PikaOS Debug evidence is separate. Full Ubuntu Debug host-provider/compiler/test chain remains outstanding. |
++| Ubuntu Sanitizers (`128417991963`) | **UNQUALIFIED**: canceled during HTTP libunistring build. | PikaOS fatal strict evidence is separate. Full hosted Ubuntu HTTP/host 87-test/compiler/application chain remains outstanding. |
++| Windows Release (`128417992061`) | **FAIL**: CRLF source-policy mismatch before MSBuild. | Native final providers, compiler, all test names with explicit corrective reruns, package and ancillary checks above. Server 2022 / SDK26100 / Python3.12 workflow execution remains outstanding. |
++| Windows Debug (`128417992069`) | **FAIL**: same independently recorded source-policy mismatch. | Native final providers, compiler, all 350 names and corrected HTTP reruns above. Same hosted environment/workflow differences remain. |
++| macOS ARM64 Debug (`128417991992`) | **UNQUALIFIED**: patched provider **87/87 PASS**, zero fail/skip, schema-3 receipt verified; canceled during ORC configure. | Historical receipt predates final recipe changes. Final-recipe providers, compiler configure/build and native tests remain unverified. |
++| macOS ARM64 Release (`128417992071`) | **UNQUALIFIED**: HTTP closure/preflight passed; canceled during host bootstrap without completed receipt. | Final-recipe providers and all 87 tests, compiler/application build and native tests remain unverified. |
++
++Canceled jobs are not passing jobs. No additional Ubuntu/macOS production defect
++was demonstrated by cancellation. The macOS jobs did not reach the existing
++explicitly qualified `vd::host::wait` call site. No native macOS host was available. Mac Debug
++used Xcode 26.6, SDK 26.5 and deployment target 14.0; sodium configure selected
++Apple `/usr/bin/ld`. Verified `ld64.lld` receipt identity is not proof that every
++macOS link invoked LLD, and no unrelated linker-policy change was made.
++
++### Retained failures and environment limits
++
++The local guest is Windows 10 build 19045 despite VM name “Windows 11”, VS Build
++Tools 17.14 / VC14.44.35207 / SDK10.0.19041.0 / Python3.14.8. Hosted Windows was
++Server2022 / SDK10.0.26100.0 / Python3.12 with the same VC tools. The disposable
++checkout is `C:\Users\a\VoidCI42377496702-Native`; the original developer
++checkout and verified physical SDK were preserved. The SDK companion libraries
++were built only in the disposable checkout. Native AOT `-###` selected that
++SDK's `lld-link`, Clang23 resources and `libcmt`; actual AOT build/run results
++are separate evidence. No AOT linker-policy change was justified.
++
++| Original local obstacle | Preserved diagnosis / handling |
++| --- | --- |
++| Missing ClangCL MSBuild support | Installed Microsoft's support component, whose closure excludes the separate compiler payload. No LLVM19 compiler installed. |
++| Missing Perl / omitted snapshot curl patches | Used existing Git Perl through task PATH; restored two exact tracked patch files to the disposable snapshot. No dependency changes. |
++| SDK junction rejected at final AOT step | Selected the same verified physical SDK executable; retained the reparse guard. |
++| Existing normal Temp ACL had foreign-SID Modify grant | Left ACL unchanged; existing staging helper created protected task TMP/TEMP. |
++| Early 20GB/7CPU guest overload | Retained overload/interruption evidence. Boss restarted/configured the VM; resumed measured settings were 8,000MB/4CPU. One outer build/test chain ran at a time. |
++| Debug disk interruptions | Preserved attempts stopped at 1,160/1,548, then 285/389; final 105 links passed in 213.63 seconds. Attempt12 stopped during test7; attempt13 stopped during317; exact remaining34 subsequently passed. No interruption was counted as PASS. |
++| Diagnostic/bookkeeping failures | Retained invalid diagnostic enum comparison, original CTest status parser failure, rejected rename/reopen probes and wrong-selector controls. The local Linux focused harness initially omitted the frontend executable: its Not Run result remains, followed by an explicit target build and separate corrective rerun. |
++
++Only exact task-generated EXE/PDB files received classic NTFS compression, with
++before/after logical SHA-256 and reparse checks. No original source, SDK or
++archive was deleted. The first 251-file Debug pass reduced allocation from
++8,602,612,224 to 4,302,893,056 bytes and raised free space from 7,856,480,256 to
++12,152,918,016. A Release 512-file pass raised free space from 1,030,545,408 to
++2,112,487,424. A forced 1,024-file Debug pass raised free space from 2,210,074,624
++to 7,508,295,680 while reported summed allocation changed only 8,192 bytes;
++the discrepancy's mechanism is unproven. A final bounded 756-file pass raised
++free space from 2,260,697,088 to 5,449,908,224 before the remaining34 tests.
++Windows displayed its own Storage Sense notice; this task did not change that
++setting. After the 285/389 interruption, free space recovered from about 2.54GB
++to 7.55GB without another cleanup/compression action; cause is unproven. A later
++disk hold measured 993,304,576 free bytes in five readings over 60 seconds.
++Original hosted preflight had over150GB/228GB workspace free and over
++84GB Temp free, so no hosted disk-policy defect was inferred. Local compressed
++outputs and control-mode relink timings are not release-performance claims.
++
++No Wine, VM power operation, saved-state operation, authentication bypass or
++security weakening was part of resumed native verification. Boss controlled
++the VM. Earlier emulated probes are not native acceptance evidence.
++
++### Final inventory and review boundary
++
++The final allowlist contains **21 paths: 12 tracked modifications and nine new
++review artifacts**, with zero staged paths. See the exact
++[readable allowlist](evidence/ci-42377496702/commit-paths.txt),
++[NUL-delimited allowlist](evidence/ci-42377496702/commit-paths.nul) and
++[per-file inventory](evidence/ci-42377496702/commit-inventory.json).
++The eleven source paths are listed above; the twelfth tracked path is this
++report. The nine new artifacts are the original/local archive-index pairs,
++source/documentation patches, both allowlists and the inventory JSON.
++
++At the final curation boundary, qualification had produced **540 Git-visible
++pending paths** (12 modified,528 untracked). After preserving the three fresh
++provider evidence directories under ignored
++`build/ci-42377496702/linux-fresh/retained-provider-evidence/` and retaining their
++named-test aggregate logs and both ASan oracle records in the indexed archive,
++the final pending count is21. Every moved file's hash was checked; no original
++failure, source, archive or user file was deleted. Redundant passing per-test
++output remains locally available. This count describes this follow-up's
++qualification output, not the earlier historical3,000/5,879-path cleanup.
++
++Recommended exact staging command for Boss, **not executed**:
++
++```bash
++git --literal-pathspecs add --pathspec-from-file=docs/voidup/evidence/ci-42377496702/commit-paths.nul --pathspec-file-nul
++```
++
++Suggested title: `Repair native Windows VOIDUP and preserve LLVM 23 provider provenance [skip ci]`.
++Local link/reference validation, source parsing, source-diff identity,
++`git diff --check`, archive member readback and the final inventory checks pass.
++No unexpected pending or staged paths remain.
++
++All original failures remain accessible in the indexed archives and local raw
++records. Generated builds, extracted sources, caches, binaries, screenshots and
++temporary experiment output are excluded from the commit inventory. The
++original pinned archives, approved patch, receipt checks and corresponding
++source packaging remain intact. No unrelated website/user work was changed.
++
++RETAIN these source corrections and evidence for independent Golden Wrench
++review and Boss-controlled integration. Native Windows core and ancillary
++verification is complete for the stated local environment. Both macOS native
++configurations, the complete hosted Ubuntu jobs, Windows hosted environment
++and ThinLTO-cache workflow conditions still require the replacement hosted run.
++No hosted acceptance or release-performance claim is made. Work stops here for
++Golden Wrench/Boss review.

@@ -1,0 +1,137 @@
+{
+  "baseline": "799a29e3c0b0e204abecd4dc1f14356bf1df3443",
+  "scope": "Exact current repair delta; earlier 159/5879-path inventories are historical",
+  "staged": 0,
+  "tracked_modified": 12,
+  "untracked_intended": 9,
+  "total_intended": 21,
+  "source_paths": [
+    ".gitattributes",
+    "CMakeLists.txt",
+    "src/runtime/host_directory_windows.cpp",
+    "src/runtime/host_windows.hpp",
+    "tests/host_capabilities/portable.cpp",
+    "tests/host_capabilities/portable_source.py",
+    "tests/net/http/reload.py",
+    "tests/stage8/sprint4.py",
+    "tests/stage9/workflow.py",
+    "tests/voidup/ci_integration.py",
+    "tools/setup_host_deps_native.py"
+  ],
+  "entries": [
+    {
+      "path": ".gitattributes",
+      "bytes": 431,
+      "sha256": "5d8919e1a239dad8b21d6f56bd63d5a8353855514526855a6fca67cde59e5c50"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "bytes": 128924,
+      "sha256": "1719002e32051e0865c9798173e4bde02ab2f759b40cea48821722054ac072ed"
+    },
+    {
+      "path": "docs/voidup/INTEGRATION_REPORT.md",
+      "bytes": 107169,
+      "sha256": "5e32602ddcfb38b11118a3d09e5ee131cdccdd37da0aca1f31b9cfbab3ca715c"
+    },
+    {
+      "path": "docs/voidup/evidence/ci-42377496702/commit-inventory.json",
+      "sha256": null,
+      "reason": "This manifest cannot hash itself"
+    },
+    {
+      "path": "docs/voidup/evidence/ci-42377496702/commit-paths.nul",
+      "bytes": 860,
+      "sha256": "2fd408ac01468cc45ce87d3964eaded4edb1b0203e62acdf6f0c74f6ac943e86"
+    },
+    {
+      "path": "docs/voidup/evidence/ci-42377496702/commit-paths.txt",
+      "bytes": 860,
+      "sha256": "6c5702053e48d0710d99a40452b30d0f949e54aa0706b6cf43aa8513fd272b37"
+    },
+    {
+      "path": "docs/voidup/evidence/ci-42377496702/documentation.patch",
+      "bytes": 28382,
+      "sha256": "b5d3d2b47ebb283390ecfb13fa936753a15232756461aa2e8c0fa0864607d7c5"
+    },
+    {
+      "path": "docs/voidup/evidence/ci-42377496702/local-verification-index.json",
+      "bytes": 269076,
+      "sha256": "72cefb58cfd836195bd6cccc541d68a56931a7d8066c32a8a55bc76b5e2d7f11"
+    },
+    {
+      "path": "docs/voidup/evidence/ci-42377496702/local-verification.tar.gz",
+      "bytes": 7513680,
+      "sha256": "c0314033bd694527ceb9febeceb1f32aa754db10d265651474b787fb3bbc9f39"
+    },
+    {
+      "path": "docs/voidup/evidence/ci-42377496702/original-ci-index.json",
+      "bytes": 4740,
+      "sha256": "0b670c7f6bb885e5a1c8fbde65c8b1d71e434a754eba7610bdfa39ffec35589b"
+    },
+    {
+      "path": "docs/voidup/evidence/ci-42377496702/original-ci.tar.gz",
+      "bytes": 2768691,
+      "sha256": "31384b8f63d8aaec1a3d044f1afb14c26ea30492649b9d595dda318408a26574"
+    },
+    {
+      "path": "docs/voidup/evidence/ci-42377496702/source.patch",
+      "bytes": 30573,
+      "sha256": "fff6bb73cf98b825fdb4357973bb09ab1ffb77164d780b5df83206df44b0c7b3"
+    },
+    {
+      "path": "src/runtime/host_directory_windows.cpp",
+      "bytes": 13924,
+      "sha256": "69f4d918ec63d99ff3adf4ad64906db79318369402911b8a14d993cd4a283557"
+    },
+    {
+      "path": "src/runtime/host_windows.hpp",
+      "bytes": 8372,
+      "sha256": "62e4c5667841e93ab7c405f7d54891f2784205e26e7b0c732f7d2962a615893b"
+    },
+    {
+      "path": "tests/host_capabilities/portable.cpp",
+      "bytes": 16887,
+      "sha256": "901a9a599a075b8d7849e008681e936b9783a467da8f4f468d61249200b0eb08"
+    },
+    {
+      "path": "tests/host_capabilities/portable_source.py",
+      "bytes": 3655,
+      "sha256": "420f9694bcb9f84f801bf16f5ff1f7d8f357e27342e416e9984989be123b1640"
+    },
+    {
+      "path": "tests/net/http/reload.py",
+      "bytes": 3567,
+      "sha256": "4a52fe4e83eb187e5b2c4ca0a3dc7d14826aabaec2ae5b507afae3cba18d53c2"
+    },
+    {
+      "path": "tests/stage8/sprint4.py",
+      "bytes": 5809,
+      "sha256": "f9644983b1ead188b9b2da1d1a94a478a1ab46cce3e88cf56f0c67e6a92a5118"
+    },
+    {
+      "path": "tests/stage9/workflow.py",
+      "bytes": 16356,
+      "sha256": "a48cc31049fce53c160d606565c80d8d1e299866fbbac597ff5e9f4b534c7190"
+    },
+    {
+      "path": "tests/voidup/ci_integration.py",
+      "bytes": 7228,
+      "sha256": "8c2e9c5362f65cdc085fe9e4319dd8e1cbd6663f510e19ba4775f17127883c0b"
+    },
+    {
+      "path": "tools/setup_host_deps_native.py",
+      "bytes": 11829,
+      "sha256": "42b30dc4d52bd66d55ad779ed3c2162c0ac0043654b5326011a4eee3a6f67bca"
+    }
+  ],
+  "excluded_generated_roots": [
+    "build/",
+    ".toolchains/",
+    "/home/shmellyorc/VM/ci-42377496702/",
+    "C:\\Users\\a\\VoidCI42377496702-Native\\"
+  ],
+  "unexpected_pending_paths": [],
+  "staging_command_not_executed": "git --literal-pathspecs add --pathspec-from-file=docs/voidup/evidence/ci-42377496702/commit-paths.nul --pathspec-file-nul",
+  "suggested_commit_title": "Repair native Windows VOIDUP and preserve LLVM 23 provider provenance [skip ci]"
+}

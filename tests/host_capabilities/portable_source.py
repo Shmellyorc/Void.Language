@@ -6,11 +6,12 @@ linked here; this test alone makes no claim that the checkout was inaccessible.
 from pathlib import Path
 import hashlib,json,os,sys,tempfile,zipfile
 import support as h
-from test_platform import native_text
 compiler=Path(sys.argv[1]).resolve();child=Path(sys.argv[2]).resolve()
 source=h.ROOT/'tests/host_capabilities/smoke.void';records=[]
 def run(command,work,expected=None):
- result=h.run(command,work,native_text(expected) if expected is not None else None,small=os.name!='nt',sources=(source,))
+ # VOID console output preserves UTF-8 bytes, including LF, on Windows too.
+ # native_text is only an oracle for CRT text streams.
+ result=h.run(command,work,expected.encode('utf-8') if expected is not None else None,small=os.name!='nt',sources=(source,))
  records.append({'command':list(map(str,command)),'status':result.returncode,'stdout':result.stdout.decode(errors='replace'),'stderr':result.stderr.decode(errors='replace')})
  return result
 crypto='true\ntrue\ntrue\nba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\ntrue true\ntrue true\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\ntrue\nfalse\nfalse\ntrue\ntrue\nfalse\n'

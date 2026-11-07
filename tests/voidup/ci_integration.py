@@ -1,5 +1,5 @@
 """Focused wiring checks; never dispatch CI or modify a real provider prefix."""
-import copy,json,os
+import copy,hashlib,json,os,subprocess
 from pathlib import Path
 import sys,tempfile,unittest
 from unittest.mock import patch
@@ -51,6 +51,19 @@ class Toolchain(unittest.TestCase):
   self.outputs.assert_not_called()
 
 class Integration(unittest.TestCase):
+ def test_approved_host_patch_checkout_bytes(self):
+  # Exercise Git's checkout filters even on Unix; Windows must receive the
+  # same bytes that the patch policy and corresponding-source notice bind.
+  folder='third_party/host-patches/libsodium-1.0.22/'
+  policy=json.loads((ROOT/folder/'PROVENANCE.json').read_text())
+  for name in ('PROVENANCE.json',policy['patch']):
+   path=folder+name
+   original=subprocess.check_output(['git','show','HEAD:'+path],cwd=ROOT)
+   checkout=subprocess.check_output(['git','-c','core.autocrlf=true','cat-file','--filters','HEAD:'+path],cwd=ROOT)
+   self.assertEqual(checkout,original,path)
+   self.assertEqual((ROOT/path).read_bytes(),checkout,path)
+   if name==policy['patch']:
+    self.assertEqual(hashlib.sha256(checkout).hexdigest(),policy['patch_sha256'])
  def test_native_profile_layouts(self):
   for system,arch,bundle in [('Linux','x86_64',''),('Windows','x86_64','windows-x86_64/'),('Darwin','arm64','macos-arm64/')]:
    for configuration,profile in [('Debug','Debug'),('Release','Release'),('Sanitizers','strict')]:

@@ -2,6 +2,7 @@
 /experiments/
 /docs/collections/evidence/run-*/
 /docs/log/evidence/run-*/
+/diagnostic fixtures with spaces/
 
 # Generated JSON test receipts
 /docs/json/evidence/implementation/*-Debug-[0-9]*.json

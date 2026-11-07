@@ -100,7 +100,11 @@ struct PrivateAccess {
             if(header->AceType==ACCESS_DENIED_ACE_TYPE)continue;
             if(header->AceType!=ACCESS_ALLOWED_ACE_TYPE)fail(ERROR_ACCESS_DENIED);
             auto* ace=static_cast<ACCESS_ALLOWED_ACE*>(entry);
-            if(ancestor?((ace->Mask&mutation) && !trusted(&ace->SidStart)):!EqualSid(&ace->SidStart,sid()))fail(ERROR_ACCESS_DENIED);
+            // OWNER_RIGHTS grants access to this object's already-verified owner.
+            // It is valid for ancestors, never a substitute for private leaf ACLs.
+            if(ancestor?((ace->Mask&mutation) && !trusted(&ace->SidStart) &&
+                !IsWellKnownSid(&ace->SidStart,WinCreatorOwnerRightsSid)):
+                !EqualSid(&ace->SidStart,sid()))fail(ERROR_ACCESS_DENIED);
         }
     }
 };

@@ -403,7 +403,8 @@ if(BUILD_TESTING)
   add_test(NAME http_examples COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/examples.py"
     "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_http_example_host>"
     --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-examples-evidence")
-  set_tests_properties(http_examples PROPERTIES TIMEOUT 300)
+  # Nineteen individually guarded commands exceed 300 seconds in native Debug.
+  set_tests_properties(http_examples PROPERTIES TIMEOUT 600)
   add_test(NAME http_ci_policy COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/ci_triage_test.py")
   set_tests_properties(http_ci_policy PROPERTIES TIMEOUT 60)
   add_test(NAME http_curl_objects COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/curl_objects_test.py")

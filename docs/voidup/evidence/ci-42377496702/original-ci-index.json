@@ -1,0 +1,150 @@
+{
+  "run": 42377496702,
+  "baseline": "799a29e3c0b0e204abecd4dc1f14356bf1df3443",
+  "archive": "original-ci.tar.gz",
+  "sha256": "31384b8f63d8aaec1a3d044f1afb14c26ea30492649b9d595dda318408a26574",
+  "bytes": 2768691,
+  "verified_each_member": true,
+  "notes": [
+    "Original seven hosted job logs and twelve downloaded diagnostic artifacts retained unchanged.",
+    "The Linux and macOS review snapshots describe checks before the subsequent Windows SDK-alias and CMake-path recipe corrections; their old receipt identities do not qualify the final recipe.",
+    "Canceled jobs remain UNQUALIFIED. No hosted CI was dispatched."
+  ],
+  "members": [
+    {
+      "path": "128417991849.log",
+      "bytes": 81087,
+      "sha256": "58a709c27f341e6dbd6b6cfe1bd63b84048d2a976c5d3583b7daccc01de0e5e4"
+    },
+    {
+      "path": "128417991924.log",
+      "bytes": 85407,
+      "sha256": "4753b04ea56987bd2b562eb54aae5d88df35ce0f4e8396c7be1c35f5c8f9c2d9"
+    },
+    {
+      "path": "128417991963.log",
+      "bytes": 79689,
+      "sha256": "674161ee8b61dfa17b1aaa43032fbb3377e7ca01a95bf41821c62c701bc01dc9"
+    },
+    {
+      "path": "128417991992.log",
+      "bytes": 133395,
+      "sha256": "7d7874f87cbdf4dbbb558620776d69f134271d4315caa80d64b9a41a0d010d2c"
+    },
+    {
+      "path": "128417992061.log",
+      "bytes": 7110847,
+      "sha256": "38cb92bc41e24ec8ada00601768f4962fe80a8085cb194e9abb58eed04735d26"
+    },
+    {
+      "path": "128417992069.log",
+      "bytes": 7127272,
+      "sha256": "30808f29931c09ac87a4d44013e456596199db95c9fbd4ba2d178e15be00983b"
+    },
+    {
+      "path": "128417992071.log",
+      "bytes": 71416,
+      "sha256": "d803b6d51947c17b5591543de3b7efcb4053171479755c701a4cad328aca23b3"
+    },
+    {
+      "path": "13575944846.zip",
+      "bytes": 4235,
+      "sha256": "eaa79c4179bc91211a9bc4c29f82f3d3e8823423768968b721f2be29b7ce877b"
+    },
+    {
+      "path": "13576152954.zip",
+      "bytes": 303414,
+      "sha256": "dc0b2cdab700c6f4dd6d35e90967438dbce6c4acac3d5dd35244b953441f7878"
+    },
+    {
+      "path": "13576182683.zip",
+      "bytes": 112748,
+      "sha256": "b8aa5c17ec665846af32989aea9189d97521e719b2017ff3deb68e51d3e684aa"
+    },
+    {
+      "path": "13576182684.zip",
+      "bytes": 32933,
+      "sha256": "f859c1f04e270717f31d2bb8d16cefb47eadeb0d2cfcbe6c74b5d231fb183d28"
+    },
+    {
+      "path": "13576287365.zip",
+      "bytes": 181721,
+      "sha256": "0984e1a266506c1d31c03be0842d760b454cf9c37f9f2ed74f84e378f55a4933"
+    },
+    {
+      "path": "13576332399.zip",
+      "bytes": 91248,
+      "sha256": "76f815757cab759d251504221d03d160c0c3f3b387929c5609a249f7b3fc4291"
+    },
+    {
+      "path": "13576601402.zip",
+      "bytes": 33057,
+      "sha256": "14dd645c500295dabd1195efddc1351dfe716443f7307bce09ffe9ba4a9e4f9a"
+    },
+    {
+      "path": "13576621395.zip",
+      "bytes": 112654,
+      "sha256": "63ffb87718ac233fa9bf5e3978fd8a6bc57d28098164d135991a47d6ee5018e1"
+    },
+    {
+      "path": "13576646539.zip",
+      "bytes": 178016,
+      "sha256": "3abbed6c00f489190df3a4824ba38275e769b60361148c9f217fdeea3ef0a155"
+    },
+    {
+      "path": "13576656467.zip",
+      "bytes": 354291,
+      "sha256": "96cad781e6d5ee98ff3040878a0576f218e9a90df118432a561d6438cdb3f8ee"
+    },
+    {
+      "path": "13576676390.zip",
+      "bytes": 4244,
+      "sha256": "cb00367db99dd4dd03f36897540e565077ed336986d8eda4c8e7043581349f40"
+    },
+    {
+      "path": "13576815720.zip",
+      "bytes": 46995,
+      "sha256": "9f3f17f0b2bb5bbbc79c5cbcbb55ba178a16efb2db52ae8786b336d00fea6c98"
+    },
+    {
+      "path": "run.json",
+      "bytes": 14203,
+      "sha256": "c15ff6b6c74ca2d099619f69551aec9caebcb84d1a39f069f5620064c3903ef3"
+    },
+    {
+      "path": "jobs.json",
+      "bytes": 86061,
+      "sha256": "2992472c328401cff87e613874e6b9e8b4b318bdb2a99db3687a904b9d9a149f"
+    },
+    {
+      "path": "artifacts.json",
+      "bytes": 10869,
+      "sha256": "10a8d6606c66ee7e8b59a6f2940ec24dc01882ef5fdaaac1fe20fa7b1d4f5bb8"
+    },
+    {
+      "path": "downloads.json",
+      "bytes": 2682,
+      "sha256": "7c8267804aea6d4409fdf166a8122a419bef8ee05eaa2a079785928ad694ffb5"
+    },
+    {
+      "path": "checkout-before.json",
+      "bytes": 758,
+      "sha256": "e2a15eef2d2c766030f611aef8bbe9ea8a5de11944d9672c4a0e5a3035cf8463"
+    },
+    {
+      "path": "checkout-fixed.json",
+      "bytes": 1048,
+      "sha256": "9a53c1b31a0c42ae50652ab11d7e4a5fe7e2bf7ad65f945111d3f849df014df8"
+    },
+    {
+      "path": "linux-review.json",
+      "bytes": 10454,
+      "sha256": "bad9c34a181c1793fcd66a8f8636b9f516d997af06806b0d881d123ead944718"
+    },
+    {
+      "path": "macos-review.json",
+      "bytes": 9546,
+      "sha256": "d29232219470c49d1b07970702aea9a449bfa8e00985abe9c8f96a7328c8db44"
+    }
+  ]
+}

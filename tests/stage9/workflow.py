@@ -39,7 +39,7 @@ with tempfile.TemporaryDirectory(prefix='VOID Stage9 é 🎮 # % ') as temporary
             executable=project/'build'/('main'+suffix)
             native=run([executable],status,'',unrelated)
             assert native.stderr==jit.stderr==''
-            run([executable,'1'],2,'')
+            run([executable,'1'],status,'')
     write('return 7\n')
     run([compiler,'run'],7,'',project);run([compiler,'run','.'],7,'',project)
     run([compiler,'build'],cwd=project);run([compiler,'build','.'],cwd=project)

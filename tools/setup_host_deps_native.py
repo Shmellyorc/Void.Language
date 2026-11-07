@@ -67,14 +67,15 @@ def main():
    '/p:ForceImportBeforeCppTargets='+str(ROOT/'cmake/host-sodium.targets'),'/p:VoidHostStrict='+str(a.profile=='strict').lower()]
   project=sodium/'builds/msvc/vs2022/libsodium/libsodium.vcxproj'
   evaluated=['LLVMToolsVersion','LLVMInstallDir','CLToolPath','CLToolExe','LinkToolPath','LinkToolExe','LibToolPath','LibToolExe',
-   'WindowsTargetPlatformVersion','WindowsSdkDir','VCToolsInstallDir','VCToolsVersion','IncludePath','LibraryPath']
+   'WindowsTargetPlatformVersion','TargetPlatformVersion','WindowsSdkDir','VCToolsInstallDir','VCToolsVersion','IncludePath','LibraryPath']
   run([msbuild,project,*properties,'-getProperty:'+','.join(evaluated)],'sodium-properties')
   actual=json.loads((evidence/'sodium-properties.log').read_text(encoding='utf-8-sig'))['Properties']
   expected={'LLVMToolsVersion':selected['LLVMToolsVersion'],'LLVMInstallDir':selected['sdk']+os.sep,
    'CLToolPath':str(cc.parent)+os.sep,'CLToolExe':'clang-cl.exe','LinkToolPath':str(cc.parent)+os.sep,
    'LinkToolExe':'lld-link.exe','LibToolPath':str(cc.parent)+os.sep,'LibToolExe':'llvm-lib.exe'}
   if any(actual.get(key)!=value for key,value in expected.items()):raise SystemExit('Evaluated MSBuild toolchain mismatch: '+repr(actual))
-  sdk=pathlib.Path(actual.get('WindowsSdkDir',''));sdk_version=actual.get('WindowsTargetPlatformVersion','')
+  # MSBuild resolves the WindowsTargetPlatformVersion "10.0" alias here.
+  sdk=pathlib.Path(actual.get('WindowsSdkDir',''));sdk_version=actual.get('TargetPlatformVersion','')
   vc=pathlib.Path(actual.get('VCToolsInstallDir',''))
   if not sdk.is_absolute() or not vc.is_absolute() or not sdk_version or not (sdk/'Include'/sdk_version/'um/Windows.h').is_file() or not (sdk/'Lib'/sdk_version/'um/x64/kernel32.lib').is_file() or not (vc/'include/vcruntime.h').is_file() or not (vc/'lib/x64/libcmt.lib').is_file():
    raise SystemExit('Evaluated native Windows SDK/VC headers and libraries are incomplete: '+repr(actual))
@@ -107,7 +108,7 @@ def main():
   report['upstream_tests']=upstream_results(sodium);verify_sodium_copy(sodium_source,report['source_provenance'])
   run(['make','install'],'sodium-install',sodium,env)
   zlib=http/'lib/libz.a';common+=['-DCMAKE_C_FLAGS='+flags,'-DCMAKE_OSX_SYSROOT='+sdk,'-DCMAKE_OSX_DEPLOYMENT_TARGET='+minimum,'-DCMAKE_OSX_ARCHITECTURES=arm64']
- run(['cmake','-S',sources['libarchive'],'-B',build/'archive',*common,'-DENABLE_ZLIB=ON','-DPOSIX_REGEX_LIB=NONE','-DZLIB_INCLUDE_DIR='+str(http/'include'),'-DZLIB_LIBRARY='+str(zlib),*options],'archive-configure')
+ run(['cmake','-S',sources['libarchive'],'-B',build/'archive',*common,'-DENABLE_ZLIB=ON','-DPOSIX_REGEX_LIB=NONE','-DZLIB_INCLUDE_DIR='+(http/'include').as_posix(),'-DZLIB_LIBRARY='+zlib.as_posix(),*options],'archive-configure')
  run(['cmake','--build',build/'archive','--parallel',a.jobs],'archive-build');run(['cmake','--install',build/'archive'],'archive-install')
  cache=(build/'archive/CMakeCache.txt').read_text()
  disabled=['LZMA','ZSTD','BZip2','OPENSSL','LIBB2','LIBXML2','EXPAT','ICONV']+(['CNG'] if system=='Windows' else [])

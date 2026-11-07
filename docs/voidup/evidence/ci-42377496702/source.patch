@@ -1,0 +1,374 @@
+diff --git a/.gitattributes b/.gitattributes
+index 57103a23..34f6a428 100644
+--- a/.gitattributes
++++ b/.gitattributes
+@@ -3,3 +3,6 @@
+ /third_party/curl/** -text
+ /docs/net/http/evidence/curl-8.23.0-cookie-oom-candidate.patch -text
+ /docs/net/http/evidence/curl-8.23.0-http2-window-candidate.patch -text
++
++# Preserve the approved host patch and provenance bytes on every checkout.
++/third_party/host-patches/** -text
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0b7caddb..3d6ae0e3 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -403,7 +403,8 @@ if(BUILD_TESTING)
+   add_test(NAME http_examples COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/examples.py"
+     "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_http_example_host>"
+     --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-examples-evidence")
+-  set_tests_properties(http_examples PROPERTIES TIMEOUT 300)
++  # Nineteen individually guarded commands exceed 300 seconds in native Debug.
++  set_tests_properties(http_examples PROPERTIES TIMEOUT 600)
+   add_test(NAME http_ci_policy COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/ci_triage_test.py")
+   set_tests_properties(http_ci_policy PROPERTIES TIMEOUT 60)
+   add_test(NAME http_curl_objects COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/curl_objects_test.py")
+diff --git a/src/runtime/host_directory_windows.cpp b/src/runtime/host_directory_windows.cpp
+index 9a2d60ea..ae59eb74 100644
+--- a/src/runtime/host_directory_windows.cpp
++++ b/src/runtime/host_directory_windows.cpp
+@@ -44,7 +44,9 @@ win::Handle relative(HANDLE parent,const std::wstring& name,bool directory,bool
+     auto call=reinterpret_cast<Create>(GetProcAddress(library,"NtCreateFile"));
+     auto convert=reinterpret_cast<Convert>(GetProcAddress(library,"RtlNtStatusToDosError"));
+     if(!call || !convert)win::fail(ERROR_PROC_NOT_FOUND);
+-    ACCESS_MASK rights=READ_CONTROL|SYNCHRONIZE|FILE_READ_ATTRIBUTES|(rename_authority?DELETE:0)|(directory?FILE_LIST_DIRECTORY:GENERIC_READ);
++    // A persistent directory DELETE grant conflicts with the kernel's target
++    // open during handle-relative rename. Acquire source DELETE only on demand.
++    ACCESS_MASK rights=READ_CONTROL|SYNCHRONIZE|FILE_READ_ATTRIBUTES|(rename_authority && !directory?DELETE:0)|(directory?FILE_LIST_DIRECTORY:GENERIC_READ);
+     if(writable)rights|=GENERIC_WRITE;
+     constexpr ULONG synchronous=0x20,open_reparse=0x200000,directory_file=1,non_directory=0x40;
+     auto status=call(&output,rights,&attributes,&io,nullptr,FILE_ATTRIBUTE_NORMAL,
+@@ -56,7 +58,7 @@ win::Handle relative(HANDLE parent,const std::wstring& name,bool directory,bool
+ std::shared_ptr<Directory> root(const std::string& path,bool create) {
+     auto full=win::absolute(path);if(full.size()<=7)win::fail(ERROR_INVALID_NAME);
+     win::PrivateAccess access;
+-    auto current=held(win::Handle(CreateFileW(full.substr(0,7).c_str(),FILE_LIST_DIRECTORY|READ_CONTROL,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,nullptr,OPEN_EXISTING,FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,nullptr)));
++    auto current=held(win::Handle(CreateFileW(full.substr(0,7).c_str(),FILE_LIST_DIRECTORY|FILE_READ_ATTRIBUTES|READ_CONTROL,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,nullptr,OPEN_EXISTING,FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,nullptr)));
+     if(current->handle.value==INVALID_HANDLE_VALUE)win::fail();
+     win::information(current->handle.value,true);
+     for(std::size_t start=7;start<full.size();) {
+@@ -74,7 +76,8 @@ std::shared_ptr<Directory> root(const std::string& path,bool create) {
+         using Convert=ULONG(NTAPI*)(NTSTATUS);
+         auto dll=GetModuleHandleW(L"ntdll.dll");auto call=reinterpret_cast<Create>(GetProcAddress(dll,"NtCreateFile"));auto convert=reinterpret_cast<Convert>(GetProcAddress(dll,"RtlNtStatusToDosError"));
+         if(!call || !convert)win::fail(ERROR_PROC_NOT_FOUND);
+-        auto status=call(&raw,FILE_LIST_DIRECTORY|READ_CONTROL|SYNCHRONIZE,&attributes,&io,nullptr,FILE_ATTRIBUTE_NORMAL,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,1,1|0x20|0x200000,nullptr,0);
++        // NtCreateFile needs the metadata read right for information() below.
++        auto status=call(&raw,FILE_LIST_DIRECTORY|FILE_READ_ATTRIBUTES|READ_CONTROL|SYNCHRONIZE,&attributes,&io,nullptr,FILE_ATTRIBUTE_NORMAL,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,1,1|0x20|0x200000,nullptr,0);
+         if(status<0)win::fail(convert(status));win::Handle next(raw);win::information(raw,true);
+         current=held(std::move(next),current);start=end+1;
+     }
+@@ -83,15 +86,41 @@ std::shared_ptr<Directory> root(const std::string& path,bool create) {
+ Result sync(HANDLE handle) {if(!FlushFileBuffers(handle))return native_error(static_cast<int>(GetLastError()));return {};}
+ bool same(HANDLE a,HANDLE b) {
+     BY_HANDLE_FILE_INFORMATION x{},y{};
+-    return GetFileInformationByHandle(a,&x) && GetFileInformationByHandle(b,&y) && x.dwVolumeSerialNumber==y.dwVolumeSerialNumber && x.nFileIndexHigh==y.nFileIndexHigh && x.nFileIndexLow==y.nFileIndexLow;
++    if(!GetFileInformationByHandle(a,&x) || !GetFileInformationByHandle(b,&y))win::fail();
++    return x.dwVolumeSerialNumber==y.dwVolumeSerialNumber && x.nFileIndexHigh==y.nFileIndexHigh && x.nFileIndexLow==y.nFileIndexLow;
++}
++win::Handle rename_source(HANDLE directory,win::PrivateAccess& access) {
++    // An empty native name reopens this held directory itself, without resolving
++    // its former name or an absolute path. This is not a public component name.
++    wchar_t zero=0;UNICODE_STRING name{};name.Buffer=&zero;
++    OBJECT_ATTRIBUTES attributes{};attributes.Length=sizeof(attributes);attributes.RootDirectory=directory;attributes.ObjectName=&name;attributes.Attributes=0x40;
++    IO_STATUS_BLOCK io{};HANDLE raw=INVALID_HANDLE_VALUE;
++    using Create=NTSTATUS(NTAPI*)(PHANDLE,ACCESS_MASK,POBJECT_ATTRIBUTES,PIO_STATUS_BLOCK,PLARGE_INTEGER,ULONG,ULONG,ULONG,ULONG,PVOID,ULONG);
++    using Convert=ULONG(NTAPI*)(NTSTATUS);
++    auto dll=GetModuleHandleW(L"ntdll.dll");if(!dll)win::fail();
++    auto call=reinterpret_cast<Create>(GetProcAddress(dll,"NtCreateFile"));auto convert=reinterpret_cast<Convert>(GetProcAddress(dll,"RtlNtStatusToDosError"));
++    if(!call || !convert)win::fail(ERROR_PROC_NOT_FOUND);
++    auto status=call(&raw,DELETE|SYNCHRONIZE|FILE_READ_ATTRIBUTES|READ_CONTROL,&attributes,&io,nullptr,FILE_ATTRIBUTE_NORMAL,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,1,1|0x20|0x200000,nullptr,0);
++    if(status<0)win::fail(convert(status));win::Handle result(raw);
++    win::information(raw,true);access.verify(raw);
++    if(!same(directory,raw))win::fail(ERROR_INVALID_PARAMETER);
++    return result;
+ }
+ Result rename(HANDLE source,HANDLE target,const std::wstring& name,bool replace) {
+     // Allocate every byte before the namespace mutation. RootDirectory pins the
+     // destination; the source is the held object, never a re-opened path.
+-    std::vector<unsigned char> storage(offsetof(FILE_RENAME_INFO,FileName)+name.size()*sizeof(wchar_t));
++    std::vector<unsigned char> storage(sizeof(FILE_RENAME_INFO)+name.size()*sizeof(wchar_t));
+     auto* info=reinterpret_cast<FILE_RENAME_INFO*>(storage.data());info->ReplaceIfExists=replace;info->RootDirectory=target;
+     info->FileNameLength=static_cast<DWORD>(name.size()*sizeof(wchar_t));std::memcpy(info->FileName,name.data(),info->FileNameLength);
+-    if(!SetFileInformationByHandle(source,FileRenameInfo,info,static_cast<DWORD>(storage.size())))return native_error(static_cast<int>(GetLastError()));
++    using Set=NTSTATUS(NTAPI*)(HANDLE,PIO_STATUS_BLOCK,PVOID,ULONG,FILE_INFORMATION_CLASS);
++    using Convert=ULONG(NTAPI*)(NTSTATUS);
++    auto dll=GetModuleHandleW(L"ntdll.dll");if(!dll)return native_error(static_cast<int>(GetLastError()));
++    auto call=reinterpret_cast<Set>(GetProcAddress(dll,"NtSetInformationFile"));auto convert=reinterpret_cast<Convert>(GetProcAddress(dll,"RtlNtStatusToDosError"));
++    if(!call || !convert)return native_error(ERROR_PROC_NOT_FOUND);
++    // Runtime file handles and rename_source() are synchronous. The native
++    // FileRenameInformation class preserves RootDirectory on Windows 10 too.
++    IO_STATUS_BLOCK io{};auto status=call(source,&io,info,static_cast<ULONG>(storage.size()),static_cast<FILE_INFORMATION_CLASS>(10));
++    if(status<0)return native_error(static_cast<int>(convert(status)));
+     Result result;result.flag=true;return result;
+ }
+ Result published(Result result,HANDLE source,HANDLE target) {
+@@ -139,9 +168,13 @@ Result windows_directory_execute(Request& q) {
+         auto target=std::static_pointer_cast<Directory>(q.objects[1]);if(!target->node)return error(7);
+         if(q.operation==dir_publish) {
+             auto name=win::wide(q.texts[0]);if(!win::component(name) || !d->parent)return error(4);
++            // Another owned alias may have moved this directory. Reject stale
++            // parent bookkeeping before mutation, so durability covers both parents.
++            {auto check=relative(d->parent->handle.value,d->name,true,false,false,access,false,false);if(!same(fd,check.value))return error(4);}
+             // Rename the held source identity. Validated ancestor ACLs exclude
+             // untrusted mutation; share-delete permits independent owned aliases.
+-            auto source=d->parent;auto result=rename(fd,target->node->handle.value,name,false);
++            auto source=d->parent;Result result;
++            {auto identity=rename_source(fd,access);result=rename(identity.value,target->node->handle.value,name,false);}
+             if(result.flag){d->parent=target->node;d->node->ancestor=target->node;d->name.swap(name);}
+             return published(result,source->handle.value,target->node->handle.value);
+         }
+diff --git a/src/runtime/host_windows.hpp b/src/runtime/host_windows.hpp
+index 79c27b78..141f0341 100644
+--- a/src/runtime/host_windows.hpp
++++ b/src/runtime/host_windows.hpp
+@@ -100,7 +100,11 @@ struct PrivateAccess {
+             if(header->AceType==ACCESS_DENIED_ACE_TYPE)continue;
+             if(header->AceType!=ACCESS_ALLOWED_ACE_TYPE)fail(ERROR_ACCESS_DENIED);
+             auto* ace=static_cast<ACCESS_ALLOWED_ACE*>(entry);
+-            if(ancestor?((ace->Mask&mutation) && !trusted(&ace->SidStart)):!EqualSid(&ace->SidStart,sid()))fail(ERROR_ACCESS_DENIED);
++            // OWNER_RIGHTS grants access to this object's already-verified owner.
++            // It is valid for ancestors, never a substitute for private leaf ACLs.
++            if(ancestor?((ace->Mask&mutation) && !trusted(&ace->SidStart) &&
++                !IsWellKnownSid(&ace->SidStart,WinCreatorOwnerRightsSid)):
++                !EqualSid(&ace->SidStart,sid()))fail(ERROR_ACCESS_DENIED);
+         }
+     }
+ };
+diff --git a/tests/host_capabilities/portable.cpp b/tests/host_capabilities/portable.cpp
+index fa6fdc4c..fc399ca9 100644
+--- a/tests/host_capabilities/portable.cpp
++++ b/tests/host_capabilities/portable.cpp
+@@ -31,6 +31,38 @@ std::shared_ptr<Object> child(const std::shared_ptr<Object>& parent,const char*
+  auto q=request(dir_child);q.objects={parent};q.texts={name};auto result=directory_execute(q);
+  check(!result.kind && q.acquired,"private child");return q.acquired;
+ }
++#ifdef _WIN32
++void owner_rights_ancestors(const fs::path& work,const fs::path& executable) {
++ struct Local {void* value;~Local(){if(value)LocalFree(value);}};
++ win::PrivateAccess access;LPWSTR owner_text=nullptr;
++ check(ConvertSidToStringSidW(access.sid(),&owner_text),"owner SID text");Local owner_memory{owner_text};
++ const std::wstring owner(owner_text);
++ auto text=[](const fs::path& path){auto bytes=path.u8string();return std::string(bytes.begin(),bytes.end());};
++ struct Case {const wchar_t* name;const wchar_t* aces;bool admitted;};
++ for(auto test:{Case{L"owner-rights",L"(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)(A;OICI;FA;;;OW)",true},
++                Case{L"owner-rights-only",L"(A;OICI;FA;;;OW)",true},
++                Case{L"owner-rights-everyone",L"(A;OICI;FA;;;OW)(A;;0x100;;;WD)",false},
++                Case{L"owner-rights-other",L"(A;OICI;FA;;;OW)(A;;0x100;;;BU)",false}}) {
++  const auto parent=work/test.name,leaf=parent/L"private";
++  const auto sddl=L"O:"+owner+L"D:P"+test.aces;PSECURITY_DESCRIPTOR descriptor=nullptr;
++  check(ConvertStringSecurityDescriptorToSecurityDescriptorW(sddl.c_str(),SDDL_REVISION_1,&descriptor,nullptr),"test ACL descriptor");Local memory{descriptor};
++  SECURITY_ATTRIBUTES security{sizeof(SECURITY_ATTRIBUTES),descriptor,FALSE};
++  check(CreateDirectoryW(parent.c_str(),&security),"exclusive ACL fixture");
++  auto q=request(dir_create);q.texts={text(leaf)};auto r=directory_execute(q);
++  if(test.admitted) {
++   check(!r.kind && q.acquired,"OWNER_RIGHTS ancestor admitted");check(!q.acquired->close(),"OWNER_RIGHTS child cleanup");
++   q=request(dir_admit);q.texts={text(parent)};r=directory_execute(q);
++   check(r.kind==2 && r.code==ERROR_ACCESS_DENIED && !q.acquired,"OWNER_RIGHTS is not a private leaf ACL");
++  } else check(r.kind==2 && r.code==ERROR_ACCESS_DENIED && !q.acquired && !fs::exists(leaf),"untrusted ancestor mutation rejected");
++  q=request(spawn);q.texts={text(executable),text(parent)};q.arrays={{"--exit"},{}};r=process_execute(q);
++  if(test.admitted) {
++   check(!r.kind && q.acquired,"OWNER_RIGHTS working directory admitted");auto process=q.acquired;
++   q=request(vd::host::wait);q.objects={process};r=process_execute(q);
++   check(!r.kind && r.number==23,"OWNER_RIGHTS child status");check(!process->close(),"OWNER_RIGHTS process cleanup");
++  } else check(r.kind==2 && r.code==ERROR_ACCESS_DENIED && !q.acquired,"untrusted working directory rejected");
++ }
++}
++#endif
+ }
+ int portable_main(int argc,char** argv) {
+  try {
+@@ -75,6 +107,7 @@ int portable_main(int argc,char** argv) {
+   auto q=request(dir_create);q.texts={root};auto r=directory_execute(q);check(!r.kind && q.acquired,"private root");auto directory=q.acquired;
+   q=request(dir_admit);q.texts={root};r=directory_execute(q);check(!r.kind,"admit root");check(!q.acquired->close(),"close admitted alias");
+   auto stage=child(directory,"stage");
++  q=request(dir_open);q.objects={directory};q.texts={"stage"};r=directory_execute(q);check(!r.kind && q.acquired,"independent source alias");auto source_alias=q.acquired;
+   q=request(dir_child);q.objects={directory};q.texts={"../escape"};r=directory_execute(q);check(r.kind!=0,"reject traversal");
+   q=request(dir_file);q.objects={stage};q.texts={"data"};q.numbers={1};r=directory_execute(q);check(!r.kind && q.acquired_file,"private file");auto file=q.acquired_file;
+   vd::filesystem::Request write(vd::filesystem::Operation::write_bytes);write.file=file;write.bytes="payload";
+@@ -88,6 +121,7 @@ int portable_main(int argc,char** argv) {
+   q=request(dir_lock);q.objects={directory};q.texts={"writer.lock"};r=directory_execute(q);check(!r.kind && q.acquired,"first lock");auto lock=q.acquired;
+   q=request(dir_lock);q.objects={directory};q.texts={"writer.lock"};r=directory_execute(q);check(r.kind!=0,"second lock denied");check(!lock->close(),"release lock");
+   q=request(dir_lock);q.objects={directory};q.texts={"writer.lock"};r=directory_execute(q);check(!r.kind,"released lock reacquired");check(!q.acquired->close(),"release second lock");
++  q=request(dir_admit);q.texts={root};r=directory_execute(q);check(!r.kind && q.acquired,"independent publication target alias");auto target_alias=q.acquired;
+   q=request(dir_publish);q.objects={stage,directory};q.texts={"release"};r=directory_execute(q);check(r.flag,"exclusive publication");
+   // Windows directory FlushFileBuffers can fail. Mutation must remain visible,
+   // with the actual durability error, rather than becoming unpublished/success.
+@@ -95,7 +129,39 @@ int portable_main(int argc,char** argv) {
+   q=request(dir_open);q.objects={directory};q.texts={"release"};r=directory_execute(q);check(!r.kind,"published directory available");check(!q.acquired->close(),"close published alias");
+   auto collision=child(directory,"collision");
+   q=request(dir_publish);q.objects={collision,directory};q.texts={"release"};r=directory_execute(q);check(r.kind && !r.flag,"publication collision has no mutation");
+-  check(!collision->close() && !stage->close() && !directory->close(),"directory cleanup");
++  check(fs::exists(work/"capability-private/collision") && fs::exists(work/"capability-private/release/data"),"collision preserves both directory identities");
++  auto destination=child(directory,"destination");
++  q=request(dir_publish);q.objects={stage,destination};q.texts={"moved"};r=directory_execute(q);
++  check(r.flag && !fs::exists(work/"capability-private/release") && fs::exists(work/"capability-private/destination/moved/data"),"held directory cross-parent publication");
++  auto impostor=child(directory,"stage");
++  q=request(dir_publish);q.objects={source_alias,directory};q.texts={"stale-move"};r=directory_execute(q);
++  check(r.kind && !r.flag && !fs::exists(work/"capability-private/stale-move") && fs::exists(work/"capability-private/stage") && fs::exists(work/"capability-private/destination/moved/data"),"stale source alias rejects replaced old name without mutation");
++  q=request(dir_open);q.objects={destination};q.texts={"moved"};r=directory_execute(q);check(!r.kind && q.acquired,"fresh source alias");auto fresh_alias=q.acquired;
++  q=request(dir_publish);q.objects={fresh_alias,directory};q.texts={"fresh-move"};r=directory_execute(q);
++  check(r.flag && fs::exists(work/"capability-private/fresh-move/data") && !fs::exists(work/"capability-private/destination/moved"),"fresh source alias publishes with current parent");
++  auto create_file=[&](const char* name,const char* content) {
++   auto operation=request(dir_file);operation.objects={directory};operation.texts={name};operation.numbers={1};auto result=directory_execute(operation);
++   check(!result.kind && operation.acquired_file,"publication file creation");auto value=operation.acquired_file;
++   vd::filesystem::Request output(vd::filesystem::Operation::write_bytes);output.file=value;output.bytes=content;
++   check(vd::filesystem::run(output).completed==static_cast<std::int64_t>(output.bytes.size()),"publication file bytes");return value;
++  };
++  auto original=create_file("original","original");
++  q=request(dir_replace);q.objects={directory,destination};q.texts={"original","selected"};q.numbers={0};q.file=std::make_shared<Borrow>(original);r=directory_execute(q);
++  check(r.flag && !fs::exists(work/"capability-private/original") && fs::exists(work/"capability-private/destination/selected"),"exclusive file publication");
++  check(vd::filesystem::close(*original).error==vd::filesystem::ErrorKind::success,"close original publication file");
++  auto replacement=create_file("replacement","replacement");
++  q=request(dir_replace);q.objects={directory,destination};q.texts={"replacement","selected"};q.numbers={0};q.file=std::make_shared<Borrow>(replacement);r=directory_execute(q);
++  check(r.kind && !r.flag && fs::exists(work/"capability-private/replacement"),"exclusive file collision preserves source");
++  q.numbers={1};r=directory_execute(q);check(r.flag && !fs::exists(work/"capability-private/replacement"),"atomic file replacement");
++  char replaced[11]{};auto replaced_read=vd::filesystem::read_at(*replacement,0,replaced,sizeof(replaced));
++  check(replaced_read.error==vd::filesystem::ErrorKind::success && replaced_read.completed==11 && std::string_view(replaced,11)=="replacement","held replacement identity and bytes");
++  check(vd::filesystem::close(*replacement).error==vd::filesystem::ErrorKind::success,"close replacement file");
++  q=request(dir_replace);q.objects={destination,directory};q.texts={"selected","closed-source"};q.numbers={0};q.file=std::make_shared<Borrow>(replacement);r=directory_execute(q);
++  check(r.kind && !r.flag && fs::exists(work/"capability-private/destination/selected") && !fs::exists(work/"capability-private/closed-source"),"closed file publication fails without mutation");
++#ifdef _WIN32
++  check(r.code==ERROR_INVALID_HANDLE,"failed identity query preserves native error");
++#endif
++  check(!fresh_alias->close() && !impostor->close() && !source_alias->close() && !target_alias->close() && !destination->close() && !collision->close() && !stage->close() && !directory->close(),"directory cleanup");
+   auto executable8=executable.u8string(),cwd8=work.u8string();
+   q=request(spawn);q.texts={std::string(executable8.begin(),executable8.end()),std::string(cwd8.begin(),cwd8.end())};q.arrays={{"--exit"},{"VOID_CHILD=owned"}};
+   r=process_execute(q);check(!r.kind && q.acquired,"explicit child launch");auto process=q.acquired;
+@@ -107,6 +173,7 @@ int portable_main(int argc,char** argv) {
+   wchar_t image[]=L"image",bad[]={static_cast<wchar_t>(0xd800),0};wchar_t* input[]={image,bad};
+   check(vd::capture_application_arguments(2,input,true).error==4,"reject invalid UTF16");
+   check(!win::component(L"CON.txt") && !win::component(L"file:stream") && !win::component(L"data. ") && !win::component(L"FOO~1"),"reject DOS aliases and streams");
++  owner_rights_ancestors(work,executable);
+ #endif
+   std::cout<<"Portable host providers: "<<checks<<" checks passed\n";return 0;
+  } catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}
+diff --git a/tests/host_capabilities/portable_source.py b/tests/host_capabilities/portable_source.py
+index e5d4ceb3..907739bb 100644
+--- a/tests/host_capabilities/portable_source.py
++++ b/tests/host_capabilities/portable_source.py
+@@ -6,11 +6,12 @@ linked here; this test alone makes no claim that the checkout was inaccessible.
+ from pathlib import Path
+ import hashlib,json,os,sys,tempfile,zipfile
+ import support as h
+-from test_platform import native_text
+ compiler=Path(sys.argv[1]).resolve();child=Path(sys.argv[2]).resolve()
+ source=h.ROOT/'tests/host_capabilities/smoke.void';records=[]
+ def run(command,work,expected=None):
+- result=h.run(command,work,native_text(expected) if expected is not None else None,small=os.name!='nt',sources=(source,))
++ # VOID console output preserves UTF-8 bytes, including LF, on Windows too.
++ # native_text is only an oracle for CRT text streams.
++ result=h.run(command,work,expected.encode('utf-8') if expected is not None else None,small=os.name!='nt',sources=(source,))
+  records.append({'command':list(map(str,command)),'status':result.returncode,'stdout':result.stdout.decode(errors='replace'),'stderr':result.stderr.decode(errors='replace')})
+  return result
+ crypto='true\ntrue\ntrue\nba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\ntrue true\ntrue true\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\ntrue\nfalse\nfalse\ntrue\ntrue\nfalse\n'
+diff --git a/tests/net/http/reload.py b/tests/net/http/reload.py
+index b02b47d1..747955d3 100644
+--- a/tests/net/http/reload.py
++++ b/tests/net/http/reload.py
+@@ -19,7 +19,8 @@ class Handler(fixture.Handler):
+         if self.path=='/held':
+             self.server.count+=1;self.server.seen.set()
+             self.send_response(200);self.send_header('Content-Length','2');self.end_headers();self.wfile.flush()
+-            if self.server.release.wait(60):self.wfile.write(b'ok')
++            # The native fixture releases this response after compatible compilation.
++            self.server.release.wait();self.wfile.write(b'ok')
+         elif self.path=='/seen':
+             if self.server.seen.wait(60):self.reply(b'ok')
+         elif self.path=='/release':self.server.release.set();self.reply(b'ok')
+@@ -29,7 +30,7 @@ SOURCE='''use net/http
+ async func entry(value: i32) -> i32:
+     if http.open_client() is Ok(var owner):
+         with owner:
+-            if owner.start(http.request(target = "@BASE@/held")) is Ok(var exchange):
++            if owner.start(http.request(target = "@BASE@/held"), http.request_options(read_timeout_ms = 0, total_timeout_ms = 0)) is Ok(var exchange):
+                 with exchange:
+                     var first = exchange.read_bytes_async()
+                     if (await first) is Ok(var block):
+diff --git a/tests/stage8/sprint4.py b/tests/stage8/sprint4.py
+index 4723ae6f..149b7a1e 100644
+--- a/tests/stage8/sprint4.py
++++ b/tests/stage8/sprint4.py
+@@ -36,7 +36,7 @@ with tempfile.TemporaryDirectory(prefix='VOID Sprint 4 ') as directory:
+         for mode in ['normal','optimized']:
+             obj=root/(f'app{number}-{mode}.obj');exe=root/(f'app{number}-{mode}.exe')
+             run([compiler,'emit',source,'-o',obj,*(['--no-opt'] if mode=='normal' else [])])
+-            link(obj,exe);run([exe],status,'');run([exe,'7'],2,'')
++            link(obj,exe);run([exe],status,'');run([exe,'7'],status,'')
+     for text,diagnostic in [
+         ('func main() -> i32:\n    if false:\n        return 1\n','Missing return'),
+         ('func main() -> string:\n    return "bad"\n','entry'),
+diff --git a/tests/stage9/workflow.py b/tests/stage9/workflow.py
+index d23e3559..e0f97543 100644
+--- a/tests/stage9/workflow.py
++++ b/tests/stage9/workflow.py
+@@ -39,7 +39,7 @@ with tempfile.TemporaryDirectory(prefix='VOID Stage9 é 🎮 # % ') as temporary
+             executable=project/'build'/('main'+suffix)
+             native=run([executable],status,'',unrelated)
+             assert native.stderr==jit.stderr==''
+-            run([executable,'1'],2,'')
++            run([executable,'1'],status,'')
+     write('return 7\n')
+     run([compiler,'run'],7,'',project);run([compiler,'run','.'],7,'',project)
+     run([compiler,'build'],cwd=project);run([compiler,'build','.'],cwd=project)
+diff --git a/tests/voidup/ci_integration.py b/tests/voidup/ci_integration.py
+index 63e5280f..15bb5b46 100644
+--- a/tests/voidup/ci_integration.py
++++ b/tests/voidup/ci_integration.py
+@@ -1,5 +1,5 @@
+ """Focused wiring checks; never dispatch CI or modify a real provider prefix."""
+-import copy,json,os
++import copy,hashlib,json,os,subprocess
+ from pathlib import Path
+ import sys,tempfile,unittest
+ from unittest.mock import patch
+@@ -51,6 +51,19 @@ class Toolchain(unittest.TestCase):
+   self.outputs.assert_not_called()
+ 
+ class Integration(unittest.TestCase):
++ def test_approved_host_patch_checkout_bytes(self):
++  # Exercise Git's checkout filters even on Unix; Windows must receive the
++  # same bytes that the patch policy and corresponding-source notice bind.
++  folder='third_party/host-patches/libsodium-1.0.22/'
++  policy=json.loads((ROOT/folder/'PROVENANCE.json').read_text())
++  for name in ('PROVENANCE.json',policy['patch']):
++   path=folder+name
++   original=subprocess.check_output(['git','show','HEAD:'+path],cwd=ROOT)
++   checkout=subprocess.check_output(['git','-c','core.autocrlf=true','cat-file','--filters','HEAD:'+path],cwd=ROOT)
++   self.assertEqual(checkout,original,path)
++   self.assertEqual((ROOT/path).read_bytes(),checkout,path)
++   if name==policy['patch']:
++    self.assertEqual(hashlib.sha256(checkout).hexdigest(),policy['patch_sha256'])
+  def test_native_profile_layouts(self):
+   for system,arch,bundle in [('Linux','x86_64',''),('Windows','x86_64','windows-x86_64/'),('Darwin','arm64','macos-arm64/')]:
+    for configuration,profile in [('Debug','Debug'),('Release','Release'),('Sanitizers','strict')]:
+diff --git a/tools/setup_host_deps_native.py b/tools/setup_host_deps_native.py
+index 92ca0898..94b08ef2 100644
+--- a/tools/setup_host_deps_native.py
++++ b/tools/setup_host_deps_native.py
+@@ -67,14 +67,15 @@ def main():
+    '/p:ForceImportBeforeCppTargets='+str(ROOT/'cmake/host-sodium.targets'),'/p:VoidHostStrict='+str(a.profile=='strict').lower()]
+   project=sodium/'builds/msvc/vs2022/libsodium/libsodium.vcxproj'
+   evaluated=['LLVMToolsVersion','LLVMInstallDir','CLToolPath','CLToolExe','LinkToolPath','LinkToolExe','LibToolPath','LibToolExe',
+-   'WindowsTargetPlatformVersion','WindowsSdkDir','VCToolsInstallDir','VCToolsVersion','IncludePath','LibraryPath']
++   'WindowsTargetPlatformVersion','TargetPlatformVersion','WindowsSdkDir','VCToolsInstallDir','VCToolsVersion','IncludePath','LibraryPath']
+   run([msbuild,project,*properties,'-getProperty:'+','.join(evaluated)],'sodium-properties')
+   actual=json.loads((evidence/'sodium-properties.log').read_text(encoding='utf-8-sig'))['Properties']
+   expected={'LLVMToolsVersion':selected['LLVMToolsVersion'],'LLVMInstallDir':selected['sdk']+os.sep,
+    'CLToolPath':str(cc.parent)+os.sep,'CLToolExe':'clang-cl.exe','LinkToolPath':str(cc.parent)+os.sep,
+    'LinkToolExe':'lld-link.exe','LibToolPath':str(cc.parent)+os.sep,'LibToolExe':'llvm-lib.exe'}
+   if any(actual.get(key)!=value for key,value in expected.items()):raise SystemExit('Evaluated MSBuild toolchain mismatch: '+repr(actual))
+-  sdk=pathlib.Path(actual.get('WindowsSdkDir',''));sdk_version=actual.get('WindowsTargetPlatformVersion','')
++  # MSBuild resolves the WindowsTargetPlatformVersion "10.0" alias here.
++  sdk=pathlib.Path(actual.get('WindowsSdkDir',''));sdk_version=actual.get('TargetPlatformVersion','')
+   vc=pathlib.Path(actual.get('VCToolsInstallDir',''))
+   if not sdk.is_absolute() or not vc.is_absolute() or not sdk_version or not (sdk/'Include'/sdk_version/'um/Windows.h').is_file() or not (sdk/'Lib'/sdk_version/'um/x64/kernel32.lib').is_file() or not (vc/'include/vcruntime.h').is_file() or not (vc/'lib/x64/libcmt.lib').is_file():
+    raise SystemExit('Evaluated native Windows SDK/VC headers and libraries are incomplete: '+repr(actual))
+@@ -107,7 +108,7 @@ def main():
+   report['upstream_tests']=upstream_results(sodium);verify_sodium_copy(sodium_source,report['source_provenance'])
+   run(['make','install'],'sodium-install',sodium,env)
+   zlib=http/'lib/libz.a';common+=['-DCMAKE_C_FLAGS='+flags,'-DCMAKE_OSX_SYSROOT='+sdk,'-DCMAKE_OSX_DEPLOYMENT_TARGET='+minimum,'-DCMAKE_OSX_ARCHITECTURES=arm64']
+- run(['cmake','-S',sources['libarchive'],'-B',build/'archive',*common,'-DENABLE_ZLIB=ON','-DPOSIX_REGEX_LIB=NONE','-DZLIB_INCLUDE_DIR='+str(http/'include'),'-DZLIB_LIBRARY='+str(zlib),*options],'archive-configure')
++ run(['cmake','-S',sources['libarchive'],'-B',build/'archive',*common,'-DENABLE_ZLIB=ON','-DPOSIX_REGEX_LIB=NONE','-DZLIB_INCLUDE_DIR='+(http/'include').as_posix(),'-DZLIB_LIBRARY='+zlib.as_posix(),*options],'archive-configure')
+  run(['cmake','--build',build/'archive','--parallel',a.jobs],'archive-build');run(['cmake','--install',build/'archive'],'archive-install')
+  cache=(build/'archive/CMakeCache.txt').read_text()
+  disabled=['LZMA','ZSTD','BZip2','OPENSSL','LIBB2','LIBXML2','EXPAT','ICONV']+(['CNG'] if system=='Windows' else [])

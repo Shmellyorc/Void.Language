@@ -44,7 +44,9 @@ win::Handle relative(HANDLE parent,const std::wstring& name,bool directory,bool 
     auto call=reinterpret_cast<Create>(GetProcAddress(library,"NtCreateFile"));
     auto convert=reinterpret_cast<Convert>(GetProcAddress(library,"RtlNtStatusToDosError"));
     if(!call || !convert)win::fail(ERROR_PROC_NOT_FOUND);
-    ACCESS_MASK rights=READ_CONTROL|SYNCHRONIZE|FILE_READ_ATTRIBUTES|(rename_authority?DELETE:0)|(directory?FILE_LIST_DIRECTORY:GENERIC_READ);
+    // A persistent directory DELETE grant conflicts with the kernel's target
+    // open during handle-relative rename. Acquire source DELETE only on demand.
+    ACCESS_MASK rights=READ_CONTROL|SYNCHRONIZE|FILE_READ_ATTRIBUTES|(rename_authority && !directory?DELETE:0)|(directory?FILE_LIST_DIRECTORY:GENERIC_READ);
     if(writable)rights|=GENERIC_WRITE;
     constexpr ULONG synchronous=0x20,open_reparse=0x200000,directory_file=1,non_directory=0x40;
     auto status=call(&output,rights,&attributes,&io,nullptr,FILE_ATTRIBUTE_NORMAL,
@@ -56,7 +58,7 @@ win::Handle relative(HANDLE parent,const std::wstring& name,bool directory,bool 
 std::shared_ptr<Directory> root(const std::string& path,bool create) {
     auto full=win::absolute(path);if(full.size()<=7)win::fail(ERROR_INVALID_NAME);
     win::PrivateAccess access;
-    auto current=held(win::Handle(CreateFileW(full.substr(0,7).c_str(),FILE_LIST_DIRECTORY|READ_CONTROL,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,nullptr,OPEN_EXISTING,FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,nullptr)));
+    auto current=held(win::Handle(CreateFileW(full.substr(0,7).c_str(),FILE_LIST_DIRECTORY|FILE_READ_ATTRIBUTES|READ_CONTROL,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,nullptr,OPEN_EXISTING,FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,nullptr)));
     if(current->handle.value==INVALID_HANDLE_VALUE)win::fail();
     win::information(current->handle.value,true);
     for(std::size_t start=7;start<full.size();) {
@@ -74,7 +76,8 @@ std::shared_ptr<Directory> root(const std::string& path,bool create) {
         using Convert=ULONG(NTAPI*)(NTSTATUS);
         auto dll=GetModuleHandleW(L"ntdll.dll");auto call=reinterpret_cast<Create>(GetProcAddress(dll,"NtCreateFile"));auto convert=reinterpret_cast<Convert>(GetProcAddress(dll,"RtlNtStatusToDosError"));
         if(!call || !convert)win::fail(ERROR_PROC_NOT_FOUND);
-        auto status=call(&raw,FILE_LIST_DIRECTORY|READ_CONTROL|SYNCHRONIZE,&attributes,&io,nullptr,FILE_ATTRIBUTE_NORMAL,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,1,1|0x20|0x200000,nullptr,0);
+        // NtCreateFile needs the metadata read right for information() below.
+        auto status=call(&raw,FILE_LIST_DIRECTORY|FILE_READ_ATTRIBUTES|READ_CONTROL|SYNCHRONIZE,&attributes,&io,nullptr,FILE_ATTRIBUTE_NORMAL,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,1,1|0x20|0x200000,nullptr,0);
         if(status<0)win::fail(convert(status));win::Handle next(raw);win::information(raw,true);
         current=held(std::move(next),current);start=end+1;
     }
@@ -83,15 +86,41 @@ std::shared_ptr<Directory> root(const std::string& path,bool create) {
 Result sync(HANDLE handle) {if(!FlushFileBuffers(handle))return native_error(static_cast<int>(GetLastError()));return {};}
 bool same(HANDLE a,HANDLE b) {
     BY_HANDLE_FILE_INFORMATION x{},y{};
-    return GetFileInformationByHandle(a,&x) && GetFileInformationByHandle(b,&y) && x.dwVolumeSerialNumber==y.dwVolumeSerialNumber && x.nFileIndexHigh==y.nFileIndexHigh && x.nFileIndexLow==y.nFileIndexLow;
+    if(!GetFileInformationByHandle(a,&x) || !GetFileInformationByHandle(b,&y))win::fail();
+    return x.dwVolumeSerialNumber==y.dwVolumeSerialNumber && x.nFileIndexHigh==y.nFileIndexHigh && x.nFileIndexLow==y.nFileIndexLow;
+}
+win::Handle rename_source(HANDLE directory,win::PrivateAccess& access) {
+    // An empty native name reopens this held directory itself, without resolving
+    // its former name or an absolute path. This is not a public component name.
+    wchar_t zero=0;UNICODE_STRING name{};name.Buffer=&zero;
+    OBJECT_ATTRIBUTES attributes{};attributes.Length=sizeof(attributes);attributes.RootDirectory=directory;attributes.ObjectName=&name;attributes.Attributes=0x40;
+    IO_STATUS_BLOCK io{};HANDLE raw=INVALID_HANDLE_VALUE;
+    using Create=NTSTATUS(NTAPI*)(PHANDLE,ACCESS_MASK,POBJECT_ATTRIBUTES,PIO_STATUS_BLOCK,PLARGE_INTEGER,ULONG,ULONG,ULONG,ULONG,PVOID,ULONG);
+    using Convert=ULONG(NTAPI*)(NTSTATUS);
+    auto dll=GetModuleHandleW(L"ntdll.dll");if(!dll)win::fail();
+    auto call=reinterpret_cast<Create>(GetProcAddress(dll,"NtCreateFile"));auto convert=reinterpret_cast<Convert>(GetProcAddress(dll,"RtlNtStatusToDosError"));
+    if(!call || !convert)win::fail(ERROR_PROC_NOT_FOUND);
+    auto status=call(&raw,DELETE|SYNCHRONIZE|FILE_READ_ATTRIBUTES|READ_CONTROL,&attributes,&io,nullptr,FILE_ATTRIBUTE_NORMAL,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,1,1|0x20|0x200000,nullptr,0);
+    if(status<0)win::fail(convert(status));win::Handle result(raw);
+    win::information(raw,true);access.verify(raw);
+    if(!same(directory,raw))win::fail(ERROR_INVALID_PARAMETER);
+    return result;
 }
 Result rename(HANDLE source,HANDLE target,const std::wstring& name,bool replace) {
     // Allocate every byte before the namespace mutation. RootDirectory pins the
     // destination; the source is the held object, never a re-opened path.
-    std::vector<unsigned char> storage(offsetof(FILE_RENAME_INFO,FileName)+name.size()*sizeof(wchar_t));
+    std::vector<unsigned char> storage(sizeof(FILE_RENAME_INFO)+name.size()*sizeof(wchar_t));
     auto* info=reinterpret_cast<FILE_RENAME_INFO*>(storage.data());info->ReplaceIfExists=replace;info->RootDirectory=target;
     info->FileNameLength=static_cast<DWORD>(name.size()*sizeof(wchar_t));std::memcpy(info->FileName,name.data(),info->FileNameLength);
-    if(!SetFileInformationByHandle(source,FileRenameInfo,info,static_cast<DWORD>(storage.size())))return native_error(static_cast<int>(GetLastError()));
+    using Set=NTSTATUS(NTAPI*)(HANDLE,PIO_STATUS_BLOCK,PVOID,ULONG,FILE_INFORMATION_CLASS);
+    using Convert=ULONG(NTAPI*)(NTSTATUS);
+    auto dll=GetModuleHandleW(L"ntdll.dll");if(!dll)return native_error(static_cast<int>(GetLastError()));
+    auto call=reinterpret_cast<Set>(GetProcAddress(dll,"NtSetInformationFile"));auto convert=reinterpret_cast<Convert>(GetProcAddress(dll,"RtlNtStatusToDosError"));
+    if(!call || !convert)return native_error(ERROR_PROC_NOT_FOUND);
+    // Runtime file handles and rename_source() are synchronous. The native
+    // FileRenameInformation class preserves RootDirectory on Windows 10 too.
+    IO_STATUS_BLOCK io{};auto status=call(source,&io,info,static_cast<ULONG>(storage.size()),static_cast<FILE_INFORMATION_CLASS>(10));
+    if(status<0)return native_error(static_cast<int>(convert(status)));
     Result result;result.flag=true;return result;
 }
 Result published(Result result,HANDLE source,HANDLE target) {
@@ -139,9 +168,13 @@ Result windows_directory_execute(Request& q) {
         auto target=std::static_pointer_cast<Directory>(q.objects[1]);if(!target->node)return error(7);
         if(q.operation==dir_publish) {
             auto name=win::wide(q.texts[0]);if(!win::component(name) || !d->parent)return error(4);
+            // Another owned alias may have moved this directory. Reject stale
+            // parent bookkeeping before mutation, so durability covers both parents.
+            {auto check=relative(d->parent->handle.value,d->name,true,false,false,access,false,false);if(!same(fd,check.value))return error(4);}
             // Rename the held source identity. Validated ancestor ACLs exclude
             // untrusted mutation; share-delete permits independent owned aliases.
-            auto source=d->parent;auto result=rename(fd,target->node->handle.value,name,false);
+            auto source=d->parent;Result result;
+            {auto identity=rename_source(fd,access);result=rename(identity.value,target->node->handle.value,name,false);}
             if(result.flag){d->parent=target->node;d->node->ancestor=target->node;d->name.swap(name);}
             return published(result,source->handle.value,target->node->handle.value);
         }
