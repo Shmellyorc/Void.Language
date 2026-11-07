@@ -72,6 +72,24 @@ class SEOChecks(unittest.TestCase):
                 finally:
                     path.write_bytes(before)
 
+    def test_installation_links_allow_only_complete_platform_guides(self):
+        path = self.public / 'getting-started/index.html'
+        before = path.read_bytes()
+        prefix = 'https://github.com/Shmellyorc/Void.Language/blob/main/'
+        for platform in ('linux', 'windows', 'macos'):
+            guide = f'docs/install/{platform}.md'
+            self.assertIn((prefix + guide).encode(), before)
+            self.assertTrue((ROOT.parent / guide).is_file())
+        try:
+            path.write_bytes(before.replace((prefix + 'docs/install/linux.md').encode(),
+                                            (prefix + 'docs/other.md').encode(), 1))
+            result = self.check()
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('public repository URL exposed', result.stderr)
+            self.assertIn('public explanation links to internal Markdown', result.stderr)
+        finally:
+            path.write_bytes(before)
+
     def test_rejects_seo_and_content_regressions(self):
         guide = 'docs/generics/index.html'
         cases = [

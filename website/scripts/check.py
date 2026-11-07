@@ -16,6 +16,12 @@ import xml.etree.ElementTree as ET
 ROOT = Path(__file__).resolve().parents[1]
 REPO = ROOT.parent
 SITE = 'https://voidlang.com'
+# The installation page links only to these canonical, publicly accessible guides.
+# Other repository URLs and internal Markdown remain outside the public site.
+INSTALLATION_GUIDES = {
+    f'https://github.com/Shmellyorc/Void.Language/blob/main/docs/install/{platform}.md'
+    for platform in ('linux', 'windows', 'macos')
+}
 SOCIAL_IMAGE = SITE + '/assets/social.png'
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--directory', type=Path, default=ROOT / 'public',
@@ -408,7 +414,7 @@ for path, page in pages.items():
         if url.netloc == 'voidlang.net':
             fail(path, 'internal link uses redirecting secondary domain')
         if url.netloc != 'voidlang.com':
-            if url.path.endswith('.md'):
+            if url.path.endswith('.md') and url.geturl() not in INSTALLATION_GUIDES:
                 fail(path, 'public explanation links to internal Markdown')
             continue
         if url.scheme != 'https':
@@ -534,7 +540,10 @@ for path in set(indexable) - visited:
 # Scan the files delivered by the static build, including scripts and metadata.
 for asset in PUBLIC.rglob('*'):
     if asset.is_file() and asset.suffix in ('.html', '.js', '.css', '.json', '.xml', '.txt', '.void'):
-        if re.search(r'github\.com/shmellyorc/void\.language', unquote(asset.read_text()), re.I):
+        content = unquote(asset.read_text())
+        for guide in INSTALLATION_GUIDES:
+            content = content.replace(guide, '')
+        if re.search(r'github\.com/shmellyorc/void\.language', content, re.I):
             fail(asset, 'public repository URL exposed')
 
 # Homepage and roadmap use the same content/source contracts as existing guides.
