@@ -1,0 +1,400 @@
+diff --git a/docs/voidup/INTEGRATION_REPORT.md b/docs/voidup/INTEGRATION_REPORT.md
+index 064d6c71..98cec177 100644
+--- a/docs/voidup/INTEGRATION_REPORT.md
++++ b/docs/voidup/INTEGRATION_REPORT.md
+@@ -1,12 +1,392 @@
+-**Active follow-up: [CI #42427327049](#ci-42427327049-hosted-repair), baseline `d7dc4b681c2cd5745210bcc49bb3a0d1ddf4c59c`. REVISE: installation correction qualified locally; Server 2022 process cause blocked on missing native diagnostics. All seven original jobs are final and inspected.**
++**Current result: RETAIN — locally qualified / hosted pending. CI #42446206797, baseline `b8776526c83d6c5668490bad8c2c1fc7a35b1f0f`. Native Windows 10 full Release and Debug each passed 351/351; final test-utility revision passed 7/7 in both profiles. Linux Release/Debug/fatal strict, real Linux/Windows editor tests, SDK/ABI and installed source-package checks passed. Actual new Server 2022 and macOS ARM64 acceptance remain pending Boss-controlled CI.**
++
++## CI #42446206797 — Windows Server ancestry and explicit private staging
++
++Boss authorized diagnosis, implementation and complete available native qualification
++of the two remaining Windows process failures in
++[this diagnostic run](https://github.com/Shmellyorc/Void.Language/actions/runs/42446206797).
++The original working tree was clean at the stated baseline. The existing
++installation correction, LLVM 23.1.4 selectors, approved libsodium backport,
++provider recipes, pins, receipts and corresponding-source packaging are retained.
++No staging, commit, branch, history change, push, hosted dispatch, provider/LLVM installation, dependency pin change
++or VM power/settings change is part of this repair. Native commands
++use the existing VirtualBox console and shared folder; no Wine or SSH is used.
++
++### Demonstrated cause and correction
++
++Both original Server 2022 profiles reached all 351 registered tests: **349 passed,
++two failed** (`host_capabilities_portable`, `host_capabilities_portable_source`).
++Both passed `cli_install` and `cli_install_resources`. Independently retained
++Release and Debug diagnostics identify `kind=2`, Win32 `code=5`, `stage=4`
++(executable ancestors), before image open or `CreateProcessW`. Their rejected
++drive-root descriptors are identical:
++
++```text
++O:NSD:(A;OICI;FA;;;BA)(A;OICI;FA;;;SY)(A;OICIIO;GA;;;CO)(A;OICI;0x1200a9;;;BU)(A;CI;LC;;;BU)(A;CIIO;DC;;;BU)(A;;0x1200a9;;;WD)
++```
++
++The rejecting rule is **owner identity**, ahead of the ACE loop. `NS` denotes
++[Network Service](https://learn.microsoft.com/en-us/windows/win32/secauthz/sid-strings),
++which is outside this caller's existing trusted ancestor-owner set. The controlled
++native regression passes this exact in-memory descriptor to the production
++predicate and obtains access denied; changing **only** its owner to SYSTEM admits
++the identical ACE list. No real drive ownership or ACL is changed. The Runtime
++header factors descriptor evaluation out of the existing handle verifier so the
++test exercises the actual policy. It does not create a source capability from a
++descriptor or add a trusted SID.
++
++The Built-in Users entries do not cause this rejection. `0x1200a9` grants
++read/execute; directory `LC` has mask `0x4` (add subdirectory); `DC` has mask `0x2`
++(add file) and is inherit-only here. These masks must be interpreted as
++[file/directory access rights](https://learn.microsoft.com/en-us/windows/win32/fileio/file-access-rights-constants),
++not directory-service permission names. Inherit-only entries do not grant access
++to this parent; effective grants on an opened child are checked there. Creation
++of a new sibling alone does not authorize replacement of an existing checked
++child. Delete-child, deletion, DACL/owner modification, attribute/EA mutation and
++generic write/all grants to untrusted principals remain rejected. Network Service
++ownership cannot simply be admitted: owners normally have implicit DACL-modifying
++rights, subject to
++[OWNER RIGHTS semantics](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-identifiers).
++This descriptor has no OWNER RIGHTS restriction that would establish a different
++trust contract.
++
++The permanent CI correction is **explicit test-caller staging**, using the existing
++native private-directory, file and SHA-256 providers. The harness approves its
++freshly built helper's exact digest, then the helper opens that regular source
++with no write/delete sharing, bounds its extent, creates an exclusive private
++directory and file under the trusted temp ancestry, copies with checked progress,
++checks source identity/extent/write time, flushes, applies private executable
++classification, and hashes the held destination again. The Python caller verifies
++the resulting file digest too. Digest mismatch and existing-root replacement
++attempts must fail at their expected checks. A failed candidate is never returned
++as an executable selection.
++
++Both existing native and source drivers pass this explicit private image to the
++unchanged process operation. The hosted diagnostics already demonstrate that the
++selected C: temp ancestry passes the original policy, while the D: build ancestry
++does not. Approval concerns the trusted harness's own build artifact; this is no
++authentication mechanism for arbitrary external images. There is no implicit
++copy/fallback in `process.start`, no weakening of ancestry checks and no runner
++security reconfiguration. Unix drivers retain their original executable path.
++
++Additional native regressions retain the original OWNER RIGHTS/private-leaf
++checks and test hostile image parents independently of hostile cwd parents,
++exact-descriptor owner/ACE discrimination, all existing mutation-mask classes,
++effective versus inherit-only grants, actual image/cwd junction rejection,
++standard-handle availability and observable stdout/stderr inheritance, exact exit
++status, repeated wait and cleanup. Junctions exist only under disposable fixture
++directories. Unicode, literal arguments and complete environments continue through
++the normal/O2 JIT and independently linked AOT source fixture.
++
++### Additional Ubuntu Debug harness failure
++
++The final Ubuntu Debug job is **cancelled**, not PASS. Its complete compiler suite
++passed **407 tests with one `io_cross_volume` skip out of 408**, and the frontend
++small-stack step passed. All three real editor modes then reported success and
++exit zero by 06:22:16 UTC. The Node harness remained alive until cancellation at
++10:17:47 UTC, around the configured six-hour job limit. Runner cleanup retained
++two orphan `tar` processes. Extension packaging and the warm relink were not
++reached; no VSIX was uploaded for this profile.
++
++The exact pinned `@vscode/test-electron` **3.1.0** source was compared with its
++SHA-512-verified [npm archive](https://registry.npmjs.org/@vscode/test-electron/-/test-electron-3.1.0.tgz).
++Its `unzipVSCode` rejects an aborted input stream without closing its extractor's
++stdin. A controlled call to that actual function reproduced a live GNU tar child
++with open stdin after rejection; closing that owned input reaped it with exit 2.
++This reproduces the retained hosted failure mechanism. A live hosted file-
++descriptor dump was unavailable, so the exact hosted stdin state is inferred from
++the pinned source, abort diagnostic and orphan-process evidence.
++
++The existing test caller now delays a download retry until its owned extractor
++pipes/processes close. It observes only its exclusive download phase through
++Node's public [child-process diagnostics channel](https://nodejs.org/docs/latest-v24.x/api/diagnostics_channel.html#event-child_process).
++It keeps the same editor version, three download attempts, upstream archive
++length/checksum checks, all editor assertions and natural harness exit. There is
++no forced successful `process.exit`, dependency patch, pin/lockfile modification,
++compiler/LSP behavior change or workflow change. New cases in the existing unit
++test file check real child EOF/reaping before retry, all-attempt failure retaining
++the original error, and immediate non-retry failure. The actual pinned upstream
++extractor also passed abort/retry plus valid-payload controls and rejected wrong
++checksums on all three attempts. An initial TypeScript parameter-type diagnostic
++is retained; the final type matches the upstream API's `Partial<DownloadOptions>`.
++
++### Qualification and evidence
++
++The VM's display name is `Windows 11`; its actual OS is **Windows 10**, not Server
++2022. The initial standard-user full Release run completed with **345 passed,
++five failed and one skipped out of 351**. `log_files` failed creating its symlink
++fixture with native error 1314; four IO cases returned their symlink-creation
++failure sentinel. An isolated public `io.create_symlink` diagnostic returned
++1314 under the standard token and zero under the existing administrator token,
++using identical compiler and source hashes. Qualification therefore uses the
++existing account's normal UAC elevation, without changing security policy,
++enabling Developer Mode or creating accounts. The standard Debug build was
++deliberately interrupted after Release completed so full qualification could use
++the appropriate caller. Its partial output and KeyboardInterrupt remain evidence.
++The existing `VOID_IO_SECOND_VOLUME` option exercises NTFS-to-VirtualBox-shared-
++filesystem renames on genuinely distinct devices; the original no-second-volume
++skip is retained separately.
++
++After correcting the caller, synchronous and asynchronous IO passed, but the two
++persistent AOT wire working directories returned 99. Earlier failed executions
++had left `copy`/`moved` fixture trees before their cleanup path. The identical
++Release AOT binaries returned the expected 7 in fresh temporary directories.
++Only the known generated wire fixture entries were inventoried, hashed, archived
++and moved to a native backup; fresh working directories were then created for
++the repeat qualification. No original data was deleted and no IO assertion or
++Runtime implementation changed. Both optimization modes and both profile fixture
++directories are recorded in the isolation receipt.
++
++Elevated qualification exposed an additional local `cli_install` denial at the
++immediate post-install directory rename, before resource verification. The
++original external holder was not identified. Five exact fresh-install probes
++subsequently renamed successfully. A real held-child control reproduced native
++error 5 while directory DELETE access succeeded and child DELETE access reported
++sharing violation 32; closing the child allowed relocation. The Windows-only
++test helper now retries those two native rename denials with a two-second budget.
++It still requires the actual rename and all subsequent containment, checksum,
++tamper, missing-resource, relocation and source/AOT assertions. It never copies,
++deletes or changes permissions to obtain success. Real native controls verified
++temporary sharing denial followed by identity-preserving relocation, persistent
++denial returning error 5 without mutation, and missing-source error 2. No
++antivirus cause is asserted, and no production installation verifier changed.
++
++The first final Release repeat later demonstrated the same immediate post-install
++Win32 5 denial at `tests/stage9/workflow.py:prefix.rename`, after its private-root
++and deep-executable checks passed. That full run finished at **350 passed, one failed, zero skipped / 351**
++in 3,410.58 seconds, with no other defect. The bounded rename operation was moved into the existing
++`tools/test_platform.py` utility and used by both demonstrated installation
++callers. Its actual rename, two-second budget, persistent-denial failure and
++missing-source behavior are preserved. The original full Debug result predates
++this test-only refactor; both affected fixtures and the portable/dependency/
++source tests subsequently passed **7/7 in each profile**, and a fresh complete
++Release repeat passed **351/351**. No compiler, Runtime or provider production code changes for
++this additional fixture correction.
++
++The broad local Debug build also hit an LLD in-page exception while linking
++`void_fixed_arrays_tests`. At inspection the VM's 85,226,405,888-byte C: volume
++had only 195,330,048 bytes free, with about 4 GB of physical memory available.
++Generated PDBs occupied 15,823,257,600 logical bytes. Existing NTFS compression
++already stored those in about 7 GB; a compression pass recovered no space and
++verified identical hashes for all 513 PDBs. A stronger built-in LZX probe preserved
++its PDB hash. Subsequent available space was 3,886,751,744 bytes and the unchanged
++failed link succeeded. Both the original exception and retry remain evidence.
++The local continuation builds Debug targets sequentially and compresses completed
++PDBs between links, checking their hashes. Debug compiler/linker flags and symbol
++contents remain intact. This is storage handling for the existing VM, without
++changing its disk/RAM/CPU settings, touching the original development checkout,
++compressing SDK/source files, changing CI or publishing symbol/binary payloads.
++
++### Final available execution results
++
++| Execution on the final relevant source | Actual result |
++| --- | --- |
++| Windows 10 Debug complete build and unfiltered CTest | **351 passed, 0 failed, 0 skipped; 10,036.70 s.** This full run precedes only the later shared Python relocation refactor; compiled Runtime/compiler/native fixture sources are unchanged. |
++| Windows 10 Debug after shared test-utility revision | **7/7 passed**, including Stage 9, CLI install/resource, provider rejection, native portable, normal/O2 JIT/independent AOT source, and VOIDUP smoke. |
++| Windows 10 Release complete build/provider verification | Both returned zero; LLVM 23.1.4 source and tool identities retained. |
++| Windows 10 final fresh unfiltered Release | **351 passed, 0 failed, 0 skipped; 3,313.96 s.** All final shared-helper callers and native/source process tests ran in this full suite. |
++| Windows 10 final focused Release | **7/7 passed** before the fresh full repeat. |
++| Shared relocation native controls | Actual held-child temporary denial followed by identity/content-preserving rename; persistent denial returns Win32 5 after 2.029 s without mutation; missing source returns Win32 2. |
++| PikaOS Linux Release / Debug / strict | Relevant compiler/Runtime/LSP/VOIDUP builds returned zero. **7/7 per profile**, 35.35 / 113.19 / 131.10 s, including both installation fixtures and portable source execution. |
++| Editor unit/type/bundle tests on Linux | **6/6 passed** under existing pinned Node 24.19.0/npm 11.17.0. |
++| Actual Linux editor, pinned VS Code 1.141.0 | Trusted, untrusted and multi-root modes passed; harness exited naturally, 131.63 s including download. Uses the native desktop/Xwayland, separately from hosted Ubuntu. |
++| Actual Windows editor build/unit tests | **6/6 passed**, including real child EOF/reaping controls, using official archive-verified portable Node 24.19.0/npm 11.17.0. |
++| Actual Windows VS Code 1.141.0 | All three real GUI modes passed and the harness exited naturally; 121.56 s including download. Actual final Debug `voidls.exe` identity recorded. |
++| Actual Windows local VSIX packaging | Returned zero, 23.34 s; 150,294-byte local artifact, not published or included in the commit inventory. |
++| Native source/tool/package audit | **PASS:** 1,036 source/test/tool inputs and the separate 256-path map match; both `/MT` provider archives verified; installed corresponding-source reconstruction and tampered-patch rejection passed. |
++
++The native portable fixture reports **151 checks**; each profile's source fixture
++records **30 commands: six AOT links and 24 executions** across normal/O2 JIT and
++independent AOT. Final provider admission/rejection tests report **17 checks** on
++Windows; all seven inner Windows installation-resource unit cases pass without
++skips under the qualified token. Windows cross-volume tests use the demonstrated
++NTFS/shared-filesystem device distinction rather than counting a skipped check
++as success. Linux children query and enforce the existing hard 1 MiB stack;
++native PE headers show 1,048,576-byte stack reserves for compiler, portable
++fixture and VOIDUP in both profiles. The portable fixture also commits the full
++1 MiB; compiler/VOIDUP initial commits remain 4 KiB. This is stack evidence, not a
++claim of equivalent platform performance.
++
++Strict Linux retains exactly
++`ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
++`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`. No sanitizer setting,
++assertion, expected output or registered test was disabled. The current repair
++reuses the unchanged providers; its focused receipt/closure tests do not claim a
++new clean provider rebuild. The seven original hosted provider bootstraps and
++five actual upstream 87-test Unix suites are retained independently.
++
++The first native editor unit attempt correctly failed because the isolated copy
++lacked the default relative `build/debug/voidls.exe` fixture. The original error
++and failed audit are retained. Supplying the existing `VOIDLS_TEST_SERVER`
++parameter with the actual built Debug LSP resolved the context; all six tests,
++real GUI modes and packaging then passed without a repository source change.
++`audit-final-results.json` explicitly combines the successful core audit and
++corrected editor continuation rather than rewriting the failed audit as PASS.
++`npm ci` retained its real warnings: six findings in the unchanged development
++dependency set (four moderate, two high), plus two install-script allowlist
++warnings. No dependency update or approval-policy change was used to clear them.
++
++Executed native commands and every expanded argument/status/time are retained in
++`native/debug-storage-resume-results.json`, `native/integration-native-results.json`,
++`native/audit-initial-editor-context-results.json`, and
++`native/editor-native-resume-results.json` inside the local evidence archive.
++From the disposable native root, the core commands were:
++
++```text
++cmake --build build\Debug --parallel 1
++cmake --build build\Release --parallel 1
++python tools\verify_host_deps.py --prefix .toolchains\host\prefix\windows-x86_64\Debug --profile Debug --platform Windows --architecture x86_64
++python tools\verify_host_deps.py --prefix .toolchains\host\prefix\windows-x86_64\Release --profile Release --platform Windows --architecture x86_64
++ctest --test-dir build\Debug --output-on-failure --output-junit \\vboxsvr\VM\ci-42446206797\debug-storage-resume-full-Debug.xml
++ctest --test-dir build\Release --output-on-failure --output-junit \\vboxsvr\VM\ci-42446206797\integration-native-full-Release.xml
++```
++
++`CTEST_PARALLEL_LEVEL=1` and the existing private `TMP`/`TEMP` apply. The final
++shared-helper continuation uses the recorded seven-case regex in both profiles,
++then unfiltered Release. Source-only Python changes require no additional native
++relink. Linux commands are captured by `linux-after-integration.py`: build
++`void_host_portable voidc voidls voidup --parallel 1`, then the same seven-case
++CTest selection in `build/llvm23-{release,debug,strict}`. Editor commands are
++`npm test`, `npm run test:host`, and on Windows `npm run package`; the existing
++`VOIDLS_PATH`/`VOIDLS_TEST_SERVER` identify the real Debug LSP. All source copies
++and the eleven-file patch are hash-checked; baseline patch reconstruction passes.
++
++### Remaining platform and hosted acceptance limits
++
++Actual Server 2022 execution of this diff is **not available locally**. The real
++Windows 10 VM supplies native process, filesystem, build, JIT/AOT, GUI and cleanup
++evidence; its exact Server descriptor regression supplies policy evidence. It
++is not relabeled Server acceptance. Local Windows uses build 19045, Windows SDK
++10.0.19041.0 and Python 3.14; the retained hosted jobs use Server build 20348,
++SDK 10.0.26100.0 and Python 3.12. Both record MSVC SDK tools 14.44.35207 and the
++same verified LLVM 23.1.4 family. Native CMake uses Ninja with `/O2 /Ob2 /DNDEBUG`
++or `/Zi /Ob0 /Od /RTC1`; the hosted `thinlto-cache` experiment and its warm relink
++remain a separate acceptance path. The original hosted D: ancestry remains
++intentionally rejected; the actual C: private staging path must pass in the next
++Server run. No real root ACL, owner, VM state, CPU/RAM/disk setting or Windows
++security policy was changed.
++
++No native macOS ARM64 machine is accessible for the new diff. Both original
++hosted macOS profiles passed independently, including the installation correction;
++Debug also passed the original real editor/package steps. New-diff ARM64 and
++Server Debug/Release, fresh Git checkout byte handling, full seven-job completion
++and hosted relink/package steps remain **hosted pending**. New-diff PikaOS GUI
++success does not turn the cancelled original Ubuntu Debug job into PASS.
++
++
++### Seven-configuration matrix — final original run
++
++These are **baseline** results from CI #42446206797. They do not certify the new
++diff on Server 2022 or macOS. Each complete job log and diagnostic/test artifact
++was inspected separately; every downloaded ZIP matched its GitHub digest.
++
++| Configuration / job | Final original result and last established validation | Correction / remaining qualification |
++| --- | --- | --- |
++| Ubuntu Release / [128625561458](https://github.com/Shmellyorc/Void.Language/actions/runs/42446206797/job/128625561458) | **PASS:** 407 passed, 0 failed, 1 skipped / 408; complete job including warm relink. | Preserve LLVM/provider/compiler behavior; current-diff Linux checks are reported above. |
++| Ubuntu Debug / [128625561148](https://github.com/Shmellyorc/Void.Language/actions/runs/42446206797/job/128625561148) | **UNQUALIFIED whole job — cancelled:** 407 passed, 0 failed, 1 skipped / 408; frontend stack and extension build/unit passed. All three editor modes exited zero, but the harness did not exit. | Repair owned extractor cleanup after the demonstrated aborted download. New end-to-end hosted completion, VSIX packaging and warm relink remain pending. |
++| Ubuntu Sanitizers / [128625561266](https://github.com/Shmellyorc/Void.Language/actions/runs/42446206797/job/128625561266) | **PASS:** 397 passed, 0 failed, 1 skipped / 398; provider 87/87 and complete job. | Preserve fatal ASan/UBSan/leak settings and original oracle limitations. |
++| Windows Release / [128625561305](https://github.com/Shmellyorc/Void.Language/actions/runs/42446206797/job/128625561305) | **FAIL:** 349 passed, 2 failed, 0 skipped / 351. Verified providers, full build, installation and all seven inner installation-resource cases passed; unfiltered CTest failed only the two portable host cases. | Exact Network Service ancestry rejection; explicit private test-image staging. Native Windows 10 qualification is separate; new Server run remains pending. |
++| Windows Debug / [128625561226](https://github.com/Shmellyorc/Void.Language/actions/runs/42446206797/job/128625561226) | **FAIL, independently inspected:** same 349/351 and two portable failures. LLVM/MSBuild/providers and installation/resource checks passed. Later frontend/editor/package/relink steps were not reached. | Same root cause; independent Debug native qualification and subsequent CI phases are required. |
++| macOS ARM64 Release / [128625561231](https://github.com/Shmellyorc/Void.Language/actions/runs/42446206797/job/128625561231) | **PASS:** 395 passed, 0 failed, 1 skipped / 396; complete job. | Original installation correction and qualified `vd::host::wait` passed. New-diff native ARM64 execution remains hosted-only. |
++| macOS ARM64 Debug / [128625561341](https://github.com/Shmellyorc/Void.Language/actions/runs/42446206797/job/128625561341) | **PASS, independently inspected:** 395 passed, 0 failed, 1 skipped / 396; real editor modes, package and complete job passed. | New downloader adapter still requires native ARM64 validation; no pass is inferred from Linux/Windows. |
++
++All five Unix-profile skips above are the original `io_cross_volume` skip; no skip
++is counted as a pass. Windows original libsodium properties select SDK-derived
++`LLVMToolsVersion=23`, `clang-cl.exe`, `lld-link.exe` and `llvm-lib.exe` from the
++verified LLVM **23.1.4** SDK; resource includes use `lib/clang/23/include`. Both
++COFF directive logs establish static `libcmt`, with no dynamic `msvcrt` directive.
++All five Unix provider suites retain **87 passed, 0 failed, 0 skipped** upstream
++targets. The accepted `sodium_utils2`/`sodium_utils3` `_exit`/ASan output-oracle
++limitations remain: 87 targets do not imply 87 output comparisons or full
++intentional-fault/leak-finalization coverage. No sanitizer, vector, expected-
++output list or dependency policy was weakened.
++
++
++### Exact review inventory and recommendation
++
++The initial working tree had **zero pending or staged paths**. The intended final
++inventory is **21 individual paths**: eleven source files, this report and nine
++packed evidence/index/diff/inventory files. Final Git audit: **10 modified,
++11 untracked, 0 deleted, 0 staged, 0 ignored-but-intended paths**, with no
++unexpected changed path. The source patch reconstructs all eleven postimages
++from the baseline; archive/member hashes, all nine new local links, Python syntax,
++protected inputs and literal allowlist/NUL correspondence pass verification. The current allowlist is
++[commit-paths.txt](evidence/ci-42446206797/commit-paths.txt), with the equivalent
++literal [NUL list](evidence/ci-42446206797/commit-paths.nul) and
++[hash inventory](evidence/ci-42446206797/commit-inventory.json).
++
++| Source path | Exact purpose |
++| --- | --- |
++| `src/runtime/host_windows.hpp` | Factor the existing descriptor predicate for direct regression exercise; preserve the same owner, ACE and mutation policy. |
++| `tests/host_capabilities/portable.cpp` | Explicit pinned/hash-verified private test-image copy; exact Server descriptor controls; hostile image/cwd, junction, standard-handle and cleanup checks. |
++| `tests/host_capabilities/staged_child.py` | Windows test-caller digest approval, negative digest/existing-root controls and readback identity. |
++| `tests/host_capabilities/portable.py` | Select staged child and assert observable inherited stdout/stderr. |
++| `tests/host_capabilities/portable_source.py` | Use that explicit image through the unchanged source process API in normal/O2 JIT/AOT. |
++| `tools/test_platform.py` | One shared bounded real-rename helper for the two demonstrated installation fixture denials. |
++| `tests/cli/install.py` | Call the shared helper; retain all existing install, relocation and rejection assertions. |
++| `tests/stage9/workflow.py` | Use the same helper for the demonstrated second immediate post-install denial. |
++| `editors/vscode/src/test/download.ts` | Close/reap only downloader-owned extractor inputs/processes before retry; preserve pins/checksums/errors and natural exit. |
++| `editors/vscode/src/test/runHost.ts` | Use the repaired download caller while retaining all GUI assertions/modes. |
++| `editors/vscode/src/test/config.test.ts` | Add real child lifecycle, retry exhaustion/original error and non-retry controls to the existing unit suite. |
++
++Actual complete review diffs are [source.patch](evidence/ci-42446206797/source.patch)
++and [documentation.patch](evidence/ci-42446206797/documentation.patch).
++[Original hosted evidence](evidence/ci-42446206797/original-ci.tar.gz) and its
++[per-file restoration index](evidence/ci-42446206797/original-ci-index.json) retain
++all final logs, metadata and diagnostic ZIPs with verified original digests.
++[Local verification](evidence/ci-42446206797/local-verification.tar.gz) and its
++[index](evidence/ci-42446206797/local-verification-index.json) retain original
++failures, all source revisions, controls, builds, complete/repeated tests, SDK/ABI,
++source-package and GUI evidence. Generated records are packed rather than adding
++thousands of loose Source Control paths. Built editor VSIX artifact ZIPs from
++the original run are excluded from permanent evidence; their original metadata
++and hashes remain available, with raw downloads preserved in ignored capture.
++
++Exact exclusions are the ignored local `build/ci-42446206797/` capture/build/
++reconstruction output, unchanged `.toolchains/` SDK/provider caches, external
++`/home/shmellyorc/VM/ci-42446206797/` transport, all guest native tools/binaries/
++PDBs/caches and local VSIX output. Source-only transport ZIPs and upstream source
++archives are engineering evidence; executable release payloads and private keys
++are excluded. The old generated IO fixture trees are preserved in archives and
++native backups. No unrelated user file or source was removed, reset or changed;
++root README, website, TCP/UDP, default/selected workflows, LLVM/provider recipes,
++pins, notices and production install/process implementations remain unchanged.
++Fifteen protected original inputs and both editor package/lock files retain their
++baseline hashes. No extra Markdown document was introduced.
++
++Recommended exact staging command for Boss, **not executed**:
++
++```bash
++git --literal-pathspecs add -f --pathspec-from-file=docs/voidup/evidence/ci-42446206797/commit-paths.nul --pathspec-file-nul
++```
++
++Suggested single title:
++
++```text
++Repair Windows CI executable staging and editor download cleanup [skip ci]
++```
++
++**RETAIN — locally qualified / hosted pending.** The demonstrated security-boundary
++failure is resolved through explicit trusted caller staging, not relaxed Runtime
++policy. The additional demonstrated fixture and downloader failures are repaired
++and actually exercised. Final source, receipt, package, stack, cleanup and
++negative controls pass as scoped above. Boss/Golden Wrench should review the two
++actual diffs and exact allowlist before Boss-controlled integration and the next
++hosted run. No staging, commit, push, branch/history change, CI dispatch or binary
++publication has been performed. No claim guarantees unexecuted hosted results.
++
++
++---
++
++**Historical follow-up: [CI #42427327049](#ci-42427327049-hosted-repair), baseline `d7dc4b681c2cd5745210bcc49bb3a0d1ddf4c59c`. Its REVISE decision and missing-diagnostics limitation describe that earlier review; the descriptor investigation above supersedes the latter. All seven original jobs were final and inspected.**
+ 
+ **Historical follow-up: [CI #42377496702 cross-platform repair](#ci-42377496702-cross-platform-repair), baseline `799a29e3c0b0e204abecd4dc1f14356bf1df3443`.**
+ The earlier integration and cleanup inventories below are retained historical
+ records: they were already present in this baseline. They are not the pending
+ file list for this follow-up. Native Windows Release/Debug verification is complete
+ for the stated local environment; hosted seven-configuration acceptance remains
+-unqualified. Use the [current exact allowlist](evidence/ci-42377496702/commit-paths.txt)
+-for this repair. Original failures and corrective reruns are separated below.
++unqualified. Its [historical exact allowlist](evidence/ci-42377496702/commit-paths.txt)
++describes that earlier repair, not the active CI #42446206797 inventory. Original failures and corrective reruns are separated below.
+ 
+ **Historical commit inventory after the earlier source-control cleanup:**
+ [REPAIR_COMMIT_PATHS.txt](REPAIR_COMMIT_PATHS.txt) and

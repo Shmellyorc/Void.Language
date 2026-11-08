@@ -4,6 +4,39 @@ import * as path from 'node:path';
 import {promises as fs} from 'node:fs';
 import * as os from 'node:os';
 import {inside, resolveProject, resolveSetting, discoverServer} from '../config';
+import {spawn, ChildProcess} from 'node:child_process';
+import {once} from 'node:events';
+import {SilentReporter, ProgressReportStage, DownloadOptions} from '@vscode/test-electron';
+import {downloadEditor} from './download';
+
+test('editor download reaps failed extractors before retry, preserving failure', async () => {
+    for (const success of [true, false]) {
+        const children: ChildProcess[] = [];
+        const failure = new Error('controlled interrupted editor archive');
+        let attempts = 0;
+        const acquire = async (options: Partial<DownloadOptions>) => {
+            assert.equal(options.version, '1.141.0');
+            assert(children.every(child => child.exitCode === 2 && child.signalCode === null));
+            ++attempts;
+            if (success && attempts === 2) return 'verified editor fixture';
+            const child = spawn(process.execPath, ['-e', "process.stdin.resume(); process.stdin.on('end', () => process.exit(2));"], {stdio: 'pipe'});
+            children.push(child);
+            child.stdout!.resume(); child.stderr!.resume();
+            await once(child, 'spawn');
+            options.reporter!.report({stage: ProgressReportStage.Retrying, error: failure, attempt: 1, totalAttempts: 3});
+            throw new Error('Retry event must end this upstream attempt');
+        };
+        if (success) assert.equal(await downloadEditor(acquire, new SilentReporter()), 'verified editor fixture');
+        else await assert.rejects(downloadEditor(acquire, new SilentReporter()), error => error === failure);
+        assert.equal(attempts, success ? 2 : 3);
+        assert(children.every(child => child.exitCode === 2 && child.stdin!.destroyed));
+    }
+});
+test('editor download keeps non-retry errors and does not start more attempts', async () => {
+    const failure = new Error('invalid requested editor version'); let attempts = 0;
+    await assert.rejects(downloadEditor(async () => { ++attempts; throw failure; }, new SilentReporter()), error => error === failure);
+    assert.equal(attempts, 1);
+});
 
 test('literal workspace paths, spaces, no shell expansion', () => {
     assert.equal(resolveSetting('build/server space', '/project', path.posix), '/project/build/server space');

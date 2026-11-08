@@ -1,0 +1,148 @@
+{
+  "scope": "Unmodified hosted logs, metadata and diagnostic artifact ZIPs; all seven jobs individually reviewed. ZIP digests match GitHub metadata. Built editor VSIX artifact ZIPs are excluded with their metadata and original verified hashes retained.",
+  "archive": "original-ci.tar.gz",
+  "bytes": 13518213,
+  "sha256": "80d95289e3348798817439aaa395aa353d46dcd7b27e7ce2f49cc1e4bd1c06e6",
+  "files": [
+    {
+      "path": "excluded-editor-artifacts.json",
+      "bytes": 1159,
+      "sha256": "f2e2204bd43ebade06bf19236cd24f864a05d3d3a7bb52f8cb9b90264924e46c"
+    },
+    {
+      "path": "original-results.json",
+      "bytes": 27264,
+      "sha256": "45d41c3c87ca09ffd631cdc0cb3e71e26ebcc5fed26961d2ec798a92aaed1ede"
+    },
+    {
+      "path": "original/128625561148.log",
+      "bytes": 1044991,
+      "sha256": "9422859339d4611275969312790d23cb8551dc874b9d8c0e7c17106346a0052d"
+    },
+    {
+      "path": "original/128625561226.log",
+      "bytes": 7982209,
+      "sha256": "c65006f11cd2fcaf8686a7a9c01d8db283cb9843c7719acc8b2141db7ba0a40e"
+    },
+    {
+      "path": "original/128625561231.log",
+      "bytes": 7794517,
+      "sha256": "a2bdfaf1b04030102ad3b8b46c849c0c9064c4b079fa3f04381d7038d09e7338"
+    },
+    {
+      "path": "original/128625561266.log",
+      "bytes": 888751,
+      "sha256": "b09b5ce6ce4c21414d43026bd970640231209f1eaa6e249d5e0c38c2f045c51d"
+    },
+    {
+      "path": "original/128625561305.log",
+      "bytes": 7966802,
+      "sha256": "f35e8fe410c5d0218ab6c45f6966088f940dc101f5620c36d584946beae628bf"
+    },
+    {
+      "path": "original/128625561341.log",
+      "bytes": 7959110,
+      "sha256": "df95812fcd20c19ad1d8dbccb6a042312c2ae88e1d123f7c2918be01555c2b6b"
+    },
+    {
+      "path": "original/128625561458.log",
+      "bytes": 892435,
+      "sha256": "48cdc754da3bb5499059819fa0e1c71602163db11b76c6856ebd49b55cdc13cb"
+    },
+    {
+      "path": "original/13604449259.zip",
+      "bytes": 1351820,
+      "sha256": "d723e473aad75fdc97ef728f8acfe6078d0a745c0f27efb77f0e0831ac4d15eb"
+    },
+    {
+      "path": "original/13604614021.zip",
+      "bytes": 1374904,
+      "sha256": "4c5427da7eff67a239190f11282717cc003b1e7347a7d4848becd377dfb1ba12"
+    },
+    {
+      "path": "original/13604683816.zip",
+      "bytes": 275627,
+      "sha256": "a4c03b2124389b6f30342304e33bfe45c9f9f6a6143cd35ba07b133fb98d40a5"
+    },
+    {
+      "path": "original/13604849674.zip",
+      "bytes": 135883,
+      "sha256": "f6e7b2c0de3a819be064974d5a17d0ab2a953e7653839a6b38a5dd2b268bed6c"
+    },
+    {
+      "path": "original/13604889468.zip",
+      "bytes": 1108190,
+      "sha256": "88ff7f28567d16d54dc05adc907dc107e03cd0056e964112415bb02debbe3cb1"
+    },
+    {
+      "path": "original/13605101514.zip",
+      "bytes": 261770,
+      "sha256": "bcc93b0b47ec45a7713ad46925fed362a9876f39fc722263cb3aeb1c20f78cf2"
+    },
+    {
+      "path": "original/13605583299.zip",
+      "bytes": 1371391,
+      "sha256": "0118f394339e451bb72d3a69e0e2429bce2b7091f2ad857657a21aef7744d2dd"
+    },
+    {
+      "path": "original/13605782933.zip",
+      "bytes": 275636,
+      "sha256": "5d318d96235a5d35362d153a5be4616bd292fb55b528590918ba4721f44d48a6"
+    },
+    {
+      "path": "original/13606924660.zip",
+      "bytes": 136604,
+      "sha256": "4fcdc41502562eeb1994e300e9b60e1c2e70e440eb7be9712ea6e788182a18b6"
+    },
+    {
+      "path": "original/13607003864.zip",
+      "bytes": 1410776,
+      "sha256": "9190beb8bd5e67cbd4deef63c6bed53a4c0d20e351be07b717783c712ed7c7ee"
+    },
+    {
+      "path": "original/13607068675.zip",
+      "bytes": 308944,
+      "sha256": "305f191ae3a497092ce52fc4bc0c9ab7efb1368aaf19f06709694e082ea57b78"
+    },
+    {
+      "path": "original/13607586223.zip",
+      "bytes": 1108276,
+      "sha256": "f5160824a627f1e881348e21bd87a47c3041ade9adb9d247578ac4e8bb372cfd"
+    },
+    {
+      "path": "original/13613037384.zip",
+      "bytes": 308810,
+      "sha256": "d2c327c015f969b5fa0af94e880c5e6ce8325f52264bc2701cc59f924df6c379"
+    },
+    {
+      "path": "original/13613211823.zip",
+      "bytes": 1590254,
+      "sha256": "b165a06d3b8fc2bdbb140225a1075c37b66fcff6a620470d6e36346d8d1d1443"
+    },
+    {
+      "path": "original/artifacts.json",
+      "bytes": 13482,
+      "sha256": "b1c83d305f2afdc767234f2fce4d696428e90c6be463b08ba4a79595ca7b73a7"
+    },
+    {
+      "path": "original/jobs-latest.json",
+      "bytes": 86573,
+      "sha256": "77fb329c9404a28506046b18db4ba228ad4e4ec10044366407e60122060f27e9"
+    },
+    {
+      "path": "original/jobs.json",
+      "bytes": 54274,
+      "sha256": "0f7dba838ba662fc984bf6b1736ecc3f5d443f078fd97a9e78cc6db2cafc8bf9"
+    },
+    {
+      "path": "original/run-final.json",
+      "bytes": 12881,
+      "sha256": "7de76a5ed66c2b589a18e8316e5b1307bad29b538e5b395a82f33e1ff30f5ec5"
+    },
+    {
+      "path": "original/run.json",
+      "bytes": 12878,
+      "sha256": "cf391e17e42a5b8092abdafae8ffc2dc573c495206fa5bca3e8a324a63c51e33"
+    }
+  ]
+}

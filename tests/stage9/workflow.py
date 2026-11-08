@@ -1,6 +1,8 @@
 """Real host executables, automatic dispatch, transactional output and private install."""
 import os, pathlib, subprocess, sys, tempfile, time
 from windows_process import windows_application_path
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / 'tools'))
+from test_platform import relocate
 compiler=pathlib.Path(sys.argv[1]).resolve()
 build=pathlib.Path(sys.argv[2]).resolve()
 configuration=sys.argv[3]
@@ -235,7 +237,7 @@ with tempfile.TemporaryDirectory(prefix='VOID Stage9 é 🎮 # % ') as temporary
     # Real staged install, then relocation. Native config must use its own archives.
     prefix=root/'private install # % é'
     run(['cmake','--install',build,'--config',configuration,'--component','compiler','--prefix',prefix])
-    moved=root/'relocated # % é';prefix.rename(moved)
+    moved=root/'relocated # % é';relocate(prefix,moved)
     installed=moved/'bin'/compiler.name;config=installed.parent/'void-native.txt'
     lines=config.read_text(encoding='utf-8').splitlines()
     assert lines[3].startswith('../lib/void/') and lines[4].startswith('../lib/void/')

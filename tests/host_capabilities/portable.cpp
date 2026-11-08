@@ -9,6 +9,7 @@
 #include <stdexcept>
 #ifdef _WIN32
 #include "../../src/runtime/host_windows.hpp"
+#include <winioctl.h>
 #endif
 namespace fs=std::filesystem;
 using namespace vd::host;
@@ -32,6 +33,77 @@ std::shared_ptr<Object> child(const std::shared_ptr<Object>& parent,const char* 
  check(!result.kind && q.acquired,"private child");return q.acquired;
 }
 #ifdef _WIN32
+void server_descriptor_regressions() {
+ // Exact D:\ root descriptor from CI 42446206797. Never install it on a drive.
+ constexpr auto dacl=L"D:(A;OICI;FA;;;BA)(A;OICI;FA;;;SY)(A;OICIIO;GA;;;CO)(A;OICI;0x1200a9;;;BU)(A;CI;LC;;;BU)(A;CIIO;DC;;;BU)(A;;0x1200a9;;;WD)";
+ win::PrivateAccess access;
+ auto admitted=[&](const std::wstring& sddl,bool ancestor=true) {
+  PSECURITY_DESCRIPTOR raw=nullptr;
+  check(ConvertStringSecurityDescriptorToSecurityDescriptorW(sddl.c_str(),SDDL_REVISION_1,&raw,nullptr),"controlled descriptor parse");
+  struct Free {void* p;~Free(){LocalFree(p);}} memory{raw};
+  try {access.verify_descriptor(raw,ancestor);return true;}
+  catch(const std::system_error& e) {check(e.code().value()==ERROR_ACCESS_DENIED,"descriptor rejection code");return false;}
+ };
+ check(!admitted(std::wstring(L"O:NS")+dacl),"hosted Network Service owner rejected before ACE admission");
+ check(admitted(std::wstring(L"O:SY")+dacl),"same hosted ACEs with trusted owner admitted");
+ check(!admitted(std::wstring(L"O:SY")+dacl,false),"hosted descriptor is not a private leaf");
+ // Creating a new sibling alone cannot replace an existing checked object.
+ // Inherit-only grants are evaluated on the opened child, not this parent.
+ for(auto mask:{L"0x40",L"0x10000",L"0x40000",L"0x80000",L"0x100",L"0x10",L"GW",L"GA"}) {
+  check(!admitted(std::wstring(L"O:SYD:(A;;")+mask+L";;;BU)"),"untrusted ancestor mutation rejected");
+ }
+ check(admitted(L"O:SYD:(A;CIIO;GA;;;BU)"),"inherit-only does not grant parent access");
+ check(!admitted(L"O:SYD:(A;CI;GA;;;BU)"),"inherited child mutation is rejected when effective");
+ std::cout<<"Server descriptor: original owner NS rejected; owner-only SY correction admits identical ACEs\n";
+}
+int stage_executable(const char* source,const char* destination,const char* expected) {
+ // Explicit trusted test-caller staging, never an implicit process.start bypass.
+ // The caller approves a build artifact digest. Pin that regular source against
+ // writes/deletion, copy into an exclusive private capability, and rehash the
+ // held destination before it can be selected for process execution.
+ std::string_view digest(expected);
+ check(digest.size()==64 && digest.find_first_not_of("0123456789abcdef")==digest.npos,"approved image digest syntax");
+ auto path=win::absolute(source);
+ win::Handle input(CreateFileW(path.c_str(),GENERIC_READ,FILE_SHARE_READ,nullptr,OPEN_EXISTING,FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
+ if(input.value==INVALID_HANDLE_VALUE)win::fail();
+ auto before=win::information(input.value,false);
+ const auto size=(std::uint64_t(before.nFileSizeHigh)<<32)|before.nFileSizeLow;
+ check(size>0 && size<=256*1024*1024,"bounded staged image extent");
+ auto q=request(dir_create);q.texts={destination};auto r=directory_execute(q);
+ check(!r.kind && q.acquired,"exclusive trusted staging root");auto directory=q.acquired;
+ q=request(dir_file);q.objects={directory};q.texts={"child.exe"};q.numbers={1};r=directory_execute(q);
+ check(!r.kind && q.acquired_file,"exclusive private staged image");auto output=q.acquired_file;
+ auto hash_file=[&](bool copy) {
+  auto h=request(hash_open);check(!crypto_execute(h).kind && h.acquired,"staging hash acquisition");auto hash=h.acquired;
+  std::array<char,65536> buffer{};std::uint64_t offset=0;
+  while(offset<size) {
+   auto count=static_cast<DWORD>(std::min<std::uint64_t>(buffer.size(),size-offset));DWORD got=0;
+   if(copy) {if(!ReadFile(input.value,buffer.data(),count,&got,nullptr))win::fail();}
+   else {auto read=vd::filesystem::read_at(*output,offset,buffer.data(),count);check(read.error==vd::filesystem::ErrorKind::success,"staged image readback");got=static_cast<DWORD>(read.completed);}
+   check(got>0 && got<=count,"staging exact progress");
+   h=request(hash_update);h.objects={hash};h.bytes={std::string(buffer.data(),got)};check(!crypto_execute(h).kind,"staging digest update");
+   if(copy) {
+    vd::filesystem::Request write(vd::filesystem::Operation::write_bytes);write.file=output;write.bytes.assign(buffer.data(),got);
+    auto written=vd::filesystem::run(write);check(written.error==vd::filesystem::ErrorKind::success && written.completed==got,"staging exact write");
+   }
+   offset+=got;
+  }
+  h=request(hash_final);h.objects={hash};auto result=crypto_execute(h);
+  check(!result.kind && result.bytes==unhex(digest),"staged image matches caller-approved digest");check(!hash->close(),"staging hash cleanup");
+ };
+ hash_file(true);
+ auto after=win::information(input.value,false);
+ check(before.dwVolumeSerialNumber==after.dwVolumeSerialNumber && before.nFileIndexHigh==after.nFileIndexHigh && before.nFileIndexLow==after.nFileIndexLow &&
+       before.nFileSizeHigh==after.nFileSizeHigh && before.nFileSizeLow==after.nFileSizeLow &&
+       CompareFileTime(&before.ftLastWriteTime,&after.ftLastWriteTime)==0,"pinned source identity and extent unchanged");
+ vd::filesystem::Request flush(vd::filesystem::Operation::flush);flush.file=output;
+ check(vd::filesystem::run(flush).error==vd::filesystem::ErrorKind::success,"flush staged image");
+ check(vd::filesystem::private_mode(*output,true).error==vd::filesystem::ErrorKind::success,"private staged image mode");
+ hash_file(false);
+ check(vd::filesystem::close(*output).error==vd::filesystem::ErrorKind::success,"staged image cleanup");
+ check(!directory->close(),"staging directory cleanup");
+ std::cout<<"Staged approved image "<<digest<<" ("<<size<<" bytes)\n";return 0;
+}
 void owner_rights_ancestors(const fs::path& work,const fs::path& executable) {
  struct Local {void* value;~Local(){if(value)LocalFree(value);}};
  win::PrivateAccess access;LPWSTR owner_text=nullptr;
@@ -60,12 +132,54 @@ void owner_rights_ancestors(const fs::path& work,const fs::path& executable) {
    q=request(vd::host::wait);q.objects={process};r=process_execute(q);
    check(!r.kind && r.number==23,"OWNER_RIGHTS child status");check(!process->close(),"OWNER_RIGHTS process cleanup");
   } else check(r.kind==2 && r.code==ERROR_ACCESS_DENIED && !q.acquired,"untrusted working directory rejected");
+  // Apply the same hostile-parent condition to the executable, independently
+  // of cwd. The copy is a disposable fixture, never the runner's real root.
+  auto image=parent/L"child.exe";fs::copy_file(executable,image);
+  q=request(spawn);q.texts={text(image),text(work)};q.arrays={{"--exit"},{}};r=process_execute(q);
+  if(test.admitted) {
+   check(!r.kind && q.acquired,"trusted image ancestry admitted");auto process=q.acquired;
+   q=request(vd::host::wait);q.objects={process};r=process_execute(q);
+   check(!r.kind && r.number==23,"trusted image exact exit");check(!process->close(),"trusted image cleanup");
+  } else check(r.kind==2 && r.code==ERROR_ACCESS_DENIED && r.detail==4 && !q.acquired,"hostile image ancestry rejected before launch");
  }
+ // A junction needs no symlink privilege. Keep all changes in this fixture;
+ // never change the real drive root or runner security configuration.
+ auto junction=work/L"image-junction";check(fs::create_directory(junction),"junction fixture directory");
+ {
+  win::Handle held(CreateFileW(junction.c_str(),GENERIC_WRITE,0,nullptr,OPEN_EXISTING,FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
+  if(held.value==INVALID_HANDLE_VALUE)win::fail();
+  auto target=executable.parent_path().wstring(),substitute=L"\\??\\"+target;
+  struct Mount {DWORD tag;WORD length,reserved,substitute_offset,substitute_length,print_offset,print_length;};
+  static_assert(sizeof(Mount)==16);
+  auto names=substitute+L'\0'+target+L'\0';
+  std::vector<unsigned char> buffer(sizeof(Mount)+names.size()*sizeof(wchar_t));
+  auto* mount=reinterpret_cast<Mount*>(buffer.data());mount->tag=IO_REPARSE_TAG_MOUNT_POINT;
+  mount->length=static_cast<WORD>(buffer.size()-8);mount->substitute_length=static_cast<WORD>(substitute.size()*2);
+  mount->print_offset=static_cast<WORD>((substitute.size()+1)*2);mount->print_length=static_cast<WORD>(target.size()*2);
+  std::copy(names.begin(),names.end(),reinterpret_cast<wchar_t*>(buffer.data()+sizeof(Mount)));
+  DWORD returned=0;check(DeviceIoControl(held.value,FSCTL_SET_REPARSE_POINT,buffer.data(),static_cast<DWORD>(buffer.size()),nullptr,0,&returned,nullptr),"junction fixture creation");
+ }
+ auto q=request(spawn);q.texts={text(junction/executable.filename()),text(work)};q.arrays={{"--exit"},{}};auto r=process_execute(q);
+ check(r.kind==2 && r.code==ERROR_ACCESS_DENIED && r.detail==4 && !q.acquired,"reparse image ancestor rejected");
+ q=request(spawn);q.texts={text(executable),text(junction)};q.arrays={{"--exit"},{}};r=process_execute(q);
+ check(r.kind==2 && r.code==ERROR_ACCESS_DENIED && r.detail==5 && !q.acquired,"reparse working directory rejected");
+ check(fs::remove(junction),"junction fixture cleanup");
 }
 #endif
 }
 int portable_main(int argc,char** argv) {
  try {
+#ifdef _WIN32
+  if(argc==5 && std::string_view(argv[1])=="--stage-executable")return stage_executable(argv[2],argv[3],argv[4]);
+  if(argc==2 && std::string_view(argv[1])=="--server-descriptor") {server_descriptor_regressions();return 0;}
+  if(argc==2 && std::string_view(argv[1])=="--verify-stdio") {
+   for(DWORD selected:{STD_INPUT_HANDLE,STD_OUTPUT_HANDLE,STD_ERROR_HANDLE}) {
+    auto handle=GetStdHandle(selected);
+    if(!handle || handle==INVALID_HANDLE_VALUE || GetFileType(handle)==FILE_TYPE_UNKNOWN)return 98;
+   }
+   std::cout<<"child inherited stdout\n";std::cerr<<"child inherited stderr\n";return 23;
+  }
+#endif
   if(argc==2 && std::string_view(argv[1])=="--exit")return 23;
   if(argc==7 && std::string_view(argv[1])=="--verify-args") {
     bool valid=std::string_view(argv[2]).empty() && std::string_view(argv[3])=="two words" && std::string_view(argv[4])=="\"quote\"" && std::string_view(argv[5])=="tail\\" && std::string_view(argv[6])=="雪😀";
@@ -230,10 +344,16 @@ int portable_main(int argc,char** argv) {
   }
   check(!r.kind && q.acquired,"explicit child launch");auto process=q.acquired;
   q=request(vd::host::wait);q.objects={process};r=process_execute(q);check(!r.kind && r.number==23 && !r.flag,"child exact status");r=process_execute(q);check(!r.kind && r.number==23,"repeat wait");check(!process->close(),"child cleanup");
+#ifdef _WIN32
+  q=request(spawn);q.texts={std::string(executable8.begin(),executable8.end()),std::string(cwd8.begin(),cwd8.end())};q.arrays={{"--verify-stdio"},{}};r=process_execute(q);
+  check(!r.kind && q.acquired,"explicit standard handle launch");process=q.acquired;
+  q=request(vd::host::wait);q.objects={process};r=process_execute(q);check(!r.kind && r.number==23,"inherited standard handles available");check(!process->close(),"standard handle child cleanup");
+#endif
   q=request(spawn);q.texts={"relative",std::string(cwd8.begin(),cwd8.end())};q.arrays={{},{}};r=process_execute(q);check(r.kind!=0,"reject relative executable");
   auto arguments=vd::checked_application_arguments({"","two words","\"quote\"","tail\\","雪😀"});check(!arguments.error && arguments.values.size()==5,"owned Unicode arguments");
   check(vd::checked_application_arguments({std::string("a\0b",3)}).error!=0,"reject embedded NUL");
 #ifdef _WIN32
+  server_descriptor_regressions();
   wchar_t image[]=L"image",bad[]={static_cast<wchar_t>(0xd800),0};wchar_t* input[]={image,bad};
   check(vd::capture_application_arguments(2,input,true).error==4,"reject invalid UTF16");
   check(!win::component(L"CON.txt") && !win::component(L"file:stream") && !win::component(L"data. ") && !win::component(L"FOO~1"),"reject DOS aliases and streams");

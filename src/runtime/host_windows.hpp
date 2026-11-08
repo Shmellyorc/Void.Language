@@ -84,7 +84,17 @@ struct PrivateAccess {
         auto status=GetSecurityInfo(handle,SE_FILE_OBJECT,OWNER_SECURITY_INFORMATION|DACL_SECURITY_INFORMATION,&owner,nullptr,&dacl,nullptr,&raw);
         if(status!=ERROR_SUCCESS)fail(status);
         struct Free {void* p;~Free(){LocalFree(p);}} memory{raw};
-        if(!owner || !dacl || !IsValidAcl(dacl))fail(ERROR_ACCESS_DENIED);
+        verify_descriptor(raw,ancestor);
+    }
+    // The handle path and controlled descriptor regressions share one policy.
+    // This does not admit a descriptor as a filesystem capability.
+    void verify_descriptor(PSECURITY_DESCRIPTOR raw,bool ancestor=false) const {
+        PACL dacl=nullptr;PSID owner=nullptr;BOOL present=FALSE,defaulted=FALSE;
+        if(!raw || !IsValidSecurityDescriptor(raw) ||
+           !GetSecurityDescriptorOwner(raw,&owner,&defaulted) ||
+           !GetSecurityDescriptorDacl(raw,&present,&dacl,&defaulted) ||
+           !owner || !present || !dacl || !IsValidAcl(dacl))fail(ERROR_ACCESS_DENIED);
+        struct Free {void* p;~Free(){LocalFree(p);}};
         std::array<unsigned char,SECURITY_MAX_SID_SIZE> system{},admins{};DWORD a=system.size(),b=admins.size();
         if(!CreateWellKnownSid(WinLocalSystemSid,nullptr,system.data(),&a) || !CreateWellKnownSid(WinBuiltinAdministratorsSid,nullptr,admins.data(),&b))fail();
         PSID installer=nullptr;

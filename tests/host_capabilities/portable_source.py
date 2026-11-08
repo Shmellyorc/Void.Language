@@ -6,6 +6,7 @@ linked here; this test alone makes no claim that the checkout was inaccessible.
 from pathlib import Path
 import hashlib,json,os,sys,tempfile,zipfile
 import support as h
+from staged_child import stage_child
 compiler=Path(sys.argv[1]).resolve();child=Path(sys.argv[2]).resolve()
 source=h.ROOT/'tests/host_capabilities/smoke.void';records=[]
 def run(command,work,expected=None):
@@ -17,6 +18,7 @@ def run(command,work,expected=None):
 crypto='true\ntrue\ntrue\nba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\ntrue true\ntrue true\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\ntrue\nfalse\nfalse\ntrue\ntrue\nfalse\n'
 with tempfile.TemporaryDirectory(prefix='VOID portable source 雪 # % ') as folder:
  work=Path(folder).resolve();good=work/'package.zip';bad=work/'hostile.zip'
+ staging=[];child=stage_child(child,work,staging)
  with zipfile.ZipFile(good,'w',compression=zipfile.ZIP_DEFLATED) as bundle:bundle.writestr('data',b'abc')
  with zipfile.ZipFile(bad,'w') as bundle:bundle.writestr('../escape',b'bad')
  process_source=h.ROOT/'tests/host_capabilities/portable_process.void'
@@ -38,6 +40,7 @@ with tempfile.TemporaryDirectory(prefix='VOID portable source 雪 # % ') as fold
   for index,base in enumerate(([compiler,'run',filesystem_source,*flags,'--no-cache','--'],[filesystem_binary])):
    run([*base,work/('private-'+str(optimize)+'-'+str(index))],work,'true\ntrue\n7\n0\ntrue\ntrue\ntrue\n7\n7\ntrue\ntrue\ntrue\n')
  record={'platform':sys.platform,'compiler_sha256':hashlib.sha256(compiler.read_bytes()).hexdigest(),'hard_main_stack_bytes':1048576 if os.name!='nt' else None,'independently_linked_aot':True,'checkout_denied':False,'records':records}
+ record['staging']=staging
  destination=Path(os.environ.get('VOID_HOST_EVIDENCE_DIR',str(h.ROOT/'docs/voidup/evidence/portability')));destination.mkdir(parents=True,exist_ok=True)
  (destination/('portable-source-'+compiler.parent.name+'.json')).write_text(json.dumps(record,indent=2)+'\n')
 print(f'{len(records)} portable source invocations; normal/O2 JIT and independent AOT passed')

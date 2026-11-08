@@ -1,0 +1,464 @@
+diff --git a/editors/vscode/src/test/config.test.ts b/editors/vscode/src/test/config.test.ts
+index 1b820129..60062a67 100644
+--- a/editors/vscode/src/test/config.test.ts
++++ b/editors/vscode/src/test/config.test.ts
+@@ -4,6 +4,39 @@ import * as path from 'node:path';
+ import {promises as fs} from 'node:fs';
+ import * as os from 'node:os';
+ import {inside, resolveProject, resolveSetting, discoverServer} from '../config';
++import {spawn, ChildProcess} from 'node:child_process';
++import {once} from 'node:events';
++import {SilentReporter, ProgressReportStage, DownloadOptions} from '@vscode/test-electron';
++import {downloadEditor} from './download';
++
++test('editor download reaps failed extractors before retry, preserving failure', async () => {
++    for (const success of [true, false]) {
++        const children: ChildProcess[] = [];
++        const failure = new Error('controlled interrupted editor archive');
++        let attempts = 0;
++        const acquire = async (options: Partial<DownloadOptions>) => {
++            assert.equal(options.version, '1.141.0');
++            assert(children.every(child => child.exitCode === 2 && child.signalCode === null));
++            ++attempts;
++            if (success && attempts === 2) return 'verified editor fixture';
++            const child = spawn(process.execPath, ['-e', "process.stdin.resume(); process.stdin.on('end', () => process.exit(2));"], {stdio: 'pipe'});
++            children.push(child);
++            child.stdout!.resume(); child.stderr!.resume();
++            await once(child, 'spawn');
++            options.reporter!.report({stage: ProgressReportStage.Retrying, error: failure, attempt: 1, totalAttempts: 3});
++            throw new Error('Retry event must end this upstream attempt');
++        };
++        if (success) assert.equal(await downloadEditor(acquire, new SilentReporter()), 'verified editor fixture');
++        else await assert.rejects(downloadEditor(acquire, new SilentReporter()), error => error === failure);
++        assert.equal(attempts, success ? 2 : 3);
++        assert(children.every(child => child.exitCode === 2 && child.stdin!.destroyed));
++    }
++});
++test('editor download keeps non-retry errors and does not start more attempts', async () => {
++    const failure = new Error('invalid requested editor version'); let attempts = 0;
++    await assert.rejects(downloadEditor(async () => { ++attempts; throw failure; }, new SilentReporter()), error => error === failure);
++    assert.equal(attempts, 1);
++});
+ 
+ test('literal workspace paths, spaces, no shell expansion', () => {
+     assert.equal(resolveSetting('build/server space', '/project', path.posix), '/project/build/server space');
+diff --git a/editors/vscode/src/test/runHost.ts b/editors/vscode/src/test/runHost.ts
+index 73aed57a..ba0efd05 100644
+--- a/editors/vscode/src/test/runHost.ts
++++ b/editors/vscode/src/test/runHost.ts
+@@ -1,4 +1,5 @@
+-import {runTests, downloadAndUnzipVSCode} from '@vscode/test-electron';
++import {runTests} from '@vscode/test-electron';
++import {downloadEditor} from './download';
+ import {spawn} from 'node:child_process';
+ import {promises as fs} from 'node:fs';
+ import * as path from 'node:path';
+@@ -7,7 +8,7 @@ import * as os from 'node:os';
+ async function main(): Promise<void> {
+     if (!process.env.VOIDLS_PATH) throw new Error('Set VOIDLS_PATH to the built real voidls executable.');
+     const server = await fs.realpath(process.env.VOIDLS_PATH);
+-    const executable = process.env.VSCODE_EXECUTABLE_PATH ?? await downloadAndUnzipVSCode('1.141.0');
++    const executable = process.env.VSCODE_EXECUTABLE_PATH ?? await downloadEditor();
+     const temp = await fs.mkdtemp(path.join(os.tmpdir(), 'VOID editor é😀 '));
+     try {
+         const project = path.join(temp, 'project space # %'); await fs.mkdir(project);
+diff --git a/src/runtime/host_windows.hpp b/src/runtime/host_windows.hpp
+index 141f0341..37cdc60c 100644
+--- a/src/runtime/host_windows.hpp
++++ b/src/runtime/host_windows.hpp
+@@ -84,7 +84,17 @@ struct PrivateAccess {
+         auto status=GetSecurityInfo(handle,SE_FILE_OBJECT,OWNER_SECURITY_INFORMATION|DACL_SECURITY_INFORMATION,&owner,nullptr,&dacl,nullptr,&raw);
+         if(status!=ERROR_SUCCESS)fail(status);
+         struct Free {void* p;~Free(){LocalFree(p);}} memory{raw};
+-        if(!owner || !dacl || !IsValidAcl(dacl))fail(ERROR_ACCESS_DENIED);
++        verify_descriptor(raw,ancestor);
++    }
++    // The handle path and controlled descriptor regressions share one policy.
++    // This does not admit a descriptor as a filesystem capability.
++    void verify_descriptor(PSECURITY_DESCRIPTOR raw,bool ancestor=false) const {
++        PACL dacl=nullptr;PSID owner=nullptr;BOOL present=FALSE,defaulted=FALSE;
++        if(!raw || !IsValidSecurityDescriptor(raw) ||
++           !GetSecurityDescriptorOwner(raw,&owner,&defaulted) ||
++           !GetSecurityDescriptorDacl(raw,&present,&dacl,&defaulted) ||
++           !owner || !present || !dacl || !IsValidAcl(dacl))fail(ERROR_ACCESS_DENIED);
++        struct Free {void* p;~Free(){LocalFree(p);}};
+         std::array<unsigned char,SECURITY_MAX_SID_SIZE> system{},admins{};DWORD a=system.size(),b=admins.size();
+         if(!CreateWellKnownSid(WinLocalSystemSid,nullptr,system.data(),&a) || !CreateWellKnownSid(WinBuiltinAdministratorsSid,nullptr,admins.data(),&b))fail();
+         PSID installer=nullptr;
+diff --git a/tests/cli/install.py b/tests/cli/install.py
+index a46c65d1..7c2eb433 100644
+--- a/tests/cli/install.py
++++ b/tests/cli/install.py
+@@ -8,6 +8,7 @@ import tempfile
+ ROOT = Path(__file__).resolve().parents[2]
+ sys.path.insert(0, str(ROOT / 'tools'))
+ from verify_install import HELLO, verify
++from test_platform import relocate
+ 
+ cmake, build, configuration = sys.argv[1:]
+ environment = os.environ.copy()
+@@ -26,7 +27,7 @@ with tempfile.TemporaryDirectory(prefix='VOID CLI installation é ') as director
+     for component in ('compiler', 'tooling'):
+         run([cmake, '--install', build, '--prefix', initial, '--config', configuration, '--component', component])
+     prefix = root / 'after move 雪'
+-    initial.rename(prefix)
++    relocate(initial, prefix)
+     expected = {path.relative_to(ROOT / 'stdlib'): path.read_bytes() for path in (ROOT / 'stdlib').rglob('*.void')}
+     actual = {path.relative_to(prefix / 'share/void/stdlib'): path.read_bytes() for path in (prefix / 'share/void/stdlib').rglob('*.void')}
+     assert expected == actual and expected
+diff --git a/tests/host_capabilities/portable.cpp b/tests/host_capabilities/portable.cpp
+index 75731e16..90d23723 100644
+--- a/tests/host_capabilities/portable.cpp
++++ b/tests/host_capabilities/portable.cpp
+@@ -9,6 +9,7 @@
+ #include <stdexcept>
+ #ifdef _WIN32
+ #include "../../src/runtime/host_windows.hpp"
++#include <winioctl.h>
+ #endif
+ namespace fs=std::filesystem;
+ using namespace vd::host;
+@@ -32,6 +33,77 @@ std::shared_ptr<Object> child(const std::shared_ptr<Object>& parent,const char*
+  check(!result.kind && q.acquired,"private child");return q.acquired;
+ }
+ #ifdef _WIN32
++void server_descriptor_regressions() {
++ // Exact D:\ root descriptor from CI 42446206797. Never install it on a drive.
++ constexpr auto dacl=L"D:(A;OICI;FA;;;BA)(A;OICI;FA;;;SY)(A;OICIIO;GA;;;CO)(A;OICI;0x1200a9;;;BU)(A;CI;LC;;;BU)(A;CIIO;DC;;;BU)(A;;0x1200a9;;;WD)";
++ win::PrivateAccess access;
++ auto admitted=[&](const std::wstring& sddl,bool ancestor=true) {
++  PSECURITY_DESCRIPTOR raw=nullptr;
++  check(ConvertStringSecurityDescriptorToSecurityDescriptorW(sddl.c_str(),SDDL_REVISION_1,&raw,nullptr),"controlled descriptor parse");
++  struct Free {void* p;~Free(){LocalFree(p);}} memory{raw};
++  try {access.verify_descriptor(raw,ancestor);return true;}
++  catch(const std::system_error& e) {check(e.code().value()==ERROR_ACCESS_DENIED,"descriptor rejection code");return false;}
++ };
++ check(!admitted(std::wstring(L"O:NS")+dacl),"hosted Network Service owner rejected before ACE admission");
++ check(admitted(std::wstring(L"O:SY")+dacl),"same hosted ACEs with trusted owner admitted");
++ check(!admitted(std::wstring(L"O:SY")+dacl,false),"hosted descriptor is not a private leaf");
++ // Creating a new sibling alone cannot replace an existing checked object.
++ // Inherit-only grants are evaluated on the opened child, not this parent.
++ for(auto mask:{L"0x40",L"0x10000",L"0x40000",L"0x80000",L"0x100",L"0x10",L"GW",L"GA"}) {
++  check(!admitted(std::wstring(L"O:SYD:(A;;")+mask+L";;;BU)"),"untrusted ancestor mutation rejected");
++ }
++ check(admitted(L"O:SYD:(A;CIIO;GA;;;BU)"),"inherit-only does not grant parent access");
++ check(!admitted(L"O:SYD:(A;CI;GA;;;BU)"),"inherited child mutation is rejected when effective");
++ std::cout<<"Server descriptor: original owner NS rejected; owner-only SY correction admits identical ACEs\n";
++}
++int stage_executable(const char* source,const char* destination,const char* expected) {
++ // Explicit trusted test-caller staging, never an implicit process.start bypass.
++ // The caller approves a build artifact digest. Pin that regular source against
++ // writes/deletion, copy into an exclusive private capability, and rehash the
++ // held destination before it can be selected for process execution.
++ std::string_view digest(expected);
++ check(digest.size()==64 && digest.find_first_not_of("0123456789abcdef")==digest.npos,"approved image digest syntax");
++ auto path=win::absolute(source);
++ win::Handle input(CreateFileW(path.c_str(),GENERIC_READ,FILE_SHARE_READ,nullptr,OPEN_EXISTING,FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
++ if(input.value==INVALID_HANDLE_VALUE)win::fail();
++ auto before=win::information(input.value,false);
++ const auto size=(std::uint64_t(before.nFileSizeHigh)<<32)|before.nFileSizeLow;
++ check(size>0 && size<=256*1024*1024,"bounded staged image extent");
++ auto q=request(dir_create);q.texts={destination};auto r=directory_execute(q);
++ check(!r.kind && q.acquired,"exclusive trusted staging root");auto directory=q.acquired;
++ q=request(dir_file);q.objects={directory};q.texts={"child.exe"};q.numbers={1};r=directory_execute(q);
++ check(!r.kind && q.acquired_file,"exclusive private staged image");auto output=q.acquired_file;
++ auto hash_file=[&](bool copy) {
++  auto h=request(hash_open);check(!crypto_execute(h).kind && h.acquired,"staging hash acquisition");auto hash=h.acquired;
++  std::array<char,65536> buffer{};std::uint64_t offset=0;
++  while(offset<size) {
++   auto count=static_cast<DWORD>(std::min<std::uint64_t>(buffer.size(),size-offset));DWORD got=0;
++   if(copy) {if(!ReadFile(input.value,buffer.data(),count,&got,nullptr))win::fail();}
++   else {auto read=vd::filesystem::read_at(*output,offset,buffer.data(),count);check(read.error==vd::filesystem::ErrorKind::success,"staged image readback");got=static_cast<DWORD>(read.completed);}
++   check(got>0 && got<=count,"staging exact progress");
++   h=request(hash_update);h.objects={hash};h.bytes={std::string(buffer.data(),got)};check(!crypto_execute(h).kind,"staging digest update");
++   if(copy) {
++    vd::filesystem::Request write(vd::filesystem::Operation::write_bytes);write.file=output;write.bytes.assign(buffer.data(),got);
++    auto written=vd::filesystem::run(write);check(written.error==vd::filesystem::ErrorKind::success && written.completed==got,"staging exact write");
++   }
++   offset+=got;
++  }
++  h=request(hash_final);h.objects={hash};auto result=crypto_execute(h);
++  check(!result.kind && result.bytes==unhex(digest),"staged image matches caller-approved digest");check(!hash->close(),"staging hash cleanup");
++ };
++ hash_file(true);
++ auto after=win::information(input.value,false);
++ check(before.dwVolumeSerialNumber==after.dwVolumeSerialNumber && before.nFileIndexHigh==after.nFileIndexHigh && before.nFileIndexLow==after.nFileIndexLow &&
++       before.nFileSizeHigh==after.nFileSizeHigh && before.nFileSizeLow==after.nFileSizeLow &&
++       CompareFileTime(&before.ftLastWriteTime,&after.ftLastWriteTime)==0,"pinned source identity and extent unchanged");
++ vd::filesystem::Request flush(vd::filesystem::Operation::flush);flush.file=output;
++ check(vd::filesystem::run(flush).error==vd::filesystem::ErrorKind::success,"flush staged image");
++ check(vd::filesystem::private_mode(*output,true).error==vd::filesystem::ErrorKind::success,"private staged image mode");
++ hash_file(false);
++ check(vd::filesystem::close(*output).error==vd::filesystem::ErrorKind::success,"staged image cleanup");
++ check(!directory->close(),"staging directory cleanup");
++ std::cout<<"Staged approved image "<<digest<<" ("<<size<<" bytes)\n";return 0;
++}
+ void owner_rights_ancestors(const fs::path& work,const fs::path& executable) {
+  struct Local {void* value;~Local(){if(value)LocalFree(value);}};
+  win::PrivateAccess access;LPWSTR owner_text=nullptr;
+@@ -60,12 +132,54 @@ void owner_rights_ancestors(const fs::path& work,const fs::path& executable) {
+    q=request(vd::host::wait);q.objects={process};r=process_execute(q);
+    check(!r.kind && r.number==23,"OWNER_RIGHTS child status");check(!process->close(),"OWNER_RIGHTS process cleanup");
+   } else check(r.kind==2 && r.code==ERROR_ACCESS_DENIED && !q.acquired,"untrusted working directory rejected");
++  // Apply the same hostile-parent condition to the executable, independently
++  // of cwd. The copy is a disposable fixture, never the runner's real root.
++  auto image=parent/L"child.exe";fs::copy_file(executable,image);
++  q=request(spawn);q.texts={text(image),text(work)};q.arrays={{"--exit"},{}};r=process_execute(q);
++  if(test.admitted) {
++   check(!r.kind && q.acquired,"trusted image ancestry admitted");auto process=q.acquired;
++   q=request(vd::host::wait);q.objects={process};r=process_execute(q);
++   check(!r.kind && r.number==23,"trusted image exact exit");check(!process->close(),"trusted image cleanup");
++  } else check(r.kind==2 && r.code==ERROR_ACCESS_DENIED && r.detail==4 && !q.acquired,"hostile image ancestry rejected before launch");
++ }
++ // A junction needs no symlink privilege. Keep all changes in this fixture;
++ // never change the real drive root or runner security configuration.
++ auto junction=work/L"image-junction";check(fs::create_directory(junction),"junction fixture directory");
++ {
++  win::Handle held(CreateFileW(junction.c_str(),GENERIC_WRITE,0,nullptr,OPEN_EXISTING,FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
++  if(held.value==INVALID_HANDLE_VALUE)win::fail();
++  auto target=executable.parent_path().wstring(),substitute=L"\\??\\"+target;
++  struct Mount {DWORD tag;WORD length,reserved,substitute_offset,substitute_length,print_offset,print_length;};
++  static_assert(sizeof(Mount)==16);
++  auto names=substitute+L'\0'+target+L'\0';
++  std::vector<unsigned char> buffer(sizeof(Mount)+names.size()*sizeof(wchar_t));
++  auto* mount=reinterpret_cast<Mount*>(buffer.data());mount->tag=IO_REPARSE_TAG_MOUNT_POINT;
++  mount->length=static_cast<WORD>(buffer.size()-8);mount->substitute_length=static_cast<WORD>(substitute.size()*2);
++  mount->print_offset=static_cast<WORD>((substitute.size()+1)*2);mount->print_length=static_cast<WORD>(target.size()*2);
++  std::copy(names.begin(),names.end(),reinterpret_cast<wchar_t*>(buffer.data()+sizeof(Mount)));
++  DWORD returned=0;check(DeviceIoControl(held.value,FSCTL_SET_REPARSE_POINT,buffer.data(),static_cast<DWORD>(buffer.size()),nullptr,0,&returned,nullptr),"junction fixture creation");
+  }
++ auto q=request(spawn);q.texts={text(junction/executable.filename()),text(work)};q.arrays={{"--exit"},{}};auto r=process_execute(q);
++ check(r.kind==2 && r.code==ERROR_ACCESS_DENIED && r.detail==4 && !q.acquired,"reparse image ancestor rejected");
++ q=request(spawn);q.texts={text(executable),text(junction)};q.arrays={{"--exit"},{}};r=process_execute(q);
++ check(r.kind==2 && r.code==ERROR_ACCESS_DENIED && r.detail==5 && !q.acquired,"reparse working directory rejected");
++ check(fs::remove(junction),"junction fixture cleanup");
+ }
+ #endif
+ }
+ int portable_main(int argc,char** argv) {
+  try {
++#ifdef _WIN32
++  if(argc==5 && std::string_view(argv[1])=="--stage-executable")return stage_executable(argv[2],argv[3],argv[4]);
++  if(argc==2 && std::string_view(argv[1])=="--server-descriptor") {server_descriptor_regressions();return 0;}
++  if(argc==2 && std::string_view(argv[1])=="--verify-stdio") {
++   for(DWORD selected:{STD_INPUT_HANDLE,STD_OUTPUT_HANDLE,STD_ERROR_HANDLE}) {
++    auto handle=GetStdHandle(selected);
++    if(!handle || handle==INVALID_HANDLE_VALUE || GetFileType(handle)==FILE_TYPE_UNKNOWN)return 98;
++   }
++   std::cout<<"child inherited stdout\n";std::cerr<<"child inherited stderr\n";return 23;
++  }
++#endif
+   if(argc==2 && std::string_view(argv[1])=="--exit")return 23;
+   if(argc==7 && std::string_view(argv[1])=="--verify-args") {
+     bool valid=std::string_view(argv[2]).empty() && std::string_view(argv[3])=="two words" && std::string_view(argv[4])=="\"quote\"" && std::string_view(argv[5])=="tail\\" && std::string_view(argv[6])=="雪😀";
+@@ -230,10 +344,16 @@ int portable_main(int argc,char** argv) {
+   }
+   check(!r.kind && q.acquired,"explicit child launch");auto process=q.acquired;
+   q=request(vd::host::wait);q.objects={process};r=process_execute(q);check(!r.kind && r.number==23 && !r.flag,"child exact status");r=process_execute(q);check(!r.kind && r.number==23,"repeat wait");check(!process->close(),"child cleanup");
++#ifdef _WIN32
++  q=request(spawn);q.texts={std::string(executable8.begin(),executable8.end()),std::string(cwd8.begin(),cwd8.end())};q.arrays={{"--verify-stdio"},{}};r=process_execute(q);
++  check(!r.kind && q.acquired,"explicit standard handle launch");process=q.acquired;
++  q=request(vd::host::wait);q.objects={process};r=process_execute(q);check(!r.kind && r.number==23,"inherited standard handles available");check(!process->close(),"standard handle child cleanup");
++#endif
+   q=request(spawn);q.texts={"relative",std::string(cwd8.begin(),cwd8.end())};q.arrays={{},{}};r=process_execute(q);check(r.kind!=0,"reject relative executable");
+   auto arguments=vd::checked_application_arguments({"","two words","\"quote\"","tail\\","雪😀"});check(!arguments.error && arguments.values.size()==5,"owned Unicode arguments");
+   check(vd::checked_application_arguments({std::string("a\0b",3)}).error!=0,"reject embedded NUL");
+ #ifdef _WIN32
++  server_descriptor_regressions();
+   wchar_t image[]=L"image",bad[]={static_cast<wchar_t>(0xd800),0};wchar_t* input[]={image,bad};
+   check(vd::capture_application_arguments(2,input,true).error==4,"reject invalid UTF16");
+   check(!win::component(L"CON.txt") && !win::component(L"file:stream") && !win::component(L"data. ") && !win::component(L"FOO~1"),"reject DOS aliases and streams");
+diff --git a/tests/host_capabilities/portable.py b/tests/host_capabilities/portable.py
+index a8a087f9..4150df0d 100644
+--- a/tests/host_capabilities/portable.py
++++ b/tests/host_capabilities/portable.py
+@@ -3,15 +3,21 @@ from pathlib import Path
+ import hashlib,json,os,platform,subprocess,sys,tempfile,zipfile
+ sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'tools'))
+ from test_platform import small_stack
++from staged_child import stage_child
+ exe=Path(sys.argv[1]).resolve()
+ root=Path(__file__).resolve().parents[2]
+ with tempfile.TemporaryDirectory(prefix='VOID portable 雪 # % ') as directory:
+  work=Path(directory).resolve()
+  with zipfile.ZipFile(work/'package.zip','w',compression=zipfile.ZIP_DEFLATED) as bundle:bundle.writestr('data',b'abc')
+  with zipfile.ZipFile(work/'hostile.zip','w') as bundle:bundle.writestr('../escape',b'bad')
+- command=[str(exe),str(work),str(exe)]
++ staging=[];child=stage_child(exe,work,staging)
++ command=[str(exe),str(work),str(child)]
+  result=subprocess.run(command,cwd=work,capture_output=True,preexec_fn=small_stack if os.name!='nt' else None,timeout=120)
+  record={'platform':platform.platform(),'command':command,'status':result.returncode,'stdout':result.stdout.decode(errors='replace'),'stderr':result.stderr.decode(errors='replace'),'sha256':hashlib.sha256(exe.read_bytes()).hexdigest(),'hard_main_stack_bytes':1048576 if os.name!='nt' else None}
++ record['staging']=staging
+  out=Path(os.environ.get('VOID_HOST_EVIDENCE_DIR',str(root/'docs/voidup/evidence/portability')))/('portable-'+exe.parent.name+'.json');out.parent.mkdir(parents=True,exist_ok=True);out.write_text(json.dumps(record,indent=2)+'\n')
+  assert result.returncode==0,record
++ if os.name=='nt':
++  assert 'child inherited stdout' in record['stdout'].splitlines(),record
++  assert 'child inherited stderr' in record['stderr'].splitlines(),record
+  print(record['stdout'],end='')
+diff --git a/tests/host_capabilities/portable_source.py b/tests/host_capabilities/portable_source.py
+index 907739bb..c5532cdb 100644
+--- a/tests/host_capabilities/portable_source.py
++++ b/tests/host_capabilities/portable_source.py
+@@ -6,6 +6,7 @@ linked here; this test alone makes no claim that the checkout was inaccessible.
+ from pathlib import Path
+ import hashlib,json,os,sys,tempfile,zipfile
+ import support as h
++from staged_child import stage_child
+ compiler=Path(sys.argv[1]).resolve();child=Path(sys.argv[2]).resolve()
+ source=h.ROOT/'tests/host_capabilities/smoke.void';records=[]
+ def run(command,work,expected=None):
+@@ -17,6 +18,7 @@ def run(command,work,expected=None):
+ crypto='true\ntrue\ntrue\nba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\ntrue true\ntrue true\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\ntrue\nfalse\nfalse\ntrue\ntrue\nfalse\n'
+ with tempfile.TemporaryDirectory(prefix='VOID portable source 雪 # % ') as folder:
+  work=Path(folder).resolve();good=work/'package.zip';bad=work/'hostile.zip'
++ staging=[];child=stage_child(child,work,staging)
+  with zipfile.ZipFile(good,'w',compression=zipfile.ZIP_DEFLATED) as bundle:bundle.writestr('data',b'abc')
+  with zipfile.ZipFile(bad,'w') as bundle:bundle.writestr('../escape',b'bad')
+  process_source=h.ROOT/'tests/host_capabilities/portable_process.void'
+@@ -38,6 +40,7 @@ with tempfile.TemporaryDirectory(prefix='VOID portable source 雪 # % ') as fold
+   for index,base in enumerate(([compiler,'run',filesystem_source,*flags,'--no-cache','--'],[filesystem_binary])):
+    run([*base,work/('private-'+str(optimize)+'-'+str(index))],work,'true\ntrue\n7\n0\ntrue\ntrue\ntrue\n7\n7\ntrue\ntrue\ntrue\n')
+  record={'platform':sys.platform,'compiler_sha256':hashlib.sha256(compiler.read_bytes()).hexdigest(),'hard_main_stack_bytes':1048576 if os.name!='nt' else None,'independently_linked_aot':True,'checkout_denied':False,'records':records}
++ record['staging']=staging
+  destination=Path(os.environ.get('VOID_HOST_EVIDENCE_DIR',str(h.ROOT/'docs/voidup/evidence/portability')));destination.mkdir(parents=True,exist_ok=True)
+  (destination/('portable-source-'+compiler.parent.name+'.json')).write_text(json.dumps(record,indent=2)+'\n')
+ print(f'{len(records)} portable source invocations; normal/O2 JIT and independent AOT passed')
+diff --git a/tests/stage9/workflow.py b/tests/stage9/workflow.py
+index e0f97543..91c670db 100644
+--- a/tests/stage9/workflow.py
++++ b/tests/stage9/workflow.py
+@@ -1,6 +1,8 @@
+ """Real host executables, automatic dispatch, transactional output and private install."""
+ import os, pathlib, subprocess, sys, tempfile, time
+ from windows_process import windows_application_path
++sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / 'tools'))
++from test_platform import relocate
+ compiler=pathlib.Path(sys.argv[1]).resolve()
+ build=pathlib.Path(sys.argv[2]).resolve()
+ configuration=sys.argv[3]
+@@ -235,7 +237,7 @@ with tempfile.TemporaryDirectory(prefix='VOID Stage9 é 🎮 # % ') as temporary
+     # Real staged install, then relocation. Native config must use its own archives.
+     prefix=root/'private install # % é'
+     run(['cmake','--install',build,'--config',configuration,'--component','compiler','--prefix',prefix])
+-    moved=root/'relocated # % é';prefix.rename(moved)
++    moved=root/'relocated # % é';relocate(prefix,moved)
+     installed=moved/'bin'/compiler.name;config=installed.parent/'void-native.txt'
+     lines=config.read_text(encoding='utf-8').splitlines()
+     assert lines[3].startswith('../lib/void/') and lines[4].startswith('../lib/void/')
+diff --git a/tools/test_platform.py b/tools/test_platform.py
+index d38d222a..ddc6d84c 100644
+--- a/tools/test_platform.py
++++ b/tools/test_platform.py
+@@ -2,6 +2,23 @@
+ import os
+ import json
+ from pathlib import Path
++import time
++
++
++def relocate(source, target):
++    """Require a real fixture rename, with bounded Windows sharing retries."""
++    deadline = time.monotonic() + 2
++    attempt = 0
++    while True:
++        try:
++            source.rename(target)
++            return
++        except OSError as error:
++            if os.name != 'nt' or error.winerror not in (5, 32) or time.monotonic() >= deadline:
++                raise
++            attempt += 1
++            print(f'Windows installation relocation denied: native={error.winerror}; retry={attempt}', flush=True)
++            time.sleep(0.05)
+ 
+ 
+ def native_manifest(compiler):
+diff --git a/tests/host_capabilities/staged_child.py b/tests/host_capabilities/staged_child.py
+new file mode 100644
+index 00000000..bb4a4736
+--- /dev/null
++++ b/tests/host_capabilities/staged_child.py
+@@ -0,0 +1,29 @@
++"""Explicit Windows test-caller approval of a private executable copy.
++
++The build artifact may live on a runner volume owned by Network Service. That
++volume is deliberately outside process.start's trusted ancestry contract. The
++native fixture pins and hashes the approved bytes into an exclusive directory
++created by the existing private-directory provider on the trusted temp volume.
++"""
++from pathlib import Path
++import hashlib,os,subprocess
++
++def stage_child(executable,work,records):
++ if os.name!='nt':return executable
++ executable=Path(executable);digest=hashlib.sha256(executable.read_bytes()).hexdigest()
++ destination=work/'approved-child'
++ def stage(target,expected,success,error=None):
++  command=[str(executable),'--stage-executable',str(executable),str(target),expected]
++  result=subprocess.run(command,capture_output=True,timeout=120,cwd=work)
++  record={'command':command,'status':result.returncode,'stdout':result.stdout.decode(errors='replace'),'stderr':result.stderr.decode(errors='replace'),'expected_success':success}
++  records.append(record)
++  assert (result.returncode==0)==success,record
++  if error is not None:assert error in record['stderr'],record
++ stage(work/'wrong-digest-child','0'*64,False,'staged image matches caller-approved digest')
++ stage(destination,digest,True)
++ child=destination/'child.exe'
++ assert hashlib.sha256(child.read_bytes()).hexdigest()==digest
++ stage(destination,digest,False,'exclusive trusted staging root') # Never replace an existing root/image.
++ assert hashlib.sha256(child.read_bytes()).hexdigest()==digest
++ records.append({'approved_source':str(executable),'staged_image':str(child),'sha256':digest,'source_bytes':executable.stat().st_size})
++ return child
+diff --git a/editors/vscode/src/test/download.ts b/editors/vscode/src/test/download.ts
+new file mode 100644
+index 00000000..981afbc9
+--- /dev/null
++++ b/editors/vscode/src/test/download.ts
+@@ -0,0 +1,48 @@
++import {ChildProcess} from 'node:child_process';
++import {channel} from 'node:diagnostics_channel';
++import {downloadAndUnzipVSCode, DownloadOptions, makeConsoleReporter, ProgressReporter, ProgressReportStage} from '@vscode/test-electron';
++
++// test-electron 3.1.0 leaves the tar input open after a failed stream. Finish
++// each owned extractor before its retry can remove/reuse the extraction tree.
++// The upstream downloader still checks the archive and chooses the executable.
++export async function downloadEditor(
++    acquire: (options: Partial<DownloadOptions>) => Promise<string> = options => downloadAndUnzipVSCode(options),
++    reporter?: ProgressReporter,
++): Promise<string> {
++    const output = reporter ?? await makeConsoleReporter();
++    const processes = channel('child_process');
++    for (let attempt = 0; attempt < 3; ++attempt) {
++        const owned = new Map<ChildProcess, Promise<void>>();
++        const track = (message: unknown) => {
++            const child = (message as {process: ChildProcess}).process;
++            owned.set(child, new Promise(resolve => child.once('close', () => resolve())));
++        };
++        let retry: Error | undefined;
++        processes.subscribe(track);
++        try {
++            return await acquire({version: '1.141.0', reporter: {
++                report(event) {
++                    if (event.stage === ProgressReportStage.Retrying) {
++                        retry = event.error;
++                        throw retry; // Delay the retry until owned pipes/processes close.
++                    }
++                    output.report(event);
++                },
++                error(error) { output.error(error); },
++            }});
++        } catch (error) {
++            if (error !== retry || attempt === 2) throw error;
++            output.report({stage: ProgressReportStage.Retrying, error: retry!, attempt: attempt + 1, totalAttempts: 3});
++        } finally {
++            processes.unsubscribe(track);
++            for (const child of owned.keys()) {
++                if (child.exitCode === null && child.signalCode === null) {
++                    child.stdin?.on('error', error => output.error(error));
++                    child.stdin?.destroy();
++                }
++            }
++            await Promise.all(owned.values());
++        }
++    }
++    throw new Error('Editor download attempts exhausted');
++}

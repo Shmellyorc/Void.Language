@@ -8,6 +8,7 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))
 from verify_install import HELLO, verify
+from test_platform import relocate
 
 cmake, build, configuration = sys.argv[1:]
 environment = os.environ.copy()
@@ -26,7 +27,7 @@ with tempfile.TemporaryDirectory(prefix='VOID CLI installation é ') as director
     for component in ('compiler', 'tooling'):
         run([cmake, '--install', build, '--prefix', initial, '--config', configuration, '--component', component])
     prefix = root / 'after move 雪'
-    initial.rename(prefix)
+    relocate(initial, prefix)
     expected = {path.relative_to(ROOT / 'stdlib'): path.read_bytes() for path in (ROOT / 'stdlib').rglob('*.void')}
     actual = {path.relative_to(prefix / 'share/void/stdlib'): path.read_bytes() for path in (prefix / 'share/void/stdlib').rglob('*.void')}
     assert expected == actual and expected

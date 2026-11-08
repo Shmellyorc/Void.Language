@@ -2,6 +2,23 @@
 import os
 import json
 from pathlib import Path
+import time
+
+
+def relocate(source, target):
+    """Require a real fixture rename, with bounded Windows sharing retries."""
+    deadline = time.monotonic() + 2
+    attempt = 0
+    while True:
+        try:
+            source.rename(target)
+            return
+        except OSError as error:
+            if os.name != 'nt' or error.winerror not in (5, 32) or time.monotonic() >= deadline:
+                raise
+            attempt += 1
+            print(f'Windows installation relocation denied: native={error.winerror}; retry={attempt}', flush=True)
+            time.sleep(0.05)
 
 
 def native_manifest(compiler):

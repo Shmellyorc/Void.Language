@@ -1,4 +1,5 @@
-import {runTests, downloadAndUnzipVSCode} from '@vscode/test-electron';
+import {runTests} from '@vscode/test-electron';
+import {downloadEditor} from './download';
 import {spawn} from 'node:child_process';
 import {promises as fs} from 'node:fs';
 import * as path from 'node:path';
@@ -7,7 +8,7 @@ import * as os from 'node:os';
 async function main(): Promise<void> {
     if (!process.env.VOIDLS_PATH) throw new Error('Set VOIDLS_PATH to the built real voidls executable.');
     const server = await fs.realpath(process.env.VOIDLS_PATH);
-    const executable = process.env.VSCODE_EXECUTABLE_PATH ?? await downloadAndUnzipVSCode('1.141.0');
+    const executable = process.env.VSCODE_EXECUTABLE_PATH ?? await downloadEditor();
     const temp = await fs.mkdtemp(path.join(os.tmpdir(), 'VOID editor é😀 '));
     try {
         const project = path.join(temp, 'project space # %'); await fs.mkdir(project);
