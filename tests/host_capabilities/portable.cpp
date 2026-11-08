@@ -164,7 +164,71 @@ int portable_main(int argc,char** argv) {
   check(!fresh_alias->close() && !impostor->close() && !source_alias->close() && !target_alias->close() && !destination->close() && !collision->close() && !stage->close() && !directory->close(),"directory cleanup");
   auto executable8=executable.u8string(),cwd8=work.u8string();
   q=request(spawn);q.texts={std::string(executable8.begin(),executable8.end()),std::string(cwd8.begin(),cwd8.end())};q.arrays={{"--exit"},{"VOID_CHILD=owned"}};
-  r=process_execute(q);check(!r.kind && q.acquired,"explicit child launch");auto process=q.acquired;
+  r=process_execute(q);
+  if(r.kind) {
+   std::cerr<<"explicit child launch: kind="<<r.kind<<" code="<<r.code<<" stage="<<r.detail<<"\n";
+#ifdef _WIN32
+   // Read-only failure evidence; never launch a child outside the checked API.
+   win::PrivateAccess access;
+   auto inspect=[&](const char* stage,const std::wstring& path,DWORD rights,bool ancestry) {
+    win::Handle held(CreateFileW(path.c_str(),rights,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
+      nullptr,OPEN_EXISTING,FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
+    if(held.value==INVALID_HANDLE_VALUE){std::cerr<<stage<<" open: native="<<GetLastError()<<"\n";return;}
+    BY_HANDLE_FILE_INFORMATION info{};
+    if(!GetFileInformationByHandle(held.value,&info)){std::cerr<<stage<<" metadata: native="<<GetLastError()<<"\n";return;}
+    std::cerr<<stage<<" metadata: attributes="<<info.dwFileAttributes<<"\n";
+    if(ancestry) {
+     try {access.verify(held.value,true);std::cerr<<stage<<" ACL: validated\n";}
+     catch(const std::system_error& e) {
+      std::cerr<<stage<<" ACL: native="<<e.code().value()<<"\n";
+      PSECURITY_DESCRIPTOR raw=nullptr;
+      auto status=GetSecurityInfo(held.value,SE_FILE_OBJECT,OWNER_SECURITY_INFORMATION|DACL_SECURITY_INFORMATION,
+        nullptr,nullptr,nullptr,nullptr,&raw);
+      std::unique_ptr<void,decltype(&LocalFree)> descriptor(raw,&LocalFree);
+      if(status==ERROR_SUCCESS) {
+       LPWSTR text=nullptr;
+       if(ConvertSecurityDescriptorToStringSecurityDescriptorW(raw,SDDL_REVISION_1,
+          OWNER_SECURITY_INFORMATION|DACL_SECURITY_INFORMATION,&text,nullptr)) {
+        std::unique_ptr<void,decltype(&LocalFree)> owner(text,&LocalFree);
+        auto count=WideCharToMultiByte(CP_UTF8,0,text,-1,nullptr,0,nullptr,nullptr);
+        if(count>0) {
+         std::string utf8(count,0);
+         if(WideCharToMultiByte(CP_UTF8,0,text,-1,utf8.data(),count,nullptr,nullptr))
+          std::cerr<<stage<<" SDDL: "<<utf8.c_str()<<"\n";
+        }
+       } else std::cerr<<stage<<" SDDL conversion: native="<<GetLastError()<<"\n";
+      } else std::cerr<<stage<<" security query: native="<<status<<"\n";
+     }
+    }
+   };
+   auto ancestors=[&](const char* stage,const std::wstring& path) {
+    inspect(stage,path.substr(0,7),FILE_LIST_DIRECTORY|FILE_READ_ATTRIBUTES|READ_CONTROL,true);
+    for(std::size_t start=7;start<path.size();) {
+     auto end=path.find(L'\\',start);
+     std::cerr<<stage<<" prefix length="<<(end==path.npos?path.size():end)<<"\n";
+     inspect(stage,path.substr(0,end),FILE_LIST_DIRECTORY|FILE_READ_ATTRIBUTES|READ_CONTROL,true);
+     if(end==path.npos)break;start=end+1;
+    }
+   };
+   auto image=win::absolute(q.texts[0]),cwd=win::absolute(q.texts[1]);
+   ancestors("image ancestors",image.substr(0,std::max<std::size_t>(7,image.find_last_of(L'\\'))));
+   ancestors("working directory ancestors",cwd);
+   inspect("working directory list-only",cwd,FILE_LIST_DIRECTORY,false);
+   inspect("working directory attributes",cwd,FILE_LIST_DIRECTORY|FILE_READ_ATTRIBUTES,false);
+   for(DWORD selected:{STD_INPUT_HANDLE,STD_OUTPUT_HANDLE,STD_ERROR_HANDLE}) {
+    auto handle=GetStdHandle(selected);DWORD flags=0;SetLastError(0);
+    auto ok=GetHandleInformation(handle,&flags);auto native=ok?0:GetLastError();
+    std::cerr<<"standard handle "<<selected<<": query="<<ok<<" native="<<native<<" flags="<<flags<<"\n";
+    if(handle && handle!=INVALID_HANDLE_VALUE) {
+     HANDLE duplicate=INVALID_HANDLE_VALUE;
+     if(!DuplicateHandle(GetCurrentProcess(),handle,GetCurrentProcess(),&duplicate,0,TRUE,DUPLICATE_SAME_ACCESS))
+      std::cerr<<"standard handle duplication: native="<<GetLastError()<<"\n";
+     else {win::Handle owner(duplicate);std::cerr<<"standard handle duplication: validated\n";}
+    }
+   }
+#endif
+  }
+  check(!r.kind && q.acquired,"explicit child launch");auto process=q.acquired;
   q=request(vd::host::wait);q.objects={process};r=process_execute(q);check(!r.kind && r.number==23 && !r.flag,"child exact status");r=process_execute(q);check(!r.kind && r.number==23,"repeat wait");check(!process->close(),"child cleanup");
   q=request(spawn);q.texts={"relative",std::string(cwd8.begin(),cwd8.end())};q.arrays={{},{}};r=process_execute(q);check(r.kind!=0,"reject relative executable");
   auto arguments=vd::checked_application_arguments({"","two words","\"quote\"","tail\\","雪😀"});check(!arguments.error && arguments.values.size()==5,"owned Unicode arguments");

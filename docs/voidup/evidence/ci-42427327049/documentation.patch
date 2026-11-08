@@ -1,0 +1,194 @@
+diff --git a/docs/voidup/INTEGRATION_REPORT.md b/docs/voidup/INTEGRATION_REPORT.md
+index 6d87e372..064d6c71 100644
+--- a/docs/voidup/INTEGRATION_REPORT.md
++++ b/docs/voidup/INTEGRATION_REPORT.md
+@@ -1,4 +1,6 @@
+-**Active follow-up: [CI #42377496702 cross-platform repair](#ci-42377496702-cross-platform-repair), baseline `799a29e3c0b0e204abecd4dc1f14356bf1df3443`.**
++**Active follow-up: [CI #42427327049](#ci-42427327049-hosted-repair), baseline `d7dc4b681c2cd5745210bcc49bb3a0d1ddf4c59c`. REVISE: installation correction qualified locally; Server 2022 process cause blocked on missing native diagnostics. All seven original jobs are final and inspected.**
++
++**Historical follow-up: [CI #42377496702 cross-platform repair](#ci-42377496702-cross-platform-repair), baseline `799a29e3c0b0e204abecd4dc1f14356bf1df3443`.**
+ The earlier integration and cleanup inventories below are retained historical
+ records: they were already present in this baseline. They are not the pending
+ file list for this follow-up. Native Windows Release/Debug verification is complete
+@@ -1361,3 +1363,181 @@ configurations, the complete hosted Ubuntu jobs, Windows hosted environment
+ and ThinLTO-cache workflow conditions still require the replacement hosted run.
+ No hosted acceptance or release-performance claim is made. Work stops here for
+ Golden Wrench/Boss review.
++
++
++## CI #42427327049 hosted repair
++
++7 November 2026, Pacific time. **REVISE — Server process repair remains blocked.**
++[Hosted run](https://github.com/Shmellyorc/Void.Language/actions/runs/42427327049),
++baseline `d7dc4b681c2cd5745210bcc49bb3a0d1ddf4c59c`.
++No staging, commit, push, branch or CI dispatch occurred. The prior inventories
++and acceptance reports above are historical for this follow-up.
++
++### Installation correction
++
++`verify_install.verify()` resolved each resource with `Path.resolve()` but
++compared it against the caller's unresolved installation prefix. A valid
++installation reached through a directory alias could therefore be rejected
++before checksum verification. The command-line entry already resolved its
++argument; the direct call from `tests/cli/install.py` did not.
++
++The correction resolves the prefix inside `verify()` and extracts the unchanged
++inventory/checksum loop as `verify_native_resources()`, which also canonicalizes
++its input. The fixed namespace comparison retains the required inventory
++header, minimum entries, installation-relative token, containment, complete
++SHA-256 verification and missing-file failures. No Runtime path policy changed.
++
++Actual reproduction executed the baseline's inventory loop and the corrected
++helper against identical bytes. Both `void_runtime.lib` and `libvoid_runtime.a`
++failed the baseline containment check through a dot-traversal alias and passed
++with the correction. A native Windows `GetShortPathNameW` alias also reproduced
++both failures: the same installation was addressed through a real 8.3 path and
++its long spelling. The corrected verifier passed both. POSIX symlink aliases
++were exercised on Linux. Native macOS execution is unavailable; these Linux
++checks do not establish macOS acceptance. The exact original hosted prefix
++spelling was not printed by the failing test, so it is not invented here.
++
++`tests/cli/install_resources.py`, registered as `cli_install_resources`, adds
++alias, `.lib`/`.a`, checksum tamper, missing resource, traversal and symlink-
++escape regressions, plus the real Windows short-path case. Linux: six passed,
++one Windows-only skip. Windows 10: five passed, two symlink-privilege skips;
++the real short-path case passed. No original assertion or negative control was
++removed.
++
++### Windows process investigation: unresolved hosted cause
++
++Both completed Server 2022 jobs failed `explicit child launch`; their source
++fixtures failed at `convert.unwrap(process.start(...))`. The original logs,
++portable JSON and CTest XML omit the failing `Result.kind`, Win32 code and
++operation stage. No exact Server code can be recovered from those records.
++The failing command paths were parsed from both artifacts: ordinary single
++backslashes, absolute drive paths and resolved temporary working directories;
++no doubled-separator defect was found.
++
++The existing Windows 10 guest (build19045, VM display name “Windows 11”) passed
++both original portable binaries: 98 checks per profile with a controlled private
++TMP/TEMP. An initial probe using its ordinary Temp directory failed private-root
++admission; that diagnostic remains and no ACL was weakened. The existing
++protected task Temp was then used, as in the earlier qualification.
++Native metadata probes succeeded with both `FILE_LIST_DIRECTORY` alone and with
++`FILE_READ_ATTRIBUTES` on all tested directories. This does not prove how
++Server 2022 behaves and does not justify assigning its failure to that access
++mask. No ACL or inherited-handle cause is asserted without evidence.
++
++No production launch-policy correction has been inferred.
++`host_process_windows.cpp` now attaches a private stage ordinal to the existing
++`Result.detail` slot on native exceptions. The original portable kind and native
++code remain intact; public `system_error` shape and success replies are unchanged.
++Native/guard calls and their arguments compare identically to baseline.
++Stages1–13 identify paths, arguments, environment, image ancestors, cwd ancestors,
++image open/metadata, cwd open/metadata, stdio, attribute init/update and process
++creation. This is diagnostic metadata, not a Server repair.
++The native fixture now prints `Result.kind`/native code on failure and performs
++read-only image-ancestor, working-directory-ancestor and standard-handle probes.
++The source fixture prints its portable error code and `os_code` before the
++original failing unwrap. All launch, exact exit status, Unicode/literal argument,
++environment, ownership and negative assertions remain.
++A deliberate missing-executable probe in each native profile emitted
++`process.start diagnostic 1 2`, then failed as expected. That is a controlled
++not-found diagnostic, **not the unknown Server failure code**.
++
++Capturing the actual hosted error and stage requires Server 2022 execution of
++these diagnostics. No such local host is available and dispatching CI is
++explicitly prohibited. A Windows 10 pass cannot resolve this gap. The process
++repair remains incomplete; these diagnostics are not represented as a fix.
++
++### Executed focused verification and retained failures
++
++- Linux Release: rebuilt portable fixture; five focused CTest cases passed under
++  hard1MiB stack: installation, inventory regressions, provider receipts,
++  native portable capabilities and source normal/O2 JIT/independent AOT.
++- Windows 10 initial focused runs: all three affected names passed in Release
++  (52.04s) and Debug (175.34s), using the installation correction.
++- An initial diagnostic fixture referenced a nonexistent `Result.cleanup` field;
++  that compile failure remains. Corrected diagnostic binaries built in both
++  profiles (Release6.88s, Debug5.36s).
++- Corrected Debug focused run: all three passed in175.65s. Release's portable
++  and source tests passed; installation failed earlier at `initial.rename()`
++  with WinError5, before the verifier ran. A separate unchanged-test installation
++  rerun passed in4.44s. Three further bounded component-install/rename probes passed with successful
++  delete/metadata opens. The intermittent rename cause remains unproven; no retry was
++  inserted into the regression test and the unfavorable result is retained.
++- Both Windows provider receipts verified again. The pinned LLVM23.1.4 SDK,
++  libsodium archive/approved patch/postimages, provider recipes, receipt verifier,
++  selected workflow and source-packaging rules remain byte-identical to baseline.
++  Installed execution still exercises relocation, compiler/LSP, JIT/AOT and
++  missing-module/Runtime rejection with output preservation.
++
++### Seven-configuration matrix: final original hosted results
++
++| Configuration / job | Actual observed result | Remaining work |
++| --- | --- | --- |
++| Ubuntu Release /128568300278 | Hosted PASS:406 passed,0 failed,1 skipped (`io_cross_volume`),407 registered; frontend stack step passed. | Preserve passing configuration. |
++| Ubuntu Debug /128568300424 | Hosted PASS:406 passed,0 failed,1 skipped (`io_cross_volume`),407 registered; complete job and artifacts inspected. | Preserve passing configuration. |
++| Ubuntu Sanitizers /128568300459 | Hosted PASS:396 passed,0 failed,1 skipped (`io_cross_volume`),397 registered; full job/artifacts inspected. | Preserve fatal ASan/UBSan/leaks and existing profile registration. |
++| Windows Release /128568300402 | Hosted FAIL:347 passed,3 failed,0 skipped,350 registered. LLVM/MSBuild/providers passed. | Revalidate installation fix; capture and repair actual Server process failure. |
++| Windows Debug /128568300594 | Independently inspected: same three failures and347/350. | Same two repairs; independent native/hosted verification. |
++| macOS ARM64 Release /128568300479 | Hosted FAIL:393 passed,1 failed (`cli_install`),1 skipped (`io_cross_volume`),395 registered. | Native installation/alias/tamper/missing-resource verification of correction. |
++| macOS ARM64 Debug /128568300477 | Independently inspected final log and XML:393 passed,1 failed (`cli_install` at the same inventory containment guard),1 skipped (`io_cross_volume`),395 registered. No additional failure. | Native ARM64 validation of the installation correction; no pass inferred from Release. |
++
++All seven completed job logs and their test/diagnostic artifacts were reviewed.
++Every downloaded ZIP's SHA-256 matches the GitHub artifact digest, and every
++CTest XML was parsed independently. Ubuntu Sanitizers retains fatal
++`ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
++`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`. Its provider receipt
++records87/87 passing upstream targets. The two accepted upstream ASan output-
++oracle limitations (`sodium_utils2`, `sodium_utils3`) remain:87 targets do not mean
++87 output comparisons. No tests or sanitizer settings were weakened here.
++
++### Final available qualification and review inventory
++
++The frozen production candidate rebuilt compiler/LSP, Runtime, native fixture
++and VOIDUP in both Windows10 profiles, one worker: Release51.42s, Debug119.19s.
++All five focused registered cases passed per profile (Release50.04s,
++Debug176.06s): installation, new inventory regression, portable native,
++portable source and VOIDUP smoke. The last test-only ACL-descriptor diagnostics
++then compiled in both profiles and passed positive native execution plus four
++deliberate error branches:missing image gave1/2/stage6; hostile image ancestry
++gave2/5/stage4 with SDDL. These controlled faults are explicitly not the original
++Server failure. The final inventory test skips only actual Windows error1314;
++unexpected filesystem errors fail. Final187-file guest/source hashes match.
++Six inspected PE images reserve1MiB. Both current provider receipts verify.
++Corresponding-source installation/reconstruction verified eight recipes, all
++three approved postimages, original archives/licenses and tampered-patch
++rejection. Provider inputs and package rules remain unchanged after that audit;
++frozen installed execution verifies the updated Runtime checksum too.
++
++The [source diff](evidence/ci-42427327049/source.patch) and
++[documentation diff](evidence/ci-42427327049/documentation.patch) contain the actual
++reviewable changes. [Original hosted evidence](evidence/ci-42427327049/original-ci.tar.gz)
++([index](evidence/ci-42427327049/original-ci-index.json)) preserves the completed
++run. [Local native/Linux evidence](evidence/ci-42427327049/local-verification.tar.gz)
++([index](evidence/ci-42427327049/local-verification-index.json)) preserves commands,
++source preimages, original local failures and corrected outcomes. Raw records
++also remain in `build/ci-42427327049/` and
++`/home/shmellyorc/VM/ci-42427327049/`; generated binaries, keys, caches and UI
++screenshots are excluded from the commit inventory.
++
++Exact intended paths are in the [allowlist](evidence/ci-42427327049/commit-paths.txt)
++and [hashed inventory](evidence/ci-42427327049/commit-inventory.json):six tracked
++modifications plus the new unit test and nine review artifacts,16 paths total.
++No unrelated or staged paths are included. This is a review inventory for an
++incomplete Server repair, not approval to describe it as CI-ready.
++
++Recommended staging command for Boss, not executed:
++
++```bash
++git --literal-pathspecs add --pathspec-from-file=docs/voidup/evidence/ci-42427327049/commit-paths.nul --pathspec-file-nul
++```
++
++Suggested title: `Fix installation aliases and capture Windows launch failures [skip ci]`.
++
++**RETAIN the installation correction; REVISE the complete repair.** Further safe
++Windows production correction is blocked until actual Server2022 execution
++captures the original failing kind/code/stage. The existing logs cannot supply
++that missing information, Windows10 does not reproduce it, and dispatching a
++new run or publishing code is prohibited. No security-policy workaround or
++speculative access-mask correction was applied. Both macOS profiles still need
++native ARM64 execution of the corrected verifier, containment/tamper controls
++and installed JIT/AOT. Boss controls source integration and any diagnostic run.
++Stop for Golden Wrench/Boss review; full hosted acceptance remains unqualified.

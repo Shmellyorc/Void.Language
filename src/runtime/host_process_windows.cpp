@@ -6,6 +6,10 @@
 #include <set>
 namespace vd::host {
 namespace {
+// Private diagnostic metadata in the existing Result.detail slot, on error only.
+enum class LaunchStage : std::int64_t { paths=1,arguments,environment,image_ancestors,
+    cwd_ancestors,image_open,image_metadata,cwd_open,cwd_metadata,stdio,attributes_init,
+    attributes_update,create_process };
 struct Child final : Object {
     std::mutex mutex;
     std::condition_variable changed;
@@ -68,13 +72,16 @@ struct Attributes {
 };
 }
 Result windows_process_execute(Request& q) {
+    auto stage=LaunchStage::paths;
     try {
         if(q.operation==wait)return std::static_pointer_cast<Child>(q.objects[0])->wait_for_exit();
         if(q.operation!=spawn)throw std::logic_error("Invalid Windows process operation");
         auto executable=win::absolute(q.texts[0]),cwd=win::absolute(q.texts[1]);
+        stage=LaunchStage::arguments;
         std::wstring command=quote(win::wide(q.texts[0]));
         for(const auto& arg:q.arrays[0]) {command+=L' ';command+=quote(win::wide(arg));if(command.size()>=32767)return error(12);}
         if(command.size()>=32767)return error(12);
+        stage=LaunchStage::environment;
         std::vector<std::wstring> entries;std::set<std::string> names;
         for(const auto& entry:q.arrays[1]) {
             auto equals=entry.find('=');if(equals==entry.npos || !name(std::string_view(entry).substr(0,equals)))return error(20);
@@ -85,15 +92,22 @@ Result windows_process_execute(Request& q) {
         std::vector<wchar_t> environment;
         for(const auto& entry:entries){environment.insert(environment.end(),entry.begin(),entry.end());environment.push_back(0);if(environment.size()>32765)return error(12);}
         if(environment.empty())environment.push_back(0);environment.push_back(0);
+        stage=LaunchStage::image_ancestors;
         auto image_ancestors=win::pin_directories(executable.substr(0,std::max<std::size_t>(7,executable.find_last_of(L'\\'))));
+        stage=LaunchStage::cwd_ancestors;
         auto cwd_ancestors=win::pin_directories(cwd);
+        stage=LaunchStage::image_open;
         win::Handle image(CreateFileW(executable.c_str(),GENERIC_READ|FILE_EXECUTE,FILE_SHARE_READ,nullptr,OPEN_EXISTING,FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
-        if(image.value==INVALID_HANDLE_VALUE)win::fail();win::information(image.value,false,false);
+        if(image.value==INVALID_HANDLE_VALUE)win::fail();
+        stage=LaunchStage::image_metadata;win::information(image.value,false,false);
+        stage=LaunchStage::cwd_open;
         win::Handle directory(CreateFileW(cwd.c_str(),FILE_LIST_DIRECTORY,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,nullptr,OPEN_EXISTING,FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
-        if(directory.value==INVALID_HANDLE_VALUE)win::fail();win::information(directory.value,true);
+        if(directory.value==INVALID_HANDLE_VALUE)win::fail();
+        stage=LaunchStage::cwd_metadata;win::information(directory.value,true);
         auto child=std::make_shared<Child>();
         STARTUPINFOEXW startup{};startup.StartupInfo.cb=sizeof(startup);startup.StartupInfo.dwFlags=STARTF_USESTDHANDLES;
         std::vector<win::Handle> standard;std::vector<HANDLE> inherited;standard.reserve(3);inherited.reserve(3);
+        stage=LaunchStage::stdio;
         for(DWORD selected:{STD_INPUT_HANDLE,STD_OUTPUT_HANDLE,STD_ERROR_HANDLE}) {
             auto original=GetStdHandle(selected);HANDLE duplicate=INVALID_HANDLE_VALUE;
             if(original && original!=INVALID_HANDLE_VALUE) {
@@ -106,17 +120,24 @@ Result windows_process_execute(Request& q) {
         }
         Attributes attributes;DWORD flags=CREATE_UNICODE_ENVIRONMENT;
         if(!inherited.empty()) {
+            stage=LaunchStage::attributes_init;
             SIZE_T count=0;InitializeProcThreadAttributeList(nullptr,1,0,&count);attributes.storage.resize(count);
             auto* list=reinterpret_cast<LPPROC_THREAD_ATTRIBUTE_LIST>(attributes.storage.data());
             if(!InitializeProcThreadAttributeList(list,1,0,&count))win::fail();attributes.list=list;
+            stage=LaunchStage::attributes_update;
             if(!UpdateProcThreadAttribute(list,0,PROC_THREAD_ATTRIBUTE_HANDLE_LIST,inherited.data(),inherited.size()*sizeof(HANDLE),nullptr,nullptr))win::fail();
             startup.lpAttributeList=list;flags|=EXTENDED_STARTUPINFO_PRESENT;
         } else startup.StartupInfo.cb=sizeof(STARTUPINFOW);
         PROCESS_INFORMATION info{};
+        stage=LaunchStage::create_process;
         if(!CreateProcessW(executable.c_str(),command.data(),nullptr,nullptr,!inherited.empty(),flags,environment.data(),cwd.c_str(),&startup.StartupInfo,&info))win::fail();
         win::Handle thread(info.hThread);child->process.value=info.hProcess;
         q.acquired=std::move(child);return {};
-    } catch(const std::system_error& e) {return native_error(e.code().value());}
+    } catch(const std::system_error& e) {
+        auto result=native_error(e.code().value());
+        if(q.operation==spawn)result.detail=static_cast<std::int64_t>(stage);
+        return result;
+    }
 }
 }
 #endif

@@ -15,14 +15,8 @@ from ci.install_smoke import frames, unframe
 HELLO = 'use console\n\nfunc main() -> i32:\n    print("Hello, world!")\n    return 0\n'
 
 
-def verify(prefix):
-    suffix = '.exe' if os.name == 'nt' else ''
-    compiler = prefix / 'bin' / ('voidc' + suffix)
-    server = prefix / 'bin' / ('voidls' + suffix)
-    for name in ('bin/void-native.txt', 'bin/void-native-resources.txt',
-                 'share/void/stdlib/console.void', 'share/void/licenses/VOID-MIT-LICENSE.txt'):
-        if not (prefix / name).is_file():
-            raise RuntimeError('Incomplete installation: missing ' + name)
+def verify_native_resources(prefix):
+    prefix = prefix.resolve()
     # Verify every installed archive/shared dependency before exercising linking.
     inventory = (prefix / 'bin/void-native-resources.txt').read_text(encoding='utf-8').splitlines()
     if not inventory or inventory[0] != 'VOID native resources 1' or len(inventory) < 3:
@@ -36,6 +30,19 @@ def verify(prefix):
             actual = hashlib.file_digest(stream, 'sha256').hexdigest()
         if actual != expected:
             raise RuntimeError('Installed resource checksum mismatch: ' + str(resource))
+
+def verify(prefix):
+    # Resolve the installation and its resources in the same filesystem namespace.
+    # In particular, macOS /var and Windows short-name Temp aliases can differ.
+    prefix = prefix.resolve()
+    suffix = '.exe' if os.name == 'nt' else ''
+    compiler = prefix / 'bin' / ('voidc' + suffix)
+    server = prefix / 'bin' / ('voidls' + suffix)
+    for name in ('bin/void-native.txt', 'bin/void-native-resources.txt',
+                 'share/void/stdlib/console.void', 'share/void/licenses/VOID-MIT-LICENSE.txt'):
+        if not (prefix / name).is_file():
+            raise RuntimeError('Incomplete installation: missing ' + name)
+    verify_native_resources(prefix)
     environment = os.environ.copy()
     environment.pop('VOID_STDLIB_ROOT', None)
     environment['PATH'] = str(prefix / 'bin') + os.pathsep + environment.get('PATH', '')

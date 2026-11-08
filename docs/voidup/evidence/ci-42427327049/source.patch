@@ -1,0 +1,307 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3d6ae0e3..56d754cc 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -332,6 +332,7 @@ if(BUILD_TESTING)
+   add_test(NAME cli_install COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/cli/install.py"
+     "${CMAKE_COMMAND}" "${CMAKE_CURRENT_BINARY_DIR}" "$<CONFIG>")
+   set_tests_properties(cli_install PROPERTIES TIMEOUT 240)
++  add_test(NAME cli_install_resources COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/cli/install_resources.py")
+   add_executable(void_target_triple tests/toolchain/Target.cpp)
+   target_include_directories(void_target_triple SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
+   target_link_libraries(void_target_triple PRIVATE void_options ${VOID_LLVM_LIBS})
+diff --git a/src/runtime/host_process_windows.cpp b/src/runtime/host_process_windows.cpp
+index af661821..20a760d9 100644
+--- a/src/runtime/host_process_windows.cpp
++++ b/src/runtime/host_process_windows.cpp
+@@ -6,6 +6,10 @@
+ #include <set>
+ namespace vd::host {
+ namespace {
++// Private diagnostic metadata in the existing Result.detail slot, on error only.
++enum class LaunchStage : std::int64_t { paths=1,arguments,environment,image_ancestors,
++    cwd_ancestors,image_open,image_metadata,cwd_open,cwd_metadata,stdio,attributes_init,
++    attributes_update,create_process };
+ struct Child final : Object {
+     std::mutex mutex;
+     std::condition_variable changed;
+@@ -68,13 +72,16 @@ struct Attributes {
+ };
+ }
+ Result windows_process_execute(Request& q) {
++    auto stage=LaunchStage::paths;
+     try {
+         if(q.operation==wait)return std::static_pointer_cast<Child>(q.objects[0])->wait_for_exit();
+         if(q.operation!=spawn)throw std::logic_error("Invalid Windows process operation");
+         auto executable=win::absolute(q.texts[0]),cwd=win::absolute(q.texts[1]);
++        stage=LaunchStage::arguments;
+         std::wstring command=quote(win::wide(q.texts[0]));
+         for(const auto& arg:q.arrays[0]) {command+=L' ';command+=quote(win::wide(arg));if(command.size()>=32767)return error(12);}
+         if(command.size()>=32767)return error(12);
++        stage=LaunchStage::environment;
+         std::vector<std::wstring> entries;std::set<std::string> names;
+         for(const auto& entry:q.arrays[1]) {
+             auto equals=entry.find('=');if(equals==entry.npos || !name(std::string_view(entry).substr(0,equals)))return error(20);
+@@ -85,15 +92,22 @@ Result windows_process_execute(Request& q) {
+         std::vector<wchar_t> environment;
+         for(const auto& entry:entries){environment.insert(environment.end(),entry.begin(),entry.end());environment.push_back(0);if(environment.size()>32765)return error(12);}
+         if(environment.empty())environment.push_back(0);environment.push_back(0);
++        stage=LaunchStage::image_ancestors;
+         auto image_ancestors=win::pin_directories(executable.substr(0,std::max<std::size_t>(7,executable.find_last_of(L'\\'))));
++        stage=LaunchStage::cwd_ancestors;
+         auto cwd_ancestors=win::pin_directories(cwd);
++        stage=LaunchStage::image_open;
+         win::Handle image(CreateFileW(executable.c_str(),GENERIC_READ|FILE_EXECUTE,FILE_SHARE_READ,nullptr,OPEN_EXISTING,FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
+-        if(image.value==INVALID_HANDLE_VALUE)win::fail();win::information(image.value,false,false);
++        if(image.value==INVALID_HANDLE_VALUE)win::fail();
++        stage=LaunchStage::image_metadata;win::information(image.value,false,false);
++        stage=LaunchStage::cwd_open;
+         win::Handle directory(CreateFileW(cwd.c_str(),FILE_LIST_DIRECTORY,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,nullptr,OPEN_EXISTING,FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
+-        if(directory.value==INVALID_HANDLE_VALUE)win::fail();win::information(directory.value,true);
++        if(directory.value==INVALID_HANDLE_VALUE)win::fail();
++        stage=LaunchStage::cwd_metadata;win::information(directory.value,true);
+         auto child=std::make_shared<Child>();
+         STARTUPINFOEXW startup{};startup.StartupInfo.cb=sizeof(startup);startup.StartupInfo.dwFlags=STARTF_USESTDHANDLES;
+         std::vector<win::Handle> standard;std::vector<HANDLE> inherited;standard.reserve(3);inherited.reserve(3);
++        stage=LaunchStage::stdio;
+         for(DWORD selected:{STD_INPUT_HANDLE,STD_OUTPUT_HANDLE,STD_ERROR_HANDLE}) {
+             auto original=GetStdHandle(selected);HANDLE duplicate=INVALID_HANDLE_VALUE;
+             if(original && original!=INVALID_HANDLE_VALUE) {
+@@ -106,17 +120,24 @@ Result windows_process_execute(Request& q) {
+         }
+         Attributes attributes;DWORD flags=CREATE_UNICODE_ENVIRONMENT;
+         if(!inherited.empty()) {
++            stage=LaunchStage::attributes_init;
+             SIZE_T count=0;InitializeProcThreadAttributeList(nullptr,1,0,&count);attributes.storage.resize(count);
+             auto* list=reinterpret_cast<LPPROC_THREAD_ATTRIBUTE_LIST>(attributes.storage.data());
+             if(!InitializeProcThreadAttributeList(list,1,0,&count))win::fail();attributes.list=list;
++            stage=LaunchStage::attributes_update;
+             if(!UpdateProcThreadAttribute(list,0,PROC_THREAD_ATTRIBUTE_HANDLE_LIST,inherited.data(),inherited.size()*sizeof(HANDLE),nullptr,nullptr))win::fail();
+             startup.lpAttributeList=list;flags|=EXTENDED_STARTUPINFO_PRESENT;
+         } else startup.StartupInfo.cb=sizeof(STARTUPINFOW);
+         PROCESS_INFORMATION info{};
++        stage=LaunchStage::create_process;
+         if(!CreateProcessW(executable.c_str(),command.data(),nullptr,nullptr,!inherited.empty(),flags,environment.data(),cwd.c_str(),&startup.StartupInfo,&info))win::fail();
+         win::Handle thread(info.hThread);child->process.value=info.hProcess;
+         q.acquired=std::move(child);return {};
+-    } catch(const std::system_error& e) {return native_error(e.code().value());}
++    } catch(const std::system_error& e) {
++        auto result=native_error(e.code().value());
++        if(q.operation==spawn)result.detail=static_cast<std::int64_t>(stage);
++        return result;
++    }
+ }
+ }
+ #endif
+diff --git a/tests/host_capabilities/portable.cpp b/tests/host_capabilities/portable.cpp
+index fc399ca9..75731e16 100644
+--- a/tests/host_capabilities/portable.cpp
++++ b/tests/host_capabilities/portable.cpp
+@@ -164,7 +164,71 @@ int portable_main(int argc,char** argv) {
+   check(!fresh_alias->close() && !impostor->close() && !source_alias->close() && !target_alias->close() && !destination->close() && !collision->close() && !stage->close() && !directory->close(),"directory cleanup");
+   auto executable8=executable.u8string(),cwd8=work.u8string();
+   q=request(spawn);q.texts={std::string(executable8.begin(),executable8.end()),std::string(cwd8.begin(),cwd8.end())};q.arrays={{"--exit"},{"VOID_CHILD=owned"}};
+-  r=process_execute(q);check(!r.kind && q.acquired,"explicit child launch");auto process=q.acquired;
++  r=process_execute(q);
++  if(r.kind) {
++   std::cerr<<"explicit child launch: kind="<<r.kind<<" code="<<r.code<<" stage="<<r.detail<<"\n";
++#ifdef _WIN32
++   // Read-only failure evidence; never launch a child outside the checked API.
++   win::PrivateAccess access;
++   auto inspect=[&](const char* stage,const std::wstring& path,DWORD rights,bool ancestry) {
++    win::Handle held(CreateFileW(path.c_str(),rights,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
++      nullptr,OPEN_EXISTING,FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
++    if(held.value==INVALID_HANDLE_VALUE){std::cerr<<stage<<" open: native="<<GetLastError()<<"\n";return;}
++    BY_HANDLE_FILE_INFORMATION info{};
++    if(!GetFileInformationByHandle(held.value,&info)){std::cerr<<stage<<" metadata: native="<<GetLastError()<<"\n";return;}
++    std::cerr<<stage<<" metadata: attributes="<<info.dwFileAttributes<<"\n";
++    if(ancestry) {
++     try {access.verify(held.value,true);std::cerr<<stage<<" ACL: validated\n";}
++     catch(const std::system_error& e) {
++      std::cerr<<stage<<" ACL: native="<<e.code().value()<<"\n";
++      PSECURITY_DESCRIPTOR raw=nullptr;
++      auto status=GetSecurityInfo(held.value,SE_FILE_OBJECT,OWNER_SECURITY_INFORMATION|DACL_SECURITY_INFORMATION,
++        nullptr,nullptr,nullptr,nullptr,&raw);
++      std::unique_ptr<void,decltype(&LocalFree)> descriptor(raw,&LocalFree);
++      if(status==ERROR_SUCCESS) {
++       LPWSTR text=nullptr;
++       if(ConvertSecurityDescriptorToStringSecurityDescriptorW(raw,SDDL_REVISION_1,
++          OWNER_SECURITY_INFORMATION|DACL_SECURITY_INFORMATION,&text,nullptr)) {
++        std::unique_ptr<void,decltype(&LocalFree)> owner(text,&LocalFree);
++        auto count=WideCharToMultiByte(CP_UTF8,0,text,-1,nullptr,0,nullptr,nullptr);
++        if(count>0) {
++         std::string utf8(count,0);
++         if(WideCharToMultiByte(CP_UTF8,0,text,-1,utf8.data(),count,nullptr,nullptr))
++          std::cerr<<stage<<" SDDL: "<<utf8.c_str()<<"\n";
++        }
++       } else std::cerr<<stage<<" SDDL conversion: native="<<GetLastError()<<"\n";
++      } else std::cerr<<stage<<" security query: native="<<status<<"\n";
++     }
++    }
++   };
++   auto ancestors=[&](const char* stage,const std::wstring& path) {
++    inspect(stage,path.substr(0,7),FILE_LIST_DIRECTORY|FILE_READ_ATTRIBUTES|READ_CONTROL,true);
++    for(std::size_t start=7;start<path.size();) {
++     auto end=path.find(L'\\',start);
++     std::cerr<<stage<<" prefix length="<<(end==path.npos?path.size():end)<<"\n";
++     inspect(stage,path.substr(0,end),FILE_LIST_DIRECTORY|FILE_READ_ATTRIBUTES|READ_CONTROL,true);
++     if(end==path.npos)break;start=end+1;
++    }
++   };
++   auto image=win::absolute(q.texts[0]),cwd=win::absolute(q.texts[1]);
++   ancestors("image ancestors",image.substr(0,std::max<std::size_t>(7,image.find_last_of(L'\\'))));
++   ancestors("working directory ancestors",cwd);
++   inspect("working directory list-only",cwd,FILE_LIST_DIRECTORY,false);
++   inspect("working directory attributes",cwd,FILE_LIST_DIRECTORY|FILE_READ_ATTRIBUTES,false);
++   for(DWORD selected:{STD_INPUT_HANDLE,STD_OUTPUT_HANDLE,STD_ERROR_HANDLE}) {
++    auto handle=GetStdHandle(selected);DWORD flags=0;SetLastError(0);
++    auto ok=GetHandleInformation(handle,&flags);auto native=ok?0:GetLastError();
++    std::cerr<<"standard handle "<<selected<<": query="<<ok<<" native="<<native<<" flags="<<flags<<"\n";
++    if(handle && handle!=INVALID_HANDLE_VALUE) {
++     HANDLE duplicate=INVALID_HANDLE_VALUE;
++     if(!DuplicateHandle(GetCurrentProcess(),handle,GetCurrentProcess(),&duplicate,0,TRUE,DUPLICATE_SAME_ACCESS))
++      std::cerr<<"standard handle duplication: native="<<GetLastError()<<"\n";
++     else {win::Handle owner(duplicate);std::cerr<<"standard handle duplication: validated\n";}
++    }
++   }
++#endif
++  }
++  check(!r.kind && q.acquired,"explicit child launch");auto process=q.acquired;
+   q=request(vd::host::wait);q.objects={process};r=process_execute(q);check(!r.kind && r.number==23 && !r.flag,"child exact status");r=process_execute(q);check(!r.kind && r.number==23,"repeat wait");check(!process->close(),"child cleanup");
+   q=request(spawn);q.texts={"relative",std::string(cwd8.begin(),cwd8.end())};q.arrays={{},{}};r=process_execute(q);check(r.kind!=0,"reject relative executable");
+   auto arguments=vd::checked_application_arguments({"","two words","\"quote\"","tail\\","雪😀"});check(!arguments.error && arguments.values.size()==5,"owned Unicode arguments");
+diff --git a/tests/host_capabilities/portable_process.void b/tests/host_capabilities/portable_process.void
+index d23a91be..2b4fc43a 100644
+--- a/tests/host_capabilities/portable_process.void
++++ b/tests/host_capabilities/portable_process.void
+@@ -3,7 +3,10 @@ use process
+ use convert
+ func main():
+     var operands = convert.unwrap(os.args())
+-    with convert.unwrap(process.start(operands[0], ["--verify-args", "", "two words", "\"quote\"", "tail\\", "雪😀"], ["VOID_CHILD=雪=value"], operands[1])) as running:
++    var started = process.start(operands[0], ["--verify-args", "", "two words", "\"quote\"", "tail\\", "雪😀"], ["VOID_CHILD=雪=value"], operands[1])
++    if started is Err(var problem):
++        print("process.start diagnostic", problem.code, problem.os_code)
++    with convert.unwrap(started) as running:
+         var status = convert.unwrap(running.wait())
+         print(status.code, status.signaled)
+         print(convert.unwrap(running.close()))
+diff --git a/tools/verify_install.py b/tools/verify_install.py
+index fa73c204..31f21eaa 100644
+--- a/tools/verify_install.py
++++ b/tools/verify_install.py
+@@ -15,14 +15,8 @@ from ci.install_smoke import frames, unframe
+ HELLO = 'use console\n\nfunc main() -> i32:\n    print("Hello, world!")\n    return 0\n'
+ 
+ 
+-def verify(prefix):
+-    suffix = '.exe' if os.name == 'nt' else ''
+-    compiler = prefix / 'bin' / ('voidc' + suffix)
+-    server = prefix / 'bin' / ('voidls' + suffix)
+-    for name in ('bin/void-native.txt', 'bin/void-native-resources.txt',
+-                 'share/void/stdlib/console.void', 'share/void/licenses/VOID-MIT-LICENSE.txt'):
+-        if not (prefix / name).is_file():
+-            raise RuntimeError('Incomplete installation: missing ' + name)
++def verify_native_resources(prefix):
++    prefix = prefix.resolve()
+     # Verify every installed archive/shared dependency before exercising linking.
+     inventory = (prefix / 'bin/void-native-resources.txt').read_text(encoding='utf-8').splitlines()
+     if not inventory or inventory[0] != 'VOID native resources 1' or len(inventory) < 3:
+@@ -36,6 +30,19 @@ def verify(prefix):
+             actual = hashlib.file_digest(stream, 'sha256').hexdigest()
+         if actual != expected:
+             raise RuntimeError('Installed resource checksum mismatch: ' + str(resource))
++
++def verify(prefix):
++    # Resolve the installation and its resources in the same filesystem namespace.
++    # In particular, macOS /var and Windows short-name Temp aliases can differ.
++    prefix = prefix.resolve()
++    suffix = '.exe' if os.name == 'nt' else ''
++    compiler = prefix / 'bin' / ('voidc' + suffix)
++    server = prefix / 'bin' / ('voidls' + suffix)
++    for name in ('bin/void-native.txt', 'bin/void-native-resources.txt',
++                 'share/void/stdlib/console.void', 'share/void/licenses/VOID-MIT-LICENSE.txt'):
++        if not (prefix / name).is_file():
++            raise RuntimeError('Incomplete installation: missing ' + name)
++    verify_native_resources(prefix)
+     environment = os.environ.copy()
+     environment.pop('VOID_STDLIB_ROOT', None)
+     environment['PATH'] = str(prefix / 'bin') + os.pathsep + environment.get('PATH', '')
+diff --git a/tests/cli/install_resources.py b/tests/cli/install_resources.py
+new file mode 100644
+index 00000000..6106f683
+--- /dev/null
++++ b/tests/cli/install_resources.py
+@@ -0,0 +1,72 @@
++"""Installed resource alias, containment, checksum and missing-file regressions."""
++from pathlib import Path
++import hashlib
++import sys
++import tempfile
++import unittest
++sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'tools'))
++from verify_install import verify_native_resources
++
++class Resources(unittest.TestCase):
++    def setUp(self):
++        self.temp = tempfile.TemporaryDirectory(prefix='VOID inventory 雪 ')
++        self.addCleanup(self.temp.cleanup)
++        self.base = Path(self.temp.name)
++        self.prefix = self.base / 'installation'
++        (self.prefix / 'bin').mkdir(parents=True)
++        (self.prefix / 'lib/void').mkdir(parents=True)
++        (self.base / 'nested').mkdir()
++    def inventory(self, names):
++        lines = ['VOID native resources 1']
++        for name in names:
++            file = self.prefix / 'lib/void' / name
++            file.write_bytes(b'archive fixture')
++            lines.append(hashlib.sha256(file.read_bytes()).hexdigest() + '\t@VOID_NATIVE_DIR@/../lib/void/' + name)
++        (self.prefix / 'bin/void-native-resources.txt').write_text('\n'.join(lines)+'\n')
++    def test_windows_and_macos_names_through_alias(self):
++        for names in [('void_runtime.lib','void_native_fixture.lib'),('libvoid_runtime.a','libvoid_native_fixture.a')]:
++            self.inventory(names)
++            verify_native_resources(self.base / 'nested/../installation')
++    def test_symlink_prefix(self):
++        self.inventory(('libvoid_runtime.a','fixture.a'))
++        alias = self.base / 'alias'
++        try: alias.symlink_to(self.prefix, target_is_directory=True)
++        except OSError as e:
++            if sys.platform != 'win32' or e.winerror != 1314:raise
++            self.skipTest('Native symlink privilege unavailable: '+str(e))
++        verify_native_resources(alias)
++    @unittest.skipUnless(sys.platform == 'win32', 'Windows short-path API')
++    def test_windows_short_path(self):
++        import ctypes
++        self.inventory(('void_runtime.lib','fixture.lib'))
++        kernel=ctypes.WinDLL('kernel32', use_last_error=True)
++        kernel.GetShortPathNameW.argtypes=[ctypes.c_wchar_p,ctypes.c_wchar_p,ctypes.c_uint32]
++        buffer=ctypes.create_unicode_buffer(32768)
++        self.assertTrue(kernel.GetShortPathNameW(str(self.prefix),buffer,len(buffer)))
++        if buffer.value == str(self.prefix):self.skipTest('8.3 aliases unavailable on this volume')
++        verify_native_resources(Path(buffer.value))
++    def test_checksum_tamper(self):
++        self.inventory(('void_runtime.lib','fixture.lib'))
++        (self.prefix/'lib/void/void_runtime.lib').write_bytes(b'tampered')
++        with self.assertRaisesRegex(RuntimeError, 'checksum mismatch'): verify_native_resources(self.prefix)
++    def test_missing_resource(self):
++        self.inventory(('libvoid_runtime.a','fixture.a'))
++        (self.prefix/'lib/void/libvoid_runtime.a').unlink()
++        with self.assertRaises(FileNotFoundError): verify_native_resources(self.prefix)
++    def test_traversal(self):
++        self.inventory(('runtime.a','fixture.a'))
++        path=self.prefix/'bin/void-native-resources.txt'
++        path.write_text(path.read_text().replace('/lib/void/runtime.a','/lib/void/../../escape'))
++        (self.prefix/'escape').write_bytes(b'archive fixture')
++        with self.assertRaisesRegex(RuntimeError, 'does not belong'): verify_native_resources(self.prefix)
++    def test_resource_symlink_escape(self):
++        self.inventory(('runtime.a','fixture.a'))
++        outside=self.base/'outside';outside.write_bytes(b'archive fixture')
++        path=self.prefix/'lib/void/runtime.a';path.unlink()
++        try:path.symlink_to(outside)
++        except OSError as e:
++            if sys.platform != 'win32' or e.winerror != 1314:raise
++            self.skipTest('Native symlink privilege unavailable: '+str(e))
++        with self.assertRaisesRegex(RuntimeError, 'does not belong'):verify_native_resources(self.prefix)
++
++if __name__=='__main__':unittest.main()

@@ -332,6 +332,7 @@ if(BUILD_TESTING)
   add_test(NAME cli_install COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/cli/install.py"
     "${CMAKE_COMMAND}" "${CMAKE_CURRENT_BINARY_DIR}" "$<CONFIG>")
   set_tests_properties(cli_install PROPERTIES TIMEOUT 240)
+  add_test(NAME cli_install_resources COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/cli/install_resources.py")
   add_executable(void_target_triple tests/toolchain/Target.cpp)
   target_include_directories(void_target_triple SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
   target_link_libraries(void_target_triple PRIVATE void_options ${VOID_LLVM_LIBS})

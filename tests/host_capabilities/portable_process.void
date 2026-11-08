@@ -3,7 +3,10 @@ use process
 use convert
 func main():
     var operands = convert.unwrap(os.args())
-    with convert.unwrap(process.start(operands[0], ["--verify-args", "", "two words", "\"quote\"", "tail\\", "雪😀"], ["VOID_CHILD=雪=value"], operands[1])) as running:
+    var started = process.start(operands[0], ["--verify-args", "", "two words", "\"quote\"", "tail\\", "雪😀"], ["VOID_CHILD=雪=value"], operands[1])
+    if started is Err(var problem):
+        print("process.start diagnostic", problem.code, problem.os_code)
+    with convert.unwrap(started) as running:
         var status = convert.unwrap(running.wait())
         print(status.code, status.signaled)
         print(convert.unwrap(running.close()))

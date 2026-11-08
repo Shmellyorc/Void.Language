@@ -1,0 +1,98 @@
+{
+  "baseline": "d7dc4b681c2cd5745210bcc49bb3a0d1ddf4c59c",
+  "status": "REVISE: installation fix tested; Server2022 process cause/repair blocked on absent native failing diagnostics. Not CI-ready.",
+  "tracked_modified": 6,
+  "untracked": 10,
+  "staged": 0,
+  "paths": [
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "1d4b13c825a077f6f359b072c582f5a7edfee76ca500e4aea387968b6074cd41",
+      "reason": null
+    },
+    {
+      "path": "docs/voidup/INTEGRATION_REPORT.md",
+      "sha256": "8dcf911067a4b5e780b2ecf4677c988135a1f60d12e247d6bafc201af8012a3b",
+      "reason": null
+    },
+    {
+      "path": "docs/voidup/evidence/ci-42427327049/commit-inventory.json",
+      "sha256": null,
+      "reason": "Self-hash omitted"
+    },
+    {
+      "path": "docs/voidup/evidence/ci-42427327049/commit-paths.nul",
+      "sha256": "b797f349d28eb02790dd6829a2fceb8f5a0fe3af918a9043db034653816a6080",
+      "reason": null
+    },
+    {
+      "path": "docs/voidup/evidence/ci-42427327049/commit-paths.txt",
+      "sha256": "715b72b46d44189cf7d324990d5f1bb014cd202ab61a87d501babc21cf07de3a",
+      "reason": null
+    },
+    {
+      "path": "docs/voidup/evidence/ci-42427327049/documentation.patch",
+      "sha256": "b330fa5ef6be001470754d66b0afe9a5a7ca173c59c02e46310f1d97f09b3c7e",
+      "reason": null
+    },
+    {
+      "path": "docs/voidup/evidence/ci-42427327049/local-verification-index.json",
+      "sha256": "d50104e9769ac26611e1af5523b4b459bc98d96b89b3c89dc6629f1da699f1ec",
+      "reason": null
+    },
+    {
+      "path": "docs/voidup/evidence/ci-42427327049/local-verification.tar.gz",
+      "sha256": "ad591479bc10d03afba150eb0041ad8953f746381d779db42c21fce44dc481c0",
+      "reason": null
+    },
+    {
+      "path": "docs/voidup/evidence/ci-42427327049/original-ci-index.json",
+      "sha256": "89b342261999b3fe36de36739f73184f5dffc6013275db63529a2094b80767a0",
+      "reason": null
+    },
+    {
+      "path": "docs/voidup/evidence/ci-42427327049/original-ci.tar.gz",
+      "sha256": "2ac9deaf53b6ce71d1ebcd700cb52bfe8a835fab9125c0611715a81596f4a38d",
+      "reason": null
+    },
+    {
+      "path": "docs/voidup/evidence/ci-42427327049/source.patch",
+      "sha256": "8302b4b94d94d20f1ffb7ccd0775aaff04e28d6b74e7c346c01be5bbd21382d8",
+      "reason": null
+    },
+    {
+      "path": "src/runtime/host_process_windows.cpp",
+      "sha256": "490e611098c2a31cae8d16b5e554d7b14fd15fe7c8b74fc93200ab5cef56854c",
+      "reason": null
+    },
+    {
+      "path": "tests/cli/install_resources.py",
+      "sha256": "09cd619aa6d13f1e5d5713195db8d39091dfc1fa5cea35465c3ed9a95f5c3f25",
+      "reason": null
+    },
+    {
+      "path": "tests/host_capabilities/portable.cpp",
+      "sha256": "eb0c78562924e49edc245b33f1a7575d7c4e0d151d88ffd5fa23d08e8b61abe7",
+      "reason": null
+    },
+    {
+      "path": "tests/host_capabilities/portable_process.void",
+      "sha256": "6b31a6fb206d5eb8822e299e9db7c7b1a6d05bb4eeb97ff4dd23cac9ee97a0ac",
+      "reason": null
+    },
+    {
+      "path": "tools/verify_install.py",
+      "sha256": "0d6862401c271bb0b34e7a419464a6fd9bba42db722b6c1b21ac24e51b21b7d8",
+      "reason": null
+    }
+  ],
+  "excluded_roots": [
+    "build/",
+    ".toolchains/",
+    "/home/shmellyorc/VM/ci-42427327049",
+    "C:\\Users\\a\\VoidCI42377496702-Native"
+  ],
+  "unrelated_pending": [],
+  "staging_command_not_executed": "git --literal-pathspecs add --pathspec-from-file=docs/voidup/evidence/ci-42427327049/commit-paths.nul --pathspec-file-nul",
+  "suggested_title": "Fix installation aliases and capture Windows launch failures [skip ci]"
+}

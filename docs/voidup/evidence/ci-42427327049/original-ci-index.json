@@ -1,0 +1,140 @@
+{
+  "scope": "Actual preserved CI42427327049 evidence; original failures and unfavorable results retained.",
+  "members": [
+    {
+      "path": "128568300278.log",
+      "bytes": 893555,
+      "sha256": "e94280927f3cbda58b333daef983f7362960d3b2ff02d8bf010312f92e3d8553"
+    },
+    {
+      "path": "128568300402.log",
+      "bytes": 7966018,
+      "sha256": "c4bcabf34beea438ffa560bd7e7d8cbea199239b9d73bc70f1d77f58fc01b217"
+    },
+    {
+      "path": "128568300424.log",
+      "bytes": 1060365,
+      "sha256": "09cbc04229adeafad1c031ff8d843b3a690a47718df6651fe9192cfc2ef722dc"
+    },
+    {
+      "path": "128568300459.log",
+      "bytes": 890757,
+      "sha256": "92176d11de3d95288cc84600d66cc356f6a935a90381a01787444f2ad7166258"
+    },
+    {
+      "path": "128568300477.log",
+      "bytes": 7791372,
+      "sha256": "c8f4daa8db5a7f351971cd2a21ca190f16e4ec3968879d87118d2858aae3ae81"
+    },
+    {
+      "path": "128568300479.log",
+      "bytes": 7783145,
+      "sha256": "3d072712850d8e14ce69e6a63bd494f6264da61a47d48b0b2af24fbc6040ef6c"
+    },
+    {
+      "path": "128568300594.log",
+      "bytes": 7979828,
+      "sha256": "4822ea247fa61c470dfed7fb51c7a73dc743629fef5e6f5584519d6bc3478fdc"
+    },
+    {
+      "path": "13596334782.zip",
+      "bytes": 1636746,
+      "sha256": "d50d506b08d522b0d0614b18ca6535be9a6d5acbd71162d02c99c935beff9a2b"
+    },
+    {
+      "path": "13596939443.zip",
+      "bytes": 1373232,
+      "sha256": "4e4b1a1c7e2a15ad828d92ee777166324972e3142858e1058688296b61db3220"
+    },
+    {
+      "path": "13597183820.zip",
+      "bytes": 274884,
+      "sha256": "9bf4711ebc3b6ba65b3ec70ea3857b637437680088c141b300fbe1a1d7cbafd4"
+    },
+    {
+      "path": "13597500595.zip",
+      "bytes": 308736,
+      "sha256": "7d32793a1b84eb1c6763f8839891a0b611e417180a7c5f628ecb1a977062b193"
+    },
+    {
+      "path": "13597593870.zip",
+      "bytes": 131381,
+      "sha256": "f01b79d50e822a6ed2cc152f6f9c48958c79b4030c89a770ea0b9d91323e150d"
+    },
+    {
+      "path": "13597852270.zip",
+      "bytes": 1054734,
+      "sha256": "1fe3f332193c3dd337c0128f5f84af604664dae139fb8cfb0d9cfe0173212afe"
+    },
+    {
+      "path": "13597857638.zip",
+      "bytes": 275781,
+      "sha256": "29cc319da0d2c3e2ea6dc9b7dea271427295ecdf3ded0f8a004cefc5135ec445"
+    },
+    {
+      "path": "13598066787.zip",
+      "bytes": 1370299,
+      "sha256": "500d1cd4e8abe370b28d1d8898be2e1c20ce458e4765b441de8894ad2caff7f3"
+    },
+    {
+      "path": "13598893836.zip",
+      "bytes": 131868,
+      "sha256": "0d32d81a067593e928d663854d2d416a024b6b4ff3fea2978b0fcc4b9a3f63bd"
+    },
+    {
+      "path": "13599613533.zip",
+      "bytes": 308880,
+      "sha256": "73e20fd76297736a42f5ba9943c826e0a74e703a7ea11c551700788229714738"
+    },
+    {
+      "path": "13599623607.zip",
+      "bytes": 1640616,
+      "sha256": "8273d6fa964fa979251800200e55c353775aa0c0515a18665ccb2ad6adce8162"
+    },
+    {
+      "path": "13599896093.zip",
+      "bytes": 1054026,
+      "sha256": "12932f8e4dcf0c3f0aa1e3d77ba7f7b1db74cbf8a64a37162b879639d1f01543"
+    },
+    {
+      "path": "13600102200.zip",
+      "bytes": 1706389,
+      "sha256": "9f9104a20d0e9170afe19147394f3d42abe00819ab91a60d358511093827af1e"
+    },
+    {
+      "path": "13600261699.zip",
+      "bytes": 359338,
+      "sha256": "0f4b0b6d09b6b803951a86d3fe0a9da2c30c19a1ec28e26de2b793ccdcf71d86"
+    },
+    {
+      "path": "artifacts-latest.json",
+      "bytes": 11022,
+      "sha256": "ad8228546ce74b38601ab2aa2b441012711574fc699ab31bebbdea2aa201e4f4"
+    },
+    {
+      "path": "artifacts.json",
+      "bytes": 5911,
+      "sha256": "50ca624543de1a4d513a7bda5524f999342b3a4cf54eaab0af1e39956727166b"
+    },
+    {
+      "path": "jobs-latest.json",
+      "bytes": 58223,
+      "sha256": "f9357b56e4879c3f11e3bf9fe35f54bd17ba73f9fcd92fd0c453d0bb7f307dd4"
+    },
+    {
+      "path": "jobs.json",
+      "bytes": 55526,
+      "sha256": "9580069212b2f97b3a7833a5220f3e769ba42bba9f661a9b6b7faa8de9b412d0"
+    },
+    {
+      "path": "run.json",
+      "bytes": 12890,
+      "sha256": "6ecc3ec7eb90bdce858a37cf5c98492de1f5df7c8eb49459fa9c52168e2cb596"
+    }
+  ],
+  "archive": {
+    "path": "original-ci.tar.gz",
+    "bytes": 13447733,
+    "sha256": "2ac9deaf53b6ce71d1ebcd700cb52bfe8a835fab9125c0611715a81596f4a38d"
+  }
+}
