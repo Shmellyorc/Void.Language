@@ -1,5 +1,23 @@
 # Trusted static native providers
 
+## Approved general C interoperability direction, 8 November 2026
+
+The [project/native architecture roadmap](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-general-purpose-c-interoperability)
+plans reusable typed C functions, structs, enums/constants and calling conventions,
+with dynamic linking by default and static archives optional. Raylib is the first
+substantial target, not a compiler subsystem. No public FFI grammar or general
+dynamic loader is implemented by this record. The static providers below remain
+valid implementation evidence, not a static-only future policy.
+
+Reuse explicit descriptors, typed IR admission, NativeSafe/precise roots, Runtime
+resources, provider quiescence and exact generation leases. Dynamic-library handles
+must outlive resources, callbacks and retained code. Project source/manifest metadata
+cannot authorize native loading or installation. The roadmap covers verified
+artifact discovery, target ABI/version constraints, JIT/AOT and VOIDUP boundaries;
+native per-platform/raylib acceptance remains future work.
+
+## Implemented trusted-provider foundation
+
 Stage 8 Sprint 4 generalizes admission to a second independently admitted static
 in-memory sink. See [the current contract](STAGE8_APPLICATION_NATIVE.md) for
 approval, implementation/verification status, exact supported operations and

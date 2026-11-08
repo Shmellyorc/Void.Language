@@ -1,5 +1,18 @@
 **Current result: RETAIN — locally qualified / hosted pending. CI #42446206797, baseline `b8776526c83d6c5668490bad8c2c1fc7a35b1f0f`. Native Windows 10 full Release and Debug each passed 351/351; final test-utility revision passed 7/7 in both profiles. Linux Release/Debug/fatal strict, real Linux/Windows editor tests, SDK/ABI and installed source-package checks passed. Actual new Server 2022 and macOS ARM64 acceptance remain pending Boss-controlled CI.**
 
+## Future project dependency boundary, 8 November 2026
+
+The [project/native roadmap](../PROJECT_ARCHITECTURE_ROADMAP.md#proposed-dependency-ownership-and-voidup-integration)
+records native `void.project.toml`, SemVer/locks and reusable C dependencies with
+dynamic linking by default, static optional. This is proposed future integration,
+not part of the retained VOIDUP implementation or its native/CI evidence below.
+VOIDUP already installs verified private toolchains; it is not yet a project
+package resolver. Keep its authenticated release catalogs, held filesystem/process
+capabilities, source/notices and resource inventories separate from project metadata.
+A manifest or import grants no installation or native-loading authority. Resolver
+command ownership remains open; reuse verification primitives without unrestricted
+package scripts. Existing platform acceptance limits remain unchanged.
+
 ## CI #42446206797 — Windows Server ancestry and explicit private staging
 
 Boss authorized diagnosis, implementation and complete available native qualification

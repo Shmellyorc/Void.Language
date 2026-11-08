@@ -4,6 +4,18 @@
 
 # VOID 2.0 language completeness roadmap
 
+## Next coordinated project roadmap, 8 November 2026
+
+The [project architecture roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) records the
+new approved direction and proposed implementation order for manifests, arbitrary
+entry filenames, init/new, app metadata/OS locations, numeric enums, general C FFI,
+dynamic-default raylib and public usability. It supersedes the `main.void`-only
+future selection requirement in this historical sprint plan, without changing
+baseline behavior or any original CI/acceptance record. This is documentation
+only; the new features and proposed syntax are not implemented or verified.
+
+## Recorded roadmap checkpoint
+
 
 20 October 2026. **Research reviewed; development direction and sprint sequence
 approved by Boss. The full roadmap is NOT implemented.** The inspected baseline is

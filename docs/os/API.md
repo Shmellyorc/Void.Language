@@ -1,9 +1,32 @@
 # OS environment and locations
 
-`use os` exposes exactly 13 public functions. All queries run synchronously on the
-owning application thread, including owner async activations and eager globals.
+The original OS delivery exposes the 13 queries below; later
+[VOIDUP Phase A](../voidup/REPORT.md) adds `args()`, now present in
+[the source facade](../../stdlib/os.void), for 14 public functions at this baseline.
+The original queries run synchronously on the owning application thread,
+including owner async activations and eager globals.
 Worker-reachable calls are rejected transitively. Import, source checking, editor
 analysis and object emission execute no native OS query.
+
+## Approved project-aware location direction, 8 November 2026
+
+The [project roadmap](../PROJECT_ARCHITECTURE_ROADMAP.md#proposed-metadata-delivery-and-os-locations)
+plans zero-argument `os.data_dir()`, `os.config_dir()`, `os.cache_dir()` and
+`os.state_dir()` using the consuming application's validated, immutable Runtime
+metadata. **Not implemented:** the four getters still require explicit IDs today.
+Keep their explicit-ID call forms, existing `result<string, error>`, validation,
+platform placement, errors, owned UTF-8 paths, owner-thread/GC rules and no-creation
+security contract. Project metadata authenticates no identity and grants no access.
+
+Propose embedding metadata in installed AOT applications and passing it explicitly
+to JIT/embedding Runtime contexts before eager globals. No cwd/source-manifest or
+process-filename guessing; library identity must not replace host application ID.
+Recommend existing `unavailable` for missing app context, zero native code/domain,
+and existing `invalid_argument` for an invalid explicitly supplied ID. Exact facade
+binding and the missing-context rule remain proposed, pending review. This does
+not change existing image/resource/PID observations of the JIT host.
+
+## Implemented original queries
 
 | Function | Return | Behavior |
 |---|---|---|
@@ -20,6 +43,11 @@ analysis and object emission execute no native OS query.
 | `architecture()` | `string` | Running binary target: `x86_64`, `aarch64`, `x86`, `arm` or `unknown`. |
 | `process_id()` | `i64` | Native getpid/GetCurrentProcessId, with unsigned DWORD widened directly. |
 | `is_bundle()` | `result<bool, error>` | Recognized macOS APPL `.app` with a file-backed executable; false for confirmed plain hosts/other platforms. |
+
+The later `args() -> result<[string], error>` reads the explicitly admitted
+per-Runtime argument snapshot; its startup/embedding and qualification record is
+[VOIDUP Phase A](../voidup/REPORT.md). It is not a project-identity API. The path,
+placement and error contracts below retain their original query scope.
 
 Every returned path is owned, nonempty, absolute, NUL-free and strict UTF-8, or
 the operation fails. Discovery creates nothing and promises no existence,

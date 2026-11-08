@@ -1,5 +1,24 @@
 # VOID 2.0: Language Bible and Compiler Architecture
 
+## Approved project and C interoperability direction, 8 November 2026
+
+The [coordinated architecture roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) records
+Boss and Golden Wrench's next priorities: native `void.project.toml`, independent
+project/application/package identities, SemVer, project-aware OS locations,
+first-file creation and `voidc init`/`new`, checked numeric-backed enum conversion,
+general typed C interoperability and IDE/package/release workflows. Dynamic linking
+is the approved default; static linking is optional. Raylib is the first substantial
+integration target, not a special compiler subsystem.
+
+**Approved direction, not implemented:** never require a hardcoded entry filename
+or an `entry` manifest key. Compiler-owned discovery must select exactly one valid
+main in the selected application source graph, in any valid source filename;
+multiple candidates diagnose ambiguity. Preserve explicit entries, standalone and
+top-level execution, and libraries without main. Baseline automatic `main.void`
+selection remains implemented until replaced. Proposed schema, `as?`/`??`, ABI and
+resolver details are labelled for review in the roadmap; metadata grants no authority.
+This is documentation only and grants no implementation or public release clearance.
+
 ## Active toolchain and migration history
 
 Current operations require [LLVM/Clang/LLD **23.1.4**](SOURCE_COMPILER.md#active-toolchain), retaining C++20, the single typed IR
@@ -481,10 +500,13 @@ No separate `printf`/`println` family is required in ordinary VOID.
 **Implemented clarification:** [MODULE_SYSTEM.md](MODULE_SYSTEM.md),
 [STAGE8_DISCOVERY.md](STAGE8_DISCOVERY.md) and
 [LOCAL_LIBRARIES.md](LOCAL_LIBRARIES.md) define the working VFS/import contracts.
-Explicit entry selection wins; automatic discovery selects the nearest exact
-`main.void` within the selected workspace, with a labelled standalone editor
+At baseline `7a3e0200`, explicit entry selection wins; automatic discovery selects
+the nearest exact `main.void` within the selected workspace, with a standalone editor
 fallback. There is no recursive search for files containing `main()`. The entry's
 parent establishes the project root and its compile-time project constants.
+The [approved replacement](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-compiler-owned-entry-discovery)
+removes filename priority and separates project root/source-set selection from
+entry selection. It is not implemented; `main.void` examples remain one valid filename.
 Application mode and selected-entry top-level execution follow the implemented
 Sprint 4 contract; imported executable top-level statements remain forbidden.
 External-package identities remain future work. Stage 11 implements runtime file
@@ -544,9 +566,12 @@ lockfile, compatible with `libs/` / `use lib/...`. It must consider target-aware
 native dependencies, platform/architecture compatibility, eventual C integration,
 trust/integrity checks without unrestricted automatic installation scripts, and
 future package discovery/editor support. Today's local imports are project-owned
-sources. [Authoritative future boundary](LOCAL_LIBRARIES.md#future-external-package-manager--boss-direction-21-october-2026):
-manifest syntax, resolver, version policy, trust and native-link contracts remain
-unapproved future design decisions. No external package implementation is claimed.
+sources. The [earlier future boundary](LOCAL_LIBRARIES.md#future-external-package-manager--boss-direction-21-october-2026)
+preserves the original scope. The [8 November project roadmap](PROJECT_ARCHITECTURE_ROADMAP.md)
+now records
+approved manifest/SemVer and dynamic-default C-linkage direction. Exact schema,
+resolver, constraints, trust and native ABI rules remain proposed design, not
+implemented contracts. No external project-package implementation is claimed.
 
 ### 10.1 Root constants
 
@@ -2126,7 +2151,12 @@ The GC owns the VOID wrapper; the native library may own the underlying resource
 
 ### 41.4 Packages and cross-platform linking
 
-An import such as `use "sqlite"` should select compatible package/native artifacts for the target OS and CPU, including `.dll`, `.so`, or `.dylib` as appropriate. Static and dynamic linking are both goals where available. A C library unavailable on the desired platform cannot be made portable by syntax alone; the tooling should explain that clearly.
+An import such as `use "sqlite"` illustrates future selection of compatible
+package/native artifacts for the target OS and CPU, including `.dll`, `.so` or
+`.dylib`. The 8 November approved direction is dynamic linking by default, with
+static linking optional; see the [typed C roadmap](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-general-purpose-c-interoperability).
+This illustrative import does not supersede current VFS/source imports or authorize
+native loading. Tooling must diagnose unavailable platform dependencies clearly.
 
 **OPEN:** Package manifest schema, native ownership annotation format, header-import generation, FFI calling conventions, callback exception propagation, dynamic library lifetime, and supported C ABI type mapping. These should be fixed before claiming arbitrary C libraries work automatically.
 
@@ -3288,8 +3318,10 @@ unapproved I2 alternative.
 ## Stage 9 approved application workflow — 21 October 2026
 
 Boss approved automatic entry classification for check/run/build/emit and removed
-the public application flag entirely. Run/build without a path use cwd main.void
-discovery. Explicit .void filenames remain unrestricted. Build produces a native
+the public application flag entirely. At baseline, run/build without a path use cwd
+main.void discovery; the [approved replacement](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-compiler-owned-entry-discovery)
+will remove filename priority. Explicit .void filenames remain unrestricted.
+Build produces a native
 executable under selected-root/build/entry-stem (Windows: .exe), with an optional
 output override. Legacy precedence/input/printing and application status, return,
 import and conflict semantics below remain unchanged. The compiler owns selection,
@@ -3313,10 +3345,11 @@ arbitrary `--entry` function selection remains unimplemented and unapproved here
 
 ## Historical entry-point discussion: 12 October 2026 [SUPERSEDED WHERE NOTED]
 
-This records a developer-simplicity discussion for future executable/project work.
-It is an **open alternative** to the discovery choices in Section 10, not an
-implementation claim or an approved replacement of that older agreed direction.
-Do not silently change CLI behavior or source semantics based on this section.
+This preserves the original developer-simplicity discussion, not a current entry
+requirement. The 8 November [approved filename-independent direction](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-compiler-owned-entry-discovery)
+supersedes its `main.void` default/only-auto-main recommendations. The old discovery
+algorithm remains implemented at baseline; arbitrary entry-function selection below
+is still illustrative and unimplemented. Do not change CLI semantics from this history.
 
 **Shared preference:** A `.void` file is valid without `main()`, `init()` or
 `deinit()`. Ordinary libraries and the future standard library can consist only

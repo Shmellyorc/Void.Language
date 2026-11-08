@@ -1,5 +1,22 @@
 # Numeric types and contextual literals
 
+## Approved numeric-backed enum direction, 8 November 2026
+
+The [project roadmap](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-numeric-backed-enums-and-fallible-conversion)
+plans checked integer-to-numeric-enum conversion. A valid conversion must check
+both backing-type range and membership in the declared discriminants; invalid
+integers must never create invalid enum values. Existing payload-bearing tagged
+variants and internal tag ordinals do not become integer-backed C enums.
+
+`(code as? error_kind) ?? error_kind.system_failure` is illustrative syntax only.
+The current parser rejects `as?` and has no `??` expression operator. Numeric enum
+declaration syntax, optional/result representation, fallback typing and grammar
+remain proposed design. Existing numeric `as`, RuntimeFailure, independent IR
+validation and shared normal/O2 LLVM JIT/AOT semantics remain unchanged. New enum
+conversion and its cross-mode/platform acceptance are not implemented or verified.
+
+## Existing numeric contract
+
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
 Phase 6 contract approved by the user on 11 October 2026. This specifies the

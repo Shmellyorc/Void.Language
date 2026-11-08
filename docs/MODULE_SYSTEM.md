@@ -1,5 +1,18 @@
 # Module system and multi-file native compilation
 
+## Approved project direction, 8 November 2026
+
+The [project architecture roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) proposes
+manifest-root source sets, persistent project/package identity and compiler-owned
+entry discovery without a required filename or `entry` key. One valid main is
+selected; multiple application candidates diagnose ambiguity. This is not
+implemented: baseline automatic selection still uses exact `main.void`, while
+explicit files can have any valid name. A manifest root would be independent of
+the selected entry's directory; explicit standalone files keep existing behavior.
+Imported libraries gain neither entry eligibility nor native authority by import.
+The proposed broader application seed graph and external package domain must pass
+the existing VFS, snapshot, visibility and typed-analysis gates.
+
 ## Stage 11 runtime global declarations
 
 Outermost `var` is a declaration in every module, including imported modules.
@@ -72,8 +85,11 @@ No namespace declarations or folder-based import restrictions are introduced.
 
 ## VFS and canonical identity
 
-The explicitly supplied entry file's parent establishes the virtual project
-root. There is no automatic entry discovery or root override in this phase.
+For explicit standalone entry files, the entry's parent establishes the virtual
+project root. The original module phase had no automatic discovery/root override;
+[Stage 8](STAGE8_DISCOVERY.md) later added shared exact-case `main.void` selection.
+Neither phase implements manifest-root selection or the filename-independent
+[replacement plan](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-compiler-owned-entry-discovery).
 The entry argument is an ordinary host path, interpreted once; all source imports
 then resolve independently of the caller's working directory.
 

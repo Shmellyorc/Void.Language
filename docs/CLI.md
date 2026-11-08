@@ -1,8 +1,21 @@
 # voidc command reference
 
-This is the current public command contract. It extends the existing commands
-with help/version output and a conventional `--` operand delimiter; no source,
-entry, JIT/cache or native-linking redesign is proposed.
+## Future project commands, 8 November 2026
+
+The [project roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) proposes `voidc init` and
+`voidc new`, manifest-aware check/run/build, profile selection and eventual
+resolve/package workflows. These are not current commands or accepted option
+syntax. The approved entry direction requires no filename convention or mandatory
+entry field: one valid main is selected by compiler analysis; ambiguity diagnoses.
+The current command forms and `main.void` directory behavior below remain the
+implemented baseline. Explicit source paths and standalone/top-level/legacy
+execution must remain compatible. Init/new perform no implicit dependency install.
+
+## Implemented command contract
+
+This is the baseline public command contract. Its help/version output and
+conventional `--` operand delimiter retain the existing source, entry, JIT/cache
+and native-linking behavior. The project redesign above remains future work.
 
 ```text
 voidc --help | -h

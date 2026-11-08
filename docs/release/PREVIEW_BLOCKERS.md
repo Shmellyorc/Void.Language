@@ -1,5 +1,18 @@
 # VOID 2.0 preview blocker register
 
+## Future application usability milestone, 8 November 2026
+
+The [project roadmap](../PROJECT_ARCHITECTURE_ROADMAP.md#proposed-ide-and-public-usability-milestones)
+records future install → init/new → arbitrary source filename → raylib → run →
+package acceptance, with project metadata, verified dependencies, native loader
+layouts, assets/notices and editor/debug evidence. These new features remain
+unimplemented and unverified. This planning entry does not reopen accepted source
+installation gates, turn every future feature into a present preview blocker,
+or clear existing redistribution, trust, platform or publication limits below.
+Boss controls the scope and timing of public release.
+
+## Recorded preview qualification and blockers
+
 5 November 2026. Private qualification; no release authorization.
 
 Current performance disposition: [integrated qualification](../compiler-health/INTEGRATED_PERFORMANCE_QUALIFICATION.md). Boss clarifies that FILE200 <10 ms is an optimization aim, not a mandatory release requirement. The original dated decision and all unfavorable measurements remain preserved.

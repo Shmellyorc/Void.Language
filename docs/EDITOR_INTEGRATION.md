@@ -1,5 +1,22 @@
 # VOID editor integration (Phase 11)
 
+## Approved project workflow roadmap, 8 November 2026
+
+The [coordinated project roadmap](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-ide-and-public-usability-milestones)
+plans first-file `void.project.toml` creation with accept/decline and persisted
+prompt suppression, validation, identity/dependency assistance, filename-independent
+entry discovery, enum conversion diagnostics, FFI navigation/completion and raylib
+native errors. Project build/run/profile/debug workflows use compiler-owned
+analysis and verified plans. No project creation, new grammar, dependency installer
+or debugger support is implemented by this documentation change.
+
+The [first-file design](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-first-file-creation-and-terminal-workflows)
+preserves standalone files, trusted-workspace restrictions, exclusive creation and
+explicit retry after decline/dismissal. Manifest/source-set edits must use shared
+selection revisions and preserve dirty overlays. Baseline `void.project.entry`,
+`voidls --discover`, exact `main.void` selection and existing session behavior below
+remain delivered behavior until the compiler/protocol replacement is implemented.
+
 **Stage 8 Sprint 1 (20 October 2026):** [STAGE8_DISCOVERY.md](STAGE8_DISCOVERY.md)
 supersedes the historical import/discovery exclusions below. It specifies separate
 standard/project source domains, importer-relative bare quoted imports, bounded

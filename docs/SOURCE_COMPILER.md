@@ -1,5 +1,18 @@
 # Source compiler and engineering build guide
 
+## Approved project/compiler roadmap, 8 November 2026
+
+The [project architecture roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) plans native
+manifest parsing, bounded compiler-owned source-set/main discovery, immutable
+application metadata, checked numeric enums and general typed C ABI/link plans.
+Never require `main.void` or a mandatory entry field in the replacement design;
+select one valid main or report ambiguity. Reuse the current frontend, typed IR
+validation, Runtime context, LLVM JIT/AOT, explicit native admission, resource
+inventories and staged artifact publication. Dynamic linking is the approved
+default; static remains optional. These are unimplemented future additions, not
+changes to current commands or a new compiler/backend. Baseline exact `main.void`
+automatic discovery and explicit-file compatibility still apply below.
+
 For onboarding, start with [source installation](install/README.md),
 [your first program](FIRST_PROGRAM.md) and the [current CLI reference](CLI.md).
 The manual build commands and dated implementation records below remain useful

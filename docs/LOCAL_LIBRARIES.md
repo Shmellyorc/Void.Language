@@ -1,5 +1,18 @@
 # Project-local VOID libraries
 
+## Later approved project/package direction, 8 November 2026
+
+The [coordinated roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) extends the future
+Git-based package direction with native project manifests, separate package/app
+identities, SemVer and verified native dependencies. General typed C linking is
+dynamic by default, static optional; raylib is the first substantial integration
+target. Today's `lib/raylib` example is source layout, not a working C binding.
+New manifest/resolver/FFI details are proposed and unimplemented. Preserve local
+`libs/` identities/visibility; external packages need a separate boundary, and
+neither imports nor metadata grant native or installation authority.
+
+## Recorded local-library delivery
+
 21 October 2026. **Implemented and locally verified; Wrench review and native
 Windows/macOS verification pending.** [Acceptance evidence](local-libraries/ACCEPTANCE.md).
 This is the owner-authorized local-library sprint, not Stage 9 or hosted acceptance.
@@ -35,7 +48,9 @@ Unquoted segments retain the existing lowercase ASCII identifier grammar and `/`
 separators; omit `.void`. Quoted project paths retain their existing portable
 filename rules. The selected entry's parent is the VFS root, independent of cwd.
 `app.void` is an explicit entry, not a new automatic discovery filename. See
-[project selection](STAGE8_DISCOVERY.md) for deterministic `main.void` discovery.
+[baseline project selection](STAGE8_DISCOVERY.md) for deterministic `main.void`
+discovery. The [approved replacement](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-compiler-owned-entry-discovery)
+selects one main regardless of filename and diagnoses ambiguity; it is not implemented.
 
 ## Identity, ownership and safety
 
@@ -100,7 +115,9 @@ Package discovery and editor integration are future capabilities, using the
 compiler-owned source/identity model where appropriate.
 
 Exact manifest syntax, resolver design, version policy, trust rules, external
-identities and native-link contracts remain **future design decisions**, not
-approved implementations. No package manager is implemented by the local-library,
-Stage 9 or CI #90 repairs. Complete VOID language features before substantial
+identities and native-link contracts remain **proposed design details**, not
+implemented contracts. The 8 November record above approves manifest/SemVer and
+dynamic-default linkage direction without freezing those details. No project package
+manager is implemented by the local-library, Stage 9 or CI #90 repairs.
+Complete VOID language features before substantial
 standard-library implementation. This section records direction, not a new sprint.

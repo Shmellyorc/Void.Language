@@ -30,6 +30,9 @@ holds in historical records do not govern current work.
 
 ## Engineering documentation
 
+- [First-class projects and C interoperability roadmap](PROJECT_ARCHITECTURE_ROADMAP.md):
+  approved next direction, proposed manifest/discovery/enum/FFI design, baseline
+  audit and ordered acceptance gates. Planning only; no implementation claimed.
 - [Current status/strategy](DEVELOPMENT_STRATEGY.md), [Wrench instructions](WRENCH_CLANKER.md),
   [Research role](RESEARCH_CLANKER.md), [known issues](KNOWN_ISSUES.md).
 - VOIDUP: [Phase A](voidup/REPORT.md), [Phase B](voidup/PHASE_B_REPORT.md),

@@ -1197,3 +1197,50 @@ known progress; shutdown can remain blocked when an external host/device prevent
 I/O progress. No mandatory io_uring, duplicate I/O framework, process-wide descriptor
 flag changes or cancellation of unrelated host requests. Preserve scoped SIGPIPE
 handling and NativeSafe/precise GC. See stage10/CONSOLE_IO.md and the Step 24 evidence.
+
+
+## 8 November 2026 — First-class projects and general C interop
+
+**Approved direction; documentation assignment only.** Boss and Golden Wrench
+agreed on the next priorities. Baseline `7a3e02008db64ee185aa4665aac5c76e3aff4b2b`.
+The [coordinated roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) owns the detailed
+proposed design, source/evidence audit, unresolved questions and acceptance gates.
+
+- First-class `void.project.toml`: independent project, stable application and
+  library/package identity; semantic versions including prerelease/build metadata;
+  source/dependency/native linkage metadata and Debug/Release settings. Installed
+  apps must reliably retain metadata. Developers should not repeat the app ID in
+  every OS call; preserve explicit-ID forms, errors and security contracts.
+- No hardcoded entry filename and no mandatory `entry` key. Main can be in any
+  valid selected application source filename. Compiler-owned graph analysis
+  selects exactly one valid main, diagnoses multiple candidates, and preserves
+  explicit entry, standalone/top-level/legacy behavior and libraries without main.
+  This supersedes the older filename-only future direction; exact-case main.void
+  automatic discovery is still implemented until the replacement lands.
+- VS Code offers first-file project creation with accept/decline and no repeated
+  prompts; standalone use continues. Plan equivalent `voidc init` and `voidc new`.
+- Checked integer-to-numeric-enum conversion must reject undeclared discriminants
+  safely; numeric enums differ from payload variants. The requested
+  `(code as? error_kind) ?? error_kind.system_failure` is illustrative pending
+  grammar/result-shape review, not executable syntax or a new numeric contract.
+- General typed C interoperability, not a raylib compiler subsystem. **Dynamic
+  linking by default; static linking optional.** Raylib is the first substantial
+  integration target. Preserve explicit native admission, precise GC, Runtime
+  ownership, foreign callback quiescence and exact generation leases.
+- Reuse compiler-owned analysis/LSP for manifests, entries, identities/dependencies,
+  enum/FFI assistance, raylib errors and project build/run/debug workflows. Plan
+  installation, examples, dependency resolution, platform packaging and release
+  readiness so users do not assemble compiler/linker commands manually.
+- Project metadata and imports confer no filesystem, native-library or package
+  installation authority. Existing Git-based package direction remains; the
+  implemented private VOIDUP toolchain installer is distinct from future project
+  dependency resolution.
+
+Proposed schema/constraints, source-set defaults, external-package identities,
+OS facade binding, enum syntax/result shape, binding ABI/loading policy, static
+JIT support and resolver ownership remain review questions. All new behavior is
+unimplemented/unverified. Existing implementation evidence and historical CI
+results retain their original scope. Recommended order and measurable gates are
+in the [roadmap](PROJECT_ARCHITECTURE_ROADMAP.md#recommended-implementation-order-and-acceptance-gates).
+Stop after documentation for Golden Wrench's independent architecture review;
+Boss retains implementation, Git, hosted CI and public release control.

@@ -1,5 +1,18 @@
 # Stage 8 Sprint 1: project and module discovery
 
+## Later approved replacement, 8 November 2026
+
+The exact-case `main.void` algorithm below is an implemented historical milestone
+and remains baseline behavior, not the permanent project design. The
+[project roadmap](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-compiler-owned-entry-discovery)
+requires filename-independent compiler-owned discovery, optional manifest entry,
+one valid main or an ambiguity diagnostic, with explicit/standalone compatibility.
+Manifest/source-set selection and protocol revisions are proposed, unimplemented
+work. Existing path-security checks and original CI evidence remain authoritative
+within their recorded scope; adapters must continue delegating discovery.
+
+## Recorded Stage 8 delivery
+
 20 October 2026. Sprint 1 is implemented and locally verified (423/423 consolidated suites);
 Boss locally accepted Sprint 1; its CI #82 repair is preserved in the
 [Sprint 2 verification](stage8/SPRINT2_ACCEPTANCE.md). Hosted acceptance is deferred

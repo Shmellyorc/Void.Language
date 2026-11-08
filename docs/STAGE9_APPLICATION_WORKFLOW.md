@@ -1,5 +1,16 @@
 # Stage 9 application workflow — 21 October 2026
 
+## Later approved project direction, 8 November 2026
+
+The [project architecture roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) records the
+approved replacement for filename-based discovery, native `void.project.toml`,
+embedded app identity, project commands and general typed C linking (dynamic by
+default, static optional). **Planning only:** the Stage 9 implementation and all
+CI evidence below retain their original scope. Never require a hardcoded filename
+or mandatory `entry` in the future manifest. Compiler analysis will select one valid
+main in the selected application source graph or diagnose ambiguity; explicit
+entries, top-level/legacy classification and libraries without main remain supported.
+
 ## Stage 11 global declaration integration
 
 File-level globals coexist with main or legacy entry and initialize before the
@@ -29,7 +40,8 @@ voidc build [file-or-directory] [-o executable] [--no-opt]
 voidc emit <file-or-directory> -o <object> [--no-opt]
 ```
 
-Absent run/build paths select cwd. Directories use shared deterministic exact-case
+At the inspected baseline, absent run/build paths select cwd. Directories use
+shared deterministic exact-case
 `main.void` discovery. Explicit `.void` files may have any filename; their parent
 is the project root. Options may precede or follow operands. Unknown/duplicate
 options, removed `--app`, unsupported application operands, cache outside run and
@@ -46,6 +58,8 @@ their i32 status without printing it, and no-result main/top-level fallthrough
 return zero. Typed main requires explicit return on every reachable path.
 Imported executable statements and conflicting entry styles reject; an imported
 main is never selected. No source scanning or separate parser chooses the mode.
+The planned compiler-owned source inventory changes discovery only after separate
+implementation; it must not introduce another parser or weaken entry validation.
 
 ## Native artifacts and resources
 
@@ -134,6 +148,6 @@ voidls and adapters retain shared discovery, local/standard import isolation,
 overlays/snapshots, UTF-16, incomplete-source recovery and navigation/completion/
 documentation/shutdown. No editor compiler or path resolver was introduced.
 
-No package manager, network fetching, manifests, arbitrary FFI, cross compilation,
+No project package manager, network fetching, project manifests, arbitrary FFI, cross compilation,
 new language feature, Git mutation, hosted execution or public README edit is part
 of this implementation.

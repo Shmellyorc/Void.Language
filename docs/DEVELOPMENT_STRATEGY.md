@@ -1,5 +1,17 @@
 # Development strategy and current status
 
+## Next project/application priorities, 8 November 2026
+
+The [coordinated architecture roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) records
+Boss and Golden Wrench's approved direction, proposed details, baseline audit,
+unresolved questions and acceptance gates. Recommended order: schema/identity and
+compiler discovery; embedded metadata/OS conveniences; init/new/editor creation;
+checked numeric enums; resolver/general typed C ABI; dynamic raylib then optional
+static; debugger, platform packaging and public onboarding/release preparation.
+Some language work can proceed independently after review. All new features remain
+unimplemented/unverified; this assignment authorizes documentation only. Existing
+acceptance and release limits retain their recorded scopes.
+
 ## Current implementation status
 
 The active toolchain is **LLVM/Clang/LLD 23.1.4 exclusively**; use the

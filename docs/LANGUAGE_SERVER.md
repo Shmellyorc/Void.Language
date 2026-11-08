@@ -1,5 +1,17 @@
 # Minimal VOID language server (Phase 10)
 
+## Approved project analysis roadmap, 8 November 2026
+
+The [project roadmap](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-ide-and-public-usability-milestones)
+proposes shared manifest diagnostics/metadata, source-set and main candidate
+selection, dependency/native errors, numeric enum conversion analysis and typed
+FFI symbols. Reuse compiler `ValidatedAnalysis`, `ToolingSession`/`ToolingIndex`,
+snapshots, UTF-16 spans and guarded navigation/edits. Discovery protocol changes
+must be explicit; adapters must not parse manifests/main/FFI independently or
+silently change fixed sessions with dirty buffers. Analysis never executes source,
+installs dependencies or loads native libraries. All additions are unimplemented;
+existing `--discover`/`--entry` selection and protocol remain the baseline contract.
+
 ## Compiler documentation and result metadata repair
 
 [Contract](DOCUMENTATION_HOVER.md) and [local evidence](DOCUMENTATION_HOVER_IMPLEMENTATION.md)
