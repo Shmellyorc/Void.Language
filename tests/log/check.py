@@ -4,7 +4,7 @@ try:
     r=h.run([sys.argv[1], 'check', sys.argv[2] if len(sys.argv)>2 else h.ROOT/'tests/log/smoke.void'])
     print(r.stdout.decode(), r.stderr.decode())
 except AssertionError as problem:
-    print('Source check failed; original receipt retained.')
+    print('Source check failed. Set VOID_TEST_DIAGNOSTICS_DIR to keep the receipt on a rerun.')
     latest=max(h.EVIDENCE.glob('run-*'),key=lambda p:p.stat().st_mtime_ns)
     print((latest/'stderr.bin').read_text()[:14000])
     raise SystemExit(1)

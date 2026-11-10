@@ -11,12 +11,11 @@ import sys
 import tempfile
 ROOT = Path(__file__).resolve().parents[2]
 HERE = Path(__file__).resolve().parent
-os.environ['VOID_CRASH_EVIDENCE'] = str(ROOT / 'docs/math/evidence/crashes')
 sys.path.insert(0, str(ROOT / 'tests/random'))
 sys.path.insert(0, str(ROOT / 'tests/text_encoding'))
 import harness as base
 import crash
-from crash import install, run as preserving_run
+from crash import install, output_directory, run as preserving_run
 sys.path.insert(0, str(HERE))
 install()
 
@@ -33,7 +32,7 @@ if len(sys.argv) > 1:
         context = {'compiler': str(compiler), 'compiler_sha256': digest,
                    'native_manifest_sha256': hashlib.sha256(manifest.read_bytes()).hexdigest() if manifest.is_file() else None,
                    'native_manifest': manifest.read_text(encoding='utf-8') if manifest.is_file() else None}
-        IDENTITY = ROOT / 'docs/math/evidence' / ('compiler-identity-' + digest + '.json')
+        IDENTITY = output_directory() / ('compiler-identity-' + digest + '.json')
         IDENTITY.parent.mkdir(parents=True, exist_ok=True)
         raw = (json.dumps(context, indent=2) + '\n').encode()
         descriptor, temporary = tempfile.mkstemp(prefix='.compiler-identity-', suffix='.tmp', dir=IDENTITY.parent)

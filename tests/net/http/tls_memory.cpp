@@ -50,7 +50,15 @@ int make_roots(const char* certificate,const char* key,const char* destination) 
     for(long serial=1;;++serial) {
         std::unique_ptr<X509,decltype(&X509_free)> copy(X509_dup(original.get()),X509_free);
         std::unique_ptr<BIO,decltype(&BIO_free)> encoded(BIO_new(BIO_s_mem()),BIO_free);
-        require(copy && encoded && ASN1_INTEGER_set(X509_get_serialNumber(copy.get()),serial)==1 &&
+        // Keep the subject as long as "localhost" while giving each synthetic
+        // root its own name. The original root still verifies the peer leaf.
+        const auto name = "root" + std::to_string(10000 + serial);
+        std::unique_ptr<X509_NAME,decltype(&X509_NAME_free)> subject(X509_NAME_new(),X509_NAME_free);
+        require(copy && encoded && subject && X509_NAME_add_entry_by_txt(subject.get(),"CN",MBSTRING_ASC,
+            reinterpret_cast<const unsigned char*>(name.c_str()),-1,-1,0)==1 &&
+            X509_set_subject_name(copy.get(),subject.get())==1 &&
+            X509_set_issuer_name(copy.get(),subject.get())==1 &&
+            ASN1_INTEGER_set(X509_get_serialNumber(copy.get()),serial)==1 &&
             X509_sign(copy.get(),signing.get(),EVP_sha256())>0 && PEM_write_bio_X509(encoded.get(),copy.get())==1,"corpus signing");
         char* bytes=nullptr;const auto size=BIO_get_mem_data(encoded.get(),&bytes);
         require(size>0,"corpus encoding");

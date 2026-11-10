@@ -33,8 +33,8 @@ with tempfile.TemporaryDirectory(prefix='VOID text installed 雪 ') as directory
         assert (moved / 'share/void/stdlib' / module).read_bytes() == (
             Path(__file__).resolve().parents[2] / 'stdlib' / module).read_bytes()
     invoke([installed, 'check', fixture], root)
-    invoke([installed, 'run', fixture, '--no-opt'], root)
-    invoke([installed, 'run', fixture], root)
+    invoke([installed, 'run', fixture, '--no-cache', '--no-opt'], root)
+    invoke([installed, 'run', fixture, '--no-cache'], root)
     output = root / ('installed.exe' if os.name == 'nt' else 'installed')
     invoke([installed, 'build', fixture, '-o', output], root)
     invoke([output], root)

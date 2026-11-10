@@ -1,11 +1,9 @@
 """URL's compiler-owned API docs, navigation and public completion inventory."""
 from pathlib import Path
-import os
 import sys
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
-os.environ["VOID_CRASH_EVIDENCE"] = str(ROOT / "docs/net/http/evidence/crashes")
 sys.path.insert(0, str(ROOT / "tests/os"))
 import support as h
 from crash import install

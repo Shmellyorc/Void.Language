@@ -11,7 +11,14 @@
 | Close | Record the accepted behavior, limitations, platforms, profiles, results, pinned dependencies and replay commands in one Markdown closeout. Keep source, tests and required inputs. Archive selected historical material, then remove disposable outputs when authorized. Record free space before and after cleanup. |
 | CI | Run the same maintained coverage. Use short-lived diagnostic artifacts for failures. Keep generated transcripts, captures, packages and build outputs out of Git. |
 
-Monitor large new directories during the work. Current test helpers that write under `docs/*/evidence/` need a separate scratch-output migration that preserves their fixtures and coverage. Use ordinary ZIP with DEFLATE level 9 for approved historical records. Keep active toolchains, verified provider inputs and release notices with the development environment.
+Monitor large new directories during the work. Use ordinary ZIP with DEFLATE level 9 for approved historical records. Keep active toolchains, verified provider inputs and release notices with the development environment.
+
+## Test development
+
+- Give each test invocation its own temporary workspace. Use Python's `TemporaryDirectory` for fixtures and subprocesses. A Python harness that writes receipts can use `tools/test_output.py`'s `output_directory()`. A CMake recipe that passes an output path can use `void_add_output_test` and the `@VOID_TEST_OUTPUT@/` prefix. Both use the system temporary location and clean up when the test exits normally, including assertion failures.
+- Keep checked-in fixtures and golden outputs read-only. Use `voidc run --no-cache` when exercising a checked-in source outside a cache test. Keep cache behavior tests pointed at copies or generated fixtures in a private directory. CTest disables Python bytecode writes. Use `python -B` for direct harness runs.
+- Use `ctest --output-on-failure` for routine diagnostics. Set `VOID_TEST_DIAGNOSTICS_DIR` to a private directory outside the checkout to keep a rerun's shared-harness output. That opt-in also retains successful reruns. Inspect and remove the directory after diagnosis. If a test runner is killed, check its task-owned temporary root for leftovers.
+- Keep build and install inputs, including generated manifests and prelinked regression executables, with their configured build. CTest's own result log stays with that build. Pass explicit output paths to one-off qualification and fixture-generation tools.
 
 ## Verified archives
 

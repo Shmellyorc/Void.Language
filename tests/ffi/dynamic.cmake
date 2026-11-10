@@ -50,8 +50,8 @@ add_executable(void_g4_tests "${g4_src}/dynamic.cpp")
 target_include_directories(void_g4_tests SYSTEM PRIVATE "${VOID_HOST_DEPS_ROOT}/include")
 target_link_libraries(void_g4_tests PRIVATE void_llvm)
 add_dependencies(void_g4_tests void_g4_plan void_g4_competitor void_g4_initializer)
-add_test(NAME ffi_g4_jit_ir COMMAND void_g4_tests "${g4_plan}" "${g4_src}/dynamic.void" "${g4_bin}/native"
-  "${g4_bin}/jit-probes" "$<TARGET_FILE:void_g4_competitor>" "$<TARGET_FILE:void_g4_initializer>")
+void_add_output_test(ffi_g4_jit_ir "$<TARGET_FILE:void_g4_tests>" "${g4_plan}" "${g4_src}/dynamic.void" "${g4_bin}/native"
+  "@VOID_TEST_OUTPUT@/ffi-g4/jit-probes" "$<TARGET_FILE:void_g4_competitor>" "$<TARGET_FILE:void_g4_initializer>")
 set_tests_properties(ffi_g4_jit_ir PROPERTIES TIMEOUT 180)
 
 foreach(mode IN ITEMS normal optimized startup)

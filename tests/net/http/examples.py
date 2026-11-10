@@ -100,7 +100,7 @@ def main():
             for name, target, expected in cases:
                 path = sources / (name + '.void')
                 extra = {'VOID_HTTP_CA': str(cert)} if name == 'authenticated_post' else {}
-                run([compiler, 'run', path], target, expected, extra=extra)
+                run([compiler, 'run', path, '--no-cache'], target, expected, extra=extra)
                 binary = work / (name + ('.exe' if os.name == 'nt' else ''))
                 run([compiler, 'build', path, '-o', binary])
                 run([binary], target, expected, extra=extra)

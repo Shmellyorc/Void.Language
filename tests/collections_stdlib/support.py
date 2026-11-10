@@ -10,9 +10,8 @@ import time
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))
 from test_platform import native_text, native_manifest
-EVIDENCE = ROOT / 'docs/collections/evidence'
-EVIDENCE.mkdir(parents=True, exist_ok=True)
-os.environ['VOID_CRASH_EVIDENCE'] = str(EVIDENCE / 'crashes')
+from test_output import output_directory
+EVIDENCE = output_directory()
 sys.path.insert(0, str(ROOT / 'tests/text_encoding'))
 import crash
 

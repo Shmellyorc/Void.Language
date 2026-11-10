@@ -29,8 +29,8 @@ endif()
 add_executable(void_g3_tests "${g3_src}/resources.cpp"
   $<TARGET_OBJECTS:void_g3_thunk> $<TARGET_OBJECTS:void_g3_fixture>)
 target_link_libraries(void_g3_tests PRIVATE void_llvm)
-add_test(NAME ffi_g3_jit_ir COMMAND void_g3_tests "${g3_bin}/resources.descriptor"
-  "${g3_src}/resources.void" "${g3_bin}/tests")
+void_add_output_test(ffi_g3_jit_ir "$<TARGET_FILE:void_g3_tests>" "${g3_bin}/resources.descriptor"
+  "${g3_src}/resources.void" "@VOID_TEST_OUTPUT@/ffi-g3/tests")
 set_tests_properties(ffi_g3_jit_ir PROPERTIES TIMEOUT 180)
 foreach(mode IN ITEMS normal optimized)
   set(g3_object "${g3_bin}/application-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")

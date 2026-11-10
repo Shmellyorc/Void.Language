@@ -39,7 +39,7 @@ with tempfile.TemporaryDirectory(prefix='VOID text encoding execution ') as dire
             cwd = root / (name + '-' + mode)
             cwd.mkdir()
             if mode in ('jit', 'o2'):
-                command = [compiler, 'run', fixture]
+                command = [compiler, 'run', fixture, '--no-cache']
                 if mode == 'jit':
                     command += ['--no-opt']
             else:

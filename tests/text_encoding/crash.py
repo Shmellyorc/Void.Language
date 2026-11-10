@@ -7,10 +7,14 @@ import re
 import shutil
 import signal
 import subprocess
+import sys
 import tempfile
 import threading
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.append(str(ROOT / 'tools'))
+from test_output import output_directory
+
 REAL_RUN = subprocess.run
 _RUN_CONTEXT = threading.local()
 
@@ -32,6 +36,11 @@ def _signal_name(status):
     except ValueError:
         # Signed Windows exception statuses are not POSIX signal numbers.
         return None
+
+
+def evidence_directory():
+    override = os.environ.get('VOID_CRASH_EVIDENCE')
+    return Path(override) if override else output_directory() / 'crashes'
 
 
 def _sources(command, cwd, source_inputs, environment):
@@ -60,7 +69,7 @@ def _sources(command, cwd, source_inputs, environment):
     configured = environment.get('VOID_STDLIB_ROOT')
     if configured:
         sources.update(Path(configured).rglob('*.void'))
-    evidence = Path(os.environ.get('VOID_CRASH_EVIDENCE', ROOT / 'docs/text-encoding/evidence/crashes')).resolve()
+    evidence = evidence_directory().resolve()
     return {path.resolve() for path in sources if path.is_file() and
             (path in explicit or not path.resolve().is_relative_to(evidence))}
 
@@ -70,7 +79,7 @@ def preserve(command, cwd, result, source_inputs=(), provenance_inputs=(), *,
     if source_snapshots is None:
         source_snapshots = getattr(result, 'source_snapshots', None)
     environment = os.environ if environment is None else environment
-    target = Path(os.environ.get('VOID_CRASH_EVIDENCE', ROOT / 'docs/text-encoding/evidence/crashes'))
+    target = evidence_directory()
     target.mkdir(parents=True, exist_ok=True)
     incident = Path(tempfile.mkdtemp(prefix='incident-', dir=target))
     working = Path(cwd or Path.cwd()).resolve()
@@ -220,7 +229,15 @@ def preserve(command, cwd, result, source_inputs=(), provenance_inputs=(), *,
             record['editor_snapshots'].append({'uri': uri, 'version': version, 'copy': str(copy),
                 'sha256': hashlib.sha256(raw).hexdigest()})
     (incident / 'receipt.json').write_text(json.dumps(record, indent=2) + '\n')
-    print('CRASH EVIDENCE:', incident, flush=True)
+    print('CRASH EVIDENCE:', incident, file=sys.stderr, flush=True)
+    if not (os.environ.get('VOID_CRASH_EVIDENCE') or os.environ.get('VOID_TEST_DIAGNOSTICS_DIR')):
+        print(f"{record['failure_kind']} ({record['returncode']}) in {arguments!r}. "
+              'Set VOID_TEST_DIAGNOSTICS_DIR to retain a rerun.', file=sys.stderr, flush=True)
+        errors = getattr(result, 'stderr', None)
+        if isinstance(errors, bytes):
+            errors = errors[-4096:].decode('utf-8', errors='backslashreplace')
+        if errors:
+            print(errors[-4096:], file=sys.stderr, flush=True)
 
 
 def run(command, *args, **kwargs):

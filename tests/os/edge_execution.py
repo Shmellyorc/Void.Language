@@ -26,7 +26,7 @@ func main():
         images.append({'path':str(binary),'sha256':hashlib.sha256(binary.read_bytes()).hexdigest()})
         h.run([binary],work,b'true\n',sources=(source,),small=small)
         assert not binary.exists()
-    (h.ROOT/'docs/os/evidence'/('deleted-image-'+compiler.parent.name+('-stack' if small else '')+'.json')).write_text(json.dumps(images,indent=2)+'\n')
+    (h.output_directory()/('deleted-image-'+compiler.parent.name+('-stack' if small else '')+'.json')).write_text(json.dumps(images,indent=2)+'\n')
     source.write_text('''use os
 use path
 func main():

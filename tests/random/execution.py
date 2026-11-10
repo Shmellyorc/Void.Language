@@ -184,7 +184,7 @@ with tempfile.TemporaryDirectory(prefix='VOID random execution ') as directory:
         h.run([executable],work,oracle,sources=(fixture,),small=small)
     record={'compiler':str(compiler),'compiler_sha256':hashlib.sha256(compiler.read_bytes()).hexdigest(),'source_sha256':hashlib.sha256(raw).hexdigest(),'oracle_sha256':hashlib.sha256(oracle).hexdigest(),'vectors':vectors,'processes':h.checks,'small_stack':small}
     # Stable fixtures and exact expected output make independent review reproducible.
-    evidence=h.ROOT/'docs/random/evidence'
+    evidence=h.output_directory()
     evidence.mkdir(exist_ok=True,parents=True)
     (evidence/'random_test.void').write_bytes(raw)
     (evidence/'expected.txt').write_bytes(oracle)

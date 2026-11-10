@@ -29,7 +29,7 @@ with tarfile.open(out / 'sources.tar.gz', 'w:gz') as archive:
             if file.is_file():
                 manifest[str(file.relative_to(h.ROOT))] = h.crash.digest(file)
 with tarfile.open(out / 'original-evidence.tar.gz', 'w:gz') as archive:
-    for path in h.EVIDENCE.iterdir():
+    for path in (h.ROOT / 'docs/log/evidence').iterdir():
         if path.name != 'performance-repair':
             archive.add(path, arcname=path.name)
 build = h.ROOT / 'build/ci-official-release'

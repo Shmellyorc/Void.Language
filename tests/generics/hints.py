@@ -1,13 +1,11 @@
 """Shared inference regressions through uncached JIT and independently linked AOT."""
 from pathlib import Path
-import os
 import sys
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tests/random'))
 import harness as h
-os.environ['VOID_CRASH_EVIDENCE'] = str(ROOT / 'docs/compiler-health/stabilization/incidents')
 compiler = Path(sys.argv[1]).resolve()
 with tempfile.TemporaryDirectory(prefix='void-hint-contracts-') as temporary:
     for name in ['nested_direct', 'nested_list', 'nested_dictionary', 'double_propagate',

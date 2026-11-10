@@ -143,13 +143,13 @@ func main() -> i32:
     for index, (source, data, expected) in enumerate(scenarios):
         run([compiler, 'check', source])
         for flags in (['--no-opt'], []):
-            run([compiler, 'run', source, *flags], data, expected=expected)
+            run([compiler, 'run', source, '--no-cache', *flags], data, expected=expected)
             executable = root / f'executable-{index}-{bool(flags)}'
             run([compiler, 'build', source, '-o', executable, *flags])
             run([executable], data, expected=expected)
             if source.name == 'ownership.void':
                 for scenario in range(1, 7):
-                    run([compiler, 'run', source, scenario, *flags], expected=native_text('1\n'))
+                    run([compiler, 'run', source, '--no-cache', scenario, *flags], expected=native_text('1\n'))
                     run([executable, scenario], expected=native_text('1\n'))
     failure = root / 'unwrap.void'
     failure.write_text('use convert\nfunc main() -> i32:\n    var failed: result<i32, string> = Err("reason")\n    return convert.unwrap(failed)\n', encoding='utf-8')

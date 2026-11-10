@@ -47,5 +47,5 @@ with tempfile.TemporaryDirectory(prefix='VOID host installed 雪 # % ') as folde
   for mode,expected in [('args',b'61726773\nargs\n'),('crypto',None)]:
    run([sys.executable,h.ROOT/'tests/host_capabilities/isolated_exec.py',isolated,binary,mode],isolated,expected,native_env)
 result={'schema':1,'build':str(build),'stack_bytes':1048576,'installed_and_relocated':True,'aot_checkout_and_installed_compiler_inaccessible':True,'approved_source_bundle_reconstructed':True,'tampered_bundle_rejected':True,'records':records}
-(Path(os.environ.get('VOID_HOST_EVIDENCE_DIR',str(h.ROOT/'docs/voidup/evidence')))/'installed-host-capabilities.json').write_text(json.dumps(result,indent=2)+'\n')
+(h.output_directory()/'installed-host-capabilities.json').write_text(json.dumps(result,indent=2)+'\n')
 print('Installed and relocated native providers, notices and modules; normal/O2 JIT and isolated AOT passed on 1 MiB stacks')

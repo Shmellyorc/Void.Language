@@ -7,8 +7,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))
 from test_platform import native_text
 sys.path.insert(0, str(ROOT / 'tests/text_encoding'))
-from crash import run as preserving_run, crashed, preserve
-os.environ.setdefault('VOID_CRASH_EVIDENCE', str(ROOT / 'docs/random/evidence/crashes'))
+from crash import run as preserving_run, crashed, preserve, output_directory
 checks = 0
 
 def stack():

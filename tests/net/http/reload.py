@@ -2,7 +2,6 @@
 import argparse
 import hashlib
 import json
-import os
 from pathlib import Path
 import subprocess
 import sys
@@ -52,9 +51,8 @@ def main():
         path=work/'main.void';source=SOURCE.replace('@BASE@',base);path.write_text(source)
         (args.evidence/'original.void').write_text(source)
         try:
-            environment=os.environ.copy();environment['VOID_CRASH_EVIDENCE']=str(ROOT/'docs/net/http/evidence/crashes')
             result=crash.run([str(binary),str(path),base,str(work/'cache')],cwd=work,capture_output=True,timeout=180,
-                env=environment,expected_returncode=0,source_inputs=[path,ROOT/'stdlib'],
+                expected_returncode=0,source_inputs=[path,ROOT/'stdlib'],
                 provenance_inputs=[Path(__file__),Path(__file__).with_suffix('.cpp'),ROOT/'CMakeLists.txt',ROOT/'src/runtime',ROOT/'include'])
             (args.evidence/'native.stdout').write_bytes(result.stdout);(args.evidence/'native.stderr').write_bytes(result.stderr)
             (args.evidence/'final.void').write_bytes(path.read_bytes())

@@ -1,9 +1,7 @@
 """Reuse the existing subprocess/crash/stack harness for the OS acceptance fixtures."""
 from pathlib import Path
-import os
 import sys
 ROOT = Path(__file__).resolve().parents[2]
-os.environ.setdefault('VOID_CRASH_EVIDENCE', str(ROOT / 'docs/os/evidence/crashes'))
 sys.path.insert(0, str(ROOT / 'tests/random'))
 import harness
 def run(command, cwd, *args, **kwargs):

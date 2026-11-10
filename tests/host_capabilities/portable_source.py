@@ -41,6 +41,6 @@ with tempfile.TemporaryDirectory(prefix='VOID portable source 雪 # % ') as fold
    run([*base,work/('private-'+str(optimize)+'-'+str(index))],work,'true\ntrue\n7\n0\ntrue\ntrue\ntrue\n7\n7\ntrue\ntrue\ntrue\n')
  record={'platform':sys.platform,'compiler_sha256':hashlib.sha256(compiler.read_bytes()).hexdigest(),'hard_main_stack_bytes':1048576 if os.name!='nt' else None,'independently_linked_aot':True,'checkout_denied':False,'records':records}
  record['staging']=staging
- destination=Path(os.environ.get('VOID_HOST_EVIDENCE_DIR',str(h.ROOT/'docs/voidup/evidence/portability')));destination.mkdir(parents=True,exist_ok=True)
+ destination=h.output_directory();destination.mkdir(parents=True,exist_ok=True)
  (destination/('portable-source-'+compiler.parent.name+'.json')).write_text(json.dumps(record,indent=2)+'\n')
 print(f'{len(records)} portable source invocations; normal/O2 JIT and independent AOT passed')

@@ -74,6 +74,6 @@ with tempfile.TemporaryDirectory(prefix='VOID math LSP ') as directory,project(d
         check('Source generic parameter.' in str(result),result)
         notes=replace(base);check(all(not x['diagnostics'] for x in notes),notes)
         client.shutdown()
-    evidence=h.ROOT/'docs/math/evidence';evidence.mkdir(parents=True,exist_ok=True)
+    evidence=h.output_directory();evidence.mkdir(parents=True,exist_ok=True)
     (evidence/('lsp-'+server.parent.name+'.json')).write_text(json.dumps({'server':str(server),'checks':checks,'public_members':sorted(public)},indent=2)+'\n')
 print(f'Math LSP: {checks} checks passed')

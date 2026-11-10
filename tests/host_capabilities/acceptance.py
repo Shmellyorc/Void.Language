@@ -152,9 +152,11 @@ with tempfile.TemporaryDirectory(prefix='VOID Phase A 雪 # % ') as folder:
   assert first.stdout.readline()==b'locked\n';first.kill();first.communicate(timeout=15)
   run([binary,'lock',private],work,b'locked\n')
  # Cached Debug code must capture new per-Runtime arguments, never cached values.
+ cached_source=work/source.name
+ cached_source.write_bytes(source.read_bytes())
  for value in ['first','second 雪']:
   expected=(b'61726773\n'+value.encode().hex().encode()+b'\nargs\n')
-  run([compiler,'run',source,'--cache','--','args',value],work,expected)
+  run([compiler,'run',cached_source,'--cache','--','args',value],work,expected)
  # Invalid UTF-8 is a checked args result even before main, not lossy replacement.
  error_source=work/'args-error.void';error_source.write_text('use os\nvar captured = os.args()\nfunc main():\n    if captured is Err(var reason):\n        print(reason.code, reason.operation)\n    else:\n        print("unexpected")\n')
  error_binary=work/'args-error';run([compiler,'build',error_source,'-o',error_binary],work)
@@ -169,5 +171,5 @@ with tempfile.TemporaryDirectory(prefix='VOID Phase A 雪 # % ') as folder:
  # A dash-leading source can still be selected after an option terminator.
  dash=work/'-source.void';dash.write_text('func main() -> i32:\n    return 0\n');run([compiler,'run','--','-source.void','--','--app'],work,b'')
 result={'schema':1,'platform':sys.platform,'profile':profile,'hard_stack_bytes':1048576 if small else None,'compiler':str(compiler),'compiler_sha256':hashlib.sha256(compiler.read_bytes()).hexdigest(),'source_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),'checked_processes':len(records),'zip_cases_per_execution':len(packages),'aot_checkout_inaccessible':'Linux Landlock','records':records,'aot_images':images}
-out=Path(os.environ.get('VOID_HOST_EVIDENCE_DIR',str(h.ROOT/'docs/voidup/evidence')))/f'{compiler.parent.name}{"-stack" if small else ""}.json';out.write_text(json.dumps(result,ensure_ascii=True,indent=2)+'\n')
+out=h.output_directory()/f'{compiler.parent.name}{"-stack" if small else ""}.json';out.write_text(json.dumps(result,ensure_ascii=True,indent=2)+'\n')
 print(f'{len(records)} processes; {len(packages)} ZIP cases per normal/O2 JIT/AOT; stack_1MiB={small}; receipt={out}')

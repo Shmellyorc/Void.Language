@@ -21,7 +21,7 @@ with tempfile.TemporaryDirectory(prefix='void-json-execution-') as tmp:
         timeout=300 if name=='shapes' else 180
         for opt in [False,True]:
             flags=[] if opt else ['--no-opt']
-            h.run([h.compiler,'run',src,*flags],src,want,timeout=timeout)
+            h.run([h.compiler,'run',src,'--no-cache',*flags],src,want,timeout=timeout)
             native=Path(tmp)/(name+('-O2' if opt else '-O0'))
             h.run([h.compiler,'build',src,'-o',native,*flags],src,timeout=timeout)
             h.run([native],src,want)

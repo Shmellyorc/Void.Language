@@ -50,8 +50,8 @@ endif()
 add_executable(void_g1_tests "${g1_src}/primitives.cpp"
   $<TARGET_OBJECTS:void_g1_thunk> $<TARGET_OBJECTS:void_g1_fixture>)
 target_link_libraries(void_g1_tests PRIVATE void_llvm void_cache_identity)
-add_test(NAME ffi_g1_primitive_jit_ir COMMAND void_g1_tests "${g1_bin}/primitives.descriptor"
-  "${g1_bin}/primitives.void" "${g1_bin}/tests")
+void_add_output_test(ffi_g1_primitive_jit_ir "$<TARGET_FILE:void_g1_tests>" "${g1_bin}/primitives.descriptor"
+  "${g1_bin}/primitives.void" "@VOID_TEST_OUTPUT@/ffi-g1/tests")
 foreach(mode IN ITEMS normal optimized)
   set(g1_object "${g1_bin}/application-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
   add_custom_command(OUTPUT "${g1_object}"

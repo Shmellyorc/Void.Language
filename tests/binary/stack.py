@@ -29,7 +29,7 @@ def run(arguments, expected=None):
 with tempfile.TemporaryDirectory(prefix="VOID binary 1MiB ") as directory:
     run([compiler, "check", source])
     for flags in (["--no-opt"], []):
-        run([compiler, "run", source, "12345", *flags], b"12345\n")
+        run([compiler, "run", source, "--no-cache", "12345", *flags], b"12345\n")
         executable = Path(directory) / ("binary" + str(bool(flags)))
         run([compiler, "build", source, "-o", executable, *flags])
         run([executable, "12345"], b"12345\n")

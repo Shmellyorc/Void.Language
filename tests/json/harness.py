@@ -3,11 +3,10 @@ from pathlib import Path
 import sys, os, json, hashlib, resource, time
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'tests/text_encoding'))
-from crash import run as preserving_run, preserve, crashed
-os.environ.setdefault('VOID_CRASH_EVIDENCE',str(ROOT/'docs/json/evidence/implementation/incidents'))
+from crash import run as preserving_run, preserve, crashed, output_directory
 compiler=Path(sys.argv[1]).resolve()
 profile=sys.argv[2] if len(sys.argv)>2 else 'adhoc'
-receipt=ROOT/'docs/json/evidence/implementation'/f'{Path(sys.argv[0]).stem}-{profile}-{time.time_ns()}.json'
+receipt=output_directory()/f'{Path(sys.argv[0]).stem}-{profile}-{time.time_ns()}.json'
 records=[]
 
 def digest(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()

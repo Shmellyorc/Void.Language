@@ -48,7 +48,7 @@ foreach(kind division remainder compound_division compound_remainder no_result b
     void_native_link("${object}" "${executable}")
     foreach(engine jit aot)
       if(engine STREQUAL "jit")
-        execute_process(COMMAND "${COMPILER}" run "${source}" 0 ${flags} RESULT_VARIABLE status OUTPUT_VARIABLE output ERROR_VARIABLE errors)
+        execute_process(COMMAND "${COMPILER}" run --no-cache "${source}" 0 ${flags} RESULT_VARIABLE status OUTPUT_VARIABLE output ERROR_VARIABLE errors)
       else()
         # The diagnostic is an embedded compile snapshot, not a filesystem reread.
         file(WRITE "${error_root}/arithmetic.void" "# source changed after object emission\n")

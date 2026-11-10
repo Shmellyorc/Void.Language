@@ -4,7 +4,6 @@ import sys, os, json, hashlib, tempfile, resource, time
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'tests/random'))
 import harness as h
-os.environ['VOID_CRASH_EVIDENCE']=str(ROOT/'docs/json/evidence/implementation/incidents')
 compiler=Path(sys.argv[1]).resolve()
 profile=sys.argv[2] if len(sys.argv)>2 else 'adhoc'
 records=[]
@@ -21,7 +20,7 @@ with tempfile.TemporaryDirectory(prefix='void-json-readonly-') as tmp:
         src=ROOT/'tests/json'/(name+'.void')
         for opt in [False,True]:
             flags=[] if opt else ['--no-opt']
-            run([compiler,'run',src,*flags],src,expected.encode())
+            run([compiler,'run',src,'--no-cache',*flags],src,expected.encode())
             output=tmp/(name+('-O2' if opt else '-O0'))
             run([compiler,'build',src,'-o',output,*flags],src)
             run([output],src,expected.encode())
@@ -51,5 +50,5 @@ src=ROOT/'tests/json/pattern_recovery_invalid.void'
 r=run([compiler,'check',src],src,status=1)
 assert b'VOID2001' in r.stderr and b'VOID IR:' not in r.stderr,r.stderr
 report={'profile':profile,'compiler':str(compiler),'compiler_sha256':hashlib.sha256(compiler.read_bytes()).hexdigest(),'checks':len(records),'records':records,'environment':{k:os.environ[k] for k in ['ASAN_OPTIONS','UBSAN_OPTIONS'] if k in os.environ}}
-(ROOT/'docs/json/evidence/implementation'/('readonly-'+profile+'-'+str(time.time_ns())+'.json')).write_text(json.dumps(report,indent=2)+'\n')
+(h.output_directory()/('readonly-'+profile+'-'+str(time.time_ns())+'.json')).write_text(json.dumps(report,indent=2)+'\n')
 print(f'readonly {profile}: {len(records)}/{len(records)} checks passed')

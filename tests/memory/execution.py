@@ -247,7 +247,7 @@ with tempfile.TemporaryDirectory(prefix="VOID memory é😀 ") as directory:
     for path, expected in programs:
         run([compiler, "check", path])
         for flags in (["--no-opt"], []):
-            run([compiler, "run", path, *flags], expected)
+            run([compiler, "run", path, "--no-cache", *flags], expected)
             executable = root / (path.stem + str(bool(flags)) + (".exe" if os.name == "nt" else ""))
             run([compiler, "build", path, "-o", executable, *flags])
             run([executable], expected)

@@ -330,6 +330,11 @@ add_custom_command(OUTPUT "${voidup_application}"
 add_custom_target(voidup ALL DEPENDS "${voidup_application}")
 include(CTest)
 if(BUILD_TESTING)
+  find_package(Python3 3.12 REQUIRED COMPONENTS Interpreter)
+  function(void_add_output_test name)
+    add_test(NAME "${name}" COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tools/test_output.py" "${name}" ${ARGN})
+  endfunction()
   add_executable(void_project_header tests/project/header.cpp)
   target_link_libraries(void_project_header PRIVATE void_options)
   set_target_properties(void_project_header PROPERTIES DISABLE_PRECOMPILE_HEADERS ON UNITY_BUILD OFF)
@@ -338,11 +343,10 @@ if(BUILD_TESTING)
   target_link_libraries(void_project_manifest PRIVATE void_core)
   add_test(NAME project_manifest COMMAND void_project_manifest)
   set_tests_properties(project_manifest PROPERTIES TIMEOUT 60)
-  add_test(NAME voidup_smoke COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/voidup/smoke.py"
-    "${voidup_application}" "${CMAKE_CURRENT_BINARY_DIR}/voidup-smoke-evidence")
+  void_add_output_test(voidup_smoke "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/voidup/smoke.py"
+    "${voidup_application}" "@VOID_TEST_OUTPUT@/voidup-smoke-evidence")
   set_tests_properties(voidup_smoke PROPERTIES TIMEOUT 240)
   add_test(NAME voidup_ci_integration COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/voidup/ci_integration.py")
-  find_package(Python3 3.12 REQUIRED COMPONENTS Interpreter)
   if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_test(NAME project_manifest_no_authority COMMAND "${Python3_EXECUTABLE}"
       "${PROJECT_SOURCE_DIR}/tests/project/authority.py" "$<TARGET_FILE:void_project_manifest>")
@@ -364,36 +368,36 @@ if(BUILD_TESTING)
   add_executable(void_project_creation tests/project/creation.cpp)
   target_link_libraries(void_project_creation PRIVATE void_core)
   add_test(NAME project_creation COMMAND void_project_creation)
-  add_test(NAME project_creation_process COMMAND "${Python3_EXECUTABLE}"
+  void_add_output_test(project_creation_process "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/project/creation.py" "$<TARGET_FILE:voidc>" "$<TARGET_FILE:voidls>"
-    "${CMAKE_CURRENT_BINARY_DIR}/project-creation-evidence.json")
+    "@VOID_TEST_OUTPUT@/project-creation-evidence.json")
   set_tests_properties(project_creation project_creation_process PROPERTIES TIMEOUT 300)
   add_executable(void_project_application tests/project/application.cpp)
   target_link_libraries(void_project_application PRIVATE void_llvm void_runtime)
   add_test(NAME project_application COMMAND void_project_application)
   set_tests_properties(project_application PROPERTIES TIMEOUT 180)
   if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    add_test(NAME project_application_process COMMAND "${Python3_EXECUTABLE}"
+    void_add_output_test(project_application_process "${Python3_EXECUTABLE}"
       "${PROJECT_SOURCE_DIR}/tests/project/application.py" "$<TARGET_FILE:voidc>"
-      "${CMAKE_CURRENT_BINARY_DIR}/project-application-evidence.json")
+      "@VOID_TEST_OUTPUT@/project-application-evidence.json")
     set_tests_properties(project_application_process PROPERTIES TIMEOUT 300)
   endif()
-  add_test(NAME project_discovery_cli COMMAND "${Python3_EXECUTABLE}"
+  void_add_output_test(project_discovery_cli "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/project/discovery.py" "$<TARGET_FILE:voidc>"
-    "${CMAKE_CURRENT_BINARY_DIR}/project-discovery-evidence.json")
+    "@VOID_TEST_OUTPUT@/project-discovery-evidence.json")
   set_tests_properties(project_discovery_cli PROPERTIES TIMEOUT 300)
-  add_test(NAME project_profiles COMMAND "${Python3_EXECUTABLE}"
+  void_add_output_test(project_profiles "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/project/profiles.py" "$<TARGET_FILE:voidc>"
     "${LLVM_TOOLS_BINARY_DIR}/llvm-objdump${CMAKE_EXECUTABLE_SUFFIX}"
-    "${CMAKE_CURRENT_BINARY_DIR}/project-profiles-evidence.json")
+    "@VOID_TEST_OUTPUT@/project-profiles-evidence.json")
   set_tests_properties(project_profiles PROPERTIES TIMEOUT 240)
-  add_test(NAME project_protocol COMMAND "${Python3_EXECUTABLE}"
+  void_add_output_test(project_protocol "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/project/protocol.py" "$<TARGET_FILE:voidls>"
-    "${CMAKE_CURRENT_BINARY_DIR}/project-protocol-evidence.json")
+    "@VOID_TEST_OUTPUT@/project-protocol-evidence.json")
   set_tests_properties(project_protocol PROPERTIES TIMEOUT 180)
-  add_test(NAME project_nested_cli COMMAND "${Python3_EXECUTABLE}"
+  void_add_output_test(project_nested_cli "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/project/nested.py" "$<TARGET_FILE:voidc>"
-    "${CMAKE_CURRENT_BINARY_DIR}/project-nested-evidence.json")
+    "@VOID_TEST_OUTPUT@/project-nested-evidence.json")
   set_tests_properties(project_nested_cli PROPERTIES TIMEOUT 180)
   add_test(NAME cli_contract COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/cli/contract.py" "$<TARGET_FILE:voidc>")
   set_tests_properties(cli_contract PROPERTIES TIMEOUT 180)
@@ -417,16 +421,16 @@ if(BUILD_TESTING)
     target_link_libraries(void_http_windows_identity PRIVATE void_options crypt32 ncrypt bcrypt advapi32)
     add_dependencies(void_http_native void_http_windows_identity)
   endif()
-  add_test(NAME http_native COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/fixture.py"
-    "$<TARGET_FILE:void_http_native>" --http2 --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-native-evidence")
+  void_add_output_test(http_native "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/fixture.py"
+    "$<TARGET_FILE:void_http_native>" --http2 --evidence "@VOID_TEST_OUTPUT@/http-native-evidence")
   set_tests_properties(http_native PROPERTIES TIMEOUT 180)
   if(NOT WIN32)
     # This corpus specifically audits the pinned AWS-LC parser and allocations.
     # It cannot certify Schannel's OS-owned allocator/store behavior.
     add_executable(void_http_tls_memory tests/net/http/tls_memory.cpp)
     target_link_libraries(void_http_tls_memory PRIVATE void_runtime)
-    add_test(NAME http_tls_memory COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/tls_memory.py"
-      "$<TARGET_FILE:void_http_tls_memory>" --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-tls-memory-evidence")
+    void_add_output_test(http_tls_memory "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/tls_memory.py"
+      "$<TARGET_FILE:void_http_tls_memory>" --evidence "@VOID_TEST_OUTPUT@/http-tls-memory-evidence")
     set_tests_properties(http_tls_memory PROPERTIES TIMEOUT 1300)
   endif()
   add_executable(void_url_native tests/net/http/url.cpp)
@@ -434,8 +438,8 @@ if(BUILD_TESTING)
   # Opt-in measurement tool; no arbitrary throughput threshold in CTest.
   add_executable(void_http_reload tests/net/http/reload.cpp)
   target_link_libraries(void_http_reload PRIVATE void_llvm void_cache_identity)
-  add_test(NAME http_reload COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/reload.py"
-    "$<TARGET_FILE:void_http_reload>" --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-reload-evidence")
+  void_add_output_test(http_reload "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/reload.py"
+    "$<TARGET_FILE:void_http_reload>" --evidence "@VOID_TEST_OUTPUT@/http-reload-evidence")
   set_tests_properties(http_reload PROPERTIES TIMEOUT 240)
   add_executable(void_http_io_performance tests/net/http/io_performance.cpp)
   target_link_libraries(void_http_io_performance PRIVATE void_llvm void_cache_identity)
@@ -443,58 +447,58 @@ if(BUILD_TESTING)
   target_link_libraries(void_http_performance PRIVATE void_runtime)
   add_executable(void_http_timeouts tests/net/http/timeouts.cpp)
   target_link_libraries(void_http_timeouts PRIVATE void_runtime)
-  add_test(NAME http_timeouts COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/timeouts.py"
-    "$<TARGET_FILE:void_http_timeouts>" --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-timeouts-evidence")
+  void_add_output_test(http_timeouts "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/timeouts.py"
+    "$<TARGET_FILE:void_http_timeouts>" --evidence "@VOID_TEST_OUTPUT@/http-timeouts-evidence")
   set_tests_properties(http_timeouts PROPERTIES TIMEOUT 60)
   add_executable(void_http_wire tests/net/http/wire.cpp)
   target_link_libraries(void_http_wire PRIVATE void_runtime)
-  add_test(NAME http_wire COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/wire.py"
-    "$<TARGET_FILE:void_http_wire>" --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-wire-evidence")
+  void_add_output_test(http_wire "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/wire.py"
+    "$<TARGET_FILE:void_http_wire>" --evidence "@VOID_TEST_OUTPUT@/http-wire-evidence")
   set_tests_properties(http_wire PROPERTIES TIMEOUT 180)
   target_link_libraries(void_http_dns PRIVATE void_runtime)
-  add_test(NAME http_dns COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/dns.py"
-    "$<TARGET_FILE:void_http_dns>" --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-dns-evidence")
+  void_add_output_test(http_dns "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/dns.py"
+    "$<TARGET_FILE:void_http_dns>" --evidence "@VOID_TEST_OUTPUT@/http-dns-evidence")
   set_tests_properties(http_dns PROPERTIES TIMEOUT 180)
   target_link_libraries(void_url_native PRIVATE void_runtime)
   add_test(NAME url_native COMMAND void_url_native)
   add_executable(void_http_source_runner tests/net/http/source_runner.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
   target_link_libraries(void_http_source_runner PRIVATE void_llvm void_cache_identity)
   if(WIN32)
-    add_test(NAME http_windows_store COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/windows_mtls.py"
+    void_add_output_test(http_windows_store "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/windows_mtls.py"
       "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_http_source_runner>" "$<TARGET_FILE:void_http_windows_identity>"
-      --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-windows-store-evidence")
+      --evidence "@VOID_TEST_OUTPUT@/http-windows-store-evidence")
     set_tests_properties(http_windows_store PROPERTIES TIMEOUT 600)
     # Both fixtures compare the complete user-scoped credential inventory.
     set_tests_properties(http_native http_windows_store PROPERTIES RESOURCE_LOCK void_windows_http_credentials)
   endif()
   add_executable(void_http_example_host examples/net_http/host.cpp)
   target_link_libraries(void_http_example_host PRIVATE void_llvm void_cache_identity)
-  add_test(NAME http_examples COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/examples.py"
+  void_add_output_test(http_examples "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/examples.py"
     "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_http_example_host>"
-    --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-examples-evidence")
+    --evidence "@VOID_TEST_OUTPUT@/http-examples-evidence")
   # Nineteen individually guarded commands exceed 300 seconds in native Debug.
   set_tests_properties(http_examples PROPERTIES TIMEOUT 600)
   add_test(NAME http_ci_policy COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/ci_triage_test.py")
   set_tests_properties(http_ci_policy PROPERTIES TIMEOUT 60)
   add_test(NAME http_curl_objects COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/curl_objects_test.py")
   set_tests_properties(http_curl_objects PROPERTIES TIMEOUT 60)
-  add_test(NAME http_install COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/install.py"
-    "$<TARGET_FILE:voidc>" --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-install-evidence")
-  add_test(NAME http_bulk COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/bulk.py"
+  void_add_output_test(http_install "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/install.py"
+    "$<TARGET_FILE:voidc>" --evidence "@VOID_TEST_OUTPUT@/http-install-evidence")
+  void_add_output_test(http_bulk "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/bulk.py"
     "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_http_source_runner>"
-    --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-bulk-evidence")
+    --evidence "@VOID_TEST_OUTPUT@/http-bulk-evidence")
   set_tests_properties(http_install http_bulk PROPERTIES TIMEOUT 300)
   add_executable(void_http_ir tests/net/http/http_ir.cpp)
   target_link_libraries(void_http_ir PRIVATE void_core)
   add_test(NAME http_ir COMMAND void_http_ir "${PROJECT_SOURCE_DIR}/tests/net/http/source_sync.void")
-  add_test(NAME http_source COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/source.py"
+  void_add_output_test(http_source "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/source.py"
     "$<TARGET_FILE:voidc>" --runner "$<TARGET_FILE:void_http_source_runner>"
-    --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-source-evidence")
-  add_test(NAME http_source_negative COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/source_negative.py"
-    "$<TARGET_FILE:voidc>" --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-source-negative-evidence")
-  add_test(NAME http_source_faults COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/source.py"
+    --evidence "@VOID_TEST_OUTPUT@/http-source-evidence")
+  void_add_output_test(http_source_negative "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/source_negative.py"
+    "$<TARGET_FILE:voidc>" --evidence "@VOID_TEST_OUTPUT@/http-source-negative-evidence")
+  void_add_output_test(http_source_faults "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/source.py"
     "$<TARGET_FILE:voidc>" --runner "$<TARGET_FILE:void_http_source_runner>" --faults-only
-    --evidence "${CMAKE_CURRENT_BINARY_DIR}/http-source-faults-evidence")
+    --evidence "@VOID_TEST_OUTPUT@/http-source-faults-evidence")
   set_tests_properties(http_source http_source_faults PROPERTIES TIMEOUT 600)
   set_tests_properties(http_ir http_source_negative PROPERTIES TIMEOUT 180)
   add_executable(void_url_ir tests/net/http/url_ir.cpp)
@@ -517,7 +521,7 @@ if(BUILD_TESTING)
   endif()
   add_executable(void_operator_reload tests/stage10/operator_reload.cpp)
   target_link_libraries(void_operator_reload PRIVATE void_llvm void_cache_identity)
-  add_test(NAME stage10_operator_reload COMMAND void_operator_reload "${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/operator reload fixtures")
+  void_add_output_test(stage10_operator_reload "$<TARGET_FILE:void_operator_reload>" "${PROJECT_SOURCE_DIR}" "@VOID_TEST_OUTPUT@/operator reload fixtures")
   set_tests_properties(stage10_operator_reload PROPERTIES TIMEOUT 180)
   add_executable(void_operator_keys tests/stage10/operator_keys.cpp)
   target_link_libraries(void_operator_keys PRIVATE void_llvm)
@@ -587,7 +591,7 @@ if(BUILD_TESTING)
     endforeach()
     add_executable(void_json_host tests/json/host.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
     target_link_libraries(void_json_host PRIVATE void_llvm void_cache_identity)
-    add_test(NAME json_host COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/json/host.py" "$<TARGET_FILE:void_json_host>" "$<CONFIG>" "${CMAKE_CURRENT_BINARY_DIR}/json host fixtures")
+    void_add_output_test(json_host "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/json/host.py" "$<TARGET_FILE:void_json_host>" "$<CONFIG>" "@VOID_TEST_OUTPUT@/json host fixtures")
     set_tests_properties(json_host PROPERTIES TIMEOUT 1800)
     add_test(NAME json_preservation COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/json/preservation.py" "$<TARGET_FILE:voidc>" "$<CONFIG>")
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -621,7 +625,7 @@ if(BUILD_TESTING)
     target_include_directories(void_arrays_storage_audit SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
     llvm_map_components_to_libnames(VOID_AUDIT_TEST_LIBS AsmParser)
     target_link_libraries(void_arrays_storage_audit PRIVATE void_llvm ${VOID_AUDIT_TEST_LIBS})
-    add_test(NAME arrays_storage_audit COMMAND void_arrays_storage_audit "${CMAKE_CURRENT_BINARY_DIR}/storage shape fixtures" "${PROJECT_SOURCE_DIR}")
+    void_add_output_test(arrays_storage_audit "$<TARGET_FILE:void_arrays_storage_audit>" "@VOID_TEST_OUTPUT@/storage shape fixtures" "${PROJECT_SOURCE_DIR}")
     set_tests_properties(arrays_storage_audit PROPERTIES TIMEOUT 90)
     set_tests_properties(arrays_storage_audit PROPERTIES LABELS "research")
     # Closed private-call behavior, emitted with the ordinary LLVM path. The
@@ -804,7 +808,7 @@ if(BUILD_TESTING)
   set_tests_properties(patterns_source PROPERTIES TIMEOUT 300)
   add_executable(void_cache_tests tests/cache/tests.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
   target_link_libraries(void_cache_tests PRIVATE void_llvm void_cache_identity)
-  add_test(NAME debug_cache COMMAND void_cache_tests "${CMAKE_CURRENT_BINARY_DIR}/cache fixtures" "${PROJECT_SOURCE_DIR}")
+  void_add_output_test(debug_cache "$<TARGET_FILE:void_cache_tests>" "@VOID_TEST_OUTPUT@/cache fixtures" "${PROJECT_SOURCE_DIR}")
   set_tests_properties(debug_cache PROPERTIES TIMEOUT 180)
   add_test(NAME debug_cache_processes COMMAND ${Python3_EXECUTABLE} "${PROJECT_SOURCE_DIR}/tests/cache/processes.py" $<TARGET_FILE:voidc> "${PROJECT_SOURCE_DIR}")
   set_tests_properties(debug_cache_processes PROPERTIES TIMEOUT 180)
@@ -972,8 +976,8 @@ if(BUILD_TESTING)
   target_link_libraries(void_lsp_tests PRIVATE void_lsp)
   add_test(NAME lsp_positions COMMAND void_lsp_tests)
   set_tests_properties(lsp_positions PROPERTIES TIMEOUT 60)
-  add_test(NAME lsp_protocol COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/lsp/protocol.py"
-    "$<TARGET_FILE:voidls>" "${CMAKE_CURRENT_BINARY_DIR}/lsp fixtures")
+  void_add_output_test(lsp_protocol "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/lsp/protocol.py"
+    "$<TARGET_FILE:voidls>" "@VOID_TEST_OUTPUT@/lsp fixtures")
   set_tests_properties(lsp_protocol PROPERTIES TIMEOUT 180)
   add_test(NAME lsp_stage11_globals COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage11/lsp_globals.py" "$<TARGET_FILE:voidls>")
   set_tests_properties(lsp_stage11_globals PROPERTIES TIMEOUT 180)
@@ -985,8 +989,8 @@ if(BUILD_TESTING)
   target_link_libraries(void_math_host PRIVATE void_llvm void_cache_identity)
   add_executable(void_math_ir tests/math/ir.cpp)
   target_link_libraries(void_math_ir PRIVATE void_core)
-  add_test(NAME math_host COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/math/host.py" "$<TARGET_FILE:void_math_host>" "${CMAKE_CURRENT_BINARY_DIR}/math host fixtures")
-  add_test(NAME math_ir COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/math/host.py" "$<TARGET_FILE:void_math_ir>" "${CMAKE_CURRENT_BINARY_DIR}/math ir fixtures")
+  void_add_output_test(math_host "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/math/host.py" "$<TARGET_FILE:void_math_host>" "@VOID_TEST_OUTPUT@/math host fixtures")
+  void_add_output_test(math_ir "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/math/host.py" "$<TARGET_FILE:void_math_ir>" "@VOID_TEST_OUTPUT@/math ir fixtures")
   foreach(fixture IN ITEMS execution frontend errors)
     add_test(NAME math_${fixture} COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/math/${fixture}.py" "$<TARGET_FILE:voidc>")
   endforeach()
@@ -1011,7 +1015,6 @@ if(BUILD_TESTING)
   set_tests_properties(host_capabilities_portable PROPERTIES TIMEOUT 180)
   add_test(NAME host_capabilities_portable_source COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/host_capabilities/portable_source.py" "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_host_portable>")
   set_tests_properties(host_capabilities_portable_source PROPERTIES TIMEOUT 1200)
-  set(host_capability_tests host_capabilities_dependencies host_capabilities_portable host_capabilities_portable_source)
   if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_executable(void_host_child tests/host_capabilities/child.c)
     add_executable(void_host_capabilities tests/host_capabilities/native.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
@@ -1025,11 +1028,7 @@ if(BUILD_TESTING)
     add_test(NAME host_capabilities_install COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/host_capabilities/install.py" "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_host_child>")
     set_tests_properties(host_capabilities_install PROPERTIES RUN_SERIAL TRUE TIMEOUT 1200)
     set_tests_properties(host_capabilities host_capabilities_stack host_capabilities_native host_capabilities_frontend host_capabilities_lsp PROPERTIES TIMEOUT 1200)
-    list(APPEND host_capability_tests host_capabilities host_capabilities_stack host_capabilities_native host_capabilities_frontend host_capabilities_lsp host_capabilities_install)
   endif()
-  file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/host-capabilities-evidence")
-  set_tests_properties(${host_capability_tests} PROPERTIES ENVIRONMENT
-    "VOID_HOST_EVIDENCE_DIR=${CMAKE_CURRENT_BINARY_DIR}/host-capabilities-evidence;VOID_CRASH_EVIDENCE=${CMAKE_CURRENT_BINARY_DIR}/host-capabilities-evidence/crashes")
   add_executable(void_os_host tests/os/host.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
   target_link_libraries(void_os_host PRIVATE void_llvm void_cache_identity)
   if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -1042,7 +1041,7 @@ if(BUILD_TESTING)
     set_tests_properties(os_edges os_edges_stack PROPERTIES TIMEOUT 900)
 
   endif()
-  add_test(NAME os_host COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/os/host.py" "$<TARGET_FILE:void_os_host>" "${CMAKE_CURRENT_BINARY_DIR}/os host fixtures")
+  void_add_output_test(os_host "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/os/host.py" "$<TARGET_FILE:void_os_host>" "@VOID_TEST_OUTPUT@/os host fixtures")
   add_test(NAME os_errors COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/os/errors.py" "$<TARGET_FILE:voidc>")
   set_tests_properties(os_host os_errors PROPERTIES TIMEOUT 900)
   add_test(NAME os_frontend COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/os/frontend.py" "$<TARGET_FILE:voidc>")
@@ -1065,7 +1064,7 @@ if(BUILD_TESTING)
   if(UNIX)
     add_test(NAME os_frontend_stack COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/os/frontend.py" "$<TARGET_FILE:voidc>" --small-stack)
     set_tests_properties(os_frontend_stack PROPERTIES TIMEOUT 600)
-    add_test(NAME os_host_stack COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/os/host.py" "$<TARGET_FILE:void_os_host>" "${CMAKE_CURRENT_BINARY_DIR}/os host stack fixtures" --small-stack)
+    void_add_output_test(os_host_stack "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/os/host.py" "$<TARGET_FILE:void_os_host>" "@VOID_TEST_OUTPUT@/os host stack fixtures" --small-stack)
     set_tests_properties(os_host_stack PROPERTIES TIMEOUT 900)
 
   endif()
@@ -1075,7 +1074,7 @@ if(BUILD_TESTING)
   if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_options(void_random_host PRIVATE "-Wl,--wrap=getrandom")
   endif()
-  add_test(NAME random_host COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/random/host.py" "$<TARGET_FILE:void_random_host>" "${CMAKE_CURRENT_BINARY_DIR}/random host fixtures")
+  void_add_output_test(random_host "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/random/host.py" "$<TARGET_FILE:void_random_host>" "@VOID_TEST_OUTPUT@/random host fixtures")
   add_test(NAME random_execution COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/random/execution.py" "$<TARGET_FILE:voidc>")
   add_test(NAME random_frontend COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/random/frontend.py" "$<TARGET_FILE:voidc>")
   add_test(NAME lsp_random COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/random/lsp.py" "$<TARGET_FILE:voidls>")
@@ -1178,7 +1177,7 @@ if(BUILD_TESTING)
   add_test(NAME text_encoding_semantic_depth COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/integration/semantic_depth.py" "$<TARGET_FILE:voidc>")
   set_tests_properties(text_encoding_semantic_depth PROPERTIES TIMEOUT 180
-    ENVIRONMENT "PYTHONPATH=${PROJECT_SOURCE_DIR}/tests/text_encoding;VOID_CRASH_EVIDENCE=${PROJECT_SOURCE_DIR}/docs/text-encoding/evidence/crashes")
+    ENVIRONMENT "PYTHONPATH=${PROJECT_SOURCE_DIR}/tests/text_encoding")
   add_executable(void_text_performance tests/text_encoding/performance.cpp)
   target_link_libraries(void_text_performance PRIVATE void_llvm)
   add_executable(void_text_audit tests/text_encoding/audit.cpp)
@@ -1221,7 +1220,7 @@ if(BUILD_TESTING)
   set_tests_properties(stage10_operator_compounds PROPERTIES TIMEOUT 180)
   add_executable(void_globals tests/stage11/globals.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
   target_link_libraries(void_globals PRIVATE void_llvm void_cache_identity)
-  add_test(NAME stage11_globals COMMAND void_globals "${CMAKE_CURRENT_BINARY_DIR}/stage11 native fixtures")
+  void_add_output_test(stage11_globals "$<TARGET_FILE:void_globals>" "@VOID_TEST_OUTPUT@/stage11 native fixtures")
   set_tests_properties(stage11_globals PROPERTIES TIMEOUT 180)
 
   add_executable(void_log_host tests/log/host.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
@@ -1242,7 +1241,7 @@ if(BUILD_TESTING)
     set(log_probe_object "${CMAKE_CURRENT_BINARY_DIR}/log-probe-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
     set(log_probe_adapter "${log_probe_object}.cpp")
     add_custom_command(OUTPUT "${log_probe_object}" "${log_probe_adapter}"
-      COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/log/process.py"
+      COMMAND "${Python3_EXECUTABLE}" -B "${PROJECT_SOURCE_DIR}/tests/log/process.py"
         "$<TARGET_FILE:void_io_runner>" --emit-probe "${PROJECT_SOURCE_DIR}/tests/log/aot.void" "${log_probe_object}" "${mode}"
       DEPENDS void_io_runner "${PROJECT_SOURCE_DIR}/tests/log/aot.void"
         "${PROJECT_SOURCE_DIR}/tests/log/native.void" "${PROJECT_SOURCE_DIR}/tests/log/publication.void"
@@ -1280,7 +1279,7 @@ if(BUILD_TESTING)
   endif()
   add_executable(void_channel_host tests/channel/host.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
   target_link_libraries(void_channel_host PRIVATE void_llvm void_cache_identity)
-  add_test(NAME channel_host COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/channel/host.py" "$<TARGET_FILE:void_channel_host>" "${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/channel-host")
+  void_add_output_test(channel_host "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/channel/host.py" "$<TARGET_FILE:void_channel_host>" "${PROJECT_SOURCE_DIR}" "@VOID_TEST_OUTPUT@/channel-host")
   set_tests_properties(channel_host PROPERTIES TIMEOUT 600)
   add_test(NAME channel_frontend COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/channel/frontend.py" "$<TARGET_FILE:voidc>")
   add_test(NAME channel_execution COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/channel/execution.py" "$<TARGET_FILE:voidc>")
@@ -1310,9 +1309,9 @@ if(BUILD_TESTING)
   include(tests/ffi/dynamic.cmake)
   add_executable(void_native_tests tests/native/tests.cpp tests/native/integrated.cpp tests/native/probe.cpp $<TARGET_OBJECTS:void_native_test_fixture> tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
   target_link_libraries(void_native_tests PRIVATE void_llvm void_cache_identity)
-  add_test(NAME native_source COMMAND void_native_tests "${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/native fixtures")
+  void_add_output_test(native_source "$<TARGET_FILE:void_native_tests>" "${PROJECT_SOURCE_DIR}" "@VOID_TEST_OUTPUT@/native fixtures")
   set_tests_properties(native_source PROPERTIES TIMEOUT 180)
-  add_test(NAME stage6_integrated COMMAND void_native_tests --integrated "${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/stage6 integrated fixtures")
+  void_add_output_test(stage6_integrated "$<TARGET_FILE:void_native_tests>" --integrated "${PROJECT_SOURCE_DIR}" "@VOID_TEST_OUTPUT@/stage6 integrated fixtures")
   set_tests_properties(stage6_integrated PROPERTIES TIMEOUT 240)
   add_test(NAME stage6_cache_processes COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/native/processes.py" "$<TARGET_FILE:void_native_tests>" "${PROJECT_SOURCE_DIR}")
   set_tests_properties(stage6_cache_processes PROPERTIES TIMEOUT 240)
@@ -1340,7 +1339,7 @@ if(BUILD_TESTING)
 
   add_executable(void_io_ownership tests/io/ownership.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
   target_link_libraries(void_io_ownership PRIVATE void_llvm void_cache_identity)
-  add_test(NAME io_ownership COMMAND void_io_ownership
+  void_add_output_test(io_ownership --chdir "$<TARGET_FILE:void_io_ownership>"
     "${PROJECT_SOURCE_DIR}/tests/io/ownership.void" "${PROJECT_SOURCE_DIR}/tests/io/ownership_async.void")
   set_tests_properties(io_ownership PROPERTIES TIMEOUT 600)
 
@@ -1353,7 +1352,7 @@ if(BUILD_TESTING)
   set_tests_properties(io_async_execution PROPERTIES TIMEOUT 600)
   set(io_wire_source "${CMAKE_CURRENT_BINARY_DIR}/io-wire.void")
   add_custom_command(OUTPUT "${io_wire_source}"
-    COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/io/execution.py" --generate-async "${io_wire_source}"
+    COMMAND "${Python3_EXECUTABLE}" -B "${PROJECT_SOURCE_DIR}/tests/io/execution.py" --generate-async "${io_wire_source}"
     DEPENDS "${PROJECT_SOURCE_DIR}/tests/io/execution.py" VERBATIM)
   foreach(mode IN ITEMS normal optimized)
     set(io_wire_object "${CMAKE_CURRENT_BINARY_DIR}/io-wire-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
@@ -1365,11 +1364,9 @@ if(BUILD_TESTING)
     set_source_files_properties("${io_wire_object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
     add_executable(void_io_wire_${mode} tests/async/aot.cpp "${io_wire_object}")
     target_link_libraries(void_io_wire_${mode} PRIVATE void_runtime)
-    file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io wire ${mode}")
-    add_test(NAME io_wire_${mode} COMMAND "${Python3_EXECUTABLE}"
+    void_add_output_test(io_wire_${mode} --chdir "${Python3_EXECUTABLE}"
       "${PROJECT_SOURCE_DIR}/tests/async/aot.py" "$<TARGET_FILE:void_io_wire_${mode}>" 7)
-    set_tests_properties(io_wire_${mode} PROPERTIES
-      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io wire ${mode}" TIMEOUT 180)
+    set_tests_properties(io_wire_${mode} PROPERTIES TIMEOUT 180)
   endforeach()
 
   add_test(NAME lsp_io COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/io/lsp.py" "$<TARGET_FILE:voidls>")
@@ -1387,27 +1384,22 @@ if(BUILD_TESTING)
 
   add_executable(void_io_native tests/io/native.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
   target_link_libraries(void_io_native PRIVATE void_llvm void_cache_identity)
-  add_test(NAME io_native_responsiveness COMMAND void_io_native "${PROJECT_SOURCE_DIR}/tests/io/responsive.void")
+  void_add_output_test(io_native_responsiveness --chdir "$<TARGET_FILE:void_io_native>" "${PROJECT_SOURCE_DIR}/tests/io/responsive.void")
   set_tests_properties(io_native_responsiveness PROPERTIES TIMEOUT 180)
-  add_test(NAME io_native_close_failure COMMAND void_io_native --close-failure "${PROJECT_SOURCE_DIR}/tests/io/close_failure.void")
-  add_test(NAME io_native_shutdown COMMAND void_io_native --shutdown "${PROJECT_SOURCE_DIR}/tests/io/shutdown.void")
+  void_add_output_test(io_native_close_failure --chdir "$<TARGET_FILE:void_io_native>" --close-failure "${PROJECT_SOURCE_DIR}/tests/io/close_failure.void")
+  void_add_output_test(io_native_shutdown --chdir "$<TARGET_FILE:void_io_native>" --shutdown "${PROJECT_SOURCE_DIR}/tests/io/shutdown.void")
   set_tests_properties(io_native_close_failure io_native_shutdown PROPERTIES TIMEOUT 180)
-  add_test(NAME io_native_opening_shutdown COMMAND void_io_native --opening-shutdown
+  void_add_output_test(io_native_opening_shutdown --chdir "$<TARGET_FILE:void_io_native>" --opening-shutdown
     "${PROJECT_SOURCE_DIR}/tests/io/opening.void")
   set_tests_properties(io_native_opening_shutdown PROPERTIES TIMEOUT 180)
-  add_test(NAME io_native_whole_shutdown COMMAND void_io_native --opening-shutdown
+  void_add_output_test(io_native_whole_shutdown --chdir "$<TARGET_FILE:void_io_native>" --opening-shutdown
     "${PROJECT_SOURCE_DIR}/tests/io/opening_whole.void")
   set_tests_properties(io_native_whole_shutdown PROPERTIES TIMEOUT 180)
 
-  file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io responsive" "${CMAKE_CURRENT_BINARY_DIR}/io pending")
-  set_tests_properties(io_native_responsiveness PROPERTIES WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io responsive")
-  add_test(NAME io_native_pending_close COMMAND void_io_native "${PROJECT_SOURCE_DIR}/tests/io/pending.void")
-  file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io cancelled")
-  add_test(NAME io_native_cancelled COMMAND void_io_native "${PROJECT_SOURCE_DIR}/tests/io/cancelled.void")
-  set_tests_properties(io_native_cancelled PROPERTIES TIMEOUT 180
-    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io cancelled")
-  set_tests_properties(io_native_pending_close PROPERTIES TIMEOUT 180
-    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io pending")
+  void_add_output_test(io_native_pending_close --chdir "$<TARGET_FILE:void_io_native>" "${PROJECT_SOURCE_DIR}/tests/io/pending.void")
+  void_add_output_test(io_native_cancelled --chdir "$<TARGET_FILE:void_io_native>" "${PROJECT_SOURCE_DIR}/tests/io/cancelled.void")
+  set_tests_properties(io_native_cancelled PROPERTIES TIMEOUT 180)
+  set_tests_properties(io_native_pending_close PROPERTIES TIMEOUT 180)
 
   foreach(mode IN ITEMS normal optimized)
     set(io_probe_object "${CMAKE_CURRENT_BINARY_DIR}/io-probe-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
@@ -1422,36 +1414,30 @@ if(BUILD_TESTING)
       $<TARGET_OBJECTS:void_managed_test_abi> "${io_probe_object}" "${io_probe_adapter}")
     target_compile_definitions(void_io_probe_${mode} PRIVATE IO_AOT_PROBE=1)
     target_link_libraries(void_io_probe_${mode} PRIVATE void_runtime)
-    file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io probe ${mode}")
-    add_test(NAME io_probe_${mode} COMMAND void_io_probe_${mode})
-    set_tests_properties(io_probe_${mode} PROPERTIES
-      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io probe ${mode}" TIMEOUT 60)
+    void_add_output_test(io_probe_${mode} --chdir "$<TARGET_FILE:void_io_probe_${mode}>")
+    set_tests_properties(io_probe_${mode} PROPERTIES TIMEOUT 60)
   endforeach()
 
 
   add_executable(void_io_runner tests/io/runner.cpp)
   target_link_libraries(void_io_runner PRIVATE void_llvm void_cache_identity)
-  add_test(NAME io_async_source COMMAND void_io_runner --async "${PROJECT_SOURCE_DIR}/tests/io/async.void")
+  void_add_output_test(io_async_source --chdir "$<TARGET_FILE:void_io_runner>" --async "${PROJECT_SOURCE_DIR}/tests/io/async.void")
   set_tests_properties(io_async_source PROPERTIES TIMEOUT 180)
-  file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io errors")
-  add_test(NAME io_errors_source COMMAND void_io_runner --sync "${PROJECT_SOURCE_DIR}/tests/io/errors.void")
-  set_tests_properties(io_errors_source PROPERTIES TIMEOUT 180
-    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io errors")
+  void_add_output_test(io_errors_source --chdir "$<TARGET_FILE:void_io_runner>" --sync "${PROJECT_SOURCE_DIR}/tests/io/errors.void")
+  set_tests_properties(io_errors_source PROPERTIES TIMEOUT 180)
   set(io_errors_async "${CMAKE_CURRENT_BINARY_DIR}/io-errors-async.void")
   add_custom_command(OUTPUT "${io_errors_async}"
-    COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/io/execution.py" --generate-errors-async "${io_errors_async}"
+    COMMAND "${Python3_EXECUTABLE}" -B "${PROJECT_SOURCE_DIR}/tests/io/execution.py" --generate-errors-async "${io_errors_async}"
     DEPENDS "${PROJECT_SOURCE_DIR}/tests/io/execution.py" "${PROJECT_SOURCE_DIR}/tests/io/errors.void" VERBATIM)
   add_custom_target(void_io_error_fixture DEPENDS "${io_errors_async}")
   add_dependencies(void_io_runner void_io_error_fixture)
-  file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io async errors")
-  add_test(NAME io_errors_async COMMAND void_io_runner --async "${io_errors_async}")
-  set_tests_properties(io_errors_async PROPERTIES TIMEOUT 180
-    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io async errors")
+  void_add_output_test(io_errors_async --chdir "$<TARGET_FILE:void_io_runner>" --async "${io_errors_async}")
+  set_tests_properties(io_errors_async PROPERTIES TIMEOUT 180)
   add_test(NAME io_examples_install COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/io/examples.py"
     "$<TARGET_FILE:voidc>" "${CMAKE_CURRENT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}/examples/io/filesystem.void" "$<CONFIG>")
   set_tests_properties(io_examples_install PROPERTIES TIMEOUT 600)
 
-  add_test(NAME io_async_acquisition COMMAND void_io_runner --async "${PROJECT_SOURCE_DIR}/tests/io/acquisition.void")
+  void_add_output_test(io_async_acquisition --chdir "$<TARGET_FILE:void_io_runner>" --async "${PROJECT_SOURCE_DIR}/tests/io/acquisition.void")
   set_tests_properties(io_async_acquisition PROPERTIES TIMEOUT 180)
   foreach(mode IN ITEMS normal optimized)
     set(io_async_object "${CMAKE_CURRENT_BINARY_DIR}/io-async-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
@@ -1464,11 +1450,9 @@ if(BUILD_TESTING)
     set_source_files_properties("${io_async_object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
     add_executable(void_io_async_${mode} tests/async/aot.cpp "${io_async_object}")
     target_link_libraries(void_io_async_${mode} PRIVATE void_runtime)
-    file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io async ${mode}")
-    add_test(NAME io_async_${mode} COMMAND "${Python3_EXECUTABLE}"
+    void_add_output_test(io_async_${mode} --chdir "${Python3_EXECUTABLE}"
       "${PROJECT_SOURCE_DIR}/tests/async/aot.py" "$<TARGET_FILE:void_io_async_${mode}>" 7)
-    set_tests_properties(io_async_${mode} PROPERTIES
-      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/io async ${mode}" TIMEOUT 180)
+    set_tests_properties(io_async_${mode} PROPERTIES TIMEOUT 180)
   endforeach()
 
 
@@ -1487,7 +1471,7 @@ if(BUILD_TESTING)
 
   add_executable(void_io_kernel tests/io/kernel.cpp)
   target_link_libraries(void_io_kernel PRIVATE void_runtime)
-  add_test(NAME io_kernel COMMAND void_io_kernel "${CMAKE_CURRENT_BINARY_DIR}/io kernel fixtures")
+  void_add_output_test(io_kernel "$<TARGET_FILE:void_io_kernel>" "@VOID_TEST_OUTPUT@/io kernel fixtures")
   set_tests_properties(io_kernel PROPERTIES TIMEOUT 60)
 
   add_executable(void_io_ir tests/io/ir.cpp)
@@ -1503,7 +1487,7 @@ if(BUILD_TESTING)
   add_test(NAME onboarding_examples COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/cli/learning.py"
     "$<TARGET_FILE:voidc>" "${CMAKE_CURRENT_BINARY_DIR}")
   set_tests_properties(onboarding_examples PROPERTIES TIMEOUT 240)
-  add_test(NAME async_source COMMAND void_async_tests "${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/async fixtures")
+  void_add_output_test(async_source "$<TARGET_FILE:void_async_tests>" "${PROJECT_SOURCE_DIR}" "@VOID_TEST_OUTPUT@/async fixtures")
   add_test(NAME async_syntax_source COMMAND void_async_tests --syntax "${PROJECT_SOURCE_DIR}")
   if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_test(NAME async_syntax_stack COMMAND void_async_tests --syntax-stack "${PROJECT_SOURCE_DIR}")
@@ -1511,9 +1495,9 @@ if(BUILD_TESTING)
   endif()
   set_tests_properties(async_syntax_source PROPERTIES TIMEOUT 180)
   add_test(NAME async_ir COMMAND void_async_tests --ir)
-  add_test(NAME async_parallel COMMAND void_async_tests --parallel "${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/async parallel fixtures")
+  void_add_output_test(async_parallel "$<TARGET_FILE:void_async_tests>" --parallel "${PROJECT_SOURCE_DIR}" "@VOID_TEST_OUTPUT@/async parallel fixtures")
   set_tests_properties(async_parallel PROPERTIES TIMEOUT 180)
-  add_test(NAME async_lifecycle COMMAND void_async_tests --lifecycle "${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/async lifecycle fixtures")
+  void_add_output_test(async_lifecycle "$<TARGET_FILE:void_async_tests>" --lifecycle "${PROJECT_SOURCE_DIR}" "@VOID_TEST_OUTPUT@/async lifecycle fixtures")
   set_tests_properties(async_lifecycle PROPERTIES TIMEOUT 180)
   foreach(fixture IN ITEMS spawn spawn_cancel spawn_failure activation managed large closures loops values methods lifecycle lifecycle_exits lifecycle_cancelled lifecycle_failures lifecycle_primary lifecycle_resources lifecycle_values)
     if(fixture STREQUAL "spawn")
@@ -1607,32 +1591,32 @@ if(BUILD_TESTING)
   set_tests_properties(sessions_demo PROPERTIES TIMEOUT 60)
   add_executable(void_tooling_example examples/tooling.cpp)
   target_link_libraries(void_tooling_example PRIVATE void_core)
-  add_test(NAME tooling_demo COMMAND "${CMAKE_COMMAND}"
+  void_add_output_test(tooling_demo "${CMAKE_COMMAND}"
     "-DDEMO=$<TARGET_FILE:void_tooling_example>" "-DROOT=${PROJECT_SOURCE_DIR}"
-    "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/tooling demonstration"
+    "-DOUTPUT=@VOID_TEST_OUTPUT@/tooling demonstration"
     -P "${PROJECT_SOURCE_DIR}/tests/integration/tooling.cmake")
   set_tests_properties(tooling_demo PROPERTIES TIMEOUT 60)
-  add_test(NAME sessions COMMAND void_tests sessions "${CMAKE_CURRENT_BINARY_DIR}/session fixtures")
+  void_add_output_test(sessions "$<TARGET_FILE:void_tests>" sessions "@VOID_TEST_OUTPUT@/session fixtures")
   set_tests_properties(sessions PROPERTIES TIMEOUT 120)
-  add_test(NAME tooling COMMAND void_tests tooling "${CMAKE_CURRENT_BINARY_DIR}/tooling fixtures")
+  void_add_output_test(tooling "$<TARGET_FILE:void_tests>" tooling "@VOID_TEST_OUTPUT@/tooling fixtures")
   set_tests_properties(tooling PROPERTIES TIMEOUT 120)
-  add_test(NAME analysis COMMAND void_tests analysis "${CMAKE_CURRENT_BINARY_DIR}/analysis fixtures")
+  void_add_output_test(analysis "$<TARGET_FILE:void_tests>" analysis "@VOID_TEST_OUTPUT@/analysis fixtures")
   set_tests_properties(analysis PROPERTIES TIMEOUT 180)
   add_test(NAME numeric COMMAND void_tests numeric "${PROJECT_SOURCE_DIR}")
   set_tests_properties(numeric PROPERTIES TIMEOUT 120)
   add_executable(void_numeric_enum_ir tests/numeric/enums_ir.cpp)
   target_link_libraries(void_numeric_enum_ir PRIVATE void_llvm void_runtime)
   add_test(NAME numeric_enum_ir COMMAND void_numeric_enum_ir)
-  add_test(NAME numeric_enum_process COMMAND "${Python3_EXECUTABLE}"
+  void_add_output_test(numeric_enum_process "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/numeric/enums.py" "$<TARGET_FILE:voidc>"
-    "${CMAKE_CURRENT_BINARY_DIR}/numeric-enum-process.json")
-  add_test(NAME numeric_enum_lsp COMMAND "${Python3_EXECUTABLE}"
+    "@VOID_TEST_OUTPUT@/numeric-enum-process.json")
+  void_add_output_test(numeric_enum_lsp "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/numeric/enums_lsp.py" "$<TARGET_FILE:voidls>"
-    "${CMAKE_CURRENT_BINARY_DIR}/numeric-enum-lsp.json")
+    "@VOID_TEST_OUTPUT@/numeric-enum-lsp.json")
   set_tests_properties(numeric_enum_ir numeric_enum_process numeric_enum_lsp PROPERTIES TIMEOUT 480)
-  add_test(NAME frontend COMMAND void_tests frontend "${PROJECT_SOURCE_DIR}")
+  void_add_output_test(frontend --chdir "$<TARGET_FILE:void_tests>" frontend "${PROJECT_SOURCE_DIR}")
   set_tests_properties(frontend PROPERTIES TIMEOUT 90)
-  add_test(NAME modules COMMAND void_tests modules "${CMAKE_CURRENT_BINARY_DIR}/module fixtures with spaces")
+  void_add_output_test(modules "$<TARGET_FILE:void_tests>" modules "@VOID_TEST_OUTPUT@/module fixtures with spaces")
   set_tests_properties(modules PROPERTIES TIMEOUT 90)
   find_program(VOID_CLANG NAMES clang clang-23 NAMES_PER_DIR HINTS "${LLVM_TOOLS_BINARY_DIR}" REQUIRED)
   find_program(VOID_DWARFDUMP NAMES llvm-dwarfdump llvm-dwarfdump-23 NAMES_PER_DIR HINTS "${LLVM_TOOLS_BINARY_DIR}" REQUIRED)
@@ -1678,8 +1662,8 @@ if(BUILD_TESTING)
     endif()
     target_compile_definitions(void_retention_${retention_variant} PRIVATE VOID_ASYNC_IMPLEMENTATION="${retention_source}" VOID_RETENTION_VARIANT="${retention_variant}")
   endforeach()
-  add_test(NAME async_retention_sprint5 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage8/sprint5/measure.py"
-    --current "$<TARGET_FILE:void_retention_current>" --sources "${PROJECT_SOURCE_DIR}/tests/stage8/sprint5" --output "${CMAKE_CURRENT_BINARY_DIR}/sprint5-measurements")
+  void_add_output_test(async_retention_sprint5 "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage8/sprint5/measure.py"
+    --current "$<TARGET_FILE:void_retention_current>" --sources "${PROJECT_SOURCE_DIR}/tests/stage8/sprint5" --output "@VOID_TEST_OUTPUT@/sprint5-measurements")
   set_tests_properties(async_retention_sprint5 PROPERTIES TIMEOUT 180)
   foreach(retention_workload IN ITEMS growth workers)
     foreach(retention_mode IN ITEMS normal optimized)
@@ -1694,14 +1678,14 @@ if(BUILD_TESTING)
       target_compile_definitions(void_retention_aot_${retention_workload}_${retention_mode} PRIVATE
         VOID_ASYNC_IMPLEMENTATION="${PROJECT_SOURCE_DIR}/src/runtime/async.cpp" VOID_RETENTION_VARIANT="current" VOID_RETENTION_AOT=1
         VOID_RETENTION_MODE="aot-${retention_mode}" VOID_RETENTION_WORKLOAD="${retention_workload}")
-      add_test(NAME async_retention_aot_${retention_workload}_${retention_mode} COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage8/sprint5/measure.py"
-        --aot "$<TARGET_FILE:void_retention_aot_${retention_workload}_${retention_mode}>" --output "${CMAKE_CURRENT_BINARY_DIR}/sprint5-aot-${retention_workload}-${retention_mode}")
+      void_add_output_test(async_retention_aot_${retention_workload}_${retention_mode} "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage8/sprint5/measure.py"
+        --aot "$<TARGET_FILE:void_retention_aot_${retention_workload}_${retention_mode}>" --output "@VOID_TEST_OUTPUT@/sprint5-aot-${retention_workload}-${retention_mode}")
       set_tests_properties(async_retention_aot_${retention_workload}_${retention_mode} PROPERTIES TIMEOUT 120)
     endforeach()
   endforeach()
   add_executable(void_sprint6_tests tests/stage8/sprint6.cpp)
   target_link_libraries(void_sprint6_tests PRIVATE void_llvm void_cache_identity)
-  add_test(NAME ergonomics_sprint6_host COMMAND void_sprint6_tests "${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/sprint6 host fixtures")
+  void_add_output_test(ergonomics_sprint6_host "$<TARGET_FILE:void_sprint6_tests>" "${PROJECT_SOURCE_DIR}" "@VOID_TEST_OUTPUT@/sprint6 host fixtures")
   set_tests_properties(ergonomics_sprint6_host PROPERTIES TIMEOUT 180)
   # The Linux recipes invoke Clang directly and need the Runtime's pinned host
   # archives after the Runtime and fixture archives.
@@ -1750,7 +1734,7 @@ if(BUILD_TESTING)
   target_link_libraries(void_sprint4_tests PRIVATE void_llvm void_cache_identity)
   add_test(NAME lsp_sprint4 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage8/lsp_sprint4.py" "$<TARGET_FILE:voidls>")
   set_tests_properties(lsp_sprint4 PROPERTIES TIMEOUT 60)
-  add_test(NAME application_native_sprint4_host COMMAND void_sprint4_tests "${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/sprint4 host fixtures")
+  void_add_output_test(application_native_sprint4_host "$<TARGET_FILE:void_sprint4_tests>" "${PROJECT_SOURCE_DIR}" "@VOID_TEST_OUTPUT@/sprint4 host fixtures")
   set_tests_properties(application_native_sprint4_host PROPERTIES TIMEOUT 180)
   add_test(NAME application_native_sprint4 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage8/sprint4.py"
     "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_sprint4_tests>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}" ${legacy_aot_host_libraries})
@@ -1762,53 +1746,55 @@ if(BUILD_TESTING)
   set_tests_properties(lsp_sprint3 PROPERTIES TIMEOUT 60)
   add_test(NAME lsp_sprint2 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/lsp/sprint2.py" "$<TARGET_FILE:voidls>")
   set_tests_properties(lsp_sprint2 PROPERTIES TIMEOUT 60)
-  add_test(NAME aot COMMAND "${CMAKE_COMMAND}"
+  void_add_output_test(aot "${CMAKE_COMMAND}"
     "-DLINKER=${VOID_LINKER}" "-DCOMPILER=$<TARGET_FILE:voidc>" "-DCLANG=${VOID_CLANG}"
-    "-DWINDOWS=${WIN32}" "-DDWARFDUMP=${VOID_DWARFDUMP}" "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/aot proof" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
+    "-DWINDOWS=${WIN32}" "-DDWARFDUMP=${VOID_DWARFDUMP}" "-DOUTPUT=@VOID_TEST_OUTPUT@/aot proof" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
     -P "${PROJECT_SOURCE_DIR}/tests/integration/aot.cmake")
-  add_test(NAME source_cli COMMAND "${CMAKE_COMMAND}"
+  void_add_output_test(source_cli "${CMAKE_COMMAND}"
     "-DPYTHON=${Python3_EXECUTABLE}"
     "-DLINKER=${VOID_LINKER}" "-DCOMPILER=$<TARGET_FILE:voidc>" "-DCLANG=${VOID_CLANG}"
     "-DWINDOWS=${WIN32}" "-DDWARFDUMP=${VOID_DWARFDUMP}" "-DROOT=${PROJECT_SOURCE_DIR}"
-    "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/source programs with spaces" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
+    "-DOUTPUT=@VOID_TEST_OUTPUT@/source programs with spaces" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
     -P "${PROJECT_SOURCE_DIR}/tests/integration/source.cmake")
   set_tests_properties(source_cli PROPERTIES TIMEOUT 180)
-  add_test(NAME value_structs_cli COMMAND "${CMAKE_COMMAND}"
+  void_add_output_test(value_structs_cli "${CMAKE_COMMAND}"
     "-DLINKER=${VOID_LINKER}" "-DCOMPILER=$<TARGET_FILE:voidc>" "-DCLANG=${VOID_CLANG}"
     "-DWINDOWS=${WIN32}" "-DDWARFDUMP=${VOID_DWARFDUMP}" "-DROOT=${PROJECT_SOURCE_DIR}"
-    "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/value struct programs with spaces" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
+    "-DOUTPUT=@VOID_TEST_OUTPUT@/value struct programs with spaces" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
     -P "${PROJECT_SOURCE_DIR}/tests/integration/structs.cmake")
   set_tests_properties(value_structs_cli PROPERTIES TIMEOUT 180)
-  add_test(NAME receiver_methods_cli COMMAND "${CMAKE_COMMAND}"
+  void_add_output_test(receiver_methods_cli "${CMAKE_COMMAND}"
     "-DMETHODS=ON" "-DLINKER=${VOID_LINKER}" "-DCOMPILER=$<TARGET_FILE:voidc>" "-DCLANG=${VOID_CLANG}"
     "-DWINDOWS=${WIN32}" "-DDWARFDUMP=${VOID_DWARFDUMP}" "-DROOT=${PROJECT_SOURCE_DIR}"
-    "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/receiver method programs with spaces" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
+    "-DOUTPUT=@VOID_TEST_OUTPUT@/receiver method programs with spaces" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
     -P "${PROJECT_SOURCE_DIR}/tests/integration/structs.cmake")
   set_tests_properties(receiver_methods_cli PROPERTIES TIMEOUT 180)
-  add_test(NAME initialization_cli COMMAND "${CMAKE_COMMAND}"
+  void_add_output_test(initialization_cli "${CMAKE_COMMAND}"
     "-DINITIALIZERS=ON" "-DLINKER=${VOID_LINKER}" "-DCOMPILER=$<TARGET_FILE:voidc>" "-DCLANG=${VOID_CLANG}"
     "-DWINDOWS=${WIN32}" "-DDWARFDUMP=${VOID_DWARFDUMP}" "-DROOT=${PROJECT_SOURCE_DIR}"
-    "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/initialization programs with spaces" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
+    "-DOUTPUT=@VOID_TEST_OUTPUT@/initialization programs with spaces" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
     -P "${PROJECT_SOURCE_DIR}/tests/integration/structs.cmake")
   set_tests_properties(initialization_cli PROPERTIES TIMEOUT 180)
-  add_test(NAME modules_cli COMMAND "${CMAKE_COMMAND}"
+  void_add_output_test(modules_cli "${CMAKE_COMMAND}"
     "-DLINKER=${VOID_LINKER}" "-DCOMPILER=$<TARGET_FILE:voidc>" "-DCLANG=${VOID_CLANG}"
     "-DWINDOWS=${WIN32}" "-DDWARFDUMP=${VOID_DWARFDUMP}" "-DROOT=${PROJECT_SOURCE_DIR}"
-    "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/module native programs with spaces" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
+    "-DOUTPUT=@VOID_TEST_OUTPUT@/module native programs with spaces" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
     -P "${PROJECT_SOURCE_DIR}/tests/integration/modules.cmake")
   set_tests_properties(modules_cli PROPERTIES TIMEOUT 180)
-  add_test(NAME analysis_cli COMMAND "${CMAKE_COMMAND}"
+  void_add_output_test(analysis_cli "${CMAKE_COMMAND}"
     "-DLINKER=${VOID_LINKER}" "-DCOMPILER=$<TARGET_FILE:voidc>" "-DCLANG=${VOID_CLANG}"
     "-DWINDOWS=${WIN32}" "-DROOT=${PROJECT_SOURCE_DIR}"
-    "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/analysis native programs" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
+    "-DOUTPUT=@VOID_TEST_OUTPUT@/analysis native programs" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
     -P "${PROJECT_SOURCE_DIR}/tests/integration/analysis.cmake")
   set_tests_properties(analysis_cli PROPERTIES TIMEOUT 180)
-  add_test(NAME numeric_cli COMMAND "${CMAKE_COMMAND}"
+  void_add_output_test(numeric_cli "${CMAKE_COMMAND}"
     "-DLINKER=${VOID_LINKER}" "-DCOMPILER=$<TARGET_FILE:voidc>" "-DCLANG=${VOID_CLANG}"
     "-DWINDOWS=${WIN32}" "-DROOT=${PROJECT_SOURCE_DIR}"
-    "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/numeric native programs" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
+    "-DOUTPUT=@VOID_TEST_OUTPUT@/numeric native programs" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
     -P "${PROJECT_SOURCE_DIR}/tests/integration/numeric.cmake")
   set_tests_properties(numeric_cli PROPERTIES TIMEOUT 240)
+  get_property(void_registered_tests DIRECTORY PROPERTY TESTS)
+  set_property(TEST ${void_registered_tests} APPEND PROPERTY ENVIRONMENT "PYTHONDONTWRITEBYTECODE=1")
 endif()
 
 if(WIN32)

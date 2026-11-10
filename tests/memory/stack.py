@@ -29,7 +29,7 @@ def run(arguments, expected=None):
 with tempfile.TemporaryDirectory(prefix="VOID memory 1MiB ") as directory:
     run([compiler, "check", source])
     for flags in (["--no-opt"], []):
-        run([compiler, "run", source, *flags], b"memory small stack passed\n")
+        run([compiler, "run", source, "--no-cache", *flags], b"memory small stack passed\n")
         executable = Path(directory) / ("memory" + str(bool(flags)))
         run([compiler, "build", source, "-o", executable, *flags])
         run([executable], b"memory small stack passed\n")

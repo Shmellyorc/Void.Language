@@ -1,6 +1,4 @@
-"""Opt-in crash preservation for existing Python regression harnesses."""
-import os
+"""Install crash diagnostics for harnesses that opt in via PYTHONPATH."""
+from crash import install
 
-if os.environ.get('VOID_CRASH_EVIDENCE'):
-    from crash import install
-    install()
+install()

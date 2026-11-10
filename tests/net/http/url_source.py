@@ -5,7 +5,6 @@ import sys
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
-os.environ["VOID_CRASH_EVIDENCE"] = str(ROOT / "docs/net/http/evidence/crashes")
 sys.path.insert(0, str(ROOT / "tests/os"))
 import support as h
 
@@ -19,7 +18,7 @@ with tempfile.TemporaryDirectory(prefix="VOID URL source ") as directory:
     work = Path(directory)
     h.run([compiler, "check", source], work, sources=(source,))
     for mode in ([], ["--no-opt"]):
-        h.run([compiler, "run", source, *mode], work, expected, sources=(source,))
+        h.run([compiler, "run", source, "--no-cache", *mode], work, expected, sources=(source,))
         binary = work / ("url-" + str(bool(mode)) + (".exe" if os.name == "nt" else ""))
         h.run([compiler, "build", source, "-o", binary, *mode], work, sources=(source,))
         h.run([binary], work, expected, sources=(source,))

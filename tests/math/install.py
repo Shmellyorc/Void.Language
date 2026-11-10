@@ -30,5 +30,5 @@ func entry(input: i32) -> i32:
         executable=work/('installed-'+mode+('.exe' if os.name=='nt' else ''))
         h.run([installed,'build',fixture,'-o',executable,*flags],work,env=env)
         h.run([executable,'2'],work,expected,sources=(fixture,),env=env)
-    (h.ROOT/'docs/math/evidence'/('install-'+compiler.parent.name+'.json')).write_text(json.dumps({'compiler':str(compiler),'processes':h.checks,'modes':['JIT O0','JIT O2','AOT O0','AOT O2'],'relocated':True},indent=2)+'\n')
+    (h.output_directory()/('install-'+compiler.parent.name+'.json')).write_text(json.dumps({'compiler':str(compiler),'processes':h.checks,'modes':['JIT O0','JIT O2','AOT O0','AOT O2'],'relocated':True},indent=2)+'\n')
 print(f'Math relocated install: {h.checks} processes passed')

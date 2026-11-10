@@ -29,7 +29,7 @@ foreach(mode normal optimized)
       list(GET answers ${index} expected)
       foreach(engine jit aot)
         if(engine STREQUAL "jit")
-          execute_process(COMMAND "${COMPILER}" run "${ROOT}/examples/growable_arrays/${program}.void" "${input}" ${flags}
+          execute_process(COMMAND "${COMPILER}" run --no-cache "${ROOT}/examples/growable_arrays/${program}.void" "${input}" ${flags}
             RESULT_VARIABLE status OUTPUT_VARIABLE result ERROR_VARIABLE errors)
         else()
           execute_process(COMMAND "${BIN}/void_growable_arrays_cli_${program}_${mode}${EXE_SUFFIX}" "${input}"

@@ -215,7 +215,7 @@ def verify(output):
 
 with tempfile.TemporaryDirectory(prefix='VOID math execution ') as directory:
     work=Path(directory);fixture=work/'math_test.void';raw=('\n'.join(source)+'\n').encode();fixture.write_bytes(raw)
-    evidence=h.ROOT/'docs/math/evidence';evidence.mkdir(exist_ok=True,parents=True)
+    evidence=h.output_directory();evidence.mkdir(exist_ok=True,parents=True)
     label=compiler.parent.name+('-stack' if small else '')
     source_copy=evidence/('math_test-'+label+'.void')
     expectations_copy=evidence/('expectations-'+label+'.json')
@@ -243,6 +243,6 @@ with tempfile.TemporaryDirectory(prefix='VOID math execution ') as directory:
         h.run([compiler,'build',fixture,'-o',executable,*flags],work,small=small,timeout=300)
         result=h.run([executable,'1'],work,sources=(fixture,),small=small)
         observations.append({'mode':'AOT '+mode,'worst_ulp':verify(result.stdout),'stdout_sha256':hashlib.sha256(result.stdout).hexdigest()})
-    record={'compiler':str(compiler),'compiler_sha256':hashlib.sha256(compiler.read_bytes()).hexdigest(),'source_sha256':hashlib.sha256(raw).hexdigest(),'vectors_sha256':bank_sha256,'source_artifact':str(source_copy.relative_to(h.ROOT)),'expectations_artifact':str(expectations_copy.relative_to(h.ROOT)),'reference_artifact':str(bank_copy.relative_to(h.ROOT)),'vectors':len(cases),'independent_mpfr_vectors':len(bank['vectors']),'independent_mpfr_interpolation_vectors':len(bank['interpolation_vectors']),'processes':h.checks,'small_stack':small,'observations':observations}
+    record={'compiler':str(compiler),'compiler_sha256':hashlib.sha256(compiler.read_bytes()).hexdigest(),'source_sha256':hashlib.sha256(raw).hexdigest(),'vectors_sha256':bank_sha256,'source_artifact':str(source_copy.relative_to(evidence)),'expectations_artifact':str(expectations_copy.relative_to(evidence)),'reference_artifact':str(bank_copy.relative_to(evidence)),'vectors':len(cases),'independent_mpfr_vectors':len(bank['vectors']),'independent_mpfr_interpolation_vectors':len(bank['interpolation_vectors']),'processes':h.checks,'small_stack':small,'observations':observations}
     retain_artifact(evidence/('execution-'+label+'.json'),(json.dumps(record,indent=2)+'\n').encode())
 print(f'Math execution: {len(cases)} vectors x four real modes; {h.checks} processes passed; 1 MiB={small}')

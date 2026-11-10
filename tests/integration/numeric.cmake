@@ -25,7 +25,7 @@ foreach(source IN LISTS programs)
     foreach(input IN LISTS inputs)
       foreach(engine jit aot)
         if(engine STREQUAL "jit")
-          execute_process(COMMAND "${COMPILER}" run "${source}" "${input}" ${flags}
+          execute_process(COMMAND "${COMPILER}" run --no-cache "${source}" "${input}" ${flags}
             RESULT_VARIABLE status OUTPUT_VARIABLE output ERROR_VARIABLE errors)
         else()
           execute_process(COMMAND "${executable}" "${input}"
