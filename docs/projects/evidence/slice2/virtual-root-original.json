@@ -1,0 +1,14 @@
+{
+  "result": "FAIL: virtual source root incorrectly produced a successful project selection",
+  "command": [
+    "build/llvm23-debug/void_project_selection"
+  ],
+  "returncode": 1,
+  "source_and_binary_sha256": {
+    "src/frontend/project_selection.inc": "c832738724d3db5d963c0133fdb08263c3be713d9a6e4d9c1a520d68b52c06d1",
+    "tests/project/selection.cpp": "46c28ef7f66fdd9a4e28ef9381ef80243ea19859b0d38e9ce08662913e996fe7",
+    "build/llvm23-debug/void_project_selection": "e1eaa6d3f211e91c89ee9d5ceb41512f691c499423022b88c4a633852cf986f3",
+    "build/llvm23-debug/voidc": "aad9c1bf9e463821fde6ccf1dd7dd3a132b3b0aa0838d5b46c4265a0ae666179"
+  },
+  "output": "failure cannot publish a project/entry\n"
+}

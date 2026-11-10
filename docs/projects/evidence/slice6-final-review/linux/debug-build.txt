@@ -1,0 +1,86 @@
+[  7%] Built target void_application_objects
+[  7%] Built target void_format_objects
+[  7%] Built target void_zone_objects
+[  7%] Built target void_native_fixture
+[ 14%] Built target void_core
+[ 85%] Built target libcurl_static
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_native_inventory
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target voidc
+[ 50%] Built target void_application_objects
+[ 50%] Built target void_format_objects
+[ 50%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Built target voidls
+[  7%] Built target void_application_objects
+[  7%] Built target void_format_objects
+[  7%] Built target void_zone_objects
+[ 78%] Built target libcurl_static
+[ 78%] Built target void_native_fixture
+[ 85%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_numeric_enum_ir
+[  6%] Built target void_application_objects
+[  6%] Built target void_format_objects
+[  6%] Built target void_zone_objects
+[ 73%] Built target libcurl_static
+[ 73%] Built target void_native_fixture
+[ 80%] Built target void_core
+[ 93%] Built target void_runtime
+[ 93%] Built target void_llvm
+[ 93%] Built target native_fixture
+[100%] Built target void_tests
+[  7%] Built target void_application_objects
+[  7%] Built target void_format_objects
+[  7%] Built target void_zone_objects
+[ 78%] Built target libcurl_static
+[ 78%] Built target void_native_fixture
+[ 78%] Building CXX object CMakeFiles/void_managed_test_abi.dir/src/runtime/abi.cpp.o
+[ 85%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_managed_test_abi
+[100%] Building CXX object CMakeFiles/void_fixed_arrays_tests.dir/tests/managed/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_fixed_arrays_tests.dir/tests/fixed_arrays/tests.cpp.o
+[100%] Linking CXX executable void_fixed_arrays_tests
+[100%] Built target void_fixed_arrays_tests
+[  6%] Built target void_application_objects
+[  6%] Built target void_format_objects
+[ 73%] Built target libcurl_static
+[ 73%] Built target void_zone_objects
+[ 73%] Built target void_native_fixture
+[ 73%] Built target void_managed_test_abi
+[ 80%] Built target void_core
+[ 93%] Built target void_runtime
+[ 93%] Built target void_llvm
+[ 93%] Built target voidc_objects
+[ 93%] Built target void_cache_identity
+[ 93%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/lifecycle.cpp.o
+[ 93%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/ir.cpp.o
+[ 93%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/lifetime.cpp.o
+[ 93%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/parallel.cpp.o
+/home/shmellyorc/Documents/Void.Language/tests/async/parallel.cpp:31:379: warning: variable 'foreign' is uninitialized when passed as a const pointer argument here [-Wuninitialized-const-pointer]
+   31 | void* fifo_start(std::int32_t,vd::RuntimeFailure* failure){void* task=nullptr;void* frame=nullptr;const std::size_t zero=0;vd::Runtime::Slot slots[]={{&task,sizeof(task),&zero,1},{&frame,sizeof(frame),&zero,1}};vd::Runtime::Frame roots(vd::Runtime::current(),slots,2);char foreign;vd::RuntimeFailure wrong;vd_async_new(&task,&frame,8,nullptr,0,8,nullptr,0,"parallel-fifo-task",&foreign,fifo_resume,&wrong,1);foreign_rejected=wrong.message && !task && !frame;return fifo_create(-1,failure);}
+      |                                                                                                                                                                                                                                                                                                                                                                                           ^~~~~~~
+[ 93%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/syntax.cpp.o
+1 warning generated.
+[ 93%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/tests.cpp.o
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_async_tests
+[100%] Built target void_async_tests
+[  6%] Built target void_application_objects
+[  6%] Built target void_format_objects
+[ 53%] Built target void_zone_objects
+[ 73%] Built target libcurl_static
+[ 73%] Built target void_native_fixture
+[ 80%] Built target void_core
+[ 93%] Built target void_runtime
+[ 93%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_stage10_fields.dir/tests/stage10/fields.cpp.o
+[100%] Linking CXX executable void_stage10_fields
+[100%] Built target void_stage10_fields

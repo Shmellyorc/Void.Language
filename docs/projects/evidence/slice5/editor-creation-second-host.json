@@ -1,0 +1,15 @@
+{
+  "mode": "trusted",
+  "editor": "1.141.0",
+  "platform": "linux",
+  "events": [
+    "activation and opening a pre-existing source do not offer",
+    "an unrelated pre-existing source suppresses a later-file offer",
+    "decline persists and prevents a repeat",
+    "dismissal persists and reset is deliberate",
+    "cancelled review writes nothing and acceptance suppresses another automatic offer",
+    "File\nEdit\nSelection\nView\nGo\nRun\nTerminal\nOpen in Agents\nSign In\n1\nExplorer\ntrusted\ngame.void\nhelper.void\nOutline\nTimeline\ngame\n.void\ngame.void\n1\n2\n3\nfunc main() -> i32:\n    return 27\nChat\nBuild with Agent\n\nAI responses may be inaccurate\n\nGenerate Agent Instructions to onboard AI onto your codebase.\n\ngame.void\nAgent\nModels\nLocal\nDefault permissions\n 0 \n 0\nVOID: standalone existing.void\nVOID\nLF\nUTF-8\nSpaces: 4\nLn 3, Col 1\nError: VOID: This document is outside the selected project or single-file entry. Configure void.project.entry for a multi-file project; use a separate window for unrelated projects. See Output → VOID.\nVOID: This document is outside the selected project or single-file entry. Configure void.project.entry for a multi-file project; use a separate window for unrelated projects. See Output → VOID.\nReview VOID project creation\n2 Results\nCreate Manifest\nApplication ID: local.a77635d02343ded2bcd7f7e0fab414053\nCancel"
+  ],
+  "failure": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  (detail.includes(manifest) && /local\\.p[0-9a-f]{32}/.test(detail) && /local\\.a[0-9a-f]{32}/.test(detail))\n\n\tat Object.run (/home/shmellyorc/Documents/Void.Language/editors/vscode/out/test/creationHost.js:201:30)",
+  "status": "FAIL"
+}

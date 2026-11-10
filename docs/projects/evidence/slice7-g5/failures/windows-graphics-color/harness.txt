@@ -1,0 +1,44 @@
+Staged verified CLI, generated install manifests, link inputs and stdlib at C:\Users\a\VoidS7-G5-Graphics\Release-qualified\compiler install
+['C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-qualified\\gallery project\\prepare.py', '--voidc', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-qualified\\compiler install\\bin\\voidc.exe', '--clang', 'C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\clang.exe', '--header', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src\\raylib.h', '--library', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.dll', '--license', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\LICENSE', '--import-library', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.lib']
+047e7255f93f8c34039cab906ad76136706b5c7b4c5b5b065d84141963ee9b6b  C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\src\raylib.h
+3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824  C:\Users\a\VoidS7-Raylib-Compatibility\build-win32-software-linked\raylib.dll
+882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799  C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\LICENSE
+59778ec137ffebe87a6c099944330f20b7eecdf1d49a5a93de7000a8992339df  C:\Users\a\VoidS7-Raylib-Compatibility\build-win32-software-linked\raylib.lib
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Release-qualified\\compiler install\\bin\\voidc.exe', 'native-bind', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-qualified\\gallery project\\native\\.bind-p75fg87z\\raylib-windows.descriptor', 'raylib_provider.h', '-o', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-qualified\\gallery project\\native\\.bind-p75fg87z\\raylib_checked.c']
+['C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\clang.exe', '-std=c11', '-shared', '-fuse-ld=lld', '-O2', '-Wall', '-Wextra', '-Werror', '-IC:\\Users\\a\\VoidS7-G5-Graphics\\Release-qualified\\gallery project\\native', '-IC:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src', '--target=x86_64-pc-windows-msvc', '-DUSE_LIBTYPE_SHARED', '-fms-runtime-lib=static', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-qualified\\gallery project\\native\\raylib_provider.c', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-qualified\\gallery project\\native\\.bind-p75fg87z\\raylib_checked.c', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.lib', '-o', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-qualified\\gallery project\\native\\.bind-p75fg87z\\void_raylib.dll']
+595ba506f4b6949dff3c74164e62e74b18e6828e832000625b92c0f288c8a166  C:\Users\a\VoidS7-G5-Graphics\Release-qualified\gallery project\native\void_raylib.dll
+3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824  C:\Users\a\VoidS7-G5-Graphics\Release-qualified\gallery project\native\raylib.dll
+55fc257ce900ef6708f7d4830ecdf036ad1d2430c5edfb37cc36c473f965cb88  C:\Users\a\VoidS7-G5-Graphics\Release-qualified\gallery project\native\raylib-windows.descriptor
+2a2c339317ade503a55a8b9d4feec5b24fd11c500a08a2a449fb02682d35dc89  C:\Users\a\VoidS7-G5-Graphics\Release-qualified\gallery project\native\raylib_checked.c
+882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799  C:\Users\a\VoidS7-G5-Graphics\Release-qualified\gallery project\native\RAYLIB-LICENSE.txt
+
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Release-qualified\\compiler install\\bin\\voidc.exe', 'check', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-qualified\\gallery project']
+Source checked successfully
+
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Release-qualified\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-qualified\\gallery project']
+Invalid invocation: This project declares native code. Pass --allow-native to authorize its execution.
+Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]
+Try 'voidc run --help' for examples.
+
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Release-qualified\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-qualified\\gallery project', '--allow-native', '--', '--reject-title']
+Raylib title rejected
+
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Release-qualified\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-qualified\\gallery project', '--allow-native', '--no-cache', '--no-opt', '--', '--trace-only']
+RAYLIB trace invoked VOID
+
+jit-normal ['C:\\Users\\a\\VoidS7-G5-Graphics\\Release-qualified\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-qualified\\gallery project', '--allow-native', '--no-cache', '--no-opt', '--', '--implicit-close']
+Traceback (most recent call last):
+  File "C:\Users\a\VoidS7-G5-Graphics\qualify-windows.py", line 279, in <module>
+    qualify(profile)
+    ~~~~~~~^^^^^^^^^
+  File "C:\Users\a\VoidS7-G5-Graphics\qualify-windows.py", line 254, in qualify
+    visible('jit-'+mode,cwd,[compiler,'run','--project',project,'--allow-native','--no-cache',*flags,'--',*implicit],
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            native,env,work/('jit-'+mode))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidS7-G5-Graphics\qualify-windows.py", line 159, in visible
+    before=capture(hwnd,out/'frame-before.bmp')
+  File "C:\Users\a\VoidS7-G5-Graphics\qualify-windows.py", line 120, in capture
+    assert len(points)>90,(name,len(points))
+           ^^^^^^^^^^^^^^
+AssertionError: ('pink', 0)

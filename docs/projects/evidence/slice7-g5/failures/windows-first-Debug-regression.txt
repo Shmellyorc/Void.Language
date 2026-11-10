@@ -1,0 +1,344 @@
+Test project C:/Users/a/VoidS7-G5-Compiler/Debug
+      Start   2: project_manifest
+      Start  17: cli_contract
+ 1/18 Test   #2: project_manifest .................   Passed    0.53 sec
+      Start 219: ffi_g1_primitive_jit_ir
+ 2/18 Test #219: ffi_g1_primitive_jit_ir ..........   Passed    1.76 sec
+      Start 220: ffi_g1_primitive_aot_normal
+ 3/18 Test #220: ffi_g1_primitive_aot_normal ......   Passed    0.82 sec
+      Start 221: ffi_g1_primitive_aot_optimized
+ 4/18 Test #221: ffi_g1_primitive_aot_optimized ...   Passed    0.67 sec
+      Start 222: ffi_g1_primitive_aot_mismatch
+ 5/18 Test #222: ffi_g1_primitive_aot_mismatch ....   Passed    0.66 sec
+      Start 223: ffi_g1_primitive_aot_missing
+ 6/18 Test #223: ffi_g1_primitive_aot_missing .....   Passed    1.27 sec
+      Start 224: ffi_g2_jit_ir
+ 7/18 Test #224: ffi_g2_jit_ir ....................   Passed    1.82 sec
+      Start 225: ffi_g2_aot_normal
+ 8/18 Test #225: ffi_g2_aot_normal ................   Passed    2.28 sec
+      Start 226: ffi_g2_aot_optimized
+ 9/18 Test #226: ffi_g2_aot_optimized .............   Passed    2.64 sec
+      Start 227: ffi_g3_jit_ir
+10/18 Test #227: ffi_g3_jit_ir ....................   Passed    3.33 sec
+      Start 228: ffi_g3_aot_normal
+11/18 Test #228: ffi_g3_aot_normal ................   Passed    1.39 sec
+      Start 229: ffi_g3_aot_optimized
+12/18 Test #229: ffi_g3_aot_optimized .............   Passed    1.75 sec
+      Start 331: reload
+13/18 Test #331: reload ...........................   Passed    2.17 sec
+      Start 332: gc
+14/18 Test #332: gc ...............................   Passed    0.32 sec
+      Start 338: analysis
+15/18 Test  #17: cli_contract .....................***Failed   21.75 sec
+Traceback (most recent call last):
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 701, in _rmtree_unsafe
+    os.unlink(fullname)
+    ~~~~~~~~~^^^^^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-tmp\\VOID CLI é # % fo972os3\\broken installation\\voidc.exe'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\a\VoidCI42377496702-Native\tests\cli\contract.py", line 75, in <module>
+    with tempfile.TemporaryDirectory(prefix='VOID CLI é # % ') as directory:
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 972, in __exit__
+    self.cleanup()
+    ~~~~~~~~~~~~^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 705, in _rmtree_unsafe
+    onexc(os.unlink, fullname, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 931, in onexc
+    _os.unlink(path)
+    ~~~~~~~~~~^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-tmp\\VOID CLI é # % fo972os3\\broken installation\\voidc.exe'
+
+      Start 345: ffi_g4_conventional
+16/18 Test #338: analysis .........................   Passed    5.58 sec
+      Start 346: ffi_g5_callbacks
+17/18 Test #346: ffi_g5_callbacks .................***Failed   10.00 sec
+cwd= C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\independent cwd argv= ['C:/gcc/bin/cmake.exe', '--install', 'C:/Users/a/VoidS7-G5-Compiler/Debug', '--prefix', 'C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\compiler install', '--config', 'Debug', '--component', 'compiler']
+exit=0
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/VOID-MIT-LICENSE.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/LICENSING_SCOPE.md
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/REDISTRIBUTION.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/NOTICE_INVENTORY.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/llvm-23.1.4
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/llvm-23.1.4/BLAKE3-LICENSE.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/llvm-23.1.4/ConvertUTF-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/llvm-23.1.4/LICENSE.TXT
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/llvm-23.1.4/Support-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/llvm-23.1.4/xxhash-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/zstd-1.5.7
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/zstd-1.5.7/EMBEDDED-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/zstd-1.5.7/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/tomlplusplus/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/tomlplusplus/upstream.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/tomlplusplus/void-bounds-and-locations.patch
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/tomlplusplus/corresponding-source/toml.hpp
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/tomlplusplus/corresponding-source/README.md
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/zlib-1.3.2/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/libarchive
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/libarchive/COPYING
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/libarchive/SOURCE-NOTICES.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/libsodium
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/libsodium/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/libsodium/SOURCE-NOTICES.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/patches
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/patches/libsodium-1.0.22
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/patches/libsodium-1.0.22/asan-alignment.patch
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/patches/libsodium-1.0.22/PROVENANCE.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/host-versions.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/setup_host_deps.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/setup_host_deps_native.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/host-sodium.targets
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/verify_host_deps.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/corresponding-source/repro/tools/setup_host_deps.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/corresponding-source/repro/tools/setup_host_deps_native.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/corresponding-source/repro/tools/verify_host_deps.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/corresponding-source/repro/tools/verify_http_dependencies.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/corresponding-source/repro/tools/ci/llvm_sdk.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/corresponding-source/repro/cmake/host-sodium.targets
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-versions.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/http-versions.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22/asan-alignment.patch
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22/PROVENANCE.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/libxml2-2.15.4
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/libxml2-2.15.4/Copyright
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/libxml2-2.15.4/FILE-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/UNICODE-LICENSE.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/archive.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/channel.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/collections.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/console.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/convert.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/crypto.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/encoding
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/encoding/ascii.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/encoding/base64.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/encoding/binary.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/encoding/hex.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/error.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/io
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/io/memory.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/io.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/json.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/log.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/math.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/net
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/net/http.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/os.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/path.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/process.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/random.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/system_error.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/text.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/time.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/stdlib/url.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/LICENSE-Boost
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/LICENSE.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/NOTICE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/stage10-versions.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/bin/voidc.exe
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/lib/void/void_runtime.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/lib/void/void_native_fixture.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/lib/void/libcurl.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/lib/void/archive.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/lib/void/libsodium.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/lib/void/psl.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/lib/void/nghttp2.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/lib/void/cares.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/lib/void/zsd.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/aws-lc-5.12.0
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/aws-lc-5.12.0/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/aws-lc-5.12.0/NOTICE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/aws-lc-5.12.0/UPSTREAM.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/c-ares-1.34.9
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/c-ares-1.34.9/LICENSE.md
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/libidn2-2.3.8
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/libidn2-2.3.8/COPYING
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/libidn2-2.3.8/COPYING.LESSERv3
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/libidn2-2.3.8/COPYING.unicode
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/libidn2-2.3.8/COPYINGv2
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/libidn2-2.3.8/README
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/libpsl-0.21.5
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/libpsl-0.21.5/COPYING
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/libpsl-0.21.5/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/libpsl-0.21.5/LICENSE.chromium
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/libpsl-0.21.5/README
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/libunistring-1.5
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/libunistring-1.5/COPYING
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/libunistring-1.5/COPYING.LIB
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/libunistring-1.5/README
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/nghttp2-1.70.0
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/nghttp2-1.70.0/COPYING
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/nghttp2-1.70.0/README
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/openssl-3.5.9
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/openssl-3.5.9/LICENSE.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/zlib-1.3.2
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/zlib-1.3.2/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/zlib-1.3.2/README
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/COPYING
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/NOTICE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/VOID-PROVENANCE.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/http-versions.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/publicsuffix
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/publicsuffix/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/publicsuffix/public_suffix_list.dat
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/publicsuffix/UPSTREAM.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/corresponding-source/setup_http_deps.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/corresponding-source/setup_http_deps_native.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/corresponding-source/http_archive.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/http/VOID-HTTP-DEPENDENCIES.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/bin/void-native.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/bin/void-native-resources.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/VOID-HOST-DEPENDENCIES.json
+-- Up-to-date: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/corresponding-source
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/corresponding-source/libarchive-3.8.11.tar.xz
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\compiler install/share/void/licenses/host/corresponding-source/libsodium-1.0.22.tar.gz
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\compiler install\\bin\\voidc.exe', 'new', 'C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\native callbacks project', '--source', 'src/main.void', '--project-id', 'org.voidlang.callback-qual']
+exit=0
+Manifest: C:/Users/a/VoidS7-G5-Compiler/Debug-g5-artifacts/g5-mxogn6bj/native callbacks project/void.project.toml
+Project ID: org.voidlang.callback-qual
+Application ID: local.a991883085e82854b65c5c375123b7005
+Next: from the displayed manifest directory, run voidc check --project .
+Created project manifest.
+Automatic application selection requires one eligible main(). Use --entry for a deliberate override.
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\compiler install\\bin\\voidc.exe', 'native-bind', 'C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\native callbacks project\\native\\callback.descriptor', 'callback_fixture.h', '-o', 'C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\callback_adapter.c']
+exit=0
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\independent cwd argv= ['C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\clang.exe', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-shared', '-fuse-ld=lld', '--target=x86_64-pc-windows-msvc', '-fms-runtime-lib=static', '-Wl,/implib:C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\g5_fixture.lib', '-DG5_FIXTURE_BUILD', 'C:\\Users\\a\\VoidCI42377496702-Native\\tests\\ffi\\callback_fixture.c', '-o', 'C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\native callbacks project\\native\\g5_fixture.dll']
+exit=0
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\independent cwd argv= ['C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\clang.exe', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-shared', '-fuse-ld=lld', '--target=x86_64-pc-windows-msvc', '-fms-runtime-lib=static', '-IC:\\Users\\a\\VoidCI42377496702-Native\\tests\\ffi', 'C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\callback_adapter.c', 'C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\g5_fixture.lib', '-o', 'C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\native callbacks project\\native\\g5_adapter.dll']
+exit=0
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\independent cwd argv= ['C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\clang.exe', '-std=c11', '-fsyntax-only', 'C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\callback_adapter.c']
+exit=1
+C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\callback_adapter.c:56:16: error: static assertion failed: C signature g5_mix
+   56 | _Static_assert(_Generic(&g5_mix, double (*)(double, float, vd_cb_floating, void*): 1, default: 0), "C signature g5_mix");
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\callback_adapter.c:118:43: error: incompatible function pointer types passing 'double (void *, double, float)' to parameter of type 'G5Float' (aka 'double (*)(void *, double, double)') [-Wincompatible-function-pointer-types]
+  118 |         double value = g5_mix(arg0, arg1, vd_enter_floating, arg2);
+      |                                           ^~~~~~~~~~~~~~~~~
+C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\callback_fixture.h:20:44: note: passing argument to parameter here
+   20 | G5_API double g5_mix(double, float, G5Float, void*);
+      |                                            ^
+2 errors generated.
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\compiler install\\bin\\voidc.exe', 'native-bind', 'C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\unsupported.descriptor', 'callback_fixture.h', '-o', 'C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\bad.c']
+exit=1
+C primitive descriptor line 11: expected a fixed C callback signature with context-first
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\compiler install\\bin\\voidc.exe', 'check', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\native callbacks project']
+exit=0
+Source checked successfully
+C:/Users/a/VoidS7-G5-Compiler/Debug-g5-artifacts/g5-mxogn6bj/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\native callbacks project']
+exit=2
+Invalid invocation: This project declares native code. Pass --allow-native to authorize its execution.
+Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]
+Try 'voidc run --help' for examples.
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\compiler install\\bin\\voidc.exe', 'check', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\native callbacks project']
+exit=1
+C:/Users/a/VoidS7-G5-Compiler/Debug-g5-artifacts/g5-mxogn6bj/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C:/Users/a/VoidS7-G5-Compiler/Debug-g5-artifacts/g5-mxogn6bj/native callbacks project/src/main.void:48:21: error: Type mismatch: expected func(i32) -> i32, received func(f64, f32) -> f64.
+    code: VOID2001
+
+ 48 |     if g5.twice(-2, mix_value) != 5:
+    |                     ^^^^^^^^^
+    Module: /src/main.void
+    Expected: func(i32) -> i32
+    Received: func(f64, f32) -> f64
+
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\compiler install\\bin\\voidc.exe', 'check', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\native callbacks project']
+exit=1
+C:/Users/a/VoidS7-G5-Compiler/Debug-g5-artifacts/g5-mxogn6bj/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C:/Users/a/VoidS7-G5-Compiler/Debug-g5-artifacts/g5-mxogn6bj/native callbacks project/src/main.void:49:21: error: A checked C callback must be supplied last as a directly named function, bound method or literal closure from this generation.
+    code: VOID1103
+
+ 49 |     if g5.twice(-2, indirect) != 5:
+    |                     ^^^^^^^^
+    Module: /src/main.void
+
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\Debug-g5-artifacts\g5-mxogn6bj\independent cwd argv= ['C:/Users/a/VoidS7-G5-Compiler/Debug/void_g5_reload.exe', 'C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\reload.void', 'C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\native callbacks project\\native', 'g5_fixture.dll', 'g5_adapter.dll', 'C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-artifacts\\g5-mxogn6bj\\native callbacks project\\native\\callback.descriptor']
+exit=1
+<host binding /callback_checked.void>:1:1: error: Declaration shadows project-root global 'registration'.
+    code: VOID2005
+
+ 1 | # Host-admitted C primitive declarations for org.voidlang.g5
+   | ^^^^^^^^^^^^
+
+
+Traceback (most recent call last):
+  File "C:\Users\a\VoidCI42377496702-Native\tests\ffi\callback_process.py", line 157, in <module>
+    qualify(Path(directory))
+    ~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidCI42377496702-Native\tests\ffi\callback_process.py", line 109, in qualify
+    run(cwd, sys.argv[4], reload, native, provider.name, adapter.name, descriptor,
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        expected='compatible/incompatible reload, retirement and self-drain passed')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidCI42377496702-Native\tests\ffi\callback_process.py", line 32, in run
+    assert completed.returncode != 0 if status is None else completed.returncode == status, output
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: <host binding /callback_checked.void>:1:1: error: Declaration shadows project-root global 'registration'.
+    code: VOID2005
+
+ 1 | # Host-admitted C primitive declarations for org.voidlang.g5
+   | ^^^^^^^^^^^^
+
+
+
+18/18 Test #345: ffi_g4_conventional ..............   Passed   58.60 sec
+
+89% tests passed, 2 tests failed out of 18
+
+Total Test time (real) =  80.53 sec
+
+The following tests FAILED:
+	 17 - cli_contract (Failed)
+	346 - ffi_g5_callbacks (Failed)
+Errors while running CTest

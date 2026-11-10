@@ -1,0 +1,55 @@
+{
+  "source": {
+    "original": "8e2379a8a2ef0b53a957a53843d985ec95b3f38895e2e611f2a1b273ea5e9f3c",
+    "diagnostic": "85a690c20710ce3332b1dc1467a455ec0fdaae30895bec148c8eaa6c49a8f17b",
+    "g2_release_original_executable": "744299321d6a2f3461e5fe9f6dbb29de63f109e4ce4f2d8923604d1c336a660a"
+  },
+  "compile": {
+    "command": "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe  /nologo -TP -DCURL_STATICLIB -DNOMINMAX -DWIN32_LEAN_AND_MEAN -D_ITERATOR_DEBUG_LEVEL=0 -D_WIN32_WINNT=0x0A00 -IC:\\Users\\a\\VoidS7-G2-source\\include -IC:\\Users\\a\\VoidS7-G2-source\\third_party\\curl\\include -IC:\\Users\\a\\VoidS7-G2-source\\tests\\integration -imsvc\"C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\include\" -imsvcC:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\http\\prefix\\windows-schannel-x86_64\\Release\\include /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MT /GR- /W4 /permissive- /EHsc /FoC:\\Users\\a\\VoidS7-G3-concurrency\\analysis-diagnostic.obj /FdC:\\Users\\a\\VoidS7-G3-concurrency\\analysis.pdb -c -- C:\\Users\\a\\VoidS7-G3-concurrency\\analysis-diagnostic.cpp",
+    "cwd": "C:\\Users\\a\\VoidS7-G2-Release",
+    "exit": 0
+  },
+  "link": {
+    "command": "C:\\Windows\\system32\\cmd.exe /C \"cd . && C:\\gcc\\bin\\cmake.exe -E vs_link_exe --msvc-ver=1944 --intdir=C:\\Users\\a\\VoidS7-G3-concurrency --rc=\"C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.19041.0\\x64\\rc.exe\" --mt=C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-mt.exe --manifests  -- C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe /nologo @C:\\Users\\a\\VoidS7-G3-concurrency\\link.rsp  /out:C:\\Users\\a\\VoidS7-G3-concurrency\\void-analysis-diagnostic.exe /implib:C:\\Users\\a\\VoidS7-G3-concurrency\\analysis.lib /pdb:C:\\Users\\a\\VoidS7-G3-concurrency\\analysis.pdb /version:0.0 /machine:x64 /INCREMENTAL:NO /subsystem:console && cd .\"",
+    "cwd": "C:\\Users\\a\\VoidS7-G2-Release",
+    "exit": 0
+  },
+  "artifacts": {
+    "executable": "24d03f75a0741475ca1ea45e0474dec4027dbf98f82443dce1f9e1890835c19a",
+    "diagnostic_object": "d538715f37271df8326f869e3ecb035037d23e76a29c680d947087952f37f613",
+    "response": "8998d551879ee45e43d6a1c3a3bc625bcdf621dab0f5ff9b1cd0a08466bec742"
+  },
+  "release-overlap": {
+    "command": [
+      "C:\\gcc\\bin\\ctest.exe",
+      "--test-dir",
+      "C:\\Users\\a\\VoidS7-G3-concurrency",
+      "--output-on-failure",
+      "-j",
+      "2",
+      "-R",
+      "^(analysis|reload|numeric)$",
+      "--repeat",
+      "until-fail:32"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS7-G3-concurrency",
+    "exit": 8
+  },
+  "debug-overlap": {
+    "command": [
+      "C:\\gcc\\bin\\ctest.exe",
+      "--test-dir",
+      "C:\\Users\\a\\VoidS7-G2-Debug",
+      "--output-on-failure",
+      "-j",
+      "2",
+      "-R",
+      "^(analysis|reload|numeric)$",
+      "--repeat",
+      "until-fail:32"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS7-G2-Debug",
+    "exit": 8
+  },
+  "status": "complete"
+}

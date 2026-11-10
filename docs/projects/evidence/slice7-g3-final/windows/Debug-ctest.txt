@@ -1,0 +1,33 @@
+Test project C:/Users/a/VoidS7-G3Final-Debug
+      Start 219: ffi_g1_primitive_jit_ir
+      Start 220: ffi_g1_primitive_aot_normal
+ 1/14 Test #220: ffi_g1_primitive_aot_normal ......   Passed    0.38 sec
+      Start 221: ffi_g1_primitive_aot_optimized
+ 2/14 Test #221: ffi_g1_primitive_aot_optimized ...   Passed    0.38 sec
+      Start 222: ffi_g1_primitive_aot_mismatch
+ 3/14 Test #222: ffi_g1_primitive_aot_mismatch ....   Passed    0.27 sec
+      Start 223: ffi_g1_primitive_aot_missing
+ 4/14 Test #219: ffi_g1_primitive_jit_ir ..........   Passed    1.37 sec
+      Start 224: ffi_g2_jit_ir
+ 5/14 Test #223: ffi_g1_primitive_aot_missing .....   Passed    0.86 sec
+      Start 225: ffi_g2_aot_normal
+ 6/14 Test #225: ffi_g2_aot_normal ................   Passed    0.78 sec
+      Start 226: ffi_g2_aot_optimized
+ 7/14 Test #224: ffi_g2_jit_ir ....................   Passed    1.80 sec
+      Start 227: ffi_g3_jit_ir
+ 8/14 Test #226: ffi_g2_aot_optimized .............   Passed    0.81 sec
+      Start 228: ffi_g3_aot_normal
+ 9/14 Test #228: ffi_g3_aot_normal ................   Passed    0.48 sec
+      Start 229: ffi_g3_aot_optimized
+10/14 Test #229: ffi_g3_aot_optimized .............   Passed    0.44 sec
+      Start 331: reload
+11/14 Test #331: reload ...........................   Passed    1.58 sec
+      Start 332: gc
+12/14 Test #332: gc ...............................   Passed    0.20 sec
+      Start 338: analysis
+13/14 Test #227: ffi_g3_jit_ir ....................   Passed    3.66 sec
+14/14 Test #338: analysis .........................   Passed    3.47 sec
+
+100% tests passed out of 14
+
+Total Test time (real) =   9.82 sec

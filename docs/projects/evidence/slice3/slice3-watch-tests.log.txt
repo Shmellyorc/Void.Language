@@ -1,0 +1,7 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start 12: project_protocol
+1/1 Test #12: project_protocol .................   Passed    0.29 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.30 sec

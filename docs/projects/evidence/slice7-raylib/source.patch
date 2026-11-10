@@ -1,0 +1,710 @@
+diff --git a/examples/raylib/native/raylib.descriptor.in b/examples/raylib/native/raylib.descriptor.in
+new file mode 100644
+--- /dev/null
++++ b/examples/raylib/native/raylib.descriptor.in
+@@ -0,0 +1,22 @@
++void-c-primitive 3 3
++provider org.voidlang.raylib
++target @TARGET@
++source /raylib_checked.void
++thunk @THUNK@
++fixture @FIXTURE@
++effects direct-sync blocking no-callbacks
++call c-default
++aliases c_int:i32 c_long:@LONG@ c_size:u64 c_bool:bool
++resource window VoidRaylibWindow pointer null open close owner-calls shutdown-owner consume-always
++record color Color 4 1 4
++field r r u8 0
++field g g u8 1
++field b b u8 2
++field a a u8 3
++bind tint vd_raylib_tint record:color record:color f32
++bind title vd_raylib_title i64 in:1:2:255 c_size c_size
++bind open vd_raylib_open owner:window c_int c_int
++bind should_close vd_raylib_should_close c_bool borrow:window
++bind direction vd_raylib_direction c_int borrow:window
++bind draw vd_raylib_draw c_int mut:window c_int c_int u8 u8 u8
++bind close vd_raylib_close i32 close:window
+diff --git a/examples/raylib/native/raylib_provider.c b/examples/raylib/native/raylib_provider.c
+new file mode 100644
+--- /dev/null
++++ b/examples/raylib/native/raylib_provider.c
+@@ -0,0 +1,113 @@
++#include "raylib_provider.h"
++
++#include <stdatomic.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++
++_Static_assert(RAYLIB_VERSION_MAJOR == 6 && RAYLIB_VERSION_MINOR == 0 && RAYLIB_VERSION_PATCH == 0,
++               "Use the qualified raylib 6.0 headers");
++_Static_assert(sizeof(Color) == 4 && _Alignof(Color) == 1 && offsetof(Color, a) == 3, "raylib Color");
++_Static_assert(sizeof(Vector2) == 8 && _Alignof(Vector2) == 4 && offsetof(Vector2, y) == 4, "raylib Vector2");
++_Static_assert(sizeof(Image) == 24 && _Alignof(Image) == 8 && offsetof(Image, width) == 8 &&
++               offsetof(Image, format) == 20, "raylib Image");
++_Static_assert(sizeof(Texture2D) == 20 && _Alignof(Texture2D) == 4 &&
++               offsetof(Texture2D, width) == 4 && offsetof(Texture2D, format) == 16, "raylib Texture2D");
++
++struct VoidRaylibWindow { Texture2D sprite; };
++
++enum { title_capacity = 256 };
++static _Thread_local char pending_title[title_capacity];
++static atomic_flag window_open = ATOMIC_FLAG_INIT;
++// raylib stores the pointer in its global window state, even on failed init.
++static char window_title[title_capacity];
++
++Color vd_raylib_tint(Color color, float factor) {
++    return ColorBrightness(color, factor);
++}
++
++static bool valid_title(const uint8_t* bytes, size_t size) {
++    for (size_t i = 0; i < size;) {
++        uint8_t lead = bytes[i++];
++        if (!lead) return false;
++        if (lead < 0x80) continue;
++        if (lead < 0xc2 || lead > 0xf4) return false;
++        unsigned more = lead < 0xe0 ? 1 : lead < 0xf0 ? 2 : 3;
++        if (more > size - i) return false;
++        uint8_t second = bytes[i];
++        if ((lead == 0xe0 && second < 0xa0) || (lead == 0xed && second >= 0xa0) ||
++            (lead == 0xf0 && second < 0x90) || (lead == 0xf4 && second >= 0x90)) return false;
++        while (more--) if ((bytes[i++] & 0xc0) != 0x80) return false;
++    }
++    return true;
++}
++
++int64_t vd_raylib_title(const uint8_t* bytes, size_t offset, size_t size) {
++    (void)offset;
++    pending_title[0] = '\0';
++    if (!bytes || !size || size >= title_capacity || !valid_title(bytes, size)) return -1;
++    memcpy(pending_title, bytes, size);
++    pending_title[size] = '\0';
++    return (int64_t)size;
++}
++
++VoidRaylibWindow* vd_raylib_open(int width, int height) {
++    if (!pending_title[0] || width < 320 || height < 240 || width > 1600 || height > 1200) return NULL;
++    if (atomic_flag_test_and_set(&window_open)) return NULL;
++    memcpy(window_title, pending_title, strlen(pending_title) + 1);
++    pending_title[0] = '\0';
++    VoidRaylibWindow* window = malloc(sizeof *window);
++    if (window) {
++        InitWindow(width, height, window_title);
++        if (IsWindowReady()) {
++            Image image = GenImageColor(24, 24, SKYBLUE);
++            window->sprite = LoadTextureFromImage(image);
++            UnloadImage(image);
++            if (IsTextureValid(window->sprite)) {
++                SetTargetFPS(60);
++                return window;
++            }
++            CloseWindow();
++        }
++        free(window);
++    }
++    atomic_flag_clear(&window_open);
++    return NULL;
++}
++
++bool vd_raylib_should_close(const VoidRaylibWindow* window) {
++    (void)window;
++    return WindowShouldClose();
++}
++
++int vd_raylib_direction(const VoidRaylibWindow* window) {
++    (void)window;
++    return (int)IsKeyDown(KEY_RIGHT) - (int)IsKeyDown(KEY_LEFT);
++}
++
++int vd_raylib_draw(VoidRaylibWindow* window, int x, int frame, uint8_t r, uint8_t g, uint8_t b) {
++    BeginDrawing();
++    ClearBackground((Color){r, g, b, 255});
++    DrawRectangle(20, 75, 600, 205, (Color){34, 48, 74, 255});
++    DrawRectangle(x, 153, 62, 43, ORANGE);
++    DrawCircle(60 + frame % 500, 229, 17, LIME);
++    DrawTextureV(window->sprite, (Vector2){(float)x + 19, 162}, WHITE);
++    DrawCircleV(GetMousePosition(), 8, PINK);
++    DrawText("VOID / raylib 6.0", 22, 23, 24, RAYWHITE);
++    DrawText("Left / right to move. Escape or close to quit.", 22, 310, 18, RAYWHITE);
++    EndDrawing();
++    return 0;
++}
++
++int32_t vd_raylib_close(VoidRaylibWindow* window) {
++    UnloadTexture(window->sprite);
++    CloseWindow();
++    const bool closed = !IsWindowReady();
++    free(window);
++    atomic_flag_clear(&window_open);
++    if (closed) {
++        puts("RAYLIB owner released texture and window");
++        fflush(stdout);
++    }
++    return closed ? 0 : -1;
++}
+diff --git a/examples/raylib/native/raylib_provider.h b/examples/raylib/native/raylib_provider.h
+new file mode 100644
+--- /dev/null
++++ b/examples/raylib/native/raylib_provider.h
+@@ -0,0 +1,21 @@
++#pragma once
++
++#include <stdbool.h>
++#include <stddef.h>
++#include <stdint.h>
++#include <raylib.h>
++
++#ifdef _WIN32
++#define VOID_RAYLIB_EXPORT __declspec(dllexport)
++#else
++#define VOID_RAYLIB_EXPORT __attribute__((visibility("default")))
++#endif
++
++typedef struct VoidRaylibWindow VoidRaylibWindow;
++VOID_RAYLIB_EXPORT Color vd_raylib_tint(Color, float);
++VOID_RAYLIB_EXPORT int64_t vd_raylib_title(const uint8_t*, size_t, size_t);
++VOID_RAYLIB_EXPORT VoidRaylibWindow* vd_raylib_open(int, int);
++VOID_RAYLIB_EXPORT bool vd_raylib_should_close(const VoidRaylibWindow*);
++VOID_RAYLIB_EXPORT int vd_raylib_direction(const VoidRaylibWindow*);
++VOID_RAYLIB_EXPORT int vd_raylib_draw(VoidRaylibWindow*, int, int, uint8_t, uint8_t, uint8_t);
++VOID_RAYLIB_EXPORT int32_t vd_raylib_close(VoidRaylibWindow*);
+diff --git a/examples/raylib/prepare.py b/examples/raylib/prepare.py
+new file mode 100644
+--- /dev/null
++++ b/examples/raylib/prepare.py
+@@ -0,0 +1,80 @@
++"""Generate the checked adapter and prepare the native directory from local raylib 6.0 inputs."""
++
++import argparse
++from hashlib import sha256
++from pathlib import Path
++import shutil
++import subprocess
++import sys
++import tempfile
++
++
++def digest(path):
++    return sha256(path.read_bytes()).hexdigest()
++
++
++def run(*args):
++    command = list(map(str, args))
++    print(command, flush=True)
++    subprocess.run(command, check=True)
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--voidc', default='voidc')
++    parser.add_argument('--clang', default='clang')
++    parser.add_argument('--header', required=True, type=Path)
++    parser.add_argument('--library', required=True, type=Path)
++    parser.add_argument('--license', required=True, type=Path)
++    parser.add_argument('--import-library', type=Path)
++    parser.add_argument('--sanitize', action='store_true', help='instrument the shim when running a sanitized Linux Runtime')
++    args = parser.parse_args()
++
++    windows = sys.platform == 'win32'
++    if windows != (args.import_library is not None) or (windows and args.sanitize):
++        parser.error('provide a COFF import library on Windows and use --sanitize only on Linux')
++    for path in (args.header, args.library, args.license, args.import_library):
++        if path is not None:
++            print(f'{digest(path)}  {path}', flush=True)
++    if args.header.name != 'raylib.h':
++        parser.error('--header must name raylib.h')
++
++    native = Path(__file__).resolve().parent / 'native'
++    platform = 'windows' if windows else 'linux'
++    provider = 'void_raylib.dll' if windows else 'libvoid_raylib.so'
++    dependency = 'raylib.dll' if windows else 'libraylib.so.600'
++    target = 'x86_64-pc-windows-msvc msvc-x64' if windows else 'x86_64-unknown-linux-gnu sysv-x64'
++    descriptor = f'raylib-{platform}.descriptor'
++    generated = 'raylib_checked.c'
++    header = native / 'raylib_provider.h'
++    source = native / 'raylib_provider.c'
++    thunk = sha256(header.read_bytes() + source.read_bytes()).hexdigest()
++    fixture = sha256(args.header.read_bytes() + args.library.read_bytes()).hexdigest()
++    plan = (native / 'raylib.descriptor.in').read_text(encoding='ascii')
++    for field, value in dict(TARGET=target, THUNK=thunk, FIXTURE=fixture, LONG='i32' if windows else 'i64').items():
++        plan = plan.replace(f'@{field}@', value)
++
++    with tempfile.TemporaryDirectory(prefix='.bind-', dir=native) as scratch:
++        stage = Path(scratch)
++        (stage / descriptor).write_bytes(plan.encode('ascii'))
++        shutil.copyfile(args.library, stage / dependency)
++        shutil.copyfile(args.license, stage / 'RAYLIB-LICENSE.txt')
++        run(args.voidc, 'native-bind', stage / descriptor, header.name, '-o', stage / generated)
++        flags = ['-std=c11', '-shared', '-fuse-ld=lld', '-O2', '-Wall', '-Wextra', '-Werror',
++                 '-I' + str(native), '-I' + str(args.header.resolve().parent)]
++        if windows:
++            flags += ['--target=x86_64-pc-windows-msvc', '-DUSE_LIBTYPE_SHARED', '-fms-runtime-lib=static']
++            imports = args.import_library.resolve()
++        else:
++            flags += ['-fPIC', '-fvisibility=hidden', '-Wl,-rpath,$ORIGIN']
++            if args.sanitize:
++                flags += ['-fsanitize=address,undefined', '-fno-sanitize-recover=all']
++            imports = stage / dependency
++        run(args.clang, *flags, source, stage / generated, imports, '-o', stage / provider)
++        for name in (provider, dependency, descriptor, generated, 'RAYLIB-LICENSE.txt'):
++            (stage / name).replace(native / name)
++            print(f'{digest(native / name)}  {native / name}')
++
++
++if __name__ == '__main__':
++    main()
+diff --git a/examples/raylib/src/gallery.void b/examples/raylib/src/gallery.void
+new file mode 100644
+--- /dev/null
++++ b/examples/raylib/src/gallery.void
+@@ -0,0 +1,48 @@
++use "/raylib_checked.void" as graphics
++use os as host
++
++func main() -> i32:
++    var implicit_close = false
++    var title = "VOID Raylib Gallery"
++    if host.args() is Ok(var options):
++        for option in options:
++            if option == "--implicit-close":
++                implicit_close = true
++            if option == "--reject-title":
++                title = "VOID\0invalid"
++
++    var title_bytes = title.to_utf8()
++    if graphics.title(title_bytes, 0, title_bytes.count as u64) < 0:
++        print("Raylib title rejected")
++        return 2
++
++    var window = graphics.open(640, 360)
++    if window == null:
++        print("Raylib window or texture initialization failed")
++        return 3
++    var owner = window as graphics.window
++    var background = graphics.tint(graphics.color(r = 21, g = 29, b = 49, a = 255), 0.08 as f32)
++    print("RAYLIB ready")
++
++    var frame: i32 = 0
++    var input_frames: i32 = 0
++    var x: i32 = 280
++    for not graphics.should_close(owner):
++        var step = graphics.direction(owner)
++        if step != 0:
++            if input_frames == 0:
++                print("RAYLIB keyboard input", step)
++            input_frames += 1
++            x += step * 5
++            if x < 25:
++                x = 25
++            if x > 550:
++                x = 550
++        if graphics.draw(owner, x, frame % 500, background.r, background.g, background.b) != 0:
++            return 4
++        frame += 1
++
++    if not implicit_close and graphics.close(owner) != 0:
++        return 5
++    print("RAYLIB frames", frame, "input frames", input_frames)
++    return 0
+diff --git a/examples/raylib/void.project.toml b/examples/raylib/void.project.toml
+new file mode 100644
+--- /dev/null
++++ b/examples/raylib/void.project.toml
+@@ -0,0 +1,31 @@
++schema = 1
++
++[project]
++id = "org.voidlang.examples.raylib"
++name = "VOID raylib"
++version = "0.1.0"
++kind = "application"
++
++[application]
++id = "org.voidlang.examples.raylib-app"
++
++[sources]
++roots = ["src"]
++
++[build.debug]
++optimization = "none"
++debug_info = "none"
++
++[build.release]
++optimization = "O2"
++debug_info = "none"
++
++[native.linux]
++descriptor = "raylib-linux.descriptor"
++library = "libvoid_raylib.so"
++adapter = "libvoid_raylib.so"
++
++[native.windows]
++descriptor = "raylib-windows.descriptor"
++library = "void_raylib.dll"
++adapter = "void_raylib.dll"
+diff --git a/include/void/c_primitive.hpp b/include/void/c_primitive.hpp
+--- a/include/void/c_primitive.hpp
++++ b/include/void/c_primitive.hpp
+@@ -18,6 +18,7 @@
+ inline constexpr std::string_view c_record_transport = "vd_c_primitive_dispatch_v2";
+ inline constexpr std::string_view c_resource_transport = "vd_c_primitive_dispatch_v3";
+ inline constexpr std::string_view c_resource_bridge = "vd_c_resource_dispatch_v3";
++inline constexpr std::string_view c_owner_resource_bridge = "vd_c_resource_dispatch_owner_v3";
+ inline constexpr std::string_view c_dynamic_resolve = "vd_c_dynamic_resolve_v1";
+ inline constexpr std::string_view c_dynamic_call = "vd_c_dynamic_call_v1";
+ extern "C" CPrimitiveThunk* vd_c_dynamic_resolve_v1(const char*, std::uint32_t) noexcept;
+@@ -26,6 +27,7 @@
+ extern "C" std::uint32_t vd_c_resource_dispatch_v3(CPrimitiveThunk*, const char*, std::uint32_t,
+     std::uint32_t, const std::uint64_t*, std::uint32_t, std::uint64_t*, void**,
+     const char*, std::uint32_t, CResourceRole) noexcept;
++extern "C" decltype(vd_c_resource_dispatch_v3) vd_c_resource_dispatch_owner_v3;
+ inline constexpr std::string_view c_span_bridge = "vd_c_span_dispatch_v2";
+ inline constexpr unsigned c_span_limit = 65536;
+ 
+@@ -44,7 +46,7 @@
+ inline bool reserved_c_transport(std::string_view symbol) {
+     return symbol.starts_with(c_primitive_transport) || symbol.starts_with(c_record_transport) ||
+         symbol.starts_with(c_span_bridge) || symbol.starts_with(c_resource_transport) ||
+-        symbol.starts_with(c_resource_bridge) || symbol.starts_with(c_dynamic_resolve) ||
++        symbol.starts_with(c_resource_bridge) || symbol.starts_with(c_owner_resource_bridge) || symbol.starts_with(c_dynamic_resolve) ||
+         symbol.starts_with(c_dynamic_call) || symbol.starts_with("vd_runtime_entry_dynamic_v1");
+ }
+ inline constexpr std::uint32_t c_primitive_probe = UINT32_MAX;
+@@ -75,6 +77,7 @@
+     struct Resource {
+         std::string name, c_name, acquire, release;
+         unsigned release_ordinal = 0;
++        bool shutdown_owner = false;
+     };
+     struct Binding {
+         std::string name, export_name;
+diff --git a/include/void/native_resource.hpp b/include/void/native_resource.hpp
+--- a/include/void/native_resource.hpp
++++ b/include/void/native_resource.hpp
+@@ -25,6 +25,7 @@
+     // Drain dependent native operations/borrows before any ledger resource is
+     // closed. Default resources have no dependencies. No source callbacks.
+     virtual std::error_code quiesce() { return {}; }
++    virtual void require_shutdown_thread() const {}
+     // Called before Runtime waits for native jobs. Signal cancellation/wakeup
+     // only: no waits, managed allocation, source callbacks or ledger reentry.
+     virtual void request_stop() noexcept {}
+@@ -50,8 +51,10 @@
+     void erase(void*, const NativeResource* expected = nullptr);
+     std::error_code shutdown();
+     void request_stop() noexcept;
++    void require_shutdown_thread();
+ 
+ private:
++    void check_shutdown_thread_locked() const;
+     Runtime& runtime_;
+     std::mutex mutex_;
+     std::mutex shutdown_mutex_;
+diff --git a/include/void/runtime.hpp b/include/void/runtime.hpp
+--- a/include/void/runtime.hpp
++++ b/include/void/runtime.hpp
+@@ -57,6 +57,8 @@
+     const ApplicationArguments& application_arguments() const { return application_arguments_; }
+     void admit_application(ApplicationMetadata::Owner); // Null explicitly admits absence.
+     void start_application(ApplicationMetadata::Owner expected = {}, bool commit = true);
++    static std::uint64_t current_thread_identity() noexcept;
++    bool is_application_thread() const;
+     ApplicationMetadata::Owner application_metadata() const;
+     bool is_managed() const { return current_runtime_ == this && thread().state == State::managed; }
+     // One explicitly admitted application owns these persistent precise roots.
+@@ -181,6 +183,7 @@
+     ApplicationArguments application_arguments_;
+     bool application_arguments_set_ = false;
+     ApplicationMetadata::Owner application_metadata_;
++    std::uint64_t application_thread_ = 0;
+     bool application_context_set_ = false, application_started_ = false;
+     friend class CallbackRegistration;
+     friend class NativeLibrary;
+diff --git a/src/backend/llvm/backend.cpp b/src/backend/llvm/backend.cpp
+--- a/src/backend/llvm/backend.cpp
++++ b/src/backend/llvm/backend.cpp
+@@ -1363,7 +1363,8 @@
+                             transport = module->getOrInsertFunction(admission.transport(), b.getInt32Ty(), b.getPtrTy(),
+                                 b.getInt32Ty(), b.getInt32Ty(), b.getPtrTy(), b.getInt32Ty(), b.getPtrTy()).getCallee();
+                         }
+-                        auto bridge = module->getOrInsertFunction(c_resource_bridge, b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(),
++                        auto bridge = module->getOrInsertFunction(info.shutdown_owner ? c_owner_resource_bridge : c_resource_bridge,
++                            b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(),
+                             b.getInt32Ty(), b.getInt32Ty(), b.getPtrTy(), b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(),
+                             b.getPtrTy(), b.getInt32Ty(), b.getInt32Ty());
+                         auto* status = b.CreateCall(bridge, {transport, bytes, b.getInt32(admission.descriptor().size()),
+@@ -2192,9 +2193,12 @@
+             if (primitives->revision() >= 2)
+                 symbols[jit->mangleAndIntern(c_span_bridge)] = llvm::orc::ExecutorSymbolDef(
+                     llvm::orc::ExecutorAddr::fromPtr(vd_c_span_dispatch_v2), llvm::JITSymbolFlags::Exported);
+-            if (primitives->revision() == 3)
++            if (primitives->revision() == 3) {
+                 symbols[jit->mangleAndIntern(c_resource_bridge)] = llvm::orc::ExecutorSymbolDef(
+                     llvm::orc::ExecutorAddr::fromPtr(vd_c_resource_dispatch_v3), llvm::JITSymbolFlags::Exported);
++                symbols[jit->mangleAndIntern(c_owner_resource_bridge)] = llvm::orc::ExecutorSymbolDef(
++                    llvm::orc::ExecutorAddr::fromPtr(vd_c_resource_dispatch_owner_v3), llvm::JITSymbolFlags::Exported);
++            }
+             check(dylib.define(llvm::orc::absoluteSymbols(symbols), generation->tracker));
+         }
+         if(object)check(jit->addObjectFile(generation->tracker,std::move(object)));
+diff --git a/src/ir/c_primitive.cpp b/src/ir/c_primitive.cpp
+--- a/src/ir/c_primitive.cpp
++++ b/src/ir/c_primitive.cpp
+@@ -208,10 +208,11 @@
+                 !names.insert(fields[1]).second || !c_records.insert(fields[2]).second ||
+                 fields[3] != "pointer" || fields[4] != "null" ||
+                 !identifier(fields[5]) || !identifier(fields[6]) || fields[5] == fields[6] ||
+-                fields[7] != "owner-calls" || fields[8] != "shutdown-any" || fields[9] != "consume-always")
++                fields[7] != "owner-calls" || (fields[8] != "shutdown-any" && !(conventional && fields[8] == "shutdown-owner")) ||
++                fields[9] != "consume-always")
+                 reject(reader.line, "unsupported or contradictory native resource contract");
+             admitted->resources_.push_back({std::string(fields[1]), std::string(fields[2]),
+-                std::string(fields[5]), std::string(fields[6])});
++                std::string(fields[5]), std::string(fields[6]), 0, fields[8] == "shutdown-owner"});
+             continue;
+         }
+         if (admitted->revision_ >= 2 && !fields.empty() && fields[0] == "record") {
+diff --git a/src/runtime/application.cpp b/src/runtime/application.cpp
+--- a/src/runtime/application.cpp
++++ b/src/runtime/application.cpp
+@@ -1,5 +1,6 @@
+ #include "void/application.hpp"
+ #include "void/runtime.hpp"
++#include <atomic>
+ #include "void/utf8.hpp"
+ #include <cstring>
+ #include <stdexcept>
+@@ -82,8 +83,20 @@
+         throw std::invalid_argument("Compiled application context conflicts with the Runtime.");
+     if (commit) {
+         if (!application_context_set_) application_metadata_ = std::move(expected);
++        if (!application_started_) application_thread_ = current_thread_identity();
+         application_context_set_ = application_started_ = true;
+     }
++}
++std::uint64_t Runtime::current_thread_identity() noexcept {
++    // A thread ID can be recycled after the application owner exits.
++    static std::atomic<std::uint64_t> next{1};
++    thread_local const auto identity = next.fetch_add(1, std::memory_order_relaxed);
++    if (!identity) std::terminate();
++    return identity;
++}
++bool Runtime::is_application_thread() const {
++    std::lock_guard lock(mutex_);
++    return application_thread_ == current_thread_identity();
+ }
+ ApplicationMetadata::Owner Runtime::application_metadata() const {
+     std::lock_guard lock(mutex_);
+diff --git a/src/runtime/c_resource.cpp b/src/runtime/c_resource.cpp
+--- a/src/runtime/c_resource.cpp
++++ b/src/runtime/c_resource.cpp
+@@ -15,6 +15,7 @@
+     std::string descriptor_, identity_;
+     CPrimitiveThunk* thunk_;
+     const std::uint32_t release_;
++    const std::uint64_t shutdown_thread_;
+     std::shared_ptr<void> generation_;
+     std::mutex mutex_;
+     std::uint64_t native_ = 0;
+@@ -33,9 +34,10 @@
+ 
+ public:
+     Resource(Runtime& runtime, void* wrapper, std::string_view descriptor, std::string_view identity,
+-             CPrimitiveThunk* thunk, std::uint32_t release)
++             CPrimitiveThunk* thunk, std::uint32_t release, bool shutdown_owner)
+         : NativeResource(runtime, wrapper), descriptor_(descriptor), identity_(identity), thunk_(thunk),
+-          release_(release), generation_(NativeCode::active_lease()) {}
++          release_(release), shutdown_thread_(shutdown_owner ? Runtime::current_thread_identity() : 0),
++          generation_(NativeCode::active_lease()) {}
+     ~Resource() override {
+         if (native_) {
+             try { (void)close(); }
+@@ -45,9 +47,14 @@
+     const void* kind() const noexcept override { return &resource_kind; }
+     std::uint64_t exclusive_native_identity() const noexcept override { return exclusive_.load(); }
+     void discard_duplicate() noexcept { native_ = 0; exclusive_ = 0; }
++    void require_shutdown_thread() const override {
++        if (shutdown_thread_ && shutdown_thread_ != Runtime::current_thread_identity())
++            throw std::runtime_error("Native shutdown requires the application owner thread");
++    }
+     bool matches(std::string_view descriptor, std::string_view identity,
+-                 CPrimitiveThunk* thunk, std::uint32_t release) const {
+-        return descriptor_ == descriptor && identity_ == identity && thunk_ == thunk && release_ == release;
++                 CPrimitiveThunk* thunk, std::uint32_t release, bool shutdown_owner) const {
++        return descriptor_ == descriptor && identity_ == identity && thunk_ == thunk &&
++            release_ == release && bool(shutdown_thread_) == shutdown_owner;
+     }
+ 
+     bool acquire(std::uint32_t ordinal, const std::uint64_t* args, std::uint32_t count) {
+@@ -73,6 +80,7 @@
+         {
+             std::lock_guard lock(mutex_);
+             if (!native_) return {};
++            require_shutdown_thread();
+             std::uint64_t result = 0;
+             // A conforming allocator can reuse the address as soon as C frees
+             // it. Close invalidates the ledger claim before that handoff.
+@@ -101,11 +109,10 @@
+     explicit NativeJob(Runtime& runtime) : runtime_(runtime) { runtime.begin_native_job(); }
+     ~NativeJob() { runtime_.end_native_job(); }
+ };
+-}
+-
+-extern "C" std::uint32_t vd::vd_c_resource_dispatch_v3(CPrimitiveThunk* thunk, const char* descriptor,
++std::uint32_t dispatch_resource(CPrimitiveThunk* thunk, const char* descriptor,
+     std::uint32_t size, std::uint32_t ordinal, const std::uint64_t* words, std::uint32_t count,
+-    std::uint64_t* result, void** handle, const char* identity, std::uint32_t release, CResourceRole role) noexcept {
++    std::uint64_t* result, void** handle, const char* identity, std::uint32_t release, CResourceRole role,
++    bool shutdown_owner) noexcept {
+     if (!thunk || !descriptor || !size || size > 16384 || !identity || !handle ||
+         ordinal >= 64 || release >= 64 || count > c_primitive_max_arguments || (count && !words) ||
+         role < CResourceRole::acquire || role > CResourceRole::close ||
+@@ -121,6 +128,7 @@
+         if (role == CResourceRole::acquire) {
+             if (ordinal == release || result) return 5;
+             *handle = nullptr;
++            if (shutdown_owner && !runtime.is_application_thread()) return 3;
+             try {
+                 auto nominal = runtime.descriptor(identity);
+                 if (!nominal || nominal->layout.size != sizeof(std::uint64_t) ||
+@@ -128,7 +136,7 @@
+                 auto layout = nominal->layout;
+                 layout.descriptor = nominal;
+                 runtime.allocate_into(handle, layout);
+-                auto owner = std::make_shared<Resource>(runtime, *handle, contract, identity, thunk, release);
++                auto owner = std::make_shared<Resource>(runtime, *handle, contract, identity, thunk, release, shutdown_owner);
+                 if (!owner->acquire(ordinal, words, count)) *handle = nullptr;
+                 else if (!library->publish_exclusive(*handle, owner)) {
+                     owner->discard_duplicate();
+@@ -145,8 +153,11 @@
+         if (!owner) return 1;
+         if (owner->kind() != &resource_kind) return 2;
+         auto resource = std::static_pointer_cast<Resource>(owner);
+-        if (!resource->matches(contract, identity, thunk, release)) return 2;
+-        try { resource->own_thread(); }
++        if (!resource->matches(contract, identity, thunk, release, shutdown_owner)) return 2;
++        try {
++            resource->own_thread();
++            resource->require_shutdown_thread();
++        }
+         catch (const std::runtime_error&) { return 3; }
+         if (role != CResourceRole::close)
+             return ordinal == release ? 5 : resource->borrow(ordinal, words, count, result);
+@@ -158,3 +169,16 @@
+         return 4;
+     }
+ }
++} // namespace
++
++extern "C" std::uint32_t vd::vd_c_resource_dispatch_v3(CPrimitiveThunk* thunk, const char* descriptor,
++    std::uint32_t size, std::uint32_t ordinal, const std::uint64_t* words, std::uint32_t count,
++    std::uint64_t* result, void** handle, const char* identity, std::uint32_t release, CResourceRole role) noexcept {
++    return dispatch_resource(thunk, descriptor, size, ordinal, words, count, result, handle, identity, release, role, false);
++}
++
++extern "C" std::uint32_t vd::vd_c_resource_dispatch_owner_v3(CPrimitiveThunk* thunk, const char* descriptor,
++    std::uint32_t size, std::uint32_t ordinal, const std::uint64_t* words, std::uint32_t count,
++    std::uint64_t* result, void** handle, const char* identity, std::uint32_t release, CResourceRole role) noexcept {
++    return dispatch_resource(thunk, descriptor, size, ordinal, words, count, result, handle, identity, release, role, true);
++}
+diff --git a/src/runtime/coordination.cpp b/src/runtime/coordination.cpp
+--- a/src/runtime/coordination.cpp
++++ b/src/runtime/coordination.cpp
+@@ -379,6 +379,7 @@
+             throw std::logic_error("Runtime cannot drain native jobs from their owning executor");
+         }
+         if (console_context_) console_context_->check_drain();
++        if (native_library_) native_library_->require_shutdown_thread();
+         closing_ = true;
+         context = console_context_;
+         changed_.notify_all();
+diff --git a/src/runtime/native_resource.cpp b/src/runtime/native_resource.cpp
+--- a/src/runtime/native_resource.cpp
++++ b/src/runtime/native_resource.cpp
+@@ -93,11 +93,21 @@
+     }
+ }
+ 
++void NativeLibrary::check_shutdown_thread_locked() const {
++    for (const auto& entry : resources_) entry.second->require_shutdown_thread();
++}
++
++void NativeLibrary::require_shutdown_thread() {
++    std::lock_guard lock(mutex_);
++    check_shutdown_thread_locked();
++}
++
+ std::error_code NativeLibrary::shutdown() {
+     std::lock_guard drain(shutdown_mutex_);
+     std::map<void*, std::shared_ptr<NativeResource>> retired;
+     {
+         std::lock_guard lock(mutex_);
++        check_shutdown_thread_locked();
+         retired.swap(resources_);
+     }
+     std::exception_ptr failure;
+diff --git a/tests/ffi/resources.cpp b/tests/ffi/resources.cpp
+--- a/tests/ffi/resources.cpp
++++ b/tests/ffi/resources.cpp
+@@ -112,6 +112,9 @@
+     });
+     test("raw bridge escape", "requires host admission", [](auto& m) {
+         m.imports.emplace_back(c_resource_bridge);
++    });
++    test("raw owner bridge escape", "requires host admission", [](auto& m) {
++        m.imports.emplace_back(c_owner_resource_bridge);
+     });
+     test("worker resource access", "require synchronous execution", [](auto& m) {
+         function(m, "::entry").worker = true;
+@@ -275,6 +278,42 @@
+     std::cout << "null and refused acquisition, refused release and retry preserved exact ownership\n";
+ }
+ 
++void owner_shutdown(const std::string& descriptor) {
++    Runtime runtime;
++    runtime.start_application({});
++    Runtime::Attachment attach(runtime);
++    admit(runtime);
++    const std::uint64_t value = 24;
++    auto acquire = [&](void** slot) {
++        return vd_c_resource_dispatch_owner_v3(vd_c_primitive_dispatch_v3, descriptor.data(),
++            static_cast<std::uint32_t>(descriptor.size()), 0, &value, 1, nullptr, slot, key,
++            release_ordinal, CResourceRole::acquire);
++    };
++    const auto before = g3_releases();
++    {
++        Runtime::Managed managed(runtime);
++        OwnerRoot owner(runtime);
++        require(acquire(&owner.value) == 0 && owner.value, "owner-affine acquisition failed");
++    }
++    std::exception_ptr failure;
++    std::jthread foreign([&] {
++        try {
++        {
++            Runtime::Attachment attachment(runtime);
++            Runtime::Managed managed(runtime);
++            OwnerRoot owner(runtime);
++            require(acquire(&owner.value) == 3 && !owner.value, "foreign acquisition was accepted");
++        }
++        rejects("foreign shutdown", "application owner thread", [&] { (void)runtime.close(); });
++        } catch (...) { failure = std::current_exception(); }
++    });
++    foreign.join();
++    if (failure) std::rethrow_exception(failure);
++    require(g3_live() == 1 && g3_releases() == before, "foreign shutdown touched native ownership");
++    require(!runtime.close() && !runtime.close() && g3_live() == 0 && g3_releases() == before + 1,
++        "owner shutdown did not release exactly once");
++}
++
+ std::binary_semaphore entered(0), shutdown_start(0), resume(0);
+ std::atomic<bool> delayed_entered{false};
+ std::atomic<unsigned> pause_at{UINT32_MAX};
+@@ -471,6 +510,7 @@
+     descriptors(descriptor);
+     malformed(program->lower());
+     runtime_denials(descriptor);
++    owner_shutdown(descriptor);
+     shutdown_race(descriptor, false);
+     shutdown_race(descriptor, true);
+     failed_shutdown_release(descriptor);

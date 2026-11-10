@@ -1,0 +1,17 @@
+enum mode(u8):
+    quiet = 3
+    loud = 255
+
+struct setting:
+    state: mode = mode.quiet
+    cached: option<mode> = None
+
+func (self setting) init():
+    if self.cached is Some(var mode_value):
+        self.state = mode_value
+
+func main() -> i32:
+    var value = setting()
+    if value.state == mode.quiet and value.cached is None:
+        return 0
+    return 1

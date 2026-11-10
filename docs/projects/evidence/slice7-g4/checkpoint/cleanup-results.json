@@ -1,0 +1,26 @@
+{
+  "platform": "Windows-10-10.0.19045-SP0",
+  "build": 19045,
+  "free_before": 24752857088,
+  "deleted": [
+    "C:\\Users\\a\\VoidS7-G4-checkpoint\\replacement\\void_g4_probe_dep.dll",
+    "C:\\Users\\a\\VoidS7-G4-checkpoint\\replacement"
+  ],
+  "retained": {
+    "C:\\Users\\a\\VoidS7-G4-checkpoint\\probe.exe": "857e068edcf79910b4e623b2b086a02abf507a67913fcd632a68da7857619e32",
+    "C:\\Users\\a\\VoidS7-G4-checkpoint\\dep.lib": "2498d9a36c134cdb79772af8588d6966257b2bb383c9a7a8f75fae50b64fc89c",
+    "C:\\Users\\a\\VoidS7-G4-checkpoint\\good\\void_g4_probe_dep.dll": "1ac73ebd5c5152c5edfb19c388ef43948492ccf8170bb8ddb9b82c0fa2f51925",
+    "C:\\Users\\a\\VoidS7-G4-checkpoint\\good\\void_g4_probe_main.dll": "d6f842278dc67be9841ab83eaf5bea72270a5be39b02cacb110123e28f1c5391",
+    "C:\\Users\\a\\VoidS7-G4-checkpoint\\bad\\void_g4_probe_dep.dll": "bd48d45bd9bf552108e0b635681a0fdaf9f1f6fb56d776b6d676e31823e01327",
+    "C:\\Users\\a\\VoidS7-G4-checkpoint\\redirection\\bare.exe": "1906d4a39db6db3b9521e815c6dcd390d8090eb4d91b8c51b88c3dfcbd3085ef",
+    "C:\\Users\\a\\VoidS7-G4-checkpoint\\redirection\\manifested.exe": "29b8c9bcd3e73da6d580c61c8b9784582032f9f5c949e5771c7b5023601aafce",
+    "C:\\Users\\a\\VoidS7-G4-checkpoint\\redirection\\activation.exe": "a348156095190dd36c80379fb62157203870f0129fbda9468801c60f700afa6c",
+    "C:\\Users\\a\\VoidS7-G4-checkpoint\\redirection\\edge.exe": "027003762352c6b8a6355fd4f635ada0a69d6d57db916bbe8c0e25c9688809a0",
+    "C:\\Users\\a\\VoidS7-G4-checkpoint\\redirection\\edge-process-default.exe": "7c6dc08a144508daf2e28000d9b78e6fa8118433b01972d3c86e971541aabf52",
+    "C:\\Users\\a\\VoidS7-G4-checkpoint\\redirection\\void_g4_probe_dep.dll": "327560f56a42c171e766c5b316f68cc19fdb762736c1169d7b9666d0847635dd",
+    "C:\\Users\\a\\VoidS7-G4-checkpoint\\redirection\\void_g4_probe_main.dll": "74b2cb925e487e288486994c750f694ada9eb42c28de1757a70e7bc7673b9a7c"
+  },
+  "removed_duplicate_sha256": "bd48d45bd9bf552108e0b635681a0fdaf9f1f6fb56d776b6d676e31823e01327",
+  "status": "PASS",
+  "free_after": 24752861184
+}

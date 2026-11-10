@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="3"
+	failures="2"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="5"
+	timestamp="2026-11-08T13:20:23"
+	>
+	<testcase name="project_manifest_legacy" classname="project_manifest_legacy" time="0.771962" status="run">
+		<properties/>
+		<system-out>project_manifest_legacy: 17 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_selection" classname="project_selection" time="0.0788282" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>diagnostic category
+</system-out>
+	</testcase>
+	<testcase name="project_discovery_cli" classname="project_discovery_cli" time="4.46543" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/project/discovery.py", line 68, in &lt;module&gt;
+    run([compiler,'check',root],1,contains=b'VOID1101')
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/project/discovery.py", line 19, in run
+    if contains is not None:assert contains in p.stderr,(args,p.stderr)
+                                   ^^^^^^^^^^^^^^^^^^^^
+AssertionError: ([PosixPath('/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc'), 'check', PosixPath('/tmp/VOID project execution 雪 sufn865e')], b'/tmp/VOID project execution \xe9\x9b\xaa sufn865e/src/unrelated.void:1:13: error: Expected a lowercase identifier.\n    code: VOID1102\n\n 1 | func broken(:\n   |             ^\n    Module: /src/unrelated.void\n\n')
+</system-out>
+	</testcase>
+</testsuite>

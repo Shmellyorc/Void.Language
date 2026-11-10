@@ -1,0 +1,896 @@
+Staged verified CLI, generated install manifests, link inputs and stdlib at C:\Users\a\VoidS7-G5-Graphics\Release-corrected\compiler install
+['C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\gallery project\\prepare.py', '--voidc', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\compiler install\\bin\\voidc.exe', '--clang', 'C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\clang.exe', '--header', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src\\raylib.h', '--library', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.dll', '--license', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\LICENSE', '--import-library', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.lib']
+047e7255f93f8c34039cab906ad76136706b5c7b4c5b5b065d84141963ee9b6b  C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\src\raylib.h
+3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824  C:\Users\a\VoidS7-Raylib-Compatibility\build-win32-software-linked\raylib.dll
+882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799  C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\LICENSE
+59778ec137ffebe87a6c099944330f20b7eecdf1d49a5a93de7000a8992339df  C:\Users\a\VoidS7-Raylib-Compatibility\build-win32-software-linked\raylib.lib
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\compiler install\\bin\\voidc.exe', 'native-bind', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\gallery project\\native\\.bind-1_51k7eu\\raylib-windows.descriptor', 'raylib_provider.h', '-o', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\gallery project\\native\\.bind-1_51k7eu\\raylib_checked.c']
+['C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\clang.exe', '-std=c11', '-shared', '-fuse-ld=lld', '-O2', '-Wall', '-Wextra', '-Werror', '-IC:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\gallery project\\native', '-IC:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src', '--target=x86_64-pc-windows-msvc', '-DUSE_LIBTYPE_SHARED', '-fms-runtime-lib=static', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\gallery project\\native\\raylib_provider.c', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\gallery project\\native\\.bind-1_51k7eu\\raylib_checked.c', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.lib', '-o', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\gallery project\\native\\.bind-1_51k7eu\\void_raylib.dll']
+b32eec9c48b34579d5c2b22881a6f66cbfe5c8f3f72d15a3350b5bf6ab17b1b2  C:\Users\a\VoidS7-G5-Graphics\Release-corrected\gallery project\native\void_raylib.dll
+3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824  C:\Users\a\VoidS7-G5-Graphics\Release-corrected\gallery project\native\raylib.dll
+55fc257ce900ef6708f7d4830ecdf036ad1d2430c5edfb37cc36c473f965cb88  C:\Users\a\VoidS7-G5-Graphics\Release-corrected\gallery project\native\raylib-windows.descriptor
+2a2c339317ade503a55a8b9d4feec5b24fd11c500a08a2a449fb02682d35dc89  C:\Users\a\VoidS7-G5-Graphics\Release-corrected\gallery project\native\raylib_checked.c
+882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799  C:\Users\a\VoidS7-G5-Graphics\Release-corrected\gallery project\native\RAYLIB-LICENSE.txt
+
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\compiler install\\bin\\voidc.exe', 'check', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\gallery project']
+Source checked successfully
+
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\gallery project']
+Invalid invocation: This project declares native code. Pass --allow-native to authorize its execution.
+Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]
+Try 'voidc run --help' for examples.
+
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\gallery project', '--allow-native', '--', '--reject-title']
+Raylib title rejected
+
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\gallery project', '--allow-native', '--no-cache', '--no-opt', '--', '--trace-only']
+RAYLIB trace invoked VOID
+
+jit-normal ['C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\gallery project', '--allow-native', '--no-cache', '--no-opt', '--', '--implicit-close']
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\compiler install\\bin\\voidc.exe', 'build', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\gallery project', '--allow-native', '--no-opt', '-o', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\build-normal\\gallery.exe']
+Built native executable: C:/Users/a/VoidS7-G5-Graphics/Release-corrected/build-normal/gallery.exe
+
+['C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\llvm-readobj.exe', '--coff-imports', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\build-normal\\gallery.exe']
+
+File: C:\Users\a\VoidS7-G5-Graphics\Release-corrected\build-normal\gallery.exe
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+Import {
+  Name: ADVAPI32.dll
+  ImportLookupTableRVA: 0x159098
+  ImportAddressTableRVA: 0x159608
+  Symbol: AddAccessAllowedAceEx (17)
+  Symbol: ConvertStringSidToSidW (131)
+  Symbol: CreateWellKnownSid (147)
+  Symbol: EqualSid (282)
+  Symbol: GetAce (311)
+  Symbol: GetLengthSid (331)
+  Symbol: GetSecurityDescriptorControl (348)
+  Symbol: GetSecurityDescriptorDacl (349)
+  Symbol: GetSecurityDescriptorOwner (352)
+  Symbol: GetSecurityInfo (355)
+  Symbol: GetTokenInformation (368)
+  Symbol: InitializeAcl (398)
+  Symbol: InitializeSecurityDescriptor (399)
+  Symbol: IsValidAcl (411)
+  Symbol: IsValidSecurityDescriptor (413)
+  Symbol: IsWellKnownSid (415)
+  Symbol: OpenProcessToken (536)
+  Symbol: SetSecurityDescriptorControl (746)
+  Symbol: SetSecurityDescriptorDacl (747)
+  Symbol: SetSecurityDescriptorOwner (749)
+  Symbol: SystemFunction036 (806)
+}
+Import {
+  Name: KERNEL32.dll
+  ImportLookupTableRVA: 0x159148
+  ImportAddressTableRVA: 0x1596B8
+  Symbol: AcquireSRWLockExclusive (0)
+  Symbol: AreFileApisANSI (35)
+  Symbol: CancelIo (115)
+  Symbol: CancelIoEx (116)
+  Symbol: CancelSynchronousIo (117)
+  Symbol: CloseHandle (137)
+  Symbol: CompareStringOrdinal (157)
+  Symbol: CompareStringW (158)
+  Symbol: CreateDirectoryW (189)
+  Symbol: CreateEventW (194)
+  Symbol: CreateFile2 (197)
+  Symbol: CreateFileW (206)
+  Symbol: CreateProcessW (232)
+  Symbol: CreateSymbolicLinkW (243)
+  Symbol: CreateThread (245)
+  Symbol: DecodePointer (269)
+  Symbol: DeleteCriticalSection (276)
+  Symbol: DeleteFileW (281)
+  Symbol: DeleteProcThreadAttributeList (282)
+  Symbol: DeviceIoControl (292)
+  Symbol: DuplicateHandle (306)
+  Symbol: EncodePointer (308)
+  Symbol: EnterCriticalSection (312)
+  Symbol: EnumSystemLocalesW (348)
+  Symbol: ExitProcess (359)
+  Symbol: FillConsoleOutputAttribute (372)
+  Symbol: FillConsoleOutputCharacterW (374)
+  Symbol: FindClose (382)
+  Symbol: FindFirstFileExW (388)
+  Symbol: FindFirstFileW (393)
+  Symbol: FindNextFileW (405)
+  Symbol: FlushFileBuffers (424)
+  Symbol: FormatMessageA (431)
+  Symbol: FreeEnvironmentStringsW (435)
+  Symbol: FreeLibrary (436)
+  Symbol: GetACP (443)
+  Symbol: GetCPInfo (458)
+  Symbol: GetCommandLineA (479)
+  Symbol: GetCommandLineW (480)
+  Symbol: GetConsoleCursorInfo (505)
+  Symbol: GetConsoleMode (517)
+  Symbol: GetConsoleOutputCP (521)
+  Symbol: GetConsoleScreenBufferInfo (523)
+  Symbol: GetCurrentDirectoryW (538)
+  Symbol: GetCurrentProcess (544)
+  Symbol: GetCurrentProcessId (545)
+  Symbol: GetCurrentThreadId (549)
+  Symbol: GetDiskFreeSpaceW (563)
+  Symbol: GetDriveTypeW (569)
+  Symbol: GetEnvironmentStringsW (577)
+  Symbol: GetExitCodeProcess (582)
+  Symbol: GetExitCodeThread (583)
+  Symbol: GetFileAttributesExW (588)
+  Symbol: GetFileAttributesW (591)
+  Symbol: GetFileInformationByHandle (593)
+  Symbol: GetFileInformationByHandleEx (594)
+  Symbol: GetFileSizeEx (598)
+  Symbol: GetFileType (600)
+  Symbol: GetFinalPathNameByHandleW (602)
+  Symbol: GetFullPathNameW (611)
+  Symbol: GetLastError (618)
+  Symbol: GetLocaleInfoEx (621)
+  Symbol: GetLocaleInfoW (622)
+  Symbol: GetModuleFileNameW (637)
+  Symbol: GetModuleHandleExW (640)
+  Symbol: GetModuleHandleW (641)
+  Symbol: GetNumberOfConsoleInputEvents (671)
+  Symbol: GetOEMCP (673)
+  Symbol: GetOverlappedResult (674)
+  Symbol: GetProcAddress (696)
+  Symbol: GetProcessHeap (702)
+  Symbol: GetStartupInfoW (730)
+  Symbol: GetStdHandle (732)
+  Symbol: GetStringTypeW (737)
+  Symbol: GetSystemInfo (749)
+  Symbol: GetSystemTimeAsFileTime (755)
+  Symbol: GetThreadErrorMode (771)
+  Symbol: GetTickCount64 (786)
+  Symbol: GetTimeZoneInformation (792)
+  Symbol: GetUserDefaultLCID (798)
+  Symbol: GetVolumePathNameW (814)
+  Symbol: HeapAlloc (849)
+  Symbol: HeapFree (853)
+  Symbol: HeapReAlloc (856)
+  Symbol: HeapSize (858)
+  Symbol: InitializeCriticalSection (874)
+  Symbol: InitializeCriticalSectionAndSpinCount (875)
+  Symbol: InitializeCriticalSectionEx (876)
+  Symbol: InitializeProcThreadAttributeList (878)
+  Symbol: InitializeSListHead (879)
+  Symbol: IsDebuggerPresent (901)
+  Symbol: IsProcessorFeaturePresent (908)
+  Symbol: IsValidCodePage (914)
+  Symbol: IsValidLocale (916)
+  Symbol: LCMapStringEx (951)
+  Symbol: LCMapStringW (952)
+  Symbol: LeaveCriticalSection (964)
+  Symbol: LoadLibraryExW (970)
+  Symbol: LocalFree (982)
+  Symbol: LockFileEx (993)
+  Symbol: MoveFileExW (1007)
+  Symbol: MultiByteToWideChar (1014)
+  Symbol: PeekConsoleInputW (1062)
+  Symbol: QueryPerformanceCounter (1106)
+  Symbol: QueryPerformanceFrequency (1107)
+  Symbol: RaiseException (1129)
+  Symbol: ReadConsoleInputW (1137)
+  Symbol: ReadConsoleW (1143)
+  Symbol: ReadFile (1146)
+  Symbol: ReleaseSRWLockExclusive (1209)
+  Symbol: RemoveDirectoryW (1216)
+  Symbol: ResetEvent (1229)
+  Symbol: RtlCaptureContext (1238)
+  Symbol: RtlLookupFunctionEntry (1245)
+  Symbol: RtlPcToFileHeader (1247)
+  Symbol: RtlUnwind (1250)
+  Symbol: RtlUnwindEx (1251)
+  Symbol: RtlVirtualUnwind (1252)
+  Symbol: SetConsoleCursorInfo (1276)
+  Symbol: SetConsoleCursorPosition (1278)
+  Symbol: SetConsoleMode (1290)
+  Symbol: SetConsoleTextAttribute (1299)
+  Symbol: SetConsoleTitleW (1301)
+  Symbol: SetEndOfFile (1313)
+  Symbol: SetEnvironmentVariableW (1317)
+  Symbol: SetEvent (1319)
+  Symbol: SetFilePointerEx (1332)
+  Symbol: SetFileTime (1335)
+  Symbol: SetLastError (1346)
+  Symbol: SetStdHandle (1372)
+  Symbol: SetThreadErrorMode (1384)
+  Symbol: SetUnhandledExceptionFilter (1408)
+  Symbol: Sleep (1424)
+  Symbol: SleepConditionVariableSRW (1426)
+  Symbol: TerminateProcess (1439)
+  Symbol: TlsAlloc (1457)
+  Symbol: TlsFree (1458)
+  Symbol: TlsGetValue (1459)
+  Symbol: TlsSetValue (1460)
+  Symbol: TryAcquireSRWLockExclusive (1464)
+  Symbol: UnhandledExceptionFilter (1473)
+  Symbol: UpdateProcThreadAttribute (1486)
+  Symbol: VirtualAlloc (1498)
+  Symbol: VirtualFree (1501)
+  Symbol: WaitForMultipleObjects (1513)
+  Symbol: WaitForSingleObject (1515)
+  Symbol: WaitForSingleObjectEx (1516)
+  Symbol: WakeAllConditionVariable (1523)
+  Symbol: WideCharToMultiByte (1554)
+  Symbol: WriteConsoleW (1573)
+  Symbol: WriteFile (1574)
+}
+
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\gallery project', '--allow-native', '--no-cache', '--', '--trace-only']
+RAYLIB trace invoked VOID
+
+jit-optimized ['C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\gallery project', '--allow-native', '--no-cache', '--']
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\compiler install\\bin\\voidc.exe', 'build', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\gallery project', '--allow-native', '-o', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\build-optimized\\gallery.exe']
+Built native executable: C:/Users/a/VoidS7-G5-Graphics/Release-corrected/build-optimized/gallery.exe
+
+['C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\llvm-readobj.exe', '--coff-imports', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\build-optimized\\gallery.exe']
+
+File: C:\Users\a\VoidS7-G5-Graphics\Release-corrected\build-optimized\gallery.exe
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+Import {
+  Name: ADVAPI32.dll
+  ImportLookupTableRVA: 0x14CAF8
+  ImportAddressTableRVA: 0x14D020
+  Symbol: AddAccessAllowedAceEx (17)
+  Symbol: ConvertStringSidToSidW (131)
+  Symbol: CreateWellKnownSid (147)
+  Symbol: EqualSid (282)
+  Symbol: GetAce (311)
+  Symbol: GetLengthSid (331)
+  Symbol: GetSecurityDescriptorControl (348)
+  Symbol: GetSecurityDescriptorDacl (349)
+  Symbol: GetSecurityDescriptorOwner (352)
+  Symbol: GetSecurityInfo (355)
+  Symbol: GetTokenInformation (368)
+  Symbol: InitializeAcl (398)
+  Symbol: InitializeSecurityDescriptor (399)
+  Symbol: IsValidAcl (411)
+  Symbol: IsValidSecurityDescriptor (413)
+  Symbol: IsWellKnownSid (415)
+  Symbol: OpenProcessToken (536)
+  Symbol: SetSecurityDescriptorControl (746)
+  Symbol: SetSecurityDescriptorDacl (747)
+  Symbol: SetSecurityDescriptorOwner (749)
+  Symbol: SystemFunction036 (806)
+}
+Import {
+  Name: KERNEL32.dll
+  ImportLookupTableRVA: 0x14CBA8
+  ImportAddressTableRVA: 0x14D0D0
+  Symbol: AcquireSRWLockExclusive (0)
+  Symbol: AreFileApisANSI (35)
+  Symbol: CancelIoEx (116)
+  Symbol: CancelSynchronousIo (117)
+  Symbol: CloseHandle (137)
+  Symbol: CompareStringOrdinal (157)
+  Symbol: CompareStringW (158)
+  Symbol: CreateDirectoryW (189)
+  Symbol: CreateEventW (194)
+  Symbol: CreateFileW (206)
+  Symbol: CreateProcessW (232)
+  Symbol: CreateSymbolicLinkW (243)
+  Symbol: CreateThread (245)
+  Symbol: DecodePointer (269)
+  Symbol: DeleteCriticalSection (276)
+  Symbol: DeleteFileW (281)
+  Symbol: DeleteProcThreadAttributeList (282)
+  Symbol: DeviceIoControl (292)
+  Symbol: DuplicateHandle (306)
+  Symbol: EncodePointer (308)
+  Symbol: EnterCriticalSection (312)
+  Symbol: EnumSystemLocalesW (348)
+  Symbol: ExitProcess (359)
+  Symbol: FillConsoleOutputAttribute (372)
+  Symbol: FillConsoleOutputCharacterW (374)
+  Symbol: FindClose (382)
+  Symbol: FindFirstFileExW (388)
+  Symbol: FindFirstFileW (393)
+  Symbol: FindNextFileW (405)
+  Symbol: FlushFileBuffers (424)
+  Symbol: FormatMessageA (431)
+  Symbol: FreeEnvironmentStringsW (435)
+  Symbol: FreeLibrary (436)
+  Symbol: GetACP (443)
+  Symbol: GetCPInfo (458)
+  Symbol: GetCommandLineA (479)
+  Symbol: GetCommandLineW (480)
+  Symbol: GetConsoleCursorInfo (505)
+  Symbol: GetConsoleMode (517)
+  Symbol: GetConsoleOutputCP (521)
+  Symbol: GetConsoleScreenBufferInfo (523)
+  Symbol: GetCurrentDirectoryW (538)
+  Symbol: GetCurrentProcess (544)
+  Symbol: GetCurrentProcessId (545)
+  Symbol: GetCurrentThreadId (549)
+  Symbol: GetEnvironmentStringsW (577)
+  Symbol: GetExitCodeProcess (582)
+  Symbol: GetExitCodeThread (583)
+  Symbol: GetFileAttributesExW (588)
+  Symbol: GetFileAttributesW (591)
+  Symbol: GetFileInformationByHandle (593)
+  Symbol: GetFileInformationByHandleEx (594)
+  Symbol: GetFileSizeEx (598)
+  Symbol: GetFileType (600)
+  Symbol: GetFinalPathNameByHandleW (602)
+  Symbol: GetFullPathNameW (611)
+  Symbol: GetLastError (618)
+  Symbol: GetLocaleInfoEx (621)
+  Symbol: GetLocaleInfoW (622)
+  Symbol: GetModuleFileNameW (637)
+  Symbol: GetModuleHandleExW (640)
+  Symbol: GetModuleHandleW (641)
+  Symbol: GetNumberOfConsoleInputEvents (671)
+  Symbol: GetOEMCP (673)
+  Symbol: GetOverlappedResult (674)
+  Symbol: GetProcAddress (696)
+  Symbol: GetProcessHeap (702)
+  Symbol: GetStartupInfoW (730)
+  Symbol: GetStdHandle (732)
+  Symbol: GetStringTypeW (737)
+  Symbol: GetSystemInfo (749)
+  Symbol: GetSystemTimeAsFileTime (755)
+  Symbol: GetThreadErrorMode (771)
+  Symbol: GetTickCount64 (786)
+  Symbol: GetTimeZoneInformation (792)
+  Symbol: GetUserDefaultLCID (798)
+  Symbol: HeapAlloc (849)
+  Symbol: HeapFree (853)
+  Symbol: HeapReAlloc (856)
+  Symbol: HeapSize (858)
+  Symbol: InitializeCriticalSection (874)
+  Symbol: InitializeCriticalSectionAndSpinCount (875)
+  Symbol: InitializeCriticalSectionEx (876)
+  Symbol: InitializeProcThreadAttributeList (878)
+  Symbol: InitializeSListHead (879)
+  Symbol: IsDebuggerPresent (901)
+  Symbol: IsProcessorFeaturePresent (908)
+  Symbol: IsValidCodePage (914)
+  Symbol: IsValidLocale (916)
+  Symbol: LCMapStringEx (951)
+  Symbol: LCMapStringW (952)
+  Symbol: LeaveCriticalSection (964)
+  Symbol: LoadLibraryExW (970)
+  Symbol: LocalFree (982)
+  Symbol: LockFileEx (993)
+  Symbol: MoveFileExW (1007)
+  Symbol: MultiByteToWideChar (1014)
+  Symbol: PeekConsoleInputW (1062)
+  Symbol: QueryPerformanceCounter (1106)
+  Symbol: QueryPerformanceFrequency (1107)
+  Symbol: RaiseException (1129)
+  Symbol: ReadConsoleInputW (1137)
+  Symbol: ReadConsoleW (1143)
+  Symbol: ReadFile (1146)
+  Symbol: ReleaseSRWLockExclusive (1209)
+  Symbol: RemoveDirectoryW (1216)
+  Symbol: RtlCaptureContext (1238)
+  Symbol: RtlLookupFunctionEntry (1245)
+  Symbol: RtlPcToFileHeader (1247)
+  Symbol: RtlUnwind (1250)
+  Symbol: RtlUnwindEx (1251)
+  Symbol: RtlVirtualUnwind (1252)
+  Symbol: SetConsoleCursorInfo (1276)
+  Symbol: SetConsoleCursorPosition (1278)
+  Symbol: SetConsoleMode (1290)
+  Symbol: SetConsoleTextAttribute (1299)
+  Symbol: SetConsoleTitleW (1301)
+  Symbol: SetEndOfFile (1313)
+  Symbol: SetEnvironmentVariableW (1317)
+  Symbol: SetEvent (1319)
+  Symbol: SetFilePointerEx (1332)
+  Symbol: SetLastError (1346)
+  Symbol: SetStdHandle (1372)
+  Symbol: SetThreadErrorMode (1384)
+  Symbol: SetUnhandledExceptionFilter (1408)
+  Symbol: Sleep (1424)
+  Symbol: SleepConditionVariableSRW (1426)
+  Symbol: TerminateProcess (1439)
+  Symbol: TlsAlloc (1457)
+  Symbol: TlsFree (1458)
+  Symbol: TlsGetValue (1459)
+  Symbol: TlsSetValue (1460)
+  Symbol: TryAcquireSRWLockExclusive (1464)
+  Symbol: UnhandledExceptionFilter (1473)
+  Symbol: UpdateProcThreadAttribute (1486)
+  Symbol: WaitForMultipleObjects (1513)
+  Symbol: WaitForSingleObject (1515)
+  Symbol: WaitForSingleObjectEx (1516)
+  Symbol: WakeAllConditionVariable (1523)
+  Symbol: WideCharToMultiByte (1554)
+  Symbol: WriteConsoleW (1573)
+  Symbol: WriteFile (1574)
+}
+
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\relocated normal 雪\\gallery.exe', '--reject-title']
+Raylib title rejected
+
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\relocated normal 雪\\gallery.exe', '--trace-only']
+RAYLIB trace invoked VOID
+
+aot-normal ['C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\relocated normal 雪\\gallery.exe']
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\relocated optimized 雪\\gallery.exe', '--reject-title']
+Raylib title rejected
+
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\relocated optimized 雪\\gallery.exe', '--trace-only']
+RAYLIB trace invoked VOID
+
+aot-optimized ['C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\relocated optimized 雪\\gallery.exe', '--implicit-close']
+Release visible raylib qualification passed
+Staged verified CLI, generated install manifests, link inputs and stdlib at C:\Users\a\VoidS7-G5-Graphics\Debug-corrected\compiler install
+['C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\gallery project\\prepare.py', '--voidc', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\compiler install\\bin\\voidc.exe', '--clang', 'C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\clang.exe', '--header', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src\\raylib.h', '--library', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.dll', '--license', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\LICENSE', '--import-library', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.lib']
+047e7255f93f8c34039cab906ad76136706b5c7b4c5b5b065d84141963ee9b6b  C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\src\raylib.h
+3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824  C:\Users\a\VoidS7-Raylib-Compatibility\build-win32-software-linked\raylib.dll
+882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799  C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\LICENSE
+59778ec137ffebe87a6c099944330f20b7eecdf1d49a5a93de7000a8992339df  C:\Users\a\VoidS7-Raylib-Compatibility\build-win32-software-linked\raylib.lib
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\compiler install\\bin\\voidc.exe', 'native-bind', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\gallery project\\native\\.bind-cwulo896\\raylib-windows.descriptor', 'raylib_provider.h', '-o', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\gallery project\\native\\.bind-cwulo896\\raylib_checked.c']
+['C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\clang.exe', '-std=c11', '-shared', '-fuse-ld=lld', '-O2', '-Wall', '-Wextra', '-Werror', '-IC:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\gallery project\\native', '-IC:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src', '--target=x86_64-pc-windows-msvc', '-DUSE_LIBTYPE_SHARED', '-fms-runtime-lib=static', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\gallery project\\native\\raylib_provider.c', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\gallery project\\native\\.bind-cwulo896\\raylib_checked.c', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.lib', '-o', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\gallery project\\native\\.bind-cwulo896\\void_raylib.dll']
+614e0208d2a28964202fcb6c6d1893c003e5db4363925db8a77397f463a02c43  C:\Users\a\VoidS7-G5-Graphics\Debug-corrected\gallery project\native\void_raylib.dll
+3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824  C:\Users\a\VoidS7-G5-Graphics\Debug-corrected\gallery project\native\raylib.dll
+55fc257ce900ef6708f7d4830ecdf036ad1d2430c5edfb37cc36c473f965cb88  C:\Users\a\VoidS7-G5-Graphics\Debug-corrected\gallery project\native\raylib-windows.descriptor
+2a2c339317ade503a55a8b9d4feec5b24fd11c500a08a2a449fb02682d35dc89  C:\Users\a\VoidS7-G5-Graphics\Debug-corrected\gallery project\native\raylib_checked.c
+882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799  C:\Users\a\VoidS7-G5-Graphics\Debug-corrected\gallery project\native\RAYLIB-LICENSE.txt
+
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\compiler install\\bin\\voidc.exe', 'check', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\gallery project']
+Source checked successfully
+
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\gallery project']
+Invalid invocation: This project declares native code. Pass --allow-native to authorize its execution.
+Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]
+Try 'voidc run --help' for examples.
+
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\gallery project', '--allow-native', '--', '--reject-title']
+Raylib title rejected
+
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\gallery project', '--allow-native', '--no-cache', '--no-opt', '--', '--trace-only']
+RAYLIB trace invoked VOID
+
+jit-normal ['C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\gallery project', '--allow-native', '--no-cache', '--no-opt', '--', '--implicit-close']
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\compiler install\\bin\\voidc.exe', 'build', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\gallery project', '--allow-native', '--no-opt', '-o', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\build-normal\\gallery.exe']
+Built native executable: C:/Users/a/VoidS7-G5-Graphics/Debug-corrected/build-normal/gallery.exe
+
+['C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\llvm-readobj.exe', '--coff-imports', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\build-normal\\gallery.exe']
+
+File: C:\Users\a\VoidS7-G5-Graphics\Debug-corrected\build-normal\gallery.exe
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+Import {
+  Name: ADVAPI32.dll
+  ImportLookupTableRVA: 0x3917F0
+  ImportAddressTableRVA: 0x391E08
+  Symbol: AddAccessAllowedAceEx (17)
+  Symbol: ConvertStringSidToSidW (131)
+  Symbol: CreateWellKnownSid (147)
+  Symbol: EqualSid (282)
+  Symbol: GetAce (311)
+  Symbol: GetLengthSid (331)
+  Symbol: GetSecurityDescriptorControl (348)
+  Symbol: GetSecurityDescriptorDacl (349)
+  Symbol: GetSecurityDescriptorOwner (352)
+  Symbol: GetSecurityInfo (355)
+  Symbol: GetTokenInformation (368)
+  Symbol: InitializeAcl (398)
+  Symbol: InitializeSecurityDescriptor (399)
+  Symbol: IsValidAcl (411)
+  Symbol: IsValidSecurityDescriptor (413)
+  Symbol: IsWellKnownSid (415)
+  Symbol: OpenProcessToken (536)
+  Symbol: SetSecurityDescriptorControl (746)
+  Symbol: SetSecurityDescriptorDacl (747)
+  Symbol: SetSecurityDescriptorOwner (749)
+  Symbol: SystemFunction036 (806)
+}
+Import {
+  Name: bcrypt.dll
+  ImportLookupTableRVA: 0x3918A0
+  ImportAddressTableRVA: 0x391EB8
+  Symbol: BCryptCloseAlgorithmProvider (2)
+  Symbol: BCryptGenRandom (29)
+  Symbol: BCryptOpenAlgorithmProvider (39)
+}
+Import {
+  Name: KERNEL32.dll
+  ImportLookupTableRVA: 0x3918C0
+  ImportAddressTableRVA: 0x391ED8
+  Symbol: AcquireSRWLockExclusive (0)
+  Symbol: AreFileApisANSI (35)
+  Symbol: CancelIo (115)
+  Symbol: CancelIoEx (116)
+  Symbol: CancelSynchronousIo (117)
+  Symbol: CloseHandle (137)
+  Symbol: CompareStringOrdinal (157)
+  Symbol: CompareStringW (158)
+  Symbol: CreateDirectoryW (189)
+  Symbol: CreateEventW (194)
+  Symbol: CreateFile2 (197)
+  Symbol: CreateFileA (198)
+  Symbol: CreateFileW (206)
+  Symbol: CreateProcessW (232)
+  Symbol: CreateSymbolicLinkW (243)
+  Symbol: CreateThread (245)
+  Symbol: DebugBreak (266)
+  Symbol: DecodePointer (269)
+  Symbol: DeleteCriticalSection (276)
+  Symbol: DeleteFileW (281)
+  Symbol: DeleteProcThreadAttributeList (282)
+  Symbol: DeviceIoControl (292)
+  Symbol: DuplicateHandle (306)
+  Symbol: EncodePointer (308)
+  Symbol: EnterCriticalSection (312)
+  Symbol: EnumSystemLocalesW (348)
+  Symbol: ExitProcess (359)
+  Symbol: ExitThread (360)
+  Symbol: FillConsoleOutputAttribute (372)
+  Symbol: FillConsoleOutputCharacterW (374)
+  Symbol: FindClose (382)
+  Symbol: FindFirstFileA (386)
+  Symbol: FindFirstFileExW (388)
+  Symbol: FindFirstFileW (393)
+  Symbol: FindNextFileW (405)
+  Symbol: FlushFileBuffers (424)
+  Symbol: FormatMessageA (431)
+  Symbol: FreeEnvironmentStringsW (435)
+  Symbol: FreeLibrary (436)
+  Symbol: FreeLibraryAndExitThread (437)
+  Symbol: GetACP (443)
+  Symbol: GetCPInfo (458)
+  Symbol: GetCommandLineA (479)
+  Symbol: GetCommandLineW (480)
+  Symbol: GetConsoleCursorInfo (505)
+  Symbol: GetConsoleMode (517)
+  Symbol: GetConsoleOutputCP (521)
+  Symbol: GetConsoleScreenBufferInfo (523)
+  Symbol: GetCurrentDirectoryW (538)
+  Symbol: GetCurrentProcess (544)
+  Symbol: GetCurrentProcessId (545)
+  Symbol: GetCurrentThreadId (549)
+  Symbol: GetDateFormatW (555)
+  Symbol: GetDiskFreeSpaceW (563)
+  Symbol: GetDriveTypeW (569)
+  Symbol: GetDynamicTimeZoneInformation (572)
+  Symbol: GetEnvironmentStringsW (577)
+  Symbol: GetExitCodeProcess (582)
+  Symbol: GetExitCodeThread (583)
+  Symbol: GetFileAttributesA (586)
+  Symbol: GetFileAttributesExW (588)
+  Symbol: GetFileAttributesW (591)
+  Symbol: GetFileInformationByHandle (593)
+  Symbol: GetFileInformationByHandleEx (594)
+  Symbol: GetFileSizeEx (598)
+  Symbol: GetFileType (600)
+  Symbol: GetFinalPathNameByHandleW (602)
+  Symbol: GetFullPathNameW (611)
+  Symbol: GetHandleInformation (615)
+  Symbol: GetLastError (618)
+  Symbol: GetLocaleInfoEx (621)
+  Symbol: GetLocaleInfoW (622)
+  Symbol: GetModuleFileNameW (637)
+  Symbol: GetModuleHandleExW (640)
+  Symbol: GetModuleHandleW (641)
+  Symbol: GetNumberOfConsoleInputEvents (671)
+  Symbol: GetOEMCP (673)
+  Symbol: GetOverlappedResult (674)
+  Symbol: GetProcAddress (696)
+  Symbol: GetProcessHeap (702)
+  Symbol: GetStartupInfoW (730)
+  Symbol: GetStdHandle (732)
+  Symbol: GetStringTypeW (737)
+  Symbol: GetSystemInfo (749)
+  Symbol: GetSystemTimeAsFileTime (755)
+  Symbol: GetSystemTimePreciseAsFileTime (756)
+  Symbol: GetTempPathW (768)
+  Symbol: GetThreadErrorMode (771)
+  Symbol: GetTickCount64 (786)
+  Symbol: GetTimeFormatW (790)
+  Symbol: GetTimeZoneInformation (792)
+  Symbol: GetUserDefaultLCID (798)
+  Symbol: GetVolumePathNameW (814)
+  Symbol: HeapAlloc (849)
+  Symbol: HeapFree (853)
+  Symbol: HeapReAlloc (856)
+  Symbol: HeapSize (858)
+  Symbol: InitOnceBeginInitialize (867)
+  Symbol: InitOnceComplete (868)
+  Symbol: InitializeCriticalSection (874)
+  Symbol: InitializeCriticalSectionAndSpinCount (875)
+  Symbol: InitializeCriticalSectionEx (876)
+  Symbol: InitializeProcThreadAttributeList (878)
+  Symbol: InitializeSListHead (879)
+  Symbol: IsDebuggerPresent (901)
+  Symbol: IsProcessorFeaturePresent (908)
+  Symbol: IsValidCodePage (914)
+  Symbol: IsValidLocale (916)
+  Symbol: LCMapStringEx (951)
+  Symbol: LCMapStringW (952)
+  Symbol: LeaveCriticalSection (964)
+  Symbol: LoadLibraryExW (970)
+  Symbol: LocalFree (982)
+  Symbol: LockFileEx (993)
+  Symbol: MoveFileExW (1007)
+  Symbol: MultiByteToWideChar (1014)
+  Symbol: OutputDebugStringW (1054)
+  Symbol: PeekConsoleInputW (1062)
+  Symbol: PeekNamedPipe (1063)
+  Symbol: QueryPerformanceCounter (1106)
+  Symbol: QueryPerformanceFrequency (1107)
+  Symbol: RaiseException (1129)
+  Symbol: ReadConsoleInputW (1137)
+  Symbol: ReadConsoleW (1143)
+  Symbol: ReadFile (1146)
+  Symbol: ReleaseSRWLockExclusive (1209)
+  Symbol: RemoveDirectoryW (1216)
+  Symbol: ResetEvent (1229)
+  Symbol: RtlCaptureContext (1238)
+  Symbol: RtlLookupFunctionEntry (1245)
+  Symbol: RtlPcToFileHeader (1247)
+  Symbol: RtlUnwind (1250)
+  Symbol: RtlUnwindEx (1251)
+  Symbol: RtlVirtualUnwind (1252)
+  Symbol: SetConsoleCursorInfo (1276)
+  Symbol: SetConsoleCursorPosition (1278)
+  Symbol: SetConsoleMode (1290)
+  Symbol: SetConsoleTextAttribute (1299)
+  Symbol: SetConsoleTitleW (1301)
+  Symbol: SetEndOfFile (1313)
+  Symbol: SetEnvironmentVariableW (1317)
+  Symbol: SetEvent (1319)
+  Symbol: SetFilePointerEx (1332)
+  Symbol: SetFileTime (1335)
+  Symbol: SetLastError (1346)
+  Symbol: SetStdHandle (1372)
+  Symbol: SetThreadErrorMode (1384)
+  Symbol: SetUnhandledExceptionFilter (1408)
+  Symbol: Sleep (1424)
+  Symbol: SleepConditionVariableSRW (1426)
+  Symbol: TerminateProcess (1439)
+  Symbol: TlsAlloc (1457)
+  Symbol: TlsFree (1458)
+  Symbol: TlsGetValue (1459)
+  Symbol: TlsSetValue (1460)
+  Symbol: TryAcquireSRWLockExclusive (1464)
+  Symbol: UnhandledExceptionFilter (1473)
+  Symbol: UpdateProcThreadAttribute (1486)
+  Symbol: VirtualAlloc (1498)
+  Symbol: VirtualFree (1501)
+  Symbol: WaitForMultipleObjects (1513)
+  Symbol: WaitForSingleObject (1515)
+  Symbol: WaitForSingleObjectEx (1516)
+  Symbol: WakeAllConditionVariable (1523)
+  Symbol: WakeConditionVariable (1524)
+  Symbol: WideCharToMultiByte (1554)
+  Symbol: WriteConsoleW (1573)
+  Symbol: WriteFile (1574)
+}
+
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\gallery project', '--allow-native', '--no-cache', '--', '--trace-only']
+RAYLIB trace invoked VOID
+
+jit-optimized ['C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\gallery project', '--allow-native', '--no-cache', '--']
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\compiler install\\bin\\voidc.exe', 'build', '--project', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\gallery project', '--allow-native', '-o', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\build-optimized\\gallery.exe']
+Built native executable: C:/Users/a/VoidS7-G5-Graphics/Debug-corrected/build-optimized/gallery.exe
+
+['C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\llvm-readobj.exe', '--coff-imports', 'C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\build-optimized\\gallery.exe']
+
+File: C:\Users\a\VoidS7-G5-Graphics\Debug-corrected\build-optimized\gallery.exe
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+Import {
+  Name: ADVAPI32.dll
+  ImportLookupTableRVA: 0x378900
+  ImportAddressTableRVA: 0x378ED0
+  Symbol: AddAccessAllowedAceEx (17)
+  Symbol: ConvertStringSidToSidW (131)
+  Symbol: CreateWellKnownSid (147)
+  Symbol: EqualSid (282)
+  Symbol: GetAce (311)
+  Symbol: GetLengthSid (331)
+  Symbol: GetSecurityDescriptorControl (348)
+  Symbol: GetSecurityDescriptorDacl (349)
+  Symbol: GetSecurityDescriptorOwner (352)
+  Symbol: GetSecurityInfo (355)
+  Symbol: GetTokenInformation (368)
+  Symbol: InitializeAcl (398)
+  Symbol: InitializeSecurityDescriptor (399)
+  Symbol: IsValidAcl (411)
+  Symbol: IsValidSecurityDescriptor (413)
+  Symbol: IsWellKnownSid (415)
+  Symbol: OpenProcessToken (536)
+  Symbol: SetSecurityDescriptorControl (746)
+  Symbol: SetSecurityDescriptorDacl (747)
+  Symbol: SetSecurityDescriptorOwner (749)
+  Symbol: SystemFunction036 (806)
+}
+Import {
+  Name: bcrypt.dll
+  ImportLookupTableRVA: 0x3789B0
+  ImportAddressTableRVA: 0x378F80
+  Symbol: BCryptCloseAlgorithmProvider (2)
+  Symbol: BCryptGenRandom (29)
+  Symbol: BCryptOpenAlgorithmProvider (39)
+}
+Import {
+  Name: KERNEL32.dll
+  ImportLookupTableRVA: 0x3789D0
+  ImportAddressTableRVA: 0x378FA0
+  Symbol: AcquireSRWLockExclusive (0)
+  Symbol: AreFileApisANSI (35)
+  Symbol: CancelIoEx (116)
+  Symbol: CancelSynchronousIo (117)
+  Symbol: CloseHandle (137)
+  Symbol: CompareStringOrdinal (157)
+  Symbol: CompareStringW (158)
+  Symbol: CreateDirectoryW (189)
+  Symbol: CreateEventW (194)
+  Symbol: CreateFile2 (197)
+  Symbol: CreateFileA (198)
+  Symbol: CreateFileW (206)
+  Symbol: CreateProcessW (232)
+  Symbol: CreateSymbolicLinkW (243)
+  Symbol: CreateThread (245)
+  Symbol: DebugBreak (266)
+  Symbol: DecodePointer (269)
+  Symbol: DeleteCriticalSection (276)
+  Symbol: DeleteFileW (281)
+  Symbol: DeleteProcThreadAttributeList (282)
+  Symbol: DeviceIoControl (292)
+  Symbol: DuplicateHandle (306)
+  Symbol: EncodePointer (308)
+  Symbol: EnterCriticalSection (312)
+  Symbol: EnumSystemLocalesW (348)
+  Symbol: ExitProcess (359)
+  Symbol: ExitThread (360)
+  Symbol: FillConsoleOutputAttribute (372)
+  Symbol: FillConsoleOutputCharacterW (374)
+  Symbol: FindClose (382)
+  Symbol: FindFirstFileExW (388)
+  Symbol: FindFirstFileW (393)
+  Symbol: FindNextFileW (405)
+  Symbol: FlushFileBuffers (424)
+  Symbol: FormatMessageA (431)
+  Symbol: FreeEnvironmentStringsW (435)
+  Symbol: FreeLibrary (436)
+  Symbol: FreeLibraryAndExitThread (437)
+  Symbol: GetACP (443)
+  Symbol: GetCPInfo (458)
+  Symbol: GetCommandLineA (479)
+  Symbol: GetCommandLineW (480)
+  Symbol: GetConsoleCursorInfo (505)
+  Symbol: GetConsoleMode (517)
+  Symbol: GetConsoleOutputCP (521)
+  Symbol: GetConsoleScreenBufferInfo (523)
+  Symbol: GetCurrentDirectoryW (538)
+  Symbol: GetCurrentProcess (544)
+  Symbol: GetCurrentProcessId (545)
+  Symbol: GetCurrentThreadId (549)
+  Symbol: GetDateFormatW (555)
+  Symbol: GetDynamicTimeZoneInformation (572)
+  Symbol: GetEnvironmentStringsW (577)
+  Symbol: GetExitCodeProcess (582)
+  Symbol: GetExitCodeThread (583)
+  Symbol: GetFileAttributesA (586)
+  Symbol: GetFileAttributesExW (588)
+  Symbol: GetFileAttributesW (591)
+  Symbol: GetFileInformationByHandle (593)
+  Symbol: GetFileInformationByHandleEx (594)
+  Symbol: GetFileSizeEx (598)
+  Symbol: GetFileType (600)
+  Symbol: GetFinalPathNameByHandleW (602)
+  Symbol: GetFullPathNameW (611)
+  Symbol: GetHandleInformation (615)
+  Symbol: GetLastError (618)
+  Symbol: GetLocaleInfoEx (621)
+  Symbol: GetLocaleInfoW (622)
+  Symbol: GetModuleFileNameW (637)
+  Symbol: GetModuleHandleExW (640)
+  Symbol: GetModuleHandleW (641)
+  Symbol: GetNumberOfConsoleInputEvents (671)
+  Symbol: GetOEMCP (673)
+  Symbol: GetOverlappedResult (674)
+  Symbol: GetProcAddress (696)
+  Symbol: GetProcessHeap (702)
+  Symbol: GetStartupInfoW (730)
+  Symbol: GetStdHandle (732)
+  Symbol: GetStringTypeW (737)
+  Symbol: GetSystemInfo (749)
+  Symbol: GetSystemTimeAsFileTime (755)
+  Symbol: GetSystemTimePreciseAsFileTime (756)
+  Symbol: GetTempPathW (768)
+  Symbol: GetThreadErrorMode (771)
+  Symbol: GetTickCount64 (786)
+  Symbol: GetTimeFormatW (790)
+  Symbol: GetTimeZoneInformation (792)
+  Symbol: GetUserDefaultLCID (798)
+  Symbol: HeapAlloc (849)
+  Symbol: HeapFree (853)
+  Symbol: HeapReAlloc (856)
+  Symbol: HeapSize (858)
+  Symbol: InitOnceBeginInitialize (867)
+  Symbol: InitOnceComplete (868)
+  Symbol: InitializeCriticalSection (874)
+  Symbol: InitializeCriticalSectionAndSpinCount (875)
+  Symbol: InitializeCriticalSectionEx (876)
+  Symbol: InitializeProcThreadAttributeList (878)
+  Symbol: InitializeSListHead (879)
+  Symbol: IsDebuggerPresent (901)
+  Symbol: IsProcessorFeaturePresent (908)
+  Symbol: IsValidCodePage (914)
+  Symbol: IsValidLocale (916)
+  Symbol: LCMapStringEx (951)
+  Symbol: LCMapStringW (952)
+  Symbol: LeaveCriticalSection (964)
+  Symbol: LoadLibraryExW (970)
+  Symbol: LocalFree (982)
+  Symbol: LockFileEx (993)
+  Symbol: MoveFileExW (1007)
+  Symbol: MultiByteToWideChar (1014)
+  Symbol: OutputDebugStringW (1054)
+  Symbol: PeekConsoleInputW (1062)
+  Symbol: PeekNamedPipe (1063)
+  Symbol: QueryPerformanceCounter (1106)
+  Symbol: QueryPerformanceFrequency (1107)
+  Symbol: RaiseException (1129)
+  Symbol: ReadConsoleInputW (1137)
+  Symbol: ReadConsoleW (1143)
+  Symbol: ReadFile (1146)
+  Symbol: ReleaseSRWLockExclusive (1209)
+  Symbol: RemoveDirectoryW (1216)
+  Symbol: RtlCaptureContext (1238)
+  Symbol: RtlLookupFunctionEntry (1245)
+  Symbol: RtlPcToFileHeader (1247)
+  Symbol: RtlUnwind (1250)
+  Symbol: RtlUnwindEx (1251)
+  Symbol: RtlVirtualUnwind (1252)
+  Symbol: SetConsoleCursorInfo (1276)
+  Symbol: SetConsoleCursorPosition (1278)
+  Symbol: SetConsoleMode (1290)
+  Symbol: SetConsoleTextAttribute (1299)
+  Symbol: SetConsoleTitleW (1301)
+  Symbol: SetEndOfFile (1313)
+  Symbol: SetEnvironmentVariableW (1317)
+  Symbol: SetEvent (1319)
+  Symbol: SetFilePointerEx (1332)
+  Symbol: SetLastError (1346)
+  Symbol: SetStdHandle (1372)
+  Symbol: SetThreadErrorMode (1384)
+  Symbol: SetUnhandledExceptionFilter (1408)
+  Symbol: Sleep (1424)
+  Symbol: SleepConditionVariableSRW (1426)
+  Symbol: TerminateProcess (1439)
+  Symbol: TlsAlloc (1457)
+  Symbol: TlsFree (1458)
+  Symbol: TlsGetValue (1459)
+  Symbol: TlsSetValue (1460)
+  Symbol: TryAcquireSRWLockExclusive (1464)
+  Symbol: UnhandledExceptionFilter (1473)
+  Symbol: UpdateProcThreadAttribute (1486)
+  Symbol: WaitForMultipleObjects (1513)
+  Symbol: WaitForSingleObject (1515)
+  Symbol: WaitForSingleObjectEx (1516)
+  Symbol: WakeAllConditionVariable (1523)
+  Symbol: WakeConditionVariable (1524)
+  Symbol: WideCharToMultiByte (1554)
+  Symbol: WriteConsoleW (1573)
+  Symbol: WriteFile (1574)
+}
+
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\relocated normal 雪\\gallery.exe', '--reject-title']
+Raylib title rejected
+
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\relocated normal 雪\\gallery.exe', '--trace-only']
+RAYLIB trace invoked VOID
+
+aot-normal ['C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\relocated normal 雪\\gallery.exe']
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\relocated optimized 雪\\gallery.exe', '--reject-title']
+Raylib title rejected
+
+['C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\relocated optimized 雪\\gallery.exe', '--trace-only']
+RAYLIB trace invoked VOID
+
+aot-optimized ['C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\relocated optimized 雪\\gallery.exe', '--implicit-close']
+Debug visible raylib qualification passed

@@ -1,0 +1,1304 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -107,7 +107,7 @@
+ add_library(void_native_fixture STATIC src/native/fixture.c src/native/sink.c)
+ target_link_libraries(void_native_fixture PRIVATE void_options)
+ add_library(void_runtime STATIC src/runtime/application.cpp src/runtime/os.cpp src/runtime/os_abi.cpp src/runtime/random.cpp src/runtime/filesystem_abi.cpp src/runtime/filesystem.cpp src/runtime/native_resource.cpp src/runtime/native_binding.cpp src/runtime/temporal_abi.cpp src/runtime/conversion.cpp src/runtime/text_case.cpp src/runtime/buffer.cpp src/runtime/list.cpp src/runtime/array.cpp src/runtime/dictionary.cpp src/runtime/fixed_abi.cpp src/runtime/gc_schema.cpp src/runtime/heap.cpp src/runtime/coordination.cpp src/runtime/console.cpp src/runtime/console_abi.cpp src/runtime/callback.cpp src/runtime/abi.cpp src/runtime/reload.cpp src/runtime/native.cpp src/runtime/async.cpp)
+-target_sources(void_runtime PRIVATE src/runtime/c_span.cpp)
++target_sources(void_runtime PRIVATE src/runtime/c_span.cpp src/runtime/c_resource.cpp)
+ target_sources(void_runtime PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects> $<TARGET_OBJECTS:void_application_objects>)
+ target_link_libraries(void_runtime PUBLIC void_options Threads::Threads void_native_fixture ${CMAKE_DL_LIBS})
+ include(cmake/CurlProvider.cmake)
+@@ -1306,6 +1306,7 @@
+   set_tests_properties(stage10_operator_integration PROPERTIES TIMEOUT 180)
+   include(tests/ffi/primitives.cmake)
+   include(tests/ffi/records.cmake)
++  include(tests/ffi/resources.cmake)
+   add_executable(void_native_tests tests/native/tests.cpp tests/native/integrated.cpp tests/native/probe.cpp $<TARGET_OBJECTS:void_native_test_fixture> tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
+   target_link_libraries(void_native_tests PRIVATE void_llvm void_cache_identity)
+   add_test(NAME native_source COMMAND void_native_tests "${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/native fixtures")
+--- a/include/void/c_primitive.hpp
++++ b/include/void/c_primitive.hpp
+@@ -15,6 +15,13 @@
+ }
+ inline constexpr std::string_view c_primitive_transport = "vd_c_primitive_dispatch_v1";
+ inline constexpr std::string_view c_record_transport = "vd_c_primitive_dispatch_v2";
++inline constexpr std::string_view c_resource_transport = "vd_c_primitive_dispatch_v3";
++inline constexpr std::string_view c_resource_bridge = "vd_c_resource_dispatch_v3";
++enum class CResourceRole : std::uint32_t { none, acquire, borrow, mutate, close };
++
++extern "C" std::uint32_t vd_c_resource_dispatch_v3(CPrimitiveThunk*, const char*, std::uint32_t,
++    std::uint32_t, const std::uint64_t*, std::uint32_t, std::uint64_t*, void**,
++    const char*, std::uint32_t, CResourceRole) noexcept;
+ inline constexpr std::string_view c_span_bridge = "vd_c_span_dispatch_v2";
+ inline constexpr unsigned c_span_limit = 65536;
+ 
+@@ -30,7 +37,8 @@
+ 
+ inline bool reserved_c_transport(std::string_view symbol) {
+     return symbol.starts_with(c_primitive_transport) || symbol.starts_with(c_record_transport) ||
+-        symbol.starts_with(c_span_bridge);
++        symbol.starts_with(c_span_bridge) || symbol.starts_with(c_resource_transport) ||
++        symbol.starts_with(c_resource_bridge);
+ }
+ inline constexpr std::uint32_t c_primitive_probe = UINT32_MAX;
+ inline constexpr unsigned c_primitive_max_arguments = 16;
+@@ -43,6 +51,8 @@
+         unsigned extent = 0; // inline C array of scalars only
+         unsigned direction = 0; // C byte span only
+         unsigned offset_argument = 0, length_argument = 0, limit = 0;
++        unsigned resource = 0; // 1-based resource identity
++        CResourceRole role = CResourceRole::none;
+     };
+     struct Field {
+         std::string name, c_name;
+@@ -53,6 +63,10 @@
+         std::string name, c_name;
+         unsigned size, alignment;
+         std::vector<Field> fields;
++    };
++    struct Resource {
++        std::string name, c_name, acquire, release;
++        unsigned release_ordinal = 0;
+     };
+     struct Binding {
+         std::string name, export_name;
+@@ -75,7 +89,13 @@
+     const std::vector<Binding>& bindings() const { return bindings_; }
+     CPrimitiveThunk* thunk() const { return thunk_; }
+     unsigned revision() const { return revision_; }
+-    std::string_view transport() const { return revision_ == 1 ? c_primitive_transport : c_record_transport; }
++    std::string_view transport() const {
++        if (revision_ == 3) return c_resource_transport;
++        return revision_ == 1 ? c_primitive_transport : c_record_transport;
++    }
++    const Resource& resource(unsigned index) const { return resources_.at(index - 1); }
++    const std::vector<Resource>& resources() const { return resources_; }
++    bool resource_type(ir::Type) const;
+     const Record& record(unsigned index) const { return records_.at(index - 1); }
+     const std::vector<Record>& records() const { return records_; }
+     bool inline_array(ir::Type) const;
+@@ -90,6 +110,7 @@
+     unsigned revision_ = 1;
+     std::vector<Binding> bindings_;
+     std::vector<Record> records_;
++    std::vector<Resource> resources_;
+     std::string source_type(const Shape&) const;
+     CPrimitiveThunk* thunk_ = nullptr;
+ };
+--- a/include/void/execution.hpp
++++ b/include/void/execution.hpp
+@@ -37,10 +37,12 @@
+     bool async_root = false;
+     ApplicationMetadata::Owner application_metadata = {};
+     std::string build_provenance = {}; // Generation-only, excluded from reload compatibility.
++    std::uintptr_t native_thunk_identity = 0; // In-process G3 ownership authority.
+     bool operator==(const Compatibility& other) const {
+         return function_id == other.function_id && signature == other.signature &&
+             layout == other.layout && captures == other.captures && constants == other.constants &&
+             constant_contract == other.constant_contract && source_contract == other.source_contract && runtime_identity == other.runtime_identity && async_root == other.async_root &&
++            native_thunk_identity == other.native_thunk_identity &&
+             (application_metadata == other.application_metadata || (application_metadata && other.application_metadata && *application_metadata == *other.application_metadata));
+     }
+ };
+--- a/include/void/native_resource.hpp
++++ b/include/void/native_resource.hpp
+@@ -18,6 +18,9 @@
+         : runtime(owner), wrapper(owner, identity) {}
+     virtual ~NativeResource() = default;
+     virtual const void* kind() const noexcept = 0;
++    // An immutable or atomically invalidated exclusive native identity. Legacy
++    // providers retain their own ownership rules with the default empty key.
++    virtual std::uint64_t exclusive_native_identity() const noexcept { return 0; }
+     virtual std::error_code close() = 0;
+     // Drain dependent native operations/borrows before any ledger resource is
+     // closed. Default resources have no dependencies. No source callbacks.
+@@ -39,6 +42,9 @@
+     static std::shared_ptr<NativeLibrary> get(Runtime&, bool cleanup = false);
+     static std::shared_ptr<NativeLibrary> existing(Runtime&);
+     void publish(void*, std::shared_ptr<NativeResource>);
++    // False means the existing owner retains the pointer and the candidate
++    // must discard its claim without calling the native release operation.
++    bool publish_exclusive(void*, const std::shared_ptr<NativeResource>&);
+     std::shared_ptr<NativeResource> find(void*, bool cleanup = false);
+     void* identity(const void* kind);
+     void erase(void*, const NativeResource* expected = nullptr);
+--- a/src/backend/llvm/backend.cpp
++++ b/src/backend/llvm/backend.cpp
+@@ -1330,6 +1330,49 @@
+                     const auto& binding = admission.bindings().at(ordinal);
+                     const auto count = static_cast<std::uint32_t>(instruction.arguments.size());
+                     auto* absent = llvm::ConstantPointerNull::get(b.getPtrTy());
++                    const auto* resource = binding.abi_result.resource ? &binding.abi_result :
++                        count && binding.abi_parameters[0].resource ? &binding.abi_parameters[0] : nullptr;
++                    if (resource) {
++                        auto* words = b.CreateAlloca(b.getInt64Ty(), b.getInt32(count ? count : 1));
++                        const bool acquire = resource->role == CResourceRole::acquire;
++                        for (unsigned a = 0; a < count; ++a) {
++                            const auto argument = instruction.arguments[a];
++                            auto* word = !acquire && a == 0 ? b.getInt64(0) : bits(values[argument], operand_type(argument));
++                            b.CreateStore(word, b.CreateInBoundsGEP(b.getInt64Ty(), words, b.getInt32(a)));
++                        }
++                        const auto result_type = instruction.type;
++                        const auto& info = admission.resource(resource->resource);
++                        auto* handle = value_roots[n].at(acquire ? values.size() : instruction.arguments[0]);
++                        llvm::Value* scalar = acquire || result_type == ir::Type::none ?
++                            static_cast<llvm::Value*>(absent) : b.CreateAlloca(b.getInt64Ty());
++                        if (scalar != absent) b.CreateStore(b.getInt64(0), scalar);
++                        auto* bytes = b.CreateGlobalString(admission.descriptor());
++                        auto* transport = module->getOrInsertFunction(admission.transport(), b.getInt32Ty(), b.getPtrTy(),
++                            b.getInt32Ty(), b.getInt32Ty(), b.getPtrTy(), b.getInt32Ty(), b.getPtrTy()).getCallee();
++                        auto bridge = module->getOrInsertFunction(c_resource_bridge, b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(),
++                            b.getInt32Ty(), b.getInt32Ty(), b.getPtrTy(), b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(),
++                            b.getPtrTy(), b.getInt32Ty(), b.getInt32Ty());
++                        auto* status = b.CreateCall(bridge, {transport, bytes, b.getInt32(admission.descriptor().size()),
++                            b.getInt32(ordinal), words, b.getInt32(count), scalar, handle,
++                            b.CreateGlobalString(admission.module() + "::" + info.name), b.getInt32(info.release_ordinal),
++                            b.getInt32(static_cast<std::uint32_t>(resource->role))});
++                        fail_if(b.CreateICmpEQ(status, b.getInt32(1)), "C resource is closed, null or invalid");
++                        fail_if(b.CreateICmpEQ(status, b.getInt32(2)), "C resource belongs to another provider or contract");
++                        fail_if(b.CreateICmpEQ(status, b.getInt32(3)), "C resource requires its owning thread");
++                        fail_if(b.CreateICmpEQ(status, b.getInt32(6)), "C provider returned a duplicate native owner");
++                        fail_if(b.CreateIsNotNull(status), "C resource operation rejected " + instruction.callee);
++                        if (acquire) v = b.CreateLoad(b.getPtrTy(), handle);
++                        else if (result_type == ir::Type::none) v = llvm::UndefValue::get(b.getInt8Ty());
++                        else {
++                            auto* raw = b.CreateLoad(b.getInt64Ty(), scalar);
++                            const unsigned width = result_type == ir::Type::boolean ? 1 : numeric::width(result_type);
++                            if (width < 64)
++                                fail_if(b.CreateIsNotNull(b.CreateLShr(raw, width)), "noncanonical C resource result");
++                            v = b.CreateZExtOrTrunc(raw, b.getIntNTy(width));
++                            if (numeric::floating(result_type)) v = b.CreateBitCast(v, type(result_type));
++                        }
++                        break;
++                    }
+                     auto scratch = [&](unsigned bytes) {
+                         auto* buffer = b.CreateAlloca(b.getInt64Ty(), b.getInt32((bytes + 7) / 8));
+                         b.CreateMemSet(buffer, b.getInt8(0), bytes, llvm::Align(8));
+@@ -1396,7 +1439,7 @@
+                     };
+                     llvm::Value* words = count ? static_cast<llvm::Value*>(scratch(count * 8)) : absent;
+                     unsigned span_count = 0;
+-                    llvm::Value* spans = admission.revision() == 2 ? absent : nullptr;
++                    llvm::Value* spans = admission.revision() >= 2 ? absent : nullptr;
+                     llvm::StructType* span_type = nullptr;
+                     for (unsigned a = 0; a < count; ++a) {
+                         const auto argument = instruction.arguments[a];
+@@ -2123,9 +2166,12 @@
+             llvm::orc::SymbolMap symbols;
+             symbols[jit->mangleAndIntern(primitives->transport())] = llvm::orc::ExecutorSymbolDef(
+                 llvm::orc::ExecutorAddr::fromPtr(primitives->thunk()), llvm::JITSymbolFlags::Exported);
+-            if (primitives->revision() == 2)
++            if (primitives->revision() >= 2)
+                 symbols[jit->mangleAndIntern(c_span_bridge)] = llvm::orc::ExecutorSymbolDef(
+                     llvm::orc::ExecutorAddr::fromPtr(vd_c_span_dispatch_v2), llvm::JITSymbolFlags::Exported);
++            if (primitives->revision() == 3)
++                symbols[jit->mangleAndIntern(c_resource_bridge)] = llvm::orc::ExecutorSymbolDef(
++                    llvm::orc::ExecutorAddr::fromPtr(vd_c_resource_dispatch_v3), llvm::JITSymbolFlags::Exported);
+             check(dylib.define(llvm::orc::absoluteSymbols(symbols), generation->tracker));
+         }
+         if(object)check(jit->addObjectFile(generation->tracker,std::move(object)));
+@@ -2281,6 +2327,8 @@
+     if (input.c_primitives && !input.analysis)
+         contract.source_contract = input.c_primitives->descriptor();
+     contract.runtime_identity = reinterpret_cast<std::uintptr_t>(runtime.get());
++    contract.native_thunk_identity = input.c_primitives && input.c_primitives->revision() == 3 ?
++        reinterpret_cast<std::uintptr_t>(input.c_primitives->thunk()) : 0;
+     if (input.coordinated && !input.analysis) {
+         std::map<std::string,std::string> layouts;
+         auto encoded = [](const std::string& text) { return std::to_string(text.size()) + ":" + text; };
+@@ -2405,6 +2453,9 @@
+     contract.constant_contract=analysis.constant_contract();contract.source_contract=analysis.compatibility_contract();
+     contract.analysis=analysis.shared_from_this();contract.runtime_identity=current.compatibility().runtime_identity;contract.async_root=current.compatibility().async_root;
+     contract.application_metadata=analysis.application_metadata();
++    const auto& native = analysis.c_primitive_admission();
++    contract.native_thunk_identity = native && native->revision() == 3 ?
++        reinterpret_cast<std::uintptr_t>(native->thunk()) : 0;
+     if(!(current.compatibility()==contract))return {};
+     struct Replacement { bool& flag; explicit Replacement(bool& value) : flag(value) { flag = true; } ~Replacement() { flag = false; } } replacement(impl_->replacing_globals);
+     return compile_analysis(analysis,optimize,std::move(contract),current.runtime_owner(),current.compatibility().async_root);
+--- a/src/frontend/compiler.cpp
++++ b/src/frontend/compiler.cpp
+@@ -5420,6 +5420,12 @@
+         if(id==console::source_module)for(auto& structure:result->structures)if(structure.token.text=="terminal_session"){structure.definition->native_resource=true;structure.definition->native_provider="void.console.v1";}
+         if (primitives && id == primitives->module()) {
+             result->c_primitives = primitives;
++            for (auto& structure : result->structures)
++                for (const auto& resource : primitives->resources())
++                    if (structure.token.text == resource.name) {
++                        structure.definition->native_resource = true;
++                        structure.definition->native_provider = primitives->provider();
++                    }
+             const auto& bindings = primitives->bindings();
+             for (auto& f : result->functions)
+                 for (unsigned index = 0; index < bindings.size(); ++index)
+--- a/src/ir/c_primitive.cpp
++++ b/src/ir/c_primitive.cpp
+@@ -98,7 +98,8 @@
+     admitted->descriptor_ = descriptor;
+     DescriptorReader reader(admitted->descriptor_);
+     const auto revision = reader.take();
+-    if (revision == std::vector<std::string_view>{"void-c-primitive", "2", "2"}) admitted->revision_ = 2;
++    if (revision == std::vector<std::string_view>{"void-c-primitive", "3", "3"}) admitted->revision_ = 3;
++    else if (revision == std::vector<std::string_view>{"void-c-primitive", "2", "2"}) admitted->revision_ = 2;
+     else if (revision != std::vector<std::string_view>{"void-c-primitive", "1", "1"})
+         reject(reader.line, "unsupported descriptor, ABI revision or effects");
+     auto provider = reader.value("provider");
+@@ -141,8 +142,19 @@
+     };
+     auto shape = [&](std::string_view token, bool field, bool result) {
+         Shape type;
+-        if (admitted->revision_ == 2) {
++        if (admitted->revision_ >= 2) {
+             const auto p = parts(token);
++            if (admitted->revision_ == 3 && !field && p.size() == 2) {
++                if (result && p[0] == "owner") type.role = CResourceRole::acquire;
++                if (!result && p[0] == "borrow") type.role = CResourceRole::borrow;
++                if (!result && p[0] == "mut") type.role = CResourceRole::mutate;
++                if (!result && p[0] == "close") type.role = CResourceRole::close;
++                if (type.role != CResourceRole::none) {
++                    for (unsigned n = 0; n < admitted->resources_.size(); ++n)
++                        if (admitted->resources_[n].name == p[1]) { type.resource = n + 1; return type; }
++                    reject(reader.line, "resource operation requires an earlier admitted identity");
++                }
++            }
+             if (p.size() == 2 && p[0] == "record") {
+                 for (unsigned n = 0; n < admitted->records_.size(); ++n)
+                     if (admitted->records_[n].name == p[1]) { type.record = n + 1; return type; }
+@@ -176,7 +188,19 @@
+     std::set<std::string_view> names, exports, c_records;
+     while (!reader.done()) {
+         const auto fields = reader.take();
+-        if (admitted->revision_ == 2 && !fields.empty() && fields[0] == "record") {
++        if (admitted->revision_ == 3 && fields[0] == "resource") {
++            if (fields.size() != 10 || !admitted->bindings_.empty() || !admitted->records_.empty() ||
++                admitted->resources_.size() == 16 || !identifier(fields[1]) || !identifier(fields[2], true) ||
++                !names.insert(fields[1]).second || !c_records.insert(fields[2]).second ||
++                fields[3] != "pointer" || fields[4] != "null" ||
++                !identifier(fields[5]) || !identifier(fields[6]) || fields[5] == fields[6] ||
++                fields[7] != "owner-calls" || fields[8] != "shutdown-any" || fields[9] != "consume-always")
++                reject(reader.line, "unsupported or contradictory native resource contract");
++            admitted->resources_.push_back({std::string(fields[1]), std::string(fields[2]),
++                std::string(fields[5]), std::string(fields[6])});
++            continue;
++        }
++        if (admitted->revision_ >= 2 && !fields.empty() && fields[0] == "record") {
+             if (fields.size() != 6 || !admitted->bindings_.empty() || admitted->records_.size() == 16 ||
+                 !identifier(fields[1]) || !identifier(fields[2], true) ||
+                 !names.insert(fields[1]).second || !c_records.insert(fields[2]).second)
+@@ -239,9 +263,39 @@
+         }
+         if (spans && (spans > 2 || writable > 1 || records || binding.result != Type::i64))
+             reject(reader.line, "unsupported span count, overlap profile, record or result contract");
++        unsigned resources = binding.abi_result.resource != 0;
++        for (unsigned n = 0; n < binding.abi_parameters.size(); ++n) {
++            const auto& argument = binding.abi_parameters[n];
++            if (!argument.resource) continue;
++            ++resources;
++            if (n || (argument.role == CResourceRole::close &&
++                (binding.abi_parameters.size() != 1 || binding.result != Type::i32 ||
++                 binding.name != admitted->resource(argument.resource).release)))
++                reject(reader.line, "invalid native borrow or terminal release signature");
++        }
++        if (resources > 1 || (resources && (records || spans)) ||
++            (binding.abi_result.resource && binding.name != admitted->resource(binding.abi_result.resource).acquire))
++            reject(reader.line, "invalid native ownership transfer or mixed ABI");
+         admitted->bindings_.push_back(std::move(binding));
+     }
+     if (admitted->bindings_.empty()) reject(reader.line, "expected at least one binding");
++    if (admitted->revision_ == 3 && admitted->resources_.empty())
++        reject(reader.line, "expected a resource contract in descriptor revision 3");
++    for (unsigned n = 0; n < admitted->resources_.size(); ++n) {
++        auto& resource = admitted->resources_[n];
++        bool acquired = false, released = false;
++        for (unsigned ordinal = 0; ordinal < admitted->bindings_.size(); ++ordinal) {
++            const auto& binding = admitted->bindings_[ordinal];
++            if (binding.name == resource.acquire)
++                acquired = binding.abi_result.resource == n + 1 && binding.abi_result.role == CResourceRole::acquire;
++            if (binding.name == resource.release && binding.abi_parameters.size() == 1 &&
++                binding.abi_parameters[0].resource == n + 1 && binding.abi_parameters[0].role == CResourceRole::close) {
++                resource.release_ordinal = ordinal;
++                released = true;
++            }
++        }
++        if (!acquired || !released) reject(reader.line, "missing exact native acquire or release contract");
++    }
+     if (!linked_thunk) throw std::invalid_argument("C primitive provider transport is unavailable");
+     if (linked_thunk(admitted->descriptor_.data(), static_cast<std::uint32_t>(admitted->descriptor_.size()),
+                      c_primitive_probe, nullptr, 0, nullptr))
+@@ -265,7 +319,21 @@
+             if (field.shape.extent && matches(field.shape, type)) return true;
+     return false;
+ }
++bool CPrimitiveAdmission::resource_type(Type type) const {
++    if (type.kind != Type::managed_ref || !type.definition) return false;
++    const auto& d = *type.definition;
++    return d.managed && d.native_resource && d.native_provider == provider_ &&
++        d.module_identity == module_ && d.identity == module_ + "::" + d.name &&
++        d.base.expired() && !d.callable && !d.interface_type && d.cases.empty() &&
++        d.fields.size() == 1 && d.fields[0].name == "_seal" &&
++        d.fields[0].visibility == "private" && Type(d.fields[0].type) == Type::u64 &&
++        std::ranges::any_of(resources_, [&](const auto& resource) { return resource.name == d.name; });
++}
+ bool CPrimitiveAdmission::matches(const Shape& shape, Type type) const {
++    if (shape.resource)
++        return !type.construction && resource_type(type) && type.definition->name == resource(shape.resource).name &&
++            type.nullable == (shape.role == CResourceRole::acquire) &&
++            ((shape.role != CResourceRole::mutate && shape.role != CResourceRole::close) || ir::readonly_paths(type).empty());
+     if (type.nullable || type.construction) return false;
+     if (shape.direction)
+         return type.kind == Type::growable_array && type.definition && type.definition->element &&
+@@ -294,6 +362,8 @@
+     return true;
+ }
+ std::string CPrimitiveAdmission::source_type(const Shape& shape) const {
++    if (shape.resource)
++        return resource(shape.resource).name + (shape.role == CResourceRole::acquire ? "?" : "");
+     if (shape.direction) return "[u8]";
+     if (shape.record) return record(shape.record).name;
+     if (shape.extent) return "[" + std::string(void_spelling(shape.scalar)) + ", " + std::to_string(shape.extent) + "]";
+@@ -301,6 +371,8 @@
+ }
+ std::string CPrimitiveAdmission::source() const {
+     std::string text = "# Host-admitted C primitive declarations for " + provider_ + "\n";
++    for (const auto& resource : resources_)
++        text += "struct " + resource.name + ":\n    private _seal: u64 = 0\n";
+     for (const auto& record : records_) {
+         text += "value struct " + record.name + ":\n";
+         for (const auto& field : record.fields) text += "    " + field.name + ": " + source_type(field.shape) + "\n";
+@@ -309,11 +381,12 @@
+         text += "func " + binding.name + "(";
+         for (std::size_t index = 0; index < binding.abi_parameters.size(); ++index) {
+             if (index) text += ", ";
+-            if (binding.abi_parameters[index].direction == 1) text += "const ";
++            if (binding.abi_parameters[index].direction == 1 ||
++                binding.abi_parameters[index].role == CResourceRole::borrow) text += "const ";
+             text += "arg" + std::to_string(index) + ": " + source_type(binding.abi_parameters[index]);
+         }
+         text += ")";
+-        if (binding.abi_result.record || binding.result != Type::none) {
++        if (binding.abi_result.record || binding.abi_result.resource || binding.result != Type::none) {
+             text += " -> ";
+             text += source_type(binding.abi_result);
+         }
+--- a/src/ir/module.cpp
++++ b/src/ir/module.cpp
+@@ -627,7 +627,7 @@
+             if(auto base=d->base.lock();base && base->native_resource)fail("native resource cannot be extended");
+             if(console::endpoint_type(t) && (t.kind!=Type::aggregate || d->module_identity!=console::source_module || d->identity!=d->module_identity+"::"+d->name || d->managed || !d->base.expired() || !d->cases.empty() || d->interface_type || d->callable || d->native_resource || d->fields.size()!=1 || Type(d->fields[0].type)!=Type::i64 || d->fields[0].name!="_id" || !d->fields[0].readonly || d->fields[0].visibility!="internal"))fail("invalid console endpoint identity");
+             if(console::session_type(t) && (!d->native_resource || d->native_provider!="void.console.v1" || t.kind!=Type::managed_ref || !d->managed || d->module_identity!=console::source_module || !d->base.expired() || d->callable || !d->cases.empty() || d->interface_type || d->fields.size()!=1 || Type(d->fields[0].type)!=Type::i64 || d->fields[0].readonly || d->fields[0].visibility!="internal" || d->fields[0].name!="_token"))fail("invalid terminal session identity");
+-            if(d->native_resource && !console::session_type(t) && ((m.native_library!="void.fixture.v1" && m.native_library!="void.sink.v1") || t.kind!=Type::managed_ref || d->native_provider!=m.native_library || !d->managed || d->fields.size()!=1 || Type(d->fields[0].type)!=Type::u64 || d->callable || !d->base.expired() || !d->cases.empty() || d->interface_type))fail("invalid native resource identity");
++            if(d->native_resource && !console::session_type(t) && !(primitive && primitive->resource_type(t)) && ((m.native_library!="void.fixture.v1" && m.native_library!="void.sink.v1") || t.kind!=Type::managed_ref || d->native_provider!=m.native_library || !d->managed || d->fields.size()!=1 || Type(d->fields[0].type)!=Type::u64 || d->callable || !d->base.expired() || !d->cases.empty() || d->interface_type))fail("invalid native resource identity");
+             if(d->task_result){
+                 auto r=Type(*d->task_result);if(t.kind!=Type::managed_ref || !d->managed || d->callable || d->interface_type || !d->base.expired() || !d->cases.empty() || d->result_type || d->element || d->extent || d->fields.size()!=2 || Type(d->fields[0].type)!=Type::i32 || (Type(d->fields[1].type)!=(r==Type::none?Type::boolean:r) || capability_key(d->fields[1].type)!=capability_key(r==Type::none?Type::boolean:r)) || d->identity!="$task:"+std::to_string(r.kind)+":"+Type::key(r)+(r.nullable?"?":"")+":"+capability_key(r))fail("invalid task handle shape");
+             }
+@@ -1037,7 +1037,9 @@
+                     break;
+                 }
+                 case Op::gc_release:
+-                    if(!f.receiver || f.method_name!="deinit" || operand(i.a).kind!=Type::managed_ref || operand(i.a).nullable || operand(i.a).construction)fail("invalid deterministic release");result=Type::boolean;break;
++                    if(!f.receiver || f.method_name!="deinit" || operand(i.a).kind!=Type::managed_ref || operand(i.a).nullable ||
++                        operand(i.a).construction || (primitive && primitive->resource_type(operand(i.a))))
++                        fail("invalid deterministic release");result=Type::boolean;break;
+                 case Op::c_primitive_call: {
+                     if (!primitive || f.module_identity != primitive->module() ||
+                         i.immediate < 0 || static_cast<std::size_t>(i.immediate) >= primitive->bindings().size())
+@@ -1601,7 +1603,7 @@
+         }
+ #include "local_cleanup.inc"
+         validate_construction(f,m,body_types);
+-        validate_numeric_enum_slots(f, primitive && primitive->revision() == 2 ? primitive : nullptr);
++        validate_numeric_enum_slots(f, primitive && primitive->revision() >= 2 ? primitive : nullptr);
+         validate_fixed_ownership(f,m,body_types);
+     }
+     for (const auto& global : m.globals) {
+--- a/src/ir/numeric_enum_storage.inc
++++ b/src/ir/numeric_enum_storage.inc
+@@ -36,12 +36,12 @@
+ 
+ bool checked_storage_slot(Type type, const CPrimitiveAdmission* native) {
+     if (contains_numeric_enum(type)) return true;
+-    if (!native || native->revision() != 2) return false;
++    if (!native || native->revision() < 2) return false;
+     // Check scalar inputs too. A forged aggregate construction must not be
+     // able to wrap an uninitialized scalar in otherwise valid record storage.
+     return numeric::integer(type) || numeric::floating(type) || type == Type::boolean ||
+         type.kind == Type::aggregate || type.kind == Type::fixed_array ||
+-        type.kind == Type::growable_array;
++        type.kind == Type::growable_array || native->resource_type(type);
+ }
+ 
+ bool checked_storage_cleanup_return(const Function& f, unsigned id, const CPrimitiveAdmission* native) {
+--- a/src/ir/reference_capabilities.inc
++++ b/src/ir/reference_capabilities.inc
+@@ -236,10 +236,12 @@
+                     case Op::c_primitive_call: {
+                         const auto& binding = module.c_primitives->bindings().at(static_cast<unsigned>(i.immediate));
+                         for (unsigned n = 0; n < binding.abi_parameters.size(); ++n) {
+-                            if (binding.abi_parameters[n].direction <= 1) continue;
++                            const auto& parameter = binding.abi_parameters[n];
++                            if (parameter.direction <= 1 && parameter.role != CResourceRole::mutate &&
++                                parameter.role != CResourceRole::close) continue;
+                             for (const auto& [path, fact] : values[i.arguments[n]]) {
+                                 effect(summary.mutations, fact);
+-                                if (fact.readonly) fail("C byte span writes through readonly reference");
++                                if (fact.readonly) fail("C binding mutates a readonly reference");
+                             }
+                         }
+                         value = reference_facts(type);
+--- /dev/null
++++ b/src/runtime/c_resource.cpp
+@@ -0,0 +1,158 @@
++#include "void/c_primitive.hpp"
++#include "void/execution.hpp"
++#include "void/native_resource.hpp"
++#include <algorithm>
++#include <array>
++#include <atomic>
++#include <bit>
++#include <stdexcept>
++
++namespace {
++using namespace vd;
++const char resource_kind = 0;
++
++class Resource final : public NativeResource {
++    std::string descriptor_, identity_;
++    CPrimitiveThunk* thunk_;
++    const std::uint32_t release_;
++    std::shared_ptr<void> generation_;
++    std::mutex mutex_;
++    std::uint64_t native_ = 0;
++    std::atomic<std::uint64_t> exclusive_ = 0;
++
++    std::uint32_t dispatch(std::uint32_t ordinal, const std::uint64_t* args,
++                           std::uint32_t count, std::uint64_t* result) {
++        if (runtime.is_managed()) {
++            Runtime::Native native(runtime);
++            return thunk_(descriptor_.data(), static_cast<std::uint32_t>(descriptor_.size()),
++                          ordinal, args, count, result);
++        }
++        return thunk_(descriptor_.data(), static_cast<std::uint32_t>(descriptor_.size()),
++                      ordinal, args, count, result);
++    }
++
++public:
++    Resource(Runtime& runtime, void* wrapper, std::string_view descriptor, std::string_view identity,
++             CPrimitiveThunk* thunk, std::uint32_t release)
++        : NativeResource(runtime, wrapper), descriptor_(descriptor), identity_(identity), thunk_(thunk),
++          release_(release), generation_(NativeCode::active_lease()) {}
++    ~Resource() override {
++        if (native_) {
++            try { (void)close(); }
++            catch (...) { std::terminate(); } // A verified terminal release must be dispatchable.
++        }
++    }
++    const void* kind() const noexcept override { return &resource_kind; }
++    std::uint64_t exclusive_native_identity() const noexcept override { return exclusive_.load(); }
++    void discard_duplicate() noexcept { native_ = 0; exclusive_ = 0; }
++    bool matches(std::string_view descriptor, std::string_view identity,
++                 CPrimitiveThunk* thunk, std::uint32_t release) const {
++        return descriptor_ == descriptor && identity_ == identity && thunk_ == thunk && release_ == release;
++    }
++
++    bool acquire(std::uint32_t ordinal, const std::uint64_t* args, std::uint32_t count) {
++        if (dispatch(ordinal, args, count, &native_))
++            throw std::runtime_error("C resource creation transport rejected");
++        exclusive_ = native_;
++        return native_ != 0;
++    }
++    std::uint32_t borrow(std::uint32_t ordinal, const std::uint64_t* args,
++                         std::uint32_t count, std::uint64_t* result) {
++        std::lock_guard lock(mutex_);
++        if (!native_) return 1;
++        std::array<std::uint64_t, c_primitive_max_arguments> words{};
++        std::copy_n(args, count, words.begin());
++        words[0] = native_;
++        return dispatch(ordinal, words.data(), count, result) ? 4 : 0;
++    }
++    std::error_code close() override {
++        std::shared_ptr<void> retired;
++        std::int32_t provider_status;
++        {
++            std::lock_guard lock(mutex_);
++            if (!native_) return {};
++            std::uint64_t result = 0;
++            // A conforming allocator can reuse the address as soon as C frees
++            // it. Close invalidates the ledger claim before that handoff.
++            exclusive_ = 0;
++            if (dispatch(release_, &native_, 1, &result)) {
++                exclusive_ = native_;
++                throw std::runtime_error("C terminal release transport rejected");
++            }
++            native_ = 0; // Accepted release consumes even when its result reports failure.
++            provider_status = std::bit_cast<std::int32_t>(static_cast<std::uint32_t>(result));
++            retired = std::move(generation_);
++        }
++        wrapper.reset(nullptr);
++        // Retire the acquisition generation outside the resource and GC locks.
++        if (runtime.is_managed()) {
++            Runtime::Native native(runtime);
++            retired.reset();
++        } else retired.reset();
++        return {provider_status, std::generic_category()};
++    }
++};
++
++class NativeJob {
++    Runtime& runtime_;
++public:
++    explicit NativeJob(Runtime& runtime) : runtime_(runtime) { runtime.begin_native_job(); }
++    ~NativeJob() { runtime_.end_native_job(); }
++};
++}
++
++extern "C" std::uint32_t vd::vd_c_resource_dispatch_v3(CPrimitiveThunk* thunk, const char* descriptor,
++    std::uint32_t size, std::uint32_t ordinal, const std::uint64_t* words, std::uint32_t count,
++    std::uint64_t* result, void** handle, const char* identity, std::uint32_t release, CResourceRole role) noexcept {
++    if (!thunk || !descriptor || !size || size > 16384 || !identity || !handle ||
++        ordinal >= 64 || release >= 64 || count > c_primitive_max_arguments || (count && !words) ||
++        role < CResourceRole::acquire || role > CResourceRole::close ||
++        (role != CResourceRole::acquire && !count) ||
++        (role == CResourceRole::close && (ordinal != release || count != 1 || !result)))
++        return 5;
++    try {
++        auto& runtime = Runtime::current();
++        (void)runtime.root_word(handle);
++        NativeJob job(runtime);
++        auto library = NativeLibrary::get(runtime);
++        const std::string_view contract(descriptor, size);
++        if (role == CResourceRole::acquire) {
++            if (ordinal == release || result) return 5;
++            *handle = nullptr;
++            try {
++                auto nominal = runtime.descriptor(identity);
++                if (!nominal || nominal->layout.size != sizeof(std::uint64_t) ||
++                    !nominal->layout.references.empty()) return 5;
++                auto layout = nominal->layout;
++                layout.descriptor = nominal;
++                runtime.allocate_into(handle, layout);
++                auto owner = std::make_shared<Resource>(runtime, *handle, contract, identity, thunk, release);
++                if (!owner->acquire(ordinal, words, count)) *handle = nullptr;
++                else if (!library->publish_exclusive(*handle, owner)) {
++                    owner->discard_duplicate();
++                    *handle = nullptr;
++                    return 6;
++                }
++                return 0;
++            } catch (...) {
++                *handle = nullptr;
++                throw;
++            }
++        }
++        auto owner = library->find(*handle, true);
++        if (!owner) return 1;
++        if (owner->kind() != &resource_kind) return 2;
++        auto resource = std::static_pointer_cast<Resource>(owner);
++        if (!resource->matches(contract, identity, thunk, release)) return 2;
++        try { resource->own_thread(); }
++        catch (const std::runtime_error&) { return 3; }
++        if (role != CResourceRole::close)
++            return ordinal == release ? 5 : resource->borrow(ordinal, words, count, result);
++        const auto error = resource->close();
++        library->erase(*handle, resource.get());
++        *result = static_cast<std::uint32_t>(error.value());
++        return 0;
++    } catch (const std::exception&) {
++        return 4;
++    }
++}
+--- a/src/runtime/native_resource.cpp
++++ b/src/runtime/native_resource.cpp
+@@ -31,6 +31,20 @@
+     if (!resources_.emplace(key, std::move(value)).second) {
+         throw std::runtime_error("Duplicate native identity");
+     }
++}
++
++bool NativeLibrary::publish_exclusive(void* key, const std::shared_ptr<NativeResource>& value) {
++    const auto identity = value->exclusive_native_identity();
++    if (!identity) throw std::invalid_argument("Missing exclusive native identity");
++    std::lock_guard admission(runtime_.mutex_);
++    std::lock_guard lock(mutex_);
++    for (const auto& [wrapper, existing] : resources_) {
++        (void)wrapper;
++        if (existing->exclusive_native_identity() == identity) return false;
++    }
++    if (runtime_.closing_) throw std::runtime_error("Native resource publication rejected during shutdown");
++    if (!resources_.emplace(key, value).second) throw std::runtime_error("Duplicate native identity");
++    return true;
+ }
+ 
+ std::shared_ptr<NativeLibrary> NativeLibrary::existing(Runtime& runtime) {
+--- /dev/null
++++ b/tests/ffi/g3_descriptor.h.in
+@@ -0,0 +1,6 @@
++#ifndef VOID_TEST_G3_DESCRIPTOR_H
++#define VOID_TEST_G3_DESCRIPTOR_H
++#define G3_FIXTURE_IDENTITY "@G3_FIXTURE_SHA@"
++static const char g3_descriptor[] =
++"@G3_DESCRIPTOR_STRING@";
++#endif
+--- /dev/null
++++ b/tests/ffi/resources.cmake
+@@ -0,0 +1,46 @@
++if(NOT TARGET void_g1_thunk)
++  return()
++endif()
++
++set(g3_src "${PROJECT_SOURCE_DIR}/tests/ffi")
++set(g3_bin "${CMAKE_CURRENT_BINARY_DIR}/ffi-g3")
++set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
++  "${g3_src}/resources_thunk.c" "${g3_src}/resources_fixture.c")
++file(SHA256 "${g3_src}/resources_thunk.c" G3_THUNK_SHA)
++file(SHA256 "${g3_src}/resources_fixture.c" G3_FIXTURE_SHA)
++configure_file("${g3_src}/resources.descriptor.in" "${g3_bin}/resources.descriptor" @ONLY NEWLINE_STYLE LF)
++file(READ "${g3_bin}/resources.descriptor" G3_DESCRIPTOR_STRING)
++string(REPLACE "\n" "\\n\"\n\"" G3_DESCRIPTOR_STRING "${G3_DESCRIPTOR_STRING}")
++configure_file("${g3_src}/g3_descriptor.h.in" "${g3_bin}/g3_descriptor.h" @ONLY NEWLINE_STYLE LF)
++
++add_library(void_g3_fixture OBJECT "${g3_src}/resources_fixture.c")
++add_library(void_g3_thunk OBJECT "${g3_src}/resources_thunk.c")
++foreach(target IN ITEMS void_g3_fixture void_g3_thunk)
++  set_target_properties("${target}" PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED YES
++    C_EXTENSIONS NO C_VISIBILITY_PRESET hidden INTERPROCEDURAL_OPTIMIZATION OFF)
++  target_link_libraries("${target}" PRIVATE void_options)
++endforeach()
++target_compile_definitions(void_g3_fixture PRIVATE G3_FIXTURE_IDENTITY="${G3_FIXTURE_SHA}")
++target_include_directories(void_g3_thunk PRIVATE "${g3_bin}")
++if(WIN32)
++  target_compile_definitions(void_g3_thunk PRIVATE G3_LLP64=1)
++endif()
++
++add_executable(void_g3_tests "${g3_src}/resources.cpp"
++  $<TARGET_OBJECTS:void_g3_thunk> $<TARGET_OBJECTS:void_g3_fixture>)
++target_link_libraries(void_g3_tests PRIVATE void_llvm)
++add_test(NAME ffi_g3_jit_ir COMMAND void_g3_tests "${g3_bin}/resources.descriptor"
++  "${g3_src}/resources.void" "${g3_bin}/tests")
++set_tests_properties(ffi_g3_jit_ir PROPERTIES TIMEOUT 180)
++foreach(mode IN ITEMS normal optimized)
++  set(g3_object "${g3_bin}/application-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
++  add_custom_command(OUTPUT "${g3_object}"
++    COMMAND void_g3_tests --emit "${g3_bin}/resources.descriptor" "${g3_src}/resources.void" "${g3_object}" "${mode}"
++    DEPENDS void_g3_tests "${g3_bin}/resources.descriptor" "${g3_src}/resources.void" VERBATIM)
++  set_source_files_properties("${g3_object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
++  add_executable("void_g3_aot_${mode}" "${g3_src}/resources_exit.cpp"
++    "${g3_object}" $<TARGET_OBJECTS:void_g3_thunk> $<TARGET_OBJECTS:void_g3_fixture>)
++  target_link_libraries("void_g3_aot_${mode}" PRIVATE void_runtime)
++  add_test(NAME "ffi_g3_aot_${mode}" COMMAND "${Python3_EXECUTABLE}"
++    "${g3_src}/resources_process.py" "$<TARGET_FILE:void_g3_aot_${mode}>")
++endforeach()
+--- /dev/null
++++ b/tests/ffi/resources.cpp
+@@ -0,0 +1,426 @@
++#include "void/backend.hpp"
++#include "void/c_primitive.hpp"
++#include "void/frontend.hpp"
++#include "void/native_resource.hpp"
++#include "void/runtime.hpp"
++#include <algorithm>
++#include <array>
++#include <atomic>
++#include <chrono>
++#include <fstream>
++#include <iostream>
++#include <iterator>
++#include <semaphore>
++#include <span>
++#include <stdexcept>
++#include <thread>
++
++extern "C" vd::CPrimitiveThunk vd_c_primitive_dispatch_v3;
++extern "C" std::int32_t g3_live();
++extern "C" std::int32_t g3_releases();
++
++namespace {
++using namespace vd;
++using namespace vd::ir;
++namespace fs = std::filesystem;
++constexpr auto key = "/native_resources.void::box";
++constexpr std::uint32_t release_ordinal = 3;
++
++void require(bool okay, std::string_view message) {
++    if (!okay) throw std::runtime_error(std::string(message));
++}
++template<class Work>
++void rejects(std::string_view label, std::string_view expected, Work work) {
++    try { work(); }
++    catch (const std::exception& error) {
++        require(std::string_view(error.what()).find(expected) != std::string_view::npos,
++                std::string(label) + " received " + error.what());
++        std::cout << label << ": " << error.what() << '\n';
++        return;
++    }
++    throw std::runtime_error(std::string(label) + " accepted");
++}
++std::string read(const fs::path& path) {
++    std::ifstream stream(path, std::ios::binary);
++    require(stream.is_open(), "cannot read input");
++    return {std::istreambuf_iterator<char>(stream), {}};
++}
++void write(const fs::path& path, std::string_view text) {
++    std::ofstream stream(path, std::ios::binary);
++    require(bool(stream << text), "cannot write source probe");
++}
++auto analyze(const fs::path& path, const CPrimitiveAdmission::Owner& admission) {
++    auto result = analyze_project(path, admission);
++    if (!result.succeeded()) throw CompilationError(result.diagnostics);
++    return result.program;
++}
++
++void descriptors(const std::string& descriptor) {
++    auto changed = [&](std::string_view from, std::string_view to, std::string_view expected) {
++        auto copy = descriptor;
++        const auto position = copy.find(from);
++        require(position != copy.npos, "descriptor marker missing");
++        copy.replace(position, from.size(), to);
++        rejects(to, expected, [&] { (void)CPrimitiveAdmission::admit(copy, vd_c_primitive_dispatch_v3); });
++    };
++    changed("3 3", "3 2", "unsupported descriptor");
++    changed("pointer null", "integer null", "resource contract");
++    changed("pointer null", "pointer minus-one", "resource contract");
++    changed("shutdown-any", "shutdown-owner", "resource contract");
++    changed("consume-always", "retry-on-error", "resource contract");
++    changed("create close_box owner", "create missing owner", "terminal release signature");
++    changed("bind close_box g3_close i32 close:box", "bind close_box g3_close i32 mut:box", "missing exact");
++    changed("i32 close:box", "i64 close:box", "terminal release");
++    changed("i32 close:box", "i32 close:box i32", "terminal release");
++    changed("i32 borrow:box i32", "i32 borrow:other i32", "earlier admitted identity");
++    changed("i32 borrow:box i32", "i32 borrow:box mut:box", "invalid native borrow");
++    changed("i32 borrow:box i32", "owner:box borrow:box i32", "ownership transfer");
++    changed("c-default", "vectorcall", "unsupported");
++    changed("nonblocking no-callbacks", "retains-owner no-callbacks", "unsupported");
++    changed("org.voidlang.g3-fixture", "org.voidlang.other", "provider rejected");
++}
++Function& function(Module& module, std::string_view suffix) {
++    auto found = std::find_if(module.functions.begin(), module.functions.end(),
++        [&](const auto& f) { return f.name.ends_with(suffix); });
++    require(found != module.functions.end(), "typed fixture function missing");
++    return *found;
++}
++void malformed(Module good) {
++    good.analysis.reset();
++    validate(good);
++    auto test = [&](std::string_view label, std::string_view expected, auto change) {
++        auto module = good;
++        change(module);
++        rejects(label, expected, [&] { validate(module); });
++    };
++    test("absent admission", "native resource identity", [](auto& m) { m.c_primitives.reset(); });
++    test("wrong provider", "exact call signature", [](auto& m) {
++        function(m, "::read").blocks[0].instructions.back().callee = "org.other::g3_read";
++    });
++    test("wrong release ordinal", "exact call signature", [](auto& m) {
++        function(m, "::close_box").blocks[0].instructions.back().immediate = 0;
++    });
++    test("forged ownership movement", "exact call signature", [](auto& m) {
++        function(m, "::close_box").blocks[0].instructions.back().initialization = true;
++    });
++    test("forged convention operand", "exact call signature", [](auto& m) {
++        function(m, "::close_box").blocks[0].instructions.back().b = 1;
++    });
++    test("scope bypass", "requires the admitted direct import", [](auto& m) {
++        m.source_imports[m.root_identity].clear();
++    });
++    test("raw bridge escape", "requires host admission", [](auto& m) {
++        m.imports.emplace_back(c_resource_bridge);
++    });
++    test("worker resource access", "require synchronous execution", [](auto& m) {
++        function(m, "::entry").worker = true;
++    });
++    test("borrow as escaping callable", "direct-call only", [](auto& m) {
++        auto& body = function(m, "::entry").blocks[0].instructions;
++        Instruction escaped{Op::function_reference};
++        escaped.callee = function(m, "::read").name;
++        body.push_back(escaped);
++    });
++    test("wrapper control flow bypass", "invalid admitted C primitive wrapper", [](auto& m) {
++        auto& f = function(m, "::close_box");
++        f.blocks.push_back(f.blocks.front());
++    });
++    test("fabricated second owning wrapper", "forged native resource", [](auto& m) {
++        auto& f = function(m, "::entry");
++        auto& body = f.blocks.front().instructions;
++        Instruction seal{Op::constant};
++        seal.type = Type::u64;
++        const auto argument = static_cast<unsigned>(body.size());
++        body.push_back(seal);
++        Instruction forged{Op::gc_construct};
++        forged.type = function(m, "::read").parameters[0];
++        forged.type.readonly = false;
++        forged.arguments = {argument};
++        body.push_back(forged);
++    });
++    test("integer-to-resource cast", "invalid conversion", [](auto& m) {
++        auto& body = function(m, "::entry").blocks.front().instructions;
++        const auto integer = static_cast<unsigned>(body.size());
++        body.push_back({Op::constant});
++        Instruction cast{Op::convert, integer};
++        cast.type = function(m, "::close_box").parameters[0];
++        body.push_back(cast);
++    });
++    test("uninitialized handle", "uninitialized C binding carrier", [](auto& m) {
++        auto& f = function(m, "::entry");
++        const auto index = static_cast<unsigned>(f.locals.size());
++        f.locals.push_back(function(m, "::close_box").parameters[0]);
++        f.blocks.front().instructions.push_back({Op::load, index});
++    });
++    test("eager global acquisition", "C primitive operation during global startup", [](auto& m) {
++        auto& init = function(m, m.globals.front().initializer);
++        auto& body = init.blocks.front().instructions;
++        const auto arg = static_cast<unsigned>(body.size());
++        body.push_back({Op::constant});
++        Instruction call{Op::call};
++        call.callee = function(m, "::create").name;
++        call.arguments = {arg};
++        body.push_back(std::move(call));
++    });
++}
++
++extern "C" std::uint32_t alternate(const char* descriptor, std::uint32_t size, std::uint32_t ordinal,
++                                   const std::uint64_t* args, std::uint32_t count, std::uint64_t* result) {
++    return vd_c_primitive_dispatch_v3(descriptor, size, ordinal, args, count, result);
++}
++
++std::uint32_t bridge(CPrimitiveThunk* thunk, std::string_view descriptor, std::uint32_t ordinal,
++                     std::span<const std::uint64_t> args, std::uint64_t* result, void** handle, CResourceRole role) {
++    return vd_c_resource_dispatch_v3(thunk, descriptor.data(), static_cast<std::uint32_t>(descriptor.size()),
++        ordinal, args.data(), static_cast<std::uint32_t>(args.size()), result, handle, key, release_ordinal, role);
++}
++void admit(Runtime& runtime) {
++    const NominalDescriptor layout{key, "", "test resource", {8, {}}};
++    runtime.admit_types({&layout, 1});
++}
++struct OwnerRoot {
++    void* value = nullptr;
++    static constexpr std::size_t zero = 0;
++    Runtime::Slot slot{&value, sizeof(value), &zero, 1};
++    Runtime::Frame frame;
++    explicit OwnerRoot(Runtime& runtime) : frame(runtime, &slot, 1) {}
++};
++std::uint64_t duplicated_pointer = 0;
++extern "C" std::uint32_t duplicate_provider(const char* descriptor, std::uint32_t size, std::uint32_t ordinal,
++    const std::uint64_t* args, std::uint32_t count, std::uint64_t* result) {
++    if (ordinal == 0 && duplicated_pointer) { *result = duplicated_pointer; return 0; }
++    const auto status = vd_c_primitive_dispatch_v3(descriptor, size, ordinal, args, count, result);
++    if (!status && ordinal == 0) duplicated_pointer = *result;
++    if (!status && ordinal == release_ordinal) duplicated_pointer = 0;
++    return status;
++}
++void runtime_denials(const std::string& descriptor) {
++    Runtime runtime;
++    Runtime::Attachment attach(runtime);
++    admit(runtime);
++    Runtime::Managed managed(runtime);
++    OwnerRoot owner(runtime), other(runtime);
++    const std::array<std::uint64_t, 1> create{24}, close{0};
++    const std::array<std::uint64_t, 2> args{0, 0};
++    std::uint64_t result = 0;
++    const auto before = g3_releases();
++    require(bridge(duplicate_provider, descriptor, 0, create, nullptr, &owner.value, CResourceRole::acquire) == 0 &&
++            owner.value && g3_live() == 1, "first acquisition");
++    require(bridge(duplicate_provider, descriptor, 0, create, nullptr, &other.value, CResourceRole::acquire) == 6 &&
++            !other.value && g3_live() == 1 && g3_releases() == before, "duplicate native ownership");
++    require(bridge(alternate, descriptor, 1, args, &result, &owner.value, CResourceRole::borrow) == 2, "wrong linked authority");
++    require(bridge(alternate, descriptor, release_ordinal, close, &result, &owner.value, CResourceRole::close) == 2,
++            "wrong linked release authority");
++    auto wrong = descriptor;
++    wrong.replace(wrong.find("org.voidlang.g3-fixture"), std::string_view("org.voidlang.g3-fixture").size(), "org.voidlang.wrong");
++    require(bridge(duplicate_provider, wrong, 1, args, &result, &owner.value, CResourceRole::borrow) == 2, "wrong provider");
++    std::atomic<unsigned> denied{0};
++    std::thread outsider([&] {
++        Runtime foreign;
++        Runtime::Attachment attachment(foreign);
++        Runtime::Managed active(foreign);
++        OwnerRoot cross(foreign);
++        cross.value = owner.value; // Deliberately forge a foreign root in the host-only proof.
++        std::uint64_t observed = 0;
++        denied = bridge(duplicate_provider, descriptor, 1, args, &observed, &cross.value, CResourceRole::borrow);
++        cross.value = nullptr;
++    });
++    {
++        Runtime::Native safe(runtime);
++        outsider.join();
++    }
++    require(denied == 1, "cross-Runtime borrowed handle admitted");
++    require(bridge(duplicate_provider, descriptor, release_ordinal, close, &result, &owner.value, CResourceRole::close) == 0 &&
++            result == 0 && g3_live() == 0 && g3_releases() == before + 1, "terminal close");
++    require(bridge(duplicate_provider, descriptor, 1, args, &result, &owner.value, CResourceRole::borrow) == 1 &&
++            bridge(duplicate_provider, descriptor, release_ordinal, close, &result, &owner.value, CResourceRole::close) == 1,
++            "stale alias or double close admitted");
++    std::cout << "duplicate native owner, foreign provider/Runtime and stale alias rejected\n";
++}
++
++std::binary_semaphore entered(0), shutdown_start(0), resume(0);
++std::atomic<bool> delayed_entered{false};
++std::atomic<unsigned> pause_at{UINT32_MAX};
++extern "C" std::uint32_t delayed(const char* descriptor, std::uint32_t size, std::uint32_t ordinal,
++                                  const std::uint64_t* args, std::uint32_t count, std::uint64_t* result) {
++    const auto status = vd_c_primitive_dispatch_v3(descriptor, size, ordinal, args, count, result);
++    if (!status && ordinal == pause_at.load()) {
++        delayed_entered = true;
++        entered.release();
++        resume.acquire();
++    }
++    return status;
++}
++void shutdown_race(const std::string& descriptor, bool creating) {
++    Runtime runtime;
++    Runtime::Attachment attach(runtime);
++    admit(runtime);
++    Runtime::Managed managed(runtime);
++    OwnerRoot owner(runtime);
++    const std::array<std::uint64_t, 1> create{24}, close{0};
++    const std::array<std::uint64_t, 2> read{0, 0};
++    std::uint64_t result = 0;
++    const auto before = g3_releases();
++    if (!creating)
++        require(bridge(delayed, descriptor, 0, create, nullptr, &owner.value, CResourceRole::acquire) == 0 && owner.value,
++            "shutdown race setup");
++    void* published = owner.value;
++    delayed_entered = false;
++    pause_at = creating ? 0 : 1;
++    std::atomic<bool> completed{false}, observed_wait{false};
++    std::atomic<unsigned> wrong_thread{0};
++    std::thread shutdown([&] {
++        entered.acquire();
++        if (!creating) {
++            {
++                Runtime::Attachment other(runtime);
++                Runtime::Managed active(runtime);
++                OwnerRoot alias(runtime);
++                alias.value = published;
++                std::uint64_t ignored = 0;
++                wrong_thread = bridge(delayed, descriptor, release_ordinal, close, &ignored, &alias.value, CResourceRole::close);
++            }
++        }
++        shutdown_start.release();
++        const auto error = runtime.close();
++        completed = !error;
++    });
++    std::thread unblock([&] {
++        shutdown_start.acquire();
++        for (unsigned n = 0; n < 5000; ++n) {
++            try { (void)NativeLibrary::get(runtime); }
++            catch (const std::runtime_error&) {
++                observed_wait = g3_live() == 1 && !completed && (creating || wrong_thread == 3);
++                break;
++            }
++            std::this_thread::sleep_for(std::chrono::milliseconds(1));
++        }
++        resume.release();
++    });
++    const auto status = creating ?
++        bridge(delayed, descriptor, 0, create, nullptr, &owner.value, CResourceRole::acquire) :
++        bridge(delayed, descriptor, 1, read, &result, &owner.value, CResourceRole::borrow);
++    if (!delayed_entered) entered.release();
++    {
++        Runtime::Native safe(runtime);
++        shutdown.join();
++        unblock.join();
++    }
++    pause_at = UINT32_MAX;
++    require(observed_wait && completed && g3_live() == 0 && g3_releases() == before + 1,
++        "shutdown released live C call or failed to drain the native owner");
++    require(creating ? status == 4 && !owner.value : status == 0 && result == 24,
++        "shutdown changed the borrow result or published a failed acquisition");
++    std::cout << (creating ? "creation-publication race" : "borrow vs wrong-thread close and shutdown") << " passed\n";
++}
++
++void failed_shutdown_release(const std::string& descriptor) {
++    Runtime runtime;
++    const auto before = g3_releases();
++    {
++        Runtime::Attachment attach(runtime);
++        admit(runtime);
++        Runtime::Managed managed(runtime);
++        OwnerRoot root(runtime);
++        const std::array<std::uint64_t, 1> create{static_cast<std::uint32_t>(-2)};
++        require(bridge(vd_c_primitive_dispatch_v3, descriptor, 0, create, nullptr, &root.value,
++                       CResourceRole::acquire) == 0 && root.value, "release-error fixture");
++    }
++    const auto error = runtime.close();
++    require(error && error.os_code == 17 && g3_live() == 0 && g3_releases() == before + 1,
++        "failed release did not consume the shutdown resource exactly once");
++    std::cout << "terminal provider error reported on shutdown after release\n";
++}
++
++void typed_stale_alias(Module module) {
++    module.analysis.reset();
++    auto& entry = function(module, "::entry");
++    auto& create = function(module, "::create");
++    auto& release = function(module, "::close_box");
++    auto& read = function(module, "::read");
++    Instruction acquire{Op::call};
++    acquire.callee = create.name;
++    acquire.type = create.result;
++    acquire.arguments = {0};
++    Instruction unwrap{Op::convert, 1};
++    unwrap.type = release.parameters[0];
++    Instruction close{Op::call};
++    close.callee = release.name;
++    close.arguments = {2};
++    Instruction borrow{Op::call};
++    borrow.callee = read.name;
++    borrow.arguments = {2, 0};
++    entry.locals.clear();
++    entry.cleanup_entry.reset();
++    entry.blocks = {{{{Op::constant}, acquire, unwrap, close, borrow}, {Terminator::Kind::return_value, 4}}};
++    validate(module); // Liveness of an alias is intentionally dynamic.
++    Jit jit;
++    auto code = jit.compile(module, module.entry_symbol, false, {}, std::make_shared<Runtime>());
++    rejects("direct typed IR stale alias", "closed, null or invalid", [&] { (void)code->invoke(0); });
++    require(g3_live() == 0, "typed IR stale alias leaked an owner");
++}
++
++void reload_resource(const fs::path& original, const fs::path& sandbox,
++                     const std::string& descriptor, const CPrimitiveAdmission::Owner& admission, bool optimize) {
++    const auto path = sandbox / "resources.void";
++    auto text = read(original);
++    write(path, text);
++    const auto before = analyze(path, admission);
++    const auto change = text.find(" + 7");
++    require(change != text.npos, "reload body marker missing");
++    text.replace(change, 4, " + 8");
++    write(path, text);
++    const auto after = analyze(path, admission);
++    auto incompatible = analyze(path, CPrimitiveAdmission::admit(descriptor, alternate));
++    Jit jit;
++    auto old = jit.compile(*before, optimize);
++    ReloadSlot slot(old);
++    require(slot.invoke(90) == 31 && g3_live() == 1, "owned resource created before reload");
++    require(!jit.replace(slot, *incompatible, optimize), "incompatible linked authority replaced live program");
++    require(jit.replace(slot, *after, optimize), "compatible body replacement rejected");
++    old.reset();
++    require(jit.live_generations() == 2 && slot.invoke(91) == 39, "live resource lost its original generation");
++    require(slot.invoke(92) == 0 && g3_live() == 0 && jit.live_generations() == 1, "terminal close did not retire acquisition generation");
++    std::cout << "compatible body reload retained the owner and generation; changed thunk rejected\n";
++}
++}
++
++int main(int argc, char** argv) try {
++    const bool emit = argc == 6 && std::string_view(argv[1]) == "--emit";
++    require(emit || argc == 4, "expected descriptor, source and probe root");
++    const auto descriptor = read(argv[emit ? 2 : 1]);
++    const fs::path source = argv[emit ? 3 : 2];
++    auto admission = CPrimitiveAdmission::admit(descriptor, vd_c_primitive_dispatch_v3);
++    auto program = analyze(source, admission);
++    if (emit) {
++        emit_object(program->lower(Emission::entry), argv[4], std::string_view(argv[5]) == "optimized", true);
++        return 0;
++    }
++    require(!analyze_project(source).succeeded(), "bare source acquired G3 authority");
++    descriptors(descriptor);
++    malformed(program->lower());
++    runtime_denials(descriptor);
++    shutdown_race(descriptor, false);
++    shutdown_race(descriptor, true);
++    failed_shutdown_release(descriptor);
++    typed_stale_alias(program->lower());
++    const fs::path sandbox = argv[3];
++    fs::create_directories(sandbox);
++    for (bool optimize : {false, true}) {
++        Jit jit;
++        auto code = jit.compile(*program, optimize);
++        const auto status = code->invoke(7);
++        require(status == 104, "source lifecycle result " + std::to_string(status));
++        rejects("closed alias", "closed, null or invalid", [&] { (void)code->invoke(-1); });
++        rejects("double close", "closed, null or invalid", [&] { (void)code->invoke(-2); });
++        rejects("null acquisition", "Null", [&] { (void)code->invoke(-3); });
++        require(code->invoke(-4) == 22 && g3_live() == 1, "live shutdown fixture");
++        require(!code->runtime_owner()->close() && g3_live() == 0, "Runtime shutdown leaked resource");
++        reload_resource(source, sandbox, descriptor, admission, optimize);
++        std::cout << "G3 JIT " << (optimize ? "O2" : "normal") << " returned 104\n";
++    }
++    return 0;
++} catch (const std::exception& error) {
++    std::cerr << error.what() << '\n';
++    return 1;
++}
+--- /dev/null
++++ b/tests/ffi/resources.descriptor.in
+@@ -0,0 +1,15 @@
++void-c-primitive 3 3
++provider org.voidlang.g3-fixture
++target @G1_TRIPLE@ @G1_PROFILE@
++source /native_resources.void
++thunk @G3_THUNK_SHA@
++fixture @G3_FIXTURE_SHA@
++effects direct-sync nonblocking no-callbacks
++call c-default
++aliases c_int:i32 c_long:@G1_LONG@ c_size:u64 c_bool:bool
++resource box G3Box pointer null create close_box owner-calls shutdown-any consume-always
++bind create g3_create owner:box i32
++bind read g3_read i32 borrow:box i32
++bind add g3_add i32 mut:box i32
++bind close_box g3_close i32 close:box
++bind live g3_live i32
+--- /dev/null
++++ b/tests/ffi/resources.void
+@@ -0,0 +1,35 @@
++use "/native_resources.void" as ffi
++
++var saved: ffi.box? = null
++
++func entry(value: i32) -> i32:
++    if value == 90:
++        saved = ffi.create(31)
++        return ffi.read(saved as ffi.box, 0)
++    if value == 91:
++        return ffi.read(saved as ffi.box, 0) + 7
++    if value == 92:
++        return ffi.close_box(saved as ffi.box)
++    if value == -3:
++        return ffi.read(ffi.create(-1) as ffi.box, 0)
++    if value == -4:
++        var live = ffi.create(22) as ffi.box
++        return ffi.read(live, 0)
++    if ffi.create(-1) != null or ffi.live() != 0:
++        return 1
++    var owned = ffi.create(11) as ffi.box
++    var alias = owned
++    if ffi.read(alias, 0) != 11 or ffi.add(owned, 4) != 15 or ffi.read(alias, 0) != 15:
++        return 2
++    if ffi.read(alias, 1) != -19 or ffi.read(alias, 0) != 15:
++        return 3
++    if ffi.close_box(owned) != 0:
++        return 4
++    if value == -1:
++        return ffi.read(alias, 0)
++    if value == -2:
++        return ffi.close_box(alias)
++    var terminal = ffi.create(-2) as ffi.box
++    if ffi.close_box(terminal) != 17 or ffi.live() != 0:
++        return 5
++    return value + 97
+--- /dev/null
++++ b/tests/ffi/resources_exit.cpp
+@@ -0,0 +1,10 @@
++// Test-only process check. Runtime shutdown must release every linked fixture owner.
++#include <cstdint>
++#include <cstdlib>
++extern "C" std::int32_t g3_live();
++namespace {
++void verify_release() {
++    if (g3_live()) std::abort();
++}
++const int registered = std::atexit(verify_release);
++}
+--- /dev/null
++++ b/tests/ffi/resources_fixture.c
+@@ -0,0 +1,42 @@
++#include <stdint.h>
++#include <stdatomic.h>
++#include <stdlib.h>
++
++typedef struct G3Box {
++    int32_t value;
++    int32_t release_status;
++} G3Box;
++
++/* Test observations only. Real ownership belongs to the Runtime ledger. */
++static atomic_int live_count;
++static atomic_int release_count;
++
++const char* g3_fixture_identity(void) { return G3_FIXTURE_IDENTITY; }
++G3Box* g3_create(int32_t value) {
++    if (value == -1) return NULL;
++    G3Box* box = malloc(sizeof *box);
++    if (box) {
++        box->value = value;
++        box->release_status = value == -2 ? 17 : 0;
++        atomic_fetch_add(&live_count, 1);
++    }
++    return box;
++}
++int32_t g3_read(const G3Box* box, int32_t control) {
++    return control ? -19 : box->value;
++}
++int32_t g3_add(G3Box* box, int32_t delta) {
++    const int64_t value = (int64_t)box->value + delta;
++    if (value < INT32_MIN || value > INT32_MAX) return -23;
++    box->value = (int32_t)value;
++    return box->value;
++}
++int32_t g3_close(G3Box* box) {
++    const int32_t status = box->release_status;
++    free(box);
++    atomic_fetch_add(&release_count, 1);
++    atomic_fetch_sub(&live_count, 1);
++    return status;
++}
++int32_t g3_live(void) { return atomic_load(&live_count); }
++int32_t g3_releases(void) { return atomic_load(&release_count); }
+--- /dev/null
++++ b/tests/ffi/resources_process.py
+@@ -0,0 +1,11 @@
++import subprocess
++import sys
++
++for value, status, expected in [(7, 0, "104"), (-1, 1, "closed, null or invalid"),
++                                 (-2, 1, "closed, null or invalid"),
++                                 (-3, 1, "Null"), (-4, 0, "22")]:
++    result = subprocess.run([sys.argv[1], str(value)], text=True, capture_output=True, timeout=45)
++    output = result.stdout + result.stderr
++    print(value, result.returncode, output.strip())
++    assert result.returncode == status, result
++    assert (result.stdout.strip() == expected if status == 0 else expected in output), result
+--- /dev/null
++++ b/tests/ffi/resources_thunk.c
+@@ -0,0 +1,54 @@
++#include <limits.h>
++#include <stdint.h>
++#include <string.h>
++#include "g3_descriptor.h"
++
++#if !defined(__clang__) || __clang_major__ != 23 || __clang_minor__ != 1 || __clang_patchlevel__ != 4
++#error Gate 3 needs the matching pinned Clang
++#endif
++#if defined(G3_LLP64)
++#if !defined(_M_X64) || !defined(_WIN32) || !defined(_MSC_VER)
++#error Expected x64 MSVC ABI
++#endif
++_Static_assert(sizeof(long) == 4, "LLP64");
++#else
++#if !defined(__linux__) || !defined(__x86_64__) || !defined(__GLIBC__)
++#error Expected Linux x64 GNU ABI
++#endif
++_Static_assert(sizeof(long) == 8, "LP64");
++#endif
++_Static_assert(CHAR_BIT == 8 && sizeof(void*) == 8 && UINTPTR_MAX == UINT64_MAX &&
++    sizeof(int) == 4 && INT32_MIN == -INT32_MAX - 1, "x64 C representation");
++
++typedef struct G3Box G3Box;
++extern const char* g3_fixture_identity(void);
++extern G3Box* g3_create(int32_t);
++extern int32_t g3_read(const G3Box*, int32_t);
++extern int32_t g3_add(G3Box*, int32_t);
++extern int32_t g3_close(G3Box*);
++extern int32_t g3_live(void);
++
++static int32_t signed_word(uint64_t word) {
++    uint32_t raw = (uint32_t)word;
++    int32_t result;
++    memcpy(&result, &raw, sizeof result);
++    return result;
++}
++uint32_t vd_c_primitive_dispatch_v3(const char* descriptor, uint32_t size, uint32_t ordinal,
++    const uint64_t* words, uint32_t count, uint64_t* out) {
++    if (!descriptor || size != sizeof(g3_descriptor) - 1 || memcmp(descriptor, g3_descriptor, size) ||
++        strcmp(g3_fixture_identity(), G3_FIXTURE_IDENTITY)) return 1;
++    if (ordinal == UINT32_MAX) return words || count || out ? 2 : 0;
++    static const uint8_t counts[] = {1, 2, 2, 1, 0};
++    if (ordinal >= sizeof counts || count != counts[ordinal] || (count && !words) || !out ||
++        (ordinal >= 1 && ordinal <= 3 && !words[0])) return 2;
++    switch (ordinal) {
++    case 0: *out = (uintptr_t)g3_create(signed_word(words[0])); break;
++    case 1: *out = (uint32_t)g3_read((const G3Box*)(uintptr_t)words[0], signed_word(words[1])); break;
++    case 2: *out = (uint32_t)g3_add((G3Box*)(uintptr_t)words[0], signed_word(words[1])); break;
++    case 3: *out = (uint32_t)g3_close((G3Box*)(uintptr_t)words[0]); break;
++    case 4: *out = (uint32_t)g3_live(); break;
++    default: return 2;
++    }
++    return 0;
++}

@@ -1,0 +1,95 @@
+{
+  "status": "PASS",
+  "profile": "Debug",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "os_build": 19045,
+  "commands": [
+    {
+      "label": "configure",
+      "argv": [
+        "C:\\gcc\\bin\\cmake.exe",
+        "-S",
+        "C:\\Users\\a\\VoidCI42377496702-Native",
+        "-B",
+        "C:\\Users\\a\\VoidS6-Storage-Debug",
+        "-G",
+        "Ninja",
+        "-DCMAKE_AR=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin/llvm-lib.exe",
+        "-DCMAKE_CXX_COMPILER=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin/clang-cl.exe",
+        "-DCMAKE_C_COMPILER=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin/clang-cl.exe",
+        "-DCMAKE_LINKER=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin/lld-link.exe",
+        "-DCMAKE_MAKE_PROGRAM=C:/gcc/bin/ninja.exe",
+        "-DCMAKE_MT=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin/llvm-mt.exe",
+        "-DCMAKE_RC_COMPILER=C:/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0/x64/rc.exe",
+        "-DLLVM_DIR=C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\lib\\cmake\\llvm",
+        "-DZLIB_INCLUDE_DIR=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4-deps/include",
+        "-DZLIB_LIBRARY_RELEASE=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4-deps/lib/zlibstatic.lib",
+        "-Dzstd_DIR=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4-deps/lib/cmake/zstd",
+        "-DLibXml2_DIR=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4-deps/lib/cmake/libxml2",
+        "-DVOID_HOST_DEPS_ROOT=C:/Users/a/VoidCI42377496702-Native/.toolchains/host/prefix/windows-x86_64/Debug",
+        "-DVOID_HTTP_DEPS_ROOT=C:/Users/a/VoidCI42377496702-Native/cmake/../.toolchains/http/prefix/windows-schannel-x86_64/Debug",
+        "-DVOID_CLANG=C:/Users/a/Documents/ChatGPT/Void TEMP/Void-native/.toolchains/native-schannel/sdk/clang+llvm-23.1.4-x86_64-pc-windows-msvc/bin/clang.exe",
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DBUILD_TESTING=ON",
+        "-DVOID_SANITIZERS=OFF",
+        "-DVOID_LLVM_RESEARCH=OFF",
+        "-DPython3_EXECUTABLE=C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe"
+      ],
+      "returncode": 0,
+      "seconds": 31.761128999991342
+    },
+    {
+      "label": "build",
+      "argv": [
+        "C:\\gcc\\bin\\cmake.exe",
+        "--build",
+        "C:\\Users\\a\\VoidS6-Storage-Debug",
+        "--parallel",
+        "2",
+        "--target",
+        "voidc",
+        "voidls",
+        "void_tests",
+        "void_numeric_enum_ir",
+        "void_native_inventory",
+        "void_project_application",
+        "void_project_sessions",
+        "void_project_selection",
+        "void_project_manifest",
+        "void_project_creation",
+        "void_fixed_arrays_tests",
+        "void_async_tests",
+        "void_stage10_fields"
+      ],
+      "returncode": 0,
+      "seconds": 324.7349355999904
+    },
+    {
+      "label": "ctest",
+      "argv": [
+        "C:\\gcc\\bin\\ctest.exe",
+        "--test-dir",
+        "C:\\Users\\a\\VoidS6-Storage-Debug",
+        "--output-on-failure",
+        "-j",
+        "2",
+        "-R",
+        "^(numeric|numeric_cli|numeric_enum_.*|fixed_arrays_source|async_ir|stage10_fields|frontend|modules|gc|reload|sessions|analysis|project_(application|application_process|creation|creation_process|sessions|selection|profiles|protocol|manifest|manifest_legacy|discovery_cli|nested_cli))$",
+        "--output-junit",
+        "\\\\vboxsvr\\VM\\project-slice6-final-review\\Debug-ctest.xml"
+      ],
+      "returncode": 0,
+      "seconds": 271.95151060000353
+    }
+  ],
+  "stage": "ctest",
+  "binaries": {
+    "voidc": "abb9ad3296776c7354b319ab3ac100ab40a41afdd20e61fe88e773c905dfb838",
+    "voidls": "e4849668552d8c6480809016a8f96dcab084eaac9dc04b540234aa85b41a8eb1",
+    "void_tests": "7d07f677c7aa71e802ed5fa5984b67aae648859002d68fe9d374ceb0005cf0bd",
+    "void_numeric_enum_ir": "be7bec0e268f60c2239484457544c8a9a4f2b726bc20a9dbea1d375363f813c9",
+    "void_project_application": "031429ff28c66fadce7443691bbbd988fbec1d922ced00112e6e88357b428776",
+    "void_project_sessions": "f7ffd53c925923ece4072447cb23bd259f3816258a73c7ff3265caf8bee45b27",
+    "void_project_creation": "542197b854be5f8d4039cfc99e62f1c67f4767a6307c9fffd8952fbc9dc3306f"
+  }
+}

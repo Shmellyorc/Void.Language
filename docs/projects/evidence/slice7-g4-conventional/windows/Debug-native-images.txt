@@ -1,0 +1,686 @@
+
+File: C:\Users\a\VoidS7-G4Conventional\Debug-artifacts\VOID G4 l00wv3vu\relocated optimized 雪\native\void_g4_conventional_dependency.dll
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+ImageFileHeader {
+  Machine: IMAGE_FILE_MACHINE_AMD64 (0x8664)
+  SectionCount: 6
+  TimeDateStamp: 2026-11-09 17:37:47 (0x6AF204EB)
+  PointerToSymbolTable: 0x0
+  SymbolCount: 0
+  StringTableSize: 0
+  OptionalHeaderSize: 240
+  Characteristics [ (0x2022)
+    IMAGE_FILE_DLL (0x2000)
+    IMAGE_FILE_EXECUTABLE_IMAGE (0x2)
+    IMAGE_FILE_LARGE_ADDRESS_AWARE (0x20)
+  ]
+}
+ImageOptionalHeader {
+  Magic: 0x20B
+  MajorLinkerVersion: 14
+  MinorLinkerVersion: 0
+  SizeOfCode: 61440
+  SizeOfInitializedData: 46592
+  SizeOfUninitializedData: 0
+  AddressOfEntryPoint: 0x19D4
+  BaseOfCode: 0x1000
+  ImageBase: 0x180000000
+  SectionAlignment: 4096
+  FileAlignment: 512
+  MajorOperatingSystemVersion: 6
+  MinorOperatingSystemVersion: 0
+  MajorImageVersion: 0
+  MinorImageVersion: 0
+  MajorSubsystemVersion: 6
+  MinorSubsystemVersion: 0
+  SizeOfImage: 122880
+  SizeOfHeaders: 1024
+  CheckSum: 0x0
+  Subsystem: IMAGE_SUBSYSTEM_WINDOWS_GUI (0x2)
+  Characteristics [ (0x160)
+    IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE (0x40)
+    IMAGE_DLL_CHARACTERISTICS_HIGH_ENTROPY_VA (0x20)
+    IMAGE_DLL_CHARACTERISTICS_NX_COMPAT (0x100)
+  ]
+  SizeOfStackReserve: 1048576
+  SizeOfStackCommit: 4096
+  SizeOfHeapReserve: 1048576
+  SizeOfHeapCommit: 4096
+  NumberOfRvaAndSize: 16
+  DataDirectory {
+    ExportTableRVA: 0x176F0
+    ExportTableSize: 0x8B
+    ImportTableRVA: 0x1777C
+    ImportTableSize: 0x28
+    ResourceTableRVA: 0x0
+    ResourceTableSize: 0x0
+    ExceptionTableRVA: 0x1B000
+    ExceptionTableSize: 0xF60
+    CertificateTableRVA: 0x0
+    CertificateTableSize: 0x0
+    BaseRelocationTableRVA: 0x1D000
+    BaseRelocationTableSize: 0x628
+    DebugRVA: 0x0
+    DebugSize: 0x0
+    ArchitectureRVA: 0x0
+    ArchitectureSize: 0x0
+    GlobalPtrRVA: 0x0
+    GlobalPtrSize: 0x0
+    TLSTableRVA: 0x0
+    TLSTableSize: 0x0
+    LoadConfigTableRVA: 0x10020
+    LoadConfigTableSize: 0x140
+    BoundImportRVA: 0x0
+    BoundImportSize: 0x0
+    IATRVA: 0x179F0
+    IATSize: 0x248
+    DelayImportDescriptorRVA: 0x0
+    DelayImportDescriptorSize: 0x0
+    CLRRuntimeHeaderRVA: 0x0
+    CLRRuntimeHeaderSize: 0x0
+    ReservedRVA: 0x0
+    ReservedSize: 0x0
+  }
+}
+DOSHeader {
+  Magic: MZ
+  UsedBytesInTheLastPage: 120
+  FileSizeInPages: 1
+  NumberOfRelocationItems: 0
+  HeaderSizeInParagraphs: 4
+  MinimumExtraParagraphs: 0
+  MaximumExtraParagraphs: 0
+  InitialRelativeSS: 0
+  InitialSP: 0
+  Checksum: 0
+  InitialIP: 0
+  InitialRelativeCS: 0
+  AddressOfRelocationTable: 64
+  OverlayNumber: 0
+  OEMid: 0
+  OEMinfo: 0
+  AddressOfNewExeHeader: 120
+}
+Import {
+  Name: KERNEL32.dll
+  ImportLookupTableRVA: 0x177A8
+  ImportAddressTableRVA: 0x179F0
+  Symbol: CloseHandle (137)
+  Symbol: CreateFileW (206)
+  Symbol: DeleteCriticalSection (276)
+  Symbol: EnterCriticalSection (312)
+  Symbol: ExitProcess (359)
+  Symbol: FindClose (382)
+  Symbol: FindFirstFileExW (388)
+  Symbol: FindNextFileW (405)
+  Symbol: FlushFileBuffers (424)
+  Symbol: FreeEnvironmentStringsW (435)
+  Symbol: FreeLibrary (436)
+  Symbol: GetACP (443)
+  Symbol: GetCPInfo (458)
+  Symbol: GetCommandLineA (479)
+  Symbol: GetCommandLineW (480)
+  Symbol: GetConsoleMode (517)
+  Symbol: GetConsoleOutputCP (521)
+  Symbol: GetCurrentProcess (544)
+  Symbol: GetCurrentProcessId (545)
+  Symbol: GetCurrentThreadId (549)
+  Symbol: GetEnvironmentStringsW (577)
+  Symbol: GetFileSizeEx (598)
+  Symbol: GetFileType (600)
+  Symbol: GetLastError (618)
+  Symbol: GetModuleFileNameW (637)
+  Symbol: GetModuleHandleExW (640)
+  Symbol: GetModuleHandleW (641)
+  Symbol: GetOEMCP (673)
+  Symbol: GetProcAddress (696)
+  Symbol: GetProcessHeap (702)
+  Symbol: GetStartupInfoW (730)
+  Symbol: GetStdHandle (732)
+  Symbol: GetStringTypeW (737)
+  Symbol: GetSystemTimeAsFileTime (755)
+  Symbol: HeapAlloc (849)
+  Symbol: HeapFree (853)
+  Symbol: HeapReAlloc (856)
+  Symbol: HeapSize (858)
+  Symbol: InitializeCriticalSectionAndSpinCount (875)
+  Symbol: InitializeSListHead (879)
+  Symbol: InterlockedFlushSList (883)
+  Symbol: IsDebuggerPresent (901)
+  Symbol: IsProcessorFeaturePresent (908)
+  Symbol: IsValidCodePage (914)
+  Symbol: LCMapStringW (952)
+  Symbol: LeaveCriticalSection (964)
+  Symbol: LoadLibraryExW (970)
+  Symbol: MultiByteToWideChar (1014)
+  Symbol: QueryPerformanceCounter (1106)
+  Symbol: QueryPerformanceFrequency (1107)
+  Symbol: RaiseException (1129)
+  Symbol: ReadConsoleW (1143)
+  Symbol: ReadFile (1146)
+  Symbol: RtlCaptureContext (1238)
+  Symbol: RtlLookupFunctionEntry (1245)
+  Symbol: RtlUnwindEx (1251)
+  Symbol: RtlVirtualUnwind (1252)
+  Symbol: SetEndOfFile (1313)
+  Symbol: SetFilePointerEx (1332)
+  Symbol: SetLastError (1346)
+  Symbol: SetStdHandle (1372)
+  Symbol: SetUnhandledExceptionFilter (1408)
+  Symbol: Sleep (1424)
+  Symbol: TerminateProcess (1439)
+  Symbol: TlsAlloc (1457)
+  Symbol: TlsFree (1458)
+  Symbol: TlsGetValue (1459)
+  Symbol: TlsSetValue (1460)
+  Symbol: UnhandledExceptionFilter (1473)
+  Symbol: WideCharToMultiByte (1554)
+  Symbol: WriteConsoleW (1573)
+  Symbol: WriteFile (1574)
+}
+Export {
+  Ordinal: 1
+  Name: g4_conventional_bias
+  RVA: 0x1000
+}
+Export {
+  Ordinal: 2
+  Name: g4_conventional_delay
+  RVA: 0x1020
+}
+
+File: C:\Users\a\VoidS7-G4Conventional\Debug-artifacts\VOID G4 l00wv3vu\relocated optimized 雪\native\void_g4_conventional_provider.dll
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+ImageFileHeader {
+  Machine: IMAGE_FILE_MACHINE_AMD64 (0x8664)
+  SectionCount: 6
+  TimeDateStamp: 2026-11-09 17:37:47 (0x6AF204EB)
+  PointerToSymbolTable: 0x0
+  SymbolCount: 0
+  StringTableSize: 0
+  OptionalHeaderSize: 240
+  Characteristics [ (0x2022)
+    IMAGE_FILE_DLL (0x2000)
+    IMAGE_FILE_EXECUTABLE_IMAGE (0x2)
+    IMAGE_FILE_LARGE_ADDRESS_AWARE (0x20)
+  ]
+}
+ImageOptionalHeader {
+  Magic: 0x20B
+  MajorLinkerVersion: 14
+  MinorLinkerVersion: 0
+  SizeOfCode: 81408
+  SizeOfInitializedData: 51712
+  SizeOfUninitializedData: 0
+  AddressOfEntryPoint: 0x179C
+  BaseOfCode: 0x1000
+  ImageBase: 0x180000000
+  SectionAlignment: 4096
+  FileAlignment: 512
+  MajorOperatingSystemVersion: 6
+  MinorOperatingSystemVersion: 0
+  MajorImageVersion: 0
+  MinorImageVersion: 0
+  MajorSubsystemVersion: 6
+  MinorSubsystemVersion: 0
+  SizeOfImage: 155648
+  SizeOfHeaders: 1024
+  CheckSum: 0x0
+  Subsystem: IMAGE_SUBSYSTEM_WINDOWS_GUI (0x2)
+  Characteristics [ (0x160)
+    IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE (0x40)
+    IMAGE_DLL_CHARACTERISTICS_HIGH_ENTROPY_VA (0x20)
+    IMAGE_DLL_CHARACTERISTICS_NX_COMPAT (0x100)
+  ]
+  SizeOfStackReserve: 1048576
+  SizeOfStackCommit: 4096
+  SizeOfHeapReserve: 1048576
+  SizeOfHeapCommit: 4096
+  NumberOfRvaAndSize: 16
+  DataDirectory {
+    ExportTableRVA: 0x1D5E0
+    ExportTableSize: 0x205
+    ImportTableRVA: 0x1D7E8
+    ImportTableSize: 0x3C
+    ResourceTableRVA: 0x0
+    ResourceTableSize: 0x0
+    ExceptionTableRVA: 0x22000
+    ExceptionTableSize: 0x1188
+    CertificateTableRVA: 0x0
+    CertificateTableSize: 0x0
+    BaseRelocationTableRVA: 0x25000
+    BaseRelocationTableSize: 0x654
+    DebugRVA: 0x0
+    DebugSize: 0x0
+    ArchitectureRVA: 0x0
+    ArchitectureSize: 0x0
+    GlobalPtrRVA: 0x0
+    GlobalPtrSize: 0x0
+    TLSTableRVA: 0x0
+    TLSTableSize: 0x0
+    LoadConfigTableRVA: 0x15080
+    LoadConfigTableSize: 0x140
+    BoundImportRVA: 0x0
+    BoundImportSize: 0x0
+    IATRVA: 0x1DA78
+    IATSize: 0x250
+    DelayImportDescriptorRVA: 0x0
+    DelayImportDescriptorSize: 0x0
+    CLRRuntimeHeaderRVA: 0x0
+    CLRRuntimeHeaderSize: 0x0
+    ReservedRVA: 0x0
+    ReservedSize: 0x0
+  }
+}
+DOSHeader {
+  Magic: MZ
+  UsedBytesInTheLastPage: 120
+  FileSizeInPages: 1
+  NumberOfRelocationItems: 0
+  HeaderSizeInParagraphs: 4
+  MinimumExtraParagraphs: 0
+  MaximumExtraParagraphs: 0
+  InitialRelativeSS: 0
+  InitialSP: 0
+  Checksum: 0
+  InitialIP: 0
+  InitialRelativeCS: 0
+  AddressOfRelocationTable: 64
+  OverlayNumber: 0
+  OEMid: 0
+  OEMinfo: 0
+  AddressOfNewExeHeader: 120
+}
+Import {
+  Name: void_g4_conventional_dependency.dll
+  ImportLookupTableRVA: 0x1D828
+  ImportAddressTableRVA: 0x1DA78
+  Symbol: g4_conventional_bias (0)
+  Symbol: g4_conventional_delay (0)
+}
+Import {
+  Name: KERNEL32.dll
+  ImportLookupTableRVA: 0x1D840
+  ImportAddressTableRVA: 0x1DA90
+  Symbol: CloseHandle (137)
+  Symbol: CreateFileW (206)
+  Symbol: DeleteCriticalSection (276)
+  Symbol: EnterCriticalSection (312)
+  Symbol: ExitProcess (359)
+  Symbol: FindClose (382)
+  Symbol: FindFirstFileExW (388)
+  Symbol: FindNextFileW (405)
+  Symbol: FlushFileBuffers (424)
+  Symbol: FreeEnvironmentStringsW (435)
+  Symbol: FreeLibrary (436)
+  Symbol: GetACP (443)
+  Symbol: GetCPInfo (458)
+  Symbol: GetCommandLineA (479)
+  Symbol: GetCommandLineW (480)
+  Symbol: GetConsoleMode (517)
+  Symbol: GetConsoleOutputCP (521)
+  Symbol: GetCurrentProcess (544)
+  Symbol: GetCurrentProcessId (545)
+  Symbol: GetCurrentThreadId (549)
+  Symbol: GetEnvironmentStringsW (577)
+  Symbol: GetFileSizeEx (598)
+  Symbol: GetFileType (600)
+  Symbol: GetLastError (618)
+  Symbol: GetModuleFileNameW (637)
+  Symbol: GetModuleHandleExW (640)
+  Symbol: GetModuleHandleW (641)
+  Symbol: GetOEMCP (673)
+  Symbol: GetProcAddress (696)
+  Symbol: GetProcessHeap (702)
+  Symbol: GetStartupInfoW (730)
+  Symbol: GetStdHandle (732)
+  Symbol: GetStringTypeW (737)
+  Symbol: GetSystemTimeAsFileTime (755)
+  Symbol: HeapAlloc (849)
+  Symbol: HeapFree (853)
+  Symbol: HeapReAlloc (856)
+  Symbol: HeapSize (858)
+  Symbol: InitializeCriticalSectionAndSpinCount (875)
+  Symbol: InitializeSListHead (879)
+  Symbol: InterlockedFlushSList (883)
+  Symbol: IsDebuggerPresent (901)
+  Symbol: IsProcessorFeaturePresent (908)
+  Symbol: IsValidCodePage (914)
+  Symbol: LCMapStringW (952)
+  Symbol: LeaveCriticalSection (964)
+  Symbol: LoadLibraryExW (970)
+  Symbol: MultiByteToWideChar (1014)
+  Symbol: QueryPerformanceCounter (1106)
+  Symbol: RaiseException (1129)
+  Symbol: ReadConsoleW (1143)
+  Symbol: ReadFile (1146)
+  Symbol: RtlCaptureContext (1238)
+  Symbol: RtlLookupFunctionEntry (1245)
+  Symbol: RtlUnwindEx (1251)
+  Symbol: RtlVirtualUnwind (1252)
+  Symbol: SetEndOfFile (1313)
+  Symbol: SetFilePointerEx (1332)
+  Symbol: SetLastError (1346)
+  Symbol: SetStdHandle (1372)
+  Symbol: SetUnhandledExceptionFilter (1408)
+  Symbol: TerminateProcess (1439)
+  Symbol: TlsAlloc (1457)
+  Symbol: TlsFree (1458)
+  Symbol: TlsGetValue (1459)
+  Symbol: TlsSetValue (1460)
+  Symbol: UnhandledExceptionFilter (1473)
+  Symbol: WideCharToMultiByte (1554)
+  Symbol: WriteConsoleW (1573)
+  Symbol: WriteFile (1574)
+}
+Export {
+  Ordinal: 1
+  Name: g4_conventional_acquire
+  RVA: 0x1330
+}
+Export {
+  Ordinal: 2
+  Name: g4_conventional_add
+  RVA: 0x1000
+}
+Export {
+  Ordinal: 3
+  Name: g4_conventional_borrow
+  RVA: 0x1360
+}
+Export {
+  Ordinal: 4
+  Name: g4_conventional_close
+  RVA: 0x1370
+}
+Export {
+  Ordinal: 5
+  Name: g4_conventional_fill
+  RVA: 0x1150
+}
+Export {
+  Ordinal: 6
+  Name: g4_conventional_flip
+  RVA: 0x1050
+}
+Export {
+  Ordinal: 7
+  Name: g4_conventional_last
+  RVA: 0x1420
+}
+Export {
+  Ordinal: 8
+  Name: g4_conventional_long
+  RVA: 0x1030
+}
+Export {
+  Ordinal: 9
+  Name: g4_conventional_ping
+  RVA: 0x13F0
+}
+Export {
+  Ordinal: 10
+  Name: g4_conventional_pings
+  RVA: 0x1410
+}
+Export {
+  Ordinal: 11
+  Name: g4_conventional_sample
+  RVA: 0x1060
+}
+Export {
+  Ordinal: 12
+  Name: g4_conventional_scale
+  RVA: 0x1020
+}
+Export {
+  Ordinal: 13
+  Name: g4_conventional_shift
+  RVA: 0x1270
+}
+Export {
+  Ordinal: 14
+  Name: g4_conventional_sum
+  RVA: 0x10A0
+}
+
+C:\Users\a\VoidS7-G4Conventional\Debug-artifacts\VOID G4 l00wv3vu\relocated optimized 雪\native\void_g4_conventional_provider.dll:	file format coff-x86-64
+
+Disassembly of section .text:
+
+0000000180001060 <g4_conventional_sample>:
+180001060: 56                          	pushq	%rsi
+180001061: 57                          	pushq	%rdi
+180001062: 53                          	pushq	%rbx
+180001063: 48 83 ec 20                 	subq	$0x20, %rsp
+180001067: 48 89 d6                    	movq	%rdx, %rsi
+18000106a: 48 89 cf                    	movq	%rcx, %rdi
+18000106d: 8b 1a                       	movl	(%rdx), %ebx
+18000106f: ff 15 03 ca 01 00           	callq	*0x1ca03(%rip)          # 0x18001da78
+180001075: 01 d8                       	addl	%ebx, %eax
+180001077: 89 07                       	movl	%eax, (%rdi)
+180001079: c7 47 04 00 00 00 00        	movl	$0x0, 0x4(%rdi)
+180001080: f2 0f 10 46 08              	movsd	0x8(%rsi), %xmm0
+180001085: f2 0f 58 c0                 	addsd	%xmm0, %xmm0
+180001089: f2 0f 11 47 08              	movsd	%xmm0, 0x8(%rdi)
+18000108e: 48 89 f8                    	movq	%rdi, %rax
+180001091: 48 83 c4 20                 	addq	$0x20, %rsp
+180001095: 5b                          	popq	%rbx
+180001096: 5f                          	popq	%rdi
+180001097: 5e                          	popq	%rsi
+180001098: c3                          	retq
+180001099: 0f 1f 80 00 00 00 00        	nopl	(%rax)
+
+00000001800010a0 <g4_conventional_sum>:
+1800010a0: 56                          	pushq	%rsi
+1800010a1: 4d 85 c0                    	testq	%r8, %r8
+1800010a4: 74 13                       	je	0x1800010b9 <g4_conventional_sum+0x19>
+
+File: C:\Users\a\VoidS7-G4Conventional\Debug-artifacts\VOID G4 l00wv3vu\relocated optimized 雪\native\void_g4_conventional_adapter.dll
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+ImageFileHeader {
+  Machine: IMAGE_FILE_MACHINE_AMD64 (0x8664)
+  SectionCount: 6
+  TimeDateStamp: 2026-11-09 17:37:48 (0x6AF204EC)
+  PointerToSymbolTable: 0x0
+  SymbolCount: 0
+  StringTableSize: 0
+  OptionalHeaderSize: 240
+  Characteristics [ (0x2022)
+    IMAGE_FILE_DLL (0x2000)
+    IMAGE_FILE_EXECUTABLE_IMAGE (0x2)
+    IMAGE_FILE_LARGE_ADDRESS_AWARE (0x20)
+  ]
+}
+ImageOptionalHeader {
+  Magic: 0x20B
+  MajorLinkerVersion: 14
+  MinorLinkerVersion: 0
+  SizeOfCode: 51200
+  SizeOfInitializedData: 47104
+  SizeOfUninitializedData: 0
+  AddressOfEntryPoint: 0x1620
+  BaseOfCode: 0x1000
+  ImageBase: 0x180000000
+  SectionAlignment: 4096
+  FileAlignment: 512
+  MajorOperatingSystemVersion: 6
+  MinorOperatingSystemVersion: 0
+  MajorImageVersion: 0
+  MinorImageVersion: 0
+  MajorSubsystemVersion: 6
+  MinorSubsystemVersion: 0
+  SizeOfImage: 118784
+  SizeOfHeaders: 1024
+  CheckSum: 0x0
+  Subsystem: IMAGE_SUBSYSTEM_WINDOWS_GUI (0x2)
+  Characteristics [ (0x160)
+    IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE (0x40)
+    IMAGE_DLL_CHARACTERISTICS_HIGH_ENTROPY_VA (0x20)
+    IMAGE_DLL_CHARACTERISTICS_NX_COMPAT (0x100)
+  ]
+  SizeOfStackReserve: 1048576
+  SizeOfStackCommit: 4096
+  SizeOfHeapReserve: 1048576
+  SizeOfHeapCommit: 4096
+  NumberOfRvaAndSize: 16
+  DataDirectory {
+    ExportTableRVA: 0x15B38
+    ExportTableSize: 0x98
+    ImportTableRVA: 0x15BD0
+    ImportTableSize: 0x3C
+    ResourceTableRVA: 0x0
+    ResourceTableSize: 0x0
+    ExceptionTableRVA: 0x1A000
+    ExceptionTableSize: 0xD8C
+    CertificateTableRVA: 0x0
+    CertificateTableSize: 0x0
+    BaseRelocationTableRVA: 0x1C000
+    BaseRelocationTableSize: 0x624
+    DebugRVA: 0x0
+    DebugSize: 0x0
+    ArchitectureRVA: 0x0
+    ArchitectureSize: 0x0
+    GlobalPtrRVA: 0x0
+    GlobalPtrSize: 0x0
+    TLSTableRVA: 0x0
+    TLSTableSize: 0x0
+    LoadConfigTableRVA: 0xE510
+    LoadConfigTableSize: 0x140
+    BoundImportRVA: 0x0
+    BoundImportSize: 0x0
+    IATRVA: 0x15EA0
+    IATSize: 0x290
+    DelayImportDescriptorRVA: 0x0
+    DelayImportDescriptorSize: 0x0
+    CLRRuntimeHeaderRVA: 0x0
+    CLRRuntimeHeaderSize: 0x0
+    ReservedRVA: 0x0
+    ReservedSize: 0x0
+  }
+}
+DOSHeader {
+  Magic: MZ
+  UsedBytesInTheLastPage: 120
+  FileSizeInPages: 1
+  NumberOfRelocationItems: 0
+  HeaderSizeInParagraphs: 4
+  MinimumExtraParagraphs: 0
+  MaximumExtraParagraphs: 0
+  InitialRelativeSS: 0
+  InitialSP: 0
+  Checksum: 0
+  InitialIP: 0
+  InitialRelativeCS: 0
+  AddressOfRelocationTable: 64
+  OverlayNumber: 0
+  OEMid: 0
+  OEMinfo: 0
+  AddressOfNewExeHeader: 120
+}
+Import {
+  Name: void_g4_conventional_provider.dll
+  ImportLookupTableRVA: 0x15C10
+  ImportAddressTableRVA: 0x15EA0
+  Symbol: g4_conventional_acquire (0)
+  Symbol: g4_conventional_add (0)
+  Symbol: g4_conventional_borrow (0)
+  Symbol: g4_conventional_close (0)
+  Symbol: g4_conventional_fill (0)
+  Symbol: g4_conventional_flip (0)
+  Symbol: g4_conventional_last (0)
+  Symbol: g4_conventional_long (0)
+  Symbol: g4_conventional_ping (0)
+  Symbol: g4_conventional_pings (0)
+  Symbol: g4_conventional_sample (0)
+  Symbol: g4_conventional_scale (0)
+  Symbol: g4_conventional_shift (0)
+  Symbol: g4_conventional_sum (0)
+}
+Import {
+  Name: KERNEL32.dll
+  ImportLookupTableRVA: 0x15C88
+  ImportAddressTableRVA: 0x15F18
+  Symbol: CloseHandle (137)
+  Symbol: CreateFileW (206)
+  Symbol: DeleteCriticalSection (276)
+  Symbol: EnterCriticalSection (312)
+  Symbol: ExitProcess (359)
+  Symbol: FindClose (382)
+  Symbol: FindFirstFileExW (388)
+  Symbol: FindNextFileW (405)
+  Symbol: FlushFileBuffers (424)
+  Symbol: FreeEnvironmentStringsW (435)
+  Symbol: FreeLibrary (436)
+  Symbol: GetACP (443)
+  Symbol: GetCPInfo (458)
+  Symbol: GetCommandLineA (479)
+  Symbol: GetCommandLineW (480)
+  Symbol: GetConsoleMode (517)
+  Symbol: GetConsoleOutputCP (521)
+  Symbol: GetCurrentProcess (544)
+  Symbol: GetCurrentProcessId (545)
+  Symbol: GetCurrentThreadId (549)
+  Symbol: GetEnvironmentStringsW (577)
+  Symbol: GetFileType (600)
+  Symbol: GetLastError (618)
+  Symbol: GetModuleFileNameW (637)
+  Symbol: GetModuleHandleExW (640)
+  Symbol: GetModuleHandleW (641)
+  Symbol: GetOEMCP (673)
+  Symbol: GetProcAddress (696)
+  Symbol: GetProcessHeap (702)
+  Symbol: GetStartupInfoW (730)
+  Symbol: GetStdHandle (732)
+  Symbol: GetStringTypeW (737)
+  Symbol: GetSystemTimeAsFileTime (755)
+  Symbol: HeapAlloc (849)
+  Symbol: HeapFree (853)
+  Symbol: HeapReAlloc (856)
+  Symbol: HeapSize (858)
+  Symbol: InitializeCriticalSectionAndSpinCount (875)
+  Symbol: InitializeSListHead (879)
+  Symbol: InterlockedFlushSList (883)
+  Symbol: IsDebuggerPresent (901)
+  Symbol: IsProcessorFeaturePresent (908)
+  Symbol: IsValidCodePage (914)
+  Symbol: LCMapStringW (952)
+  Symbol: LeaveCriticalSection (964)
+  Symbol: LoadLibraryExW (970)
+  Symbol: MultiByteToWideChar (1014)
+  Symbol: QueryPerformanceCounter (1106)
+  Symbol: RaiseException (1129)
+  Symbol: RtlCaptureContext (1238)
+  Symbol: RtlLookupFunctionEntry (1245)
+  Symbol: RtlUnwindEx (1251)
+  Symbol: RtlVirtualUnwind (1252)
+  Symbol: SetFilePointerEx (1332)
+  Symbol: SetLastError (1346)
+  Symbol: SetStdHandle (1372)
+  Symbol: SetUnhandledExceptionFilter (1408)
+  Symbol: TerminateProcess (1439)
+  Symbol: TlsAlloc (1457)
+  Symbol: TlsFree (1458)
+  Symbol: TlsGetValue (1459)
+  Symbol: TlsSetValue (1460)
+  Symbol: UnhandledExceptionFilter (1473)
+  Symbol: WideCharToMultiByte (1554)
+  Symbol: WriteConsoleW (1573)
+  Symbol: WriteFile (1574)
+}
+Export {
+  Ordinal: 1
+  Name: conventional_generated_dispatch
+  RVA: 0x1000
+}
+Export {
+  Ordinal: 2
+  Name: vd_c_primitive_dispatch_v3
+  RVA: 0x12C0
+}

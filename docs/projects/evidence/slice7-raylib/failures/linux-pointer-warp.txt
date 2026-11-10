@@ -1,0 +1,200 @@
+['cmake', '--install', '/home/shmellyorc/Documents/Void.Language/build/llvm23-release', '--prefix', '/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install', '--config', 'Release', '--component', 'compiler']
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/VOID-MIT-LICENSE.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/LICENSING_SCOPE.md
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/REDISTRIBUTION.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/NOTICE_INVENTORY.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/llvm-23.1.4
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/llvm-23.1.4/LICENSE.TXT
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/llvm-23.1.4/ConvertUTF-NOTICES.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/llvm-23.1.4/xxhash-NOTICES.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/llvm-23.1.4/BLAKE3-LICENSE.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/llvm-23.1.4/Support-NOTICES.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/zstd-1.5.7
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/zstd-1.5.7/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/zstd-1.5.7/EMBEDDED-NOTICES.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/tomlplusplus/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/tomlplusplus/upstream.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/tomlplusplus/void-bounds-and-locations.patch
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/tomlplusplus/corresponding-source/toml.hpp
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/tomlplusplus/corresponding-source/README.md
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/zlib-1.3.2/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/libsodium
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/libsodium/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/libsodium/SOURCE-NOTICES.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/libarchive
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/libarchive/COPYING
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/libarchive/SOURCE-NOTICES.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/patches
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/patches/libsodium-1.0.22
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/patches/libsodium-1.0.22/asan-alignment.patch
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/patches/libsodium-1.0.22/PROVENANCE.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/host-versions.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/setup_host_deps.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/setup_host_deps_native.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/host-sodium.targets
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/verify_host_deps.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/corresponding-source/repro/tools/setup_host_deps.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/corresponding-source/repro/tools/setup_host_deps_native.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/corresponding-source/repro/tools/verify_host_deps.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/corresponding-source/repro/tools/verify_http_dependencies.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/corresponding-source/repro/tools/ci/llvm_sdk.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/corresponding-source/repro/cmake/host-sodium.targets
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-versions.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/corresponding-source/repro/third_party/http-versions.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22/asan-alignment.patch
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22/PROVENANCE.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/UNICODE-LICENSE.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/time.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/console.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/encoding
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/encoding/binary.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/encoding/hex.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/encoding/base64.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/encoding/ascii.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/io
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/io/memory.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/error.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/convert.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/io.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/path.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/text.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/random.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/math.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/json.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/channel.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/os.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/collections.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/log.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/url.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/net
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/net/http.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/system_error.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/crypto.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/archive.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/stdlib/process.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/LICENSE-Boost
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/LICENSE.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/NOTICE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/stage10-versions.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/bin/voidc
+-- Set non-toolchain portion of runtime path of "/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/bin/voidc" to "$ORIGIN/../lib/void"
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/libvoid_runtime.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/libvoid_native_fixture.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/libcurl.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/libarchive.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/libsodium.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/libpsl.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/libnghttp2.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/libssl.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/libcrypto.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/libcares.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/libz.a
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/cmake
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/cmake/nghttp2
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/cmake/c-ares
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/cmake/zlib
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/pkgconfig
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/crypto
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/crypto/cmake
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/crypto/cmake/static
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/ssl
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/ssl/cmake
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/ssl/cmake/static
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/libunistring.so.5
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/libunistring.so
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/libidn2.so.0
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/libidn2.so
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/libunistring.so.5.2.2
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/lib/void/libidn2.so.0.4.0
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/nghttp2-1.70.0
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/nghttp2-1.70.0/COPYING
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/nghttp2-1.70.0/README
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/c-ares-1.34.9
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/c-ares-1.34.9/LICENSE.md
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/zlib-1.3.2
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/zlib-1.3.2/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/zlib-1.3.2/README
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/openssl-3.5.9
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/openssl-3.5.9/LICENSE.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/libidn2-2.3.8
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/libidn2-2.3.8/COPYING
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/libidn2-2.3.8/COPYING.LESSERv3
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/libidn2-2.3.8/COPYING.unicode
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/libidn2-2.3.8/COPYINGv2
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/libidn2-2.3.8/README
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/libpsl-0.21.5
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/libpsl-0.21.5/README
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/libpsl-0.21.5/COPYING
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/libpsl-0.21.5/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/libpsl-0.21.5/LICENSE.chromium
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/libunistring-1.5
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/libunistring-1.5/COPYING.LIB
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/libunistring-1.5/README
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/libunistring-1.5/COPYING
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/aws-lc-5.12.0
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/aws-lc-5.12.0/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/aws-lc-5.12.0/NOTICE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/aws-lc-5.12.0/UPSTREAM.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/COPYING
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/NOTICE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/VOID-PROVENANCE.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/http-versions.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/publicsuffix
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/publicsuffix/public_suffix_list.dat
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/publicsuffix/UPSTREAM.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/publicsuffix/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/corresponding-source/libidn2-2.3.8.tar.gz
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/corresponding-source/libunistring-1.5.tar.xz
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/corresponding-source/setup_http_deps.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/corresponding-source/setup_http_deps_native.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/corresponding-source/http_archive.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/http/VOID-HTTP-DEPENDENCIES.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/bin/void-native.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/bin/void-native-resources.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/VOID-HOST-DEPENDENCIES.json
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/corresponding-source
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/corresponding-source/libsodium-1.0.22.tar.gz
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/share/void/licenses/host/corresponding-source/libarchive-3.8.11.tar.xz
+
+['/usr/bin/python3', '/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/gallery project/prepare.py', '--voidc', '/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/bin/voidc', '--clang', '/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--header', '/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/upstream/raylib-6.0_linux_amd64/include/raylib.h', '--library', '/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/upstream/raylib-6.0_linux_amd64/lib/libraylib.so.6.0.0', '--license', '/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/upstream/raylib-6.0_linux_amd64/LICENSE']
+047e7255f93f8c34039cab906ad76136706b5c7b4c5b5b065d84141963ee9b6b  /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/upstream/raylib-6.0_linux_amd64/include/raylib.h
+1041653dd5c1cb8c67494fa398a296520d3ffec20cf1bf71b1eaa4b96ac61aee  /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/upstream/raylib-6.0_linux_amd64/lib/libraylib.so.6.0.0
+882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799  /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/upstream/raylib-6.0_linux_amd64/LICENSE
+['/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/bin/voidc', 'native-bind', '/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/gallery project/native/.bind-c1qweorn/raylib-linux.descriptor', 'raylib_provider.h', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/gallery project/native/.bind-c1qweorn/raylib_checked.c']
+['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '-std=c11', '-shared', '-fuse-ld=lld', '-O2', '-Wall', '-Wextra', '-Werror', '-I/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/gallery project/native', '-I/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/upstream/raylib-6.0_linux_amd64/include', '-fPIC', '-fvisibility=hidden', '-Wl,-rpath,$ORIGIN', '/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/gallery project/native/raylib_provider.c', '/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/gallery project/native/.bind-c1qweorn/raylib_checked.c', '/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/gallery project/native/.bind-c1qweorn/libraylib.so.600', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/gallery project/native/.bind-c1qweorn/libvoid_raylib.so']
+cf03aa2aa1cdb1012dd3fa27be387916f8369e1d6a636ea224d4990895d1ae3b  /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/gallery project/native/libvoid_raylib.so
+1041653dd5c1cb8c67494fa398a296520d3ffec20cf1bf71b1eaa4b96ac61aee  /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/gallery project/native/libraylib.so.600
+8138e517764ef5fa25653b8b9b798ac9e4106a0a0fe62a65c367e704cbe2b01e  /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/gallery project/native/raylib-linux.descriptor
+cacde759d14aeea284f2ef1e7ea38549708c709bcc812afc5f4a5276e7482335  /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/gallery project/native/raylib_checked.c
+882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799  /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/gallery project/native/RAYLIB-LICENSE.txt
+
+['/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/bin/voidc', 'check', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/gallery project']
+Source checked successfully
+
+['/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/bin/voidc', 'run', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/gallery project']
+Invalid invocation: This project declares native code. Pass --allow-native to authorize its execution.
+Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]
+Try 'voidc run --help' for examples.
+
+['/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/bin/voidc', 'run', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/gallery project', '--allow-native', '--', '--reject-title']
+Raylib title rejected
+
+jit-normal ['/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/compiler install/bin/voidc', 'run', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-first/gallery project', '--allow-native', '--no-cache', '--no-opt', '--', '--implicit-close']
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/qualify.py", line 137, in <module>
+    qualify('jit-'+mode,[compiler,'run','--project',project,'--allow-native','--no-cache',*flags,'--',*implicit],native,environment)
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/qualify.py", line 100, in qualify
+    pink = [center(f, (255, 109, 194)) for f in (first, second)]
+            ~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/qualify.py", line 44, in center
+    assert len(points) > 100, (color, len(points))
+           ^^^^^^^^^^^^^^^^^
+AssertionError: ((255, 109, 194), 52)

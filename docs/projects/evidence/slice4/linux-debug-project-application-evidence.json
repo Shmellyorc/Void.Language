@@ -1,0 +1,304 @@
+{
+  "checks": 61,
+  "processes": [
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/checkout",
+        "--profile",
+        "debug",
+        "--no-cache"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 0,
+      "stdout": "eager-data|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated data \u96ea/org.test.context-game\neager-config|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated config \u96ea/org.test.context-game\neager-cache|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated cache \u96ea/org.test.context-game\neager-state|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated state \u96ea/org.test.context-game\nbody-data|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated data \u96ea/org.test.context-game\nbody-config|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated config \u96ea/org.test.context-game\nbody-cache|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated cache \u96ea/org.test.context-game\nbody-state|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated state \u96ea/org.test.context-game\nfunction-value|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated data \u96ea/org.test.context-game\nnamed-explicit|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated config \u96ea/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": "/tmp/VOID S4 metadata \u96ea vmce5tzh/checkout/launcher.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /launcher.void\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/checkout",
+        "--profile",
+        "debug",
+        "--no-cache"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 0,
+      "stdout": "eager-data|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/share/org.test.context-game\neager-config|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.config/org.test.context-game\neager-cache|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.cache/org.test.context-game\neager-state|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/state/org.test.context-game\nbody-data|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/share/org.test.context-game\nbody-config|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.config/org.test.context-game\nbody-cache|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.cache/org.test.context-game\nbody-state|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/state/org.test.context-game\nfunction-value|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/share/org.test.context-game\nnamed-explicit|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.config/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": "/tmp/VOID S4 metadata \u96ea vmce5tzh/checkout/launcher.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /launcher.void\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated/standalone.void",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 0,
+      "stdout": "eager-data|6|os.data_dir|0|0|0|Application identity is unavailable.|true\neager-config|6|os.config_dir|0|0|0|Application identity is unavailable.|true\neager-cache|6|os.cache_dir|0|0|0|Application identity is unavailable.|true\neager-state|6|os.state_dir|0|0|0|Application identity is unavailable.|true\nbody-data|6|os.data_dir|0|0|0|Application identity is unavailable.|true\nbody-config|6|os.config_dir|0|0|0|Application identity is unavailable.|true\nbody-cache|6|os.cache_dir|0|0|0|Application identity is unavailable.|true\nbody-state|6|os.state_dir|0|0|0|Application identity is unavailable.|true\nfunction-value|4|os.data_dir|0|0|0|os.data_dir: native text is not valid UTF-8; native code 0|false\nnamed-explicit|4|os.config_dir|0|0|0|os.config_dir: native text is not valid UTF-8; native code 0|false\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated/standalone.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /standalone.void\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "build",
+        "--project",
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/checkout",
+        "--profile",
+        "debug",
+        "-o",
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/output-debug"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID S4 metadata \u96ea vmce5tzh/output-debug\n",
+      "stderr": "/tmp/VOID S4 metadata \u96ea vmce5tzh/checkout/launcher.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /launcher.void\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "build",
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated/standalone.void",
+        "-o",
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/installation/no-context-debug",
+        "--no-opt"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID S4 metadata \u96ea vmce5tzh/installation/no-context-debug\n",
+      "stderr": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated/standalone.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /standalone.void\n\n"
+    },
+    {
+      "argv": [
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/installation/no-context-debug"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 0,
+      "stdout": "eager-data|6|os.data_dir|0|0|0|Application identity is unavailable.|true\neager-config|6|os.config_dir|0|0|0|Application identity is unavailable.|true\neager-cache|6|os.cache_dir|0|0|0|Application identity is unavailable.|true\neager-state|6|os.state_dir|0|0|0|Application identity is unavailable.|true\nbody-data|6|os.data_dir|0|0|0|Application identity is unavailable.|true\nbody-config|6|os.config_dir|0|0|0|Application identity is unavailable.|true\nbody-cache|6|os.cache_dir|0|0|0|Application identity is unavailable.|true\nbody-state|6|os.state_dir|0|0|0|Application identity is unavailable.|true\nfunction-value|4|os.data_dir|0|0|0|os.data_dir: native text is not valid UTF-8; native code 0|false\nnamed-explicit|4|os.config_dir|0|0|0|os.config_dir: native text is not valid UTF-8; native code 0|false\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/checkout",
+        "--profile",
+        "release",
+        "--no-cache"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 0,
+      "stdout": "eager-data|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated data \u96ea/org.test.context-game\neager-config|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated config \u96ea/org.test.context-game\neager-cache|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated cache \u96ea/org.test.context-game\neager-state|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated state \u96ea/org.test.context-game\nbody-data|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated data \u96ea/org.test.context-game\nbody-config|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated config \u96ea/org.test.context-game\nbody-cache|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated cache \u96ea/org.test.context-game\nbody-state|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated state \u96ea/org.test.context-game\nfunction-value|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated data \u96ea/org.test.context-game\nnamed-explicit|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated config \u96ea/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": "/tmp/VOID S4 metadata \u96ea vmce5tzh/checkout/launcher.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /launcher.void\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/checkout",
+        "--profile",
+        "release",
+        "--no-cache"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 0,
+      "stdout": "eager-data|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/share/org.test.context-game\neager-config|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.config/org.test.context-game\neager-cache|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.cache/org.test.context-game\neager-state|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/state/org.test.context-game\nbody-data|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/share/org.test.context-game\nbody-config|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.config/org.test.context-game\nbody-cache|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.cache/org.test.context-game\nbody-state|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/state/org.test.context-game\nfunction-value|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/share/org.test.context-game\nnamed-explicit|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.config/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": "/tmp/VOID S4 metadata \u96ea vmce5tzh/checkout/launcher.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /launcher.void\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated/standalone.void",
+        "--no-cache"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 0,
+      "stdout": "eager-data|6|os.data_dir|0|0|0|Application identity is unavailable.|true\neager-config|6|os.config_dir|0|0|0|Application identity is unavailable.|true\neager-cache|6|os.cache_dir|0|0|0|Application identity is unavailable.|true\neager-state|6|os.state_dir|0|0|0|Application identity is unavailable.|true\nbody-data|6|os.data_dir|0|0|0|Application identity is unavailable.|true\nbody-config|6|os.config_dir|0|0|0|Application identity is unavailable.|true\nbody-cache|6|os.cache_dir|0|0|0|Application identity is unavailable.|true\nbody-state|6|os.state_dir|0|0|0|Application identity is unavailable.|true\nfunction-value|4|os.data_dir|0|0|0|os.data_dir: native text is not valid UTF-8; native code 0|false\nnamed-explicit|4|os.config_dir|0|0|0|os.config_dir: native text is not valid UTF-8; native code 0|false\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated/standalone.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /standalone.void\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "build",
+        "--project",
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/checkout",
+        "--profile",
+        "release",
+        "-o",
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/output-release"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID S4 metadata \u96ea vmce5tzh/output-release\n",
+      "stderr": "/tmp/VOID S4 metadata \u96ea vmce5tzh/checkout/launcher.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /launcher.void\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "build",
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated/standalone.void",
+        "-o",
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/installation/no-context-release"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID S4 metadata \u96ea vmce5tzh/installation/no-context-release\n",
+      "stderr": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated/standalone.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /standalone.void\n\n"
+    },
+    {
+      "argv": [
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/installation/no-context-release"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 0,
+      "stdout": "eager-data|6|os.data_dir|0|0|0|Application identity is unavailable.|true\neager-config|6|os.config_dir|0|0|0|Application identity is unavailable.|true\neager-cache|6|os.cache_dir|0|0|0|Application identity is unavailable.|true\neager-state|6|os.state_dir|0|0|0|Application identity is unavailable.|true\nbody-data|6|os.data_dir|0|0|0|Application identity is unavailable.|true\nbody-config|6|os.config_dir|0|0|0|Application identity is unavailable.|true\nbody-cache|6|os.cache_dir|0|0|0|Application identity is unavailable.|true\nbody-state|6|os.state_dir|0|0|0|Application identity is unavailable.|true\nfunction-value|4|os.data_dir|0|0|0|os.data_dir: native text is not valid UTF-8; native code 0|false\nnamed-explicit|4|os.config_dir|0|0|0|os.config_dir: native text is not valid UTF-8; native code 0|false\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "build",
+        "--project",
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/checkout",
+        "-o",
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/installation/version-changed"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID S4 metadata \u96ea vmce5tzh/installation/version-changed\n",
+      "stderr": "/tmp/VOID S4 metadata \u96ea vmce5tzh/checkout/launcher.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /launcher.void\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "build",
+        "--project",
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/checkout",
+        "-o",
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/installation/scalar"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID S4 metadata \u96ea vmce5tzh/installation/scalar\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated/control.void",
+        "--no-cache"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 41,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "check",
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated/control.void"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated/control.void:3:15: error: Incorrect argument count: missing required argument 'id'.\n    code: VOID2004\n\n 3 |     return os.data_dir()\n   |               ^^^^^^^^\n    Module: /control.void\n    Hint: Supply an explicit constructed value or every required argument.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "check",
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated/control.void"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated/control.void:3:52: error: Type mismatch: expected func() -> result<string, /@stdlib/os.void::error>, received func(string) -> result<string, /@stdlib/os.void::error>.\n    code: VOID2001\n\n 3 |     var f: func() -> result<string, os.error> = os.data_dir\n   |                                                    ^^^^^^^^\n    Module: /control.void\n    Expected: func() -> result<string, /@stdlib/os.void::error>\n    Received: func(string) -> result<string, /@stdlib/os.void::error>\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/checkout"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID S4 metadata \u96ea vmce5tzh/checkout/void.project.toml:8:4: error: Invalid portable manifest identity.\n    code: VOID5004\n\n 8 | id='con.bad'\n   |    ^^^^^^^^^\n    Module: /void.project.toml\n    Hint: Use 1-255 lowercase ASCII bytes with letters/digits and interior dot, underscore or hyphen; no empty dot pieces or reserved device stems.\n\n"
+    },
+    {
+      "argv": [
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/installation/unrelated-image-debug"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 0,
+      "stdout": "eager-data|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated data \u96ea/org.test.context-game\neager-config|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated config \u96ea/org.test.context-game\neager-cache|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated cache \u96ea/org.test.context-game\neager-state|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated state \u96ea/org.test.context-game\nbody-data|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated data \u96ea/org.test.context-game\nbody-config|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated config \u96ea/org.test.context-game\nbody-cache|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated cache \u96ea/org.test.context-game\nbody-state|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated state \u96ea/org.test.context-game\nfunction-value|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated data \u96ea/org.test.context-game\nnamed-explicit|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated config \u96ea/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/installation/unrelated-image-debug"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 0,
+      "stdout": "eager-data|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/share/org.test.context-game\neager-config|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.config/org.test.context-game\neager-cache|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.cache/org.test.context-game\neager-state|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/state/org.test.context-game\nbody-data|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/share/org.test.context-game\nbody-config|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.config/org.test.context-game\nbody-cache|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.cache/org.test.context-game\nbody-state|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/state/org.test.context-game\nfunction-value|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/share/org.test.context-game\nnamed-explicit|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.config/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/installation/unrelated-image-release"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 0,
+      "stdout": "eager-data|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated data \u96ea/org.test.context-game\neager-config|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated config \u96ea/org.test.context-game\neager-cache|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated cache \u96ea/org.test.context-game\neager-state|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated state \u96ea/org.test.context-game\nbody-data|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated data \u96ea/org.test.context-game\nbody-config|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated config \u96ea/org.test.context-game\nbody-cache|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated cache \u96ea/org.test.context-game\nbody-state|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated state \u96ea/org.test.context-game\nfunction-value|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated data \u96ea/org.test.context-game\nnamed-explicit|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated config \u96ea/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/installation/unrelated-image-release"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 0,
+      "stdout": "eager-data|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/share/org.test.context-game\neager-config|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.config/org.test.context-game\neager-cache|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.cache/org.test.context-game\neager-state|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/state/org.test.context-game\nbody-data|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/share/org.test.context-game\nbody-config|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.config/org.test.context-game\nbody-cache|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.cache/org.test.context-game\nbody-state|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/state/org.test.context-game\nfunction-value|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/share/org.test.context-game\nnamed-explicit|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.config/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/installation/version-changed"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 0,
+      "stdout": "eager-data|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated data \u96ea/org.test.context-game\neager-config|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated config \u96ea/org.test.context-game\neager-cache|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated cache \u96ea/org.test.context-game\neager-state|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated state \u96ea/org.test.context-game\nbody-data|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated data \u96ea/org.test.context-game\nbody-config|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated config \u96ea/org.test.context-game\nbody-cache|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated cache \u96ea/org.test.context-game\nbody-state|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated state \u96ea/org.test.context-game\nfunction-value|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated data \u96ea/org.test.context-game\nnamed-explicit|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated config \u96ea/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/installation/version-changed"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 0,
+      "stdout": "eager-data|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/share/org.test.context-game\neager-config|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.config/org.test.context-game\neager-cache|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.cache/org.test.context-game\neager-state|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/state/org.test.context-game\nbody-data|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/share/org.test.context-game\nbody-config|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.config/org.test.context-game\nbody-cache|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.cache/org.test.context-game\nbody-state|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/state/org.test.context-game\nfunction-value|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.local/share/org.test.context-game\nnamed-explicit|/tmp/VOID S4 metadata \u96ea vmce5tzh/uncreated home \u96ea/.config/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/VOID S4 metadata \u96ea vmce5tzh/installation/scalar"
+      ],
+      "cwd": "/tmp/VOID S4 metadata \u96ea vmce5tzh/unrelated",
+      "status": 7,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

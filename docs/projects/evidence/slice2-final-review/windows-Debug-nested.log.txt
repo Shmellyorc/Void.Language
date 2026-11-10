@@ -1,0 +1,1 @@
+C:\Users\a\AppData\Local\Programs\Python\Python314\python.exe: can't open file 'C:\\Users\\a\\VoidSlice2-FinalReview-20261108\\tests\\project\\nested.py': [Errno 2] No such file or directory

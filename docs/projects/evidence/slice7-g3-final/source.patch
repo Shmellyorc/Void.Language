@@ -1,0 +1,187 @@
+diff --git a/src/runtime/c_resource.cpp b/src/runtime/c_resource.cpp
+--- a/src/runtime/c_resource.cpp
++++ b/src/runtime/c_resource.cpp
+@@ -51,8 +51,10 @@
+     }
+ 
+     bool acquire(std::uint32_t ordinal, const std::uint64_t* args, std::uint32_t count) {
+-        if (dispatch(ordinal, args, count, &native_))
++        std::uint64_t acquired = 0;
++        if (dispatch(ordinal, args, count, &acquired))
+             throw std::runtime_error("C resource creation transport rejected");
++        native_ = acquired; // Only a successful transport transfers ownership.
+         exclusive_ = native_;
+         return native_ != 0;
+     }
+diff --git a/tests/ffi/resources.cpp b/tests/ffi/resources.cpp
+--- a/tests/ffi/resources.cpp
++++ b/tests/ffi/resources.cpp
+@@ -10,6 +10,7 @@
+ #include <fstream>
+ #include <iostream>
+ #include <iterator>
++#include <memory>
+ #include <semaphore>
+ #include <span>
+ #include <stdexcept>
+@@ -186,8 +187,17 @@
+     explicit OwnerRoot(Runtime& runtime) : frame(runtime, &slot, 1) {}
+ };
+ std::uint64_t duplicated_pointer = 0;
++bool refuse_close = false;
+ extern "C" std::uint32_t duplicate_provider(const char* descriptor, std::uint32_t size, std::uint32_t ordinal,
+     const std::uint64_t* args, std::uint32_t count, std::uint64_t* result) {
++    if (ordinal == 0 && !count) {
++        const auto status = vd_c_primitive_dispatch_v3(descriptor, size, ordinal, args, count, result);
++        // A failed transport transfers nothing, even with a stale output word.
++        *result = duplicated_pointer;
++        return status;
++    }
++    if (ordinal == release_ordinal && refuse_close)
++        return vd_c_primitive_dispatch_v3(descriptor, size, ordinal, args, 0, result);
+     if (ordinal == 0 && duplicated_pointer) { *result = duplicated_pointer; return 0; }
+     const auto status = vd_c_primitive_dispatch_v3(descriptor, size, ordinal, args, count, result);
+     if (!status && ordinal == 0) duplicated_pointer = *result;
+@@ -201,13 +211,26 @@
+     Runtime::Managed managed(runtime);
+     OwnerRoot owner(runtime), other(runtime);
+     const std::array<std::uint64_t, 1> create{24}, close{0};
++    const std::array<std::uint64_t, 1> null_create{static_cast<std::uint32_t>(-1)};
+     const std::array<std::uint64_t, 2> args{0, 0};
+     std::uint64_t result = 0;
+     const auto before = g3_releases();
++    require(bridge(duplicate_provider, descriptor, 0, null_create, nullptr, &other.value, CResourceRole::acquire) == 0 &&
++            !other.value && g3_live() == 0 && g3_releases() == before, "null acquired ownership");
++    require(bridge(duplicate_provider, descriptor, 0, {}, nullptr, &other.value, CResourceRole::acquire) == 4 &&
++            !other.value && g3_live() == 0 && g3_releases() == before, "refused acquisition acquired ownership");
+     require(bridge(duplicate_provider, descriptor, 0, create, nullptr, &owner.value, CResourceRole::acquire) == 0 &&
+             owner.value && g3_live() == 1, "first acquisition");
++    require(bridge(duplicate_provider, descriptor, 0, {}, nullptr, &other.value, CResourceRole::acquire) == 4 &&
++            !other.value && g3_live() == 1 && g3_releases() == before,
++            "refused acquisition consumed the existing owner");
+     require(bridge(duplicate_provider, descriptor, 0, create, nullptr, &other.value, CResourceRole::acquire) == 6 &&
+             !other.value && g3_live() == 1 && g3_releases() == before, "duplicate native ownership");
++    void* const identity = owner.value;
++    owner.value = nullptr;
++    require(runtime.collect() == Runtime::Collection::completed && runtime.contains(identity) && g3_live() == 1,
++            "collection lost the ledger-owned wrapper");
++    owner.value = identity;
+     require(bridge(alternate, descriptor, 1, args, &result, &owner.value, CResourceRole::borrow) == 2, "wrong linked authority");
+     require(bridge(alternate, descriptor, release_ordinal, close, &result, &owner.value, CResourceRole::close) == 2,
+             "wrong linked release authority");
+@@ -230,12 +253,26 @@
+         outsider.join();
+     }
+     require(denied == 1, "cross-Runtime borrowed handle admitted");
++    refuse_close = true;
++    result = 123;
++    const auto refusal = bridge(duplicate_provider, descriptor, release_ordinal, close,
++                                &result, &owner.value, CResourceRole::close);
++    refuse_close = false;
++    require(refusal == 4 && result == 123 && g3_live() == 1 && g3_releases() == before,
++            "transport refusal consumed ownership or returned a terminal status");
++    require(bridge(duplicate_provider, descriptor, 0, create, nullptr, &other.value, CResourceRole::acquire) == 6 &&
++            !other.value && bridge(duplicate_provider, descriptor, 1, args, &result, &owner.value, CResourceRole::borrow) == 0 &&
++            result == 24, "transport refusal lost the exclusive claim or live owner");
+     require(bridge(duplicate_provider, descriptor, release_ordinal, close, &result, &owner.value, CResourceRole::close) == 0 &&
+             result == 0 && g3_live() == 0 && g3_releases() == before + 1, "terminal close");
+     require(bridge(duplicate_provider, descriptor, 1, args, &result, &owner.value, CResourceRole::borrow) == 1 &&
+             bridge(duplicate_provider, descriptor, release_ordinal, close, &result, &owner.value, CResourceRole::close) == 1,
+             "stale alias or double close admitted");
++    owner.value = nullptr;
++    require(runtime.collect() == Runtime::Collection::completed && !runtime.contains(identity),
++            "closed ledger wrapper remained rooted");
+     std::cout << "duplicate native owner, foreign provider/Runtime and stale alias rejected\n";
++    std::cout << "null and refused acquisition, refused release and retry preserved exact ownership\n";
+ }
+ 
+ std::binary_semaphore entered(0), shutdown_start(0), resume(0);
+@@ -243,12 +280,14 @@
+ std::atomic<unsigned> pause_at{UINT32_MAX};
+ extern "C" std::uint32_t delayed(const char* descriptor, std::uint32_t size, std::uint32_t ordinal,
+                                   const std::uint64_t* args, std::uint32_t count, std::uint64_t* result) {
+-    const auto status = vd_c_primitive_dispatch_v3(descriptor, size, ordinal, args, count, result);
+-    if (!status && ordinal == pause_at.load()) {
++    const auto pause = [] {
+         delayed_entered = true;
+         entered.release();
+         resume.acquire();
+-    }
++    };
++    if (ordinal == 1 && ordinal == pause_at.load()) pause();
++    const auto status = vd_c_primitive_dispatch_v3(descriptor, size, ordinal, args, count, result);
++    if (!status && ordinal == 0 && ordinal == pause_at.load()) pause();
+     return status;
+ }
+ void shutdown_race(const std::string& descriptor, bool creating) {
+@@ -329,6 +368,7 @@
+     const auto error = runtime.close();
+     require(error && error.os_code == 17 && g3_live() == 0 && g3_releases() == before + 1,
+         "failed release did not consume the shutdown resource exactly once");
++    require(!runtime.close() && g3_releases() == before + 1, "terminal error repeated native release");
+     std::cout << "terminal provider error reported on shutdown after release\n";
+ }
+ 
+@@ -360,8 +400,31 @@
+     require(g3_live() == 0, "typed IR stale alias leaked an owner");
+ }
+ 
+-void reload_resource(const fs::path& original, const fs::path& sandbox,
+-                     const std::string& descriptor, const CPrimitiveAdmission::Owner& admission, bool optimize) {
++struct ReleaseObservation {
++    std::weak_ptr<void> acquisition;
++    unsigned calls = 0;
++    bool before = false, after = false;
++};
++thread_local ReleaseObservation release_observation;
++
++extern "C" std::uint32_t observe_release(const char* descriptor, std::uint32_t size, std::uint32_t ordinal,
++    const std::uint64_t* args, std::uint32_t count, std::uint64_t* result) {
++    if (ordinal == release_ordinal) {
++        ++release_observation.calls;
++        release_observation.before = !release_observation.acquisition.expired();
++    }
++    const auto status = vd_c_primitive_dispatch_v3(descriptor, size, ordinal, args, count, result);
++    if (ordinal == release_ordinal)
++        release_observation.after = !release_observation.acquisition.expired();
++    if (ordinal == 0 && !status && *result)
++        release_observation.acquisition = NativeCode::active_lease();
++    return status;
++}
++
++void reload_resource(const fs::path& original, const fs::path& sandbox, const std::string& descriptor,
++                     bool optimize, bool shutdown) {
++    release_observation = {};
++    const auto admission = CPrimitiveAdmission::admit(descriptor, observe_release);
+     const auto path = sandbox / "resources.void";
+     auto text = read(original);
+     write(path, text);
+@@ -380,8 +443,16 @@
+     require(jit.replace(slot, *after, optimize), "compatible body replacement rejected");
+     old.reset();
+     require(jit.live_generations() == 2 && slot.invoke(91) == 39, "live resource lost its original generation");
+-    require(slot.invoke(92) == 0 && g3_live() == 0 && jit.live_generations() == 1, "terminal close did not retire acquisition generation");
+-    std::cout << "compatible body reload retained the owner and generation; changed thunk rejected\n";
++    const auto before_release = g3_releases();
++    if (shutdown) require(!slot.acquire()->runtime_owner()->close(), "shutdown after reload failed");
++    else require(slot.invoke(92) == 0, "explicit close after reload failed");
++    require(release_observation.calls == 1 && release_observation.before && release_observation.after,
++            "acquisition generation was unavailable within the terminal thunk");
++    require(release_observation.acquisition.expired() && g3_live() == 0 &&
++            g3_releases() == before_release + 1 && jit.live_generations() == 1,
++            "terminal release did not consume the owner and retire its acquisition generation");
++    std::cout << (shutdown ? "shutdown" : "explicit close")
++              << " after reload retained the acquisition lease across the C release\n";
+ }
+ }
+ 
+@@ -416,7 +487,8 @@
+         rejects("null acquisition", "Null", [&] { (void)code->invoke(-3); });
+         require(code->invoke(-4) == 22 && g3_live() == 1, "live shutdown fixture");
+         require(!code->runtime_owner()->close() && g3_live() == 0, "Runtime shutdown leaked resource");
+-        reload_resource(source, sandbox, descriptor, admission, optimize);
++        reload_resource(source, sandbox, descriptor, optimize, false);
++        reload_resource(source, sandbox, descriptor, optimize, true);
+         std::cout << "G3 JIT " << (optimize ? "O2" : "normal") << " returned 104\n";
+     }
+     return 0;

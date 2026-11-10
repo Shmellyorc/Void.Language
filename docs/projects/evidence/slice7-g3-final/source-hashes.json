@@ -1,0 +1,10 @@
+{
+  "src/runtime/c_resource.cpp": {
+    "before": "9c728d656364fae365551581d6977651985fe47c8f80bbaf7e1f657a9ca469c9",
+    "after": "e4c3e9a3016ee824446ab851a0417afe28b939e623bea4ec83a2d840ec3289f7"
+  },
+  "tests/ffi/resources.cpp": {
+    "before": "3faf04eb4153d855a3d37138c35fccf506131d70a24fcda5e6b4b3f431beaef4",
+    "after": "c3c541a54df9717ee7722662bb0395f20edb98c473d645e526cdc31d17421a39"
+  }
+}

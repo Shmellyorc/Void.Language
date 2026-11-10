@@ -1,0 +1,200 @@
+cwd= /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/independent cwd argv= ['/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc', 'new', '/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project', '--source', 'src/main.void', '--project-id', 'org.voidlang.callback-qual']
+exit=0
+Manifest: /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/void.project.toml
+Project ID: org.voidlang.callback-qual
+Application ID: local.a3108f5c046440c3a687ec1ba2a8252fa
+Next: from the displayed manifest directory, run voidc check --project .
+Created project manifest.
+Automatic application selection requires one eligible main(). Use --entry for a deliberate override.
+
+cwd= /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/independent cwd argv= ['/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc', 'native-bind', '/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/native/callback.descriptor', 'callback_fixture.h', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/callback_adapter.c']
+exit=0
+
+cwd= /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/independent cwd argv= ['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-shared', '-fuse-ld=lld', '-fPIC', '-fvisibility=hidden', '-pthread', '-Wl,-rpath,$ORIGIN', '-Wl,-soname,g5_fixture.so', '-DG5_FIXTURE_BUILD', '/home/shmellyorc/Documents/Void.Language/tests/ffi/callback_fixture.c', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/native/g5_fixture.so']
+exit=0
+
+cwd= /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/independent cwd argv= ['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-shared', '-fuse-ld=lld', '-fPIC', '-fvisibility=hidden', '-pthread', '-Wl,-rpath,$ORIGIN', '-I/home/shmellyorc/Documents/Void.Language/tests/ffi', '/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/callback_adapter.c', '/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/native/g5_fixture.so', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/native/g5_adapter.so']
+exit=0
+
+cwd= /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/independent cwd argv= ['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '-std=c11', '-fsyntax-only', '/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/callback_adapter.c']
+exit=1
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/callback_adapter.c:56:16: error: static assertion failed: C signature g5_mix
+   56 | _Static_assert(_Generic(&g5_mix, double (*)(double, float, vd_cb_floating, void*): 1, default: 0), "C signature g5_mix");
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/callback_adapter.c:118:43: error: incompatible function pointer types passing 'double (void *, double, float)' to parameter of type 'G5Float' (aka 'double (*)(void *, double, double)') [-Wincompatible-function-pointer-types]
+  118 |         double value = g5_mix(arg0, arg1, vd_enter_floating, arg2);
+      |                                           ^~~~~~~~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/callback_fixture.h:20:44: note: passing argument to parameter here
+   20 | G5_API double g5_mix(double, float, G5Float, void*);
+      |                                            ^
+2 errors generated.
+
+cwd= /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/independent cwd argv= ['/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc', 'native-bind', '/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/unsupported.descriptor', 'callback_fixture.h', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/bad.c']
+exit=1
+C primitive descriptor line 11: expected a fixed C callback signature with context-first
+
+cwd= /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/independent cwd argv= ['/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc', 'check', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project']
+exit=0
+Source checked successfully
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd= /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/independent cwd argv= ['/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc', 'run', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project']
+exit=2
+Invalid invocation: This project declares native code. Pass --allow-native to authorize its execution.
+Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]
+Try 'voidc run --help' for examples.
+
+cwd= /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/independent cwd argv= ['/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc', 'check', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project']
+exit=1
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/src/main.void:48:21: error: Type mismatch: expected func(i32) -> i32, received func(f64, f32) -> f64.
+    code: VOID2001
+
+ 48 |     if g5.twice(-2, mix_value) != 5:
+    |                     ^^^^^^^^^
+    Module: /src/main.void
+    Expected: func(i32) -> i32
+    Received: func(f64, f32) -> f64
+
+
+cwd= /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/independent cwd argv= ['/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc', 'check', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project']
+exit=1
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/src/main.void:49:21: error: A checked C callback must be supplied last as a directly named function, bound method or literal closure from this generation.
+    code: VOID1103
+
+ 49 |     if g5.twice(-2, indirect) != 5:
+    |                     ^^^^^^^^
+    Module: /src/main.void
+
+
+cwd= /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/independent cwd argv= ['/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc', 'run', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project', '--allow-native', '--no-cache', '--no-opt', '--', 'normal']
+exit=0
+G5 integer, mixed floating point, void, reentry and retained foreign callbacks passed
+G5 barrier mode=2 result=140
+G5 native unregistered and drained
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd= /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/independent cwd argv= ['/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc', 'run', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project', '--allow-native', '--no-cache', '--no-opt', '--', 'implicit']
+exit=0
+G5 integer, mixed floating point, void, reentry and retained foreign callbacks passed
+G5 barrier mode=1 result=0
+G5 native unregistered and drained
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd= /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/independent cwd argv= ['/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc', 'run', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project', '--allow-native', '--no-cache', '--no-opt', '--', 'retired']
+exit=1
+G5 integer, mixed floating point, void, reentry and retained foreign callbacks passed
+G5 barrier mode=2 result=140
+G5 native unregistered and drained
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/callback_checked.void:12:6: runtime error: C resource is closed, null or invalid
+In function /callback_checked.void::fire
+Called from /src/main.void::main
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/src/main.void:78:19: source call
+        return g5.fire(owner, 7, 0)
+                  ^
+Called from /src/main.void::$app_adapter
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/src/main.void:38:6: source call
+
+
+cwd= /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/independent cwd argv= ['/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc', 'run', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project', '--allow-native', '--no-cache', '--no-opt', '--', 'failure']
+exit=1
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/src/main.void:29:14: runtime error: Division by zero
+    return 1 / (value - value)
+             ^
+In function /src/main.void::fail_callback
+Called from /callback_checked.void::twice
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/callback_checked.void:4:6: source call
+Called from /src/main.void::main
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/src/main.void:45:26: source call
+        var invalid = g5.twice(7, fail_callback)
+                         ^
+Called from /src/main.void::$app_adapter
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/src/main.void:38:6: source call
+
+
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/callback_process.py", line 143, in <module>
+    qualify(Path(directory))
+    ~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/callback_process.py", line 117, in qualify
+    cases([compiler, 'run', *select, '--allow-native', '--no-cache', *options, '--'], environment)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/callback_process.py", line 104, in cases
+    output = run(cwd, *argv, status=1, expected='division by zero', env=env)
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/callback_process.py", line 34, in run
+    assert expected in output, output
+           ^^^^^^^^^^^^^^^^^^
+AssertionError: /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/src/main.void:29:14: runtime error: Division by zero
+    return 1 / (value - value)
+             ^
+In function /src/main.void::fail_callback
+Called from /callback_checked.void::twice
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/callback_checked.void:4:6: source call
+Called from /src/main.void::main
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/src/main.void:45:26: source call
+        var invalid = g5.twice(7, fail_callback)
+                         ^
+Called from /src/main.void::$app_adapter
+/home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-release/g5-5ty619ip/native callbacks project/src/main.void:38:6: source call
+
+

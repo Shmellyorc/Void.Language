@@ -1,0 +1,66 @@
+[
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "run",
+      "--no-cache",
+      "/home/shmellyorc/Documents/Void.Language/docs/projects/evidence/slice6-final-review/cleanup-failure.void",
+      "--no-opt"
+    ],
+    "status": 1,
+    "stdout": "STORAGE CLEANUP\n",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/docs/projects/evidence/slice6-final-review/cleanup-failure.void:9:23: runtime error: Division by zero\n    var quotient = 10 / raw\n                      ^\nIn function /cleanup-failure.void::choose\nCalled from /cleanup-failure.void::main\n/home/shmellyorc/Documents/Void.Language/docs/projects/evidence/slice6-final-review/cleanup-failure.void:15:8: source call\n    if choose(0) is mode.ready:\n       ^\nCalled from /cleanup-failure.void::$app_adapter\n/home/shmellyorc/Documents/Void.Language/docs/projects/evidence/slice6-final-review/cleanup-failure.void:14:6: source call\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "build",
+      "/home/shmellyorc/Documents/Void.Language/docs/projects/evidence/slice6-final-review/cleanup-failure.void",
+      "-o",
+      "/tmp/VOID S6 cleanup failure h9kh4_0p/normal",
+      "--no-opt"
+    ],
+    "status": 0,
+    "stdout": "Built native executable: /tmp/VOID S6 cleanup failure h9kh4_0p/normal\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/tmp/VOID S6 cleanup failure h9kh4_0p/normal"
+    ],
+    "status": 1,
+    "stdout": "STORAGE CLEANUP\n",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/docs/projects/evidence/slice6-final-review/cleanup-failure.void:9:23: runtime error: Division by zero\n    var quotient = 10 / raw\n                      ^\nIn function /cleanup-failure.void::choose\nCalled from /cleanup-failure.void::main\n/home/shmellyorc/Documents/Void.Language/docs/projects/evidence/slice6-final-review/cleanup-failure.void:15:8: source call\n    if choose(0) is mode.ready:\n       ^\nCalled from /cleanup-failure.void::$app_adapter\n/home/shmellyorc/Documents/Void.Language/docs/projects/evidence/slice6-final-review/cleanup-failure.void:14:6: source call\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "run",
+      "--no-cache",
+      "/home/shmellyorc/Documents/Void.Language/docs/projects/evidence/slice6-final-review/cleanup-failure.void"
+    ],
+    "status": 1,
+    "stdout": "STORAGE CLEANUP\n",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/docs/projects/evidence/slice6-final-review/cleanup-failure.void:9:23: runtime error: Division by zero\n    var quotient = 10 / raw\n                      ^\nIn function /cleanup-failure.void::choose\nCalled from /cleanup-failure.void::main\n/home/shmellyorc/Documents/Void.Language/docs/projects/evidence/slice6-final-review/cleanup-failure.void:15:8: source call\n    if choose(0) is mode.ready:\n       ^\nCalled from /cleanup-failure.void::$app_adapter\n/home/shmellyorc/Documents/Void.Language/docs/projects/evidence/slice6-final-review/cleanup-failure.void:14:6: source call\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "build",
+      "/home/shmellyorc/Documents/Void.Language/docs/projects/evidence/slice6-final-review/cleanup-failure.void",
+      "-o",
+      "/tmp/VOID S6 cleanup failure h9kh4_0p/o2"
+    ],
+    "status": 0,
+    "stdout": "Built native executable: /tmp/VOID S6 cleanup failure h9kh4_0p/o2\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/tmp/VOID S6 cleanup failure h9kh4_0p/o2"
+    ],
+    "status": 1,
+    "stdout": "STORAGE CLEANUP\n",
+    "stderr": "/home/shmellyorc/Documents/Void.Language/docs/projects/evidence/slice6-final-review/cleanup-failure.void:9:23: runtime error: Division by zero\n    var quotient = 10 / raw\n                      ^\nIn function /cleanup-failure.void::choose\nCalled from /cleanup-failure.void::main\n/home/shmellyorc/Documents/Void.Language/docs/projects/evidence/slice6-final-review/cleanup-failure.void:15:8: source call\n    if choose(0) is mode.ready:\n       ^\nCalled from /cleanup-failure.void::$app_adapter\n/home/shmellyorc/Documents/Void.Language/docs/projects/evidence/slice6-final-review/cleanup-failure.void:14:6: source call\n\n"
+  }
+]

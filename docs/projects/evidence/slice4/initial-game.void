@@ -1,0 +1,5 @@
+use os as system
+var location = system.data_dir()
+func main():
+    if location is Ok(var path):
+        print(path)

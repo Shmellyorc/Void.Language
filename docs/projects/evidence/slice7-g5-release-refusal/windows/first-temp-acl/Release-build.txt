@@ -1,0 +1,29 @@
+[0/2] Re-checking globbed directories...
+[1/29] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\c_resource.cpp.obj
+[2/29] Linking CXX static library void_runtime.lib
+[3/29] Generating cache-identity-Release.cpp
+[4/29] Building CXX object CMakeFiles\void_g5_reload.dir\tests\ffi\callback_reload.cpp.obj
+[5/29] Building CXX object CMakeFiles\void_cache_identity.dir\cache-identity-Release.cpp.obj
+[6/29] Linking CXX static library void_cache_identity.lib
+[7/29] Linking CXX executable void_g2_tests.exe
+[8/29] Linking CXX executable void_g1_tests.exe
+[9/29] Generating void-native-resources.txt, native-resources-install-Release.txt
+[10/29] Generating ffi-g1/application-normal.obj
+[11/29] Generating ffi-g1/application-optimized.obj
+[12/29] Linking CXX executable void_g3_tests.exe
+[13/29] Generating ffi-g2/application-normal.obj
+[14/29] Generating ffi-g2/application-optimized.obj
+[15/29] Generating ffi-g3/application-normal.obj
+[16/29] Generating ffi-g3/application-optimized.obj
+[17/29] C:\Windows\system32\cmd.exe /C "cd /D C:\Users\a\VoidS7-G5-Compiler\Release && C:\gcc\bin\cmake.exe -E make_directory C:/Users/a/VoidS7-G5-Compiler/Release && C:\gcc\bin\cmake.exe -E copy_if_different C:/Users/a/VoidS7-G5-Compiler/Release/void-native-resources.txt C:/Users/a/VoidS7-G5-Compiler/Release/void-native-resources.txt"
+[18/29] Linking CXX executable void_runtime_callbacks.exe
+[19/29] Linking CXX executable voidc.exe
+[20/29] Linking CXX executable void_g1_aot_normal.exe
+[21/29] Linking CXX executable void_g1_aot_optimized.exe
+[22/29] Linking CXX executable void_g1_aot_mismatch.exe
+[23/29] Linking CXX executable void_g2_aot_normal.exe
+[24/29] Linking CXX executable void_g2_aot_optimized.exe
+[25/29] Linking CXX executable void_g3_aot_normal.exe
+[26/29] Linking CXX executable void_g3_aot_optimized.exe
+[27/29] Linking CXX executable void_g5_reload.exe
+[28/29] Linking CXX executable void_tests.exe

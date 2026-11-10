@@ -1,0 +1,60 @@
+Test project C:/Users/a/VoidS6-Final-Release
+      Start   2: project_manifest
+      Start   5: project_manifest_legacy
+ 1/21 Test   #2: project_manifest .................   Passed    0.15 sec
+      Start   7: project_selection
+ 2/21 Test   #5: project_manifest_legacy ..........   Passed    3.73 sec
+      Start   8: project_sessions
+ 3/21 Test   #8: project_sessions .................   Passed    0.63 sec
+      Start   9: project_creation
+ 4/21 Test   #9: project_creation .................   Passed    0.21 sec
+      Start  10: project_creation_process
+ 5/21 Test  #10: project_creation_process .........   Passed   10.75 sec
+      Start  11: project_application
+ 6/21 Test   #7: project_selection ................   Passed   29.09 sec
+      Start  12: project_application_process
+ 7/21 Test  #11: project_application ..............   Passed   23.24 sec
+      Start  14: project_profiles
+ 8/21 Test  #14: project_profiles .................   Passed    3.92 sec
+      Start  15: project_protocol
+ 9/21 Test  #15: project_protocol .................   Passed    4.06 sec
+      Start 320: reload
+10/21 Test #320: reload ...........................   Passed    1.07 sec
+      Start 321: gc
+11/21 Test #321: gc ...............................   Passed    0.11 sec
+      Start 325: sessions
+12/21 Test #325: sessions .........................   Passed    0.40 sec
+      Start 327: analysis
+13/21 Test #327: analysis .........................   Passed    5.47 sec
+      Start 328: numeric
+14/21 Test #328: numeric ..........................   Passed    4.16 sec
+      Start 329: numeric_enum_ir
+15/21 Test #329: numeric_enum_ir ..................***Failed    0.21 sec
+thread is not attached to this runtime
+
+      Start 330: numeric_enum_process
+16/21 Test  #12: project_application_process ......   Passed   29.49 sec
+      Start 331: numeric_enum_lsp
+17/21 Test #331: numeric_enum_lsp .................   Passed    1.08 sec
+      Start 332: frontend
+18/21 Test #330: numeric_enum_process .............***Failed   11.65 sec
+Traceback (most recent call last):
+  File "C:\Users\a\VoidCI42377496702-Native\tests\numeric\enums.py", line 175, in <module>
+    assert f"Debug cache: {expected_cache}" in row["stderr"], row
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'argv': ['C:\\Users\\a\\VoidS6-Final-Release\\voidc.exe', 'run', 'C:\\Users\\a\\VoidS6-tmp-Release\\VOID S6 numeric enum ephyv5xh\\integration.void', '--cache'], 'status': 0, 'stdout': '', 'stderr': 'Debug cache: unavailable\r\n'}
+
+      Start 333: modules
+19/21 Test #332: frontend .........................   Passed   10.52 sec
+      Start 368: numeric_cli
+20/21 Test #333: modules ..........................   Passed    3.33 sec
+21/21 Test #368: numeric_cli ......................   Passed   66.36 sec
+
+90% tests passed, 2 tests failed out of 21
+
+Total Test time (real) = 136.84 sec
+
+The following tests FAILED:
+	329 - numeric_enum_ir (Failed)
+	330 - numeric_enum_process (Failed)
+Errors while running CTest

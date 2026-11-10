@@ -1,0 +1,154 @@
+{
+  "profile": "debug",
+  "host": "x86_64",
+  "c_compile_commands": [
+    {
+      "directory": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+      "command": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -DG2_FIXTURE_IDENTITY=\\\"889eda7481b9615a96f9468b0ee504cff8e6523beb364b14c2daeeef9d23cb3e\\\" -I/home/shmellyorc/Documents/Void.Language/include -g -std=c11 -fvisibility=hidden -Wall -Wextra -Wpedantic -o CMakeFiles/void_g2_fixture.dir/tests/ffi/records_fixture.c.o -c /home/shmellyorc/Documents/Void.Language/tests/ffi/records_fixture.c",
+      "file": "/home/shmellyorc/Documents/Void.Language/tests/ffi/records_fixture.c",
+      "output": "CMakeFiles/void_g2_fixture.dir/tests/ffi/records_fixture.c.o"
+    },
+    {
+      "directory": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+      "command": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang  -I/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g2 -I/home/shmellyorc/Documents/Void.Language/include -g -std=c11 -fvisibility=hidden -Wall -Wextra -Wpedantic -o CMakeFiles/void_g2_thunk.dir/tests/ffi/records_thunk.c.o -c /home/shmellyorc/Documents/Void.Language/tests/ffi/records_thunk.c",
+      "file": "/home/shmellyorc/Documents/Void.Language/tests/ffi/records_thunk.c",
+      "output": "CMakeFiles/void_g2_thunk.dir/tests/ffi/records_thunk.c.o"
+    }
+  ],
+  "artifacts": {
+    "void_g2_tests": "452d5264394cd20bd63eb4ef9917ad77f47b16ba5f3c2f58197cba11f0ecece2",
+    "void_g2_aot_normal": "06db912c58fa955f9516749d328b19da7d092b6f3270f8a712902828a6149410",
+    "void_g2_aot_optimized": "7b3891c8af90e8e7110163bddca36bde831b7fc7b2fce95e2930f9dbbaa83f34",
+    "voidc": "5bec7d2f5fce2d7278f3880547df1ceb5040a72db4b34a5069dea87160bff0fb",
+    "ffi-g2/application-normal.o": "5f99c84461cc36ad8b6a93206d1f912c87391186921fcdf86d5ec5cab589a030",
+    "ffi-g2/application-optimized.o": "f2f2bf7267680817fe052779a3bc1e0aa128c45cf1a855200d4754da44075ac3",
+    "ffi-g2/records.descriptor": "afd3638941c2de06b19b4ececdb37b03e6ed0af6c483cc49bc4082c42ade9194",
+    "CMakeFiles/void_g2_fixture.dir/tests/ffi/records_fixture.c.o": "8be680cd6bf51d4e2340c587467738e0e8dc72772aa49c75140bcc71a9e29817",
+    "CMakeFiles/void_g2_thunk.dir/tests/ffi/records_thunk.c.o": "e6d997d258436f7a085851036e89f27189194308bfe017cd1d466f2309f376de"
+  },
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "abort_on_error=1:halt_on_error=1:detect_leaks=1",
+    "UBSAN_OPTIONS": "abort_on_error=1:halt_on_error=1:print_stacktrace=1"
+  },
+  "processes": [
+    {
+      "case": "direct-jit-typed-ir-and-GC",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g2_tests",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g2/records.descriptor",
+        "/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void"
+      ],
+      "status": 0,
+      "stdout": "2 1: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects\nsample G2Sample 16 4 2: C primitive descriptor line 17: C record size, alignment or tail padding disagrees with natural layout\npacket G2Packet 31 8 4: C primitive descriptor line 22: C record size, alignment or tail padding disagrees with natural layout\nreading f64 4: C primitive descriptor line 17: C record field offset or padding disagrees with natural layout\nreading ptr 8: C primitive descriptor line 17: unsupported C primitive type\nreading u64 8: C primitive provider rejected the exact descriptor or fixture identity\ntag tag u32: C primitive provider rejected the exact descriptor or fixture identity\narray:u16:3:1: C primitive descriptor line 20: invalid inline array extent or stride\narray:u16:0:2: C primitive descriptor line 20: invalid inline array extent or stride\narray:u16:03:2: C primitive descriptor line 20: invalid bounded canonical decimal field\ndatum datum record:packet: C primitive descriptor line 22: record must name an earlier verified declaration\nfastcall: C primitive descriptor line 8: unsupported descriptor, ABI revision or effects\nretains-pointer no-callbacks: C primitive descriptor line 7: unsupported descriptor, ABI revision or effects\nout:1:2:65537: C primitive descriptor line 27: invalid bounded canonical decimal field\nout:1:1:64: C primitive descriptor line 27: invalid byte span offset/length contract\nout:1:2:64 u64: C primitive descriptor line 27: byte span offsets and lengths require exact c_size operands\nout:1:2:64 c_size c_size out:4:5:64: C primitive descriptor line 29: unsupported span count, overlap profile, record or result contract\nbind fill g2_fill i32: C primitive descriptor line 27: unsupported span count, overlap profile, record or result contract\ninout:1:2:64: C primitive provider rejected the exact descriptor or fixture identity\nabsent host seal: VOID IR: C primitive call outside the admitted binding module\nwrong provider: VOID IR: invalid C primitive descriptor or exact call signature\nwrong ordinal: VOID IR: invalid C primitive descriptor or exact call signature\nrecord identity: VOID IR: invalid C primitive descriptor or exact call signature\nspan count and slot swap: VOID IR: invalid C primitive argument type or placement\nreadonly output: VOID IR: invalid C primitive descriptor or exact call signature\nforeign raw ABI use: VOID IR: C primitive transport requires host admission and typed operations\nunauthorized direct import: VOID IR: C primitive binding requires the admitted direct import\nworker: VOID IR: C primitive graphs require synchronous execution\nraw pointer construction flag: VOID IR: invalid C primitive descriptor or exact call signature\nuninitialized record: VOID IR: read of uninitialized C binding carrier storage in /records.void::entry\nuninitialized byte list: VOID IR: read of uninitialized C binding carrier storage in /records.void::entry\nuninitialized scalar field: VOID IR: read of uninitialized C binding carrier storage in /records.void::entry\nincomplete inline array escapes: VOID IR: incomplete C inline array escapes private construction\nNativeSafe collection, zeroed output scratch, partial commit, oversized and negative rollback passed\n-1: <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent\nIn function /native_records.void::fill\nCalled from /records.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:6:20: source call\n        return ffi.fill(bytes, 0, 5, 8) as i32\n                   ^\n\n-2: <host binding /native_records.void>:27:6: runtime error: overlapping C byte spans\nIn function /native_records.void::move_bytes\nCalled from /records.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:8:20: source call\n        return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32\n                   ^\n\n-3: <host binding /native_records.void>:23:6: runtime error: C byte span returned an oversized written prefix\nIn function /native_records.void::fill\nCalled from /records.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:10:20: source call\n        return ffi.fill(bytes, 0, 4, 254) as i32\n                   ^\n\n-4: <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent\nIn function /native_records.void::fill\nCalled from /records.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:12:20: source call\n        return ffi.fill(bytes, 18446744073709551615 as u64, 1, 8) as i32\n                   ^\n\nG2 JIT normal returned 103\n-1: <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent\nIn function /native_records.void::fill\nCalled from /records.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:6:20: source call\n        return ffi.fill(bytes, 0, 5, 8) as i32\n                   ^\n\n-2: <host binding /native_records.void>:27:6: runtime error: overlapping C byte spans\nIn function /native_records.void::move_bytes\nCalled from /records.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:8:20: source call\n        return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32\n                   ^\n\n-3: <host binding /native_records.void>:23:6: runtime error: C byte span returned an oversized written prefix\nIn function /native_records.void::fill\nCalled from /records.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:10:20: source call\n        return ffi.fill(bytes, 0, 4, 254) as i32\n                   ^\n\n-4: <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent\nIn function /native_records.void::fill\nCalled from /records.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:12:20: source call\n        return ffi.fill(bytes, 18446744073709551615 as u64, 1, 8) as i32\n                   ^\n\nG2 JIT O2 returned 103\n",
+      "stderr": ""
+    },
+    {
+      "case": "independently-linked-aot-normal",
+      "argv": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/ffi/records_process.py",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g2_aot_normal"
+      ],
+      "status": 0,
+      "stdout": "7 0 103\n-1 1 <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent\nIn function /native_records.void::fill\nCalled from /records.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:6:20: source call\n        return ffi.fill(bytes, 0, 5, 8) as i32\n                   ^\n-2 1 <host binding /native_records.void>:27:6: runtime error: overlapping C byte spans\nIn function /native_records.void::move_bytes\nCalled from /records.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:8:20: source call\n        return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32\n                   ^\n-3 1 <host binding /native_records.void>:23:6: runtime error: C byte span returned an oversized written prefix\nIn function /native_records.void::fill\nCalled from /records.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:10:20: source call\n        return ffi.fill(bytes, 0, 4, 254) as i32\n                   ^\n-4 1 <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent\nIn function /native_records.void::fill\nCalled from /records.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:12:20: source call\n        return ffi.fill(bytes, 18446744073709551615 as u64, 1, 8) as i32\n                   ^\n",
+      "stderr": ""
+    },
+    {
+      "case": "independently-linked-aot-optimized",
+      "argv": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/ffi/records_process.py",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g2_aot_optimized"
+      ],
+      "status": 0,
+      "stdout": "7 0 103\n-1 1 <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent\nIn function /native_records.void::fill\nCalled from /records.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:6:20: source call\n        return ffi.fill(bytes, 0, 5, 8) as i32\n                   ^\n-2 1 <host binding /native_records.void>:27:6: runtime error: overlapping C byte spans\nIn function /native_records.void::move_bytes\nCalled from /records.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:8:20: source call\n        return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32\n                   ^\n-3 1 <host binding /native_records.void>:23:6: runtime error: C byte span returned an oversized written prefix\nIn function /native_records.void::fill\nCalled from /records.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:10:20: source call\n        return ffi.fill(bytes, 0, 4, 254) as i32\n                   ^\n-4 1 <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent\nIn function /native_records.void::fill\nCalled from /records.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:12:20: source call\n        return ffi.fill(bytes, 18446744073709551615 as u64, 1, 8) as i32\n                   ^\n",
+      "stderr": ""
+    },
+    {
+      "case": "startup-source-denial",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g2_tests",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g2/records.descriptor",
+        "/home/shmellyorc/Documents/Void.Language/build/slice7-g2/source-probes/startup.void",
+        "/home/shmellyorc/Documents/Void.Language/build/slice7-g2/source-probes/debug-startup.o",
+        "normal"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "<host binding /native_records.void>:21:6: error: C primitive calls require a completed application startup.\n    code: VOID1106\n\n 21 | func sum(const arg0: [u8], arg1: u64, arg2: u64) -> i64:\n    |      ^^^\n\n"
+    },
+    {
+      "case": "readonly-source-denial",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g2_tests",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g2/records.descriptor",
+        "/home/shmellyorc/Documents/Void.Language/build/slice7-g2/source-probes/readonly.void",
+        "/home/shmellyorc/Documents/Void.Language/build/slice7-g2/source-probes/debug-readonly.o",
+        "normal"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "/home/shmellyorc/Documents/Void.Language/build/slice7-g2/source-probes/readonly.void:4:16: error: Cannot assign readonly reference leaf '[u8]' to storage or a parameter promising mutable access.\n    code: VOID2007\n\n 4 |     return ffi.fill(bytes, 0, 1, 7) as i32\n   |                ^^^^\n    Module: /readonly.void\n    Parameter declared here; const accepts readonly reference leaves. at <host binding /native_records.void>:23:11\n\n 23 | func fill(arg0: [u8], arg1: u64, arg2: u64, arg3: u8) -> i64:\n    |           ^^^^\n    Module: /native_records.void\n    Hint: Use a const parameter for readonly access or independently held mutable references. Copying value storage does not restore reference authority.\n\n"
+    }
+  ],
+  "clang_abi_probe": [
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-DG2_FIXTURE_IDENTITY=\"889eda7481b9615a96f9468b0ee504cff8e6523beb364b14c2daeeef9d23cb3e\"",
+        "-I/home/shmellyorc/Documents/Void.Language/include",
+        "-g",
+        "-std=c11",
+        "-fvisibility=hidden",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-o",
+        "-",
+        "-S",
+        "-emit-llvm",
+        "/home/shmellyorc/Documents/Void.Language/tests/ffi/records_fixture.c"
+      ],
+      "C_IR_signatures": [
+        "target triple = \"x86_64-unknown-linux-gnu\"",
+        "define hidden ptr @g2_fixture_identity() #0 !dbg !37 {",
+        "define hidden i32 @g2_color(i32 %0) #0 !dbg !43 {",
+        "define hidden { i32, double } @g2_calibrate(i32 %0, double %1, float noundef %2) #0 !dbg !62 {",
+        "define hidden void @g2_packet(ptr dead_on_unwind noalias writable sret(%struct.G2Packet) align 8 %0, i32 %1, double %2, ptr noundef byval(%struct.G2Packet) align 8 %3, i32 noundef %4) #0 !dbg !102 {",
+        "define hidden i64 @g2_sum(ptr noundef %0, i64 noundef %1) #0 !dbg !172 {",
+        "define hidden i64 @g2_fill(ptr noundef %0, i64 noundef %1, i8 noundef zeroext %2) #0 !dbg !231 {",
+        "define hidden i64 @g2_adjust(ptr noundef %0, i64 noundef %1) #0 !dbg !297 {",
+        "define hidden i64 @g2_move(ptr noundef %0, i64 noundef %1, ptr noundef %2, i64 noundef %3) #0 !dbg !329 {"
+      ]
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-I/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g2",
+        "-I/home/shmellyorc/Documents/Void.Language/include",
+        "-g",
+        "-std=c11",
+        "-fvisibility=hidden",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-o",
+        "-",
+        "-S",
+        "-emit-llvm",
+        "/home/shmellyorc/Documents/Void.Language/tests/ffi/records_thunk.c"
+      ],
+      "C_IR_signatures": [
+        "target triple = \"x86_64-unknown-linux-gnu\"",
+        "declare ptr @g2_fixture_identity() #2",
+        "declare i32 @g2_color(i32) #2",
+        "declare { i32, double } @g2_calibrate(i32, double, float noundef) #2",
+        "declare void @g2_packet(ptr dead_on_unwind writable sret(%struct.G2Packet) align 8, i32, double, ptr noundef byval(%struct.G2Packet) align 8, i32 noundef) #2",
+        "declare i64 @g2_sum(ptr noundef, i64 noundef) #2",
+        "declare i64 @g2_fill(ptr noundef, i64 noundef, i8 noundef zeroext) #2",
+        "declare i64 @g2_adjust(ptr noundef, i64 noundef) #2",
+        "declare i64 @g2_move(ptr noundef, i64 noundef, ptr noundef, i64 noundef) #2"
+      ]
+    }
+  ]
+}

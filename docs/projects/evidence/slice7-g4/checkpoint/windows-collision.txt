@@ -1,0 +1,10 @@
+held C:\Users\a\VoidS7-G4-checkpoint\good id c60478b6:00110000000078e4
+held C:\Users\a\VoidS7-G4-checkpoint\good\void_g4_probe_main.dll id c60478b6:000600000005145f
+held C:\Users\a\VoidS7-G4-checkpoint\good\void_g4_probe_dep.dll id c60478b6:000a0000000293eb
+provider MEM_IMAGE=1 match=1
+  held: \Device\HarddiskVolume3\Users\a\VoidS7-G4-checkpoint\good\void_g4_probe_main.dll
+  mapped: \Device\HarddiskVolume3\Users\a\VoidS7-G4-checkpoint\good\void_g4_probe_main.dll
+dependency MEM_IMAGE=1 match=0
+  held: \Device\HarddiskVolume3\Users\a\VoidS7-G4-checkpoint\good\void_g4_probe_dep.dll
+  mapped: \Device\HarddiskVolume3\Users\a\VoidS7-G4-checkpoint\bad\void_g4_probe_dep.dll
+result=134

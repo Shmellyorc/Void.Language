@@ -1,0 +1,147 @@
+{
+  "checks": 8,
+  "commands_and_requests": [
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Release\\voidls-slice3.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID S3 protocol \u00e9\ud83d\ude00 bxgzsl8q",
+        "",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5010\",\"message\":\"No eligible main() in application project.\"}],\"discoveryCount\":1,\"entry\":null,\"executionCount\":0,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 bxgzsl8q/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 bxgzsl8q\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 bxgzsl8q\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"3fe62e2005f678fa7e5dc736fc7625e9c114039f4d250a46ee4902bfc773fc6c\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "method": "initialize",
+      "params": {
+        "capabilities": {
+          "textDocument": {
+            "publishDiagnostics": {
+              "relatedInformation": true,
+              "versionSupport": true
+            }
+          },
+          "workspace": {
+            "workspaceEdit": {
+              "documentChanges": true,
+              "failureHandling": "textOnlyTransactional"
+            }
+          }
+        }
+      },
+      "response": {
+        "id": 1,
+        "jsonrpc": "2.0",
+        "result": {
+          "capabilities": {
+            "completionProvider": {
+              "triggerCharacters": [
+                ".",
+                " ",
+                "\"",
+                "/",
+                ":"
+              ]
+            },
+            "definitionProvider": true,
+            "documentFormattingProvider": true,
+            "documentSymbolProvider": true,
+            "experimental": {
+              "refreshProject": true,
+              "voidProjectProtocol": 1,
+              "voidToolingProtocol": 1
+            },
+            "hoverProvider": true,
+            "positionEncoding": "utf-16",
+            "referencesProvider": true,
+            "renameProvider": {
+              "prepareProvider": true
+            },
+            "signatureHelpProvider": {
+              "triggerCharacters": [
+                "(",
+                ","
+              ]
+            },
+            "textDocumentSync": {
+              "change": 1,
+              "openClose": true,
+              "save": {
+                "includeText": false
+              }
+            },
+            "workspace": {
+              "fileOperations": {
+                "didCreate": {
+                  "filters": [
+                    {
+                      "pattern": {
+                        "glob": "**/*"
+                      },
+                      "scheme": "file"
+                    }
+                  ]
+                },
+                "didDelete": {
+                  "filters": [
+                    {
+                      "pattern": {
+                        "glob": "**/*"
+                      },
+                      "scheme": "file"
+                    }
+                  ]
+                },
+                "didRename": {
+                  "filters": [
+                    {
+                      "pattern": {
+                        "glob": "**/*"
+                      },
+                      "scheme": "file"
+                    }
+                  ]
+                }
+              }
+            },
+            "workspaceSymbolProvider": true
+          },
+          "serverInfo": {
+            "name": "VOID",
+            "version": "0.2.0"
+          }
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 4,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 bxgzsl8q/src/game.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 bxgzsl8q/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 bxgzsl8q",
+          "schema": 2,
+          "selectionRevision": "2",
+          "snapshotKey": "4f7ff57e5a3a30b6835d8fb510888409c6a99562dc58bd76b9aed9c838f18f63",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    }
+  ]
+}

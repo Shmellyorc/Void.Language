@@ -1,0 +1,1200 @@
+{
+  "checks": 169,
+  "commands_and_requests": [
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///tmp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20pzmrjvxv/bare.void"
+        },
+        "position": {
+          "line": 0,
+          "character": 6
+        }
+      },
+      "response": {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "range": {
+            "end": {
+              "character": 10,
+              "line": 0
+            },
+            "start": {
+              "character": 5,
+              "line": 0
+            }
+          },
+          "uri": "file:///tmp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20pzmrjvxv/bare.void"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+        "",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5010\",\"message\":\"No eligible main() in application project.\"}],\"discoveryCount\":1,\"entry\":null,\"executionCount\":0,\"kind\":\"application\",\"manifest\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv\",\"requiresReselection\":false,\"root\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"55ac9040db9fcaf9f29a451f8a9863cb86e45e3ec65671702426ce2b7f3b3ea3\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "method": "initialize",
+      "params": {
+        "capabilities": {
+          "textDocument": {
+            "publishDiagnostics": {
+              "relatedInformation": true,
+              "versionSupport": true
+            }
+          },
+          "workspace": {
+            "workspaceEdit": {
+              "documentChanges": true,
+              "failureHandling": "textOnlyTransactional"
+            }
+          }
+        }
+      },
+      "response": {
+        "id": 1,
+        "jsonrpc": "2.0",
+        "result": {
+          "capabilities": {
+            "completionProvider": {
+              "triggerCharacters": [
+                ".",
+                " ",
+                "\"",
+                "/",
+                ":"
+              ]
+            },
+            "definitionProvider": true,
+            "documentFormattingProvider": true,
+            "documentSymbolProvider": true,
+            "experimental": {
+              "refreshProject": true,
+              "voidProjectProtocol": 1,
+              "voidToolingProtocol": 1
+            },
+            "hoverProvider": true,
+            "positionEncoding": "utf-16",
+            "referencesProvider": true,
+            "renameProvider": {
+              "prepareProvider": true
+            },
+            "signatureHelpProvider": {
+              "triggerCharacters": [
+                "(",
+                ","
+              ]
+            },
+            "textDocumentSync": {
+              "change": 1,
+              "openClose": true,
+              "save": {
+                "includeText": false
+              }
+            },
+            "workspace": {
+              "fileOperations": {
+                "didCreate": {
+                  "filters": [
+                    {
+                      "pattern": {
+                        "glob": "**/*"
+                      },
+                      "scheme": "file"
+                    }
+                  ]
+                },
+                "didDelete": {
+                  "filters": [
+                    {
+                      "pattern": {
+                        "glob": "**/*"
+                      },
+                      "scheme": "file"
+                    }
+                  ]
+                },
+                "didRename": {
+                  "filters": [
+                    {
+                      "pattern": {
+                        "glob": "**/*"
+                      },
+                      "scheme": "file"
+                    }
+                  ]
+                }
+              }
+            },
+            "workspaceSymbolProvider": true
+          },
+          "serverInfo": {
+            "name": "VOID",
+            "version": "0.2.0"
+          }
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 4,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/src/game.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+          "schema": 2,
+          "selectionRevision": "2",
+          "snapshotKey": "fdd8f9c612924be30c29cdcfe0cf98a06f893ad107551245fdee48f8d19d22b8",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///tmp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20pzmrjvxv/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 13
+        }
+      },
+      "response": {
+        "id": 5,
+        "jsonrpc": "2.0",
+        "result": {
+          "range": {
+            "end": {
+              "character": 17,
+              "line": 0
+            },
+            "start": {
+              "character": 12,
+              "line": 0
+            }
+          },
+          "uri": "file:///tmp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20pzmrjvxv/src/helper.void"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/hover",
+      "params": {
+        "textDocument": {
+          "uri": "file:///tmp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20pzmrjvxv/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 14
+        }
+      },
+      "response": {
+        "id": 6,
+        "jsonrpc": "2.0",
+        "result": {
+          "contents": {
+            "kind": "plaintext",
+            "value": "value() -> i32"
+          },
+          "range": {
+            "end": {
+              "character": 18,
+              "line": 2
+            },
+            "start": {
+              "character": 13,
+              "line": 2
+            }
+          }
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/formatting",
+      "params": {
+        "textDocument": {
+          "uri": "file:///tmp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20pzmrjvxv/src/game.void"
+        },
+        "options": {
+          "tabSize": 4,
+          "insertSpaces": true
+        }
+      },
+      "response": {
+        "id": 8,
+        "jsonrpc": "2.0",
+        "result": [
+          {
+            "newText": "use \"./helper.void\" as h\nfunc main() -> i32:\n    return h.value()\n",
+            "range": {
+              "end": {
+                "character": 0,
+                "line": 3
+              },
+              "start": {
+                "character": 0,
+                "line": 0
+              }
+            }
+          }
+        ]
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/rename",
+      "params": {
+        "textDocument": {
+          "uri": "file:///tmp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20pzmrjvxv/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 14
+        },
+        "newName": "renamed_helper"
+      },
+      "response": {
+        "id": 10,
+        "jsonrpc": "2.0",
+        "result": {
+          "documentChanges": [
+            {
+              "edits": [
+                {
+                  "newText": "renamed_helper",
+                  "range": {
+                    "end": {
+                      "character": 18,
+                      "line": 2
+                    },
+                    "start": {
+                      "character": 13,
+                      "line": 2
+                    }
+                  }
+                }
+              ],
+              "textDocument": {
+                "uri": "file:///tmp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20pzmrjvxv/src/game.void",
+                "version": 3
+              }
+            },
+            {
+              "edits": [
+                {
+                  "newText": "renamed_helper",
+                  "range": {
+                    "end": {
+                      "character": 17,
+                      "line": 0
+                    },
+                    "start": {
+                      "character": 12,
+                      "line": 0
+                    }
+                  }
+                }
+              ],
+              "textDocument": {
+                "uri": "file:///tmp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20pzmrjvxv/src/helper.void",
+                "version": null
+              }
+            }
+          ]
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 12,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5001",
+              "message": "Invalid project TOML: Error while parsing table header: expected a bare or quoted key"
+            }
+          ],
+          "discoveryCount": 0,
+          "entry": null,
+          "executionCount": 0,
+          "kind": null,
+          "manifest": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+          "schema": 2,
+          "selectionRevision": "5",
+          "snapshotKey": "",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///tmp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20pzmrjvxv/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 13
+        }
+      },
+      "response": {
+        "id": 13,
+        "jsonrpc": "2.0",
+        "result": null
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 15,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/src/game.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+          "schema": 2,
+          "selectionRevision": "6",
+          "snapshotKey": "fdd8f9c612924be30c29cdcfe0cf98a06f893ad107551245fdee48f8d19d22b8",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///tmp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20pzmrjvxv/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 13
+        }
+      },
+      "response": {
+        "id": 16,
+        "jsonrpc": "2.0",
+        "result": {
+          "range": {
+            "end": {
+              "character": 17,
+              "line": 0
+            },
+            "start": {
+              "character": 12,
+              "line": 0
+            }
+          },
+          "uri": "file:///tmp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20pzmrjvxv/src/helper.void"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 20,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5010",
+              "message": "Ambiguous project entry: 2 eligible main() declarations."
+            }
+          ],
+          "discoveryCount": 3,
+          "entry": null,
+          "executionCount": 0,
+          "kind": "application",
+          "manifest": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+          "schema": 2,
+          "selectionRevision": "9",
+          "snapshotKey": "d71db24940fe2c58d145a2f5109aeb460dbc08af34cc181af42bfd9243781266",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 22,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/src/game.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+          "schema": 2,
+          "selectionRevision": "11",
+          "snapshotKey": "c3831d7bdb62d5820066a48a7df3d5b43ef9ae2518ce608487263f7f0681c4ae",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 25,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5010",
+              "message": "No eligible main() in application project."
+            }
+          ],
+          "discoveryCount": 1,
+          "entry": null,
+          "executionCount": 0,
+          "kind": "application",
+          "manifest": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+          "schema": 2,
+          "selectionRevision": "14",
+          "snapshotKey": "5dc134ee9b0ea6ea786da26ab5d7cde56e4576847e86da318ece70e5960d9977",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 27,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+          "schema": 2,
+          "selectionRevision": "17",
+          "snapshotKey": "c97a885c2d042de5d91bcb6fa22f20bc0770bf58aabfacea31a8528ad3a35630",
+          "standalone": false,
+          "status": "reselection-required"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 30,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+          "schema": 2,
+          "selectionRevision": "19",
+          "snapshotKey": "0ec9f6ec23e4018a6212b2ebdd9fe13fd3f3c627a102b163c386c0e40723246a",
+          "standalone": false,
+          "status": "reselection-required"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/reselectProject",
+      "params": {},
+      "response": {
+        "id": 31,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+          "schema": 2,
+          "selectionRevision": "20",
+          "snapshotKey": "0ec9f6ec23e4018a6212b2ebdd9fe13fd3f3c627a102b163c386c0e40723246a",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": [
+        {
+          "diagnostics": [],
+          "uri": "file:///tmp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20pzmrjvxv/src/helper.void",
+          "voidProjectRevision": "20"
+        },
+        {
+          "diagnostics": [],
+          "uri": "file:///tmp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20pzmrjvxv/src/renamed.void",
+          "version": 1,
+          "voidProjectRevision": "20"
+        },
+        {
+          "diagnostics": [],
+          "uri": "file:///tmp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20pzmrjvxv/void.project.toml",
+          "version": 4,
+          "voidProjectRevision": "20"
+        }
+      ]
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 32,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+          "schema": 2,
+          "selectionRevision": "20",
+          "snapshotKey": "0ec9f6ec23e4018a6212b2ebdd9fe13fd3f3c627a102b163c386c0e40723246a",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 34,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+          "schema": 2,
+          "selectionRevision": "20",
+          "snapshotKey": "0ec9f6ec23e4018a6212b2ebdd9fe13fd3f3c627a102b163c386c0e40723246a",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 37,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5009",
+              "message": "Source path crosses nested project boundary '/src/child'."
+            }
+          ],
+          "discoveryCount": 2,
+          "entry": null,
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+          "schema": 2,
+          "selectionRevision": "22",
+          "snapshotKey": "30c90852be325f9c358f027b2a35aca9db848614b0167fe8c37dd509818b41ee",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 40,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+          "schema": 2,
+          "selectionRevision": "24",
+          "snapshotKey": "0e8014cbb8bf53a5e6a3cfb4fd70d94aeb3a5f184bb7bff9a358feb7adf1bc6a",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 42,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5009",
+              "message": "Manifest must use exact case without case siblings in '/src/child'."
+            }
+          ],
+          "discoveryCount": 0,
+          "entry": null,
+          "executionCount": 0,
+          "kind": "application",
+          "manifest": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+          "schema": 2,
+          "selectionRevision": "25",
+          "snapshotKey": "359e233ac497e63ffcdcca1bf44ba37889513bc24926f03567c8162ad74aad81",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 44,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+          "schema": 2,
+          "selectionRevision": "26",
+          "snapshotKey": "0e8014cbb8bf53a5e6a3cfb4fd70d94aeb3a5f184bb7bff9a358feb7adf1bc6a",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 46,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5009",
+              "message": "Selected project manifest is unavailable."
+            }
+          ],
+          "discoveryCount": 0,
+          "entry": null,
+          "executionCount": 0,
+          "kind": null,
+          "manifest": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+          "schema": 2,
+          "selectionRevision": "28",
+          "snapshotKey": "",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 48,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+          "schema": 2,
+          "selectionRevision": "29",
+          "snapshotKey": "0e8014cbb8bf53a5e6a3cfb4fd70d94aeb3a5f184bb7bff9a358feb7adf1bc6a",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+        "",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":2,\"entry\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/src/game.void\",\"executionCount\":2,\"kind\":\"application\",\"manifest\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv\",\"requiresReselection\":false,\"root\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"6afcd2403b3cc50e9f4b43c14b0bbfd6b24b32813d1e011f0a73670bb2feecd7\",\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/src/child/launcher.void",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":1,\"entry\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/src/child/launcher.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/src/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/src/child\",\"requiresReselection\":false,\"root\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/src/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"463a551292cd3bd233af3276d7ec6d77fa5140562b39ba97922580fb2570c8bd\",\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/src/child/launcher.void",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Source path crosses nested project boundary '/src/child'.\"}],\"discoveryCount\":2,\"entry\":null,\"executionCount\":2,\"kind\":\"application\",\"manifest\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv\",\"requiresReselection\":false,\"root\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"92c7cffe49640e3e42c5f8df57a38a919e7596f4ef000d8e0c7d1ac3b0f9b7aa\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/src/game.void",
+        "",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/bare.void"
+      ],
+      "status": 0,
+      "stdout": "{\"entry\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/bare.void\",\"mode\":\"legacy\",\"root\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv\",\"schema\":2,\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": null,
+          "executionCount": 2,
+          "kind": "library",
+          "manifest": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv",
+          "schema": 2,
+          "selectionRevision": "1",
+          "snapshotKey": "14dcaf70ee576531e6be1e284001537293677c61aec621538081564c1daae5a6",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///tmp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20pzmrjvxv/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 13
+        }
+      },
+      "response": {
+        "id": 3,
+        "jsonrpc": "2.0",
+        "result": {
+          "range": {
+            "end": {
+              "character": 17,
+              "line": 0
+            },
+            "start": {
+              "character": 12,
+              "line": 0
+            }
+          },
+          "uri": "file:///tmp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20pzmrjvxv/src/helper.void"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/child/launcher.void",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Source path crosses nested project boundary '/child'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"331ee5b9358163441c643d2d1fcde50c1e480db72f428bffec7e1fb4948b9c6b\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/child/void.project.toml",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active manifest is outside the pinned project boundary: '/child/void.project.toml'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"331ee5b9358163441c643d2d1fcde50c1e480db72f428bffec7e1fb4948b9c6b\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/outside.void",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active document is outside the pinned project boundary.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"331ee5b9358163441c643d2d1fcde50c1e480db72f428bffec7e1fb4948b9c6b\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/notes.txt",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3001\",\"message\":\"Import must name a .void source file.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"331ee5b9358163441c643d2d1fcde50c1e480db72f428bffec7e1fb4948b9c6b\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/@stdlib/main.void",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5006\",\"message\":\"Document identity must be an exact canonical root-relative .void path\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"331ee5b9358163441c643d2d1fcde50c1e480db72f428bffec7e1fb4948b9c6b\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/Main.void",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3001\",\"message\":\"Filesystem case collision for 'Main.void'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"331ee5b9358163441c643d2d1fcde50c1e480db72f428bffec7e1fb4948b9c6b\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/void.project.toml",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":0,\"entry\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/main.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"331ee5b9358163441c643d2d1fcde50c1e480db72f428bffec7e1fb4948b9c6b\",\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/virtual/draft.void",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":0,\"entry\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/main.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"331ee5b9358163441c643d2d1fcde50c1e480db72f428bffec7e1fb4948b9c6b\",\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/child/launcher.void",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":1,\"entry\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/child/launcher.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/child\",\"requiresReselection\":false,\"root\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"e11843426914aed7352fff85459a5d98c48b5d87e8d837042a736af465fe881c\",\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/child/launcher.void",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Source path crosses nested project boundary '/child'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"331ee5b9358163441c643d2d1fcde50c1e480db72f428bffec7e1fb4948b9c6b\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/child/void.project.toml",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active manifest is outside the pinned project boundary: '/child/void.project.toml'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"331ee5b9358163441c643d2d1fcde50c1e480db72f428bffec7e1fb4948b9c6b\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/child/launcher.void",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5001\",\"message\":\"Invalid project TOML: Error while parsing table header: expected a bare or quoted key\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":0,\"kind\":null,\"manifest\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/child\",\"requiresReselection\":false,\"root\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/child/launcher.void",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Manifest must use exact case without case siblings in '/child'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"331ee5b9358163441c643d2d1fcde50c1e480db72f428bffec7e1fb4948b9c6b\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/child/void.Project.toml",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3001\",\"message\":\"Import must name a .void source file.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"331ee5b9358163441c643d2d1fcde50c1e480db72f428bffec7e1fb4948b9c6b\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/child/launcher.void",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Manifest must use exact case without case siblings in ''.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":0,\"kind\":null,\"manifest\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/child\",\"requiresReselection\":false,\"root\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "voidls: Usage: voidls --entry <project entry.void>\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/outside.void",
+        "",
+        ""
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "voidls: Active file is outside selected workspace\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/alias.void",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3001\",\"message\":\"Symbolic links are not supported in module paths.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"422d79b122cefab3245cc17cfb1fb187eeaa8dbfd6bc5e3aa6f4ba60163db626\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+        "--discover-project",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/unreadable.void",
+        "/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3002\",\"message\":\"Cannot read admitted project source.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID S3 protocol \u00e9\ud83d\ude00 pzmrjvxv/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"e62a2265e5c648460a69d5a7d55284835ed2a2210ad8593241f71e0be61c6407\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "include/void/ir.hpp": {
+    "before": "93368036c02ac249870828179818f10b33030628e56eb48585289e02bada100c",
+    "after": "c8b7ca66d9426ad6e5827a52acd0fdf218bf325a82e9247298f98cf1fad40eda"
+  },
+  "include/void/runtime_abi.hpp": {
+    "before": "0b9b03cfff1895068cfec37159550aa21c023995c7b2a8cf908085ba3aaa70c6",
+    "after": "b0433cb8c3b8f5bee6f106f5c6e22b5521f7b08d407df1872596098f9a5a9608"
+  },
+  "src/backend/llvm/backend.cpp": {
+    "before": "74ed8147b22fd19e3f95546e472de5a2fc5e1a31df287662a673ad75800d3569",
+    "after": "ecaa6dac17c29dcd6fd6a718d337e07a2cc6fd546109139276a5b906c66bf15b"
+  },
+  "src/frontend/compiler.cpp": {
+    "before": "d956d31c0a615871dd0a619528b3aedfe7a9857beddb87dc8d2f7586ab22319f",
+    "after": "1183a47409148da6f9ba3aa843310a63804f985956e31e36329815af6921875e"
+  },
+  "src/ir/module.cpp": {
+    "before": "64d20126b6b1c44ea9343359931776f73f1eaeaea43ee3531d5e3ea6a89a2286",
+    "after": "29b296166475f18d966fd1e56260d5e55f67de79987036a66847b0135ba68cae"
+  },
+  "src/ir/numeric_enum_storage.inc": {
+    "before": "7cf8cf64093e9a3bad87d68f1956cc2c5d18ffa0b6c713dea93197ca958ba652",
+    "after": "2b18017bb39149c096c87a906d9ff7e52d72d2bcf7eae88a2b898c26ae06630e"
+  },
+  "src/ir/reference_capabilities.inc": {
+    "before": "86a8b9282c9d162223d8073b894e488826706701d9d1fd971d1c5f32a49e79b9",
+    "after": "8975ed3e5c07d482b2ed3ca8a5bf61c6ff6b0238d03b5810ea6d5115f114fe55"
+  },
+  "src/runtime/fixed_abi.cpp": {
+    "before": "cddac0e6ca3c8adf6830c96b36871ca292adb80173558dcd009133e1bfbaabc4",
+    "after": "73d629cf5fdb407686731de1be52e5f140d9a5d2d87eeace4f1cfde58027903e"
+  },
+  "tests/numeric/enum_storage.inc": {
+    "before": null,
+    "after": "a710c200d24ba4cfab4759739ac4aabebbac7d282cc3aa39ed257927346f1fb4"
+  },
+  "tests/numeric/enums.py": {
+    "before": "644d40700a852bc6a4ecb0d426e4e31375fa02e31020341e037617f22f2b788e",
+    "after": "007014e26d1b777b9874e382f2348e85ce8118f8671971ec19600dfe415ba99c"
+  },
+  "tests/numeric/enums_ir.cpp": {
+    "before": "9c09c773442bc8d151839d0d52d9971123241ba41a35273d88d697a4795821ba",
+    "after": "1f04cbce43eccb31c415c7bdfb33677bf906a156fe983d113fd1a4b3f2c0bc5c"
+  }
+}

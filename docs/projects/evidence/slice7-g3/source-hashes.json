@@ -1,0 +1,86 @@
+{
+  "CMakeLists.txt": {
+    "before": "694e1d5985e9326f7d2f8d5fe2770684b270f4b18eb164ee3006dc49ddb2701e",
+    "after": "14066959762163d1eaa924d733a13be49b9eb3c10ad0e141bf1d124acc9673ca"
+  },
+  "include/void/c_primitive.hpp": {
+    "before": "4c4561be6910b94d83c8f58a5ca354f8ac89c3480269aab9c2f6872fa944be7f",
+    "after": "c19e5f0284fbf53614afca1f295e5a179acce5d5f86e8dd20c051a2fcd73d88e"
+  },
+  "include/void/execution.hpp": {
+    "before": "3cabeac28b886adf6bd8b34ab3751a59370f48e196d9c3dec3e028643714e634",
+    "after": "21adf78d83cfdf1803ac59b047e6fe04ba52350eb0ad88ea2b6544482e0c126d"
+  },
+  "include/void/native_resource.hpp": {
+    "before": "215d14e7829b563fa0594f8d0284bc2951b7d9e2872c8aa08266eed370831081",
+    "after": "3c927708dceb9f7d06fc0ce130e4645b48c5fc45ef4fadfff866953810000a15"
+  },
+  "src/backend/llvm/backend.cpp": {
+    "before": "d4758e846e5efbd72642460d32fc9311a952fd85d37eb5c381b3812fd2e7b779",
+    "after": "d4fb7179f2c5e59becf17e480943892d6164a4262992f3780f9e9917a9468c8c"
+  },
+  "src/frontend/compiler.cpp": {
+    "before": "3dc1ec69b54a5ac837f59590bcd0feb88141483972dc1ec50064a398286c2d9a",
+    "after": "44c8f2b9305f674f9946750d02c607432f4dd868445aa057f6effe07946eef72"
+  },
+  "src/ir/c_primitive.cpp": {
+    "before": "0821a6f381bbe2245560fbe859713709d22fa255e28ca135b5d5c5dbf11793f5",
+    "after": "26da8ae05b2141bbebe6d83805660cf081db2142e868a83a424faf19040c9895"
+  },
+  "src/ir/module.cpp": {
+    "before": "a2eb9e40d1da2b6c2ac077abfa039fe8dbc77c9904d0593adf911485bbc20fb2",
+    "after": "566f9bb9468e5f322b58ce904f06bd7eca5f75fbfde3547c9d4f7cb739f8032a"
+  },
+  "src/ir/numeric_enum_storage.inc": {
+    "before": "a29582a0664220c7aed31929ef433b96fe8e6b1c346b09de11d7a4773581de34",
+    "after": "1b4d2d776b95c3fadbebbe7a63984fea1b7ee7c1823fd239ed41fbda03dcc830"
+  },
+  "src/ir/reference_capabilities.inc": {
+    "before": "ff52cbee306e0042218ab1d53db862142307c53a5f057fd29c08087179c017df",
+    "after": "cb878f8fb27792bbc326adf975925cbcfda617a46e3cee061c2aa2d263011de6"
+  },
+  "src/runtime/c_resource.cpp": {
+    "before": null,
+    "after": "9c728d656364fae365551581d6977651985fe47c8f80bbaf7e1f657a9ca469c9"
+  },
+  "src/runtime/native_resource.cpp": {
+    "before": "13778b35862e1b71e8ebf4454ec2e1e810b6a1ac034fcdbd00d9f34fb9362ecd",
+    "after": "4ce307cce7c91b6c6c045cc5c718ea0132c5cef64c4cedd8e02b26f143cfd954"
+  },
+  "tests/ffi/g3_descriptor.h.in": {
+    "before": null,
+    "after": "062cc833ff51529b0c64e902db27072fc569dcb552f3b6cf92f5798d148e1529"
+  },
+  "tests/ffi/resources.cmake": {
+    "before": null,
+    "after": "7fb1dea0de9ca8a7e29b69b8614d31b4730578ec118896568a8f77b8f0c49728"
+  },
+  "tests/ffi/resources.cpp": {
+    "before": null,
+    "after": "3faf04eb4153d855a3d37138c35fccf506131d70a24fcda5e6b4b3f431beaef4"
+  },
+  "tests/ffi/resources.descriptor.in": {
+    "before": null,
+    "after": "0d303da30b50a2fc1bf60658d270750646c0cf0d1accc568b7646e0a86d09372"
+  },
+  "tests/ffi/resources.void": {
+    "before": null,
+    "after": "2679503c2451c01680ba339db76d68093f970891dce7e2dab4ff40b4a3f159ef"
+  },
+  "tests/ffi/resources_exit.cpp": {
+    "before": null,
+    "after": "5dacc0673464977cca6459b1819a003ee8e91fa42f89164955472f19ff16fc3a"
+  },
+  "tests/ffi/resources_fixture.c": {
+    "before": null,
+    "after": "bfd1c699c7d4b144c02e79f46246f381628072b66e22511eeda1d4b055e4a6a6"
+  },
+  "tests/ffi/resources_process.py": {
+    "before": null,
+    "after": "a8b269da22da9d50595f737fea4c8f6f953076e9ab5e65b48c893ec9e983ec8e"
+  },
+  "tests/ffi/resources_thunk.c": {
+    "before": null,
+    "after": "b5515df106d3ec7917e19b1cec7a5fcd037ee2985cda4240b2b8f8aa6d31b5af"
+  }
+}

@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "C:\Users\a\VoidSlice3-Corrected-20261108\tests\project\protocol.py", line 33, in <module>
+    opened(c,game,main);ready=state(c);check(ready['entry']==str(game) and ready['status']=='ready','virtual source entry');check(definition(c,game,main,'value()')['uri']==(root/'src/helper.void').as_uri(),'project-root import navigation')
+                                       ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidSlice3-Corrected-20261108\tests\project\protocol.py", line 13, in check
+    assert v,message
+           ^
+AssertionError: virtual source entry

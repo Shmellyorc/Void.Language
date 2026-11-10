@@ -1,0 +1,13 @@
+
+get_property(attested_shim_loaded GLOBAL PROPERTY VOID_AUDIT_ATTESTED_SHIM_LOADED)
+if(attested_shim_loaded)
+  return()
+endif()
+set_property(GLOBAL PROPERTY VOID_AUDIT_ATTESTED_SHIM_LOADED TRUE)
+macro(include)
+  if("${ARGV0}" STREQUAL "cmake/HostDependencies.cmake")
+    _include("C:/Users/a/VS7I2/HostDependencies-attested.cmake")
+  else()
+    _include(${ARGV})
+  endif()
+endmacro()

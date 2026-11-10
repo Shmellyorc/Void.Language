@@ -1,0 +1,57 @@
+Test project C:/Users/a/VoidS6-Storage-Release
+      Start   2: project_manifest
+      Start   5: project_manifest_legacy
+ 1/26 Test   #2: project_manifest .................   Passed    0.12 sec
+      Start   7: project_selection
+ 2/26 Test   #5: project_manifest_legacy ..........   Passed    2.81 sec
+      Start   8: project_sessions
+ 3/26 Test   #8: project_sessions .................   Passed    0.63 sec
+      Start   9: project_creation
+ 4/26 Test   #9: project_creation .................   Passed    0.19 sec
+      Start  10: project_creation_process
+ 5/26 Test  #10: project_creation_process .........   Passed    8.23 sec
+      Start  11: project_application
+ 6/26 Test   #7: project_selection ................   Passed   25.91 sec
+      Start  12: project_application_process
+ 7/26 Test  #11: project_application ..............   Passed   20.16 sec
+      Start  13: project_discovery_cli
+ 8/26 Test  #13: project_discovery_cli ............   Passed   11.79 sec
+      Start  14: project_profiles
+ 9/26 Test  #14: project_profiles .................   Passed    4.08 sec
+      Start  15: project_protocol
+10/26 Test  #15: project_protocol .................   Passed    2.29 sec
+      Start  16: project_nested_cli
+11/26 Test  #12: project_application_process ......   Passed   24.67 sec
+      Start  55: stage10_fields
+12/26 Test  #55: stage10_fields ...................   Passed    0.43 sec
+      Start  72: fixed_arrays_source
+13/26 Test  #16: project_nested_cli ...............   Passed    1.13 sec
+      Start 270: async_ir
+14/26 Test #270: async_ir .........................   Passed    0.15 sec
+      Start 320: reload
+15/26 Test #320: reload ...........................   Passed    0.79 sec
+      Start 321: gc
+16/26 Test #321: gc ...............................   Passed    0.05 sec
+      Start 325: sessions
+17/26 Test #325: sessions .........................   Passed    0.33 sec
+      Start 327: analysis
+18/26 Test  #72: fixed_arrays_source ..............   Passed    3.00 sec
+      Start 328: numeric
+19/26 Test #327: analysis .........................   Passed    3.15 sec
+      Start 329: numeric_enum_ir
+20/26 Test #329: numeric_enum_ir ..................   Passed    0.45 sec
+      Start 330: numeric_enum_process
+21/26 Test #328: numeric ..........................   Passed    3.26 sec
+      Start 331: numeric_enum_lsp
+22/26 Test #331: numeric_enum_lsp .................   Passed    0.61 sec
+      Start 332: frontend
+23/26 Test #332: frontend .........................   Passed    8.83 sec
+      Start 333: modules
+24/26 Test #333: modules ..........................   Passed    2.35 sec
+      Start 368: numeric_cli
+25/26 Test #330: numeric_enum_process .............   Passed   13.63 sec
+26/26 Test #368: numeric_cli ......................   Passed   55.57 sec
+
+100% tests passed out of 26
+
+Total Test time (real) = 124.99 sec

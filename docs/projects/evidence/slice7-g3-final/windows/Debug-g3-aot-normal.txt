@@ -1,0 +1,18 @@
+7 0 104
+-1 1 <host binding /native_resources.void>:6:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::read
+Called from /resources.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:29:20: source call
+        return ffi.read(alias, 0)
+                   ^
+-2 1 <host binding /native_resources.void>:10:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::close_box
+Called from /resources.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:31:20: source call
+        return ffi.close_box(alias)
+                   ^
+-3 1 C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:14:40: runtime error: Null managed reference in checked conversion
+        return ffi.read(ffi.create(-1) as ffi.box, 0)
+                                       ^
+In function /resources.void::entry
+-4 0 22

@@ -1,0 +1,304 @@
+{
+  "checks": 61,
+  "processes": [
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\checkout",
+        "--profile",
+        "debug",
+        "--no-cache"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 0,
+      "stdout": "eager-data|C:/Users/a/AppData/Local/org.test.context-game\neager-config|C:/Users/a/AppData/Roaming/org.test.context-game\neager-cache|C:/Users/a/AppData/Local/org.test.context-game/cache\neager-state|C:/Users/a/AppData/Local/org.test.context-game/state\nbody-data|C:/Users/a/AppData/Local/org.test.context-game\nbody-config|C:/Users/a/AppData/Roaming/org.test.context-game\nbody-cache|C:/Users/a/AppData/Local/org.test.context-game/cache\nbody-state|C:/Users/a/AppData/Local/org.test.context-game/state\nfunction-value|C:/Users/a/AppData/Local/org.test.context-game\nnamed-explicit|C:/Users/a/AppData/Roaming/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S4 metadata \u96ea ak26n1nw/checkout/launcher.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /launcher.void\n\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\checkout",
+        "--profile",
+        "debug",
+        "--no-cache"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 0,
+      "stdout": "eager-data|C:/Users/a/AppData/Local/org.test.context-game\neager-config|C:/Users/a/AppData/Roaming/org.test.context-game\neager-cache|C:/Users/a/AppData/Local/org.test.context-game/cache\neager-state|C:/Users/a/AppData/Local/org.test.context-game/state\nbody-data|C:/Users/a/AppData/Local/org.test.context-game\nbody-config|C:/Users/a/AppData/Roaming/org.test.context-game\nbody-cache|C:/Users/a/AppData/Local/org.test.context-game/cache\nbody-state|C:/Users/a/AppData/Local/org.test.context-game/state\nfunction-value|C:/Users/a/AppData/Local/org.test.context-game\nnamed-explicit|C:/Users/a/AppData/Roaming/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S4 metadata \u96ea ak26n1nw/checkout/launcher.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /launcher.void\n\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "run",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated\\standalone.void",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 0,
+      "stdout": "eager-data|6|os.data_dir|0|0|0|Application identity is unavailable.|true\neager-config|6|os.config_dir|0|0|0|Application identity is unavailable.|true\neager-cache|6|os.cache_dir|0|0|0|Application identity is unavailable.|true\neager-state|6|os.state_dir|0|0|0|Application identity is unavailable.|true\nbody-data|6|os.data_dir|0|0|0|Application identity is unavailable.|true\nbody-config|6|os.config_dir|0|0|0|Application identity is unavailable.|true\nbody-cache|6|os.cache_dir|0|0|0|Application identity is unavailable.|true\nbody-state|6|os.state_dir|0|0|0|Application identity is unavailable.|true\nfunction-value|C:/Users/a/AppData/Local/org.test.context-game\nnamed-explicit|C:/Users/a/AppData/Roaming/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S4 metadata \u96ea ak26n1nw/unrelated/standalone.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /standalone.void\n\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "build",
+        "--project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\checkout",
+        "--profile",
+        "debug",
+        "-o",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\output-debug.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidS6-Storage-tmp-Release/VOID S4 metadata \u96ea ak26n1nw/output-debug.exe\n",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S4 metadata \u96ea ak26n1nw/checkout/launcher.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /launcher.void\n\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "build",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated\\standalone.void",
+        "-o",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\installation\\no-context-debug.exe",
+        "--no-opt"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidS6-Storage-tmp-Release/VOID S4 metadata \u96ea ak26n1nw/installation/no-context-debug.exe\n",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S4 metadata \u96ea ak26n1nw/unrelated/standalone.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /standalone.void\n\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\installation\\no-context-debug.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 0,
+      "stdout": "eager-data|6|os.data_dir|0|0|0|Application identity is unavailable.|true\neager-config|6|os.config_dir|0|0|0|Application identity is unavailable.|true\neager-cache|6|os.cache_dir|0|0|0|Application identity is unavailable.|true\neager-state|6|os.state_dir|0|0|0|Application identity is unavailable.|true\nbody-data|6|os.data_dir|0|0|0|Application identity is unavailable.|true\nbody-config|6|os.config_dir|0|0|0|Application identity is unavailable.|true\nbody-cache|6|os.cache_dir|0|0|0|Application identity is unavailable.|true\nbody-state|6|os.state_dir|0|0|0|Application identity is unavailable.|true\nfunction-value|C:/Users/a/AppData/Local/org.test.context-game\nnamed-explicit|C:/Users/a/AppData/Roaming/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\checkout",
+        "--profile",
+        "release",
+        "--no-cache"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 0,
+      "stdout": "eager-data|C:/Users/a/AppData/Local/org.test.context-game\neager-config|C:/Users/a/AppData/Roaming/org.test.context-game\neager-cache|C:/Users/a/AppData/Local/org.test.context-game/cache\neager-state|C:/Users/a/AppData/Local/org.test.context-game/state\nbody-data|C:/Users/a/AppData/Local/org.test.context-game\nbody-config|C:/Users/a/AppData/Roaming/org.test.context-game\nbody-cache|C:/Users/a/AppData/Local/org.test.context-game/cache\nbody-state|C:/Users/a/AppData/Local/org.test.context-game/state\nfunction-value|C:/Users/a/AppData/Local/org.test.context-game\nnamed-explicit|C:/Users/a/AppData/Roaming/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S4 metadata \u96ea ak26n1nw/checkout/launcher.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /launcher.void\n\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\checkout",
+        "--profile",
+        "release",
+        "--no-cache"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 0,
+      "stdout": "eager-data|C:/Users/a/AppData/Local/org.test.context-game\neager-config|C:/Users/a/AppData/Roaming/org.test.context-game\neager-cache|C:/Users/a/AppData/Local/org.test.context-game/cache\neager-state|C:/Users/a/AppData/Local/org.test.context-game/state\nbody-data|C:/Users/a/AppData/Local/org.test.context-game\nbody-config|C:/Users/a/AppData/Roaming/org.test.context-game\nbody-cache|C:/Users/a/AppData/Local/org.test.context-game/cache\nbody-state|C:/Users/a/AppData/Local/org.test.context-game/state\nfunction-value|C:/Users/a/AppData/Local/org.test.context-game\nnamed-explicit|C:/Users/a/AppData/Roaming/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S4 metadata \u96ea ak26n1nw/checkout/launcher.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /launcher.void\n\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "run",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated\\standalone.void",
+        "--no-cache"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 0,
+      "stdout": "eager-data|6|os.data_dir|0|0|0|Application identity is unavailable.|true\neager-config|6|os.config_dir|0|0|0|Application identity is unavailable.|true\neager-cache|6|os.cache_dir|0|0|0|Application identity is unavailable.|true\neager-state|6|os.state_dir|0|0|0|Application identity is unavailable.|true\nbody-data|6|os.data_dir|0|0|0|Application identity is unavailable.|true\nbody-config|6|os.config_dir|0|0|0|Application identity is unavailable.|true\nbody-cache|6|os.cache_dir|0|0|0|Application identity is unavailable.|true\nbody-state|6|os.state_dir|0|0|0|Application identity is unavailable.|true\nfunction-value|C:/Users/a/AppData/Local/org.test.context-game\nnamed-explicit|C:/Users/a/AppData/Roaming/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S4 metadata \u96ea ak26n1nw/unrelated/standalone.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /standalone.void\n\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "build",
+        "--project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\checkout",
+        "--profile",
+        "release",
+        "-o",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\output-release.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidS6-Storage-tmp-Release/VOID S4 metadata \u96ea ak26n1nw/output-release.exe\n",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S4 metadata \u96ea ak26n1nw/checkout/launcher.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /launcher.void\n\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "build",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated\\standalone.void",
+        "-o",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\installation\\no-context-release.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidS6-Storage-tmp-Release/VOID S4 metadata \u96ea ak26n1nw/installation/no-context-release.exe\n",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S4 metadata \u96ea ak26n1nw/unrelated/standalone.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /standalone.void\n\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\installation\\no-context-release.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 0,
+      "stdout": "eager-data|6|os.data_dir|0|0|0|Application identity is unavailable.|true\neager-config|6|os.config_dir|0|0|0|Application identity is unavailable.|true\neager-cache|6|os.cache_dir|0|0|0|Application identity is unavailable.|true\neager-state|6|os.state_dir|0|0|0|Application identity is unavailable.|true\nbody-data|6|os.data_dir|0|0|0|Application identity is unavailable.|true\nbody-config|6|os.config_dir|0|0|0|Application identity is unavailable.|true\nbody-cache|6|os.cache_dir|0|0|0|Application identity is unavailable.|true\nbody-state|6|os.state_dir|0|0|0|Application identity is unavailable.|true\nfunction-value|C:/Users/a/AppData/Local/org.test.context-game\nnamed-explicit|C:/Users/a/AppData/Roaming/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "build",
+        "--project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\checkout",
+        "-o",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\installation\\version-changed.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidS6-Storage-tmp-Release/VOID S4 metadata \u96ea ak26n1nw/installation/version-changed.exe\n",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S4 metadata \u96ea ak26n1nw/checkout/launcher.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /launcher.void\n\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "build",
+        "--project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\checkout",
+        "-o",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\installation\\scalar.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidS6-Storage-tmp-Release/VOID S4 metadata \u96ea ak26n1nw/installation/scalar.exe\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "run",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated\\control.void",
+        "--no-cache"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 41,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated\\control.void"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S4 metadata \u96ea ak26n1nw/unrelated/control.void:3:15: error: Incorrect argument count: missing required argument 'id'.\n    code: VOID2004\n\n 3 |     return os.data_dir()\n   |               ^^^^^^^^\n    Module: /control.void\n    Hint: Supply an explicit constructed value or every required argument.\n\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated\\control.void"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S4 metadata \u96ea ak26n1nw/unrelated/control.void:3:52: error: Type mismatch: expected func() -> result<string, /@stdlib/os.void::error>, received func(string) -> result<string, /@stdlib/os.void::error>.\n    code: VOID2001\n\n 3 |     var f: func() -> result<string, os.error> = os.data_dir\n   |                                                    ^^^^^^^^\n    Module: /control.void\n    Expected: func() -> result<string, /@stdlib/os.void::error>\n    Received: func(string) -> result<string, /@stdlib/os.void::error>\n\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\checkout"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S4 metadata \u96ea ak26n1nw/checkout/void.project.toml:8:4: error: Invalid portable manifest identity.\n    code: VOID5004\n\n 8 | id='con.bad'\n   |    ^^^^^^^^^\n    Module: /void.project.toml\n    Hint: Use 1-255 lowercase ASCII bytes with letters/digits and interior dot, underscore or hyphen; no empty dot pieces or reserved device stems.\n\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\installation\\unrelated-image-debug.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 0,
+      "stdout": "eager-data|C:/Users/a/AppData/Local/org.test.context-game\neager-config|C:/Users/a/AppData/Roaming/org.test.context-game\neager-cache|C:/Users/a/AppData/Local/org.test.context-game/cache\neager-state|C:/Users/a/AppData/Local/org.test.context-game/state\nbody-data|C:/Users/a/AppData/Local/org.test.context-game\nbody-config|C:/Users/a/AppData/Roaming/org.test.context-game\nbody-cache|C:/Users/a/AppData/Local/org.test.context-game/cache\nbody-state|C:/Users/a/AppData/Local/org.test.context-game/state\nfunction-value|C:/Users/a/AppData/Local/org.test.context-game\nnamed-explicit|C:/Users/a/AppData/Roaming/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\installation\\unrelated-image-debug.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 0,
+      "stdout": "eager-data|C:/Users/a/AppData/Local/org.test.context-game\neager-config|C:/Users/a/AppData/Roaming/org.test.context-game\neager-cache|C:/Users/a/AppData/Local/org.test.context-game/cache\neager-state|C:/Users/a/AppData/Local/org.test.context-game/state\nbody-data|C:/Users/a/AppData/Local/org.test.context-game\nbody-config|C:/Users/a/AppData/Roaming/org.test.context-game\nbody-cache|C:/Users/a/AppData/Local/org.test.context-game/cache\nbody-state|C:/Users/a/AppData/Local/org.test.context-game/state\nfunction-value|C:/Users/a/AppData/Local/org.test.context-game\nnamed-explicit|C:/Users/a/AppData/Roaming/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\installation\\unrelated-image-release.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 0,
+      "stdout": "eager-data|C:/Users/a/AppData/Local/org.test.context-game\neager-config|C:/Users/a/AppData/Roaming/org.test.context-game\neager-cache|C:/Users/a/AppData/Local/org.test.context-game/cache\neager-state|C:/Users/a/AppData/Local/org.test.context-game/state\nbody-data|C:/Users/a/AppData/Local/org.test.context-game\nbody-config|C:/Users/a/AppData/Roaming/org.test.context-game\nbody-cache|C:/Users/a/AppData/Local/org.test.context-game/cache\nbody-state|C:/Users/a/AppData/Local/org.test.context-game/state\nfunction-value|C:/Users/a/AppData/Local/org.test.context-game\nnamed-explicit|C:/Users/a/AppData/Roaming/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\installation\\unrelated-image-release.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 0,
+      "stdout": "eager-data|C:/Users/a/AppData/Local/org.test.context-game\neager-config|C:/Users/a/AppData/Roaming/org.test.context-game\neager-cache|C:/Users/a/AppData/Local/org.test.context-game/cache\neager-state|C:/Users/a/AppData/Local/org.test.context-game/state\nbody-data|C:/Users/a/AppData/Local/org.test.context-game\nbody-config|C:/Users/a/AppData/Roaming/org.test.context-game\nbody-cache|C:/Users/a/AppData/Local/org.test.context-game/cache\nbody-state|C:/Users/a/AppData/Local/org.test.context-game/state\nfunction-value|C:/Users/a/AppData/Local/org.test.context-game\nnamed-explicit|C:/Users/a/AppData/Roaming/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\installation\\version-changed.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 0,
+      "stdout": "eager-data|C:/Users/a/AppData/Local/org.test.context-game\neager-config|C:/Users/a/AppData/Roaming/org.test.context-game\neager-cache|C:/Users/a/AppData/Local/org.test.context-game/cache\neager-state|C:/Users/a/AppData/Local/org.test.context-game/state\nbody-data|C:/Users/a/AppData/Local/org.test.context-game\nbody-config|C:/Users/a/AppData/Roaming/org.test.context-game\nbody-cache|C:/Users/a/AppData/Local/org.test.context-game/cache\nbody-state|C:/Users/a/AppData/Local/org.test.context-game/state\nfunction-value|C:/Users/a/AppData/Local/org.test.context-game\nnamed-explicit|C:/Users/a/AppData/Roaming/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\installation\\version-changed.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 0,
+      "stdout": "eager-data|C:/Users/a/AppData/Local/org.test.context-game\neager-config|C:/Users/a/AppData/Roaming/org.test.context-game\neager-cache|C:/Users/a/AppData/Local/org.test.context-game/cache\neager-state|C:/Users/a/AppData/Local/org.test.context-game/state\nbody-data|C:/Users/a/AppData/Local/org.test.context-game\nbody-config|C:/Users/a/AppData/Roaming/org.test.context-game\nbody-cache|C:/Users/a/AppData/Local/org.test.context-game/cache\nbody-state|C:/Users/a/AppData/Local/org.test.context-game/state\nfunction-value|C:/Users/a/AppData/Local/org.test.context-game\nnamed-explicit|C:/Users/a/AppData/Roaming/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\installation\\scalar.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S4 metadata \u96ea ak26n1nw\\unrelated",
+      "status": 7,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

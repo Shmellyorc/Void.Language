@@ -1,0 +1,223 @@
+[0/2] Re-checking globbed directories...
+[1/113] Building CXX object CMakeFiles\void_application_objects.dir\src\application_metadata.cpp.obj
+[2/113] Building CXX object CMakeFiles\void_application_objects.dir\src\project_identity.cpp.obj
+[3/113] Building CXX object CMakeFiles\void_core.dir\src\frontend\source.cpp.obj
+[4/113] Building CXX object CMakeFiles\void_core.dir\src\frontend\project.cpp.obj
+[5/113] Building CXX object CMakeFiles\void_core.dir\src\frontend\tooling.cpp.obj
+[6/113] Building CXX object CMakeFiles\void_core.dir\src\numeric.cpp.obj
+[7/113] Building CXX object CMakeFiles\void_core.dir\src\ir\module.cpp.obj
+[8/113] Building CXX object CMakeFiles\void_core.dir\src\ir\native_storage.cpp.obj
+[9/113] Building CXX object CMakeFiles\void_core.dir\src\ir\native_binding.cpp.obj
+[10/113] Linking C static library void_native_fixture.lib
+[11/113] Building CXX object CMakeFiles\void_core.dir\src\frontend\compiler.cpp.obj
+[12/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\application.cpp.obj
+[13/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\os.cpp.obj
+[14/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\os_abi.cpp.obj
+[15/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\random.cpp.obj
+[16/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\filesystem_abi.cpp.obj
+[17/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\filesystem.cpp.obj
+C:\Users\a\VoidCI42377496702-Native\src\runtime\filesystem.cpp(20,9): warning: 'NOMINMAX' macro redefined [-Wmacro-redefined]
+   20 | #define NOMINMAX
+      |         ^
+<command line>(4,9): note: previous definition is here
+    4 | #define NOMINMAX 1
+      |         ^
+1 warning generated.
+[18/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\native_resource.cpp.obj
+[19/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\native_binding.cpp.obj
+[20/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\temporal_abi.cpp.obj
+[21/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\conversion.cpp.obj
+[22/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\text_case.cpp.obj
+[23/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\buffer.cpp.obj
+[24/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\list.cpp.obj
+[25/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\dictionary.cpp.obj
+[26/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\array.cpp.obj
+[27/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\gc_schema.cpp.obj
+[28/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\fixed_abi.cpp.obj
+[29/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\heap.cpp.obj
+[30/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\coordination.cpp.obj
+[31/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\console.cpp.obj
+C:\Users\a\VoidCI42377496702-Native\src\runtime\console.cpp(16,9): warning: 'WIN32_LEAN_AND_MEAN' macro redefined [-Wmacro-redefined]
+   16 | #define WIN32_LEAN_AND_MEAN
+      |         ^
+<command line>(6,9): note: previous definition is here
+    6 | #define WIN32_LEAN_AND_MEAN 1
+      |         ^
+C:\Users\a\VoidCI42377496702-Native\src\runtime\console.cpp(17,9): warning: 'NOMINMAX' macro redefined [-Wmacro-redefined]
+   17 | #define NOMINMAX
+      |         ^
+<command line>(4,9): note: previous definition is here
+    4 | #define NOMINMAX 1
+      |         ^
+C:\Users\a\VoidCI42377496702-Native\src\runtime\console.cpp(669,137): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  669 |                 if(data.key && !request.keys && (!data.key->down || data.key->repeat!=1))return {-1,false,false,{ErrorKind::unsupported}};
+      |                                                                                                                                         ^
+C:\Users\a\VoidCI42377496702-Native\src\runtime\console.cpp(672,69): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  672 |                 if(data.after)return {-1,false,false,data.after,true};
+      |                                                                     ^
+C:\Users\a\VoidCI42377496702-Native\src\runtime\console.cpp(675,41): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  675 |             if(queue.eof)return {-1,true};
+      |                                         ^
+C:\Users\a\VoidCI42377496702-Native\src\runtime\console.cpp(676,44): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  676 |             if(!fetch)return {-1,false,true};
+      |                                            ^
+C:\Users\a\VoidCI42377496702-Native\src\runtime\console.cpp(677,91): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  677 |             if(auto error=stopped(request,op.adapter());error)return {-1,false,false,error};
+      |                                                                                           ^
+C:\Users\a\VoidCI42377496702-Native\src\runtime\console.cpp(690,137): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  690 |                 if(poll && !native.completed && native.error.kind==ErrorKind::would_block){queue.blocks.pop_back();return {-1,false,true};}
+      |                                                                                                                                         ^
+8 warnings generated.
+[32/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\console_abi.cpp.obj
+[33/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\callback.cpp.obj
+[34/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\abi.cpp.obj
+[35/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\native.cpp.obj
+[36/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\reload.cpp.obj
+[37/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\async.cpp.obj
+[38/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_abi.cpp.obj
+[39/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_crypto.cpp.obj
+[40/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_error.cpp.obj
+[41/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_directory.cpp.obj
+[42/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_archive.cpp.obj
+[43/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_process.cpp.obj
+[44/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_process_windows.cpp.obj
+[45/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\http_provider.cpp.obj
+[46/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_directory_windows.cpp.obj
+[47/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\url.cpp.obj
+[48/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\url_abi.cpp.obj
+[49/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\http.cpp.obj
+[50/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\http_bulk.cpp.obj
+[51/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\http_resource.cpp.obj
+[52/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\http_file.cpp.obj
+[53/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\native_work.cpp.obj
+[54/113] Linking C static library curl\lib\libcurl.lib
+[55/113] Linking CXX static library void_core.lib
+[56/113] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\http_abi.cpp.obj
+C:\Users\a\VoidCI42377496702-Native\src\runtime\http_abi.cpp(118,67): warning: unused parameter 'upper' [-Wunused-parameter]
+  118 |             auto environment = [&](const char* lower, const char* upper) {
+      |                                                                   ^
+1 warning generated.
+[57/113] Linking CXX static library void_runtime.lib
+[58/113] Building CXX object CMakeFiles\void_llvm.dir\src\backend\llvm\native_cache.cpp.obj
+[59/113] Building CXX object CMakeFiles\voidc_objects.dir\src\main.cpp.obj
+[60/113] Building CXX object CMakeFiles\voidc_objects.dir\src\native_build.cpp.obj
+[61/113] Building CXX object CMakeFiles\voidc_objects.dir\examples\proof.cpp.obj
+C:\Users\a\VoidCI42377496702-Native\examples\proof.cpp(7,46): warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+    7 |         {Terminator::Kind::return_value, 2}}}};
+      |                                              ^
+C:\Users\a\VoidCI42377496702-Native\examples\proof.cpp(13,6): warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+   13 |     }};
+      |      ^
+2 warnings generated.
+[62/113] Building CXX object CMakeFiles\void_lsp.dir\src\lsp\positions.cpp.obj
+[63/113] Building C object CMakeFiles\native_fixture.dir\tests\integration\native_fixture.c.obj
+[64/113] Generating void-native-resources.txt, native-resources-install-Debug.txt
+[65/113] Generating io-errors-async.void
+[66/113] Linking CXX static library void_lsp.lib
+[67/113] Building CXX object CMakeFiles\void_llvm.dir\src\backend\llvm\backend.cpp.obj
+[68/113] Linking CXX static library void_llvm.lib
+[69/113] Generating cache-identity-Debug.cpp
+[70/113] Building CXX object CMakeFiles\void_cache_identity.dir\cache-identity-Debug.cpp.obj
+[71/113] Linking CXX static library void_cache_identity.lib
+[72/113] Building CXX object CMakeFiles\voidls.dir\src\lsp\main.cpp.obj
+[73/113] Building CXX object CMakeFiles\void_project_manifest.dir\tests\project\manifest.cpp.obj
+[74/113] Building CXX object CMakeFiles\void_project_selection.dir\tests\project\selection.cpp.obj
+[75/113] Building CXX object CMakeFiles\void_project_sessions.dir\tests\project\sessions.cpp.obj
+[76/113] Building CXX object CMakeFiles\void_managed_test_abi.dir\src\runtime\abi.cpp.obj
+[77/113] Building CXX object CMakeFiles\void_project_application.dir\tests\project\application.cpp.obj
+[78/113] Building CXX object CMakeFiles\void_os_host.dir\tests\managed\probe.cpp.obj
+[79/113] Linking C static library native_fixture.lib
+[80/113] Building C object CMakeFiles\void_native_test_fixture.dir\src\native\fixture.c.obj
+[81/113] Building CXX object CMakeFiles\void_os_host.dir\tests\os\host.cpp.obj
+C:\Users\a\VoidCI42377496702-Native\tests\os\host.cpp(57,79): warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+   57 |     Environment(const char* key, const char* value) : name(key), present(std::getenv(key) != nullptr) {
+      |                                                                               ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt\stdlib.h(1183,20): note: 'getenv' has been explicitly marked deprecated here
+ 1183 |     _Check_return_ _CRT_INSECURE_DEPRECATE(_dupenv_s)
+      |                    ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\a\VoidCI42377496702-Native\tests\os\host.cpp(58,33): warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+   58 |         if (present) old = std::getenv(key); set(key, value);
+      |                                 ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt\stdlib.h(1183,20): note: 'getenv' has been explicitly marked deprecated here
+ 1183 |     _Check_return_ _CRT_INSECURE_DEPRECATE(_dupenv_s)
+      |                    ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+2 warnings generated.
+[82/113] Building CXX object CMakeFiles\void_globals.dir\tests\stage11\globals.cpp.obj
+[83/113] Building CXX object CMakeFiles\void_globals.dir\tests\managed\probe.cpp.obj
+[84/113] Building CXX object CMakeFiles\void_native_tests.dir\tests\native\tests.cpp.obj
+[85/113] Building CXX object CMakeFiles\void_native_tests.dir\tests\native\integrated.cpp.obj
+[86/113] Building CXX object CMakeFiles\void_native_tests.dir\tests\native\probe.cpp.obj
+[87/113] Building CXX object CMakeFiles\void_native_tests.dir\tests\managed\probe.cpp.obj
+[88/113] Building CXX object CMakeFiles\void_tests.dir\tests\sessions\tests.cpp.obj
+[89/113] Building CXX object CMakeFiles\void_tests.dir\tests\tooling\tests.cpp.obj
+C:\Users\a\VoidCI42377496702-Native\tests\tooling\tests.cpp(236,31): warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  236 |     std::string previous=std::getenv("VOID_STDLIB_ROOT")?std::getenv("VOID_STDLIB_ROOT"):"";
+      |                               ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt\stdlib.h(1183,20): note: 'getenv' has been explicitly marked deprecated here
+ 1183 |     _Check_return_ _CRT_INSECURE_DEPRECATE(_dupenv_s)
+      |                    ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\a\VoidCI42377496702-Native\tests\tooling\tests.cpp(236,63): warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  236 |     std::string previous=std::getenv("VOID_STDLIB_ROOT")?std::getenv("VOID_STDLIB_ROOT"):"";
+      |                                                               ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt\stdlib.h(1183,20): note: 'getenv' has been explicitly marked deprecated here
+ 1183 |     _Check_return_ _CRT_INSECURE_DEPRECATE(_dupenv_s)
+      |                    ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+2 warnings generated.
+[90/113] Building CXX object CMakeFiles\void_tests.dir\tests\analysis\tests.cpp.obj
+[91/113] Building CXX object CMakeFiles\void_tests.dir\tests\frontend\tests.cpp.obj
+[92/113] Building CXX object CMakeFiles\void_tests.dir\tests\tests.cpp.obj
+C:\Users\a\VoidCI42377496702-Native\tests\tests.cpp(174,57): warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+  174 |             {vd::ir::Terminator::Kind::return_value,1}}}};
+      |                                                         ^
+1 warning generated.
+[93/113] Building CXX object CMakeFiles\void_tests.dir\tests\frontend\values.cpp.obj
+[94/113] Building CXX object CMakeFiles\void_tests.dir\tests\frontend\structs.cpp.obj
+[95/113] Building CXX object CMakeFiles\void_tests.dir\tests\frontend\initialization.cpp.obj
+[96/113] Building CXX object CMakeFiles\void_tests.dir\tests\frontend\methods.cpp.obj
+[97/113] Building CXX object CMakeFiles\void_tests.dir\tests\numeric\tests.cpp.obj
+[98/113] Building CXX object CMakeFiles\void_tests.dir\tests\modules\tests.cpp.obj
+[99/113] C:\Windows\system32\cmd.exe /C "cd /D C:\Users\a\VoidS4-Final-Debug && C:\gcc\bin\cmake.exe -E make_directory C:/Users/a/VoidS4-Final-Debug && C:\gcc\bin\cmake.exe -E copy_if_different C:/Users/a/VoidS4-Final-Debug/void-native-resources.txt C:/Users/a/VoidS4-Final-Debug/void-native-resources.txt"
+[100/113] Building CXX object CMakeFiles\void_tests.dir\examples\proof.cpp.obj
+C:\Users\a\VoidCI42377496702-Native\examples\proof.cpp(7,46): warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+    7 |         {Terminator::Kind::return_value, 2}}}};
+      |                                              ^
+C:\Users\a\VoidCI42377496702-Native\examples\proof.cpp(13,6): warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+   13 |     }};
+      |      ^
+2 warnings generated.
+[101/113] Linking CXX executable voidls.exe
+[102/113] Building CXX object CMakeFiles\void_io_runner.dir\tests\io\runner.cpp.obj
+[103/113] Linking CXX executable void_project_manifest.exe
+[104/113] Linking CXX executable void_project_selection.exe
+[105/113] Linking CXX executable voidc.exe
+[106/113] Linking CXX executable void_project_sessions.exe
+[107/113] Linking CXX executable void_project_application.exe
+[108/113] Linking CXX executable void_os_host.exe
+[109/113] Linking CXX executable void_globals.exe
+[110/113] Linking CXX executable void_native_tests.exe
+[111/113] Linking CXX executable void_io_runner.exe
+[112/113] Linking CXX executable void_tests.exe

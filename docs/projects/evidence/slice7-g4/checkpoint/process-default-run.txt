@@ -1,0 +1,9 @@
+held C:\Users\a\VoidS7-G4-checkpoint\good id c60478b6:00110000000078e4
+held C:\Users\a\VoidS7-G4-checkpoint\good\void_g4_probe_main.dll id c60478b6:000600000005145f
+held C:\Users\a\VoidS7-G4-checkpoint\good\void_g4_probe_dep.dll id c60478b6:000a0000000293eb
+dependency loaded before activation=0
+active context redirects dependency=1
+dependency MEM_IMAGE=1 match=0
+  held: \Device\HarddiskVolume3\Users\a\VoidS7-G4-checkpoint\good\void_g4_probe_dep.dll
+  mapped: \Device\HarddiskVolume3\Users\a\VoidS7-G4-checkpoint\redirection\void_g4_probe_dep.dll
+initializer-marker=1 kernel-oracle-provider=00000000 kernel-oracle-dependency=c00000d4

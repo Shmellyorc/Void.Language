@@ -1,0 +1,24 @@
+
+xwininfo: Window id: 0x4a00007 "VOID Raylib Gallery"
+
+  Absolute upper-left X:  640
+  Absolute upper-left Y:  575
+  Relative upper-left X:  640
+  Relative upper-left Y:  575
+  Width: 640
+  Height: 360
+  Depth: 24
+  Visual: 0x27
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x4a00006 (not installed)
+  Bit Gravity State: ForgetGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: no
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +640+575  -5120+575  -5120-505  +640-505
+  -geometry 640x360+640+575
+

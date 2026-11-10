@@ -1,0 +1,179 @@
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_zone_objects
+[ 71%] Built target void_native_fixture
+[ 71%] Built target native_fixture
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/modules/tests.cpp.o
+[100%] Linking CXX executable void_tests
+[100%] Built target void_tests
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Linking CXX executable void_project_manifest
+[100%] Built target void_project_manifest
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_zone_objects
+[ 71%] Built target void_application_objects
+[ 71%] Built target void_g1_fixture
+[ 71%] Built target void_g1_thunk
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_g1_tests.dir/tests/ffi/primitives.cpp.o
+[100%] Linking CXX executable void_g1_tests
+[100%] Built target void_g1_tests
+[100%] Generating ffi-g1/application-normal.o
+[100%] Linking CXX executable void_g1_aot_normal
+[100%] Built target void_g1_aot_normal
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_g1_fixture
+[ 71%] Built target void_application_objects
+[ 71%] Built target void_g1_thunk
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target void_g1_tests
+[100%] Generating ffi-g1/application-optimized.o
+[100%] Linking CXX executable void_g1_aot_optimized
+[100%] Built target void_g1_aot_optimized
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[ 66%] Built target libcurl_static
+[ 66%] Built target void_zone_objects
+[ 66%] Built target void_application_objects
+[ 66%] Built target void_g1_wrong_fixture
+[ 66%] Built target void_g1_thunk
+[ 73%] Built target void_core
+[ 73%] Built target void_g1_fixture
+[ 93%] Built target void_runtime
+[ 93%] Built target void_llvm
+[ 93%] Built target voidc_objects
+[ 93%] Built target void_cache_identity
+[ 93%] Built target void_g1_tests
+[100%] Linking CXX executable void_g1_aot_mismatch
+[100%] Built target void_g1_aot_mismatch
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_zone_objects
+[ 71%] Built target void_g2_fixture
+[ 71%] Built target void_application_objects
+[ 71%] Built target void_g2_thunk
+[ 92%] Built target void_runtime
+[100%] Built target void_core
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_g2_tests.dir/tests/ffi/records.cpp.o
+[100%] Linking CXX executable void_g2_tests
+[100%] Built target void_g2_tests
+[100%] Generating ffi-g2/application-normal.o
+[100%] Linking CXX executable void_g2_aot_normal
+[100%] Built target void_g2_aot_normal
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 66%] Built target libcurl_static
+[ 66%] Built target void_application_objects
+[ 66%] Built target void_g2_fixture
+[ 66%] Built target void_g2_thunk
+[ 73%] Built target void_core
+[ 93%] Built target void_runtime
+[ 93%] Built target void_llvm
+[ 93%] Built target void_g2_tests
+[ 93%] Generating ffi-g2/application-optimized.o
+[ 93%] Linking CXX executable void_g2_aot_optimized
+[100%] Built target void_g2_aot_optimized
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_zone_objects
+[ 71%] Built target void_application_objects
+[ 71%] Built target void_g3_fixture
+[ 71%] Built target void_g3_thunk
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_g3_tests
+[100%] Generating ffi-g3/application-normal.o
+[100%] Linking CXX executable void_g3_aot_normal
+[100%] Built target void_g3_aot_normal
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_application_objects
+[ 71%] Built target void_g3_fixture
+[ 71%] Built target void_g3_thunk
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_g3_tests
+[100%] Generating ffi-g3/application-optimized.o
+[100%] Linking CXX executable void_g3_aot_optimized
+[100%] Built target void_g3_aot_optimized
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_application_objects
+[ 71%] Built target void_g4_dep
+[ 71%] Built target void_g4_competitor
+[ 71%] Built target void_g4_initializer
+[ 92%] Built target void_runtime
+[ 92%] Built target void_g4_main
+[ 92%] Built target void_g4_plan
+[100%] Built target void_core
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_g4_tests.dir/tests/ffi/dynamic.cpp.o
+[100%] Linking CXX executable void_g4_tests
+[100%] Built target void_g4_tests
+[100%] Generating ffi-g4/application-normal.o
+[100%] Linking CXX executable void_g4_aot_normal
+[100%] Built target void_g4_aot_normal
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_application_objects
+[ 71%] Built target void_g4_dep
+[ 71%] Built target void_g4_competitor
+[ 71%] Built target void_g4_initializer
+[ 71%] Built target void_g4_main
+[ 92%] Built target void_runtime
+[100%] Built target void_core
+[100%] Built target void_g4_plan
+[100%] Built target void_llvm
+[100%] Built target void_g4_tests
+[100%] Generating ffi-g4/application-optimized.o
+[100%] Linking CXX executable void_g4_aot_optimized
+[100%] Built target void_g4_aot_optimized
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[ 66%] Built target libcurl_static
+[ 66%] Built target void_zone_objects
+[ 66%] Built target void_g4_dep
+[ 66%] Built target void_application_objects
+[ 66%] Built target void_g4_competitor
+[ 66%] Built target void_g4_initializer
+[ 66%] Built target void_g4_main
+[ 86%] Built target void_runtime
+[ 93%] Built target void_core
+[ 93%] Built target void_g4_plan
+[ 93%] Built target void_llvm
+[ 93%] Built target void_g4_tests
+[100%] Generating ffi-g4/application-startup.o
+[100%] Linking CXX executable void_g4_aot_startup
+[100%] Built target void_g4_aot_startup

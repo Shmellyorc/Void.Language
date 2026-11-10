@@ -1,0 +1,644 @@
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/usr/bin/cmake", "--install", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release", "--prefix", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install", "--config", "Release", "--component", "compiler"]}
+exit=0
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/VOID-MIT-LICENSE.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/LICENSING_SCOPE.md
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/REDISTRIBUTION.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/NOTICE_INVENTORY.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/llvm-23.1.4
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/llvm-23.1.4/LICENSE.TXT
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/llvm-23.1.4/ConvertUTF-NOTICES.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/llvm-23.1.4/xxhash-NOTICES.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/llvm-23.1.4/BLAKE3-LICENSE.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/llvm-23.1.4/Support-NOTICES.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/zstd-1.5.7
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/zstd-1.5.7/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/zstd-1.5.7/EMBEDDED-NOTICES.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/tomlplusplus/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/tomlplusplus/upstream.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/tomlplusplus/void-bounds-and-locations.patch
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/tomlplusplus/corresponding-source/toml.hpp
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/tomlplusplus/corresponding-source/README.md
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/zlib-1.3.2/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/libsodium
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/libsodium/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/libsodium/SOURCE-NOTICES.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/libarchive
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/libarchive/COPYING
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/libarchive/SOURCE-NOTICES.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/patches
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/patches/libsodium-1.0.22
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/patches/libsodium-1.0.22/asan-alignment.patch
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/patches/libsodium-1.0.22/PROVENANCE.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/host-versions.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/setup_host_deps.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/setup_host_deps_native.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/host-sodium.targets
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/verify_host_deps.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/corresponding-source/repro/tools/setup_host_deps.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/corresponding-source/repro/tools/setup_host_deps_native.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/corresponding-source/repro/tools/verify_host_deps.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/corresponding-source/repro/tools/verify_http_dependencies.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/corresponding-source/repro/tools/ci/llvm_sdk.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/corresponding-source/repro/cmake/host-sodium.targets
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-versions.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/corresponding-source/repro/third_party/http-versions.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22/asan-alignment.patch
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22/PROVENANCE.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/UNICODE-LICENSE.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/time.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/console.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/encoding
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/encoding/binary.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/encoding/hex.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/encoding/base64.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/encoding/ascii.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/io
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/io/memory.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/error.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/convert.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/io.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/path.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/text.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/random.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/math.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/json.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/channel.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/os.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/collections.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/log.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/url.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/net
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/net/http.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/system_error.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/crypto.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/archive.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/process.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/LICENSE-Boost
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/LICENSE.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/NOTICE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/stage10-versions.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/bin/voidc
+-- Set non-toolchain portion of runtime path of "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/bin/voidc" to "$ORIGIN/../lib/void"
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/libvoid_runtime.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/libvoid_native_fixture.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/libcurl.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/libarchive.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/libsodium.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/libpsl.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/libnghttp2.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/libssl.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/libcrypto.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/libcares.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/libz.a
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/cmake
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/cmake/nghttp2
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/cmake/c-ares
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/cmake/zlib
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/pkgconfig
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/crypto
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/crypto/cmake
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/crypto/cmake/static
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/ssl
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/ssl/cmake
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/ssl/cmake/static
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/libunistring.so.5
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/libunistring.so
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/libidn2.so.0
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/libidn2.so
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/libunistring.so.5.2.2
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/lib/void/libidn2.so.0.4.0
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/nghttp2-1.70.0
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/nghttp2-1.70.0/COPYING
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/nghttp2-1.70.0/README
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/c-ares-1.34.9
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/c-ares-1.34.9/LICENSE.md
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/zlib-1.3.2
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/zlib-1.3.2/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/zlib-1.3.2/README
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/openssl-3.5.9
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/openssl-3.5.9/LICENSE.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/libidn2-2.3.8
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/libidn2-2.3.8/COPYING
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/libidn2-2.3.8/COPYING.LESSERv3
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/libidn2-2.3.8/COPYING.unicode
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/libidn2-2.3.8/COPYINGv2
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/libidn2-2.3.8/README
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/libpsl-0.21.5
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/libpsl-0.21.5/README
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/libpsl-0.21.5/COPYING
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/libpsl-0.21.5/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/libpsl-0.21.5/LICENSE.chromium
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/libunistring-1.5
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/libunistring-1.5/COPYING.LIB
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/libunistring-1.5/README
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/libunistring-1.5/COPYING
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/aws-lc-5.12.0
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/aws-lc-5.12.0/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/aws-lc-5.12.0/NOTICE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/aws-lc-5.12.0/UPSTREAM.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/COPYING
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/NOTICE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/VOID-PROVENANCE.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/http-versions.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/publicsuffix
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/publicsuffix/public_suffix_list.dat
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/publicsuffix/UPSTREAM.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/publicsuffix/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/corresponding-source/libidn2-2.3.8.tar.gz
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/corresponding-source/libunistring-1.5.tar.xz
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/corresponding-source/setup_http_deps.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/corresponding-source/setup_http_deps_native.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/corresponding-source/http_archive.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/http/VOID-HTTP-DEPENDENCIES.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/bin/void-native.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/bin/void-native-resources.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/VOID-HOST-DEPENDENCIES.json
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/corresponding-source
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/corresponding-source/libsodium-1.0.22.tar.gz
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/host/corresponding-source/libarchive-3.8.11.tar.xz
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/usr/bin/cmake", "--install", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release", "--prefix", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install", "--config", "Release", "--component", "tooling"]}
+exit=0
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/bin/voidls
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/VOID-MIT-LICENSE.txt
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/LICENSING_SCOPE.md
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/REDISTRIBUTION.txt
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/NOTICE_INVENTORY.json
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/llvm-23.1.4
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/llvm-23.1.4/LICENSE.TXT
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/llvm-23.1.4/ConvertUTF-NOTICES.txt
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/llvm-23.1.4/xxhash-NOTICES.txt
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/llvm-23.1.4/BLAKE3-LICENSE.txt
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/llvm-23.1.4/Support-NOTICES.txt
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/zstd-1.5.7
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/zstd-1.5.7/LICENSE
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/zstd-1.5.7/EMBEDDED-NOTICES.txt
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/tomlplusplus/LICENSE
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/tomlplusplus/upstream.json
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/tomlplusplus/void-bounds-and-locations.patch
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/tomlplusplus/corresponding-source/toml.hpp
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/tomlplusplus/corresponding-source/README.md
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/zlib-1.3.2/LICENSE
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/UNICODE-LICENSE.txt
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/time.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/console.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/encoding
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/encoding/binary.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/encoding/hex.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/encoding/base64.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/encoding/ascii.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/io
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/io/memory.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/error.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/convert.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/io.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/path.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/text.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/random.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/math.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/json.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/channel.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/os.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/collections.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/log.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/url.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/net
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/net/http.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/system_error.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/crypto.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/archive.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/stdlib/process.void
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/LICENSE-Boost
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/LICENSE.txt
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/NOTICE
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/LICENSE
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/licenses/stage10-versions.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/vim
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/vim/ftdetect
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/vim/ftdetect/void.vim
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/vim/ftplugin
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/vim/ftplugin/void.vim
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/vim/syntax
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/vim/syntax/void.vim
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/vim/indent
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/vim/indent/void.vim
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/vim/autoload
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/vim/autoload/void.vim
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/vim/autoload/void_format.vim
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/neovim
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/neovim/lua
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/compiler install/share/void/neovim/lua/void.lua
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated compiler 雪/bin/voidc", "--version"]}
+exit=0
+VOID Language Compiler v0.1.0 (development)
+LLVM 23.1.4
+Target: x86_64-unknown-linux-gnu
+Build identity: 79b81722db94d5dcb45217b3da6adf7cce7a4b04ac3807b4c89b38ed5588dd2a
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/usr/bin/python3", "/home/shmellyorc/Documents/Void.Language/tools/verify_install.py", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated compiler 雪"]}
+exit=0
+VOID Language Compiler v0.1.0 (development)
+LLVM 23.1.4
+Target: x86_64-unknown-linux-gnu
+Build identity: 79b81722db94d5dcb45217b3da6adf7cce7a4b04ac3807b4c89b38ed5588dd2a
+PASS: installed stdlib check, optimized/Debug run, native build/run, resource hashes and LSP handshake
+
+Installed compiler SHA-256 c25dc6df30605fbd796d6e896f76527398854bf9698327c9b26e880566322c00
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated compiler 雪/bin/voidc", "new", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/created project", "--source", "src/launch.void", "--project-id", "org.voidlang.s7-integrated-new"]}
+exit=0
+Manifest: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/created project/void.project.toml
+Project ID: org.voidlang.s7-integrated-new
+Application ID: local.a3d212fd05d1baa5243767e8f733e8118
+Next: from the displayed manifest directory, run voidc check --project .
+Created project manifest.
+Automatic application selection requires one eligible main(). Use --entry for a deliberate override.
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated compiler 雪/bin/voidc", "check", "--project", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/created project"]}
+exit=0
+Source checked successfully
+/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/created project/void.project.toml:14:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 14 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated compiler 雪/bin/voidc", "run", "--project", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/created project", "--no-opt"]}
+exit=0
+/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/created project/void.project.toml:14:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 14 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated compiler 雪/bin/voidc", "run", "--project", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/created project"]}
+exit=0
+/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/created project/void.project.toml:14:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 14 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated compiler 雪/bin/voidc", "init", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/initialized project", "--project-id", "org.voidlang.s7-integrated-init"]}
+exit=0
+Manifest: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/initialized project/void.project.toml
+Project ID: org.voidlang.s7-integrated-init
+Application ID: local.a58cfe388d050fd312d2cb6cf87374e64
+Next: from the displayed manifest directory, run voidc check --project .
+Created project manifest.
+Automatic application selection requires one eligible main(). Use --entry for a deliberate override.
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated compiler 雪/bin/voidc", "check", "--project", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/initialized project"]}
+exit=0
+Source checked successfully
+/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/initialized project/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 11 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated compiler 雪/bin/voidc", "build", "--project", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/initialized project", "-o", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/ordinary build/ordinary"]}
+exit=0
+Built native executable: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/ordinary build/ordinary
+/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/initialized project/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 11 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/usr/bin/python3", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/gallery project/prepare.py", "--voidc", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated compiler 雪/bin/voidc", "--clang", "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang", "--header", "/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/upstream/raylib-6.0_linux_amd64/include/raylib.h", "--library", "/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/upstream/raylib-6.0_linux_amd64/lib/libraylib.so.6.0.0", "--license", "/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/upstream/raylib-6.0_linux_amd64/LICENSE"]}
+exit=0
+047e7255f93f8c34039cab906ad76136706b5c7b4c5b5b065d84141963ee9b6b  /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/upstream/raylib-6.0_linux_amd64/include/raylib.h
+1041653dd5c1cb8c67494fa398a296520d3ffec20cf1bf71b1eaa4b96ac61aee  /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/upstream/raylib-6.0_linux_amd64/lib/libraylib.so.6.0.0
+882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799  /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/upstream/raylib-6.0_linux_amd64/LICENSE
+['/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated compiler 雪/bin/voidc', 'native-bind', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/gallery project/native/.bind-w33wepf6/raylib-linux.descriptor', 'raylib_provider.h', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/gallery project/native/.bind-w33wepf6/raylib_checked.c']
+['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '-std=c11', '-shared', '-fuse-ld=lld', '-O2', '-Wall', '-Wextra', '-Werror', '-I/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/gallery project/native', '-I/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/upstream/raylib-6.0_linux_amd64/include', '-fPIC', '-fvisibility=hidden', '-Wl,-rpath,$ORIGIN', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/gallery project/native/raylib_provider.c', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/gallery project/native/.bind-w33wepf6/raylib_checked.c', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/gallery project/native/.bind-w33wepf6/libraylib.so.600', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/gallery project/native/.bind-w33wepf6/libvoid_raylib.so']
+9d1ed04f2fc97f5b339173a268223d6e9ec7684d59101043b52a760621c5dccc  /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/gallery project/native/libvoid_raylib.so
+1041653dd5c1cb8c67494fa398a296520d3ffec20cf1bf71b1eaa4b96ac61aee  /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/gallery project/native/libraylib.so.600
+31d8c67bf58e3e55c36bc305c1f1959b1edcf399bf47df846c39f74175ff952c  /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/gallery project/native/raylib-linux.descriptor
+818c9911886f85e0c26f6b23b2e97298198ff3dc733203bf161e5035a52a945b  /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/gallery project/native/raylib_checked.c
+882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799  /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/gallery project/native/RAYLIB-LICENSE.txt
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated compiler 雪/bin/voidc", "check", "--project", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/gallery project"]}
+exit=0
+Source checked successfully
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated compiler 雪/bin/voidc", "run", "--project", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/gallery project", "--", "--trace-only"]}
+exit=2
+Invalid invocation: This project declares native code. Pass --allow-native to authorize its execution.
+Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]
+Try 'voidc run --help' for examples.
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated compiler 雪/bin/voidc", "build", "--project", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/gallery project", "-o", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/denied"]}
+exit=2
+Invalid invocation: This project declares native code. Pass --allow-native to authorize its execution.
+Usage: voidc build [file-or-directory] [-o executable] [--no-opt]
+Try 'voidc build --help' for examples.
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated compiler 雪/bin/voidc", "run", "--project", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/gallery project", "--allow-native", "--no-opt", "--", "--trace-only"]}
+exit=0
+RAYLIB trace invoked VOID
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated compiler 雪/bin/voidc", "build", "--project", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/gallery project", "--allow-native", "--no-opt", "-o", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/linked normal/gallery"]}
+exit=0
+Built native executable: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/linked normal/gallery
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated compiler 雪/bin/voidc", "run", "--project", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/gallery project", "--allow-native", "--", "--trace-only"]}
+exit=0
+RAYLIB trace invoked VOID
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated compiler 雪/bin/voidc", "build", "--project", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/gallery project", "--allow-native", "-o", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/linked optimized/gallery"]}
+exit=0
+Built native executable: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/linked optimized/gallery
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated ordinary 雪/ordinary"]}
+exit=0
+SLICE7 installed ordinary application
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated gallery normal 雪/gallery", "--trace-only"]}
+exit=0
+RAYLIB trace invoked VOID
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated gallery optimized 雪/gallery", "--trace-only"]}
+exit=0
+RAYLIB trace invoked VOID
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/usr/bin/ldd", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated ordinary 雪/ordinary"]}
+exit=0
+	linux-vdso.so.1 (0x00007f228222d000)
+	libidn2.so.0 => /usr/lib/x86_64-linux-gnu/libidn2.so.0 (0x00007f22821c8000)
+	libunistring.so.5 => /usr/lib/x86_64-linux-gnu/libunistring.so.5 (0x00007f2281c16000)
+	libstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f2281800000)
+	libm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007f22820ad000)
+	libgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f228207d000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007f2281600000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f228222f000)
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/usr/bin/readelf", "-d", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated ordinary 雪/ordinary"]}
+exit=0
+
+Dynamic section at offset 0x2065a8 contains 32 entries:
+  Tag        Type                         Name/Value
+ 0x000000000000001d (RUNPATH)            Library runpath: [/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated compiler 雪/bin/../lib/void]
+ 0x0000000000000001 (NEEDED)             Shared library: [libidn2.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libunistring.so.5]
+ 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+ 0x000000006ffffffb (FLAGS_1)            Flags: PIE
+ 0x0000000000000015 (DEBUG)              0x0
+ 0x0000000000000007 (RELA)               0x4630
+ 0x0000000000000008 (RELASZ)             11976 (bytes)
+ 0x0000000000000009 (RELAENT)            24 (bytes)
+ 0x000000006ffffff9 (RELACOUNT)          432
+ 0x0000000000000017 (JMPREL)             0x74f8
+ 0x0000000000000002 (PLTRELSZ)           5328 (bytes)
+ 0x0000000000000003 (PLTGOT)             0x20a058
+ 0x0000000000000014 (PLTREL)             RELA
+ 0x0000000000000006 (SYMTAB)             0x320
+ 0x000000000000000b (SYMENT)             24 (bytes)
+ 0x0000000000000005 (STRTAB)             0x229c
+ 0x000000000000000a (STRSZ)              9105 (bytes)
+ 0x000000006ffffef5 (GNU_HASH)           0x2208
+ 0x0000000000000019 (INIT_ARRAY)         0x207330
+ 0x000000000000001b (INIT_ARRAYSZ)       8 (bytes)
+ 0x000000000000001a (FINI_ARRAY)         0x207328
+ 0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)
+ 0x000000000000000c (INIT)               0x205500
+ 0x000000000000000d (FINI)               0x20551c
+ 0x000000006ffffff0 (VERSYM)             0x1d48
+ 0x000000006ffffffe (VERNEED)            0x1f78
+ 0x000000006fffffff (VERNEEDNUM)         3
+ 0x0000000000000000 (NULL)               0x0
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/usr/bin/ldd", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated gallery normal 雪/gallery"]}
+exit=0
+	linux-vdso.so.1 (0x00007ffb40daf000)
+	libidn2.so.0 => /usr/lib/x86_64-linux-gnu/libidn2.so.0 (0x00007ffb40d4a000)
+	libunistring.so.5 => /usr/lib/x86_64-linux-gnu/libunistring.so.5 (0x00007ffb40816000)
+	libstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007ffb40400000)
+	libm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007ffb406fb000)
+	libgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007ffb40d1a000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007ffb40200000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007ffb40db1000)
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/usr/bin/readelf", "-d", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated gallery normal 雪/gallery"]}
+exit=0
+
+Dynamic section at offset 0x288890 contains 32 entries:
+  Tag        Type                         Name/Value
+ 0x000000000000001d (RUNPATH)            Library runpath: [/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated compiler 雪/bin/../lib/void]
+ 0x0000000000000001 (NEEDED)             Shared library: [libidn2.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libunistring.so.5]
+ 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+ 0x000000006ffffffb (FLAGS_1)            Flags: PIE
+ 0x0000000000000015 (DEBUG)              0x0
+ 0x0000000000000007 (RELA)               0x5648
+ 0x0000000000000008 (RELASZ)             37152 (bytes)
+ 0x0000000000000009 (RELAENT)            24 (bytes)
+ 0x000000006ffffff9 (RELACOUNT)          1475
+ 0x0000000000000017 (JMPREL)             0xe768
+ 0x0000000000000002 (PLTRELSZ)           7008 (bytes)
+ 0x0000000000000003 (PLTGOT)             0x28c3c8
+ 0x0000000000000014 (PLTREL)             RELA
+ 0x0000000000000006 (SYMTAB)             0x320
+ 0x000000000000000b (SYMENT)             24 (bytes)
+ 0x0000000000000005 (STRTAB)             0x2a10
+ 0x000000000000000a (STRSZ)              11319 (bytes)
+ 0x000000006ffffef5 (GNU_HASH)           0x2978
+ 0x0000000000000019 (INIT_ARRAY)         0x285cc0
+ 0x000000000000001b (INIT_ARRAYSZ)       8 (bytes)
+ 0x000000000000001a (FINI_ARRAY)         0x285cb8
+ 0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)
+ 0x000000000000000c (INIT)               0x283a28
+ 0x000000000000000d (FINI)               0x283a44
+ 0x000000006ffffff0 (VERSYM)             0x2408
+ 0x000000006ffffffe (VERNEED)            0x26c8
+ 0x000000006fffffff (VERNEEDNUM)         3
+ 0x0000000000000000 (NULL)               0x0
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/usr/bin/ldd", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated gallery optimized 雪/gallery"]}
+exit=0
+	linux-vdso.so.1 (0x00007efea5a31000)
+	libidn2.so.0 => /usr/lib/x86_64-linux-gnu/libidn2.so.0 (0x00007efea59cc000)
+	libunistring.so.5 => /usr/lib/x86_64-linux-gnu/libunistring.so.5 (0x00007efea5416000)
+	libstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007efea5000000)
+	libm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007efea58b1000)
+	libgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007efea53e8000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007efea4e00000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007efea5a33000)
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/usr/bin/readelf", "-d", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated gallery optimized 雪/gallery"]}
+exit=0
+
+Dynamic section at offset 0x286d30 contains 32 entries:
+  Tag        Type                         Name/Value
+ 0x000000000000001d (RUNPATH)            Library runpath: [/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated compiler 雪/bin/../lib/void]
+ 0x0000000000000001 (NEEDED)             Shared library: [libidn2.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libunistring.so.5]
+ 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+ 0x000000006ffffffb (FLAGS_1)            Flags: PIE
+ 0x0000000000000015 (DEBUG)              0x0
+ 0x0000000000000007 (RELA)               0x5690
+ 0x0000000000000008 (RELASZ)             34680 (bytes)
+ 0x0000000000000009 (RELAENT)            24 (bytes)
+ 0x000000006ffffff9 (RELACOUNT)          1372
+ 0x0000000000000017 (JMPREL)             0xde08
+ 0x0000000000000002 (PLTRELSZ)           7056 (bytes)
+ 0x0000000000000003 (PLTGOT)             0x289868
+ 0x0000000000000014 (PLTREL)             RELA
+ 0x0000000000000006 (SYMTAB)             0x320
+ 0x000000000000000b (SYMENT)             24 (bytes)
+ 0x0000000000000005 (STRTAB)             0x2a48
+ 0x000000000000000a (STRSZ)              11330 (bytes)
+ 0x000000006ffffef5 (GNU_HASH)           0x29b0
+ 0x0000000000000019 (INIT_ARRAY)         0x2834a0
+ 0x000000000000001b (INIT_ARRAYSZ)       8 (bytes)
+ 0x000000000000001a (FINI_ARRAY)         0x283498
+ 0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)
+ 0x000000000000000c (INIT)               0x2811e8
+ 0x000000000000000d (FINI)               0x281204
+ 0x000000006ffffff0 (VERSYM)             0x2438
+ 0x000000006ffffffe (VERNEED)            0x26fc
+ 0x000000006fffffff (VERNEEDNUM)         3
+ 0x0000000000000000 (NULL)               0x0
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/usr/bin/ldd", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated gallery normal 雪/native/libvoid_raylib.so"]}
+exit=0
+	linux-vdso.so.1 (0x00007f4662f66000)
+	libraylib.so.600 => /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated gallery normal 雪/native/libraylib.so.600 (0x00007f4662d3a000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007f4662a00000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f4662f68000)
+	libm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007f4662c1f000)
+	libX11.so.6 => /usr/lib/x86_64-linux-gnu/libX11.so.6 (0x00007f4662893000)
+	libxcb.so.1 => /usr/lib/x86_64-linux-gnu/libxcb.so.1 (0x00007f4662866000)
+	libXau.so.6 => /usr/lib/x86_64-linux-gnu/libXau.so.6 (0x00007f4662c18000)
+	libXdmcp.so.6 => /usr/lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007f4662c10000)
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/usr/bin/readelf", "-d", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated gallery normal 雪/native/libvoid_raylib.so"]}
+exit=0
+
+Dynamic section at offset 0x23b0 contains 27 entries:
+  Tag        Type                         Name/Value
+ 0x000000000000001d (RUNPATH)            Library runpath: [$ORIGIN]
+ 0x0000000000000001 (NEEDED)             Shared library: [libraylib.so.600]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]
+ 0x0000000000000007 (RELA)               0xab0
+ 0x0000000000000008 (RELASZ)             216 (bytes)
+ 0x0000000000000009 (RELAENT)            24 (bytes)
+ 0x000000006ffffff9 (RELACOUNT)          3
+ 0x0000000000000017 (JMPREL)             0xb88
+ 0x0000000000000002 (PLTRELSZ)           984 (bytes)
+ 0x0000000000000003 (PLTGOT)             0x55a0
+ 0x0000000000000014 (PLTREL)             RELA
+ 0x0000000000000006 (SYMTAB)             0x270
+ 0x000000000000000b (SYMENT)             24 (bytes)
+ 0x0000000000000005 (STRTAB)             0x7d4
+ 0x000000000000000a (STRSZ)              727 (bytes)
+ 0x000000006ffffef5 (GNU_HASH)           0x788
+ 0x0000000000000019 (INIT_ARRAY)         0x43a8
+ 0x000000000000001b (INIT_ARRAYSZ)       8 (bytes)
+ 0x000000000000001a (FINI_ARRAY)         0x43a0
+ 0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)
+ 0x000000000000000c (INIT)               0x30cc
+ 0x000000000000000d (FINI)               0x30e8
+ 0x000000006ffffff0 (VERSYM)             0x6d8
+ 0x000000006ffffffe (VERNEED)            0x738
+ 0x000000006fffffff (VERNEEDNUM)         2
+ 0x0000000000000000 (NULL)               0x0
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/usr/bin/ldd", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated gallery optimized 雪/native/libvoid_raylib.so"]}
+exit=0
+	linux-vdso.so.1 (0x00007f1be62a1000)
+	libraylib.so.600 => /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated gallery optimized 雪/native/libraylib.so.600 (0x00007f1be6075000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007f1be5e00000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f1be62a3000)
+	libm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007f1be5ce5000)
+	libX11.so.6 => /usr/lib/x86_64-linux-gnu/libX11.so.6 (0x00007f1be5b78000)
+	libxcb.so.1 => /usr/lib/x86_64-linux-gnu/libxcb.so.1 (0x00007f1be6046000)
+	libXau.so.6 => /usr/lib/x86_64-linux-gnu/libXau.so.6 (0x00007f1be6041000)
+	libXdmcp.so.6 => /usr/lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007f1be6039000)
+
+{"cwd": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/independent cwd", "argv": ["/usr/bin/readelf", "-d", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated gallery optimized 雪/native/libvoid_raylib.so"]}
+exit=0
+
+Dynamic section at offset 0x23b0 contains 27 entries:
+  Tag        Type                         Name/Value
+ 0x000000000000001d (RUNPATH)            Library runpath: [$ORIGIN]
+ 0x0000000000000001 (NEEDED)             Shared library: [libraylib.so.600]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]
+ 0x0000000000000007 (RELA)               0xab0
+ 0x0000000000000008 (RELASZ)             216 (bytes)
+ 0x0000000000000009 (RELAENT)            24 (bytes)
+ 0x000000006ffffff9 (RELACOUNT)          3
+ 0x0000000000000017 (JMPREL)             0xb88
+ 0x0000000000000002 (PLTRELSZ)           984 (bytes)
+ 0x0000000000000003 (PLTGOT)             0x55a0
+ 0x0000000000000014 (PLTREL)             RELA
+ 0x0000000000000006 (SYMTAB)             0x270
+ 0x000000000000000b (SYMENT)             24 (bytes)
+ 0x0000000000000005 (STRTAB)             0x7d4
+ 0x000000000000000a (STRSZ)              727 (bytes)
+ 0x000000006ffffef5 (GNU_HASH)           0x788
+ 0x0000000000000019 (INIT_ARRAY)         0x43a8
+ 0x000000000000001b (INIT_ARRAYSZ)       8 (bytes)
+ 0x000000000000001a (FINI_ARRAY)         0x43a0
+ 0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)
+ 0x000000000000000c (INIT)               0x30cc
+ 0x000000000000000d (FINI)               0x30e8
+ 0x000000006ffffff0 (VERSYM)             0x6d8
+ 0x000000006ffffffe (VERNEED)            0x738
+ 0x000000006fffffff (VERNEEDNUM)         2
+ 0x0000000000000000 (NULL)               0x0
+
+{
+  "raylib_input_hashes": {
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/upstream/raylib-6.0_linux_amd64/include/raylib.h": "047e7255f93f8c34039cab906ad76136706b5c7b4c5b5b065d84141963ee9b6b",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/upstream/raylib-6.0_linux_amd64/lib/libraylib.so.6.0.0": "1041653dd5c1cb8c67494fa398a296520d3ffec20cf1bf71b1eaa4b96ac61aee",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-raylib/upstream/raylib-6.0_linux_amd64/LICENSE": "882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799"
+  },
+  "packaged_hashes": {
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated ordinary 雪/ordinary": "f1037ab683a5420b6dc996792a99e2d60c653321bf393bed29b98ed50274c855",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated gallery normal 雪/gallery": "af0c453b5bce72bfe994b58975e90fe9571ccf5fc6a515a613377fb5e9c1b6df",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated gallery optimized 雪/gallery": "6c06396a12ad9ab61466caf752e1c61c4722aaed6e6a881ff0890052194504f5",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated gallery normal 雪/native/libvoid_raylib.so": "9d1ed04f2fc97f5b339173a268223d6e9ec7684d59101043b52a760621c5dccc",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated gallery normal 雪/native/libraylib.so.600": "1041653dd5c1cb8c67494fa398a296520d3ffec20cf1bf71b1eaa4b96ac61aee",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated gallery normal 雪/native/RAYLIB-LICENSE.txt": "882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated gallery optimized 雪/native/libvoid_raylib.so": "9d1ed04f2fc97f5b339173a268223d6e9ec7684d59101043b52a760621c5dccc",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated gallery optimized 雪/native/libraylib.so.600": "1041653dd5c1cb8c67494fa398a296520d3ffec20cf1bf71b1eaa4b96ac61aee",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/linux-public-release/relocated gallery optimized 雪/native/RAYLIB-LICENSE.txt": "882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799"
+  }
+}
+Integrated installed workflow passed

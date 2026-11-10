@@ -1,0 +1,10 @@
+VOID native resources 1
+cf4e3290b5e5e86273e2a6ff540bb74bdf72d92f536ac7d084ef4634de3b3181	C:/Users/a/VoidS4-Final-Debug/void_runtime.lib
+bfb0e165281d5a49df551dfd7714a04e862b0e7369fcf1169d02433ee5f38a22	C:/Users/a/VoidS4-Final-Debug/void_native_fixture.lib
+16161176de7eb511618b9edb3b22327ff418c152e793b226a2d57700ea11dfd4	C:/Users/a/VoidCI42377496702-Native/.toolchains/host/prefix/windows-x86_64/Debug/lib/archive.lib
+ec232de215f8271c95ab6a2a18740156669dfb4b784e39f16636406caa71e298	C:/Users/a/VoidCI42377496702-Native/.toolchains/host/prefix/windows-x86_64/Debug/lib/libsodium.lib
+7bcbdc91fdbcb604fe4eef97145c8720c6a2ec4ec8d74ea373783e2aafaf7425	C:/Users/a/VoidS4-Final-Debug/curl/lib/libcurl.lib
+14a0b2617ed408da866cdfeabb643979dcc1603a1c046acb7944f8ad9c88f865	C:/Users/a/VoidCI42377496702-Native/.toolchains/http/prefix/windows-schannel-x86_64/Debug/lib/psl.lib
+f9648b25723c3408fb1c8b346f412febcdb7f1d07c56f5b45c0940599aa9e545	C:/Users/a/VoidCI42377496702-Native/.toolchains/http/prefix/windows-schannel-x86_64/Debug/lib/nghttp2.lib
+b31cf5c35cd859c54be1de71fa44ef4d2f6dc5e9a15126fbf2fe0082a6c06519	C:/Users/a/VoidCI42377496702-Native/.toolchains/http/prefix/windows-schannel-x86_64/Debug/lib/cares.lib
+357dd492c4d13392c7599e98e523cd0d3930ca66c0899724388d385949a3dccf	C:/Users/a/VoidCI42377496702-Native/.toolchains/http/prefix/windows-schannel-x86_64/Debug/lib/zsd.lib

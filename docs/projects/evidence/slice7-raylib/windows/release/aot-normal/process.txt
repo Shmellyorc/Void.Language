@@ -1,0 +1,35 @@
+INFO: Initializing raylib 6.0
+INFO: Platform backend: DESKTOP (WIN32)
+INFO: Supported raylib modules:
+INFO:     > rcore:..... loaded (mandatory)
+INFO:     > rlgl:...... loaded (mandatory)
+INFO:     > rshapes:... loaded (optional)
+INFO:     > rtextures:. loaded (optional)
+INFO:     > rtext:..... loaded (optional)
+INFO:     > rmodels:... loaded (optional)
+INFO:     > raudio:.... loaded (optional)
+INFO: DISPLAY: Device initialized successfully 
+INFO:     > Display size: 688 x 925
+INFO:     > Screen size:  640 x 360
+INFO:     > Render size:  640 x 360
+INFO:     > Viewport offsets: 0, 0
+INFO: GL: OpenGL device information:
+INFO:     > Vendor:   RLSW
+INFO:     > Renderer: RLSW OpenGL Software Renderer
+INFO:     > Version:  1.5
+INFO:     > GLSL:     NOT SUPPORTED
+INFO: PLATFORM: DESKTOP: WIN32: Initialized successfully
+INFO: RLSW: Software renderer initialized successfully
+INFO: RLGL: Default OpenGL state initialized successfully
+INFO: TEXTURE: [ID 1] Texture loaded successfully (128x128 | GRAY_ALPHA | 1 mipmaps)
+INFO: FONT: Default font loaded successfully (224 glyphs)
+INFO: SYSTEM: Working Directory: C:\Users\a\VoidS7-Raylib-Graphics\Release-psapi\independent cwd
+INFO: TEXTURE: [ID 2] Texture loaded successfully (24x24 | R8G8B8A8 | 1 mipmaps)
+INFO: TIMER: Target time per frame: 16.667 milliseconds
+RAYLIB ready
+RAYLIB keyboard input 1
+INFO: TEXTURE: [ID 2] Unloaded texture data from VRAM (GPU)
+INFO: TEXTURE: [ID 1] Unloaded texture data from VRAM (GPU)
+INFO: Window closed successfully
+RAYLIB owner released texture and window
+RAYLIB frames 53 input frames 27

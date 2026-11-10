@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/project/application.py", line 167, in <module>
+    output, _ = run([compiler, "run", "--project", root, "--profile", profile, "--no-cache"], cwd, env)
+                ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/project/application.py", line 33, in run
+    check(result.returncode == status, records[-1])
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/project/application.py", line 24, in check
+    assert condition, detail
+           ^^^^^^^^^
+AssertionError: {'argv': ['/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc', 'run', '--project', '/tmp/VOID S4 metadata 雪 s5y4v5lh/checkout', '--profile', 'debug', '--no-cache'], 'cwd': '/tmp/VOID S4 metadata 雪 s5y4v5lh/unrelated', 'status': 1, 'stdout': '', 'stderr': '/tmp/VOID S4 metadata 雪 s5y4v5lh/checkout/launcher.void:7:165: error: Value struct equality is not implemented.\n    code: VOID2016\n\n 7 |         print("{label}|{reason.code}|{reason.operation}|{reason.path.byte_length}|{reason.native_domain.byte_length}|{reason.os_code}|{reason.message}|{reason.kind == system.error_kind.unavailable}")\n   |                                                                                                                                                                     ^^\n    Module: /launcher.void\n\n'}

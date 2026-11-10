@@ -1,0 +1,7 @@
+The initial collector copied the Windows logs, then mistakenly included linux-mapping.c in the set of sources it expected on the Windows share. It stopped with the following error before writing the evidence manifest.
+
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/VM/project-slice7-g4-checkpoint/linux-mapping.c'
+
+The corrected collector explicitly enumerates Windows inputs and checks the bytes of the logs already copied.
+
+The first cleanup preparation shell also stopped with share: unbound variable before copying or launching either cleanup input. Setting the explicit share path corrected the launch. See cleanup-results.json.

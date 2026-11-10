@@ -1,0 +1,7 @@
+{
+  "status": "FAIL",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "root": "C:\\Users\\a\\VoidSlice1Closeout-20261108",
+  "commands": [],
+  "error": "Traceback (most recent call last):\n  File \"\\\\vboxsvr\\VM\\project-slice1-closeout\\native.py\", line 21, in <module>\n    with zipfile.ZipFile(out/'source.zip') as z:z.extractall(root)\n         ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\zipfile\\__init__.py\", line 1505, in __init__\n    self._RealGetContents()\n    ~~~~~~~~~~~~~~~~~~~~~^^\n  File \"C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\zipfile\\__init__.py\", line 1572, in _RealGetContents\n    raise BadZipFile(\"File is not a zip file\")\nzipfile.BadZipFile: File is not a zip file\n"
+}

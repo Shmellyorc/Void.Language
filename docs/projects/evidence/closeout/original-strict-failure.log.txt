@@ -1,0 +1,78 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-strict
+      Start 400: modules_cli
+      Start 402: numeric_cli
+ 1/24 Test #402: numeric_cli ......................   Passed   42.50 sec
+      Start 175: os_frontend
+ 2/24 Test #400: modules_cli ......................   Passed   51.99 sec
+      Start 176: lsp_os
+ 3/24 Test #176: lsp_os ...........................   Passed    6.47 sec
+      Start 174: os_errors
+ 4/24 Test #174: os_errors ........................   Passed   20.84 sec
+      Start  68: application_workflow_stage9
+ 5/24 Test #175: os_frontend ......................   Passed   38.36 sec
+      Start 396: source_cli
+ 6/24 Test #396: source_cli .......................   Passed   14.95 sec
+      Start 365: frontend
+ 7/24 Test #365: frontend .........................   Passed   11.63 sec
+      Start   7: cli_contract
+ 8/24 Test  #68: application_workflow_stage9 ......   Passed   31.27 sec
+      Start 364: numeric
+ 9/24 Test #364: numeric ..........................   Passed    6.68 sec
+      Start 366: modules
+10/24 Test   #7: cli_contract .....................   Passed   11.49 sec
+      Start  98: debug_cache_processes
+11/24 Test #366: modules ..........................   Passed    2.13 sec
+      Start 363: analysis
+12/24 Test #363: analysis .........................   Passed    1.24 sec
+      Start 401: analysis_cli
+13/24 Test #401: analysis_cli .....................   Passed    1.14 sec
+      Start 388: local_libraries
+14/24 Test #388: local_libraries ..................   Passed    1.00 sec
+      Start 222: lsp_stage7
+15/24 Test #222: lsp_stage7 .......................   Passed    0.47 sec
+      Start 362: tooling
+16/24 Test #362: tooling ..........................   Passed    0.61 sec
+      Start 361: sessions
+17/24 Test #361: sessions .........................   Passed    0.26 sec
+      Start  99: automatic_cache_processes
+18/24 Test  #99: automatic_cache_processes ........   Passed    1.48 sec
+      Start   9: cli_install_resources
+19/24 Test   #9: cli_install_resources ............   Passed    0.09 sec
+      Start   1: project_manifest
+20/24 Test   #1: project_manifest .................***Failed    0.44 sec
+/home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15487:4: runtime error: assumption is violated during execution
+    #0 0x5644a765aacb in toml::v3::impl::impl_noex::parser::parse_key() /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15487:4
+    #1 0x5644a764fb35 in toml::v3::impl::impl_noex::parser::parse_table_header() /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15609:5
+    #2 0x5644a764c862 in toml::v3::impl::impl_noex::parser::parse_document() /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15916:22
+    #3 0x5644a764b997 in toml::v3::impl::impl_noex::parser::parser(toml::v3::impl::utf8_reader_interface&&) /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:16001:6
+    #4 0x5644a762f3c6 in toml::v3::impl::do_parse(toml::v3::impl::utf8_reader_interface&&) /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:16212:10
+    #5 0x5644a762f3c6 in toml::v3::noex::parse(std::basic_string_view<char, std::char_traits<char>>, std::basic_string_view<char, std::char_traits<char>>) /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:16279:10
+    #6 0x5644a762f3c6 in vd::project::ManifestParser::parse() /home/shmellyorc/Documents/Void.Language/src/frontend/project.cpp:304:23
+    #7 0x5644a762db5c in vd::project::parse_manifest(vd::SourceFile const&) /home/shmellyorc/Documents/Void.Language/src/frontend/project.cpp:366:86
+    #8 0x5644a76267d2 in (anonymous namespace)::parse(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>) /home/shmellyorc/Documents/Void.Language/tests/project/manifest.cpp:62:12
+    #9 0x5644a76126cb in (anonymous namespace)::mutations() /home/shmellyorc/Documents/Void.Language/tests/project/manifest.cpp:232:27
+    #10 0x5644a76126cb in main /home/shmellyorc/Documents/Void.Language/tests/project/manifest.cpp:293:89
+    #11 0x7f2c1ca2a3fd  (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a3fd) (BuildId: a6ece0eae08c71f58eaefb817ae72b57782127d3)
+    #12 0x7f2c1ca2a51a in __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a51a) (BuildId: a6ece0eae08c71f58eaefb817ae72b57782127d3)
+    #13 0x5644a75193f4 in _start (/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_project_manifest+0x4a63f4)
+
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15487:4 
+
+      Start   2: project_manifest_no_authority
+21/24 Test   #2: project_manifest_no_authority ....SIGSYS***Exception:   0.08 sec
+/home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15487:4: runtime error: assumption is violated during execution
+
+      Start   5: project_manifest_legacy
+22/24 Test   #5: project_manifest_legacy ..........   Passed    1.60 sec
+      Start   6: project_manifest_provenance
+23/24 Test   #6: project_manifest_provenance ......   Passed    0.04 sec
+24/24 Test  #98: debug_cache_processes ............   Passed    9.21 sec
+
+92% tests passed, 2 tests failed out of 24
+
+Total Test time (real) = 128.15 sec
+
+The following tests FAILED:
+	  1 - project_manifest (Failed)
+	  2 - project_manifest_no_authority (SIGSYS)
+Errors while running CTest

@@ -1,0 +1,1799 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index b7185ad..e9c58e4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -96,15 +96,17 @@ target_include_directories(void_zone_objects PRIVATE third_party/date/include)
+ target_compile_definitions(void_zone_objects PRIVATE
+   USE_OS_TZDB=0 HAS_REMOTE_API=0 AUTO_DOWNLOAD=0 VOID_EMBEDDED_TZDB=1)
+ target_link_libraries(void_zone_objects PRIVATE void_options)
++add_library(void_application_objects OBJECT src/application_metadata.cpp src/project_identity.cpp)
++target_link_libraries(void_application_objects PRIVATE void_options)
+ add_library(void_core src/frontend/project.cpp src/frontend/source.cpp src/frontend/compiler.cpp src/frontend/tooling.cpp src/numeric.cpp src/ir/module.cpp src/ir/native_storage.cpp src/ir/native_binding.cpp)
+-target_sources(void_core PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects>)
++target_sources(void_core PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects> $<TARGET_OBJECTS:void_application_objects>)
+ target_include_directories(void_core SYSTEM PRIVATE third_party/tomlplusplus)
+ target_compile_definitions(void_core PRIVATE VOID_STDLIB_ROOT="${VOID_STDLIB_ROOT}")
+ target_link_libraries(void_core PUBLIC void_options Threads::Threads)
+ add_library(void_native_fixture STATIC src/native/fixture.c src/native/sink.c)
+ target_link_libraries(void_native_fixture PRIVATE void_options)
+ add_library(void_runtime STATIC src/runtime/application.cpp src/runtime/os.cpp src/runtime/os_abi.cpp src/runtime/random.cpp src/runtime/filesystem_abi.cpp src/runtime/filesystem.cpp src/runtime/native_resource.cpp src/runtime/native_binding.cpp src/runtime/temporal_abi.cpp src/runtime/conversion.cpp src/runtime/text_case.cpp src/runtime/buffer.cpp src/runtime/list.cpp src/runtime/array.cpp src/runtime/dictionary.cpp src/runtime/fixed_abi.cpp src/runtime/gc_schema.cpp src/runtime/heap.cpp src/runtime/coordination.cpp src/runtime/console.cpp src/runtime/console_abi.cpp src/runtime/callback.cpp src/runtime/abi.cpp src/runtime/reload.cpp src/runtime/native.cpp src/runtime/async.cpp)
+-target_sources(void_runtime PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects>)
++target_sources(void_runtime PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects> $<TARGET_OBJECTS:void_application_objects>)
+ target_link_libraries(void_runtime PUBLIC void_options Threads::Threads void_native_fixture ${CMAKE_DL_LIBS})
+ include(cmake/CurlProvider.cmake)
+ void_add_curl_provider(HTTP)
+@@ -354,6 +356,16 @@ if(BUILD_TESTING)
+   target_link_libraries(void_project_sessions PRIVATE void_llvm void_runtime)
+   add_test(NAME project_sessions COMMAND void_project_sessions)
+   set_tests_properties(project_sessions PROPERTIES TIMEOUT 180)
++  add_executable(void_project_application tests/project/application.cpp)
++  target_link_libraries(void_project_application PRIVATE void_llvm void_runtime)
++  add_test(NAME project_application COMMAND void_project_application)
++  set_tests_properties(project_application PROPERTIES TIMEOUT 180)
++  if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
++    add_test(NAME project_application_process COMMAND "${Python3_EXECUTABLE}"
++      "${PROJECT_SOURCE_DIR}/tests/project/application.py" "$<TARGET_FILE:voidc>"
++      "${CMAKE_CURRENT_BINARY_DIR}/project-application-evidence.json")
++    set_tests_properties(project_application_process PROPERTIES TIMEOUT 300)
++  endif()
+   add_test(NAME project_discovery_cli COMMAND "${Python3_EXECUTABLE}"
+     "${PROJECT_SOURCE_DIR}/tests/project/discovery.py" "$<TARGET_FILE:voidc>"
+     "${CMAKE_CURRENT_BINARY_DIR}/project-discovery-evidence.json")
+diff --git a/docs/PROJECT_ARCHITECTURE_ROADMAP.md b/docs/PROJECT_ARCHITECTURE_ROADMAP.md
+index a1fb707..b28d855 100644
+--- a/docs/PROJECT_ARCHITECTURE_ROADMAP.md
++++ b/docs/PROJECT_ARCHITECTURE_ROADMAP.md
+@@ -1,6 +1,15 @@
+ # First-class VOID projects and native application roadmap
+ 
+-## Current Slice 3 implementation, 8 November 2026
++## Current Slice 4 implementation
++
++Golden Wrench accepted the [S3 final closeout](projects/SLICE3_FINAL_CLOSEOUT.md).
++Slice 4 adds the versioned application record, per-Runtime admission before eager
++globals, AOT embedding and four closed OS location adapters. [Implementation and
++qualification](projects/SLICE4.md) records the ABI, tests and platform scope. Stop
++for independent S4 review before S5. Hosted CI remains on strict hold until the
++integrated project, C FFI and dynamically linked raylib milestone.
++
++## Slice 3 implementation, 8 November 2026
+ 
+ Golden Wrench accepts the preserved [S2 final closeout](projects/SLICE2_FINAL_CLOSEOUT.md).
+ Boss authorizes project ToolingSession/voidls/editor integration and project-only CLI
+@@ -13,8 +22,8 @@ library metadata sessions, separate TOML overlays, owned revision acceptance, ne
+ schema-2 preflight and `voidProjectProtocol: 1`, guarded VS Code project recognition,
+ and effective optimization/cache profiles. It separates raw selection/build provenance
+ from normalized semantic source context; source hashes do not become permanent Runtime
+-application identity. No Runtime application metadata or OS convenience adapters are
+-implemented.
++application identity. S3 deferred Runtime application metadata and OS convenience
++adapters to S4.
+ 
+ Boss explicitly approved structured warning VOID5012 for the selected unsupported
+ line/full debug-information mode, retaining requested metadata, actual optimization
+diff --git a/docs/RUNTIME_GLOBALS.md b/docs/RUNTIME_GLOBALS.md
+index b2194b4..8120a21 100644
+--- a/docs/RUNTIME_GLOBALS.md
++++ b/docs/RUNTIME_GLOBALS.md
+@@ -1,15 +1,16 @@
+ # Runtime globals — Stage 11
+ 
+-## Phase 1 project proposal, 8 November 2026
++## Manifest project startup
+ 
+ The [project contract](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-compiler-owned-entry-discovery)
+ preserves selected-entry root visibility and initializes only its reachable import
+ graph E. Parsing unrelated application seeds for discovery does not initialize or
+ emit their globals. The manifest directory is a VFS boundary, not a source module.
+-The [metadata proposal](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-metadata-delivery-and-os-locations)
+-admits immutable application identity before eager globals and preserves body-only
+-reload; metadata/entry changes require restart. This is unimplemented project work,
+-not an amendment to the accepted Stage 11 behavior or CI evidence below. HOLD remains.
++JIT and AOT admit the immutable application context before entering the checked
++startup wrapper. Runtime admission freezes either validated metadata or explicit
++absence. Eager globals can query the four application directories as soon as their
++initializers run. A compatible replacement retains the context and the initialized
++cells. Metadata or selected entry changes require restart. [Project startup contract](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-metadata-delivery-and-os-locations).
+ 
+ **STAGE 11: OFFICIALLY LOCKED, October 25, 2026.** Golden Wrench reviewed and
+ accepted the implementation; Boss authorized the lock at tested commit
+diff --git a/docs/os/API.md b/docs/os/API.md
+index 5024840..4214e85 100644
+--- a/docs/os/API.md
++++ b/docs/os/API.md
+@@ -8,29 +8,24 @@ including owner async activations and eager globals.
+ Worker-reachable calls are rejected transitively. Import, source checking, editor
+ analysis and object emission execute no native OS query.
+ 
+-## Approved project-aware location direction, 8 November 2026
+-
+-The [project roadmap](../PROJECT_ARCHITECTURE_ROADMAP.md#proposed-metadata-delivery-and-os-locations)
+-plans zero-argument `os.data_dir()`, `os.config_dir()`, `os.cache_dir()` and
+-`os.state_dir()` using the consuming application's validated, immutable Runtime
+-metadata. **Not implemented:** the four getters still require explicit IDs today.
+-Keep their explicit-ID call forms, existing `result<string, error>`, validation,
+-platform placement, errors, owned UTF-8 paths, owner-thread/GC rules and no-creation
+-security contract. Project metadata authenticates no identity and grants no access.
+-
+-Propose embedding metadata in installed AOT applications and passing it explicitly
+-to JIT/embedding Runtime contexts before eager globals. No cwd/source-manifest or
+-process-filename guessing; library identity must not replace host application ID.
+-The [Phase 1 metadata/binding proposal](../PROJECT_ARCHITECTURE_ROADMAP.md#proposed-metadata-delivery-and-os-locations)
+-now freezes recommended missing-context behavior: existing `unavailable` (code 6),
+-exact getter operation, empty path/domain, native code zero and fixed value-free
+-message, before any native root query. Explicit invalid IDs keep `invalid_argument`.
+-Keep the public one-string declarations/function-value types; adapt only direct
+-zero-argument calls to the four exact resolved stdlib identities through verified
+-private facades. Runtime-dependent IDs are not pure default arguments and do not
+-justify general function overloading. Context admission is once-only before globals;
+-libraries observe their consumer's context. All details await review, implementation
+-is HOLD, and existing JIT image/resource/PID observations are unchanged.
++## Project application locations
++
++Direct calls to `os.data_dir()`, `os.config_dir()`, `os.cache_dir()` and
++`os.state_dir()` use the consuming Runtime's admitted application ID. Each returns
++`result<string, error>` and delegates to the corresponding explicit-ID function.
++Library code uses the same consuming Runtime. JIT image, resource and PID queries
++still describe the host process.
++
++Each public declaration and function value takes one string. The compiler accepts
++an omitted ID at a direct call to one of the four resolved standard declarations,
++including calls through an import alias. Use a closure to store the zero-argument
++form in a function value.
++
++Missing context returns `unavailable` (code 6) before native root discovery. The
++error identifies the public operation, carries empty path and native domain, has
++native code zero, and reads `Application identity is unavailable.` An explicit
++invalid ID still returns `invalid_argument`. Metadata conveys no access or ownership
++authority. [Project metadata and startup](../PROJECT_ARCHITECTURE_ROADMAP.md#proposed-metadata-delivery-and-os-locations).
+ 
+ ## Implemented original queries
+ 
+diff --git a/include/void/application_metadata.hpp b/include/void/application_metadata.hpp
+new file mode 100644
+index 0000000..a8ac24b
+--- /dev/null
++++ b/include/void/application_metadata.hpp
+@@ -0,0 +1,29 @@
++#pragma once
++#include <array>
++#include <cstddef>
++#include <cstdint>
++#include <memory>
++#include <string>
++#include <string_view>
++
++namespace vd {
++// Format v1 owns six UTF-8 fields in project ID/name/version, application
++// ID/name/version order. Encoding is independent of native layout and TOML.
++class ApplicationMetadata final {
++public:
++    static constexpr std::uint32_t revision = 1;
++    static constexpr std::size_t byte_limit = 4 + 6 * 4 + 4 * 255 + 2 * 512;
++    using Fields = std::array<std::string_view, 6>;
++    using Owner = std::shared_ptr<const ApplicationMetadata>;
++
++    static Owner make(const Fields&);
++    static Owner decode(std::string_view);
++    const std::string& bytes() const { return bytes_; }
++    std::string_view application_id() const;
++    bool operator==(const ApplicationMetadata&) const = default;
++private:
++    ApplicationMetadata(std::string bytes, std::uint32_t app_offset, std::uint32_t app_length);
++    std::string bytes_;
++    std::uint32_t app_offset_, app_length_;
++};
++}
+diff --git a/include/void/backend.hpp b/include/void/backend.hpp
+index 34dba75..32c0f9b 100644
+--- a/include/void/backend.hpp
++++ b/include/void/backend.hpp
+@@ -35,7 +35,7 @@ private:
+     std::shared_ptr<Impl> impl_;
+ };
+ void emit_async_object(const ir::Module&, const std::filesystem::path&, bool optimize);
+-void emit_object(const ir::Module&, const std::filesystem::path&, bool optimize, bool source_program = false);
++void emit_object(const ir::Module&, const std::filesystem::path&, bool optimize, bool source_program = false, std::string_view build_inputs = {});
+ // Internal architectural harness supplies its own runtime entry guard/main.
+ void emit_runtime_object(const ir::Module&, const std::filesystem::path&, bool optimize, const std::string& generation_suffix = {});
+ }
+diff --git a/include/void/execution.hpp b/include/void/execution.hpp
+index 5829999..78a7718 100644
+--- a/include/void/execution.hpp
++++ b/include/void/execution.hpp
+@@ -1,4 +1,5 @@
+ #pragma once
++#include "void/application_metadata.hpp"
+ #include <cstdint>
+ #include <memory>
+ #include <mutex>
+@@ -34,10 +35,13 @@ struct Compatibility {
+     std::shared_ptr<const ValidatedAnalysis> analysis = {};
+     std::uintptr_t runtime_identity = 0;
+     bool async_root = false;
++    ApplicationMetadata::Owner application_metadata = {};
++    std::string build_provenance = {}; // Generation-only, excluded from reload compatibility.
+     bool operator==(const Compatibility& other) const {
+         return function_id == other.function_id && signature == other.signature &&
+             layout == other.layout && captures == other.captures && constants == other.constants &&
+-            constant_contract == other.constant_contract && source_contract == other.source_contract && runtime_identity == other.runtime_identity && async_root == other.async_root;
++            constant_contract == other.constant_contract && source_contract == other.source_contract && runtime_identity == other.runtime_identity && async_root == other.async_root &&
++            (application_metadata == other.application_metadata || (application_metadata && other.application_metadata && *application_metadata == *other.application_metadata));
+     }
+ };
+ class NativeCode {
+diff --git a/include/void/frontend.hpp b/include/void/frontend.hpp
+index a65fb2f..a5ad9ce 100644
+--- a/include/void/frontend.hpp
++++ b/include/void/frontend.hpp
+@@ -75,6 +75,7 @@ class ValidatedAnalysis : public std::enable_shared_from_this<ValidatedAnalysis>
+     friend struct AnalysisAccess;
+     std::string entry_, entry_symbol_, contract_, constants_;
+     bool application_=false, executable_=true;
++    ApplicationMetadata::Owner application_metadata_;
+     std::vector<Diagnostic> warnings_;
+     std::vector<AnalyzedModule> modules_;
+     std::vector<AnalyzedDeclaration> declarations_;
+@@ -90,6 +91,7 @@ public:
+     const std::string& entry_identity() const { return entry_; }
+     const std::string& entry_symbol() const { return entry_symbol_; }
+     bool application() const { return application_; }
++    const ApplicationMetadata::Owner& application_metadata() const { return application_metadata_; }
+     bool executable() const { return executable_; } // Libraries expose metadata only.
+     const auto& modules() const { return modules_; }
+     const auto& declarations() const { return declarations_; }
+diff --git a/include/void/ir.hpp b/include/void/ir.hpp
+index bed9800..ab10651 100644
+--- a/include/void/ir.hpp
++++ b/include/void/ir.hpp
+@@ -1,4 +1,5 @@
+ #pragma once
++#include "void/application_metadata.hpp"
+ #include "void/source.hpp"
+ #include <cstdint>
+ #include <memory>
+@@ -144,6 +145,7 @@ struct Instruction {
+     std::string source_excerpt = {}; // Snapshot of the source line and caret.
+     bool array_repeat = false; // fixed_array only: pure prototype value, copied extent times.
+     std::string operator_glyph = {}; // Exact source operator call proof, using ordinary call ABI.
++    bool os_location_adapter = false; // Closed direct-call proof for standard OS location helpers.
+ };
+ struct Terminator {
+     enum class Kind { return_value, branch, jump, return_void, unreachable } kind = Kind::return_value;
+@@ -215,6 +217,7 @@ struct Module {
+     struct GenericInstance { std::string declaration; std::vector<Type> arguments; };
+     std::map<std::string,GenericDeclaration> generic_declarations = {};
+     std::map<std::string,GenericInstance> generic_instances = {};
++    ApplicationMetadata::Owner application_metadata = {};
+ };
+ std::string generic_identity(std::string_view,const std::vector<Type>&);
+ std::string generic_instance_identity(const Module&,const Module::GenericInstance&,const Function* = nullptr);
+diff --git a/include/void/native_build.hpp b/include/void/native_build.hpp
+index 3b0f6c8..2023d2c 100644
+--- a/include/void/native_build.hpp
++++ b/include/void/native_build.hpp
+@@ -3,6 +3,6 @@
+ namespace vd {
+ // Same-directory publication staging protects previous artifacts. Windows links
+ // in a separate short private directory, then verifies/copies into that staging.
+-void publish_object(const ValidatedAnalysis&, const std::filesystem::path&, bool optimize);
+-void build_executable(const ValidatedAnalysis&, const std::filesystem::path&, bool optimize, const char* argv0);
++void publish_object(const ValidatedAnalysis&, const std::filesystem::path&, bool optimize, std::string_view profile = {});
++void build_executable(const ValidatedAnalysis&, const std::filesystem::path&, bool optimize, const char* argv0, std::string_view profile = {});
+ }
+diff --git a/include/void/os.hpp b/include/void/os.hpp
+index a600f3b..112d07b 100644
+--- a/include/void/os.hpp
++++ b/include/void/os.hpp
+@@ -8,9 +8,22 @@
+ namespace vd::os {
+ // Private same-build compiler/Runtime contract. No native handles cross this boundary.
+ inline constexpr std::string_view source_module = "/@stdlib/os.void";
++inline constexpr std::string_view source_prefix = "/@stdlib/os.void::";
++struct LocationAdapter { std::string_view facade, implementation; };
++inline constexpr std::array location_adapters = {
++    LocationAdapter{"data_dir", "_app_data_dir"}, LocationAdapter{"config_dir", "_app_config_dir"},
++    LocationAdapter{"cache_dir", "_app_cache_dir"}, LocationAdapter{"state_dir", "_app_state_dir"}
++};
++inline const LocationAdapter* location_adapter(std::string_view symbol, bool facade) {
++    if (!symbol.starts_with(source_prefix)) return nullptr;
++    symbol.remove_prefix(source_prefix.size());
++    for (const auto& candidate : location_adapters)
++        if (symbol == (facade ? candidate.facade : candidate.implementation)) return &candidate;
++    return nullptr;
++}
+ enum class Operation : unsigned {
+     data_root, config_root, cache_root, state_root, home, temp, executable,
+-    resources, environment, platform, architecture, process_id, bundle
++    resources, environment, platform, architecture, process_id, bundle, application_id
+ };
+ struct Contract { std::string_view name; bool text_argument = false; };
+ inline constexpr std::array operations = {
+@@ -18,7 +31,7 @@ inline constexpr std::array operations = {
+     Contract{"_os_state_root"}, Contract{"_os_home"}, Contract{"_os_temp"},
+     Contract{"_os_executable"}, Contract{"_os_resources"}, Contract{"_os_env", true},
+     Contract{"_os_platform"}, Contract{"_os_architecture"}, Contract{"_os_process_id"},
+-    Contract{"_os_bundle"}
++    Contract{"_os_bundle"}, Contract{"_os_application_id"}
+ };
+ enum class ErrorKind : std::int64_t {
+     success, not_found, invalid_argument, invalid_path, invalid_utf8,
+diff --git a/include/void/project.hpp b/include/void/project.hpp
+index 72140ad..31c3d0a 100644
+--- a/include/void/project.hpp
++++ b/include/void/project.hpp
+@@ -31,6 +31,7 @@ public:
+ };
+ std::optional<SemanticVersion> parse_version(std::string_view);
+ bool valid_identity(std::string_view) noexcept;
++bool valid_name(std::string_view);
+ 
+ enum class Kind { application, library };
+ enum class Optimization { none, O2 };
+diff --git a/include/void/runtime.hpp b/include/void/runtime.hpp
+index 9fe856f..6d77683 100644
+--- a/include/void/runtime.hpp
++++ b/include/void/runtime.hpp
+@@ -54,6 +54,9 @@ public:
+     static Runtime* attached() noexcept { return current_runtime_; }
+     void application_arguments(ApplicationArguments);
+     const ApplicationArguments& application_arguments() const { return application_arguments_; }
++    void admit_application(ApplicationMetadata::Owner); // Null explicitly admits absence.
++    void start_application(ApplicationMetadata::Owner expected = {}, bool commit = true);
++    ApplicationMetadata::Owner application_metadata() const;
+     bool is_managed() const { return current_runtime_ == this && thread().state == State::managed; }
+     // One explicitly admitted application owns these persistent precise roots.
+     void admit_globals(std::string_view contract, bool replacement = false, bool commit = true);
+@@ -172,6 +175,8 @@ public:
+ private:
+     ApplicationArguments application_arguments_;
+     bool application_arguments_set_ = false;
++    ApplicationMetadata::Owner application_metadata_;
++    bool application_context_set_ = false, application_started_ = false;
+     friend class CallbackRegistration;
+     friend class NativeLibrary;
+     friend class NativeWorkers;
+diff --git a/include/void/runtime_abi.hpp b/include/void/runtime_abi.hpp
+index 00034ed..3ffc0de 100644
+--- a/include/void/runtime_abi.hpp
++++ b/include/void/runtime_abi.hpp
+@@ -93,6 +93,7 @@ const void* vd_gc_witness(const char*) noexcept;
+ std::int64_t vd_gc_interface_binding(void*,const void*,const char* const*,std::size_t) noexcept;
+ std::int32_t vd_runtime_entry_metadata(vd::NativeCode::CheckedEntry,std::int32_t,vd::RuntimeFailure*,const vd::RuntimeTypeRecord*,std::size_t,const vd::RuntimeWitnessRecord*,std::size_t) noexcept;
+ std::int32_t vd_runtime_entry_application(vd::NativeCode::CheckedEntry,vd::RuntimeFailure*,const vd::RuntimeTypeRecord*,std::size_t,const vd::RuntimeWitnessRecord*,std::size_t,int,const void*,bool) noexcept;
++std::int32_t vd_runtime_entry_context_v1(vd::NativeCode::CheckedEntry,std::int32_t,vd::RuntimeFailure*,const vd::RuntimeTypeRecord*,std::size_t,const vd::RuntimeWitnessRecord*,std::size_t,int,const void*,bool,const char*,std::size_t) noexcept;
+ std::int64_t vd_gc_dynamic_type(void*,const char* const*,std::size_t) noexcept;
+ std::int32_t vd_runtime_entry(vd::NativeCode::CheckedEntry, std::int32_t, vd::RuntimeFailure*) noexcept;
+ std::int32_t vd_runtime_entry_typed(vd::NativeCode::CheckedEntry,std::int32_t,vd::RuntimeFailure*,const vd::RuntimeTypeRecord*,std::size_t) noexcept;
+diff --git a/src/application_metadata.cpp b/src/application_metadata.cpp
+new file mode 100644
+index 0000000..287db51
+--- /dev/null
++++ b/src/application_metadata.cpp
+@@ -0,0 +1,53 @@
++#include "void/application_metadata.hpp"
++#include "void/project.hpp"
++#include <stdexcept>
++#include <utility>
++
++namespace vd {
++namespace {
++[[noreturn]] void invalid() { throw std::invalid_argument("Invalid application metadata."); }
++void append_word(std::string& bytes, std::uint32_t word) {
++    for (unsigned shift = 0; shift < 32; shift += 8) bytes.push_back(static_cast<char>((word >> shift) & 255));
++}
++std::uint32_t take_word(std::string_view& bytes) {
++    if (bytes.size() < 4) invalid();
++    std::uint32_t word = 0;
++    for (unsigned i = 0; i < 4; ++i) word |= std::uint32_t(static_cast<unsigned char>(bytes[i])) << (i * 8);
++    bytes.remove_prefix(4);
++    return word;
++}
++}
++ApplicationMetadata::ApplicationMetadata(std::string bytes, std::uint32_t offset, std::uint32_t length)
++    : bytes_(std::move(bytes)), app_offset_(offset), app_length_(length) {}
++
++ApplicationMetadata::Owner ApplicationMetadata::make(const Fields& fields) {
++    for (unsigned i : {0u, 3u}) {
++        if (!project::valid_identity(fields[i]) || !project::valid_name(fields[i+1]) ||
++            !project::parse_version(fields[i+2])) invalid();
++    }
++    std::string bytes;
++    append_word(bytes, revision);
++    std::uint32_t offset = 0;
++    for (unsigned i = 0; i < fields.size(); ++i) {
++        append_word(bytes, static_cast<std::uint32_t>(fields[i].size()));
++        if (i == 3) offset = static_cast<std::uint32_t>(bytes.size());
++        bytes.append(fields[i]);
++    }
++    return Owner(new ApplicationMetadata(std::move(bytes), offset, static_cast<std::uint32_t>(fields[3].size())));
++}
++ApplicationMetadata::Owner ApplicationMetadata::decode(std::string_view bytes) {
++    if (bytes.size() > byte_limit || take_word(bytes) != revision) invalid();
++    Fields fields;
++    for (auto& field : fields) {
++        const auto size = take_word(bytes);
++        if (size > bytes.size()) invalid();
++        field = bytes.substr(0, size);
++        bytes.remove_prefix(size);
++    }
++    if (!bytes.empty()) invalid();
++    return make(fields);
++}
++std::string_view ApplicationMetadata::application_id() const {
++    return std::string_view(bytes_).substr(app_offset_, app_length_);
++}
++}
+diff --git a/src/backend/llvm/backend.cpp b/src/backend/llvm/backend.cpp
+index d2d5c8a..c0bb337 100644
+--- a/src/backend/llvm/backend.cpp
++++ b/src/backend/llvm/backend.cpp
+@@ -34,6 +34,7 @@
+ #include <cmath>
+ #include <array>
+ #include <llvm/ADT/SmallVector.h>
++#include <llvm/Config/llvm-config.h>
+ #include <llvm/ExecutionEngine/Orc/LLJIT.h>
+ #include <llvm/IR/DIBuilder.h>
+ #include <llvm/IR/IRBuilder.h>
+@@ -46,6 +47,7 @@
+ #include <llvm/TargetParser/Host.h>
+ #include <llvm/Support/TargetSelect.h>
+ #include <llvm/Target/TargetMachine.h>
++#include <llvm/Transforms/Utils/ModuleUtils.h>
+ #include <atomic>
+ #include <map>
+ #include <mutex>
+@@ -1837,6 +1839,8 @@ struct Jit::Impl {
+     struct Generation {
+         std::shared_ptr<llvm::orc::LLJIT> jit;
+         std::shared_ptr<std::atomic<std::size_t>> live;
++        ApplicationMetadata::Owner application_metadata;
++        std::string build_provenance;
+         llvm::orc::ResourceTrackerSP tracker;
+         llvm::orc::JITDylib* dylib=nullptr;
+         ~Generation() {
+@@ -1863,6 +1867,8 @@ struct Jit::Impl {
+ #endif
+         auto generation = std::make_shared<Generation>();
+         generation->jit=jit;generation->live=live;++*live;
++        generation->application_metadata=contract.application_metadata;
++        generation->build_provenance=contract.build_provenance;
+         auto* target=&jit->getMainJITDylib();
+         // Source generations are self-contained. Trusted raw-IR clients retain
+         // their existing cross-module exported-symbol linking contract.
+@@ -1973,6 +1979,17 @@ void Jit::bind_address(std::string name, std::uintptr_t entry) {
+         llvm::orc::ExecutorAddr(entry), llvm::JITSymbolFlags::Exported);
+     check(impl_->jit->getMainJITDylib().define(llvm::orc::absoluteSymbols(symbols)));
+ }
++static std::string application_build_provenance(const ValidatedAnalysis* analysis, const ApplicationMetadata& metadata,
++                                                std::string_view target, bool optimize, std::string_view inputs) {
++    std::string recipe="VOID-application-build-v1";
++    auto field=[&](std::string_view value){llvm_backend::cache_field(recipe,value);};
++    field(LLVM_VERSION_STRING);field(target);field(optimize?"O2":"O0");field(inputs);field(metadata.bytes());
++    if(analysis) {
++        field(analysis->entry_identity());field(analysis->compatibility_contract());
++        for(const auto& source:analysis->modules()) {field(source.identity);field(source.source.text());}
++    }
++    return llvm_backend::digest(recipe);
++}
+ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const std::string& entry,
+                                               bool optimize, Compatibility contract, std::shared_ptr<Runtime> runtime) {
+     if(auto* attached=Runtime::attached();attached && attached->is_managed()) {
+@@ -1985,7 +2002,7 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
+         return compile(coordinated,entry,optimize,std::move(contract),std::move(runtime));
+     }
+     if (input.coordinated && input.analysis && !runtime) {
+-        if (!input.globals.empty()) runtime = std::make_shared<Runtime>(256);
++        if (input.application_metadata || !input.globals.empty()) runtime = std::make_shared<Runtime>(256);
+         else { if (!impl_->source_runtime) impl_->source_runtime=std::make_shared<Runtime>(256); runtime=impl_->source_runtime; }
+     }
+     std::map<std::string,ir::ReferenceEffects> checked_effects;ir::validate(input,nullptr,&checked_effects);
+@@ -1998,6 +2015,7 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
+         if (f.name == input.identity + "::" + entry && !f.module_identity.empty()) selected = &f;
+     if (!selected) throw std::invalid_argument("entry function does not exist");
+     if(selected->asynchronous!=input.async_root)throw std::invalid_argument("Async entry requires the explicit scheduler root adapter");
++    if (runtime) runtime->start_application(input.application_metadata,false);
+     if (!input.globals.empty()) runtime->admit_globals(global_contract(input), impl_->replacing_globals, false);
+     contract.async_root=input.async_root;
+     if (selected->parameters != std::vector<ir::Type>{ir::Type::i32} || selected->result != ir::Type::i32)
+@@ -2008,6 +2026,9 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
+         throw std::invalid_argument("code identity or signature does not match IR");
+     // Compiler records always override host-supplied source safety metadata.
+     contract.analysis = input.analysis;
++    contract.application_metadata = input.application_metadata;
++    if (input.application_metadata)
++        contract.build_provenance = application_build_provenance(input.analysis.get(),*input.application_metadata,impl_->target_identity,optimize,impl_->cache.build_identity);
+     contract.source_contract = input.analysis ? input.analysis->compatibility_contract() : std::string{};
+     contract.runtime_identity = reinterpret_cast<std::uintptr_t>(runtime.get());
+     if (input.coordinated && !input.analysis) {
+@@ -2079,6 +2100,7 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
+     field(optimize?"ir-O2":"no-ir-O2");
+     field(impl_->emission==ir::Emission::entry?"entry-emission-v1":"all-exports");
+     field(analysis.compatibility_contract());field(analysis.constant_contract());field(runtime ? "forced-runtime" : "automatic-runtime");
++    field(analysis.application_metadata()?std::string_view(analysis.application_metadata()->bytes()):std::string_view{});
+     field(std::to_string(analysis.modules().size()));
+     for(const auto& m:analysis.modules()) {field("module");field(m.identity);field(m.source.path());field(m.source.text());field(std::to_string(m.imports.size()));for(const auto& i:m.imports)field(i);}
+     } catch(const std::bad_alloc&) {impl_->cache_status="unavailable";return cold();}
+@@ -2092,9 +2114,10 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
+             const bool globals = std::any_of(analysis.declarations().begin(), analysis.declarations().end(), [](const auto& d) { return d.kind == AnalyzedDeclaration::Kind::global_variable; });
+             if (globals && !artifact->coordinated) throw std::runtime_error("global cache coordination mismatch");
+             if (artifact->coordinated && !owner) {
+-                if (globals) owner = std::make_shared<Runtime>(256);
++                if (analysis.application_metadata() || globals) owner = std::make_shared<Runtime>(256);
+                 else { if (!impl_->source_runtime) impl_->source_runtime = std::make_shared<Runtime>(256); owner = impl_->source_runtime; }
+             }
++            if (owner) owner->start_application(analysis.application_metadata(),false);
+             if (globals) owner->admit_globals(global_contract(analysis), impl_->replacing_globals, false);
+             if(bool(owner)!=artifact->coordinated)throw std::runtime_error("cache coordination mismatch");
+             auto expected=analysis.entry_symbol();
+@@ -2102,6 +2125,9 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
+             if(contract.function_id!=expected || contract.signature!="c:i32(i32)")throw std::invalid_argument("code identity or signature does not match IR");
+             contract.source_contract=analysis.compatibility_contract();contract.constant_contract=analysis.constant_contract();
+             contract.analysis=analysis.shared_from_this();contract.runtime_identity=reinterpret_cast<std::uintptr_t>(owner.get());
++            contract.application_metadata=analysis.application_metadata();
++            if (contract.application_metadata)
++                contract.build_provenance=application_build_provenance(&analysis,*contract.application_metadata,impl_->target_identity,optimize,impl_->cache.build_identity);
+             ir::Function entry;entry.name=expected;entry.module_identity=analysis.entry_identity();
+             auto result=impl_->load({}, {},native_symbol(entry,"__cache"),contract,impl_,true,owner,"__cache",true,std::move(object));
+             if (globals) owner->admit_globals(global_contract(analysis), impl_->replacing_globals);
+@@ -2123,6 +2149,7 @@ std::shared_ptr<const NativeCode> Jit::replacement(const NativeCode& current,con
+     if(contract.function_id.empty())contract.function_id=analysis.entry_symbol();
+     contract.constant_contract=analysis.constant_contract();contract.source_contract=analysis.compatibility_contract();
+     contract.analysis=analysis.shared_from_this();contract.runtime_identity=current.compatibility().runtime_identity;contract.async_root=current.compatibility().async_root;
++    contract.application_metadata=analysis.application_metadata();
+     if(!(current.compatibility()==contract))return {};
+     struct Replacement { bool& flag; explicit Replacement(bool& value) : flag(value) { flag = true; } ~Replacement() { flag = false; } } replacement(impl_->replacing_globals);
+     return compile_analysis(analysis,optimize,std::move(contract),current.runtime_owner(),current.compatibility().async_root);
+@@ -2177,7 +2204,7 @@ std::shared_ptr<const NativeCode> Jit::compile_root_probe(bool optimize) {
+     return impl_->load(std::move(module), std::move(context), name, {"/proof::root_probe"}, impl_);
+ }
+ static void emit_impl(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program, bool runtime_object, const std::string& generation_suffix = {},
+-                      bool storage_proof = false, const std::filesystem::path& proof_report = {}) {
++                      bool storage_proof = false, const std::filesystem::path& proof_report = {}, std::string_view build_inputs = {}) {
+     if ((runtime_object && !input.coordinated) || (input.coordinated && !runtime_object && !source_program)) throw std::invalid_argument("coordinated AOT requires the runtime proof bootstrap");
+     initialize();
+     llvm::LLVMContext context;
+@@ -2204,6 +2231,14 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
+                         );
+     module->setTargetTriple(machine->getTargetTriple());
+     module->setDataLayout(machine->createDataLayout());
++    llvm::GlobalVariable* application_record = nullptr;
++    if (input.application_metadata) {
++        llvm::IRBuilder<> constants(context);
++        application_record = constants.CreateGlobalString(input.application_metadata->bytes(),"vd.application.metadata.v1",0,module.get(),false);
++        auto provenance = application_build_provenance(input.analysis.get(),*input.application_metadata,triple,optimize,build_inputs);
++        auto* identity = constants.CreateGlobalString(provenance,"vd.application.provenance.v1",0,module.get());
++        llvm::appendToUsed(*module,{application_record,identity});
++    }
+     if (!runtime_object) {
+     const ir::Function* entry_function = nullptr;
+     for (const auto& f : input.functions) if (f.name == input.entry_symbol) entry_function = &f;
+@@ -2270,7 +2305,15 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
+         auto* count=module->getNamedGlobal("__vd_type_count"+(source_program ? std::string("__void") : std::string{}));
+         auto* size_type=b.getIntNTy(module->getDataLayout().getPointerSizeInBits());
+         auto* witnesses=module->getNamedGlobal("__vd_witnesses"+(source_program ? std::string("__void") : std::string{}));auto* witness_count=module->getNamedGlobal("__vd_witness_count"+(source_program ? std::string("__void") : std::string{}));
+-        if (source_program && input.application)
++        if (application_record) {
++            const bool forward = source_program && input.application;
++            const bool wide = forward && llvm::Triple(module->getTargetTriple()).isOSWindows();
++            auto bootstrap=module->getOrInsertFunction("vd_runtime_entry_context_v1",b.getInt32Ty(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy(),size_type,b.getInt32Ty(),b.getPtrTy(),b.getInt1Ty(),b.getPtrTy(),size_type);
++            result=b.CreateCall(bootstrap,{entry,input_value,failure,catalog,b.CreateLoad(size_type,count),witnesses,b.CreateLoad(size_type,witness_count),
++                forward?static_cast<llvm::Value*>(main->getArg(0)):b.getInt32(0),
++                forward?static_cast<llvm::Value*>(main->getArg(1)):llvm::ConstantPointerNull::get(b.getPtrTy()),
++                b.getInt1(wide),application_record,llvm::ConstantInt::get(size_type,input.application_metadata->bytes().size())});
++        } else if (source_program && input.application)
+             result=b.CreateCall(module->getOrInsertFunction("vd_runtime_entry_application",b.getInt32Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy(),size_type,b.getInt32Ty(),b.getPtrTy(),b.getInt1Ty()),{entry,failure,catalog,b.CreateLoad(size_type,count),witnesses,b.CreateLoad(size_type,witness_count),main->getArg(0),main->getArg(1),b.getInt1(llvm::Triple(module->getTargetTriple()).isOSWindows())});
+         else result=b.CreateCall(module->getOrInsertFunction("vd_runtime_entry_metadata",b.getInt32Ty(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy(),size_type),{entry,input_value,failure,catalog,b.CreateLoad(size_type,count),witnesses,b.CreateLoad(size_type,witness_count)});
+     }
+@@ -2354,8 +2397,8 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
+     write_object(*module,*machine,output);
+ }
+ void emit_async_object(const ir::Module& source,const std::filesystem::path& output,bool optimize){auto module=source;module.async_root=true;emit_object(module,output,optimize,true);}
+-void emit_object(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program) {
+-    emit_impl(input,output,optimize,source_program,false);
++void emit_object(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program, std::string_view build_inputs) {
++    emit_impl(input,output,optimize,source_program,false,{},false,{},build_inputs);
+ }
+ void emit_runtime_object(const ir::Module& input, const std::filesystem::path& output, bool optimize, const std::string& generation_suffix) {
+     emit_impl(input,output,optimize,false,true,generation_suffix);
+diff --git a/src/frontend/compiler.cpp b/src/frontend/compiler.cpp
+index 92d921c..3fd3ec5 100644
+--- a/src/frontend/compiler.cpp
++++ b/src/frontend/compiler.cpp
+@@ -29,6 +29,12 @@
+ #include <llvm/Support/SHA256.h>
+ #include <llvm/ADT/StringRef.h>
+ #ifdef _WIN32
++#ifndef WIN32_LEAN_AND_MEAN
++#define WIN32_LEAN_AND_MEAN
++#endif
++#ifndef NOMINMAX
++#define NOMINMAX
++#endif
+ #include <windows.h>
+ #endif
+ // These handler boundaries keep unrelated temporaries out of recursive semantic
+@@ -3304,6 +3310,19 @@ class Semantics {
+             catch (const CompilationError&) { check_arguments(); throw; }
+             catch (const Poison&) { check_arguments(); throw; }
+         }();
++        if (e.parts.empty() && e.type_arguments.empty()) if (const auto* location = os::location_adapter(target.symbol,true)) {
++            const auto& declarations = units.at(std::string(os::source_module))->declarations;
++            auto adapter = declarations.find(std::string(location->implementation));
++            if (adapter == declarations.end() || target.visibility != "public" || target.asynchronous ||
++                target.parameters.size() != 1 || target.parameters.front().type != Type::string ||
++                adapter->second->visibility != "private" || adapter->second->asynchronous ||
++                !adapter->second->parameters.empty() || adapter->second->result != target.result)
++                error(source,e.token,Code::invalid_value,"Invalid trusted OS application-location adapter.");
++            e.source_target = target.symbol;
++            e.target = adapter->second->symbol;
++            e.op = "$os.location";
++            return e.type = call_arguments(e,*adapter->second,0);
++        }
+         e.target = target.symbol;
+         return e.type = call_arguments(e,target,0);
+     }
+@@ -4762,6 +4781,7 @@ class Lowering {
+             if(selected_receiver && !e.parts[0]->property)emit({ir::Op::store,receiver->slot,selected_receiver->read()},e.token);
+             ir::Instruction i{e.asynchronous_call || !parallel_target.empty() ? ir::Op::async_call : e.interface_call ? ir::Op::interface_call : !e.virtual_slot.empty() && !e.super_call ? ir::Op::virtual_call : ir::Op::call}; i.callee = parallel_target.empty()?e.target+(e.super_call && e.token.text=="deinit"?"::$body$"+Type::key(e.parts[0]->type):""):std::string(parallel_target); i.receiver = receiver;
+             if(e.op=="$operator")i.operator_glyph=e.token.text=="!="?"==":e.token.text;
++            i.os_location_adapter = e.op == "$os.location";
+             if (context) if (auto found=context->calls.find(&e);found!=context->calls.end())
+                 i.callee=ir::construction_name(e.target,{found->second.begin(),found->second.end()});
+             i.arguments.resize(slots.size());
+@@ -6132,9 +6152,10 @@ std::shared_ptr<const ValidatedAnalysis> validated_source(const SourceFile&);
+ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path&, const SourceOverrides& = {}, bool verify_disk = false,const NativeProject* = nullptr,EditorProbe* = nullptr);
+ // This factory is the only way to construct a successful result.
+ struct AnalysisAccess {
+-    static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry,std::vector<Diagnostic> warnings={},const std::string& context_key={},std::shared_ptr<Unit> library_scope={}) {
++    static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry,std::vector<Diagnostic> warnings={},const std::string& context_key={},std::shared_ptr<Unit> library_scope={},ApplicationMetadata::Owner metadata={}) {
+         auto result = std::shared_ptr<ValidatedAnalysis>(new ValidatedAnalysis);result->warnings_=std::move(warnings);
+         result->entry_ = entry;
++        result->application_metadata_ = std::move(metadata);
+         const auto& selected=library_scope?*library_scope:*units.at(entry);
+         result->executable_=!library_scope;
+         const auto* app=application_entry(selected);
+@@ -6534,6 +6555,7 @@ struct AnalysisAccess {
+ };
+ ir::Module ValidatedAnalysis::lower(ir::Emission emission) const {
+     auto module = lower_(); module.constant_contract = constants_; module.analysis = shared_from_this();
++    module.application_metadata = application_metadata_;
+     // The complete graph has already passed checking and typed-IR validation.
+     if(emission==ir::Emission::entry)ir::retain_entry(module);
+     return module;
+diff --git a/src/frontend/generic_tooling.inc b/src/frontend/generic_tooling.inc
+index b4e5ba3..55c96c4 100644
+--- a/src/frontend/generic_tooling.inc
++++ b/src/frontend/generic_tooling.inc
+@@ -14,7 +14,7 @@ auto type_references=[&](const auto& uses,const std::map<std::string,std::string
+         // Resolve source names only: do not instantiate or type-check an unused
+         // body merely to publish navigation. Unknown body types remain deferred.
+         try {
+-            auto [target,declaration]=structure_lookup(*unit,*graph->at(entry),*graph,spelling,token);(void)target;
++            auto [target,declaration]=structure_lookup(*unit,context,*graph,spelling,token);(void)target;
+             if(declaration)reference(owner,declaration->definition->identity,use,*unit);
+         }catch(const CompilationError&){}
+     }
+diff --git a/src/frontend/project.cpp b/src/frontend/project.cpp
+index 686e253..7daef76 100644
+--- a/src/frontend/project.cpp
++++ b/src/frontend/project.cpp
+@@ -15,47 +15,6 @@
+ 
+ namespace vd::project {
+ namespace {
+-bool digit(char c) { return c >= '0' && c <= '9'; }
+-bool numeric(std::string_view s) { return !s.empty() && std::all_of(s.begin(), s.end(), digit); }
+-std::strong_ordering number_order(std::string_view a, std::string_view b) noexcept {
+-    if (a.size() != b.size()) return a.size() <=> b.size();
+-    return a <=> b;
+-}
+-bool component(std::string_view s) {
+-    return numeric(s) && (s.size() == 1 || s.front() != '0');
+-}
+-bool identifiers(std::string_view s, std::vector<std::string>& out, bool prerelease) {
+-    if (s.empty()) return false;
+-    for (std::size_t begin = 0; begin <= s.size();) {
+-        auto end = s.find('.', begin);
+-        if (end == std::string_view::npos) end = s.size();
+-        auto piece = s.substr(begin, end - begin);
+-        if (piece.empty() || !std::all_of(piece.begin(), piece.end(), [](char c) {
+-            return digit(c) || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '-';
+-        }) || (prerelease && numeric(piece) && !component(piece))) return false;
+-        out.emplace_back(piece);
+-        if (end == s.size()) break;
+-        begin = end + 1;
+-    }
+-    return true;
+-}
+-bool valid_name(std::string_view s) {
+-    bool non_space = false;
+-    std::size_t scalars = 0;
+-    for (std::size_t i = 0; i < s.size();) {
+-        auto n = utf8_scalar_bytes(s, i);
+-        if (!n || ++scalars > 128) return false;
+-        unsigned cp = static_cast<unsigned char>(s[i]) & (n == 1 ? 127 : n == 2 ? 31 : n == 3 ? 15 : 7);
+-        for (unsigned k = 1; k < n; ++k) cp = (cp << 6) | (static_cast<unsigned char>(s[i+k]) & 63);
+-        if (cp < 32 || (cp >= 127 && cp <= 159)) return false;
+-        // Unicode White_Space, without locale-dependent classification.
+-        bool space = cp == 32 || cp == 0xa0 || cp == 0x1680 || (cp >= 0x2000 && cp <= 0x200a) ||
+-            cp == 0x2028 || cp == 0x2029 || cp == 0x202f || cp == 0x205f || cp == 0x3000;
+-        non_space |= !space;
+-        i += n;
+-    }
+-    return scalars && non_space;
+-}
+ bool relative_path(std::string_view s, bool root) {
+     if (root && s == ".") return true;
+     if (s.empty() || s.front() == '/' || s.back() == '/') return false;
+@@ -77,62 +36,6 @@ bool ancestor(std::string_view a, std::string_view b) {
+ }
+ }
+ 
+-std::optional<SemanticVersion> parse_version(std::string_view text) {
+-    if (text.empty() || text.size() > 255) return {};
+-    SemanticVersion version;
+-    version.text_ = text;
+-    auto build = text.find('+');
+-    if (build != std::string_view::npos) {
+-        if (!identifiers(text.substr(build + 1), version.build_, false)) return {};
+-        text = text.substr(0, build);
+-    }
+-    auto prerelease = text.find('-');
+-    if (prerelease != std::string_view::npos) {
+-        if (!identifiers(text.substr(prerelease + 1), version.prerelease_, true)) return {};
+-        text = text.substr(0, prerelease);
+-    }
+-    std::size_t begin = 0;
+-    for (std::size_t i = 0; i < 3; ++i) {
+-        auto end = text.find('.', begin);
+-        if (i < 2 && end == std::string_view::npos) return {};
+-        if (i == 2 && end != std::string_view::npos) return {};
+-        if (end == std::string_view::npos) end = text.size();
+-        auto value = text.substr(begin, end - begin);
+-        if (!component(value)) return {};
+-        version.core_[i] = value;
+-        begin = end + 1;
+-    }
+-    return version;
+-}
+-std::strong_ordering SemanticVersion::compare_precedence(const SemanticVersion& other) const noexcept {
+-    for (std::size_t i = 0; i < 3; ++i) {
+-        auto order = number_order(core_[i], other.core_[i]);
+-        if (order != 0) return order;
+-    }
+-    if (prerelease_.empty() != other.prerelease_.empty())
+-        return prerelease_.empty() ? std::strong_ordering::greater : std::strong_ordering::less;
+-    for (std::size_t i = 0; i < std::min(prerelease_.size(), other.prerelease_.size()); ++i) {
+-        std::string_view a = prerelease_[i], b = other.prerelease_[i];
+-        bool na = numeric(a), nb = numeric(b);
+-        if (na != nb) return na ? std::strong_ordering::less : std::strong_ordering::greater;
+-        auto order = na ? number_order(a, b) : a <=> b;
+-        if (order != 0) return order;
+-    }
+-    return prerelease_.size() <=> other.prerelease_.size();
+-}
+-bool valid_identity(std::string_view s) noexcept {
+-    auto alnum = [](char c) { return digit(c) || (c >= 'a' && c <= 'z'); };
+-    if (s.empty() || s.size() > 255 || !alnum(s.front()) || !alnum(s.back())) return false;
+-    char previous = 0;
+-    for (auto c : s) {
+-        if ((!alnum(c) && c != '.' && c != '_' && c != '-') || (c == '.' && previous == '.')) return false;
+-        previous = c;
+-    }
+-    auto stem = s.substr(0, s.find('.'));
+-    return !(stem == "con" || stem == "prn" || stem == "aux" || stem == "nul" ||
+-        (stem.size() == 4 && (stem.starts_with("com") || stem.starts_with("lpt")) && stem[3] >= '1' && stem[3] <= '9'));
+-}
+-
+ class ManifestParser {
+     using Code = DiagnosticCode;
+     std::shared_ptr<Manifest> manifest_ = std::shared_ptr<Manifest>(new Manifest);
+diff --git a/src/frontend/project_selection.inc b/src/frontend/project_selection.inc
+index 80fc5d1..9c215ca 100644
+--- a/src/frontend/project_selection.inc
++++ b/src/frontend/project_selection.inc
+@@ -255,7 +255,10 @@ struct ProjectAnalysisAccess {
+         result->context_key_=project_context_key(capture,entry);
+         if(!entry.empty()) {
+             result->entry_=capture.root/utf8_path(entry).relative_path();
+-            result->program_=AnalysisAccess::build(std::move(capture.graph.units),entry,capture.diagnostics.warnings(),result->context_key_);
++            const auto& project = capture.manifest->project();
++            const auto& app = *capture.manifest->application();
++            auto metadata = ApplicationMetadata::make({project.id, project.name, project.version.text(), app.id, app.name, app.version.text()});
++            result->program_=AnalysisAccess::build(std::move(capture.graph.units),entry,capture.diagnostics.warnings(),result->context_key_,{},std::move(metadata));
+             result->semantic_=result->program_;
+         } else {
+             result->semantic_=AnalysisAccess::build(std::move(capture.graph.units),entry,capture.diagnostics.warnings(),result->context_key_,std::move(library_scope));
+diff --git a/src/ir/module.cpp b/src/ir/module.cpp
+index 10b52bb..6ae4078 100644
+--- a/src/ir/module.cpp
++++ b/src/ir/module.cpp
+@@ -1,4 +1,5 @@
+ #include "void/ir.hpp"
++#include "void/frontend.hpp"
+ #include "void/native_binding.hpp"
+ #include "void/numeric.hpp"
+ #include "void/math_ops.hpp"
+@@ -464,6 +465,12 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+     InstructionTypes qualified_types;
+     auto fail = [](const std::string& text) { throw std::invalid_argument("VOID IR: " + text); };
+     if (m.identity.empty()) fail("missing module identity");
++    if (m.application_metadata) (void)ApplicationMetadata::decode(m.application_metadata->bytes());
++    if (m.analysis) {
++        const auto& expected = m.analysis->application_metadata();
++        if (expected != m.application_metadata && (!expected || !m.application_metadata || *expected != *m.application_metadata))
++            fail("application metadata differs from validated source analysis");
++    }
+     if (!m.globals.empty() && (m.root_identity != m.identity || !m.source_imports.contains(m.root_identity))) fail("invalid global source scope graph");
+     std::map<std::string, const Global*> globals;
+     for (const auto& value : m.globals) {
+@@ -837,6 +844,26 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+                 validating=&i;
+                 Type result = Type::i32;
+                 if(!i.operator_glyph.empty() && i.op!=Op::call)fail("operator proof on non-call instruction");
++                auto location = os::location_adapter(i.callee,false);
++                if (location || i.os_location_adapter) {
++                    if (!location || !i.os_location_adapter || !m.coordinated || i.op != Op::call ||
++                        i.receiver || i.a || i.b || i.immediate || i.initialization || !i.arguments.empty())
++                        fail("invalid OS location direct-call proof");
++                    auto adapter = functions.find(i.callee);
++                    auto facade = functions.find(std::string(os::source_prefix) + std::string(location->facade));
++                    auto scope = m.source_imports.find(f.module_identity);
++                    if (adapter == functions.end() || facade == functions.end() ||
++                        (f.module_identity != os::source_module && (scope == m.source_imports.end() || !scope->second.contains(std::string(os::source_module)))))
++                        fail("OS location adapter has no admitted source declaration");
++                    const auto& a = *adapter->second;
++                    const auto& p = *facade->second;
++                    if (a.module_identity != os::source_module || p.module_identity != os::source_module ||
++                        a.visibility != "private" || p.visibility != "public" || a.asynchronous || p.asynchronous ||
++                        a.receiver || p.receiver || !a.parameters.empty() || p.parameters != std::vector<Type>{Type::string} ||
++                        a.result != p.result || !a.result.definition || !a.result.definition->result_type ||
++                        field_type(a.result,1) != Type::string || Type::key(field_type(a.result,2)) != "/@stdlib/os.void::error")
++                        fail("invalid OS location adapter declaration");
++                }
+                 if(i.array_repeat && i.op!=Op::fixed_array) fail("repeat template on non-array instruction");
+                 switch (i.op) {
+                 case Op::interface_pack: {
+diff --git a/src/ir/os.inc b/src/ir/os.inc
+index ddc228c..9b9e7aa 100644
+--- a/src/ir/os.inc
++++ b/src/ir/os.inc
+@@ -3,6 +3,8 @@
+                         i.a || i.b || i.immediate < 0 || static_cast<std::size_t>(i.immediate) >= os::operations.size() ||
+                         i.receiver || !i.callee.empty() || !i.operator_glyph.empty() || i.initialization || i.array_repeat) fail("invalid private OS operation");
+                     const auto& contract = os::operations.at(i.immediate);
++                    if (i.immediate == static_cast<unsigned>(os::Operation::application_id) && !os::location_adapter(f.name,false))
++                        fail("application ID query outside a standard OS location adapter");
+                     if (i.arguments.size() != (contract.text_argument ? 1u : 0u)) fail("invalid OS arity");
+                     if (contract.text_argument && operand(i.arguments[0]) != Type::string) fail("invalid OS input type");
+                     if (i.immediate == static_cast<unsigned>(os::Operation::process_id)) {
+diff --git a/src/main.cpp b/src/main.cpp
+index 3fe594d..c8f5996 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -228,7 +228,7 @@ static int run_cli(int argc, char** argv) {
+         if(command=="run") {
+             std::unique_ptr<vd::Jit> jit;
+             if(!no_cache)jit=std::make_unique<vd::Jit>(vd::DebugCache{project?project->root():std::filesystem::canonical(selected.parent_path().empty()?std::filesystem::path("."):selected.parent_path()),std::string(vd::compiler_build_identity())+(project?":project-selection-v1:"+project->selection_key()+":"+profile_key:"")},vd::ir::Emission::entry);
+-            else jit=std::make_unique<vd::Jit>(vd::DebugCache{},vd::ir::Emission::entry);
++            else jit=std::make_unique<vd::Jit>(vd::DebugCache{{},std::string(vd::compiler_build_identity())+(project?":"+profile_key:"")},vd::ir::Emission::entry);
+             auto code=jit->compile(*analysis.program,optimize);
+             if(auto runtime=code->runtime_owner())
+                 runtime->application_arguments(vd::checked_application_arguments(std::move(application_arguments)));
+@@ -246,10 +246,10 @@ static int run_cli(int argc, char** argv) {
+ #endif
+                 output=(project?project->root():entry.parent_path())/"build"/name;
+             }
+-            vd::build_executable(*analysis.program,*output,optimize,argv[0]);
++            vd::build_executable(*analysis.program,*output,optimize,argv[0],profile_key);
+             std::cout<<"Built native executable: "<<vd::path_utf8(*output)<<'\n';
+         } else {
+-            vd::publish_object(*analysis.program,*output,optimize);
++            vd::publish_object(*analysis.program,*output,optimize,profile_key);
+             std::cout<<"Wrote native source object: "<<vd::path_utf8(*output)<<'\n';
+         }
+         return 0;
+diff --git a/src/native_build.cpp b/src/native_build.cpp
+index 963f50e..61c37bf 100644
+--- a/src/native_build.cpp
++++ b/src/native_build.cpp
+@@ -1,5 +1,6 @@
+ #include "void/native_build.hpp"
+ #include "void/backend.hpp"
++#include "void/cache.hpp"
+ #include "void/path.hpp"
+ #include <llvm/Support/FileSystem.h>
+ #include <llvm/Support/Path.h>
+@@ -113,8 +114,9 @@ void publish(const fs::path& staged,const fs::path& output) {
+ struct Resources {
+     fs::path driver,linker,runtime,fixture;
+     std::vector<std::string> flags;
++    std::string verified_digests;
+ };
+-void verify_resources(const fs::path& config, const Resources& resources) {
++void verify_resources(const fs::path& config, Resources& resources) {
+     const auto inventory = config.parent_path()/"void-native-resources.txt";
+     std::ifstream file(inventory);
+     std::string line;
+@@ -142,6 +144,7 @@ void verify_resources(const fs::path& config, const Resources& resources) {
+         for(auto byte:digest.final()){actual+=hex[byte>>4];actual+=hex[byte&15];}
+         if(actual!=line.substr(0,64))
+             throw std::runtime_error("Native link resource checksum mismatch: "+path_utf8(path));
++        resources.verified_digests += actual;
+         if(std::find(checked.begin(),checked.end(),path)!=checked.end())
+             throw std::runtime_error("Duplicate native resource inventory entry");
+         checked.push_back(path);
+@@ -166,7 +169,7 @@ Resources resources(const char* argv0) {
+     if(!file.eof() || lines.size()<5 || (lines[0]!="VOID native 23.1.4 v1" && lines[0]!="VOID native 23.1.4 v2"))
+         throw std::runtime_error("Native toolchain resources missing or invalid: "+path_utf8(config));
+     auto path=[&](const std::string& text){auto p=utf8_path(text);return p.is_absolute()?p:(config.parent_path()/p).lexically_normal();};
+-    Resources result{path(lines[1]),lines[2].empty()?fs::path{}:path(lines[2]),path(lines[3]),path(lines[4]),{}};
++    Resources result{path(lines[1]),lines[2].empty()?fs::path{}:path(lines[2]),path(lines[3]),path(lines[4]),{},{}};
+     for(const auto& p:{result.driver,result.runtime,result.fixture}) {
+         if(!fs::is_regular_file(p))throw std::runtime_error("Native toolchain resource missing: "+path_utf8(p));
+         exact_path(p);
+@@ -207,13 +210,13 @@ void version(const fs::path& tool,const char* expected,const fs::path& capture)
+         throw std::runtime_error("Native toolchain requires matching LLVM/Clang/LLD 23.1.4: "+path_utf8(tool));
+ }
+ }
+-void publish_object(const ValidatedAnalysis& analysis,const fs::path& requested,bool optimize) {
++void publish_object(const ValidatedAnalysis& analysis,const fs::path& requested,bool optimize,std::string_view profile) {
+     auto output=output_path(analysis,requested);Staging stage(output);
+     auto object=stage.directory/"program.o";
+-    emit_object(analysis.lower(),object,optimize,true);
++    emit_object(analysis.lower(),object,optimize,true,std::string(compiler_build_identity())+":"+std::string(profile));
+     output_path(analysis,output);publish(object,output);
+ }
+-void build_executable(const ValidatedAnalysis& analysis,const fs::path& requested,bool optimize,const char* argv0) {
++void build_executable(const ValidatedAnalysis& analysis,const fs::path& requested,bool optimize,const char* argv0,std::string_view profile) {
+     auto config=[&] {
+         try {return resources(argv0);}
+         catch(const std::exception& error) {
+@@ -238,7 +241,9 @@ void build_executable(const ValidatedAnalysis& analysis,const fs::path& requeste
+     version(config.driver,"clang version 23.1.4",work/"version.txt");
+     if(!config.linker.empty())version(config.linker,"LLD 23.1.4",work/"version.txt");
+     const auto object=work/"program.o";
+-    emit_object(analysis.lower(ir::Emission::entry),object,optimize,true);
++    std::string provenance=std::string(compiler_build_identity())+":"+std::to_string(profile.size())+":"+std::string(profile)+":"+config.verified_digests;
++    for(const auto& flag:config.flags)provenance+=std::to_string(flag.size())+":"+flag;
++    emit_object(analysis.lower(ir::Emission::entry),object,optimize,true,provenance);
+     std::vector<std::string> args{path_utf8(config.driver),"--driver-mode=g++"};
+     if(!config.linker.empty())args.push_back("--ld-path="+path_utf8(config.linker));
+     // LLD interprets '%' in absolute output paths. The driver's child working
+diff --git a/src/project_identity.cpp b/src/project_identity.cpp
+new file mode 100644
+index 0000000..9f20c79
+--- /dev/null
++++ b/src/project_identity.cpp
+@@ -0,0 +1,105 @@
++#include "void/project.hpp"
++#include "void/utf8.hpp"
++#include <algorithm>
++
++namespace vd::project {
++namespace {
++bool digit(char c) { return c >= '0' && c <= '9'; }
++bool numeric(std::string_view s) { return !s.empty() && std::all_of(s.begin(), s.end(), digit); }
++std::strong_ordering number_order(std::string_view a, std::string_view b) noexcept {
++    if (a.size() != b.size()) return a.size() <=> b.size();
++    return a <=> b;
++}
++bool component(std::string_view s) {
++    return numeric(s) && (s.size() == 1 || s.front() != '0');
++}
++bool identifiers(std::string_view s, std::vector<std::string>& out, bool prerelease) {
++    if (s.empty()) return false;
++    for (std::size_t begin = 0; begin <= s.size();) {
++        auto end = s.find('.', begin);
++        if (end == std::string_view::npos) end = s.size();
++        auto piece = s.substr(begin, end - begin);
++        if (piece.empty() || !std::all_of(piece.begin(), piece.end(), [](char c) {
++            return digit(c) || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '-';
++        }) || (prerelease && numeric(piece) && !component(piece))) return false;
++        out.emplace_back(piece);
++        if (end == s.size()) break;
++        begin = end + 1;
++    }
++    return true;
++}
++}
++bool valid_name(std::string_view s) {
++    bool non_space = false;
++    std::size_t scalars = 0;
++    for (std::size_t i = 0; i < s.size();) {
++        auto n = utf8_scalar_bytes(s, i);
++        if (!n || ++scalars > 128) return false;
++        unsigned cp = static_cast<unsigned char>(s[i]) & (n == 1 ? 127 : n == 2 ? 31 : n == 3 ? 15 : 7);
++        for (unsigned k = 1; k < n; ++k) cp = (cp << 6) | (static_cast<unsigned char>(s[i+k]) & 63);
++        if (cp < 32 || (cp >= 127 && cp <= 159)) return false;
++        // Unicode White_Space, without locale-dependent classification.
++        bool space = cp == 32 || cp == 0xa0 || cp == 0x1680 || (cp >= 0x2000 && cp <= 0x200a) ||
++            cp == 0x2028 || cp == 0x2029 || cp == 0x202f || cp == 0x205f || cp == 0x3000;
++        non_space |= !space;
++        i += n;
++    }
++    return scalars && non_space;
++}
++std::optional<SemanticVersion> parse_version(std::string_view text) {
++    if (text.empty() || text.size() > 255) return {};
++    SemanticVersion version;
++    version.text_ = text;
++    auto build = text.find('+');
++    if (build != std::string_view::npos) {
++        if (!identifiers(text.substr(build + 1), version.build_, false)) return {};
++        text = text.substr(0, build);
++    }
++    auto prerelease = text.find('-');
++    if (prerelease != std::string_view::npos) {
++        if (!identifiers(text.substr(prerelease + 1), version.prerelease_, true)) return {};
++        text = text.substr(0, prerelease);
++    }
++    std::size_t begin = 0;
++    for (std::size_t i = 0; i < 3; ++i) {
++        auto end = text.find('.', begin);
++        if (i < 2 && end == std::string_view::npos) return {};
++        if (i == 2 && end != std::string_view::npos) return {};
++        if (end == std::string_view::npos) end = text.size();
++        auto value = text.substr(begin, end - begin);
++        if (!component(value)) return {};
++        version.core_[i] = value;
++        begin = end + 1;
++    }
++    return version;
++}
++std::strong_ordering SemanticVersion::compare_precedence(const SemanticVersion& other) const noexcept {
++    for (std::size_t i = 0; i < 3; ++i) {
++        auto order = number_order(core_[i], other.core_[i]);
++        if (order != 0) return order;
++    }
++    if (prerelease_.empty() != other.prerelease_.empty())
++        return prerelease_.empty() ? std::strong_ordering::greater : std::strong_ordering::less;
++    for (std::size_t i = 0; i < std::min(prerelease_.size(), other.prerelease_.size()); ++i) {
++        std::string_view a = prerelease_[i], b = other.prerelease_[i];
++        bool na = numeric(a), nb = numeric(b);
++        if (na != nb) return na ? std::strong_ordering::less : std::strong_ordering::greater;
++        auto order = na ? number_order(a, b) : a <=> b;
++        if (order != 0) return order;
++    }
++    return prerelease_.size() <=> other.prerelease_.size();
++}
++bool valid_identity(std::string_view s) noexcept {
++    auto alnum = [](char c) { return digit(c) || (c >= 'a' && c <= 'z'); };
++    if (s.empty() || s.size() > 255 || !alnum(s.front()) || !alnum(s.back())) return false;
++    char previous = 0;
++    for (auto c : s) {
++        if ((!alnum(c) && c != '.' && c != '_' && c != '-') || (c == '.' && previous == '.')) return false;
++        previous = c;
++    }
++    auto stem = s.substr(0, s.find('.'));
++    return !(stem == "con" || stem == "prn" || stem == "aux" || stem == "nul" ||
++        (stem.size() == 4 && (stem.starts_with("com") || stem.starts_with("lpt")) && stem[3] >= '1' && stem[3] <= '9'));
++}
++
++}
+diff --git a/src/runtime/abi.cpp b/src/runtime/abi.cpp
+index b3ceed5..0bb3c1e 100644
+--- a/src/runtime/abi.cpp
++++ b/src/runtime/abi.cpp
+@@ -21,6 +21,7 @@ int Runtime::globals_begin(std::string_view contract, std::size_t count, Runtime
+         if (global_state_ == 3) { failure = global_failure_.value(); return -1; }
+         if (global_state_ == 2) return 0;
+         if (global_state_ == 1) throw std::logic_error("Reentrant entry during global initialization");
++        application_context_set_ = application_started_ = true;
+         global_contract_ = contract; global_admitted_ = true;
+         global_owner_ = std::this_thread::get_id(); global_state_ = 1;
+     }
+@@ -115,10 +116,11 @@ VD_DISPLAY_ENCODING(u8);VD_DISPLAY_ENCODING(u16);VD_DISPLAY_ENCODING(u32);VD_DIS
+ VD_DISPLAY_ENCODING(f32);VD_DISPLAY_ENCODING(f64);
+ #undef VD_DISPLAY_ENCODING
+ static_assert(static_cast<unsigned>(vd::ScalarEncoding::boolean)==10);
+-std::int32_t runtime_entry(vd::NativeCode::CheckedEntry entry,std::int32_t value,vd::RuntimeFailure* failure,const vd::RuntimeTypeRecord* records,std::size_t count,const vd::RuntimeWitnessRecord* witnesses=nullptr,std::size_t witness_count=0,int argc=0,const void* argv=nullptr,bool wide=false) noexcept {
++std::int32_t runtime_entry(vd::NativeCode::CheckedEntry entry,std::int32_t value,vd::RuntimeFailure* failure,const vd::RuntimeTypeRecord* records,std::size_t count,const vd::RuntimeWitnessRecord* witnesses=nullptr,std::size_t witness_count=0,int argc=0,const void* argv=nullptr,bool wide=false,vd::ApplicationMetadata::Owner application={}) noexcept {
+     try {
+         vd::Runtime runtime(256);
+         runtime.application_arguments(argc ? vd::capture_application_arguments(argc, argv, wide) : vd::checked_application_arguments({}));
++        runtime.start_application(std::move(application));
+         vd::Runtime::Attachment attachment(runtime);
+         if(count || witness_count) {vd_runtime_admit_metadata(&runtime,records,count,witnesses,witness_count,failure);if(failure->message) return 0;}
+         auto checkpoint=runtime.console_checkpoint();vd::NativeCode::LeaseScope native_failures(vd::NativeCode::active_lease());std::int32_t result;
+@@ -148,6 +150,15 @@ extern "C" {
+ std::int32_t vd_runtime_entry_application(vd::NativeCode::CheckedEntry entry,vd::RuntimeFailure* failure,const vd::RuntimeTypeRecord* records,std::size_t count,const vd::RuntimeWitnessRecord* witnesses,std::size_t witness_count,int argc,const void* argv,bool wide) noexcept {
+     return runtime_entry(entry,0,failure,records,count,witnesses,witness_count,argc,argv,wide);
+ }
++std::int32_t vd_runtime_entry_context_v1(vd::NativeCode::CheckedEntry entry,std::int32_t value,vd::RuntimeFailure* failure,const vd::RuntimeTypeRecord* records,std::size_t count,const vd::RuntimeWitnessRecord* witnesses,std::size_t witness_count,int argc,const void* argv,bool wide,const char* bytes,std::size_t size) noexcept {
++    try {
++        if (!bytes || !size) throw std::invalid_argument("Missing application metadata.");
++        auto metadata = vd::ApplicationMetadata::decode(std::string_view(bytes,size));
++        return runtime_entry(entry,value,failure,records,count,witnesses,witness_count,argc,argv,wide,std::move(metadata));
++    } catch (const std::invalid_argument&) {failure->message="Invalid compiled application metadata.";}
++      catch (const std::bad_alloc&) {failure->message="Runtime startup allocation failed.";}
++    return 0;
++}
+ void vd_display_enter(const char* hook,void* identity,vd::RuntimeFailure* failure) noexcept {
+     try{vd::Runtime::current().display_enter(hook,identity);}
+     catch(const std::length_error&){failure->message="Display hook nesting limit exceeded";}
+diff --git a/src/runtime/application.cpp b/src/runtime/application.cpp
+index 4002fc8..4360388 100644
+--- a/src/runtime/application.cpp
++++ b/src/runtime/application.cpp
+@@ -68,4 +68,25 @@ void Runtime::application_arguments(ApplicationArguments value) {
+     if (!value.error) value = checked_application_arguments(std::move(value.values));
+     application_arguments_ = std::move(value); application_arguments_set_ = true;
+ }
++void Runtime::admit_application(ApplicationMetadata::Owner value) {
++    std::lock_guard lock(mutex_);
++    if (application_started_ || closing_) throw std::logic_error("Late application context admission.");
++    if (application_context_set_) throw std::logic_error("Application context is already admitted.");
++    application_metadata_ = std::move(value);
++    application_context_set_ = true;
++}
++void Runtime::start_application(ApplicationMetadata::Owner expected, bool commit) {
++    std::lock_guard lock(mutex_);
++    if (closing_) throw std::logic_error("Runtime is closing.");
++    if (application_context_set_ && expected && (!application_metadata_ || *application_metadata_ != *expected))
++        throw std::invalid_argument("Compiled application context conflicts with the Runtime.");
++    if (commit) {
++        if (!application_context_set_) application_metadata_ = std::move(expected);
++        application_context_set_ = application_started_ = true;
++    }
++}
++ApplicationMetadata::Owner Runtime::application_metadata() const {
++    std::lock_guard lock(mutex_);
++    return application_metadata_;
++}
+ }
+diff --git a/src/runtime/os.cpp b/src/runtime/os.cpp
+index 158d3d0..e088891 100644
+--- a/src/runtime/os.cpp
++++ b/src/runtime/os.cpp
+@@ -189,7 +189,8 @@ Result checked_path(std::string text, bool executable) {
+     Result result; result.text = std::move(text); return result;
+ }
+ Result query(Operation operation, std::string_view input) {
+-    if (static_cast<unsigned>(operation) >= operations.size()) throw std::invalid_argument("Invalid OS operation");
++    if (static_cast<unsigned>(operation) >= operations.size() || operation == Operation::application_id)
++        throw std::invalid_argument("Invalid native OS operation");
+     if (operation == Operation::environment) {
+         if (input.empty() || input.find('\0') != std::string_view::npos || input.find('=') != std::string_view::npos) return fail(ErrorKind::invalid_argument);
+         if (!valid_utf8(input)) return fail(ErrorKind::invalid_utf8);
+diff --git a/src/runtime/os_abi.cpp b/src/runtime/os_abi.cpp
+index 49f282d..9a1be1e 100644
+--- a/src/runtime/os_abi.cpp
++++ b/src/runtime/os_abi.cpp
+@@ -34,7 +34,10 @@ extern "C" void vd_os_call(void* output, const vd::os::ReplyLayout* layout,
+         // independently checked in typed IR; null is a valid empty env name here.
+         if (os::operations[operation].text_argument) copied = runtime.string_bytes(input);
+         os::Result result;
+-        {
++        if (selected == os::Operation::application_id) {
++            if (auto metadata = runtime.application_metadata()) result.text = metadata->application_id();
++            else result.kind = os::ErrorKind::unavailable;
++        } else {
+             Runtime::Native safe(runtime);
+             result = os::query(selected, copied);
+         }
+diff --git a/src/runtime/reload.cpp b/src/runtime/reload.cpp
+index cdc5f09..978a914 100644
+--- a/src/runtime/reload.cpp
++++ b/src/runtime/reload.cpp
+@@ -40,6 +40,7 @@ std::int32_t NativeCode::invoke(std::int32_t value) const {
+     RuntimeFailure failure;
+     std::int32_t result;
+     if (runtime_) {
++        runtime_->start_application(compatibility_.application_metadata);
+         Runtime::Attachment attachment(*runtime_);
+         auto checkpoint=runtime_->console_checkpoint();
+         {Runtime::Managed managed(*runtime_);result = checked_(value, &failure);}
+diff --git a/stdlib/os.void b/stdlib/os.void
+index 710b232..db87323 100644
+--- a/stdlib/os.void
++++ b/stdlib/os.void
+@@ -176,7 +176,8 @@ private func _directory(operation: string, app_id: string, reply: _reply, leaf:
+ 
+ ## Discover XDG data, Windows LocalAppData or macOS Application Support, with one validated application component.
+ ## Returns a path only; creates nothing, resolves no links and promises no writability or permissions.
+-## @param app_id Portable 1-255 byte lowercase ASCII token; no empty dot pieces or Windows device stems.
++## Direct data_dir() uses the consuming Runtime application ID and returns unavailable when absent.
++## @param app_id Portable 1-255 byte lowercase ASCII token; no empty dot pieces or Windows device stems. Direct data_dir() uses Runtime application identity and returns unavailable when absent.
+ ## @return Ok with an owned absolute UTF-8 directory, or Err with operation os.data_dir and native diagnostics.
+ func data_dir(app_id: string) -> result<string, error>:
+     if not _valid_id(app_id):
+@@ -187,7 +188,8 @@ func data_dir(app_id: string) -> result<string, error>:
+ 
+ ## Discover XDG config, Windows RoamingAppData or macOS Application Support/id/config, with one validated application component.
+ ## Returns a path only; creates nothing, resolves no links and promises no writability or permissions.
+-## @param app_id Portable 1-255 byte lowercase ASCII token; no empty dot pieces or Windows device stems.
++## Direct config_dir() uses the consuming Runtime application ID and returns unavailable when absent.
++## @param app_id Portable 1-255 byte lowercase ASCII token; no empty dot pieces or Windows device stems. Direct config_dir() uses Runtime application identity and returns unavailable when absent.
+ ## @return Ok with an owned absolute UTF-8 directory, or Err with operation os.config_dir and native diagnostics.
+ func config_dir(app_id: string) -> result<string, error>:
+     if not _valid_id(app_id):
+@@ -200,7 +202,8 @@ func config_dir(app_id: string) -> result<string, error>:
+ 
+ ## Discover XDG cache, Windows LocalAppData/id/cache or macOS Caches, with one validated application component.
+ ## Returns a path only; creates nothing, resolves no links and promises no writability or permissions.
+-## @param app_id Portable 1-255 byte lowercase ASCII token; no empty dot pieces or Windows device stems.
++## Direct cache_dir() uses the consuming Runtime application ID and returns unavailable when absent.
++## @param app_id Portable 1-255 byte lowercase ASCII token; no empty dot pieces or Windows device stems. Direct cache_dir() uses Runtime application identity and returns unavailable when absent.
+ ## @return Ok with an owned absolute UTF-8 directory, or Err with operation os.cache_dir and native diagnostics.
+ func cache_dir(app_id: string) -> result<string, error>:
+     if not _valid_id(app_id):
+@@ -214,7 +217,8 @@ func cache_dir(app_id: string) -> result<string, error>:
+ ## Discover XDG state, Windows LocalAppData/id/state or macOS Application Support/id/state, with one validated application component.
+ ## Returns a path only; creates nothing, resolves no links and promises no writability or permissions.
+ ## Persistent operational history/restart data; no log rotation, retention or session IPC guarantees.
+-## @param app_id Portable 1-255 byte lowercase ASCII token; no empty dot pieces or Windows device stems.
++## Direct state_dir() uses the consuming Runtime application ID and returns unavailable when absent.
++## @param app_id Portable 1-255 byte lowercase ASCII token; no empty dot pieces or Windows device stems. Direct state_dir() uses Runtime application identity and returns unavailable when absent.
+ ## @return Ok with an owned absolute UTF-8 directory, or Err with operation os.state_dir and native diagnostics.
+ func state_dir(app_id: string) -> result<string, error>:
+     if not _valid_id(app_id):
+@@ -225,6 +229,39 @@ func state_dir(app_id: string) -> result<string, error>:
+     return _directory("os.state_dir", app_id, _os_state_root(), leaf)
+ 
+ 
++private func _missing_application_identity(operation: string) -> error:
++    return error(message = "Application identity is unavailable.", path = "", code = 6,
++        operation = operation, kind = error_kind.unavailable, os_code = 0, native_domain = "")
++
++
++private func _app_data_dir() -> result<string, error>:
++    var identity = _os_application_id()
++    if identity.kind != 0:
++        return Err(_missing_application_identity("os.data_dir"))
++    return data_dir(identity.text)
++
++
++private func _app_config_dir() -> result<string, error>:
++    var identity = _os_application_id()
++    if identity.kind != 0:
++        return Err(_missing_application_identity("os.config_dir"))
++    return config_dir(identity.text)
++
++
++private func _app_cache_dir() -> result<string, error>:
++    var identity = _os_application_id()
++    if identity.kind != 0:
++        return Err(_missing_application_identity("os.cache_dir"))
++    return cache_dir(identity.text)
++
++
++private func _app_state_dir() -> result<string, error>:
++    var identity = _os_application_id()
++    if identity.kind != 0:
++        return Err(_missing_application_identity("os.state_dir"))
++    return state_dir(identity.text)
++
++
+ ## Discover the current application home; Linux honors absolute HOME then real-user passwd fallback.
+ ## Returns an owned absolute UTF-8 snapshot without resolving symlinks or testing existence/access.
+ ## @return Ok with the native location, or Err with original diagnostics; no guessed location on failure.
+diff --git a/tests/os/frontend.py b/tests/os/frontend.py
+index e032b8c..d75932b 100644
+--- a/tests/os/frontend.py
++++ b/tests/os/frontend.py
+@@ -10,10 +10,10 @@ with tempfile.TemporaryDirectory(prefix='VOID OS frontend ') as directory:
+         source.write_text(text)
+         r=h.run([compiler,'check',source],work,status=0 if valid else 1,small=small)
+         if diagnostic:assert diagnostic.encode() in r.stderr,r.stderr
+-    calls=['data_dir("com.game")','config_dir("com.game")','cache_dir("com.game")','state_dir("com.game")','home_dir()','temp_dir()','executable_path()','resource_dir()','env("HOME")','platform()','architecture()','process_id()','is_bundle()']
++    calls=['data_dir("com.game")','config_dir("com.game")','cache_dir("com.game")','state_dir("com.game")','data_dir()','config_dir()','cache_dir()','state_dir()','home_dir()','temp_dir()','executable_path()','resource_dir()','env("HOME")','platform()','architecture()','process_id()','is_bundle()']
+     for call in calls:
+         check('use os as system\nfunc main():\n    var answer = system.'+call+'\n')
+-    for call in ('data_dir()','data_dir(1)','data_dir("a", "b")','env()','env(true)','home_dir(0)','process_id(0)','platform(0)','is_bundle(0)','_os_env("HOME")','_reply()','cwd()','runtime_dir()','session_dir()'):
++    for call in ('data_dir(1)','data_dir("a", "b")','env()','env(true)','home_dir(0)','process_id(0)','platform(0)','is_bundle(0)','_os_env("HOME")','_os_application_id()','_app_data_dir()','_reply()','cwd()','runtime_dir()','session_dir()'):
+         check('use os\nfunc main():\n    var answer = os.'+call+'\n',False)
+     for symbol in ('_os_env("HOME")','_os_process_id()'):
+         check('func main():\n    var answer = '+symbol+'\n',False)
+diff --git a/tests/project/application.cpp b/tests/project/application.cpp
+new file mode 100644
+index 0000000..44551c0
+--- /dev/null
++++ b/tests/project/application.cpp
+@@ -0,0 +1,248 @@
++#include "void/backend.hpp"
++#include "void/frontend.hpp"
++#include "void/os.hpp"
++#include "void/os_abi.hpp"
++#include "void/path.hpp"
++#include "void/runtime_abi.hpp"
++#include <chrono>
++#include <cstdlib>
++#include <fstream>
++#include <iostream>
++#include <new>
++#include <stdexcept>
++#include <utility>
++
++namespace {
++thread_local bool fail_next_allocation = false;
++}
++void* operator new(std::size_t size) {
++    if (std::exchange(fail_next_allocation,false)) throw std::bad_alloc();
++    if (auto* pointer=std::malloc(size?size:1)) return pointer;
++    throw std::bad_alloc();
++}
++void operator delete(void* pointer) noexcept {std::free(pointer);}
++void operator delete(void* pointer,std::size_t) noexcept {std::free(pointer);}
++void* operator new(std::size_t size,const std::nothrow_t&) noexcept {
++    try {return ::operator new(size);} catch (const std::bad_alloc&) {return nullptr;}
++}
++void operator delete(void* pointer,const std::nothrow_t&) noexcept {::operator delete(pointer);}
++
++namespace {
++namespace fs=std::filesystem;
++unsigned checks=0, startup_calls=0;
++void check(bool value,const char* message) {
++    ++checks;
++    if (!value) throw std::runtime_error(message);
++}
++template<class Exception=std::invalid_argument,class Action>
++void rejects(Action action,const char* message) {
++    try {action();} catch (const Exception&) {check(true,message);return;}
++    check(false,message);
++}
++
++vd::ApplicationMetadata::Owner metadata(std::string_view app="org.test.application") {
++    return vd::ApplicationMetadata::make({"org.test.project","Project","2.3.4",app,"App","5.6.7-beta+build"});
++}
++std::int32_t bootstrap_entry(std::int32_t value,vd::RuntimeFailure*) {
++    ++startup_calls;
++    auto context=vd::Runtime::current().application_metadata();
++    return context && context->application_id()=="org.test.application"?value:-1;
++}
++void admission() {
++    auto record=metadata();
++    auto decoded=vd::ApplicationMetadata::decode(record->bytes());
++    check(decoded!=record && *decoded==*record,"metadata decode owns the bytes");
++    rejects([&]{metadata("con.device");},"invalid host ID accepted");
++    rejects([&]{vd::ApplicationMetadata::make({"ok","\x01","0.0.0","ok","App","0.0.0"});},"invalid name accepted");
++    rejects([&]{vd::ApplicationMetadata::make({"ok","Project","0.0.0","ok","App","0.0.0-01"});},"invalid SemVer accepted");
++
++    vd::Runtime first,second;
++    first.admit_application(record);
++    rejects<std::logic_error>([&]{first.admit_application(record);},"duplicate admission accepted");
++    first.start_application(decoded,false);
++    first.start_application(decoded);
++    first.start_application(decoded);
++    rejects<std::logic_error>([&]{first.admit_application(record);},"late admission accepted");
++    rejects([&]{first.start_application(metadata("org.other.app"));},"conflicting context accepted");
++    second.admit_application({});
++    rejects([&]{second.start_application(record);},"explicit absence was overwritten");
++    second.start_application();
++    check(first.application_metadata()==record && !second.application_metadata(),"independent admission states");
++
++    auto boot=[&](std::string_view bytes,vd::RuntimeFailure& failure) {
++        return vd_runtime_entry_context_v1(bootstrap_entry,17,&failure,nullptr,0,nullptr,0,0,nullptr,false,bytes.data(),bytes.size());
++    };
++    auto broken=record->bytes();broken[0]=2;
++    vd::RuntimeFailure failure;
++    check(boot(broken,failure)==0 && failure.message && startup_calls==0,"unsupported revision ran entry");
++    failure={};broken=record->bytes();broken[4]=static_cast<char>(255);
++    check(boot(broken,failure)==0 && failure.message && startup_calls==0,"corrupt extent ran entry");
++    failure={};
++    check(boot(std::string_view(record->bytes()).substr(0,record->bytes().size()-1),failure)==0 && failure.message && startup_calls==0,"truncated metadata ran entry");
++    failure={};fail_next_allocation=true;
++    auto status=boot(record->bytes(),failure);
++    fail_next_allocation=false;
++    check(status==0 && failure.message && startup_calls==0,"metadata allocation failure ran entry");
++    failure={};
++    check(boot(record->bytes(),failure)==17 && !failure.message && startup_calls==1,"startup did not see admitted metadata");
++}
++
++void bridge_allocation() {
++    struct Reply {std::int64_t kind,code,number;bool flag;void* text;void* domain;};
++    const vd::os::ReplyLayout geometry{sizeof(Reply),{offsetof(Reply,kind),offsetof(Reply,code),offsetof(Reply,number),offsetof(Reply,flag),offsetof(Reply,text),offsetof(Reply,domain)}};
++    const std::size_t refs[]={offsetof(Reply,text),offsetof(Reply,domain)};
++    auto context=metadata("org.test.long-application-identity");
++    vd::Runtime runtime(1);runtime.start_application(context);
++    vd::Runtime::Attachment attachment(runtime);
++    vd::Runtime::Managed managed(runtime);
++    Reply reply{};
++    vd::Runtime::Slot slot{&reply,sizeof(reply),refs,2};
++    vd::Runtime::Frame roots(runtime,&slot,1);
++    vd::RuntimeFailure failure;
++    fail_next_allocation=true;
++    vd_os_call(&reply,&geometry,static_cast<unsigned>(vd::os::Operation::application_id),nullptr,&failure);
++    fail_next_allocation=false;
++    check(failure.message && std::string_view(failure.message)=="OS boundary allocation failed" && !reply.text,"OS identity fault became an ordinary result");
++    failure={};
++    vd_os_call(&reply,&geometry,static_cast<unsigned>(vd::os::Operation::application_id),nullptr,&failure);
++    check(!failure.message && reply.kind==0 && runtime.string_bytes(reply.text)==context->application_id(),"rooted OS reply did not recover");
++    check(runtime.collect()==vd::Runtime::Collection::completed && runtime.string_bytes(reply.text)==context->application_id(),"OS identity reply lost its precise root");
++}
++
++struct Fixture {
++    fs::path root=fs::temp_directory_path()/vd::utf8_path("VOID S4 application 雪 "+std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
++    Fixture(){fs::create_directories(root);}
++    ~Fixture(){std::error_code error;fs::remove_all(root,error);}
++    void put(const fs::path& file,std::string_view text) {
++        auto path=root/file;
++        fs::create_directories(path.parent_path());
++        std::ofstream out(path,std::ios::binary);out<<text;
++        if (!out) throw std::runtime_error("application fixture write failed");
++    }
++    void manifest(std::string_view id,std::string_view name="Game",std::string_view version="1.0.0") {
++        put("void.project.toml","schema=1\n[project]\nid='org.test.project'\nname='Project'\nversion='2.0.0'\nkind='application'\n"
++            "[application]\nid='"+std::string(id)+"'\nname='"+std::string(name)+"'\nversion='"+std::string(version)+"'\n");
++    }
++    std::shared_ptr<const vd::ValidatedAnalysis> analysis() const {
++        auto result=vd::analyze_manifest_project(root);
++        if(!result.succeeded())throw vd::CompilationError(std::move(result.diagnostics));
++        return result.project->program();
++    }
++};
++std::string body(std::string_view id,int value,bool globals) {
++    std::string text="use \"./locations.void\" as lib\nuse os\n";
++    if(globals)text+="var snapshot = lib.directory()\nvar state = 0\n";
++    text+="func main() -> i32:\n";
++    if(globals)text+="    state += 1\n    var actual = snapshot\n";
++    else text+="    var actual = lib.directory()\n";
++    text+="    if actual is Ok(var observed):\n        if os.data_dir(app_id = \""+std::string(id)+"\") is Ok(var expected):\n"
++        "            if observed == expected:\n                return "+std::string(globals?"state + ":"")+std::to_string(value)+"\n    return 99\n";
++    return text;
++}
++void generation(bool optimize) {
++    constexpr auto a="org.test.alpha",b="org.test.beta";
++    const auto library="use os as system\nfunc directory() -> result<string, system.error>:\n    return system.data_dir()\n";
++    Fixture first,second;
++    first.manifest(a);second.manifest(b);
++    first.put("locations.void",library);second.put("locations.void",library);
++    first.put("main.void",body(a,10,true));second.put("main.void",body(b,30,false));
++    auto original=first.analysis(),other=second.analysis();
++    vd::Jit jit({},vd::ir::Emission::entry);
++    auto one=jit.compile(*original,optimize),two=jit.compile(*other,optimize);
++    check(one->runtime_owner() && two->runtime_owner() && one->runtime_owner()!=two->runtime_owner(),"independent applications share a Runtime");
++    check(one->invoke(0)==11 && two->invoke(0)==30,"application identity missing in global or shared library code");
++    check(one->runtime_owner()->application_metadata()->application_id()==a && two->runtime_owner()->application_metadata()->application_id()==b,"Runtime ID leakage");
++
++    auto slot=std::make_unique<vd::ReloadSlot>(one);
++    first.put("main.void",body(a,20,true));
++    auto edited=first.analysis();
++    check(jit.replace(*slot,*edited,optimize),"body-only application replacement rejected");
++    auto next=slot->acquire();
++    check(next->runtime_owner()==one->runtime_owner() && next->invoke(0)==22,"global cells or application context reset on replacement");
++    check(next->compatibility().build_provenance!=one->compatibility().build_provenance,"generation provenance did not notice changed bytes");
++    check(one->invoke(0)==13,"retained old generation stopped working");
++    first.manifest(a,"Renamed","1.0.1");
++    check(!jit.replace(*slot,*first.analysis(),optimize),"metadata name/version changed without restart");
++    first.manifest(b);
++    check(!jit.replace(*slot,*first.analysis(),optimize),"application ID changed without restart");
++    first.manifest(a);
++    auto changed=body(a,20,true);changed.replace(changed.find("state = 0"),9,"state = 1");
++    first.put("main.void",changed);
++    check(!jit.replace(*slot,*first.analysis(),optimize),"global initializer change retained incompatible cells");
++    first.put("main.void",body(a,20,true));
++    fs::rename(first.root/"main.void",first.root/"renamed.void");
++    check(!jit.replace(*slot,*first.analysis(),optimize),"entry rename reused incompatible application state");
++    fs::rename(first.root/"renamed.void",first.root/"main.void");
++    {
++        std::ofstream manifest(first.root/"void.project.toml",std::ios::app);
++        manifest<<"[sources]\nexclude=['elsewhere']\n";
++    }
++    check(!jit.replace(*slot,*first.analysis(),optimize),"source policy change reused selected application");
++    std::weak_ptr<vd::Runtime> closed=one->runtime_owner();
++    slot.reset();next.reset();one.reset();
++    check(closed.expired() && two->invoke(0)==30,"closing one application affected another Runtime");
++
++    auto ir=other->lower(vd::ir::Emission::entry);
++    auto explicit_owner=std::make_shared<vd::Runtime>(1);
++    explicit_owner->admit_application(other->application_metadata());
++    auto matching=jit.compile(ir,ir.entry_symbol,optimize,{},explicit_owner);
++    check(matching->invoke(0)==30,"matching host context or GC-budgeted query failed");
++    auto standalone=vd::analyze_project(second.root/"main.void");
++    check(standalone.succeeded() && !standalone.program->application_metadata(),"bare source inherited project metadata");
++    auto standalone_ir=standalone.program->lower(vd::ir::Emission::entry);
++    auto hosted=jit.compile(standalone_ir,standalone_ir.entry_symbol,optimize,{},explicit_owner);
++    check(hosted->invoke(0)==30,"standalone embedding discarded its admitted host context");
++    auto conflict=std::make_shared<vd::Runtime>();
++    conflict->admit_application(other->application_metadata());
++    auto eager=original->lower(vd::ir::Emission::entry);
++    rejects([&]{jit.compile(eager,eager.entry_symbol,optimize,{},conflict);},"conflicting host metadata reached eager program");
++    check(conflict->application_metadata()==other->application_metadata(),"failed admission changed host metadata");
++
++    auto bad=ir;
++    bad.application_metadata.reset();
++    rejects([&]{vd::ir::validate(bad);},"typed IR allowed compiled metadata to be stripped");
++    bad=ir;
++    bool found=false;
++    for(auto& f:bad.functions)for(auto& block:f.blocks)for(auto& i:block.instructions)if(i.os_location_adapter) {
++        i.os_location_adapter=false;found=true;
++    }
++    check(found,"adapter proof missing from typed IR");
++    rejects([&]{vd::ir::validate(bad);},"typed IR allowed forged private adapter call");
++}
++void cache_and_scalar() {
++    Fixture fixture;fixture.manifest("org.test.cached");
++    fixture.put("main.void","func main() -> i32:\n    return 7\n");
++    vd::Jit scalar;
++    auto code=scalar.compile(*fixture.analysis());
++    check(!code->runtime_owner() && code->invoke(0)==7 && code->compatibility().application_metadata,"metadata forced a Runtime for scalar code");
++
++    fixture.put("locations.void","use os\nfunc directory() -> result<string, os.error>:\n    return os.data_dir()\n");
++    fixture.put("main.void",body("org.test.cached",9,false));
++    auto program=fixture.analysis();
++    vd::Jit cache({fixture.root,"slice4-application-test"},vd::ir::Emission::entry);
++    auto first=cache.compile(*program,false);
++    auto cold=cache.cache_status();
++    auto second=cache.compile(*program,false);
++    auto warm=cache.cache_status();
++    check(first->runtime_owner()!=second->runtime_owner() && first->invoke(0)==9 && second->invoke(0)==9,"cache reused Runtime state");
++    check((cold=="miss" && warm=="hit") || (cold=="unavailable" && warm=="unavailable"),"cache cold/warm result");
++    std::cout<<"Application cache: "<<cold<<"/"<<warm<<'\n';
++
++    Fixture library;
++    library.put("void.project.toml","schema=1\n[project]\nid='org.test.lib'\nname='Lib'\nversion='1.0.0'\n"
++        "kind='library'\n[package]\nid='org.test.locations'\nname='locations'\n");
++    library.put("locations.void","use os\nfunc directory() -> result<string, os.error>:\n    return os.data_dir()\n");
++    auto checked=vd::analyze_manifest_project(library.root);
++    check(checked.succeeded() && !checked.project->program() && !checked.project->semantic_analysis()->application_metadata(),
++        "library package acquired application metadata");
++}
++}
++int main() {
++    try {
++        admission();bridge_allocation();generation(false);generation(true);cache_and_scalar();
++        std::cout<<"project_application: "<<checks<<" checks passed\n";
++        return 0;
++    } catch (const std::exception& error) {
++        fail_next_allocation=false;std::cerr<<error.what()<<'\n';return 1;
++    }
++}
+diff --git a/tests/project/application.py b/tests/project/application.py
+new file mode 100644
+index 0000000..0db55eb
+--- /dev/null
++++ b/tests/project/application.py
+@@ -0,0 +1,227 @@
++"""S4 compiled application identity in JIT, AOT, and a relocated installation."""
++from pathlib import Path
++import json
++import os
++import shutil
++import struct
++import subprocess
++import sys
++import tempfile
++
++compiler = Path(sys.argv[1]).resolve()
++evidence = Path(sys.argv[2]).resolve()
++suffix = ".exe" if os.name == "nt" else ""
++operations = ("data", "config", "cache", "state")
++records = []
++checks = 0
++app_id = "org.test.context-game"
++project_id = "org.test.context-project"
++
++
++def check(condition, detail):
++    global checks
++    checks += 1
++    assert condition, detail
++
++
++def run(args, cwd, env, status=0):
++    command = list(map(str, args))
++    result = subprocess.run(command, cwd=cwd, env=env, capture_output=True, timeout=90)
++    stdout = result.stdout.decode("utf-8", errors="backslashreplace").replace("\r\n", "\n")
++    stderr = result.stderr.decode("utf-8", errors="backslashreplace").replace("\r\n", "\n")
++    records.append({"argv": command, "cwd": str(cwd), "status": result.returncode, "stdout": stdout, "stderr": stderr})
++    check(result.returncode == status, records[-1])
++    return stdout, stderr
++
++
++def manifest(name="Orbit 雪", version="1.0.0"):
++    return f"""schema=1
++[project]
++id='{project_id}'
++name='Project'
++version='2.3.4'
++kind='application'
++[application]
++id='{app_id}'
++name='{name}'
++version='{version}'
++[build.release]
++debug_info='none'
++[build.debug]
++debug_info='none'
++"""
++
++
++def encoded_metadata(name, version):
++    fields = (project_id, "Project", "2.3.4", app_id, name, version)
++    return struct.pack("<I", 1) + b"".join(struct.pack("<I", len(b)) + b for b in map(lambda s: s.encode(), fields))
++
++
++def roots(base, use_xdg):
++    env = dict(os.environ)
++    locations = {}
++    if sys.platform == "linux":
++        home = base / "uncreated home 雪"
++        env["HOME"] = str(home)
++        for operation, fallback in zip(operations, (".local/share", ".config", ".cache", ".local/state")):
++            root = base / f"uncreated {operation} 雪" if use_xdg else home / fallback
++            env[f"XDG_{operation.upper()}_HOME"] = str(root) if use_xdg else "invalid-relative"
++            locations[operation] = root
++    elif os.name == "nt":
++        # Ask the platform API independently of VOID and environment conventions.
++        import ctypes
++        import uuid
++        from ctypes import wintypes
++
++        def known_folder(identifier):
++            guid = (ctypes.c_byte * 16).from_buffer_copy(uuid.UUID(identifier).bytes_le)
++            location = ctypes.c_wchar_p()
++            api = ctypes.windll.shell32.SHGetKnownFolderPath
++            api.argtypes = (ctypes.c_void_p, wintypes.DWORD, wintypes.HANDLE, ctypes.POINTER(ctypes.c_wchar_p))
++            api.restype = ctypes.c_long
++            status = api(ctypes.byref(guid), 0x4000, None, ctypes.byref(location))  # KF_FLAG_DONT_VERIFY
++            check(status == 0 and location.value, f"Known Folder failure {status}")
++            try:
++                return Path(location.value)
++            finally:
++                ctypes.windll.ole32.CoTaskMemFree(ctypes.cast(location, ctypes.c_void_p))
++
++        local = known_folder("F1B32785-6FBA-4FCF-9D55-7B8E7F157091")
++        roaming = known_folder("3EB685DB-65F9-4CF6-A03A-E3EF65729F3D")
++        locations = {"data": local, "config": roaming, "cache": local, "state": local}
++        env.update(LOCALAPPDATA=str(base / "poisoned-local"), APPDATA=str(base / "poisoned-roaming"))
++    else:
++        raise RuntimeError("This fixture has native Linux and Windows path oracles")
++    return env, locations
++
++
++def expected_paths(locations, label):
++    rows = []
++    for operation, root in locations.items():
++        path = root / app_id
++        if os.name == "nt" and operation in ("cache", "state"):
++            path /= operation
++        rows.append(f"{label}-{operation}|{path.as_posix()}")
++    return rows
++
++
++report = """use os as system
++
++func show(label: string, response: result<string, system.error>):
++    if response is Ok(var value):
++        print("{label}|{value}")
++    else if response is Err(var reason):
++        var unavailable = false
++        match reason.kind:
++            system.error_kind.unavailable:
++                unavailable = true
++        print("{label}|{reason.code}|{reason.operation}|{reason.path.byte_length}|{reason.native_domain.byte_length}|{reason.os_code}|{reason.message}|{unavailable}")
++"""
++src = report + "\n" + "".join(f"var eager_{n} = system.{n}_dir()\n" for n in operations)
++src += "\nfunc main():\n"
++for kind in ("eager", "body"):
++    for operation in operations:
++        expression = f"eager_{operation}" if kind == "eager" else f"system.{operation}_dir()"
++        src += f'    show("{kind}-{operation}", {expression})\n'
++src += f'    var named: func(string) -> result<string, system.error> = system.data_dir\n'
++src += f'    show("function-value", named("{app_id}"))\n'
++src += f'    show("named-explicit", system.config_dir(app_id = "{app_id}"))\n'
++src += '    show("invalid-explicit", system.data_dir("CON"))\n'
++
++try:
++    with tempfile.TemporaryDirectory(prefix="VOID S4 metadata 雪 ") as directory:
++        base = Path(directory)
++        root, install, cwd = (base / name for name in ("checkout", "installation", "unrelated"))
++        for folder in (root, install, cwd):
++            folder.mkdir()
++        policy = root / "void.project.toml"
++        policy.write_text(manifest(), encoding="utf-8")
++        active = root / "launcher.void"
++        active.write_text(src, encoding="utf-8")
++        env, locations = roots(base, True)
++        fallback, fallback_locations = roots(base, False)
++        absent = cwd / "standalone.void"
++        absent.write_text(src, encoding="utf-8")
++
++        def success(output, locations):
++            lines = output.splitlines()
++            paths = expected_paths(locations, "eager") + expected_paths(locations, "body")
++            paths += [paths[0].replace("eager-data", "function-value"), paths[1].replace("eager-config", "named-explicit")]
++            check(lines[:-1] == paths, lines)
++            check(lines[-1].startswith("invalid-explicit|2|os.data_dir|0|0|0|"), lines[-1])
++
++        def missing(output):
++            lines = output.splitlines()
++            expected = [f"{kind}-{operation}|6|os.{operation}_dir|0|0|0|Application identity is unavailable.|true"
++                        for kind in ("eager", "body") for operation in operations]
++            check(lines[:8] == expected, lines)
++
++        def unrelated_queries():
++            # Invalid native root text would surface as a different error if
++            # the adapter queried roots before detecting an absent context.
++            if sys.platform != "linux":
++                return env
++            return {**env, **{f"XDG_{kind.upper()}_HOME": b"/poison\xff" for kind in operations}}
++
++        outputs = []
++        for profile in ("debug", "release"):
++            output, _ = run([compiler, "run", "--project", root, "--profile", profile, "--no-cache"], cwd, env)
++            success(output, locations)
++            output, _ = run([compiler, "run", "--project", root, "--profile", profile, "--no-cache"], cwd, fallback)
++            success(output, fallback_locations)
++            flags = ["--no-opt"] if profile == "debug" else []
++            output, _ = run([compiler, "run", absent, "--no-cache", *flags], cwd, unrelated_queries())
++            missing(output)
++            binary = base / ("output-" + profile + suffix)
++            run([compiler, "build", "--project", root, "--profile", profile, "-o", binary], cwd, env)
++            check(encoded_metadata("Orbit 雪", "1.0.0") in binary.read_bytes(), "AOT record missing")
++            target = install / ("unrelated-image-" + profile + suffix)
++            binary.rename(target)
++            outputs.append(target)
++            no_context = install / ("no-context-" + profile + suffix)
++            run([compiler, "build", absent, "-o", no_context, *flags], cwd, env)
++            missing(run([no_context], cwd, unrelated_queries())[0])
++
++        policy.write_text(manifest("Orbit Renamed", "1.0.1-beta+build"), encoding="utf-8")
++        changed = install / ("version-changed" + suffix)
++        run([compiler, "build", "--project", root, "-o", changed], cwd, env)
++        check(encoded_metadata("Orbit Renamed", "1.0.1-beta+build") in changed.read_bytes(), "updated metadata missing")
++        check(encoded_metadata("Orbit 雪", "1.0.0") not in changed.read_bytes(), "old metadata retained")
++        outputs.append(changed)
++
++        # Scalar applications keep their record even when no Runtime is needed.
++        active.write_text("func main() -> i32:\n    return 7\n", encoding="utf-8")
++        scalar = install / ("scalar" + suffix)
++        run([compiler, "build", "--project", root, "-o", scalar], cwd, env)
++        check(encoded_metadata("Orbit Renamed", "1.0.1-beta+build") in scalar.read_bytes(), "scalar metadata eliminated")
++
++        # Source-only binding and diagnostics. Local and imported lookalikes
++        # retain their declared arity, and function values retain one parameter.
++        shadow = cwd / "shadow.void"
++        shadow.write_text("func data_dir() -> i32:\n    return 41\n", encoding="utf-8")
++        control = cwd / "control.void"
++        control.write_text('use "./shadow.void" as os\nfunc main() -> i32:\n    return os.data_dir()\n', encoding="utf-8")
++        run([compiler, "run", control, "--no-cache"], cwd, env, 41)
++        shadow.write_text("func data_dir(id: string) -> i32:\n    return 41\n", encoding="utf-8")
++        check("required argument" in run([compiler, "check", control], cwd, env, 1)[1], "lookalike adapted")
++        control.write_text("use os\nfunc main():\n    var f: func() -> result<string, os.error> = os.data_dir\n", encoding="utf-8")
++        run([compiler, "check", control], cwd, env, 1)
++
++        invalid = manifest().replace(app_id, "con.bad")
++        policy.write_text(invalid, encoding="utf-8")
++        check("VOID5004" in run([compiler, "run", "--project", root], cwd, env, 1)[1], "invalid ID ran application")
++        shutil.rmtree(root)
++        absent.unlink()
++        for target in outputs:
++            for active_env, expected in ((env, locations), (fallback, fallback_locations)):
++                # Even an explicit compiler source root cannot affect the installed program.
++                active_env = dict(active_env, VOID_STDLIB_ROOT=str(base / "missing compiler resources"))
++                success(run([target], cwd, active_env)[0], expected)
++        run([scalar], cwd, env, 7)
++        for root_path in locations.values():
++            if sys.platform == "linux":
++                check(not root_path.exists(), f"location query created {root_path}")
++        check(not (base / "uncreated home 雪").exists(), "location query created HOME")
++    print(f"project_application_process: {checks} checks passed")
++finally:
++    evidence.write_text(json.dumps({"checks": checks, "processes": records}, indent=2) + "\n", encoding="utf-8")
+diff --git a/tests/project/legacy.py b/tests/project/legacy.py
+index 6d979c2..e66ff67 100644
+--- a/tests/project/legacy.py
++++ b/tests/project/legacy.py
+@@ -48,9 +48,15 @@ with tempfile.TemporaryDirectory(prefix="void manifest legacy ") as temporary:
+     for args in (["init", root], ["new", root / "new-project"]):
+         run(args, 2, root)
+     no_id = root / "missing_context.void"
+-    no_id.write_text("use os\nfunc main():\n    var directory = os.data_dir()\n", encoding="utf-8")
+-    result = run(["check", no_id], 1, root)
+-    assert b"VOID2004" in result.stderr
++    no_id.write_text(
++        'use os\nfunc main() -> i32:\n'
++        '    if os.data_dir() is Err(var reason):\n'
++        '        if reason.code == 6 and reason.message == "Application identity is unavailable.":\n'
++        '            return 19\n'
++        '    return 1\n', encoding="utf-8")
++    run(["check", no_id], 0, root)
++    result = run(["run", no_id, "--no-cache"], 19, root)
++    assert not result.stdout and not result.stderr
+     # Native AOT/default output spelling remains tied to the explicit source file.
+     result = run(["build", app], 0, root)
+     executable = root / "build" / ("game.exe" if os.name == "nt" else "game")

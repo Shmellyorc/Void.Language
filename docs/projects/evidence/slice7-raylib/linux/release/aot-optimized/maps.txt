@@ -1,0 +1,38 @@
+557e48076000-557e481d0000 r--p 00000000 08:03 2018406278                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/relocated optimized 雪/gallery
+557e481d0000-557e482f4000 r-xp 00159000 08:03 2018406278                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/relocated optimized 雪/gallery
+557e482f4000-557e482fa000 r--p 0027c000 08:03 2018406278                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/relocated optimized 雪/gallery
+557e482fa000-557e482fc000 rw-p 00281000 08:03 2018406278                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/relocated optimized 雪/gallery
+7fb60c128000-7fb60c133000 r--p 00000000 08:03 1881557610                 /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
+7fb60c133000-7fb60c17c000 r-xp 0000b000 08:03 1881557610                 /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
+7fb60c17c000-7fb60c18e000 r--p 00054000 08:03 1881557610                 /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
+7fb60c18e000-7fb60c192000 r--p 00065000 08:03 1881557610                 /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
+7fb60c192000-7fb60c193000 rw-p 00069000 08:03 1881557610                 /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
+7fb60c194000-7fb60c1d5000 r--p 00000000 08:03 1879086046                 /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0
+7fb60c1d5000-7fb60c214000 r-xp 00041000 08:03 1879086046                 /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0
+7fb60c214000-7fb60c227000 r--p 00080000 08:03 1879086046                 /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0
+7fb60c227000-7fb60c243000 r--p 00093000 08:03 1879086046                 /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0
+7fb60c243000-7fb60c244000 rw-p 000af000 08:03 1879086046                 /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0
+7fb60c24c000-7fb60c24f000 r--p 00000000 08:03 1879086040                 /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0
+7fb60c24f000-7fb60c26a000 r-xp 00003000 08:03 1879086040                 /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0
+7fb60c26a000-7fb60c26d000 r--p 0001e000 08:03 1879086040                 /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0
+7fb60c26d000-7fb60c26e000 r--p 00021000 08:03 1879086040                 /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0
+7fb60c26e000-7fb60c26f000 rw-p 00022000 08:03 1879086040                 /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0
+7fb60c27f000-7fb60c280000 r--p 00000000 08:03 1879092113                 /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0
+7fb60c280000-7fb60c281000 r-xp 00001000 08:03 1879092113                 /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0
+7fb60c281000-7fb60c282000 r--p 00002000 08:03 1879092113                 /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0
+7fb60c282000-7fb60c283000 r--p 00002000 08:03 1879092113                 /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0
+7fb60c283000-7fb60c284000 rw-p 00003000 08:03 1879092113                 /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0
+7fb60c29f000-7fb60c2bb000 r--p 00000000 08:03 1879092117                 /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+7fb60c2bb000-7fb60c371000 r-xp 0001c000 08:03 1879092117                 /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+7fb60c371000-7fb60c405000 r--p 000d2000 08:03 1879092117                 /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+7fb60c405000-7fb60c407000 r--p 00165000 08:03 1879092117                 /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+7fb60c407000-7fb60c40c000 rw-p 00167000 08:03 1879092117                 /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+7fb60c40c000-7fb60c43c000 r--p 00000000 08:03 6108671                    /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/relocated optimized 雪/native/libraylib.so.600
+7fb60c43c000-7fb60c54a000 r-xp 00030000 08:03 6108671                    /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/relocated optimized 雪/native/libraylib.so.600
+7fb60c54a000-7fb60c5c8000 r--p 0013e000 08:03 6108671                    /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/relocated optimized 雪/native/libraylib.so.600
+7fb60c5c8000-7fb60c5cc000 r--p 001bb000 08:03 6108671                    /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/relocated optimized 雪/native/libraylib.so.600
+7fb60c5cc000-7fb60c5d0000 rw-p 001bf000 08:03 6108671                    /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/relocated optimized 雪/native/libraylib.so.600
+7fb60ccb5000-7fb60ccb7000 r--p 00000000 08:03 6108670                    /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/relocated optimized 雪/native/libvoid_raylib.so
+7fb60ccb7000-7fb60ccb8000 r-xp 00001000 08:03 6108670                    /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/relocated optimized 雪/native/libvoid_raylib.so
+7fb60ccb8000-7fb60ccba000 r--p 00001000 08:03 6108670                    /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/relocated optimized 雪/native/libvoid_raylib.so
+7fb60ccba000-7fb60ccbb000 rw-p 00002000 08:03 6108670                    /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/relocated optimized 雪/native/libvoid_raylib.so

@@ -1,0 +1,166 @@
+
+> void-language@0.1.0 build
+> npm run typecheck && npm run compile
+
+
+> void-language@0.1.0 typecheck
+> tsc --noEmit
+
+
+> void-language@0.1.0 compile
+> tsc && node build.cjs
+
+[90m[main 2026-11-09T02:11:41.946Z][0m [node-compile-cache] main: packaged cache inactive (status: disabled, configured: /home/shmellyorc/Documents/Void.Language/editors/vscode/.vscode-test/vscode-linux-x64-1.141.0/resources/app/node-compile-cache/main, active: none)
+[90m[main 2026-11-09T02:11:42.077Z][0m StorageMainService: creating application shared storage
+[90m[main 2026-11-09T02:11:42.186Z][0m [shared storage] Creating shared storage database at ':memory:' (wasCreated: true)
+[90m[main 2026-11-09T02:11:42.187Z][0m [shared storage] Initializing fallback application storage (path: in-memory)
+[90m[main 2026-11-09T02:11:42.263Z][0m [shared storage] Fallback application storage initialized with 3 items
+[90m[main 2026-11-09T02:11:42.266Z][0m update#setState disabled
+[90m[main 2026-11-09T02:11:42.266Z][0m update#ctor - updates are disabled by the environment
+[RemoteAgentHost] Reconciling: desired=[], current=[]
+Started local extension host with pid 724149.
+Started initializing default profile extensions in extensions installation folder. file:///tmp/VOID%20S6%20editor%20JDgRSM/extensions
+Completed initializing default profile extensions in extensions installation folder. file:///tmp/VOID%20S6%20editor%20JDgRSM/extensions
+[AccountPolicyGate] apply: state=inactive, reason=undefined, isRestricted=false
+Loading development extension at /home/shmellyorc/Documents/Void.Language/editors/vscode
+Extension 'github.copilot-chat' appears in product.json but enables LESS API proposals than the extension wants.
+package.json (LOSES): agentSessionsWorkspace
+agentsWindowConfiguration
+chatDebug
+chatHooks
+envIsConnectionMetered
+extensionsAny
+newSymbolNamesProvider
+interactive
+codeActionAI
+activeComment
+commentReveal
+contribCommentThreadAdditionalMenu
+contribCommentsViewThreadMenus
+contribChatEditorInlineGutterMenu
+documentFiltersExclusive
+embeddings
+findTextInFiles
+findTextInFiles2
+languageModelToolSupportsModel
+findFiles2
+textSearchProvider
+terminalDataWriteEvent
+terminalExecuteCommandEvent
+terminalSelection
+terminalQuickFixProvider
+mappedEditsProvider
+aiRelatedInformation
+aiSettingsSearch
+chatParticipantAdditions
+defaultChatParticipant
+contribSourceControlInputBoxMenu
+authLearnMore
+authIssuers
+testObserver
+aiTextSearchProvider
+chatParticipantPrivate
+chatProvider
+contribDebugCreateConfiguration
+chatReferenceDiagnostic
+textSearchProvider2
+chatReferenceBinaryData
+languageModelSystem
+languageModelCapabilities
+languageModelPricing
+inlineCompletionsAdditions
+chatStatusItem
+chatInputNotification
+taskProblemMatcherStatus
+contribLanguageModelToolSets
+textDocumentChangeReason
+resolvers
+taskExecutionTerminal
+dataChannels
+languageModelThinkingPart
+chatSessionsProvider
+devDeviceId
+contribEditorContentMenu
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+environmentPower
+terminalTitle
+toolInvocationApproveCombination
+chatSessionCustomizationProvider
+product.json (WINS): agentSessionsWorkspace
+agentsWindowConfiguration
+interactive
+terminalDataWriteEvent
+terminalExecuteCommandEvent
+terminalSelection
+terminalQuickFixProvider
+chatParticipantAdditions
+defaultChatParticipant
+embeddings
+chatProvider
+mappedEditsProvider
+aiRelatedInformation
+aiSettingsSearch
+codeActionAI
+findTextInFiles
+findTextInFiles2
+textSearchProvider
+textSearchProvider2
+activeComment
+commentReveal
+contribSourceControlInputBoxMenu
+contribCommentEditorActionsMenu
+contribCommentThreadAdditionalMenu
+contribCommentsViewThreadMenus
+contribChatEditorInlineGutterMenu
+extensionAffinity
+newSymbolNamesProvider
+findFiles2
+chatReferenceDiagnostic
+extensionsAny
+authLearnMore
+testObserver
+aiTextSearchProvider
+documentFiltersExclusive
+chatParticipantPrivate
+contribDebugCreateConfiguration
+inlineCompletionsAdditions
+chatReferenceBinaryData
+languageModelSystem
+languageModelCapabilities
+languageModelThinkingPart
+languageModelToolSupportsModel
+chatStatusItem
+taskProblemMatcherStatus
+contribLanguageModelToolSets
+textDocumentChangeReason
+resolvers
+taskExecutionTerminal
+dataChannels
+chatSessionsProvider
+chatSessionCustomizationProvider
+devDeviceId
+contribEditorContentMenu
+tokenInformation
+toolInvocationApproveCombination
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+chatHooks
+chatDebug
+envIsConnectionMetered
+environmentPower
+terminalTitle
+languageModelPricing
+chatInputNotification
+DELTA: authIssuers
+Proceeding with EXTRA proposals (authIssuers) because extension is in development mode. Still, this EXTENSION WILL BE BROKEN unless product.json is updated.
+[RemoteAgentHost] Reconciling: desired=[], current=[]
+[CloudSandboxApi] No 'github' session with scopes [read:user, user:email, repo, workflow]
+Settings Sync: Account status changed from uninitialized to unavailable
+numeric_enum_editor: 6 checks passed
+[90m[main 2026-11-09T02:11:48.253Z][0m Extension host with pid 724149 exited with code: 0, signal: unknown.
+Exit code:   0

@@ -1,0 +1,41 @@
+{
+  "exit": 0,
+  "frames": 53,
+  "input_frames": 26,
+  "before": {
+    "pink": [
+      139.5,
+      124.5
+    ],
+    "green": [
+      80.5,
+      228.5
+    ],
+    "orange": [
+      310.5,
+      174.14
+    ]
+  },
+  "after": {
+    "pink": [
+      474.5,
+      234.5
+    ],
+    "green": [
+      106.5,
+      228.5
+    ],
+    "orange": [
+      415.5,
+      174.14
+    ]
+  },
+  "modules": [
+    "C:\\Users\\a\\VoidS7-Raylib-Graphics\\Debug-psapi\\relocated optimized \u96ea\\native\\void_raylib.dll",
+    "C:\\Users\\a\\VoidS7-Raylib-Graphics\\Debug-psapi\\relocated optimized \u96ea\\native\\raylib.dll"
+  ],
+  "sha256": {
+    "raylib.dll": "3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824",
+    "void_raylib.dll": "685c546ca416a170afec1796cfa33b3c0213f6c110922f6c3e4320af21044b5d"
+  }
+}

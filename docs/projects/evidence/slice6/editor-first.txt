@@ -1,0 +1,24 @@
+
+> void-language@0.1.0 build
+> npm run typecheck && npm run compile
+
+
+> void-language@0.1.0 typecheck
+> tsc --noEmit
+
+src/test/numericHost.ts(29,21): error TS2345: Argument of type '() => Thenable<vscode.Location[]>' is not assignable to parameter of type '() => Location[] | Promise<Location[]>'.
+  Type 'Thenable<Location[]>' is not assignable to type 'Location[] | Promise<Location[]>'.
+    Type 'Thenable<Location[]>' is missing the following properties from type 'Promise<Location[]>': catch, finally, [Symbol.toStringTag]
+src/test/numericHost.ts(32,21): error TS2345: Argument of type '() => Thenable<vscode.Hover[]>' is not assignable to parameter of type '() => Hover[] | Promise<Hover[]>'.
+  Type 'Thenable<Hover[]>' is not assignable to type 'Hover[] | Promise<Hover[]>'.
+    Type 'Thenable<Hover[]>' is missing the following properties from type 'Promise<Hover[]>': catch, finally, [Symbol.toStringTag]
+src/test/numericHost.ts(40,21): error TS2345: Argument of type '() => Thenable<vscode.Location[]>' is not assignable to parameter of type '() => Location[] | Promise<Location[]>'.
+  Type 'Thenable<Location[]>' is not assignable to type 'Location[] | Promise<Location[]>'.
+    Type 'Thenable<Location[]>' is missing the following properties from type 'Promise<Location[]>': catch, finally, [Symbol.toStringTag]
+src/test/numericHost.ts(42,21): error TS2345: Argument of type '() => Thenable<vscode.Location[]>' is not assignable to parameter of type '() => Location[] | Promise<Location[]>'.
+  Type 'Thenable<Location[]>' is not assignable to type 'Location[] | Promise<Location[]>'.
+    Type 'Thenable<Location[]>' is missing the following properties from type 'Promise<Location[]>': catch, finally, [Symbol.toStringTag]
+src/test/numericHost.ts(47,27): error TS2322: Type 'Thenable<CompletionList<CompletionItem>>' is not assignable to type 'CompletionList<CompletionItem> | Promise<CompletionList<CompletionItem>>'.
+  Type 'Thenable<CompletionList<CompletionItem>>' is missing the following properties from type 'Promise<CompletionList<CompletionItem>>': catch, finally, [Symbol.toStringTag]
+src/test/numericHost.ts(58,41): error TS2322: Type 'Thenable<TextEdit[]>' is not assignable to type 'TextEdit[] | Promise<TextEdit[]>'.
+  Type 'Thenable<TextEdit[]>' is missing the following properties from type 'Promise<TextEdit[]>': catch, finally, [Symbol.toStringTag]

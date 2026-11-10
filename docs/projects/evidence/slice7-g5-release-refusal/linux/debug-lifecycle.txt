@@ -1,0 +1,27 @@
+Selected stdout lines from build/llvm23-debug/Testing/Temporary/LastTest.log
+
+G5 transport refused before native unregister
+G5 callback after refused release returned 44 (expected 44)
+G5 transport refused before native unregister
+G5 ORC normal capture, compatible/incompatible reload, refusal/retry, retirement and self-drain passed
+G5 transport refused before native unregister
+G5 callback after refused release returned 44 (expected 44)
+G5 transport refused before native unregister
+G5 ORC O2 capture, compatible/incompatible reload, refusal/retry, retirement and self-drain passed
+G5 barrier mode=2 result=140
+G5 barrier mode=1 result=0
+G5 barrier mode=2 result=140
+G5 barrier mode=2 result=140
+G5 barrier mode=1 result=0
+G5 barrier mode=2 result=140
+G5 barrier mode=2 result=140
+G5 barrier mode=1 result=0
+G5 barrier mode=2 result=140
+G5 barrier mode=2 result=140
+G5 barrier mode=1 result=0
+G5 barrier mode=2 result=140
+G5 passed all four compiled and relocated execution modes with independent C
+null and refused acquisition, refused release and retry preserved exact ownership
+borrow vs wrong-thread close and shutdown passed
+creation-publication race passed
+terminal provider error reported on shutdown after release

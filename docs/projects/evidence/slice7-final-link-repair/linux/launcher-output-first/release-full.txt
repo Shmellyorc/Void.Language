@@ -1,0 +1,2 @@
+dir: unrecognized option '--parallel'
+Try 'dir --help' for more information.

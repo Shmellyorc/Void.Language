@@ -1,0 +1,33 @@
+["C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\clang.exe", "--target=x86_64-pc-windows-msvc", "-fuse-ld=lld", "-fms-runtime-lib=static", "-std=c11", "-O2", "-shared", "-D_CRT_SECURE_NO_WARNINGS", "-DBUILD_LIBTYPE_SHARED", "-DPLATFORM_DESKTOP_WIN32", "-DGRAPHICS_API_OPENGL_SOFTWARE", "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src\\rcore.c", "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src\\rshapes.c", "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src\\rtextures.c", "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src\\rtext.c", "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src\\rmodels.c", "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src\\raudio.c", "-lopengl32", "-lgdi32", "-lwinmm", "-lshcore", "-luser32", "-lshell32", "-Wl,/implib:C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.lib", "-o", "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.dll"]
+In file included from C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\src\rcore.c:544:
+C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\src\platforms/rcore_desktop_win32.c:1782:70: warning: passing 'unsigned int *' to parameter of type 'int *' converts between pointers to integer types with different sign [-Wpointer-sign]
+ 1782 |             if (CORE.Time.frameCounter > 2) HandleWindowResize(hwnd, &platform.appScreenWidth, &platform.appScreenHeight);
+      |                                                                      ^~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\src\platforms/rcore_desktop_win32.c:794:48: note: passing argument to parameter 'width' here
+  794 | static void HandleWindowResize(HWND hwnd, int *width, int *height);
+      |                                                ^
+C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\src\platforms/rcore_desktop_win32.c:1782:96: warning: passing 'unsigned int *' to parameter of type 'int *' converts between pointers to integer types with different sign [-Wpointer-sign]
+ 1782 |             if (CORE.Time.frameCounter > 2) HandleWindowResize(hwnd, &platform.appScreenWidth, &platform.appScreenHeight);
+      |                                                                                                ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\src\platforms/rcore_desktop_win32.c:794:60: note: passing argument to parameter 'height' here
+  794 | static void HandleWindowResize(HWND hwnd, int *width, int *height);
+      |                                                            ^
+C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\src\platforms/rcore_desktop_win32.c:1891:70: warning: passing 'unsigned int *' to parameter of type 'int *' converts between pointers to integer types with different sign [-Wpointer-sign]
+ 1891 |             if (!(pos->flags & SWP_NOSIZE)) HandleWindowResize(hwnd, &platform.appScreenWidth, &platform.appScreenHeight);
+      |                                                                      ^~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\src\platforms/rcore_desktop_win32.c:794:48: note: passing argument to parameter 'width' here
+  794 | static void HandleWindowResize(HWND hwnd, int *width, int *height);
+      |                                                ^
+C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\src\platforms/rcore_desktop_win32.c:1891:96: warning: passing 'unsigned int *' to parameter of type 'int *' converts between pointers to integer types with different sign [-Wpointer-sign]
+ 1891 |             if (!(pos->flags & SWP_NOSIZE)) HandleWindowResize(hwnd, &platform.appScreenWidth, &platform.appScreenHeight);
+      |                                                                                                ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\src\platforms/rcore_desktop_win32.c:794:60: note: passing argument to parameter 'height' here
+  794 | static void HandleWindowResize(HWND hwnd, int *width, int *height);
+      |                                                            ^
+4 warnings generated.
+In file included from C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\src\raudio.c:214:
+C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\src\external/stb_vorbis.c:1404:75: warning: pointer comparison always evaluates to false [-Wtautological-compare]
+ 1404 |       if (f->stream_start + loc >= f->stream_end || f->stream_start + loc < f->stream_start) {
+      |                                                                           ^
+1 warning generated.
+exit=0

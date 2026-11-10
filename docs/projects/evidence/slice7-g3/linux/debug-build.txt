@@ -1,0 +1,478 @@
+[  0%] Built target void_application_objects
+[  7%] Built target void_format_objects
+[  7%] Built target void_zone_objects
+[  7%] Built target void_native_fixture
+[  7%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[ 78%] Built target libcurl_static
+[ 78%] Building CXX object CMakeFiles/void_core.dir/src/ir/module.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/ir/module.cpp:1042:63: warning: misleading indentation; statement is not part of the previous 'if' [-Wmisleading-indentation]
+ 1042 |                         fail("invalid deterministic release");result=Type::boolean;break;
+      |                                                               ^
+/home/shmellyorc/Documents/Void.Language/src/ir/module.cpp:1040:21: note: previous statement is here
+ 1040 |                     if(!f.receiver || f.method_name!="deinit" || operand(i.a).kind!=Type::managed_ref || operand(i.a).nullable ||
+      |                     ^
+1 warning generated.
+[ 78%] Building CXX object CMakeFiles/void_core.dir/src/ir/c_primitive.cpp.o
+[ 78%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/application.cpp.o
+[ 78%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/os_abi.cpp.o
+[ 78%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/random.cpp.o
+[ 78%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem_abi.cpp.o
+[ 78%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_resource.cpp.o
+[ 78%] Linking CXX static library libvoid_core.a
+[ 78%] Built target void_core
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_binding.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/temporal_abi.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/conversion.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/text_case.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/buffer.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/list.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/array.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/dictionary.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/fixed_abi.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/coordination.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console_abi.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:669:137: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  669 |                 if(data.key && !request.keys && (!data.key->down || data.key->repeat!=1))return {-1,false,false,{ErrorKind::unsupported}};
+      |                                                                                                                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:672:69: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  672 |                 if(data.after)return {-1,false,false,data.after,true};
+      |                                                                     ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:675:41: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  675 |             if(queue.eof)return {-1,true};
+      |                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:676:44: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  676 |             if(!fetch)return {-1,false,true};
+      |                                            ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:677:91: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  677 |             if(auto error=stopped(request,op.adapter());error)return {-1,false,false,error};
+      |                                                                                           ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:690:137: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  690 |                 if(poll && !native.completed && native.error.kind==ErrorKind::would_block){queue.blocks.pop_back();return {-1,false,true};}
+      |                                                                                                                                         ^
+6 warnings generated.
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/callback.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/abi.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/reload.cpp.o
+[ 85%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/async.cpp.o
+[ 92%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/c_span.cpp.o
+[ 92%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/c_resource.cpp.o
+[ 92%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_abi.cpp.o
+[ 92%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_error.cpp.o
+[ 92%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_crypto.cpp.o
+[ 92%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_archive.cpp.o
+[ 92%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_directory.cpp.o
+[ 92%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_process.cpp.o
+[ 92%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_process_windows.cpp.o
+[ 92%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_directory_windows.cpp.o
+[ 92%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/url_abi.cpp.o
+[ 92%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http.cpp.o
+[ 92%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_bulk.cpp.o
+[ 92%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_resource.cpp.o
+[ 92%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_file.cpp.o
+[ 92%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_abi.cpp.o
+[ 92%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_work.cpp.o
+[100%] Linking CXX static library libvoid_runtime.a
+[100%] Built target void_runtime
+[100%] Generating void-native-resources.txt, native-resources-install-Debug.txt
+[100%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+[100%] Built target void_native_inventory
+[100%] Linking CXX static library libvoid_llvm.a
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/voidc_objects.dir/src/native_build.cpp.o
+[100%] Building CXX object CMakeFiles/voidc_objects.dir/src/main.cpp.o
+[100%] Built target voidc_objects
+[100%] Generating cache-identity-Debug.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Debug.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[  0%] Built target void_application_objects
+[100%] Built target void_format_objects
+[100%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Linking CXX executable voidls
+[100%] Built target voidls
+[  0%] Built target void_application_objects
+[  7%] Built target void_format_objects
+[  7%] Built target void_zone_objects
+[ 78%] Built target libcurl_static
+[ 78%] Built target void_native_fixture
+[ 78%] Built target native_fixture
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/frontend/initialization.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/analysis/tests.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/frontend/methods.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/frontend/structs.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/frontend/tests.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/frontend/values.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/modules/tests.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/numeric/tests.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/sessions/tests.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/tests.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/tooling/tests.cpp.o
+/home/shmellyorc/Documents/Void.Language/tests/tests.cpp:174:57: warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+  174 |             {vd::ir::Terminator::Kind::return_value,1}}}};
+      |                                                         ^
+1 warning generated.
+[100%] Linking CXX executable void_tests
+[100%] Built target void_tests
+[  0%] Built target void_application_objects
+[  7%] Built target void_format_objects
+[ 78%] Built target libcurl_static
+[ 78%] Built target void_zone_objects
+[ 78%] Built target void_native_fixture
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_numeric_enum_ir.dir/tests/numeric/enums_ir.cpp.o
+[100%] Linking CXX executable void_numeric_enum_ir
+[100%] Built target void_numeric_enum_ir
+[  0%] Built target void_native_fixture
+[  7%] Built target void_format_objects
+[  7%] Built target void_zone_objects
+[ 78%] Built target libcurl_static
+[ 78%] Built target void_application_objects
+[100%] Built target void_runtime
+[100%] Built target void_native_inventory
+[  0%] Built target void_application_objects
+[  7%] Built target void_format_objects
+[ 78%] Built target libcurl_static
+[ 78%] Built target void_zone_objects
+[ 78%] Built target void_native_fixture
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_project_application.dir/tests/project/application.cpp.o
+[100%] Linking CXX executable void_project_application
+[100%] Built target void_project_application
+[  0%] Built target void_application_objects
+[  7%] Built target void_format_objects
+[ 78%] Built target libcurl_static
+[ 78%] Built target void_zone_objects
+[ 78%] Built target void_native_fixture
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_project_sessions.dir/tests/project/sessions.cpp.o
+[100%] Linking CXX executable void_project_sessions
+[100%] Built target void_project_sessions
+[100%] Built target void_format_objects
+[100%] Built target void_application_objects
+[100%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Linking CXX executable void_project_selection
+[100%] Built target void_project_selection
+[100%] Built target void_application_objects
+[100%] Built target void_format_objects
+[100%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Linking CXX executable void_project_manifest
+[100%] Built target void_project_manifest
+Built target void_project_header
+[100%] Built target void_application_objects
+[100%] Built target void_format_objects
+[100%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Linking CXX executable void_project_creation
+[100%] Built target void_project_creation
+[  0%] Built target void_application_objects
+[  7%] Built target void_format_objects
+[  7%] Built target void_zone_objects
+[ 78%] Built target libcurl_static
+[ 78%] Built target void_native_fixture
+[ 78%] Built target void_core
+[ 78%] Building CXX object CMakeFiles/void_managed_test_abi.dir/src/runtime/abi.cpp.o
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_managed_test_abi
+[100%] Building CXX object CMakeFiles/void_fixed_arrays_tests.dir/tests/managed/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_fixed_arrays_tests.dir/tests/fixed_arrays/tests.cpp.o
+[100%] Linking CXX executable void_fixed_arrays_tests
+[100%] Built target void_fixed_arrays_tests
+[  0%] Built target void_application_objects
+[  7%] Built target void_format_objects
+[ 78%] Built target libcurl_static
+[ 78%] Built target void_zone_objects
+[ 78%] Built target void_native_fixture
+[ 78%] Built target void_managed_test_abi
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/ir.cpp.o
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/lifecycle.cpp.o
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/lifetime.cpp.o
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/parallel.cpp.o
+/home/shmellyorc/Documents/Void.Language/tests/async/parallel.cpp:31:379: warning: variable 'foreign' is uninitialized when passed as a const pointer argument here [-Wuninitialized-const-pointer]
+   31 | void* fifo_start(std::int32_t,vd::RuntimeFailure* failure){void* task=nullptr;void* frame=nullptr;const std::size_t zero=0;vd::Runtime::Slot slots[]={{&task,sizeof(task),&zero,1},{&frame,sizeof(frame),&zero,1}};vd::Runtime::Frame roots(vd::Runtime::current(),slots,2);char foreign;vd::RuntimeFailure wrong;vd_async_new(&task,&frame,8,nullptr,0,8,nullptr,0,"parallel-fifo-task",&foreign,fifo_resume,&wrong,1);foreign_rejected=wrong.message && !task && !frame;return fifo_create(-1,failure);}
+      |                                                                                                                                                                                                                                                                                                                                                                                           ^~~~~~~
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/syntax.cpp.o
+1 warning generated.
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/async/tests.cpp.o
+[100%] Building CXX object CMakeFiles/void_async_tests.dir/tests/managed/probe.cpp.o
+[100%] Linking CXX executable void_async_tests
+[100%] Built target void_async_tests
+[  0%] Built target void_application_objects
+[  7%] Built target void_format_objects
+[  7%] Built target void_zone_objects
+[ 78%] Built target libcurl_static
+[ 78%] Built target void_native_fixture
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_stage10_fields.dir/tests/stage10/fields.cpp.o
+[100%] Linking CXX executable void_stage10_fields
+[100%] Built target void_stage10_fields
+[  0%] Built target void_application_objects
+[  7%] Built target void_format_objects
+[ 78%] Built target libcurl_static
+[ 78%] Built target void_zone_objects
+[ 78%] Built target void_native_fixture
+[ 78%] Built target void_managed_test_abi
+[ 78%] Built target void_native_test_fixture
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_native_tests.dir/tests/managed/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_native_tests.dir/tests/native/integrated.cpp.o
+[100%] Building CXX object CMakeFiles/void_native_tests.dir/tests/native/probe.cpp.o
+[100%] Building CXX object CMakeFiles/void_native_tests.dir/tests/native/tests.cpp.o
+[100%] Linking CXX executable void_native_tests
+[100%] Built target void_native_tests
+[  0%] Built target void_application_objects
+[  6%] Built target void_format_objects
+[ 73%] Built target libcurl_static
+[ 73%] Built target void_zone_objects
+[ 73%] Built target void_native_fixture
+[ 73%] Built target void_g1_fixture
+[ 73%] Built target void_g1_thunk
+[ 73%] Built target void_core
+[ 93%] Built target void_runtime
+[ 93%] Built target void_llvm
+[ 93%] Built target voidc_objects
+[ 93%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_g1_tests.dir/tests/ffi/primitives.cpp.o
+[100%] Linking CXX executable void_g1_tests
+[100%] Built target void_g1_tests
+[  0%] Built target void_native_fixture
+[  6%] Built target void_format_objects
+[  6%] Built target void_zone_objects
+[ 73%] Built target libcurl_static
+[ 73%] Built target void_application_objects
+[ 73%] Built target void_g1_fixture
+[ 73%] Built target void_g1_thunk
+[ 73%] Built target void_core
+[ 93%] Built target void_runtime
+[ 93%] Built target void_llvm
+[ 93%] Built target voidc_objects
+[ 93%] Built target void_cache_identity
+[100%] Built target void_g1_tests
+[100%] Generating ffi-g1/application-normal.o
+[100%] Linking CXX executable void_g1_aot_normal
+[100%] Built target void_g1_aot_normal
+[  0%] Built target void_native_fixture
+[  6%] Built target void_format_objects
+[  6%] Built target void_zone_objects
+[ 73%] Built target libcurl_static
+[ 73%] Built target void_application_objects
+[ 73%] Built target void_g1_fixture
+[ 73%] Built target void_g1_thunk
+[ 73%] Built target void_core
+[ 93%] Built target void_runtime
+[ 93%] Built target void_llvm
+[ 93%] Built target voidc_objects
+[ 93%] Built target void_cache_identity
+[100%] Built target void_g1_tests
+[100%] Generating ffi-g1/application-optimized.o
+[100%] Linking CXX executable void_g1_aot_optimized
+[100%] Built target void_g1_aot_optimized
+[  0%] Built target void_native_fixture
+[  6%] Built target void_format_objects
+[  6%] Built target void_zone_objects
+[ 73%] Built target libcurl_static
+[ 73%] Built target void_application_objects
+[ 73%] Built target void_g1_wrong_fixture
+[ 73%] Built target void_g1_thunk
+[ 73%] Built target void_core
+[ 73%] Built target void_g1_fixture
+[ 93%] Built target void_runtime
+[ 93%] Built target void_llvm
+[ 93%] Built target voidc_objects
+[ 93%] Built target void_cache_identity
+[100%] Built target void_g1_tests
+[100%] Linking CXX executable void_g1_aot_mismatch
+[100%] Built target void_g1_aot_mismatch
+[  0%] Built target void_application_objects
+[  7%] Built target void_format_objects
+[ 78%] Built target libcurl_static
+[ 78%] Built target void_zone_objects
+[ 78%] Built target void_native_fixture
+[ 78%] Built target void_g2_fixture
+[ 78%] Built target void_g2_thunk
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_g2_tests.dir/tests/ffi/records.cpp.o
+[100%] Linking CXX executable void_g2_tests
+[100%] Built target void_g2_tests
+[  0%] Built target void_native_fixture
+[  7%] Built target void_format_objects
+[  7%] Built target void_zone_objects
+[ 78%] Built target libcurl_static
+[ 78%] Built target void_application_objects
+[ 78%] Built target void_g2_fixture
+[ 78%] Built target void_g2_thunk
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_g2_tests
+[100%] Generating ffi-g2/application-normal.o
+[100%] Linking CXX executable void_g2_aot_normal
+[100%] Built target void_g2_aot_normal
+[  0%] Built target void_native_fixture
+[  7%] Built target void_format_objects
+[  7%] Built target void_zone_objects
+[ 78%] Built target libcurl_static
+[ 78%] Built target void_application_objects
+[ 78%] Built target void_g2_fixture
+[ 78%] Built target void_g2_thunk
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_g2_tests
+[100%] Generating ffi-g2/application-optimized.o
+[100%] Linking CXX executable void_g2_aot_optimized
+[100%] Built target void_g2_aot_optimized
+[  0%] Built target void_application_objects
+[  7%] Built target void_format_objects
+[  7%] Built target void_zone_objects
+[  7%] Built target void_native_fixture
+[ 78%] Built target libcurl_static
+[ 78%] Building C object CMakeFiles/void_g3_fixture.dir/tests/ffi/resources_fixture.c.o
+[ 78%] Building C object CMakeFiles/void_g3_thunk.dir/tests/ffi/resources_thunk.c.o
+[ 78%] Built target void_g3_fixture
+[ 78%] Built target void_g3_thunk
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_g3_tests.dir/tests/ffi/resources.cpp.o
+[100%] Linking CXX executable void_g3_tests
+[100%] Built target void_g3_tests
+[  0%] Built target void_native_fixture
+[  7%] Built target void_format_objects
+[  7%] Built target void_zone_objects
+[ 78%] Built target libcurl_static
+[ 78%] Built target void_application_objects
+[ 78%] Built target void_g3_fixture
+[ 78%] Built target void_g3_thunk
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_g3_tests
+[100%] Generating ffi-g3/application-normal.o
+[100%] Building CXX object CMakeFiles/void_g3_aot_normal.dir/tests/ffi/resources_exit.cpp.o
+[100%] Linking CXX executable void_g3_aot_normal
+[100%] Built target void_g3_aot_normal
+[  0%] Built target void_native_fixture
+[  6%] Built target void_format_objects
+[ 73%] Built target libcurl_static
+[ 73%] Built target void_zone_objects
+[ 73%] Built target void_application_objects
+[ 73%] Built target void_g3_fixture
+[ 73%] Built target void_g3_thunk
+[ 73%] Built target void_core
+[ 93%] Built target void_runtime
+[ 93%] Built target void_llvm
+[ 93%] Built target void_g3_tests
+[ 93%] Generating ffi-g3/application-optimized.o
+[ 93%] Building CXX object CMakeFiles/void_g3_aot_optimized.dir/tests/ffi/resources_exit.cpp.o
+[100%] Linking CXX executable void_g3_aot_optimized
+[100%] Built target void_g3_aot_optimized
+[  0%] Built target void_native_fixture
+[  7%] Built target void_format_objects
+[ 78%] Built target libcurl_static
+[ 78%] Built target void_zone_objects
+[ 78%] Built target void_application_objects
+[ 78%] Built target void_managed_test_abi
+[ 78%] Built target void_native_test_fixture
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target void_native_tests
+[100%] Generating native-main-normal.o
+[100%] Linking CXX executable void_native_aot_main_normal
+[100%] Built target void_native_aot_main_normal
+[  0%] Built target void_native_fixture
+[  7%] Built target void_format_objects
+[  7%] Built target void_zone_objects
+[ 78%] Built target libcurl_static
+[ 78%] Built target void_application_objects
+[ 78%] Built target void_managed_test_abi
+[ 78%] Built target void_native_test_fixture
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target void_native_tests
+[100%] Generating native-main-optimized.o
+[100%] Linking CXX executable void_native_aot_main_optimized
+[100%] Built target void_native_aot_main_optimized
+[  0%] Built target void_native_fixture
+[  7%] Built target void_format_objects
+[  7%] Built target void_zone_objects
+[ 78%] Built target libcurl_static
+[ 78%] Built target void_application_objects
+[ 78%] Built target void_managed_test_abi
+[ 78%] Built target void_native_test_fixture
+[100%] Built target void_runtime
+[100%] Built target void_core
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target void_native_tests
+[100%] Generating native-terminated_nul-normal.o
+[100%] Linking CXX executable void_native_aot_terminated_nul_normal
+[100%] Built target void_native_aot_terminated_nul_normal
+[  0%] Built target void_native_fixture
+[  6%] Built target void_format_objects
+[  6%] Built target void_zone_objects
+[ 73%] Built target libcurl_static
+[ 73%] Built target void_application_objects
+[ 73%] Built target void_managed_test_abi
+[ 73%] Built target void_native_test_fixture
+[ 73%] Built target void_core
+[ 93%] Built target void_runtime
+[ 93%] Built target void_llvm
+[ 93%] Built target voidc_objects
+[ 93%] Built target void_cache_identity
+[ 93%] Built target void_native_tests
+[100%] Generating native-closed-optimized.o
+[100%] Linking CXX executable void_native_aot_closed_optimized
+[100%] Built target void_native_aot_closed_optimized
+[  0%] Built target void_native_fixture
+[  7%] Built target void_format_objects
+[  7%] Built target void_zone_objects
+[ 78%] Built target libcurl_static
+[ 78%] Built target void_application_objects
+[ 78%] Built target void_managed_test_abi
+[ 78%] Built target void_native_test_fixture
+[100%] Built target void_runtime
+[100%] Built target void_core
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target void_native_tests
+[100%] Generating native-duplicate-normal.o
+[100%] Linking CXX executable void_native_aot_duplicate_normal
+[100%] Built target void_native_aot_duplicate_normal

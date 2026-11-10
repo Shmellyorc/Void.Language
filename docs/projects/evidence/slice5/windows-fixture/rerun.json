@@ -1,0 +1,196 @@
+{
+  "status": "PASS",
+  "profiles": {
+    "Release": {
+      "status": "PASS",
+      "profile": "Release",
+      "binaries": {
+        "voidc": "831132e6a510ce8d07c476948408c7e863b6309f4b0240d5a8cf40a3258338f3",
+        "voidls": "30d54915da5e838a7fac30c0de7e49a19d12ef028fc0ddc5088af0b9d0ef146f",
+        "void_project_application": "d5b23648ac844a502477630fddff7300a02c80ef69804f486d132ff2d2609484",
+        "void_project_sessions": "42e9c3ec5c38774e3f9e236565f8fe4f3a42b3da3fb776fcc966ba1e1c8836db",
+        "void_project_creation": "5c7dd2274d3901c9bc3cfe341998371ad2b5e8942a0689384cd9092446be8b43"
+      },
+      "prior_fixture_sha256": "5430b4ae6dfc85142519ed4e33d15ffbbe9ac0d4abab9c8287e1dd69b0b07c6f",
+      "unchanged_void_core_sha256": "2ce50374e7f75d49804997a893ae2f81fcd2c3b4ab8dd4c3655f237032ac1cf5",
+      "distinct_tests_passed": 14
+    },
+    "Debug": {
+      "status": "PASS",
+      "profile": "Debug",
+      "binaries": {
+        "voidc": "02aa32485c7d54fc61d1df44ba28937da4eea63c542aff81b193dab145955d53",
+        "voidls": "90544beaebe491f8245bfcc4552bb4301b58a8cc1fc4c9405e988b9226ae6eaa",
+        "void_project_application": "276f69d6d23e762f0c7a9d87f691e90f48fb326e407cdd3ff5d183f565e39c7e",
+        "void_project_sessions": "607ec3fb5a09ed224bab67c6c1639359f0f7534be0f45525d160c302788af25b",
+        "void_project_creation": "b88fe0db779416e9928f6eea79b144598e7711417c402eedf46207ad6975668b"
+      },
+      "prior_fixture_sha256": "1e4ea752b79260850be4ea1ec0ef3604b41978077e08e53d4d8438e93faa026e",
+      "unchanged_void_core_sha256": "448aac125e09450bafdd8114d2d78c5a1beef77fc9056c778364cb5c29e1b95e",
+      "distinct_tests_passed": 14
+    }
+  },
+  "commands": [
+    {
+      "profile": "Release",
+      "label": "compile",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/std:c++20",
+        "/EHsc",
+        "/MT",
+        "/GR-",
+        "/W4",
+        "/permissive-",
+        "/D_ITERATOR_DEBUG_LEVEL=0",
+        "/IC:\\Users\\a\\VoidS5-source-final\\include",
+        "/O2",
+        "/DNDEBUG",
+        "/c",
+        "C:\\Users\\a\\VoidS5-Final-Release\\slice5-fixture\\creation.cpp",
+        "/FoC:\\Users\\a\\VoidS5-Final-Release\\slice5-fixture\\creation.obj",
+        "/FdC:\\Users\\a\\VoidS5-Final-Release\\slice5-fixture\\creation.pdb"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS5-Final-Release",
+      "status": 0
+    },
+    {
+      "profile": "Release",
+      "label": "link",
+      "argv": [
+        "C:\\gcc\\bin\\cmake.exe",
+        "-E",
+        "vs_link_exe",
+        "--msvc-ver=1944",
+        "--intdir=C:\\Users\\a\\VoidS5-Final-Release\\slice5-fixture\\link",
+        "--rc=C:/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0/x64/rc.exe",
+        "--mt=C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-mt.exe",
+        "--manifests",
+        "--",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe",
+        "@C:\\Users\\a\\VoidS5-Final-Release\\slice5-fixture\\link.rsp"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS5-Final-Release",
+      "status": 0
+    },
+    {
+      "profile": "Release",
+      "label": "direct",
+      "argv": [
+        "C:\\Users\\a\\VoidS5-Final-Release\\slice5-fixture\\void_project_creation.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS5-Final-Release",
+      "status": 0
+    },
+    {
+      "profile": "Release",
+      "label": "ctest",
+      "argv": [
+        "C:\\gcc\\bin\\ctest.exe",
+        "--test-dir",
+        "C:\\Users\\a\\VoidS5-Final-Release",
+        "--output-on-failure",
+        "-R",
+        "^project_creation$",
+        "--output-junit",
+        "\\\\vboxsvr\\VM\\project-slice5\\fixture\\Release-corrected.xml"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS5-Final-Release",
+      "status": 0
+    },
+    {
+      "profile": "Release",
+      "label": "invalid-id",
+      "argv": [
+        "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+        "\\\\vboxsvr\\VM\\project-slice5\\fixture\\invalid-id.py",
+        "C:\\Users\\a\\VoidS5-Final-Release\\voidc.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS5-Final-Release",
+      "status": 0
+    },
+    {
+      "profile": "Debug",
+      "label": "compile",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/std:c++20",
+        "/EHsc",
+        "/MT",
+        "/GR-",
+        "/W4",
+        "/permissive-",
+        "/D_ITERATOR_DEBUG_LEVEL=0",
+        "/IC:\\Users\\a\\VoidS5-source-final\\include",
+        "/Od",
+        "/Zi",
+        "/c",
+        "C:\\Users\\a\\VoidS5-Final-Debug\\slice5-fixture\\creation.cpp",
+        "/FoC:\\Users\\a\\VoidS5-Final-Debug\\slice5-fixture\\creation.obj",
+        "/FdC:\\Users\\a\\VoidS5-Final-Debug\\slice5-fixture\\creation.pdb"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS5-Final-Debug",
+      "status": 0
+    },
+    {
+      "profile": "Debug",
+      "label": "link",
+      "argv": [
+        "C:\\gcc\\bin\\cmake.exe",
+        "-E",
+        "vs_link_exe",
+        "--msvc-ver=1944",
+        "--intdir=C:\\Users\\a\\VoidS5-Final-Debug\\slice5-fixture\\link",
+        "--rc=C:/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0/x64/rc.exe",
+        "--mt=C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-mt.exe",
+        "--manifests",
+        "--",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe",
+        "@C:\\Users\\a\\VoidS5-Final-Debug\\slice5-fixture\\link.rsp"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS5-Final-Debug",
+      "status": 0
+    },
+    {
+      "profile": "Debug",
+      "label": "direct",
+      "argv": [
+        "C:\\Users\\a\\VoidS5-Final-Debug\\slice5-fixture\\void_project_creation.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS5-Final-Debug",
+      "status": 0
+    },
+    {
+      "profile": "Debug",
+      "label": "ctest",
+      "argv": [
+        "C:\\gcc\\bin\\ctest.exe",
+        "--test-dir",
+        "C:\\Users\\a\\VoidS5-Final-Debug",
+        "--output-on-failure",
+        "-R",
+        "^project_creation$",
+        "--output-junit",
+        "\\\\vboxsvr\\VM\\project-slice5\\fixture\\Debug-corrected.xml"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS5-Final-Debug",
+      "status": 0
+    },
+    {
+      "profile": "Debug",
+      "label": "invalid-id",
+      "argv": [
+        "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+        "\\\\vboxsvr\\VM\\project-slice5\\fixture\\invalid-id.py",
+        "C:\\Users\\a\\VoidS5-Final-Debug\\voidc.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS5-Final-Debug",
+      "status": 0
+    }
+  ],
+  "fixture_sha256": "d729c111f883723f00d153894e9c11433fd0ff90c56861aaab79bd2c717eef2c",
+  "free_bytes_before": 7258288128,
+  "free_bytes_after": 7141048320
+}

@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "dll": "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.dll",
+  "dll_sha256": "3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824",
+  "import_library": "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.lib",
+  "import_sha256": "59778ec137ffebe87a6c099944330f20b7eecdf1d49a5a93de7000a8992339df",
+  "header": "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src\\raylib.h",
+  "header_sha256": "047e7255f93f8c34039cab906ad76136706b5c7b4c5b5b065d84141963ee9b6b"
+}

@@ -1,0 +1,42 @@
+{
+  "build": 19045,
+  "workspace": "C:\\Users\\a\\VoidS7-G4W2-acl",
+  "prebuild_free_bytes": 24748244992,
+  "commands": [
+    {
+      "label": "build-acl",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/std:c++20",
+        "/EHsc",
+        "/MT",
+        "-fuse-ld=lld",
+        "C:\\Users\\a\\VoidS7-G4W2-acl\\acl_probe.cpp",
+        "/FeC:\\Users\\a\\VoidS7-G4W2-acl\\acl_probe.exe",
+        "/link",
+        "bcrypt.lib",
+        "advapi32.lib",
+        "/manifest:embed"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "case-acl-full",
+      "argv": [
+        "C:\\Users\\a\\VoidS7-G4W2-acl\\acl_probe.exe",
+        "acl",
+        "C:\\Users\\a\\VoidS7-G4W2-acl\\fixture\\void_w2_gate.dll",
+        "C:\\Users\\a\\VoidS7-G4W2-acl\\fixture",
+        "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33"
+      ],
+      "exit": 0
+    }
+  ],
+  "base_source_sha256": "22d233d555dd3ca2f025a8b56ba74e9a5de1e89fa2b4433f769f20233cb3fdc4",
+  "compiled_source_sha256": "02db3cea40db04b98b52325209c2faf6bd286792a55fbc1ccbe0fec7786583b4",
+  "runner_sha256": "c042333b072a489cda0da7c50ea35f1c52c3d0065ac532e7e5cc14816d495eaf",
+  "binary_sha256": "49a016017d7b6d24eb1cfd7d4c290c57ff62b9d51fcb7ad44423adfe6003f481",
+  "fixture_sha256": "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33",
+  "passed": true
+}

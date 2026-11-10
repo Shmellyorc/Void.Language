@@ -1,0 +1,115 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+        Start   1: project_manifest_header
+        Start   2: project_manifest
+        Start   3: voidup_smoke
+        Start   4: voidup_ci_integration
+        Start   5: project_manifest_no_authority
+  1/433 Test   #1: project_manifest_header ...................   Passed    0.04 sec
+        Start   6: project_manifest_legacy
+  2/433 Test   #4: voidup_ci_integration .....................   Passed    0.51 sec
+        Start   7: project_manifest_provenance
+  3/433 Test   #2: project_manifest ..........................   Passed    0.54 sec
+        Start   8: project_selection
+  4/433 Test   #5: project_manifest_no_authority .............   Passed    0.56 sec
+        Start   9: project_sessions
+  5/433 Test   #7: project_manifest_provenance ...............   Passed    0.12 sec
+        Start  10: project_creation
+  6/433 Test  #10: project_creation ..........................   Passed    0.71 sec
+        Start  11: project_creation_process
+  7/433 Test   #9: project_sessions ..........................   Passed    1.04 sec
+        Start  12: project_application
+  8/433 Test   #3: voidup_smoke ..............................   Passed    2.70 sec
+        Start  13: project_application_process
+  9/433 Test   #6: project_manifest_legacy ...................   Passed   10.97 sec
+        Start  14: project_discovery_cli
+ 10/433 Test   #8: project_selection .........................   Passed   13.60 sec
+        Start  15: project_profiles
+ 11/433 Test  #15: project_profiles ..........................   Passed    7.30 sec
+        Start  16: project_protocol
+ 12/433 Test  #16: project_protocol ..........................   Passed    2.21 sec
+        Start  17: project_nested_cli
+ 13/433 Test  #17: project_nested_cli ........................   Passed    3.13 sec
+        Start  18: cli_contract
+ 14/433 Test  #11: project_creation_process ..................   Passed   31.73 sec
+        Start  19: cli_install
+ 15/433 Test  #14: project_discovery_cli .....................   Passed   34.92 sec
+        Start  20: cli_install_resources
+ 16/433 Test  #20: cli_install_resources .....................   Passed    0.24 sec
+        Start  21: target_triple
+ 17/433 Test  #21: target_triple .............................   Passed    0.06 sec
+        Start  22: http_native
+ 18/433 Test  #19: cli_install ...............................   Passed   15.52 sec
+        Start  23: http_tls_memory
+ 19/433 Test  #18: cli_contract ..............................   Passed   26.59 sec
+        Start  24: http_reload
+ 20/433 Test  #22: http_native ...............................   Passed   32.60 sec
+        Start  25: http_timeouts
+ 21/433 Test  #25: http_timeouts .............................   Passed   11.58 sec
+        Start  26: http_wire
+ 22/433 Test  #26: http_wire .................................   Passed    2.20 sec
+        Start  27: http_dns
+ 23/433 Test  #12: project_application .......................   Passed   94.70 sec
+        Start  28: url_native
+ 24/433 Test  #28: url_native ................................   Passed    0.79 sec
+        Start  29: http_examples
+ 25/433 Test  #13: project_application_process ...............   Passed   94.78 sec
+        Start  30: http_ci_policy
+ 26/433 Test  #27: http_dns ..................................   Passed   10.06 sec
+        Start  31: http_curl_objects
+ 27/433 Test  #30: http_ci_policy ............................   Passed    6.67 sec
+        Start  32: http_install
+ 28/433 Test  #31: http_curl_objects .........................   Passed    1.82 sec
+        Start  33: http_bulk
+ 29/433 Test  #33: http_bulk .................................   Passed   57.38 sec
+        Start  34: http_ir
+ 30/433 Test  #34: http_ir ...................................   Passed   40.47 sec
+        Start  35: http_source
+ 31/433 Test  #24: http_reload ...............................   Passed  156.47 sec
+        Start  36: http_source_negative
+ 32/433 Test  #36: http_source_negative ......................   Passed   14.37 sec
+        Start  37: http_source_faults
+ 33/433 Test  #23: http_tls_memory ...........................***Failed  317.84 sec
+/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/tls_memory.py:74: DeprecationWarning: ssl.TLSVersion.TLSv1 is deprecated
+  context.minimum_version = ssl.TLSVersion.TLSv1
+/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/tls_memory.py:75: DeprecationWarning: ssl.TLSVersion.TLSv1_1 is deprecated
+  context.maximum_version = ssl.TLSVersion.TLSv1_1
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/tls_memory.py", line 91, in <module>
+    if __name__ == '__main__': main()
+                               ~~~~^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/tls_memory.py", line 80, in main
+    run([binary, f'https://127.0.0.1:{peers[0].server_port}/',
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+         f'https://127.0.0.1:{peers[1].server_port}/', roots,
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+         *[f'https://127.0.0.1:{peer.server_port}/' for peer in peers[2:]]], 'probe', timeout=1200)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/tls_memory.py", line 52, in run
+    assert result.returncode == 0, (name, result.stderr.decode(errors='replace'))
+           ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('probe', 'TLS failure kind=14 code=28\nTLS corpus verified handshake\n')
+
+        Start  38: url_ir
+ 34/433 Test  #38: url_ir ....................................   Passed    1.82 sec
+        Start  39: url_source
+ 35/433 Test  #39: url_source ................................   Passed   19.31 sec
+        Start  40: url_lsp
+ 36/433 Test  #40: url_lsp ...................................   Passed    0.66 sec
+        Start  41: http_lsp
+ 37/433 Test  #32: http_install ..............................***Timeout 300.07 sec
+
+        Start  42: toolchain_stop_token
+ 38/433 Test  #42: toolchain_stop_token ......................   Passed    0.06 sec
+        Start  43: stage10_operator_reload
+ 39/433 Test  #41: http_lsp ..................................   Passed   22.40 sec
+        Start  44: stage10_operator_keys
+ 40/433 Test  #44: stage10_operator_keys .....................   Passed    1.50 sec
+        Start  45: stage10_operator_resolution
+ 41/433 Test  #45: stage10_operator_resolution ...............   Passed    6.85 sec
+        Start  46: stage10_operator_declarations
+ 42/433 Test  #46: stage10_operator_declarations .............   Passed    4.28 sec
+        Start  47: stage10_source_formatting
+ 43/433 Test  #47: stage10_source_formatting .................   Passed    2.91 sec
+        Start  48: stage10_tooling
+ 44/433 Test  #48: stage10_tooling ...........................   Passed    2.14 sec
+        Start  49: stage10_display_reload

@@ -1,0 +1,32 @@
+['C:\\gcc\\bin\\cmake.exe', '--install', 'C:\\Users\\a\\VoidS7-Raylib-Compiler\\Release', '--prefix', 'C:\\Users\\a\\VoidS7-Raylib-Graphics\\Release-first\\compiler install', '--config', 'Release', '--component', 'compiler']
+-- Installing: C:\Users\a\VoidS7-Raylib-Graphics\Release-first\compiler install/share/void/licenses/VOID-MIT-LICENSE.txt
+-- Installing: C:\Users\a\VoidS7-Raylib-Graphics\Release-first\compiler install/share/void/licenses/LICENSING_SCOPE.md
+-- Installing: C:\Users\a\VoidS7-Raylib-Graphics\Release-first\compiler install/share/void/licenses/REDISTRIBUTION.txt
+-- Installing: C:\Users\a\VoidS7-Raylib-Graphics\Release-first\compiler install/share/void/licenses/NOTICE_INVENTORY.json
+-- Installing: C:\Users\a\VoidS7-Raylib-Graphics\Release-first\compiler install/share/void/licenses/llvm-23.1.4
+-- Installing: C:\Users\a\VoidS7-Raylib-Graphics\Release-first\compiler install/share/void/licenses/llvm-23.1.4/BLAKE3-LICENSE.txt
+-- Installing: C:\Users\a\VoidS7-Raylib-Graphics\Release-first\compiler install/share/void/licenses/llvm-23.1.4/ConvertUTF-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-Raylib-Graphics\Release-first\compiler install/share/void/licenses/llvm-23.1.4/LICENSE.TXT
+-- Installing: C:\Users\a\VoidS7-Raylib-Graphics\Release-first\compiler install/share/void/licenses/llvm-23.1.4/Support-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-Raylib-Graphics\Release-first\compiler install/share/void/licenses/llvm-23.1.4/xxhash-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-Raylib-Graphics\Release-first\compiler install/share/void/licenses/zstd-1.5.7
+-- Installing: C:\Users\a\VoidS7-Raylib-Graphics\Release-first\compiler install/share/void/licenses/zstd-1.5.7/EMBEDDED-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-Raylib-Graphics\Release-first\compiler install/share/void/licenses/zstd-1.5.7/LICENSE
+CMake Error at C:/Users/a/VoidS7-Raylib-Compiler/Release/cmake_install.cmake:69 (file):
+  file INSTALL cannot find
+  "C:/Users/a/VoidCI42377496702-Native/cmake/../third_party/tomlplusplus/LICENSE":
+  File exists.
+
+
+
+Traceback (most recent call last):
+  File "C:\Users\a\VoidS7-Raylib-Graphics\qualify-windows.py", line 229, in <module>
+    qualify(profile)
+    ~~~~~~~^^^^^^^^^
+  File "C:\Users\a\VoidS7-Raylib-Graphics\qualify-windows.py", line 190, in qualify
+    run(cwd,cmake,'--install',build,'--prefix',prefix,'--config',profile,'--component','compiler')
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidS7-Raylib-Graphics\qualify-windows.py", line 126, in run
+    assert p.returncode==status,(p.returncode,output)
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: (1, '-- Installing: C:\\Users\\a\\VoidS7-Raylib-Graphics\\Release-first\\compiler install/share/void/licenses/VOID-MIT-LICENSE.txt\n-- Installing: C:\\Users\\a\\VoidS7-Raylib-Graphics\\Release-first\\compiler install/share/void/licenses/LICENSING_SCOPE.md\n-- Installing: C:\\Users\\a\\VoidS7-Raylib-Graphics\\Release-first\\compiler install/share/void/licenses/REDISTRIBUTION.txt\n-- Installing: C:\\Users\\a\\VoidS7-Raylib-Graphics\\Release-first\\compiler install/share/void/licenses/NOTICE_INVENTORY.json\n-- Installing: C:\\Users\\a\\VoidS7-Raylib-Graphics\\Release-first\\compiler install/share/void/licenses/llvm-23.1.4\n-- Installing: C:\\Users\\a\\VoidS7-Raylib-Graphics\\Release-first\\compiler install/share/void/licenses/llvm-23.1.4/BLAKE3-LICENSE.txt\n-- Installing: C:\\Users\\a\\VoidS7-Raylib-Graphics\\Release-first\\compiler install/share/void/licenses/llvm-23.1.4/ConvertUTF-NOTICES.txt\n-- Installing: C:\\Users\\a\\VoidS7-Raylib-Graphics\\Release-first\\compiler install/share/void/licenses/llvm-23.1.4/LICENSE.TXT\n-- Installing: C:\\Users\\a\\VoidS7-Raylib-Graphics\\Release-first\\compiler install/share/void/licenses/llvm-23.1.4/Support-NOTICES.txt\n-- Installing: C:\\Users\\a\\VoidS7-Raylib-Graphics\\Release-first\\compiler install/share/void/licenses/llvm-23.1.4/xxhash-NOTICES.txt\n-- Installing: C:\\Users\\a\\VoidS7-Raylib-Graphics\\Release-first\\compiler install/share/void/licenses/zstd-1.5.7\n-- Installing: C:\\Users\\a\\VoidS7-Raylib-Graphics\\Release-first\\compiler install/share/void/licenses/zstd-1.5.7/EMBEDDED-NOTICES.txt\n-- Installing: C:\\Users\\a\\VoidS7-Raylib-Graphics\\Release-first\\compiler install/share/void/licenses/zstd-1.5.7/LICENSE\nCMake Error at C:/Users/a/VoidS7-Raylib-Compiler/Release/cmake_install.cmake:69 (file):\n  file INSTALL cannot find\n  "C:/Users/a/VoidCI42377496702-Native/cmake/../third_party/tomlplusplus/LICENSE":\n  File exists.\n\n\n')

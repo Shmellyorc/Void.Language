@@ -1,0 +1,111 @@
+[
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS5-Final-Release\\voidc.exe",
+      "init"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS5-tmp-Release\\VOID S5 creation u0t5u_5c\\existing",
+    "status": 0,
+    "stdout": "Manifest: C:/Users/a/VoidS5-tmp-Release/VOID S5 creation u0t5u_5c/existing/void.project.toml\r\nProject ID: local.p1abf29143273ca067eb9f6992e55debb\r\nApplication ID: local.a6cc9c314a3c716268350a27e5e4b1093\r\nNext: voidc check --project \"C:/Users/a/VoidS5-tmp-Release/VOID S5 creation u0t5u_5c/existing\"\r\nCreated project manifest.\r\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS5-Final-Release\\voidc.exe",
+      "run",
+      "--project",
+      "C:\\Users\\a\\VoidS5-tmp-Release\\VOID S5 creation u0t5u_5c\\existing"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS5-tmp-Release\\VOID S5 creation u0t5u_5c",
+    "status": 19,
+    "stdout": "",
+    "stderr": "C:/Users/a/VoidS5-tmp-Release/VOID S5 creation u0t5u_5c/existing/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS5-Final-Release\\voidc.exe",
+      "run",
+      "--project",
+      "C:\\Users\\a\\VoidS5-tmp-Release\\VOID S5 creation u0t5u_5c\\existing",
+      "--no-opt"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS5-tmp-Release\\VOID S5 creation u0t5u_5c",
+    "status": 19,
+    "stdout": "",
+    "stderr": "C:/Users/a/VoidS5-tmp-Release/VOID S5 creation u0t5u_5c/existing/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS5-Final-Release\\voidc.exe",
+      "init",
+      "C:\\Users\\a\\VoidS5-tmp-Release\\VOID S5 creation u0t5u_5c\\existing"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS5-tmp-Release\\VOID S5 creation u0t5u_5c",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Project manifest already exists, including a possible case sibling: C:/Users/a/VoidS5-tmp-Release/VOID S5 creation u0t5u_5c/existing/void.project.toml\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS5-Final-Release\\voidc.exe",
+      "init",
+      "C:\\Users\\a\\VoidS5-tmp-Release\\VOID S5 creation u0t5u_5c\\empty"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS5-tmp-Release\\VOID S5 creation u0t5u_5c",
+    "status": 0,
+    "stdout": "Manifest: C:/Users/a/VoidS5-tmp-Release/VOID S5 creation u0t5u_5c/empty/void.project.toml\r\nProject ID: local.pc1345313bfa3e1262dc53e4c3d776e72\r\nApplication ID: local.a6692b807edca6670a7268cbb9a32ed30\r\nNext: voidc check --project \"C:/Users/a/VoidS5-tmp-Release/VOID S5 creation u0t5u_5c/empty\"\r\nCreated project manifest.\r\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS5-Final-Release\\voidc.exe",
+      "check",
+      "--project",
+      "C:\\Users\\a\\VoidS5-tmp-Release\\VOID S5 creation u0t5u_5c\\empty"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS5-tmp-Release\\VOID S5 creation u0t5u_5c",
+    "status": 1,
+    "stdout": "",
+    "stderr": "C:/Users/a/VoidS5-tmp-Release/VOID S5 creation u0t5u_5c/empty/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nC:/Users/a/VoidS5-tmp-Release/VOID S5 creation u0t5u_5c/empty/void.project.toml:1:1: error: No eligible main() in application project.\r\n    code: VOID5010\r\n\r\n 1 | schema = 1\r\n   | ^\r\n    Module: /void.project.toml\r\n    Hint: Add a valid main() in the admitted source roots or set project.entry/--entry for an explicit script or source.\r\n\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS5-Final-Release\\voidc.exe",
+      "init",
+      "C:\\Users\\a\\VoidS5-tmp-Release\\VOID S5 creation u0t5u_5c\\many"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS5-tmp-Release\\VOID S5 creation u0t5u_5c",
+    "status": 0,
+    "stdout": "Manifest: C:/Users/a/VoidS5-tmp-Release/VOID S5 creation u0t5u_5c/many/void.project.toml\r\nProject ID: local.pbd826c33abd6e4f43d188ed148c59f36\r\nApplication ID: local.ab484e98d8ee2ca141f448d8bd33b8610\r\nNext: voidc check --project \"C:/Users/a/VoidS5-tmp-Release/VOID S5 creation u0t5u_5c/many\"\r\nCreated project manifest.\r\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS5-Final-Release\\voidc.exe",
+      "check",
+      "--project",
+      "C:\\Users\\a\\VoidS5-tmp-Release\\VOID S5 creation u0t5u_5c\\many"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS5-tmp-Release\\VOID S5 creation u0t5u_5c",
+    "status": 1,
+    "stdout": "",
+    "stderr": "C:/Users/a/VoidS5-tmp-Release/VOID S5 creation u0t5u_5c/many/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nC:/Users/a/VoidS5-tmp-Release/VOID S5 creation u0t5u_5c/many/void.project.toml:1:1: error: Ambiguous project entry: 2 eligible main() declarations.\r\n    code: VOID5010\r\n\r\n 1 | schema = 1\r\n   | ^\r\n    Module: /void.project.toml\r\n    Candidate /game.void at C:/Users/a/VoidS5-tmp-Release/VOID S5 creation u0t5u_5c/many/game.void:1:6\r\n\r\n 1 | func main() -> i32:\r\n   |      ^^^^\r\n    Module: /game.void\r\n    Candidate /launcher.void at C:/Users/a/VoidS5-tmp-Release/VOID S5 creation u0t5u_5c/many/launcher.void:1:6\r\n\r\n 1 | func main() -> i32:\r\n   |      ^^^^\r\n    Module: /launcher.void\r\n    Hint: Set project.entry/--entry or narrow sources.roots/exclude.\r\n\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS5-Final-Release\\voidc.exe",
+      "new",
+      "C:\\Users\\a\\VoidS5-tmp-Release\\VOID S5 creation u0t5u_5c\\arbitrary",
+      "--source",
+      "tools/launcher.void",
+      "--name",
+      "Orbit \"Pilot\" \\",
+      "--version",
+      "1.2.3-beta.4+qual"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS5-tmp-Release\\VOID S5 creation u0t5u_5c",
+    "status": 1,
+    "stdout": "Manifest: C:/Users/a/VoidS5-tmp-Release/VOID S5 creation u0t5u_5c/arbitrary/void.project.toml\r\nProject ID: local.p826389d2dcf31bc94b076ff15f1cfb83\r\nApplication ID: local.aba100524aaac5ae7c9d05c16a82a8fd6\r\nNext: voidc check --project \"C:/Users/a/VoidS5-tmp-Release/VOID S5 creation u0t5u_5c/arbitrary\"\r\n",
+    "stderr": "Cannot publish project exclusively (Windows error 5).\r\n"
+  }
+]

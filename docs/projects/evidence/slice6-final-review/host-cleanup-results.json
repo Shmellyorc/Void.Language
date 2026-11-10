@@ -1,0 +1,43 @@
+{
+  "removed": [
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice6-final-review/storage.void",
+      "sha256": "d593bdc01b495d61020adf80015840cf2e192a02c9f3de0302ff15fb712823a0"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice6-final-review/vm-native-command.png",
+      "sha256": "293cc9aaf0fca037657024cb2ac99174299346408817803cea24e2d44e30c82a"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice6-final-review/vm-native-restart.png",
+      "sha256": "407ead82b6cf52dbe49b19114f8da5d3b6d9081d6faa36146a7de167b557001b"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice6-final-review/vm-native-status.png",
+      "sha256": "bb70caff50fe27e1b7182c5dd97bf78dbdc9e16fbcc971c893acaff044bebcaf"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice6-final-review/vm-status-command.png",
+      "sha256": "763c425b8ab2034bc5bb054badb59e58b34fd2f66ee2bbe11bbdb7b3aabb047b"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice6-final-review/vm-direct-command.png",
+      "sha256": "f3a8abf924d72d3aa8e7f1a40bbeaa245bf35f141b36c228b8f5998e0a041485"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice6-final-review/vm-cleanup-command.png",
+      "sha256": "8c408c849755c61553aac58a045ca9c14ef110648ec27be82c973537e74258c5"
+    }
+  ],
+  "retained": [
+    "/home/shmellyorc/Documents/Void.Language/build/slice6-final-review",
+    "/home/shmellyorc/Documents/Void.Language/build/slice6-final-review/start",
+    "/home/shmellyorc/Documents/Void.Language/docs/projects/evidence/slice6-final-review",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict",
+    "/home/shmellyorc/VM/project-slice6-final-review"
+  ],
+  "reason": "Retained builds, exact source checkpoints, evidence and qualification scripts.",
+  "fixtures": "CTest and direct replay fixtures cleaned their own temporary directories."
+}

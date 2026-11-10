@@ -1,0 +1,14 @@
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 76%] Built target libcurl_static
+[ 76%] Built target void_native_fixture
+[ 76%] Built target void_g3_fixture
+[ 76%] Built target void_g3_thunk
+[ 84%] Built target void_core
+[ 84%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/c_resource.cpp.o
+[ 84%] Linking CXX static library libvoid_runtime.a
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_g3_tests
+[100%] Built target void_g3_tests

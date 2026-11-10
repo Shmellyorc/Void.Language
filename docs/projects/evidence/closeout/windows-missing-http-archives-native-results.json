@@ -1,0 +1,47 @@
+{
+  "status": "FAIL",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "root": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+  "commands": [
+    {
+      "label": "Release-configure",
+      "argv": [
+        "C:\\gcc\\bin\\cmake.exe",
+        "-S",
+        "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+        "-B",
+        "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\build\\Release",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DLLVM_DIR=C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\lib\\cmake\\llvm",
+        "-DPython3_EXECUTABLE=C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+        "-DCMAKE_MAKE_PROGRAM=C:/gcc/bin/ninja.exe",
+        "-DCMAKE_C_COMPILER=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin/clang-cl.exe",
+        "-DCMAKE_CXX_COMPILER=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin/clang-cl.exe",
+        "-DCMAKE_LINKER=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin/lld-link.exe",
+        "-DCMAKE_AR=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin/llvm-lib.exe",
+        "-DCMAKE_MT=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin/llvm-mt.exe",
+        "-DCMAKE_RC_COMPILER=C:/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0/x64/rc.exe",
+        "-DZLIB_INCLUDE_DIR=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4-deps/include",
+        "-DZLIB_LIBRARY_RELEASE=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4-deps/lib/zlibstatic.lib",
+        "-DLibXml2_DIR=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4-deps/lib/cmake/libxml2",
+        "-Dzstd_DIR=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4-deps/lib/cmake/zstd",
+        "-Dzstd_INCLUDE_DIR=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4-deps/include",
+        "-Dzstd_LIBRARY=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4-deps/lib/zstd_static.lib",
+        "-Dzstd_STATIC_LIBRARY=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4-deps/lib/zstd_static.lib",
+        "-DLIBXML2_STATIC_LIBRARY=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4-deps/lib/libxml2s.lib",
+        "-DVOID_HOST_DEPS_ROOT=C:/Users/a/VoidCI42377496702-Native/.toolchains/host/prefix/windows-x86_64/Release",
+        "-DVOID_HTTP_DEPS_ROOT=C:/Users/a/VoidCI42377496702-Native/cmake/../.toolchains/http/prefix/windows-schannel-x86_64/Release",
+        "-DVOID_CLANG=C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang.exe",
+        "-DVOID_DWARFDUMP=C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-dwarfdump.exe"
+      ],
+      "returncode": 1,
+      "seconds": 2.1073638000016217
+    }
+  ],
+  "source_files": 3370,
+  "source_snapshot_sha256": "10885f160970af76bc854d5b5d81a363a12a25ab09722715c4e6e18c083fb6d8",
+  "stage": "Release-configure",
+  "error": "Traceback (most recent call last):\n  File \"\\\\vboxsvr\\VM\\project-slice1-closeout\\native.py\", line 35, in <module>\n    run(profile+'-configure',args)\n    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"\\\\vboxsvr\\VM\\project-slice1-closeout\\native.py\", line 16, in run\n    assert p.returncode==0,(label,p.returncode)\n           ^^^^^^^^^^^^^^^\nAssertionError: ('Release-configure', 1)\n"
+}

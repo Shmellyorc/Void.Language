@@ -1,0 +1,9 @@
+{
+  "mode": "manual",
+  "editor": "1.141.0",
+  "platform": "linux",
+  "events": [
+    "deliberate creation works around existing multiple sources"
+  ],
+  "status": "PASS"
+}

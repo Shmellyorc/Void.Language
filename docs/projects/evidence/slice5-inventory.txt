@@ -1,0 +1,861 @@
+HEAD 2f667ea338127b8f91c3136804377ef3fa5218d6
+Indexed path/mode/blob/stage tuples match the starting index and HEAD. Staged diff empty.
+{"index_entries": 68996, "modified": 56, "new_s5_report_evidence_paths": 78, "s5_source_and_documentation_paths": 23, "starting_amended": 13, "starting_paths": 768, "starting_preserved": 755, "total": 856, "untracked": 800}
+
+STATUS | LAYER | EXACT PATH
+ M | S5 amendment; original layer: S4 amendment; original layer: S3 amendment; original layer: S1 amended by S2 | CMakeLists.txt
+ M | S1 preserved | cmake/InstallLicenses.cmake
+ M | S5 amendment; original layer: S3 amendment; original layer: S1 amended by S2 | docs/CLI.md
+ M | S1 amended by S2 | docs/DECISIONS.md
+ M | S3 amendment; original layer: S1 amended by S2 | docs/DIAGNOSTICS.md
+ M | S5 amendment; original layer: S3 amendment; original layer: S1 preserved | docs/EDITOR_INTEGRATION.md
+ M | S1 preserved | docs/LANGUAGE_BIBLE.md
+ M | S5 amendment; original layer: S3 amendment; original layer: S1 preserved | docs/LANGUAGE_SERVER.md
+ M | S1 preserved | docs/LOCAL_LIBRARIES.md
+ M | S1 amended by S2 | docs/MODULE_SYSTEM.md
+ M | S1 preserved | docs/NATIVE_LIBRARIES.md
+ M | S5 amendment; original layer: S4 amendment; original layer: S3 amendment; original layer: S1 amended by S2 | docs/PROJECT_ARCHITECTURE_ROADMAP.md
+ M | S1 amended by S2 | docs/README.md
+ M | S4 amendment; original layer: S1 preserved | docs/RUNTIME_GLOBALS.md
+ M | S1 amended by S2 | docs/SOURCE_COMPILER.md
+ M | S1 preserved | docs/STAGE8_DISCOVERY.md
+ M | S1 preserved | docs/STAGE9_APPLICATION_WORKFLOW.md
+ M | S3 new source/documentation | docs/TOOLING_SESSIONS.md
+ M | S4 amendment; original layer: S1 preserved | docs/os/API.md
+ M | S1 preserved | docs/release/NOTICE_INVENTORY.json
+ M | S1 preserved | docs/release/REDISTRIBUTION_NOTICES.md
+ M | S3 new source/documentation | editors/vscode/README.md
+ M | S5 amendment; original layer: S3 new source/documentation | editors/vscode/package.json
+ M | S5 amendment; original layer: S3 new source/documentation | editors/vscode/src/config.ts
+ M | S5 amendment; original layer: S3 new source/documentation | editors/vscode/src/extension.ts
+ M | S3 new source/documentation | editors/vscode/src/test/config.test.ts
+ M | S4 source/documentation | include/void/backend.hpp
+ M | S3 amendment; original layer: S1 amended by S2 | include/void/diagnostic.hpp
+ M | S4 source/documentation | include/void/execution.hpp
+ M | S4 amendment; original layer: S3 amendment; original layer: S2 baseline modification | include/void/frontend.hpp
+ M | S4 source/documentation | include/void/ir.hpp
+ M | S4 source/documentation | include/void/native_build.hpp
+ M | S4 source/documentation | include/void/os.hpp
+ M | S1 preserved | include/void/path.hpp
+ M | S4 source/documentation | include/void/runtime.hpp
+ M | S4 source/documentation | include/void/runtime_abi.hpp
+ M | S3 new source/documentation | include/void/tooling.hpp
+ M | S4 source/documentation | src/backend/llvm/backend.cpp
+ M | S5 amendment; original layer: S4 amendment; original layer: S3 amendment; original layer: S2 final review amendment; original layer: S1 amended by S2 | src/frontend/compiler.cpp
+ M | S4 source/documentation | src/frontend/generic_tooling.inc
+ M | S3 new source/documentation | src/frontend/source.cpp
+ M | S3 new source/documentation | src/frontend/tooling.cpp
+ M | S4 source/documentation | src/ir/module.cpp
+ M | S4 source/documentation | src/ir/os.inc
+ M | S5 amendment; original layer: S3 new source/documentation | src/lsp/main.cpp
+ M | S5 amendment; original layer: S4 amendment; original layer: S3 amendment; original layer: S2 baseline modification | src/main.cpp
+ M | S4 source/documentation | src/native_build.cpp
+ M | S4 source/documentation | src/runtime/abi.cpp
+ M | S4 source/documentation | src/runtime/application.cpp
+ M | S4 source/documentation | src/runtime/os.cpp
+ M | S4 source/documentation | src/runtime/os_abi.cpp
+ M | S4 source/documentation | src/runtime/reload.cpp
+ M | S4 source/documentation | stdlib/os.void
+ M | S5 source/documentation | tests/cli/install.py
+ M | S4 source/documentation | tests/os/frontend.py
+ M | S3 new source/documentation | tools/lsp_client.py
+?? | S3 new report/evidence | docs/log/evidence/lsp-llvm23-debug-xw88aa_p/receipt.json
+?? | S3 new report/evidence | docs/log/evidence/lsp-llvm23-release-dyit2nor/receipt.json
+?? | S3 new report/evidence | docs/log/evidence/lsp-llvm23-strict-8a388way/receipt.json
+?? | S1 preserved | docs/projects/SLICE1.md
+?? | S1 preserved | docs/projects/SLICE1_CLOSEOUT.md
+?? | S2 new | docs/projects/SLICE2.md
+?? | S2 final review: new report/evidence | docs/projects/SLICE2_FINAL_CLOSEOUT.md
+?? | S3 new report/evidence | docs/projects/SLICE3.md
+?? | S3 final review report/evidence | docs/projects/SLICE3_FINAL_CLOSEOUT.md
+?? | S4 report/evidence | docs/projects/SLICE4.md
+?? | S5 report/evidence | docs/projects/SLICE5.md
+?? | S1 preserved | docs/projects/evidence/closeout/header-target-first-build.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/linux-debug.xml
+?? | S1 preserved | docs/projects/evidence/closeout/linux-install.xml
+?? | S1 preserved | docs/projects/evidence/closeout/linux-release.xml
+?? | S1 preserved | docs/projects/evidence/closeout/linux-strict.xml
+?? | S1 preserved | docs/projects/evidence/closeout/notice-corrected.json
+?? | S1 preserved | docs/projects/evidence/closeout/notice-failure.json
+?? | S1 preserved | docs/projects/evidence/closeout/original-debug-failure.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/original-debug-failure.xml
+?? | S1 preserved | docs/projects/evidence/closeout/original-strict-failure.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/original-strict-failure.xml
+?? | S1 preserved | docs/projects/evidence/closeout/upstream-verification.json
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-header-build.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-header.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-host-verified.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-http-verified.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-manifest-compile.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-manifest-link.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-manifest.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-project-compile.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-first-transfer-failure.json
+?? | S1 preserved | docs/projects/evidence/closeout/windows-focused.cmd
+?? | S1 preserved | docs/projects/evidence/closeout/windows-focused.json
+?? | S1 preserved | docs/projects/evidence/closeout/windows-focused.py
+?? | S1 preserved | docs/projects/evidence/closeout/windows-missing-host-archives-Release-configure.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-missing-host-archives-native-results.json
+?? | S1 preserved | docs/projects/evidence/closeout/windows-missing-http-archives-Release-configure.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-missing-http-archives-native-results.json
+?? | S1 preserved | docs/projects/evidence/closeout/windows-missing-reviewed-patches-Release-configure.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-missing-reviewed-patches-native-results.json
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-header-build.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-header.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-host-verified.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-http-verified.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-manifest-compile.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-manifest-link.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-manifest.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-project-compile.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-sdk-layout-Release-configure.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-sdk-layout-native-results.json
+?? | S1 preserved | docs/projects/evidence/slice1-baseline-source.patch
+?? | S1 preserved | docs/projects/evidence/slice1-closeout-inventory.txt
+?? | S1 preserved | docs/projects/evidence/slice1-closeout-source.patch
+?? | S1 preserved | docs/projects/evidence/slice1-closeout.json
+?? | S1 preserved | docs/projects/evidence/slice1-local.json
+?? | S1 preserved | docs/projects/evidence/slice1-malformed-header.toml
+?? | S2 new | docs/projects/evidence/slice2-baseline-source.patch
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-baseline-source.patch
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review-inventory.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review-source.patch
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review.json
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/artifacts.py
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/audit.py
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/original-focused-source.cpp.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/original-focused.json
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/original-oracle.cpp.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/patches.json
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/patches.py
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/regressions-before-repair.cpp.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-debug-build.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-debug-final-build.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-debug-tests.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-debug.xml
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-original-build.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-original-corrected-oracle-build.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-original-corrected-oracle-tests.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-original-focused-build.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-original-focused-tests.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-original-tests.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-release-build.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-release-final-build.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-release-focused.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-release-tests.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-release.xml
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-strict-build.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-strict-tests.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-strict.xml
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/starting-checkpoint.json
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-CMakeCache.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-cli-link.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-cli-link.rsp
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-compiler-compile.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-host-verified.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-http-verified.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-identity-compile.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-identity-generate.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-legacy.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-main-compile.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-nested-corrective.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-nested.json
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-nested.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-project-cli.json
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-project-cli.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-project-compile.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-selection-compile.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-selection-link.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-selection-link.rsp
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-selection.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-CMakeCache.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-cli-link.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-cli-link.rsp
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-compiler-compile.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-host-verified.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-http-verified.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-identity-compile.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-identity-generate.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-legacy.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-main-compile.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-nested-corrective.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-nested.json
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-project-cli.json
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-project-cli.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-project-compile.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-selection-compile.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-selection-link.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-selection-link.rsp
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-selection.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-native-console.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-native-results.json
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-native.cmd
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-native.py
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-nested-corrective-console.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-nested-corrective-native-results.json
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-nested-corrective-native.cmd
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-nested-corrective-native.py
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-nested-corrective-vcvars.log.txt
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-nested.py
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-probe.json
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-source-hashes.json
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-vcvars.log.txt
+?? | S2 new | docs/projects/evidence/slice2-inventory.txt
+?? | S2 new | docs/projects/evidence/slice2-local.json
+?? | S2 new | docs/projects/evidence/slice2-source.patch
+?? | S2 new | docs/projects/evidence/slice2/D-E-byte-bound-original.json
+?? | S2 new | docs/projects/evidence/slice2/cli-install.xml
+?? | S2 new | docs/projects/evidence/slice2/first-build-failure.log.txt
+?? | S2 new | docs/projects/evidence/slice2/first-corrected-tests.xml
+?? | S2 new | docs/projects/evidence/slice2/first-smoke.json
+?? | S2 new | docs/projects/evidence/slice2/first-tests.xml
+?? | S2 new | docs/projects/evidence/slice2/import-depth-original.json
+?? | S2 new | docs/projects/evidence/slice2/import-depth-pre-fix.cpp.txt
+?? | S2 new | docs/projects/evidence/slice2/incorrect-target-build.log.txt
+?? | S2 new | docs/projects/evidence/slice2/installed.json
+?? | S2 new | docs/projects/evidence/slice2/linux-debug-nested-processes.json
+?? | S2 new | docs/projects/evidence/slice2/linux-debug-nested.xml
+?? | S2 new | docs/projects/evidence/slice2/linux-debug-processes.json
+?? | S2 new | docs/projects/evidence/slice2/linux-debug.xml
+?? | S2 new | docs/projects/evidence/slice2/linux-release-nested-processes.json
+?? | S2 new | docs/projects/evidence/slice2/linux-release-nested.xml
+?? | S2 new | docs/projects/evidence/slice2/linux-release-processes.json
+?? | S2 new | docs/projects/evidence/slice2/linux-release.xml
+?? | S2 new | docs/projects/evidence/slice2/linux-strict-nested-processes.json
+?? | S2 new | docs/projects/evidence/slice2/linux-strict-nested.xml
+?? | S2 new | docs/projects/evidence/slice2/linux-strict-processes.json
+?? | S2 new | docs/projects/evidence/slice2/linux-strict.xml
+?? | S2 new | docs/projects/evidence/slice2/low-stack.json
+?? | S2 new | docs/projects/evidence/slice2/pre-final-debug.xml
+?? | S2 new | docs/projects/evidence/slice2/pre-final-release.xml
+?? | S2 new | docs/projects/evidence/slice2/pre-final-strict.xml
+?? | S2 new | docs/projects/evidence/slice2/root-alias-original.json
+?? | S2 new | docs/projects/evidence/slice2/root-alias-pre-fix.inc.txt
+?? | S2 new | docs/projects/evidence/slice2/second-tests.xml
+?? | S2 new | docs/projects/evidence/slice2/source-hardlink-original.json
+?? | S2 new | docs/projects/evidence/slice2/source-hardlink-pre-correction.inc.txt
+?? | S2 new | docs/projects/evidence/slice2/third-tests.xml
+?? | S2 new | docs/projects/evidence/slice2/virtual-root-original.json
+?? | S2 new | docs/projects/evidence/slice2/virtual-root-pre-fix.inc.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-Debug-nested.json
+?? | S2 new | docs/projects/evidence/slice2/windows-Debug-nested.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-Release-nested.json
+?? | S2 new | docs/projects/evidence/slice2/windows-Release-nested.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-cli-link.rsp
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-compiler-compile.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-host-verified.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-http-verified.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-legacy.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-project-cli.json
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-project-cli.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-project-compile.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-selection-link.rsp
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-selection.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-native.cmd
+?? | S2 new | docs/projects/evidence/slice2/windows-native.json
+?? | S2 new | docs/projects/evidence/slice2/windows-native.py
+?? | S2 new | docs/projects/evidence/slice2/windows-nested-native-results.json
+?? | S2 new | docs/projects/evidence/slice2/windows-nested-native.cmd
+?? | S2 new | docs/projects/evidence/slice2/windows-nested-native.py
+?? | S2 new | docs/projects/evidence/slice2/windows-original-failure.json
+?? | S2 new | docs/projects/evidence/slice2/windows-original-failure.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-original-oracle.py
+?? | S2 new | docs/projects/evidence/slice2/windows-original-processes.json
+?? | S2 new | docs/projects/evidence/slice2/windows-release-cli-link.rsp
+?? | S2 new | docs/projects/evidence/slice2/windows-release-compiler-compile.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-release-host-verified.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-release-http-verified.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-release-legacy.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-release-project-cli.json
+?? | S2 new | docs/projects/evidence/slice2/windows-release-project-cli.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-release-project-compile.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-release-selection-link.rsp
+?? | S2 new | docs/projects/evidence/slice2/windows-release-selection.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-source-hashes.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3-baseline-source.patch
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight-inventory.txt
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight-source.patch
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight.json
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-debug-build.log.txt
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-debug-protocol.json
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-debug.xml
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-launch-failure.json
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-release-build.log.txt
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-release-final-probe.json
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-release-original-protocol.json
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-release-original-protocol.log.txt
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-release-original.json
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-release-protocol.json
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-release-readable-large.json
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-release.xml
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-strict-build.log.txt
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-strict-protocol.json
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-strict.xml
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/probe.py
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/vscode-project-host-final.json
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/vscode-tests-final.log.txt
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-Debug-original-preflight.json
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-Debug-original-regression.log.txt
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-Debug-protocol.json
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-Debug-server-link.rsp
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-Debug-sessions-link.rsp
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-Release-original-preflight.json
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-Release-original-regression.log.txt
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-Release-protocol.json
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-Release-server-link.rsp
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-Release-sessions-link.rsp
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-attempt1-Release-project-protocol.json
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-attempt1-Release-project-protocol.log.txt
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-attempt1-native-results.json
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-attempt2-Release-project-protocol.json
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-attempt2-Release-project-protocol.log.txt
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-attempt2-native-results.json
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-native-results.json
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-native.py
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-qualified-native-results.json
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-qualify.py
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-resume.py
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-resume2.py
+?? | S3 new report/evidence | docs/projects/evidence/slice3-inventory.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3-local.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3-profile-decision.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3-source.patch
+?? | S3 new report/evidence | docs/projects/evidence/slice3/installed-final-protocol.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/installed-final-results.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/installed-protocol.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/installed-results.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-debug-project-discovery.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-debug-project-nested.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-debug-project-profiles.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-debug-project-protocol.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-release-project-discovery.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-release-project-nested.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-release-project-profiles.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-release-project-protocol.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-strict-project-discovery.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-strict-project-nested.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-strict-project-profiles.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-strict-project-protocol.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-audit.py
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-cli-install-tests.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-cli-install.xml
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-core-first-build.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-corrected-tests.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-corrected-tests.xml
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-corrective-build.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-debug-build.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-debug-configure.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-debug-final-build.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-debug-final-server-build.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-debug-final-server-tests.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-debug-final-server.xml
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-debug-tests.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-debug-verified-tests.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-debug-verified.xml
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-debug.xml
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-complete-tests.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-corrected-tests.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-corrected-typecheck.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-final-tests.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-first-tests.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-first-typecheck.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-guard-typecheck.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-legacy-host-complete.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-legacy-host-serial.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-legacy-host-verified.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-legacy-host.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host-complete.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host-complete.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host-corrected.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host-corrected.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host-final.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host-final.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host-original-runner.ts.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host-original.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host-original.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host-verified.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host-verified.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-switch-original.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-switch-original.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-symbol-guards-tests.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-verified-tests.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-first-integrated-build.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-index-audit.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-inherited-selection-first.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-initial-tests.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-initial-tests.xml
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-installed-identity.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-installed-identity.py
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-installed.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-installed.py
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-original-cache-fixture.py
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-original-index-receipt.py
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-original-manifest-hints-tooling.cpp.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-original-project-switch-extension.ts.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-original-receipt.py
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-original-relative-entry-lsp.cpp.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-patches.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-portable-protocol-tests.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-portable-protocol.xml
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-project-integrated-build.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-queries-tests.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-queries-tests.xml
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-receipt.py
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-relative-entry-probe.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-release-configure.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-release-final-build.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-release-final-server-build.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-release-final-server-tests.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-release-final-server.xml
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-release-second-configure.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-release-verified-tests.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-release-verified.xml
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-sessions-first-build.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-source-artifacts.py
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-strict-build.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-strict-configure.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-strict-final-server-build.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-strict-final-server-tests.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-strict-final-server.xml
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-strict-portable-protocol-tests.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-strict-portable-protocol.xml
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-strict-verified-tests.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-strict-verified.xml
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-tests-build.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-watch-build.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-watch-tests.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-watch-tests.xml
+?? | S3 new report/evidence | docs/projects/evidence/slice3/starting-checkpoint.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Debug-CMakeCache.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Debug-final-project-protocol.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Debug-final-server.rsp
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Debug-nested.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Debug-profiles.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Debug-project-cli.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Debug-protocol.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-CMakeCache.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-backend-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-cli-link.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-cli-link.rsp
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-compiler-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-final-project-protocol.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-final-server.rsp
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-header-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-header-link.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-header-link.rsp
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-header.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-host-verified.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-http-verified.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-identity-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-identity-generate.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-lsp-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-lsp-link.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-lsp-link.rsp
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-main-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-manifest-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-manifest-link.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-manifest-link.rsp
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-manifest.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-nested.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-profiles.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-profiles.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-project-cli.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-project-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-protocol.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-protocol.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-provenance.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-selection-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-selection-link.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-selection-link.rsp
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-selection.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-sessions-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-sessions-link.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-sessions-link.rsp
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-sessions.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-source-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-tooling-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-baseline-source.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-before-final-server-source-hashes.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continue-native.cmd
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continue-native.py
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Debug-cli-link.rsp
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Debug-header-link.rsp
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Debug-lsp-link.rsp
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Debug-manifest-link.rsp
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Debug-selection-link.rsp
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Debug-sessions-link.rsp
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Release-header.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Release-legacy-lsp-protocol.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Release-legacy.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Release-manifest.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Release-nested.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Release-profiles.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Release-project-cli.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Release-protocol.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Release-provenance.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Release-selection.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Release-sessions.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-native-console.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-native-results.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-vcvars.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-backend-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-cli-link.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-compiler-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-header-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-header-link.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-header.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-host-verified.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-http-verified.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-identity-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-identity-generate.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-legacy-lsp-protocol.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-legacy-lsp-sprint2.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-legacy-lsp-stage7.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-legacy-lsp-stage8.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-legacy.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-lsp-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-lsp-link.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-main-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-manifest-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-manifest-link.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-manifest.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-nested.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-profiles.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-project-cli.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-project-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-protocol.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-provenance.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-selection-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-selection-link.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-selection.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-sessions-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-sessions-link.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-sessions.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-source-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-tooling-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Release-legacy-lsp-protocol.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Release-legacy-lsp-sprint2.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Release-legacy-lsp-stage7.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Release-legacy-lsp-stage8.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-native-console.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-native-results.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-server-console.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-server-native-results.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-server-native.cmd
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-server-native.py
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-server-vcvars.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-vcvars.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-finish-native.cmd
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-finish-native.py
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-legacy-argv-original-continue-native.py
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-legacy-argv-original-continued-Release-legacy-lsp-protocol.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-legacy-argv-original-continued-native-results.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-native-console.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-native-results.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-native.cmd
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-native.py
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-original-native-console.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-original-native-results.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-original-native.py
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-original-source-hashes.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-probe-console.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-probe.cmd
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-probe.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-probe.py
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-protocol-corrected.py
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-protocol-original-Release-protocol.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-protocol-original-Release-protocol.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-protocol-original-native-results.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-protocol-original-native.py
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-protocol-original-source-hashes.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Debug-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Debug-legacy-protocol.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Debug-legacy-sprint2.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Debug-legacy-stage7.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Debug-legacy-stage8.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Debug-link.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Debug-project-protocol.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Release-compile.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Release-legacy-protocol.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Release-legacy-sprint2.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Release-legacy-stage7.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Release-legacy-stage8.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Release-link.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Release-project-protocol.log.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-src_lsp_main.cpp.txt
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-tests_project_protocol.py
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-tools_lsp_client.py
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-source-hashes.json
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-vcvars.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4-inventory.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4-local.json
+?? | S4 report/evidence | docs/projects/evidence/slice4-source.patch
+?? | S4 report/evidence | docs/projects/evidence/slice4/aot-corrupt-context.py
+?? | S4 report/evidence | docs/projects/evidence/slice4/deleted-image-llvm23-debug-stack.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/deleted-image-llvm23-debug.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/deleted-image-llvm23-release-stack.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/deleted-image-llvm23-release.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/deleted-image-llvm23-strict-stack.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/deleted-image-llvm23-strict.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/first-aot.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/first-jit.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/initial-game.void
+?? | S4 report/evidence | docs/projects/evidence/slice4/initial-project.toml
+?? | S4 report/evidence | docs/projects/evidence/slice4/legacy-context.py
+?? | S4 report/evidence | docs/projects/evidence/slice4/library-first-backtrace.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/library-repro.toml
+?? | S4 report/evidence | docs/projects/evidence/slice4/library-repro.void
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-cleanup-s4-results.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-allocator-ctest.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-allocator.xml
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-corrected.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-corrected.xml
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-oracle-ctest.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-oracle.xml
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-portable-build.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-portable-ctest.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-portable.xml
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-project-application-evidence.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-project-discovery-evidence.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-project-profiles-evidence.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-project-protocol-evidence.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-qualification-build.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-qualified.xml
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-lean-preprocess.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-adapter-lsp-original.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-adapter-lsp.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-allocator-ctest.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-allocator.xml
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-aot-corrupt-context.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-aot-corrupt-context.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-application-build.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-corrected.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-corrected.xml
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-final-ctest.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-final.xml
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-first-application.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-first-build.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-initial-process.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-initial-process.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-legacy-context.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-oracle-ctest.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-oracle.xml
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-portable-build.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-portable-ctest.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-portable.xml
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-project-application-evidence.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-project-discovery-evidence.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-project-profiles-evidence.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-project-protocol-evidence.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-qualified.xml
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-second-process.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-second-process.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-stdlib-doc-rerun.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-stdlib-doc-rerun.xml
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-strict-allocator-direct.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-strict-portable-build.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-strict-portable-ctest.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-strict-portable.xml
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-strict-project-application-evidence.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-strict-project-discovery-evidence.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-strict-project-profiles-evidence.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-strict-project-protocol-evidence.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-strict-qualification-build.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-strict-qualified-ctest.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-strict-qualified.xml
+?? | S4 report/evidence | docs/projects/evidence/slice4/os-location-lsp-original.py
+?? | S4 report/evidence | docs/projects/evidence/slice4/os-location-lsp.py
+?? | S4 report/evidence | docs/projects/evidence/slice4/s3-original-matched.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/s3-original-no-id.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-allocator-compile.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-allocator-link.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-allocator-process.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-allocator-test.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-build.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-configure.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-corrected-process.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-ctest.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-disk-full-process.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-disk-full-process.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-first-build-result.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-first-build.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-first-configure-result.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-first-configure.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-fourth-configure-result.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-fourth-configure.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-original-ctest.xml
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-original-process.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-retained-CMakeCache.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-retained-project-discovery-evidence.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-retained-project-profiles-evidence.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-retained-project-protocol-evidence.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-retained-void-native-resources.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-retained-void-native.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-second-build-result.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-second-build.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-second-configure-result.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-second-configure.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-third-configure-result.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-third-configure.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-allocator-compile.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-allocator-link.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-allocator-process.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-allocator-test.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-build.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-configure.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-corrected-process.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-ctest.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-first-build-result.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-first-build.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-first-configure-result.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-first-configure.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-fourth-configure-result.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-fourth-configure.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-original-ctest.xml
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-original-process.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-retained-CMakeCache.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-retained-project-discovery-evidence.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-retained-project-profiles-evidence.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-retained-project-protocol-evidence.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-retained-void-native-resources.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-retained-void-native.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-second-build-result.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-second-build.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-second-configure-result.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-second-configure.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-third-configure-result.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-third-configure.log.txt
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-allocator-final-results.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-allocator-first-results.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-allocator-first.py
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-allocator-resume.py
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-allocator-resumed-results.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-allocator-shared.py
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-cleanup-s4-results.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-cleanup-s4.py
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-native-archives.py
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-native-attested.py
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-native-corrected.py
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-native-lean.py
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-native-original-results.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-native-original.py
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-native-packet.py
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-native-portable.py
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-native-results.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-native-resume.py
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-os-doc-update.json
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-update-os.py
+?? | S5 report/evidence | docs/projects/evidence/slice5-inventory.txt
+?? | S5 report/evidence | docs/projects/evidence/slice5-source.patch
+?? | S5 report/evidence | docs/projects/evidence/slice5/cleanup-host.py
+?? | S5 report/evidence | docs/projects/evidence/slice5/cleanup.cmd
+?? | S5 report/evidence | docs/projects/evidence/slice5/cleanup.py
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor-creation-close-fixture-host.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor-creation-diagnostic-host.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor-creation-first-host.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor-creation-fourth-host.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor-creation-second-host.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor-creation-storage-test-host.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor-creation-third-host.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor/collision-host.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor/manual-host.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor/multi-root-host.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor/offered-close-host.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor/old-server-host.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor/old-tree-host.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor/outside-host.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor/persistence-host.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor/s3-project-host.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor/trusted-host.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor/untrusted-host.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/host-cleanup-results.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/invalid-id.py
+?? | S5 report/evidence | docs/projects/evidence/slice5/inventory.py
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux-debug-ctest.xml
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux-debug-original-creation.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/debug-binaries.sha256
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/debug-configuration.txt
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/debug-creation.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/debug-ctest.xml
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/invalid-id-linux.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/release-binaries.sha256
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/release-configuration.txt
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/release-creation.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/release-ctest.xml
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/strict-binaries.sha256
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/strict-configuration.txt
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/strict-creation.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/strict-ctest.xml
+?? | S5 report/evidence | docs/projects/evidence/slice5/packet.py
+?? | S5 report/evidence | docs/projects/evidence/slice5/qualify-linux.sh
+?? | S5 report/evidence | docs/projects/evidence/slice5/run-editor.sh
+?? | S5 report/evidence | docs/projects/evidence/slice5/source-hashes.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/source.py
+?? | S5 report/evidence | docs/projects/evidence/slice5/verify-native-packet.py
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-cleanup-results.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/Debug-ctest.xml
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/Debug-project-application-evidence.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/Debug-project-creation-evidence.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/Debug-result.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/Release-ctest.xml
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/Release-project-application-evidence.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/Release-project-creation-evidence.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/Release-result.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/native-results.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/native.cmd
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/native.py
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/source-packet-sha256.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-fixture/Debug-corrected.xml
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-fixture/Release-corrected.xml
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-fixture/creation.sha256
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-fixture/rerun.cmd
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-fixture/rerun.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-fixture/rerun.py
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-original/Debug-ctest.xml
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-original/Debug-project-creation-evidence.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-original/Debug-result.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-original/Release-ctest.xml
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-original/Release-project-creation-evidence.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-original/Release-result.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-original/native-results.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-original/native.cmd
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-original/native.py
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-original/source-packet-sha256.json
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-packet-archives.sha256
+?? | S5 source/documentation | editors/vscode/src/creation.ts
+?? | S5 source/documentation | editors/vscode/src/creationWorkflow.ts
+?? | S5 source/documentation | editors/vscode/src/test/creationHost.ts
+?? | S5 source/documentation | editors/vscode/src/test/creationWorkbench.ts
+?? | S3 new source/documentation | editors/vscode/src/test/projectHost.ts
+?? | S5 source/documentation | editors/vscode/src/test/runCreationHost.ts
+?? | S3 new source/documentation | editors/vscode/src/test/runProjectHost.ts
+?? | S4 source/documentation | include/void/application_metadata.hpp
+?? | S4 amendment; original layer: S3 amendment; original layer: S1 preserved | include/void/project.hpp
+?? | S5 source/documentation | include/void/project_creation.hpp
+?? | S4 source/documentation | src/application_metadata.cpp
+?? | S4 amendment; original layer: S3 amendment; original layer: S1 preserved | src/frontend/project.cpp
+?? | S5 source/documentation | src/frontend/project_creation.cpp
+?? | S5 amendment; original layer: S4 amendment; original layer: S3 final review amendment; original layer: S3 amendment; original layer: S2 final review amendment; original layer: S2 new | src/frontend/project_selection.inc
+?? | S4 source/documentation | src/project_identity.cpp
+?? | S4 source/documentation | tests/project/application.cpp
+?? | S4 source/documentation | tests/project/application.py
+?? | S1 preserved | tests/project/authority.py
+?? | S5 source/documentation | tests/project/creation.cpp
+?? | S5 source/documentation | tests/project/creation.py
+?? | S2 new | tests/project/discovery.py
+?? | S1 preserved | tests/project/header.cpp
+?? | S5 amendment; original layer: S4 amendment; original layer: S1 amended by S2 | tests/project/legacy.py
+?? | S1 preserved | tests/project/manifest.cpp
+?? | S2 new | tests/project/nested.py
+?? | S3 new source/documentation | tests/project/profiles.py
+?? | S3 final review amendment; original layer: S3 new source/documentation | tests/project/protocol.py
+?? | S1 preserved | tests/project/provenance.py
+?? | S2 final review amendment; original layer: S2 new | tests/project/selection.cpp
+?? | S3 final review amendment; original layer: S3 new source/documentation | tests/project/sessions.cpp
+?? | S1 preserved | third_party/tomlplusplus/LICENSE
+?? | S1 preserved | third_party/tomlplusplus/README.md
+?? | S1 preserved | third_party/tomlplusplus/toml.hpp
+?? | S1 preserved | third_party/tomlplusplus/upstream.json
+?? | S1 preserved | third_party/tomlplusplus/void-bounds-and-locations.patch

@@ -1,0 +1,343 @@
+{"cwd": "C:\\Users\\a\\VS7I2\\Release-public\\independent cwd", "argv": ["C:\\gcc\\bin\\cmake.exe", "--install", "C:\\Users\\a\\VS7I2\\Release", "--prefix", "C:\\Users\\a\\VS7I2\\Release-public\\compiler install", "--config", "Release", "--component", "compiler"]}
+exit=0
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/VOID-MIT-LICENSE.txt
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/LICENSING_SCOPE.md
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/REDISTRIBUTION.txt
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/NOTICE_INVENTORY.json
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/llvm-23.1.4
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/llvm-23.1.4/BLAKE3-LICENSE.txt
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/llvm-23.1.4/ConvertUTF-NOTICES.txt
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/llvm-23.1.4/LICENSE.TXT
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/llvm-23.1.4/Support-NOTICES.txt
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/llvm-23.1.4/xxhash-NOTICES.txt
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/zstd-1.5.7
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/zstd-1.5.7/EMBEDDED-NOTICES.txt
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/zstd-1.5.7/LICENSE
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/tomlplusplus/LICENSE
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/tomlplusplus/upstream.json
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/tomlplusplus/void-bounds-and-locations.patch
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/tomlplusplus/corresponding-source/toml.hpp
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/tomlplusplus/corresponding-source/README.md
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/zlib-1.3.2/LICENSE
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/libarchive
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/libarchive/COPYING
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/libarchive/SOURCE-NOTICES.json
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/libsodium
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/libsodium/LICENSE
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/libsodium/SOURCE-NOTICES.json
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/patches
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/patches/libsodium-1.0.22
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/patches/libsodium-1.0.22/asan-alignment.patch
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/patches/libsodium-1.0.22/PROVENANCE.json
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/host-versions.json
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/setup_host_deps.py
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/setup_host_deps_native.py
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/host-sodium.targets
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/verify_host_deps.py
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/corresponding-source/repro/tools/setup_host_deps.py
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/corresponding-source/repro/tools/setup_host_deps_native.py
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/corresponding-source/repro/tools/verify_host_deps.py
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/corresponding-source/repro/tools/verify_http_dependencies.py
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/corresponding-source/repro/tools/ci/llvm_sdk.py
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/corresponding-source/repro/cmake/host-sodium.targets
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-versions.json
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/http-versions.json
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22/asan-alignment.patch
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22/PROVENANCE.json
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/libxml2-2.15.4
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/libxml2-2.15.4/Copyright
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/libxml2-2.15.4/FILE-NOTICES.txt
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/UNICODE-LICENSE.txt
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/archive.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/channel.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/collections.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/console.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/convert.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/crypto.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/encoding
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/encoding/ascii.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/encoding/base64.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/encoding/binary.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/encoding/hex.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/error.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/io
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/io/memory.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/io.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/json.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/log.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/math.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/net
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/net/http.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/os.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/path.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/process.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/random.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/system_error.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/text.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/time.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/url.void
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/LICENSE-Boost
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/LICENSE.txt
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/NOTICE
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/LICENSE
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/stage10-versions.json
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/bin/voidc.exe
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/lib/void/void_runtime.lib
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/lib/void/void_native_fixture.lib
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/lib/void/libcurl.lib
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/lib/void/archive.lib
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/lib/void/libsodium.lib
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/lib/void/psl.lib
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/lib/void/nghttp2.lib
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/lib/void/cares.lib
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/lib/void/zs.lib
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/aws-lc-5.12.0
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/aws-lc-5.12.0/LICENSE
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/aws-lc-5.12.0/NOTICE
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/aws-lc-5.12.0/UPSTREAM.json
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/c-ares-1.34.9
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/c-ares-1.34.9/LICENSE.md
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/libidn2-2.3.8
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/libidn2-2.3.8/COPYING
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/libidn2-2.3.8/COPYING.LESSERv3
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/libidn2-2.3.8/COPYING.unicode
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/libidn2-2.3.8/COPYINGv2
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/libidn2-2.3.8/README
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/libpsl-0.21.5
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/libpsl-0.21.5/COPYING
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/libpsl-0.21.5/LICENSE
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/libpsl-0.21.5/LICENSE.chromium
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/libpsl-0.21.5/README
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/libunistring-1.5
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/libunistring-1.5/COPYING
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/libunistring-1.5/COPYING.LIB
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/libunistring-1.5/README
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/nghttp2-1.70.0
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/nghttp2-1.70.0/COPYING
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/nghttp2-1.70.0/README
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/openssl-3.5.9
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/openssl-3.5.9/LICENSE.txt
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/zlib-1.3.2
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/zlib-1.3.2/LICENSE
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/zlib-1.3.2/README
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/COPYING
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/NOTICE
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/VOID-PROVENANCE.json
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/http-versions.json
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/publicsuffix
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/publicsuffix/LICENSE
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/publicsuffix/public_suffix_list.dat
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/publicsuffix/UPSTREAM.json
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/corresponding-source/setup_http_deps.py
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/corresponding-source/setup_http_deps_native.py
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/corresponding-source/http_archive.py
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/http/VOID-HTTP-DEPENDENCIES.json
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/bin/void-native.txt
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/bin/void-native-resources.txt
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/VOID-HOST-DEPENDENCIES.json
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/corresponding-source
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/corresponding-source/libarchive-3.8.11.tar.xz
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/host/corresponding-source/libsodium-1.0.22.tar.gz
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Release-public\\independent cwd", "argv": ["C:\\gcc\\bin\\cmake.exe", "--install", "C:\\Users\\a\\VS7I2\\Release", "--prefix", "C:\\Users\\a\\VS7I2\\Release-public\\compiler install", "--config", "Release", "--component", "tooling"]}
+exit=0
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/bin/voidls.exe
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/VOID-MIT-LICENSE.txt
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/LICENSING_SCOPE.md
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/REDISTRIBUTION.txt
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/NOTICE_INVENTORY.json
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/llvm-23.1.4
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/llvm-23.1.4/BLAKE3-LICENSE.txt
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/llvm-23.1.4/ConvertUTF-NOTICES.txt
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/llvm-23.1.4/LICENSE.TXT
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/llvm-23.1.4/Support-NOTICES.txt
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/llvm-23.1.4/xxhash-NOTICES.txt
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/zstd-1.5.7
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/zstd-1.5.7/EMBEDDED-NOTICES.txt
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/zstd-1.5.7/LICENSE
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/tomlplusplus/LICENSE
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/tomlplusplus/upstream.json
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/tomlplusplus/void-bounds-and-locations.patch
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/tomlplusplus/corresponding-source/toml.hpp
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/tomlplusplus/corresponding-source/README.md
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/zlib-1.3.2/LICENSE
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/libxml2-2.15.4
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/libxml2-2.15.4/Copyright
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/libxml2-2.15.4/FILE-NOTICES.txt
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/UNICODE-LICENSE.txt
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/archive.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/channel.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/collections.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/console.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/convert.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/crypto.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/encoding
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/encoding/ascii.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/encoding/base64.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/encoding/binary.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/encoding/hex.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/error.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/io
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/io/memory.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/io.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/json.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/log.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/math.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/net
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/net/http.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/os.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/path.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/process.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/random.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/system_error.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/text.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/time.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/stdlib/url.void
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/LICENSE-Boost
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/LICENSE.txt
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/NOTICE
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/LICENSE
+-- Up-to-date: C:\Users\a\VS7I2\Release-public\compiler install/share/void/licenses/stage10-versions.json
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/vim
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/vim/autoload
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/vim/autoload/void.vim
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/vim/autoload/void_format.vim
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/vim/ftdetect
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/vim/ftdetect/void.vim
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/vim/ftplugin
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/vim/ftplugin/void.vim
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/vim/indent
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/vim/indent/void.vim
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/vim/syntax
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/vim/syntax/void.vim
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/neovim
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/neovim/lua
+-- Installing: C:\Users\a\VS7I2\Release-public\compiler install/share/void/neovim/lua/void.lua
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Release-public\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Release-public\\relocated compiler 雪\\bin\\voidc.exe", "--version"]}
+exit=0
+VOID Language Compiler v0.1.0 (development)
+LLVM 23.1.4
+Target: x86_64-pc-windows-msvc
+Build identity: acf3ea102087c2595d95f118860c61faf6efd96d382199e0a7bbf1480a7420c7
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Release-public\\independent cwd", "argv": ["C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\a\\VS7I2\\src\\tools\\verify_install.py", "C:\\Users\\a\\VS7I2\\Release-public\\relocated compiler 雪"]}
+exit=0
+VOID Language Compiler v0.1.0 (development)
+LLVM 23.1.4
+Target: x86_64-pc-windows-msvc
+Build identity: acf3ea102087c2595d95f118860c61faf6efd96d382199e0a7bbf1480a7420c7
+PASS: installed stdlib check, optimized/Debug run, native build/run, resource hashes and LSP handshake
+
+Installed compiler SHA-256 a13169c49e568475080e70f0f8821c8abd2eff31332820f92bf58771d7d81764
+{"cwd": "C:\\Users\\a\\VS7I2\\Release-public\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Release-public\\relocated compiler 雪\\bin\\voidc.exe", "new", "C:\\Users\\a\\VS7I2\\Release-public\\created project", "--source", "src/launch.void", "--project-id", "org.voidlang.s7-integrated-new"]}
+exit=0
+Manifest: C:/Users/a/VS7I2/Release-public/created project/void.project.toml
+Project ID: org.voidlang.s7-integrated-new
+Application ID: local.a9e0a2e4d8c9dace4bfc15298be10409d
+Next: from the displayed manifest directory, run voidc check --project .
+Created project manifest.
+Automatic application selection requires one eligible main(). Use --entry for a deliberate override.
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Release-public\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Release-public\\relocated compiler 雪\\bin\\voidc.exe", "check", "--project", "C:\\Users\\a\\VS7I2\\Release-public\\created project"]}
+exit=0
+Source checked successfully
+C:/Users/a/VS7I2/Release-public/created project/void.project.toml:14:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 14 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Release-public\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Release-public\\relocated compiler 雪\\bin\\voidc.exe", "run", "--project", "C:\\Users\\a\\VS7I2\\Release-public\\created project", "--no-opt"]}
+exit=0
+C:/Users/a/VS7I2/Release-public/created project/void.project.toml:14:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 14 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Release-public\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Release-public\\relocated compiler 雪\\bin\\voidc.exe", "run", "--project", "C:\\Users\\a\\VS7I2\\Release-public\\created project"]}
+exit=0
+C:/Users/a/VS7I2/Release-public/created project/void.project.toml:14:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 14 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Release-public\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Release-public\\relocated compiler 雪\\bin\\voidc.exe", "init", "C:\\Users\\a\\VS7I2\\Release-public\\initialized project", "--project-id", "org.voidlang.s7-integrated-init"]}
+exit=0
+Manifest: C:/Users/a/VS7I2/Release-public/initialized project/void.project.toml
+Project ID: org.voidlang.s7-integrated-init
+Application ID: local.a473311303a416cb4bf48992bdc19791f
+Next: from the displayed manifest directory, run voidc check --project .
+Created project manifest.
+Automatic application selection requires one eligible main(). Use --entry for a deliberate override.
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Release-public\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Release-public\\relocated compiler 雪\\bin\\voidc.exe", "check", "--project", "C:\\Users\\a\\VS7I2\\Release-public\\initialized project"]}
+exit=0
+Source checked successfully
+C:/Users/a/VS7I2/Release-public/initialized project/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 11 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Release-public\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Release-public\\relocated compiler 雪\\bin\\voidc.exe", "build", "--project", "C:\\Users\\a\\VS7I2\\Release-public\\initialized project", "-o", "C:\\Users\\a\\VS7I2\\Release-public\\ordinary build\\ordinary.exe"]}
+exit=0
+Built native executable: C:/Users/a/VS7I2/Release-public/ordinary build/ordinary.exe
+C:/Users/a/VS7I2/Release-public/initialized project/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 11 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Release-public\\independent cwd", "argv": ["C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\a\\VS7I2\\Release-public\\gallery project\\prepare.py", "--voidc", "C:\\Users\\a\\VS7I2\\Release-public\\relocated compiler 雪\\bin\\voidc.exe", "--clang", "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang.exe", "--header", "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src\\raylib.h", "--library", "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.dll", "--license", "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\LICENSE", "--import-library", "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.lib"]}
+exit=1
+047e7255f93f8c34039cab906ad76136706b5c7b4c5b5b065d84141963ee9b6b  C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\src\raylib.h
+3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824  C:\Users\a\VoidS7-Raylib-Compatibility\build-win32-software-linked\raylib.dll
+882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799  C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\LICENSE
+59778ec137ffebe87a6c099944330f20b7eecdf1d49a5a93de7000a8992339df  C:\Users\a\VoidS7-Raylib-Compatibility\build-win32-software-linked\raylib.lib
+Traceback (most recent call last):
+  File "C:\Users\a\VS7I2\Release-public\gallery project\prepare.py", line 80, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\a\VS7I2\Release-public\gallery project\prepare.py", line 62, in main
+    run(args.voidc, 'native-bind', stage / descriptor, header.name, '-o', stage / generated)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VS7I2\Release-public\gallery project\prepare.py", line 18, in run
+    print(command, flush=True)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u96ea' in position 58: character maps to <undefined>
+
+Traceback (most recent call last):
+  File "\\vboxsvr\VM\slice7-final-integrated\public-workflow.py", line 83, in <module>
+    run(*prepare)
+    ~~~^^^^^^^^^^
+  File "\\vboxsvr\VM\slice7-final-integrated\public-workflow.py", line 39, in run
+    assert process.returncode==status,(status,process.returncode,output)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (0, 1, '047e7255f93f8c34039cab906ad76136706b5c7b4c5b5b065d84141963ee9b6b  C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src\\raylib.h\r\n3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824  C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.dll\r\n882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799  C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\LICENSE\r\n59778ec137ffebe87a6c099944330f20b7eecdf1d49a5a93de7000a8992339df  C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.lib\r\nTraceback (most recent call last):\r\n  File "C:\\Users\\a\\VS7I2\\Release-public\\gallery project\\prepare.py", line 80, in <module>\r\n    main()\r\n    ~~~~^^\r\n  File "C:\\Users\\a\\VS7I2\\Release-public\\gallery project\\prepare.py", line 62, in main\r\n    run(args.voidc, \'native-bind\', stage / descriptor, header.name, \'-o\', stage / generated)\r\n    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File "C:\\Users\\a\\VS7I2\\Release-public\\gallery project\\prepare.py", line 18, in run\r\n    print(command, flush=True)\r\n    ~~~~~^^^^^^^^^^^^^^^^^^^^^\r\n  File "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\encodings\\cp1252.py", line 19, in encode\r\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\r\n           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nUnicodeEncodeError: \'charmap\' codec can\'t encode character \'\\u96ea\' in position 58: character maps to <undefined>\r\n')

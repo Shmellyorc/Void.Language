@@ -1,0 +1,15 @@
+{
+  "registrations": {
+    "ergonomics_sprint6": "tests/stage8/sprint6.py",
+    "stage10_fields_aot": "tests/stage10/fields.py",
+    "stage10_temporal_aot": "tests/stage10/temporal.py",
+    "stage11_globals_aot": "tests/stage11/globals.py",
+    "stage10_console_aot": "tests/stage10/console.py",
+    "stage10_operators_aot": "tests/stage10/operators.py",
+    "stage10_conversion_aot": "tests/stage10/conversion.py",
+    "application_native_sprint4": "tests/stage8/sprint4.py",
+    "text_collections_sprint3": "tests/stage8/sprint3.py"
+  },
+  "linux_only_archives": "VOID_HOST_LINK_FILES",
+  "non_linux_argv_and_recipes": "equivalent with an empty archive list"
+}

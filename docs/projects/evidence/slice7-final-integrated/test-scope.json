@@ -1,0 +1,35 @@
+{
+  "linux_configured": {
+    "release": 443,
+    "debug": 456,
+    "strict": 433
+  },
+  "debug_only": [
+    "arrays_storage_audit",
+    "private_fixed_call_normal_0_2_observed",
+    "private_fixed_call_normal_0_2_unobserved",
+    "private_fixed_call_normal_3_2_observed",
+    "private_fixed_call_normal_3_2_unobserved",
+    "private_fixed_call_normal_7_16384_observed",
+    "private_fixed_call_normal_7_16384_unobserved",
+    "private_fixed_call_optimized_0_2_observed",
+    "private_fixed_call_optimized_0_2_unobserved",
+    "private_fixed_call_optimized_3_2_observed",
+    "private_fixed_call_optimized_3_2_unobserved",
+    "private_fixed_call_optimized_7_16384_observed",
+    "private_fixed_call_optimized_7_16384_unobserved"
+  ],
+  "release_only_vs_strict": [
+    "binary_stack",
+    "channel_stack",
+    "combined_stack",
+    "io_async_stack",
+    "io_stack",
+    "lsp_const_recovery_stack",
+    "lsp_io_stack",
+    "lsp_text_encoding_stack",
+    "memory_stack",
+    "text_encoding_stack"
+  ],
+  "strict_only_vs_release": []
+}

@@ -1,0 +1,95 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug
+        Start 434: stage10_console_aot
+        Start 435: stage10_operators_aot
+        Start 446: text_collections_sprint3
+        Start 431: stage10_temporal_aot
+        Start 433: stage11_globals_aot
+  1/456 Test #433: stage11_globals_aot ...............................   Passed   12.24 sec
+        Start 428: ergonomics_sprint6
+  2/456 Test #428: ergonomics_sprint6 ................................   Passed    5.93 sec
+        Start 445: application_native_sprint4
+  3/456 Test #431: stage10_temporal_aot ..............................   Passed   22.30 sec
+        Start 436: stage10_conversion_aot
+  4/456 Test #436: stage10_conversion_aot ............................   Passed    1.82 sec
+        Start 429: stage10_fields_aot
+  5/456 Test #429: stage10_fields_aot ................................   Passed    1.22 sec
+        Start   1: project_manifest_header
+  6/456 Test   #1: project_manifest_header ...........................   Passed    0.01 sec
+        Start   2: project_manifest
+  7/456 Test #445: application_native_sprint4 ........................   Passed    7.23 sec
+        Start   3: voidup_smoke
+  8/456 Test   #2: project_manifest ..................................   Passed    1.27 sec
+        Start   4: voidup_ci_integration
+  9/456 Test   #3: voidup_smoke ......................................***Failed    1.35 sec
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/voidup-smoke-evidence/crashes/incident-fily5lsj
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-debug/tests/voidup/smoke.py", line 47, in <module>
+    run(['--root',root,'doctor']);run(['--root',root,'list'])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-debug/tests/voidup/smoke.py", line 31, in run
+    raise AssertionError(records[-1])
+AssertionError: {'command': ['/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/voidup/voidup', '--root', '/tmp/void-s7-link-debug-full.R2Ka9A/VOIDUP CI 雪 # % psm56c5u/private', 'doctor'], 'status': 1, 'expected': 0, 'stdout': '', 'stderr': 'VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}\n{"message":"io.create_private_directory failed; native code 0","operation":"io.create_private_directory","kind":"/@stdlib/io.void::error_kind.permission_denied","phase":"","status":0,"code":1,"native_domain":"filesystem","native_code":0,"cleanup_code":0,"progress":0,"published":false,"durable":false}\n'}
+
+        Start   5: project_manifest_no_authority
+ 10/456 Test   #4: voidup_ci_integration .............................   Passed    0.49 sec
+        Start   6: project_manifest_legacy
+ 11/456 Test   #5: project_manifest_no_authority .....................   Passed    1.25 sec
+        Start   7: project_manifest_provenance
+ 12/456 Test   #7: project_manifest_provenance .......................   Passed    0.11 sec
+        Start   8: project_selection
+ 13/456 Test   #6: project_manifest_legacy ...........................   Passed    8.53 sec
+        Start   9: project_sessions
+ 14/456 Test   #9: project_sessions ..................................   Passed    0.68 sec
+        Start  10: project_creation
+ 15/456 Test  #10: project_creation ..................................   Passed    0.33 sec
+        Start  11: project_creation_process
+ 16/456 Test #446: text_collections_sprint3 ..........................   Passed   47.51 sec
+        Start  12: project_application
+ 17/456 Test  #11: project_creation_process ..........................   Passed   20.98 sec
+        Start  13: project_application_process
+ 18/456 Test   #8: project_selection .................................   Passed   49.76 sec
+        Start  14: project_discovery_cli
+ 19/456 Test  #14: project_discovery_cli .............................   Passed   17.13 sec
+        Start  15: project_profiles
+ 20/456 Test  #15: project_profiles ..................................   Passed    2.97 sec
+        Start  16: project_protocol
+ 21/456 Test  #16: project_protocol ..................................   Passed    0.67 sec
+        Start  17: project_nested_cli
+ 22/456 Test  #17: project_nested_cli ................................   Passed    1.33 sec
+        Start  18: cli_contract
+ 23/456 Test  #18: cli_contract ......................................   Passed   14.05 sec
+        Start  19: cli_install
+ 24/456 Test  #19: cli_install .......................................   Passed    8.32 sec
+        Start  20: cli_install_resources
+ 25/456 Test  #20: cli_install_resources .............................   Passed    0.19 sec
+        Start  21: target_triple
+ 26/456 Test  #21: target_triple .....................................   Passed    0.02 sec
+        Start  22: http_native
+ 27/456 Test  #13: project_application_process .......................   Passed   72.23 sec
+        Start  23: http_tls_memory
+ 28/456 Test  #12: project_application ...............................   Passed   84.81 sec
+        Start  24: http_reload
+ 29/456 Test  #22: http_native .......................................   Passed   29.99 sec
+        Start  25: http_timeouts
+ 30/456 Test  #25: http_timeouts .....................................   Passed    6.62 sec
+        Start  26: http_wire
+ 31/456 Test  #26: http_wire .........................................   Passed    1.36 sec
+        Start  27: http_dns
+ 32/456 Test  #27: http_dns ..........................................   Passed    6.41 sec
+        Start  28: url_native
+ 33/456 Test  #28: url_native ........................................   Passed    0.10 sec
+        Start  29: http_examples
+ 34/456 Test  #24: http_reload .......................................   Passed  108.35 sec
+        Start  30: http_ci_policy
+ 35/456 Test  #30: http_ci_policy ....................................   Passed    7.36 sec
+        Start  31: http_curl_objects
+ 36/456 Test  #31: http_curl_objects .................................   Passed    1.49 sec
+        Start  32: http_install
+ 37/456 Test #435: stage10_operators_aot .............................   Passed  282.51 sec
+        Start  33: http_bulk
+ 38/456 Test  #33: http_bulk .........................................   Passed   94.06 sec
+        Start  34: http_ir

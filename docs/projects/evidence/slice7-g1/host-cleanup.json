@@ -1,0 +1,537 @@
+{
+  "roots": [
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g1/tests",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g1/direct-replay",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g1/evidence-replay",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/tests",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/direct-replay",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/evidence-replay",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/ffi-g1/tests",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/ffi-g1/evidence-replay"
+  ],
+  "approved": [
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1",
+      "kind": "directory"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting",
+      "kind": "directory"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-release-build-first.log",
+      "kind": "file",
+      "sha256": "127d538893f798fea66b8fd53e4b7a0773d37f560b91187b3a4d023911af6d2a"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/edit-backend.py",
+      "kind": "file",
+      "sha256": "c8b2de88a0c4063341fa0959873fea0d5d3bffd2cc81b7b7ae22c4d6888326cf"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-release-g1-first.log",
+      "kind": "file",
+      "sha256": "09274884603b58d5a046401ddbe4f27711cffe53c1604781e95b0fd908fc1f65"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-release-configure.log",
+      "kind": "file",
+      "sha256": "51c5e2946828e0cc9b8e209723ea2cedca6daebb11acdf12db3a6074ce603f58"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-debug-configure.log",
+      "kind": "file",
+      "sha256": "20d2c925deaef3b9c9bc6ef26238e83fa2f4582ae49d55bdc580e87d5e7734bb"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-strict-configure.log",
+      "kind": "file",
+      "sha256": "c2217fbaef1d59a2db94c5ad9578592b7f0248f934881d1b905d98f705b22ce9"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-release-g1-build.log",
+      "kind": "file",
+      "sha256": "99eb3536c3d12c6e32c4a1f604c0d57fb456792b193bfef3ebd360d0cf55ce79"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-debug-g1-build.log",
+      "kind": "file",
+      "sha256": "6893c4a979503356cf2948196cfafb109f0d011b394e2a9c21e78ee80c7866f0"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-strict-g1-build.log",
+      "kind": "file",
+      "sha256": "079f2e6d64a0e96d559bb4465e128d7c2c5837c010500f49aaa772b5208b09ea"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-release-g1-build.status",
+      "kind": "file",
+      "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-release-g1-diagnostic-field-original.log",
+      "kind": "file",
+      "sha256": "99eb3536c3d12c6e32c4a1f604c0d57fb456792b193bfef3ebd360d0cf55ce79"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-release-configure-corrected.log",
+      "kind": "file",
+      "sha256": "b4719880dc248e610cf50afdab38a5de7628771a3eeecca385479a2fcc5ec306"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-release-g1-corrected.log",
+      "kind": "file",
+      "sha256": "3d1bc0399a5f27a144e60fe369dfba98ddc442a1471ec89b8fa86e543cd22944"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-debug-g1-build.status",
+      "kind": "file",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-debug-g1-ctest-first.log",
+      "kind": "file",
+      "sha256": "d5f3eeacccb173d7154afeaa230a4a7a94c9b3d9690528f8350e362ab4a7201c"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/qualify-linux.sh",
+      "kind": "file",
+      "sha256": "85be4d3ec56301bc03ac2d8f858878046a9446aec3a0634239915efd14ad3b81"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-replay-original.sh",
+      "kind": "file",
+      "sha256": "3e09176ab264dad076c0bd677ce4f70317a9f3b62a4190f80e79c0c70b2ca3b7"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final",
+      "kind": "directory"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/collect-linux.py",
+      "kind": "file",
+      "sha256": "94e6b5cc42c2ab98d773b142d88d5152a0dc7e308a9db2e48245bf361a2180f1"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/inventory.py",
+      "kind": "file",
+      "sha256": "c821dbd3970529fc8ec845698cd20b10b340a127b06a1808b71e76fc4cfb45b7"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-strict-g1-build.status",
+      "kind": "file",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/cleanup-host.py",
+      "kind": "file",
+      "sha256": "f537571bbf8c3082579a863a749d8a310d7fe9e26ead1f9464ee60fed6b1a229"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-strict-stale.status",
+      "kind": "file",
+      "sha256": "aa67a169b0bba217aa0aa88a65346920c84c42447c36ba5f7ea65f422c1fe5d8"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/strict-stale-compiler.cpp.o",
+      "kind": "file",
+      "sha256": "b3cb5ec67a9533ea7c1e44bb11767a17a94577ec12ef0c90b92573dab716ac19"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/collect-windows.py",
+      "kind": "file",
+      "sha256": "1e6ca5d9d6582dd0e22d80887fbed93a3e67f90904a9359ff5a3896e111998df"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/CMakeLists.txt",
+      "kind": "file",
+      "sha256": "8c8a2b0db4e1cd494ffc7719bc5f8f81c803486b6c5a127c78791de52dbd3110"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/include",
+      "kind": "directory"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/src",
+      "kind": "directory"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/release-configure.txt",
+      "kind": "file",
+      "sha256": "c97ee85746405ca59f7011e2d6c14605a516ae18a29fbbe1d6d08fabc4cb8251"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/debug-configure.txt",
+      "kind": "file",
+      "sha256": "13b844988132796350e02002d171c388af8c4ed2e01bb1cfcd015af95e2778a3"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/debug-build.txt",
+      "kind": "file",
+      "sha256": "392c32116612c78933f1331a2ba8536f7cff9fc8c0211af6018908cb8c9dbe93"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/release-build.txt",
+      "kind": "file",
+      "sha256": "10b4fb5a6869438a274a33ea3e6242f7830698a144a7f69983edbdf928899539"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/debug-ctest.txt",
+      "kind": "file",
+      "sha256": "4caaf9d5ed48ec5d47e778924b816a0b4c642b23974139b5d892a71a47109967"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/release-ctest.txt",
+      "kind": "file",
+      "sha256": "6b9e5c064dbef91396714139d12c90c89d1beb8034243ab614d85fc228e4fb5d"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/debug-g1-direct.txt",
+      "kind": "file",
+      "sha256": "5a2b852828fdc0481d15fbeb502333fb9f68b9888a1c5034b14551c3886963e2"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/release-g1-direct.txt",
+      "kind": "file",
+      "sha256": "5a2b852828fdc0481d15fbeb502333fb9f68b9888a1c5034b14551c3886963e2"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/release-ctest.xml",
+      "kind": "file",
+      "sha256": "210fef36664392c572adee0c785b785915befd7c4f4ae12f76b9a022e62be031"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/release.status",
+      "kind": "file",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/debug-ctest.xml",
+      "kind": "file",
+      "sha256": "be31b3859b3a1c54ee0c6107d6b6e6684f5313fa2d9188f23cc546b9a0ae00e8"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/debug.status",
+      "kind": "file",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/release-primitives.descriptor",
+      "kind": "file",
+      "sha256": "044560cab14ec1aeee266724b1b27ca6c71127152822a07357711e1897e1fcff"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/release-primitives.void",
+      "kind": "file",
+      "sha256": "f0f3e781505b1448552fd82048f625df3437e70aad769facb30c3847cc8fdb7b"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/release-artifacts.json",
+      "kind": "file",
+      "sha256": "0fd5b9cdf78f53462f6b1eb2b922414cff23441aa9ebd6e671335b64f57c798a"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/debug-primitives.descriptor",
+      "kind": "file",
+      "sha256": "044560cab14ec1aeee266724b1b27ca6c71127152822a07357711e1897e1fcff"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/debug-primitives.void",
+      "kind": "file",
+      "sha256": "f0f3e781505b1448552fd82048f625df3437e70aad769facb30c3847cc8fdb7b"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/debug-artifacts.json",
+      "kind": "file",
+      "sha256": "4b240281d6afe9a74b95e2f7acd040b19c73d496354e1fc590cfa89e3c7e265d"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/strict-configure.txt",
+      "kind": "file",
+      "sha256": "b0b7f8a4d5a3f9bfa753b335c7847526388b9b4c0dcf9495204e66837b219fb7"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/strict-build.txt",
+      "kind": "file",
+      "sha256": "e1e8310f16b7e97fb07be90206a9e31e54dfe7cd9a3bb72fc150f9e1c35a057f"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/strict-ctest.txt",
+      "kind": "file",
+      "sha256": "9e93e5e730a567f86ff7d6232674d4345517ae3dd476ec16b64635f87f46edd8"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/strict-ctest.xml",
+      "kind": "file",
+      "sha256": "ba150f755fffa574227628dcfc4c7bd583757329753876101262a5bf10d8818e"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/strict-primitives.descriptor",
+      "kind": "file",
+      "sha256": "044560cab14ec1aeee266724b1b27ca6c71127152822a07357711e1897e1fcff"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/strict-primitives.void",
+      "kind": "file",
+      "sha256": "f0f3e781505b1448552fd82048f625df3437e70aad769facb30c3847cc8fdb7b"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/strict-artifacts.json",
+      "kind": "file",
+      "sha256": "337432d31668a47d664026413f7d971ad08f7c7b42f47133be3c6dd9c09580b0"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/strict.status",
+      "kind": "file",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/include/void",
+      "kind": "directory"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/src/frontend",
+      "kind": "directory"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/src/ir",
+      "kind": "directory"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/src/backend",
+      "kind": "directory"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/src/native_build.cpp",
+      "kind": "file",
+      "sha256": "b43c080c034e69bb13e9b4e47b7b4b7c815e06182c6e3f8b0112c3c6289cf6af"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/src/frontend/compiler.cpp",
+      "kind": "file",
+      "sha256": "1183a47409148da6f9ba3aa843310a63804f985956e31e36329815af6921875e"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/src/ir/module.cpp",
+      "kind": "file",
+      "sha256": "29b296166475f18d966fd1e56260d5e55f67de79987036a66847b0135ba68cae"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/src/backend/llvm",
+      "kind": "directory"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/src/backend/llvm/backend.cpp",
+      "kind": "file",
+      "sha256": "ecaa6dac17c29dcd6fd6a718d337e07a2cc6fd546109139276a5b906c66bf15b"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/include/void/ir.hpp",
+      "kind": "file",
+      "sha256": "c8b7ca66d9426ad6e5827a52acd0fdf218bf325a82e9247298f98cf1fad40eda"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/include/void/frontend.hpp",
+      "kind": "file",
+      "sha256": "b8ddb1f403d76a1599b35ceead3c7a2751f078188fe518f08c3615bdc3f7ff2a"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g1/tests",
+      "kind": "directory"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g1/tests/probe.void",
+      "kind": "file",
+      "sha256": "47d68e2be249e02a55f30a853dbc2b8f7f742411ed1f2a4740838f44cf3ea7f1"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g1/direct-replay",
+      "kind": "directory"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g1/direct-replay/probe.void",
+      "kind": "file",
+      "sha256": "47d68e2be249e02a55f30a853dbc2b8f7f742411ed1f2a4740838f44cf3ea7f1"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g1/evidence-replay",
+      "kind": "directory"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g1/evidence-replay/probe.void",
+      "kind": "file",
+      "sha256": "47d68e2be249e02a55f30a853dbc2b8f7f742411ed1f2a4740838f44cf3ea7f1"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/tests",
+      "kind": "directory"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/tests/probe.void",
+      "kind": "file",
+      "sha256": "47d68e2be249e02a55f30a853dbc2b8f7f742411ed1f2a4740838f44cf3ea7f1"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/direct-replay",
+      "kind": "directory"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/direct-replay/probe.void",
+      "kind": "file",
+      "sha256": "47d68e2be249e02a55f30a853dbc2b8f7f742411ed1f2a4740838f44cf3ea7f1"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/evidence-replay",
+      "kind": "directory"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/evidence-replay/probe.void",
+      "kind": "file",
+      "sha256": "47d68e2be249e02a55f30a853dbc2b8f7f742411ed1f2a4740838f44cf3ea7f1"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/ffi-g1/tests",
+      "kind": "directory"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/ffi-g1/tests/probe.void",
+      "kind": "file",
+      "sha256": "47d68e2be249e02a55f30a853dbc2b8f7f742411ed1f2a4740838f44cf3ea7f1"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/ffi-g1/evidence-replay",
+      "kind": "directory"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/ffi-g1/evidence-replay/probe.void",
+      "kind": "file",
+      "sha256": "47d68e2be249e02a55f30a853dbc2b8f7f742411ed1f2a4740838f44cf3ea7f1"
+    }
+  ],
+  "deleted": [
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/src/backend/llvm/backend.cpp",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/src/frontend/compiler.cpp",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/src/ir/module.cpp",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/src/backend/llvm",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/include/void/ir.hpp",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/include/void/frontend.hpp",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/include/void",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/src/frontend",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/src/ir",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/src/backend",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/src/native_build.cpp",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g1/tests/probe.void",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g1/direct-replay/probe.void",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g1/evidence-replay/probe.void",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/tests/probe.void",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/direct-replay/probe.void",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/evidence-replay/probe.void",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/ffi-g1/tests/probe.void",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/ffi-g1/evidence-replay/probe.void",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/CMakeLists.txt",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/include",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting/src",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/release-configure.txt",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/debug-configure.txt",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/debug-build.txt",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/release-build.txt",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/debug-ctest.txt",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/release-ctest.txt",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/debug-g1-direct.txt",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/release-g1-direct.txt",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/release-ctest.xml",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/release.status",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/debug-ctest.xml",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/debug.status",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/release-primitives.descriptor",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/release-primitives.void",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/release-artifacts.json",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/debug-primitives.descriptor",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/debug-primitives.void",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/debug-artifacts.json",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/strict-configure.txt",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/strict-build.txt",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/strict-ctest.txt",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/strict-ctest.xml",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/strict-primitives.descriptor",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/strict-primitives.void",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/strict-artifacts.json",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final/strict.status",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g1/tests",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g1/direct-replay",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g1/evidence-replay",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/tests",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/direct-replay",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/evidence-replay",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/ffi-g1/tests",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/ffi-g1/evidence-replay",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/starting",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-release-build-first.log",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/edit-backend.py",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-release-g1-first.log",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-release-configure.log",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-debug-configure.log",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-strict-configure.log",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-release-g1-build.log",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-debug-g1-build.log",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-strict-g1-build.log",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-release-g1-build.status",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-release-g1-diagnostic-field-original.log",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-release-configure-corrected.log",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-release-g1-corrected.log",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-debug-g1-build.status",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-debug-g1-ctest-first.log",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/qualify-linux.sh",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-replay-original.sh",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/final",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/collect-linux.py",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/inventory.py",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-strict-g1-build.status",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/cleanup-host.py",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/linux-strict-stale.status",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/strict-stale-compiler.cpp.o",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1/collect-windows.py",
+    "/home/shmellyorc/Documents/Void.Language/build/slice7-g1"
+  ],
+  "retained_artifact_hashes": {
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_g1_tests": "851ad3954c49ddb8e465cebb809a6c0ce24bcd9067656436c2171efca4f6c94f",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_g1_aot_normal": "457aaf722c616f5fb5b1a5fce85358d0524a4c93a5b8b7fa25a0b08a70d4581a",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_g1_aot_optimized": "27e5ecbed768e9b3214636492f1128c38ba6e7b8d272ecab28b66d45b64d2bcd",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_g1_aot_mismatch": "1e1e0f9549cc6aaa7724faea23dfe6cc182699ffa2b3abe9d9bac65719a5524a",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc": "d556960f4a2905b6212fccb0c957075f837d334ae0a9b8db55a08f7584cd819e",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g1/application-normal.o": "84bf27821685bc6184e75c292ca48c567b49d39dc69e18118ccba2ba6e50bf38",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g1/application-optimized.o": "f84038728869c784b483632d7b0bb9fd728819b6c26703abd83e87faeb8a6aa4",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g1/primitives.descriptor": "044560cab14ec1aeee266724b1b27ca6c71127152822a07357711e1897e1fcff",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g1/primitives.void": "f0f3e781505b1448552fd82048f625df3437e70aad769facb30c3847cc8fdb7b",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/CMakeFiles/void_g1_fixture.dir/tests/ffi/primitives_fixture.c.o": "8f13b3b4a0038bed94e1f210b1ca78cac8b698b86b6fef36056dfc26d52f465a",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/CMakeFiles/void_g1_wrong_fixture.dir/tests/ffi/primitives_fixture.c.o": "333b0557c18cfce0a26ee24b348aea1a89df6203c80a3f7648b732b5faea93ad",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/CMakeFiles/void_g1_thunk.dir/tests/ffi/primitives_thunk.c.o": "a531a69d8c9473ad4d6357350b742142bbe46733e2ba36a6d5f3e27c03e57ace",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g1_tests": "a3b4500771a8d6536fa7c229fca7cb246f5a01c54cfa6b9f380167963e532ff1",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g1_aot_normal": "19574b6ffcf9788b30dd7f670be208e728064595d4643398a79d5610126ca445",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g1_aot_optimized": "25ccc29c1bdba3fd7dffc4d836608228e98f0f74ed5b28759efeec092e1b0a59",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g1_aot_mismatch": "e3ec232d03e8fc8f689da1841c0d5fab7aacc39ff45c294ccd4b4f3ecd96ac05",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc": "9570eca65bfa8774d6a7f980063bfa657917a72073aefa2c87d6da31971520cd",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/application-normal.o": "e155da933ecf6c617910a43a85be33b3bf1b135de55be06e57c5059ae498fb23",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/application-optimized.o": "b531e61a3b69d674f6b83a49c91a7887e5c69b396387519eb172c621ac3f6dd9",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/primitives.descriptor": "044560cab14ec1aeee266724b1b27ca6c71127152822a07357711e1897e1fcff",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/primitives.void": "f0f3e781505b1448552fd82048f625df3437e70aad769facb30c3847cc8fdb7b",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/CMakeFiles/void_g1_fixture.dir/tests/ffi/primitives_fixture.c.o": "de577a68c7cc2977bae70c4760e02ea9a1836ccaad251a1f205c9d94f1aaa904",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/CMakeFiles/void_g1_wrong_fixture.dir/tests/ffi/primitives_fixture.c.o": "b7271bc50944cf5a4543eac59fe657550efbf2dd2bf976ef26b024c0629c8c43",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/CMakeFiles/void_g1_thunk.dir/tests/ffi/primitives_thunk.c.o": "6624cfed224aad1cc936b83b573a54d549e12fe4f02ecd463ac64f97e52de94a",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_g1_tests": "c3b6489e5a285b95e4bedf849de39f3abce8fdc0c6421ad5cf4c2873c33d20c9",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_g1_aot_normal": "d2a193be56817cea11d0de5f0cedd59e60701052212b8153fd01e93cb10f446f",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_g1_aot_optimized": "fd969bb8f42d07ad1ee7d6bc605b58ec1aa1c1412771c4a0720db460a951d401",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_g1_aot_mismatch": "dfa740920ab2b89a482229fbb43d594bb730d95927a36a388cce61bb89cd4580",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc": "497a4c1e48728c5fbcfc09ff1111f74167c0e21de68aec6fe59f4e1b5ba56627",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/ffi-g1/application-normal.o": "7688424b2fa91459b7f61ad510397a66b8ae8e604e436c0ec1d598ee98275320",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/ffi-g1/application-optimized.o": "dd3103cc08fe054c7b915cfeffb5ffc76e72ecf6d8de8199eabc4c031030cfaf",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/ffi-g1/primitives.descriptor": "044560cab14ec1aeee266724b1b27ca6c71127152822a07357711e1897e1fcff",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/ffi-g1/primitives.void": "f0f3e781505b1448552fd82048f625df3437e70aad769facb30c3847cc8fdb7b",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/CMakeFiles/void_g1_fixture.dir/tests/ffi/primitives_fixture.c.o": "09c950547022fd0fbafe09c451f9bbb028882c1a3e3c3e5336fc2b8646781da2",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/CMakeFiles/void_g1_wrong_fixture.dir/tests/ffi/primitives_fixture.c.o": "2dde6301327c11c1d42376c02a3031d2d66412b6b69700b5b28b4a3471797a54",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/CMakeFiles/void_g1_thunk.dir/tests/ffi/primitives_thunk.c.o": "e5eb3b302e48f51ac7f7bd0e457a03ef69641ea75bf36ae44b92175245cec945",
+    "/home/shmellyorc/VM/project-slice7-g1/source-packet.zip": "ff7552af6f249ffe583ffebab0bcbb45d0f00a7ea14160949ceac11507581d15"
+  },
+  "status": "PASS"
+}

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="1"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="57"
+	timestamp="2026-11-08T17:27:43"
+	>
+	<testcase name="project_application" classname="project_application" time="57.9048" status="run">
+		<properties/>
+		<system-out>Application cache: miss/hit
+project_application: 63 checks passed
+</system-out>
+	</testcase>
+</testsuite>

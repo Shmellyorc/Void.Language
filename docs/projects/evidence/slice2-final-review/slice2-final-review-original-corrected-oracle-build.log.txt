@@ -1,0 +1,6 @@
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[100%] Built target void_core
+[100%] Building CXX object CMakeFiles/void_project_selection.dir/tests/project/selection.cpp.o
+[100%] Linking CXX executable void_project_selection
+[100%] Built target void_project_selection

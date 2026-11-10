@@ -1,0 +1,4 @@
+C: filesystem=NTFS
+held file=C:\Users\a\VoidS7-G4W2-final\approved\void_w2_gate.dll id=c60478b6:00090000000bcbba sha256=845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33
+embedded manifest=1 active redirect=0 loaded basename=0
+mapped exact path=\Device\HarddiskVolume3\Users\a\VoidS7-G4W2-final\approved\void_w2_gate.dll result=7

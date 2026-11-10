@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "C:\Users\a\VoidSlice3-Corrected-20261108\tests\lsp\protocol.py", line 612, in <module>
+    root = pathlib.Path(sys.argv[2]).resolve() / "project space é\U0001f600 # %"
+                        ~~~~~~~~^^^
+IndexError: list index out of range

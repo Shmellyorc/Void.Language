@@ -1,0 +1,41 @@
+[
+  {
+    "argv": [
+      "check",
+      "--project",
+      "/tmp/VOID slice2 smoke wyzde32w"
+    ],
+    "status": 0,
+    "stdout": "Source checked successfully\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "run",
+      "/tmp/VOID slice2 smoke wyzde32w",
+      "--no-cache"
+    ],
+    "status": 23,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "run",
+      "--project",
+      "/tmp/VOID slice2 smoke wyzde32w",
+      "--entry",
+      "src/features/game.void",
+      "--no-opt",
+      "--no-cache"
+    ],
+    "status": 23,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "status": 0,
+    "stdout": "Library project checked successfully\n",
+    "stderr": ""
+  }
+]

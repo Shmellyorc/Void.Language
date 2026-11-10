@@ -1,0 +1,1 @@
+Verified approved patched Windows host providers: Release; build 2976df7940cd7eb146479760b58f0fedb7721bc88690611ba3822cd5ae76778c

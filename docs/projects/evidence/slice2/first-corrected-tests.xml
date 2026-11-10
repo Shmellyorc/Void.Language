@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="3"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="16"
+	timestamp="2026-11-08T13:25:56"
+	>
+	<testcase name="project_manifest_legacy" classname="project_manifest_legacy" time="0.765702" status="run">
+		<properties/>
+		<system-out>project_manifest_legacy: 17 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_selection" classname="project_selection" time="7.24408" status="run">
+		<properties/>
+		<system-out>project_selection: 137 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_discovery_cli" classname="project_discovery_cli" time="8.95082" status="run">
+		<properties/>
+		<system-out>project_discovery_cli: 78 process checks passed
+</system-out>
+	</testcase>
+</testsuite>

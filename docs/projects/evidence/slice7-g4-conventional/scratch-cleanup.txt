@@ -1,0 +1,10 @@
+Removed the task-owned temporary VM screenshots below. The diagnostic screenshot is retained in original/.
+
+5432f23c0e75e96465db42206c50fbf85c1e3c2c246e0859590a648c5202c967  /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/guest.png
+f84222530182f92f09827d95bebd528fdad7c11d4654d582d6ab91d059a4b4a3  /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/guest-now.png
+ec90eff1e39c3742e3cbd23c15f2dd4c62027a1fb162eb65a8642b72e699d701  /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/guest-build.png
+ef66553a9f43ad436fdf3e72398ad8e2e8faceeade7e86a376e22b4200cb4e14  /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/guest-progress.png
+adc424c797971048bc54a08490ac52c47f37f35b393674b5a20c6444c47fdbbe  /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/guest-modal-check.png
+a5e9e84963f3ce0581b2ad12cfbc79102d48bb16a4c4f2eaa8c790021a3cb188  /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/guest-diagnostic-launch.png
+620b8aa05196db5a63c6d65b03f85d794f48462d8db45df53a8314fb1f61499f  /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/guest-final.png
+e8fb9b41d1e0d21088826ee366653762e569602eebea5421f5ea2363927dd1b7  /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/guest-dismiss.png

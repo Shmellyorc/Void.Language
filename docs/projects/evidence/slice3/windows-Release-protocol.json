@@ -1,0 +1,926 @@
+{
+  "checks": 71,
+  "commands_and_requests": [
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Release\\voidls-slice3.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+        "",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5010\",\"message\":\"No eligible main() in application project.\"}],\"discoveryCount\":1,\"entry\":null,\"executionCount\":0,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"e24105d7a589202427ab07a702adb502769ad19d6928d698ead8e9a31def28e9\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "method": "initialize",
+      "params": {
+        "capabilities": {
+          "textDocument": {
+            "publishDiagnostics": {
+              "relatedInformation": true,
+              "versionSupport": true
+            }
+          },
+          "workspace": {
+            "workspaceEdit": {
+              "documentChanges": true,
+              "failureHandling": "textOnlyTransactional"
+            }
+          }
+        }
+      },
+      "response": {
+        "id": 1,
+        "jsonrpc": "2.0",
+        "result": {
+          "capabilities": {
+            "completionProvider": {
+              "triggerCharacters": [
+                ".",
+                " ",
+                "\"",
+                "/",
+                ":"
+              ]
+            },
+            "definitionProvider": true,
+            "documentFormattingProvider": true,
+            "documentSymbolProvider": true,
+            "experimental": {
+              "refreshProject": true,
+              "voidProjectProtocol": 1,
+              "voidToolingProtocol": 1
+            },
+            "hoverProvider": true,
+            "positionEncoding": "utf-16",
+            "referencesProvider": true,
+            "renameProvider": {
+              "prepareProvider": true
+            },
+            "signatureHelpProvider": {
+              "triggerCharacters": [
+                "(",
+                ","
+              ]
+            },
+            "textDocumentSync": {
+              "change": 1,
+              "openClose": true,
+              "save": {
+                "includeText": false
+              }
+            },
+            "workspace": {
+              "fileOperations": {
+                "didCreate": {
+                  "filters": [
+                    {
+                      "pattern": {
+                        "glob": "**/*"
+                      },
+                      "scheme": "file"
+                    }
+                  ]
+                },
+                "didDelete": {
+                  "filters": [
+                    {
+                      "pattern": {
+                        "glob": "**/*"
+                      },
+                      "scheme": "file"
+                    }
+                  ]
+                },
+                "didRename": {
+                  "filters": [
+                    {
+                      "pattern": {
+                        "glob": "**/*"
+                      },
+                      "scheme": "file"
+                    }
+                  ]
+                }
+              }
+            },
+            "workspaceSymbolProvider": true
+          },
+          "serverInfo": {
+            "name": "VOID",
+            "version": "0.2.0"
+          }
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 4,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/src/game.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+          "schema": 2,
+          "selectionRevision": "2",
+          "snapshotKey": "6b540895d19cb99c798142db57d07e6d2bb16d4d9b60530eec68f705d68ad6fa",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ffxmk3aj/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 13
+        }
+      },
+      "response": {
+        "id": 5,
+        "jsonrpc": "2.0",
+        "result": {
+          "range": {
+            "end": {
+              "character": 17,
+              "line": 0
+            },
+            "start": {
+              "character": 12,
+              "line": 0
+            }
+          },
+          "uri": "file:///C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ffxmk3aj/src/helper.void"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/hover",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ffxmk3aj/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 14
+        }
+      },
+      "response": {
+        "id": 6,
+        "jsonrpc": "2.0",
+        "result": {
+          "contents": {
+            "kind": "plaintext",
+            "value": "value() -> i32"
+          },
+          "range": {
+            "end": {
+              "character": 18,
+              "line": 2
+            },
+            "start": {
+              "character": 13,
+              "line": 2
+            }
+          }
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/formatting",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ffxmk3aj/src/game.void"
+        },
+        "options": {
+          "tabSize": 4,
+          "insertSpaces": true
+        }
+      },
+      "response": {
+        "id": 8,
+        "jsonrpc": "2.0",
+        "result": [
+          {
+            "newText": "use \"./helper.void\" as h\nfunc main() -> i32:\n    return h.value()\n",
+            "range": {
+              "end": {
+                "character": 0,
+                "line": 3
+              },
+              "start": {
+                "character": 0,
+                "line": 0
+              }
+            }
+          }
+        ]
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/rename",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ffxmk3aj/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 14
+        },
+        "newName": "renamed_helper"
+      },
+      "response": {
+        "id": 10,
+        "jsonrpc": "2.0",
+        "result": {
+          "documentChanges": [
+            {
+              "edits": [
+                {
+                  "newText": "renamed_helper",
+                  "range": {
+                    "end": {
+                      "character": 18,
+                      "line": 2
+                    },
+                    "start": {
+                      "character": 13,
+                      "line": 2
+                    }
+                  }
+                }
+              ],
+              "textDocument": {
+                "uri": "file:///C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ffxmk3aj/src/game.void",
+                "version": 3
+              }
+            },
+            {
+              "edits": [
+                {
+                  "newText": "renamed_helper",
+                  "range": {
+                    "end": {
+                      "character": 17,
+                      "line": 0
+                    },
+                    "start": {
+                      "character": 12,
+                      "line": 0
+                    }
+                  }
+                }
+              ],
+              "textDocument": {
+                "uri": "file:///C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ffxmk3aj/src/helper.void",
+                "version": null
+              }
+            }
+          ]
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 12,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5001",
+              "message": "Invalid project TOML: Error while parsing table header: expected a bare or quoted key"
+            }
+          ],
+          "discoveryCount": 0,
+          "entry": null,
+          "executionCount": 0,
+          "kind": null,
+          "manifest": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+          "schema": 2,
+          "selectionRevision": "5",
+          "snapshotKey": "",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ffxmk3aj/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 13
+        }
+      },
+      "response": {
+        "id": 13,
+        "jsonrpc": "2.0",
+        "result": null
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 15,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/src/game.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+          "schema": 2,
+          "selectionRevision": "6",
+          "snapshotKey": "6b540895d19cb99c798142db57d07e6d2bb16d4d9b60530eec68f705d68ad6fa",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ffxmk3aj/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 13
+        }
+      },
+      "response": {
+        "id": 16,
+        "jsonrpc": "2.0",
+        "result": {
+          "range": {
+            "end": {
+              "character": 17,
+              "line": 0
+            },
+            "start": {
+              "character": 12,
+              "line": 0
+            }
+          },
+          "uri": "file:///C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ffxmk3aj/src/helper.void"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 20,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5010",
+              "message": "Ambiguous project entry: 2 eligible main() declarations."
+            }
+          ],
+          "discoveryCount": 3,
+          "entry": null,
+          "executionCount": 0,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+          "schema": 2,
+          "selectionRevision": "9",
+          "snapshotKey": "f7ea6b723d20e1c7df6425a4ecb22789ad718b3030a93de813c4b2719c9459ca",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 22,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/src/game.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+          "schema": 2,
+          "selectionRevision": "11",
+          "snapshotKey": "1fcc45ca4f08827149a9a424c8b16ec802d1ea15da124c81df429914efc71322",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 25,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5010",
+              "message": "No eligible main() in application project."
+            }
+          ],
+          "discoveryCount": 1,
+          "entry": null,
+          "executionCount": 0,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+          "schema": 2,
+          "selectionRevision": "14",
+          "snapshotKey": "94f26aece87ca5eef9b10dbccf0029ee7c8d252fb4116ca66086dece5d439ca0",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 27,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+          "schema": 2,
+          "selectionRevision": "17",
+          "snapshotKey": "565c4bcdbbb88b4288649765d64a6fa950ac3bf6689d45dff1b28c3ae040ae1f",
+          "standalone": false,
+          "status": "reselection-required"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 30,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+          "schema": 2,
+          "selectionRevision": "19",
+          "snapshotKey": "853b5d237f7bf4255a7ec60c3f2ff214052ceb7a3336083e997973fd09714244",
+          "standalone": false,
+          "status": "reselection-required"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/reselectProject",
+      "params": {},
+      "response": {
+        "id": 31,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+          "schema": 2,
+          "selectionRevision": "20",
+          "snapshotKey": "853b5d237f7bf4255a7ec60c3f2ff214052ceb7a3336083e997973fd09714244",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": [
+        {
+          "diagnostics": [],
+          "uri": "file:///C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ffxmk3aj/src/helper.void",
+          "voidProjectRevision": "20"
+        },
+        {
+          "diagnostics": [],
+          "uri": "file:///C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ffxmk3aj/src/renamed.void",
+          "version": 1,
+          "voidProjectRevision": "20"
+        },
+        {
+          "diagnostics": [],
+          "uri": "file:///C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ffxmk3aj/void.project.toml",
+          "version": 4,
+          "voidProjectRevision": "20"
+        }
+      ]
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 32,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+          "schema": 2,
+          "selectionRevision": "20",
+          "snapshotKey": "853b5d237f7bf4255a7ec60c3f2ff214052ceb7a3336083e997973fd09714244",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 34,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+          "schema": 2,
+          "selectionRevision": "20",
+          "snapshotKey": "853b5d237f7bf4255a7ec60c3f2ff214052ceb7a3336083e997973fd09714244",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 37,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5009",
+              "message": "Source path crosses nested project boundary '/src/child'."
+            }
+          ],
+          "discoveryCount": 2,
+          "entry": null,
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+          "schema": 2,
+          "selectionRevision": "22",
+          "snapshotKey": "f7b77a4baaf6e971c22bf19612adf0236f9743752089d744b821b1b4ee971389",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 40,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+          "schema": 2,
+          "selectionRevision": "24",
+          "snapshotKey": "da5356d0a1e7e81b7e2293cd4b382dab105d6af85dfd70a6e1790518626108db",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 42,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5009",
+              "message": "Manifest must use exact case without case siblings in '/src/child'."
+            }
+          ],
+          "discoveryCount": 0,
+          "entry": null,
+          "executionCount": 0,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+          "schema": 2,
+          "selectionRevision": "25",
+          "snapshotKey": "767af30ec42651a502dc22f23aa2c547412c92ef8bdcb5f6b30a7a7c7603a970",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 44,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+          "schema": 2,
+          "selectionRevision": "26",
+          "snapshotKey": "da5356d0a1e7e81b7e2293cd4b382dab105d6af85dfd70a6e1790518626108db",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 46,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5009",
+              "message": "Selected project manifest is unavailable."
+            }
+          ],
+          "discoveryCount": 0,
+          "entry": null,
+          "executionCount": 0,
+          "kind": null,
+          "manifest": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+          "schema": 2,
+          "selectionRevision": "28",
+          "snapshotKey": "",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 48,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+          "schema": 2,
+          "selectionRevision": "29",
+          "snapshotKey": "da5356d0a1e7e81b7e2293cd4b382dab105d6af85dfd70a6e1790518626108db",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Release\\voidls-slice3.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+        "",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":2,\"entry\":\"C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/src/game.void\",\"executionCount\":2,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"11d31530438fec0ec91976afab11d8d9984e02bdb8df9ec171e48f378e522073\",\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Release\\voidls-slice3.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj\\src\\child\\launcher.void",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":1,\"entry\":\"C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/src/child/launcher.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/src/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/src/child\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/src/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"f0aa36053a91f51dc2c33d2cfd9f8ddb4c8cd2499eae3bab2e0ff444b8871641\",\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Release\\voidls-slice3.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj\\src\\child\\launcher.void",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active document is outside the pinned project boundary: C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/src/child/launcher.void:1:1: error: Source path crosses nested project boundary '/src/child'.\\n    code: VO\"}],\"discoveryCount\":2,\"entry\":null,\"executionCount\":2,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"b9d5e51a95b7d39ddca108a04db2f0db55b470eab272803e8ca2b0e65cf96b5b\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Release\\voidls-slice3.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj\\src\\game.void",
+        "",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj\\bare.void"
+      ],
+      "status": 0,
+      "stdout": "{\"entry\":\"C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/bare.void\",\"mode\":\"legacy\",\"root\":\"C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj\",\"schema\":2,\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": null,
+          "executionCount": 2,
+          "kind": "library",
+          "manifest": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID S3 protocol \u00e9\ud83d\ude00 ffxmk3aj",
+          "schema": 2,
+          "selectionRevision": "1",
+          "snapshotKey": "fa426d98a3ea212609a5dde3051c2fdd0e89ced4d1dac87c0ef008340f46c8cd",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ffxmk3aj/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 13
+        }
+      },
+      "response": {
+        "id": 3,
+        "jsonrpc": "2.0",
+        "result": {
+          "range": {
+            "end": {
+              "character": 17,
+              "line": 0
+            },
+            "start": {
+              "character": 12,
+              "line": 0
+            }
+          },
+          "uri": "file:///C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ffxmk3aj/src/helper.void"
+        }
+      },
+      "diagnostics": []
+    }
+  ]
+}

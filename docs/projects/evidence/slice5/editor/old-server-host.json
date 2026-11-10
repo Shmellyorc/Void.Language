@@ -1,0 +1,9 @@
+{
+  "mode": "old-server",
+  "editor": "1.141.0",
+  "platform": "linux",
+  "events": [
+    "an older server fails visibly with no standalone creation fallback"
+  ],
+  "status": "PASS"
+}

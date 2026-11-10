@@ -1,0 +1,1084 @@
+{
+  "platform": "win32",
+  "checks_completed": 88,
+  "commands": [
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Source checked successfully\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--no-cache"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "build",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "-o",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\native\\app.exe"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/native/app.exe\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\native\\app.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "build",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "-o",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\native\\app.exe",
+        "--no-opt"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/native/app.exe\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\native\\app.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Source checked successfully\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--no-cache"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "build",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "-o",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\native\\program.exe"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/native/program.exe\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\native\\program.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "build",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "-o",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\native\\program.exe",
+        "--no-opt"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/native/program.exe\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\native\\program.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Source checked successfully\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--no-cache"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "build",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "-o",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\native\\game.exe"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/native/game.exe\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\native\\game.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "build",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "-o",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\native\\game.exe",
+        "--no-opt"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/native/game.exe\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\native\\game.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Source checked successfully\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--no-cache"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "build",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "-o",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\native\\launcher.exe"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/native/launcher.exe\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\native\\launcher.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "build",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "-o",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\native\\launcher.exe",
+        "--no-opt"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/native/launcher.exe\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\native\\launcher.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "build",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "-o",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\graph-program.exe"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/graph-program.exe\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\graph-program.exe"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nC:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:1:1: error: Ambiguous project entry: 2 eligible main() declarations.\r\n    code: VOID5010\r\n\r\n 1 | schema=1\r\n   | ^\r\n    Module: /void.project.toml\r\n    Candidate /src/features/launcher.void at C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/src/features/launcher.void:4:6\r\n\r\n 4 | func main() -> i32:\r\n   |      ^^^^\r\n    Module: /src/features/launcher.void\r\n    Candidate /src/main.void at C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/src/main.void:1:6\r\n\r\n 1 | func main() -> i32:\r\n   |      ^^^^\r\n    Module: /src/main.void\r\n    Hint: Set project.entry/--entry or narrow sources.roots/exclude.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nC:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:1:1: error: Ambiguous project entry: 2 eligible main() declarations.\r\n    code: VOID5010\r\n\r\n 1 | schema=1\r\n   | ^\r\n    Module: /void.project.toml\r\n    Candidate /src/features/launcher.void at C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/src/features/launcher.void:2:6\r\n\r\n 2 | func main() -> i32:\r\n   |      ^^^^\r\n    Module: /src/features/launcher.void\r\n    Candidate /src/main.void at C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/src/main.void:1:6\r\n\r\n 1 | func main() -> i32:\r\n   |      ^^^^\r\n    Module: /src/main.void\r\n    Hint: Set project.entry/--entry or narrow sources.roots/exclude.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--entry",
+        "src/main.void",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--entry",
+        "src/missing.void"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nC:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:1:1: error: Cannot find imported file '/src/missing.void'.\r\n    code: VOID3002\r\n\r\n 1 | schema=1\r\n   | ^^^^^^^^\r\n    Module: /void.project.toml\r\n    Hint: Check this path relative to the importing file or virtual project root.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--entry",
+        "../outside.void"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nC:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:1:1: error: Explicit entry must be a canonical portable manifest-relative .void path.\r\n    code: VOID5006\r\n\r\n 1 | schema=1\r\n   | ^\r\n    Module: /void.project.toml\r\n    Hint: Use an exact relative path without ., .., drive prefixes or reserved components; no fallback is attempted.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--entry",
+        "src/main.void",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\src\\features\\launcher.void"
+      ],
+      "cwd": null,
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --project cannot accompany a positional file or directory selector.\r\nUsage: voidc check <file-or-directory> [--no-opt]\r\nTry 'voidc check --help' for examples.\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\src\\features\\launcher.void",
+        "--entry",
+        "src/main.void"
+      ],
+      "cwd": null,
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --entry requires a manifest-selected project context.\r\nUsage: voidc check <file-or-directory> [--no-opt]\r\nTry 'voidc check --help' for examples.\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nC:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/src/unrelated.void:2:5: error: Type mismatch: expected i32, received bool.\r\n    code: VOID2001\r\n\r\n 2 |     return false\r\n   |     ^^^^^^\r\n    Module: /src/unrelated.void\r\n    Expected: i32\r\n    Received: bool\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nC:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/src/unrelated.void:1:13: error: Expected a lowercase identifier.\r\n    code: VOID1102\r\n\r\n 1 | func broken(:\r\n   |             ^\r\n    Module: /src/unrelated.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nC:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/src/helper.void:1:1: error: Imported modules cannot contain executable top-level statements.\r\n    code: VOID4001\r\n\r\n 1 | print(\"MUST NOT INITIALIZE\")\r\n   | ^\r\n    Module: /src/helper.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 12 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "IMPORTED\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 12 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "IMPORTED\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 12 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "build",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "-o",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\graph-program.exe"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/graph-program.exe\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 12 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\graph-program.exe"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "IMPORTED\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "build",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/build/launcher.exe\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 12 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\build\\launcher.exe"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "IMPORTED\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Source checked successfully\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 12 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--entry",
+        "src/child/child.void"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 12 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nC:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:1:1: error: Source path crosses nested project boundary '/src/child'.\r\n    code: VOID5009\r\n\r\n 1 | schema=1\r\n   | ^\r\n    Module: /void.project.toml\r\n    Hint: Select the child project explicitly; parent imports and entry overrides cannot cross it.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 12 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nC:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:1:1: error: Source path crosses nested project boundary '/src/child'.\r\n    code: VOID5009\r\n\r\n 1 | schema=1\r\n   | ^\r\n    Module: /void.project.toml\r\n    Hint: Select the child project explicitly; parent imports and entry overrides cannot cross it.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--entry",
+        "tools/script.void",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "SCRIPT\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 12 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--entry",
+        "tools/script.void",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "SCRIPT\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 12 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--entry",
+        "tools/legacy.void",
+        "--",
+        "9"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "11\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 12 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--entry",
+        "tools/args.void",
+        "--",
+        "--app",
+        "two words"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "--app\ntwo words\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 12 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "SCRIPT\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 12 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--entry",
+        "tools/legacy.void",
+        "--",
+        "5"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "7\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 12 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 12 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nC:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:1:1: error: Cannot find imported file '/tools/missing.void'.\r\n    code: VOID3002\r\n\r\n 1 | schema=1\r\n   | ^^^^^^^^\r\n    Module: /void.project.toml\r\n    Hint: Check this path relative to the importing file or virtual project root.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nC:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:1:1: error: No eligible main() in application project.\r\n    code: VOID5010\r\n\r\n 1 | schema=1\r\n   | ^\r\n    Module: /void.project.toml\r\n    Hint: Add a valid main() in the admitted source roots or set project.entry/--entry for an explicit script or source.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nC:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:1:1: error: No eligible main() in application project.\r\n    code: VOID5010\r\n\r\n 1 | schema=1\r\n   | ^\r\n    Module: /void.project.toml\r\n    Hint: Add a valid main() in the admitted source roots or set project.entry/--entry for an explicit script or source.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "build",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nC:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:1:1: error: No eligible main() in application project.\r\n    code: VOID5010\r\n\r\n 1 | schema=1\r\n   | ^\r\n    Module: /void.project.toml\r\n    Hint: Add a valid main() in the admitted source roots or set project.entry/--entry for an explicit script or source.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\src\\features\\launcher.void"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Source checked successfully\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Library project checked successfully\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 12 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 12 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nLibrary project run/build/emit is unsupported; use check for source analysis.\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "build",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 12 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nLibrary project run/build/emit is unsupported; use check for source analysis.\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "emit",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "-o",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\library.o"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 12 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nLibrary project run/build/emit is unsupported; use check for source analysis.\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--entry",
+        "src/helper.void"
+      ],
+      "cwd": null,
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --entry cannot select an application entry in a library project.\r\nUsage: voidc check <file-or-directory> [--no-opt]\r\nTry 'voidc check --help' for examples.\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nDebug cache: unavailable\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nDebug cache: unavailable\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--cache"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nC:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:1:1: error: Ambiguous project entry: 2 eligible main() declarations.\r\n    code: VOID5010\r\n\r\n 1 | schema=1\r\n   | ^\r\n    Module: /void.project.toml\r\n    Candidate /src/features/launcher.void at C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/src/features/launcher.void:1:6\r\n\r\n 1 | func main() -> i32:\r\n   |      ^^^^\r\n    Module: /src/features/launcher.void\r\n    Candidate /src/second.void at C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/src/second.void:1:6\r\n\r\n 1 | func main() -> i32:\r\n   |      ^^^^\r\n    Module: /src/second.void\r\n    Hint: Set project.entry/--entry or narrow sources.roots/exclude.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nDebug cache: unavailable\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:12:12: warning: Project profile 'debug' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 12 | debug_info='line'\r\n    |            ^^^^^^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nDebug cache: unavailable\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nDebug cache: unavailable\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\src\\features\\launcher.void",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:1:2: error: Invalid project TOML: Error while parsing table header: expected a bare or quoted key\r\n    code: VOID5001\r\n\r\n 1 | [=roject]\r\n   |  ^\r\n    Module: /void.project.toml\r\n    Hint: Use TOML 1.0 syntax; no configuration code is executed.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:1:1: error: Manifest must use exact case without case siblings in ''.\r\n    code: VOID5009\r\n\r\n 1 | \r\n   | ^\r\n    Module: /void.project.toml\r\n    Hint: Correct the project path or source policy and retry.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:1:1: error: Selected project manifest is unavailable.\r\n    code: VOID5009\r\n\r\n 1 | \r\n   | ^\r\n    Module: /void.project.toml\r\n    Hint: Select a directory containing an exact regular void.project.toml; a deleted manifest cannot fall back to legacy mode.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "No main.void in selected workspace\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\src\\features\\launcher.void",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst\\tools\\legacy.void",
+        "3"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "4\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "4"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "5\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 12 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID project execution \u96ea _sv_atst",
+        "--",
+        "4"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "5\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID project execution \u96ea _sv_atst/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    }
+  ]
+}

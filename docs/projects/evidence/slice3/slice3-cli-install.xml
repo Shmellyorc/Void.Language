@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="1"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="0"
+	timestamp="2026-11-08T15:54:26"
+	>
+	<testcase name="cli_install" classname="cli_install" time="0.96999" status="run">
+		<properties/>
+		<system-out>VOID Language Compiler v0.1.0 (development)
+LLVM 23.1.4
+Target: x86_64-unknown-linux-gnu
+Build identity: 85639b740a4245bcf8bb6a9fe9ea0680503642799fdd767e37de3e620bd631d8
+PASS: installed stdlib check, optimized/Debug run, native build/run, resource hashes and LSP handshake
+PASS: 25 installed stdlib sources, relocated compiler/LSP, missing-module/Runtime controls, native output preservation
+</system-out>
+	</testcase>
+</testsuite>

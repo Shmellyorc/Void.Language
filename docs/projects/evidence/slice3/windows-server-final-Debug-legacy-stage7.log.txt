@@ -1,0 +1,1 @@
+Stage 7: completion/recovery, signatures, hover, bindings, symbols, guarded rename, formatting, refresh, batching, cancellation passed

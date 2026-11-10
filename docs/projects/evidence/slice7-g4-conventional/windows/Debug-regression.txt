@@ -1,0 +1,39 @@
+Test project C:/Users/a/VoidS7-G4Conventional/Debug-attested
+      Start  17: cli_contract
+      Start 345: ffi_g4_conventional
+ 1/17 Test  #17: cli_contract .....................   Passed   20.14 sec
+      Start 338: analysis
+ 2/17 Test #338: analysis .........................   Passed    2.86 sec
+      Start 227: ffi_g3_jit_ir
+ 3/17 Test #227: ffi_g3_jit_ir ....................   Passed    2.47 sec
+      Start 331: reload
+ 4/17 Test #331: reload ...........................   Passed    2.00 sec
+      Start 224: ffi_g2_jit_ir
+ 5/17 Test #224: ffi_g2_jit_ir ....................   Passed    1.58 sec
+      Start 225: ffi_g2_aot_normal
+ 6/17 Test #225: ffi_g2_aot_normal ................   Passed    0.91 sec
+      Start 226: ffi_g2_aot_optimized
+ 7/17 Test #226: ffi_g2_aot_optimized .............   Passed    0.88 sec
+      Start 219: ffi_g1_primitive_jit_ir
+ 8/17 Test #219: ffi_g1_primitive_jit_ir ..........   Passed    1.04 sec
+      Start 223: ffi_g1_primitive_aot_missing
+ 9/17 Test #223: ffi_g1_primitive_aot_missing .....   Passed    0.80 sec
+      Start 228: ffi_g3_aot_normal
+10/17 Test #228: ffi_g3_aot_normal ................   Passed    0.70 sec
+      Start 229: ffi_g3_aot_optimized
+11/17 Test #229: ffi_g3_aot_optimized .............   Passed    0.66 sec
+      Start   2: project_manifest
+12/17 Test   #2: project_manifest .................   Passed    0.39 sec
+      Start 221: ffi_g1_primitive_aot_optimized
+13/17 Test #221: ffi_g1_primitive_aot_optimized ...   Passed    0.44 sec
+      Start 332: gc
+14/17 Test #332: gc ...............................   Passed    0.13 sec
+      Start 222: ffi_g1_primitive_aot_mismatch
+15/17 Test #222: ffi_g1_primitive_aot_mismatch ....   Passed    0.40 sec
+      Start 220: ffi_g1_primitive_aot_normal
+16/17 Test #220: ffi_g1_primitive_aot_normal ......   Passed    0.44 sec
+17/17 Test #345: ffi_g4_conventional ..............   Passed   54.85 sec
+
+100% tests passed out of 17
+
+Total Test time (real) =  54.89 sec

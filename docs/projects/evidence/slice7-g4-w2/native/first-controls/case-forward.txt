@@ -1,0 +1,2 @@
+held file=C:\Users\a\VoidS7-G4W2-replay\forwarder\void_w2_gate.dll id=c60478b6:00090000000bcb9a sha256=18c7676a6a7c338b126e9147a06fae89c05a1dad213098a877479339f0c309b2
+denied before executable load: forwarded export

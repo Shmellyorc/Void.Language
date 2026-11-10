@@ -1,0 +1,194 @@
+{
+  "pinned-child-source": {
+    "argv": [
+      "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-final.exe",
+      "--discover-project",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\parent\\child\\launcher.void",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active document is outside the pinned project boundary: C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/child/launcher.void:1:1: error: Source path crosses nested project boundary '/child'.\\n    code: VOID5009\\n\\n 1 | \"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"b8d5187605aa7b6335d5108d8b622c1712dce86f68c87a128e0baa984518065b\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "pinned-child-manifest": {
+    "argv": [
+      "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-final.exe",
+      "--discover-project",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\parent\\child\\void.project.toml",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":0,\"entry\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/main.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"b8d5187605aa7b6335d5108d8b622c1712dce86f68c87a128e0baa984518065b\",\"standalone\":false,\"status\":\"ready\"}\n",
+    "stderr": ""
+  },
+  "pinned-outside": {
+    "argv": [
+      "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-final.exe",
+      "--discover-project",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\outside.void",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active document is outside the pinned project boundary: <document identity>:1:1: error: Import escapes the project root.\\n    code: VOID3001\\n\\n 1 | \\n   | ^\\n    Hint: External imports require an explicit permission/identity contract and are not enabled in thi\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"b8d5187605aa7b6335d5108d8b622c1712dce86f68c87a128e0baa984518065b\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "invalid-source-identity": {
+    "argv": [
+      "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-final.exe",
+      "--discover-project",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\parent\\notes.txt",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active document is outside the pinned project boundary: <document identity>:1:1: error: Import must name a .void source file.\\n    code: VOID3001\\n\\n 1 | \\n   | ^\\n    Hint: Supply an exact-case filename, not a directory.\\n\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"b8d5187605aa7b6335d5108d8b622c1712dce86f68c87a128e0baa984518065b\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "virtual-source": {
+    "argv": [
+      "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-final.exe",
+      "--discover-project",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\parent\\new\\draft.void",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":0,\"entry\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/main.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"b8d5187605aa7b6335d5108d8b622c1712dce86f68c87a128e0baa984518065b\",\"standalone\":false,\"status\":\"ready\"}\n",
+    "stderr": ""
+  },
+  "selected-manifest": {
+    "argv": [
+      "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-final.exe",
+      "--discover-project",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\parent\\void.project.toml",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":0,\"entry\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/main.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"b8d5187605aa7b6335d5108d8b622c1712dce86f68c87a128e0baa984518065b\",\"standalone\":false,\"status\":\"ready\"}\n",
+    "stderr": ""
+  },
+  "nearest-child": {
+    "argv": [
+      "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-final.exe",
+      "--discover-project",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\parent\\child\\launcher.void",
+      "",
+      ""
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":1,\"entry\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/child/launcher.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/child\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"35e2a5715253c1f9cd61363fd653dcf2057dbd2751250c2a417118000f93e270\",\"standalone\":false,\"status\":\"ready\"}\n",
+    "stderr": ""
+  },
+  "pinned-malformed-child-source": {
+    "argv": [
+      "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-final.exe",
+      "--discover-project",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\parent\\child\\launcher.void",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active document is outside the pinned project boundary: C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/child/launcher.void:1:1: error: Source path crosses nested project boundary '/child'.\\n    code: VOID5009\\n\\n 1 | \"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"b8d5187605aa7b6335d5108d8b622c1712dce86f68c87a128e0baa984518065b\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "pinned-malformed-child-manifest": {
+    "argv": [
+      "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-final.exe",
+      "--discover-project",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\parent\\child\\void.project.toml",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":0,\"entry\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/main.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"b8d5187605aa7b6335d5108d8b622c1712dce86f68c87a128e0baa984518065b\",\"standalone\":false,\"status\":\"ready\"}\n",
+    "stderr": ""
+  },
+  "nearest-malformed-child": {
+    "argv": [
+      "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-final.exe",
+      "--discover-project",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\parent\\child\\launcher.void",
+      "",
+      ""
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5001\",\"message\":\"Invalid project TOML: Error while parsing table header: expected a bare or quoted key\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":0,\"kind\":null,\"manifest\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/child\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "pinned-wrong-case-child-source": {
+    "argv": [
+      "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-final.exe",
+      "--discover-project",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\parent\\child\\launcher.void",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active document is outside the pinned project boundary: C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/child/launcher.void:1:1: error: Manifest must use exact case without case siblings in '/child'.\\n    code: VOID5\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"b8d5187605aa7b6335d5108d8b622c1712dce86f68c87a128e0baa984518065b\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "pinned-wrong-case-child-manifest": {
+    "argv": [
+      "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-final.exe",
+      "--discover-project",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\parent\\child\\void.Project.toml",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active document is outside the pinned project boundary: <document identity>:1:1: error: Import must name a .void source file.\\n    code: VOID3001\\n\\n 1 | \\n   | ^\\n    Hint: Supply an exact-case filename, not a directory.\\n\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"b8d5187605aa7b6335d5108d8b622c1712dce86f68c87a128e0baa984518065b\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "nearest-wrong-case-child": {
+    "argv": [
+      "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-final.exe",
+      "--discover-project",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9\\parent\\child\\launcher.void",
+      "",
+      ""
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Manifest must use exact case without case siblings in ''.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":0,\"kind\":null,\"manifest\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/child\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID preflight review 86ymkhx9/parent/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "bad-invocation": {
+    "argv": [
+      "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-final.exe",
+      "--discover-project",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9"
+    ],
+    "exit": 2,
+    "stdout": "",
+    "stderr": "voidls: Usage: voidls --entry <project entry.void>\n"
+  },
+  "unpinned-invalid-discovery-path": {
+    "argv": [
+      "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-final.exe",
+      "--discover-project",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\VOID preflight review 86ymkhx9",
+      "C:\\Users\\a\\VoidSlice3-Final-Preflight-20261108\\tmp\\outside.void",
+      "",
+      ""
+    ],
+    "exit": 2,
+    "stdout": "",
+    "stderr": "voidls: Active file is outside selected workspace\n"
+  }
+}

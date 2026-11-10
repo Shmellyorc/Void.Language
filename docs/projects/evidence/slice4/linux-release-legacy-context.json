@@ -1,0 +1,82 @@
+[
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "--project",
+      "/tmp/VOID S4 legacy context 8niecq4a/checkout",
+      "--profile",
+      "debug",
+      "--no-cache",
+      "--",
+      "17"
+    ],
+    "exit": 0,
+    "stdout": "19\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "--project",
+      "/tmp/VOID S4 legacy context 8niecq4a/checkout",
+      "--profile",
+      "debug",
+      "-o",
+      "/tmp/VOID S4 legacy context 8niecq4a/installed/debug"
+    ],
+    "exit": 0,
+    "stdout": "Built native executable: /tmp/VOID S4 legacy context 8niecq4a/installed/debug\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "run",
+      "--project",
+      "/tmp/VOID S4 legacy context 8niecq4a/checkout",
+      "--profile",
+      "release",
+      "--no-cache",
+      "--",
+      "17"
+    ],
+    "exit": 0,
+    "stdout": "19\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "--project",
+      "/tmp/VOID S4 legacy context 8niecq4a/checkout",
+      "--profile",
+      "release",
+      "-o",
+      "/tmp/VOID S4 legacy context 8niecq4a/installed/release"
+    ],
+    "exit": 0,
+    "stdout": "Built native executable: /tmp/VOID S4 legacy context 8niecq4a/installed/release\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/tmp/VOID S4 legacy context 8niecq4a/installed/debug",
+      "17"
+    ],
+    "exit": 0,
+    "stdout": "19\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/tmp/VOID S4 legacy context 8niecq4a/installed/release",
+      "17"
+    ],
+    "exit": 0,
+    "stdout": "19\n",
+    "stderr": ""
+  }
+]

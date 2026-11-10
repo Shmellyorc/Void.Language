@@ -1,0 +1,13 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start 280: ffi_g3_jit_ir
+1/1 Test #280: ffi_g3_jit_ir ....................Subprocess aborted***Exception:   0.02 sec
+free(): double free detected in tcache 2
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   0.03 sec
+
+The following tests FAILED:
+	280 - ffi_g3_jit_ir (Subprocess aborted)
+Errors while running CTest

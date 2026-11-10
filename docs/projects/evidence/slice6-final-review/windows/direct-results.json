@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "profiles": [
+    {
+      "profile": "Release",
+      "returncode": 0,
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\void_numeric_enum_ir.exe"
+      ],
+      "direct_ir_binary_sha256": "c552d04b88a75d13f5177e8973237d3f00f9b56203cad55a3d9ffa975fca89b6",
+      "other_test_binaries": {
+        "void_fixed_arrays_tests.exe": "f6ab2956d47c1963a0211031e30f68e7c52638f724e6a236d96a037cea66078d",
+        "void_async_tests.exe": "f13e415ec8a077f7f1e4a49698582c9dc3272718d7b975d908566fe2ce98ccb9",
+        "void_stage10_fields.exe": "71f5a3a8b4c8d9144bc7108cbc9b30cd3b2fac8f1148f8e31047e04c17c6f17e"
+      }
+    },
+    {
+      "profile": "Debug",
+      "returncode": 0,
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Debug\\void_numeric_enum_ir.exe"
+      ],
+      "direct_ir_binary_sha256": "be7bec0e268f60c2239484457544c8a9a4f2b726bc20a9dbea1d375363f813c9",
+      "other_test_binaries": {
+        "void_fixed_arrays_tests.exe": "d01362b544200ed68f818e72fdc3283df1b6b55c10e873578fa1f97c18f511cd",
+        "void_async_tests.exe": "81849a5a1647ccbe29e9565cd242fb0bd062b5f11428eadef7d47ac3cc497caf",
+        "void_stage10_fields.exe": "03163a3bd7f18656f1a8822098d54c925077c517634fc7516931a31b9b392d12"
+      }
+    }
+  ]
+}

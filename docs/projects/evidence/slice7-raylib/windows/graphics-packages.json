@@ -1,0 +1,52 @@
+{
+  "Release": {
+    "normal": {
+      "package": "C:\\Users\\a\\VoidS7-Raylib-Graphics\\Release-psapi\\relocated normal \u96ea",
+      "identities": {
+        "gallery.exe": "75aa63e07cf215f614dbff88cee68afb6eaea6004cb4fd2702b13f7ffe7da688",
+        "native/RAYLIB-LICENSE.txt": "882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799",
+        "native/raylib.dll": "3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824",
+        "native/void_raylib.dll": "696897ddf29baed5021eea1368edef7a55c584ee635b1dac004b068c32870398"
+      }
+    },
+    "optimized": {
+      "package": "C:\\Users\\a\\VoidS7-Raylib-Graphics\\Release-psapi\\relocated optimized \u96ea",
+      "identities": {
+        "gallery.exe": "5e6538c1ee0835b010329223db742cd46cfd4ce6ec9b3daa060b14d034756368",
+        "native/RAYLIB-LICENSE.txt": "882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799",
+        "native/raylib.dll": "3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824",
+        "native/void_raylib.dll": "696897ddf29baed5021eea1368edef7a55c584ee635b1dac004b068c32870398"
+      }
+    },
+    "temporary_directories": "No .bind-* directories. Private link temp empty."
+  },
+  "Debug": {
+    "normal": {
+      "package": "C:\\Users\\a\\VoidS7-Raylib-Graphics\\Debug-psapi\\relocated normal \u96ea",
+      "identities": {
+        "gallery.exe": "8409034269e34160b6bfb09a29f50665367c6a5cce28a8cbe3ece2bae25c51d6",
+        "native/RAYLIB-LICENSE.txt": "882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799",
+        "native/raylib.dll": "3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824",
+        "native/void_raylib.dll": "685c546ca416a170afec1796cfa33b3c0213f6c110922f6c3e4320af21044b5d"
+      }
+    },
+    "optimized": {
+      "package": "C:\\Users\\a\\VoidS7-Raylib-Graphics\\Debug-psapi\\relocated optimized \u96ea",
+      "identities": {
+        "gallery.exe": "f4b4ec2d4ef4c2617093abe9d79225a8bd26521dae9c8752241eb63c36d9aee8",
+        "native/RAYLIB-LICENSE.txt": "882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799",
+        "native/raylib.dll": "3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824",
+        "native/void_raylib.dll": "685c546ca416a170afec1796cfa33b3c0213f6c110922f6c3e4320af21044b5d"
+      }
+    },
+    "temporary_directories": "No .bind-* directories. Private link temp empty."
+  },
+  "gallery_source": {
+    "void.project.toml": "43631249e85635ab34403aee52cfec1408bfc4bef48d5ff91afcae591dce7336",
+    "prepare.py": "78a464efb28956f66387b738498f87ecacfd3c02fa07c70adc35b4c44e48c8e5",
+    "native/raylib.descriptor.in": "0de82d9345462e2e0c61148aab143d719afbee8fa2af81469c530b5baf0ff7c4",
+    "native/raylib_provider.h": "47cbb15bae3fa0175ee828f6f4e4b28b5b60eb15303b2f2a13cb09e4b6043dd6",
+    "native/raylib_provider.c": "69682dab3d00ca65ea1c9961b72141ec15db21532b434b9f6f58a79642f09752",
+    "src/gallery.void": "4945c53af9386223a884499d6d3b5343dff40f68ead715af05df803cd715b2ae"
+  }
+}

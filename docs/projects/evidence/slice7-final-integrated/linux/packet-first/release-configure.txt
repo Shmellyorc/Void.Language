@@ -1,0 +1,44 @@
+ASAN_OPTIONS= UBSAN_OPTIONS=
+cmake -S /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src -B /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release -G Ninja -DCMAKE_MAKE_PROGRAM=/home/shmellyorc/Documents/Void.Language/.toolchains/ninja-1.13.2/ninja -DBUILD_TESTING=ON -DCMAKE_AR:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-ar -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_CXX_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++ -DCMAKE_C_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -DCMAKE_LINKER:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld -DCMAKE_NM:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-nm -DCMAKE_RANLIB:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-ranlib -DLLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm -DVOID_CLANG:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -DVOID_DWARFDUMP:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-dwarfdump -DVOID_HOST_DEPS_ROOT:PATH=/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Release -DVOID_HTTP_DEPS_ROOT:PATH=/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release -DVOID_LINKER:FILEPATH=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld -DVOID_LLVM_RESEARCH:BOOL=OFF -DVOID_SANITIZERS:BOOL=OFF 
+-- The C compiler identification is Clang 23.1.4
+-- The CXX compiler identification is Clang 23.1.4
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found ZLIB: /usr/lib/x86_64-linux-gnu/libz.so (found version "1.3.2")
+-- Found zstd: /usr/lib/x86_64-linux-gnu/libzstd.so
+-- Found LibXml2: /usr/lib/x86_64-linux-gnu/libxml2.so (found version "2.15.4")
+-- VOID LLVM: 23.1.4 at /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- Found Python3: /usr/bin/python3 (found suitable version "3.14.8", minimum required is "3.12") found components: Interpreter
+CMake Error at cmake/CurlProvider.cmake:13 (message):
+  Vendored curl verification failed: Traceback (most recent call last):
+
+    File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/cmake/../tools/verify_curl_source.py", line 32, in <module>
+      if hashlib.sha256(patch.read_bytes()).hexdigest() != review["sha256"]:
+                        ~~~~~~~~~~~~~~~~^^
+    File "/usr/lib/python3.14/pathlib/__init__.py", line 778, in read_bytes
+      with self.open(mode='rb', buffering=0) as f:
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+      return io.open(self, mode, buffering, encoding, errors, newline)
+             ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  FileNotFoundError: [Errno 2] No such file or directory:
+  '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/docs/net/http/evidence/curl-8.23.0-cookie-oom-candidate.patch'
+
+Call Stack (most recent call first):
+  CMakeLists.txt:114 (void_add_curl_provider)
+
+
+-- Configuring incomplete, errors occurred!

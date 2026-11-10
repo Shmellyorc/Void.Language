@@ -1,0 +1,11 @@
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_zone_objects
+[  0%] Built target void_core
+[ 83%] Built target libcurl_static
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_g5_reload.dir/tests/ffi/callback_reload.cpp.o
+[100%] Linking CXX executable void_g5_reload
+[100%] Built target void_g5_reload

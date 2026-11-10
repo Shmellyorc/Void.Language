@@ -1,0 +1,8 @@
+recapture expected VOID5009; got:
+/tmp/VOID project 雪 111079903384409/void.project.toml:1:1: error: Project changed during discovery; retry.
+    code: VOID5011
+
+ 1 | schema=1
+   | ^
+    Hint: Retry after filesystem changes finish; no partial selection or cached entry was accepted.
+

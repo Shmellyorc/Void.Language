@@ -1,0 +1,578 @@
+[
+  {
+    "method": "textDocument/definition",
+    "params": {
+      "textDocument": {
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/entry.void"
+      },
+      "position": {
+        "line": 5,
+        "character": 29
+      }
+    },
+    "response": {
+      "id": 2,
+      "jsonrpc": "2.0",
+      "result": {
+        "range": {
+          "end": {
+            "character": 9,
+            "line": 3
+          },
+          "start": {
+            "character": 4,
+            "line": 3
+          }
+        },
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/modes.void"
+      }
+    },
+    "diagnostics": []
+  },
+  {
+    "method": "textDocument/hover",
+    "params": {
+      "textDocument": {
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/entry.void"
+      },
+      "position": {
+        "line": 5,
+        "character": 29
+      }
+    },
+    "response": {
+      "id": 3,
+      "jsonrpc": "2.0",
+      "result": {
+        "contents": {
+          "kind": "plaintext",
+          "value": "/modes.void::mode.ready = 7 (i8)\n\nValue used when ready."
+        },
+        "range": {
+          "end": {
+            "character": 33,
+            "line": 5
+          },
+          "start": {
+            "character": 28,
+            "line": 5
+          }
+        }
+      }
+    },
+    "diagnostics": []
+  },
+  {
+    "method": "textDocument/references",
+    "params": {
+      "textDocument": {
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/entry.void"
+      },
+      "position": {
+        "line": 5,
+        "character": 29
+      },
+      "context": {
+        "includeDeclaration": true
+      }
+    },
+    "response": {
+      "id": 4,
+      "jsonrpc": "2.0",
+      "result": [
+        {
+          "range": {
+            "end": {
+              "character": 9,
+              "line": 3
+            },
+            "start": {
+              "character": 4,
+              "line": 3
+            }
+          },
+          "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/modes.void"
+        },
+        {
+          "range": {
+            "end": {
+              "character": 33,
+              "line": 5
+            },
+            "start": {
+              "character": 28,
+              "line": 5
+            }
+          },
+          "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/entry.void"
+        }
+      ]
+    },
+    "diagnostics": []
+  },
+  {
+    "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/modes.void",
+    "version": 1,
+    "text": "# Snow \ud83c\udfae\npublic enum mode(i8):\n    ## Value used when ready.\n    ready = 7\n    gone = -128\n",
+    "diagnostics": [
+      {
+        "diagnostics": [],
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/entry.void"
+      },
+      {
+        "diagnostics": [],
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/modes.void",
+        "version": 1
+      }
+    ]
+  },
+  {
+    "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/modes.void",
+    "version": 2,
+    "text": "# Snow \ud83c\udfae\npublic enum mode(i8):\n    ## Value used when ready.\n    ready = 7\n    gone = 7\n",
+    "diagnostics": [
+      {
+        "diagnostics": [
+          {
+            "code": "VOID1103",
+            "message": "Unsupported type 'm.mode'.\nHint: Use a numeric type, bool, string or a visible value/managed struct.",
+            "range": {
+              "end": {
+                "character": 21,
+                "line": 4
+              },
+              "start": {
+                "character": 15,
+                "line": 4
+              }
+            },
+            "severity": 1,
+            "source": "VOID"
+          },
+          {
+            "code": "VOID1103",
+            "message": "Unknown struct type in pattern.",
+            "range": {
+              "end": {
+                "character": 29,
+                "line": 4
+              },
+              "start": {
+                "character": 25,
+                "line": 4
+              }
+            },
+            "severity": 1,
+            "source": "VOID"
+          },
+          {
+            "code": "VOID2001",
+            "message": "Use explicit list/dictionary patterns for collection contents.",
+            "range": {
+              "end": {
+                "character": 22,
+                "line": 5
+              },
+              "start": {
+                "character": 21,
+                "line": 5
+              }
+            },
+            "severity": 1,
+            "source": "VOID"
+          }
+        ],
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/entry.void"
+      },
+      {
+        "diagnostics": [
+          {
+            "code": "VOID2005",
+            "message": "Duplicate numeric enum discriminant.",
+            "range": {
+              "end": {
+                "character": 12,
+                "line": 4
+              },
+              "start": {
+                "character": 11,
+                "line": 4
+              }
+            },
+            "relatedInformation": [
+              {
+                "location": {
+                  "range": {
+                    "end": {
+                      "character": 13,
+                      "line": 3
+                    },
+                    "start": {
+                      "character": 12,
+                      "line": 3
+                    }
+                  },
+                  "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/modes.void"
+                },
+                "message": "Previously declared value."
+              }
+            ],
+            "severity": 1,
+            "source": "VOID"
+          }
+        ],
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/modes.void",
+        "version": 2
+      }
+    ]
+  },
+  {
+    "method": "textDocument/definition",
+    "params": {
+      "textDocument": {
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/entry.void"
+      },
+      "position": {
+        "line": 5,
+        "character": 29
+      }
+    },
+    "response": {
+      "id": 7,
+      "jsonrpc": "2.0",
+      "result": null
+    },
+    "diagnostics": []
+  },
+  {
+    "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/modes.void",
+    "version": 3,
+    "text": "# Snow \ud83c\udfae\npublic enum mode(i8):\n    ## Value used when ready.\n    ready = 7\n    gone = -128\n",
+    "diagnostics": [
+      {
+        "diagnostics": [],
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/entry.void"
+      },
+      {
+        "diagnostics": [],
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/modes.void",
+        "version": 3
+      }
+    ]
+  },
+  {
+    "method": "textDocument/definition",
+    "params": {
+      "textDocument": {
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/entry.void"
+      },
+      "position": {
+        "line": 5,
+        "character": 29
+      }
+    },
+    "response": {
+      "id": 9,
+      "jsonrpc": "2.0",
+      "result": {
+        "range": {
+          "end": {
+            "character": 9,
+            "line": 3
+          },
+          "start": {
+            "character": 4,
+            "line": 3
+          }
+        },
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/modes.void"
+      }
+    },
+    "diagnostics": []
+  },
+  {
+    "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/entry.void",
+    "version": 1,
+    "text": "use \"./modes.void\" as m\n\nfunc main() -> i32:\n    var raw: i32 = 7\n    if \"\ud83c\udfae\" as? m.mode is Some(var picked):\n        if picked is m.mode.ready:\n            return 7\n    return 1\n",
+    "diagnostics": [
+      {
+        "diagnostics": [
+          {
+            "code": "VOID2015",
+            "message": "as? requires an integer operand and an integer or numeric enum destination.",
+            "range": {
+              "end": {
+                "character": 15,
+                "line": 4
+              },
+              "start": {
+                "character": 12,
+                "line": 4
+              }
+            },
+            "severity": 1,
+            "source": "VOID"
+          },
+          {
+            "code": "VOID1103",
+            "message": "Unknown struct type in pattern.",
+            "range": {
+              "end": {
+                "character": 30,
+                "line": 4
+              },
+              "start": {
+                "character": 26,
+                "line": 4
+              }
+            },
+            "severity": 1,
+            "source": "VOID"
+          },
+          {
+            "code": "VOID2002",
+            "message": "Unknown identifier 'picked'.\nHint: Declare it with var before use.",
+            "range": {
+              "end": {
+                "character": 17,
+                "line": 5
+              },
+              "start": {
+                "character": 11,
+                "line": 5
+              }
+            },
+            "severity": 1,
+            "source": "VOID"
+          },
+          {
+            "code": "VOID2001",
+            "message": "Use explicit list/dictionary patterns for collection contents.",
+            "range": {
+              "end": {
+                "character": 22,
+                "line": 5
+              },
+              "start": {
+                "character": 21,
+                "line": 5
+              }
+            },
+            "severity": 1,
+            "source": "VOID"
+          }
+        ],
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/entry.void",
+        "version": 1
+      },
+      {
+        "diagnostics": [],
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/modes.void",
+        "version": 3
+      }
+    ]
+  },
+  {
+    "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/entry.void",
+    "version": 2,
+    "text": "use \"./modes.void\" as m\n\nfunc main() -> i32:\n    var raw: i32 = 7\n    if raw as? m.mode is Some(var picked):\n        if picked is m.mode.:\n            return 7\n    return 1\n",
+    "diagnostics": [
+      {
+        "diagnostics": [
+          {
+            "code": "VOID1102",
+            "message": "Expected a lowercase identifier.",
+            "range": {
+              "end": {
+                "character": 29,
+                "line": 5
+              },
+              "start": {
+                "character": 28,
+                "line": 5
+              }
+            },
+            "severity": 1,
+            "source": "VOID"
+          },
+          {
+            "code": "VOID1101",
+            "message": "Expected an expression, found '<indent>'.",
+            "range": {
+              "end": {
+                "character": 12,
+                "line": 6
+              },
+              "start": {
+                "character": 12,
+                "line": 6
+              }
+            },
+            "severity": 1,
+            "source": "VOID"
+          }
+        ],
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/entry.void",
+        "version": 2
+      },
+      {
+        "diagnostics": [],
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/modes.void",
+        "version": 3
+      }
+    ]
+  },
+  {
+    "method": "textDocument/completion",
+    "params": {
+      "textDocument": {
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/entry.void"
+      },
+      "position": {
+        "line": 5,
+        "character": 28
+      }
+    },
+    "response": {
+      "id": 12,
+      "jsonrpc": "2.0",
+      "result": [
+        {
+          "detail": "/modes.void::mode = 7",
+          "documentation": "Value used when ready.",
+          "kind": 20,
+          "label": "ready",
+          "textEdit": {
+            "newText": "ready",
+            "range": {
+              "end": {
+                "character": 28,
+                "line": 5
+              },
+              "start": {
+                "character": 28,
+                "line": 5
+              }
+            }
+          }
+        },
+        {
+          "detail": "/modes.void::mode = -128",
+          "documentation": "",
+          "kind": 20,
+          "label": "gone",
+          "textEdit": {
+            "newText": "gone",
+            "range": {
+              "end": {
+                "character": 28,
+                "line": 5
+              },
+              "start": {
+                "character": 28,
+                "line": 5
+              }
+            }
+          }
+        }
+      ]
+    },
+    "diagnostics": []
+  },
+  {
+    "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/entry.void",
+    "version": 3,
+    "text": "use \"./modes.void\" as m\n\nfunc main() -> i32:\n    var raw: i32 = 7\n    if raw   as?    m.mode is Some(var picked):\n        if picked is m.mode.ready:\n            return 7\n    return 1\n",
+    "diagnostics": [
+      {
+        "diagnostics": [],
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/entry.void",
+        "version": 3
+      },
+      {
+        "diagnostics": [],
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/modes.void",
+        "version": 3
+      }
+    ]
+  },
+  {
+    "method": "textDocument/formatting",
+    "params": {
+      "textDocument": {
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/entry.void"
+      },
+      "options": {
+        "tabSize": 4,
+        "insertSpaces": true
+      }
+    },
+    "response": {
+      "id": 14,
+      "jsonrpc": "2.0",
+      "result": [
+        {
+          "newText": "use \"./modes.void\" as m\n\nfunc main() -> i32:\n    var raw: i32 = 7\n    if raw as? m.mode is Some(var picked):\n        if picked is m.mode.ready:\n            return 7\n    return 1\n",
+          "range": {
+            "end": {
+              "character": 0,
+              "line": 8
+            },
+            "start": {
+              "character": 0,
+              "line": 0
+            }
+          }
+        }
+      ]
+    },
+    "diagnostics": []
+  },
+  {
+    "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/entry.void",
+    "version": 4,
+    "text": "use \"./modes.void\" as m\n\nfunc main() -> i32:\n    var raw: i32 = 7\n    if raw as? m.mode is Some(var picked):\n        if picked is m.mode.ready:\n            return 7\n    return 1\n",
+    "diagnostics": [
+      {
+        "diagnostics": [],
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/entry.void",
+        "version": 4
+      },
+      {
+        "diagnostics": [],
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/modes.void",
+        "version": 3
+      }
+    ]
+  },
+  {
+    "method": "textDocument/definition",
+    "params": {
+      "textDocument": {
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/entry.void"
+      },
+      "position": {
+        "line": 5,
+        "character": 29
+      }
+    },
+    "response": {
+      "id": 16,
+      "jsonrpc": "2.0",
+      "result": {
+        "range": {
+          "end": {
+            "character": 9,
+            "line": 3
+          },
+          "start": {
+            "character": 4,
+            "line": 3
+          }
+        },
+        "uri": "file:///tmp/VOID%20S6%20LSP%2093xxlz7r/modes.void"
+      }
+    },
+    "diagnostics": []
+  }
+]

@@ -1,0 +1,5 @@
+held file=C:\Users\a\VoidS7-G4W2-replay\approved\void_w2_gate.dll id=c60478b6:00090000000bcb84 sha256=d2777f220e42ad4bf4590cd23c4507d3054d8f55e38e88af31fb1e157dc2039e
+embedded manifest=1 active redirect=0 loaded basename=0
+initial namespace observation clear
+embedded manifest=1 active redirect=0 loaded basename=1
+denied before executable load: loaded basename

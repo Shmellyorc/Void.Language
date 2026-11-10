@@ -1,0 +1,128 @@
+{
+  "status": "PASS",
+  "profile": "Debug",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "build": 19045,
+  "free_bytes_before": 15122694144,
+  "commands": [
+    {
+      "label": "scratch-acl",
+      "argv": [
+        "icacls.exe",
+        "C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp",
+        "/grant:r",
+        "desktop-n4vh0f7\\a:(OI)(CI)F",
+        "/inheritance:r"
+      ],
+      "returncode": 0,
+      "seconds": 0.017167699996207375
+    },
+    {
+      "label": "scratch-acl-verified",
+      "argv": [
+        "icacls.exe",
+        "C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp"
+      ],
+      "returncode": 0,
+      "seconds": 0.017386900006385986
+    },
+    {
+      "label": "configure",
+      "argv": [
+        "C:\\gcc\\bin\\cmake.exe",
+        "-S",
+        "C:\\Users\\a\\VoidCI42377496702-Native",
+        "-B",
+        "C:\\Users\\a\\VoidS7-G5-Compiler\\Debug",
+        "-G",
+        "Ninja",
+        "-DCMAKE_AR=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin/llvm-lib.exe",
+        "-DCMAKE_CXX_COMPILER=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin/clang-cl.exe",
+        "-DCMAKE_C_COMPILER=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin/clang-cl.exe",
+        "-DCMAKE_LINKER=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin/lld-link.exe",
+        "-DCMAKE_MAKE_PROGRAM=C:/gcc/bin/ninja.exe",
+        "-DCMAKE_MT=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin/llvm-mt.exe",
+        "-DCMAKE_RC_COMPILER=C:/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0/x64/rc.exe",
+        "-DLLVM_DIR=C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\lib\\cmake\\llvm",
+        "-DZLIB_INCLUDE_DIR=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4-deps/include",
+        "-DZLIB_LIBRARY_RELEASE=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4-deps/lib/zlibstatic.lib",
+        "-Dzstd_DIR=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4-deps/lib/cmake/zstd",
+        "-DLibXml2_DIR=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4-deps/lib/cmake/libxml2",
+        "-DVOID_HOST_DEPS_ROOT=C:/Users/a/VoidCI42377496702-Native/.toolchains/host/prefix/windows-x86_64/Debug",
+        "-DVOID_HTTP_DEPS_ROOT=C:/Users/a/VoidCI42377496702-Native/cmake/../.toolchains/http/prefix/windows-schannel-x86_64/Debug",
+        "-DVOID_CLANG=C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\clang.exe",
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DBUILD_TESTING=ON",
+        "-DVOID_SANITIZERS=OFF",
+        "-DVOID_LLVM_RESEARCH=OFF",
+        "-DPython3_EXECUTABLE=C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe"
+      ],
+      "returncode": 0,
+      "seconds": 21.288297500002955
+    },
+    {
+      "label": "build",
+      "argv": [
+        "C:\\gcc\\bin\\cmake.exe",
+        "--build",
+        "C:\\Users\\a\\VoidS7-G5-Compiler\\Debug",
+        "--parallel",
+        "2",
+        "--target",
+        "voidc",
+        "void_g5_reload",
+        "void_runtime_callbacks",
+        "void_tests",
+        "void_g1_tests",
+        "void_g1_aot_normal",
+        "void_g1_aot_optimized",
+        "void_g1_aot_mismatch",
+        "void_g2_tests",
+        "void_g2_aot_normal",
+        "void_g2_aot_optimized",
+        "void_g3_tests",
+        "void_g3_aot_normal",
+        "void_g3_aot_optimized",
+        "void_project_manifest"
+      ],
+      "returncode": 0,
+      "seconds": 20.600086999998894
+    },
+    {
+      "label": "regression",
+      "argv": [
+        "C:\\gcc\\bin\\ctest.exe",
+        "--test-dir",
+        "C:\\Users\\a\\VoidS7-G5-Compiler\\Debug",
+        "--output-on-failure",
+        "-j",
+        "1",
+        "-R",
+        "^(ffi_g[12345]_.*|runtime_callbacks|gc|reload|analysis|project_manifest|project_cli|cli_contract)$",
+        "--output-junit",
+        "\\\\vboxsvr\\VM\\slice7-g5-release-refusal\\Debug-regression.xml"
+      ],
+      "returncode": 8,
+      "seconds": 116.6198504999993
+    },
+    {
+      "label": "regression",
+      "argv": [
+        "C:\\gcc\\bin\\ctest.exe",
+        "--test-dir",
+        "C:\\Users\\a\\VoidS7-G5-Compiler\\Debug",
+        "--output-on-failure",
+        "-j",
+        "1",
+        "-R",
+        "^(ffi_g[12345]_.*|runtime_callbacks|gc|reload|analysis|project_manifest|project_cli|cli_contract)$",
+        "--output-junit",
+        "\\\\vboxsvr\\VM\\slice7-g5-release-refusal\\Debug-regression.xml"
+      ],
+      "returncode": 0,
+      "seconds": 114.02977019999526
+    }
+  ],
+  "stage": "regression",
+  "free_bytes_after": 15051497472
+}

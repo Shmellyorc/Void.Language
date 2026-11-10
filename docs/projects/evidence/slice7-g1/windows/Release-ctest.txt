@@ -1,0 +1,87 @@
+Test project C:/Users/a/VoidS7-G1-Release
+      Start   1: project_manifest_header
+      Start   2: project_manifest
+ 1/41 Test   #1: project_manifest_header ............   Passed    0.16 sec
+      Start   5: project_manifest_legacy
+ 2/41 Test   #2: project_manifest ...................   Passed    0.12 sec
+      Start   6: project_manifest_provenance
+ 3/41 Test   #6: project_manifest_provenance ........   Passed    0.17 sec
+      Start   7: project_selection
+ 4/41 Test   #5: project_manifest_legacy ............   Passed    3.24 sec
+      Start   8: project_sessions
+ 5/41 Test   #8: project_sessions ...................   Passed    0.64 sec
+      Start   9: project_creation
+ 6/41 Test   #9: project_creation ...................   Passed    0.20 sec
+      Start  10: project_creation_process
+ 7/41 Test  #10: project_creation_process ...........   Passed    8.72 sec
+      Start  11: project_application
+ 8/41 Test   #7: project_selection ..................   Passed   27.84 sec
+      Start  12: project_application_process
+ 9/41 Test  #11: project_application ................   Passed   20.90 sec
+      Start  13: project_discovery_cli
+10/41 Test  #13: project_discovery_cli ..............   Passed   12.89 sec
+      Start  14: project_profiles
+11/41 Test  #14: project_profiles ...................   Passed    3.77 sec
+      Start  15: project_protocol
+12/41 Test  #15: project_protocol ...................   Passed    2.34 sec
+      Start  16: project_nested_cli
+13/41 Test  #12: project_application_process ........   Passed   26.04 sec
+      Start  55: stage10_fields
+14/41 Test  #16: project_nested_cli .................   Passed    1.49 sec
+      Start  72: fixed_arrays_source
+15/41 Test  #55: stage10_fields .....................   Passed    0.42 sec
+      Start 219: ffi_g1_primitive_jit_ir
+16/41 Test #219: ffi_g1_primitive_jit_ir ............   Passed    0.71 sec
+      Start 220: ffi_g1_primitive_aot_normal
+17/41 Test #220: ffi_g1_primitive_aot_normal ........   Passed    0.32 sec
+      Start 221: ffi_g1_primitive_aot_optimized
+18/41 Test #221: ffi_g1_primitive_aot_optimized .....   Passed    0.22 sec
+      Start 222: ffi_g1_primitive_aot_mismatch
+19/41 Test #222: ffi_g1_primitive_aot_mismatch ......   Passed    0.21 sec
+      Start 223: ffi_g1_primitive_aot_missing
+20/41 Test  #72: fixed_arrays_source ................   Passed    2.57 sec
+      Start 224: native_source
+21/41 Test #223: ffi_g1_primitive_aot_missing .......   Passed    0.88 sec
+      Start 225: stage6_integrated
+22/41 Test #224: native_source ......................   Passed    3.99 sec
+      Start 226: stage6_cache_processes
+23/41 Test #225: stage6_integrated ..................   Passed    6.41 sec
+      Start 227: native_aot_main_normal
+24/41 Test #227: native_aot_main_normal .............   Passed    0.30 sec
+      Start 228: native_aot_main_optimized
+25/41 Test #228: native_aot_main_optimized ..........   Passed    0.27 sec
+      Start 229: native_aot_terminated_nul_normal
+26/41 Test #229: native_aot_terminated_nul_normal ...   Passed    0.26 sec
+      Start 232: native_aot_closed_optimized
+27/41 Test #226: stage6_cache_processes .............   Passed    3.39 sec
+      Start 233: native_aot_duplicate_normal
+28/41 Test #232: native_aot_closed_optimized ........   Passed    0.26 sec
+      Start 275: async_ir
+29/41 Test #233: native_aot_duplicate_normal ........   Passed    0.31 sec
+      Start 325: reload
+30/41 Test #275: async_ir ...........................   Passed    0.18 sec
+      Start 326: gc
+31/41 Test #326: gc .................................   Passed    0.07 sec
+      Start 330: sessions
+32/41 Test #330: sessions ...........................   Passed    0.76 sec
+      Start 332: analysis
+33/41 Test #325: reload .............................   Passed    1.07 sec
+      Start 333: numeric
+34/41 Test #332: analysis ...........................   Passed    3.90 sec
+      Start 334: numeric_enum_ir
+35/41 Test #334: numeric_enum_ir ....................   Passed    0.41 sec
+      Start 335: numeric_enum_process
+36/41 Test #333: numeric ............................   Passed    4.29 sec
+      Start 336: numeric_enum_lsp
+37/41 Test #336: numeric_enum_lsp ...................   Passed    0.82 sec
+      Start 337: frontend
+38/41 Test #337: frontend ...........................   Passed   10.82 sec
+      Start 338: modules
+39/41 Test #338: modules ............................   Passed    3.49 sec
+      Start 373: numeric_cli
+40/41 Test #335: numeric_enum_process ...............   Passed   16.82 sec
+41/41 Test #373: numeric_cli ........................   Passed   62.21 sec
+
+100% tests passed out of 41
+
+Total Test time (real) = 147.74 sec

@@ -1,0 +1,175 @@
+
+> void-language@0.1.0 build
+> npm run typecheck && npm run compile
+
+
+> void-language@0.1.0 typecheck
+> tsc --noEmit
+
+
+> void-language@0.1.0 compile
+> tsc && node build.cjs
+
+[90m[main 2026-11-09T02:09:00.470Z][0m [node-compile-cache] main: packaged cache inactive (status: disabled, configured: /home/shmellyorc/Documents/Void.Language/editors/vscode/.vscode-test/vscode-linux-x64-1.141.0/resources/app/node-compile-cache/main, active: none)
+[90m[main 2026-11-09T02:09:00.568Z][0m StorageMainService: creating application shared storage
+[90m[main 2026-11-09T02:09:00.654Z][0m [shared storage] Creating shared storage database at ':memory:' (wasCreated: true)
+[90m[main 2026-11-09T02:09:00.655Z][0m [shared storage] Initializing fallback application storage (path: in-memory)
+[90m[main 2026-11-09T02:09:00.707Z][0m [shared storage] Fallback application storage initialized with 3 items
+[90m[main 2026-11-09T02:09:00.708Z][0m update#setState disabled
+[90m[main 2026-11-09T02:09:00.709Z][0m update#ctor - updates are disabled by the environment
+[RemoteAgentHost] Reconciling: desired=[], current=[]
+Started local extension host with pid 708344.
+Started initializing default profile extensions in extensions installation folder. file:///tmp/VOID%20S6%20editor%20R2Zq9E/extensions
+Completed initializing default profile extensions in extensions installation folder. file:///tmp/VOID%20S6%20editor%20R2Zq9E/extensions
+[AccountPolicyGate] apply: state=inactive, reason=undefined, isRestricted=false
+Loading development extension at /home/shmellyorc/Documents/Void.Language/editors/vscode
+Extension 'github.copilot-chat' appears in product.json but enables LESS API proposals than the extension wants.
+package.json (LOSES): agentSessionsWorkspace
+agentsWindowConfiguration
+chatDebug
+chatHooks
+envIsConnectionMetered
+extensionsAny
+newSymbolNamesProvider
+interactive
+codeActionAI
+activeComment
+commentReveal
+contribCommentThreadAdditionalMenu
+contribCommentsViewThreadMenus
+contribChatEditorInlineGutterMenu
+documentFiltersExclusive
+embeddings
+findTextInFiles
+findTextInFiles2
+languageModelToolSupportsModel
+findFiles2
+textSearchProvider
+terminalDataWriteEvent
+terminalExecuteCommandEvent
+terminalSelection
+terminalQuickFixProvider
+mappedEditsProvider
+aiRelatedInformation
+aiSettingsSearch
+chatParticipantAdditions
+defaultChatParticipant
+contribSourceControlInputBoxMenu
+authLearnMore
+authIssuers
+testObserver
+aiTextSearchProvider
+chatParticipantPrivate
+chatProvider
+contribDebugCreateConfiguration
+chatReferenceDiagnostic
+textSearchProvider2
+chatReferenceBinaryData
+languageModelSystem
+languageModelCapabilities
+languageModelPricing
+inlineCompletionsAdditions
+chatStatusItem
+chatInputNotification
+taskProblemMatcherStatus
+contribLanguageModelToolSets
+textDocumentChangeReason
+resolvers
+taskExecutionTerminal
+dataChannels
+languageModelThinkingPart
+chatSessionsProvider
+devDeviceId
+contribEditorContentMenu
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+environmentPower
+terminalTitle
+toolInvocationApproveCombination
+chatSessionCustomizationProvider
+product.json (WINS): agentSessionsWorkspace
+agentsWindowConfiguration
+interactive
+terminalDataWriteEvent
+terminalExecuteCommandEvent
+terminalSelection
+terminalQuickFixProvider
+chatParticipantAdditions
+defaultChatParticipant
+embeddings
+chatProvider
+mappedEditsProvider
+aiRelatedInformation
+aiSettingsSearch
+codeActionAI
+findTextInFiles
+findTextInFiles2
+textSearchProvider
+textSearchProvider2
+activeComment
+commentReveal
+contribSourceControlInputBoxMenu
+contribCommentEditorActionsMenu
+contribCommentThreadAdditionalMenu
+contribCommentsViewThreadMenus
+contribChatEditorInlineGutterMenu
+extensionAffinity
+newSymbolNamesProvider
+findFiles2
+chatReferenceDiagnostic
+extensionsAny
+authLearnMore
+testObserver
+aiTextSearchProvider
+documentFiltersExclusive
+chatParticipantPrivate
+contribDebugCreateConfiguration
+inlineCompletionsAdditions
+chatReferenceBinaryData
+languageModelSystem
+languageModelCapabilities
+languageModelThinkingPart
+languageModelToolSupportsModel
+chatStatusItem
+taskProblemMatcherStatus
+contribLanguageModelToolSets
+textDocumentChangeReason
+resolvers
+taskExecutionTerminal
+dataChannels
+chatSessionsProvider
+chatSessionCustomizationProvider
+devDeviceId
+contribEditorContentMenu
+tokenInformation
+toolInvocationApproveCombination
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+chatHooks
+chatDebug
+envIsConnectionMetered
+environmentPower
+terminalTitle
+languageModelPricing
+chatInputNotification
+DELTA: authIssuers
+Proceeding with EXTRA proposals (authIssuers) because extension is in development mode. Still, this EXTENSION WILL BE BROKEN unless product.json is updated.
+[RemoteAgentHost] Reconciling: desired=[], current=[]
+Settings Sync: Account status changed from uninitialized to unavailable
+[AccountPolicyGate] apply: state=inactive, reason=undefined, isRestricted=false
+Error: Timed out waiting for exact enum hover
+	at until (/home/shmellyorc/Documents/Void.Language/editors/vscode/out/test/creationWorkbench.js:21:11)
+	at async Object.run (/home/shmellyorc/Documents/Void.Language/editors/vscode/out/test/numericHost.js:70:9)
+[90m[main 2026-11-09T02:09:19.382Z][0m Extension host with pid 708344 exited with code: 0, signal: unknown.
+Exit code:   1
+TestRunFailedError: Test run failed with code 1
+    at ChildProcess.onProcessClosed (/home/shmellyorc/Documents/Void.Language/editors/vscode/node_modules/@vscode/test-electron/out/runTest.js:125:24)
+    at ChildProcess.emit (node:events:509:28)
+    at ChildProcess._handle.onexit (node:internal/child_process:295:12) {
+  code: 1,
+  signal: undefined
+}

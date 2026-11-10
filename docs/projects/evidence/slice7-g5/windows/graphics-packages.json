@@ -1,0 +1,90 @@
+{
+  "Release": {
+    "normal": {
+      "package": "C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\relocated normal \u96ea",
+      "identities": {
+        "gallery.exe": "1c7dd136435b7423edc02b675c7f22ec6654b4f35454c9cb2bbddb8528a3f812",
+        "native/RAYLIB-LICENSE.txt": "882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799",
+        "native/raylib.dll": "3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824",
+        "native/void_raylib.dll": "b32eec9c48b34579d5c2b22881a6f66cbfe5c8f3f72d15a3350b5bf6ab17b1b2"
+      }
+    },
+    "optimized": {
+      "package": "C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\relocated optimized \u96ea",
+      "identities": {
+        "gallery.exe": "a679444905c0d0ddfa29e922e15f00293786df1178c348509e81d16c24d11b94",
+        "native/RAYLIB-LICENSE.txt": "882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799",
+        "native/raylib.dll": "3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824",
+        "native/void_raylib.dll": "b32eec9c48b34579d5c2b22881a6f66cbfe5c8f3f72d15a3350b5bf6ab17b1b2"
+      }
+    },
+    "temporary_directories": "No .bind-* directories. Private link temp empty."
+  },
+  "Debug": {
+    "normal": {
+      "package": "C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\relocated normal \u96ea",
+      "identities": {
+        "gallery.exe": "6900a84aa90b88118d4e0d3762312310095ac0425232197758bbc71a656e1c55",
+        "native/RAYLIB-LICENSE.txt": "882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799",
+        "native/raylib.dll": "3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824",
+        "native/void_raylib.dll": "614e0208d2a28964202fcb6c6d1893c003e5db4363925db8a77397f463a02c43"
+      }
+    },
+    "optimized": {
+      "package": "C:\\Users\\a\\VoidS7-G5-Graphics\\Debug-corrected\\relocated optimized \u96ea",
+      "identities": {
+        "gallery.exe": "6c20ce3fe398c05c658b33032b76ce1b6d98078062b57e4d3dd29a2c4229ff1b",
+        "native/RAYLIB-LICENSE.txt": "882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799",
+        "native/raylib.dll": "3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824",
+        "native/void_raylib.dll": "614e0208d2a28964202fcb6c6d1893c003e5db4363925db8a77397f463a02c43"
+      }
+    },
+    "temporary_directories": "No .bind-* directories. Private link temp empty."
+  },
+  "callback_fixture": {
+    "Release": {
+      "normal": {
+        "package": "C:\\Users\\a\\VoidS7-G5-Compiler\\Release-g5-final-artifacts\\g5-mn50estd\\relocated normal \u96ea",
+        "identities": {
+          "g5.exe": "4e2e658e8600e1cc9b2f67ab914476ea6ca18525f6b806a2658a9ad81f865663",
+          "native/g5_adapter.dll": "0d917ec1941166879c620d38020ef057eb9e97b5f0f950213456b25f14248ee3",
+          "native/g5_fixture.dll": "1f166fa52c52725d247ba04a76f34121401db63ff05b2e060f0b049531a657aa"
+        }
+      },
+      "optimized": {
+        "package": "C:\\Users\\a\\VoidS7-G5-Compiler\\Release-g5-final-artifacts\\g5-mn50estd\\relocated optimized \u96ea",
+        "identities": {
+          "g5.exe": "8b352d44588fa142a376ab8058c3e085c30a13ce9322b698343f36df9f6c7aaf",
+          "native/g5_adapter.dll": "0d917ec1941166879c620d38020ef057eb9e97b5f0f950213456b25f14248ee3",
+          "native/g5_fixture.dll": "1f166fa52c52725d247ba04a76f34121401db63ff05b2e060f0b049531a657aa"
+        }
+      }
+    },
+    "Debug": {
+      "normal": {
+        "package": "C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-final-artifacts\\g5-hfd0p3to\\relocated normal \u96ea",
+        "identities": {
+          "g5.exe": "b8595b367bb1c91680a890c9e7e88ca0d061429d789b2ab02c0077902953b7b1",
+          "native/g5_adapter.dll": "14df9f145251f242e5fea7cfb63c9343141670b5e96c4ef82ee9b2ba8c81eecc",
+          "native/g5_fixture.dll": "1c1bbf52cbda42baffb758591054c91aee31b058ec620d0e97203cfb9725c964"
+        }
+      },
+      "optimized": {
+        "package": "C:\\Users\\a\\VoidS7-G5-Compiler\\Debug-g5-final-artifacts\\g5-hfd0p3to\\relocated optimized \u96ea",
+        "identities": {
+          "g5.exe": "cedaaa5b65c4dad1fcd5ef72787f2ec523e81c1867c84476ba2214ba73a12692",
+          "native/g5_adapter.dll": "14df9f145251f242e5fea7cfb63c9343141670b5e96c4ef82ee9b2ba8c81eecc",
+          "native/g5_fixture.dll": "1c1bbf52cbda42baffb758591054c91aee31b058ec620d0e97203cfb9725c964"
+        }
+      }
+    }
+  },
+  "gallery_source": {
+    "native/raylib.descriptor.in": "197a98f5e7c54cb487d37fcdbbdfd81b8a6fa6450238a2025c44903faea9b6c8",
+    "native/raylib_provider.c": "bcab87187fcaec272faac89c429c5c605514f0d32cc53971d91e86723c67642c",
+    "native/raylib_provider.h": "729aafd3e077787732ee91a3c968876a113dd66a60a0a91ca6edfdac6d1d24e9",
+    "prepare.py": "78a464efb28956f66387b738498f87ecacfd3c02fa07c70adc35b4c44e48c8e5",
+    "src/gallery.void": "524c0a587357d5a2fc8d06fde70df7c13e65882186b5ebadc11fff6c3da3aa44",
+    "void.project.toml": "43631249e85635ab34403aee52cfec1408bfc4bef48d5ff91afcae591dce7336"
+  }
+}

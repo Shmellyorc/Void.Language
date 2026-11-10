@@ -1,0 +1,17 @@
+{
+  "events": [
+    "no-main project session opens with manifest diagnostics",
+    "file creation selects any-name main",
+    "missing-main diagnostic clears",
+    "real editor project navigation",
+    "dirty TOML diagnostic publication",
+    "failed manifest hides historical semantic results",
+    "malformed manifest repair",
+    "shared compiler project recovery completion",
+    "editor rename updates entry without rebasing root",
+    "second main invalidates project selection"
+  ],
+  "status": "INCOMPLETE",
+  "platform": "linux",
+  "editor": "1.141.0"
+}

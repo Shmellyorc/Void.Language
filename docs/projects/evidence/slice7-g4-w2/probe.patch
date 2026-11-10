@@ -1,0 +1,821 @@
+diff --git a/docs/projects/evidence/slice7-g4-w2/probes/acl-run.cmd b/docs/projects/evidence/slice7-g4-w2/probes/acl-run.cmd
+new file mode 100644
+index 00000000..37895c6d
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-w2/probes/acl-run.cmd
+@@ -0,0 +1,8 @@
++@echo off
++setlocal
++set "W2SHARE=\\vboxsvr\VM\g4w2"
++copy /y "%W2SHARE%\acl-run.py" "%~dp0acl-run.py" > "%W2SHARE%\acl-transfer.txt" 2>&1
++if errorlevel 1 exit /b 1
++call "C:\BuildTools\VS2022\VC\Auxiliary\Build\vcvarsall.bat" x64 > "%W2SHARE%\acl-vcvars.txt" 2>&1
++if errorlevel 1 exit /b 1
++"C:\Users\a\AppData\Local\Programs\Python\Python314\python.exe" "%~dp0acl-run.py" > "%W2SHARE%\acl-console.txt" 2>&1
+diff --git a/docs/projects/evidence/slice7-g4-w2/probes/acl-run.py b/docs/projects/evidence/slice7-g4-w2/probes/acl-run.py
+new file mode 100644
+index 00000000..612a11c0
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-w2/probes/acl-run.py
+@@ -0,0 +1,72 @@
++"""Rerun only the file access control with a fully restricted token."""
++import hashlib
++import json
++from pathlib import Path
++import shutil
++import subprocess
++import sys
++
++share = Path(r"\\vboxsvr\VM\g4w2")
++home = Path.home()
++previous = home / "VoidS7-G4W2-final"
++work = home / "VoidS7-G4W2-acl"
++out = share / "acl-followup"
++receipt = json.loads((share / previous.name / "results.json").read_bytes())
++
++
++def sha(path):
++    return hashlib.sha256(path.read_bytes()).hexdigest()
++
++
++record = {"build": sys.getwindowsversion().build, "workspace": str(work),
++          "prebuild_free_bytes": shutil.disk_usage("C:/").free, "commands": []}
++if record["build"] != 19045 or record["prebuild_free_bytes"] < 12 * 1024**3 or home.drive != "C:":
++    raise RuntimeError("guest platform, location or storage preflight")
++out.mkdir()
++work.mkdir()
++
++
++def run(label, argv):
++    argv = [str(value) for value in argv]
++    result = subprocess.run(argv, cwd=work, capture_output=True, timeout=120)
++    output = result.stdout + result.stderr
++    (out / (label + ".txt")).write_bytes(output)
++    record["commands"].append({"label": label, "argv": argv, "exit": result.returncode})
++    return result.returncode, output
++
++
++try:
++    base = previous / "image_probe.cpp"
++    record["base_source_sha256"] = sha(base)
++    if record["base_source_sha256"] != receipt["inputs"]["sources"][base.name]:
++        raise RuntimeError("baseline source hash changed")
++    old = b"DISABLE_MAX_PRIVILEGE|WRITE_RESTRICTED"
++    new = b"DISABLE_MAX_PRIVILEGE"
++    content = base.read_bytes()
++    if content.count(old) != 1:
++        raise RuntimeError("expected exact write-only restriction flag")
++    source = work / "acl_probe.cpp"
++    source.write_bytes(content.replace(old, new))
++    shutil.copyfile(source, out / source.name)
++    record["compiled_source_sha256"] = sha(source)
++    record["runner_sha256"] = sha(Path(__file__))
++    clang = home / r"VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\clang-cl.exe"
++    program = work / "acl_probe.exe"
++    code, _ = run("build-acl", [clang, "/nologo", "/std:c++20", "/EHsc", "/MT", "-fuse-ld=lld",
++                                 source, "/Fe" + str(program), "/link", "bcrypt.lib", "advapi32.lib",
++                                 "/manifest:embed"])
++    if code:
++        raise RuntimeError("ACL-only build failed")
++    record["binary_sha256"] = sha(program)
++    directory = work / "fixture"
++    directory.mkdir()
++    fixture = directory / "void_w2_gate.dll"
++    shutil.copyfile(previous / "approved" / fixture.name, fixture)
++    record["fixture_sha256"] = sha(fixture)
++    if record["fixture_sha256"] != receipt["artifacts"]["approved/" + fixture.name]:
++        raise RuntimeError("ACL fixture changed")
++    code, output = run("case-acl-full", [program, "acl", fixture, directory, record["fixture_sha256"]])
++    record["passed"] = code == 0 and b"read=1 write=0 delete=0 change-DACL=0 add-file=0" in output
++    sys.exit(0 if record["passed"] else 1)
++finally:
++    (out / "results.json").write_text(json.dumps(record, indent=2) + "\n")
+diff --git a/docs/projects/evidence/slice7-g4-w2/probes/build.cmd b/docs/projects/evidence/slice7-g4-w2/probes/build.cmd
+new file mode 100644
+index 00000000..177c18bf
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-w2/probes/build.cmd
+@@ -0,0 +1,8 @@
++@echo off
++setlocal
++set "W2SHARE=\\vboxsvr\VM\g4w2"
++copy /y "%W2SHARE%\native-run.py" "%~dp0native-run.py" > "%W2SHARE%\transfer.txt" 2>&1
++if errorlevel 1 exit /b 1
++call "C:\BuildTools\VS2022\VC\Auxiliary\Build\vcvarsall.bat" x64 > "%W2SHARE%\vcvars.txt" 2>&1
++if errorlevel 1 exit /b 1
++"C:\Users\a\AppData\Local\Programs\Python\Python314\python.exe" "%~dp0native-run.py" > "%W2SHARE%\native-console.txt" 2>&1
+diff --git a/docs/projects/evidence/slice7-g4-w2/probes/cleanup.cmd b/docs/projects/evidence/slice7-g4-w2/probes/cleanup.cmd
+new file mode 100644
+index 00000000..1707ae6d
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-w2/probes/cleanup.cmd
+@@ -0,0 +1,6 @@
++@echo off
++setlocal
++set "W2SHARE=\\vboxsvr\VM\g4w2"
++copy /y "%W2SHARE%\cleanup.py" "%~dp0cleanup.py" > "%W2SHARE%\cleanup-transfer.txt" 2>&1
++if errorlevel 1 exit /b 1
++"C:\Users\a\AppData\Local\Programs\Python\Python314\python.exe" "%~dp0cleanup.py" > "%W2SHARE%\cleanup-console.txt" 2>&1
+diff --git a/docs/projects/evidence/slice7-g4-w2/probes/cleanup.py b/docs/projects/evidence/slice7-g4-w2/probes/cleanup.py
+new file mode 100644
+index 00000000..faad2c32
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-w2/probes/cleanup.py
+@@ -0,0 +1,64 @@
++"""Remove only hash-verified duplicate transfer scripts after evidence capture."""
++import csv
++import hashlib
++import json
++from pathlib import Path
++import shutil
++import subprocess
++import sys
++
++share = Path(r"\\vboxsvr\VM\g4w2")
++home = Path.home()
++transfer = home / "VoidS7-G4W2-io"
++main = home / "VoidS7-G4W2-final"
++acl = home / "VoidS7-G4W2-acl"
++plan = json.loads((share / "cleanup-plan.json").read_bytes())
++result = {"build": sys.getwindowsversion().build, "deleted": [], "retained": [],
++          "free_before": shutil.disk_usage("C:/").free}
++
++
++def digest(path):
++    return hashlib.sha256(path.read_bytes()).hexdigest()
++
++
++def local(path):
++    return path.drive == "C:" and not path.is_symlink() and path.resolve(strict=True) == path
++
++
++try:
++    if not all(local(p) for p in (home, transfer, main, acl)) or result["build"] != 19045:
++        raise RuntimeError("unexpected cleanup location or OS build")
++    tasks = subprocess.check_output([r"C:\Windows\System32\tasklist.exe", "/fo", "csv", "/nh"],
++                                    text=True, errors="replace")
++    names = {row[0].lower() for row in csv.reader(tasks.splitlines()) if row}
++    if names & {"probe.exe", "probe-embedded.exe", "probe-external.exe", "acl_probe.exe", "clang-cl.exe",
++                "lld-link.exe", "llvm-readobj.exe"}:
++        raise RuntimeError("a native probe or tool is still active")
++    retained = {main / path: sha for path, sha in plan["main_artifacts"].items()}
++    retained[main / "image_probe.cpp"] = plan["main_source"]
++    retained[acl / "acl_probe.exe"] = plan["acl_binary"]
++    retained[acl / "acl_probe.cpp"] = plan["acl_source"]
++    retained[acl / "fixture" / "void_w2_gate.dll"] = plan["acl_fixture"]
++    for path, sha in retained.items():
++        if not local(path) or digest(path) != sha:
++            raise RuntimeError(f"retained item mismatch: {path}")
++        result["retained"].append({"path": str(path), "sha256": sha})
++    names = {"space.cmd", "build.cmd", "native-run.py", "acl-run.cmd", "acl-run.py"}
++    if set(plan["duplicates"]) != names:
++        raise RuntimeError("cleanup targets do not match assignment transfer copies")
++    for name in sorted(names):
++        path = transfer / name
++        if not local(path) or digest(path) != plan["duplicates"][name]:
++            raise RuntimeError(f"transfer copy mismatch: {path}")
++    for name in sorted(names):
++        path = transfer / name
++        path.unlink()
++        result["deleted"].append({"path": str(path), "sha256": plan["duplicates"][name]})
++    result["status"] = "pass"
++except Exception as exc:
++    result["status"] = "failed"
++    result["error"] = str(exc)
++    raise
++finally:
++    result["free_after"] = shutil.disk_usage("C:/").free
++    (share / "cleanup-results.json").write_text(json.dumps(result, indent=2) + "\n")
+diff --git a/docs/projects/evidence/slice7-g4-w2/probes/image_probe.cpp b/docs/projects/evidence/slice7-g4-w2/probes/image_probe.cpp
+new file mode 100644
+index 00000000..69bb0bec
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-w2/probes/image_probe.cpp
+@@ -0,0 +1,312 @@
++#define WIN32_LEAN_AND_MEAN
++#include <windows.h>
++#include <bcrypt.h>
++#include <psapi.h>
++#include <sddl.h>
++
++#include <array>
++#include <cstdio>
++#include <cstring>
++#include <stdexcept>
++#include <string>
++#include <string_view>
++#include <utility>
++#include <vector>
++
++namespace {
++constexpr auto name = L"void_w2_gate.dll";
++constexpr DWORD flags = LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_SYSTEM32;
++struct Refused { const char* stage; };
++void check(bool okay, const char* step) {
++    if (!okay) {
++        const DWORD error = GetLastError();
++        throw std::runtime_error(std::string(step) + ", Win32 " + std::to_string(error));
++    }
++}
++struct Handle {
++    HANDLE value;
++    explicit Handle(HANDLE h) : value(h) {}
++    Handle(Handle&& h) noexcept : value(std::exchange(h.value,nullptr)) {}
++    ~Handle() { if (value && value != INVALID_HANDLE_VALUE) CloseHandle(value); }
++    explicit operator bool() const { return value && value != INVALID_HANDLE_VALUE; }
++};
++Handle open_file(const std::wstring& path, DWORD access, DWORD share, bool directory = false) {
++    return Handle(CreateFileW(path.c_str(),access,share,nullptr,OPEN_EXISTING,
++        FILE_FLAG_OPEN_REPARSE_POINT | (directory ? FILE_FLAG_BACKUP_SEMANTICS : 0),nullptr));
++}
++BY_HANDLE_FILE_INFORMATION attributes(const Handle& file) {
++    BY_HANDLE_FILE_INFORMATION info{};
++    check(file && GetFileInformationByHandle(file.value,&info),"file attributes");
++    return info;
++}
++std::wstring final_name(const Handle& file, DWORD format) {
++    wchar_t output[1024];
++    const auto size = GetFinalPathNameByHandleW(file.value,output,1024,format);
++    check(size > 0 && size < 1024,"canonical held name");
++    return {output,size};
++}
++std::vector<Handle> hold_directories(const std::wstring& path) {
++    wchar_t absolute[1024];
++    const auto count = GetFullPathNameW(path.c_str(),1024,absolute,nullptr);
++    if (!count || count >= 1024 || path != absolute || !path.starts_with(L"C:\\"))
++        throw Refused{"path alias"};
++    std::vector<Handle> held;
++    for (auto end = path.find(L'\\',3); end != path.npos; end = path.find(L'\\',end+1)) {
++        const auto parent = path.substr(0,end);
++        auto file = open_file(parent,FILE_READ_ATTRIBUTES,FILE_SHARE_READ | FILE_SHARE_WRITE,true);
++        const auto info = attributes(file);
++        if (info.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) throw Refused{"reparse ancestor"};
++        if (!(info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ||
++            final_name(file,VOLUME_NAME_DOS) != L"\\\\?\\"+parent) throw Refused{"directory alias"};
++        held.push_back(std::move(file));
++    }
++    return held;
++}
++std::wstring sha256(const Handle& file) {
++    LARGE_INTEGER size{};
++    check(GetFileSizeEx(file.value,&size) && size.QuadPart > 0 && size.QuadPart < 1024*1024,"fixture size");
++    std::vector<UCHAR> bytes(static_cast<size_t>(size.QuadPart));
++    DWORD read = 0;
++    check(ReadFile(file.value,bytes.data(),static_cast<DWORD>(bytes.size()),&read,nullptr) &&
++          read == bytes.size(),"read held bytes");
++    BCRYPT_ALG_HANDLE algorithm = nullptr;
++    check(BCryptOpenAlgorithmProvider(&algorithm,BCRYPT_SHA256_ALGORITHM,nullptr,0) >= 0,"open CNG SHA-256");
++    std::array<UCHAR,32> digest{};
++    const auto status = BCryptHash(algorithm,nullptr,0,bytes.data(),static_cast<ULONG>(bytes.size()),
++                                   digest.data(),static_cast<ULONG>(digest.size()));
++    BCryptCloseAlgorithmProvider(algorithm,0);
++    check(status >= 0,"CNG SHA-256");
++    std::wstring result;
++    constexpr std::wstring_view hex = L"0123456789abcdef";
++    for (auto byte : digest) { result.push_back(hex[byte >> 4]); result.push_back(hex[byte & 15]); }
++    return result;
++}
++
++struct InspectView {
++    Handle section;
++    const unsigned char* image;
++    explicit InspectView(const Handle& file)
++        : section(CreateFileMappingW(file.value,nullptr,PAGE_READONLY|SEC_IMAGE_NO_EXECUTE,0,0,nullptr)),
++          image(section ? static_cast<const unsigned char*>(MapViewOfFile(section.value,FILE_MAP_READ,0,0,0)) : nullptr) {
++        check(image != nullptr,"non-executing held image view");
++    }
++    ~InspectView() { UnmapViewOfFile(image); }
++};
++DWORD inspect(const Handle& file) {
++    InspectView view(file);
++    auto* dos = reinterpret_cast<const IMAGE_DOS_HEADER*>(view.image);
++    check(dos->e_magic == IMAGE_DOS_SIGNATURE && dos->e_lfanew >= 64 && dos->e_lfanew < 2048,"fixture DOS");
++    auto* pe = reinterpret_cast<const IMAGE_NT_HEADERS64*>(view.image+dos->e_lfanew);
++    check(pe->Signature == IMAGE_NT_SIGNATURE && pe->FileHeader.Machine == IMAGE_FILE_MACHINE_AMD64 &&
++          pe->OptionalHeader.Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC,"fixture PE64");
++    const auto& header = pe->OptionalHeader;
++    if (header.AddressOfEntryPoint) throw Refused{"entry point"};
++    for (auto entry : {IMAGE_DIRECTORY_ENTRY_IMPORT,IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT,
++                       IMAGE_DIRECTORY_ENTRY_TLS,IMAGE_DIRECTORY_ENTRY_LOAD_CONFIG}) {
++        const auto& dir = header.DataDirectory[entry];
++        if (dir.VirtualAddress || dir.Size) throw Refused{"execution-bearing PE directory"};
++    }
++    const auto dir = header.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT];
++    auto bounded = [&](DWORD rva, size_t bytes) {
++        check(rva && rva < header.SizeOfImage && bytes <= header.SizeOfImage-rva,"fixture RVA");
++        return view.image+rva;
++    };
++    bounded(dir.VirtualAddress,dir.Size);
++    const auto* table = reinterpret_cast<const IMAGE_EXPORT_DIRECTORY*>(
++        bounded(dir.VirtualAddress,sizeof(IMAGE_EXPORT_DIRECTORY)));
++    check(table->NumberOfFunctions <= 32 && table->NumberOfNames <= 32,"fixture export count");
++    const auto* functions = reinterpret_cast<const DWORD*>(bounded(table->AddressOfFunctions,
++        table->NumberOfFunctions*sizeof(DWORD)));
++    for (DWORD n=0;n<table->NumberOfFunctions;++n)
++        if (functions[n] >= dir.VirtualAddress && functions[n]-dir.VirtualAddress < dir.Size)
++            throw Refused{"forwarded export"};
++    const auto* names = reinterpret_cast<const DWORD*>(bounded(table->AddressOfNames,table->NumberOfNames*sizeof(DWORD)));
++    const auto* ordinals = reinterpret_cast<const WORD*>(bounded(table->AddressOfNameOrdinals,table->NumberOfNames*sizeof(WORD)));
++    for (DWORD n=0;n<table->NumberOfNames;++n) {
++        constexpr char symbol[] = "g4_dependency";
++        if (!std::memcmp(bounded(names[n],sizeof(symbol)),symbol,sizeof(symbol))) {
++            check(ordinals[n]<table->NumberOfFunctions,"fixture export ordinal");
++            bounded(functions[ordinals[n]],1);
++            return functions[ordinals[n]];
++        }
++    }
++    throw Refused{"absent export"};
++}
++
++bool redirect() {
++    ACTCTX_SECTION_KEYED_DATA data{};
++    data.cbSize = sizeof(data);
++    if (FindActCtxSectionStringW(0,nullptr,ACTIVATION_CONTEXT_SECTION_DLL_REDIRECTION,name,&data)) return true;
++    check(GetLastError()==ERROR_SXS_KEY_NOT_FOUND || GetLastError()==ERROR_SXS_SECTION_NOT_FOUND,"activation query");
++    return false;
++}
++
++struct Activation {
++    HANDLE context = INVALID_HANDLE_VALUE;
++    ULONG_PTR cookie = 0;
++    explicit Activation(const std::wstring& path) {
++        ACTCTXW input{};
++        input.cbSize = sizeof(input);
++        input.lpSource = path.c_str();
++        context = CreateActCtxW(&input);
++        check(context != INVALID_HANDLE_VALUE && ActivateActCtx(context,&cookie),"set test activation");
++    }
++    ~Activation() { DeactivateActCtx(0,cookie); ReleaseActCtx(context); }
++};
++
++struct Approved {
++    std::vector<Handle> directories;
++    Handle file;
++    DWORD export_rva;
++    Approved(const std::wstring& path, std::wstring_view expected)
++        : directories(hold_directories(path)), file(open_file(path,GENERIC_READ,FILE_SHARE_READ)),
++          export_rva(0) {
++        const auto info = attributes(file);
++        if (info.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) throw Refused{"reparse image"};
++        if (info.nNumberOfLinks != 1) throw Refused{"hardlinked image"};
++        if (final_name(file,VOLUME_NAME_DOS) != L"\\\\?\\"+path) throw Refused{"image alias"};
++        const auto digest = sha256(file);
++        std::printf("held file=%ls id=%08lx:%08lx%08lx sha256=%ls\n",path.c_str(),
++                    info.dwVolumeSerialNumber,info.nFileIndexHigh,info.nFileIndexLow,digest.c_str());
++        if (expected != digest) throw Refused{"image digest"};
++        export_rva = inspect(file);
++    }
++};
++
++void namespace_guard() {
++    const bool active = redirect(), loaded = GetModuleHandleW(name)!=nullptr;
++    const bool manifest = FindResourceW(nullptr,MAKEINTRESOURCEW(1),MAKEINTRESOURCEW(24))!=nullptr;
++    std::printf("embedded manifest=%d active redirect=%d loaded basename=%d\n",manifest,active,loaded);
++    if (active) throw Refused{"active manifest redirect"};
++    if (loaded) throw Refused{"loaded basename"};
++}
++void execute(const std::wstring& path, const Approved& held) {
++    HMODULE module = LoadLibraryExW(path.c_str(),nullptr,flags);
++    check(module != nullptr,"executable load");
++    wchar_t actual[1024];
++    const auto size=GetMappedFileNameW(GetCurrentProcess(),module,actual,1024);
++    MEMORY_BASIC_INFORMATION memory{};
++    check(size && size < 1024 && VirtualQuery(module,&memory,sizeof(memory)) && memory.Type==MEM_IMAGE &&
++          std::wstring_view(actual,size)==final_name(held.file,VOLUME_NAME_NT),"post-load mapped image");
++    auto address = GetProcAddress(module,"g4_dependency");
++    check(address && reinterpret_cast<const char*>(address) ==
++          reinterpret_cast<const char*>(module)+held.export_rva,"mapped export ownership");
++    const int value = reinterpret_cast<int(*)()>(address)();
++    std::printf("mapped exact path=%ls result=%d\n",actual,value);
++    check(value==7 && FreeLibrary(module),"approved result");
++}
++
++std::wstring user_sid(const Handle& token) {
++    DWORD length=0;
++    GetTokenInformation(token.value,TokenUser,nullptr,0,&length);
++    std::vector<unsigned char> data(length);
++    check(length && GetTokenInformation(token.value,TokenUser,data.data(),length,&length),"token SID");
++    LPWSTR text=nullptr;
++    check(ConvertSidToStringSidW(reinterpret_cast<TOKEN_USER*>(data.data())->User.Sid,&text),"SID string");
++    std::wstring result(text);
++    LocalFree(text);
++    return result;
++}
++void acl_test(const std::wstring& directory, const std::wstring& path) {
++    HANDLE primary=nullptr;
++    check(OpenProcessToken(GetCurrentProcess(),TOKEN_QUERY|TOKEN_DUPLICATE,&primary),"open fixture owner token");
++    Handle owner(primary);
++    const auto acl=L"D:P(A;;FA;;;"+user_sid(owner)+L")(A;;GRGX;;;RC)(A;;GRGX;;;OW)";
++    PSECURITY_DESCRIPTOR sd=nullptr;
++    check(ConvertStringSecurityDescriptorToSecurityDescriptorW(acl.c_str(),SDDL_REVISION_1,&sd,nullptr),
++          "fixture DACL");
++    const bool protected_acl = SetFileSecurityW(directory.c_str(),
++        DACL_SECURITY_INFORMATION|PROTECTED_DACL_SECURITY_INFORMATION,sd) &&
++        SetFileSecurityW(path.c_str(),DACL_SECURITY_INFORMATION|PROTECTED_DACL_SECURITY_INFORMATION,sd);
++    LocalFree(sd);
++    check(protected_acl,"protect assignment-only objects");
++    PSID sid=nullptr;
++    check(ConvertStringSidToSidW(L"S-1-5-12",&sid),"restricting SID");
++    SID_AND_ATTRIBUTES restricting{sid,0};
++    HANDLE narrowed=nullptr;
++    const BOOL created=CreateRestrictedToken(owner.value,DISABLE_MAX_PRIVILEGE|WRITE_RESTRICTED,
++        0,nullptr,0,nullptr,1,&restricting,&narrowed);
++    const DWORD token_error=created ? ERROR_SUCCESS : GetLastError();
++    LocalFree(sid);
++    SetLastError(token_error);
++    check(created,"restricted token");
++    Handle writer(narrowed);
++    check(ImpersonateLoggedOnUser(writer.value),"impersonate fixture writer");
++    const auto share=FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE;
++    auto read=open_file(path,GENERIC_READ,share);
++    auto write=open_file(path,GENERIC_WRITE,share);
++    auto erase=open_file(path,DELETE,share);
++    auto change=open_file(path,WRITE_DAC,share);
++    auto add=open_file(directory,FILE_ADD_FILE,share,true);
++    check(RevertToSelf(),"leave restricted token");
++    std::printf("restricted token read=%d write=%d delete=%d change-DACL=%d add-file=%d\n",
++        bool(read),bool(write),bool(erase),bool(change),bool(add));
++    check(read && !write && !erase && !change && !add,"scratch DACL separates this writer");
++}
++}
++
++int wmain(int argc, wchar_t** argv) try {
++    if (argc!=5) return 2;
++    const std::wstring_view mode=argv[1], digest=argv[4];
++    const std::wstring path=argv[2], other=argv[3];
++    wchar_t filesystem[16]{};
++    check(GetVolumeInformationW(L"C:\\",nullptr,0,nullptr,nullptr,nullptr,filesystem,16) &&
++          std::wstring_view(filesystem)==L"NTFS","local NTFS");
++    std::printf("C: filesystem=%ls\n",filesystem);
++    check(SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_SYSTEM32),"process search policy");
++
++    if (mode==L"acl") { acl_test(other,path); return 0; }
++    const char* expected=nullptr;
++    if (mode==L"alias") expected="path alias";
++    if (mode==L"junction") expected="reparse ancestor";
++    if (mode==L"symlink") expected="reparse image";
++    if (mode==L"hardlink") expected="hardlinked image";
++    if (mode==L"forward") expected="forwarded export";
++    if (mode==L"guarded-substitute") expected="image digest";
++    if (mode==L"late") expected="loaded basename";
++    if (mode==L"thread" || mode==L"external" || mode==L"embedded") expected="active manifest redirect";
++    if (mode==L"unguarded-substitute" || mode==L"guarded-substitute") {
++        { Approved original(path,digest); }
++        check(MoveFileExW(other.c_str(),path.c_str(),MOVEFILE_REPLACE_EXISTING),"swap after releasing validation handle");
++        std::puts("approved no-entry image replaced after dropping the held identity");
++        if (mode==L"unguarded-substitute") {
++            std::fflush(stdout);
++            LoadLibraryExW(path.c_str(),nullptr,flags);
++            throw std::runtime_error("unguarded load returned instead of reaching initializer sentinel");
++        }
++    }
++    try {
++        Approved held(path,digest);
++        if (mode==L"pin") {
++            const auto parent=path.substr(0,path.find_last_of(L'\\'));
++            auto write=open_file(path,GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE);
++            const DWORD write_error=write ? 0 : GetLastError();
++            const BOOL replaced=MoveFileExW(other.c_str(),path.c_str(),MOVEFILE_REPLACE_EXISTING);
++            const DWORD replace_error=replaced ? 0 : GetLastError();
++            const BOOL renamed=MoveFileExW(parent.c_str(),(parent+L"-renamed").c_str(),0);
++            const DWORD rename_error=renamed ? 0 : GetLastError();
++            std::printf("pinned write error=%lu replacement error=%lu ancestor rename error=%lu\n",
++                        write_error,replace_error,rename_error);
++            check(!write && !replaced && !renamed,"pins refused write, rename and replacement");
++        }
++        if (mode==L"late") {
++            namespace_guard();
++            std::puts("initial namespace observation clear");
++            auto loaded=LoadLibraryExW(other.c_str(),nullptr,flags);
++            check(loaded!=nullptr,"load controlled no-entry collision");
++        }
++        if (mode==L"thread") {
++            Activation active(other);
++            namespace_guard();
++        } else namespace_guard();
++        check(!expected,"negative was accepted before executable load");
++        execute(path,held);
++    } catch (const Refused& error) {
++        check(expected && std::string_view(expected)==error.stage,"expected denial stage");
++        std::printf("denied before executable load: %s\n",error.stage);
++    }
++    return 0;
++} catch (const std::exception& error) {
++    std::fprintf(stderr,"%s\n",error.what());
++    return 1;
++}
+diff --git a/docs/projects/evidence/slice7-g4-w2/probes/native-run.py b/docs/projects/evidence/slice7-g4-w2/probes/native-run.py
+new file mode 100644
+index 00000000..5483ed96
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-w2/probes/native-run.py
+@@ -0,0 +1,195 @@
++"""Run the bounded G4-W2 controls on the existing Windows 10 guest."""
++import hashlib
++import json
++import os
++from pathlib import Path
++import shutil
++import subprocess
++import sys
++import traceback
++
++share = Path(r"\\vboxsvr\VM\g4w2")
++home = Path.home()
++name = "void_w2_gate.dll"
++tools = home / r"VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin"
++run = json.loads((share / "inputs.json").read_text())
++work = home / run["workspace"]
++out = share / run["workspace"]
++out.mkdir()
++record = {"workspace": str(work), "build": sys.getwindowsversion().build,
++          "commands": [], "artifacts": {}, "inputs": run, "status": "incomplete"}
++
++
++def save():
++    (out / "results.json").write_text(json.dumps(record, indent=2) + "\n")
++
++
++def sha(path):
++    return hashlib.sha256(path.read_bytes()).hexdigest()
++
++
++def cmd(label, argv, expected=0, contains=()):
++    argv = [str(value) for value in argv]
++    print(label, subprocess.list2cmdline(argv), flush=True)
++    result = subprocess.run(argv, cwd=work, capture_output=True, timeout=120)
++    output = result.stdout + result.stderr
++    (out / (label + ".txt")).write_bytes(output)
++    passed = result.returncode == expected and all(item.encode() in output for item in contains)
++    record["commands"].append({"label": label, "argv": argv, "exit": result.returncode,
++                               "expected_exit": expected, "expected_output": list(contains), "passed": passed})
++    save()
++    return passed
++
++
++def require(label, argv, expected=0, contains=()):
++    if not cmd(label, argv, expected, contains):
++        raise RuntimeError(f"{label} did not meet its control")
++
++
++def copy_case(folder, source, filename=name):
++    path = work / folder / filename
++    path.parent.mkdir(exist_ok=True)
++    shutil.copyfile(source, path)
++    return path
++
++
++def main():
++    record["prebuild_free_bytes"] = shutil.disk_usage("C:/").free
++    if record["build"] != 19045 or record["prebuild_free_bytes"] < 12 * 1024**3:
++        raise RuntimeError("guest platform or storage preflight")
++    if work.drive != "C:" or work.parent != home or not work.name.startswith("VoidS7-G4W2"):
++        raise RuntimeError("workspace must be assignment-owned local C:")
++    work.mkdir()
++    for filename, digest in run["sources"].items():
++        if Path(filename).name != filename:
++            raise RuntimeError("unexpected source path")
++        local = Path(__file__).parent / filename if filename in ("native-run.py", "build.cmd") else work / filename
++        if filename not in ("native-run.py", "build.cmd"):
++            shutil.copyfile(share / filename, local)
++        if sha(local) != digest:
++            raise RuntimeError(f"input hash mismatch: {filename}")
++    clang = tools / "clang-cl.exe"
++    lld = tools / "lld-link.exe"
++    readobj = tools / "llvm-readobj.exe"
++    require("toolchain-clang", [clang, "--version"])
++    require("toolchain-lld", [lld, "--version"])
++    require("toolchain-readobj", [readobj, "--version"])
++    for folder, source, define in [
++        ("approved", "dependency.c", "/DFIXTURE_VALUE=7"),
++        ("collision", "dependency.c", "/DFIXTURE_VALUE=99"),
++        ("sentinel121", "sentinel.c", "/DW2_SENTINEL=121"),
++        ("sentinel122", "sentinel.c", "/DW2_SENTINEL=122"),
++    ]:
++        (work / folder).mkdir()
++        obj = f"{folder}.obj"
++        require(f"compile-{folder}", [clang, "/nologo", "/TC", "/c", "/GS-", "/Zl",
++                                      define, source, "/Fo" + obj])
++        entry = ["/entry:sentinel_entry", "kernel32.lib"] if source == "sentinel.c" else ["/noentry"]
++        require(f"link-{folder}", [lld, "/dll", "/nodefaultlib", f"/out:{folder}/{name}", obj, *entry])
++    good = work / "approved" / name
++    bad121 = work / "sentinel121" / name
++    bad122 = work / "sentinel122" / name
++    digest = sha(good)
++    probe = work / "probe.exe"
++    (work / "embedded").mkdir()
++    (work / "external").mkdir()
++    embedded = work / "embedded" / "probe-embedded.exe"
++    external = work / "external" / "probe-external.exe"
++    for label, program, manifest in [
++        ("probe", probe, ["/manifest:embed"]),
++        ("embedded", embedded, ["/manifest:embed", "/manifestinput:redirect.manifest"]),
++        ("external", external, ["/manifest:no"]),
++    ]:
++        require(f"build-{label}", [clang, "/nologo", "/std:c++20", "/EHsc", "/MT", "-fuse-ld=lld",
++                                   "image_probe.cpp", f"/Fo{label}.obj", f"/Fe{program}",
++                                   "/link", "bcrypt.lib", "advapi32.lib", *manifest])
++    old = home / r"VoidS7-G4W-architecture-final\good\void_g4w_forwarder.dll"
++    if sha(old) != run["forwarder_sha256"]:
++        raise RuntimeError("W1 local forwarder does not match accepted receipt")
++    forwarded = copy_case("forwarder", old)
++    for label, image in [("approved", good), ("collision", work / "collision" / name),
++                         ("sentinel121", bad121), ("sentinel122", bad122), ("forwarder", forwarded),
++                         ("embedded", embedded), ("external", external), ("probe", probe)]:
++        require(f"pe-{label}", [readobj, "--file-headers", "--coff-imports", "--coff-exports",
++                                "--coff-resources", image])
++    pin = copy_case("pin", good)
++    replacement = copy_case("pin-replacement", bad121)
++    acl = copy_case("acl", good)
++    hard = copy_case("hardlink", good)
++    os.link(hard, hard.with_name("second.dll"))
++    junction = work / "junction"
++    require("make-junction", [Path(r"C:\Windows\System32\cmd.exe"), "/d", "/c", "mklink", "/J",
++                              junction, good.parent])
++    if not junction.is_junction() or junction.resolve(strict=True) != good.parent:
++        raise RuntimeError("junction fixture targets unexpected directory")
++    symlink = work / "symlink" / name
++    symlink.parent.mkdir()
++    try:
++        os.symlink(good, symlink)
++    except OSError as error:
++        if error.winerror != 1314:
++            raise
++        record["leaf_symlink"] = str(error)
++    separate = copy_case("separate", probe, "probe.exe")
++    copy_case("separate", bad122)
++    copy_case("embedded", bad122)
++    copy_case("external", bad122)
++    copy_case("external", work / "redirect.manifest", external.name + ".manifest")
++    sidecar = copy_case("override", work / "redirect.manifest", "redirect.manifest")
++    copy_case("override", bad122)
++    cases = [
++        ("clean", probe, "clean", good, "-", digest, 0, ("C: filesystem=NTFS", "result=7")),
++        ("separate", separate, "clean", good, "-", digest, 0, ("result=7",)),
++        ("pin", probe, "pin", pin, replacement, digest, 0,
++         ("pinned write error=", "replacement error=", "ancestor rename error=", "result=7")),
++        ("alias", probe, "alias", str(pin.parent) + r"\..\pin" + "\\" + name, "-", digest, 0,
++         ("denied before executable load: path alias",)),
++        ("junction", probe, "junction", junction / name, "-", digest, 0,
++         ("denied before executable load: reparse ancestor",)),
++        ("hardlink", probe, "hardlink", hard, "-", digest, 0,
++         ("denied before executable load: hardlinked image",)),
++        ("forward", probe, "forward", forwarded, "-", sha(forwarded), 0,
++         ("denied before executable load: forwarded export",)),
++        ("late", probe, "late", good, work / "collision" / name, digest, 0,
++         ("initial namespace observation clear", "denied before executable load: loaded basename")),
++        ("thread", probe, "thread", good, sidecar, digest, 0,
++         ("active redirect=1", "denied before executable load: active manifest redirect")),
++        ("embedded", embedded, "embedded", good, "-", digest, 0,
++         ("embedded manifest=1", "denied before executable load: active manifest redirect")),
++        ("external", external, "external", good, "-", digest, 0,
++         ("embedded manifest=0", "denied before executable load: active manifest redirect")),
++        ("acl", probe, "acl", acl, acl.parent, digest, 0,
++         ("read=1 write=0 delete=0 change-DACL=0 add-file=0",)),
++    ]
++    if symlink.is_symlink():
++        cases.append(("symlink", probe, "symlink", symlink, "-", digest, 0,
++                      ("denied before executable load: reparse image",)))
++    for label, mode, bad, code, message in [
++        ("swap-open", "unguarded-substitute", bad121, 121, "approved no-entry image replaced"),
++        ("calibrate122", "unguarded-substitute", bad122, 122, "approved no-entry image replaced"),
++        ("swap-guarded", "guarded-substitute", bad122, 0, "denied before executable load: image digest"),
++    ]:
++        target = copy_case(label, good)
++        alternate = copy_case(label, bad, "replacement.dll")
++        cases.append((label, probe, mode, target, alternate, digest, code, (message,)))
++    # Keep all controls even if another control fails. Each executable starts in a fresh process.
++    results = [cmd("case-" + label, [program, mode, path, other, expected_sha], code, output)
++               for label, program, mode, path, other, expected_sha, code, output in cases]
++    for root, dirs, files in os.walk(work):
++        dirs[:] = [d for d in dirs if not (Path(root) / d).is_junction()]
++        for file in files:
++            path = Path(root) / file
++            if not path.is_symlink() and path.suffix.lower() in (".dll", ".exe", ".manifest"):
++                record["artifacts"][path.relative_to(work).as_posix()] = sha(path)
++    record["status"] = "pass" if all(results) else "failed controls"
++    return 0 if all(results) else 1
++
++
++try:
++    sys.exit(main())
++except Exception:
++    record["status"] = "setup or build failure"
++    record["failure"] = traceback.format_exc()
++    raise
++finally:
++    save()
+diff --git a/docs/projects/evidence/slice7-g4-w2/probes/redirect.manifest b/docs/projects/evidence/slice7-g4-w2/probes/redirect.manifest
+new file mode 100644
+index 00000000..dacab17a
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-w2/probes/redirect.manifest
+@@ -0,0 +1,5 @@
++<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
++<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
++  <assemblyIdentity type="win32" name="VoidG4W2.ImageSelection" version="1.0.0.0" processorArchitecture="amd64"/>
++  <file name="void_w2_gate.dll"/>
++</assembly>
+diff --git a/docs/projects/evidence/slice7-g4-w2/probes/sentinel.c b/docs/projects/evidence/slice7-g4-w2/probes/sentinel.c
+new file mode 100644
+index 00000000..fbc45272
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-w2/probes/sentinel.c
+@@ -0,0 +1,11 @@
++#define WIN32_LEAN_AND_MEAN
++#include <windows.h>
++
++__declspec(dllexport) int g4_dependency(void) { return 99; }
++
++BOOL WINAPI sentinel_entry(HINSTANCE image, DWORD reason, LPVOID reserved) {
++    (void)image;
++    (void)reserved;
++    if (reason == DLL_PROCESS_ATTACH) ExitProcess(W2_SENTINEL);
++    return TRUE;
++}
+diff --git a/docs/projects/evidence/slice7-g4-w2/probes/space.cmd b/docs/projects/evidence/slice7-g4-w2/probes/space.cmd
+new file mode 100644
+index 00000000..bd3446c8
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-w2/probes/space.cmd
+@@ -0,0 +1,2 @@
++@echo off
++"C:\Users\a\AppData\Local\Programs\Python\Python314\python.exe" -c "import json,shutil,sys; print(json.dumps(dict(build=sys.getwindowsversion().build, free_bytes=shutil.disk_usage('C:/').free)))" > "\\vboxsvr\VM\g4w2\space-before-build.json"
+diff --git a/docs/projects/evidence/slice7-g4-w2/inventory.py b/docs/projects/evidence/slice7-g4-w2/inventory.py
+new file mode 100644
+index 00000000..ef2e16e8
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-w2/inventory.py
+@@ -0,0 +1,72 @@
++from collections import Counter
++from hashlib import sha256
++import json
++import os
++from pathlib import Path
++import subprocess
++
++repo = Path.cwd()
++evidence = Path('docs/projects/evidence/slice7-g4-w2')
++report = Path('docs/projects/SLICE7_G4_WINDOWS_IMAGE_SELECTION.md')
++previous = Path('docs/projects/evidence/slice7-g4-windows/inventory.txt')
++inventory = evidence / 'inventory.txt'
++
++def git(*args):
++    return subprocess.check_output(['git', '--no-optional-locks', *args], cwd=repo)
++
++def digest(path):
++    return sha256(path.read_bytes()).hexdigest()
++
++head = git('rev-parse', 'HEAD').decode().strip()
++assert head == '2f667ea338127b8f91c3136804377ef3fa5218d6'
++index = git('ls-files', '--stage', '-z')
++index_hash = sha256(index).hexdigest()
++assert index_hash == 'c9b3a3ca23a36c7c11fac5839d50c9f3d07311f5ec61f8577182f1abb0715fc0'
++assert git('diff', '--cached', '--name-only', '-z') == b''
++tree = []
++for entry in git('ls-tree', '-rz', 'HEAD').split(b'\0')[:-1]:
++    spec, name = entry.split(b'\t', 1)
++    mode, _, object_id = spec.split()
++    tree.append((name, mode + b' ' + object_id + b' 0\t' + name + b'\0'))
++assert index == b''.join(row for _, row in sorted(tree))
++
++assert digest(previous) == '3886df814a21c8bbc38168b89476c4ca8f1fd9cb7e49cf7754a9f06e30026027'
++starting = {}
++for line in previous.read_text().splitlines()[7:]:
++    if line:
++        flag, layer, name, initial_hash = line.split(' | ', 3)
++        assert name not in starting
++        starting[name] = (flag, layer, initial_hash)
++assert len(starting) == 1811
++entries = git('status', '--porcelain=v1', '-z', '--untracked-files=all').split(b'\0')[:-1]
++assert all(entry[:2] in (b' M', b'??') and entry[2:3] == b' ' for entry in entries)
++current = {os.fsdecode(entry[3:]): entry[:2].decode('ascii') for entry in entries}
++current[str(inventory)] = '??'
++new_evidence = {str(path) for path in evidence.rglob('*') if path.is_file()} | {str(report), str(inventory)}
++assert set(current) == set(starting) | new_evidence
++assert all(current[name] == '??' for name in new_evidence)
++
++counters = Counter(current.values())
++git('diff', '--check')
++git('apply', '--reverse', '--check', str(evidence/'probe.patch'))
++header = [
++    f'HEAD {head}', f'Index tuple SHA-256 {index_hash}',
++    'Index tuples match the prior audit checkpoint and HEAD. Staged diff is empty.',
++    f'All {len(starting):,} previous working-tree paths retained. No production paths changed.',
++    json.dumps({'index_entries': len(tree), 'modified': counters[' M'], 'untracked': counters['??'],
++                'paths': len(current), 'starting_paths': len(starting),
++                'production_changes': 0, 'g4w2_report_evidence_paths': len(new_evidence)}, sort_keys=True),
++    '', 'STATUS | LAYER | EXACT PATH | SHA-256'
++]
++for name, flag in sorted(current.items()):
++    value = '(self)' if name == str(inventory) else digest(Path(name))
++    if name in starting:
++        prior_flag, layer, initial_hash = starting[name]
++        assert flag == prior_flag, name
++        if initial_hash != '(self)':
++            assert value == initial_hash, name
++    else:
++        layer = 'S7 G4-W2 image-selection report/evidence'
++    header.append(f'{flag} | {layer} | {name} | {value}')
++inventory.write_text('\n'.join(header) + '\n')
++print(header[4])

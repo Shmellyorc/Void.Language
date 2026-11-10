@@ -1,0 +1,1172 @@
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\gcc\\bin\\cmake.exe", "--install", "C:\\Users\\a\\VS7I2\\Debug", "--prefix", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\compiler install", "--config", "Debug", "--component", "compiler"]}
+exit=0
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/VOID-MIT-LICENSE.txt
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/LICENSING_SCOPE.md
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/REDISTRIBUTION.txt
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/NOTICE_INVENTORY.json
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/llvm-23.1.4
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/llvm-23.1.4/BLAKE3-LICENSE.txt
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/llvm-23.1.4/ConvertUTF-NOTICES.txt
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/llvm-23.1.4/LICENSE.TXT
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/llvm-23.1.4/Support-NOTICES.txt
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/llvm-23.1.4/xxhash-NOTICES.txt
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/zstd-1.5.7
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/zstd-1.5.7/EMBEDDED-NOTICES.txt
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/zstd-1.5.7/LICENSE
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/tomlplusplus/LICENSE
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/tomlplusplus/upstream.json
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/tomlplusplus/void-bounds-and-locations.patch
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/tomlplusplus/corresponding-source/toml.hpp
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/tomlplusplus/corresponding-source/README.md
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/zlib-1.3.2/LICENSE
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/libarchive
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/libarchive/COPYING
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/libarchive/SOURCE-NOTICES.json
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/libsodium
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/libsodium/LICENSE
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/libsodium/SOURCE-NOTICES.json
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/patches
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/patches/libsodium-1.0.22
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/patches/libsodium-1.0.22/asan-alignment.patch
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/patches/libsodium-1.0.22/PROVENANCE.json
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/host-versions.json
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/setup_host_deps.py
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/setup_host_deps_native.py
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/host-sodium.targets
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/verify_host_deps.py
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/corresponding-source/repro/tools/setup_host_deps.py
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/corresponding-source/repro/tools/setup_host_deps_native.py
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/corresponding-source/repro/tools/verify_host_deps.py
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/corresponding-source/repro/tools/verify_http_dependencies.py
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/corresponding-source/repro/tools/ci/llvm_sdk.py
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/corresponding-source/repro/cmake/host-sodium.targets
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-versions.json
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/http-versions.json
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22/asan-alignment.patch
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22/PROVENANCE.json
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/libxml2-2.15.4
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/libxml2-2.15.4/Copyright
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/libxml2-2.15.4/FILE-NOTICES.txt
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/UNICODE-LICENSE.txt
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/archive.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/channel.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/collections.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/console.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/convert.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/crypto.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/encoding
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/encoding/ascii.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/encoding/base64.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/encoding/binary.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/encoding/hex.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/error.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/io
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/io/memory.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/io.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/json.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/log.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/math.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/net
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/net/http.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/os.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/path.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/process.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/random.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/system_error.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/text.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/time.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/url.void
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/LICENSE-Boost
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/LICENSE.txt
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/NOTICE
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/LICENSE
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/stage10-versions.json
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/bin/voidc.exe
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/lib/void/void_runtime.lib
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/lib/void/void_native_fixture.lib
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/lib/void/libcurl.lib
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/lib/void/archive.lib
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/lib/void/libsodium.lib
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/lib/void/psl.lib
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/lib/void/nghttp2.lib
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/lib/void/cares.lib
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/lib/void/zsd.lib
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/aws-lc-5.12.0
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/aws-lc-5.12.0/LICENSE
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/aws-lc-5.12.0/NOTICE
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/aws-lc-5.12.0/UPSTREAM.json
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/c-ares-1.34.9
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/c-ares-1.34.9/LICENSE.md
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/libidn2-2.3.8
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/libidn2-2.3.8/COPYING
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/libidn2-2.3.8/COPYING.LESSERv3
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/libidn2-2.3.8/COPYING.unicode
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/libidn2-2.3.8/COPYINGv2
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/libidn2-2.3.8/README
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/libpsl-0.21.5
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/libpsl-0.21.5/COPYING
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/libpsl-0.21.5/LICENSE
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/libpsl-0.21.5/LICENSE.chromium
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/libpsl-0.21.5/README
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/libunistring-1.5
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/libunistring-1.5/COPYING
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/libunistring-1.5/COPYING.LIB
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/libunistring-1.5/README
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/nghttp2-1.70.0
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/nghttp2-1.70.0/COPYING
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/nghttp2-1.70.0/README
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/openssl-3.5.9
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/openssl-3.5.9/LICENSE.txt
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/zlib-1.3.2
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/zlib-1.3.2/LICENSE
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/zlib-1.3.2/README
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/COPYING
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/NOTICE
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/VOID-PROVENANCE.json
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/http-versions.json
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/publicsuffix
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/publicsuffix/LICENSE
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/publicsuffix/public_suffix_list.dat
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/publicsuffix/UPSTREAM.json
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/corresponding-source/setup_http_deps.py
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/corresponding-source/setup_http_deps_native.py
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/corresponding-source/http_archive.py
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/http/VOID-HTTP-DEPENDENCIES.json
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/bin/void-native.txt
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/bin/void-native-resources.txt
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/VOID-HOST-DEPENDENCIES.json
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/corresponding-source
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/corresponding-source/libarchive-3.8.11.tar.xz
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/host/corresponding-source/libsodium-1.0.22.tar.gz
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\gcc\\bin\\cmake.exe", "--install", "C:\\Users\\a\\VS7I2\\Debug", "--prefix", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\compiler install", "--config", "Debug", "--component", "tooling"]}
+exit=0
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/bin/voidls.exe
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/VOID-MIT-LICENSE.txt
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/LICENSING_SCOPE.md
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/REDISTRIBUTION.txt
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/NOTICE_INVENTORY.json
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/llvm-23.1.4
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/llvm-23.1.4/BLAKE3-LICENSE.txt
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/llvm-23.1.4/ConvertUTF-NOTICES.txt
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/llvm-23.1.4/LICENSE.TXT
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/llvm-23.1.4/Support-NOTICES.txt
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/llvm-23.1.4/xxhash-NOTICES.txt
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/zstd-1.5.7
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/zstd-1.5.7/EMBEDDED-NOTICES.txt
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/zstd-1.5.7/LICENSE
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/tomlplusplus/LICENSE
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/tomlplusplus/upstream.json
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/tomlplusplus/void-bounds-and-locations.patch
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/tomlplusplus/corresponding-source/toml.hpp
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/tomlplusplus/corresponding-source/README.md
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/zlib-1.3.2/LICENSE
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/libxml2-2.15.4
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/libxml2-2.15.4/Copyright
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/libxml2-2.15.4/FILE-NOTICES.txt
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/UNICODE-LICENSE.txt
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/archive.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/channel.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/collections.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/console.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/convert.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/crypto.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/encoding
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/encoding/ascii.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/encoding/base64.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/encoding/binary.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/encoding/hex.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/error.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/io
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/io/memory.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/io.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/json.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/log.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/math.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/net
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/net/http.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/os.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/path.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/process.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/random.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/system_error.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/text.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/time.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/stdlib/url.void
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/LICENSE-Boost
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/LICENSE.txt
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/NOTICE
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/LICENSE
+-- Up-to-date: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/licenses/stage10-versions.json
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/vim
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/vim/autoload
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/vim/autoload/void.vim
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/vim/autoload/void_format.vim
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/vim/ftdetect
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/vim/ftdetect/void.vim
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/vim/ftplugin
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/vim/ftplugin/void.vim
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/vim/indent
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/vim/indent/void.vim
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/vim/syntax
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/vim/syntax/void.vim
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/neovim
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/neovim/lua
+-- Installing: C:\Users\a\VS7I2\Debug-public-utf8\compiler install/share/void/neovim/lua/void.lua
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated compiler 雪\\bin\\voidc.exe", "--version"]}
+exit=0
+VOID Language Compiler v0.1.0 (development)
+LLVM 23.1.4
+Target: x86_64-pc-windows-msvc
+Build identity: 594ad2df03df0c380272a8cc6a288667ee3e51b6371cb8581923ca3563639844
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\a\\VS7I2\\src\\tools\\verify_install.py", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated compiler 雪"]}
+exit=0
+VOID Language Compiler v0.1.0 (development)
+LLVM 23.1.4
+Target: x86_64-pc-windows-msvc
+Build identity: 594ad2df03df0c380272a8cc6a288667ee3e51b6371cb8581923ca3563639844
+PASS: installed stdlib check, optimized/Debug run, native build/run, resource hashes and LSP handshake
+
+Installed compiler SHA-256 77f5025c74a01444dd689998c7a4d831c859fbbfc541218652e2983a77fdcd42
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated compiler 雪\\bin\\voidc.exe", "new", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\created project", "--source", "src/launch.void", "--project-id", "org.voidlang.s7-integrated-new"]}
+exit=0
+Manifest: C:/Users/a/VS7I2/Debug-public-utf8/created project/void.project.toml
+Project ID: org.voidlang.s7-integrated-new
+Application ID: local.a1f10032f52735dbd3bd7ee2bca521904
+Next: from the displayed manifest directory, run voidc check --project .
+Created project manifest.
+Automatic application selection requires one eligible main(). Use --entry for a deliberate override.
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated compiler 雪\\bin\\voidc.exe", "check", "--project", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\created project"]}
+exit=0
+Source checked successfully
+C:/Users/a/VS7I2/Debug-public-utf8/created project/void.project.toml:14:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 14 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated compiler 雪\\bin\\voidc.exe", "run", "--project", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\created project", "--no-opt"]}
+exit=0
+C:/Users/a/VS7I2/Debug-public-utf8/created project/void.project.toml:14:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 14 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated compiler 雪\\bin\\voidc.exe", "run", "--project", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\created project"]}
+exit=0
+C:/Users/a/VS7I2/Debug-public-utf8/created project/void.project.toml:14:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 14 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated compiler 雪\\bin\\voidc.exe", "init", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\initialized project", "--project-id", "org.voidlang.s7-integrated-init"]}
+exit=0
+Manifest: C:/Users/a/VS7I2/Debug-public-utf8/initialized project/void.project.toml
+Project ID: org.voidlang.s7-integrated-init
+Application ID: local.ae3abed55005d3668df8f7bc25bf2e127
+Next: from the displayed manifest directory, run voidc check --project .
+Created project manifest.
+Automatic application selection requires one eligible main(). Use --entry for a deliberate override.
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated compiler 雪\\bin\\voidc.exe", "check", "--project", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\initialized project"]}
+exit=0
+Source checked successfully
+C:/Users/a/VS7I2/Debug-public-utf8/initialized project/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 11 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated compiler 雪\\bin\\voidc.exe", "build", "--project", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\initialized project", "-o", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\ordinary build\\ordinary.exe"]}
+exit=0
+Built native executable: C:/Users/a/VS7I2/Debug-public-utf8/ordinary build/ordinary.exe
+C:/Users/a/VS7I2/Debug-public-utf8/initialized project/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 11 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\gallery project\\prepare.py", "--voidc", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated compiler 雪\\bin\\voidc.exe", "--clang", "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang.exe", "--header", "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src\\raylib.h", "--library", "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.dll", "--license", "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\LICENSE", "--import-library", "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.lib"]}
+exit=0
+047e7255f93f8c34039cab906ad76136706b5c7b4c5b5b065d84141963ee9b6b  C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\src\raylib.h
+3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824  C:\Users\a\VoidS7-Raylib-Compatibility\build-win32-software-linked\raylib.dll
+882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799  C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\LICENSE
+59778ec137ffebe87a6c099944330f20b7eecdf1d49a5a93de7000a8992339df  C:\Users\a\VoidS7-Raylib-Compatibility\build-win32-software-linked\raylib.lib
+['C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated compiler 雪\\bin\\voidc.exe', 'native-bind', 'C:\\Users\\a\\VS7I2\\Debug-public-utf8\\gallery project\\native\\.bind-h2948xz7\\raylib-windows.descriptor', 'raylib_provider.h', '-o', 'C:\\Users\\a\\VS7I2\\Debug-public-utf8\\gallery project\\native\\.bind-h2948xz7\\raylib_checked.c']
+['C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang.exe', '-std=c11', '-shared', '-fuse-ld=lld', '-O2', '-Wall', '-Wextra', '-Werror', '-IC:\\Users\\a\\VS7I2\\Debug-public-utf8\\gallery project\\native', '-IC:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src', '--target=x86_64-pc-windows-msvc', '-DUSE_LIBTYPE_SHARED', '-fms-runtime-lib=static', 'C:\\Users\\a\\VS7I2\\Debug-public-utf8\\gallery project\\native\\raylib_provider.c', 'C:\\Users\\a\\VS7I2\\Debug-public-utf8\\gallery project\\native\\.bind-h2948xz7\\raylib_checked.c', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.lib', '-o', 'C:\\Users\\a\\VS7I2\\Debug-public-utf8\\gallery project\\native\\.bind-h2948xz7\\void_raylib.dll']
+17764f149b360456265b1b661d01ae8a59005ed475bd5cd0b3e7c2e97b9b024b  C:\Users\a\VS7I2\Debug-public-utf8\gallery project\native\void_raylib.dll
+3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824  C:\Users\a\VS7I2\Debug-public-utf8\gallery project\native\raylib.dll
+55fc257ce900ef6708f7d4830ecdf036ad1d2430c5edfb37cc36c473f965cb88  C:\Users\a\VS7I2\Debug-public-utf8\gallery project\native\raylib-windows.descriptor
+2a2c339317ade503a55a8b9d4feec5b24fd11c500a08a2a449fb02682d35dc89  C:\Users\a\VS7I2\Debug-public-utf8\gallery project\native\raylib_checked.c
+882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799  C:\Users\a\VS7I2\Debug-public-utf8\gallery project\native\RAYLIB-LICENSE.txt
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated compiler 雪\\bin\\voidc.exe", "check", "--project", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\gallery project"]}
+exit=0
+Source checked successfully
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated compiler 雪\\bin\\voidc.exe", "run", "--project", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\gallery project", "--", "--trace-only"]}
+exit=2
+Invalid invocation: This project declares native code. Pass --allow-native to authorize its execution.
+Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]
+Try 'voidc run --help' for examples.
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated compiler 雪\\bin\\voidc.exe", "build", "--project", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\gallery project", "-o", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\denied.exe"]}
+exit=2
+Invalid invocation: This project declares native code. Pass --allow-native to authorize its execution.
+Usage: voidc build [file-or-directory] [-o executable] [--no-opt]
+Try 'voidc build --help' for examples.
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated compiler 雪\\bin\\voidc.exe", "run", "--project", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\gallery project", "--allow-native", "--no-opt", "--", "--trace-only"]}
+exit=0
+RAYLIB trace invoked VOID
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated compiler 雪\\bin\\voidc.exe", "build", "--project", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\gallery project", "--allow-native", "--no-opt", "-o", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\linked normal\\gallery.exe"]}
+exit=0
+Built native executable: C:/Users/a/VS7I2/Debug-public-utf8/linked normal/gallery.exe
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated compiler 雪\\bin\\voidc.exe", "run", "--project", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\gallery project", "--allow-native", "--", "--trace-only"]}
+exit=0
+RAYLIB trace invoked VOID
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated compiler 雪\\bin\\voidc.exe", "build", "--project", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\gallery project", "--allow-native", "-o", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\linked optimized\\gallery.exe"]}
+exit=0
+Built native executable: C:/Users/a/VS7I2/Debug-public-utf8/linked optimized/gallery.exe
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated ordinary 雪\\ordinary.exe"]}
+exit=0
+SLICE7 installed ordinary application
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated gallery normal 雪\\gallery.exe", "--trace-only"]}
+exit=0
+RAYLIB trace invoked VOID
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated gallery optimized 雪\\gallery.exe", "--trace-only"]}
+exit=0
+RAYLIB trace invoked VOID
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-readobj.exe", "--coff-imports", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated ordinary 雪\\ordinary.exe"]}
+exit=0
+
+File: C:\Users\a\VS7I2\Debug-public-utf8\relocated ordinary 雪\ordinary.exe
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+Import {
+  Name: KERNEL32.dll
+  ImportLookupTableRVA: 0x21FA40
+  ImportAddressTableRVA: 0x21FE58
+  Symbol: AcquireSRWLockExclusive (0)
+  Symbol: AreFileApisANSI (35)
+  Symbol: CancelIoEx (116)
+  Symbol: CancelSynchronousIo (117)
+  Symbol: CloseHandle (137)
+  Symbol: CompareStringW (158)
+  Symbol: CreateEventW (194)
+  Symbol: CreateFileW (206)
+  Symbol: CreateThread (245)
+  Symbol: DecodePointer (269)
+  Symbol: DeleteCriticalSection (276)
+  Symbol: EncodePointer (308)
+  Symbol: EnterCriticalSection (312)
+  Symbol: EnumSystemLocalesW (348)
+  Symbol: ExitProcess (359)
+  Symbol: ExitThread (360)
+  Symbol: FillConsoleOutputAttribute (372)
+  Symbol: FillConsoleOutputCharacterW (374)
+  Symbol: FindClose (382)
+  Symbol: FindFirstFileExW (388)
+  Symbol: FindFirstFileW (393)
+  Symbol: FindNextFileW (405)
+  Symbol: FlushFileBuffers (424)
+  Symbol: FormatMessageA (431)
+  Symbol: FreeEnvironmentStringsW (435)
+  Symbol: FreeLibrary (436)
+  Symbol: FreeLibraryAndExitThread (437)
+  Symbol: GetACP (443)
+  Symbol: GetCPInfo (458)
+  Symbol: GetCommandLineA (479)
+  Symbol: GetCommandLineW (480)
+  Symbol: GetConsoleCursorInfo (505)
+  Symbol: GetConsoleMode (517)
+  Symbol: GetConsoleOutputCP (521)
+  Symbol: GetConsoleScreenBufferInfo (523)
+  Symbol: GetCurrentProcess (544)
+  Symbol: GetCurrentProcessId (545)
+  Symbol: GetCurrentThreadId (549)
+  Symbol: GetDateFormatW (555)
+  Symbol: GetDynamicTimeZoneInformation (572)
+  Symbol: GetEnvironmentStringsW (577)
+  Symbol: GetExitCodeThread (583)
+  Symbol: GetFileAttributesExW (588)
+  Symbol: GetFileInformationByHandleEx (594)
+  Symbol: GetFileSizeEx (598)
+  Symbol: GetFileType (600)
+  Symbol: GetLastError (618)
+  Symbol: GetLocaleInfoEx (621)
+  Symbol: GetLocaleInfoW (622)
+  Symbol: GetModuleFileNameW (637)
+  Symbol: GetModuleHandleExW (640)
+  Symbol: GetModuleHandleW (641)
+  Symbol: GetNumberOfConsoleInputEvents (671)
+  Symbol: GetOEMCP (673)
+  Symbol: GetOverlappedResult (674)
+  Symbol: GetProcAddress (696)
+  Symbol: GetProcessHeap (702)
+  Symbol: GetStartupInfoW (730)
+  Symbol: GetStdHandle (732)
+  Symbol: GetStringTypeW (737)
+  Symbol: GetSystemTimeAsFileTime (755)
+  Symbol: GetSystemTimePreciseAsFileTime (756)
+  Symbol: GetThreadErrorMode (771)
+  Symbol: GetTickCount64 (786)
+  Symbol: GetTimeFormatW (790)
+  Symbol: GetTimeZoneInformation (792)
+  Symbol: GetUserDefaultLCID (798)
+  Symbol: HeapAlloc (849)
+  Symbol: HeapFree (853)
+  Symbol: HeapReAlloc (856)
+  Symbol: HeapSize (858)
+  Symbol: InitOnceBeginInitialize (867)
+  Symbol: InitOnceComplete (868)
+  Symbol: InitializeCriticalSectionAndSpinCount (875)
+  Symbol: InitializeCriticalSectionEx (876)
+  Symbol: InitializeSListHead (879)
+  Symbol: IsDebuggerPresent (901)
+  Symbol: IsProcessorFeaturePresent (908)
+  Symbol: IsValidCodePage (914)
+  Symbol: IsValidLocale (916)
+  Symbol: LCMapStringEx (951)
+  Symbol: LCMapStringW (952)
+  Symbol: LeaveCriticalSection (964)
+  Symbol: LoadLibraryExW (970)
+  Symbol: LocalFree (982)
+  Symbol: MultiByteToWideChar (1014)
+  Symbol: OutputDebugStringW (1054)
+  Symbol: PeekConsoleInputW (1062)
+  Symbol: QueryPerformanceCounter (1106)
+  Symbol: QueryPerformanceFrequency (1107)
+  Symbol: RaiseException (1129)
+  Symbol: ReadConsoleInputW (1137)
+  Symbol: ReadConsoleW (1143)
+  Symbol: ReadFile (1146)
+  Symbol: ReleaseSRWLockExclusive (1209)
+  Symbol: RtlCaptureContext (1238)
+  Symbol: RtlLookupFunctionEntry (1245)
+  Symbol: RtlPcToFileHeader (1247)
+  Symbol: RtlUnwind (1250)
+  Symbol: RtlUnwindEx (1251)
+  Symbol: RtlVirtualUnwind (1252)
+  Symbol: SetConsoleCursorInfo (1276)
+  Symbol: SetConsoleCursorPosition (1278)
+  Symbol: SetConsoleMode (1290)
+  Symbol: SetConsoleTextAttribute (1299)
+  Symbol: SetConsoleTitleW (1301)
+  Symbol: SetEnvironmentVariableW (1317)
+  Symbol: SetEvent (1319)
+  Symbol: SetFilePointerEx (1332)
+  Symbol: SetLastError (1346)
+  Symbol: SetStdHandle (1372)
+  Symbol: SetThreadErrorMode (1384)
+  Symbol: SetUnhandledExceptionFilter (1408)
+  Symbol: Sleep (1424)
+  Symbol: SleepConditionVariableSRW (1426)
+  Symbol: TerminateProcess (1439)
+  Symbol: TlsAlloc (1457)
+  Symbol: TlsFree (1458)
+  Symbol: TlsGetValue (1459)
+  Symbol: TlsSetValue (1460)
+  Symbol: TryAcquireSRWLockExclusive (1464)
+  Symbol: UnhandledExceptionFilter (1473)
+  Symbol: WaitForMultipleObjects (1513)
+  Symbol: WaitForSingleObject (1515)
+  Symbol: WaitForSingleObjectEx (1516)
+  Symbol: WakeAllConditionVariable (1523)
+  Symbol: WakeConditionVariable (1524)
+  Symbol: WideCharToMultiByte (1554)
+  Symbol: WriteConsoleW (1573)
+  Symbol: WriteFile (1574)
+}
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-readobj.exe", "--coff-imports", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated gallery normal 雪\\gallery.exe"]}
+exit=0
+
+File: C:\Users\a\VS7I2\Debug-public-utf8\relocated gallery normal 雪\gallery.exe
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+Import {
+  Name: ADVAPI32.dll
+  ImportLookupTableRVA: 0x391040
+  ImportAddressTableRVA: 0x391658
+  Symbol: AddAccessAllowedAceEx (17)
+  Symbol: ConvertStringSidToSidW (131)
+  Symbol: CreateWellKnownSid (147)
+  Symbol: EqualSid (282)
+  Symbol: GetAce (311)
+  Symbol: GetLengthSid (331)
+  Symbol: GetSecurityDescriptorControl (348)
+  Symbol: GetSecurityDescriptorDacl (349)
+  Symbol: GetSecurityDescriptorOwner (352)
+  Symbol: GetSecurityInfo (355)
+  Symbol: GetTokenInformation (368)
+  Symbol: InitializeAcl (398)
+  Symbol: InitializeSecurityDescriptor (399)
+  Symbol: IsValidAcl (411)
+  Symbol: IsValidSecurityDescriptor (413)
+  Symbol: IsWellKnownSid (415)
+  Symbol: OpenProcessToken (536)
+  Symbol: SetSecurityDescriptorControl (746)
+  Symbol: SetSecurityDescriptorDacl (747)
+  Symbol: SetSecurityDescriptorOwner (749)
+  Symbol: SystemFunction036 (806)
+}
+Import {
+  Name: bcrypt.dll
+  ImportLookupTableRVA: 0x3910F0
+  ImportAddressTableRVA: 0x391708
+  Symbol: BCryptCloseAlgorithmProvider (2)
+  Symbol: BCryptGenRandom (29)
+  Symbol: BCryptOpenAlgorithmProvider (39)
+}
+Import {
+  Name: KERNEL32.dll
+  ImportLookupTableRVA: 0x391110
+  ImportAddressTableRVA: 0x391728
+  Symbol: AcquireSRWLockExclusive (0)
+  Symbol: AreFileApisANSI (35)
+  Symbol: CancelIo (115)
+  Symbol: CancelIoEx (116)
+  Symbol: CancelSynchronousIo (117)
+  Symbol: CloseHandle (137)
+  Symbol: CompareStringOrdinal (157)
+  Symbol: CompareStringW (158)
+  Symbol: CreateDirectoryW (189)
+  Symbol: CreateEventW (194)
+  Symbol: CreateFile2 (197)
+  Symbol: CreateFileA (198)
+  Symbol: CreateFileW (206)
+  Symbol: CreateProcessW (232)
+  Symbol: CreateSymbolicLinkW (243)
+  Symbol: CreateThread (245)
+  Symbol: DebugBreak (266)
+  Symbol: DecodePointer (269)
+  Symbol: DeleteCriticalSection (276)
+  Symbol: DeleteFileW (281)
+  Symbol: DeleteProcThreadAttributeList (282)
+  Symbol: DeviceIoControl (292)
+  Symbol: DuplicateHandle (306)
+  Symbol: EncodePointer (308)
+  Symbol: EnterCriticalSection (312)
+  Symbol: EnumSystemLocalesW (348)
+  Symbol: ExitProcess (359)
+  Symbol: ExitThread (360)
+  Symbol: FillConsoleOutputAttribute (372)
+  Symbol: FillConsoleOutputCharacterW (374)
+  Symbol: FindClose (382)
+  Symbol: FindFirstFileA (386)
+  Symbol: FindFirstFileExW (388)
+  Symbol: FindFirstFileW (393)
+  Symbol: FindNextFileW (405)
+  Symbol: FlushFileBuffers (424)
+  Symbol: FormatMessageA (431)
+  Symbol: FreeEnvironmentStringsW (435)
+  Symbol: FreeLibrary (436)
+  Symbol: FreeLibraryAndExitThread (437)
+  Symbol: GetACP (443)
+  Symbol: GetCPInfo (458)
+  Symbol: GetCommandLineA (479)
+  Symbol: GetCommandLineW (480)
+  Symbol: GetConsoleCursorInfo (505)
+  Symbol: GetConsoleMode (517)
+  Symbol: GetConsoleOutputCP (521)
+  Symbol: GetConsoleScreenBufferInfo (523)
+  Symbol: GetCurrentDirectoryW (538)
+  Symbol: GetCurrentProcess (544)
+  Symbol: GetCurrentProcessId (545)
+  Symbol: GetCurrentThreadId (549)
+  Symbol: GetDateFormatW (555)
+  Symbol: GetDiskFreeSpaceW (563)
+  Symbol: GetDriveTypeW (569)
+  Symbol: GetDynamicTimeZoneInformation (572)
+  Symbol: GetEnvironmentStringsW (577)
+  Symbol: GetExitCodeProcess (582)
+  Symbol: GetExitCodeThread (583)
+  Symbol: GetFileAttributesA (586)
+  Symbol: GetFileAttributesExW (588)
+  Symbol: GetFileAttributesW (591)
+  Symbol: GetFileInformationByHandle (593)
+  Symbol: GetFileInformationByHandleEx (594)
+  Symbol: GetFileSizeEx (598)
+  Symbol: GetFileType (600)
+  Symbol: GetFinalPathNameByHandleW (602)
+  Symbol: GetFullPathNameW (611)
+  Symbol: GetHandleInformation (615)
+  Symbol: GetLastError (618)
+  Symbol: GetLocaleInfoEx (621)
+  Symbol: GetLocaleInfoW (622)
+  Symbol: GetModuleFileNameW (637)
+  Symbol: GetModuleHandleExW (640)
+  Symbol: GetModuleHandleW (641)
+  Symbol: GetNumberOfConsoleInputEvents (671)
+  Symbol: GetOEMCP (673)
+  Symbol: GetOverlappedResult (674)
+  Symbol: GetProcAddress (696)
+  Symbol: GetProcessHeap (702)
+  Symbol: GetStartupInfoW (730)
+  Symbol: GetStdHandle (732)
+  Symbol: GetStringTypeW (737)
+  Symbol: GetSystemInfo (749)
+  Symbol: GetSystemTimeAsFileTime (755)
+  Symbol: GetSystemTimePreciseAsFileTime (756)
+  Symbol: GetTempPathW (768)
+  Symbol: GetThreadErrorMode (771)
+  Symbol: GetTickCount64 (786)
+  Symbol: GetTimeFormatW (790)
+  Symbol: GetTimeZoneInformation (792)
+  Symbol: GetUserDefaultLCID (798)
+  Symbol: GetVolumePathNameW (814)
+  Symbol: HeapAlloc (849)
+  Symbol: HeapFree (853)
+  Symbol: HeapReAlloc (856)
+  Symbol: HeapSize (858)
+  Symbol: InitOnceBeginInitialize (867)
+  Symbol: InitOnceComplete (868)
+  Symbol: InitializeCriticalSection (874)
+  Symbol: InitializeCriticalSectionAndSpinCount (875)
+  Symbol: InitializeCriticalSectionEx (876)
+  Symbol: InitializeProcThreadAttributeList (878)
+  Symbol: InitializeSListHead (879)
+  Symbol: IsDebuggerPresent (901)
+  Symbol: IsProcessorFeaturePresent (908)
+  Symbol: IsValidCodePage (914)
+  Symbol: IsValidLocale (916)
+  Symbol: LCMapStringEx (951)
+  Symbol: LCMapStringW (952)
+  Symbol: LeaveCriticalSection (964)
+  Symbol: LoadLibraryExW (970)
+  Symbol: LocalFree (982)
+  Symbol: LockFileEx (993)
+  Symbol: MoveFileExW (1007)
+  Symbol: MultiByteToWideChar (1014)
+  Symbol: OutputDebugStringW (1054)
+  Symbol: PeekConsoleInputW (1062)
+  Symbol: PeekNamedPipe (1063)
+  Symbol: QueryPerformanceCounter (1106)
+  Symbol: QueryPerformanceFrequency (1107)
+  Symbol: RaiseException (1129)
+  Symbol: ReadConsoleInputW (1137)
+  Symbol: ReadConsoleW (1143)
+  Symbol: ReadFile (1146)
+  Symbol: ReleaseSRWLockExclusive (1209)
+  Symbol: RemoveDirectoryW (1216)
+  Symbol: ResetEvent (1229)
+  Symbol: RtlCaptureContext (1238)
+  Symbol: RtlLookupFunctionEntry (1245)
+  Symbol: RtlPcToFileHeader (1247)
+  Symbol: RtlUnwind (1250)
+  Symbol: RtlUnwindEx (1251)
+  Symbol: RtlVirtualUnwind (1252)
+  Symbol: SetConsoleCursorInfo (1276)
+  Symbol: SetConsoleCursorPosition (1278)
+  Symbol: SetConsoleMode (1290)
+  Symbol: SetConsoleTextAttribute (1299)
+  Symbol: SetConsoleTitleW (1301)
+  Symbol: SetEndOfFile (1313)
+  Symbol: SetEnvironmentVariableW (1317)
+  Symbol: SetEvent (1319)
+  Symbol: SetFilePointerEx (1332)
+  Symbol: SetFileTime (1335)
+  Symbol: SetLastError (1346)
+  Symbol: SetStdHandle (1372)
+  Symbol: SetThreadErrorMode (1384)
+  Symbol: SetUnhandledExceptionFilter (1408)
+  Symbol: Sleep (1424)
+  Symbol: SleepConditionVariableSRW (1426)
+  Symbol: TerminateProcess (1439)
+  Symbol: TlsAlloc (1457)
+  Symbol: TlsFree (1458)
+  Symbol: TlsGetValue (1459)
+  Symbol: TlsSetValue (1460)
+  Symbol: TryAcquireSRWLockExclusive (1464)
+  Symbol: UnhandledExceptionFilter (1473)
+  Symbol: UpdateProcThreadAttribute (1486)
+  Symbol: VirtualAlloc (1498)
+  Symbol: VirtualFree (1501)
+  Symbol: WaitForMultipleObjects (1513)
+  Symbol: WaitForSingleObject (1515)
+  Symbol: WaitForSingleObjectEx (1516)
+  Symbol: WakeAllConditionVariable (1523)
+  Symbol: WakeConditionVariable (1524)
+  Symbol: WideCharToMultiByte (1554)
+  Symbol: WriteConsoleW (1573)
+  Symbol: WriteFile (1574)
+}
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-readobj.exe", "--coff-imports", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated gallery optimized 雪\\gallery.exe"]}
+exit=0
+
+File: C:\Users\a\VS7I2\Debug-public-utf8\relocated gallery optimized 雪\gallery.exe
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+Import {
+  Name: ADVAPI32.dll
+  ImportLookupTableRVA: 0x378210
+  ImportAddressTableRVA: 0x3787E0
+  Symbol: AddAccessAllowedAceEx (17)
+  Symbol: ConvertStringSidToSidW (131)
+  Symbol: CreateWellKnownSid (147)
+  Symbol: EqualSid (282)
+  Symbol: GetAce (311)
+  Symbol: GetLengthSid (331)
+  Symbol: GetSecurityDescriptorControl (348)
+  Symbol: GetSecurityDescriptorDacl (349)
+  Symbol: GetSecurityDescriptorOwner (352)
+  Symbol: GetSecurityInfo (355)
+  Symbol: GetTokenInformation (368)
+  Symbol: InitializeAcl (398)
+  Symbol: InitializeSecurityDescriptor (399)
+  Symbol: IsValidAcl (411)
+  Symbol: IsValidSecurityDescriptor (413)
+  Symbol: IsWellKnownSid (415)
+  Symbol: OpenProcessToken (536)
+  Symbol: SetSecurityDescriptorControl (746)
+  Symbol: SetSecurityDescriptorDacl (747)
+  Symbol: SetSecurityDescriptorOwner (749)
+  Symbol: SystemFunction036 (806)
+}
+Import {
+  Name: bcrypt.dll
+  ImportLookupTableRVA: 0x3782C0
+  ImportAddressTableRVA: 0x378890
+  Symbol: BCryptCloseAlgorithmProvider (2)
+  Symbol: BCryptGenRandom (29)
+  Symbol: BCryptOpenAlgorithmProvider (39)
+}
+Import {
+  Name: KERNEL32.dll
+  ImportLookupTableRVA: 0x3782E0
+  ImportAddressTableRVA: 0x3788B0
+  Symbol: AcquireSRWLockExclusive (0)
+  Symbol: AreFileApisANSI (35)
+  Symbol: CancelIoEx (116)
+  Symbol: CancelSynchronousIo (117)
+  Symbol: CloseHandle (137)
+  Symbol: CompareStringOrdinal (157)
+  Symbol: CompareStringW (158)
+  Symbol: CreateDirectoryW (189)
+  Symbol: CreateEventW (194)
+  Symbol: CreateFile2 (197)
+  Symbol: CreateFileA (198)
+  Symbol: CreateFileW (206)
+  Symbol: CreateProcessW (232)
+  Symbol: CreateSymbolicLinkW (243)
+  Symbol: CreateThread (245)
+  Symbol: DebugBreak (266)
+  Symbol: DecodePointer (269)
+  Symbol: DeleteCriticalSection (276)
+  Symbol: DeleteFileW (281)
+  Symbol: DeleteProcThreadAttributeList (282)
+  Symbol: DeviceIoControl (292)
+  Symbol: DuplicateHandle (306)
+  Symbol: EncodePointer (308)
+  Symbol: EnterCriticalSection (312)
+  Symbol: EnumSystemLocalesW (348)
+  Symbol: ExitProcess (359)
+  Symbol: ExitThread (360)
+  Symbol: FillConsoleOutputAttribute (372)
+  Symbol: FillConsoleOutputCharacterW (374)
+  Symbol: FindClose (382)
+  Symbol: FindFirstFileExW (388)
+  Symbol: FindFirstFileW (393)
+  Symbol: FindNextFileW (405)
+  Symbol: FlushFileBuffers (424)
+  Symbol: FormatMessageA (431)
+  Symbol: FreeEnvironmentStringsW (435)
+  Symbol: FreeLibrary (436)
+  Symbol: FreeLibraryAndExitThread (437)
+  Symbol: GetACP (443)
+  Symbol: GetCPInfo (458)
+  Symbol: GetCommandLineA (479)
+  Symbol: GetCommandLineW (480)
+  Symbol: GetConsoleCursorInfo (505)
+  Symbol: GetConsoleMode (517)
+  Symbol: GetConsoleOutputCP (521)
+  Symbol: GetConsoleScreenBufferInfo (523)
+  Symbol: GetCurrentDirectoryW (538)
+  Symbol: GetCurrentProcess (544)
+  Symbol: GetCurrentProcessId (545)
+  Symbol: GetCurrentThreadId (549)
+  Symbol: GetDateFormatW (555)
+  Symbol: GetDynamicTimeZoneInformation (572)
+  Symbol: GetEnvironmentStringsW (577)
+  Symbol: GetExitCodeProcess (582)
+  Symbol: GetExitCodeThread (583)
+  Symbol: GetFileAttributesA (586)
+  Symbol: GetFileAttributesExW (588)
+  Symbol: GetFileAttributesW (591)
+  Symbol: GetFileInformationByHandle (593)
+  Symbol: GetFileInformationByHandleEx (594)
+  Symbol: GetFileSizeEx (598)
+  Symbol: GetFileType (600)
+  Symbol: GetFinalPathNameByHandleW (602)
+  Symbol: GetFullPathNameW (611)
+  Symbol: GetHandleInformation (615)
+  Symbol: GetLastError (618)
+  Symbol: GetLocaleInfoEx (621)
+  Symbol: GetLocaleInfoW (622)
+  Symbol: GetModuleFileNameW (637)
+  Symbol: GetModuleHandleExW (640)
+  Symbol: GetModuleHandleW (641)
+  Symbol: GetNumberOfConsoleInputEvents (671)
+  Symbol: GetOEMCP (673)
+  Symbol: GetOverlappedResult (674)
+  Symbol: GetProcAddress (696)
+  Symbol: GetProcessHeap (702)
+  Symbol: GetStartupInfoW (730)
+  Symbol: GetStdHandle (732)
+  Symbol: GetStringTypeW (737)
+  Symbol: GetSystemInfo (749)
+  Symbol: GetSystemTimeAsFileTime (755)
+  Symbol: GetSystemTimePreciseAsFileTime (756)
+  Symbol: GetTempPathW (768)
+  Symbol: GetThreadErrorMode (771)
+  Symbol: GetTickCount64 (786)
+  Symbol: GetTimeFormatW (790)
+  Symbol: GetTimeZoneInformation (792)
+  Symbol: GetUserDefaultLCID (798)
+  Symbol: HeapAlloc (849)
+  Symbol: HeapFree (853)
+  Symbol: HeapReAlloc (856)
+  Symbol: HeapSize (858)
+  Symbol: InitOnceBeginInitialize (867)
+  Symbol: InitOnceComplete (868)
+  Symbol: InitializeCriticalSection (874)
+  Symbol: InitializeCriticalSectionAndSpinCount (875)
+  Symbol: InitializeCriticalSectionEx (876)
+  Symbol: InitializeProcThreadAttributeList (878)
+  Symbol: InitializeSListHead (879)
+  Symbol: IsDebuggerPresent (901)
+  Symbol: IsProcessorFeaturePresent (908)
+  Symbol: IsValidCodePage (914)
+  Symbol: IsValidLocale (916)
+  Symbol: LCMapStringEx (951)
+  Symbol: LCMapStringW (952)
+  Symbol: LeaveCriticalSection (964)
+  Symbol: LoadLibraryExW (970)
+  Symbol: LocalFree (982)
+  Symbol: LockFileEx (993)
+  Symbol: MoveFileExW (1007)
+  Symbol: MultiByteToWideChar (1014)
+  Symbol: OutputDebugStringW (1054)
+  Symbol: PeekConsoleInputW (1062)
+  Symbol: PeekNamedPipe (1063)
+  Symbol: QueryPerformanceCounter (1106)
+  Symbol: QueryPerformanceFrequency (1107)
+  Symbol: RaiseException (1129)
+  Symbol: ReadConsoleInputW (1137)
+  Symbol: ReadConsoleW (1143)
+  Symbol: ReadFile (1146)
+  Symbol: ReleaseSRWLockExclusive (1209)
+  Symbol: RemoveDirectoryW (1216)
+  Symbol: RtlCaptureContext (1238)
+  Symbol: RtlLookupFunctionEntry (1245)
+  Symbol: RtlPcToFileHeader (1247)
+  Symbol: RtlUnwind (1250)
+  Symbol: RtlUnwindEx (1251)
+  Symbol: RtlVirtualUnwind (1252)
+  Symbol: SetConsoleCursorInfo (1276)
+  Symbol: SetConsoleCursorPosition (1278)
+  Symbol: SetConsoleMode (1290)
+  Symbol: SetConsoleTextAttribute (1299)
+  Symbol: SetConsoleTitleW (1301)
+  Symbol: SetEndOfFile (1313)
+  Symbol: SetEnvironmentVariableW (1317)
+  Symbol: SetEvent (1319)
+  Symbol: SetFilePointerEx (1332)
+  Symbol: SetLastError (1346)
+  Symbol: SetStdHandle (1372)
+  Symbol: SetThreadErrorMode (1384)
+  Symbol: SetUnhandledExceptionFilter (1408)
+  Symbol: Sleep (1424)
+  Symbol: SleepConditionVariableSRW (1426)
+  Symbol: TerminateProcess (1439)
+  Symbol: TlsAlloc (1457)
+  Symbol: TlsFree (1458)
+  Symbol: TlsGetValue (1459)
+  Symbol: TlsSetValue (1460)
+  Symbol: TryAcquireSRWLockExclusive (1464)
+  Symbol: UnhandledExceptionFilter (1473)
+  Symbol: UpdateProcThreadAttribute (1486)
+  Symbol: WaitForMultipleObjects (1513)
+  Symbol: WaitForSingleObject (1515)
+  Symbol: WaitForSingleObjectEx (1516)
+  Symbol: WakeAllConditionVariable (1523)
+  Symbol: WakeConditionVariable (1524)
+  Symbol: WideCharToMultiByte (1554)
+  Symbol: WriteConsoleW (1573)
+  Symbol: WriteFile (1574)
+}
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-readobj.exe", "--coff-imports", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated gallery normal 雪\\native\\void_raylib.dll"]}
+exit=0
+
+File: C:\Users\a\VS7I2\Debug-public-utf8\relocated gallery normal 雪\native\void_raylib.dll
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+Import {
+  Name: raylib.dll
+  ImportLookupTableRVA: 0x1CBB0
+  ImportAddressTableRVA: 0x1CE90
+  Symbol: BeginDrawing (0)
+  Symbol: ClearBackground (0)
+  Symbol: CloseWindow (0)
+  Symbol: ColorBrightness (0)
+  Symbol: DrawCircle (0)
+  Symbol: DrawCircleV (0)
+  Symbol: DrawRectangle (0)
+  Symbol: DrawText (0)
+  Symbol: DrawTextureV (0)
+  Symbol: EndDrawing (0)
+  Symbol: GenImageColor (0)
+  Symbol: GetMousePosition (0)
+  Symbol: InitWindow (0)
+  Symbol: IsKeyDown (0)
+  Symbol: IsTextureValid (0)
+  Symbol: IsWindowReady (0)
+  Symbol: LoadTextureFromImage (0)
+  Symbol: SetTargetFPS (0)
+  Symbol: SetTraceLogCallback (0)
+  Symbol: TraceLog (0)
+  Symbol: UnloadImage (0)
+  Symbol: UnloadTexture (0)
+  Symbol: WindowShouldClose (0)
+}
+Import {
+  Name: KERNEL32.dll
+  ImportLookupTableRVA: 0x1CC70
+  ImportAddressTableRVA: 0x1CF50
+  Symbol: CloseHandle (137)
+  Symbol: CreateFileW (206)
+  Symbol: DeleteCriticalSection (276)
+  Symbol: EnterCriticalSection (312)
+  Symbol: ExitProcess (359)
+  Symbol: FindClose (382)
+  Symbol: FindFirstFileExW (388)
+  Symbol: FindNextFileW (405)
+  Symbol: FlushFileBuffers (424)
+  Symbol: FreeEnvironmentStringsW (435)
+  Symbol: FreeLibrary (436)
+  Symbol: GetACP (443)
+  Symbol: GetCPInfo (458)
+  Symbol: GetCommandLineA (479)
+  Symbol: GetCommandLineW (480)
+  Symbol: GetConsoleMode (517)
+  Symbol: GetConsoleOutputCP (521)
+  Symbol: GetCurrentProcess (544)
+  Symbol: GetCurrentProcessId (545)
+  Symbol: GetCurrentThreadId (549)
+  Symbol: GetEnvironmentStringsW (577)
+  Symbol: GetFileSizeEx (598)
+  Symbol: GetFileType (600)
+  Symbol: GetLastError (618)
+  Symbol: GetModuleFileNameW (637)
+  Symbol: GetModuleHandleExW (640)
+  Symbol: GetModuleHandleW (641)
+  Symbol: GetOEMCP (673)
+  Symbol: GetProcAddress (696)
+  Symbol: GetProcessHeap (702)
+  Symbol: GetStartupInfoW (730)
+  Symbol: GetStdHandle (732)
+  Symbol: GetStringTypeW (737)
+  Symbol: GetSystemTimeAsFileTime (755)
+  Symbol: HeapAlloc (849)
+  Symbol: HeapFree (853)
+  Symbol: HeapReAlloc (856)
+  Symbol: HeapSize (858)
+  Symbol: InitializeCriticalSectionAndSpinCount (875)
+  Symbol: InitializeSListHead (879)
+  Symbol: InterlockedFlushSList (883)
+  Symbol: IsDebuggerPresent (901)
+  Symbol: IsProcessorFeaturePresent (908)
+  Symbol: IsValidCodePage (914)
+  Symbol: LCMapStringW (952)
+  Symbol: LeaveCriticalSection (964)
+  Symbol: LoadLibraryExW (970)
+  Symbol: MultiByteToWideChar (1014)
+  Symbol: QueryPerformanceCounter (1106)
+  Symbol: RaiseException (1129)
+  Symbol: RtlCaptureContext (1238)
+  Symbol: RtlLookupFunctionEntry (1245)
+  Symbol: RtlUnwindEx (1251)
+  Symbol: RtlVirtualUnwind (1252)
+  Symbol: SetFilePointerEx (1332)
+  Symbol: SetLastError (1346)
+  Symbol: SetStdHandle (1372)
+  Symbol: SetUnhandledExceptionFilter (1408)
+  Symbol: TerminateProcess (1439)
+  Symbol: TlsAlloc (1457)
+  Symbol: TlsFree (1458)
+  Symbol: TlsGetValue (1459)
+  Symbol: TlsSetValue (1460)
+  Symbol: UnhandledExceptionFilter (1473)
+  Symbol: WideCharToMultiByte (1554)
+  Symbol: WriteConsoleW (1573)
+  Symbol: WriteFile (1574)
+}
+
+{"cwd": "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\independent cwd", "argv": ["C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-readobj.exe", "--coff-imports", "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated gallery optimized 雪\\native\\void_raylib.dll"]}
+exit=0
+
+File: C:\Users\a\VS7I2\Debug-public-utf8\relocated gallery optimized 雪\native\void_raylib.dll
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+Import {
+  Name: raylib.dll
+  ImportLookupTableRVA: 0x1CBB0
+  ImportAddressTableRVA: 0x1CE90
+  Symbol: BeginDrawing (0)
+  Symbol: ClearBackground (0)
+  Symbol: CloseWindow (0)
+  Symbol: ColorBrightness (0)
+  Symbol: DrawCircle (0)
+  Symbol: DrawCircleV (0)
+  Symbol: DrawRectangle (0)
+  Symbol: DrawText (0)
+  Symbol: DrawTextureV (0)
+  Symbol: EndDrawing (0)
+  Symbol: GenImageColor (0)
+  Symbol: GetMousePosition (0)
+  Symbol: InitWindow (0)
+  Symbol: IsKeyDown (0)
+  Symbol: IsTextureValid (0)
+  Symbol: IsWindowReady (0)
+  Symbol: LoadTextureFromImage (0)
+  Symbol: SetTargetFPS (0)
+  Symbol: SetTraceLogCallback (0)
+  Symbol: TraceLog (0)
+  Symbol: UnloadImage (0)
+  Symbol: UnloadTexture (0)
+  Symbol: WindowShouldClose (0)
+}
+Import {
+  Name: KERNEL32.dll
+  ImportLookupTableRVA: 0x1CC70
+  ImportAddressTableRVA: 0x1CF50
+  Symbol: CloseHandle (137)
+  Symbol: CreateFileW (206)
+  Symbol: DeleteCriticalSection (276)
+  Symbol: EnterCriticalSection (312)
+  Symbol: ExitProcess (359)
+  Symbol: FindClose (382)
+  Symbol: FindFirstFileExW (388)
+  Symbol: FindNextFileW (405)
+  Symbol: FlushFileBuffers (424)
+  Symbol: FreeEnvironmentStringsW (435)
+  Symbol: FreeLibrary (436)
+  Symbol: GetACP (443)
+  Symbol: GetCPInfo (458)
+  Symbol: GetCommandLineA (479)
+  Symbol: GetCommandLineW (480)
+  Symbol: GetConsoleMode (517)
+  Symbol: GetConsoleOutputCP (521)
+  Symbol: GetCurrentProcess (544)
+  Symbol: GetCurrentProcessId (545)
+  Symbol: GetCurrentThreadId (549)
+  Symbol: GetEnvironmentStringsW (577)
+  Symbol: GetFileSizeEx (598)
+  Symbol: GetFileType (600)
+  Symbol: GetLastError (618)
+  Symbol: GetModuleFileNameW (637)
+  Symbol: GetModuleHandleExW (640)
+  Symbol: GetModuleHandleW (641)
+  Symbol: GetOEMCP (673)
+  Symbol: GetProcAddress (696)
+  Symbol: GetProcessHeap (702)
+  Symbol: GetStartupInfoW (730)
+  Symbol: GetStdHandle (732)
+  Symbol: GetStringTypeW (737)
+  Symbol: GetSystemTimeAsFileTime (755)
+  Symbol: HeapAlloc (849)
+  Symbol: HeapFree (853)
+  Symbol: HeapReAlloc (856)
+  Symbol: HeapSize (858)
+  Symbol: InitializeCriticalSectionAndSpinCount (875)
+  Symbol: InitializeSListHead (879)
+  Symbol: InterlockedFlushSList (883)
+  Symbol: IsDebuggerPresent (901)
+  Symbol: IsProcessorFeaturePresent (908)
+  Symbol: IsValidCodePage (914)
+  Symbol: LCMapStringW (952)
+  Symbol: LeaveCriticalSection (964)
+  Symbol: LoadLibraryExW (970)
+  Symbol: MultiByteToWideChar (1014)
+  Symbol: QueryPerformanceCounter (1106)
+  Symbol: RaiseException (1129)
+  Symbol: RtlCaptureContext (1238)
+  Symbol: RtlLookupFunctionEntry (1245)
+  Symbol: RtlUnwindEx (1251)
+  Symbol: RtlVirtualUnwind (1252)
+  Symbol: SetFilePointerEx (1332)
+  Symbol: SetLastError (1346)
+  Symbol: SetStdHandle (1372)
+  Symbol: SetUnhandledExceptionFilter (1408)
+  Symbol: TerminateProcess (1439)
+  Symbol: TlsAlloc (1457)
+  Symbol: TlsFree (1458)
+  Symbol: TlsGetValue (1459)
+  Symbol: TlsSetValue (1460)
+  Symbol: UnhandledExceptionFilter (1473)
+  Symbol: WideCharToMultiByte (1554)
+  Symbol: WriteConsoleW (1573)
+  Symbol: WriteFile (1574)
+}
+
+{
+  "raylib_input_hashes": {
+    "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src\\raylib.h": "047e7255f93f8c34039cab906ad76136706b5c7b4c5b5b065d84141963ee9b6b",
+    "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.dll": "3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824",
+    "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\LICENSE": "882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799",
+    "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.lib": "59778ec137ffebe87a6c099944330f20b7eecdf1d49a5a93de7000a8992339df"
+  },
+  "packaged_hashes": {
+    "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated ordinary 雪\\ordinary.exe": "ebf9d324b05c6aeb67329c1a28c3df0886e8475ba726f4dbbe33e4017f78a692",
+    "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated gallery normal 雪\\gallery.exe": "2070ba1b62e6cc6388f6f470d2a2fa0050cd60b647d948b364231af01c1eb4f2",
+    "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated gallery optimized 雪\\gallery.exe": "8c0537f63de6ee2ec1af50bf58b9048cd6571cb1f87e410b618d0e352816056e",
+    "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated gallery normal 雪\\native\\void_raylib.dll": "17764f149b360456265b1b661d01ae8a59005ed475bd5cd0b3e7c2e97b9b024b",
+    "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated gallery normal 雪\\native\\raylib.dll": "3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824",
+    "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated gallery normal 雪\\native\\RAYLIB-LICENSE.txt": "882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799",
+    "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated gallery optimized 雪\\native\\void_raylib.dll": "17764f149b360456265b1b661d01ae8a59005ed475bd5cd0b3e7c2e97b9b024b",
+    "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated gallery optimized 雪\\native\\raylib.dll": "3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824",
+    "C:\\Users\\a\\VS7I2\\Debug-public-utf8\\relocated gallery optimized 雪\\native\\RAYLIB-LICENSE.txt": "882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799"
+  }
+}
+Integrated installed workflow passed

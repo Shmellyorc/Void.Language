@@ -1,0 +1,51 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-strict
+      Start 396: ffi_g4_conventional
+      Start 397: ffi_g5_callbacks
+ 1/23 Test #397: ffi_g5_callbacks .................   Passed   25.00 sec
+      Start 276: ffi_g4_jit_ir
+ 2/23 Test #276: ffi_g4_jit_ir ....................   Passed    4.98 sec
+      Start  18: cli_contract
+ 3/23 Test #396: ffi_g4_conventional ..............   Passed   33.72 sec
+      Start 273: ffi_g3_jit_ir
+ 4/23 Test #273: ffi_g3_jit_ir ....................   Passed    2.29 sec
+      Start 270: ffi_g2_jit_ir
+ 5/23 Test #270: ffi_g2_jit_ir ....................   Passed    1.52 sec
+      Start 265: ffi_g1_primitive_jit_ir
+ 6/23 Test #265: ffi_g1_primitive_jit_ir ..........   Passed    1.36 sec
+      Start 382: reload
+ 7/23 Test #382: reload ...........................   Passed    1.16 sec
+      Start 269: ffi_g1_primitive_aot_missing
+ 8/23 Test #269: ffi_g1_primitive_aot_missing .....   Passed    0.86 sec
+      Start 389: analysis
+ 9/23 Test #389: analysis .........................   Passed    1.26 sec
+      Start 149: runtime_callbacks
+10/23 Test  #18: cli_contract .....................   Passed   13.00 sec
+      Start 277: ffi_g4_aot_normal
+11/23 Test #149: runtime_callbacks ................   Passed    0.96 sec
+      Start 278: ffi_g4_aot_optimized
+12/23 Test #278: ffi_g4_aot_optimized .............   Passed    0.61 sec
+      Start 279: ffi_g4_aot_startup
+13/23 Test #277: ffi_g4_aot_normal ................   Passed    0.75 sec
+      Start   2: project_manifest
+14/23 Test #279: ffi_g4_aot_startup ...............   Passed    0.24 sec
+      Start 271: ffi_g2_aot_normal
+15/23 Test   #2: project_manifest .................   Passed    0.26 sec
+      Start 383: gc
+16/23 Test #271: ffi_g2_aot_normal ................   Passed    0.15 sec
+      Start 275: ffi_g3_aot_optimized
+17/23 Test #275: ffi_g3_aot_optimized .............   Passed    0.16 sec
+      Start 274: ffi_g3_aot_normal
+18/23 Test #383: gc ...............................   Passed    0.35 sec
+      Start 272: ffi_g2_aot_optimized
+19/23 Test #274: ffi_g3_aot_normal ................   Passed    0.16 sec
+      Start 266: ffi_g1_primitive_aot_normal
+20/23 Test #266: ffi_g1_primitive_aot_normal ......   Passed    0.07 sec
+      Start 268: ffi_g1_primitive_aot_mismatch
+21/23 Test #272: ffi_g2_aot_optimized .............   Passed    0.16 sec
+      Start 267: ffi_g1_primitive_aot_optimized
+22/23 Test #268: ffi_g1_primitive_aot_mismatch ....   Passed    0.06 sec
+23/23 Test #267: ffi_g1_primitive_aot_optimized ...   Passed    0.08 sec
+
+100% tests passed, 0 tests failed out of 23
+
+Total Test time (real) =  44.61 sec

@@ -1,0 +1,33 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+      Start 293: ffi_g3_jit_ir
+      Start 290: ffi_g2_jit_ir
+ 1/14 Test #290: ffi_g2_jit_ir ....................   Passed    1.13 sec
+      Start 289: ffi_g1_primitive_aot_missing
+ 2/14 Test #293: ffi_g3_jit_ir ....................   Passed    1.70 sec
+      Start 285: ffi_g1_primitive_jit_ir
+ 3/14 Test #289: ffi_g1_primitive_aot_missing .....   Passed    0.94 sec
+      Start 408: analysis
+ 4/14 Test #285: ffi_g1_primitive_jit_ir ..........   Passed    0.77 sec
+      Start 401: reload
+ 5/14 Test #401: reload ...........................   Passed    0.44 sec
+      Start 402: gc
+ 6/14 Test #408: analysis .........................   Passed    0.87 sec
+      Start 292: ffi_g2_aot_optimized
+ 7/14 Test #292: ffi_g2_aot_optimized .............   Passed    0.04 sec
+      Start 291: ffi_g2_aot_normal
+ 8/14 Test #402: gc ...............................   Passed    0.11 sec
+      Start 295: ffi_g3_aot_optimized
+ 9/14 Test #291: ffi_g2_aot_normal ................   Passed    0.05 sec
+      Start 294: ffi_g3_aot_normal
+10/14 Test #295: ffi_g3_aot_optimized .............   Passed    0.05 sec
+      Start 288: ffi_g1_primitive_aot_mismatch
+11/14 Test #294: ffi_g3_aot_normal ................   Passed    0.05 sec
+      Start 286: ffi_g1_primitive_aot_normal
+12/14 Test #288: ffi_g1_primitive_aot_mismatch ....   Passed    0.03 sec
+      Start 287: ffi_g1_primitive_aot_optimized
+13/14 Test #286: ffi_g1_primitive_aot_normal ......   Passed    0.03 sec
+14/14 Test #287: ffi_g1_primitive_aot_optimized ...   Passed    0.03 sec
+
+100% tests passed, 0 tests failed out of 14
+
+Total Test time (real) =   3.16 sec

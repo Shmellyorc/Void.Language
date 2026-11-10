@@ -1,0 +1,9 @@
+/home/shmellyorc/Documents/Void.Language/build/slice6/managed-default.void:10:13: error: Field 'cached' must be initialized before it is read.
+    code: VOID1106
+
+ 10 |     if self.cached is Some(var mode_value):
+    |             ^^^^^^
+    Module: /managed-default.void
+    Hint: Construction views cannot become ordinary references before successful initialization and commit.
+
+exit=1

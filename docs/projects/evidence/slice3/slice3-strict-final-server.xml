@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="30"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="67"
+	timestamp="2026-11-08T16:14:35"
+	>
+	<testcase name="project_protocol" classname="project_protocol" time="1.79365" status="run">
+		<properties/>
+		<system-out>project_protocol: 74 checks passed
+</system-out>
+	</testcase>
+	<testcase name="generics_hint_lsp" classname="generics_hint_lsp" time="0.109632" status="run">
+		<properties/>
+		<system-out>Shared hints LSP: projected hover, navigation, diagnostics and repair passed on 1 MiB stack
+</system-out>
+	</testcase>
+	<testcase name="lsp_positions" classname="lsp_positions" time="0.0247423" status="run">
+		<properties/>
+		<system-out>UTF16 positions, owned snapshots and URI mapping passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_protocol" classname="lsp_protocol" time="1.33391" status="run">
+		<properties/>
+		<system-out>editor: CRLF/UTF16, cross-file symbols, overlays, versions, invalid/repair, graph changes and cycles passed
+transport: fragmented/coalesced frames, IDs, malformed messages, bounded framing, lifecycle and EOF passed
+value structs: real LSP type/constructor/field navigation, references, readonly diagnostics and revision recovery passed
+receiver methods: imported native LSP navigation, references, effect changes and revision recovery passed
+initialization: imported initializer navigation/references, exact argument diagnostics and unsaved recovery passed
+managed structs: cyclic types, imported fields/methods, readonly aliases and unsaved recovery passed
+managed initialization: imported constructor, private helper navigation, required-field diagnostics and unsaved repair passed
+reference values: imported nested reference navigation, precise readonly diagnostics and unsaved recovery passed
+composition: imported promoted navigation, ambiguity and unsaved repair passed
+inheritance: original owners, static virtual/sup...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage11_globals" classname="lsp_stage11_globals" time="0.180677" status="run">
+		<properties/>
+		<system-out>Global hover, completion, cross-file definition/references/rename, overlays and stale-version checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage8" classname="lsp_stage8" time="2.06917" status="run">
+		<properties/>
+		<system-out>Debug cache: hit
+Debug cache: hit
+SKIP: Windows 8.3 coverage requires Windows
+POSIX workspace ancestor alias and descendant rejection checks passed
+Stage 8 compiler-backed LSP discovery/docs/readonly checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_documentation" classname="lsp_documentation" time="0.389202" status="run">
+		<properties/>
+		<system-out>Documentation: 196 assertions passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_math" classname="lsp_math" time="1.1952" status="run">
+		<properties/>
+		<system-out>Math LSP: 65 checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_os" classname="lsp_os" time="6.91946" status="run">
+		<properties/>
+		<system-out>OS LSP: 44 checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_random" classname="lsp_random" time="3.03047" status="run">
+		<properties/>
+		<system-out>Random LSP: 61 checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_binary" classname="lsp_binary" time="0.294286" status="run">
+		<properties/>
+		<system-out>Binary LSP: 81 import, completion, navigation, hover and active-parameter checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_const_recovery" classname="lsp_const_recovery" time="3.69675" status="run">
+		<properties/>
+		<system-out>Const/global completion recovery: 472 assertions passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_combined" classname="lsp_combined" time="5.37955" status="run">
+		<properties/>
+		<system-out>Combined LSP: 97 documentation, completion, signature and navigation assertions passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_memory" classname="lsp_memory" time="1.69647" status="run">
+		<properties/>
+		<system-out>Memory LSP: 156 completion, navigation, hover, constructor/method signature and documentation checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_text_encoding" classname="lsp_text_encoding" time="3.1657" status="run">
+		<properties/>
+		<system-out>54 persistent LSP documentation/completion/recovery checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage7" classname="lsp_stage7" time="0.467191" status="run">
+		<properties/>
+		<system-out>Stage 7: completion/recovery, signatures, hover, bindings, symbols, guarded rename, formatting, refresh, batching, cancellation passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_demo" classname="lsp_demo" time="0.107528" status="run">
+		<properties/>
+		<system-out>initialized: full synchronization, UTF-16, definition and references
+open: no diagnostics
+definition: worker.void:1:6
+references: declaration and one source call
+unsaved edit: VOID2002 at worker.void:2:12
+invalid revision: navigation returns null
+repair: old diagnostics cleared; fresh navigation restored
+shutdown and exit: clean protocol streams
+</system-out>
+	</testcase>
+	<testcase name="lsp_log" classname="lsp_log" time="13.2747" status="run">
+		<properties/>
+		<system-out>VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+Logging LSP: 38 checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_collections_stdlib" classname="lsp_collections_stdlib" time="0.806026" status="run">
+		<properties/>
+		<system-out>Collections LSP: 40 checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_channel" classname="lsp_channel" time="0.510623" status="run">
+		<properties/>
+		<system-out>Channel LSP: 55 checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_io" classname="lsp_io" time="5.14937" status="run">
+		<properties/>
+		<system-out>41 io/path LSP documentation, completion and persistent recovery checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_async_syntax" classname="lsp_async_syntax" time="0.188907" status="run">
+		<properties/>
+		<system-out>await syntax LSP: hover, definition, rename, signatures, formatting, completion, exact spans, recovery and repair passed; stack=1 MiB on Linux
+</system-out>
+	</testcase>
+	<testcase name="lsp_sprint6" classname="lsp_sprint6" time="0.866265" status="run">
+		<properties/>
+		<system-out>Sprint 6 LSP navigation, UTF-16, hover, rename, completion, signature, diagnostics and formatting passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage10_fields" classname="lsp_stage10_fields" time="0.116651" status="run">
+		<properties/>
+		<system-out>Field LSP privacy, const hover/completion, dirty rejection and repair passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage10_display" classname="lsp_stage10_display" time="12.4929" status="run">
+		<properties/>
+		<system-out>Display LSP primitive/hook/temporal hover, completion, navigation, signature, original hole spans and dirty repair passed
+237 console/composite LSP checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage10_intelligence" classname="lsp_stage10_intelligence" time="0.659401" status="run">
+		<properties/>
+		<system-out>170 Stage 10 LSP intelligence checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage10_source_formatting" classname="lsp_stage10_source_formatting" time="1.13726" status="run">
+		<properties/>
+		<system-out>144 source formatting LSP/revision/diagnostic checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_sprint4" classname="lsp_sprint4" time="0.103442" status="run">
+		<properties/>
+		<system-out>Sprint 4 nonexecuting application analysis and native trust checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_sprint3" classname="lsp_sprint3" time="0.160783" status="run">
+		<properties/>
+		<system-out>Sprint 3 text/collection completion, hover, signatures, references and builtin protections passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_sprint2" classname="lsp_sprint2" time="0.116958" status="run">
+		<properties/>
+		<system-out>Sprint 2 numeric completion/hover/signatures/readonly and named-label navigation passed
+</system-out>
+	</testcase>
+</testsuite>

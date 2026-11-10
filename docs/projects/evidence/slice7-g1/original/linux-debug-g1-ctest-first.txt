@@ -1,0 +1,161 @@
+UpdateCTestConfiguration  from :/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/DartConfiguration.tcl
+Parse Config file:/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/DartConfiguration.tcl
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 285
+    Start 285: ffi_g1_primitive_jit_ir
+
+285: Test command: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g1_tests "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/primitives.descriptor" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/primitives.void" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/tests"
+285: Working Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+285: Test timeout computed to be: 180
+285: void-c-primitive 2 1: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+285: void-c-primitive 1 2: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+285: call vectorcall: C primitive descriptor line 8: unsupported descriptor, ABI revision or effects
+285: effects direct-sync blocking no-callbacks: C primitive descriptor line 7: unsupported descriptor, ABI revision or effects
+285: c_size:i64: C primitive descriptor line 9: unsupported descriptor, ABI revision or effects
+285: c_bool:u8: C primitive descriptor line 9: unsupported descriptor, ABI revision or effects
+285: bind signed8 g1_signed8 i8 ptr: C primitive descriptor line 10: unsupported C primitive type
+285: bind signed8 g1_signed8 i8 record: C primitive descriptor line 10: unsupported C primitive type
+285: bind signed8 g1_signed8 i8 void: C primitive descriptor line 10: unsupported C primitive type
+285: bind signed8 g1_signed8 i8 u8: C primitive provider rejected the exact descriptor or fixture identity
+285: bind signed8 g1_missing i8 i8: C primitive provider rejected the exact descriptor or fixture identity
+285: bind signed16 g1_signed8 i8 i8: C primitive descriptor line 11: invalid or duplicate binding name or export
+285: bind signed8 g1_signed16 i8 i8: C primitive descriptor line 11: invalid or duplicate binding name or export
+285: extra signed8 g1_signed8 i8 i8: C primitive descriptor line 10: expected a bounded primitive binding record
+285: provider org.voidlang.forged: C primitive provider rejected the exact descriptor or fixture identity
+285: source /other.void: C primitive provider rejected the exact descriptor or fixture identity
+285: source /../other.void: C primitive descriptor line 4: expected a canonical single-file VFS identity
+285: target aarch64-: C primitive descriptor line 3: unsupported target/profile combination
+285: artifact identity: C primitive provider rejected the exact descriptor or fixture identity
+285: descriptor bounds: C primitive descriptor line 1: descriptor size outside 1..16384 bytes
+285: unavailable fixture: C primitive provider transport is unavailable
+285: missing independent admission: VOID IR: C primitive call outside the admitted binding module
+285: wrong provider: VOID IR: invalid C primitive descriptor or exact call signature
+285: wrong export: VOID IR: invalid C primitive descriptor or exact call signature
+285: wrong ordinal: VOID IR: invalid C primitive descriptor or exact call signature
+285: negative ordinal: VOID IR: C primitive call outside the admitted binding module
+285: missing operand: VOID IR: invalid C primitive descriptor or exact call signature
+285: extra operand: VOID IR: invalid C primitive descriptor or exact call signature
+285: argument signedness: VOID IR: invalid C primitive descriptor or exact call signature
+285: argument width: VOID IR: invalid C primitive descriptor or exact call signature
+285: return signedness: VOID IR: invalid C primitive descriptor or exact call signature
+285: return count: VOID IR: invalid C primitive descriptor or exact call signature
+285: aggregate result: VOID IR: invalid C primitive descriptor or exact call signature
+285: pointer-like result: VOID IR: invalid C primitive descriptor or exact call signature
+285: receiver: VOID IR: invalid C primitive descriptor or exact call signature
+285: unadmitted scope: VOID IR: C primitive binding requires the admitted direct import
+285: unadmitted body received VOID IR: unknown callee /native_primitives.void::signed32
+1/5 Test #285: ffi_g1_primitive_jit_ir ..........***Failed    0.07 sec
+void-c-primitive 2 1: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+void-c-primitive 1 2: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+call vectorcall: C primitive descriptor line 8: unsupported descriptor, ABI revision or effects
+effects direct-sync blocking no-callbacks: C primitive descriptor line 7: unsupported descriptor, ABI revision or effects
+c_size:i64: C primitive descriptor line 9: unsupported descriptor, ABI revision or effects
+c_bool:u8: C primitive descriptor line 9: unsupported descriptor, ABI revision or effects
+bind signed8 g1_signed8 i8 ptr: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 record: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 void: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 u8: C primitive provider rejected the exact descriptor or fixture identity
+bind signed8 g1_missing i8 i8: C primitive provider rejected the exact descriptor or fixture identity
+bind signed16 g1_signed8 i8 i8: C primitive descriptor line 11: invalid or duplicate binding name or export
+bind signed8 g1_signed16 i8 i8: C primitive descriptor line 11: invalid or duplicate binding name or export
+extra signed8 g1_signed8 i8 i8: C primitive descriptor line 10: expected a bounded primitive binding record
+provider org.voidlang.forged: C primitive provider rejected the exact descriptor or fixture identity
+source /other.void: C primitive provider rejected the exact descriptor or fixture identity
+source /../other.void: C primitive descriptor line 4: expected a canonical single-file VFS identity
+target aarch64-: C primitive descriptor line 3: unsupported target/profile combination
+artifact identity: C primitive provider rejected the exact descriptor or fixture identity
+descriptor bounds: C primitive descriptor line 1: descriptor size outside 1..16384 bytes
+unavailable fixture: C primitive provider transport is unavailable
+missing independent admission: VOID IR: C primitive call outside the admitted binding module
+wrong provider: VOID IR: invalid C primitive descriptor or exact call signature
+wrong export: VOID IR: invalid C primitive descriptor or exact call signature
+wrong ordinal: VOID IR: invalid C primitive descriptor or exact call signature
+negative ordinal: VOID IR: C primitive call outside the admitted binding module
+missing operand: VOID IR: invalid C primitive descriptor or exact call signature
+extra operand: VOID IR: invalid C primitive descriptor or exact call signature
+argument signedness: VOID IR: invalid C primitive descriptor or exact call signature
+argument width: VOID IR: invalid C primitive descriptor or exact call signature
+return signedness: VOID IR: invalid C primitive descriptor or exact call signature
+return count: VOID IR: invalid C primitive descriptor or exact call signature
+aggregate result: VOID IR: invalid C primitive descriptor or exact call signature
+pointer-like result: VOID IR: invalid C primitive descriptor or exact call signature
+receiver: VOID IR: invalid C primitive descriptor or exact call signature
+unadmitted scope: VOID IR: C primitive binding requires the admitted direct import
+unadmitted body received VOID IR: unknown callee /native_primitives.void::signed32
+
+test 286
+    Start 286: ffi_g1_primitive_aot_normal
+
+286: Test command: /usr/bin/python3 "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g1_aot_normal" "73"
+286: Working Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+286: Test timeout computed to be: 1500
+2/5 Test #286: ffi_g1_primitive_aot_normal ......   Passed    0.03 sec
+test 287
+    Start 287: ffi_g1_primitive_aot_optimized
+
+287: Test command: /usr/bin/python3 "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g1_aot_optimized" "73"
+287: Working Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+287: Test timeout computed to be: 1500
+3/5 Test #287: ffi_g1_primitive_aot_optimized ...   Passed    0.03 sec
+test 288
+    Start 288: ffi_g1_primitive_aot_mismatch
+
+288: Test command: /usr/bin/python3 "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g1_aot_mismatch" "failure:C primitive provider rejected the exact descriptor or fixture identity"
+288: Working Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+288: Test timeout computed to be: 1500
+4/5 Test #288: ffi_g1_primitive_aot_mismatch ....   Passed    0.03 sec
+test 289
+    Start 289: ffi_g1_primitive_aot_missing
+
+289: Test command: /usr/bin/python3 "/home/shmellyorc/Documents/Void.Language/tests/ffi/missing.py" "/usr/bin/cmake" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug" "Debug"
+289: Working Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+289: Test timeout computed to be: 180
+289: [ 62%] Built target libcurl_static
+289: [ 68%] Built target void_native_fixture
+289: [ 68%] Built target void_format_objects
+289: [ 68%] Built target void_zone_objects
+289: [ 68%] Built target void_application_objects
+289: [ 81%] Built target void_runtime
+289: [ 87%] Built target void_core
+289: [ 87%] Built target void_llvm
+289: [ 87%] Built target voidc_objects
+289: [ 93%] Built target void_cache_identity
+289: [ 93%] Built target void_g1_fixture
+289: [ 93%] Built target void_g1_thunk
+289: [ 93%] Built target void_g1_tests
+289: [ 93%] Building CXX object CMakeFiles/void_g1_aot_missing.dir/tests/async/aot.cpp.o
+289: [ 93%] Linking CXX executable void_g1_aot_missing
+289: ld.lld: error: undefined symbol: vd_c_primitive_dispatch_v1
+289: >>> referenced by native_primitives.void>:2 (<host binding /native_primitives.void>:2)
+289: >>>               ffi-g1/application-optimized.o:(__vd_2f6e61746976655f7072696d6974697665732e766f69643a3a7369676e656438__void)
+289: >>> referenced by native_primitives.void>:4 (<host binding /native_primitives.void>:4)
+289: >>>               ffi-g1/application-optimized.o:(__vd_2f6e61746976655f7072696d6974697665732e766f69643a3a7369676e65643136__void)
+289: >>> referenced by native_primitives.void>:6 (<host binding /native_primitives.void>:6)
+289: >>>               ffi-g1/application-optimized.o:(__vd_2f6e61746976655f7072696d6974697665732e766f69643a3a7369676e65643332__void)
+289: >>> referenced 16 more times
+289: clang++: error: linker command failed with exit code 1 (use -v to see invocation)
+289: gmake[3]: *** [CMakeFiles/void_g1_aot_missing.dir/build.make:122: void_g1_aot_missing] Error 1
+289: gmake[2]: *** [CMakeFiles/Makefile2:19821: CMakeFiles/void_g1_aot_missing.dir/all] Error 2
+289: gmake[1]: *** [CMakeFiles/Makefile2:19828: CMakeFiles/void_g1_aot_missing.dir/rule] Error 2
+289: gmake: *** [Makefile:6849: void_g1_aot_missing] Error 2
+5/5 Test #289: ffi_g1_primitive_aot_missing .....   Passed    0.92 sec
+
+The following tests passed:
+	ffi_g1_primitive_aot_normal
+	ffi_g1_primitive_aot_optimized
+	ffi_g1_primitive_aot_mismatch
+	ffi_g1_primitive_aot_missing
+
+80% tests passed, 1 tests failed out of 5
+
+Total Test time (real) =   1.10 sec
+
+The following tests FAILED:
+	285 - ffi_g1_primitive_jit_ir (Failed)
+Errors while running CTest

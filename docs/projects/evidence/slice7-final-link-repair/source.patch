@@ -1,0 +1,318 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1703,30 +1703,39 @@
+   target_link_libraries(void_sprint6_tests PRIVATE void_llvm void_cache_identity)
+   add_test(NAME ergonomics_sprint6_host COMMAND void_sprint6_tests "${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/sprint6 host fixtures")
+   set_tests_properties(ergonomics_sprint6_host PROPERTIES TIMEOUT 180)
++  # The Linux recipes invoke Clang directly and need the Runtime's pinned host
++  # archives after the Runtime and fixture archives.
++  set(legacy_aot_host_libraries "")
++  if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
++    set(legacy_aot_host_libraries ${VOID_HOST_LINK_FILES})
++  endif()
+   add_test(NAME ergonomics_sprint6 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage8/sprint6.py"
+-    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}")
++    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}" ${legacy_aot_host_libraries})
+   set_tests_properties(ergonomics_sprint6 PROPERTIES TIMEOUT 240)
+   add_test(NAME stage10_fields_aot COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage10/fields.py"
+-    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}")
++    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}" ${legacy_aot_host_libraries})
+   add_test(NAME stage10_temporal_install COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage10/install_temporal.py"
+     "${CMAKE_COMMAND}" "${CMAKE_CURRENT_BINARY_DIR}" "$<CONFIG>")
+   set_tests_properties(stage10_temporal_install PROPERTIES TIMEOUT 300)
+   add_test(NAME stage10_temporal_aot COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage10/temporal.py"
+-    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}")
++    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}" ${legacy_aot_host_libraries})
+   set_tests_properties(stage10_temporal_aot PROPERTIES TIMEOUT 240)
+   if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+     add_test(NAME stage11_globals_stack COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage11/stack.py" "$<TARGET_FILE:voidc>")
+     set_tests_properties(stage11_globals_stack PROPERTIES TIMEOUT 180)
+   endif()
+-  add_test(NAME stage11_globals_aot COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage11/globals.py" $<TARGET_FILE:voidc> "${VOID_CLANG}" "${VOID_LINKER}" $<TARGET_FILE:void_runtime> $<TARGET_FILE:void_native_fixture> "${VOID_SANITIZERS}")
++  add_test(NAME stage11_globals_aot COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage11/globals.py"
++    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}" ${legacy_aot_host_libraries})
+   set_tests_properties(stage11_globals_aot PROPERTIES TIMEOUT 900)
+-  add_test(NAME stage10_console_aot COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage10/console.py" $<TARGET_FILE:voidc> "${VOID_CLANG}" "${VOID_LINKER}" $<TARGET_FILE:void_runtime> $<TARGET_FILE:void_native_fixture> "${VOID_SANITIZERS}")
++  add_test(NAME stage10_console_aot COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage10/console.py"
++    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}" ${legacy_aot_host_libraries})
+   set_tests_properties(stage10_console_aot PROPERTIES TIMEOUT 2400)
+-  add_test(NAME stage10_operators_aot COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage10/operators.py" $<TARGET_FILE:voidc> "${VOID_CLANG}" "${VOID_LINKER}" $<TARGET_FILE:void_runtime> $<TARGET_FILE:void_native_fixture> "${VOID_SANITIZERS}" $<TARGET_FILE:void_operator_integration>)
++  add_test(NAME stage10_operators_aot COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage10/operators.py"
++    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}" "$<TARGET_FILE:void_operator_integration>" ${legacy_aot_host_libraries})
+   # Includes the combined temporal/field/hook fixtures and measured source workloads.
+   set_tests_properties(stage10_operators_aot PROPERTIES TIMEOUT 600)
+   add_test(NAME stage10_conversion_aot COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage10/conversion.py"
+-    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}")
++    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}" ${legacy_aot_host_libraries})
+   set_tests_properties(stage10_fields_aot stage10_conversion_aot PROPERTIES TIMEOUT 240)
+   add_test(NAME lsp_sprint6 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage8/lsp_sprint6.py" "$<TARGET_FILE:voidls>")
+   add_test(NAME lsp_stage10_fields COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage10/lsp_fields.py" "$<TARGET_FILE:voidls>")
+@@ -1744,10 +1753,10 @@
+   add_test(NAME application_native_sprint4_host COMMAND void_sprint4_tests "${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/sprint4 host fixtures")
+   set_tests_properties(application_native_sprint4_host PROPERTIES TIMEOUT 180)
+   add_test(NAME application_native_sprint4 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage8/sprint4.py"
+-    "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_sprint4_tests>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}")
++    "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_sprint4_tests>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}" ${legacy_aot_host_libraries})
+   set_tests_properties(application_native_sprint4 PROPERTIES TIMEOUT 240)
+   add_test(NAME text_collections_sprint3 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage8/sprint3.py"
+-    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}")
++    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}" ${legacy_aot_host_libraries})
+   set_tests_properties(text_collections_sprint3 PROPERTIES TIMEOUT 240)
+   add_test(NAME lsp_sprint3 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage8/lsp_sprint3.py" "$<TARGET_FILE:voidls>")
+   set_tests_properties(lsp_sprint3 PROPERTIES TIMEOUT 60)
+diff --git a/tests/stage10/console.py b/tests/stage10/console.py
+--- a/tests/stage10/console.py
++++ b/tests/stage10/console.py
+@@ -11,7 +11,7 @@
+ import threading
+ import time
+ 
+-compiler, clang, linker, runtime, fixture, sanitizer = sys.argv[1:]
++compiler, clang, linker, runtime, fixture, sanitizer, *host_libraries = sys.argv[1:]
+ compiler, runtime, fixture = map(lambda x: str(Path(x).resolve()), (compiler, runtime, fixture))
+ fixtures = Path(__file__).resolve().parent
+ checks = 0
+@@ -106,7 +106,7 @@
+             obj = root / (name + ("-O2.o" if optimized else "-normal.o"))
+             executable = obj.with_suffix(".exe" if os.name == "nt" else ".bin")
+             run([compiler, "emit", source, "-o", obj, *switches])
+-            run([clang, *flags, obj, runtime, fixture, "-o", executable])
++            run([clang, *flags, obj, runtime, fixture, *host_libraries, "-o", executable])
+             started = time.perf_counter()
+             p = run([executable], stdin, status)
+             assert p.stdout == stdout, (name, optimized, "AOT stdout", p.stdout, stdout)
+@@ -148,7 +148,7 @@
+         obj = root / ("prompt-O2.o" if optimized else "prompt-normal.o")
+         executable = obj.with_suffix(".exe" if os.name == "nt" else ".bin")
+         run([compiler, "emit", source, "-o", obj, *switches])
+-        run([clang, *flags, obj, runtime, fixture, "-o", executable])
++        run([clang, *flags, obj, runtime, fixture, *host_libraries, "-o", executable])
+         for label, args in [("JIT", [compiler, "run", source, *switches]), ("linked AOT", [executable])]:
+             for case, payload, ending in [("unicode-CR-open", "Ada🎮\r".encode(), "Hello, Ada🎮\ndone\n".encode()), ("empty-line", b"\n", b"Hello, \ndone\n"), ("EOF", b"", b"EOF\ndone\n"), ("invalid-UTF8", b"\xff", b"input error invalid_encoding 1\ndone\n")]:
+                 child = subprocess.Popen([str(a) for a in args], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=environment)
+@@ -220,7 +220,7 @@
+             obj = root / ("terminal-O2.o" if optimized else "terminal-normal.o")
+             executable = obj.with_suffix(".bin")
+             run([compiler, "emit", source, "-o", obj, *switches])
+-            run([clang, *flags, obj, runtime, fixture, "-o", executable])
++            run([clang, *flags, obj, runtime, fixture, *host_libraries, "-o", executable])
+             for label, args in [("JIT", [compiler, "run", source, *switches]), ("linked AOT", [executable])]:
+                 master, slave = pty.openpty()
+                 fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack("HHHH", 24, 80, 0, 0))
+@@ -276,7 +276,7 @@
+                 obj = root / ("keys-opt.o" if optimized else "keys.o")
+                 executable = obj.with_suffix(".bin")
+                 run([compiler, "emit", source, "-o", obj, *switches])
+-                run([clang, *flags, obj, runtime, fixture, "-o", executable])
++                run([clang, *flags, obj, runtime, fixture, *host_libraries, "-o", executable])
+                 for label, args in [("JIT", [compiler, "run", source, *switches]), ("linked AOT", [executable])]:
+                     master, slave = pty.openpty()
+                     mode = termios.tcgetattr(slave)
+@@ -317,7 +317,7 @@
+         source.write_text('use console\nfunc done():\n    print("broken-cleanup;", file = console.stderr, end = "")\nfunc again():\n    print("also broken")\nfunc main():\n    defer done()\n    defer again()\n    print("broken")\n', encoding="utf-8")
+         obj, executable = root / "broken.o", root / "broken.bin"
+         run([compiler, "emit", source, "-o", obj])
+-        run([clang, *flags, obj, runtime, fixture, "-o", executable])
++        run([clang, *flags, obj, runtime, fixture, *host_libraries, "-o", executable])
+         for label, args in [("JIT/O2", [compiler, "run", source]), ("linked AOT/O2", [executable])]:
+             read_fd, write_fd = os.pipe()
+             os.close(read_fd)
+@@ -342,7 +342,7 @@
+         for optimized in (False,True):
+             switches=[] if optimized else ["--no-opt"]
+             obj=root/("partial-O2.o" if optimized else "partial-normal.o");exe=obj.with_suffix(".bin")
+-            run([compiler,"emit",source,"-o",obj,*switches]);run([clang,*flags,obj,runtime,fixture,"-o",exe])
++            run([compiler,"emit",source,"-o",obj,*switches]);run([clang,*flags,obj,runtime,fixture,*host_libraries,"-o",exe])
+             for label,args in [("JIT",[compiler,"run",source,*switches]),("linked AOT",[exe])]:
+                 read_fd,write_fd=os.pipe();capacity=fcntl.fcntl(read_fd,fcntl.F_GETPIPE_SZ)
+                 child=subprocess.Popen([str(x) for x in args],stdin=subprocess.DEVNULL,stdout=write_fd,stderr=subprocess.PIPE,env=environment);os.close(write_fd)
+diff --git a/tests/stage10/conversion.py b/tests/stage10/conversion.py
+--- a/tests/stage10/conversion.py
++++ b/tests/stage10/conversion.py
+@@ -5,7 +5,7 @@
+ import sys
+ import tempfile
+ 
+-compiler, clang, linker, runtime, fixture, sanitizer = sys.argv[1:]
++compiler, clang, linker, runtime, fixture, sanitizer, *host_libraries = sys.argv[1:]
+ flags = ["--driver-mode=g++", "-pthread"]
+ if linker:
+     flags.append("--ld-path=" + linker)
+@@ -56,7 +56,7 @@
+         obj = root / ("optimized.o" if optimized else "normal.o")
+         exe = obj.with_suffix(".exe" if os.name == "nt" else ".bin")
+         run([compiler, "emit", source, "-o", obj, *switches])
+-        run([clang, *flags, obj, runtime, fixture, "-o", exe])
++        run([clang, *flags, obj, runtime, fixture, *host_libraries, "-o", exe])
+         for value in (0, 4, -3):
+             assert run([exe, value]) == str(len(str(value)) + max(3, len(str(abs(value)))) + (1 if value < 0 else 0))
+ print(f"{checks} source display JIT/AOT checks passed")
+diff --git a/tests/stage10/fields.py b/tests/stage10/fields.py
+--- a/tests/stage10/fields.py
++++ b/tests/stage10/fields.py
+@@ -5,7 +5,7 @@
+ import sys
+ import tempfile
+ 
+-compiler, clang, linker, runtime, fixture, sanitizer = sys.argv[1:]
++compiler, clang, linker, runtime, fixture, sanitizer, *host_libraries = sys.argv[1:]
+ flags = ["--driver-mode=g++", "-pthread"]
+ if linker:
+     flags.append("--ld-path=" + linker)
+@@ -65,7 +65,7 @@
+         obj = root / ("optimized.o" if optimized else "normal.o")
+         exe = obj.with_suffix(".exe" if os.name == "nt" else ".bin")
+         run([compiler, "emit", source, "-o", obj, *switches])
+-        run([clang, *flags, obj, runtime, fixture, "-o", exe])
++        run([clang, *flags, obj, runtime, fixture, *host_libraries, "-o", exe])
+         for value in (0, 4, -3):
+             assert run([exe, value]) == str(2 * value + 3)
+ print(f"{checks} field JIT/AOT checks passed")
+diff --git a/tests/stage10/operators.py b/tests/stage10/operators.py
+--- a/tests/stage10/operators.py
++++ b/tests/stage10/operators.py
+@@ -7,7 +7,7 @@
+ import sys
+ import tempfile
+ 
+-compiler, clang, linker, runtime, fixture, sanitizer, integration = sys.argv[1:]
++compiler, clang, linker, runtime, fixture, sanitizer, integration, *host_libraries = sys.argv[1:]
+ flags = ["--driver-mode=g++", "-pthread"]
+ if linker:
+     flags.append("--ld-path=" + linker)
+@@ -46,7 +46,7 @@
+         obj = root / ("optimized.o" if optimized else "normal.o")
+         exe = obj.with_suffix(".exe" if os.name == "nt" else ".bin")
+         run([compiler, "emit", source, "-o", obj, *switches])
+-        run([clang, *flags, obj, runtime, fixture, "-o", exe])
++        run([clang, *flags, obj, runtime, fixture, *host_libraries, "-o", exe])
+         for value in (0, 4, -3):
+             assert run([exe, value]) == str(value)
+     # Reuse the compiler-owned async/native admission harness for fixtures that
+@@ -86,7 +86,7 @@
+             obj = root / (name + mode + ".o")
+             exe = obj.with_suffix(".exe" if os.name == "nt" else ".bin")
+             run([integration, "--emit", source, obj, mode, kind])
+-            run([clang, *flags, obj, runtime, fixture, "-o", exe])
++            run([clang, *flags, obj, runtime, fixture, *host_libraries, "-o", exe])
+             for value, expected in inputs:
+                 diagnostics = () if expected is not None else ("Division by zero",)
+                 if name == "operator_native_systems" and expected is None:
+diff --git a/tests/stage10/temporal.py b/tests/stage10/temporal.py
+--- a/tests/stage10/temporal.py
++++ b/tests/stage10/temporal.py
+@@ -4,7 +4,7 @@
+ import subprocess
+ import sys
+ import tempfile
+-compiler, clang, linker, runtime, fixture, sanitizer = sys.argv[1:]
++compiler, clang, linker, runtime, fixture, sanitizer, *host_libraries = sys.argv[1:]
+ flags = ["--driver-mode=g++", "-pthread"]
+ if linker: flags.append("--ld-path=" + linker)
+ if sanitizer == "ON": flags.append("-fsanitize=address,undefined")
+@@ -27,7 +27,7 @@
+         obj=root/("optimized.o" if optimized else "normal.o")
+         exe=obj.with_suffix(".exe" if os.name=="nt" else ".bin")
+         execute([compiler,"emit",source,"-o",obj,*options])
+-        execute([clang,*flags,obj,runtime,fixture,"-o",exe])
++        execute([clang,*flags,obj,runtime,fixture,*host_libraries,"-o",exe])
+         for value in (0,4,-3): assert execute([exe,value])[0]==str(value)
+     for body in ('var value = date(2024, 1, 1)', 'var value: date', 'var value = "{make_date(2024, 1, 1):yyyy}"',
+                  'if make_date(2024, 1, 1) is Ok(var value):\n        var invalid = "{value:HH}"',
+diff --git a/tests/stage11/globals.py b/tests/stage11/globals.py
+--- a/tests/stage11/globals.py
++++ b/tests/stage11/globals.py
+@@ -7,7 +7,7 @@
+ import sys
+ import tempfile
+ 
+-compiler, clang, linker, runtime, fixture, sanitizer = sys.argv[1:]
++compiler, clang, linker, runtime, fixture, sanitizer, *host_libraries = sys.argv[1:]
+ flags = ["--driver-mode=g++", "-pthread"]
+ if sys.platform.startswith("linux"):
+     flags.append("-ldl")
+@@ -46,7 +46,7 @@
+             obj = root / "program.o"
+             exe = root / ("program.exe" if os.name == "nt" else "program")
+             run([compiler, "emit", path, "-o", obj, *switches])
+-            run([clang, obj, runtime, fixture, *flags, "-o", exe])
++            run([clang, obj, runtime, fixture, *host_libraries, *flags, "-o", exe])
+             result = run([exe], status)
+             assert result.stdout == stdout and error in result.stderr, (name, "AOT", result)
+ 
+diff --git a/tests/stage8/sprint3.py b/tests/stage8/sprint3.py
+--- a/tests/stage8/sprint3.py
++++ b/tests/stage8/sprint3.py
+@@ -2,6 +2,7 @@
+ import os, pathlib, subprocess, sys, tempfile
+ compiler=pathlib.Path(sys.argv[1]).resolve();clang=sys.argv[2];linker=sys.argv[3] if len(sys.argv)>3 else ''
+ runtime=pathlib.Path(sys.argv[4]).resolve();fixture=pathlib.Path(sys.argv[5]).resolve();sanitizers=sys.argv[6]=='ON'
++host_libraries=sys.argv[7:]
+ link_flags=['--driver-mode=g++',*(['--ld-path='+linker] if linker else []),*(['-fsanitize=address,undefined'] if sanitizers else [])]
+ if os.name=='nt':link_flags += ['-fms-runtime-lib=static','-llegacy_stdio_definitions']
+ checks=0
+@@ -176,7 +177,7 @@
+         for flags in [[],['--no-opt']]:
+             assert run([compiler,'run',path,'0',*flags]).stdout.strip()=='1'
+             obj=root/(name+str(len(flags))+'.o');exe=root/(name+str(len(flags))+('.exe' if os.name=='nt' else '.bin'))
+-            run([compiler,'emit',path,'-o',obj,*flags]);run([clang,*link_flags,obj,runtime,fixture,'-o',exe]);assert run([exe,'0']).stdout.strip()=='1'
++            run([compiler,'emit',path,'-o',obj,*flags]);run([clang,*link_flags,obj,runtime,fixture,*host_libraries,'-o',exe]);assert run([exe,'0']).stdout.strip()=='1'
+     malformed=[[128],[192,175],[224,128,128],[237,160,128],[244,144,128,128],[245,128,128,128],[240,159,142],[194],[65,128],[255],[226,40,161]]
+     path=root/'malformed.void'
+     lines=['func entry(x: i32) -> i32:']
+@@ -185,12 +186,12 @@
+     lines.append('    return 1');path.write_text('\n'.join(lines)+'\n',encoding='utf-8')
+     for flags in [[],['--no-opt']]:
+         assert run([compiler,'run',path,'0',*flags]).stdout.strip()=='1'
+-        obj=root/('malformed'+str(len(flags))+'.o');exe=root/('malformed'+str(len(flags))+('.exe' if os.name=='nt' else '.bin'));run([compiler,'emit',path,'-o',obj,*flags]);run([clang,*link_flags,obj,runtime,fixture,'-o',exe]);assert run([exe,'0']).stdout.strip()=='1'
++        obj=root/('malformed'+str(len(flags))+'.o');exe=root/('malformed'+str(len(flags))+('.exe' if os.name=='nt' else '.bin'));run([compiler,'emit',path,'-o',obj,*flags]);run([clang,*link_flags,obj,runtime,fixture,*host_libraries,'-o',exe]);assert run([exe,'0']).stdout.strip()=='1'
+     for expression in ['""[0]','"abc"[3]','"abc"[-4]','"abc"[i64.min_value]','"abc"[u64.max_value]']:
+         path=root/'bounds.void';path.write_text('func entry(x: i32) -> i32:\n    var value = '+expression+'\n    return 1\n',encoding='utf-8');run([compiler,'check',path])
+         for flags in [[],['--no-opt']]:
+             assert 'String index' in run([compiler,'run',path,'0',*flags],False).stderr
+-            obj=root/('bounds'+str(len(flags))+'.o');exe=root/('bounds'+str(len(flags))+('.exe' if os.name=='nt' else '.bin'));run([compiler,'emit',path,'-o',obj,*flags]);run([clang,*link_flags,obj,runtime,fixture,'-o',exe]);failure=run([exe,'0'],False);assert 'String index' in failure.stdout+failure.stderr
++            obj=root/('bounds'+str(len(flags))+'.o');exe=root/('bounds'+str(len(flags))+('.exe' if os.name=='nt' else '.bin'));run([compiler,'emit',path,'-o',obj,*flags]);run([clang,*link_flags,obj,runtime,fixture,*host_libraries,'-o',exe]);failure=run([exe,'0'],False);assert 'String index' in failure.stdout+failure.stderr
+ 
+     invalid=['var s = "x"\n    s[0] = "a"','var s = "x"\n    s.length = 2','var v = "a"[true]','var v = "a"[0.5]','var bytes: [i32] = [1]\n    var v = string.from_utf8(bytes)','var v = [1].get(true)','var v = [1].get(0.5)','var a: [i32, 1] = [1]\n    a.pop()','const a = [1]\n    a.pop()','const a = [1]\n    var b = a\n    b.pop()','var d = {1: 2}\n    d.get(true)']
+     for body in invalid:
+diff --git a/tests/stage8/sprint4.py b/tests/stage8/sprint4.py
+--- a/tests/stage8/sprint4.py
++++ b/tests/stage8/sprint4.py
+@@ -2,6 +2,7 @@
+ import os, pathlib, subprocess, sys, tempfile
+ compiler, host, clang, linker, runtime, fixture = sys.argv[1:7]
+ sanitizers=sys.argv[7]=='ON'
++host_libraries=sys.argv[8:]
+ flags=['--driver-mode=g++', *(['--ld-path='+linker] if linker else []), *(['-fsanitize=address,undefined'] if sanitizers else [])]
+ if os.name=='nt': flags+=['-fms-runtime-lib=static','-llegacy_stdio_definitions']
+ checks=0
+@@ -17,7 +18,7 @@
+ with tempfile.TemporaryDirectory(prefix='VOID Sprint 4 ') as directory:
+     root=pathlib.Path(directory);source=root/'main.void'
+     def write(text): source.write_text(text,encoding='utf-8')
+-    def link(obj,exe): run([clang,*flags,obj,runtime,fixture,'-pthread','-o',exe])
++    def link(obj,exe): run([clang,*flags,obj,runtime,fixture,*host_libraries,'-pthread','-o',exe])
+     cases=[('var value = 10\nvalue += 5\nreturn value\n',15),
+            ('var text = "A🎮\\0"\nif text.length == 3:\n    return 7\nreturn 2\n',7),
+            ('var value = 10\n',0),('return\n',0),
+diff --git a/tests/stage8/sprint6.py b/tests/stage8/sprint6.py
+--- a/tests/stage8/sprint6.py
++++ b/tests/stage8/sprint6.py
+@@ -2,6 +2,7 @@
+ import os,pathlib,subprocess,sys,tempfile
+ compiler=pathlib.Path(sys.argv[1]).resolve(); clang=sys.argv[2];linker=sys.argv[3]
+ runtime=pathlib.Path(sys.argv[4]).resolve();fixture=pathlib.Path(sys.argv[5]).resolve();sanitizers=sys.argv[6]=='ON'
++host_libraries=sys.argv[7:]
+ flags=['--driver-mode=g++',*(['--ld-path='+linker] if linker else []),*(['-fsanitize=address,undefined'] if sanitizers else [])]
+ if os.name=='nt': flags+=['-fms-runtime-lib=static','-llegacy_stdio_definitions']
+ checks=0
+@@ -21,7 +22,7 @@
+         for value,want in [(1,28),(2,18),(0,38),(-1,38)]:
+             assert run([compiler,'run',source,value,*switches]).stdout.strip()==str(want)
+         obj=root/('optimized.o' if opt else 'normal.o');exe=obj.with_suffix('.exe' if os.name=='nt' else '.bin')
+-        run([compiler,'emit',source,'-o',obj,*switches]);run([clang,*flags,obj,runtime,fixture,'-pthread','-o',exe])
++        run([compiler,'emit',source,'-o',obj,*switches]);run([clang,*flags,obj,runtime,fixture,*host_libraries,'-pthread','-o',exe])
+         for value,want in [(1,28),(2,18),(0,38),(-1,38)]:assert run([exe,value]).stdout.strip()==str(want)
+     # Preserve physical line ending handling through call and indentation tokens.
+     for newline in ['\r\n','\r']:

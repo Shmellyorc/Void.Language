@@ -1,0 +1,17 @@
+["C:\\gcc\\bin\\cmake.exe", "-S", "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0", "-B", "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build", "-G", "Ninja", "-DCMAKE_MAKE_PROGRAM=C:\\gcc\\bin\\ninja.exe", "-DCMAKE_C_COMPILER=C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\clang-cl.exe", "-DCMAKE_LINKER=C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\lld-link.exe", "-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded", "-DBUILD_SHARED_LIBS=ON", "-DBUILD_EXAMPLES=OFF", "-DPLATFORM=Desktop", "-DOPENGL_VERSION=1.1"]
+-- The C compiler identification is Clang 23.1.4 with MSVC-like command-line
+-- The CXX compiler identification is Clang 23.1.4 with GNU-like command-line
+CMake Error at C:/gcc/share/cmake-4.4/Modules/Platform/Windows-Clang.cmake:187 (message):
+  The current configuration uses the Clang compiler tool with mixed frontend
+  variants, both the GNU and in MSVC CL like variants.  This is not
+  supported.  Use either clang/clang++ or clang-cl as all C, C++, CUDA,
+  and/or HIP compilers.
+Call Stack (most recent call first):
+  C:/gcc/share/cmake-4.4/Modules/Platform/Windows-Clang.cmake:201 (__verify_same_language_values)
+  C:/gcc/share/cmake-4.4/Modules/Platform/Windows-Clang-C.cmake:1 (include)
+  C:/gcc/share/cmake-4.4/Modules/CMakeCInformation.cmake:48 (include)
+  CMakeLists.txt:3 (project)
+
+
+-- Configuring incomplete, errors occurred!
+exit=1

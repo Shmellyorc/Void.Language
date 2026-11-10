@@ -1,0 +1,75 @@
+Test project C:/Users/a/VoidS7-Raylib-Compiler/Debug
+      Start   2: project_manifest
+      Start  17: cli_contract
+ 1/17 Test   #2: project_manifest .................   Passed    0.43 sec
+      Start 219: ffi_g1_primitive_jit_ir
+ 2/17 Test #219: ffi_g1_primitive_jit_ir ..........   Passed    1.35 sec
+      Start 220: ffi_g1_primitive_aot_normal
+ 3/17 Test #220: ffi_g1_primitive_aot_normal ......   Passed    0.35 sec
+      Start 221: ffi_g1_primitive_aot_optimized
+ 4/17 Test #221: ffi_g1_primitive_aot_optimized ...   Passed    0.32 sec
+      Start 222: ffi_g1_primitive_aot_mismatch
+ 5/17 Test #222: ffi_g1_primitive_aot_mismatch ....   Passed    0.26 sec
+      Start 223: ffi_g1_primitive_aot_missing
+ 6/17 Test #223: ffi_g1_primitive_aot_missing .....   Passed    0.99 sec
+      Start 224: ffi_g2_jit_ir
+ 7/17 Test #224: ffi_g2_jit_ir ....................   Passed    1.82 sec
+      Start 225: ffi_g2_aot_normal
+ 8/17 Test #225: ffi_g2_aot_normal ................   Passed    0.85 sec
+      Start 226: ffi_g2_aot_optimized
+ 9/17 Test #226: ffi_g2_aot_optimized .............   Passed    0.84 sec
+      Start 227: ffi_g3_jit_ir
+10/17 Test #227: ffi_g3_jit_ir ....................   Passed    3.01 sec
+      Start 228: ffi_g3_aot_normal
+11/17 Test #228: ffi_g3_aot_normal ................   Passed    1.05 sec
+      Start 229: ffi_g3_aot_optimized
+12/17 Test #229: ffi_g3_aot_optimized .............   Passed    1.13 sec
+      Start 331: reload
+13/17 Test #331: reload ...........................   Passed    1.71 sec
+      Start 332: gc
+14/17 Test #332: gc ...............................   Passed    0.22 sec
+      Start 338: analysis
+15/17 Test #338: analysis .........................   Passed    4.91 sec
+      Start 345: ffi_g4_conventional
+16/17 Test  #17: cli_contract .....................***Failed   20.39 sec
+Traceback (most recent call last):
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 701, in _rmtree_unsafe
+    os.unlink(fullname)
+    ~~~~~~~~~^^^^^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\a\\VoidS7-Raylib-Compiler\\Debug-tmp\\VOID CLI é # % z9f13zah\\broken installation\\voidc.exe'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\a\VoidCI42377496702-Native\tests\cli\contract.py", line 75, in <module>
+    with tempfile.TemporaryDirectory(prefix='VOID CLI é # % ') as directory:
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 972, in __exit__
+    self.cleanup()
+    ~~~~~~~~~~~~^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 705, in _rmtree_unsafe
+    onexc(os.unlink, fullname, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 931, in onexc
+    _os.unlink(path)
+    ~~~~~~~~~~^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\a\\VoidS7-Raylib-Compiler\\Debug-tmp\\VOID CLI é # % z9f13zah\\broken installation\\voidc.exe'
+
+17/17 Test #345: ffi_g4_conventional ..............   Passed   55.95 sec
+
+94% tests passed, 1 tests failed out of 17
+
+Total Test time (real) =  75.33 sec
+
+The following tests FAILED:
+	 17 - cli_contract (Failed)
+Errors while running CTest

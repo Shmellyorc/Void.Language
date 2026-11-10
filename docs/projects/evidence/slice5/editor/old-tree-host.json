@@ -1,0 +1,10 @@
+{
+  "mode": "old-tree",
+  "editor": "1.141.0",
+  "platform": "linux",
+  "events": [
+    "activation and opening a pre-existing source do not offer",
+    "an unrelated pre-existing source suppresses a later-file offer"
+  ],
+  "status": "PASS"
+}

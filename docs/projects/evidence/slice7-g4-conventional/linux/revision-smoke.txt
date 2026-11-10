@@ -1,0 +1,68 @@
+['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/release-final-artifacts/VOID G4 dys48b5d/archived compiler install/bin/voidc', 'new', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/revision-1']
+Manifest: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/revision-1/void.project.toml
+Project ID: local.pe3f935e9f26d24a03ce7784b232249ef
+Application ID: local.a9fb2d6ded3ab3d84fa44699fcaabf8f3
+Next: from the displayed manifest directory, run voidc check --project .
+Created project manifest.
+Automatic application selection requires one eligible main(). Use --entry for a deliberate override.
+
+['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/release-final-artifacts/VOID G4 dys48b5d/archived compiler install/bin/voidc', 'native-bind', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/revision-1/native/provider.descriptor', 'conventional_fixture.h', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/revision-1/adapter.c']
+
+['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '-std=c11', '-shared', '-fPIC', '-fuse-ld=lld', '-Wl,-rpath,$ORIGIN', '-I/home/shmellyorc/Documents/Void.Language/tests/ffi', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/revision-1/adapter.c', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/revision-1/native/libvoid_g4_conventional_provider.so', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/revision-1/native/adapter.so']
+
+['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/release-final-artifacts/VOID G4 dys48b5d/archived compiler install/bin/voidc', 'run', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/revision-1', '--allow-native']
+/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/revision-1/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/release-final-artifacts/VOID G4 dys48b5d/archived compiler install/bin/voidc', 'build', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/revision-1', '--allow-native', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/package-1/application']
+/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/revision-1/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+Built native executable: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/package-1/application
+
+['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/package-1/application']
+PASS: descriptor revision 1, conventional JIT and relocated AOT both printed 42
+['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/release-final-artifacts/VOID G4 dys48b5d/archived compiler install/bin/voidc', 'new', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/revision-2']
+Manifest: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/revision-2/void.project.toml
+Project ID: local.p6638fadf81211e3a029cf3f527c31627
+Application ID: local.a3b88b0a8e4e81603cd19559e6046a8d5
+Next: from the displayed manifest directory, run voidc check --project .
+Created project manifest.
+Automatic application selection requires one eligible main(). Use --entry for a deliberate override.
+
+['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/release-final-artifacts/VOID G4 dys48b5d/archived compiler install/bin/voidc', 'native-bind', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/revision-2/native/provider.descriptor', 'conventional_fixture.h', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/revision-2/adapter.c']
+
+['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '-std=c11', '-shared', '-fPIC', '-fuse-ld=lld', '-Wl,-rpath,$ORIGIN', '-I/home/shmellyorc/Documents/Void.Language/tests/ffi', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/revision-2/adapter.c', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/revision-2/native/libvoid_g4_conventional_provider.so', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/revision-2/native/adapter.so']
+
+['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/release-final-artifacts/VOID G4 dys48b5d/archived compiler install/bin/voidc', 'run', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/revision-2', '--allow-native']
+/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/revision-2/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/release-final-artifacts/VOID G4 dys48b5d/archived compiler install/bin/voidc', 'build', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/revision-2', '--allow-native', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/package-2/application']
+/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/revision-2/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+Built native executable: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/package-2/application
+
+['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/revision-smoke/package-2/application']
+PASS: descriptor revision 2, conventional JIT and relocated AOT both printed 42

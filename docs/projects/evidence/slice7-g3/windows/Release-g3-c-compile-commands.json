@@ -1,0 +1,14 @@
+[
+  {
+    "directory": "C:/Users/a/VoidS7-G3-Release",
+    "command": "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe  /nologo -DG3_FIXTURE_IDENTITY=\\\"bfd1c699c7d4b144c02e79f46246f381628072b66e22511eeda1d4b055e4a6a6\\\" -D_ITERATOR_DEBUG_LEVEL=0 -IC:\\Users\\a\\VoidCI42377496702-Native\\include /DWIN32 /D_WINDOWS /O2 /Ob2 /DNDEBUG /std:c11 -MT /W4 /permissive- /EHsc /FoCMakeFiles\\void_g3_fixture.dir\\tests\\ffi\\resources_fixture.c.obj /FdCMakeFiles\\void_g3_fixture.dir\\ -c -- C:\\Users\\a\\VoidCI42377496702-Native\\tests\\ffi\\resources_fixture.c",
+    "file": "C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources_fixture.c",
+    "output": "C:/Users/a/VoidS7-G3-Release/CMakeFiles/void_g3_fixture.dir/tests/ffi/resources_fixture.c.obj"
+  },
+  {
+    "directory": "C:/Users/a/VoidS7-G3-Release",
+    "command": "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe  /nologo -DG3_LLP64=1 -D_ITERATOR_DEBUG_LEVEL=0 -IC:\\Users\\a\\VoidS7-G3-Release\\ffi-g3 -IC:\\Users\\a\\VoidCI42377496702-Native\\include /DWIN32 /D_WINDOWS /O2 /Ob2 /DNDEBUG /std:c11 -MT /W4 /permissive- /EHsc /FoCMakeFiles\\void_g3_thunk.dir\\tests\\ffi\\resources_thunk.c.obj /FdCMakeFiles\\void_g3_thunk.dir\\ -c -- C:\\Users\\a\\VoidCI42377496702-Native\\tests\\ffi\\resources_thunk.c",
+    "file": "C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources_thunk.c",
+    "output": "C:/Users/a/VoidS7-G3-Release/CMakeFiles/void_g3_thunk.dir/tests/ffi/resources_thunk.c.obj"
+  }
+]

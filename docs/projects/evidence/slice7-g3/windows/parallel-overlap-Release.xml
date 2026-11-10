@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Win32-ninja"
+	tests="3"
+	failures="1"
+	disabled="0"
+	skipped="0"
+	hostname="DESKTOP-N4VH0F7"
+	time="103"
+	timestamp="2026-11-08T20:53:07"
+	>
+	<testcase name="reload" classname="reload" time="0.795176" status="run">
+		<properties/>
+		<system-out>reload: passed
+</system-out>
+	</testcase>
+	<testcase name="analysis" classname="analysis" time="0.369585" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>FAILED: concurrent call/lease failure
+</system-out>
+	</testcase>
+	<testcase name="numeric" classname="numeric" time="3.28803" status="run">
+		<properties/>
+		<system-out>210 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed
+numeric: passed
+</system-out>
+	</testcase>
+</testsuite>

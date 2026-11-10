@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="1"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="0"
+	timestamp="2026-11-08T15:45:10"
+	>
+	<testcase name="project_protocol" classname="project_protocol" time="0.321644" status="run">
+		<properties/>
+		<system-out>project_protocol: 71 checks passed
+</system-out>
+	</testcase>
+</testsuite>

@@ -1,0 +1,42 @@
+
+> void-language@0.1.0 test
+> npm run build && node --test out/test/config.test.js
+
+
+> void-language@0.1.0 build
+> npm run typecheck && npm run compile
+
+
+> void-language@0.1.0 typecheck
+> tsc --noEmit
+
+
+> void-language@0.1.0 compile
+> tsc && node build.cjs
+
+✔ editor download reaps failed extractors before retry, preserving failure (141.930601ms)
+✔ editor download keeps non-retry errors and does not start more attempts (3.702517ms)
+✔ literal workspace paths, spaces, no shell expansion (0.394823ms)
+✔ Windows paths are literal, drive/root boundaries preserved (0.62092ms)
+✖ validate executable and deterministic canonical project selection (116.461997ms)
+✔ presentation covers approved keyword colors and space indentation (4.856098ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 5
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 384.454141
+
+✖ failing tests:
+
+test at out/test/config.test.js:100:22
+✖ validate executable and deterministic canonical project selection (116.461997ms)
+  Error: VOID project preflight failed. Automatic/manifest selection requires a matching voidProjectProtocol 1 server; no legacy downgrade was attempted. Error: Command failed: /tmp/VOID config space tlUqxK/voidls --discover-project /tmp/VOID config space tlUqxK /tmp/VOID config space tlUqxK/single.void  
+  voidls: Usage: voidls --entry <project entry.void>
+  
+      at resolveProject (/home/shmellyorc/Documents/Void.Language/editors/vscode/out/config.js:118:15)
+      at async TestContext.<anonymous> (/home/shmellyorc/Documents/Void.Language/editors/vscode/out/test/config.test.js:129:26)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)

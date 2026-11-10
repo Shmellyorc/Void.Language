@@ -33,6 +33,17 @@ std::optional<SemanticVersion> parse_version(std::string_view);
 bool valid_identity(std::string_view) noexcept;
 bool valid_name(std::string_view);
 
+struct VersionRequirement {
+    struct Bound { SemanticVersion version; bool inclusive; };
+    std::optional<SemanticVersion> exact;
+    std::optional<Bound> lower, upper;
+    bool accepts(const SemanticVersion&) const;
+    std::string text() const;
+};
+std::optional<VersionRequirement> parse_version_requirement(std::string_view);
+struct Dependency { std::string id, path; VersionRequirement version; };
+inline constexpr std::size_t dependency_edge_limit = 1024;
+
 enum class Kind { application, library };
 enum class Optimization { none, O2 };
 enum class DebugInfo { none, line, full };
@@ -52,7 +63,8 @@ class Manifest {
     Identity project_;
     Kind kind_ = Kind::application;
     std::optional<Identity> application_, package_;
-    std::optional<std::string> entry_;
+    std::optional<std::string> entry_, package_entry_;
+    std::map<std::string, Dependency> dependencies_;
     std::map<std::string, NativeLibrary> native_;
     Sources sources_;
     Profile debug_ = {Optimization::none, DebugInfo::full};
@@ -67,6 +79,8 @@ public:
     const auto& application() const { return application_; }
     const auto& package() const { return package_; }
     const auto& entry() const { return entry_; }
+    const auto& package_entry() const { return package_entry_; }
+    const auto& dependencies() const { return dependencies_; }
     const auto& native() const { return native_; }
     const Sources& sources() const { return sources_; }
     const Profile& debug() const { return debug_; }

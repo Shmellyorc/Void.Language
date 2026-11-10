@@ -1,0 +1,1200 @@
+{
+  "checks": 169,
+  "commands_and_requests": [
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidS4-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20xbs0ygmb/bare.void"
+        },
+        "position": {
+          "line": 0,
+          "character": 6
+        }
+      },
+      "response": {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "range": {
+            "end": {
+              "character": 10,
+              "line": 0
+            },
+            "start": {
+              "character": 5,
+              "line": 0
+            }
+          },
+          "uri": "file:///C:/Users/a/VoidS4-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20xbs0ygmb/bare.void"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+        "",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5010\",\"message\":\"No eligible main() in application project.\"}],\"discoveryCount\":1,\"entry\":null,\"executionCount\":0,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"7bcdb42bb3379152ede3b6d63a7d2770ad2973417f6f6b4b02555c91d07876ec\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "method": "initialize",
+      "params": {
+        "capabilities": {
+          "textDocument": {
+            "publishDiagnostics": {
+              "relatedInformation": true,
+              "versionSupport": true
+            }
+          },
+          "workspace": {
+            "workspaceEdit": {
+              "documentChanges": true,
+              "failureHandling": "textOnlyTransactional"
+            }
+          }
+        }
+      },
+      "response": {
+        "id": 1,
+        "jsonrpc": "2.0",
+        "result": {
+          "capabilities": {
+            "completionProvider": {
+              "triggerCharacters": [
+                ".",
+                " ",
+                "\"",
+                "/",
+                ":"
+              ]
+            },
+            "definitionProvider": true,
+            "documentFormattingProvider": true,
+            "documentSymbolProvider": true,
+            "experimental": {
+              "refreshProject": true,
+              "voidProjectProtocol": 1,
+              "voidToolingProtocol": 1
+            },
+            "hoverProvider": true,
+            "positionEncoding": "utf-16",
+            "referencesProvider": true,
+            "renameProvider": {
+              "prepareProvider": true
+            },
+            "signatureHelpProvider": {
+              "triggerCharacters": [
+                "(",
+                ","
+              ]
+            },
+            "textDocumentSync": {
+              "change": 1,
+              "openClose": true,
+              "save": {
+                "includeText": false
+              }
+            },
+            "workspace": {
+              "fileOperations": {
+                "didCreate": {
+                  "filters": [
+                    {
+                      "pattern": {
+                        "glob": "**/*"
+                      },
+                      "scheme": "file"
+                    }
+                  ]
+                },
+                "didDelete": {
+                  "filters": [
+                    {
+                      "pattern": {
+                        "glob": "**/*"
+                      },
+                      "scheme": "file"
+                    }
+                  ]
+                },
+                "didRename": {
+                  "filters": [
+                    {
+                      "pattern": {
+                        "glob": "**/*"
+                      },
+                      "scheme": "file"
+                    }
+                  ]
+                }
+              }
+            },
+            "workspaceSymbolProvider": true
+          },
+          "serverInfo": {
+            "name": "VOID",
+            "version": "0.2.0"
+          }
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 4,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/src/game.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+          "schema": 2,
+          "selectionRevision": "2",
+          "snapshotKey": "f33ad17d5744f86769310977c00f2eca6eff6115f7a2f6d1d7039f47b9f3ee11",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidS4-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20xbs0ygmb/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 13
+        }
+      },
+      "response": {
+        "id": 5,
+        "jsonrpc": "2.0",
+        "result": {
+          "range": {
+            "end": {
+              "character": 17,
+              "line": 0
+            },
+            "start": {
+              "character": 12,
+              "line": 0
+            }
+          },
+          "uri": "file:///C:/Users/a/VoidS4-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20xbs0ygmb/src/helper.void"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/hover",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidS4-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20xbs0ygmb/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 14
+        }
+      },
+      "response": {
+        "id": 6,
+        "jsonrpc": "2.0",
+        "result": {
+          "contents": {
+            "kind": "plaintext",
+            "value": "value() -> i32"
+          },
+          "range": {
+            "end": {
+              "character": 18,
+              "line": 2
+            },
+            "start": {
+              "character": 13,
+              "line": 2
+            }
+          }
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/formatting",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidS4-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20xbs0ygmb/src/game.void"
+        },
+        "options": {
+          "tabSize": 4,
+          "insertSpaces": true
+        }
+      },
+      "response": {
+        "id": 8,
+        "jsonrpc": "2.0",
+        "result": [
+          {
+            "newText": "use \"./helper.void\" as h\nfunc main() -> i32:\n    return h.value()\n",
+            "range": {
+              "end": {
+                "character": 0,
+                "line": 3
+              },
+              "start": {
+                "character": 0,
+                "line": 0
+              }
+            }
+          }
+        ]
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/rename",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidS4-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20xbs0ygmb/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 14
+        },
+        "newName": "renamed_helper"
+      },
+      "response": {
+        "id": 10,
+        "jsonrpc": "2.0",
+        "result": {
+          "documentChanges": [
+            {
+              "edits": [
+                {
+                  "newText": "renamed_helper",
+                  "range": {
+                    "end": {
+                      "character": 18,
+                      "line": 2
+                    },
+                    "start": {
+                      "character": 13,
+                      "line": 2
+                    }
+                  }
+                }
+              ],
+              "textDocument": {
+                "uri": "file:///C:/Users/a/VoidS4-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20xbs0ygmb/src/game.void",
+                "version": 3
+              }
+            },
+            {
+              "edits": [
+                {
+                  "newText": "renamed_helper",
+                  "range": {
+                    "end": {
+                      "character": 17,
+                      "line": 0
+                    },
+                    "start": {
+                      "character": 12,
+                      "line": 0
+                    }
+                  }
+                }
+              ],
+              "textDocument": {
+                "uri": "file:///C:/Users/a/VoidS4-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20xbs0ygmb/src/helper.void",
+                "version": null
+              }
+            }
+          ]
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 12,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5001",
+              "message": "Invalid project TOML: Error while parsing table header: expected a bare or quoted key"
+            }
+          ],
+          "discoveryCount": 0,
+          "entry": null,
+          "executionCount": 0,
+          "kind": null,
+          "manifest": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+          "schema": 2,
+          "selectionRevision": "5",
+          "snapshotKey": "",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidS4-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20xbs0ygmb/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 13
+        }
+      },
+      "response": {
+        "id": 13,
+        "jsonrpc": "2.0",
+        "result": null
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 15,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/src/game.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+          "schema": 2,
+          "selectionRevision": "6",
+          "snapshotKey": "f33ad17d5744f86769310977c00f2eca6eff6115f7a2f6d1d7039f47b9f3ee11",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidS4-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20xbs0ygmb/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 13
+        }
+      },
+      "response": {
+        "id": 16,
+        "jsonrpc": "2.0",
+        "result": {
+          "range": {
+            "end": {
+              "character": 17,
+              "line": 0
+            },
+            "start": {
+              "character": 12,
+              "line": 0
+            }
+          },
+          "uri": "file:///C:/Users/a/VoidS4-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20xbs0ygmb/src/helper.void"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 20,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5010",
+              "message": "Ambiguous project entry: 2 eligible main() declarations."
+            }
+          ],
+          "discoveryCount": 3,
+          "entry": null,
+          "executionCount": 0,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+          "schema": 2,
+          "selectionRevision": "9",
+          "snapshotKey": "71bd9943cae0764b2a4ab86622323db70f0763943fc19a99b9f70a3b1680a77e",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 22,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/src/game.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+          "schema": 2,
+          "selectionRevision": "11",
+          "snapshotKey": "f3657ae92c9d19ca80c2a997e3a23be459724ae48107603a4b3838be790de4d8",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 25,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5010",
+              "message": "No eligible main() in application project."
+            }
+          ],
+          "discoveryCount": 1,
+          "entry": null,
+          "executionCount": 0,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+          "schema": 2,
+          "selectionRevision": "14",
+          "snapshotKey": "6738c4d962b501a54aaa997fa0992c8202bc25658e1c1ae71889fdc96328b743",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 27,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+          "schema": 2,
+          "selectionRevision": "17",
+          "snapshotKey": "e6ec1b4603a33125517e75fe87f32b9a380fc3195de7cf96e7f97e015d541d06",
+          "standalone": false,
+          "status": "reselection-required"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 30,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+          "schema": 2,
+          "selectionRevision": "19",
+          "snapshotKey": "2857cbb0819d7adb2445f601516de366a30567db07263e74f025a01bb9563e83",
+          "standalone": false,
+          "status": "reselection-required"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/reselectProject",
+      "params": {},
+      "response": {
+        "id": 31,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+          "schema": 2,
+          "selectionRevision": "20",
+          "snapshotKey": "2857cbb0819d7adb2445f601516de366a30567db07263e74f025a01bb9563e83",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": [
+        {
+          "diagnostics": [],
+          "uri": "file:///C:/Users/a/VoidS4-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20xbs0ygmb/src/helper.void",
+          "voidProjectRevision": "20"
+        },
+        {
+          "diagnostics": [],
+          "uri": "file:///C:/Users/a/VoidS4-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20xbs0ygmb/src/renamed.void",
+          "version": 1,
+          "voidProjectRevision": "20"
+        },
+        {
+          "diagnostics": [],
+          "uri": "file:///C:/Users/a/VoidS4-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20xbs0ygmb/void.project.toml",
+          "version": 4,
+          "voidProjectRevision": "20"
+        }
+      ]
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 32,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+          "schema": 2,
+          "selectionRevision": "20",
+          "snapshotKey": "2857cbb0819d7adb2445f601516de366a30567db07263e74f025a01bb9563e83",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 34,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+          "schema": 2,
+          "selectionRevision": "20",
+          "snapshotKey": "2857cbb0819d7adb2445f601516de366a30567db07263e74f025a01bb9563e83",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 37,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5009",
+              "message": "Source path crosses nested project boundary '/src/child'."
+            }
+          ],
+          "discoveryCount": 2,
+          "entry": null,
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+          "schema": 2,
+          "selectionRevision": "22",
+          "snapshotKey": "fd827eadd0ea408d38b4f35b2280c0cf554069bff5a650e2f4a6cca0eebca559",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 40,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+          "schema": 2,
+          "selectionRevision": "24",
+          "snapshotKey": "981b4413e9657320c9012982e32ef9abbd957cca51fdac1a08b00432bb027adb",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 42,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5009",
+              "message": "Manifest must use exact case without case siblings in '/src/child'."
+            }
+          ],
+          "discoveryCount": 0,
+          "entry": null,
+          "executionCount": 0,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+          "schema": 2,
+          "selectionRevision": "25",
+          "snapshotKey": "467657ddcb0fa24c3798eb2e6038cbf215c810aeb9b3dfe8928d4c014172f3ce",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 44,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+          "schema": 2,
+          "selectionRevision": "26",
+          "snapshotKey": "981b4413e9657320c9012982e32ef9abbd957cca51fdac1a08b00432bb027adb",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 46,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5009",
+              "message": "Selected project manifest is unavailable."
+            }
+          ],
+          "discoveryCount": 0,
+          "entry": null,
+          "executionCount": 0,
+          "kind": null,
+          "manifest": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+          "schema": 2,
+          "selectionRevision": "28",
+          "snapshotKey": "",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 48,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+          "schema": 2,
+          "selectionRevision": "29",
+          "snapshotKey": "981b4413e9657320c9012982e32ef9abbd957cca51fdac1a08b00432bb027adb",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+        "",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":2,\"entry\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/src/game.void\",\"executionCount\":2,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"2ab2efbf8787ea97f8190e1bb6320723be96ae4996b57ef39bdcc2ad038a16f2\",\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\src\\child\\launcher.void",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":1,\"entry\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/src/child/launcher.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/src/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/src/child\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/src/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"3ea9381351c20c96fd547f4bc4db9d41de9c4389c8843fb147fd04722bac6735\",\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\src\\child\\launcher.void",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Source path crosses nested project boundary '/src/child'.\"}],\"discoveryCount\":2,\"entry\":null,\"executionCount\":2,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"4e7224116825769419f5334a39c62231da2f5af8a2f0f76ede9c8ee04022a2b5\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\src\\game.void",
+        "",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\bare.void"
+      ],
+      "status": 0,
+      "stdout": "{\"entry\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/bare.void\",\"mode\":\"legacy\",\"root\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\",\"schema\":2,\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": null,
+          "executionCount": 2,
+          "kind": "library",
+          "manifest": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb",
+          "schema": 2,
+          "selectionRevision": "1",
+          "snapshotKey": "4edc9f760d2eaa459ec44d44644c7b50afcfae89e0080bce574ee8d4928c7105",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidS4-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20xbs0ygmb/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 13
+        }
+      },
+      "response": {
+        "id": 3,
+        "jsonrpc": "2.0",
+        "result": {
+          "range": {
+            "end": {
+              "character": 17,
+              "line": 0
+            },
+            "start": {
+              "character": 12,
+              "line": 0
+            }
+          },
+          "uri": "file:///C:/Users/a/VoidS4-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20xbs0ygmb/src/helper.void"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent\\child\\launcher.void",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Source path crosses nested project boundary '/child'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"6b2e4fc7bf1c3006c37f41efe92d26f926dbf8ccbc7b506aa7400aa4005c56ad\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent\\child\\void.project.toml",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active manifest is outside the pinned project boundary: '/child/void.project.toml'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"6b2e4fc7bf1c3006c37f41efe92d26f926dbf8ccbc7b506aa7400aa4005c56ad\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\outside.void",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active document is outside the pinned project boundary.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"6b2e4fc7bf1c3006c37f41efe92d26f926dbf8ccbc7b506aa7400aa4005c56ad\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent\\notes.txt",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3001\",\"message\":\"Import must name a .void source file.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"6b2e4fc7bf1c3006c37f41efe92d26f926dbf8ccbc7b506aa7400aa4005c56ad\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent\\@stdlib\\main.void",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5006\",\"message\":\"Document identity must be an exact canonical root-relative .void path\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"6b2e4fc7bf1c3006c37f41efe92d26f926dbf8ccbc7b506aa7400aa4005c56ad\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent\\Main.void",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3001\",\"message\":\"Filesystem case collision for 'Main.void'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"6b2e4fc7bf1c3006c37f41efe92d26f926dbf8ccbc7b506aa7400aa4005c56ad\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent\\void.project.toml",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":0,\"entry\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/main.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"6b2e4fc7bf1c3006c37f41efe92d26f926dbf8ccbc7b506aa7400aa4005c56ad\",\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent\\virtual\\draft.void",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":0,\"entry\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/main.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"6b2e4fc7bf1c3006c37f41efe92d26f926dbf8ccbc7b506aa7400aa4005c56ad\",\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent\\child\\launcher.void",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":1,\"entry\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/child/launcher.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/child\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"307dccc44983d36da8ff097cf8ba9f46a72be3c0fcb861b477fc24f5fb29f4be\",\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent\\child\\launcher.void",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Source path crosses nested project boundary '/child'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"6b2e4fc7bf1c3006c37f41efe92d26f926dbf8ccbc7b506aa7400aa4005c56ad\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent\\child\\void.project.toml",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active manifest is outside the pinned project boundary: '/child/void.project.toml'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"6b2e4fc7bf1c3006c37f41efe92d26f926dbf8ccbc7b506aa7400aa4005c56ad\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent\\child\\launcher.void",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5001\",\"message\":\"Invalid project TOML: Error while parsing table header: expected a bare or quoted key\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":0,\"kind\":null,\"manifest\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/child\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent\\child\\launcher.void",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Manifest must use exact case without case siblings in '/child'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"6b2e4fc7bf1c3006c37f41efe92d26f926dbf8ccbc7b506aa7400aa4005c56ad\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent\\child\\void.Project.toml",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3001\",\"message\":\"Import must name a .void source file.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"6b2e4fc7bf1c3006c37f41efe92d26f926dbf8ccbc7b506aa7400aa4005c56ad\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent\\child\\launcher.void",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Manifest must use exact case without case siblings in ''.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":0,\"kind\":null,\"manifest\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/child\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "voidls: Usage: voidls --entry <project entry.void>\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\outside.void",
+        "",
+        ""
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "voidls: Active file is outside selected workspace\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent\\junction\\outside.void",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3001\",\"message\":\"Module path contains a filesystem alias.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"b51a21430490e7cb6578bb676c47373892ad3092c9d83093b90db19ba7b882e5\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent\\unreadable.void",
+        "C:\\Users\\a\\VoidS4-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3002\",\"message\":\"Cannot read admitted project source.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS4-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 xbs0ygmb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"419467b842271b189872d375e0bf0fe83223e772c3522725c23bacd65b12e812\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    }
+  ]
+}

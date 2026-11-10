@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "/tmp/VOID missing executable y9d36uhe/voidls",
+    "--discover-project",
+    "/tmp/VOID missing executable y9d36uhe",
+    "",
+    "",
+    ""
+  ],
+  "exception": "FileNotFoundError",
+  "errno": 2,
+  "child_exit": null
+}

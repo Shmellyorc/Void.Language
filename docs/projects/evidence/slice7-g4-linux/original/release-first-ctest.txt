@@ -1,0 +1,57 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start 283: ffi_g4_jit_ir
+    Start 284: ffi_g4_aot_normal
+1/4 Test #283: ffi_g4_jit_ir ....................***Failed    0.02 sec
+bad closure revision: C dynamic closure: unsupported revision
+system library policy: C dynamic closure: unsupported target, system ABI or relocation policy
+foreign provider: C dynamic closure does not match the exact descriptor or host root
+aliased image: C dynamic closure: invalid or duplicate image
+missing descriptor export: C dynamic closure is missing an owned descriptor export
+wrong target thunk: C dynamic closure does not match the exact descriptor or host root
+direct bridge import: VOID IR: C primitive transport requires host admission and typed operations
+erased closure admission: VOID IR: C primitive admission differs from analyzed source
+forged dynamic ordinal received VOID IR: C primitive call outside the admitted binding module
+
+    Start 285: ffi_g4_aot_optimized
+2/4 Test #284: ffi_g4_aot_normal ................***Failed    0.07 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/dynamic_process.py", line 76, in <module>
+    qualify()
+    ~~~~~~~^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/dynamic_process.py", line 26, in qualify
+    assert 'libvoid_g4_' not in dynamic and '(RPATH)' not in dynamic and '(RUNPATH)' not in dynamic
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+
+    Start 286: ffi_g4_aot_startup
+3/4 Test #285: ffi_g4_aot_optimized .............***Failed    0.06 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/dynamic_process.py", line 76, in <module>
+    qualify()
+    ~~~~~~~^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/dynamic_process.py", line 26, in qualify
+    assert 'libvoid_g4_' not in dynamic and '(RPATH)' not in dynamic and '(RUNPATH)' not in dynamic
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+
+4/4 Test #286: ffi_g4_aot_startup ...............***Failed    0.06 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/dynamic_process.py", line 76, in <module>
+    qualify()
+    ~~~~~~~^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/dynamic_process.py", line 26, in qualify
+    assert 'libvoid_g4_' not in dynamic and '(RPATH)' not in dynamic and '(RUNPATH)' not in dynamic
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+
+
+0% tests passed, 4 tests failed out of 4
+
+Total Test time (real) =   0.14 sec
+
+The following tests FAILED:
+	283 - ffi_g4_jit_ir (Failed)
+	284 - ffi_g4_aot_normal (Failed)
+	285 - ffi_g4_aot_optimized (Failed)
+	286 - ffi_g4_aot_startup (Failed)
+Errors while running CTest

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="3"
+	failures="2"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="6"
+	timestamp="2026-11-08T13:22:11"
+	>
+	<testcase name="project_manifest_legacy" classname="project_manifest_legacy" time="0.769756" status="run">
+		<properties/>
+		<system-out>project_manifest_legacy: 17 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_selection" classname="project_selection" time="0.245253" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>expected VOID5010; actual diagnostics:
+/tmp/VOID project 雪 105666493421094/void.project.toml:1:1: error: Source path crosses nested project boundary '/src'.
+    code: VOID5009
+
+ 1 | 
+   | ^
+    Hint: Select the child project explicitly; parent imports and entry overrides cannot cross it.
+
+</system-out>
+	</testcase>
+	<testcase name="project_discovery_cli" classname="project_discovery_cli" time="5.97498" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/project/discovery.py", line 91, in &lt;module&gt;
+    run([compiler,'run','--project',root,'--entry','tools/args.void','--','--app','two words'],0,b'--app\ntwo words\n')
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/project/discovery.py", line 17, in run
+    assert p.returncode==status,(args,status,p.returncode,p.stdout,p.stderr)
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: ([PosixPath('/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc'), 'run', '--project', PosixPath('/tmp/VOID project execution 雪 tf2qu2_c'), '--entry', 'tools/args.void', '--', '--app', 'two words'], 0, 1, b'', b'/tmp/VOID project execution \xe9\x9b\xaa tf2qu2_c/tools/args.void:3:5: error: Iteration requires an array, dictionary or integer range.\n    code: VOID1105\n\n 3 |     for arg in os.args():\n   |     ^^^\n    Module: /tools/args.void\n\n')
+</system-out>
+	</testcase>
+</testsuite>

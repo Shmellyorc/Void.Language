@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/numeric/enums.py", line 156, in <module>
+    row = invoke([compiler, "run", file, "--no-cache", *optimization], root)
+  File "/home/shmellyorc/Documents/Void.Language/tests/numeric/enums.py", line 23, in invoke
+    assert result.returncode == expected, row
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'argv': ['/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc', 'run', '/tmp/VOID S6 numeric enum x1p2c9r7/integration.void', '--no-cache', '--no-opt'], 'status': 1, 'stdout': '', 'stderr': "/tmp/VOID S6 numeric enum x1p2c9r7/modes.void:10:34: error: Type 'option' is not a generic struct.\n    code: VOID1103\n\n 10 | public func score_cast<t>(value: option<t>) -> i32:\n    |                                  ^^^^^^\n    Module: /modes.void\n\n"}

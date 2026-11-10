@@ -1,0 +1,13 @@
+C:\Users\a\VoidSlice3-Corrected-20261108\src\frontend\source.cpp(139,29): warning: '_wgetenv' is deprecated: This function or variable may be unsafe. Consider using _wdupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  139 |     if(const wchar_t* value=_wgetenv(L"VOID_STDLIB_ROOT")) {
+      |                             ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt\corecrt_wstdlib.h(417,24): note: '_wgetenv' has been explicitly marked deprecated here
+  417 |         _Check_return_ _CRT_INSECURE_DEPRECATE(_wdupenv_s)
+      |                        ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+1 warning generated.

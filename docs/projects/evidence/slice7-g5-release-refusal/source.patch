@@ -1,0 +1,143 @@
+diff --git a/src/runtime/c_resource.cpp b/src/runtime/c_resource.cpp
+--- a/src/runtime/c_resource.cpp
++++ b/src/runtime/c_resource.cpp
+@@ -82,6 +82,10 @@
+         } else registration_.close();
+     }
+     void seal() noexcept { sealed_ = true; }
++    void resume_after_refusal() noexcept {
++        std::lock_guard lock(error_mutex_);
++        if (!error_.value().message) sealed_ = false;
++    }
+     void set_owner(const void* owner) noexcept { owner_ = owner; }
+     static bool active(const void* owner) noexcept {
+         for (auto* invocation = active_; invocation; invocation = invocation->previous)
+@@ -185,7 +189,10 @@
+             exclusive_ = 0;
+             if (callback_) callback_->seal();
+             if (dispatch(release_, &native_, 1, &result)) {
++                // Transport refusal precedes the C operation. Both the
++                // native owner and its registered callback pair remain live.
+                 exclusive_ = native_;
++                if (callback_) callback_->resume_after_refusal();
+                 throw std::runtime_error("C terminal release transport rejected");
+             }
+             native_ = 0; // Accepted release consumes even when its result reports failure.
+diff --git a/tests/ffi/callback_process.py b/tests/ffi/callback_process.py
+--- a/tests/ffi/callback_process.py
++++ b/tests/ffi/callback_process.py
+@@ -106,8 +106,28 @@
+     if len(sys.argv) > 4:
+         reload = root / 'reload.void'
+         shutil.copyfile(sources / 'callback_reload.void', reload)
+-        run(cwd, sys.argv[4], reload, native, provider.name, adapter.name, descriptor,
+-            expected='compatible/incompatible reload, retirement and self-drain passed')
++        refusal_source = root / 'callback_refusal_adapter.c'
++        refusal_adapter = native / ('g5_refusal_adapter' + suffix)
++        release = '        int32_t value = g5_unregister(arg0);'
++        adapter_text = generated.read_text()
++        assert adapter_text.count(release) == 1
++        # The reload fixture holds one owner and retries each refusal once.
++        # A refusal precedes the provider call and leaves the result word alone.
++        refusal_source.write_text('#include <stdio.h>\n' + adapter_text.replace(release, '''
++        static int refused;
++        if (!refused) {
++            refused = 1;
++            puts("G5 transport refused before native unregister");
++            fflush(stdout);
++            return 2;
++        }
++        refused = 0;
++''' + release))
++        run(cwd, clang, *flags, '-I' + str(sources), refusal_source, import_library, '-o', refusal_adapter)
++        output = run(cwd, sys.argv[4], reload, native, provider.name, refusal_adapter.name, descriptor,
++                     expected='compatible/incompatible reload, refusal/retry, retirement and self-drain passed')
++        assert output.count('G5 transport refused before native unregister') == 4
++        assert output.count('G5 native unregistered and drained') == 4
+ 
+     def cases(command, env):
+         for mode in ('normal', 'implicit', 'retired', 'failure'):
+diff --git a/tests/ffi/callback_reload.cpp b/tests/ffi/callback_reload.cpp
+--- a/tests/ffi/callback_reload.cpp
++++ b/tests/ffi/callback_reload.cpp
+@@ -14,6 +14,15 @@
+ 
+ void require(bool condition, const char* message) {
+     if (!condition) throw std::runtime_error(message);
++}
++
++void expect_failure(vd::ReloadSlot& slot, int input, std::string_view message) {
++    try { (void)slot.invoke(input); }
++    catch (const std::runtime_error& error) {
++        if (std::string_view(error.what()).find(message) != std::string_view::npos) return;
++        throw;
++    }
++    throw std::runtime_error("Expected checked failure: " + std::string(message));
+ }
+ 
+ void write(const Path& path, const std::string& data) {
+@@ -92,20 +101,23 @@
+     auto mismatched = vd::CPrimitiveAdmission::admit_conventional(incompatible, native, provider, adapter);
+     require(!jit.replace(slot, *analyze(entry, mismatched), optimize), "incompatible callback C contract reloaded");
+     require(slot.invoke(3) == 43, "incompatible candidate touched original registration");
++    expect_failure(slot, -1, "C resource operation rejected");
++    require(jit.live_generations() == 2, "transport refusal retired the original ORC generation");
++    const auto after_refusal = slot.invoke(4);
+     require(slot.invoke(-1) == 0 && jit.live_generations() == 1, "unregister did not retire original ORC generation");
++    std::cout << "G5 callback after refused release returned " << after_refusal << " (expected 44)\n";
++    require(after_refusal == 44, "refused release lost retained callback admission");
+     require(slot.invoke(0) == 1 && slot.invoke(2) == 142, "replacement registration did not use replacement body");
+-    bool rejected = false;
+-    try { (void)slot.invoke(-20); }
+-    catch (const std::runtime_error& error) {
+-        rejected = std::string(error.what()).find("Retained C callback failed") != std::string::npos;
+-    }
+-    require(rejected, "retained self-unregister was not rejected");
++    expect_failure(slot, -20, "Retained C callback failed");
++    expect_failure(slot, -1, "C resource operation rejected");
++    expect_failure(slot, -21, "Retained C callback failed");
++    require(slot.invoke(-22) == 0, "refused release reopened a faulted callback");
+     const auto failure = runtime->close();
+     require(failure.kind == vd::console::ErrorKind::io_failure &&
+             failure.os_code == static_cast<int>(std::errc::operation_canceled),
+             "retained failure was not reported after shutdown drain");
+     std::cout << "G5 ORC " << (optimize ? "O2" : "normal")
+-              << " capture, compatible/incompatible reload, retirement and self-drain passed\n";
++              << " capture, compatible/incompatible reload, refusal/retry, retirement and self-drain passed\n";
+ }
+ } // namespace
+ 
+diff --git a/tests/ffi/callback_reload.void b/tests/ffi/callback_reload.void
+--- a/tests/ffi/callback_reload.void
++++ b/tests/ffi/callback_reload.void
+@@ -1,6 +1,7 @@
+ use "/callback_checked.void" as g5
+ 
+ var saved_registration: g5.registration? = null
++var fault_probe: i32 = 0
+ 
+ struct capture:
+     bias: i32
+@@ -9,6 +10,8 @@
+     if value == -20:
+         var owner = saved_registration as g5.registration
+         return g5.unregister(owner)
++    if value == -21:
++        fault_probe = 1
+     return s.bias + value
+ 
+ func entry(value: i32) -> i32:
+@@ -18,9 +21,13 @@
+         if saved_registration == null:
+             return -1
+         return 1
++    if value == -22:
++        return fault_probe
+     var owner = saved_registration as g5.registration
+     if value == -1:
+         var result = g5.unregister(owner)
+         saved_registration = null
+         return result
++    if value > 0:
++        return g5.fire(owner, value, 1)
+     return g5.fire(owner, value, 0)

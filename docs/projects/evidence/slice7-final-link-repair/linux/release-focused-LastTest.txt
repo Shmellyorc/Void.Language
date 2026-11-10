@@ -1,0 +1,191 @@
+Start testing: Nov 09 14:57 MST
+----------------------------------------------------------
+416/443 Testing: stage10_fields_aot
+416/443 Test: stage10_fields_aot
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/stage10/fields.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a" "OFF" "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Release/lib/libarchive.a" "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Release/lib/libsodium.a"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release
+"stage10_fields_aot" start time: Nov 09 14:57 MST
+Output:
+----------------------------------------------------------
+16 field JIT/AOT checks passed
+<end of output>
+Test time =   0.81 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_fields_aot" end time: Nov 09 14:57 MST
+"stage10_fields_aot" time elapsed: 00:00:00
+----------------------------------------------------------
+
+415/443 Testing: ergonomics_sprint6
+415/443 Test: ergonomics_sprint6
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/stage8/sprint6.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a" "OFF" "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Release/lib/libarchive.a" "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Release/lib/libsodium.a"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release
+"ergonomics_sprint6" start time: Nov 09 14:57 MST
+Output:
+----------------------------------------------------------
+Sprint 6 process checks passed: 55
+<end of output>
+Test time =   2.68 sec
+----------------------------------------------------------
+Test Passed.
+"ergonomics_sprint6" end time: Nov 09 14:57 MST
+"ergonomics_sprint6" time elapsed: 00:00:02
+----------------------------------------------------------
+
+420/443 Testing: stage11_globals_aot
+420/443 Test: stage11_globals_aot
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/stage11/globals.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a" "OFF" "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Release/lib/libarchive.a" "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Release/lib/libsodium.a"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release
+"stage11_globals_aot" start time: Nov 09 14:57 MST
+Output:
+----------------------------------------------------------
+157 real-program global commands passed
+<end of output>
+Test time =   6.74 sec
+----------------------------------------------------------
+Test Passed.
+"stage11_globals_aot" end time: Nov 09 14:57 MST
+"stage11_globals_aot" time elapsed: 00:00:06
+----------------------------------------------------------
+
+418/443 Testing: stage10_temporal_aot
+418/443 Test: stage10_temporal_aot
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/stage10/temporal.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a" "OFF" "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Release/lib/libarchive.a" "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Release/lib/libsodium.a"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release
+"stage10_temporal_aot" start time: Nov 09 14:57 MST
+Output:
+----------------------------------------------------------
+23 source temporal JIT/AOT and rejection checks passed
+<end of output>
+Test time =   7.80 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_temporal_aot" end time: Nov 09 14:57 MST
+"stage10_temporal_aot" time elapsed: 00:00:07
+----------------------------------------------------------
+
+423/443 Testing: stage10_conversion_aot
+423/443 Test: stage10_conversion_aot
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/stage10/conversion.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a" "OFF" "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Release/lib/libarchive.a" "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Release/lib/libsodium.a"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release
+"stage10_conversion_aot" start time: Nov 09 14:57 MST
+Output:
+----------------------------------------------------------
+16 source display JIT/AOT checks passed
+<end of output>
+Test time =   0.80 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_conversion_aot" end time: Nov 09 14:57 MST
+"stage10_conversion_aot" time elapsed: 00:00:00
+----------------------------------------------------------
+
+432/443 Testing: application_native_sprint4
+432/443 Test: application_native_sprint4
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/stage8/sprint4.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/voidc" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/void_sprint4_tests" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a" "OFF" "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Release/lib/libarchive.a" "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Release/lib/libsodium.a"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release
+"application_native_sprint4" start time: Nov 09 14:57 MST
+Output:
+----------------------------------------------------------
+Sprint 4 process checks passed: 163
+<end of output>
+Test time =   3.76 sec
+----------------------------------------------------------
+Test Passed.
+"application_native_sprint4" end time: Nov 09 14:57 MST
+"application_native_sprint4" time elapsed: 00:00:03
+----------------------------------------------------------
+
+433/443 Testing: text_collections_sprint3
+433/443 Test: text_collections_sprint3
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/stage8/sprint3.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a" "OFF" "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Release/lib/libarchive.a" "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Release/lib/libsodium.a"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release
+"text_collections_sprint3" start time: Nov 09 14:57 MST
+Output:
+----------------------------------------------------------
+Sprint 3: 106 text/collection normal/O2 JIT, linked AOT and diagnostic process checks passed
+<end of output>
+Test time =  19.57 sec
+----------------------------------------------------------
+Test Passed.
+"text_collections_sprint3" end time: Nov 09 14:58 MST
+"text_collections_sprint3" time elapsed: 00:00:19
+----------------------------------------------------------
+
+422/443 Testing: stage10_operators_aot
+422/443 Test: stage10_operators_aot
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/stage10/operators.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a" "OFF" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/void_operator_integration" "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Release/lib/libarchive.a" "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Release/lib/libsodium.a"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release
+"stage10_operators_aot" start time: Nov 09 14:57 MST
+Output:
+----------------------------------------------------------
+operator_systems: normal/O2 JIT and independently linked AOT verified
+operator_systems_async: normal/O2 JIT and independently linked AOT verified
+operator_native_systems: normal/O2 JIT and independently linked AOT verified
+operator_systems_workload: normal/O2 JIT and independently linked AOT verified
+operator_format_cache: normal/O2 JIT and independently linked AOT verified
+operator_keys: normal/O2 JIT and independently linked AOT verified
+operator_native_compound_invalidation: normal/O2 JIT and independently linked AOT verified
+operator_compound_capture: normal/O2 JIT and independently linked AOT verified
+operator_compound_conversions: normal/O2 JIT and independently linked AOT verified
+operator_compounds: normal/O2 JIT and independently linked AOT verified
+operator_native_compounds: normal/O2 JIT and independently linked AOT verified
+operator_native_compound_failure: normal/O2 JIT and independently linked AOT verified
+operator_compound_suspension: normal/O2 JIT and independently linked AOT verified
+operator_compound_workers: normal/O2 JIT and independently linked AOT verified
+operator_lifetimes: normal/O2 JIT and independently linked AOT verified
+operator_suspension: normal/O2 JIT and independently linked AOT verified
+operator_workers: normal/O2 JIT and independently linked AOT verified
+operator_failures: normal/O2 JIT and independently linked AOT verified
+operator_errors: normal/O2 JIT and independently linked AOT verified
+operator_worker_failures: normal/O2 JIT and independently linked AOT verified
+operator_cleanup: normal/O2 JIT and independently linked AOT verified
+operator_native: normal/O2 JIT and independently linked AOT verified
+344 source operator JIT/AOT checks passed
+<end of output>
+Test time =  88.97 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operators_aot" end time: Nov 09 14:59 MST
+"stage10_operators_aot" time elapsed: 00:01:28
+----------------------------------------------------------
+
+421/443 Testing: stage10_console_aot
+421/443 Test: stage10_console_aot
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/stage10/console.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a" "OFF" "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Release/lib/libarchive.a" "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/Release/lib/libsodium.a"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release
+"stage10_console_aot" start time: Nov 09 14:57 MST
+Output:
+----------------------------------------------------------
+operator_console_systems: exact normal/O2 JIT and linked AOT verified
+console_operator_systems: exact normal/O2 JIT and linked AOT verified
+console_operator_failure: exact normal/O2 JIT and linked AOT verified
+console_operator_compound_failure: exact normal/O2 JIT and linked AOT verified
+console_operator_workload: exact normal/O2 JIT and linked AOT verified
+console_sum_display: exact normal/O2 JIT and linked AOT verified
+console_sum_failure: exact normal/O2 JIT and linked AOT verified
+console_collections: exact normal/O2 JIT and linked AOT verified
+console_collection_invalidated: exact normal/O2 JIT and linked AOT verified
+console_collection_failed_hook: exact normal/O2 JIT and linked AOT verified
+console_keys: exact normal/O2 JIT and linked AOT verified
+console_terminal: exact normal/O2 JIT and linked AOT verified
+console_exit: exact normal/O2 JIT and linked AOT verified
+console_zero: exact normal/O2 JIT and linked AOT verified
+console_cleanup_primary: exact normal/O2 JIT and linked AOT verified
+console_cleanup_only: exact normal/O2 JIT and linked AOT verified
+console_print: exact normal/O2 JIT and linked AOT verified
+console_order: exact normal/O2 JIT and linked AOT verified
+console_reads: exact normal/O2 JIT and linked AOT verified
+console_fail: exact normal/O2 JIT and linked AOT verified
+console_endpoints: exact normal/O2 JIT and linked AOT verified
+console_read_errors: exact normal/O2 JIT and linked AOT verified
+source console JIT/AOT driver checks: 616
+<end of output>
+Test time = 195.15 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_console_aot" end time: Nov 09 15:00 MST
+"stage10_console_aot" time elapsed: 00:03:15
+----------------------------------------------------------
+
+End testing: Nov 09 15:00 MST

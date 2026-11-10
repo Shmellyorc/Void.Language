@@ -1,0 +1,19 @@
+VOID_SANITIZERS:BOOL=ON
+
+void_runtime
+C_FLAGS = -O2 -g -DNDEBUG -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer
+CXX_FLAGS = -O2 -g -DNDEBUG -std=c++20 -fno-rtti -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer
+
+void_g3_fixture
+C_FLAGS = -O2 -g -DNDEBUG -std=c11 -fvisibility=hidden -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer
+
+void_g3_thunk
+C_FLAGS = -O2 -g -DNDEBUG -std=c11 -fvisibility=hidden -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer
+
+void_g3_tests
+C_FLAGS = -O2 -g -DNDEBUG -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer
+CXX_FLAGS = -O2 -g -DNDEBUG -std=c++20 -fno-rtti -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer
+
+Sanitizer entrypoints linked into void_g3_tests
+0000000002dad6e0 T __asan_init
+0000000002de0c30 T __ubsan_handle_type_mismatch_v1_abort

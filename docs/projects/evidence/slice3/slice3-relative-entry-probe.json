@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+    "--entry",
+    "main.void"
+  ],
+  "cwd": "/tmp/VOID S3 relative entry mkixnx3l",
+  "status": 2,
+  "stdout": "",
+  "stderr": "voidls: filesystem error: cannot make absolute path: Invalid argument []\n"
+}

@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="52"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="39"
+	timestamp="2026-11-09T08:15:42"
+	>
+	<testcase name="project_manifest_header" classname="project_manifest_header" time="0.00350581" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="project_manifest" classname="project_manifest" time="0.0390917" status="run">
+		<properties/>
+		<system-out>project_manifest: 8787 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_no_authority" classname="project_manifest_no_authority" time="0.101569" status="run">
+		<properties/>
+		<system-out>project_manifest: 8788 checks passed under syscall denial
+project_manifest_no_authority: four live SIGSYS controls passed
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_legacy" classname="project_manifest_legacy" time="1.15299" status="run">
+		<properties/>
+		<system-out>project_manifest_legacy: 18 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_provenance" classname="project_manifest_provenance" time="0.0382722" status="run">
+		<properties/>
+		<system-out>project_manifest_provenance: 3 file hashes and exact pinned upstream reconstruction passed
+</system-out>
+	</testcase>
+	<testcase name="project_selection" classname="project_selection" time="2.82313" status="run">
+		<properties/>
+		<system-out>project_selection: 476 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_sessions" classname="project_sessions" time="0.53453" status="run">
+		<properties/>
+		<system-out>project_sessions: 166 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_creation" classname="project_creation" time="0.0673079" status="run">
+		<properties/>
+		<system-out>creation: entropy, reviewed directory, external collision, rollback ownership, staged content passed
+</system-out>
+	</testcase>
+	<testcase name="project_creation_process" classname="project_creation_process" time="3.02319" status="run">
+		<properties/>
+		<system-out>S5 creation process: 64 invocations passed
+</system-out>
+	</testcase>
+	<testcase name="project_application" classname="project_application" time="9.58867" status="run">
+		<properties/>
+		<system-out>Application cache: miss/hit
+project_application: 63 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_application_process" classname="project_application_process" time="10.9807" status="run">
+		<properties/>
+		<system-out>project_application_process: 61 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_discovery_cli" classname="project_discovery_cli" time="3.67462" status="run">
+		<properties/>
+		<system-out>project_discovery_cli: 88 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_profiles" classname="project_profiles" time="0.999833" status="run">
+		<properties/>
+		<system-out>project_profiles: 43 process checks passed; compute instruction counts O0=6, O2=2, release --no-opt=6
+</system-out>
+	</testcase>
+	<testcase name="project_protocol" classname="project_protocol" time="0.474542" status="run">
+		<properties/>
+		<system-out>project_protocol: 169 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_nested_cli" classname="project_nested_cli" time="0.342269" status="run">
+		<properties/>
+		<system-out>project_nested_cli: 11 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_fields" classname="stage10_fields" time="0.38224" status="run">
+		<properties/>
+		<system-out>54 field policy checks passed
+</system-out>
+	</testcase>
+	<testcase name="fixed_arrays_source" classname="fixed_arrays_source" time="1.73025" status="run">
+		<properties/>
+		<system-out>source array normal: 158 failing allocation budgets, recovery and cleanup passed
+source array O2: 158 failing allocation budgets, recovery and cleanup passed
+Numeric fixed arrays: source execution, roots, publication and failure recovery passed
+</system-out>
+	</testcase>
+	<testcase name="ffi_g1_primitive_jit_ir" classname="ffi_g1_primitive_jit_ir" time="0.62617" status="run">
+		<properties/>
+		<system-out>void-c-primitive 2 1: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+void-c-primitive 1 2: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+call vectorcall: C primitive descriptor line 8: unsupported descriptor, ABI revision or effects
+effects direct-sync blocking no-callbacks: C primitive descriptor line 7: unsupported descriptor, ABI revision or effects
+c_size:i64: C primitive descriptor line 9: unsupported descriptor, ABI revision or effects
+c_bool:u8: C primitive descriptor line 9: unsupported descriptor, ABI revision or effects
+bind signed8 g1_signed8 i8 ptr: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 record: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 void: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 u8: C primitive provider rejected the exact descriptor or fixture identity
+bind signed8 g1_missing i8 i8: C primi...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g1_primitive_aot_normal" classname="ffi_g1_primitive_aot_normal" time="0.0374403" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="ffi_g1_primitive_aot_optimized" classname="ffi_g1_primitive_aot_optimized" time="0.0508333" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="ffi_g1_primitive_aot_mismatch" classname="ffi_g1_primitive_aot_mismatch" time="0.0365105" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="ffi_g1_primitive_aot_missing" classname="ffi_g1_primitive_aot_missing" time="0.920434" status="run">
+		<properties/>
+		<system-out>[ 83%] Built target libcurl_static
+[ 83%] Built target void_native_fixture
+[ 83%] Built target void_format_objects
+[ 83%] Built target void_zone_objects
+[ 83%] Built target void_application_objects
+[100%] Built target void_runtime
+[100%] Built target void_core
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target void_g1_fixture
+[100%] Built target void_g1_thunk
+[100%] Built target void_g1_tests
+[100%] Linking CXX executable void_g1_aot_missing
+ld.lld: error: undefined symbol: vd_c_primitive_dispatch_v1
+&gt;&gt;&gt; referenced by native_primitives.void&gt;:2 (&lt;host binding /native_primitives.void&gt;:2)
+&gt;&gt;&gt;               ffi-g1/application-optimized.o:(__vd_2f6e61746976655f7072696d6974697665732e766f69643a3a7369676e656438__void)
+&gt;&gt;&gt; referenced by native_primitives.void&gt;:4 (&lt;host binding /native_primitives.void&gt;:4)
+&gt;&gt;&gt;               ffi-g1/application-optimized.o:(__vd_2f6e61746976655f7072696d6974697665732e766f69643a3a7369676e65643136__void)
+&gt;&gt;&gt; referenced ...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g2_jit_ir" classname="ffi_g2_jit_ir" time="0.465684" status="run">
+		<properties/>
+		<system-out>2 1: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+sample G2Sample 16 4 2: C primitive descriptor line 17: C record size, alignment or tail padding disagrees with natural layout
+packet G2Packet 31 8 4: C primitive descriptor line 22: C record size, alignment or tail padding disagrees with natural layout
+reading f64 4: C primitive descriptor line 17: C record field offset or padding disagrees with natural layout
+reading ptr 8: C primitive descriptor line 17: unsupported C primitive type
+reading u64 8: C primitive provider rejected the exact descriptor or fixture identity
+tag tag u32: C primitive provider rejected the exact descriptor or fixture identity
+array:u16:3:1: C primitive descriptor line 20: invalid inline array extent or stride
+array:u16:0:2: C primitive descriptor line 20: invalid inline array extent or stride
+array:u16:03:2: C primitive descriptor line 20: invalid bounded canonical decimal field
+datum datum record:packet: C primitive descriptor line 22: record must n...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g2_aot_normal" classname="ffi_g2_aot_normal" time="0.0510395" status="run">
+		<properties/>
+		<system-out>7 0 103
+-1 1 &lt;host binding /native_records.void&gt;:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:6:20: source call
+        return ffi.fill(bytes, 0, 5, 8) as i32
+                   ^
+-2 1 &lt;host binding /native_records.void&gt;:27:6: runtime error: overlapping C byte spans
+In function /native_records.void::move_bytes
+Called from /records.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:8:20: source call
+        return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32
+                   ^
+-3 1 &lt;host binding /native_records.void&gt;:23:6: runtime error: C byte span returned an oversized written prefix
+In function /native_records.void::fill
+Called from /records.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:10:20: source call
+        return ffi.fill(bytes, 0, 4, 254) as i32
+                   ^
+-4 1 &lt;host binding /native_re...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g2_aot_optimized" classname="ffi_g2_aot_optimized" time="0.0629088" status="run">
+		<properties/>
+		<system-out>7 0 103
+-1 1 &lt;host binding /native_records.void&gt;:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:6:20: source call
+        return ffi.fill(bytes, 0, 5, 8) as i32
+                   ^
+-2 1 &lt;host binding /native_records.void&gt;:27:6: runtime error: overlapping C byte spans
+In function /native_records.void::move_bytes
+Called from /records.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:8:20: source call
+        return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32
+                   ^
+-3 1 &lt;host binding /native_records.void&gt;:23:6: runtime error: C byte span returned an oversized written prefix
+In function /native_records.void::fill
+Called from /records.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:10:20: source call
+        return ffi.fill(bytes, 0, 4, 254) as i32
+                   ^
+-4 1 &lt;host binding /native_re...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g3_jit_ir" classname="ffi_g3_jit_ir" time="0.813092" status="run">
+		<properties/>
+		<system-out>3 2: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+integer null: C primitive descriptor line 10: unsupported or contradictory native resource contract
+pointer minus-one: C primitive descriptor line 10: unsupported or contradictory native resource contract
+shutdown-owner: C primitive descriptor line 10: unsupported or contradictory native resource contract
+retry-on-error: C primitive descriptor line 10: unsupported or contradictory native resource contract
+create missing owner: C primitive descriptor line 14: invalid native borrow or terminal release signature
+bind close_box g3_close i32 mut:box: C primitive descriptor line 15: missing exact native acquire or release contract
+i64 close:box: C primitive descriptor line 14: invalid native borrow or terminal release signature
+i32 close:box i32: C primitive descriptor line 14: invalid native borrow or terminal release signature
+i32 borrow:other i32: C primitive descriptor line 12: resource operation requires an earlier admitted ide...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g3_aot_normal" classname="ffi_g3_aot_normal" time="0.0533097" status="run">
+		<properties/>
+		<system-out>7 0 104
+-1 1 &lt;host binding /native_resources.void&gt;:6:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::read
+Called from /resources.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:29:20: source call
+        return ffi.read(alias, 0)
+                   ^
+-2 1 &lt;host binding /native_resources.void&gt;:10:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::close_box
+Called from /resources.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:31:20: source call
+        return ffi.close_box(alias)
+                   ^
+-3 1 /home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:14:40: runtime error: Null managed reference in checked conversion
+        return ffi.read(ffi.create(-1) as ffi.box, 0)
+                                       ^
+In function /resources.void::entry
+-4 0 22
+</system-out>
+	</testcase>
+	<testcase name="ffi_g3_aot_optimized" classname="ffi_g3_aot_optimized" time="0.0517722" status="run">
+		<properties/>
+		<system-out>7 0 104
+-1 1 &lt;host binding /native_resources.void&gt;:6:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::read
+Called from /resources.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:29:20: source call
+        return ffi.read(alias, 0)
+                   ^
+-2 1 &lt;host binding /native_resources.void&gt;:10:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::close_box
+Called from /resources.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:31:20: source call
+        return ffi.close_box(alias)
+                   ^
+-3 1 /home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:14:40: runtime error: Null managed reference in checked conversion
+        return ffi.read(ffi.create(-1) as ffi.box, 0)
+                                       ^
+In function /resources.void::entry
+-4 0 22
+</system-out>
+	</testcase>
+	<testcase name="ffi_g4_jit_ir" classname="ffi_g4_jit_ir" time="0.983539" status="run">
+		<properties/>
+		<system-out>bad closure revision: C dynamic closure: unsupported revision
+system library policy: C dynamic closure: unsupported target, system ABI or relocation policy
+foreign provider: C dynamic closure: exact descriptor provider or target mismatch
+aliased image: C dynamic closure: invalid or duplicate image
+missing descriptor export: C dynamic closure is missing an owned descriptor export
+wrong target thunk: C dynamic closure: exact descriptor thunk mismatch
+direct bridge import: VOID IR: C primitive transport requires host admission and typed operations
+erased closure admission: VOID IR: C primitive admission differs from analyzed source
+forged dynamic ordinal: VOID IR: C primitive call outside the admitted binding module
+forged provider and symbol: VOID IR: invalid C primitive descriptor or exact call signature
+missing provider: C dynamic artifact: libvoid_g4_main.so is missing, aliased or outside file bounds
+modified dependency: C dynamic digest: libvoid_g4_dep.so
+symlink provider: C dynamic artifact: libvoid_g4_mai...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g4_aot_normal" classname="ffi_g4_aot_normal" time="0.535623" status="run">
+		<properties/>
+		<system-out>normal ['7'] exit=0 104
+normal ['-1'] exit=1 &lt;host binding /native_dynamic.void&gt;:15:6: runtime error: C resource is closed, null or invalid
+In function /native_dynamic.void::read
+Called from /dynamic.void::entry
+/tmp/void-g4-source-bawe3_bm/dynamic.void:46:20: source call
+        return ffi.read(alias, 0)
+                   ^
+normal ['-2'] exit=1 &lt;host binding /native_dynamic.void&gt;:17:6: runtime error: C resource is closed, null or invalid
+In function /native_dynamic.void::close_box
+Called from /dynamic.void::entry
+/tmp/void-g4-source-bawe3_bm/dynamic.void:48:20: source call
+        return ffi.close_box(alias)
+                   ^
+normal ['-3'] exit=1 &lt;host binding /native_dynamic.void&gt;:13:6: runtime error: C resource operation rejected org.voidlang.g4-fixture::g4_create
+In function /native_dynamic.void::create
+Called from /dynamic.void::entry
+/tmp/void-g4-source-bawe3_bm/dynamic.void:22:28: source call
+        var rejected = ffi.create(-3)
+                           ^
+normal ['-4'] exit=0 22
+normal ['7'] exi...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g4_aot_optimized" classname="ffi_g4_aot_optimized" time="0.110748" status="run">
+		<properties/>
+		<system-out>optimized ['7'] exit=0 104
+optimized ['-1'] exit=1 &lt;host binding /native_dynamic.void&gt;:15:6: runtime error: C resource is closed, null or invalid
+In function /native_dynamic.void::read
+Called from /dynamic.void::entry
+/tmp/void-g4-source-0bltdox0/dynamic.void:46:20: source call
+        return ffi.read(alias, 0)
+                   ^
+optimized ['-2'] exit=1 &lt;host binding /native_dynamic.void&gt;:17:6: runtime error: C resource is closed, null or invalid
+In function /native_dynamic.void::close_box
+Called from /dynamic.void::entry
+/tmp/void-g4-source-0bltdox0/dynamic.void:48:20: source call
+        return ffi.close_box(alias)
+                   ^
+optimized ['-3'] exit=1 &lt;host binding /native_dynamic.void&gt;:13:6: runtime error: C resource operation rejected org.voidlang.g4-fixture::g4_create
+In function /native_dynamic.void::create
+Called from /dynamic.void::entry
+/tmp/void-g4-source-0bltdox0/dynamic.void:22:28: source call
+        var rejected = ffi.create(-3)
+                           ^
+optimized ['-4'] exit=0 22
+o...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g4_aot_startup" classname="ffi_g4_aot_startup" time="0.0959499" status="run">
+		<properties/>
+		<system-out>startup ['7'] exit=1 /tmp/void-g4-source-hje03oqr/dynamic_startup.void:5:15: runtime error: Division by zero
+    return 12 / zero
+              ^
+In function /dynamic_startup.void::eager
+Called from /dynamic_startup.void::$global$initialized
+/tmp/void-g4-source-hje03oqr/dynamic_startup.void:7:24: source call
+var initialized: i32 = eager()
+                       ^
+startup ['7'] exit=1 C dynamic digest: libvoid_g4_dep.so
+startup ['7'] exit=1 C dynamic artifact: libvoid_g4_dep.so is missing, aliased or outside file bounds
+startup ['7'] exit=1 C dynamic path: root is unavailable or aliased
+startup verified relocated dynamic AOT with its compile source removed
+</system-out>
+	</testcase>
+	<testcase name="native_source" classname="native_source" time="2.17379" status="run">
+		<properties/>
+		<system-out>native source passed
+</system-out>
+	</testcase>
+	<testcase name="stage6_integrated" classname="stage6_integrated" time="3.31953" status="run">
+		<properties/>
+		<system-out>combined cached old root=1; old roots at barrier=14; retired generations=1; post-drain objects=0
+combined cached old root=1; old roots at barrier=14; retired generations=1; post-drain objects=0
+</system-out>
+	</testcase>
+	<testcase name="stage6_cache_processes" classname="stage6_cache_processes" time="4.22164" status="run">
+		<properties/>
+		<system-out>Integrated fresh-process cold/hit/corrupt fallback (or safe bypass): passed
+Integrated fresh-process cold/hit/corrupt fallback (or safe bypass): passed
+</system-out>
+	</testcase>
+	<testcase name="native_aot_main_normal" classname="native_aot_main_normal" time="0.0383266" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_main_optimized" classname="native_aot_main_optimized" time="0.041607" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_terminated_nul_normal" classname="native_aot_terminated_nul_normal" time="0.0367226" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_closed_optimized" classname="native_aot_closed_optimized" time="0.0439023" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_duplicate_normal" classname="native_aot_duplicate_normal" time="0.0385083" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_ir" classname="async_ir" time="0.198069" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="reload" classname="reload" time="0.374958" status="run">
+		<properties/>
+		<system-out>reload: passed
+</system-out>
+	</testcase>
+	<testcase name="gc" classname="gc" time="0.0225819" status="run">
+		<properties/>
+		<system-out>gc: passed
+</system-out>
+	</testcase>
+	<testcase name="sessions" classname="sessions" time="0.0585303" status="run">
+		<properties/>
+		<system-out>sessions: passed
+</system-out>
+	</testcase>
+	<testcase name="analysis" classname="analysis" time="0.474252" status="run">
+		<properties/>
+		<system-out>normal: body edit 53 -&gt; 61, const edit rejected, old lease 53; concurrent calls 288011
+O2: body edit 53 -&gt; 61, const edit rejected, old lease 53; concurrent calls 225946
+analysis: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric" classname="numeric" time="2.02339" status="run">
+		<properties/>
+		<system-out>210 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed
+numeric: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric_enum_ir" classname="numeric_enum_ir" time="0.360125" status="run">
+		<properties/>
+		<system-out>enum: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+enum initialized: accepted
+field: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+field initialized: accepted
+array: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+array initialized: accepted
+field-array: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+field-array initialized: accepted
+array-field: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+array-field initialized: accepted
+nested: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+nested initialized: accepted
+managed: rejected (VOID IR: non-nullable reference storage read before initialization in /enum-storage.void::probe)
+managed initialized: accepted
+zero-backed holder: rejected (VOID IR: nominal source objects require complete construction)...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="numeric_enum_process" classname="numeric_enum_process" time="5.75418" status="run">
+		<properties/>
+		<system-out>S6 542 boundary pairs, 39 invalid sources and 62 executed processes
+</system-out>
+	</testcase>
+	<testcase name="numeric_enum_lsp" classname="numeric_enum_lsp" time="0.0900203" status="run">
+		<properties/>
+		<system-out>S6 LSP passed 15 recorded requests and overlay revisions
+</system-out>
+	</testcase>
+	<testcase name="frontend" classname="frontend" time="4.8285" status="run">
+		<properties/>
+		<system-out>Frontend begin: diagnostics
+50+ source diagnostic cases and UTF-8/ABI checks passed
+Frontend passed: diagnostics
+Frontend begin: programs
+Real .void files and independent programs executed through normal/O2 JIT
+Frontend passed: programs
+Frontend begin: numeric values
+1216 constant/normal/O2 numeric matrix comparisons passed
+Readonly/compile-time constants, numeric boundaries, concurrent failures, bounded traces and restart checks passed
+Frontend passed: numeric values
+Frontend begin: diagnostic recovery/resource limits
+Frontend resource case: combined expression/constant depth
+Structured diagnostics: independent files, recovery, bounded cascades, snapshots and failed reload verified
+Frontend passed: diagnostic recovery/resource limits
+Frontend begin: value structs
+Frontend resource case: bounded expanded value layouts
+Value struct source: nested/mixed layouts, copies, normal/O2 JIT, diagnostics, tooling and reload passed
+Frontend passed: value structs
+Frontend begin: receiver methods
+Frontend resource case: b...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="modules" classname="modules" time="0.687588" status="run">
+		<properties/>
+		<system-out>Project constants, forwards, visibility, cycles, imports and restart checks passed
+Project-local library identities, cycles, ownership, overlays, native JIT and invalidation passed
+Multi-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed
+modules: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric_cli" classname="numeric_cli" time="13.4107" status="run">
+		<properties/>
+		<system-out>-- Numeric source constants, JIT and native AOT passed in both optimization modes
+</system-out>
+	</testcase>
+</testsuite>

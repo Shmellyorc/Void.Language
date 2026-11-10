@@ -1,0 +1,45 @@
+{
+  "binaries": [
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "sha256": "a634538cb0efbdaeea35e0685936ed306ff71d5f6eafe5b12e2e8a4ab92ab389",
+      "bytes": 78253488,
+      "version_argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "--version"
+      ],
+      "version": "VOID Language Compiler v0.1.0 (development)\nLLVM 23.1.4\nTarget: x86_64-unknown-linux-gnu\nBuild identity: 85639b740a4245bcf8bb6a9fe9ea0680503642799fdd767e37de3e620bd631d8\n",
+      "runpath": [
+        "0x000000000000001d (RUNPATH)            Library runpath: [/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/lib:]"
+      ],
+      "code_sha256": {
+        ".text": "355a74d6fed18362046a0fc5f53a38644dc8fc6ac0a22dfde9e4fa98b0064207",
+        ".rodata": "259d69c93de8371563a795347b7849ddbe049c2278d8fb7d08fc85315f8f4959"
+      }
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice3-installed/compiler/bin/voidc",
+      "sha256": "dd7b511fe3a10654abc235e6225c2d9ea1e2c3a7980a8af101e537b02223d40f",
+      "bytes": 78253488,
+      "version_argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/slice3-installed/compiler/bin/voidc",
+        "--version"
+      ],
+      "version": "VOID Language Compiler v0.1.0 (development)\nLLVM 23.1.4\nTarget: x86_64-unknown-linux-gnu\nBuild identity: 85639b740a4245bcf8bb6a9fe9ea0680503642799fdd767e37de3e620bd631d8\n",
+      "runpath": [
+        "0x000000000000001d (RUNPATH)            Library runpath: [$ORIGIN/../lib/void]"
+      ],
+      "code_sha256": {
+        ".text": "355a74d6fed18362046a0fc5f53a38644dc8fc6ac0a22dfde9e4fa98b0064207",
+        ".rodata": "259d69c93de8371563a795347b7849ddbe049c2278d8fb7d08fc85315f8f4959"
+      }
+    }
+  ],
+  "whole_file_equality": false,
+  "same_build_identity": true,
+  "same_code_sections": true,
+  "all_changes_confined_to": [
+    ".dynamic",
+    ".dynstr"
+  ]
+}

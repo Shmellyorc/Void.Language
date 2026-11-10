@@ -1,0 +1,144 @@
+{
+  "boundary_cases": 542,
+  "records": [
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Release\\voidc.exe",
+        "run",
+        "C:\\Users\\a\\VoidS6-tmp-Release\\VOID S6 numeric enum ephyv5xh\\matrix.void",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Release\\voidc.exe",
+        "build",
+        "C:\\Users\\a\\VoidS6-tmp-Release\\VOID S6 numeric enum ephyv5xh\\matrix.void",
+        "-o",
+        "C:\\Users\\a\\VoidS6-tmp-Release\\VOID S6 numeric enum ephyv5xh\\matrix-normal.exe",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidS6-tmp-Release/VOID S6 numeric enum ephyv5xh/matrix-normal.exe\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-tmp-Release\\VOID S6 numeric enum ephyv5xh\\matrix-normal.exe"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Release\\voidc.exe",
+        "run",
+        "C:\\Users\\a\\VoidS6-tmp-Release\\VOID S6 numeric enum ephyv5xh\\matrix.void",
+        "--no-cache"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Release\\voidc.exe",
+        "build",
+        "C:\\Users\\a\\VoidS6-tmp-Release\\VOID S6 numeric enum ephyv5xh\\matrix.void",
+        "-o",
+        "C:\\Users\\a\\VoidS6-tmp-Release\\VOID S6 numeric enum ephyv5xh\\matrix-o2.exe"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidS6-tmp-Release/VOID S6 numeric enum ephyv5xh/matrix-o2.exe\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-tmp-Release\\VOID S6 numeric enum ephyv5xh\\matrix-o2.exe"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Release\\voidc.exe",
+        "run",
+        "C:\\Users\\a\\VoidS6-tmp-Release\\VOID S6 numeric enum ephyv5xh\\integration.void",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Release\\voidc.exe",
+        "build",
+        "C:\\Users\\a\\VoidS6-tmp-Release\\VOID S6 numeric enum ephyv5xh\\integration.void",
+        "-o",
+        "C:\\Users\\a\\VoidS6-tmp-Release\\VOID S6 numeric enum ephyv5xh\\integration-normal.exe",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidS6-tmp-Release/VOID S6 numeric enum ephyv5xh/integration-normal.exe\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-tmp-Release\\VOID S6 numeric enum ephyv5xh\\integration-normal.exe"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Release\\voidc.exe",
+        "run",
+        "C:\\Users\\a\\VoidS6-tmp-Release\\VOID S6 numeric enum ephyv5xh\\integration.void",
+        "--no-cache"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Release\\voidc.exe",
+        "build",
+        "C:\\Users\\a\\VoidS6-tmp-Release\\VOID S6 numeric enum ephyv5xh\\integration.void",
+        "-o",
+        "C:\\Users\\a\\VoidS6-tmp-Release\\VOID S6 numeric enum ephyv5xh\\integration-o2.exe"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidS6-tmp-Release/VOID S6 numeric enum ephyv5xh/integration-o2.exe\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-tmp-Release\\VOID S6 numeric enum ephyv5xh\\integration-o2.exe"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Release\\voidc.exe",
+        "run",
+        "C:\\Users\\a\\VoidS6-tmp-Release\\VOID S6 numeric enum ephyv5xh\\integration.void",
+        "--cache"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": "Debug cache: unavailable\r\n"
+    }
+  ]
+}

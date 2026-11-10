@@ -1,0 +1,7 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start 280: ffi_g3_jit_ir
+1/1 Test #280: ffi_g3_jit_ir ....................   Passed    0.41 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.41 sec

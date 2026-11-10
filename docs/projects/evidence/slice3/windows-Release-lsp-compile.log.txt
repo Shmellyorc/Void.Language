@@ -1,0 +1,7 @@
+C:\Users\a\VoidSlice3-Corrected-20261108\src\lsp\main.cpp(21,9): warning: 'NOMINMAX' macro redefined [-Wmacro-redefined]
+   21 | #define NOMINMAX
+      |         ^
+<command line>(4,9): note: previous definition is here
+    4 | #define NOMINMAX 1
+      |         ^
+1 warning generated.

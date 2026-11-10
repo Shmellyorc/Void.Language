@@ -1,0 +1,2016 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index d4ae3b1..a2e4442 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1614,6 +1614,16 @@ if(BUILD_TESTING)
+   set_tests_properties(analysis PROPERTIES TIMEOUT 180)
+   add_test(NAME numeric COMMAND void_tests numeric "${PROJECT_SOURCE_DIR}")
+   set_tests_properties(numeric PROPERTIES TIMEOUT 120)
++  add_executable(void_numeric_enum_ir tests/numeric/enums_ir.cpp)
++  target_link_libraries(void_numeric_enum_ir PRIVATE void_llvm void_runtime)
++  add_test(NAME numeric_enum_ir COMMAND void_numeric_enum_ir)
++  add_test(NAME numeric_enum_process COMMAND "${Python3_EXECUTABLE}"
++    "${PROJECT_SOURCE_DIR}/tests/numeric/enums.py" "$<TARGET_FILE:voidc>"
++    "${CMAKE_CURRENT_BINARY_DIR}/numeric-enum-process.json")
++  add_test(NAME numeric_enum_lsp COMMAND "${Python3_EXECUTABLE}"
++    "${PROJECT_SOURCE_DIR}/tests/numeric/enums_lsp.py" "$<TARGET_FILE:voidls>"
++    "${CMAKE_CURRENT_BINARY_DIR}/numeric-enum-lsp.json")
++  set_tests_properties(numeric_enum_ir numeric_enum_process numeric_enum_lsp PROPERTIES TIMEOUT 480)
+   add_test(NAME frontend COMMAND void_tests frontend "${PROJECT_SOURCE_DIR}")
+   set_tests_properties(frontend PROPERTIES TIMEOUT 90)
+   add_test(NAME modules COMMAND void_tests modules "${CMAKE_CURRENT_BINARY_DIR}/module fixtures with spaces")
+diff --git a/docs/LANGUAGE_BIBLE.md b/docs/LANGUAGE_BIBLE.md
+index 0150fa0..dcc9367 100644
+--- a/docs/LANGUAGE_BIBLE.md
++++ b/docs/LANGUAGE_BIBLE.md
+@@ -23,14 +23,13 @@ general typed C interoperability and IDE/package/release workflows. Dynamic link
+ is the approved default; static linking is optional. Raylib is the first substantial
+ integration target, not a special compiler subsystem.
+ 
+-**Approved direction, not implemented:** never require a hardcoded entry filename
++**Project entry rule:** never require a hardcoded entry filename
+ or an `entry` manifest key. Compiler-owned discovery must select exactly one valid
+ main in the selected application source graph, in any valid source filename;
+ multiple candidates diagnose ambiguity. Preserve explicit entries, standalone and
+-top-level execution, and libraries without main. Baseline automatic `main.void`
+-selection remains implemented until replaced. Proposed schema, `as?`/`??`, ABI and
+-resolver details are labelled for review in the roadmap; metadata grants no authority.
+-This is documentation only and grants no implementation or public release clearance.
++top-level execution, and libraries without main. Manifestless automatic discovery
++retains `main.void`. Integer and numeric-enum `as?` now follow the Slice 6 contract.
++The roadmap carries open ABI and resolver decisions. Metadata grants no authority.
+ 
+ ## Active toolchain and migration history
+ 
+@@ -311,7 +310,7 @@ func test():
+ 
+ ## 6. Numeric types and literals [AGREED]
+ 
+-**Implemented clarification (Phase 6):** All ten fixed-width integer/float types, contextual literals, wrapping integer arithmetic, defined division/remainder, IEEE floating behavior and explicit **checked numeric `as`** are specified and implemented in `NUMERIC_TYPES.md`. These are not still undecided. Invalid runtime casts report source-located failures; numeric `as?`, platform-sized aliases, alternative base/exponent/separator literals, hashing and other broader conversions remain future scope. Exact rules for those extensions are not inferred from examples here.
++**Implemented clarification:** Phase 6 implements all ten fixed-width integer/float types, contextual literals, wrapping integer arithmetic, defined division/remainder, IEEE floating behavior and checked numeric `as`. Invalid runtime casts report source-located failures. Project Slice 6 adds integer-to-integer and integer-to-numeric-enum `as?` returning canonical `option<T>`. See [Numeric types and contextual literals](NUMERIC_TYPES.md). Platform-sized aliases, alternative base/exponent/separator literals, hashing and broader conversions remain future scope.
+ 
+ Exact-width types are available: `i8`, `i16`, `i32`, `i64`, unsigned counterparts, `f32`, `f64`, and `bool`. The precise list of platform-sized integer aliases remains open. Unannotated small integral literals normally infer `i32`; unannotated floating literals normally infer `f32`, reflecting the game-development focus.
+ 
+@@ -1598,10 +1597,10 @@ Use proper error types, including enums with cases such as `not_found`, `permiss
+ 
+ ## 30. Type casts, checks, and parsing [AGREED]
+ 
+-**Implemented clarification:** Phase 6 defines the numeric `as` conversion matrix, floating truncation/rounding, invalid-value failures, range checking and optimization-independent behavior. Phase 16+ separately implements bounded checked managed reference conversions/upcasts in its approved nominal/interface source family. This section's older generic OPEN language applies to future `as?`, downcasts, foreign conversions and richer type patterns, not the existing checked numeric casts.
++**Implemented clarification:** Phase 6 defines the numeric `as` conversion matrix, floating truncation/rounding, invalid-value failures, range checking and optimization-independent behavior. Phase 16+ separately implements bounded checked managed reference conversions/upcasts in its approved nominal/interface source family. Project Slice 6 implements the integer and numeric-backed enum `as?` family in [Numeric types and contextual literals](NUMERIC_TYPES.md#numeric-backed-enums-and-fallible-casts). Other fallible conversions, downcasts, foreign conversions and richer type patterns remain open.
+ 
+ - `value as type` is an explicit checked conversion; when allowed but invalid at runtime, report a VOID runtime error.
+-- `value as? type` is a checked, nullable conversion; return `null` on failure.
++- `value as? type` checks an integer against the target integer range and, for a numeric-backed enum, its declared discriminants. The result is canonical `option<type>` containing `Some(value)` or `None`. This supersedes the older nullable-cast proposal for the implemented family.
+ - `value is type` / `value is type(binding)` checks types and narrows them through the pattern system.
+ - Parse strings using `parse<t>(text)`, returning a `result`, rather than magically casting strings to numbers.
+ - Compatible numeric literals adapt to expected parameter/field types.
+@@ -1612,9 +1611,8 @@ var number = 100
+ var speed = number as f32
+ var precise = speed as f64
+ 
+-var unit: base_unit = enemy()
+-if (unit as? player) is Ok(p):
+-    print(p.name)
++if number as? i8 is Some(var small):
++    print(small)
+ ```
+ 
+ ```python
+@@ -1629,7 +1627,7 @@ match parse<i32>(age):
+ # var bad = age as i32  # Compile error: parsing is not casting
+ ```
+ 
+-Explicit floating-to-integer casts were proposed to truncate toward zero, rejecting out-of-range values, `NaN`, and infinity with either runtime error (`as`) or null (`as?`). Exact conversion tables, rounding rules, interface/reference upcasts, and impossible-cast diagnostics are **OPEN**. User-defined conversion operators are intentionally deferred.
++Floating-to-integer `as` truncates toward zero and reports a runtime error for out-of-range values, `NaN`, and infinity. The earlier floating-to-integer `as?` sketch was part of the nullable proposal. Fallible floating-point and reference conversions, along with user-defined conversion operators, remain deferred.
+ 
+ ## 31. Generics and constraints [AGREED]
+ 
+@@ -3157,7 +3155,7 @@ This section matters especially when an AI assistant inherits this file without
+ 14. **Array API spelling:** [APPROVED PHASE 23 API: count/push/remove_at; source arrays still gated] Phase 23 A9 approves `.count`, `.push(value)` and `.remove_at(index)` for the first source-array slice; it does not approve an automatic `add` alias. `pop`, search/equality removal, slicing and other methods remain separate future API decisions. Approved names do not establish completed source-array implementation.
+ 15. **Iteration modification:** [APPROVED DIRECTION: invalidation at next iterator access] Structural mutation invalidates active growable-list iterators when they next access the iterator, in either direction; this is approved design, not completed source-list execution. The special reverse-current-element deletion exception remains deferred, not accepted or tested.
+ 16. **Pattern forms:** [IMPLEMENTED; HOSTED-LOCKED: Stage 4, CI #68] Shared is/match patterns with success-scoped explicit var captures, range/struct/list/rest/dictionary forms; see ADVANCED_LANGUAGE.md.
+-17. **Numeric conversion policy:** [IMPLEMENTED CORE: Phase 6 numeric behavior; additional casts/hashing open] `NUMERIC_TYPES.md` implements contextual literal typing, wrapping integer overflow, signed/unsigned arithmetic rules, IEEE NaN/signed-zero comparisons and checked numeric `as` (including truncate-toward-zero float-to-int). `as?`, float hashing/total ordering, platform-sized aliases and additional conversions remain future design.
++17. **Numeric conversion policy:** [IMPLEMENTED CORE: Phase 6 numeric behavior and project Slice 6 fallible integer casts] `NUMERIC_TYPES.md` specifies contextual literals, wrapping integer overflow, signed/unsigned arithmetic, IEEE NaN/signed-zero comparisons and checked numeric `as`. Project Slice 6 adds canonical `option<T>` for integer-to-integer and integer-to-numeric-enum `as?`. Float hashing and total ordering, platform-sized aliases and additional conversions remain future design.
+ 18. **UTF-8 semantics:** [IMPLEMENTED CORE: Phase 22 UTF-8 foundation; future indexing/slicing open] S1-S8 approve the strict UTF-8 foundation with exact bytes,
+     no normalization and embedded NUL. Section 8.1 approves future scalar indexing,
+     scalar length, byte_length and nullable strings in principle, outside Phase 22.
+diff --git a/docs/NUMERIC_TYPES.md b/docs/NUMERIC_TYPES.md
+index c7954d1..28dc5c3 100644
+--- a/docs/NUMERIC_TYPES.md
++++ b/docs/NUMERIC_TYPES.md
+@@ -1,19 +1,50 @@
+ # Numeric types and contextual literals
+ 
+-## Approved numeric-backed enum direction, 8 November 2026
+-
+-The [project roadmap](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-numeric-backed-enums-and-fallible-conversion)
+-plans checked integer-to-numeric-enum conversion. A valid conversion must check
+-both backing-type range and membership in the declared discriminants; invalid
+-integers must never create invalid enum values. Existing payload-bearing tagged
+-variants and internal tag ordinals do not become integer-backed C enums.
++## Numeric-backed enums and fallible casts
++
++```void
++enum mode(u8):
++    quiet = 3
++    loud = 255
++
++func decode(raw: i32) -> option<mode>:
++    return raw as? mode
++
++func select_mode(raw: i32) -> mode:
++    match decode(raw):
++        Some(var value):
++            return value
++        None:
++            return mode.quiet
++```
+ 
+-`(code as? error_kind) ?? error_kind.system_failure` is illustrative syntax only.
+-The current parser rejects `as?` and has no `??` expression operator. Numeric enum
+-declaration syntax, optional/result representation, fallback typing and grammar
+-remain proposed design. Existing numeric `as`, RuntimeFailure, independent IR
+-validation and shared normal/O2 LLVM JIT/AOT semantics remain unchanged. New enum
+-conversion and its cross-mode/platform acceptance are not implemented or verified.
++Numeric-backed enum declarations accept all eight fixed-width integer types.
++Each lowercase member must have an explicit decimal integer discriminant, with
++an optional leading sign. Values must fit the backing type. Member names and
++mathematical values must be unique, so `0` and `-0` denote the same discriminant.
++Matching and equality preserve nominal identity. Exhaustiveness follows the
++declared members even when their discriminants are sparse. Enum locals and array
++elements require initialized values. Tagged enums keep their existing semantics.
++
++`as?` shares the precedence and left-to-right association of `as`. The operand is
++evaluated once. An unsuffixed integer literal used directly as an operand selects
++the first type that fits from `i32`, `i64`, and `u64`. Operands beyond those types
++diagnose. For integer destinations, the mathematical range check decides the
++result before narrowing. For numeric-backed enums, a second check requires a
++declared discriminant. Constant evaluation follows the same rules as execution.
++
++The result is the canonical tagged sum `option<T>`, with `Some(value)` for success
++and `None` for failure. In expressions the constructors use the expected canonical
++option type. In patterns they use the subject type. Slice 6 supports fixed-width
++integer and numeric-backed enum payloads. Ordinary name lookup still resolves a
++user-declared `option` where visible. That declaration has its own nominal
++identity, and the compiler-generated type of an `as?` expression remains canonical.
++
++Existing `as` conversion and RuntimeFailure behavior remain in effect. Slice 6
++defers enum-to-integer extraction, enum arithmetic, automatic numbering, aliases,
++C ABI contracts, additional fallible conversion categories and `??`. The older
++nullable-cast proposal has been superseded for this conversion family.
++Local qualification is recorded in the [Slice 6 report](projects/SLICE6.md).
+ 
+ ## Existing numeric contract
+ 
+@@ -125,7 +156,8 @@ actual caller trace; no exception unwinds through generated code. Direct known
+ invalid integer literal casts in evaluated function expressions diagnose early.
+ Short-circuited constant branches are type-checked but do not execute conversions
+ or arithmetic. Ordinary malformed/out-of-range literal construction still diagnoses.
+-There is no `as?`, nullable stand-in, implicit Boolean conversion or wrapping cast.
++The fallible integer conversions above use `as?`. Implicit Boolean conversion
++and wrapping casts remain outside the numeric contract.
+ 
+ ## Shared implementation and guards
+ 
+diff --git a/docs/PROJECT_ARCHITECTURE_ROADMAP.md b/docs/PROJECT_ARCHITECTURE_ROADMAP.md
+index d715188..809e357 100644
+--- a/docs/PROJECT_ARCHITECTURE_ROADMAP.md
++++ b/docs/PROJECT_ARCHITECTURE_ROADMAP.md
+@@ -870,6 +870,16 @@ are retained. Creation UI is separate from compiler/LSP semantic authority.
+ 
+ ## Proposed numeric-backed enums and fallible conversion
+ 
++The S6 design approval resolves this section's earlier alternatives for the
++implemented family. `enum mode(u8):` declares an exact nominal type with explicit
++decimal discriminants. Integer `as?` returns canonical `option<T>` after range and,
++where applicable, discriminant membership checks. `Some` and `None` use existing
++tagged-sum storage and matching. The approved slice defers `??`, nullable casts,
++enum extraction and C ABI rules. See the [language contract](NUMERIC_TYPES.md#numeric-backed-enums-and-fallible-casts)
++and [Slice 6 qualification](projects/SLICE6.md).
++
++### Historical proposal
++
+ Introduce a separately specified numeric-backed, payload-free enum form with one
+ explicit fixed-width integer representation and declared discriminants. Do not
+ reinterpret existing tagged payload variants or expose their internal tags as C
+diff --git a/editors/vscode/src/test/numericHost.ts b/editors/vscode/src/test/numericHost.ts
+new file mode 100644
+index 0000000..46009fd
+--- /dev/null
++++ b/editors/vscode/src/test/numericHost.ts
+@@ -0,0 +1,79 @@
++import * as vscode from 'vscode';
++import assert from 'node:assert/strict';
++import {promises as fs} from 'node:fs';
++import * as path from 'node:path';
++import {until} from './creationWorkbench';
++
++const checks: string[] = [];
++async function replace(document: vscode.TextDocument, source: string) {
++    const edit = new vscode.WorkspaceEdit();
++    edit.replace(document.uri, new vscode.Range(document.positionAt(0), document.positionAt(document.getText().length)), source);
++    assert(await vscode.workspace.applyEdit(edit));
++}
++export async function run(): Promise<void> {
++    const root = process.env.VOID_NUMERIC_HOST_ROOT!;
++    const output = process.env.VOID_NUMERIC_HOST_EVIDENCE!;
++    const extension = vscode.extensions.getExtension('void-language.void-language');
++    assert(extension);
++    let api: {ready(): Promise<void>; deactivate(): Promise<void>} | undefined;
++    let status = 'FAIL';
++    try {
++        assert(vscode.workspace.isTrusted);
++        const helper = await vscode.workspace.openTextDocument(path.join(root, 'modes.void'));
++        const document = await vscode.workspace.openTextDocument(path.join(root, 'entry.void'));
++        await vscode.window.showTextDocument(document);
++        api = await extension.activate();
++        await api!.ready();
++        const member = document.positionAt(document.getText().indexOf('.ready') + 2);
++        const definition = async () => vscode.commands.executeCommand<vscode.Location[]>('vscode.executeDefinitionProvider', document.uri, member);
++        await until(definition, definitions => !!definitions?.some(item => item.uri.fsPath === helper.uri.fsPath), 'imported numeric enum definition');
++        checks.push('imported definition');
++        const hover = async () => {
++            const values = await vscode.commands.executeCommand<vscode.Hover[]>('vscode.executeHoverProvider', document.uri, member);
++            return values?.flatMap(value => value.contents.map(content => typeof content === 'string' ? content : content.value));
++        };
++        await until(hover, values => !!values?.some(value => value.replaceAll('&nbsp;', ' ').replaceAll('\\', '').includes('mode.ready = 7 (i8)')), 'exact enum hover');
++        checks.push('declared value in hover');
++        const source = helper.getText();
++        await vscode.window.showTextDocument(helper, vscode.ViewColumn.Beside);
++        await replace(helper, source.replace('gone = -128', 'gone = 7'));
++        await until(() => vscode.languages.getDiagnostics(helper.uri),
++            values => values.some(value => value.message.includes('Duplicate numeric enum discriminant')), 'dirty duplicate diagnostic');
++        assert(helper.isDirty);
++        await until(definition, values => !values?.length, 'no stale navigation');
++        await replace(helper, source);
++        await until(definition, values => !!values?.some(item => item.uri.fsPath === helper.uri.fsPath), 'recovered navigation');
++        checks.push('dirty import invalidates and recovers');
++        const original = document.getText();
++        await replace(document, original.replace('.ready', '.'));
++        const cursor = document.positionAt(document.getText().indexOf('m.mode.') + 'm.mode.'.length);
++        await until(async () => vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider', document.uri, cursor),
++            value => !!value?.items.some(item => (typeof item.label === 'string' ? item.label : item.label.label) === 'gone' &&
++                item.detail?.includes('-128')), 'dirty enum completion');
++        checks.push('dirty completion retains signed backing value');
++        await replace(document, original.replace('raw as?', '"🎮" as?'));
++        const bad = document.positionAt(document.getText().indexOf('as?'));
++        await until(() => vscode.languages.getDiagnostics(document.uri),
++            values => values.some(value => value.message.includes('as? requires an integer') &&
++                value.range.isEqual(new vscode.Range(bad, bad.translate(0, 3)))), 'UTF-16 as? range');
++        checks.push('UTF-16 conversion error');
++        await replace(document, original.replace('raw as? m.mode', 'raw   as?    m.mode'));
++        const edits = await until(async () => vscode.commands.executeCommand<vscode.TextEdit[]>('vscode.executeFormatDocumentProvider', document.uri,
++            {insertSpaces: true, tabSize: 4}), value => !!value?.length, 'formatted as?');
++        let formatted = document.getText();
++        for (const edit of edits.sort((a, b) => b.range.start.compareTo(a.range.start))) {
++            formatted = formatted.slice(0, document.offsetAt(edit.range.start)) + edit.newText +
++                formatted.slice(document.offsetAt(edit.range.end));
++        }
++        assert.equal(formatted, original);
++        await replace(document, original);
++        await document.save();
++        await helper.save();
++        checks.push('formatting preserves the cast token and values');
++        status = 'PASS';
++        console.log(`numeric_enum_editor: ${checks.length} checks passed`);
++    } finally {
++        await api?.deactivate();
++        await fs.writeFile(output, JSON.stringify({status, editor: vscode.version, checks}, null, 2) + '\n');
++    }
++}
+diff --git a/editors/vscode/src/test/runNumericHost.ts b/editors/vscode/src/test/runNumericHost.ts
+new file mode 100644
+index 0000000..fbd716c
+--- /dev/null
++++ b/editors/vscode/src/test/runNumericHost.ts
+@@ -0,0 +1,49 @@
++import {runTests} from '@vscode/test-electron';
++import {promises as fs} from 'node:fs';
++import * as path from 'node:path';
++import * as os from 'node:os';
++
++async function main() {
++    const {VOIDLS_PATH, VSCODE_EXECUTABLE_PATH, VOID_NUMERIC_HOST_EVIDENCE} = process.env;
++    if (!VOIDLS_PATH || !VSCODE_EXECUTABLE_PATH || !VOID_NUMERIC_HOST_EVIDENCE)
++        throw new Error('Set VOIDLS_PATH, VSCODE_EXECUTABLE_PATH and VOID_NUMERIC_HOST_EVIDENCE.');
++    const temp = await fs.mkdtemp(path.join(os.tmpdir(), 'VOID S6 editor '));
++    try {
++        const root = path.join(temp, 'project');
++        const profile = path.join(temp, 'profile');
++        await fs.mkdir(root);
++        await fs.mkdir(path.join(profile, 'User'), {recursive: true});
++        await fs.writeFile(path.join(root, 'void.project.toml'), `schema=1
++[project]
++id='org.test.numeric'
++name='Numeric'
++version='1.0.0'
++kind='application'
++[application]
++id='org.test.numeric-app'
++`);
++        await fs.writeFile(path.join(root, 'modes.void'), 'public enum mode(i8):\n    ready = 7\n    gone = -128\n');
++        await fs.writeFile(path.join(root, 'entry.void'), `use "./modes.void" as m
++func main() -> i32:
++    var raw: i32 = 7
++    if raw as? m.mode is Some(var picked):
++        if picked is m.mode.ready:
++            return 7
++    return 1
++`);
++        await fs.writeFile(path.join(profile, 'User/settings.json'), JSON.stringify({
++            'void.server.path': await fs.realpath(VOIDLS_PATH),
++            'security.workspace.trust.startupPrompt': 'never', 'workbench.startupEditor': 'none',
++            'telemetry.telemetryLevel': 'off', 'update.mode': 'none', 'chat.disableAIFeatures': true
++        }));
++        await runTests({
++            vscodeExecutablePath: VSCODE_EXECUTABLE_PATH,
++            extensionDevelopmentPath: path.resolve(__dirname, '../..'),
++            extensionTestsPath: path.resolve(__dirname, 'numericHost.js'),
++            extensionTestsEnv: {VOID_NUMERIC_HOST_ROOT: root, VOID_NUMERIC_HOST_EVIDENCE},
++            launchArgs: [root, '--user-data-dir='+profile, '--extensions-dir='+path.join(temp,'extensions'),
++                '--disable-extensions', '--disable-updates', '--disable-gpu', '--skip-welcome', '--skip-release-notes'],
++        });
++    } finally { await fs.rm(temp, {recursive: true, force: true}); }
++}
++main().catch(error => { console.error(error); process.exitCode = 1; });
+diff --git a/editors/vscode/syntaxes/void.tmLanguage.json b/editors/vscode/syntaxes/void.tmLanguage.json
+index 0f153d2..8349f07 100644
+--- a/editors/vscode/syntaxes/void.tmLanguage.json
++++ b/editors/vscode/syntaxes/void.tmLanguage.json
+@@ -13,9 +13,10 @@
+     {"name":"keyword.control.void","match":"\\bsuper(?=[ \\t]*\\.)"},
+     {"name":"keyword.control.void", "match":"^\\s*(?:get(?=[ \\t]*:)|set(?=[ \\t]*\\())"},
+     {"name":"storage.type.void", "match":"\\b(?:i8|i16|i32|i64|u8|u16|u32|u64|f32|f64|bool|string|result)\\b"},
++    {"name":"keyword.operator.void", "match":"\\bas\\?"},
+     {"name":"keyword.control.void", "match":"\\b(?:use|operator|func|property|enum|has|is|match|defer|with|event|var|const|async|await|spawn|return|pass|if|else|for|break|continue|as|and|or|not|in|reverse|public|private|internal)\\b"},
+-    {"name":"support.function.void", "match":"\\b(?:Ok|Err)(?=[ \\t]*\\()"},
+-    {"name":"constant.language.void", "match":"\\b(?:true|false|null)\\b"},
++    {"name":"support.function.void", "match":"\\b(?:Ok|Err|Some)(?=[ \\t]*\\()"},
++    {"name":"constant.language.void", "match":"\\b(?:true|false|null|None)\\b"},
+     {"name":"constant.numeric.void", "match":"\\b[0-9]+(?:\\.[0-9]+)?[fd]?\\b"},
+     {"name":"keyword.operator.void", "match":"->|==|!=|<=|>=|\\+=|-=|\\*=|/=|%=|\\+\\+|--|[+*/%=<>-]"}
+   ]
+diff --git a/include/void/ir.hpp b/include/void/ir.hpp
+index ab10651..66a3b62 100644
+--- a/include/void/ir.hpp
++++ b/include/void/ir.hpp
+@@ -18,7 +18,7 @@ struct TypeArena;
+ using ReferencePath = std::vector<unsigned>;
+ using ReferencePaths = std::set<ReferencePath>;
+ struct Type {
+-    enum Kind { i32, boolean, none, i8, i16, i64, u8, u16, u32, u64, f32, f64, aggregate, unresolved, invalid, managed_ref, null_value, interface_ref, prepared_receiver, string, fixed_array, growable_array, dictionary };
++    enum Kind { i32, boolean, none, i8, i16, i64, u8, u16, u32, u64, f32, f64, aggregate, unresolved, invalid, managed_ref, null_value, interface_ref, prepared_receiver, string, fixed_array, growable_array, dictionary, numeric_enum };
+     Kind kind = i32;
+     bool nullable = false, readonly = false;
+     std::string preparation = {}; // Private prepared requirement identity; never user storage.
+@@ -37,6 +37,7 @@ struct Type {
+         return key(a) < key(b);
+     }
+     static std::string key(const Type&);
++    static Type nominal(std::shared_ptr<const ValueType>);
+ };
+ // Descriptor edges never own another descriptor/table. A Type obtained from an
+ // edge reacquires the immutable table owner; public/query Types remain owning.
+@@ -57,6 +58,7 @@ struct ValueField {
+     std::size_t source_offset = 0;
+ };
+ struct SumCase { std::string name; unsigned begin=0, count=0; };
++struct NumericMember { std::string name; std::uint64_t bits; };
+ struct ValueType {
+     std::string identity, name;
+     std::vector<ValueField> fields;
+@@ -67,6 +69,9 @@ struct ValueType {
+     bool interface_type = false;
+     std::vector<SumCase> cases = {}; // Disjoint, zero-inactive payload fields; field zero is the tag.
+     bool result_type = false;
++    bool option_type = false;
++    std::optional<Type::Kind> enum_backing;
++    std::vector<NumericMember> numeric_members;
+     bool callable = false;
+     std::string native_provider = {}; // Compiled catalog identity, independent of source module spelling.
+     bool native_resource = false; // Binding-private managed identity; no source payload/constructor.
+@@ -87,7 +92,7 @@ struct ValueType {
+ struct TypeArena { std::vector<std::shared_ptr<const ValueType>> definitions; };
+ inline std::string Type::key(const Type& t) { return t.definition ? t.definition->identity : std::string{}; }
+ inline bool operator==(const Type& a, const Type& b) {
+-    return (a.kind!=Type::prepared_receiver || a.preparation==b.preparation) && a.kind == b.kind && a.nullable == b.nullable && a.construction == b.construction && (a.kind != Type::aggregate && a.kind != Type::unresolved && a.kind != Type::managed_ref && a.kind != Type::interface_ref && a.kind != Type::prepared_receiver && a.kind != Type::fixed_array && a.kind != Type::growable_array && a.kind != Type::dictionary ? true :
++    return (a.kind!=Type::prepared_receiver || a.preparation==b.preparation) && a.kind == b.kind && a.nullable == b.nullable && a.construction == b.construction && (a.kind != Type::aggregate && a.kind != Type::unresolved && a.kind != Type::managed_ref && a.kind != Type::interface_ref && a.kind != Type::prepared_receiver && a.kind != Type::fixed_array && a.kind != Type::growable_array && a.kind != Type::dictionary && a.kind != Type::numeric_enum ? true :
+         a.definition && b.definition && a.definition->identity == b.definition->identity);
+ }
+ struct ConstantValue { std::uint64_t bits = 0; std::vector<ConstantValue> fields; std::string text = {};
+@@ -107,6 +112,9 @@ std::vector<unsigned> physical_field_path(Type owner, unsigned field);
+ std::string capability_key(Type type);
+ std::string reference_path_name(Type type,const ReferencePath& path);
+ std::string type_name(Type type);
++std::string option_identity(Type payload);
++std::string numeric_enum_layout(Type type);
++bool numeric_enum_member(Type type,std::uint64_t bits);
+ inline constexpr unsigned array_element_path=~0u;
+ bool array_type(Type);
+ bool collection_type(Type);
+@@ -129,7 +137,7 @@ enum class Op { math, random_xor, random_seed, global_cell, bitcast, native_call
+     remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate, aggregate, extract, insert,
+     stage_begin, gc_construct, gc_allocate, gc_read, gc_write, gc_collect, gc_poll, gc_alive,
+     upcast, virtual_call, base_init, stage_prefix, interface_pack, interface_prepare, interface_call, string_literal, string_concat, string_equal, string_count, string_index, string_encode, string_decode, text_case, scalar_display, scalar_format, format_unwrap, format_layout, scalar_parse, result_unwrap, memory_write, temporal_result, temporal_native, string_join, collection_enter, collection_leave, collection_append, collection_finish, os_query, host_native, url_native, http_native, http_async, http_control, console_endpoint, console_native, console_print, filesystem_native, filesystem_async, filesystem_control,
+-    fixed_array, array_get, array_set, fixed_snapshot, fixed_select, fixed_commit, array_count, list_push, list_remove, list_index, list_version, list_commit, list_check, array_capture, array_allocate, array_initialize, list_insert, list_clear, array_slice, dict_new, dict_get, dict_set, dict_contains, dict_remove, dict_clear, dict_count, dict_version, dict_check, dict_entry, text_translate, string_join_encode, local_cleanup, filesystem_write };
++    fixed_array, array_get, array_set, fixed_snapshot, fixed_select, fixed_commit, array_count, list_push, list_remove, list_index, list_version, list_commit, list_check, array_capture, array_allocate, array_initialize, list_insert, list_clear, array_slice, dict_new, dict_get, dict_set, dict_contains, dict_remove, dict_clear, dict_count, dict_version, dict_check, dict_entry, text_translate, string_join_encode, local_cleanup, filesystem_write, try_convert };
+ // A validated local aggregate storage path; never a source-visible reference.
+ struct Place { std::uint32_t slot = 0; std::vector<unsigned> fields; };
+ struct Instruction {
+diff --git a/include/void/numeric.hpp b/include/void/numeric.hpp
+index d8f9514..5edd1e4 100644
+--- a/include/void/numeric.hpp
++++ b/include/void/numeric.hpp
+@@ -24,6 +24,8 @@ bool supports(ir::Op, ir::Type);
+ // LLVM support utilities are private implementation details, never IR types.
+ std::uint64_t literal(std::string text, ir::Type, bool explicit_rounding = false);
+ std::uint64_t convert(std::uint64_t, ir::Type from, ir::Type to);
++std::optional<std::uint64_t> try_integer_convert(std::uint64_t, ir::Type from, ir::Type to);
++std::string integer_text(std::uint64_t, ir::Type);
+ std::uint64_t negate(std::uint64_t, ir::Type);
+ std::uint64_t binary(ir::Op, std::uint64_t, std::uint64_t, ir::Type);
+ }
+diff --git a/src/backend/llvm/backend.cpp b/src/backend/llvm/backend.cpp
+index c0bb337..d780e57 100644
+--- a/src/backend/llvm/backend.cpp
++++ b/src/backend/llvm/backend.cpp
+@@ -247,8 +247,31 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
+         if (t == ir::Type::none) return b.getVoidTy();
+         if (t == ir::Type::f32) return b.getFloatTy();
+         if (t == ir::Type::f64) return b.getDoubleTy();
++        if(t.kind==ir::Type::numeric_enum)t=*t.definition->enum_backing;
+         return b.getIntNTy(numeric::width(t));
+     };
++    auto checked_integer=[&](llvm::Value* value,ir::Type from,ir::Type to) {
++        auto* wide_type=b.getIntNTy(128);
++        auto extend=[&](std::uint64_t bits) {
++            auto limit=llvm::APInt(numeric::width(to),bits);
++            return llvm::ConstantInt::get(context,numeric::signed_integer(to)?limit.sext(128):limit.zext(128));
++        };
++        auto* wide=numeric::signed_integer(from)?b.CreateSExt(value,wide_type):b.CreateZExt(value,wide_type);
++        auto* low=extend(numeric::limit(to,false));
++        auto* high=extend(numeric::limit(to,true));
++        auto* valid=b.CreateAnd(b.CreateICmpSGE(wide,low),b.CreateICmpSLE(wide,high));
++        return std::pair{wide,valid};
++    };
++    auto enum_membership=[&](ir::Type enumeration,llvm::Value* value,bool wide) {
++        auto backing=ir::Type(*enumeration.definition->enum_backing);
++        llvm::Value* valid=b.getFalse();
++        for(const auto& member:enumeration.definition->numeric_members) {
++            auto bits=llvm::APInt(numeric::width(backing),member.bits);
++            if(wide)bits=numeric::signed_integer(backing)?bits.sext(128):bits.zext(128);
++            valid=b.CreateOr(valid,b.CreateICmpEQ(value,llvm::ConstantInt::get(context,bits)));
++        }
++        return valid;
++    };
+     auto field_offset=[&](ir::Type owner,unsigned field) {
+         std::uint64_t offset=0; auto* native=type(ir::Type(owner.definition));
+         for(auto index:ir::physical_field_path(owner,field)) {
+@@ -289,7 +312,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
+         };
+     auto element_key=[&](ir::Type t) {
+         if(numeric::number(t) || t==ir::Type::boolean)return std::string("void.fixed.scalar.v1/")+std::to_string(scalar_encoding(t));
+-        return std::string("void.array.element.v1/")+std::to_string(t.kind)+":"+ir::Type::key(t)+(t.nullable?"?":"");
++        auto key=std::string("void.array.element.v1/")+std::to_string(t.kind)+":"+ir::Type::key(t)+(t.nullable?"?":"");
++        if(t.kind==ir::Type::numeric_enum)key+="|"+ir::numeric_enum_layout(t);
++        return key;
+     };
+     auto list_key=[&](ir::Type element) {auto key=element_key(element);constexpr std::string_view scalar="void.fixed.scalar.v1/";return key.starts_with(scalar) ? "void.list.v1/"+key.substr(scalar.size()) : "void.list.v2/"+key;};
+     auto* element_field_type=llvm::StructType::get(b.getPtrTy(),size_type,b.getInt64Ty(),b.getInt32Ty(),b.getInt32Ty());
+@@ -302,7 +327,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
+         std::function<void(ir::Type,std::uint64_t,bool)> visit=[&](ir::Type t,std::uint64_t offset,bool inactive) {
+             if(t.kind==ir::Type::aggregate) {for(unsigned n=0;n<t.definition->fields.size();++n)visit(ir::field_type(t,n),offset+field_offset(t,n),inactive || (!t.definition->cases.empty() && n!=0));return;}
+             unsigned kind;std::string target;std::uint64_t extent=0;
+-            if(numeric::number(t) || t==ir::Type::boolean)kind=scalar_encoding(t);
++            if(t.kind==ir::Type::numeric_enum)kind=scalar_encoding(*t.definition->enum_backing);
++            else if(numeric::number(t) || t==ir::Type::boolean)kind=scalar_encoding(t);
+             else if(t.kind==ir::Type::managed_ref){kind=11;target=ir::Type::key(t);}
+             else if(t.kind==ir::Type::string)kind=12;
+             else if(t.kind==ir::Type::interface_ref){kind=13;target=ir::Type::key(t);}
+@@ -462,6 +488,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
+     for(const auto& [scope,imports]:input.source_imports) {access_contract+=encoded(scope);for(const auto& imported:imports) access_contract+=encoded(imported);}
+     for(auto t:input.nominal_types) {
+         access_contract+=encoded(ir::type_name(t))+encoded(std::to_string(t.kind))+encoded(t.definition->module_identity)+encoded(t.definition->visibility);auto base=t.definition->base.lock();access_contract+=encoded(base ? base->identity : "");
++        if(t.kind==ir::Type::numeric_enum)access_contract+=encoded(ir::numeric_enum_layout(t));
+         for(const auto& variant:t.definition->cases)access_contract+=encoded(variant.name)+encoded(std::to_string(variant.begin))+encoded(std::to_string(variant.count));
+         for(const auto& field:t.definition->fields) access_contract+=encoded(field.name)+encoded(field.owner)+encoded(ir::type_name(field.type))+(field.using_field ? "U;" : "F;");
+     }
+@@ -550,6 +577,11 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
+                 layout.getABITypeAlign(native).value()*8,llvm::DINode::FlagZero,nullptr,debug.getOrCreateArray(members));
+             debug_aggregates.emplace(t.definition->identity,result); return result;
+         }
++        if(t.kind==ir::Type::numeric_enum) {
++            auto backing=ir::Type(*t.definition->enum_backing);
++            return debug.createBasicType(ir::type_name(t),numeric::width(backing),
++                numeric::signed_integer(backing)?llvm::dwarf::DW_ATE_signed:llvm::dwarf::DW_ATE_unsigned);
++        }
+         return debug.createBasicType(ir::type_name(t),numeric::width(t), t == ir::Type::boolean ? llvm::dwarf::DW_ATE_boolean : numeric::floating(t) ? llvm::dwarf::DW_ATE_float : numeric::signed_integer(t) ? llvm::dwarf::DW_ATE_signed : llvm::dwarf::DW_ATE_unsigned);
+     };
+     module->addModuleFlag(llvm::Module::Warning, "Debug Info Version", llvm::DEBUG_METADATA_VERSION);
+@@ -1596,6 +1628,31 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
+                     v=b.CreateInsertValue(value,code,2); break;
+                 }
+                 case Op::bitcast: v=b.CreateBitCast(values[instruction.a],type(instruction.type));break;
++                case Op::try_convert: {
++                    const auto destination=ir::field_type(instruction.type,1);
++                    const bool enumeration=destination.kind==ir::Type::numeric_enum;
++                    const auto backing=enumeration?ir::Type(*destination.definition->enum_backing):destination;
++                    auto [wide,in_range]=checked_integer(values[instruction.a],operand_type(instruction.a),backing);
++                    auto* absent=b.GetInsertBlock();
++                    auto* present=llvm::BasicBlock::Create(context,"try_convert.some",fn);
++                    auto* done=llvm::BasicBlock::Create(context,"try_convert.done",fn);
++                    llvm::BasicBlock* membership=nullptr;
++                    if(enumeration) {
++                        membership=llvm::BasicBlock::Create(context,"try_convert.membership",fn);
++                        b.CreateCondBr(in_range,membership,done);b.SetInsertPoint(membership);
++                        b.CreateCondBr(enum_membership(destination,wide,true),present,done);
++                    } else b.CreateCondBr(in_range,present,done);
++                    b.SetInsertPoint(present);
++                    auto* empty=llvm::Constant::getNullValue(type(instruction.type));
++                    auto* tagged=b.CreateInsertValue(empty,b.getInt32(1),0);
++                    auto* some=b.CreateInsertValue(tagged,b.CreateTrunc(wide,type(backing)),1);
++                    b.CreateBr(done);b.SetInsertPoint(done);
++                    auto* option=b.CreatePHI(type(instruction.type),enumeration?3:2);
++                    option->addIncoming(empty,absent);
++                    if(membership)option->addIncoming(empty,membership);
++                    option->addIncoming(some,present);
++                    v=option;break;
++                }
+                 case Op::convert: {
+                     auto* a = values[instruction.a]; auto from = operand_type(instruction.a), to = instruction.type;
+                     if(from.definition && from.definition->callable){if(!to.nullable)fail_if(b.CreateICmpEQ(b.CreateExtractValue(a,0),b.getInt64(0)),"Null function value in checked conversion");v=a;break;}
+@@ -1606,10 +1663,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
+                     }
+                     if (from == to) { v = a; break; }
+                     if (numeric::integer(from) && numeric::integer(to)) {
+-                        auto* wide = numeric::signed_integer(from) ? b.CreateSExt(a,b.getIntNTy(128)) : b.CreateZExt(a,b.getIntNTy(128));
+-                        auto low = numeric::signed_integer(to) ? llvm::APInt::getSignedMinValue(numeric::width(to)).sext(128) : llvm::APInt(128,0);
+-                        auto high = numeric::signed_integer(to) ? llvm::APInt::getSignedMaxValue(numeric::width(to)).sext(128) : llvm::APInt::getMaxValue(numeric::width(to)).zext(128);
+-                        fail_if(b.CreateOr(b.CreateICmpSLT(wide,llvm::ConstantInt::get(context,low)),b.CreateICmpSGT(wide,llvm::ConstantInt::get(context,high))),"Checked numeric conversion is out of range");
++                        auto [wide,valid]=checked_integer(a,from,to);
++                        fail_if(b.CreateNot(valid),"Checked numeric conversion is out of range");
+                         v = b.CreateTrunc(wide,type(to));
+                     } else if (numeric::integer(from)) {
+                         v = numeric::signed_integer(from) ? b.CreateSIToFP(a,type(to)) : b.CreateUIToFP(a,type(to));
+@@ -1742,6 +1797,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
+ 
+                 }
+                 auto result_type = instruction_types[n].at(values.size());
++                if(result_type.kind==ir::Type::numeric_enum && instruction.op!=Op::constant)
++                    fail_if(b.CreateNot(enum_membership(result_type,v,false)),"Invalid numeric enum discriminant in storage");
+                 if(async && result_type!=ir::Type::none)b.CreateStore(v,frame_home(async->values[n][values.size()]));
+                 else if (input.coordinated && value_roots[n].at(values.size())) b.CreateStore(v,value_roots[n][values.size()]);
+                 value_types.push_back(result_type);
+@@ -2039,6 +2096,7 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
+             auto base=t.definition->base.lock();
+             std::string text = encoded(t.definition->identity) + "base:"+encoded(base ? base->identity : "")+"{";
+             for (const auto& field : t.definition->fields) text += encoded(field.name) + ":"+encoded(field.owner)+":"+encoded(ir::type_name(field.type))+":"+encoded(ir::capability_key(field.type))+";";
++            if(t.kind==ir::Type::numeric_enum)text+=encoded(ir::numeric_enum_layout(t));
+             for(const auto& variant:t.definition->cases)text+=encoded(variant.name)+":"+std::to_string(variant.begin)+":"+std::to_string(variant.count)+";";
+             layouts.emplace(t.definition->identity,text + "}");
+             for (const auto& field : t.definition->fields) record(field.type);
+diff --git a/src/frontend/compiler.cpp b/src/frontend/compiler.cpp
+index e4fe0b8..5aade76 100644
+--- a/src/frontend/compiler.cpp
++++ b/src/frontend/compiler.cpp
+@@ -256,13 +256,21 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::
+             if (p == text.size() || text[p] != '"') error(source, {TokenKind::path, "", start}, Code::import_quote, "Unterminated import path.", "Close the path with a double quote on this line.");
+             emit(TokenKind::path, text.substr(start + 1, p - start - 1), start); ++p; continue;
+         }
+-        if ((c=='O' && text.substr(p,2)=="Ok") || (c=='E' && text.substr(p,3)=="Err")) {
+-            const auto width=c=='O'?2u:3u;
+-            if(p+width<text.size() && (letter(text[p+width]) || digit(text[p+width])))error(source,{TokenKind::symbol,"",p},Code::identifier,"Only Ok and Err use uppercase spelling.");
+-            p+=width;emit(TokenKind::name,text.substr(start,width),start);continue;
++        if(c=='O' || c=='E' || c=='S' || c=='N') {
++            const std::string_view names[]={"Ok","Err","Some","None"};
++            auto spelling=std::find_if(std::begin(names),std::end(names),[&](auto name){return std::string_view(text).substr(p).starts_with(name);});
++            if(spelling!=std::end(names)) {
++                const auto width=spelling->size();
++                if(p+width<text.size() && (letter(text[p+width]) || digit(text[p+width])))
++                    error(source,{TokenKind::symbol,"",p},Code::identifier,"Only Ok, Err, Some and None use uppercase spelling.");
++                p+=width;emit(TokenKind::name,std::string(*spelling),start);continue;
++            }
+         }
+         if (letter(c)) {
+             while (p < text.size() && (letter(text[p]) || digit(text[p]))) ++p;
++            if(p-start==2 && text.compare(start,2,"as")==0 && p<end && text[p]=='?') {
++                ++p;emit(TokenKind::symbol,"as?",start);continue;
++            }
+             emit(TokenKind::name, text.substr(start, p - start), start); continue;
+         }
+         if (digit(c)) {
+@@ -680,6 +688,7 @@ struct Unit {
+     std::vector<Type> synthetic_types;
+     std::map<std::string,AnalyzedDeclaration> builtins;
+     std::function<Type(Type,Type)> make_result;
++    std::function<Type(Type)> make_option;
+     std::function<Type(Type,const Token&)> resolve_callable;
+     std::function<Type(const std::vector<Type>&,Type)> make_callable;
+     std::function<Type(Type)> make_task;
+@@ -797,7 +806,7 @@ class Parser {
+         return take();
+     }
+     Token name() {
+-        if (peek().kind != TokenKind::name || reserved.contains(peek().text))
++        if (peek().kind != TokenKind::name || reserved.contains(peek().text) || at("Some") || at("None"))
+             error(source, peek(), Code::identifier, "Expected a lowercase identifier.");
+         return take();
+     }
+@@ -1019,11 +1028,11 @@ class Parser {
+     std::unique_ptr<Expr> expression(int minimum = 1) {
+         Depth guard(depth, source, peek());
+         auto left = unary();
+-        while (precedence(peek().text) >= minimum || (at("as") && minimum <= 6)) {
+-            if (at("as")) {
++        while (precedence(peek().text) >= minimum || ((at("as") || at("as?")) && minimum <= 6)) {
++            if (at("as") || at("as?")) {
+                 if (++nodes > 512) error(source, peek(), Code::nesting, "Expression size limit exceeded.", "Split this expression into smaller local values.");
+                 auto token = take();
+-                if (at("?")) error(source,peek(),Code::character,"The as? conversion is not supported.","Use a checked as conversion; fallible conversion syntax is deferred.");
++                if (token.text=="as" && at("?")) error(source,peek(),Code::syntax,"Write the fallible conversion operator as? without an intervening space.");
+                 auto e = std::make_unique<Expr>(Expr::Kind::conversion, token);
+                 e->parts.push_back(std::move(left)); e->type = type(); left = std::move(e); continue;
+             }
+@@ -1182,14 +1191,38 @@ public:
+             if(accept("enum")) {
+                 Structure enumeration;enumeration.token=name();enumeration.visibility=f.visibility;
+                 enumeration.definition=std::make_shared<ir::ValueType>();enumeration.definition->name=enumeration.token.text;
+-                Statement tag(Statement::Kind::variable,enumeration.token);tag.name="$tag";tag.annotation=Type::i32;enumeration.fields.push_back(std::move(tag));
+-                need(":");newline();need("<indent>");std::set<std::string> cases;
++                if(accept("(")) {
++                    auto backing=take();auto type=numeric::primitive(backing.text);
++                    if(!numeric::integer(type))error(source,backing,Code::unsupported_type,"A numeric enum requires a fixed-width integer backing.");
++                    enumeration.definition->enum_backing=type.kind;
++                    need(")");
++                } else {
++                    Statement tag(Statement::Kind::variable,enumeration.token);tag.name="$tag";tag.annotation=Type::i32;enumeration.fields.push_back(std::move(tag));
++                }
++                need(":");newline();need("<indent>");std::set<std::string> cases;std::map<std::uint64_t,Token> discriminants;
+                 while(!at("<dedent>") && !at("<end of file>")) {
+                     std::string visibility="public";
+                     if(at("private") || at("internal") || at("public"))visibility=take().text;
+-                    if(at("operator")){operator_declaration(enumeration,visibility);continue;}
++                    if(at("operator") && !enumeration.definition->enum_backing){operator_declaration(enumeration,visibility);continue;}
+                     if(visibility!="public")error(source,peek(),Code::syntax,"Enum variant visibility modifiers are not supported.");
+                     auto token=name();enumeration.case_tokens.push_back(token);if(!cases.insert(token.text).second)error(source,token,Code::duplicate,"Duplicate enum variant.");
++                    if(enumeration.definition->enum_backing) {
++                        if(!letter(token.text.front()))error(source,token,Code::identifier,"Numeric enum member names are lowercase.");
++                        need("=");
++                        auto value=peek();std::string spelling;
++                        if(at("+") || at("-"))spelling=take().text;
++                        auto digits=take();
++                        if(digits.kind!=TokenKind::number || !std::all_of(digits.text.begin(),digits.text.end(),digit))
++                            error(source,digits,Code::integer_range,"A numeric enum discriminant must be a decimal integer literal.");
++                        value.source_width=digits.offset+digits.text.size()-value.offset;
++                        std::uint64_t bits;
++                        try {bits=numeric::literal(spelling+digits.text,*enumeration.definition->enum_backing);}
++                        catch(const std::invalid_argument& failure){error(source,value,Code::integer_range,failure.what());}
++                        auto [previous,inserted]=discriminants.emplace(bits,value);
++                        if(!inserted)error(source,value,Code::duplicate,"Duplicate numeric enum discriminant.",{},
++                            {{span(source,previous->second),"Previously declared value."}});
++                        enumeration.definition->numeric_members.push_back({token.text,bits});newline();continue;
++                    }
+                     ir::SumCase variant{token.text,static_cast<unsigned>(enumeration.fields.size()),0};
+                     if(accept("(")) {if(!at(")"))do {
+                         Statement field(Statement::Kind::variable,name());field.name="$"+token.text+"$"+field.token.text;need(":");field.annotation=type();enumeration.fields.push_back(std::move(field));++variant.count;
+@@ -1419,11 +1452,14 @@ Type resolve_type(Type t, Unit& unit, Unit& root, const std::map<std::string,std
+     if (!structure) error(unit.source,location,Code::unsupported_type,"Unsupported type '" + t.definition->name + "'.","Use a numeric type, bool, string or a visible value/managed struct.");
+     if(!structure->generics.empty())error(unit.source,token,Code::unsupported_type,"Generic type '"+structure->token.text+"' requires concrete type arguments.");
+     if (structure->layout_state == 3) throw Poison{};
+-    Type result(structure->definition, structure->definition->interface_type ? Type::interface_ref : structure->definition->managed ? Type::managed_ref : Type::aggregate);
++    auto result=Type::nominal(structure->definition);
+     result.nullable = t.nullable; result.readonly=t.readonly;
+     if (result.nullable && !ir::reference_value(result)) error(unit.source,token,Code::unsupported_type,"Only managed references can be nullable in this phase.");
+     return result;
+ }
++bool checked_initializer_default(Type t) {
++    return t.kind==Type::numeric_enum || (t.definition && t.definition->option_type) || console::endpoint_type(t);
++}
+ ir::ConstantValue constant_value(const SourceFile&, const Expr&);
+ void check_dictionary_key(const SourceFile& source,const Token& use,Type key,const std::map<std::string,std::unique_ptr<Unit>>& units) {
+     if(auto owner=ir::dictionary_equality_owner(key)) {
+@@ -2018,8 +2054,11 @@ class Semantics {
+                 const auto& field = *structure.effective_fields[n].second;
+                 auto& field_owner=*structure.effective_fields[n].first;
+                 if(field.expression){
+-                    if(initializer_declaration && console::endpoint_type(*field.annotation)){
+-                        auto value=std::make_unique<Expr>(Expr::Kind::literal,field.token);value->type=*field.annotation;value->aggregate_value=structure.defaults.fields.at(n);value->slot=n;e.omitted.push_back(std::move(value));
++                    if(initializer_declaration && checked_initializer_default(*field.annotation)){
++                        auto value=std::make_unique<Expr>(Expr::Kind::literal,field.token);
++                        value->type=*field.annotation;value->aggregate_value=structure.defaults.fields.at(n);
++                        value->value=value->aggregate_value.bits;value->slot=n;
++                        e.omitted.push_back(std::move(value));
+                     }
+                     continue;
+                 }
+@@ -2075,11 +2114,11 @@ class Semantics {
+             const auto& field=*structure.effective_fields[n].second; auto& field_owner=*structure.effective_fields[n].first;
+             Type t = *field.annotation;
+             const bool complete_default = field.expression && t.definition &&
+-                (t.definition->callable || !t.definition->cases.empty() || console::endpoint_type(t));
++                (t.kind==Type::numeric_enum || t.definition->callable || !t.definition->cases.empty() || console::endpoint_type(t));
+             if (ir::requires_initialization(t) && !complete_default && std::find(e.field_indexes.begin(),e.field_indexes.end(),n)==e.field_indexes.end()) {
+                 if(!ir::field_accessible(*root.member_catalog,Type(structure.definition,structure.definition->managed?Type::managed_ref:Type::aggregate),n,access.identity,lexical_owner()))
+                     error(source,e.token,Code::visibility,"An inaccessible required field cannot be supplied by this caller: "+field.name+".","Provide an accessible owner initializer or factory.",{{span(field_owner.source,field.token),"Required field declared here."}});
+-                error(source,e.token,Code::argument_count,"A non-nullable reference field requires an explicit value: " + field.name + ".",{},{{span(field_owner.source,field.token),"Required field declared here."}});
++                error(source,e.token,Code::argument_count,(t.kind==Type::numeric_enum?"A numeric enum field requires an explicit value: ":"A non-nullable reference field requires an explicit value: ") + field.name + ".",{},{{span(field_owner.source,field.token),"Required field declared here."}});
+             }
+         }
+         if (!structure.initializer || !structure.definition->managed) construction_fields(e,owner,structure,runtime);
+@@ -2242,7 +2281,7 @@ class Semantics {
+     VOID_SEMANTIC_HANDLER std::optional<Type> field_anchor(Expr& e) {
+         using K=Expr::Kind;
+         if (auto [owner, declaration] = enum_declaration(e); declaration) {
+-            return Type(declaration->definition);
++            return Type::nominal(declaration->definition);
+         }
+         if(primitive_base_selected(*e.parts[0]))return primitive_anchor(*e.parts[0]);
+         const auto& operand = *e.parts[0];
+@@ -2273,7 +2312,10 @@ class Semantics {
+             if (e.literal_text.back() == 'd') return Type::f64;
+             return {};
+         }
+-        if (e.kind == K::conversion) return e.type;
++        if (e.kind == K::conversion) {
++            if(e.token.text!="as?" || !e.type_arguments.empty())return e.type;
++            return fallible_anchor(e);
++        }
+         if (e.kind == K::global) return e.type;
+         if (e.kind==K::spawned || e.kind==K::propagate || e.kind==K::awaited)return projected_anchor(e);
+         if (e.kind==K::choice)return choice_anchor(e);
+@@ -2559,10 +2601,13 @@ class Semantics {
+         case Expr::Kind::array_slice: return slice_expression(e);
+         case Expr::Kind::literal: return literal_expression(e, expected);
+         case Expr::Kind::global: return e.type;
+-        case Expr::Kind::name: return name_expression(e);
++        case Expr::Kind::name:
++            if(e.token.text=="None" && e.qualifier.empty())return option_expression(e,expected);
++            return name_expression(e);
+         case Expr::Kind::field: return field_expression(e, expected);
+         case Expr::Kind::call:
+             if(e.token.text=="Ok" || e.token.text=="Err")return result_expression(e,expected);
++            if((e.token.text=="Some" || e.token.text=="None") && e.qualifier.empty())return option_expression(e,expected);
+             return call_expression(e);
+         case Expr::Kind::method_call: return method_expression(e);
+         case Expr::Kind::conversion: return conversion_expression(e);
+@@ -2693,6 +2738,13 @@ class Semantics {
+         e.source_target=target.symbol;
+         return sum_expression(e,*expected,e.token.text=="Ok"?0:1,0);
+     }
++    VOID_SEMANTIC_HANDLER Type option_expression(Expr& e,const std::optional<Type>& expected) {
++        if(!expected || !expected->definition || !expected->definition->option_type)
++            error(source,e.token,Code::type_mismatch,"Some and None require a contextual option<T> type.");
++        const bool some=e.token.text=="Some";
++        if(!some && e.kind!=Expr::Kind::name)error(source,e.token,Code::syntax,"Write None without parentheses.");
++        return sum_expression(e,*expected,some?1u:0u,0);
++    }
+     std::pair<Unit*, Structure*> enum_declaration(Expr& e) {
+         auto& base = *e.parts[0];
+         std::string spelling;
+@@ -2707,7 +2759,7 @@ class Semantics {
+             return {};
+         }
+         auto selected = structure_lookup(unit, root, units, spelling, base.token);
+-        if (!selected.second || selected.second->definition->cases.empty()) {
++        if (!selected.second || (selected.second->definition->cases.empty() && !selected.second->definition->enum_backing)) {
+             return {};
+         }
+         return selected;
+@@ -2718,6 +2770,23 @@ class Semantics {
+         if (!structure) {
+             return {};
+         }
++        if(structure->definition->enum_backing) {
++            auto type=Type::nominal(structure->definition);
++            const auto& members=structure->definition->numeric_members;
++            if(editor_cursor(e)) {
++                if(!invalid_function && !unit.failed_import)for(unsigned n=0;n<members.size();++n) {
++                    const auto& member=members[n];
++                    auto detail=ir::type_name(type)+" = "+numeric::integer_text(member.bits,*structure->definition->enum_backing);
++                    diagnostics.editor->result.candidates.push_back({member.name,detail,20,{},source_documentation(owner->source,structure->case_tokens[n].offset).text(false)});
++                }
++                throw EditorProbeFound{};
++            }
++            auto found=std::find_if(members.begin(),members.end(),[&](const auto& member){return member.name==e.token.text;});
++            if(found==members.end())error(source,e.token,Code::unknown_identifier,"Unknown numeric enum member '"+e.token.text+"'.");
++            if(call)error(source,e.token,Code::not_callable,"Numeric enum members are values.");
++            e.kind=Expr::Kind::literal;e.parts.clear();e.value=found->bits;e.target=Type::key(type)+"::variant::"+found->name;
++            return e.type=type;
++        }
+         const auto& variants=structure->definition->cases;
+         if(editor_cursor(e)) {
+             auto& out=diagnostics.editor->result;
+@@ -3289,7 +3358,7 @@ class Semantics {
+         }
+         auto [owner, structure] = structure_lookup(unit,root,units,e.qualifier.empty() ? e.token.text : e.qualifier + "." + e.token.text,e.qualifier.empty() ? e.token : e.qualifier_token);
+         if (structure && !(e.qualifier.empty() && lookup(e.token.text))) {
+-            if(!structure->definition->cases.empty())error(source,e.token,Code::not_callable,"Construct enum values with type.variant and its payload arguments.");
++            if(structure->definition->enum_backing || !structure->definition->cases.empty())error(source,e.token,Code::not_callable,"Construct enum values with type.variant and its payload arguments.");
+             auto& concrete=concrete_structure(e,*owner,*structure);
+             construction(e,*owner,concrete,current != nullptr,unit);
+             return e.type;
+@@ -3327,7 +3396,31 @@ class Semantics {
+         e.target = target.symbol;
+         return e.type = call_arguments(e,target,0);
+     }
++    VOID_SEMANTIC_HANDLER std::optional<Type> fallible_anchor(const Expr& e) {
++        auto target=resolve_type(e.type,unit,root,units,e.token);
++        if(numeric::integer(target) || target.kind==Type::numeric_enum)return unit.make_option(target);
++        return {};
++    }
++    VOID_SEMANTIC_HANDLER Type fallible_conversion(Expr& e) {
++        if(!e.type_arguments.empty())return e.type;
++        auto destination=resolve_type(e.type,unit,root,units,e.token);
++        auto& operand=*e.parts[0];
++        Type from=Type::none;
++        if(operand.kind==Expr::Kind::literal && !operand.literal_text.empty() && !decimal(operand)) {
++            for(auto candidate:{Type::i32,Type::i64,Type::u64})try {
++                operand.value=numeric::literal(operand.literal_text,candidate);
++                operand.type=from=candidate;operand.literal_text.clear();break;
++            } catch(const std::invalid_argument&) {}
++            if(from==Type::none)error(source,operand.token,Code::integer_range,"Fallible conversion literal is outside the fixed-width integer domain.");
++        } else from=expression(operand);
++        if(from==error_type)return error_type;
++        if(!numeric::integer(from) || !(numeric::integer(destination) || destination.kind==Type::numeric_enum))
++            error(source,e.token,Code::numeric_conversion,"as? requires an integer operand and an integer or numeric enum destination.");
++        e.type_arguments.push_back(destination);
++        return e.type=unit.make_option(destination);
++    }
+     VOID_SEMANTIC_HANDLER Type conversion_expression(Expr& e) {
++        if(e.token.text=="as?")return fallible_conversion(e);
+         using K = Expr::Kind;
+         Type target = e.type = resolve_type(e.type,unit,root,units,e.token);
+         auto& operand = *e.parts[0];
+@@ -3515,6 +3608,7 @@ class Semantics {
+                 if(needs_array_recipe(t))s.expression=array_recipe(t,s.token,true,unit);
+                 else {s.expression=std::make_unique<Expr>(Expr::Kind::literal,s.token);s.expression->type=t;s.expression->aggregate_value=array_default(t,s.token);}
+             }
++            if(!s.expression && t.kind==Type::numeric_enum)error(source,s.token,Code::initializer,"Numeric enum values require an explicit initializer.");
+             if(!s.expression && t.definition && !t.definition->cases.empty())error(source,s.token,Code::initializer,"Enum/result values require an explicit variant initializer.");
+             if (!s.expression && t.kind == Type::aggregate) {
+                 auto [owner,structure] = owned_structure(t);
+@@ -3788,7 +3882,7 @@ public:
+         auto [owner,structure] = owned_structure(f.receiver->type);
+         if (f.receiver->type.kind==Type::aggregate) for (const auto& field:structure->fields) {
+             auto type=*field.annotation;
+-            const bool complete_default=field.expression && type.definition && (type.definition->callable || !type.definition->cases.empty() || console::endpoint_type(type));
++            const bool complete_default=field.expression && type.definition && (type.kind==Type::numeric_enum || type.definition->callable || !type.definition->cases.empty() || console::endpoint_type(type));
+             if (ir::requires_initialization(type) && !complete_default)
+                 error(source,f.token,Code::initializer,"Value init requires every field to be valid before its body; a non-nullable reference has no safe default.","Use named-field construction without init for a value with required reference fields.",{{span(owner->source,field.token),"Required reference field declared here."}});
+         }
+@@ -3800,7 +3894,7 @@ public:
+         if(t.kind==Type::growable_array || t.kind==Type::dictionary)return false;
+         if(t.kind==Type::fixed_array)return *t.definition->extent && needs_array_recipe(ir::array_element(t));
+         if(t.kind!=Type::aggregate || t.definition->callable)return false;
+-        if(t.definition->result_type)return false;
++        if(t.definition->result_type || t.definition->option_type)return false;
+         auto [owner,structure]=owned_structure(t);if(structure->initializer)return true;
+         for(const auto& field:t.definition->fields)if(needs_array_recipe(field.type))return true;
+         return false;
+@@ -3813,7 +3907,7 @@ public:
+             e->kind=Expr::Kind::array_default;e->parts.push_back(array_recipe(ir::array_element(t),token,runtime,access));return e;
+         }
+         if(t.definition && t.definition->callable){if(!t.nullable)error(source,token,Code::initializer,"An array of functions requires complete values.");e->kind=Expr::Kind::function_null;return e;}
+-        if(t.definition && !t.definition->cases.empty())error(source,token,Code::initializer,"Enum/result elements require explicit variants.");
++        if(t.kind==Type::numeric_enum || (t.definition && !t.definition->cases.empty()))error(source,token,Code::initializer,"Enum/result elements require explicit variants.");
+         if(t.kind==Type::aggregate){auto [owner,structure]=owned_structure(t);construction(*e,*owner,*structure,runtime,access);}
+         else if(ir::reference_value(t) && !t.nullable)error(source,token,Code::initializer,"A required array reference needs an explicit initializer.");
+         return e;
+@@ -3822,6 +3916,7 @@ public:
+         ir::ConstantValue value;if(t.kind==Type::growable_array || t.kind==Type::dictionary)return value;value.repeat=*t.definition->extent;
+         if(!*value.repeat) return value;
+         auto element=ir::array_element(t);
++        if(element.kind==Type::numeric_enum)error(source,token,Code::initializer,"Numeric enum elements require explicit values.");
+         if(console::endpoint_type(element))error(source,token,Code::initializer,"Console endpoint elements require explicit borrowed values.");
+         if(ir::reference_value(element) && !element.nullable)error(source,token,Code::initializer,"A nonempty array of required references needs a complete literal.");
+         if(ir::collection_type(element)) value.fields.push_back(array_default(element,token));
+@@ -4798,7 +4893,9 @@ class Lowering {
+             });
+         });
+         case K::conversion: return frontend_case([&]() -> unsigned {
+-            auto value = expression(*e.parts[0]); if(e.op=="identity" && expression_type(e)==expression_type(*e.parts[0])) return value; ir::Instruction i{e.op=="interface" ? ir::Op::interface_pack : e.op=="upcast" ? (expression_type(e).construction ? ir::Op::stage_prefix : ir::Op::upcast) : ir::Op::convert,value}; i.type = expression_type(e);i.callee=e.target; return emit(i,e.token);
++            auto value = expression(*e.parts[0]);
++            if(e.token.text=="as?") {ir::Instruction i{ir::Op::try_convert,value};i.type=expression_type(e);return emit(i,e.token);}
++            if(e.op=="identity" && expression_type(e)==expression_type(*e.parts[0])) return value; ir::Instruction i{e.op=="interface" ? ir::Op::interface_pack : e.op=="upcast" ? (expression_type(e).construction ? ir::Op::stage_prefix : ir::Op::upcast) : ir::Op::convert,value}; i.type = expression_type(e);i.callee=e.target; return emit(i,e.token);
+         });
+         case K::unary: return frontend_case([&]() -> unsigned {
+             auto value = expression(*e.parts[0]);
+@@ -5087,7 +5184,7 @@ public:
+                 Type t=f.receiver->type.definition->fields[field].type;
+                 std::optional<unsigned> selected;
+                 for(const auto& child:f.initialization_defaults) if(child->slot==field) selected=expression(*child);
+-                if (ir::requires_initialization(t) && !(console::endpoint_type(t) && selected)) continue;
++                if (ir::requires_initialization(t) && !(checked_initializer_default(t) && selected)) continue;
+                 auto value=selected ? *selected : constant(t,f.initialization_value.fields.at(field),f.token);
+                 auto view=emit({ir::Op::load,0},f.token);
+                 ir::Instruction write{ir::Op::gc_write,view,value}; write.immediate=field; emit(write,f.token);
+@@ -5410,6 +5507,16 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
+     auto a = constant_value(source,*e.parts[0]).bits;
+     try {
+         if (e.kind == Expr::Kind::conversion) {
++            if(e.token.text=="as?") {
++                auto destination=ir::field_type(e.type,1);
++                auto backing=destination.kind==Type::numeric_enum?Type(*destination.definition->enum_backing):destination;
++                auto value=numeric::try_integer_convert(a,e.parts[0]->type,backing);
++                ir::ConstantValue result;result.fields.resize(2);
++                if(value && (destination.kind!=Type::numeric_enum || ir::numeric_enum_member(destination,*value))) {
++                    result.fields[0].bits=1;result.fields[1].bits=*value;
++                }
++                return result;
++            }
+             if (ir::reference_value(e.type)) { if (!a && !e.type.nullable) throw std::invalid_argument("Cannot unwrap null in a compile-time expression"); return {a,{}}; }
+             return {numeric::convert(a,e.parts[0]->type,e.type),{}};
+         }
+@@ -5418,7 +5525,7 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
+         if (e.op == "or" && a) return {1,{}};
+         auto b = constant_value(source,*e.parts[1]).bits;
+         if (e.op == "and" || e.op == "or") return {b,{}};
+-        if (ir::reference_value(e.parts[0]->type)) return {static_cast<std::uint64_t>(e.op=="==" ? a==b : a!=b),{}};
++        if (ir::reference_value(e.parts[0]->type) || e.parts[0]->type.kind==Type::numeric_enum) return {static_cast<std::uint64_t>(e.op=="==" ? a==b : a!=b),{}};
+         return {numeric::binary(operation(e.op),a,b,e.parts[0]->type),{}};
+     } catch (const CompilationError&) { throw; }
+       catch (const std::invalid_argument& failure) {
+@@ -5440,7 +5547,7 @@ ir::Module member_catalog(const std::map<std::string,std::unique_ptr<Unit>>& uni
+     ir::Module m;m.root_identity=entry;
+     for(const auto& [id,u]:units) {
+         auto& imports=m.source_imports[id];for(const auto& i:u->imports) if(!i.target.empty()) imports.insert(i.target);
+-        for(const auto& s:u->structures) m.nominal_types.emplace_back(s.definition,s.definition->interface_type ? Type::interface_ref : s.definition->managed ? Type::managed_ref : Type::aggregate);
++        for(const auto& s:u->structures) m.nominal_types.push_back(Type::nominal(s.definition));
+         for(const auto& f:u->functions) if(!f.parse_failed) {
+             auto header=member_header(*u,f);
+             if(f.interface_requirement) m.interface_requirements.push_back(std::move(header));else m.functions.push_back(std::move(header));
+@@ -5740,6 +5847,20 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
+         return ir::with_field_type(ir::with_field_type(Type(canonical),1,success),2,failure);
+     };
+     for(auto& [id,u]:units)u->make_result=make_result;
++    std::map<std::string,Type> canonical_options;
++    auto make_option=[&](Type payload) {
++        payload.readonly=false;
++        const auto key=ir::option_identity(payload);
++        if(auto found=canonical_options.find(key);found!=canonical_options.end())return found->second;
++        auto d=std::make_shared<ir::ValueType>();
++        d->identity=d->name=key;d->display_name="option<"+ir::type_name(payload)+">";d->option_type=true;
++        d->cases={{"None",1,0},{"Some",1,1}};
++        d->fields={{"$tag",Type::i32,key},{"$some",payload,key}};
++        d->self=d;d->arena=arena;arena->definitions.push_back(d);
++        auto type=Type(d);canonical_options.emplace(key,type);root.synthetic_types.push_back(type);
++        return type;
++    };
++    for(auto& [id,u]:units)u->make_option=make_option;
+ 
+     for(auto& [id,u]:units)u->resolve_result=[&,owner=u.get()](Type raw,const Token& token)->Type {
+         auto found=std::find_if(owner->results.begin(),owner->results.end(),[&](const auto& syntax){return syntax.definition==raw.definition;});
+@@ -6053,7 +6174,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
+     diagnostics.finish();
+     (void)string_pool(units);
+     for(auto& [id,u]:units)for(auto& f:u->functions)if(f.asynchronous){f.task=u->make_task(f.result);if(!ir::async_boundary_safe(f.result))error(u->source,f.token,Code::unsupported_type,"Callable-containing results cannot escape an async task in Delivery 1.");for(const auto& parameter:f.parameters)if(!ir::async_boundary_safe(parameter.type))error(u->source,parameter.token,Code::unsupported_type,"Callable-containing or borrowed arguments cannot cross an async task boundary in Delivery 1.");if(f.receiver && !ir::async_boundary_safe(f.receiver->type))error(u->source,f.token,Code::unsupported_type,"Callable-containing managed receivers cannot cross an async task boundary in Delivery 1.");if(f.initializer || f.accessor || (f.receiver && f.token.text=="deinit") || f.virtual_method || f.overriding || f.interface_requirement || (f.receiver && f.receiver->type.kind!=Type::managed_ref))error(u->source,f.token,Code::unsupported_type,"Async lifecycle methods, accessors, value receivers and virtual/interface methods require a reviewed contract.");}
+-    for(auto& [id,u]:units) {u->resolve_global={};u->make_task={};u->make_cleanup={};u->make_capture_record={};u->make_callable={};u->resolve_callable={};u->resolve_result={};u->make_result={};u->resolve_array={};u->resolve_application={};u->specialize_function={};u->specialize_structure={};} // No closures into this validation frame escape.
++    for(auto& [id,u]:units) {u->resolve_global={};u->make_task={};u->make_cleanup={};u->make_capture_record={};u->make_callable={};u->resolve_callable={};u->resolve_result={};u->make_result={};u->make_option={};u->resolve_array={};u->resolve_application={};u->specialize_function={};u->specialize_structure={};} // No closures into this validation frame escape.
+ }
+ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry) {
+     ir::Module module;
+@@ -6078,7 +6199,7 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
+     }
+     for(const auto& [id,unit]:units)for(auto type:unit->synthetic_types){module.nominal_types.push_back(type);if(type.kind==Type::managed_ref)module.coordinated=true;}
+     for (const auto& [id,unit] : units) for (const auto& structure : unit->structures) {
+-        module.nominal_types.emplace_back(structure.definition,structure.definition->interface_type ? Type::interface_ref : structure.definition->managed ? Type::managed_ref : Type::aggregate);
++        module.nominal_types.push_back(Type::nominal(structure.definition));
+         if (structure.definition->managed || structure.definition->interface_type) module.coordinated=true;
+     }
+     std::set<std::string> results;
+@@ -6405,7 +6526,8 @@ struct AnalysisAccess {
+             }
+             for (const auto& structure : unit->structures) {
+                 auto key = structure.definition->identity;
+-                std::string layout;
++                auto type=Type::nominal(structure.definition);
++                std::string layout=ir::numeric_enum_layout(type);
+                 for(const auto& variant:structure.definition->cases){field(layout,"variant");field(layout,variant.name);field(layout,std::to_string(variant.begin));field(layout,std::to_string(variant.count));}
+                 for (const auto& member : structure.fields) {
+                     auto t = *member.annotation; auto identity = key + "::field::" + member.name;
+@@ -6415,14 +6537,23 @@ struct AnalysisAccess {
+                     record.using_field=member.using_field;record.readonly=member.readonly;record.editor_symbol_kind=member.event?24:8; declaration(std::move(record),true,structure.definition->cases.empty());
+                     if (member.expression) expression(*member.expression,identity,{});
+                 }
+-                for(unsigned n=0;n<structure.case_tokens.size();++n){const auto& variant=structure.definition->cases[n];std::vector<Type> parameters;for(unsigned field=0;field<variant.count;++field)parameters.push_back(ir::field_type(Type(structure.definition),variant.begin+field));
++                for(unsigned n=0;n<structure.definition->numeric_members.size();++n){
++                    const auto& member=structure.definition->numeric_members[n];
++                    const auto value=numeric::integer_text(member.bits,*structure.definition->enum_backing);
++                    AnalyzedDeclaration record{AnalyzedDeclaration::Kind::module_constant,key+"::variant::"+member.name,id,structure.visibility,location(structure.case_tokens[n]),{},type,value,member.bits,key};
++                    record.editor_symbol_kind=22;
++                    record.signature=ir::type_name(type)+"."+member.name+" = "+value+" ("+ir::type_name(*structure.definition->enum_backing)+")";
++                    declaration(std::move(record));
++                }
++                for(unsigned n=0;n<structure.definition->cases.size();++n){const auto& variant=structure.definition->cases[n];std::vector<Type> parameters;for(unsigned field=0;field<variant.count;++field)parameters.push_back(ir::field_type(Type(structure.definition),variant.begin+field));
+                     AnalyzedDeclaration record{variant.count?AnalyzedDeclaration::Kind::function:AnalyzedDeclaration::Kind::module_constant,key+"::variant::"+variant.name,id,structure.visibility,location(structure.case_tokens[n]),parameters,Type(structure.definition),std::to_string(n),variant.count?std::optional<std::uint64_t>{}:std::optional<std::uint64_t>{n},key};
+                     for(unsigned i=0;i<variant.count;++i){const auto& member=structure.fields[variant.begin+i];record.written_parameters.push_back({member.token.text,parameters[i],location(member.token)});}
+                     record.editor_symbol_kind=22;declaration(std::move(record));
+                 }
+-                AnalyzedDeclaration record{structure.definition->interface_type ? AnalyzedDeclaration::Kind::interface_type : structure.definition->managed ? AnalyzedDeclaration::Kind::managed_structure : AnalyzedDeclaration::Kind::value_structure,key,id,structure.visibility,location(structure.token),{},Type(structure.definition,structure.definition->interface_type ? Type::interface_ref : structure.definition->managed ? Type::managed_ref : Type::aggregate),layout,{},id};
++                AnalyzedDeclaration record{structure.definition->interface_type ? AnalyzedDeclaration::Kind::interface_type : structure.definition->managed ? AnalyzedDeclaration::Kind::managed_structure : AnalyzedDeclaration::Kind::value_structure,key,id,structure.visibility,location(structure.token),{},type,layout,{},id};
+                 if(structure.source_end>structure.token.offset){auto r=location(structure.token);r.begin=unit->source.line_starts().at(unit->source.location(structure.token.offset).line-1);r.end=structure.source_end;record.extent=r;}
+                 if(!structure.case_tokens.empty())record.editor_symbol_kind=10;
++                if(structure.definition->enum_backing)record.signature="enum "+structure.token.text+"("+ir::type_name(*structure.definition->enum_backing)+")";
+                 if(auto base=structure.definition->base.lock()) record.base_identity=base->identity;
+                 declaration(std::move(record));
+             }
+diff --git a/src/frontend/construction.inc b/src/frontend/construction.inc
+index 5978968..1487a13 100644
+--- a/src/frontend/construction.inc
++++ b/src/frontend/construction.inc
+@@ -33,11 +33,11 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
+             const auto& fields=parameters.at(origin).definition->fields;
+             for (unsigned field=0;field<fields.size();++field) {
+                 Type t=fields[field].type;
+-                const bool endpoint_default=f.initializer && origin==0 && console::endpoint_type(t) &&
++                const bool checked_default=f.initializer && origin==0 && checked_initializer_default(t) &&
+                     std::any_of(f.initialization_defaults.begin(),f.initialization_defaults.end(),[&](const auto& value){return value->slot==field;});
+                 // The existing initializer prelude writes these checked constant
+                 // copies before the body; independent IR still proves the write.
+-                if (!f.initializer || !ir::requires_initialization(t) || endpoint_default) initial.emplace(origin,field);
++                if (!f.initializer || !ir::requires_initialization(t) || checked_default) initial.emplace(origin,field);
+             }
+         }
+         auto require_field=[&](unsigned origin,unsigned field,const Ready& ready,const Token& token) {
+diff --git a/src/frontend/generic_declarations.inc b/src/frontend/generic_declarations.inc
+index a912ce1..caf68c1 100644
+--- a/src/frontend/generic_declarations.inc
++++ b/src/frontend/generic_declarations.inc
+@@ -34,6 +34,12 @@ for(auto& [id,u]:units) {
+         auto application=std::find_if(u->applications.begin(),u->applications.end(),[&](const auto& a){return a.definition==raw.definition;});
+         if(application!=u->applications.end()) {
+             auto [owner,declaration]=structure_lookup(*u,root,units,application->name,application->token);(void)owner;
++            if(!declaration && application->name=="option") {
++                if(raw.nullable)error(u->source,token,Code::unsupported_type,"Options cannot be nullable.");
++                if(application->arguments.size()!=1)error(u->source,application->token,Code::argument_count,"option<T> requires exactly one payload type.");
++                type(application->arguments.front(),application->token,names);
++                return;
++            }
+             if(!declaration || declaration->generics.empty())error(u->source,application->token,Code::unsupported_type,"Type '"+application->name+"' is not a generic struct.");
+             if(raw.nullable && !declaration->definition->managed)error(u->source,token,Code::unsupported_type,"Only managed references can be nullable.");
+             if(application->arguments.size()!=declaration->generics.size())error(u->source,application->token,Code::argument_count,"Incorrect number of generic type arguments.");
+@@ -51,7 +57,7 @@ for(auto& [id,u]:units) {
+             Depth guard(diagnostics.semantic_depth(),u->source,s.token,128);
+             std::string key=std::to_string(raw.kind)+":"+Type::key(raw)+(raw.nullable?"?":"");
+             auto add=[&](const std::string& part){key+=":"+std::to_string(part.size())+":"+part;};
+-            for(const auto& a:u->applications)if(a.definition==raw.definition){auto [module,owner]=structure_lookup(*u,root,units,a.name,a.token);(void)module;key=owner->definition->identity+(raw.nullable?"?":"");for(auto argument:a.arguments)add(operand_key(argument));return key;}
++            for(const auto& a:u->applications)if(a.definition==raw.definition){auto [module,owner]=structure_lookup(*u,root,units,a.name,a.token);(void)module;key=(owner?owner->definition->identity:"$option")+(raw.nullable?"?":"");for(auto argument:a.arguments)add(operand_key(argument));return key;}
+             for(auto& a:u->arrays)if(a.definition==raw.definition){key=a.key?"dictionary":a.extent?"fixed":"list";if(a.key)add(operand_key(*a.key));else if(a.extent)add(std::to_string(*array_extent(*u,a)));add(operand_key(a.element));return key;}
+             for(const auto& r:u->results)if(r.definition==raw.definition){key="result";add(operand_key(r.success));add(operand_key(r.failure));return key;}
+             for(const auto& f:u->function_types)if(f.definition==raw.definition){key=raw.nullable?"func?":"func";for(auto p:f.parameters)add(operand_key(p));add(operand_key(f.result));return key;}
+diff --git a/src/frontend/generic_inference.inc b/src/frontend/generic_inference.inc
+index a219b9c..1f2d833 100644
+--- a/src/frontend/generic_inference.inc
++++ b/src/frontend/generic_inference.inc
+@@ -55,6 +55,11 @@ std::vector<Type> infer_arguments(Unit& owner,const std::vector<GenericParameter
+             auto application=std::find_if(owner.applications.begin(),owner.applications.end(),[&](const auto& a){return a.definition==pattern.definition;});
+             if(application==owner.applications.end())return;
+             auto [declaration_owner,generic]=structure_lookup(owner,root,units,application->name,application->token);(void)declaration_owner;
++            if(!generic && application->name=="option" && application->arguments.size()==1 &&
++               actual.definition && actual.definition->option_type) {
++                match(application->arguments.front(),ir::field_type(actual,1));
++                return;
++            }
+             for(const auto& [id,u]:units)for(const auto& concrete:u->structures)if(concrete.definition==actual.definition && concrete.generic_origin==generic)
+                 for(unsigned n=0;n<application->arguments.size() && n<concrete.type_arguments.size();++n)match(application->arguments[n],concrete.type_arguments[n]);
+         }
+diff --git a/src/frontend/generics.inc b/src/frontend/generics.inc
+index 17efc5d..f7a2b69 100644
+--- a/src/frontend/generics.inc
++++ b/src/frontend/generics.inc
+@@ -119,6 +119,13 @@ for(auto& [id,u]:units) {
+         if(found==owner->applications.end())return raw;
+         if(found->resolved!=Type::none)return found->resolved;
+         auto [declaration_owner,generic]=structure_lookup(*owner,root,units,found->name,found->token);
++        if(!generic && found->name=="option") {
++            if(found->arguments.size()!=1)error(owner->source,found->token,Code::argument_count,"option<T> requires exactly one payload type.");
++            auto payload=resolve_type(found->arguments.front(),*owner,root,units,site);
++            if(!numeric::integer(payload) && payload.kind!=Type::numeric_enum)
++                error(owner->source,found->token,Code::unsupported_type,"option<T> requires an integer or numeric enum payload.");
++            return found->resolved=owner->make_option(payload);
++        }
+         if(!generic || generic->generics.empty())error(owner->source,found->token,Code::unsupported_type,"Type '"+found->name+"' is not a generic struct.");
+         std::vector<Type> arguments;for(auto argument:found->arguments)arguments.push_back(resolve_type(argument,*owner,root,units,site));
+         auto& concrete=owner->specialize_structure(*owner,*declaration_owner,*generic,arguments,site);
+diff --git a/src/frontend/pattern_parser.inc b/src/frontend/pattern_parser.inc
+index 25cc4b1..0a5a1f6 100644
+--- a/src/frontend/pattern_parser.inc
++++ b/src/frontend/pattern_parser.inc
+@@ -25,7 +25,7 @@
+             bool generic=false;
+             if(end<tokens.size() && tokens[end].text=="<"){unsigned count=0;auto close=end;for(;close<tokens.size();++close){if(tokens[close].text=="<")++count;else if(tokens[close].text==">" && !--count)break;else if(tokens[close].kind==TokenKind::newline || tokens[close].kind==TokenKind::end)break;}if(close<tokens.size() && tokens[close].text==">"){generic=true;end=close+1;}}
+             bool value_tail=false;
+-            if(end<tokens.size() && tokens[end].text=="("){unsigned count=0;auto close=end;for(;close<tokens.size();++close){if(tokens[close].text=="(")++count;else if(tokens[close].text==")" && !--count)break;}if(close+1<tokens.size())value_tail=precedence(tokens[close+1].text)>=4 || tokens[close+1].text=="as" || tokens[close+1].text==".." || tokens[close+1].text=="..<";}
++            if(end<tokens.size() && tokens[end].text=="("){unsigned count=0;auto close=end;for(;close<tokens.size();++close){if(tokens[close].text=="(")++count;else if(tokens[close].text==")" && !--count)break;}if(close+1<tokens.size())value_tail=precedence(tokens[close+1].text)>=4 || tokens[close+1].text=="as" || tokens[close+1].text=="as?" || tokens[close+1].text==".." || tokens[close+1].text=="..<";}
+             if(end<tokens.size() && (tokens[end].text=="(" || generic) && !value_tail) {
+                 result.kind=Pattern::Kind::constructor;result.variant_token=take();result.spelling=result.variant_token.text;
+                 while(accept(".")){result.variant_token=name();result.spelling+="."+result.variant_token.text;}
+diff --git a/src/frontend/pattern_semantics.inc b/src/frontend/pattern_semantics.inc
+index c2f1fc1..89f73e7 100644
+--- a/src/frontend/pattern_semantics.inc
++++ b/src/frontend/pattern_semantics.inc
+@@ -23,17 +23,19 @@
+         return false;
+     }
+     template<class Visit> bool warn_match(const Token& token,Type type,Visit patterns) {
+-        bool complete=false,present=false,absent=false;std::set<unsigned> covered;std::set<std::uint64_t> booleans;
++        bool complete=false,present=false,absent=false;std::set<unsigned> covered;std::set<std::uint64_t> scalar_cases;
+         patterns([&](const Pattern& p){
+             complete|=irrefutable(p);
+             present|=p.nullable && p.children.size()==1 && irrefutable(p.children[0]);
+             absent|=p.kind==Pattern::Kind::value && p.values[0]->token.text=="null";
+             if(p.kind==Pattern::Kind::constructor && type.definition && !type.definition->cases.empty() && std::all_of(p.children.begin(),p.children.end(),[&](const auto& child){return irrefutable(child);}))covered.insert(p.tag);
+             if(p.kind==Pattern::Kind::value && p.values[0]->kind==Expr::Kind::sum && p.values[0]->parts.empty())covered.insert(p.values[0]->slot);
+-            if(type==Type::boolean && p.kind==Pattern::Kind::value && p.values[0]->kind==Expr::Kind::literal)booleans.insert(p.values[0]->value);
++            if((type==Type::boolean || type.kind==Type::numeric_enum) && p.kind==Pattern::Kind::value &&
++               p.values[0]->kind==Expr::Kind::literal)scalar_cases.insert(p.values[0]->value);
+         });
+         if(type.definition && !type.definition->cases.empty())complete|=covered.size()==type.definition->cases.size();
+-        if(type==Type::boolean)complete|=booleans.size()==2;
++        if(type==Type::boolean)complete|=scalar_cases.size()==2;
++        if(type.kind==Type::numeric_enum)complete|=scalar_cases.size()==type.definition->numeric_members.size();
+         if(type.nullable)complete|=present && absent;
+         if(!complete)diagnostics.warn(source,token,Code::incomplete_match,"Match may leave values unmatched.");return complete;
+     }
+@@ -90,7 +92,7 @@
+             }
+             if(type.definition && !type.definition->cases.empty()) {
+                 const auto& cases=type.definition->cases;std::string variant=p.spelling;
+-                if(!type.definition->result_type) {
++                if(!type.definition->result_type && !type.definition->option_type) {
+                     const auto dot=variant.rfind('.');
+                     if(dot==std::string::npos)error(source,p.token,Code::type_mismatch,"Enum patterns require type.variant spelling.");
+                     auto [owner,structure]=structure_lookup(unit,root,units,variant.substr(0,dot),p.token);
+@@ -98,11 +100,21 @@
+                     variant=variant.substr(dot+1);
+                 }
+                 auto selected=std::find_if(cases.begin(),cases.end(),[&](const auto& c){return c.name==variant;});
++                if(type.definition->option_type && variant=="None")
++                    error(source,p.token,Code::syntax,"Write the None pattern without parentheses.");
+                 if(selected==cases.end() || selected->count!=p.children.size())error(source,p.token,Code::type_mismatch,"Enum/result pattern payload does not match its variant.");
+                 p.tag=static_cast<unsigned>(selected-cases.begin());
+                 if(type.definition->result_type)(void)result_editor_target(type,p.tag,p.variant_token);
+                 for(unsigned n=0;n<p.children.size();++n){if(!p.fields[n].text.empty())error(source,p.fields[n],Code::syntax,"Variant patterns use positional payloads.");p.indexes.push_back(selected->begin+n);check_pattern(p.children[n],ir::field_type(type,selected->begin+n));}return;
+             }
++            if(type.kind==Type::numeric_enum) {
++                auto [owner,structure]=structure_lookup(unit,root,units,p.spelling,p.token);
++                if(!structure || structure->definition!=type.definition || p.children.size()>1 ||
++                   (!p.children.empty() && !p.fields.front().text.empty()))
++                    error(source,p.token,Code::type_mismatch,"Numeric enum patterns require a member or an exact whole-value type.");
++                if(p.children.empty()){p.kind=K::wildcard;return;}
++                auto inner=std::move(p.children.front());p=std::move(inner);check_pattern(p,type);return;
++            }
+             auto resolved=p.annotated_type?resolve_type(p.narrowed,unit,root,units,p.token):Type(Type::none);
+             if(p.annotated_type && (numeric::number(resolved) || resolved==Type::boolean || resolved==Type::string)){
+                 expect(type,resolved,p.token);p.narrowed=resolved;if(p.children.size()>1)error(source,p.token,Code::type_mismatch,"Scalar type patterns accept one whole-value pattern.");if(!p.children.empty()){p.rest=true;check_pattern(p.children[0],resolved);}return;
+diff --git a/src/ir/module.cpp b/src/ir/module.cpp
+index 6ae4078..3d16531 100644
+--- a/src/ir/module.cpp
++++ b/src/ir/module.cpp
+@@ -157,6 +157,11 @@ CompactValueShape compact_value_shape(Type root) {
+     };
+     std::function<CompactValueShape(Type)> visit=[&](Type t)->CompactValueShape {
+         if((t.nullable && !reference_value(t) && !(t.definition && t.definition->callable)) || t.construction || !t.preparation.empty()) throw std::invalid_argument("Unsupported array value shape");
++        if(t.kind==Type::numeric_enum) {
++            if(!t.definition || !t.definition->enum_backing || !numeric::integer(*t.definition->enum_backing))
++                throw std::invalid_argument("Invalid numeric enum array element");
++            return {0,numeric::width(*t.definition->enum_backing)/8u,1};
++        }
+         if(numeric::number(t) || t==Type::boolean) return {0,t==Type::boolean ? 1u : numeric::width(t)/8u,1};
+         if(reference_value(t) || t.kind==Type::string || (t.kind==Type::growable_array || t.kind==Type::dictionary))return {0,sizeof(void*),1};
+         if((t.kind!=Type::fixed_array && t.kind!=Type::aggregate) || !t.definition || t.definition->managed || t.definition->interface_type)
+@@ -222,7 +227,7 @@ bool async_boundary_safe(Type root) {
+     while(!pending.empty()){auto t=pending.back();pending.pop_back();if(t.construction || t.kind==Type::prepared_receiver)return false;if(!t.definition || !seen.insert(t.definition.get()).second)continue;if(t.definition->callable || t.definition->native_resource)return false;if(t.definition->element)pending.push_back(*t.definition->element);for(const auto& field:t.definition->fields)pending.push_back(field.type);}
+     return true;
+ }
+-bool requires_initialization(Type t){return !t.nullable && (console::endpoint_type(t) || reference_value(t) || (t.definition && (t.definition->callable || !t.definition->cases.empty())));}
++bool requires_initialization(Type t){return !t.nullable && (t.kind==Type::numeric_enum || console::endpoint_type(t) || reference_value(t) || (t.definition && (t.definition->callable || !t.definition->cases.empty())));}
+ bool reference_value(Type t) { return t.kind==Type::managed_ref || t.kind==Type::interface_ref; }
+ Type::Type(std::shared_ptr<const ValueType> d, Kind k) : kind(k) {
+     if (!d) return;
+@@ -249,12 +254,29 @@ Type::Type(std::shared_ptr<const ValueType> d, Kind k) : kind(k) {
+     }
+     definition = std::shared_ptr<const ValueType>(std::move(owner),d.get());
+ }
++Type Type::nominal(std::shared_ptr<const ValueType> d) {
++    const auto kind=d->enum_backing?numeric_enum:d->interface_type?interface_ref:d->managed?managed_ref:aggregate;
++    return Type(std::move(d),kind);
++}
++std::string option_identity(Type payload) {return "$option:"+array_identity(payload,{});}
++bool numeric_enum_member(Type t,std::uint64_t bits) {
++    return t.kind==Type::numeric_enum && t.definition &&
++        std::any_of(t.definition->numeric_members.begin(),t.definition->numeric_members.end(),
++                    [&](const auto& member){return member.bits==bits;});
++}
++std::string numeric_enum_layout(Type t) {
++    if(t.kind!=Type::numeric_enum)return {};
++    std::string layout=type_name(*t.definition->enum_backing)+":";
++    for(const auto& member:t.definition->numeric_members)
++        layout+=std::to_string(member.name.size())+":"+member.name+"="+std::to_string(member.bits)+";";
++    return layout;
++}
+ FieldType::FieldType(Type t) : kind(t.kind), nullable(t.nullable), readonly(t.readonly), readonly_references(t.readonly_references) {
+     if (t.construction) throw std::invalid_argument("construction view cannot be a field type");
+     if (t.definition) target = t.definition->self;
+ }
+ FieldType::operator Type() const {
+-    if (kind != Type::aggregate && kind != Type::unresolved && kind != Type::managed_ref && kind != Type::interface_ref && kind!=Type::fixed_array && kind!=Type::growable_array && kind!=Type::dictionary) { Type t(kind); t.nullable=nullable; t.readonly=readonly;t.readonly_references=readonly_references; return t; }
++    if (kind != Type::aggregate && kind != Type::unresolved && kind != Type::managed_ref && kind != Type::interface_ref && kind!=Type::fixed_array && kind!=Type::growable_array && kind!=Type::dictionary && kind!=Type::numeric_enum) { Type t(kind); t.nullable=nullable; t.readonly=readonly;t.readonly_references=readonly_references; return t; }
+     auto d = target.lock();
+     if (!d) throw std::logic_error("nominal type edge outlived its definition table");
+     Type t(std::move(d),kind); t.nullable=nullable; t.readonly=readonly;t.readonly_references=readonly_references; return t;
+@@ -434,7 +456,7 @@ std::string type_name(Type t) {
+     if(t.kind==Type::dictionary)return "{"+type_name(dictionary_key(t))+": "+type_name(dictionary_value(t))+"}";
+     if(array_type(t)) return "["+type_name(array_element(t))+(t.definition->extent ? ", "+std::to_string(*t.definition->extent) : "")+"]";
+     if (t.kind == Type::managed_ref && t.definition) return std::string(t.readonly ? "readonly " : "") + t.definition->identity + (t.nullable ? "?" : "");
+-    switch (t.kind) { case Type::string: return "string"; case Type::aggregate: if (t.definition) return t.definition->identity.c_str(); break; case Type::unresolved: if (t.definition) return t.definition->name.c_str(); break; case Type::i8: return "i8"; case Type::i16: return "i16"; case Type::i64: return "i64"; case Type::u8: return "u8"; case Type::u16: return "u16"; case Type::u32: return "u32"; case Type::u64: return "u64"; case Type::f32: return "f32"; case Type::f64: return "f64"; case Type::i32: return "i32"; case Type::boolean: return "bool"; case Type::none: return "no result"; default: break; }
++    switch (t.kind) { case Type::string: return "string"; case Type::numeric_enum: case Type::aggregate: if (t.definition) return t.definition->identity.c_str(); break; case Type::unresolved: if (t.definition) return t.definition->name.c_str(); break; case Type::i8: return "i8"; case Type::i16: return "i16"; case Type::i64: return "i64"; case Type::u8: return "u8"; case Type::u16: return "u16"; case Type::u32: return "u32"; case Type::u64: return "u64"; case Type::f32: return "f32"; case Type::f64: return "f64"; case Type::i32: return "i32"; case Type::boolean: return "bool"; case Type::none: return "no result"; default: break; }
+     throw std::invalid_argument("VOID IR: unknown type");
+ }
+ std::vector<VirtualTarget> virtual_targets(const Module& module,const Function& root) {
+@@ -458,6 +480,7 @@ std::vector<VirtualTarget> virtual_targets(const Module& module,const Function&
+ #include "construction.inc"
+ #include "reference_capabilities.inc"
+ #include "fixed_ownership.inc"
++#include "numeric_enum_storage.inc"
+ void validate(const Module& m, InstructionTypes* results,std::map<std::string,ReferenceEffects>* verified_effects) {
+     for(const auto& symbol:m.imports)if(symbol.starts_with("vd_native_fixture_call"))throw std::invalid_argument("VOID IR: native bridge requires its verified typed descriptor");
+     for (const auto& symbol : m.imports) if (symbol.starts_with("vd_global")) throw std::invalid_argument("VOID IR: global bridge requires validated typed global operations");
+@@ -517,6 +540,10 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+         std::vector<Type> pending{root};
+         for (std::size_t n=0;n<pending.size();++n) {
+             auto t=pending[n];
++            if(t.definition && t.kind!=Type::numeric_enum && (t.definition->enum_backing || !t.definition->numeric_members.empty()))
++                fail("numeric enum used with a non-enum type");
++            if(t.definition && t.kind!=Type::aggregate && (t.definition->option_type || t.definition->identity.starts_with("$option:")))
++                fail("canonical option used with a non-sum type");
+             if(t.kind==Type::dictionary) {
+                 if(!m.coordinated || !t.definition || !t.definition->element || t.definition->extent || !t.definition->fields.empty() || t.nullable || t.construction || !t.preparation.empty())fail("invalid dictionary type");
+                 auto entry=array_element(t);if(entry.kind!=Type::aggregate || entry.definition->fields.size()!=3 || field_type(entry,2)!=Type::u64 || !dictionary_key_supported(dictionary_key(t)) || dictionary_type(dictionary_key(t),dictionary_value(t))!=t)fail("invalid dictionary key/value shape");
+@@ -555,6 +582,31 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+                 if(!added && found->second!=t.definition.get()) fail("duplicate nominal interface identity");
+                 continue;
+             }
++            if(t.kind==Type::numeric_enum) {
++                auto* d=t.definition.get();
++                if(!d || !d->enum_backing || !numeric::integer(*d->enum_backing) || d->numeric_members.empty() ||
++                   d->managed || d->interface_type || d->callable || d->result_type || d->option_type ||
++                   d->native_resource || !d->native_provider.empty() || d->custom_equality || d->task_result ||
++                   d->element || d->extent || !d->base.expired() || !d->fields.empty() || !d->cases.empty() ||
++                   d->call_result || !d->call_parameters.empty() || !t.preparation.empty() || !t.readonly_references.empty() ||
++                   d->name.empty() || d->identity.find('\0')!=std::string::npos || d->module_identity.empty() ||
++                   d->identity!=d->module_identity+"::"+d->name || !m.source_imports.contains(d->module_identity) ||
++                   (d->visibility!="public" && d->visibility!="private" && d->visibility!="internal"))
++                    fail("invalid numeric enum descriptor");
++                auto [previous,inserted]=definitions.emplace(d->identity,d);
++                if(!inserted && previous->second!=d)fail("conflicting numeric enum identity");
++                if(checked.insert(d).second) {
++                    std::set<std::string> names;std::set<std::uint64_t> values;
++                    const auto width=numeric::width(*d->enum_backing);
++                    for(const auto& member:d->numeric_members) {
++                        if(member.name.empty() || (member.name.front()>='0' && member.name.front()<='9') ||
++                           !std::all_of(member.name.begin(),member.name.end(),[](char c){return c=='_' || (c>='a' && c<='z') || (c>='0' && c<='9');}) ||
++                           !names.insert(member.name).second || !values.insert(member.bits).second ||
++                           (width<64 && member.bits>>width))fail("invalid or duplicate numeric enum discriminant");
++                    }
++                }
++                continue;
++            }
+             if(t.definition && t.definition->interface_type) fail("interface used as an ordinary concrete nominal");
+             if (t.kind!=Type::aggregate && t.kind!=Type::managed_ref) {
+                 if (t.kind==Type::unresolved || t.kind==Type::invalid || t.kind==Type::null_value) fail("unresolved type");
+@@ -573,6 +625,23 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+                 if(t.kind!=Type::aggregate || d->managed || d->interface_type || !d->cases.empty() || d->result_type || d->fields.size()!=2 || Type(d->fields[0].type)!=Type::u64 || Type(d->fields[1].type).kind!=Type::managed_ref || !d->fields[1].type.nullable || !d->call_result || !d->base.expired())fail("invalid function value shape");
+                 pending.push_back(*d->call_result);for(const auto& parameter:d->call_parameters){if(Type(parameter)==Type::none)fail("no-result function parameter");pending.push_back(parameter);}
+             }
++            if(d->option_type) {
++                if(t.kind!=Type::aggregate || d->managed || d->callable || d->result_type || d->native_resource ||
++                   d->task_result || d->call_result || !d->call_parameters.empty() || !d->module_identity.empty() ||
++                   d->cases.size()!=2 || d->cases[0].name!="None" || d->cases[0].count!=0 ||
++                   d->cases[1].name!="Some" || d->cases[1].count!=1 || d->fields.size()!=2 ||
++                   d->fields[0].name!="$tag" || d->fields[1].name!="$some")
++                    fail("invalid canonical option shape");
++                auto payload=Type(d->fields[1].type);
++                if((!numeric::integer(payload) && payload.kind!=Type::numeric_enum) ||
++                   payload.nullable || payload.readonly || !payload.readonly_references.empty() ||
++                   d->identity!=option_identity(payload) || d->name!=d->identity)
++                    fail("invalid canonical option identity");
++                for(const auto& field:d->fields)
++                    if(field.owner!=d->identity || field.visibility!="public" || field.using_field || field.event ||
++                       field.readonly || field.type.readonly || field.type.nullable || !field.type.readonly_references.empty())
++                        fail("invalid canonical option field");
++            } else if(d->identity.starts_with("$option:"))fail("forged canonical option identity");
+             if(d->result_type && d->cases.empty())fail("result type has no variants");
+             if(!d->cases.empty()) {
+                 if(t.kind!=Type::aggregate || d->fields.empty() || Type(d->fields[0].type)!=Type::i32 || d->managed || d->interface_type || !d->base.expired())fail("invalid sum layout");
+@@ -584,7 +653,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+             if(!m.interface_requirements.empty() && d->visibility!="public" && d->visibility!="internal" && d->visibility!="private") fail("invalid concrete nominal visibility");
+             const bool callable_environment=d->identity=="$void::$environment";
+             if(callable_environment && (!d->managed || !d->fields.empty() || !d->base.expired() || !d->module_identity.empty() || d->name!="$environment" || d->visibility!="private"))fail("invalid shared callable environment base");
+-            if(!m.interface_requirements.empty() && !callable_environment && !dictionary_entries.contains(d) && !d->result_type && !d->callable && !d->task_result && (d->identity!=d->module_identity+"::"+d->name || !m.source_imports.contains(d->module_identity))) fail("invalid concrete nominal ownership for interface binding");
++            if(!m.interface_requirements.empty() && !callable_environment && !dictionary_entries.contains(d) && !d->result_type && !d->option_type && !d->callable && !d->task_result && (d->identity!=d->module_identity+"::"+d->name || !m.source_imports.contains(d->module_identity))) fail("invalid concrete nominal ownership for interface binding");
+             if (t.construction && !d->managed) fail("construction view requires a managed nominal");
+             if (t.kind==Type::aggregate && d->managed) fail("managed nominal cannot be an inline value");
+             auto [found,added]=definitions.emplace(d->identity,d);
+@@ -627,7 +696,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+     };
+     std::set<const ValueType*> catalog_definitions;
+     for(auto t:m.nominal_types) {
+-        if((t.kind!=Type::aggregate && t.kind!=Type::managed_ref && t.kind!=Type::interface_ref) || !t.definition || !catalog_definitions.insert(t.definition.get()).second) fail("invalid or duplicate nominal catalog entry");
++        if((t.kind!=Type::aggregate && t.kind!=Type::managed_ref && t.kind!=Type::interface_ref && t.kind!=Type::numeric_enum) || !t.definition || !catalog_definitions.insert(t.definition.get()).second) fail("invalid or duplicate nominal catalog entry");
+         valid_type(t);
+         if(t.kind==Type::managed_ref && !t.definition->managed) fail("nominal catalog requires a managed class");
+         auto base=t.definition->base.lock();
+@@ -904,6 +973,8 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+                     valid_type(i.type);
+                     if(std::any_of(m.nominal_types.begin(),m.nominal_types.end(),[&](auto t){return t.kind==Type::managed_ref && Type::key(t)==Type::key(i.type);})) fail("nominal source objects require complete construction");
+                     if (!m.coordinated || i.type.kind != Type::managed_ref || i.type.construction || i.type.definition->fields.empty()) fail("invalid managed allocation");
++                    for(const auto& field:i.type.definition->fields)
++                        if(contains_numeric_enum(field.type))fail("numeric enum fields require complete managed construction");
+                     result = i.type; break;
+                 case Op::gc_read: case Op::gc_write: {
+                     if(operand(i.a).definition && operand(i.a).definition->task_result)fail("task payload access requires await");
+@@ -1290,7 +1361,10 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+                 case Op::constant:
+                     if (array_type(i.type) || i.type.construction || i.type.kind == Type::aggregate || i.type.kind==Type::prepared_receiver || i.type == Type::none || (reference_value(i.type) && i.immediate != 0) || (i.type == Type::boolean && i.immediate != 0 && i.immediate != 1) || (i.type==Type::string && i.immediate!=0)) fail("invalid literal");
+                     if (reference_value(i.type) && !i.type.nullable) fail("null literal requires a nullable reference type");
+-                    valid_type(i.type); result = i.type; break;
++                    valid_type(i.type);
++                    if(i.type.kind==Type::numeric_enum && !numeric_enum_member(i.type,std::bit_cast<std::uint64_t>(i.immediate)))
++                        fail("undeclared numeric enum constant");
++                    result = i.type; break;
+                 case Op::add: case Op::subtract: case Op::multiply: case Op::divide: case Op::remainder:
+                     result = operand(i.a);
+                     if (!numeric::supports(i.op,result)) fail("illegal numeric operation");
+@@ -1299,7 +1373,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+                     if (!numeric::supports(i.op,operand(i.a))) fail("non-numeric ordering");
+                     expect(i.b,operand(i.a)); result = Type::boolean; break;
+                 case Op::equal: case Op::not_equal:
+-                    if (!((operand(i.a).definition && operand(i.b).definition && operand(i.a).definition->callable && operand(i.b).definition->callable && Type::key(operand(i.a))==Type::key(operand(i.b))) || (reference_value(operand(i.a)) && !operand(i.a).construction && operand(i.b).kind==operand(i.a).kind && !operand(i.b).construction && Type::key(operand(i.a))==Type::key(operand(i.b))) || (numeric::supports(i.op,operand(i.a)) && operand(i.a)==operand(i.b)))) fail("comparison type mismatch");
++                    if (!((operand(i.a).definition && operand(i.b).definition && operand(i.a).definition->callable && operand(i.b).definition->callable && Type::key(operand(i.a))==Type::key(operand(i.b))) || (reference_value(operand(i.a)) && !operand(i.a).construction && operand(i.b).kind==operand(i.a).kind && !operand(i.b).construction && Type::key(operand(i.a))==Type::key(operand(i.b))) || ((numeric::supports(i.op,operand(i.a)) || operand(i.a).kind==Type::numeric_enum) && operand(i.a)==operand(i.b)))) fail("comparison type mismatch");
+                     result = Type::boolean; break;
+                 case Op::stage_prefix: {
+                     auto from=operand(i.a),to=i.type;
+@@ -1357,6 +1431,12 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+                     valid_type(i.type);
+                     if(!numeric::number(operand(i.a)) || !numeric::number(i.type) || numeric::width(operand(i.a))!=numeric::width(i.type) || i.b || i.receiver || !i.arguments.empty() || !i.callee.empty())fail("invalid numeric bitcast");
+                     result=i.type;break;
++                case Op::try_convert:
++                    valid_type(i.type);
++                    if(!numeric::integer(operand(i.a)) || !i.type.definition || !i.type.definition->option_type ||
++                       i.b || i.immediate || i.receiver || i.initialization || i.array_repeat ||
++                       !i.arguments.empty() || !i.callee.empty())fail("invalid fallible integer conversion");
++                    result=i.type;break;
+                 case Op::convert:
+                     valid_type(i.type);
+                     if (!((operand(i.a).definition && i.type.definition && operand(i.a).definition->callable && i.type.definition->callable && Type::key(operand(i.a))==Type::key(i.type)) || (reference_value(operand(i.a)) && !operand(i.a).construction && i.type.kind==operand(i.a).kind && !i.type.construction && Type::key(operand(i.a))==Type::key(i.type) && !i.type.nullable) || (numeric::number(operand(i.a)) && numeric::number(i.type)))) fail("invalid conversion");
+@@ -1449,6 +1529,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+         }
+ #include "local_cleanup.inc"
+         validate_construction(f,m,body_types);
++        validate_numeric_enum_slots(f);
+         validate_fixed_ownership(f,m,body_types);
+     }
+     for (const auto& global : m.globals) {
+@@ -1494,7 +1575,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+         }
+     }
+     if(m.async_root){auto entry=functions.find(m.entry_symbol);if(entry!=functions.end() && entry->second->worker)fail("worker cannot be a root adapter");if(entry==functions.end() || !entry->second->asynchronous || entry->second->parameters!=std::vector<Type>{Type::i32} || entry->second->result!=Type::i32)fail("invalid explicit async root adapter signature");}
+-    if(!m.interface_requirements.empty()) for(const auto& [key,definition]:definitions) if(!catalog_definitions.contains(definition) && !dictionary_entries.contains(definition) && !definition->result_type && !definition->callable) fail("incomplete nominal universe for structural interfaces");
++    if(!m.interface_requirements.empty()) for(const auto& [key,definition]:definitions) if(!catalog_definitions.contains(definition) && !dictionary_entries.contains(definition) && !definition->result_type && !definition->option_type && !definition->callable) fail("incomplete nominal universe for structural interfaces");
+     std::map<std::string,ReferenceEffects> worker_effects;
+     auto* inferred=verified_effects?verified_effects:&worker_effects;
+     validate_reference_capabilities(m,qualified_types,inferred);
+diff --git a/src/ir/numeric_enum_storage.inc b/src/ir/numeric_enum_storage.inc
+new file mode 100644
+index 0000000..9a073df
+--- /dev/null
++++ b/src/ir/numeric_enum_storage.inc
+@@ -0,0 +1,49 @@
++// Only inline fields can expose an uninitialized scalar discriminant. Heap and
++// collection references use their existing construction and publication checks.
++bool contains_numeric_enum(Type root) {
++    if(root.kind!=Type::aggregate)return root.kind==Type::numeric_enum;
++    std::vector<Type> pending{root};
++    std::set<const ValueType*> seen;
++    for(std::size_t n=0;n<pending.size();++n) {
++        const auto type=pending[n];
++        if(type.kind==Type::numeric_enum)return true;
++        if(type.kind==Type::aggregate && type.definition && seen.insert(type.definition.get()).second)
++            for(const auto& field:type.definition->fields)pending.emplace_back(field.type);
++    }
++    return false;
++}
++
++void validate_numeric_enum_slots(const Function& f) {
++    std::set<unsigned> tracked;
++    for(unsigned n=0;n<f.locals.size();++n)if(contains_numeric_enum(f.locals[n]))tracked.insert(n);
++    if(tracked.empty())return;
++
++    // Follow explicit control-flow edges, intersecting definitely initialized
++    // slots at joins. An aggregate receiver is bound by the incoming ABI.
++    std::vector<std::optional<std::set<unsigned>>> inputs(f.blocks.size());
++    inputs.front().emplace();
++    if(f.receiver && tracked.contains(0))inputs.front()->insert(0);
++    std::vector<unsigned> work{0};
++    while(!work.empty()) {
++        const auto id=work.back();work.pop_back();
++        auto state=*inputs[id];
++        const auto& block=f.blocks[id];
++        auto require=[&](unsigned slot) {
++            if(tracked.contains(slot) && !state.contains(slot))
++                throw std::invalid_argument("VOID IR: read of uninitialized numeric enum storage in "+f.name);
++        };
++        for(const auto& i:block.instructions) {
++            if(i.op==Op::load)require(i.a);
++            if(i.receiver)require(i.receiver->slot);
++            if(i.op==Op::store && tracked.contains(i.a))state.insert(i.a);
++        }
++        auto edge=[&](unsigned target) {
++            auto& known=inputs[target];
++            if(!known){known=state;work.push_back(target);return;}
++            const auto removed=std::erase_if(*known,[&](unsigned slot){return !state.contains(slot);});
++            if(removed)work.push_back(target);
++        };
++        if(block.end.kind==Terminator::Kind::jump || block.end.kind==Terminator::Kind::branch)edge(block.end.yes);
++        if(block.end.kind==Terminator::Kind::branch)edge(block.end.no);
++    }
++}
+diff --git a/src/numeric.cpp b/src/numeric.cpp
+index d67afff..0a2412c 100644
+--- a/src/numeric.cpp
++++ b/src/numeric.cpp
+@@ -2,6 +2,7 @@
+ #include "void/numeric.hpp"
+ #include <llvm/ADT/APFloat.h>
+ #include <llvm/ADT/APSInt.h>
++#include <llvm/ADT/SmallString.h>
+ #include <llvm/Support/Error.h>
+ #include <stdexcept>
+ namespace vd::numeric {
+@@ -77,16 +78,26 @@ std::uint64_t literal(std::string text, Type t, bool explicit_rounding) {
+         throw std::invalid_argument("Integer literal is not exactly representable in " + std::string(ir::type_name(t)) + "; use as for explicit rounding");
+     return bits(v);
+ }
++std::optional<std::uint64_t> try_integer_convert(std::uint64_t v, Type from, Type to) {
++    if (!integer(from) || !integer(to)) throw std::invalid_argument("Integer conversion requires integer types");
++    llvm::APInt input(width(from),v);
++    const auto wide=signed_integer(from)?input.sext(128):input.zext(128);
++    if (!(signed_integer(to)?wide.isSignedIntN(width(to)):!wide.isNegative() && wide.isIntN(width(to)))) return {};
++    return wide.trunc(width(to)).getZExtValue();
++}
++std::string integer_text(std::uint64_t value, Type type) {
++    llvm::SmallString<24> text;
++    llvm::APInt(width(type),value).toString(text,10,signed_integer(type));
++    return std::string(text);
++}
+ std::uint64_t convert(std::uint64_t v, Type from, Type to) {
+     if (!number(from) || !number(to)) throw std::invalid_argument("Numeric as requires numeric source and destination types");
+     if (from == to) return v;
+     if (integer(from)) {
+         llvm::APInt a(width(from), v);
+         if (integer(to)) {
+-            auto extended = signed_integer(from) ? a.sext(128) : a.zext(128);
+-            if (!(signed_integer(to) ? extended.isSignedIntN(width(to)) : !extended.isNegative() && extended.isIntN(width(to))))
+-                throw std::invalid_argument("Checked numeric conversion is out of range");
+-            return extended.trunc(width(to)).getZExtValue();
++            if(auto converted=try_integer_convert(v,from,to))return *converted;
++            throw std::invalid_argument("Checked numeric conversion is out of range");
+         }
+         llvm::APFloat result(semantics(to)); result.convertFromAPInt(a, signed_integer(from), nearest); return bits(result);
+     }
+diff --git a/tests/numeric/enums.py b/tests/numeric/enums.py
+new file mode 100644
+index 0000000..5ef406e
+--- /dev/null
++++ b/tests/numeric/enums.py
+@@ -0,0 +1,244 @@
++"""Cross-mode tests for the eight integer backings and fallible cast boundaries."""
++from pathlib import Path
++import json
++import os
++import subprocess
++import sys
++import tempfile
++
++compiler, evidence = (Path(name).resolve() for name in sys.argv[1:])
++limits = {
++    f"{sign}{width}": (-(1 << (width - 1)), (1 << (width - 1)) - 1) if sign == "i" else (0, (1 << width) - 1)
++    for sign in ("i", "u") for width in (8, 16, 32, 64)
++}
++records = []
++cases = 0
++
++
++def invoke(argv, directory, expected=0, stack_bytes=None):
++    def limit_stack():
++        import resource
++        _, hard = resource.getrlimit(resource.RLIMIT_STACK)
++        resource.setrlimit(resource.RLIMIT_STACK, (stack_bytes, hard))
++
++    result = subprocess.run(list(map(str, argv)), cwd=directory, capture_output=True, timeout=150,
++                            preexec_fn=limit_stack if stack_bytes else None)
++    row = {"argv": list(map(str, argv)), "status": result.returncode,
++           "stdout": result.stdout.decode("utf-8", "replace"), "stderr": result.stderr.decode("utf-8", "replace")}
++    if stack_bytes:
++        row["stack_bytes"] = stack_bytes
++    records.append(row)
++    assert result.returncode == expected, row
++    return row
++
++
++def integer_cases():
++    global cases
++    declarations, calls = [], []
++    for src, (src_min, src_max) in limits.items():
++        for dest, (dest_min, dest_max) in limits.items():
++            name = f"cast_{src}_{dest}"
++            declarations.append(f"func {name}(value: {src}) -> option<{dest}>:\n    return value as? {dest}\n")
++            points = {src_min, src_max, -1, 0, 1, dest_min - 1, dest_min, dest_max, dest_max + 1}
++            for value in sorted(point for point in points if src_min <= point <= src_max):
++                pattern = f"Some({value})" if dest_min <= value <= dest_max else "None"
++                calls.append(f"    if not ({name}({value}) is {pattern}):\n        return 11")
++                cases += 1
++    return declarations, calls
++
++
++def enum_cases():
++    global cases
++    declarations, calls = [], []
++    for dest, (minimum, maximum) in limits.items():
++        # Sparse endpoints. A signed enum here excludes zero, including in inactive storage.
++        first = minimum
++        declarations += [f"enum enum_{dest}({dest}):\n    first = {first}\n    last = {maximum}\n"]
++        for src, (src_min, src_max) in limits.items():
++            name = f"decode_{src}_{dest}"
++            declarations += [f"func {name}(value: {src}) -> option<enum_{dest}>:\n    return value as? enum_{dest}\n"]
++            for value in sorted({first, maximum, first - 1, first + 1, maximum + 1, -1, 0}):
++                if not src_min <= value <= src_max:
++                    continue
++                pattern = f"Some(enum_{dest}.first)" if value == first else f"Some(enum_{dest}.last)" if value == maximum else "None"
++                calls.append(f"    if not ({name}({value}) is {pattern}):\n        return 12")
++                cases += 1
++    return declarations, calls
++
++
++interaction = """use "./modes.void" as modes
++
++private struct option<t>:
++    value: t
++
++struct record:
++    mode: modes.mode = modes.mode.quiet
++    previous: modes.mode
++
++struct owner:
++    state: modes.mode
++    history: [modes.mode]
++
++struct initialized:
++    state: modes.mode = modes.mode.quiet
++
++func (self initialized) init():
++    if self.state == modes.mode.loud:
++        self.state = modes.mode.quiet
++
++func identity<t>(value: t) -> t:
++    return value
++
++var evaluations: i32 = 0
++const one = 255 as? modes.mode
++const hole = 4 as? modes.mode
++const maximum = 18446744073709551615 as? u64
++const from_i64 = 2147483648 as? i64
++const from_i32 = 2147483647 as? i32
++const lower = -9223372036854775808 as? i64
++const too_narrow = -129 as? i8
++
++func next(value: i32) -> i32:
++    evaluations += 1
++    return value
++
++func main() -> i32:
++    if not (one is Some(modes.mode.loud)) or not (hole is None):
++        return 1
++    if not (maximum is Some(18446744073709551615)) or not (lower is Some(-9223372036854775808)):
++        return 2
++    if not (from_i64 is Some(2147483648)) or not (from_i32 is Some(2147483647)) or not (too_narrow is None):
++        return 3
++    var loud = modes.mode.quiet
++    if identity(next(255) as? modes.mode) is Some(var converted):
++        loud = converted
++    else:
++        return 4
++    if not (next(-1) as? modes.mode is None) or evaluations != 2 or loud != modes.mode.loud:
++        return 5
++    var shadow: option<i32> = option<i32>(value = 21)
++    if shadow.value != 21 or modes.score(loud) != 19 or modes.score_cast(next(255) as? modes.mode) != 19:
++        return 6
++    var defaults = initialized()
++    if defaults.state != modes.mode.quiet or not (modes.default_score() is None):
++        return 10
++    var data = record(previous = loud)
++    var recent: [modes.mode, 2] = [data.mode, data.previous]
++    var object = owner(state = recent[0], history = [recent[1]])
++    var table: {i32: modes.mode} = {1: object.history[0]}
++    for i in 0..<4000:
++        var transient = owner(state = modes.mode.quiet, history = [modes.mode.loud])
++        if transient.state != modes.mode.quiet:
++            return 7
++    if object.state != modes.mode.quiet or table[1] != modes.mode.loud:
++        return 8
++    var existing: i16 = 7
++    if not (existing as i64 as? u8 is Some(7)):
++        return 9
++    return 0
++"""
++modes = """public enum mode(u8):
++    quiet = 3
++    loud = 255
++
++public func score(value: mode) -> i32:
++    return match value:
++        mode.quiet: 7
++        mode.loud: 19
++
++struct maybe_state:
++    cached: option<mode> = None
++
++func (self maybe_state) init():
++    if self.cached is Some(mode.loud):
++        self.cached = None
++
++public func default_score() -> option<mode>:
++    return maybe_state().cached
++
++public func score_cast<t>(value: option<t>) -> i32:
++    if value is Some(var decoded):
++        return score(decoded)
++    return 0
++"""
++
++try:
++    with tempfile.TemporaryDirectory(prefix="VOID S6 numeric enum ") as temporary:
++        root = Path(temporary).resolve()
++        integer_functions, integer_checks = integer_cases()
++        enum_functions, enum_checks = enum_cases()
++        boundary = "\n".join(integer_functions + enum_functions)
++        # Split checks into bounded activations for Windows Debug stack and diagnostics.
++        checks = integer_checks + enum_checks
++        chunks = [checks[start:start+32] for start in range(0, len(checks), 32)]
++        for n, chunk in enumerate(chunks):
++            boundary += f"\nfunc boundary_{n}() -> i32:\n" + "\n".join(chunk) + "\n    return 0\n"
++        boundary += "\nfunc main() -> i32:\n" + "".join(
++            f"    if boundary_{n}() != 0:\n        return {20+n}\n" for n in range(len(chunks))) + "    return 0\n"
++        (root / "modes.void").write_text(modes, encoding="utf-8")
++        for name, source in [("matrix", boundary), ("integration", interaction)]:
++            file = root / (name + ".void")
++            file.write_text(source, encoding="utf-8")
++            for optimization in (["--no-opt"], []):
++                mode = "normal" if optimization else "o2"
++                row = invoke([compiler, "run", file, "--no-cache", *optimization], root)
++                assert not row["stderr"], row
++                output = root / (name + "-" + mode + (".exe" if os.name == "nt" else ""))
++                invoke([compiler, "build", file, "-o", output, *optimization], root)
++                invoke([output], root)
++        file = root / "integration.void"
++        if sys.platform == "linux":
++            for optimization in (["--no-opt"], []):
++                invoke([compiler, "run", file, "--no-cache", *optimization], root, stack_bytes=1024 * 1024)
++        # Persistent native cache publication is unavailable on Windows.
++        # Require that exact result and confirm both runs still execute correctly.
++        windows = os.name == "nt"
++        for expected_cache in (("unavailable", "unavailable") if windows else ("miss", "hit")):
++            row = invoke([compiler, "run", file, "--cache"], root)
++            assert f"Debug cache: {expected_cache}" in row["stderr"], row
++        # A discriminant-only edit changes the compiled semantics and cache key.
++        helper = root / "modes.void"
++        helper.write_text(modes.replace("loud = 255", "loud = 254"), encoding="utf-8")
++        row = invoke([compiler, "run", file, "--cache"], root, 1)
++        expected_cache = "unavailable" if windows else "miss"
++        assert f"Debug cache: {expected_cache}" in row["stderr"], row
++        if windows:
++            assert not (root / ".void" / "cache").exists(), "Windows published a native cache"
++
++        prefix = "enum mode(u8):\n    idle = 1\n"
++        invalid = [
++            ("duplicate name", prefix + "    idle = 2\n", "Duplicate enum"),
++            ("duplicate value", prefix + "    ready = +1\n", "Duplicate numeric enum"),
++            ("duplicate mathematical zero", "enum mode(i8):\n    idle = -0\n    ready = 0\n", "Duplicate numeric enum"),
++            ("invalid backing", "enum mode(f32):\n    idle = 1\n", "fixed-width integer"),
++            ("negative unsigned", "enum mode(u64):\n    idle = -1\n", "unsigned"),
++            ("payload", prefix + "    ready(x: i32)\n", "Expected '='"),
++            ("implicit", prefix + "    ready\n", "Expected '='"),
++            ("arithmetic member", prefix + "    ready = 2 + 3\n", "Expected end of statement"),
++            ("float cast", "func main():\n    var x = 1.0 as? i32\n", "as? requires an integer"),
++            ("bool cast", "func main():\n    var x = true as? i32\n", "as? requires an integer"),
++            ("tagged cast", "enum tag:\n    idle\nfunc main():\n    var x = 1 as? tag\n", "as? requires an integer"),
++            ("enum extraction", prefix + "func main():\n    var x = mode.idle as? u8\n", "as? requires an integer"),
++            ("unrelated enums", prefix + "enum other(u8):\n    idle = 1\nfunc main():\n    var x: mode = other.idle\n", "Type mismatch"),
++            ("enum arithmetic", prefix + "func main():\n    var x = mode.idle + mode.idle\n", "Type mismatch"),
++            ("implicit conversion", prefix + "func main():\n    var x: mode = 1\n", "Type mismatch"),
++            ("uninitialized enum", prefix + "func main():\n    var x: mode\n", "explicit initializer"),
++            ("default enum array", prefix + "func main():\n    var x: [mode, 2]\n", "explicit values"),
++            ("shadow is nominal", "struct option<t>:\n    value: t\nfunc main():\n    var x: option<i8> = 1 as? i8\n", "Type mismatch"),
++            ("None needs context", "func main():\n    var x = None\n", "contextual option"),
++            ("legacy as still checks", "func main():\n    var x = 256 as u8\n", "outside the u8 range"),
++            ("literal past unsigned domain", "func main():\n    var x = 18446744073709551616 as? u64\n", "fixed-width integer domain"),
++            ("literal below signed domain", "func main():\n    var x = -9223372036854775809 as? i64\n", "fixed-width integer domain"),
++            ("split operator", "func main():\n    var x = 1 as ? i32\n", "without an intervening space"),
++        ]
++        for kind, (lo, hi) in limits.items():
++            for value in (lo - 1, hi + 1):
++                invalid.append((f"{kind} bound {value}", f"enum mode({kind}):\n    invalid = {value}\n", "range"))
++        for n, (label, source, message) in enumerate(invalid):
++            file = root / f"invalid_{n}.void"
++            file.write_text(source + ("\nfunc main():\n    pass\n" if "func main" not in source else ""), encoding="utf-8")
++            row = invoke([compiler, "check", file], root, 1)
++            assert message in row["stderr"], (label, row)
++    print(f"S6 {cases} boundary pairs, {len(invalid)} invalid sources and {len(records)} executed processes")
++finally:
++    evidence.write_text(json.dumps({"boundary_cases": cases, "records": records}, indent=2) + "\n", encoding="utf-8")
+diff --git a/tests/numeric/enums_ir.cpp b/tests/numeric/enums_ir.cpp
+new file mode 100644
+index 0000000..fc5bcd8
+--- /dev/null
++++ b/tests/numeric/enums_ir.cpp
+@@ -0,0 +1,160 @@
++#include "void/backend.hpp"
++#include "void/frontend.hpp"
++#include "void/runtime.hpp"
++#include <algorithm>
++#include <iostream>
++#include <stdexcept>
++#include <string_view>
++
++namespace {
++using namespace vd::ir;
++void check(bool condition,std::string_view message) {
++    if(!condition)throw std::runtime_error(std::string(message));
++}
++void rejects(const Module& module,std::string_view message) {
++    try {validate(module);}
++    catch(const std::invalid_argument& error) {
++        check(std::string_view(error.what()).find(message)!=std::string_view::npos,error.what());
++        return;
++    }
++    throw std::runtime_error("Malformed IR accepted");
++}
++std::shared_ptr<const vd::ValidatedAnalysis> analysis(const std::string& text) {
++    auto result=vd::analyze_source({"enum-reload.void",text});
++    if(!result.succeeded())throw vd::CompilationError(std::move(result.diagnostics));
++    return result.program;
++}
++std::string source(std::string_view backing,unsigned high,int answer) {
++    return "enum mode("+std::string(backing)+"):\n    low = 3\n    high = "+std::to_string(high)+R"(
++
++struct state:
++    current: option<mode>
++    payload: [mode]
++
++func entry(raw: i32) -> i32:
++    var held = state(current = raw as? mode, payload = [mode.low])
++    for index in 0..<1024:
++        var temp = state(current = None, payload = [mode.high])
++        if not (temp.current is None):
++            return 2
++    if held.current is Some(mode.high) and held.payload[0] is mode.low:
++        return )"+std::to_string(answer)+"\n    return 1\n";
++}
++void malformed() {
++    const auto valid=analysis(source("u8",255,17))->lower();
++    auto bad=valid;
++    auto& checked=*std::find_if(bad.functions.begin(),bad.functions.end(),[](const auto& function) {
++        return std::any_of(function.blocks.begin(),function.blocks.end(),[](const auto& block) {
++            return std::any_of(block.instructions.begin(),block.instructions.end(),[](const auto& i){return i.op==Op::try_convert;});
++        });
++    });
++    Type option;
++    for(auto& block:checked.blocks)for(auto& i:block.instructions)if(i.op==Op::try_convert) {
++        option=i.type;i.type=Type::i32;
++    }
++    rejects(bad,"invalid fallible integer conversion");
++
++    bad=valid;
++    const auto enumeration=field_type(option,1);
++    auto probe=Function{};
++    probe.name=valid.identity+"::invalid_enum_ir";
++    probe.module_identity=valid.identity;
++    probe.source_name="invalid_enum_ir";
++    probe.parameters.clear();
++    probe.result=option;
++    Instruction boolean{Op::constant};boolean.type=Type::boolean;boolean.immediate=1;
++    Instruction attempt{Op::try_convert};attempt.type=option;
++    probe.blocks={{{boolean,attempt},{Terminator::Kind::return_value,1}}};
++    bad.functions.push_back(probe);
++    rejects(bad,"invalid fallible integer conversion");
++
++    probe.result=enumeration;
++    Instruction raw{Op::constant};raw.type=enumeration;raw.immediate=4;
++    probe.blocks={{{raw},{Terminator::Kind::return_value,0}}};
++    bad.functions.back()=probe;
++    rejects(bad,"undeclared numeric enum constant");
++    probe.locals={enumeration};
++    probe.blocks={{{Instruction{Op::load,0}},{Terminator::Kind::return_value,0}}};
++    bad.functions.back()=probe;
++    rejects(bad,"uninitialized numeric enum storage");
++
++    auto duplicate=std::make_shared<ValueType>();
++    duplicate->identity=valid.identity+"::bad_members";
++    duplicate->module_identity=valid.identity;
++    duplicate->name="bad_members";
++    duplicate->enum_backing=Type::i8;
++    duplicate->numeric_members={{"a",127},{"b",127}};
++    duplicate->self=duplicate;
++    bad=valid;
++    bad.nominal_types.push_back(Type::nominal(duplicate));
++    rejects(bad,"duplicate numeric enum discriminant");
++    duplicate->numeric_members[1].bits=256;
++    rejects(bad,"numeric enum discriminant");
++    duplicate->enum_backing=Type::f64;
++    rejects(bad,"invalid numeric enum descriptor");
++
++    auto forged=std::make_shared<ValueType>(*option.definition);
++    forged->identity=forged->name="$option:wrong";
++    forged->self=forged;
++    bad=valid;
++    bad.nominal_types.emplace_back(forged);
++    rejects(bad,"invalid canonical option identity");
++}
++void literal_source_types() {
++    const auto module=analysis(R"(func probe():
++    var i32_min = -2147483648 as? i64
++    var i32_max = 2147483647 as? i64
++    var below_i32 = -2147483649 as? i64
++    var above_i32 = 2147483648 as? i64
++    var i64_min = -9223372036854775808 as? i64
++    var i64_max = 9223372036854775807 as? i64
++    var above_i64 = 9223372036854775808 as? u64
++    var u64_max = 18446744073709551615 as? u64
++)" )->lower();
++    std::vector<Type> sources;
++    for(const auto& f:module.functions)for(const auto& block:f.blocks)for(const auto& op:block.instructions) {
++        if(op.op!=Op::try_convert)continue;
++        const auto& source=block.instructions.at(op.a);
++        check(source.op==Op::constant,"literal cast lowered a nonconstant operand");
++        sources.push_back(source.type);
++    }
++    check(sources==std::vector<Type>{Type::i32,Type::i32,Type::i64,Type::i64,Type::i64,Type::i64,Type::u64,Type::u64},
++          "literal fallible-cast source types disagree at an integer boundary");
++}
++void reload_and_gc() {
++    auto initial=analysis(source("u8",255,17));
++    auto body=analysis(source("u8",255,23));
++    auto value_edit=analysis(source("u8",254,23));
++    auto backing_edit=analysis(source("u16",255,23));
++    for(bool optimize:{false,true}) {
++        auto runtime=std::make_shared<vd::Runtime>(16);
++        vd::Jit jit;
++        auto code=jit.compile(initial->lower(),"entry",optimize,{},runtime);
++        check(code->invoke(255)==17 && code->invoke(4)==1,"checked option changed across GC allocations");
++        check(runtime->snapshot().completed_epoch>0,"no collection took place during live enum/option use");
++        {
++            vd::Runtime::Attachment attached(*runtime);
++            vd::Runtime::Managed managed(*runtime);
++            check(runtime->collect()==vd::Runtime::Collection::completed,"forced collection failed");
++        }
++        check(code->invoke(255)==17,"forced GC invalidated enum or option");
++        // Use the ordinary validated-analysis path for generation replacement.
++        vd::ReloadSlot slot(jit.compile(*initial,optimize));
++        check(jit.replace(slot,*body,optimize) && slot.invoke(255)==23,"body-only edit refused");
++        check(!jit.replace(slot,*value_edit,optimize),"discriminant edit reused a generation");
++        check(!jit.replace(slot,*backing_edit,optimize),"backing edit reused a generation");
++        check(slot.invoke(255)==23 && slot.invoke(254)==1,"rejected reload changed live enum semantics");
++    }
++}
++}
++int main() {
++    try {
++        malformed();
++        literal_source_types();
++        reload_and_gc();
++        std::cout<<"numeric enum IR rejection, normal/O2 GC and reload passed\n";
++    } catch(const std::exception& error) {
++        std::cerr<<error.what()<<'\n';
++        return 1;
++    }
++}
+diff --git a/tests/numeric/enums_lsp.py b/tests/numeric/enums_lsp.py
+new file mode 100644
+index 0000000..3af9022
+--- /dev/null
++++ b/tests/numeric/enums_lsp.py
+@@ -0,0 +1,100 @@
++"""Exercise numeric enum declarations, cast tokens and overlays over real LSP pipes."""
++from pathlib import Path
++import json
++import sys
++import tempfile
++
++sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools"))
++from lsp_client import Client
++
++server, evidence = (Path(arg).resolve() for arg in sys.argv[1:])
++events = []
++main = '''use "./modes.void" as m
++
++func main() -> i32:
++    var raw: i32 = 7
++    if raw as? m.mode is Some(var picked):
++        if picked is m.mode.ready:
++            return 7
++    return 1
++'''
++modes = '''# Snow 🎮
++public enum mode(i8):
++    ## Value used when ready.
++    ready = 7
++    gone = -128
++'''
++
++
++def point(source, offset):
++    prefix = source[:offset]
++    return {"line": prefix.count("\n"), "character": len(prefix.rsplit("\n", 1)[-1].encode("utf-16-le")) // 2}
++
++
++def request(client, method, params):
++    response, notes = client.request(method, params)
++    events.append({"method": method, "params": params, "response": response, "diagnostics": notes})
++    assert "result" in response, response
++    return response["result"]
++
++
++def overlay(client, path, text, version, opened=False):
++    document = {"uri": path.as_uri(), "version": version}
++    if opened:
++        client.notify("textDocument/didOpen", {"textDocument": dict(document, text=text, languageId="void")})
++    else:
++        client.notify("textDocument/didChange", {"textDocument": document, "contentChanges": [{"text": text}]})
++    notes = client.sync()
++    events.append({"uri": path.as_uri(), "version": version, "text": text, "diagnostics": notes})
++    return [diagnostic for note in notes if note["uri"] == path.as_uri() for diagnostic in note["diagnostics"]]
++
++
++try:
++    with tempfile.TemporaryDirectory(prefix="VOID S6 LSP ") as temporary:
++        root = Path(temporary).resolve()
++        entry, owner = root / "entry.void", root / "modes.void"
++        entry.write_bytes(main.encode())
++        owner.write_bytes(modes.encode())
++        with Client(server, entry) as client:
++            assert not any(note["diagnostics"] for note in client.initialize())
++            document = {"uri": entry.as_uri()}
++            position = point(main, main.index(".ready") + 2)
++            params = {"textDocument": document, "position": position}
++            location = request(client, "textDocument/definition", params)
++            assert location["uri"] == owner.as_uri() and location["range"]["start"] == point(modes, modes.index("ready =")), location
++            hover = request(client, "textDocument/hover", params)
++            assert "mode.ready = 7 (i8)" in hover["contents"]["value"], hover
++            references = request(client, "textDocument/references", dict(params, context={"includeDeclaration": True}))
++            assert {ref["uri"] for ref in references} == {entry.as_uri(), owner.as_uri()}, references
++
++            assert not overlay(client, owner, modes, 1, opened=True)
++            duplicate = modes.replace("gone = -128", "gone = 7")
++            diagnostics = overlay(client, owner, duplicate, 2)
++            error = next(item for item in diagnostics if "Duplicate numeric enum discriminant" in item["message"])
++            assert error["range"]["start"] == point(duplicate, duplicate.rindex("7")), error
++            assert request(client, "textDocument/definition", params) is None
++            assert not overlay(client, owner, modes, 3)
++            assert request(client, "textDocument/definition", params) == location
++
++            bad = main.replace("raw as?", '"🎮" as?')
++            diagnostics = overlay(client, entry, bad, 1, opened=True)
++            error = next(item for item in diagnostics if "as? requires an integer" in item["message"])
++            offset = bad.index("as?")
++            assert error["range"] == {"start": point(bad, offset), "end": point(bad, offset + 3)}, error
++            dirty = main.replace("m.mode.ready", "m.mode.")
++            overlay(client, entry, dirty, 2)
++            completion = request(client, "textDocument/completion", {"textDocument": document,
++                "position": point(dirty, dirty.index("m.mode.") + len("m.mode."))})
++            candidates = completion if isinstance(completion, list) else completion["items"]
++            assert any(item["label"] == "gone" and "-128" in item["detail"] for item in candidates), candidates
++            rough = main.replace("raw as? m.mode", "raw   as?    m.mode")
++            assert not overlay(client, entry, rough, 3)
++            edits = request(client, "textDocument/formatting", {"textDocument": document,
++                "options": {"tabSize": 4, "insertSpaces": True}})
++            assert edits[0]["newText"] == main, edits
++            assert not overlay(client, entry, main, 4)
++            assert request(client, "textDocument/definition", params) == location
++            client.shutdown()
++    print(f"S6 LSP passed {len(events)} recorded requests and overlay revisions")
++finally:
++    evidence.write_text(json.dumps(events, indent=2) + "\n", encoding="utf-8")
+diff --git a/tests/numeric/tests.cpp b/tests/numeric/tests.cpp
+index 12efb04..782f4be 100644
+--- a/tests/numeric/tests.cpp
++++ b/tests/numeric/tests.cpp
+@@ -132,7 +132,7 @@ void numeric_tests(const std::filesystem::path& root) {
+         {"var x = 1 as bool",C::numeric_conversion},
+         {"var x = 300 as i8",C::numeric_conversion},
+         {"var x = 1.0q",C::numeric_literal},
+-        {"var x = 1.0 as? i32",C::character}
++        {"var x = 1.0 as? i32",C::numeric_conversion}
+     };
+     for (const auto& [body,code] : invalid) reject("func f():\n    " + body + "\n",code);
+     reject("const bad: i32 = (0.0 / 0.0) as i32\n",C::numeric_conversion);

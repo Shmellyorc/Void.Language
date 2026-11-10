@@ -1,0 +1,33 @@
+The prior qualification binaries, Runtime/fixture archives, native manifests and test registrations retain their recorded hashes.
+The focused and public replay build copies retain the same compiler, Runtime, callback harness and native manifest bytes.
+The result summary records native full-suite build hashes and checks profile host archives against both CTest and the native manifest.
+Task scratch verified absent: /tmp/void-s7-link-debug-focused.1mIy7d
+Task scratch verified absent: /tmp/void-s7-link-debug-full.rxdQQo
+Task scratch verified absent: /tmp/void-s7-link-debug-public.9QkP1H
+Task scratch verified absent: /tmp/void-s7-link-debug-focused.hIIN35
+Task scratch verified absent: /tmp/void-s7-link-release-focused.Arl6Go
+Task scratch verified absent: /tmp/void-s7-link-strict-focused.nvhy8G
+Retained remaining diagnostic files in /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/retained-temp-remnants/void-s7-link-debug-full.R2Ka9A
+Task scratch verified absent: /tmp/void-s7-link-debug-full.R2Ka9A
+Retained remaining diagnostic files in /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/retained-temp-remnants/void-s7-link-release-full.AETxi4
+Task scratch verified absent: /tmp/void-s7-link-release-full.AETxi4
+Retained remaining diagnostic files in /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/retained-temp-remnants/void-s7-link-strict-full.56AkOl
+Task scratch verified absent: /tmp/void-s7-link-strict-full.56AkOl
+Retained remaining diagnostic files in /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/retained-temp-remnants/void-s7-link-debug-full.tZ6OIf
+Task scratch verified absent: /tmp/void-s7-link-debug-full.tZ6OIf
+Retained remaining diagnostic files in /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/retained-temp-remnants/void-s7-link-debug-full.R29BRH
+Task scratch verified absent: /tmp/void-s7-link-debug-full.R29BRH
+Retained and compared diagnostic archive: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/retained-temp-remnants/void-s7-link-release-full.PXdRW0.tar SHA-256 36067e31e66744611c73c6fc848a5db2be93abe9a4f4829c2bef6631a3257685
+Task scratch verified absent: /tmp/void-s7-link-release-full.PXdRW0
+Retained and compared diagnostic archive: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/retained-temp-remnants/void-s7-link-strict-full.OK9LjT.tar SHA-256 ebe71ca8d05ad285791fefb2932c827607fcc8f04a21a09d95c2c824279f5741
+Task scratch verified absent: /tmp/void-s7-link-strict-full.OK9LjT
+Task scratch verified absent: /tmp/void-s7-link-release-focused.wOJjEl
+Task scratch verified absent: /tmp/void-s7-link-release-full.SZ9tfE
+Task scratch verified absent: /tmp/void-s7-link-release-public.EkSHoF
+Task scratch verified absent: /tmp/void-s7-link-strict-focused.VUd4oa
+Task scratch verified absent: /tmp/void-s7-link-strict-full.jLMaa7
+Task scratch verified absent: /tmp/void-s7-link-strict-public.YeWZE0
+Copy-on-write probe verified absent: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/reflink-probe
+Retained build copies, installed packages, test sources and test output: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair
+The focused and public build copies replay at their configured paths in private mounts.
+The retained native full-suite builds run directly on the host.

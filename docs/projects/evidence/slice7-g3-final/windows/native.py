@@ -1,0 +1,199 @@
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+import hashlib, json, os, platform, re, shutil, subprocess, sys, time, traceback, zipfile
+
+out=Path(r'\\vboxsvr\VM\project-slice7-g3-final')
+prior=out.parent/'project-slice3'
+home=Path.home()
+baseline=home/'VoidCI42377496702-Native'
+packet=home/'VoidS7-G3Final-source'
+source=baseline
+backup=home/'VoidS7-G3Final-backup'
+sdk=baseline/'.toolchains/llvm-23.1.4'
+cmake=Path(r'C:\gcc\bin\cmake.exe')
+ctest=cmake.with_name('ctest.exe')
+ninja=cmake.with_name('ninja.exe')
+def sha(path):
+    with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+def save(name,value):(out/name).write_text(json.dumps(value,indent=2)+'\n')
+def options(profile):
+    cache=(prior/(profile+'-CMakeCache.txt')).read_text()
+    lookup=lambda key:re.search(r'^'+re.escape(key)+r':[^=]+=(.*)$',cache,re.M)[1]
+    keys=('CMAKE_AR','CMAKE_CXX_COMPILER','CMAKE_C_COMPILER','CMAKE_LINKER','CMAKE_MAKE_PROGRAM',
+          'CMAKE_MT','CMAKE_RC_COMPILER','LLVM_DIR','ZLIB_INCLUDE_DIR','ZLIB_LIBRARY_RELEASE','zstd_DIR','LibXml2_DIR',
+          'VOID_HOST_DEPS_ROOT','VOID_HTTP_DEPS_ROOT','VOID_CLANG')
+    return ['-D'+key+'='+lookup(key) for key in keys]+['-DCMAKE_BUILD_TYPE='+profile,'-DBUILD_TESTING=ON','-DVOID_SANITIZERS=OFF','-DVOID_LLVM_RESEARCH=OFF','-DPython3_EXECUTABLE='+sys.executable]
+def qualify(profile):
+    # Release and Debug have separate output and temp roots.
+    record={'status':'running','profile':profile,'platform':platform.platform(),'os_build':sys.getwindowsversion().build,'commands':[]}
+    build=home/('VoidS7-G3Final-'+profile)
+    temp=home/('VoidS7-G3Final-tmp-'+profile)
+    filename=profile+'-result.json'
+    def run(label,args,timeout=1800):
+        argv=list(map(str,args));record['stage']=label;save(filename,record);start=time.monotonic()
+        with (out/(profile+'-'+label+'.log')).open('wb') as log:
+            process=subprocess.run(argv,cwd=source,env=env,stdout=log,stderr=subprocess.STDOUT,timeout=timeout)
+        record['commands'].append({'label':label,'argv':argv,'returncode':process.returncode,'seconds':time.monotonic()-start})
+        save(filename,record)
+        assert process.returncode==0,(label,process.returncode)
+    try:
+        temp.mkdir(exist_ok=True)
+        env=dict(os.environ,VOID_CLANG=str(sdk/'bin/clang.exe'),TEMP=str(temp),TMP=str(temp))
+        env['PATH']=str(sdk/'bin')+os.pathsep+env['PATH']
+        env['VOID_CRASH_EVIDENCE']=str(temp/'crashes')
+        run('configure',[cmake,'-S',source,'-B',build,'-G','Ninja',*options(profile)])
+        targets=['void_tests','void_g1_tests','void_g1_aot_normal','void_g1_aot_optimized','void_g1_aot_mismatch',
+                 'void_g2_tests','void_g2_aot_normal','void_g2_aot_optimized',
+                 'void_g3_tests','void_g3_aot_normal','void_g3_aot_optimized']
+        run('build',[cmake,'--build',build,'--parallel','2','--target',*targets])
+        tests=r'^(ffi_g[123]_.*|gc|reload|analysis)$'
+        xml=out/(profile+'-ctest.xml')
+        ctest_args=[ctest,'--test-dir',build,'--output-on-failure','-j','2','-R',tests,'--output-junit',xml]
+        for attempt in range(1,5):
+            try:
+                run('ctest',ctest_args,1200)
+                shutil.copyfile(build/'Testing/Temporary/LastTest.log',out/(profile+'-LastTest.log'))
+                break
+            except AssertionError:
+                import xml.etree.ElementTree as ET
+                cases=ET.parse(xml).getroot()
+                failures=[case.get('name') for case in cases.findall('testcase') if case.find('failure') is not None]
+                shutil.copyfile(out/(profile+'-ctest.log'),out/(profile+f'-attempt-{attempt}-ctest.log'))
+                shutil.copyfile(xml,out/(profile+f'-attempt-{attempt}-ctest.xml'))
+                shutil.copyfile(build/'Testing/Temporary/LastTest.log',out/(profile+f'-attempt-{attempt}-LastTest.log'))
+                assert failures==['analysis'] and 'concurrent call/lease failure' in (out/(profile+'-ctest.log')).read_text()
+                if attempt==4: raise
+        record['binaries']={'void_tests':sha(build/'void_tests.exe')}
+        run('g1-direct',[build/'void_g1_tests.exe',build/'ffi-g1/primitives.descriptor',
+                         build/'ffi-g1/primitives.void',build/'ffi-g1/tests'])
+        run('g2-direct',[build/'void_g2_tests.exe',build/'ffi-g2/records.descriptor',source/'tests/ffi/records.void'])
+        for mode in ('normal','optimized'):
+            run('g2-aot-'+mode,[sys.executable,source/'tests/ffi/records_process.py',build/('void_g2_aot_'+mode+'.exe')])
+        run('g3-direct',[build/'void_g3_tests.exe',build/'ffi-g3/resources.descriptor',
+                         source/'tests/ffi/resources.void',build/'ffi-g3/tests'])
+        for mode in ('normal','optimized'):
+            run('g3-aot-'+mode,[sys.executable,source/'tests/ffi/resources_process.py',build/('void_g3_aot_'+mode+'.exe')])
+        for mode in ('normal','optimized','mismatch'):
+            subprocess.run([str(build/('void_g1_aot_'+mode+'.exe')), '7'], cwd=build, env=env,
+                stdout=(out/(profile+'-g1-aot-'+mode+'.log')).open('wb'), stderr=subprocess.STDOUT, timeout=30)
+        file_names=['ffi-g1/primitives.descriptor','ffi-g1/primitives.void','ffi-g1/application-normal.obj',
+                    'ffi-g1/application-optimized.obj','void_g1_tests.exe','void_g1_aot_normal.exe',
+                    'void_g1_aot_optimized.exe','void_g1_aot_mismatch.exe']
+        file_names += [str(x.relative_to(build)) for n in ('void_g1_thunk','void_g1_fixture','void_g1_wrong_fixture')
+                       for x in (build/'CMakeFiles'/(n+'.dir')).rglob('*.obj')]
+        record['g1_artifacts']={name:sha(build/name) for name in file_names}
+        assert len(record['g1_artifacts'])==11
+        file_names=['ffi-g2/records.descriptor','ffi-g2/application-normal.obj','ffi-g2/application-optimized.obj',
+                    'void_g2_tests.exe','void_g2_aot_normal.exe','void_g2_aot_optimized.exe']
+        file_names += [str(x.relative_to(build)) for n in ('void_g2_thunk','void_g2_fixture')
+                       for x in (build/'CMakeFiles'/(n+'.dir')).rglob('*.obj')]
+        record['g2_artifacts']={name:sha(build/name) for name in file_names}
+        assert len(record['g2_artifacts'])==8
+        shutil.copyfile(build/'ffi-g2/records.descriptor',out/(profile+'-records.descriptor'))
+        file_names=['ffi-g3/resources.descriptor','ffi-g3/application-normal.obj','ffi-g3/application-optimized.obj',
+                    'void_g3_tests.exe','void_g3_aot_normal.exe','void_g3_aot_optimized.exe']
+        file_names += [str(x.relative_to(build)) for n in ('void_g3_thunk','void_g3_fixture')
+                       for x in (build/'CMakeFiles'/(n+'.dir')).rglob('*.obj')]
+        record['g3_artifacts']={name:sha(build/name) for name in file_names}
+        assert len(record['g3_artifacts'])==8
+        shutil.copyfile(build/'ffi-g3/resources.descriptor',out/(profile+'-resources.descriptor'))
+        for name in ('primitives.descriptor','primitives.void'):
+            shutil.copyfile(build/'ffi-g1'/name,out/(profile+'-'+name))
+        commands=json.loads((build/'compile_commands.json').read_text())
+        save(profile+'-g1-c-compile-commands.json',[command for command in commands
+            if Path(command['file']).name in ('primitives_thunk.c','primitives_fixture.c')])
+        save(profile+'-g2-c-compile-commands.json',[command for command in commands
+            if Path(command['file']).name in ('records_thunk.c','records_fixture.c')])
+        save(profile+'-g3-c-compile-commands.json',[command for command in commands
+            if Path(command['file']).name in ('resources_thunk.c','resources_fixture.c')])
+        record['status']='PASS'
+    except BaseException:record['status']='FAIL';record['error']=traceback.format_exc()
+    finally:save(filename,record)
+    return record
+
+summary={'status':'running','free_bytes_before':shutil.disk_usage(home).free,'platform':platform.platform(),'scope':'Native Windows 10 targeted builds at the provider-attested source root. Original source files are backed up and restored. Build outputs and evidence use isolated paths.'}
+save('native-results.json',summary)
+overlays={}
+created_dirs=[]
+def parents(path):
+    needed=[]
+    while not path.exists():
+        needed.append(path)
+        path=path.parent
+    for directory in reversed(needed):
+        directory.mkdir()
+        created_dirs.append(directory)
+
+def alias(path):
+    return path.is_symlink() or path.is_junction()
+
+try:
+    accepted=json.loads((out.parent/'project-slice7-g3/native-results.json').read_text())
+    assert accepted['status']=='PASS' and accepted['restored_original_source']
+    assert sys.getwindowsversion().build==19045
+    assert not json.loads((out/'storage.json').read_text())['active_builds']
+    hashes=json.loads((out/'source-packet-sha256.json').read_text())
+    packet.mkdir(exist_ok=True)
+    with zipfile.ZipFile(out/'source-packet.zip') as archive:
+        assert set(archive.namelist())==set(hashes)
+        for name,digest in hashes.items():
+            target=packet/name
+            assert target.is_relative_to(packet) and '..' not in Path(name).parts
+            data=archive.read(name)
+            assert hashlib.sha256(data).hexdigest()==digest,name
+            assert not alias(target) and not any(alias(p) for p in target.parents if p.is_relative_to(packet)),name
+            target.parent.mkdir(parents=True,exist_ok=True)
+            target.write_bytes(data)
+            assert sha(target)==digest,name
+
+    backup.mkdir()
+    assert shutil.disk_usage(home).free >= 12*1024**3, 'Need 12 GiB before starting both Windows builds'
+    for name,digest in hashes.items():
+        incoming=packet/name
+        assert sha(incoming)==digest,name
+        target=source/name
+        assert not alias(target) and not any(alias(p) for p in target.parents if p.is_relative_to(source)),name
+        originals=accepted['before_overlay_sha256']
+        if name in originals:
+            assert (sha(target) if target.exists() else None)==originals[name],name
+        elif name in accepted['source_inputs_sha256']:
+            assert sha(target)==accepted['source_inputs_sha256'][name],name
+        else:
+            assert not target.exists(),name
+        if target.exists():
+            assert target.is_file(),name
+            previous=sha(target)
+            if previous==digest:continue
+            preserved=backup/name
+            preserved.parent.mkdir(parents=True,exist_ok=True)
+            shutil.copy2(target,preserved)
+            assert sha(preserved)==previous,name
+        else:previous=None
+        overlays[name]=previous
+        parents(target.parent)
+        shutil.copyfile(incoming,target)
+        assert sha(target)==digest,name
+    summary['source_inputs_sha256']=hashes
+    summary['before_overlay_sha256']=overlays
+    summary['source_packet_sha256']=sha(out/'source-packet.zip')
+    summary['free_bytes_latest']=shutil.disk_usage(home).free
+    save('native-results.json',summary)
+    with ThreadPoolExecutor(max_workers=2) as pool:summary['profiles']=list(pool.map(qualify,('Release','Debug')))
+    summary['status']='PASS' if all(p['status']=='PASS' for p in summary['profiles']) else 'FAIL'
+except BaseException:summary['status']='FAIL';summary['error']=traceback.format_exc()
+finally:
+    try:
+        for name,digest in reversed(list(overlays.items())):
+            target=source/name
+            if digest is None:target.unlink(missing_ok=True)
+            else:
+                shutil.copy2(backup/name,target)
+                assert sha(target)==digest,name
+        for directory in reversed(created_dirs):
+            if not any(directory.iterdir()):directory.rmdir()
+        summary['restored_original_source']=True
+    except BaseException:
+        summary['status']='FAIL'
+        summary['restoration_error']=traceback.format_exc()
+    summary['free_bytes_latest']=shutil.disk_usage(home).free
+    save('native-results.json',summary)

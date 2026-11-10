@@ -1,0 +1,27 @@
+void-c-primitive 1 1
+provider org.voidlang.g1-fixture
+target x86_64-pc-windows-msvc msvc-x64
+source /native_primitives.void
+thunk 910dfb4ad0a26f5eecf4c19bbfb7e48d551dba326ad1facf0d78e1a2f62bd98c
+fixture 7b65c2c5583114556c4d940903ed6b003742832380abbbac07f5bf8f06c11a63
+effects direct-sync nonblocking no-callbacks
+call c-default
+aliases c_int:i32 c_long:i32 c_size:u64 c_bool:bool
+bind signed8 g1_signed8 i8 i8
+bind signed16 g1_signed16 i16 i16
+bind signed32 g1_signed32 i32 i32
+bind signed64 g1_signed64 i64 i64
+bind unsigned8 g1_unsigned8 u8 u8
+bind unsigned16 g1_unsigned16 u16 u16
+bind unsigned32 g1_unsigned32 u32 u32
+bind unsigned64 g1_unsigned64 u64 u64
+bind cint g1_cint c_int c_int
+bind clong g1_clong c_long c_long
+bind csize g1_csize c_size c_size
+bind invert g1_invert c_bool c_bool
+bind single g1_single f32 f32 f32
+bind double_value g1_double f64 f64 f64
+bind sign_zero g1_sign_zero c_bool f32 f64
+bind mixed g1_mixed u64 i8 u16 i32 f32 u64 f64 i64 f32 u32 f64 u8 i16 f32 f64
+bind sentinel g1_sentinel u32
+bind no_result g1_no_result void u32

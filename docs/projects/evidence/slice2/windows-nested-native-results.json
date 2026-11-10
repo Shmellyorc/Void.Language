@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "script_sha256": "647dad971b57dc880a04c710f4a200fc036dd65477f9ef83dc23e2d86f8fc0f3",
+  "commands": [
+    {
+      "argv": [
+        "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+        "\\\\vboxsvr\\VM\\project-slice2-verified\\nested.py",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Release\\voidc-slice2-verified.exe",
+        "\\\\vboxsvr\\VM\\project-slice2-verified\\Release-nested.json"
+      ],
+      "returncode": 0,
+      "binary_sha256": "d6e1ab2ac286eeec3f026d7acf81b2764845a07f73e1cef39c4f77f921587011"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+        "\\\\vboxsvr\\VM\\project-slice2-verified\\nested.py",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice2-verified.exe",
+        "\\\\vboxsvr\\VM\\project-slice2-verified\\Debug-nested.json"
+      ],
+      "returncode": 0,
+      "binary_sha256": "516e50f90236aee3950457051ef96a6889cf5e67838952f9abc444f585032ce8"
+    }
+  ]
+}

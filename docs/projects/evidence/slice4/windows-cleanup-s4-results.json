@@ -1,0 +1,36 @@
+{
+  "status": "PASS",
+  "removed": [
+    "C:\\Users\\a\\VoidS4-Release",
+    "C:\\Users\\a\\VoidS4-Debug",
+    "C:\\Users\\a\\VoidS4-tmp-Release",
+    "C:\\Users\\a\\VoidS4-tmp-Debug",
+    "C:\\Users\\a\\VoidS4-Final-Release",
+    "C:\\Users\\a\\VoidS4-Final-Debug",
+    "C:\\Users\\a\\VoidS4-Allocator-Rerun",
+    "C:\\Users\\a\\VoidS4-Allocator-Final",
+    "C:\\Users\\a\\VoidS4-source2",
+    "C:\\Users\\a\\VoidS4-native-backup",
+    "C:\\Users\\a\\VoidS4-native-retry-backup",
+    "C:\\Users\\a\\VoidS4-native-lean-backup",
+    "\\\\vboxsvr\\VM\\project-slice4\\allocator-local-artifacts"
+  ],
+  "errors": [],
+  "retained_receipts": {
+    "Release-retained-CMakeCache.txt": "1c6d64a8365a40e8824dde5ec3a0e8a44c876b983e86ba69650416307a2ee7eb",
+    "Release-retained-void-native.txt": "3f1389938ef355e150a7a1d6c8c89b3d08850666012779d38737d15db6cffe49",
+    "Release-retained-void-native-resources.txt": "ea80124a71536de873e8acd363b8f3e93daee87412465ac0d2be8c9ec29f7230",
+    "Release-retained-project-discovery-evidence.json": "75e327f233b78ec20a08a53b3e13153824528328cff7c065aefbaf88310261a4",
+    "Release-retained-project-protocol-evidence.json": "27e44d559fd359203fc359255a89229a8de8b1f7296dc74ec2f9a91f9eb97339",
+    "Release-retained-project-profiles-evidence.json": "abe78059a7165fb692f6260d245bc03c0558760956161db3e8cce762064b67e6",
+    "Debug-retained-CMakeCache.txt": "812e2d78bd9cdf72270033d6fe593bfd261e81c3b4eb016cc64989c0ed40b9a3",
+    "Debug-retained-void-native.txt": "0923ae56b1855f43275d1a0b6a95564b50424b115b0105c6fcd74b1a5fd95249",
+    "Debug-retained-void-native-resources.txt": "5a8a6bbcc49d7d400053c035340cb7d1caeccd4405ef4e80dbecf5884bca2e5e",
+    "Debug-retained-project-discovery-evidence.json": "6a2ffe0c6b09e4a2ee7b658a17cddf97c3241105cc36c074181613baff25924e",
+    "Debug-retained-project-protocol-evidence.json": "0138c05b19ed056d9a09775e80809073577ae456c9f50537692a95857c46196c",
+    "Debug-retained-project-profiles-evidence.json": "428cf38454f78b94fe5aae2f54a61eb84ee2ae91774d6e68c6c88548da7f384a"
+  },
+  "restored_source_paths_verified": 144,
+  "free_bytes_before": 6768480256,
+  "free_bytes_after": 9271255040
+}

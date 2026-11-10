@@ -1,0 +1,146 @@
+Start testing: Nov 09 08:08 MST
+----------------------------------------------------------
+284/441 Testing: ffi_g4_aot_normal
+284/441 Test: ffi_g4_aot_normal
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/ffi/dynamic_process.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_g4_aot_normal" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/native" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/application-normal.o.source.txt" "normal" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/outside/libvoid_g4_dep.so"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+"ffi_g4_aot_normal" start time: Nov 09 08:08 MST
+Output:
+----------------------------------------------------------
+normal ['7'] exit=0 104
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/dynamic_process.py", line 76, in <module>
+    qualify()
+    ~~~~~~~^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/dynamic_process.py", line 53, in qualify
+    invoke(['7'], 104)
+    ~~~~~~^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/dynamic_process.py", line 45, in invoke
+    assert process.returncode == returncode, (args, returncode, output)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['7'], 104, '104\n')
+<end of output>
+Test time =   0.49 sec
+----------------------------------------------------------
+Test Failed.
+"ffi_g4_aot_normal" end time: Nov 09 08:08 MST
+"ffi_g4_aot_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+283/441 Testing: ffi_g4_jit_ir
+283/441 Test: ffi_g4_jit_ir
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_g4_tests" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/closure.txt" "/home/shmellyorc/Documents/Void.Language/tests/ffi/dynamic.void" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/native" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/jit-probes" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/outside/libvoid_g4_dep.so" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/initializer/libvoid_g4_dep.so"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+"ffi_g4_jit_ir" start time: Nov 09 08:08 MST
+Output:
+----------------------------------------------------------
+bad closure revision: C dynamic closure: unsupported revision
+system library policy: C dynamic closure: unsupported target, system ABI or relocation policy
+foreign provider: C dynamic closure does not match the exact descriptor or host root
+aliased image: C dynamic closure: invalid or duplicate image
+missing descriptor export: C dynamic closure is missing an owned descriptor export
+wrong target thunk: C dynamic closure does not match the exact descriptor or host root
+direct bridge import: VOID IR: C primitive transport requires host admission and typed operations
+erased closure admission: VOID IR: C primitive admission differs from analyzed source
+forged dynamic ordinal: VOID IR: C primitive call outside the admitted binding module
+missing provider: C dynamic artifact: libvoid_g4_main.so is missing, aliased or outside file bounds
+modified dependency: C dynamic digest: libvoid_g4_dep.so
+symlink provider: C dynamic artifact: libvoid_g4_main.so is missing, aliased or outside file bounds
+hardlinked provider: C dynamic artifact: libvoid_g4_main.so is missing, aliased or outside file bounds
+missing required export: C dynamic symbol: missing exact owned export g4_missing
+wrong symbol owner: C dynamic symbol: missing exact owned export g4_bias
+unapproved ELF target: C dynamic ELF: unsupported target or header
+unsupported dynamic tag 15: C dynamic ELF: unsupported dynamic tag 15
+unsupported dynamic tag 1879047932: C dynamic ELF: unsupported dynamic tag 1879047932
+unsupported dynamic tag 12: C dynamic ELF: unsupported dynamic tag 12
+system DT_NEEDED: C dynamic dependency: unapproved DT_NEEDED in libvoid_g4_main.so
+ELF interpreter segment: C dynamic ELF: unsupported program header 3
+IFUNC resolver: C dynamic ELF: unsupported dynamic symbol (including weak, TLS and resolver symbols)
+IRELATIVE resolver: C dynamic ELF: unsupported relocation or target
+real initializer would exit 121 if mapped: C dynamic ELF: unsupported dynamic tag 1879048185
+cross-Runtime binding transfer: C dynamic authority: native binding is already owned by a Runtime
+stale dynamic alias: <host binding /native_dynamic.void>:15:6: runtime error: C resource is closed, null or invalid
+In function /native_dynamic.void::read
+Called from /dynamic.void::entry
+/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/jit-probes/dynamic.void:46:20: source call
+        return ffi.read(alias, 0)
+                   ^
+
+dynamic double close: <host binding /native_dynamic.void>:17:6: runtime error: C resource is closed, null or invalid
+In function /native_dynamic.void::close_box
+Called from /dynamic.void::entry
+/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/jit-probes/dynamic.void:48:20: source call
+        return ffi.close_box(alias)
+                   ^
+
+refused dynamic acquisition containing a live pointer: <host binding /native_dynamic.void>:13:6: runtime error: C resource operation rejected org.voidlang.g4-fixture::g4_create
+In function /native_dynamic.void::create
+Called from /dynamic.void::entry
+/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/jit-probes/dynamic.void:16:28: source call
+        var rejected = ffi.create(-3)
+                           ^
+
+Runtime globals require their application owner thread
+<end of output>
+Test time =   0.53 sec
+----------------------------------------------------------
+Test Failed.
+"ffi_g4_jit_ir" end time: Nov 09 08:08 MST
+"ffi_g4_jit_ir" time elapsed: 00:00:00
+----------------------------------------------------------
+
+285/441 Testing: ffi_g4_aot_optimized
+285/441 Test: ffi_g4_aot_optimized
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/ffi/dynamic_process.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_g4_aot_optimized" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/native" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/application-optimized.o.source.txt" "optimized" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/outside/libvoid_g4_dep.so"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+"ffi_g4_aot_optimized" start time: Nov 09 08:08 MST
+Output:
+----------------------------------------------------------
+optimized ['7'] exit=0 104
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/dynamic_process.py", line 76, in <module>
+    qualify()
+    ~~~~~~~^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/dynamic_process.py", line 53, in qualify
+    invoke(['7'], 104)
+    ~~~~~~^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/dynamic_process.py", line 45, in invoke
+    assert process.returncode == returncode, (args, returncode, output)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['7'], 104, '104\n')
+<end of output>
+Test time =   0.11 sec
+----------------------------------------------------------
+Test Failed.
+"ffi_g4_aot_optimized" end time: Nov 09 08:08 MST
+"ffi_g4_aot_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+286/441 Testing: ffi_g4_aot_startup
+286/441 Test: ffi_g4_aot_startup
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/ffi/dynamic_process.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_g4_aot_startup" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/native" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/application-startup.o.source.txt" "startup" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/outside/libvoid_g4_dep.so"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+"ffi_g4_aot_startup" start time: Nov 09 08:08 MST
+Output:
+----------------------------------------------------------
+startup ['7'] exit=1 /tmp/void-g4-source-t3_h4unj/dynamic_startup.void:5:15: runtime error: Division by zero
+    return 12 / zero
+              ^
+In function /dynamic_startup.void::eager
+Called from /dynamic_startup.void::$global$initialized
+/tmp/void-g4-source-t3_h4unj/dynamic_startup.void:7:24: source call
+var initialized: i32 = eager()
+                       ^
+startup ['7'] exit=1 C dynamic digest: libvoid_g4_dep.so
+startup ['7'] exit=1 C dynamic artifact: libvoid_g4_dep.so is missing, aliased or outside file bounds
+startup ['7'] exit=1 C dynamic path: root is unavailable or aliased
+startup verified relocated dynamic AOT with its compile source removed
+<end of output>
+Test time =   0.10 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g4_aot_startup" end time: Nov 09 08:08 MST
+"ffi_g4_aot_startup" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 09 08:08 MST

@@ -1,0 +1,5 @@
+{
+  "server": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidls",
+  "server_sha256": "7da4faa325b34855eadf93c23c3c81d8b5b1b05100f984cb777b4a1dc7dbc1f5",
+  "checks": 38
+}

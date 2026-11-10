@@ -1,0 +1,13 @@
+{
+  "mode": "trusted",
+  "editor": "1.141.0",
+  "platform": "linux",
+  "events": [
+    "activation and opening a pre-existing source do not offer",
+    "an unrelated pre-existing source suppresses a later-file offer",
+    "File\nEdit\nSelection\nView\nGo\nRun\n[Extension Development Host] trusted\nExplorer\ntrusted\nexisting.void\nlater.void\nOutline\nTimeline\nShow All Commands\nCtrl\n+\nShift\n+\nP\nFind in Files\nCtrl\n+\nShift\n+\nF\nGo to File\nCtrl\n+\nP\n 0 \n 0\nVOID: standalone existing.void\nInfo: All installed extensions are temporarily disabled.\nReload and Enable Extensions\nAll installed extensions are temporarily disabled.",
+    "{\"status\":{\"state\":\"running\",\"entry\":\"/tmp/VOID S5 editor InsPg0/trusted/existing.void\"},\"open\":[{\"file\":\"/tmp/VOID S5 editor InsPg0/trusted/existing.void\",\"dirty\":false,\"version\":1}],\"diagnostics\":[[\"/tmp/VOID S5 editor InsPg0/trusted/existing.void\",[]]]}"
+  ],
+  "failure": "Error: Timed out waiting for pre-existing fixture editor to close\n\tat until (/home/shmellyorc/Documents/Void.Language/editors/vscode/out/test/creationHost.js:55:11)\n\tat async Object.run (/home/shmellyorc/Documents/Void.Language/editors/vscode/out/test/creationHost.js:174:9)",
+  "status": "FAIL"
+}

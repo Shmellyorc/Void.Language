@@ -1,0 +1,56 @@
+[
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang.exe",
+      "-target",
+      "x86_64-pc-windows-msvc",
+      "-std=c11",
+      "-O0",
+      "-S",
+      "-emit-llvm",
+      "-DG2_FIXTURE_IDENTITY=\"889eda7481b9615a96f9468b0ee504cff8e6523beb364b14c2daeeef9d23cb3e\"",
+      "-IC:\\Users\\a\\VoidS7-G3-Debug\\ffi-g2",
+      "C:\\Users\\a\\VoidCI42377496702-Native\\tests\\ffi\\records_fixture.c",
+      "-o",
+      "C:\\Users\\a\\VoidS7-G3-Debug\\ffi-g2\\records-fixture.ll"
+    ],
+    "C_IR_signatures": [
+      "target triple = \"x86_64-pc-windows-msvc19.44.35229\"",
+      "define dso_local ptr @g2_fixture_identity() #0 {",
+      "define dso_local i32 @g2_color(i32 %0) #0 {",
+      "define dso_local void @g2_calibrate(ptr dead_on_unwind noalias writable sret(%struct.G2Sample) align 8 %0, ptr noundef align 8 dead_on_return %1, float noundef %2) #0 {",
+      "define dso_local void @g2_packet(ptr dead_on_unwind noalias writable sret(%struct.G2Packet) align 8 %0, ptr noundef align 8 dead_on_return %1, ptr noundef align 8 dead_on_return %2, i32 noundef %3) #0 {",
+      "define dso_local i64 @g2_sum(ptr noundef %0, i64 noundef %1) #0 {",
+      "define dso_local i64 @g2_fill(ptr noundef %0, i64 noundef %1, i8 noundef %2) #0 {",
+      "define dso_local i64 @g2_adjust(ptr noundef %0, i64 noundef %1) #0 {",
+      "define dso_local i64 @g2_move(ptr noundef %0, i64 noundef %1, ptr noundef %2, i64 noundef %3) #0 {"
+    ]
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang.exe",
+      "-target",
+      "x86_64-pc-windows-msvc",
+      "-std=c11",
+      "-O0",
+      "-S",
+      "-emit-llvm",
+      "-DG2_LLP64=1",
+      "-IC:\\Users\\a\\VoidS7-G3-Debug\\ffi-g2",
+      "C:\\Users\\a\\VoidCI42377496702-Native\\tests\\ffi\\records_thunk.c",
+      "-o",
+      "C:\\Users\\a\\VoidS7-G3-Debug\\ffi-g2\\records-thunk.ll"
+    ],
+    "C_IR_signatures": [
+      "target triple = \"x86_64-pc-windows-msvc19.44.35229\"",
+      "declare dso_local ptr @g2_fixture_identity() #1",
+      "declare dso_local i32 @g2_color(i32) #1",
+      "declare dso_local void @g2_calibrate(ptr dead_on_unwind writable sret(%struct.G2Sample) align 8, ptr noundef align 8 dead_on_return, float noundef) #1",
+      "declare dso_local void @g2_packet(ptr dead_on_unwind writable sret(%struct.G2Packet) align 8, ptr noundef align 8 dead_on_return, ptr noundef align 8 dead_on_return, i32 noundef) #1",
+      "declare dso_local i64 @g2_sum(ptr noundef, i64 noundef) #1",
+      "declare dso_local i64 @g2_fill(ptr noundef, i64 noundef, i8 noundef) #1",
+      "declare dso_local i64 @g2_adjust(ptr noundef, i64 noundef) #1",
+      "declare dso_local i64 @g2_move(ptr noundef, i64 noundef, ptr noundef, i64 noundef) #1"
+    ]
+  }
+]

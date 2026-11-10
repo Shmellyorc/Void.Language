@@ -1,0 +1,6 @@
+{
+  "status": "running",
+  "free_bytes_before": 6308917248,
+  "platform": "Windows-10-10.0.19045-SP0",
+  "scope": "Native Windows 10 targeted builds at the provider-attested source root. Original source files are backed up and restored. Build outputs and evidence use isolated paths."
+}

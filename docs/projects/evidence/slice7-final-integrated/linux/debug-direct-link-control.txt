@@ -1,0 +1,24 @@
+["ctest", "--test-dir", "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/direct-link-controls/debug", "--parallel", "2", "--output-on-failure", "--output-junit", "/home/shmellyorc/Documents/Void.Language/docs/projects/evidence/slice7-final-integrated/linux/debug-direct-link-control.xml"]
+Test project /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/direct-link-controls/debug
+    Start 1: ergonomics_sprint6
+    Start 2: stage10_fields_aot
+1/9 Test #2: stage10_fields_aot ...............   Passed    1.67 sec
+    Start 3: stage10_temporal_aot
+2/9 Test #1: ergonomics_sprint6 ...............   Passed    5.51 sec
+    Start 4: stage11_globals_aot
+3/9 Test #4: stage11_globals_aot ..............   Passed   13.33 sec
+    Start 5: stage10_console_aot
+4/9 Test #3: stage10_temporal_aot .............   Passed   22.58 sec
+    Start 6: stage10_operators_aot
+5/9 Test #6: stage10_operators_aot ............   Passed  273.67 sec
+    Start 7: stage10_conversion_aot
+6/9 Test #7: stage10_conversion_aot ...........   Passed    2.13 sec
+    Start 8: application_native_sprint4
+7/9 Test #8: application_native_sprint4 .......   Passed    6.32 sec
+    Start 9: text_collections_sprint3
+8/9 Test #9: text_collections_sprint3 .........   Passed   41.01 sec
+9/9 Test #5: stage10_console_aot ..............   Passed  674.97 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Total Test time (real) = 693.83 sec

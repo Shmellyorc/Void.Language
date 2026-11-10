@@ -1,0 +1,41 @@
+{
+  "exit": 0,
+  "frames": 56,
+  "input_frames": 27,
+  "before": {
+    "pink": [
+      139.5,
+      124.5
+    ],
+    "green": [
+      80.5,
+      228.5
+    ],
+    "orange": [
+      310.5,
+      174.14
+    ]
+  },
+  "after": {
+    "pink": [
+      474.5,
+      234.5
+    ],
+    "green": [
+      108.5,
+      228.5
+    ],
+    "orange": [
+      415.5,
+      174.14
+    ]
+  },
+  "modules": [
+    "C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\gallery project\\native\\void_raylib.dll",
+    "C:\\Users\\a\\VoidS7-G5-Graphics\\Release-corrected\\gallery project\\native\\raylib.dll"
+  ],
+  "sha256": {
+    "raylib.dll": "3bf4db7515f019512026f72baacb8e6c9f98f32786593571e98d28df9dafa824",
+    "void_raylib.dll": "b32eec9c48b34579d5c2b22881a6f66cbfe5c8f3f72d15a3350b5bf6ab17b1b2"
+  }
+}

@@ -2,6 +2,7 @@
 #include "void/frontend.hpp"
 #include "void/path.hpp"
 #include "void/utf8.hpp"
+#include "project_files.hpp"
 #include <llvm/Support/RandomNumberGenerator.h>
 #include <algorithm>
 #include <array>
@@ -128,9 +129,11 @@ std::string key(const NativeInfo& info) {
 struct Parent {
     fs::path path;
     std::vector<NativeHandle> pins;
-    explicit Parent(fs::path requested):path(absolute_target(requested)),pins(native_windows::pin_directories(path)) {
-        auto current=path.root_path();
-        for (const auto& part:path.relative_path()) {named(current,path_utf8(part),true);current/=part;}
+    explicit Parent(fs::path requested,bool exact_spelling=true):path(absolute_target(requested)),pins(native_windows::pin_directories(path)) {
+        if(exact_spelling) {
+            auto current=path.root_path();
+            for (const auto& part:path.relative_path()) {named(current,path_utf8(part),true);current/=part;}
+        }
         path=fs::canonical(path);
     }
     std::string identity_key() const {return key(identity(pins.back()));}
@@ -203,18 +206,18 @@ void erase(Node& node) {
         throw std::runtime_error("Staging object could not be safely removed: "+path_utf8(node.path));
     CloseHandle(std::exchange(node.handle.value,INVALID_HANDLE_VALUE));
 }
-void rename_exclusive(const Node& node,const fs::path& destination) {
+void publish_file(const Node& node,const fs::path& destination,bool replace=false) {
     auto text=destination.native();
     std::vector<std::byte> bytes(sizeof(FILE_RENAME_INFO)+text.size()*sizeof(wchar_t));
     auto* rename=reinterpret_cast<FILE_RENAME_INFO*>(bytes.data());
-    rename->ReplaceIfExists=FALSE;rename->RootDirectory=nullptr;
+    rename->ReplaceIfExists=replace;rename->RootDirectory=nullptr;
     rename->FileNameLength=static_cast<DWORD>(text.size()*sizeof(wchar_t));
     std::copy(text.begin(),text.end(),rename->FileName);
     if(SetFileInformationByHandle(node.handle.value,FileRenameInfo,rename,static_cast<DWORD>(bytes.size())))return;
     auto error=GetLastError();
     if(error==ERROR_ALREADY_EXISTS || error==ERROR_FILE_EXISTS)
         throw CreationCollision("Exclusive project publication collided with an existing destination.");
-    native_windows::fail("Cannot publish project exclusively",error);
+    native_windows::fail("Cannot publish project object",error);
 }
 #else
 struct NativeHandle {
@@ -244,11 +247,11 @@ constexpr int dir_flags=O_RDONLY|O_DIRECTORY|O_NOFOLLOW|O_CLOEXEC;
 struct Parent {
     fs::path path;
     NativeHandle handle;
-    explicit Parent(fs::path requested):path(absolute_target(requested)),handle(open(path.root_path().c_str(),dir_flags)) {
+    explicit Parent(fs::path requested,bool exact_spelling=true):path(absolute_target(requested)),handle(open(path.root_path().c_str(),dir_flags)) {
         if(handle.fd<0)system_failure("Cannot open project filesystem root");
         auto current=path.root_path();
         for (const auto& part:path.relative_path()) {
-            named(current,path_utf8(part),true);
+            if(exact_spelling)named(current,path_utf8(part),true);
             NativeHandle next(openat(handle.fd,part.c_str(),dir_flags));
             if(next.fd<0)system_failure("Cannot pin project directory");
             handle=std::move(next);current/=part;
@@ -330,6 +333,160 @@ CreationRoot inspect_creation_root(const fs::path& path) {
 }
 bool creation_manifest_present(const fs::path& directory) {
     return named(directory,std::string(manifest_name));
+}
+
+bool project_path_alias(const fs::path& path) {
+    std::error_code error;
+    const auto status=fs::symlink_status(path,error);
+    if(error==std::errc::no_such_file_or_directory)return false;
+    if(error)throw fs::filesystem_error("Cannot inspect project path",path,error);
+    if(fs::is_symlink(status))return true;
+#ifdef _WIN32
+    const auto attributes=GetFileAttributesW(path.c_str());
+    return attributes!=INVALID_FILE_ATTRIBUTES && (attributes&FILE_ATTRIBUTE_REPARSE_POINT);
+#else
+    return false;
+#endif
+}
+
+std::string read_project_input(const fs::path& path,std::size_t limit) {
+    const auto fail=[&](const char* message) { return std::runtime_error(std::string(message)+" "+path_utf8(path)); };
+    // The caller inventories exact spellings. Open beneath a pinned, no-alias
+    // parent and check that the held file still names the same directory entry.
+    Parent directory(path.parent_path(),false);
+    if(directory.path!=path.parent_path())throw fail("Project input parent spelling changed.");
+#ifdef _WIN32
+    NativeHandle file(CreateFileW(path.c_str(),GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
+        nullptr,OPEN_EXISTING,FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
+    if(file.value==INVALID_HANDLE_VALUE)throw fail("Cannot open project input.");
+    const auto info=identity(file);
+    if(info.nNumberOfLinks!=1 || info.dwFileAttributes&(FILE_ATTRIBUTE_DIRECTORY|FILE_ATTRIBUTE_REPARSE_POINT))
+        throw fail("Project input must be a regular file without aliases.");
+    const auto size=(std::uint64_t(info.nFileSizeHigh)<<32)|info.nFileSizeLow;
+#else
+    const auto leaf=path.filename();
+    NativeHandle file(openat(directory.handle.fd,leaf.c_str(),O_RDONLY|O_NOFOLLOW|O_NONBLOCK|O_CLOEXEC));
+    if(file.fd<0)throw fail("Cannot open project input without following aliases.");
+    const auto info=identity(file);
+    if(!S_ISREG(info.st_mode) || info.st_nlink!=1 || info.st_size<0)
+        throw fail("Project input must be a regular file without aliases.");
+    const auto size=static_cast<std::uint64_t>(info.st_size);
+#endif
+    if(size>limit)throw fail("Project input byte limit exceeded.");
+    std::string bytes(static_cast<std::size_t>(size)+1,'\0');
+    std::size_t total=0;
+    while(total<bytes.size()) {
+#ifdef _WIN32
+        DWORD count=0;
+        if(!ReadFile(file.value,bytes.data()+total,static_cast<DWORD>(bytes.size()-total),&count,nullptr))
+            throw fail("Cannot read project input.");
+#else
+        auto count=read(file.fd,bytes.data()+total,bytes.size()-total);
+        if(count<0 && errno==EINTR)continue;
+        if(count<0)throw fail("Cannot read project input.");
+#endif
+        if(count==0)break;
+        total+=static_cast<std::size_t>(count);
+    }
+#ifdef _WIN32
+    NativeHandle current(CreateFileW(path.c_str(),FILE_READ_ATTRIBUTES,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
+        nullptr,OPEN_EXISTING,FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
+    if(current.value==INVALID_HANDLE_VALUE)throw fail("Project input disappeared during reading.");
+    const auto observed=identity(current);
+    if(key(observed)!=key(info) || observed.nNumberOfLinks!=1 ||
+       CompareFileTime(&observed.ftLastWriteTime,&info.ftLastWriteTime)!=0)
+        throw fail("Project input identity changed during reading.");
+#else
+    struct stat current{};
+    if(fstatat(directory.handle.fd,leaf.c_str(),&current,AT_SYMLINK_NOFOLLOW) ||
+       key(current)!=key(info) || current.st_nlink!=1 ||
+       Parent::path_key(directory.path)!=directory.identity_key())
+        throw fail("Project input identity changed during reading.");
+#endif
+    if(total!=size)throw fail("Project input size changed during reading.");
+    bytes.resize(total);
+    return bytes;
+}
+
+std::optional<std::string> read_dependency_lock(const fs::path& root) {
+    const std::string name(lock_name);
+    if(!named(root,name))return {};
+    named(root,name,true);
+    return read_project_input(root/lock_name,lock_byte_limit);
+}
+
+bool publish_dependency_lock(const CreationRoot& root,const std::optional<std::string>& previous,
+                             std::string_view desired,const std::function<void()>& recheck) {
+    Parent parent(root.path);
+    if(parent.identity_key()!=root.identity)throw std::runtime_error("Project root changed before lock publication.");
+    const auto work=parent.path/".void";
+#ifdef _WIN32
+    if(!CreateDirectoryW(work.c_str(),nullptr) && GetLastError()!=ERROR_ALREADY_EXISTS)
+        native_windows::fail("Cannot create project lock workspace");
+#else
+    if(flock(parent.handle.fd,LOCK_EX))system_failure("Cannot serialize project lock publication");
+    if(mkdirat(parent.handle.fd,".void",0700) && errno!=EEXIST)system_failure("Cannot create project lock workspace");
+#endif
+    Parent workspace(work);
+#ifdef _WIN32
+    NativeHandle writer(CreateFileW((work/"dependency-writer").c_str(),GENERIC_READ|GENERIC_WRITE,
+        FILE_SHARE_READ|FILE_SHARE_WRITE,nullptr,OPEN_ALWAYS,FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
+    if(writer.value==INVALID_HANDLE_VALUE)native_windows::fail("Cannot open project lock writer");
+    const auto info=identity(writer);
+    if(info.nNumberOfLinks!=1 || info.dwFileAttributes&(FILE_ATTRIBUTE_DIRECTORY|FILE_ATTRIBUTE_REPARSE_POINT))
+        throw std::runtime_error("Project lock writer must be a regular file without aliases.");
+    OVERLAPPED offset{};
+    if(!LockFileEx(writer.value,LOCKFILE_EXCLUSIVE_LOCK,0,1,0,&offset))
+        native_windows::fail("Cannot serialize project lock publication");
+#endif
+    auto compare_destination=[&] {
+        const auto existing=read_dependency_lock(parent.path);
+        if(existing && *existing==desired)return false;
+        if(existing!=previous)throw std::runtime_error("Dependency lock changed during resolution; retry.");
+        return true;
+    };
+    if(!compare_destination()) {
+        recheck();
+        return false;
+    }
+    const auto temporary="resolve-"+random_hex();
+    std::vector<Node> staged;
+    staged.reserve(2);
+    bool published=false;
+    try {
+#ifdef _WIN32
+        staged.push_back(make_directory(work/temporary,true));
+        staged.push_back(make_file(staged[0].path/lock_name));
+#else
+        staged.push_back(make_directory(workspace.handle.fd,temporary));
+        staged.push_back(make_file(staged[0].handle.fd,std::string(lock_name)));
+#endif
+        auto& file=staged[1];
+        write_file(file,desired);
+        recheck();
+        if(inspect_creation_root(parent.path).identity!=root.identity ||
+           inspect_creation_root(work).identity!=workspace.identity_key() ||
+           !owns(staged[0]) || !owns(file) || !matches_file(file,desired))
+            throw std::runtime_error("Project lock staging changed before publication.");
+        if(!compare_destination())throw std::runtime_error("Dependency lock changed during publication; retry.");
+#ifdef _WIN32
+        publish_file(file,parent.path/lock_name,previous.has_value());
+#else
+        if(previous) {
+            if(renameat(file.parent,file.name.c_str(),parent.handle.fd,lock_name.data()))
+                system_failure("Cannot replace project dependency lock");
+        } else rename_exclusive(file,parent.handle.fd,std::string(lock_name));
+#endif
+        published=true;
+        erase(staged[0]);
+        return true;
+    } catch(const std::exception& error) {
+        if(published)throw std::runtime_error(std::string(error.what())+" Lock publication completed; inspect void.lock.");
+        bool uncertain=false;
+        for(auto it=staged.rbegin();it!=staged.rend();++it)try{erase(*it);}catch(const std::exception&){uncertain=true;}
+        if(uncertain)throw std::runtime_error(std::string(error.what())+" Retained uncertain lock staging at "+path_utf8(work/temporary)+".");
+        throw;
+    }
 }
 
 CreationPlan plan_creation(const fs::path& requested,const CreationOptions& options,CreationEntropy entropy) {
@@ -436,7 +593,7 @@ void publish_creation(const CreationPlan& plan,CreationCheckpoint before_publish
         // stays pinned; rollback must reopen descendants by their saved IDs.
         if(fresh)for(auto it=objects.begin()+1;it!=objects.end();++it)
             CloseHandle(std::exchange(it->handle.value,INVALID_HANDLE_VALUE));
-        rename_exclusive(selected,fresh?root:root/manifest_name);
+        publish_file(selected,fresh?root:root/manifest_name);
 #else
         rename_exclusive(selected,parent.handle.fd,fresh?path_utf8(root.filename()):std::string(manifest_name));
 #endif

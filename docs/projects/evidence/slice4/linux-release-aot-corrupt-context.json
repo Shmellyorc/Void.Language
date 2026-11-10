@@ -1,0 +1,36 @@
+[
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "build",
+      "--project",
+      "/tmp/VOID S4 malformed AOT uect_wbw",
+      "-o",
+      "/tmp/VOID S4 malformed AOT uect_wbw/program"
+    ],
+    "status": 0,
+    "stdout": "Built native executable: /tmp/VOID S4 malformed AOT uect_wbw/program\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/tmp/VOID S4 malformed AOT uect_wbw/program"
+    ],
+    "status": 0,
+    "stdout": "eager entered\nmain entered /home/shmellyorc/.local/share/org.test.admission\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/tmp/VOID S4 malformed AOT uect_wbw/program"
+    ],
+    "status": 1,
+    "stdout": "",
+    "stderr": "Invalid compiled application metadata.\n"
+  },
+  {
+    "record_offset": 1252661,
+    "old_sha256": "1576511c198b406998d7d400a4cd18444feda800825a3c9f3883d9711e6cc603",
+    "rejected_sha256": "e986075a30e4dfb0fd448d7fd0a2064283e911915cac99231fe3f80baf433b3a"
+  }
+]

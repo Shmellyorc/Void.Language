@@ -1,0 +1,37 @@
+Test project C:/Users/a/VS7I2/Release
+      Start  84: fixed_arrays_cli
+ 1/16 Test  #84: fixed_arrays_cli .................   Passed   15.12 sec
+      Start  85: growable_arrays_cli
+ 2/16 Test  #85: growable_arrays_cli ..............   Passed   11.66 sec
+      Start  86: arrays_cli
+ 3/16 Test  #86: arrays_cli .......................   Passed   25.92 sec
+      Start  87: generics_cli
+ 4/16 Test  #87: generics_cli .....................   Passed   12.58 sec
+      Start  88: collections_cli
+ 5/16 Test  #88: collections_cli ..................   Passed   22.77 sec
+      Start  89: dictionaries_cli
+ 6/16 Test  #89: dictionaries_cli .................   Passed   22.99 sec
+      Start  90: properties_cli
+ 7/16 Test  #90: properties_cli ...................   Passed   12.44 sec
+      Start  91: patterns_cli
+ 8/16 Test  #91: patterns_cli .....................   Passed    9.46 sec
+      Start  92: advanced_cli
+ 9/16 Test  #92: advanced_cli .....................   Passed   20.48 sec
+      Start  96: managed_cli
+10/16 Test  #96: managed_cli ......................   Passed    6.51 sec
+      Start 100: managed_initialization_cli
+11/16 Test #100: managed_initialization_cli .......   Passed    9.08 sec
+      Start 104: reference_values_cli
+12/16 Test #104: reference_values_cli .............   Passed   12.13 sec
+      Start 108: composition_cli
+13/16 Test #108: composition_cli ..................   Passed    6.80 sec
+      Start 112: inheritance_cli
+14/16 Test #112: inheritance_cli ..................   Passed   10.23 sec
+      Start 116: interfaces_cli
+15/16 Test #116: interfaces_cli ...................   Passed    8.85 sec
+      Start 120: strings_cli
+16/16 Test #120: strings_cli ......................   Passed    4.33 sec
+
+100% tests passed out of 16
+
+Total Test time (real) = 211.46 sec

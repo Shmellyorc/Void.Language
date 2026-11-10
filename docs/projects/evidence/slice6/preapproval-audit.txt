@@ -1,0 +1,146 @@
+# Slice 6 architecture audit and decision record
+
+Baseline HEAD `2f667ea338127b8f91c3136804377ef3fa5218d6`. Golden Wrench accepted
+S5 for local continuation. S6 stopped at the language design boundary required
+by the assignment. The working tree changes from this audit are this report,
+the baseline probe receipt and the layered inventory.
+
+## Decisions that require approval
+
+The [project roadmap](../PROJECT_ARCHITECTURE_ROADMAP.md#proposed-numeric-backed-enums-and-fallible-conversion)
+specifies evaluating the input once and checking both mathematical range and
+declared membership. It expressly leaves declaration syntax, numbering,
+discriminant aliases and enum-to-integer conversion open. The
+[numeric contract](../NUMERIC_TYPES.md#approved-numeric-backed-enum-direction-8-november-2026)
+also leaves the result shape and fallback grammar open. The S6 assignment
+chooses `option<T>`, `Some(value)` and `None`. The current compiler implements
+`result<T, E>` and nullable references. Adding the requested option requires a
+new public type, constructor and pattern contract. The older
+[Language Bible cast section](../LANGUAGE_BIBLE.md#30-type-casts-checks-and-parsing-agreed)
+describes a nullable result. The S6 assignment gives the result a different shape.
+
+| Decision | Recommended S6 contract | Alternative and cost |
+| --- | --- | --- |
+| Declaration and values | `enum mode(u8):` with lowercase members written `idle = 0` and `ready = 7`. Admit all eight fixed-width integer types. Require a signed or unsigned decimal integer literal on each member. Reject duplicate names, duplicate mathematical values, payloads and out-of-range values. Every hole is invalid, including values a C API reserves or may add later. | A type-suffix header is possible. Allowing named constants or arithmetic also needs an explicit rule for intermediate overflow and resolution order. Automatic numbering and aliases need rules for changes in source order, canonical member names and coverage. |
+| Conversion surface | `as?` is adjacent and has the existing `as` precedence and associativity. Admit integer-to-integer and integer-to-closed-numeric-enum. Use the operand's exact type. For a direct untyped integer literal, choose the first representable source type in `i32`, `i64`, `u64`. A literal outside that domain still diagnoses. Keep enum-to-integer, enum-to-enum, floating, Boolean, reference and tagged-enum casts outside this operation. | An exact backing-type extraction can be approved separately. A wider cast matrix requires policy for float rounding, NaN and infinity, and reference and payload rules. An arbitrary-precision literal operand also needs an explicit rule for values outside the language's integer domain. |
+| Option and fallback | Add a canonical, nameable `option<T>` for the S6 destination types, using the existing tagged-sum storage and patterns. Admit contextual `Some(value)` and `None` in expressions and patterns. Retain existing user-declared `option` type lookup and use the built-in when no visible user declaration matches. `as?` always produces the canonical option type, which can be inferred under name shadowing. Use existing match syntax for fallback. | A `result<T, E>` API reuses the current public type but changes the assignment's result shape. A built-in spelling that always wins can break existing type lookup. Adding `??` now requires separate precedence, associativity, laziness and type rules. |
+
+Proposed user spelling, pending approval:
+
+```void
+enum mode(u8):
+    idle = 0
+    ready = 7
+
+func decode(raw: i32) -> mode:
+    var converted: option<mode> = raw as? mode
+    if converted is Some(var value):
+        return value
+    return mode.idle
+```
+
+The recommended enum is nominal in source and typed IR, with exactly the chosen
+scalar integer storage in LLVM. Members can participate in same-type equality,
+`is` and match coverage by declared member. Recommend leaving arithmetic,
+integer range patterns, dictionary keys and implicit default values outside S6
+for the new type. Arrays, generic parameters and collection values should keep
+the enum's exact type. Existing tagged enums currently have no dictionary-key
+admission. This recommendation preserves that rule and avoids accidentally
+admitting a numeric enum through integer-only predicates.
+
+## Implementation audit and plan after approval
+
+- **Parsing and coverage.** The existing enum parser creates a payload sum with
+  an internal `i32` tag and ordinal case indexes. The same parser handles
+  `as` and currently rejects `as?`. The lexer has uppercase exceptions for
+  `Ok` and `Err`. Accepting `Some` and `None` would require explicit additional
+  exceptions. Match analysis checks declared variants and warns on incomplete
+  coverage. Value-producing matches retain their existing unmatched failure.
+  Reuse coverage over the new enum's declared member set, including sparse values.
+  [Compiler parser](../../src/frontend/compiler.cpp#L1019),
+  [enum declaration](../../src/frontend/compiler.cpp#L1182),
+  [pattern semantics](../../src/frontend/pattern_semantics.inc#L25).
+- **Numeric checks and constants.** The shared numeric layer already checks
+  exact integer representability using sign or zero extension. The typed AST's
+  constant evaluator calls that conversion routine, and LLVM's current checked
+  conversion guards before truncation. Reuse those range rules, with an absence
+  result on failure in the new operation. Successful enum conversion additionally
+  checks exact membership on a range-proven value. Construct a semantic enum only
+  in the successful branch. Existing `as` keeps its exception and RuntimeFailure
+  behavior. [Software conversion](../../src/numeric.cpp#L80),
+  [constant evaluation](../../src/frontend/compiler.cpp#L5412),
+  [LLVM conversion](../../src/backend/llvm/backend.cpp#L1599).
+- **Generic types and ownership.** The canonical result factory interns
+  a tagged-sum descriptor keyed by type identity and carries the concrete
+  payload types. Option can reuse the sum shape and its payload rules without
+  acquiring result propagation behavior. Existing visibility and
+  module-qualified nominal resolution should own the new declaration. Use
+  a distinct enum IR type with an immutable backing type and discriminant
+  set. Include its identity in generic substitutions, typed fields,
+  constants, layouts and compatibility fingerprints.
+  [Nominal lookup](../../src/frontend/compiler.cpp#L1358),
+  [result factory](../../src/frontend/compiler.cpp#L5737),
+  [IR descriptors](../../include/void/ir.hpp#L61).
+- **Independent IR and native execution.** Add an independently validated
+  fallible conversion instruction. Validate admitted source and destination
+  categories, the canonical `option<T>` result shape, enum descriptor identity,
+  range and uniqueness. Audit constant, sum, projection, zero/default and
+  other producer paths so an invalid enum cannot enter typed code. Zeroing
+  inactive option payload storage must preserve absence even if zero is
+  undeclared. Shared lowering serves normal/O2 JIT and AOT. Keep the enum
+  scalar free of references and use the existing sum rooting path. Fingerprint
+  backing types and member values so cache or reload cannot reuse incompatible
+  code. [IR validation](../../src/ir/module.cpp#L461),
+  [JIT lowering call](../../src/backend/llvm/backend.cpp#L2076),
+  [AOT lowering call](../../src/backend/llvm/backend.cpp#L2226),
+  [reload compatibility](../../src/runtime/reload.cpp#L78).
+- **Compiler-owned tooling.** The compiler already resolves enum members for
+  completion and exports owned declaration and reference spans. Current tagged
+  member metadata uses the ordinal, so numeric member hover needs the declared
+  signed or unsigned value instead. Carry source ownership through
+  `ToolingSession`, use the existing UTF-16 adapter and lexer-backed formatter,
+  and cover dirty edits in both the enum definition and the importing file.
+  [Enum completion](../../src/frontend/compiler.cpp#L2716),
+  [declaration index](../../src/frontend/compiler.cpp#L6418),
+  [formatter](../../src/frontend/compiler.cpp#L6810),
+  [tooling session](../../src/frontend/tooling.cpp#L260),
+  [LSP ranges](../../src/lsp/main.cpp#L160).
+- **Native authority.** Existing native bindings use an admitted provider
+  catalog and independent exact signature checks. A VOID enum's scalar
+  representation leaves future C calling convention, promotion and target
+  ABI verification to the FFI review. The audit preserves existing catalog
+  admission and the dynamic-default raylib milestone.
+  [Native catalog validation](../../src/ir/native_binding.cpp#L57),
+  [native IR admission](../../src/ir/module.cpp#L946).
+
+## Executed audit probes
+
+The existing Linux Release compiler executed a tagged-enum payload pattern,
+a `result<i32, string>` constructor/pattern and checked integer `as`. The
+controls returned 17, 19 and 20 respectively. Separate checks rejected the
+proposed declaration header, `as?`, `option<i32>`, `Some` and `??`.
+The first positive fixture used an uppercase variant and failed with
+VOID1003. Replaying it preserved that diagnostic. Lowercasing the variant
+names corrected the control. The [probe receipt](evidence/slice6-baseline-audit.json)
+records the exact inputs, compiler hash, outputs and statuses.
+
+These probes used the existing compiler. S6 implementation and Release,
+Debug, sanitizer, Windows and editor qualification await the design review.
+The eventual matrix should cover all eight integer backings and boundary
+pairs, signed-to-unsigned failure, sparse values, duplicate names and values,
+nominal identity through imports and generics, constant/runtime parity,
+patterns, malformed IR, low-stack Debug, GC roots, cache/reload and
+independent AOT.
+
+## Source inventory and cleanup
+
+The [layered Git inventory](evidence/slice6-inventory.txt) verifies the original
+856 changed paths by SHA-256 and accounts for the three audit paths. HEAD and
+the index match the starting state. Hosted CI remains on strict hold.
+
+**End-of-task temporary workspace cleanup.** The two Linux probe fixture
+directories were removed by their fixture owners. The temporary audit
+checkpoint was removed after the layered inventory and receipt were written.
+Existing binaries and build trees were retained. This audit did not start
+a Windows qualification or create a guest workspace. Current guest free
+space was not measured for the audit.

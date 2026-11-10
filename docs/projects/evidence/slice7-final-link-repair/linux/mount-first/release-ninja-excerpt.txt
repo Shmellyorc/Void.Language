@@ -1,0 +1,9 @@
+      stdout: |
+        Change Dir: '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/CMakeFiles/CMakeScratch/TryCompile-jaRvIz'
+        
+        Run Build Command(s): /home/shmellyorc/Documents/Void.Language/.toolchains/ninja-1.13.2/ninja -v cmTC_9e52a
+        ninja: fatal: posix_spawn: Permission denied
+        
+      exitCode: 1
+    runResult:
+      variable: "VOID_LLVM_ORC_RUNS_EXITCODE"

@@ -1,0 +1,2 @@
+Application cache: miss/hit
+project_application: 54 checks passed

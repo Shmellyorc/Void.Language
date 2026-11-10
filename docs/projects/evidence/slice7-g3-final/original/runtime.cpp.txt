@@ -1,0 +1,158 @@
+#include "void/c_primitive.hpp"
+#include "void/execution.hpp"
+#include "void/native_resource.hpp"
+#include <algorithm>
+#include <array>
+#include <atomic>
+#include <bit>
+#include <stdexcept>
+
+namespace {
+using namespace vd;
+const char resource_kind = 0;
+
+class Resource final : public NativeResource {
+    std::string descriptor_, identity_;
+    CPrimitiveThunk* thunk_;
+    const std::uint32_t release_;
+    std::shared_ptr<void> generation_;
+    std::mutex mutex_;
+    std::uint64_t native_ = 0;
+    std::atomic<std::uint64_t> exclusive_ = 0;
+
+    std::uint32_t dispatch(std::uint32_t ordinal, const std::uint64_t* args,
+                           std::uint32_t count, std::uint64_t* result) {
+        if (runtime.is_managed()) {
+            Runtime::Native native(runtime);
+            return thunk_(descriptor_.data(), static_cast<std::uint32_t>(descriptor_.size()),
+                          ordinal, args, count, result);
+        }
+        return thunk_(descriptor_.data(), static_cast<std::uint32_t>(descriptor_.size()),
+                      ordinal, args, count, result);
+    }
+
+public:
+    Resource(Runtime& runtime, void* wrapper, std::string_view descriptor, std::string_view identity,
+             CPrimitiveThunk* thunk, std::uint32_t release)
+        : NativeResource(runtime, wrapper), descriptor_(descriptor), identity_(identity), thunk_(thunk),
+          release_(release), generation_(NativeCode::active_lease()) {}
+    ~Resource() override {
+        if (native_) {
+            try { (void)close(); }
+            catch (...) { std::terminate(); } // A verified terminal release must be dispatchable.
+        }
+    }
+    const void* kind() const noexcept override { return &resource_kind; }
+    std::uint64_t exclusive_native_identity() const noexcept override { return exclusive_.load(); }
+    void discard_duplicate() noexcept { native_ = 0; exclusive_ = 0; }
+    bool matches(std::string_view descriptor, std::string_view identity,
+                 CPrimitiveThunk* thunk, std::uint32_t release) const {
+        return descriptor_ == descriptor && identity_ == identity && thunk_ == thunk && release_ == release;
+    }
+
+    bool acquire(std::uint32_t ordinal, const std::uint64_t* args, std::uint32_t count) {
+        if (dispatch(ordinal, args, count, &native_))
+            throw std::runtime_error("C resource creation transport rejected");
+        exclusive_ = native_;
+        return native_ != 0;
+    }
+    std::uint32_t borrow(std::uint32_t ordinal, const std::uint64_t* args,
+                         std::uint32_t count, std::uint64_t* result) {
+        std::lock_guard lock(mutex_);
+        if (!native_) return 1;
+        std::array<std::uint64_t, c_primitive_max_arguments> words{};
+        std::copy_n(args, count, words.begin());
+        words[0] = native_;
+        return dispatch(ordinal, words.data(), count, result) ? 4 : 0;
+    }
+    std::error_code close() override {
+        std::shared_ptr<void> retired;
+        std::int32_t provider_status;
+        {
+            std::lock_guard lock(mutex_);
+            if (!native_) return {};
+            std::uint64_t result = 0;
+            // A conforming allocator can reuse the address as soon as C frees
+            // it. Close invalidates the ledger claim before that handoff.
+            exclusive_ = 0;
+            if (dispatch(release_, &native_, 1, &result)) {
+                exclusive_ = native_;
+                throw std::runtime_error("C terminal release transport rejected");
+            }
+            native_ = 0; // Accepted release consumes even when its result reports failure.
+            provider_status = std::bit_cast<std::int32_t>(static_cast<std::uint32_t>(result));
+            retired = std::move(generation_);
+        }
+        wrapper.reset(nullptr);
+        // Retire the acquisition generation outside the resource and GC locks.
+        if (runtime.is_managed()) {
+            Runtime::Native native(runtime);
+            retired.reset();
+        } else retired.reset();
+        return {provider_status, std::generic_category()};
+    }
+};
+
+class NativeJob {
+    Runtime& runtime_;
+public:
+    explicit NativeJob(Runtime& runtime) : runtime_(runtime) { runtime.begin_native_job(); }
+    ~NativeJob() { runtime_.end_native_job(); }
+};
+}
+
+extern "C" std::uint32_t vd::vd_c_resource_dispatch_v3(CPrimitiveThunk* thunk, const char* descriptor,
+    std::uint32_t size, std::uint32_t ordinal, const std::uint64_t* words, std::uint32_t count,
+    std::uint64_t* result, void** handle, const char* identity, std::uint32_t release, CResourceRole role) noexcept {
+    if (!thunk || !descriptor || !size || size > 16384 || !identity || !handle ||
+        ordinal >= 64 || release >= 64 || count > c_primitive_max_arguments || (count && !words) ||
+        role < CResourceRole::acquire || role > CResourceRole::close ||
+        (role != CResourceRole::acquire && !count) ||
+        (role == CResourceRole::close && (ordinal != release || count != 1 || !result)))
+        return 5;
+    try {
+        auto& runtime = Runtime::current();
+        (void)runtime.root_word(handle);
+        NativeJob job(runtime);
+        auto library = NativeLibrary::get(runtime);
+        const std::string_view contract(descriptor, size);
+        if (role == CResourceRole::acquire) {
+            if (ordinal == release || result) return 5;
+            *handle = nullptr;
+            try {
+                auto nominal = runtime.descriptor(identity);
+                if (!nominal || nominal->layout.size != sizeof(std::uint64_t) ||
+                    !nominal->layout.references.empty()) return 5;
+                auto layout = nominal->layout;
+                layout.descriptor = nominal;
+                runtime.allocate_into(handle, layout);
+                auto owner = std::make_shared<Resource>(runtime, *handle, contract, identity, thunk, release);
+                if (!owner->acquire(ordinal, words, count)) *handle = nullptr;
+                else if (!library->publish_exclusive(*handle, owner)) {
+                    owner->discard_duplicate();
+                    *handle = nullptr;
+                    return 6;
+                }
+                return 0;
+            } catch (...) {
+                *handle = nullptr;
+                throw;
+            }
+        }
+        auto owner = library->find(*handle, true);
+        if (!owner) return 1;
+        if (owner->kind() != &resource_kind) return 2;
+        auto resource = std::static_pointer_cast<Resource>(owner);
+        if (!resource->matches(contract, identity, thunk, release)) return 2;
+        try { resource->own_thread(); }
+        catch (const std::runtime_error&) { return 3; }
+        if (role != CResourceRole::close)
+            return ordinal == release ? 5 : resource->borrow(ordinal, words, count, result);
+        const auto error = resource->close();
+        library->erase(*handle, resource.get());
+        *result = static_cast<std::uint32_t>(error.value());
+        return 0;
+    } catch (const std::exception&) {
+        return 4;
+    }
+}

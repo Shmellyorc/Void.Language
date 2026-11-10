@@ -1,0 +1,41 @@
+[
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+      "new",
+      "/tmp/VOID S5 invalid identity f0_qok0f/application",
+      "--app-id",
+      "CON"
+    ],
+    "status": 1,
+    "stdout": "",
+    "stderr": "/tmp/VOID S5 invalid identity f0_qok0f/application/void.project.toml:10:6: error: Invalid portable manifest identity.\n    code: VOID5004\n\n 10 | id = \"CON\"\n    |      ^^^^^\n    Hint: Use 1-255 lowercase ASCII bytes with letters/digits and interior dot, underscore or hyphen; no empty dot pieces or reserved device stems.\n\n",
+    "remaining_entries": []
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+      "new",
+      "/tmp/VOID S5 invalid identity f0_qok0f/application",
+      "--app-id",
+      "CON"
+    ],
+    "status": 1,
+    "stdout": "",
+    "stderr": "/tmp/VOID S5 invalid identity f0_qok0f/application/void.project.toml:10:6: error: Invalid portable manifest identity.\n    code: VOID5004\n\n 10 | id = \"CON\"\n    |      ^^^^^\n    Hint: Use 1-255 lowercase ASCII bytes with letters/digits and interior dot, underscore or hyphen; no empty dot pieces or reserved device stems.\n\n",
+    "remaining_entries": []
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 invalid identity f0_qok0f/application",
+      "--app-id",
+      "CON"
+    ],
+    "status": 1,
+    "stdout": "",
+    "stderr": "/tmp/VOID S5 invalid identity f0_qok0f/application/void.project.toml:10:6: error: Invalid portable manifest identity.\n    code: VOID5004\n\n 10 | id = \"CON\"\n    |      ^^^^^\n    Hint: Use 1-255 lowercase ASCII bytes with letters/digits and interior dot, underscore or hyphen; no empty dot pieces or reserved device stems.\n\n",
+    "remaining_entries": []
+  }
+]

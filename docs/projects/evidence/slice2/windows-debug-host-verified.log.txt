@@ -1,0 +1,1 @@
+Verified approved patched Windows host providers: Debug; build 8aaf40fb4ec7009c1de06976fdbc00b21d86520bae3084e19bdb9425ac6006c7

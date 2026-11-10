@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="17"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="16"
+	timestamp="2026-11-08T18:31:26"
+	>
+	<testcase name="project_manifest_header" classname="project_manifest_header" time="0.00408765" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="project_manifest" classname="project_manifest" time="0.0571373" status="run">
+		<properties/>
+		<system-out>project_manifest: 8787 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_no_authority" classname="project_manifest_no_authority" time="0.121779" status="run">
+		<properties/>
+		<system-out>project_manifest: 8788 checks passed under syscall denial
+project_manifest_no_authority: four live SIGSYS controls passed
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_legacy" classname="project_manifest_legacy" time="1.66934" status="run">
+		<properties/>
+		<system-out>project_manifest_legacy: 18 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_provenance" classname="project_manifest_provenance" time="0.0539172" status="run">
+		<properties/>
+		<system-out>project_manifest_provenance: 3 file hashes and exact pinned upstream reconstruction passed
+</system-out>
+	</testcase>
+	<testcase name="project_selection" classname="project_selection" time="3.64734" status="run">
+		<properties/>
+		<system-out>project_selection: 476 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_sessions" classname="project_sessions" time="0.447254" status="run">
+		<properties/>
+		<system-out>project_sessions: 166 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_creation" classname="project_creation" time="0.0660204" status="run">
+		<properties/>
+		<system-out>creation: entropy, reviewed directory, external collision, rollback ownership, staged content passed
+</system-out>
+	</testcase>
+	<testcase name="project_creation_process" classname="project_creation_process" time="3.95501" status="run">
+		<properties/>
+		<system-out>S5 creation process: 64 invocations passed
+</system-out>
+	</testcase>
+	<testcase name="project_application" classname="project_application" time="11.5327" status="run">
+		<properties/>
+		<system-out>Application cache: miss/hit
+project_application: 63 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_application_process" classname="project_application_process" time="13.3157" status="run">
+		<properties/>
+		<system-out>project_application_process: 61 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_discovery_cli" classname="project_discovery_cli" time="5.35743" status="run">
+		<properties/>
+		<system-out>project_discovery_cli: 88 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_profiles" classname="project_profiles" time="1.44932" status="run">
+		<properties/>
+		<system-out>project_profiles: 43 process checks passed; compute instruction counts O0=6, O2=2, release --no-opt=6
+</system-out>
+	</testcase>
+	<testcase name="project_protocol" classname="project_protocol" time="0.598213" status="run">
+		<properties/>
+		<system-out>project_protocol: 169 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_nested_cli" classname="project_nested_cli" time="0.521669" status="run">
+		<properties/>
+		<system-out>project_nested_cli: 11 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="cli_contract" classname="cli_contract" time="3.04636" status="run">
+		<properties/>
+		<system-out>76 CLI process checks passed on linux; native output and collision preservation passed
+</system-out>
+	</testcase>
+	<testcase name="cli_install" classname="cli_install" time="1.71465" status="run">
+		<properties/>
+		<system-out>VOID Language Compiler v0.1.0 (development)
+LLVM 23.1.4
+Target: x86_64-unknown-linux-gnu
+Build identity: 32955d39379b95680e221bc7b57b537928166e29036ddc9e87359b202587321a
+PASS: installed stdlib check, optimized/Debug run, native build/run, resource hashes and LSP handshake
+PASS: 25 installed stdlib sources, relocated compiler/LSP, missing-module/Runtime controls, native output preservation
+</system-out>
+	</testcase>
+</testsuite>

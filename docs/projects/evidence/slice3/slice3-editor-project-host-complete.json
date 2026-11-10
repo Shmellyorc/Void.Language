@@ -1,0 +1,21 @@
+{
+  "events": [
+    "no-main project session opens with manifest diagnostics",
+    "file creation selects any-name main",
+    "missing-main diagnostic clears",
+    "real editor project navigation",
+    "real editor project symbols",
+    "dirty TOML diagnostic publication",
+    "failed manifest hides historical semantic results",
+    "malformed manifest repair",
+    "shared compiler project recovery completion",
+    "editor rename updates entry without rebasing root",
+    "second main invalidates project selection",
+    "editor deletion restores unique entry",
+    "deliberate project switch uses a fresh pinned session",
+    "old project semantic results unavailable after switch"
+  ],
+  "status": "PASS",
+  "platform": "linux",
+  "editor": "1.141.0"
+}

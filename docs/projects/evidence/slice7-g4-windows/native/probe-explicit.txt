@@ -1,0 +1,9 @@
+held C:\Users\a\VoidS7-G4W-architecture-final\good\void_g4w_explicit.dll id=c60478b6:00090000000bcb4b
+held C:\Users\a\VoidS7-G4W-architecture-final\good\void_g4_probe_dep.dll id=c60478b6:00090000000bcb45
+explicit leaf match=1 MEM_IMAGE=1
+  held=\Device\HarddiskVolume3\Users\a\VoidS7-G4W-architecture-final\good\void_g4_probe_dep.dll
+  mapped=\Device\HarddiskVolume3\Users\a\VoidS7-G4W-architecture-final\good\void_g4_probe_dep.dll
+explicit provider match=1 MEM_IMAGE=1
+  held=\Device\HarddiskVolume3\Users\a\VoidS7-G4W-architecture-final\good\void_g4w_explicit.dll
+  mapped=\Device\HarddiskVolume3\Users\a\VoidS7-G4W-architecture-final\good\void_g4w_explicit.dll
+explicit table used C record, byte span, opaque token and terminal release

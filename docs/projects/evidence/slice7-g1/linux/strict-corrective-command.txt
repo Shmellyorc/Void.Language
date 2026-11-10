@@ -1,0 +1,9 @@
+Forced frontend rebuild from final corrected sources, after the original CTest completed.
+mv build/llvm23-strict/CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o build/slice7-g1/strict-stale-compiler.cpp.o
+bash docs/projects/evidence/slice7-g1/replay-linux.sh strict build/slice7-g1/final
+1c5f87693fa7a6a8dc0281843f7b0553c2e8f19647bfa8a3c284f14da1ae8313  src/frontend/compiler.cpp
+b3cb5ec67a9533ea7c1e44bb11767a17a94577ec12ef0c90b92573dab716ac19  build/slice7-g1/strict-stale-compiler.cpp.o
+7594645507d1952f8e15585dafde6847af02b24da3ebc863d089bb9785b4eb9c  build/llvm23-strict/CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+c3b6489e5a285b95e4bedf849de39f3abce8fdc0c6421ad5cf4c2873c33d20c9  build/llvm23-strict/void_g1_tests
+Corrective CTest exit status
+0

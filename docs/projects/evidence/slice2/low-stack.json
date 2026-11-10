@@ -1,0 +1,32 @@
+[
+  {
+    "profile": "release",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_project_selection"
+    ],
+    "stack_bytes": 1048576,
+    "returncode": 0,
+    "seconds": 1.8841009400057374,
+    "output": "project_selection: 339 checks passed\n"
+  },
+  {
+    "profile": "debug",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_project_selection"
+    ],
+    "stack_bytes": 1048576,
+    "returncode": 0,
+    "seconds": 25.091384026993182,
+    "output": "project_selection: 339 checks passed\n"
+  },
+  {
+    "profile": "strict",
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_project_selection"
+    ],
+    "stack_bytes": 1048576,
+    "returncode": 0,
+    "seconds": 6.951659932004986,
+    "output": "project_selection: 339 checks passed\n"
+  }
+]

@@ -1,0 +1,89 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+      Start 178: os_execution
+      Start 179: os_stack
+ 1/36 Test #179: os_stack .........................   Passed   26.05 sec
+      Start 187: os_owner
+ 2/36 Test #178: os_execution .....................   Passed   26.40 sec
+      Start 182: os_host
+ 3/36 Test #182: os_host ..........................   Passed    5.99 sec
+      Start 190: os_frontend_stack
+ 4/36 Test #187: os_owner .........................   Passed   13.83 sec
+      Start 191: os_host_stack
+ 5/36 Test #190: os_frontend_stack ................   Passed    8.39 sec
+      Start 271: stage6_integrated
+ 6/36 Test #271: stage6_integrated ................   Passed    3.59 sec
+      Start 186: os_cache
+ 7/36 Test #191: os_host_stack ....................   Passed    5.73 sec
+      Start 180: os_edges
+ 8/36 Test #186: os_cache .........................   Passed    3.58 sec
+      Start 188: os_examples
+ 9/36 Test #180: os_edges .........................   Passed    4.09 sec
+      Start 181: os_edges_stack
+10/36 Test #188: os_examples ......................   Passed    3.90 sec
+      Start 270: native_source
+11/36 Test #181: os_edges_stack ...................   Passed    4.37 sec
+      Start  12: project_discovery_cli
+12/36 Test #270: native_source ....................   Passed    2.82 sec
+      Start   8: project_selection
+13/36 Test   #8: project_selection ................   Passed    2.71 sec
+      Start  13: project_profiles
+14/36 Test  #12: project_discovery_cli ............   Passed    3.89 sec
+      Start  80: gc_buffers
+15/36 Test  #13: project_profiles .................   Passed    0.96 sec
+      Start 184: os_frontend
+16/36 Test  #80: gc_buffers .......................   Passed    0.89 sec
+      Start 183: os_errors
+17/36 Test #183: os_errors ........................   Passed    5.01 sec
+      Start   9: project_sessions
+18/36 Test   #9: project_sessions .................   Passed    0.45 sec
+      Start 398: stage11_globals_aot
+19/36 Test #184: os_frontend ......................   Passed    8.15 sec
+      Start  15: project_nested_cli
+20/36 Test  #15: project_nested_cli ...............   Passed    0.37 sec
+      Start  14: project_protocol
+21/36 Test  #14: project_protocol .................   Passed    0.54 sec
+      Start 153: lsp_protocol
+22/36 Test #153: lsp_protocol .....................   Passed    0.39 sec
+      Start   6: project_manifest_legacy
+23/36 Test   #6: project_manifest_legacy ..........***Failed    0.32 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/project/legacy.py", line 52, in <module>
+    result = run(["check", no_id], 1, root)
+  File "/home/shmellyorc/Documents/Void.Language/tests/project/legacy.py", line 17, in run
+    assert result.returncode == expected, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['check', PosixPath('/tmp/void manifest legacy 6g683e1o/missing_context.void')], 0, b'Source checked successfully\n', b'')
+
+      Start 155: lsp_stage8
+24/36 Test #398: stage11_globals_aot ..............   Passed    4.06 sec
+      Start 185: lsp_os
+25/36 Test #155: lsp_stage8 .......................   Passed    0.59 sec
+      Start 240: stage11_globals
+26/36 Test #240: stage11_globals ..................   Passed    0.89 sec
+      Start 397: stage11_globals_stack
+27/36 Test #185: lsp_os ...........................   Passed    1.42 sec
+      Start  81: gc_schemas
+28/36 Test  #81: gc_schemas .......................   Passed    0.05 sec
+      Start 380: sessions
+29/36 Test #397: stage11_globals_stack ............   Passed    0.39 sec
+      Start   5: project_manifest_no_authority
+30/36 Test #380: sessions .........................   Passed    0.16 sec
+      Start   2: project_manifest
+31/36 Test   #2: project_manifest .................   Passed    0.05 sec
+      Start   7: project_manifest_provenance
+32/36 Test   #5: project_manifest_no_authority ....   Passed    0.09 sec
+      Start   1: project_manifest_header
+33/36 Test   #1: project_manifest_header ..........   Passed    0.00 sec
+      Start  10: project_application
+34/36 Test   #7: project_manifest_provenance ......   Passed    0.04 sec
+      Start  11: project_application_process
+35/36 Test  #10: project_application ..............   Passed    6.82 sec
+36/36 Test  #11: project_application_process ......   Passed   10.32 sec
+
+97% tests passed, 1 tests failed out of 36
+
+Total Test time (real) =  80.43 sec
+
+The following tests FAILED:
+	  6 - project_manifest_legacy (Failed)
+Errors while running CTest

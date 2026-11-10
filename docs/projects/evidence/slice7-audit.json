@@ -1,0 +1,270 @@
+{
+  "scope": "Slice 7 architecture audit and existing Linux compiler boundary probes",
+  "qualified_new_ffi_builds_or_executions": [],
+  "hosted_runs": [],
+  "git": {
+    "head": "2f667ea338127b8f91c3136804377ef3fa5218d6",
+    "index_tuple_sha256": "c9b3a3ca23a36c7c11fac5839d50c9f3d07311f5ec61f8577182f1abb0715fc0",
+    "index_entry_count": 68996,
+    "index_matches_head": true,
+    "staged_diff_empty": true,
+    "starting_status_counts": {
+      " M": 69,
+      "??": 1043
+    },
+    "verified_starting_paths_byte_identical": 1112,
+    "starting_checkpoint_sha256": "30ae67b0427c63164a6285af55b578353ccd2a6cdfb4300d96a3557e1bb01d4a",
+    "git_diff_check": "PASS",
+    "inventory_path": "docs/projects/evidence/slice7-inventory.txt",
+    "final_status_counts": {
+      " M": 69,
+      "??": 1046
+    }
+  },
+  "linux_release_baseline_probes": {
+    "compiler_sha256": "b3e43d772a31b609ff7efb0b2ccabe0b77850caddb8111f3fc28b6749ec46fad",
+    "compiler_version": "VOID Language Compiler v0.1.0 (development)\nLLVM 23.1.4\nTarget: x86_64-unknown-linux-gnu\nBuild identity: e702727129906a0ff1bdc591bb79e26c46295eb7a6e90748bbd94793c5fca9ac\n",
+    "probes": [
+      {
+        "case": "control",
+        "argv": [
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+          "check",
+          "--project",
+          "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/check-fixture"
+        ],
+        "manifest": "schema=1\n[project]\nid='org.example.audit'\nname='Audit'\nversion='1.0.0'\nkind='application'\n[application]\nid='org.example.audit-app'\n",
+        "source": "func main() -> i32:\n    return 0\n",
+        "status": 0,
+        "stdout": "Source checked successfully\n",
+        "stderr": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/check-fixture/void.project.toml:9:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 9 | \n   | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+      },
+      {
+        "case": "reserved-native",
+        "argv": [
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+          "check",
+          "--project",
+          "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/check-fixture"
+        ],
+        "manifest": "schema=1\n[project]\nid='org.example.audit'\nname='Audit'\nversion='1.0.0'\nkind='application'\n[application]\nid='org.example.audit-app'\n[native.example]\npackage='org.example.native'\n",
+        "source": "func main() -> i32:\n    return 0\n",
+        "status": 1,
+        "stdout": "",
+        "stderr": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/check-fixture/void.project.toml:9:1: error: Nonempty project dependencies/native declarations are reserved.\n    code: VOID5008\n\n 9 | [native.example]\n   | ^^^^^^^^^^^^^^^^\n    Module: /void.project.toml\n    Hint: Schema 1 does not resolve, install, link or load project dependencies; remove the declarations.\n\n"
+      },
+      {
+        "case": "reserved-dependencies",
+        "argv": [
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+          "check",
+          "--project",
+          "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/check-fixture"
+        ],
+        "manifest": "schema=1\n[project]\nid='org.example.audit'\nname='Audit'\nversion='1.0.0'\nkind='application'\n[application]\nid='org.example.audit-app'\n[dependencies]\nexample='1.0.0'\n",
+        "source": "func main() -> i32:\n    return 0\n",
+        "status": 1,
+        "stdout": "",
+        "stderr": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/check-fixture/void.project.toml:9:1: error: Nonempty project dependencies/native declarations are reserved.\n    code: VOID5008\n\n 9 | [dependencies]\n   | ^^^^^^^^^^^^^^\n    Module: /void.project.toml\n    Hint: Schema 1 does not resolve, install, link or load project dependencies; remove the declarations.\n\n"
+      },
+      {
+        "case": "proposed-source-form",
+        "argv": [
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+          "check",
+          "--project",
+          "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/check-fixture"
+        ],
+        "manifest": "schema=1\n[project]\nid='org.example.audit'\nname='Audit'\nversion='1.0.0'\nkind='application'\n[application]\nid='org.example.audit-app'\n",
+        "source": "native example from \"org.example.native\":\n    extern \"c\" func answer() -> i32 = \"answer\"\n\nfunc main() -> i32:\n    return 0\n",
+        "status": 1,
+        "stdout": "",
+        "stderr": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/check-fixture/void.project.toml:9:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 9 | \n   | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/check-fixture/main.void:1:8: error: Expected end of statement, found 'example'.\n    code: VOID1101\n\n 1 | native example from \"org.example.native\":\n   |        ^^^^^^^\n    Module: /main.void\n    Hint: Put each statement on its own line; postfix ++/-- cannot be used as values.\n\n"
+      }
+    ]
+  },
+  "linux_probe_reproduction": "Write the saved manifest and source to void.project.toml and main.void in an empty scratch project root. Rerun the saved argv with its final directory replaced by that root. Compare exit status, diagnostic codes and spans. Absolute fixture paths differ.",
+  "windows_10_storage": {
+    "read_only_before_resize": {
+      "captured_utc": "2026-11-09T02:55:46.6749336Z",
+      "guest": "Microsoft Windows 10 Home",
+      "build": "19045",
+      "drive": "C:",
+      "filesystem": "NTFS",
+      "total_bytes": 85226405888,
+      "free_bytes": 3868229632,
+      "partitions": [
+        {
+          "DiskNumber": 0,
+          "PartitionNumber": 1,
+          "DriveLetter": null,
+          "Offset": 1048576,
+          "Size": 104857600,
+          "Type": "System"
+        },
+        {
+          "DiskNumber": 0,
+          "PartitionNumber": 2,
+          "DriveLetter": null,
+          "Offset": 105906176,
+          "Size": 16777216,
+          "Type": "Reserved"
+        },
+        {
+          "DiskNumber": 0,
+          "PartitionNumber": 3,
+          "DriveLetter": "C",
+          "Offset": 122683392,
+          "Size": 85226408448,
+          "Type": "Basic"
+        },
+        {
+          "DiskNumber": 0,
+          "PartitionNumber": 4,
+          "DriveLetter": null,
+          "Offset": 85349892096,
+          "Size": 547356672,
+          "Type": "Recovery"
+        }
+      ],
+      "partition_query_error": null
+    },
+    "read_only_probe_powershell": "$ErrorActionPreference = 'Stop'\n$drive = Get-CimInstance -ClassName Win32_LogicalDisk -Filter \"DeviceID='C:'\"\n$os = Get-CimInstance -ClassName Win32_OperatingSystem\n$partitions = @()\n$partition_error = $null\ntry {\n    $system = Get-Partition -DriveLetter C\n    $partitions = @(Get-Partition -DiskNumber $system.DiskNumber | Sort-Object Offset | Select-Object DiskNumber,PartitionNumber,DriveLetter,Offset,Size,Type)\n} catch { $partition_error = $_.Exception.Message }\n[ordered]@{ captured_utc = [DateTime]::UtcNow.ToString('o'); guest = $os.Caption; build = $os.BuildNumber; drive = $drive.DeviceID; filesystem = $drive.FileSystem; total_bytes = $drive.Size; free_bytes = $drive.FreeSpace; partitions = $partitions; partition_query_error = $partition_error } | ConvertTo-Json -Depth 4 | Set-Content -Encoding ascii -LiteralPath '\\\\vboxsvr\\VM\\void-s7-audit.Wbw08GjA\\guest-storage.json'\n",
+    "read_only_probe_batch": "@echo off\nC:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -NonInteractive -Command \"$p='\\\\vboxsvr\\VM\\void-s7-audit.Wbw08GjA\\guest-storage.ps1'; Invoke-Expression ([IO.File]::ReadAllText($p))\" > \"\\\\vboxsvr\\VM\\void-s7-audit.Wbw08GjA\\guest-storage-console.txt\" 2>&1\n",
+    "read_only_probe_console": "",
+    "separately_authorized_resize": {
+      "receipt_path": "/home/shmellyorc/VM/windows10-grow-c.FGkDemEL/resize-receipt.json",
+      "receipt_sha256": "273676a2f88441b4c5481e98d73346c1bf7c0f21f817df461730bccec12fd4d1",
+      "postboot_receipt_path": "/home/shmellyorc/VM/windows10-grow-c.FGkDemEL/postboot-results.json",
+      "postboot_receipt_sha256": "0f6fe4163fc3195df682c7da90bee544f53585496477725ac972698708b12fc2",
+      "boot_time": "2026-11-09T03:14:56.5000000Z",
+      "status": "PASS",
+      "drive": "C:",
+      "guest": "Microsoft Windows 10 Home",
+      "build": "19045",
+      "filesystem": "NTFS",
+      "virtual_disk_bytes": 118111600640,
+      "volume_bytes": 117438660608,
+      "volume_growth_bytes": 32212254720,
+      "free_bytes": 36302782464,
+      "windows_recovery_boot_verified": true,
+      "dirty_bit": "Volume - C: is NOT Dirty\r\n",
+      "verified_binaries": [
+        {
+          "path": "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+          "sha256": "357246aac813446c909e3e3aee726fe253d22f97cf5de324d58c0346fc37713d"
+        },
+        {
+          "path": "C:\\Users\\a\\VoidS6-Storage-Debug\\voidc.exe",
+          "sha256": "abb9ad3296776c7354b319ab3ac100ab40a41afdd20e61fe88e773c905dfb838"
+        }
+      ]
+    },
+    "handoff_read_only_observation": {
+      "source": "Windows 10 Explorer This PC view captured from the running guest",
+      "observed_utc": "2026-11-09T03:22:47.538917+00:00",
+      "displayed_capacity": "109 GB",
+      "displayed_free": "33.8 GB",
+      "units": "Explorer displays rounded binary units with a GB label",
+      "guest_cleanup": "None required. The audit ran its read-only probe from the host share."
+    }
+  },
+  "cleanup": {
+    "canonical_host_root": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA",
+    "planned_files": [
+      {
+        "path": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/baseline-probes.json",
+        "sha256": "7f72113d0c0a7ddbef649cf9f735af4dc704b17eff306a5cc962e9df281c25f9"
+      },
+      {
+        "path": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/baseline.json",
+        "sha256": "30ae67b0427c63164a6285af55b578353ccd2a6cdfb4300d96a3557e1bb01d4a"
+      },
+      {
+        "path": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/check-fixture/main.void",
+        "sha256": "7f686f7a52cf58b6cff4facb8e63d7fae1809756e6bd65a2e9b071dd537e5816"
+      },
+      {
+        "path": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/check-fixture/void.project.toml",
+        "sha256": "7cf642565d75c4e67de7be4ae954b34d79f1c4c7ea09201a8d29c9679e62f08a"
+      },
+      {
+        "path": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/guest-command.png",
+        "sha256": "ca52801f07a9005a9feaea6d5eb4d30ecbbe305aee40cb97e01b72202dee2d26"
+      },
+      {
+        "path": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/guest-storage-console.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/guest-storage.cmd",
+        "sha256": "a81f762abc1bfe7f0ba6168ca46cdc5291eab7a4b8cafd9457c1b3c87c7fa5cc"
+      },
+      {
+        "path": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/guest-storage.json",
+        "sha256": "7dbb3b8ec0bd58470c12f25630a4c348a4ca63585512cbd8f866d7748b72a12e"
+      },
+      {
+        "path": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/guest-storage.ps1",
+        "sha256": "a6efbc60e8d599ebb97b1935a9c27e89d510342b4aa021fce4602956f5c8bfb4"
+      },
+      {
+        "path": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/handoff-screen.png",
+        "sha256": "75185c9d643b192a2e88f4afaf35168053fd0e7fd579d7200b80a875ffc4bccf"
+      }
+    ],
+    "planned_directories": [
+      "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/check-fixture",
+      "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA"
+    ],
+    "deleted_files": [
+      {
+        "path": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/baseline-probes.json",
+        "sha256": "7f72113d0c0a7ddbef649cf9f735af4dc704b17eff306a5cc962e9df281c25f9"
+      },
+      {
+        "path": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/baseline.json",
+        "sha256": "30ae67b0427c63164a6285af55b578353ccd2a6cdfb4300d96a3557e1bb01d4a"
+      },
+      {
+        "path": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/check-fixture/main.void",
+        "sha256": "7f686f7a52cf58b6cff4facb8e63d7fae1809756e6bd65a2e9b071dd537e5816"
+      },
+      {
+        "path": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/check-fixture/void.project.toml",
+        "sha256": "7cf642565d75c4e67de7be4ae954b34d79f1c4c7ea09201a8d29c9679e62f08a"
+      },
+      {
+        "path": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/guest-command.png",
+        "sha256": "ca52801f07a9005a9feaea6d5eb4d30ecbbe305aee40cb97e01b72202dee2d26"
+      },
+      {
+        "path": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/guest-storage-console.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/guest-storage.cmd",
+        "sha256": "a81f762abc1bfe7f0ba6168ca46cdc5291eab7a4b8cafd9457c1b3c87c7fa5cc"
+      },
+      {
+        "path": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/guest-storage.json",
+        "sha256": "7dbb3b8ec0bd58470c12f25630a4c348a4ca63585512cbd8f866d7748b72a12e"
+      },
+      {
+        "path": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/guest-storage.ps1",
+        "sha256": "a6efbc60e8d599ebb97b1935a9c27e89d510342b4aa021fce4602956f5c8bfb4"
+      },
+      {
+        "path": "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/handoff-screen.png",
+        "sha256": "75185c9d643b192a2e88f4afaf35168053fd0e7fd579d7200b80a875ffc4bccf"
+      }
+    ],
+    "deleted_directories": [
+      "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA/check-fixture",
+      "/home/shmellyorc/VM/void-s7-audit.Wbw08GjA"
+    ],
+    "guest_paths_deleted": [],
+    "retained": "All earlier evidence, native qualification binaries, source packets, test harnesses, reusable builds and toolchains. Separate VM resize evidence also retained.",
+    "completed_utc": "2026-11-09T03:24:01.641397+00:00"
+  }
+}

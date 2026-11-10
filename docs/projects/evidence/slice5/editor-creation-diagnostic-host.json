@@ -1,0 +1,16 @@
+{
+  "mode": "trusted",
+  "editor": "1.141.0",
+  "platform": "linux",
+  "events": [
+    "activation and opening a pre-existing source do not offer",
+    "an unrelated pre-existing source suppresses a later-file offer",
+    "decline persists and prevents a repeat",
+    "dismissal persists and reset is deliberate",
+    "cancelled review writes nothing and acceptance suppresses another automatic offer",
+    "File\nEdit\nSelection\nView\nGo\nRun\n[Extension Development Host] trusted\n1\nExplorer\ntrusted\ngame.void\nhelper.void\nvoid.project.toml\nOutline\nTimeline\ngame\n.void\ngame.void\n1\n2\n3\nfunc main() -> i32:\n    return 27\n 1 \n 0\nVOID: project errors\nVOID\nLF\nUTF-8\nSpaces: 4\nLn 3, Col 1\nError: VOID: This document is outside the selected project or single-file entry. Configure void.project.entry for a multi-file project; use a separate window for unrelated projects. See Output → VOID.",
+    "{\"status\":{\"state\":\"running\"},\"open\":[{\"file\":\"/tmp/VOID S5 editor HHSlsV/trusted/existing.void\",\"dirty\":false,\"version\":1},{\"file\":\"/tmp/VOID S5 editor HHSlsV/trusted/game.void\",\"dirty\":true,\"version\":2}],\"diagnostics\":[[\"/tmp/VOID S5 editor HHSlsV/trusted/existing.void\",[]],[\"/tmp/VOID S5 editor HHSlsV/trusted/game.void\",[]],[\"/tmp/VOID S5 editor HHSlsV/trusted/void.project.toml\",[{\"message\":\"Ambiguous project entry: 2 eligible main() declarations.\\nHint: Set project.entry/--entry or narrow sources.roots/exclude.\",\"code\":\"VOID5010\"}]]]}"
+  ],
+  "failure": "Error: Timed out waiting for dirty main in a compiler project session\n\tat until (/home/shmellyorc/Documents/Void.Language/editors/vscode/out/test/creationHost.js:55:11)\n\tat async Object.run (/home/shmellyorc/Documents/Void.Language/editors/vscode/out/test/creationHost.js:224:9)",
+  "status": "FAIL"
+}

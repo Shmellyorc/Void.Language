@@ -1,0 +1,28 @@
+enum: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+enum initialized: accepted
+field: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+field initialized: accepted
+array: accepted
+array initialized: accepted
+field-array: accepted
+field-array initialized: accepted
+array-field: accepted
+array-field initialized: accepted
+nested: accepted
+nested initialized: accepted
+managed: rejected (VOID IR: non-nullable reference storage read before initialization in /enum-storage.void::probe)
+managed initialized: accepted
+zero-backed holder: rejected (VOID IR: nominal source objects require complete construction)
+zero-backed legacy_scalar: rejected (VOID IR: numeric enum fields require complete managed construction)
+zero-backed legacy_array: accepted
+managed missing field: rejected (VOID IR: invalid complete managed construction)
+managed partial buffer: accepted
+read allocated array before initialization: accepted
+join missing true write: accepted
+join missing false write: accepted
+join with both writes: accepted
+unset option: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+constructed None: accepted
+unchecked inactive payload: rejected (VOID IR: sum payload requires checked access)
+storage audit: 17 negative, 9 positive, 9 mismatches
+typed-IR storage audit failed

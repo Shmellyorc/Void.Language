@@ -1,0 +1,23 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug
+    Start 428: ergonomics_sprint6
+    Start 429: stage10_fields_aot
+    Start 431: stage10_temporal_aot
+1/9 Test #429: stage10_fields_aot ...............   Passed    1.33 sec
+    Start 433: stage11_globals_aot
+2/9 Test #428: ergonomics_sprint6 ...............   Passed    4.92 sec
+    Start 434: stage10_console_aot
+3/9 Test #433: stage11_globals_aot ..............   Passed    9.62 sec
+    Start 435: stage10_operators_aot
+4/9 Test #431: stage10_temporal_aot .............   Passed   18.20 sec
+    Start 436: stage10_conversion_aot
+5/9 Test #436: stage10_conversion_aot ...........   Passed    1.48 sec
+    Start 445: application_native_sprint4
+6/9 Test #445: application_native_sprint4 .......   Passed    4.85 sec
+    Start 446: text_collections_sprint3
+7/9 Test #446: text_collections_sprint3 .........   Passed   34.89 sec
+8/9 Test #435: stage10_operators_aot ............   Passed  183.67 sec
+9/9 Test #434: stage10_console_aot ..............   Passed  466.46 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Total Test time (real) = 471.40 sec

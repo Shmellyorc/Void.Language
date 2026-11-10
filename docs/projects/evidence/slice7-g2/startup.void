@@ -1,0 +1,5 @@
+use "/native_records.void" as ffi
+var bytes: [u8] = [1]
+var copied = ffi.sum(bytes, 0, 1)
+func main():
+    pass

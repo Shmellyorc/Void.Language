@@ -1,0 +1,94 @@
+{
+  "CMakeLists.txt": {
+    "before": "6cc013b70b97322efe51e80f00507d0481c58b588a9e71eadd2e15f643d84d38",
+    "after": "2b016d7d872e8b22a6ed8520f6388ad0704d766795a37f6e6eea9427d66f9590"
+  },
+  "docs/CLI.md": {
+    "before": "a9f1bee8fda6e51b3b329c8aa1bf85c5d30b8aa2dee50339b73fbc08ee9bc6cd",
+    "after": "7a4506b08f3e7c171a48710e7d1e413e5a0e7e6413d5668aa77b5ce3cc5337c2"
+  },
+  "docs/EDITOR_INTEGRATION.md": {
+    "before": "bb8cc23acf00af34b45262d1dfcca92461cba564ecf4f115b0950e18efb4d308",
+    "after": "cec88a456c2795df9df93c6b9a3e2b9d0bbf58473d4a9951e22065f0240347df"
+  },
+  "docs/LANGUAGE_SERVER.md": {
+    "before": "4215bd94a53e625c5e99b8bd345e55080c3cbc32a910345d3c699b371a7eca07",
+    "after": "5a2753144bd58914b7716011d6e2695987984a5f5f63de6933f8c8b8cedfeb65"
+  },
+  "docs/PROJECT_ARCHITECTURE_ROADMAP.md": {
+    "before": "58e0483bd428ea564fffb9c4cad9e826e1de5a11a4b1bdff47b84b49f412c4d4",
+    "after": "09f60b6496323537702906b83c631661217f45fd5ccb8b0e69af57ed3d6e8e3b"
+  },
+  "editors/vscode/package.json": {
+    "before": "865c61d58584ac54f32e14ba70da23e455a024371f04b2bb5ae2b314db38ab39",
+    "after": "51b27e30c058c91201ecd1d7a94fafea2f98276042e53cc5c621217daf797c84"
+  },
+  "editors/vscode/src/config.ts": {
+    "before": "012b2281f5c77134f1b3fd190ca7a23d7e5c858e72e9fb49861b6437ea6fde92",
+    "after": "02bd8372728001a27a9cf4c41a432da883e833236620342c2dd2a2227e4324f2"
+  },
+  "editors/vscode/src/creation.ts": {
+    "before": null,
+    "after": "3ed6e2a8d9268135add6f1689d7d2cd1720a90842d9698440920fd308febcd17"
+  },
+  "editors/vscode/src/creationWorkflow.ts": {
+    "before": null,
+    "after": "062334a3569a235502d126d6ce61262f666770f309963a5a5c677d6a638232d9"
+  },
+  "editors/vscode/src/extension.ts": {
+    "before": "ac7b722cdec1e1e4c57545ae219199bd169d6e55d456cd80a514563d10999ce4",
+    "after": "f5e75422509a29e86b7ebb174359ae591dd18b9a6a792bad6ba7cf60d15483e9"
+  },
+  "editors/vscode/src/test/creationHost.ts": {
+    "before": null,
+    "after": "232ab18af64b7fa914e551a7bac3cc600d7e3d324b9e9857b8e3ef561546065a"
+  },
+  "editors/vscode/src/test/creationWorkbench.ts": {
+    "before": null,
+    "after": "993bccfda801b35cb3ebaf64538eed7979b3b875c9d60d7e364b96a0e798bc2f"
+  },
+  "editors/vscode/src/test/runCreationHost.ts": {
+    "before": null,
+    "after": "f66599e563b2c669c5636488f46c6206d6773e175ed7fd53cbb94c851de115b5"
+  },
+  "include/void/project_creation.hpp": {
+    "before": null,
+    "after": "4d635db78819abe081db9cda3b09c8a9f746ab0cd19c3221f9bf65297b3c7a45"
+  },
+  "src/frontend/compiler.cpp": {
+    "before": "b296de7b1a6a19306b9e9e9a57343cfa439146eccadacb8cc838587f2b9e3178",
+    "after": "a590ec7a321e0bf6c6bd9a2015511ed3225eef6a038e6775ca12238bcf10776c"
+  },
+  "src/frontend/project_creation.cpp": {
+    "before": null,
+    "after": "86ce642e2cf6b4ffd87c3ab45c752a6c24a393c5a8a79306a0fa16932d6a68da"
+  },
+  "src/frontend/project_selection.inc": {
+    "before": "a0987bc9ebea2e1de5deed9d3a422fb8c2414ceb904241d71e1364d834206308",
+    "after": "e1c10cbab8684f69a0287a38e82aecd49c62054de08169286b4adc1df5094e5f"
+  },
+  "src/lsp/main.cpp": {
+    "before": "628ec7c6a22ba7e61259b38923724ffaf6153dc99b437e338fb8165b025b32c2",
+    "after": "21d177b8c52d417d5b4b4e0bfb3ab4211cda59830a51dfdcde86502b0e492906"
+  },
+  "src/main.cpp": {
+    "before": "7e0def54be17fbd8fd5c9eb4183bf72548d8dbab064798c4e3b918b227fb9c4c",
+    "after": "3d78ed9e69367394ef331add0b5f1812e08f3d27ad9a978d1981c8b22f1c9e7f"
+  },
+  "tests/cli/install.py": {
+    "before": "b52adc67af7ff596b977ed478403a152415ad6017aaed7f328a2ff78dd3d99cf",
+    "after": "615a6887446c141c231f496c605e4f01a4043a7262cf1c7172587f83de66274b"
+  },
+  "tests/project/creation.cpp": {
+    "before": null,
+    "after": "d729c111f883723f00d153894e9c11433fd0ff90c56861aaab79bd2c717eef2c"
+  },
+  "tests/project/creation.py": {
+    "before": null,
+    "after": "76cc53fdc21c725833e1bf87af0afc6cba3ae6b9ee40f0769d2b890386b90fea"
+  },
+  "tests/project/legacy.py": {
+    "before": "a41b3f985cae8240d8db1c5f83a2ec1968c08641c703c3b0064908b9bfb2568e",
+    "after": "5400b55db1c13c7c7c7791ddb42642ea00fec0117d5d1f3e1e86a728877f1746"
+  }
+}

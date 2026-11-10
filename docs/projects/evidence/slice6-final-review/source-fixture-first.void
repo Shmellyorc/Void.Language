@@ -1,0 +1,38 @@
+enum mode(u8):
+    ready = 7
+    done = 255
+
+var initializations: i32 = 0
+var cleanups: i32 = 0
+
+value struct stamp:
+    state: mode = mode.ready
+
+func (self stamp) init():
+    if self.state == mode.ready:
+        initializations += 1
+    self.state = mode.done
+
+struct holder:
+    rows: [[stamp, 2], 3]
+    absent: option<mode>
+
+func select_mode() -> mode:
+    defer:
+        cleanups += 1
+    return mode.done
+
+func main() -> i32:
+    var rows: [[stamp, 2], 3]
+    var saved = holder(rows = rows, absent = None)
+    var count: i32 = 0
+    for row in saved.rows:
+        for cell in row:
+            if cell.state != mode.done:
+                return 1
+            count += 1
+    if count != 6 or initializations != 6 or not (saved.absent is None):
+        return 2
+    if select_mode() != mode.done or cleanups != 1:
+        return 3
+    return 0

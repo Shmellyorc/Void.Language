@@ -1,0 +1,29 @@
+void-c-primitive 2 2
+provider org.voidlang.g2-fixture
+target x86_64-unknown-linux-gnu sysv-x64
+source /native_records.void
+thunk 30a5e3615e312b0681da6f5dae1a10e9c3ec021a1b1f1501b0e6efa4911027d3
+fixture 889eda7481b9615a96f9468b0ee504cff8e6523beb364b14c2daeeef9d23cb3e
+effects direct-sync nonblocking no-callbacks
+call c-default
+aliases c_int:i32 c_long:i64 c_size:u64 c_bool:bool
+record rgba G2Color 4 1 4
+field r r u8 0
+field g g u8 1
+field b b u8 2
+field a a u8 3
+record sample G2Sample 16 8 2
+field tag tag i32 0
+field reading reading f64 8
+record packet G2Packet 32 8 4
+field color color record:rgba 0
+field channels channels array:u16:3:2 4
+field mode mode u8 10
+field datum datum record:sample 16
+bind color g2_color record:rgba record:rgba
+bind calibrate g2_calibrate record:sample record:sample f32
+bind packet_mix g2_packet record:packet record:sample record:packet u32
+bind sum g2_sum i64 in:1:2:64 c_size c_size
+bind fill g2_fill i64 out:1:2:64 c_size c_size u8
+bind adjust g2_adjust i64 inout:1:2:64 c_size c_size
+bind move_bytes g2_move i64 in:1:2:64 c_size c_size out:4:5:64 c_size c_size

@@ -1,0 +1,154 @@
+{
+  "status": "FAIL",
+  "os": "Windows-10-10.0.19045-SP0",
+  "build": 19045,
+  "work": "C:\\Users\\a\\VoidS7-G4W-architecture",
+  "commands": [
+    {
+      "label": "toolchain",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "--version"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "build-dependency",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/TC",
+        "/c",
+        "/GS-",
+        "/Zl",
+        "dependency.c",
+        "/Fodependency.obj"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "build-competitor",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/TC",
+        "/c",
+        "/GS-",
+        "/Zl",
+        "/DFIXTURE_VALUE=99",
+        "dependency.c",
+        "/Focompetitor.obj"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "build-provider",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/TC",
+        "/c",
+        "/GS-",
+        "/Zl",
+        "provider.c",
+        "/Foprovider.obj"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "build-marker",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/TC",
+        "/c",
+        "/GS-",
+        "/Zl",
+        "redirected.c",
+        "/Fomarker.obj"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "build-explicit-object",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/TC",
+        "/c",
+        "/GS-",
+        "/Zl",
+        "explicit.c",
+        "/Foexplicit.obj"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "link-good",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe",
+        "/dll",
+        "/noentry",
+        "/nodefaultlib",
+        "/out:good/void_g4_probe_dep.dll",
+        "/implib:dep.lib",
+        "dependency.obj"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "link-alternate",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe",
+        "/dll",
+        "/entry:checkpoint_attach",
+        "/nodefaultlib",
+        "/out:alternate/void_g4_probe_dep.dll",
+        "competitor.obj",
+        "marker.obj"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "link-provider",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe",
+        "/dll",
+        "/noentry",
+        "/nodefaultlib",
+        "/out:good/void_g4_probe_main.dll",
+        "provider.obj",
+        "dep.lib"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "link-explicit",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe",
+        "/dll",
+        "/noentry",
+        "/nodefaultlib",
+        "/out:good/void_g4w_explicit.dll",
+        "explicit.obj"
+      ],
+      "exit": 1
+    }
+  ],
+  "inputs": {
+    "dependency.c": "86e2dd69bd2394c4ccc11cb5fc709099a78482542bd9d9d21530434e9b084773",
+    "provider.c": "5cbbb27ad31058d5d445f9f69a4bc2d2e7a073888aba2867ebf8948de31cdbde",
+    "redirected.c": "be95976eefb42c3e565efa81f23a4462b323118c50b68f89b9b24ea0303f021d",
+    "override-dependency.manifest": "dbcafe32764879187ebf30497dfabb439da8d03dcd56139221b2a2dd0c28e335",
+    "explicit.c": "4d218210006e90e9159ef1d66165758d88830b516a4359f8513d4f7a793d5938",
+    "explicit_abi.h": "c3f38e1b63f798a518ff10c19c0b64c7dc1a62269b0f3790f2b45ed8bafe9ee2",
+    "forwarder.def": "e3a44f13889f278021dd27357cecd9d7fa373f6a41cdb74e0ba29a528651bf9a",
+    "launcher.cpp": "4d316366808d495aefe1e311975c719c285c1e114600936fe61ba386d0ae7d5f",
+    "loader_probe.cpp": "0523b8628975c27eb48475ebd4f0b81a1f122f925a2883466c00b0d328529096",
+    "native-run.cmd": "01da10d6006290254a5ee8bd842dcf649abd6806121213e12252905c0fb29068",
+    "native-run.py": "44fe0139d9d416e08f09d3c3bb2d2f00411d06986751c6e61ae5faec5d828026",
+    "startup.c": "79c824f303e1a5f264bf67a7f238c7d91da29db0b0c39f2c4aa1cca3807ecf8c"
+  },
+  "artifacts": {},
+  "error": "Traceback (most recent call last):\n  File \"\\\\vboxsvr\\VM\\project-slice7-g4-windows\\native-run.py\", line 66, in <module>\n    run('link-explicit',linker,'/dll','/noentry','/nodefaultlib','/out:good/void_g4w_explicit.dll','explicit.obj')\n    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"\\\\vboxsvr\\VM\\project-slice7-g4-windows\\native-run.py\", line 34, in run\n    raise RuntimeError(f'{label} failed with {result.returncode}')\nRuntimeError: link-explicit failed with 1\n"
+}

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Win32-ninja"
+	tests="16"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="DESKTOP-N4VH0F7"
+	time="211"
+	timestamp="2026-11-09T12:41:58"
+	>
+	<testcase name="fixed_arrays_cli" classname="fixed_arrays_cli" time="15.1174" status="run">
+		<properties/>
+		<system-out>-- Real numeric fixed-array programs passed JIT and linked AOT, normal/O2
+</system-out>
+	</testcase>
+	<testcase name="growable_arrays_cli" classname="growable_arrays_cli" time="11.6598" status="run">
+		<properties/>
+		<system-out>-- Growable numeric/bool lists passed normal/O2 source JIT and native AOT
+</system-out>
+	</testcase>
+	<testcase name="arrays_cli" classname="arrays_cli" time="25.9174" status="run">
+		<properties/>
+		<system-out>-- Phase 23 arrays/ranges passed normal/O2 source JIT and native AOT
+</system-out>
+	</testcase>
+	<testcase name="generics_cli" classname="generics_cli" time="12.5848" status="run">
+		<properties/>
+		<system-out>-- Generic programs passed normal/O2 JIT and linked AOT
+</system-out>
+	</testcase>
+	<testcase name="collections_cli" classname="collections_cli" time="22.7705" status="run">
+		<properties/>
+		<system-out>-- Collections: normal/O2 JIT and independently linked AOT passed
+</system-out>
+	</testcase>
+	<testcase name="dictionaries_cli" classname="dictionaries_cli" time="22.9898" status="run">
+		<properties/>
+		<system-out>-- Dictionaries: normal/O2 JIT and independently linked AOT passed
+</system-out>
+	</testcase>
+	<testcase name="properties_cli" classname="properties_cli" time="12.4384" status="run">
+		<properties/>
+		<system-out>-- Properties: 44 successful + 12 checked failures, normal/O2 JIT/independently linked AOT passed
+</system-out>
+	</testcase>
+	<testcase name="patterns_cli" classname="patterns_cli" time="9.46187" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="advanced_cli" classname="advanced_cli" time="20.4833" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="managed_cli" classname="managed_cli" time="6.5083" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="managed_initialization_cli" classname="managed_initialization_cli" time="9.07652" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="reference_values_cli" classname="reference_values_cli" time="12.1317" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="composition_cli" classname="composition_cli" time="6.80452" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="inheritance_cli" classname="inheritance_cli" time="10.2316" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="interfaces_cli" classname="interfaces_cli" time="8.84766" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="strings_cli" classname="strings_cli" time="4.3255" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+</testsuite>

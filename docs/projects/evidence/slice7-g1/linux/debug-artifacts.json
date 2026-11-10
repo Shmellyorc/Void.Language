@@ -1,0 +1,166 @@
+{
+  "profile": "debug",
+  "host": "x86_64",
+  "c_compile_commands": [
+    {
+      "directory": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+      "command": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -DG1_FIXTURE_IDENTITY=\\\"7b65c2c5583114556c4d940903ed6b003742832380abbbac07f5bf8f06c11a63\\\" -I/home/shmellyorc/Documents/Void.Language/include -g -std=c11 -fvisibility=hidden -Wall -Wextra -Wpedantic -o CMakeFiles/void_g1_fixture.dir/tests/ffi/primitives_fixture.c.o -c /home/shmellyorc/Documents/Void.Language/tests/ffi/primitives_fixture.c",
+      "file": "/home/shmellyorc/Documents/Void.Language/tests/ffi/primitives_fixture.c",
+      "output": "CMakeFiles/void_g1_fixture.dir/tests/ffi/primitives_fixture.c.o"
+    },
+    {
+      "directory": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+      "command": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -DG1_MISMATCHED_FIXTURE=1 -I/home/shmellyorc/Documents/Void.Language/include -g -std=c11 -fvisibility=hidden -Wall -Wextra -Wpedantic -o CMakeFiles/void_g1_wrong_fixture.dir/tests/ffi/primitives_fixture.c.o -c /home/shmellyorc/Documents/Void.Language/tests/ffi/primitives_fixture.c",
+      "file": "/home/shmellyorc/Documents/Void.Language/tests/ffi/primitives_fixture.c",
+      "output": "CMakeFiles/void_g1_wrong_fixture.dir/tests/ffi/primitives_fixture.c.o"
+    },
+    {
+      "directory": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+      "command": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang  -I/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1 -I/home/shmellyorc/Documents/Void.Language/include -g -std=c11 -fvisibility=hidden -Wall -Wextra -Wpedantic -o CMakeFiles/void_g1_thunk.dir/tests/ffi/primitives_thunk.c.o -c /home/shmellyorc/Documents/Void.Language/tests/ffi/primitives_thunk.c",
+      "file": "/home/shmellyorc/Documents/Void.Language/tests/ffi/primitives_thunk.c",
+      "output": "CMakeFiles/void_g1_thunk.dir/tests/ffi/primitives_thunk.c.o"
+    }
+  ],
+  "artifacts": {
+    "void_g1_tests": "a3b4500771a8d6536fa7c229fca7cb246f5a01c54cfa6b9f380167963e532ff1",
+    "void_g1_aot_normal": "19574b6ffcf9788b30dd7f670be208e728064595d4643398a79d5610126ca445",
+    "void_g1_aot_optimized": "25ccc29c1bdba3fd7dffc4d836608228e98f0f74ed5b28759efeec092e1b0a59",
+    "void_g1_aot_mismatch": "e3ec232d03e8fc8f689da1841c0d5fab7aacc39ff45c294ccd4b4f3ecd96ac05",
+    "voidc": "9570eca65bfa8774d6a7f980063bfa657917a72073aefa2c87d6da31971520cd",
+    "ffi-g1/application-normal.o": "e155da933ecf6c617910a43a85be33b3bf1b135de55be06e57c5059ae498fb23",
+    "ffi-g1/application-optimized.o": "b531e61a3b69d674f6b83a49c91a7887e5c69b396387519eb172c621ac3f6dd9",
+    "ffi-g1/primitives.descriptor": "044560cab14ec1aeee266724b1b27ca6c71127152822a07357711e1897e1fcff",
+    "ffi-g1/primitives.void": "f0f3e781505b1448552fd82048f625df3437e70aad769facb30c3847cc8fdb7b",
+    "CMakeFiles/void_g1_fixture.dir/tests/ffi/primitives_fixture.c.o": "de577a68c7cc2977bae70c4760e02ea9a1836ccaad251a1f205c9d94f1aaa904",
+    "CMakeFiles/void_g1_wrong_fixture.dir/tests/ffi/primitives_fixture.c.o": "b7271bc50944cf5a4543eac59fe657550efbf2dd2bf976ef26b024c0629c8c43",
+    "CMakeFiles/void_g1_thunk.dir/tests/ffi/primitives_thunk.c.o": "6624cfed224aad1cc936b83b573a54d549e12fe4f02ecd463ac64f97e52de94a"
+  },
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "abort_on_error=1:halt_on_error=1:detect_leaks=1",
+    "UBSAN_OPTIONS": "abort_on_error=1:halt_on_error=1:print_stacktrace=1"
+  },
+  "processes": [
+    {
+      "case": "direct-jit-and-typed-ir",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g1_tests",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/primitives.descriptor",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/primitives.void",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/evidence-replay"
+      ],
+      "status": 0,
+      "stdout": "void-c-primitive 2 1: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects\nvoid-c-primitive 1 2: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects\ncall vectorcall: C primitive descriptor line 8: unsupported descriptor, ABI revision or effects\neffects direct-sync blocking no-callbacks: C primitive descriptor line 7: unsupported descriptor, ABI revision or effects\nc_size:i64: C primitive descriptor line 9: unsupported descriptor, ABI revision or effects\nc_bool:u8: C primitive descriptor line 9: unsupported descriptor, ABI revision or effects\nbind signed8 g1_signed8 i8 ptr: C primitive descriptor line 10: unsupported C primitive type\nbind signed8 g1_signed8 i8 record: C primitive descriptor line 10: unsupported C primitive type\nbind signed8 g1_signed8 i8 void: C primitive descriptor line 10: unsupported C primitive type\nbind signed8 g1_signed8 i8 u8: C primitive provider rejected the exact descriptor or fixture identity\nbind signed8 g1_missing i8 i8: C primitive provider rejected the exact descriptor or fixture identity\nbind signed16 g1_signed8 i8 i8: C primitive descriptor line 11: invalid or duplicate binding name or export\nbind signed8 g1_signed16 i8 i8: C primitive descriptor line 11: invalid or duplicate binding name or export\nextra signed8 g1_signed8 i8 i8: C primitive descriptor line 10: expected a bounded primitive binding record\nprovider org.voidlang.forged: C primitive provider rejected the exact descriptor or fixture identity\nsource /other.void: C primitive provider rejected the exact descriptor or fixture identity\nsource /../other.void: C primitive descriptor line 4: expected a canonical single-file VFS identity\ntarget aarch64-: C primitive descriptor line 3: unsupported target/profile combination\nartifact identity: C primitive provider rejected the exact descriptor or fixture identity\ndescriptor bounds: C primitive descriptor line 1: descriptor size outside 1..16384 bytes\nunavailable fixture: C primitive provider transport is unavailable\nmissing independent admission: VOID IR: C primitive call outside the admitted binding module\nwrong provider: VOID IR: invalid C primitive descriptor or exact call signature\nwrong export: VOID IR: invalid C primitive descriptor or exact call signature\nwrong ordinal: VOID IR: invalid C primitive descriptor or exact call signature\nnegative ordinal: VOID IR: C primitive call outside the admitted binding module\nmissing operand: VOID IR: invalid C primitive descriptor or exact call signature\nextra operand: VOID IR: invalid C primitive descriptor or exact call signature\nargument signedness: VOID IR: invalid C primitive descriptor or exact call signature\nargument width: VOID IR: invalid C primitive descriptor or exact call signature\nreturn signedness: VOID IR: invalid C primitive descriptor or exact call signature\nreturn count: VOID IR: invalid C primitive descriptor or exact call signature\naggregate result: VOID IR: invalid C primitive descriptor or exact call signature\npointer-like result: VOID IR: invalid C primitive descriptor or exact call signature\nnondefault ABI operand: VOID IR: invalid C primitive descriptor or exact call signature\nreceiver: VOID IR: invalid C primitive descriptor or exact call signature\nunadmitted scope: VOID IR: C primitive binding requires the admitted direct import\nunadmitted body: VOID IR: C primitive call outside the admitted binding module\nplain import bypass: VOID IR: C primitive transport requires host admission and typed operations\nfirst class binding: VOID IR: C primitive binding is direct-call only\nasync activation: VOID IR: C primitive graphs require synchronous execution\nruntime-free bypass: VOID IR: invalid C primitive module admission\nORC untrusted symbol bypass: C primitive transport requires per-generation admission\nJIT normal returned 73; direct C oracle agreed; long=64 bits\nJIT O2 returned 73; direct C oracle agreed; long=64 bits\n",
+      "stderr": ""
+    },
+    {
+      "case": "independently-linked-aot-normal",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g1_aot_normal",
+        "7"
+      ],
+      "status": 0,
+      "stdout": "73\n",
+      "stderr": ""
+    },
+    {
+      "case": "independently-linked-aot-optimized",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g1_aot_optimized",
+        "7"
+      ],
+      "status": 0,
+      "stdout": "73\n",
+      "stderr": ""
+    },
+    {
+      "case": "mismatched-fixture-aot",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g1_aot_mismatch",
+        "7"
+      ],
+      "status": 1,
+      "stdout": "VOID: C primitive provider rejected the exact descriptor or fixture identity\n",
+      "stderr": ""
+    }
+  ],
+  "clang_abi_probe": [
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-DG1_FIXTURE_IDENTITY=\"7b65c2c5583114556c4d940903ed6b003742832380abbbac07f5bf8f06c11a63\"",
+        "-I/home/shmellyorc/Documents/Void.Language/include",
+        "-g",
+        "-std=c11",
+        "-fvisibility=hidden",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-o",
+        "-",
+        "-S",
+        "-emit-llvm",
+        "/home/shmellyorc/Documents/Void.Language/tests/ffi/primitives_fixture.c"
+      ],
+      "C_IR_signatures": [
+        "define hidden ptr @g1_fixture_identity() #0 !dbg !17 {",
+        "define hidden signext i8 @g1_signed8(i8 noundef signext %0) #0 !dbg !23 {",
+        "define hidden signext i16 @g1_signed16(i16 noundef signext %0) #0 !dbg !36 {",
+        "define hidden i32 @g1_signed32(i32 noundef %0) #0 !dbg !46 {",
+        "define hidden i64 @g1_signed64(i64 noundef %0) #0 !dbg !56 {",
+        "define hidden zeroext i8 @g1_unsigned8(i8 noundef zeroext %0) #0 !dbg !66 {",
+        "define hidden zeroext i16 @g1_unsigned16(i16 noundef zeroext %0) #0 !dbg !77 {",
+        "define hidden i32 @g1_unsigned32(i32 noundef %0) #0 !dbg !87 {",
+        "define hidden i64 @g1_unsigned64(i64 noundef %0) #0 !dbg !97 {",
+        "define hidden i32 @g1_cint(i32 noundef %0) #0 !dbg !107 {",
+        "define hidden i64 @g1_clong(i64 noundef %0) #0 !dbg !114 {",
+        "define hidden i64 @g1_csize(i64 noundef %0) #0 !dbg !121 {",
+        "define hidden zeroext i1 @g1_invert(i1 noundef zeroext %0) #0 !dbg !130 {",
+        "define hidden float @g1_single(float noundef %0, float noundef %1) #0 !dbg !139 {",
+        "define hidden double @g1_double(double noundef %0, double noundef %1) #0 !dbg !151 {",
+        "define hidden zeroext i1 @g1_sign_zero(float noundef %0, double noundef %1) #0 !dbg !163 {",
+        "define hidden i64 @g1_mixed(i8 noundef signext %0, i16 noundef zeroext %1, i32 noundef %2, float noundef %3, i64 noundef %4, double noundef %5, i64 noundef %6, float noundef %7, i32 noundef %8, double noundef %9, i8 noundef zeroext %10, i16 noundef signext %11, float noundef %12, double noundef %13) #0 !dbg !184 {",
+        "define hidden i32 @g1_sentinel() #0 !dbg !260 {",
+        "define hidden void @g1_no_result(i32 noundef %0) #0 !dbg !264 {"
+      ]
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-I/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1",
+        "-I/home/shmellyorc/Documents/Void.Language/include",
+        "-g",
+        "-std=c11",
+        "-fvisibility=hidden",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-o",
+        "-",
+        "-S",
+        "-emit-llvm",
+        "/home/shmellyorc/Documents/Void.Language/tests/ffi/primitives_thunk.c"
+      ],
+      "C_IR_signatures": [
+        "declare ptr @g1_fixture_identity() #2",
+        "declare signext i8 @g1_signed8(i8 noundef signext) #2",
+        "declare signext i16 @g1_signed16(i16 noundef signext) #2",
+        "declare i32 @g1_signed32(i32 noundef) #2",
+        "declare i64 @g1_signed64(i64 noundef) #2",
+        "declare zeroext i8 @g1_unsigned8(i8 noundef zeroext) #2",
+        "declare zeroext i16 @g1_unsigned16(i16 noundef zeroext) #2",
+        "declare i32 @g1_unsigned32(i32 noundef) #2",
+        "declare i64 @g1_unsigned64(i64 noundef) #2",
+        "declare i32 @g1_cint(i32 noundef) #2",
+        "declare i64 @g1_clong(i64 noundef) #2",
+        "declare i64 @g1_csize(i64 noundef) #2",
+        "declare zeroext i1 @g1_invert(i1 noundef zeroext) #2",
+        "declare float @g1_single(float noundef, float noundef) #2",
+        "declare double @g1_double(double noundef, double noundef) #2",
+        "declare zeroext i1 @g1_sign_zero(float noundef, double noundef) #2",
+        "declare i64 @g1_mixed(i8 noundef signext, i16 noundef zeroext, i32 noundef, float noundef, i64 noundef, double noundef, i64 noundef, float noundef, i32 noundef, double noundef, i8 noundef zeroext, i16 noundef signext, float noundef, double noundef) #2",
+        "declare i32 @g1_sentinel() #2",
+        "declare void @g1_no_result(i32 noundef) #2"
+      ]
+    }
+  ]
+}

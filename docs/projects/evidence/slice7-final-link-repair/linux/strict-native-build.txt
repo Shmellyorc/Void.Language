@@ -1,0 +1,1524 @@
+[0/2] Re-checking globbed directories...
+[1/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/amigaos.c.o
+[2/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/altsvc.c.o
+[3/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/bufref.c.o
+[4/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/api.c.o
+[5/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/bufq.c.o
+[6/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-haproxy.c.o
+[7/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-https-connect.c.o
+[8/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-recvbuf.c.o
+[9/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-h1-proxy.c.o
+[10/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-ip-happy.c.o
+[11/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-h2-proxy.c.o
+[12/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-setup.c.o
+[13/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/connect.c.o
+[14/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cfilters.c.o
+[15/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/content_encoding.c.o
+[16/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/conncache.c.o
+[17/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cf-socket.c.o
+[18/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/creds.c.o
+[19/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_endian.c.o
+[20/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_fnmatch.c.o
+[21/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_addrinfo.c.o
+[22/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_get_line.c.o
+[23/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_fopen.c.o
+[24/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_gethostname.c.o
+[25/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_gssapi.c.o
+[26/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_memrchr.c.o
+[27/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_ntlm_core.c.o
+[28/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_range.c.o
+[29/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_sasl.c.o
+[30/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cshutdn.c.o
+[31/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_sspi.c.o
+[32/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_sha512_256.c.o
+[33/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_threads.c.o
+[34/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_share.c.o
+[35/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cookie.c.o
+[36/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/dict.c.o
+[37/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cw-pause.c.o
+[38/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/cw-out.c.o
+[39/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/easygetopt.c.o
+[40/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_trc.c.o
+[41/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/easyoptions.c.o
+[42/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/dynhds.c.o
+[43/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/fake_addrinfo.c.o
+[44/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/escape.c.o
+[45/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/file.c.o
+[46/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/fileinfo.c.o
+[47/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ftplistparser.c.o
+[48/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ftp.c.o
+[49/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/getenv.c.o
+[50/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/easy.c.o
+[51/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/gopher.c.o
+[52/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/formdata.c.o
+[53/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/hash.c.o
+[54/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/hsts.c.o
+[55/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/headers.c.o
+[56/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/hmac.c.o
+[57/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/getinfo.c.o
+[58/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_aws_sigv4.c.o
+[59/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http1.c.o
+[60/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_httpsig.c.o
+[61/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curl_ed25519.c.o
+[62/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_digest.c.o
+[63/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_negotiate.c.o
+[64/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_ntlm.c.o
+[65/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_chunks.c.o
+[66/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/idn.c.o
+[67/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/if2ip.c.o
+[68/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/imap.c.o
+[69/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ldap.c.o
+[70/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/llist.c.o
+[71/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http_proxy.c.o
+[72/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/md4.c.o
+[73/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/macos.c.o
+[74/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/memdebug.c.o
+[75/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/md5.c.o
+[76/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/mprintf.c.o
+[77/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/mqtt.c.o
+[78/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http2.c.o
+[79/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/mime.c.o
+[80/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/http.c.o
+[81/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/netrc.c.o
+[82/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/openldap.c.o
+[83/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/multi_ntfy.c.o
+[84/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/multi_ev.c.o
+[85/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/pingpong.c.o
+[86/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/pop3.c.o
+[87/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/peer.c.o
+[88/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/protocol.c.o
+[89/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/parsedate.c.o
+[90/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/psl.c.o
+[91/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/progress.c.o
+[92/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ptrarray.c.o
+[93/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/proxy.c.o
+[94/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/rand.c.o
+[95/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ratelimit.c.o
+[96/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/rtsp.c.o
+[97/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/request.c.o
+[98/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/select.c.o
+[99/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/sha256.c.o
+[100/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/sendf.c.o
+[101/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/slist.c.o
+[102/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/smtp.c.o
+[103/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/socketpair.c.o
+[104/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/socks_gssapi.c.o
+[105/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/socks_sspi.c.o
+[106/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/splay.c.o
+[107/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/setopt.c.o
+[108/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/strcase.c.o
+[109/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/strequal.c.o
+[110/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/telnet.c.o
+[111/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/strerror.c.o
+[112/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/thrdpool.c.o
+[113/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/thrdqueue.c.o
+[114/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/tftp.c.o
+[115/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/multi.c.o
+[116/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/u8_strset.c.o
+[117/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/u32_ptrset.c.o
+[118/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/transfer.c.o
+[119/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/uint-bset.c.o
+[120/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/uint-table.c.o
+[121/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/uint-spbset.c.o
+[122/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/socks.c.o
+[123/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/version.c.o
+[124/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/ws.c.o
+[125/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/cleartext.c.o
+[126/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/cram.c.o
+[127/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/digest_sspi.c.o
+[128/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/gsasl.c.o
+[129/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/krb5_gssapi.c.o
+[130/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/krb5_sspi.c.o
+[131/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/digest.c.o
+[132/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/ntlm.c.o
+[133/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/ntlm_sspi.c.o
+[134/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/oauth2.c.o
+[135/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/spnego_gssapi.c.o
+[136/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/spnego_sspi.c.o
+[137/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vauth/vauth.c.o
+[138/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/asyn-base.c.o
+[139/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/asyn-ares.c.o
+[140/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/asyn-thrdd.c.o
+[141/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/urlapi.c.o
+[142/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/doh.c.o
+[143/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/url.c.o
+[144/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/hostip4.c.o
+[145/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/dnscache.c.o
+[146/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/cf-dns.c.o
+[147/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/hostip6.c.o
+[148/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/httpsrr.c.o
+[149/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/apple.c.o
+[150/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/cipher_suite.c.o
+[151/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/mbedtls.c.o
+[152/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/gtls.c.o
+[153/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/hostcheck.c.o
+[154/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/rustls.c.o
+[155/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/schannel.c.o
+[156/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/schannel_verify.c.o
+[157/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vdns/hostip.c.o
+[158/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/vtls_config.c.o
+[159/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/vtls_spack.c.o
+[160/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/wolfssl.c.o
+[161/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/vtls_scache.c.o
+[162/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/x509asn1.c.o
+[163/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-capsule.c.o
+[164/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/capsule.c.o
+[165/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-ngtcp2.c.o
+[166/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-ngtcp2-proxy.c.o
+[167/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-ngtcp2-cmn.c.o
+[168/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/vquic.c.o
+[169/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/cf-quiche.c.o
+[170/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vssh/libssh.c.o
+[171/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vquic/vquic-tls.c.o
+[172/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vssh/libssh2.c.o
+[173/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vssh/vssh.c.o
+[174/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/basename.c.o
+[175/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/vtls.c.o
+[176/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/base64.c.o
+[177/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/win32-fopen.c.o
+[178/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/dynbuf.c.o
+[179/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/inet_ntop.c.o
+[180/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/multibyte.c.o
+[181/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/nonblock.c.o
+[182/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/snprintf.c.o
+[183/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/strcopy.c.o
+[184/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/inet_pton.c.o
+[185/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/strdup.c.o
+[186/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/timediff.c.o
+[187/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/strerr.c.o
+[188/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/strparse.c.o
+[189/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/wait.c.o
+[190/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/version_win32.c.o
+[191/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/winapi.c.o
+[192/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/timeval.c.o
+[193/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/curlx/warnless.c.o
+[194/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/__/__/__/src/runtime/curl_keylog_disabled.c.o
+[195/1161] Building C object CMakeFiles/void_g4_main.dir/tests/ffi/dynamic_fixture.c.o
+[196/1161] Building C object CMakeFiles/void_g4_main.dir/tests/ffi/dynamic_thunk.c.o
+[197/1161] Building C object curl/lib/CMakeFiles/libcurl_static.dir/vtls/openssl.c.o
+[198/1161] Linking C shared library ffi-g4/native/libvoid_g4_main.so
+[199/1161] Building C object CMakeFiles/void_g2_thunk.dir/tests/ffi/records_thunk.c.o
+[200/1161] Linking C static library curl/lib/libcurl.a
+[201/1161] Building C object CMakeFiles/void_g1_thunk.dir/tests/ffi/primitives_thunk.c.o
+[202/1161] Generating io-errors-async.void
+[203/1161] Building C object CMakeFiles/void_g3_thunk.dir/tests/ffi/resources_thunk.c.o
+[204/1161] Generating ffi-g4/closure.txt
+[205/1161] Generating void-native-resources.txt, native-resources-install-RelWithDebInfo.txt
+[206/1161] cd /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict && /usr/bin/cmake -E make_directory /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict && /usr/bin/cmake -E copy_if_different /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void-native-resources.txt /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void-native-resources.txt
+[207/1161] Generating cache-identity-RelWithDebInfo.cpp
+[208/1161] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-RelWithDebInfo.cpp.o
+[209/1161] Linking CXX static library libvoid_cache_identity.a
+[210/1161] Linking CXX executable void_runtime_generated
+[211/1161] Linking CXX executable void_managed_tests
+[212/1161] Linking CXX executable void_managed_initialization_tests
+[213/1161] Linking CXX executable void_io_runner
+[214/1161] Linking CXX executable voidc
+[215/1161] Linking CXX executable void_reference_values_tests
+[216/1161] Linking CXX executable void_composition_tests
+[217/1161] Linking CXX executable void_inheritance_tests
+[218/1161] Linking CXX executable void_interfaces_tests
+[219/1161] Linking CXX executable void_g1_tests
+[220/1161] Linking CXX executable void_strings_tests
+[221/1161] Linking CXX executable void_combined_ownership
+[222/1161] Linking CXX executable void_g2_tests
+[223/1161] Linking CXX executable void_g3_tests
+[224/1161] Generating io-wire.void
+[225/1161] Linking CXX executable void_async_tests
+[226/1161] Linking CXX executable void_native_tests
+[227/1161] Generating fixed_arrays-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/fixed_arrays-main-normal.o
+[228/1161] Generating fixed_arrays-copies-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/fixed_arrays-copies-normal.o
+[229/1161] Generating fixed_arrays-order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/fixed_arrays-order-normal.o
+[230/1161] Generating fixed_arrays-indexes-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/fixed_arrays-indexes-normal.o
+[231/1161] Linking CXX executable void_retention_current
+[232/1161] Generating fixed_arrays-empty-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/fixed_arrays-empty-normal.o
+[233/1161] Generating fixed_arrays-index_types-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/fixed_arrays-index_types-normal.o
+[234/1161] Generating fixed_arrays-large-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/fixed_arrays-large-normal.o
+[235/1161] Generating fixed_arrays-numeric-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/fixed_arrays-numeric-normal.o
+[236/1161] Generating fixed_arrays-value_fields-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/fixed_arrays-value_fields-normal.o
+[237/1161] Generating fixed_arrays-bounds_order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/fixed_arrays-bounds_order-normal.o
+[238/1161] Generating fixed_arrays-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/fixed_arrays-main-optimized.o
+[239/1161] Generating fixed_arrays-loops-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/fixed_arrays-loops-normal.o
+[240/1161] Linking CXX executable void_g4_tests
+[241/1161] Generating fixed_arrays-copies-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/fixed_arrays-copies-optimized.o
+[242/1161] Generating fixed_arrays-indexes-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/fixed_arrays-indexes-optimized.o
+[243/1161] Generating fixed_arrays-order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/fixed_arrays-order-optimized.o
+[244/1161] Generating fixed_arrays-index_types-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/fixed_arrays-index_types-optimized.o
+[245/1161] Generating fixed_arrays-empty-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/fixed_arrays-empty-optimized.o
+[246/1161] Generating fixed_arrays-large-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/fixed_arrays-large-optimized.o
+[247/1161] Generating fixed_arrays-bounds_order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/fixed_arrays-bounds_order-optimized.o
+[248/1161] Generating fixed_arrays-value_fields-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/fixed_arrays-value_fields-optimized.o
+[249/1161] Generating growable_arrays-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/growable_arrays-main-normal.o
+[250/1161] Generating fixed_arrays-loops-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/fixed_arrays-loops-optimized.o
+[251/1161] Generating growable_arrays-invalidation-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/growable_arrays-invalidation-normal.o
+[252/1161] Generating growable_arrays-selection-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/growable_arrays-selection-normal.o
+[253/1161] Generating growable_arrays-aliases-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/growable_arrays-aliases-normal.o
+[254/1161] Generating growable_arrays-indexes-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/growable_arrays-indexes-normal.o
+[255/1161] Generating fixed_arrays-numeric-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/fixed_arrays-numeric-optimized.o
+[256/1161] Generating growable_arrays-large-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/growable_arrays-large-normal.o
+[257/1161] Generating growable_arrays-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/growable_arrays-main-optimized.o
+[258/1161] Generating growable_arrays-aliases-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/growable_arrays-aliases-optimized.o
+[259/1161] Generating growable_arrays-selection-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/growable_arrays-selection-optimized.o
+[260/1161] Generating growable_arrays-invalidation-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/growable_arrays-invalidation-optimized.o
+[261/1161] Generating growable_arrays-numeric-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/growable_arrays-numeric-normal.o
+[262/1161] Generating growable_arrays-indexes-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/growable_arrays-indexes-optimized.o
+[263/1161] Generating growable_arrays-large-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/growable_arrays-large-optimized.o
+[264/1161] Generating arrays-strings-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-strings-normal.o
+[265/1161] Generating growable_arrays-numeric-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/growable_arrays-numeric-optimized.o
+[266/1161] Generating arrays-defaults-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-defaults-normal.o
+[267/1161] Generating arrays-nested-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-nested-normal.o
+[268/1161] Generating arrays-tree-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-tree-normal.o
+[269/1161] Generating arrays-interfaces-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-interfaces-normal.o
+[270/1161] Generating arrays-readonly-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-readonly-normal.o
+[271/1161] Generating arrays-values-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-values-normal.o
+[272/1161] Generating arrays-selection-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-selection-normal.o
+[273/1161] Generating arrays-iteration-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-iteration-normal.o
+[274/1161] Generating arrays-invalidation-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-invalidation-normal.o
+[275/1161] Generating arrays-nested_failure-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-nested_failure-normal.o
+[276/1161] Generating arrays-ranges-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-ranges-normal.o
+[277/1161] Generating arrays-empty-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-empty-normal.o
+[278/1161] Generating arrays-failures-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-failures-normal.o
+[279/1161] Generating arrays-large-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-large-normal.o
+[280/1161] Generating arrays-cycles-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-cycles-normal.o
+[281/1161] Generating arrays-strings-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-strings-optimized.o
+[282/1161] Generating arrays-nested-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-nested-optimized.o
+[283/1161] Generating arrays-defaults-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-defaults-optimized.o
+[284/1161] Generating arrays-tree-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-tree-optimized.o
+[285/1161] Generating arrays-interfaces-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-interfaces-optimized.o
+[286/1161] Generating arrays-readonly-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-readonly-optimized.o
+[287/1161] Generating arrays-values-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-values-optimized.o
+[288/1161] Generating arrays-selection-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-selection-optimized.o
+[289/1161] Generating arrays-nested_failure-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-nested_failure-optimized.o
+[290/1161] Generating arrays-iteration-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-iteration-optimized.o
+[291/1161] Generating arrays-invalidation-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-invalidation-optimized.o
+[292/1161] Generating arrays-ranges-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-ranges-optimized.o
+[293/1161] Generating arrays-empty-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-empty-optimized.o
+[294/1161] Generating arrays-cycles-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-cycles-optimized.o
+[295/1161] Generating generics-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-main-normal.o
+[296/1161] Generating arrays-failures-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-failures-optimized.o
+[297/1161] Generating arrays-large-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/arrays-large-optimized.o
+[298/1161] Generating generics-constraints-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-constraints-normal.o
+[299/1161] Generating generics-functions-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-functions-normal.o
+[300/1161] Generating generics-types-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-types-normal.o
+[301/1161] Generating generics-methods-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-methods-normal.o
+[302/1161] Generating generics-initialization-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-initialization-normal.o
+[303/1161] Generating generics-imports-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-imports-normal.o
+[304/1161] Generating generics-failures-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-failures-normal.o
+[305/1161] Generating generics-arrays-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-arrays-normal.o
+[306/1161] Generating generics-order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-order-normal.o
+[307/1161] Generating generics-large-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-large-normal.o
+[308/1161] Generating generics-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-main-optimized.o
+[309/1161] Generating generics-reload-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-reload-normal.o
+[310/1161] Generating generics-functions-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-functions-optimized.o
+[311/1161] Generating generics-constraints-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-constraints-optimized.o
+[312/1161] Generating generics-types-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-types-optimized.o
+[313/1161] Generating generics-methods-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-methods-optimized.o
+[314/1161] Generating generics-initialization-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-initialization-optimized.o
+[315/1161] Generating generics-imports-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-imports-optimized.o
+[316/1161] Generating generics-arrays-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-arrays-optimized.o
+[317/1161] Generating generics-failures-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-failures-optimized.o
+[318/1161] Generating generics-large-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-large-optimized.o
+[319/1161] Generating generics-reload-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-reload-optimized.o
+[320/1161] Generating generics-order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/generics-order-optimized.o
+[321/1161] Generating collections-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/collections-main-normal.o
+[322/1161] Generating collections-invalidation-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/collections-invalidation-normal.o
+[323/1161] Generating collections-bounds-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/collections-bounds-normal.o
+[324/1161] Generating collections-order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/collections-order-normal.o
+[325/1161] Generating collections-large-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/collections-large-normal.o
+[326/1161] Generating collections-readonly-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/collections-readonly-normal.o
+[327/1161] Generating collections-nested-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/collections-nested-normal.o
+[328/1161] Generating collections-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/collections-main-optimized.o
+[329/1161] Generating collections-numeric-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/collections-numeric-normal.o
+[330/1161] Generating collections-order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/collections-order-optimized.o
+[331/1161] Generating collections-bounds-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/collections-bounds-optimized.o
+[332/1161] Generating collections-invalidation-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/collections-invalidation-optimized.o
+[333/1161] Generating collections-large-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/collections-large-optimized.o
+[334/1161] Generating collections-readonly-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/collections-readonly-optimized.o
+[335/1161] Generating collections-nested-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/collections-nested-optimized.o
+[336/1161] Generating dictionaries-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/dictionaries-main-normal.o
+[337/1161] Generating collections-numeric-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/collections-numeric-optimized.o
+[338/1161] Generating dictionaries-keys-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/dictionaries-keys-normal.o
+[339/1161] Generating dictionaries-large-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/dictionaries-large-normal.o
+[340/1161] Generating dictionaries-nested-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/dictionaries-nested-normal.o
+[341/1161] Generating dictionaries-literal-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/dictionaries-literal-normal.o
+[342/1161] Generating dictionaries-transactions-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/dictionaries-transactions-normal.o
+[343/1161] Generating dictionaries-order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/dictionaries-order-normal.o
+[344/1161] Generating dictionaries-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/dictionaries-main-optimized.o
+[345/1161] Generating dictionaries-large-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/dictionaries-large-optimized.o
+[346/1161] Generating dictionaries-keys-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/dictionaries-keys-optimized.o
+[347/1161] Generating dictionaries-order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/dictionaries-order-optimized.o
+[348/1161] Generating dictionaries-transactions-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/dictionaries-transactions-optimized.o
+[349/1161] Generating dictionaries-literal-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/dictionaries-literal-optimized.o
+[350/1161] Generating properties-generic-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/properties-generic-normal.o
+[351/1161] Generating dictionaries-nested-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/dictionaries-nested-optimized.o
+[352/1161] Generating properties-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/properties-main-normal.o
+[353/1161] Generating properties-order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/properties-order-normal.o
+[354/1161] Generating properties-methods-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/properties-methods-normal.o
+[355/1161] Generating properties-callable-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/properties-callable-normal.o
+[356/1161] Generating properties-references-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/properties-references-normal.o
+[357/1161] Generating properties-imports-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/properties-imports-normal.o
+[358/1161] Generating properties-failure-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/properties-failure-normal.o
+[359/1161] Generating properties-selection-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/properties-selection-normal.o
+[360/1161] Generating properties-receiver-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/properties-receiver-normal.o
+[361/1161] Generating properties-generic-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/properties-generic-optimized.o
+[362/1161] Generating properties-order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/properties-order-optimized.o
+[363/1161] Generating properties-methods-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/properties-methods-optimized.o
+[364/1161] Generating properties-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/properties-main-optimized.o
+[365/1161] Generating properties-references-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/properties-references-optimized.o
+[366/1161] Generating properties-callable-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/properties-callable-optimized.o
+[367/1161] Generating properties-failure-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/properties-failure-optimized.o
+[368/1161] Generating properties-imports-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/properties-imports-optimized.o
+[369/1161] Generating properties-selection-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/properties-selection-optimized.o
+[370/1161] Generating properties-receiver-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/properties-receiver-optimized.o
+[371/1161] Generating patterns-results-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-results-normal.o
+[372/1161] Generating patterns-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-main-normal.o
+[373/1161] Generating patterns-interfaces-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-interfaces-normal.o
+[374/1161] Generating patterns-values-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-values-normal.o
+[375/1161] Generating patterns-nullable-normal.o
+/home/shmellyorc/Documents/Void.Language/examples/patterns/nullable.void:9:5: warning: Match may leave values unmatched.
+    code: VOID2021
+
+ 9 |     match result:
+   |     ^^^^^
+    Module: /nullable.void
+
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-nullable-normal.o
+[376/1161] Generating patterns-large-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-large-normal.o
+[377/1161] Generating patterns-generic-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-generic-normal.o
+[378/1161] Generating patterns-control-normal.o
+/home/shmellyorc/Documents/Void.Language/examples/patterns/control.void:14:5: warning: Match may leave values unmatched.
+    code: VOID2021
+
+ 14 |     match current:
+    |     ^^^^^
+    Module: /control.void
+
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-control-normal.o
+[379/1161] Generating patterns-unmatched-normal.o
+/home/shmellyorc/Documents/Void.Language/examples/patterns/unmatched.void:2:12: warning: Match may leave values unmatched.
+    code: VOID2021
+
+ 2 |     return match x:
+   |            ^^^^^
+    Module: /unmatched.void
+
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-unmatched-normal.o
+[380/1161] Generating patterns-transactions-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-transactions-normal.o
+[381/1161] Generating patterns-combined-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-combined-normal.o
+[382/1161] Generating patterns-nested-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-nested-normal.o
+[383/1161] Generating patterns-types-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-types-normal.o
+[384/1161] Generating patterns-fields-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-fields-normal.o
+[385/1161] Generating patterns-results-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-results-optimized.o
+[386/1161] Generating patterns-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-main-optimized.o
+[387/1161] Generating patterns-values-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-values-optimized.o
+[388/1161] Generating patterns-interfaces-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-interfaces-optimized.o
+[389/1161] Generating patterns-generic-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-generic-optimized.o
+[390/1161] Generating patterns-nullable-optimized.o
+/home/shmellyorc/Documents/Void.Language/examples/patterns/nullable.void:9:5: warning: Match may leave values unmatched.
+    code: VOID2021
+
+ 9 |     match result:
+   |     ^^^^^
+    Module: /nullable.void
+
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-nullable-optimized.o
+[391/1161] Generating patterns-control-optimized.o
+/home/shmellyorc/Documents/Void.Language/examples/patterns/control.void:14:5: warning: Match may leave values unmatched.
+    code: VOID2021
+
+ 14 |     match current:
+    |     ^^^^^
+    Module: /control.void
+
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-control-optimized.o
+[392/1161] Generating patterns-large-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-large-optimized.o
+[393/1161] Generating patterns-unmatched-optimized.o
+/home/shmellyorc/Documents/Void.Language/examples/patterns/unmatched.void:2:12: warning: Match may leave values unmatched.
+    code: VOID2021
+
+ 2 |     return match x:
+   |            ^^^^^
+    Module: /unmatched.void
+
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-unmatched-optimized.o
+[394/1161] Generating patterns-relocation-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-relocation-normal.o
+[395/1161] Generating patterns-transactions-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-transactions-optimized.o
+[396/1161] Generating patterns-combined-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-combined-optimized.o
+[397/1161] Generating patterns-types-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-types-optimized.o
+[398/1161] Generating patterns-nested-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-nested-optimized.o
+[399/1161] Generating advanced-closures-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-closures-normal.o
+[400/1161] Generating patterns-fields-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-fields-optimized.o
+[401/1161] Generating advanced-callbacks-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-callbacks-normal.o
+[402/1161] Generating advanced-captures-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-captures-normal.o
+[403/1161] Generating advanced-defer-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-defer-normal.o
+[404/1161] Generating advanced-with-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-with-normal.o
+[405/1161] Generating patterns-relocation-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/patterns-relocation-optimized.o
+[406/1161] Generating advanced-cleanup_failure-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-cleanup_failure-normal.o
+[407/1161] Generating advanced-events-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-events-normal.o
+[408/1161] Generating advanced-propagation-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-propagation-normal.o
+[409/1161] Generating advanced-nullable-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-nullable-normal.o
+[410/1161] Generating advanced-large-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-large-normal.o
+[411/1161] Generating advanced-event_snapshot-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-event_snapshot-normal.o
+[412/1161] Generating advanced-fixed_capture-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-fixed_capture-normal.o
+[413/1161] Generating advanced-with_transaction-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-with_transaction-normal.o
+[414/1161] Generating advanced-inheritance-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-inheritance-normal.o
+[415/1161] Generating advanced-scope-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-scope-normal.o
+[416/1161] Generating advanced-function_arrays-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-function_arrays-normal.o
+[417/1161] Generating advanced-identity-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-identity-normal.o
+[418/1161] Generating advanced-dictionary_closures-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-dictionary_closures-normal.o
+[419/1161] Generating advanced-combined-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-combined-normal.o
+[420/1161] Generating advanced-construction_cleanup-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-construction_cleanup-normal.o
+[421/1161] Generating advanced-generic_callbacks-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-generic_callbacks-normal.o
+[422/1161] Generating advanced-composite_defaults-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-composite_defaults-normal.o
+[423/1161] Generating advanced-closures-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-closures-optimized.o
+[424/1161] Generating advanced-callbacks-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-callbacks-optimized.o
+[425/1161] Generating advanced-captures-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-captures-optimized.o
+[426/1161] Generating advanced-defer-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-defer-optimized.o
+[427/1161] Generating advanced-with-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-with-optimized.o
+[428/1161] Generating advanced-events-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-events-optimized.o
+[429/1161] Generating advanced-cleanup_failure-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-cleanup_failure-optimized.o
+[430/1161] Generating advanced-propagation-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-propagation-optimized.o
+[431/1161] Generating advanced-nullable-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-nullable-optimized.o
+[432/1161] Generating advanced-large-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-large-optimized.o
+[433/1161] Generating advanced-event_snapshot-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-event_snapshot-optimized.o
+[434/1161] Generating advanced-fixed_capture-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-fixed_capture-optimized.o
+[435/1161] Generating advanced-inheritance-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-inheritance-optimized.o
+[436/1161] Generating advanced-with_transaction-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-with_transaction-optimized.o
+[437/1161] Generating advanced-scope-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-scope-optimized.o
+[438/1161] Generating advanced-function_arrays-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-function_arrays-optimized.o
+[439/1161] Generating advanced-generic_callbacks-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-generic_callbacks-optimized.o
+[440/1161] Generating advanced-identity-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-identity-optimized.o
+[441/1161] Generating advanced-combined-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-combined-optimized.o
+[442/1161] Generating advanced-dictionary_closures-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-dictionary_closures-optimized.o
+[443/1161] Generating advanced-construction_cleanup-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-construction_cleanup-optimized.o
+[444/1161] Generating advanced-composite_defaults-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/advanced-composite_defaults-optimized.o
+[445/1161] Generating managed-cli-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed-cli-main-normal.o
+[446/1161] Generating managed-cli-handoffs-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed-cli-handoffs-normal.o
+[447/1161] Generating managed-library-normal.o
+[448/1161] Generating managed-cli-imports-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed-cli-imports-normal.o
+[449/1161] Generating managed-cli-order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed-cli-order-normal.o
+[450/1161] Generating managed-cli-null_failure-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed-cli-null_failure-normal.o
+[451/1161] Generating managed-library-optimized.o
+[452/1161] Generating managed-cli-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed-cli-main-optimized.o
+[453/1161] Generating managed-cli-numeric-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed-cli-numeric-normal.o
+[454/1161] Generating managed-cli-handoffs-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed-cli-handoffs-optimized.o
+[455/1161] Generating managed-cli-imports-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed-cli-imports-optimized.o
+[456/1161] Generating managed-cli-order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed-cli-order-optimized.o
+[457/1161] Generating managed-cli-null_failure-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed-cli-null_failure-optimized.o
+[458/1161] Generating managed-cli-numeric-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed-cli-numeric-optimized.o
+[459/1161] Generating managed_initialization-cli-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed_initialization-cli-main-normal.o
+[460/1161] Generating managed_initialization-cli-numeric-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed_initialization-cli-numeric-normal.o
+[461/1161] Generating managed_initialization-cli-stress-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed_initialization-cli-stress-normal.o
+[462/1161] Generating managed_initialization-library-normal.o
+[463/1161] Generating managed_initialization-cli-imports-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed_initialization-cli-imports-normal.o
+[464/1161] Generating managed_initialization-cli-failure-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed_initialization-cli-failure-normal.o
+[465/1161] Generating managed_initialization-cli-fail_default-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed_initialization-cli-fail_default-normal.o
+[466/1161] Generating managed_initialization-cli-fail_argument-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed_initialization-cli-fail_argument-normal.o
+[467/1161] Generating managed_initialization-cli-fail_child-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed_initialization-cli-fail_child-normal.o
+[468/1161] Generating managed_initialization-cli-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed_initialization-cli-main-optimized.o
+[469/1161] Generating managed_initialization-cli-numeric-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed_initialization-cli-numeric-optimized.o
+[470/1161] Generating managed_initialization-library-optimized.o
+[471/1161] Generating managed_initialization-cli-stress-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed_initialization-cli-stress-optimized.o
+[472/1161] Generating managed_initialization-cli-failure-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed_initialization-cli-failure-optimized.o
+[473/1161] Generating managed_initialization-cli-imports-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed_initialization-cli-imports-optimized.o
+[474/1161] Generating managed_initialization-cli-fail_default-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed_initialization-cli-fail_default-optimized.o
+[475/1161] Generating managed_initialization-cli-fail_argument-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed_initialization-cli-fail_argument-optimized.o
+[476/1161] Generating managed_initialization-cli-fail_child-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/managed_initialization-cli-fail_child-optimized.o
+[477/1161] Generating reference_values-cli-copies-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/reference_values-cli-copies-normal.o
+[478/1161] Generating reference_values-cli-templates-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/reference_values-cli-templates-normal.o
+[479/1161] Generating reference_values-cli-initialization-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/reference_values-cli-initialization-normal.o
+[480/1161] Generating reference_values-library-normal.o
+[481/1161] Generating reference_values-cli-readonly-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/reference_values-cli-readonly-normal.o
+[482/1161] Generating reference_values-cli-methods-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/reference_values-cli-methods-normal.o
+[483/1161] Generating reference_values-cli-staged-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/reference_values-cli-staged-normal.o
+[484/1161] Generating reference_values-cli-order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/reference_values-cli-order-normal.o
+[485/1161] Generating reference_values-cli-null_failure-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/reference_values-cli-null_failure-normal.o
+[486/1161] Generating reference_values-cli-required-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/reference_values-cli-required-normal.o
+[487/1161] Generating reference_values-cli-imports-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/reference_values-cli-imports-normal.o
+[488/1161] Generating reference_values-cli-stress-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/reference_values-cli-stress-normal.o
+[489/1161] Generating reference_values-cli-copies-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/reference_values-cli-copies-optimized.o
+[490/1161] Generating reference_values-library-optimized.o
+[491/1161] Generating reference_values-cli-initialization-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/reference_values-cli-initialization-optimized.o
+[492/1161] Generating reference_values-cli-templates-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/reference_values-cli-templates-optimized.o
+[493/1161] Generating reference_values-cli-readonly-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/reference_values-cli-readonly-optimized.o
+[494/1161] Generating reference_values-cli-methods-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/reference_values-cli-methods-optimized.o
+[495/1161] Generating reference_values-cli-staged-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/reference_values-cli-staged-optimized.o
+[496/1161] Generating reference_values-cli-order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/reference_values-cli-order-optimized.o
+[497/1161] Generating reference_values-cli-required-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/reference_values-cli-required-optimized.o
+[498/1161] Generating reference_values-cli-imports-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/reference_values-cli-imports-optimized.o
+[499/1161] Generating reference_values-cli-null_failure-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/reference_values-cli-null_failure-optimized.o
+[500/1161] Generating composition-cli-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/composition-cli-main-normal.o
+[501/1161] Generating reference_values-cli-stress-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/reference_values-cli-stress-optimized.o
+[502/1161] Generating composition-cli-imports-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/composition-cli-imports-normal.o
+[503/1161] Generating composition-library-normal.o
+[504/1161] Generating composition-cli-stress-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/composition-cli-stress-normal.o
+[505/1161] Generating composition-cli-order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/composition-cli-order-normal.o
+[506/1161] Generating composition-cli-staged-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/composition-cli-staged-normal.o
+[507/1161] Generating composition-cli-receiver_order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/composition-cli-receiver_order-normal.o
+[508/1161] Generating composition-library-optimized.o
+[509/1161] Generating composition-cli-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/composition-cli-main-optimized.o
+[510/1161] Generating composition-cli-imports-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/composition-cli-imports-optimized.o
+[511/1161] Generating composition-cli-stress-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/composition-cli-stress-optimized.o
+[512/1161] Generating composition-cli-order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/composition-cli-order-optimized.o
+[513/1161] Generating composition-cli-receiver_order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/composition-cli-receiver_order-optimized.o
+[514/1161] Generating composition-cli-staged-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/composition-cli-staged-optimized.o
+[515/1161] Generating inheritance-cli-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/inheritance-cli-main-normal.o
+[516/1161] Generating inheritance-cli-initialization-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/inheritance-cli-initialization-normal.o
+[517/1161] Generating inheritance-library-normal.o
+[518/1161] Generating inheritance-reloaded-normal.o
+[519/1161] Generating inheritance-cli-imports-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/inheritance-cli-imports-normal.o
+[520/1161] Generating inheritance-cli-stress-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/inheritance-cli-stress-normal.o
+[521/1161] Generating inheritance-cli-order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/inheritance-cli-order-normal.o
+[522/1161] Generating inheritance-cli-receiver_order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/inheritance-cli-receiver_order-normal.o
+[523/1161] Generating inheritance-cli-nested-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/inheritance-cli-nested-normal.o
+[524/1161] Generating inheritance-cli-failure-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/inheritance-cli-failure-normal.o
+[525/1161] Generating inheritance-library-optimized.o
+[526/1161] Generating inheritance-reloaded-optimized.o
+[527/1161] Generating inheritance-cli-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/inheritance-cli-main-optimized.o
+[528/1161] Generating inheritance-cli-results-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/inheritance-cli-results-normal.o
+[529/1161] Generating inheritance-cli-initialization-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/inheritance-cli-initialization-optimized.o
+[530/1161] Generating inheritance-cli-imports-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/inheritance-cli-imports-optimized.o
+[531/1161] Generating inheritance-cli-order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/inheritance-cli-order-optimized.o
+[532/1161] Generating inheritance-cli-stress-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/inheritance-cli-stress-optimized.o
+[533/1161] Generating inheritance-cli-receiver_order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/inheritance-cli-receiver_order-optimized.o
+[534/1161] Generating inheritance-cli-failure-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/inheritance-cli-failure-optimized.o
+[535/1161] Generating inheritance-cli-nested-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/inheritance-cli-nested-optimized.o
+[536/1161] Generating inheritance-cli-results-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/inheritance-cli-results-optimized.o
+[537/1161] Generating interfaces-library-normal.o
+[538/1161] Generating interfaces-cli-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/interfaces-cli-main-normal.o
+[539/1161] Generating interfaces-reloaded-normal.o
+[540/1161] Generating interfaces-cli-handoffs-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/interfaces-cli-handoffs-normal.o
+[541/1161] Generating interfaces-cli-stress-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/interfaces-cli-stress-normal.o
+[542/1161] Generating interfaces-cli-nullable-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/interfaces-cli-nullable-normal.o
+[543/1161] Generating interfaces-cli-selection-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/interfaces-cli-selection-normal.o
+[544/1161] Generating interfaces-cli-imports-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/interfaces-cli-imports-normal.o
+[545/1161] Generating interfaces-cli-static-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/interfaces-cli-static-normal.o
+[546/1161] Generating interfaces-cli-cycles-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/interfaces-cli-cycles-normal.o
+[547/1161] Generating interfaces-cli-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/interfaces-cli-main-optimized.o
+[548/1161] Generating interfaces-library-optimized.o
+[549/1161] Generating interfaces-reloaded-optimized.o
+[550/1161] Generating interfaces-cli-nullable-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/interfaces-cli-nullable-optimized.o
+[551/1161] Generating interfaces-cli-selection-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/interfaces-cli-selection-optimized.o
+[552/1161] Generating interfaces-cli-handoffs-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/interfaces-cli-handoffs-optimized.o
+[553/1161] Generating interfaces-cli-stress-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/interfaces-cli-stress-optimized.o
+[554/1161] Generating interfaces-cli-imports-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/interfaces-cli-imports-optimized.o
+[555/1161] Generating interfaces-cli-static-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/interfaces-cli-static-optimized.o
+[556/1161] Generating interfaces-cli-cycles-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/interfaces-cli-cycles-optimized.o
+[557/1161] Generating strings-cli-main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/strings-cli-main-normal.o
+[558/1161] Generating strings-reloaded-normal.o
+[559/1161] Generating strings-library-normal.o
+[560/1161] Generating strings-cli-initialization-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/strings-cli-initialization-normal.o
+[561/1161] Generating strings-cli-stress-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/strings-cli-stress-normal.o
+[562/1161] Generating strings-cli-unicode-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/strings-cli-unicode-normal.o
+[563/1161] Generating strings-cli-main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/strings-cli-main-optimized.o
+[564/1161] Generating strings-library-optimized.o
+[565/1161] Generating strings-reloaded-optimized.o
+[566/1161] Generating strings-cli-initialization-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/strings-cli-initialization-optimized.o
+[567/1161] Generating strings-cli-stress-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/strings-cli-stress-optimized.o
+[568/1161] Generating strings-cli-unicode-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/strings-cli-unicode-optimized.o
+[569/1161] Generating runtime-normal.o
+[570/1161] Generating runtime-optimized.o
+[571/1161] Generating combined-async-normal.o
+[572/1161] Generating combined-async-optimized.o
+[573/1161] Generating ffi-g1/application-optimized.o
+[574/1161] Generating ffi-g1/application-normal.o
+[575/1161] Generating ffi-g2/application-normal.o
+[576/1161] Generating ffi-g2/application-optimized.o
+[577/1161] Generating ffi-g3/application-normal.o
+[578/1161] Generating ffi-g3/application-optimized.o
+[579/1161] Generating native-main-normal.o
+[580/1161] Generating native-main-optimized.o
+[581/1161] Generating native-terminated_nul-normal.o
+[582/1161] Generating native-terminated_nul-optimized.o
+[583/1161] Generating native-closed-normal.o
+[584/1161] Generating native-closed-optimized.o
+[585/1161] Generating native-duplicate-normal.o
+[586/1161] Generating native-duplicate-optimized.o
+[587/1161] Generating native-cleanup_failure-normal.o
+[588/1161] Generating native-cleanup_failure-optimized.o
+[589/1161] Generating native-integrated-normal.o
+[590/1161] Generating native-integrated-optimized.o
+[591/1161] Generating native-integrated_cancel-normal.o
+[592/1161] Generating native-integrated_cancel-optimized.o
+[593/1161] Generating native-integrated_failure-normal.o
+[594/1161] Generating native-integrated_failure-optimized.o
+[595/1161] Generating log-probe-normal.o, log-probe-normal.o.cpp
+[596/1161] Generating log-probe-optimized.o, log-probe-optimized.o.cpp
+[597/1161] Generating io-wire-normal.o
+[598/1161] Generating io-probe-normal.o, io-probe-normal.o.cpp
+[599/1161] Generating io-probe-optimized.o, io-probe-optimized.o.cpp
+[600/1161] Generating io-wire-optimized.o
+[601/1161] Generating async-spawn-normal.o
+[602/1161] Generating async-spawn-optimized.o
+[603/1161] Generating async-spawn_cancel-normal.o
+[604/1161] Generating async-spawn_cancel-optimized.o
+[605/1161] Generating async-spawn_failure-normal.o
+[606/1161] Generating async-spawn_failure-optimized.o
+[607/1161] Generating async-activation-normal.o
+[608/1161] Generating async-activation-optimized.o
+[609/1161] Generating async-managed-normal.o
+[610/1161] Generating async-managed-optimized.o
+[611/1161] Generating async-large-normal.o
+[612/1161] Generating async-large-optimized.o
+[613/1161] Generating async-closures-normal.o
+[614/1161] Generating async-closures-optimized.o
+[615/1161] Generating async-loops-normal.o
+[616/1161] Generating async-loops-optimized.o
+[617/1161] Generating async-values-normal.o
+[618/1161] Generating async-values-optimized.o
+[619/1161] Generating async-methods-normal.o
+[620/1161] Generating async-methods-optimized.o
+[621/1161] Generating async-lifecycle-normal.o
+[622/1161] Generating async-lifecycle-optimized.o
+[623/1161] Generating async-lifecycle_exits-normal.o
+[624/1161] Generating async-lifecycle_exits-optimized.o
+[625/1161] Generating io-async-normal.o
+[626/1161] Generating async-lifecycle_cancelled-normal.o
+[627/1161] Generating async-lifecycle_cancelled-optimized.o
+[628/1161] Generating async-lifecycle_failures-normal.o
+[629/1161] Generating async-lifecycle_primary-normal.o
+[630/1161] Generating async-lifecycle_failures-optimized.o
+[631/1161] Generating async-lifecycle_primary-optimized.o
+[632/1161] Generating async-lifecycle_resources-normal.o
+[633/1161] Generating async-lifecycle_resources-optimized.o
+[634/1161] Generating async-lifecycle_values-normal.o
+[635/1161] Generating async-lifecycle_values-optimized.o
+[636/1161] Generating io-async-optimized.o
+[637/1161] Generating async-syntax-values-normal.o
+[638/1161] Generating async-syntax-errors-normal.o
+[639/1161] Generating async-syntax-values-optimized.o
+[640/1161] Generating async-syntax-cancelled-normal.o
+[641/1161] Generating async-syntax-cancelled-optimized.o
+[642/1161] Generating async-syntax-failure-normal.o
+[643/1161] Generating async-syntax-errors-optimized.o
+[644/1161] Generating async-syntax-spawn-normal.o
+[645/1161] Generating async-syntax-spawn-optimized.o
+[646/1161] Generating async-syntax-failure-optimized.o
+[647/1161] Generating retention-workers-optimized.o
+[648/1161] Generating retention-growth-optimized.o
+[649/1161] Generating retention-growth-normal.o
+[650/1161] Generating retention-workers-normal.o
+[651/1161] Building CXX object CMakeFiles/void_log_probe_normal.dir/log-probe-normal.o.cpp.o
+[652/1161] Building CXX object CMakeFiles/void_io_probe_optimized.dir/io-probe-optimized.o.cpp.o
+[653/1161] Building CXX object CMakeFiles/void_log_probe_optimized.dir/log-probe-optimized.o.cpp.o
+[654/1161] Building CXX object CMakeFiles/void_io_probe_normal.dir/io-probe-normal.o.cpp.o
+[655/1161] Generating ffi-g4/application-startup.o
+[656/1161] Generating ffi-g4/application-optimized.o
+[657/1161] Generating ffi-g4/application-normal.o
+[658/1161] Linking CXX executable void_http_native
+[659/1161] Linking CXX executable void_native_example
+[660/1161] Linking CXX executable void_http_tls_memory
+[661/1161] Linking CXX executable void_url_native
+[662/1161] Linking CXX executable void_http_dns
+[663/1161] Linking CXX executable void_project_sessions
+[664/1161] Linking CXX executable void_http_performance
+[665/1161] Linking CXX executable void_http_timeouts
+[666/1161] Linking CXX executable void_project_application
+[667/1161] Linking CXX executable void_http_reload
+[668/1161] Linking CXX executable void_http_io_performance
+[669/1161] Linking CXX executable void_http_wire
+[670/1161] Linking CXX executable void_http_source_runner
+[671/1161] Linking CXX executable void_http_example_host
+[672/1161] Linking CXX executable void_operator_reload
+[673/1161] Linking CXX executable void_operator_keys
+[674/1161] Linking CXX executable void_stage10_tooling
+[675/1161] Linking CXX executable void_operator_resolution
+[676/1161] Linking CXX executable void_operator_declarations
+[677/1161] Linking CXX executable void_temporal
+[678/1161] Linking CXX executable void_source_formatting
+[679/1161] Linking CXX executable void_display_reload
+[680/1161] Linking CXX executable void_decimal_float
+[681/1161] Linking CXX executable void_temporal_ir
+[682/1161] Linking CXX executable void_stage10_hooks
+[683/1161] Linking CXX executable void_format_numeric
+[684/1161] Linking CXX executable void_format_zones
+[685/1161] Linking CXX executable void_stage10_interpolation
+[686/1161] Linking CXX executable void_gc_buffers
+[687/1161] Linking CXX executable void_gc_schemas
+[688/1161] Linking CXX executable void_runtime_console
+[689/1161] Linking CXX executable void_stage10_conversion
+[690/1161] Linking CXX executable void_runtime_console_transfers
+[691/1161] Linking CXX executable void_runtime_console_keyboard
+[692/1161] Linking CXX executable void_runtime_console_terminal
+[693/1161] Linking CXX executable void_runtime_console_wide
+[694/1161] Linking CXX executable void_runtime_console_input
+[695/1161] Linking CXX executable void_runtime_tests
+[696/1161] Linking CXX executable void_stage10_fields
+[697/1161] Linking CXX executable void_json_host
+[698/1161] Linking CXX executable void_growable_arrays_tests
+[699/1161] Linking CXX executable void_fixed_arrays_tests
+[700/1161] Linking CXX executable void_arrays_source
+[701/1161] Linking CXX executable void_generics_tests
+[702/1161] Linking CXX executable void_collections_tests
+[703/1161] Linking CXX executable void_dictionaries_tests
+[704/1161] Linking CXX executable void_properties_tests
+[705/1161] Linking CXX executable void_fixed_arrays_cli_main_normal
+[706/1161] Linking CXX executable void_fixed_arrays_cli_copies_normal
+[707/1161] Linking CXX executable void_patterns_tests
+[708/1161] Linking CXX executable void_fixed_arrays_cli_order_normal
+[709/1161] Linking CXX executable void_fixed_arrays_cli_numeric_normal
+[710/1161] Linking CXX executable void_fixed_arrays_cli_index_types_normal
+[711/1161] Linking CXX executable void_fixed_arrays_cli_indexes_normal
+[712/1161] Linking CXX executable void_fixed_arrays_cli_large_normal
+[713/1161] Linking CXX executable void_fixed_arrays_cli_empty_normal
+[714/1161] Linking CXX executable void_cache_tests
+[715/1161] Linking CXX executable void_fixed_arrays_cli_bounds_order_normal
+[716/1161] Linking CXX executable void_fixed_arrays_cli_value_fields_normal
+[717/1161] Linking CXX executable void_advanced_tests
+[718/1161] Linking CXX executable void_fixed_arrays_cli_loops_normal
+[719/1161] Linking CXX executable void_fixed_arrays_cli_order_optimized
+[720/1161] Linking CXX executable void_fixed_arrays_cli_main_optimized
+[721/1161] Linking CXX executable void_fixed_arrays_cli_copies_optimized
+[722/1161] Linking CXX executable void_fixed_arrays_cli_numeric_optimized
+[723/1161] Linking CXX executable void_fixed_arrays_cli_index_types_optimized
+[724/1161] Linking CXX executable void_fixed_arrays_cli_indexes_optimized
+[725/1161] Linking CXX executable void_fixed_arrays_cli_large_optimized
+[726/1161] Linking CXX executable void_fixed_arrays_cli_empty_optimized
+[727/1161] Linking CXX executable void_fixed_arrays_cli_value_fields_optimized
+[728/1161] Linking CXX executable void_fixed_arrays_cli_loops_optimized
+[729/1161] Linking CXX executable void_fixed_arrays_cli_bounds_order_optimized
+[730/1161] Linking CXX executable void_growable_arrays_cli_main_normal
+[731/1161] Linking CXX executable void_growable_arrays_cli_selection_normal
+[732/1161] Linking CXX executable void_growable_arrays_cli_indexes_normal
+[733/1161] Linking CXX executable void_growable_arrays_cli_invalidation_normal
+[734/1161] Linking CXX executable void_growable_arrays_cli_aliases_normal
+[735/1161] Linking CXX executable void_growable_arrays_cli_main_optimized
+[736/1161] Linking CXX executable void_growable_arrays_cli_numeric_normal
+[737/1161] Linking CXX executable void_growable_arrays_cli_aliases_optimized
+[738/1161] Linking CXX executable void_growable_arrays_cli_large_normal
+[739/1161] Linking CXX executable void_growable_arrays_cli_selection_optimized
+[740/1161] Linking CXX executable void_growable_arrays_cli_numeric_optimized
+[741/1161] Linking CXX executable void_growable_arrays_cli_indexes_optimized
+[742/1161] Linking CXX executable void_growable_arrays_cli_invalidation_optimized
+[743/1161] Linking CXX executable void_arrays_cli_strings_normal
+[744/1161] Linking CXX executable void_growable_arrays_cli_large_optimized
+[745/1161] Linking CXX executable void_arrays_cli_nested_normal
+[746/1161] Linking CXX executable void_arrays_cli_values_normal
+[747/1161] Linking CXX executable void_arrays_cli_interfaces_normal
+[748/1161] Linking CXX executable void_arrays_cli_defaults_normal
+[749/1161] Linking CXX executable void_arrays_cli_selection_normal
+[750/1161] Linking CXX executable void_arrays_cli_tree_normal
+[751/1161] Linking CXX executable void_arrays_cli_readonly_normal
+[752/1161] Linking CXX executable void_arrays_cli_iteration_normal
+[753/1161] Linking CXX executable void_arrays_cli_ranges_normal
+[754/1161] Linking CXX executable void_arrays_cli_invalidation_normal
+[755/1161] Linking CXX executable void_arrays_cli_nested_failure_normal
+[756/1161] Linking CXX executable void_arrays_cli_large_normal
+[757/1161] Linking CXX executable void_arrays_cli_cycles_normal
+[758/1161] Linking CXX executable void_arrays_cli_empty_normal
+[759/1161] Linking CXX executable void_arrays_cli_failures_normal
+[760/1161] Linking CXX executable void_arrays_cli_strings_optimized
+[761/1161] Linking CXX executable void_arrays_cli_values_optimized
+[762/1161] Linking CXX executable void_arrays_cli_nested_optimized
+[763/1161] Linking CXX executable void_arrays_cli_defaults_optimized
+[764/1161] Linking CXX executable void_arrays_cli_interfaces_optimized
+[765/1161] Linking CXX executable void_arrays_cli_selection_optimized
+[766/1161] Linking CXX executable void_arrays_cli_tree_optimized
+[767/1161] Linking CXX executable void_arrays_cli_readonly_optimized
+[768/1161] Linking CXX executable void_arrays_cli_iteration_optimized
+[769/1161] Linking CXX executable void_arrays_cli_invalidation_optimized
+[770/1161] Linking CXX executable void_arrays_cli_ranges_optimized
+[771/1161] Linking CXX executable void_arrays_cli_nested_failure_optimized
+[772/1161] Linking CXX executable void_arrays_cli_large_optimized
+[773/1161] Linking CXX executable void_arrays_cli_cycles_optimized
+[774/1161] Linking CXX executable void_arrays_cli_empty_optimized
+[775/1161] Linking CXX executable void_arrays_cli_failures_optimized
+[776/1161] Linking CXX executable void_generics_cli_main_normal
+[777/1161] Linking CXX executable void_generics_cli_types_normal
+[778/1161] Linking CXX executable void_generics_cli_functions_normal
+[779/1161] Linking CXX executable void_generics_cli_constraints_normal
+[780/1161] Linking CXX executable void_generics_cli_arrays_normal
+[781/1161] Linking CXX executable void_generics_cli_initialization_normal
+[782/1161] Linking CXX executable void_generics_cli_methods_normal
+[783/1161] Linking CXX executable void_generics_cli_failures_normal
+[784/1161] Linking CXX executable void_generics_cli_imports_normal
+[785/1161] Linking CXX executable void_generics_cli_large_normal
+[786/1161] Linking CXX executable void_generics_cli_order_normal
+[787/1161] Linking CXX executable void_generics_cli_reload_normal
+[788/1161] Linking CXX executable void_generics_cli_types_optimized
+[789/1161] Linking CXX executable void_generics_cli_main_optimized
+[790/1161] Linking CXX executable void_generics_cli_functions_optimized
+[791/1161] Linking CXX executable void_generics_cli_constraints_optimized
+[792/1161] Linking CXX executable void_generics_cli_methods_optimized
+[793/1161] Linking CXX executable void_generics_cli_initialization_optimized
+[794/1161] Linking CXX executable void_generics_cli_arrays_optimized
+[795/1161] Linking CXX executable void_generics_cli_failures_optimized
+[796/1161] Linking CXX executable void_generics_cli_reload_optimized
+[797/1161] Linking CXX executable void_generics_cli_imports_optimized
+[798/1161] Linking CXX executable void_generics_cli_large_optimized
+[799/1161] Linking CXX executable void_generics_cli_order_optimized
+[800/1161] Linking CXX executable void_collections_cli_nested_normal
+[801/1161] Linking CXX executable void_collections_cli_main_normal
+[802/1161] Linking CXX executable void_collections_cli_order_normal
+[803/1161] Linking CXX executable void_collections_cli_bounds_normal
+[804/1161] Linking CXX executable void_collections_cli_invalidation_normal
+[805/1161] Linking CXX executable void_collections_cli_large_normal
+[806/1161] Linking CXX executable void_collections_cli_readonly_normal
+[807/1161] Linking CXX executable void_collections_cli_numeric_normal
+[808/1161] Linking CXX executable void_collections_cli_main_optimized
+[809/1161] Linking CXX executable void_collections_cli_nested_optimized
+[810/1161] Linking CXX executable void_collections_cli_order_optimized
+[811/1161] Linking CXX executable void_collections_cli_bounds_optimized
+[812/1161] Linking CXX executable void_collections_cli_invalidation_optimized
+[813/1161] Linking CXX executable void_collections_cli_large_optimized
+[814/1161] Linking CXX executable void_collections_cli_readonly_optimized
+[815/1161] Linking CXX executable void_collections_cli_numeric_optimized
+[816/1161] Linking CXX executable void_dictionaries_cli_main_normal
+[817/1161] Linking CXX executable void_dictionaries_cli_keys_normal
+[818/1161] Linking CXX executable void_dictionaries_cli_nested_normal
+[819/1161] Linking CXX executable void_dictionaries_cli_order_normal
+[820/1161] Linking CXX executable void_dictionaries_cli_transactions_normal
+[821/1161] Linking CXX executable void_dictionaries_cli_large_normal
+[822/1161] Linking CXX executable void_dictionaries_cli_literal_normal
+[823/1161] Linking CXX executable void_dictionaries_cli_main_optimized
+[824/1161] Linking CXX executable void_dictionaries_cli_nested_optimized
+[825/1161] Linking CXX executable void_dictionaries_cli_keys_optimized
+[826/1161] Linking CXX executable void_dictionaries_cli_order_optimized
+[827/1161] Linking CXX executable void_dictionaries_cli_large_optimized
+[828/1161] Linking CXX executable void_dictionaries_cli_transactions_optimized
+[829/1161] Linking CXX executable void_dictionaries_cli_literal_optimized
+[830/1161] Linking CXX executable void_properties_cli_main_normal
+[831/1161] Linking CXX executable void_properties_cli_generic_normal
+[832/1161] Linking CXX executable void_properties_cli_order_normal
+[833/1161] Linking CXX executable void_properties_cli_references_normal
+[834/1161] Linking CXX executable void_properties_cli_methods_normal
+[835/1161] Linking CXX executable void_properties_cli_callable_normal
+[836/1161] Linking CXX executable void_properties_cli_selection_normal
+[837/1161] Linking CXX executable void_properties_cli_imports_normal
+[838/1161] Linking CXX executable void_properties_cli_failure_normal
+[839/1161] Linking CXX executable void_properties_cli_receiver_normal
+[840/1161] Linking CXX executable void_properties_cli_main_optimized
+[841/1161] Linking CXX executable void_properties_cli_generic_optimized
+[842/1161] Linking CXX executable void_properties_cli_references_optimized
+[843/1161] Linking CXX executable void_properties_cli_order_optimized
+[844/1161] Linking CXX executable void_properties_cli_methods_optimized
+[845/1161] Linking CXX executable void_properties_cli_callable_optimized
+[846/1161] Linking CXX executable void_properties_cli_selection_optimized
+[847/1161] Linking CXX executable void_properties_cli_imports_optimized
+[848/1161] Linking CXX executable void_properties_cli_failure_optimized
+[849/1161] Linking CXX executable void_properties_cli_receiver_optimized
+[850/1161] Linking CXX executable void_patterns_cli_main_normal
+[851/1161] Linking CXX executable void_patterns_cli_results_normal
+[852/1161] Linking CXX executable void_patterns_cli_values_normal
+[853/1161] Linking CXX executable void_patterns_cli_generic_normal
+[854/1161] Linking CXX executable void_patterns_cli_interfaces_normal
+[855/1161] Linking CXX executable void_patterns_cli_large_normal
+[856/1161] Linking CXX executable void_patterns_cli_nullable_normal
+[857/1161] Linking CXX executable void_patterns_cli_control_normal
+[858/1161] Linking CXX executable void_patterns_cli_unmatched_normal
+[859/1161] Linking CXX executable void_patterns_cli_combined_normal
+[860/1161] Linking CXX executable void_patterns_cli_types_normal
+[861/1161] Linking CXX executable void_patterns_cli_nested_normal
+[862/1161] Linking CXX executable void_patterns_cli_transactions_normal
+[863/1161] Linking CXX executable void_patterns_cli_fields_normal
+[864/1161] Linking CXX executable void_patterns_cli_relocation_normal
+[865/1161] Linking CXX executable void_patterns_cli_results_optimized
+[866/1161] Linking CXX executable void_patterns_cli_interfaces_optimized
+[867/1161] Linking CXX executable void_patterns_cli_main_optimized
+[868/1161] Linking CXX executable void_patterns_cli_values_optimized
+[869/1161] Linking CXX executable void_patterns_cli_control_optimized
+[870/1161] Linking CXX executable void_patterns_cli_large_optimized
+[871/1161] Linking CXX executable void_patterns_cli_generic_optimized
+[872/1161] Linking CXX executable void_patterns_cli_nullable_optimized
+[873/1161] Linking CXX executable void_patterns_cli_unmatched_optimized
+[874/1161] Linking CXX executable void_patterns_cli_combined_optimized
+[875/1161] Linking CXX executable void_patterns_cli_transactions_optimized
+[876/1161] Linking CXX executable void_patterns_cli_nested_optimized
+[877/1161] Linking CXX executable void_patterns_cli_types_optimized
+[878/1161] Linking CXX executable void_patterns_cli_fields_optimized
+[879/1161] Linking CXX executable void_patterns_cli_relocation_optimized
+[880/1161] Linking CXX executable void_advanced_cli_closures_normal
+[881/1161] Linking CXX executable void_advanced_cli_captures_normal
+[882/1161] Linking CXX executable void_advanced_cli_callbacks_normal
+[883/1161] Linking CXX executable void_advanced_cli_defer_normal
+[884/1161] Linking CXX executable void_advanced_cli_events_normal
+[885/1161] Linking CXX executable void_advanced_cli_with_normal
+[886/1161] Linking CXX executable void_advanced_cli_cleanup_failure_normal
+[887/1161] Linking CXX executable void_advanced_cli_propagation_normal
+[888/1161] Linking CXX executable void_advanced_cli_event_snapshot_normal
+[889/1161] Linking CXX executable void_advanced_cli_nullable_normal
+[890/1161] Linking CXX executable void_advanced_cli_large_normal
+[891/1161] Linking CXX executable void_advanced_cli_fixed_capture_normal
+[892/1161] Linking CXX executable void_advanced_cli_scope_normal
+[893/1161] Linking CXX executable void_advanced_cli_inheritance_normal
+[894/1161] Linking CXX executable void_advanced_cli_with_transaction_normal
+[895/1161] Linking CXX executable void_advanced_cli_combined_normal
+[896/1161] Linking CXX executable void_advanced_cli_function_arrays_normal
+[897/1161] Linking CXX executable void_advanced_cli_identity_normal
+[898/1161] Linking CXX executable void_advanced_cli_generic_callbacks_normal
+[899/1161] Linking CXX executable void_advanced_cli_dictionary_closures_normal
+[900/1161] Linking CXX executable void_advanced_cli_construction_cleanup_normal
+[901/1161] Linking CXX executable void_advanced_cli_composite_defaults_normal
+[902/1161] Linking CXX executable void_advanced_cli_closures_optimized
+[903/1161] Linking CXX executable void_advanced_cli_callbacks_optimized
+[904/1161] Linking CXX executable void_advanced_cli_captures_optimized
+[905/1161] Linking CXX executable void_advanced_cli_defer_optimized
+[906/1161] Linking CXX executable void_advanced_cli_with_optimized
+[907/1161] Linking CXX executable void_advanced_cli_events_optimized
+[908/1161] Linking CXX executable void_advanced_cli_propagation_optimized
+[909/1161] Linking CXX executable void_advanced_cli_cleanup_failure_optimized
+[910/1161] Linking CXX executable void_advanced_cli_event_snapshot_optimized
+[911/1161] Linking CXX executable void_advanced_cli_nullable_optimized
+[912/1161] Linking CXX executable void_advanced_cli_fixed_capture_optimized
+[913/1161] Linking CXX executable void_advanced_cli_large_optimized
+[914/1161] Linking CXX executable void_advanced_cli_inheritance_optimized
+[915/1161] Linking CXX executable void_advanced_cli_scope_optimized
+[916/1161] Linking CXX executable void_advanced_cli_with_transaction_optimized
+[917/1161] Linking CXX executable void_advanced_cli_combined_optimized
+[918/1161] Linking CXX executable void_advanced_cli_identity_optimized
+[919/1161] Linking CXX executable void_advanced_cli_function_arrays_optimized
+[920/1161] Linking CXX executable void_advanced_cli_dictionary_closures_optimized
+[921/1161] Linking CXX executable void_advanced_cli_generic_callbacks_optimized
+[922/1161] Linking CXX executable void_advanced_cli_construction_cleanup_optimized
+[923/1161] Linking CXX executable void_advanced_cli_composite_defaults_optimized
+[924/1161] Linking CXX executable void_managed_aot_normal
+[925/1161] Linking CXX executable void_managed_cli_main_normal
+[926/1161] Linking CXX executable void_managed_cli_order_normal
+[927/1161] Linking CXX executable void_managed_cli_handoffs_normal
+[928/1161] Linking CXX executable void_managed_cli_imports_normal
+[929/1161] Linking CXX executable void_managed_cli_numeric_normal
+[930/1161] Linking CXX executable void_managed_cli_null_failure_normal
+[931/1161] Linking CXX executable void_managed_aot_optimized
+[932/1161] Linking CXX executable void_managed_cli_handoffs_optimized
+[933/1161] Linking CXX executable void_managed_cli_main_optimized
+[934/1161] Linking CXX executable void_managed_cli_order_optimized
+[935/1161] Linking CXX executable void_managed_cli_imports_optimized
+[936/1161] Linking CXX executable void_managed_cli_numeric_optimized
+[937/1161] Linking CXX executable void_managed_cli_null_failure_optimized
+[938/1161] Linking CXX executable void_managed_initialization_cli_main_normal
+[939/1161] Linking CXX executable void_managed_initialization_aot_normal
+[940/1161] Linking CXX executable void_managed_initialization_cli_stress_normal
+[941/1161] Linking CXX executable void_managed_initialization_cli_numeric_normal
+[942/1161] Linking CXX executable void_managed_initialization_cli_failure_normal
+[943/1161] Linking CXX executable void_managed_initialization_cli_imports_normal
+[944/1161] Linking CXX executable void_managed_initialization_cli_fail_default_normal
+[945/1161] Linking CXX executable void_managed_initialization_cli_fail_argument_normal
+[946/1161] Linking CXX executable void_managed_initialization_cli_main_optimized
+[947/1161] Linking CXX executable void_managed_initialization_cli_fail_child_normal
+[948/1161] Linking CXX executable void_managed_initialization_cli_stress_optimized
+[949/1161] Linking CXX executable void_managed_initialization_aot_optimized
+[950/1161] Linking CXX executable void_managed_initialization_cli_numeric_optimized
+[951/1161] Linking CXX executable void_managed_initialization_cli_imports_optimized
+[952/1161] Linking CXX executable void_managed_initialization_cli_failure_optimized
+[953/1161] Linking CXX executable void_managed_initialization_cli_fail_default_optimized
+[954/1161] Linking CXX executable void_managed_initialization_cli_fail_argument_optimized
+[955/1161] Linking CXX executable void_managed_initialization_cli_fail_child_optimized
+[956/1161] Linking CXX executable void_reference_values_aot_normal
+[957/1161] Linking CXX executable void_reference_values_cli_copies_normal
+[958/1161] Linking CXX executable void_reference_values_cli_readonly_normal
+[959/1161] Linking CXX executable void_reference_values_cli_templates_normal
+[960/1161] Linking CXX executable void_reference_values_cli_initialization_normal
+[961/1161] Linking CXX executable void_reference_values_cli_staged_normal
+[962/1161] Linking CXX executable void_reference_values_cli_methods_normal
+[963/1161] Linking CXX executable void_reference_values_cli_order_normal
+[964/1161] Linking CXX executable void_reference_values_cli_imports_normal
+[965/1161] Linking CXX executable void_reference_values_cli_required_normal
+[966/1161] Linking CXX executable void_reference_values_cli_stress_normal
+[967/1161] Linking CXX executable void_reference_values_cli_null_failure_normal
+[968/1161] Linking CXX executable void_reference_values_aot_optimized
+[969/1161] Linking CXX executable void_reference_values_cli_copies_optimized
+[970/1161] Linking CXX executable void_reference_values_cli_readonly_optimized
+[971/1161] Linking CXX executable void_reference_values_cli_initialization_optimized
+[972/1161] Linking CXX executable void_reference_values_cli_methods_optimized
+[973/1161] Linking CXX executable void_reference_values_cli_templates_optimized
+[974/1161] Linking CXX executable void_reference_values_cli_staged_optimized
+[975/1161] Linking CXX executable void_reference_values_cli_order_optimized
+[976/1161] Linking CXX executable void_reference_values_cli_imports_optimized
+[977/1161] Linking CXX executable void_reference_values_cli_stress_optimized
+[978/1161] Linking CXX executable void_reference_values_cli_required_optimized
+[979/1161] Linking CXX executable void_reference_values_cli_null_failure_optimized
+[980/1161] Linking CXX executable void_composition_cli_imports_normal
+[981/1161] Linking CXX executable void_composition_aot_normal
+[982/1161] Linking CXX executable void_composition_cli_stress_normal
+[983/1161] Linking CXX executable void_composition_cli_main_normal
+[984/1161] Linking CXX executable void_composition_cli_order_normal
+[985/1161] Linking CXX executable void_composition_cli_staged_normal
+[986/1161] Linking CXX executable void_composition_cli_receiver_order_normal
+[987/1161] Linking CXX executable void_composition_aot_optimized
+[988/1161] Linking CXX executable void_composition_cli_imports_optimized
+[989/1161] Linking CXX executable void_composition_cli_main_optimized
+[990/1161] Linking CXX executable void_composition_cli_stress_optimized
+[991/1161] Linking CXX executable void_composition_cli_order_optimized
+[992/1161] Linking CXX executable void_composition_cli_staged_optimized
+[993/1161] Linking CXX executable void_composition_cli_receiver_order_optimized
+[994/1161] Linking CXX executable void_inheritance_aot_normal
+[995/1161] Linking CXX executable void_inheritance_cli_main_normal
+[996/1161] Linking CXX executable void_inheritance_cli_initialization_normal
+[997/1161] Linking CXX executable void_inheritance_cli_stress_normal
+[998/1161] Linking CXX executable void_inheritance_cli_order_normal
+[999/1161] Linking CXX executable void_inheritance_cli_imports_normal
+[1000/1161] Linking CXX executable void_inheritance_cli_receiver_order_normal
+[1001/1161] Linking CXX executable void_inheritance_cli_results_normal
+[1002/1161] Linking CXX executable void_inheritance_cli_nested_normal
+[1003/1161] Linking CXX executable void_inheritance_cli_failure_normal
+[1004/1161] Linking CXX executable void_inheritance_cli_initialization_optimized
+[1005/1161] Linking CXX executable void_inheritance_cli_main_optimized
+[1006/1161] Linking CXX executable void_inheritance_aot_optimized
+[1007/1161] Linking CXX executable void_inheritance_cli_stress_optimized
+[1008/1161] Linking CXX executable void_inheritance_cli_order_optimized
+[1009/1161] Linking CXX executable void_inheritance_cli_imports_optimized
+[1010/1161] Linking CXX executable void_inheritance_cli_receiver_order_optimized
+[1011/1161] Linking CXX executable void_inheritance_cli_results_optimized
+[1012/1161] Linking CXX executable void_inheritance_cli_nested_optimized
+[1013/1161] Linking CXX executable void_inheritance_cli_failure_optimized
+[1014/1161] Linking CXX executable void_interfaces_aot_normal
+[1015/1161] Linking CXX executable void_interfaces_cli_main_normal
+[1016/1161] Linking CXX executable void_interfaces_cli_stress_normal
+[1017/1161] Linking CXX executable void_interfaces_cli_nullable_normal
+[1018/1161] Linking CXX executable void_interfaces_cli_selection_normal
+[1019/1161] Linking CXX executable void_interfaces_cli_imports_normal
+[1020/1161] Linking CXX executable void_interfaces_cli_handoffs_normal
+[1021/1161] Linking CXX executable void_interfaces_cli_cycles_normal
+[1022/1161] Linking CXX executable void_interfaces_cli_static_normal
+[1023/1161] Linking CXX executable void_interfaces_aot_optimized
+[1024/1161] Linking CXX executable void_interfaces_cli_main_optimized
+[1025/1161] Linking CXX executable void_interfaces_cli_stress_optimized
+[1026/1161] Linking CXX executable void_interfaces_cli_nullable_optimized
+[1027/1161] Linking CXX executable void_interfaces_cli_selection_optimized
+[1028/1161] Linking CXX executable void_interfaces_cli_handoffs_optimized
+[1029/1161] Linking CXX executable void_interfaces_cli_imports_optimized
+[1030/1161] Linking CXX executable void_interfaces_cli_cycles_optimized
+[1031/1161] Linking CXX executable void_interfaces_cli_static_optimized
+[1032/1161] Linking CXX executable void_strings_cli_main_normal
+[1033/1161] Linking CXX executable void_strings_aot_normal
+[1034/1161] Linking CXX executable void_strings_cli_stress_normal
+[1035/1161] Linking CXX executable void_strings_cli_initialization_normal
+[1036/1161] Linking CXX executable void_strings_cli_unicode_normal
+[1037/1161] Linking CXX executable void_strings_cli_main_optimized
+[1038/1161] Linking CXX executable void_strings_aot_optimized
+[1039/1161] Linking CXX executable void_strings_cli_stress_optimized
+[1040/1161] Linking CXX executable void_strings_cli_initialization_optimized
+[1041/1161] Linking CXX executable void_strings_cli_unicode_optimized
+[1042/1161] Linking CXX executable void_runtime_failures
+[1043/1161] Linking CXX executable void_runtime_aot_normal
+[1044/1161] Linking CXX executable void_runtime_aot_optimized
+[1045/1161] Linking CXX executable void_runtime_invariants
+[1046/1161] Linking CXX executable void_host_portable
+[1047/1161] Linking CXX executable void_host_capabilities
+[1048/1161] Linking CXX executable void_runtime_callbacks
+[1049/1161] Linking CXX executable void_math_host
+[1050/1161] Linking CXX executable void_os_host
+[1051/1161] Linking CXX executable void_combined_async_normal
+[1052/1161] Linking CXX executable void_combined_async_optimized
+[1053/1161] Linking CXX executable void_random_host
+[1054/1161] Linking CXX executable void_text_audit
+[1055/1161] Linking CXX executable void_binary_ownership
+[1056/1161] Linking CXX executable void_text_performance
+[1057/1161] Linking CXX executable void_text_ownership
+[1058/1161] Linking CXX executable void_memory_ownership
+[1059/1161] Linking CXX executable void_log_probe_normal
+[1060/1161] Linking CXX executable void_operator_compounds
+[1061/1161] Linking CXX executable void_log_probe_optimized
+[1062/1161] Linking CXX executable void_globals
+[1063/1161] Linking CXX executable void_log_host
+[1064/1161] Linking CXX executable void_channel_benchmark
+[1065/1161] Linking CXX executable void_collections_stdlib_host
+[1066/1161] Linking CXX executable void_channel_host
+[1067/1161] Linking CXX executable void_g1_aot_normal
+[1068/1161] Linking CXX executable void_g1_aot_optimized
+[1069/1161] Linking CXX executable void_g1_aot_mismatch
+[1070/1161] Linking CXX executable void_g2_aot_normal
+[1071/1161] Linking CXX executable void_g2_aot_optimized
+[1072/1161] Linking CXX executable void_g3_aot_normal
+[1073/1161] Linking CXX executable void_g3_aot_optimized
+[1074/1161] Linking CXX executable void_g4_aot_normal
+[1075/1161] Linking CXX executable void_g4_aot_optimized
+[1076/1161] Linking CXX executable void_g4_aot_startup
+[1077/1161] Linking CXX executable void_console_source
+[1078/1161] Linking CXX executable void_native_aot_main_normal
+[1079/1161] Linking CXX executable void_native_aot_main_optimized
+[1080/1161] Linking CXX executable void_native_aot_terminated_nul_normal
+[1081/1161] Linking CXX executable void_native_aot_terminated_nul_optimized
+[1082/1161] Linking CXX executable void_native_aot_closed_normal
+[1083/1161] Linking CXX executable void_native_aot_closed_optimized
+[1084/1161] Linking CXX executable void_native_aot_duplicate_normal
+[1085/1161] Linking CXX executable void_native_aot_duplicate_optimized
+[1086/1161] Linking CXX executable void_native_aot_cleanup_failure_normal
+[1087/1161] Linking CXX executable void_native_aot_cleanup_failure_optimized
+[1088/1161] Linking CXX executable void_native_aot_integrated_normal
+[1089/1161] Linking CXX executable void_operator_integration
+[1090/1161] Linking CXX executable void_native_aot_integrated_optimized
+[1091/1161] Linking CXX executable void_native_aot_integrated_cancel_normal
+[1092/1161] Linking CXX executable void_native_aot_integrated_cancel_optimized
+[1093/1161] Linking CXX executable void_native_aot_integrated_failure_normal
+[1094/1161] Linking CXX executable void_native_aot_integrated_failure_optimized
+[1095/1161] Linking CXX executable void_io_wire_normal
+[1096/1161] Linking CXX executable void_io_wire_optimized
+[1097/1161] Linking CXX executable void_io_probe_normal
+[1098/1161] Linking CXX executable void_io_probe_optimized
+[1099/1161] Linking CXX executable void_io_async_normal
+[1100/1161] Linking CXX executable void_io_async_optimized
+[1101/1161] Linking CXX executable void_io_native_jobs
+[1102/1161] Linking CXX executable void_async_external_tests
+[1103/1161] Linking CXX executable void_io_kernel
+[1104/1161] Linking CXX executable void_native_workers_tests
+[1105/1161] Linking CXX executable void_async_aot_spawn_normal
+[1106/1161] Linking CXX executable void_async_aot_spawn_optimized
+[1107/1161] Linking CXX executable void_async_aot_spawn_cancel_optimized
+[1108/1161] Linking CXX executable void_async_aot_spawn_cancel_normal
+[1109/1161] Linking CXX executable void_async_aot_spawn_failure_normal
+[1110/1161] Linking CXX executable void_async_aot_spawn_failure_optimized
+[1111/1161] Linking CXX executable void_io_ownership
+[1112/1161] Linking CXX executable void_async_aot_activation_normal
+[1113/1161] Linking CXX executable void_async_aot_activation_optimized
+[1114/1161] Linking CXX executable void_io_native
+[1115/1161] Linking CXX executable void_async_aot_managed_normal
+[1116/1161] Linking CXX executable void_async_aot_large_optimized
+[1117/1161] Linking CXX executable void_async_aot_managed_optimized
+[1118/1161] Linking CXX executable void_async_aot_large_normal
+[1119/1161] Linking CXX executable void_async_aot_closures_normal
+[1120/1161] Linking CXX executable void_async_aot_closures_optimized
+[1121/1161] Linking CXX executable void_async_aot_loops_normal
+[1122/1161] Linking CXX executable void_async_aot_loops_optimized
+[1123/1161] Linking CXX executable void_async_aot_values_normal
+[1124/1161] Linking CXX executable void_async_aot_values_optimized
+[1125/1161] Linking CXX executable void_async_aot_methods_normal
+[1126/1161] Linking CXX executable void_async_aot_lifecycle_normal
+[1127/1161] Linking CXX executable void_async_aot_methods_optimized
+[1128/1161] Linking CXX executable void_async_aot_lifecycle_optimized
+[1129/1161] Linking CXX executable void_async_aot_lifecycle_exits_normal
+[1130/1161] Linking CXX executable void_async_aot_lifecycle_exits_optimized
+[1131/1161] Linking CXX executable void_async_aot_lifecycle_cancelled_normal
+[1132/1161] Linking CXX executable void_async_aot_lifecycle_cancelled_optimized
+[1133/1161] Linking CXX executable void_async_aot_lifecycle_failures_normal
+[1134/1161] Linking CXX executable void_async_aot_lifecycle_failures_optimized
+[1135/1161] Linking CXX executable void_async_aot_lifecycle_primary_normal
+[1136/1161] Linking CXX executable void_async_aot_lifecycle_primary_optimized
+[1137/1161] Linking CXX executable void_async_aot_lifecycle_resources_normal
+[1138/1161] Linking CXX executable void_async_aot_lifecycle_resources_optimized
+[1139/1161] Linking CXX executable void_async_aot_lifecycle_values_normal
+[1140/1161] Linking CXX executable void_async_aot_lifecycle_values_optimized
+[1141/1161] Linking CXX executable void_async_syntax_values_normal
+[1142/1161] Linking CXX executable void_async_syntax_values_optimized
+[1143/1161] Linking CXX executable void_async_syntax_errors_normal
+[1144/1161] Linking CXX executable void_async_syntax_errors_optimized
+[1145/1161] Linking CXX executable void_async_syntax_cancelled_normal
+[1146/1161] Linking CXX executable void_async_syntax_cancelled_optimized
+[1147/1161] Linking CXX executable void_async_syntax_failure_normal
+[1148/1161] Linking CXX executable void_async_syntax_spawn_normal
+[1149/1161] Linking CXX executable void_async_syntax_failure_optimized
+[1150/1161] Linking CXX executable void_async_syntax_spawn_optimized
+[1151/1161] Linking CXX executable void_retention_aot_growth_normal
+[1152/1161] Linking CXX executable void_retention_aot_growth_optimized
+[1153/1161] Linking CXX executable void_retention_aot_workers_normal
+[1154/1161] Linking CXX executable void_numeric_enum_ir
+[1155/1161] Linking CXX executable void_g5_reload
+[1156/1161] Linking CXX executable void_retention_aot_workers_optimized
+[1157/1161] Linking CXX executable void_tests
+[1158/1161] Linking CXX executable void_sprint4_tests
+[1159/1161] Linking CXX executable void_sprint6_tests
+[1160/1161] Generating voidup/voidup
+Built native executable: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/voidup/voidup

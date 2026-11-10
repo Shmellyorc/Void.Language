@@ -1,0 +1,181 @@
+UpdateCTestConfiguration  from :/home/shmellyorc/Documents/Void.Language/build/llvm23-release/DartConfiguration.tcl
+Parse Config file:/home/shmellyorc/Documents/Void.Language/build/llvm23-release/DartConfiguration.tcl
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 277
+    Start 277: ffi_g2_jit_ir
+
+277: Test command: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_g2_tests "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g2/records.descriptor" "/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void"
+277: Working Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+277: Test timeout computed to be: 180
+277: 2 1: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+277: sample G2Sample 16 4 2: C primitive descriptor line 17: C record size, alignment or tail padding disagrees with natural layout
+277: packet G2Packet 31 8 4: C primitive descriptor line 22: C record size, alignment or tail padding disagrees with natural layout
+277: reading f64 4: C primitive descriptor line 17: C record field offset or padding disagrees with natural layout
+277: reading ptr 8: C primitive descriptor line 17: unsupported C primitive type
+277: reading u64 8: C primitive provider rejected the exact descriptor or fixture identity
+277: tag tag u32: C primitive provider rejected the exact descriptor or fixture identity
+277: array:u16:3:1: C primitive descriptor line 20: invalid inline array extent or stride
+277: array:u16:0:2: C primitive descriptor line 20: invalid inline array extent or stride
+277: array:u16:03:2: C primitive descriptor line 20: invalid bounded canonical decimal field
+277: datum datum record:packet: C primitive descriptor line 22: record must name an earlier verified declaration
+277: fastcall: C primitive descriptor line 8: unsupported descriptor, ABI revision or effects
+277: retains-pointer no-callbacks: C primitive descriptor line 7: unsupported descriptor, ABI revision or effects
+277: out:1:2:65537: C primitive descriptor line 27: invalid bounded canonical decimal field
+277: out:1:1:64: C primitive descriptor line 27: invalid byte span offset/length contract
+277: out:1:2:64 u64: C primitive descriptor line 27: byte span offsets and lengths require exact c_size operands
+277: out:1:2:64 c_size c_size out:4:5:64: C primitive descriptor line 29: unsupported span count, overlap profile, record or result contract
+277: bind fill g2_fill i32: C primitive descriptor line 27: unsupported span count, overlap profile, record or result contract
+277: inout:1:2:64: C primitive provider rejected the exact descriptor or fixture identity
+277: absent host seal: VOID IR: C primitive call outside the admitted binding module
+277: wrong provider: VOID IR: invalid C primitive descriptor or exact call signature
+277: wrong ordinal: VOID IR: invalid C primitive descriptor or exact call signature
+277: record identity: VOID IR: invalid C primitive descriptor or exact call signature
+277: span count and slot swap: VOID IR: invalid C primitive argument type or placement
+277: readonly output: VOID IR: invalid C primitive descriptor or exact call signature
+277: foreign raw ABI use: VOID IR: C primitive transport requires host admission and typed operations
+277: unauthorized direct import: VOID IR: C primitive binding requires the admitted direct import
+277: worker: VOID IR: C primitive graphs require synchronous execution
+277: raw pointer construction flag: VOID IR: invalid C primitive descriptor or exact call signature
+277: uninitialized record: VOID IR: read of uninitialized C binding carrier storage in /records.void::entry
+277: uninitialized byte list: VOID IR: read of uninitialized C binding carrier storage in /records.void::entry
+277: uninitialized scalar field: VOID IR: read of uninitialized C binding carrier storage in /records.void::entry
+277: incomplete inline array escapes: VOID IR: incomplete C inline array escapes private construction
+277: NativeSafe collection, zeroed output scratch, partial commit, oversized and negative rollback passed
+277: -1: <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+277: In function /native_records.void::fill
+277: Called from /records.void::entry
+277: /home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:6:20: source call
+277:         return ffi.fill(bytes, 0, 5, 8) as i32
+277:                    ^
+277: 
+277: -2: <host binding /native_records.void>:27:6: runtime error: overlapping C byte spans
+277: In function /native_records.void::move_bytes
+277: Called from /records.void::entry
+277: /home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:8:20: source call
+277:         return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32
+277:                    ^
+277: 
+277: -3: <host binding /native_records.void>:23:6: runtime error: C byte span returned an oversized written prefix
+277: In function /native_records.void::fill
+277: Called from /records.void::entry
+277: /home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:10:20: source call
+277:         return ffi.fill(bytes, 0, 4, 254) as i32
+277:                    ^
+277: 
+277: -4: <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+277: In function /native_records.void::fill
+277: Called from /records.void::entry
+277: /home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:12:20: source call
+277:         return ffi.fill(bytes, 18446744073709551615 as u64, 1, 8) as i32
+277:                    ^
+277: 
+277: G2 JIT normal returned 103
+277: -1: <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+277: In function /native_records.void::fill
+277: Called from /records.void::entry
+277: /home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:6:20: source call
+277:         return ffi.fill(bytes, 0, 5, 8) as i32
+277:                    ^
+277: 
+277: -2: <host binding /native_records.void>:27:6: runtime error: overlapping C byte spans
+277: In function /native_records.void::move_bytes
+277: Called from /records.void::entry
+277: /home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:8:20: source call
+277:         return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32
+277:                    ^
+277: 
+277: -3: <host binding /native_records.void>:23:6: runtime error: C byte span returned an oversized written prefix
+277: In function /native_records.void::fill
+277: Called from /records.void::entry
+277: /home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:10:20: source call
+277:         return ffi.fill(bytes, 0, 4, 254) as i32
+277:                    ^
+277: 
+277: -4: <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+277: In function /native_records.void::fill
+277: Called from /records.void::entry
+277: /home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:12:20: source call
+277:         return ffi.fill(bytes, 18446744073709551615 as u64, 1, 8) as i32
+277:                    ^
+277: 
+277: G2 JIT O2 returned 103
+1/3 Test #277: ffi_g2_jit_ir ....................   Passed    0.33 sec
+test 278
+    Start 278: ffi_g2_aot_normal
+
+278: Test command: /usr/bin/python3 "/home/shmellyorc/Documents/Void.Language/tests/ffi/records_process.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_g2_aot_normal"
+278: Working Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+278: Test timeout computed to be: 1500
+278: 7 0 103
+278: -1 1 <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+278: In function /native_records.void::fill
+278: Called from /records.void::entry
+278: /home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:6:20: source call
+278:         return ffi.fill(bytes, 0, 5, 8) as i32
+278:                    ^
+278: -2 1 <host binding /native_records.void>:27:6: runtime error: overlapping C byte spans
+278: In function /native_records.void::move_bytes
+278: Called from /records.void::entry
+278: /home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:8:20: source call
+278:         return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32
+278:                    ^
+278: -3 1 <host binding /native_records.void>:23:6: runtime error: C byte span returned an oversized written prefix
+278: In function /native_records.void::fill
+278: Called from /records.void::entry
+278: /home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:10:20: source call
+278:         return ffi.fill(bytes, 0, 4, 254) as i32
+278:                    ^
+278: -4 1 <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+278: In function /native_records.void::fill
+278: Called from /records.void::entry
+278: /home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:12:20: source call
+278:         return ffi.fill(bytes, 18446744073709551615 as u64, 1, 8) as i32
+278:                    ^
+2/3 Test #278: ffi_g2_aot_normal ................   Passed    0.04 sec
+test 279
+    Start 279: ffi_g2_aot_optimized
+
+279: Test command: /usr/bin/python3 "/home/shmellyorc/Documents/Void.Language/tests/ffi/records_process.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_g2_aot_optimized"
+279: Working Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+279: Test timeout computed to be: 1500
+279: 7 0 103
+279: -1 1 <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+279: In function /native_records.void::fill
+279: Called from /records.void::entry
+279: /home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:6:20: source call
+279:         return ffi.fill(bytes, 0, 5, 8) as i32
+279:                    ^
+279: -2 1 <host binding /native_records.void>:27:6: runtime error: overlapping C byte spans
+279: In function /native_records.void::move_bytes
+279: Called from /records.void::entry
+279: /home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:8:20: source call
+279:         return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32
+279:                    ^
+279: -3 1 <host binding /native_records.void>:23:6: runtime error: C byte span returned an oversized written prefix
+279: In function /native_records.void::fill
+279: Called from /records.void::entry
+279: /home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:10:20: source call
+279:         return ffi.fill(bytes, 0, 4, 254) as i32
+279:                    ^
+279: -4 1 <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+279: In function /native_records.void::fill
+279: Called from /records.void::entry
+279: /home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:12:20: source call
+279:         return ffi.fill(bytes, 18446744073709551615 as u64, 1, 8) as i32
+279:                    ^
+3/3 Test #279: ffi_g2_aot_optimized .............   Passed    0.04 sec
+
+The following tests passed:
+	ffi_g2_jit_ir
+	ffi_g2_aot_normal
+	ffi_g2_aot_optimized
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =   0.41 sec

@@ -1,0 +1,19 @@
+Start testing: Nov 09 07:17 MST
+----------------------------------------------------------
+280/437 Testing: ffi_g3_jit_ir
+280/437 Test: ffi_g3_jit_ir
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_g3_tests" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g3/resources.descriptor" "/home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g3/tests"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+"ffi_g3_jit_ir" start time: Nov 09 07:17 MST
+Output:
+----------------------------------------------------------
+free(): double free detected in tcache 2
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Failed.
+"ffi_g3_jit_ir" end time: Nov 09 07:17 MST
+"ffi_g3_jit_ir" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 09 07:17 MST

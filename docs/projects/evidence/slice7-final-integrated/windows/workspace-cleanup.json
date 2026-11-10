@@ -1,0 +1,8 @@
+{
+  "failed_configure_root_removed": "C:\\Users\\a\\VS7I",
+  "verified_absent": true,
+  "attested_toolchains_preserved": "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains",
+  "retained_root": "C:\\Users\\a\\VS7I2",
+  "retained_source_packet_sha256": "5cf21e1e755a5fdf30a2614ac3486d609b5c81a363fab25e4c78c7c13469ef48",
+  "free_bytes": 50999296
+}

@@ -1,0 +1,21 @@
+{
+  "compiler_sha256": "152f75f9b0369efde1b586eebd4d65acaac3aa75c60bc81d03120f65514a5839",
+  "stream_bytes": 134217728,
+  "stack_limits": [
+    8388608,
+    -1
+  ],
+  "source_sha256": {
+    "stdlib/net/http.void": "3dc77729522d1ea1e2ed9ae14962b82e4cf2e4793219f613772584f2591ac1b4",
+    "include/void/http_ops.hpp": "48f9ccbe6bc5ab9fd33f1e500e55e19bb61f18c1c6ff87bed9029b6195fccc19",
+    "src/runtime/http.cpp": "c851066977bdfe25703b3d982d064a91bf58f31442cac059cac5ff18fbbfbe62",
+    "src/runtime/http_abi.cpp": "af9d7c2213a4156fbc408134e4ce5814cca1c32d43f546fd28bcbb50bb0691fc",
+    "src/runtime/http_file.cpp": "66cdea5e72a3460849aaf61f9fcab4386476890b612e3d8c5f6545e04164ea40",
+    "src/runtime/http_resource.cpp": "b2bb6b85a42e9ad2542e41cf18c1ac368b185044a6e638780c06f9021075784f",
+    "src/runtime/native_work.cpp": "01e519cf58d228e576a0d8928d00d2c4231a5df4ed84c4925aae71b9f2e966b4",
+    "src/runtime/async.cpp": "e29616fc3c69306f700978052d2b8b1dc3bc1f6b286b87c62e54126f6b4974d0",
+    "third_party/http-versions.json": "13215bee95300e7fc1538bbf506d1408146a1c2648fba29088f78e7386a44496"
+  },
+  "ASAN_OPTIONS": "",
+  "UBSAN_OPTIONS": ""
+}

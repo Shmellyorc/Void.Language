@@ -1,0 +1,13 @@
+INFO: Initializing raylib 6.0
+INFO: Platform backend: DESKTOP (GLFW)
+INFO: Supported raylib modules:
+INFO:     > rcore:..... loaded (mandatory)
+INFO:     > rlgl:...... loaded (mandatory)
+INFO:     > rshapes:... loaded (optional)
+INFO:     > rtextures:. loaded (optional)
+INFO:     > rtext:..... loaded (optional)
+INFO:     > rmodels:... loaded (optional)
+INFO:     > raudio:.... loaded (optional)
+WARNING: GLFW: Error: 65542 Description: WGL: The driver does not appear to support OpenGL
+WARNING: GLFW: Failed to initialize Window
+WARNING: SYSTEM: Failed to initialize platform

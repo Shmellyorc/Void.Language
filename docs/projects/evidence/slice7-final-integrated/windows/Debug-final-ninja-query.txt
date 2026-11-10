@@ -1,0 +1,20 @@
+void_arrays_cli_values_normal.exe:
+  input: CXX_EXECUTABLE_LINKER__void_arrays_cli_values_normal_Debug
+    arrays-values-normal.obj
+    CMakeFiles/void_arrays_cli_values_normal.dir/tests/integration/native_link.cpp.obj
+    | void_runtime.lib
+    | void_native_fixture.lib
+    | curl/lib/libcurl.lib
+    | C:/Users/a/VoidCI42377496702-Native/.toolchains/http/prefix/windows-schannel-x86_64/Debug/lib/cares.lib
+    | C:/Users/a/VoidCI42377496702-Native/.toolchains/http/prefix/windows-schannel-x86_64/Debug/lib/nghttp2.lib
+    | C:/Users/a/VoidCI42377496702-Native/.toolchains/http/prefix/windows-schannel-x86_64/Debug/lib/psl.lib
+    | C:/Users/a/VoidCI42377496702-Native/.toolchains/http/prefix/windows-schannel-x86_64/Debug/lib/zsd.lib
+    | C:/Users/a/VoidCI42377496702-Native/.toolchains/host/prefix/windows-x86_64/Debug/lib/archive.lib
+    | C:/Users/a/VoidCI42377496702-Native/.toolchains/host/prefix/windows-x86_64/Debug/lib/libsodium.lib
+    || curl/lib/libcurl.lib
+    || void_native_fixture.lib
+    || void_runtime.lib
+    || voidc.exe
+  outputs:
+    void_arrays_cli_values_normal
+    all

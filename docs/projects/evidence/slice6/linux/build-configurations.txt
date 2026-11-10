@@ -1,0 +1,14 @@
+Linux x86_64
+10:C_FLAGS = -O2 -g -DNDEBUG -D_GNU_SOURCE -D_GLIBCXX_USE_CXX11_ABI=1 -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer
+16:CXX_FLAGS = -O2 -g -DNDEBUG -std=c++20 -D_GNU_SOURCE -D_GLIBCXX_USE_CXX11_ABI=1 -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fno-rtti -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86
+build/llvm23-release/CMakeCache.txt:CMAKE_BUILD_TYPE:STRING=Release
+build/llvm23-release/CMakeCache.txt:CMAKE_CXX_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+build/llvm23-release/CMakeCache.txt:VOID_SANITIZERS:BOOL=OFF
+build/llvm23-debug/CMakeCache.txt:CMAKE_BUILD_TYPE:STRING=Debug
+build/llvm23-debug/CMakeCache.txt:CMAKE_CXX_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+build/llvm23-debug/CMakeCache.txt:VOID_SANITIZERS:BOOL=OFF
+build/llvm23-strict/CMakeCache.txt:CMAKE_BUILD_TYPE:STRING=RelWithDebInfo
+build/llvm23-strict/CMakeCache.txt:CMAKE_CXX_COMPILER:STRING=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++
+build/llvm23-strict/CMakeCache.txt:VOID_SANITIZERS:BOOL=ON

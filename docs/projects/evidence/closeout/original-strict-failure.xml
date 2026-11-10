@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="24"
+	failures="2"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="128"
+	timestamp="2026-11-08T12:03:00"
+	>
+	<testcase name="project_manifest" classname="project_manifest" time="0.436321" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>/home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15487:4: runtime error: assumption is violated during execution
+    #0 0x5644a765aacb in toml::v3::impl::impl_noex::parser::parse_key() /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15487:4
+    #1 0x5644a764fb35 in toml::v3::impl::impl_noex::parser::parse_table_header() /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15609:5
+    #2 0x5644a764c862 in toml::v3::impl::impl_noex::parser::parse_document() /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15916:22
+    #3 0x5644a764b997 in toml::v3::impl::impl_noex::parser::parser(toml::v3::impl::utf8_reader_interface&amp;&amp;) /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:16001:6
+    #4 0x5644a762f3c6 in toml::v3::impl::do_parse(toml::v3::impl::utf8_reader_interface&amp;&amp;) /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:16212:10
+    #5 0x5644a762f3c6 in toml::v3::noex::parse(std::basic_string_view&lt;char, std::char_traits&lt;char&gt;&gt;, std::basic_string_view&lt;char, std::char_traits&lt;char&gt;&gt;) /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:16279:10
+    #6 0x5644a762f3c6 in vd::project::ManifestParser::parse() /home/shmellyorc/Documents/Void.Language/src/frontend/project.cpp:304:23
+    #7 0x5644a762db5c in vd::project::parse_manifest(vd::SourceFile const&amp;) /home/shmellyorc/Documents/Void.Language/src/frontend/project.cpp:366:86
+    #8 0x5644a76267d2 in (anonymous namespace)::parse(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt;&gt;) /home/shmellyorc/Documents/Void.Language/tests/project/manifest.cpp:62:12
+    #9 0x5644a76126cb in (anonymous namespace)::mutations() /home/shmellyorc/Documents/Void.Language/tests/project/manifest.cpp:232:27
+    #10 0x5644a76126cb in main /home/shmellyorc/Documents/Void.Language/tests/project/manifest.cpp:293:89
+    #11 0x7f2c1ca2a3fd  (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a3fd) (BuildId: a6ece0eae08c71f58eaefb817ae72b57782127d3)
+    #12 0x7f2c1ca2a51a in __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a51a) (BuildId: a6ece0eae08c71f58eaefb817ae72b57782127d3)
+    #13 0x5644a75193f4 in _start (/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_project_manifest+0x4a63f4)
+
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15487:4 
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_no_authority" classname="project_manifest_no_authority" time="0.0809555" status="fail">
+		<failure message="SIGSYS"/>
+		<properties/>
+		<system-out>/home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15487:4: runtime error: assumption is violated during execution
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_legacy" classname="project_manifest_legacy" time="1.59525" status="run">
+		<properties/>
+		<system-out>project_manifest_legacy: 15 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_provenance" classname="project_manifest_provenance" time="0.0375676" status="run">
+		<properties/>
+		<system-out>project_manifest_provenance: 3 file hashes and exact pinned upstream reconstruction passed
+</system-out>
+	</testcase>
+	<testcase name="cli_contract" classname="cli_contract" time="11.4944" status="run">
+		<properties/>
+		<system-out>76 CLI process checks passed on linux; native output and collision preservation passed
+</system-out>
+	</testcase>
+	<testcase name="cli_install_resources" classname="cli_install_resources" time="0.0858446" status="run">
+		<properties/>
+		<system-out>......s
+----------------------------------------------------------------------
+Ran 7 tests in 0.006s
+
+OK (skipped=1)
+</system-out>
+	</testcase>
+	<testcase name="application_workflow_stage9" classname="application_workflow_stage9" time="31.2715" status="run">
+		<properties/>
+		<system-out>Stage 9 real workflow checks passed: 111
+</system-out>
+	</testcase>
+	<testcase name="debug_cache_processes" classname="debug_cache_processes" time="9.21252" status="run">
+		<properties/>
+		<system-out>Fresh processes, corruption, concurrent publication, imports, diagnostics and large arrays passed
+</system-out>
+	</testcase>
+	<testcase name="automatic_cache_processes" classname="automatic_cache_processes" time="1.48075" status="run">
+		<properties/>
+		<system-out>Automatic O2/no-IR-O2 caching, bypass, fresh globals and diagnostics passed
+</system-out>
+	</testcase>
+	<testcase name="os_errors" classname="os_errors" time="20.8356" status="run">
+		<properties/>
+		<system-out>OS errors: 8 process checks, 9 valid/61 invalid IDs x four getters; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="os_frontend" classname="os_frontend" time="38.3567" status="run">
+		<properties/>
+		<system-out>OS frontend: 62 processes passed; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="lsp_os" classname="lsp_os" time="6.47054" status="run">
+		<properties/>
+		<system-out>OS LSP: 44 checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage7" classname="lsp_stage7" time="0.468449" status="run">
+		<properties/>
+		<system-out>Stage 7: completion/recovery, signatures, hover, bindings, symbols, guarded rename, formatting, refresh, batching, cancellation passed
+</system-out>
+	</testcase>
+	<testcase name="sessions" classname="sessions" time="0.261518" status="run">
+		<properties/>
+		<system-out>sessions: passed
+</system-out>
+	</testcase>
+	<testcase name="tooling" classname="tooling" time="0.614805" status="run">
+		<properties/>
+		<system-out>queries: aliased/direct definitions, 2 callers, root/local constants, byte spans and retained snapshots
+plan: /leaf.void -&gt; /middle.void::wrapper -&gt; /main.void::entry; validated 53 -&gt; 61, const restart required
+tooling: passed
+</system-out>
+	</testcase>
+	<testcase name="analysis" classname="analysis" time="1.24354" status="run">
+		<properties/>
+		<system-out>normal: body edit 53 -&gt; 61, const edit rejected, old lease 53; concurrent calls 559061
+O2: body edit 53 -&gt; 61, const edit rejected, old lease 53; concurrent calls 671952
+analysis: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric" classname="numeric" time="6.67598" status="run">
+		<properties/>
+		<system-out>210 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed
+numeric: passed
+</system-out>
+	</testcase>
+	<testcase name="frontend" classname="frontend" time="11.6283" status="run">
+		<properties/>
+		<system-out>Frontend begin: diagnostics
+50+ source diagnostic cases and UTF-8/ABI checks passed
+Frontend passed: diagnostics
+Frontend begin: programs
+Real .void files and independent programs executed through normal/O2 JIT
+Frontend passed: programs
+Frontend begin: numeric values
+1216 constant/normal/O2 numeric matrix comparisons passed
+Readonly/compile-time constants, numeric boundaries, concurrent failures, bounded traces and restart checks passed
+Frontend passed: numeric values
+Frontend begin: diagnostic recovery/resource limits
+Frontend resource case: combined expression/constant depth
+Structured diagnostics: independent files, recovery, bounded cascades, snapshots and failed reload verified
+Frontend passed: diagnostic recovery/resource limits
+Frontend begin: value structs
+Frontend resource case: bounded expanded value layouts
+Value struct source: nested/mixed layouts, copies, normal/O2 JIT, diagnostics, tooling and reload passed
+Frontend passed: value structs
+Frontend begin: receiver methods
+Frontend resource case: b...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="modules" classname="modules" time="2.13108" status="run">
+		<properties/>
+		<system-out>Project constants, forwards, visibility, cycles, imports and restart checks passed
+Project-local library identities, cycles, ownership, overlays, native JIT and invalidation passed
+Multi-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed
+modules: passed
+</system-out>
+	</testcase>
+	<testcase name="local_libraries" classname="local_libraries" time="1.00206" status="run">
+		<properties/>
+		<system-out>Local libraries: 16 compiler/JIT/AOT/cache/application checks and same-server LSP completion/overlay/refresh checks passed
+</system-out>
+	</testcase>
+	<testcase name="source_cli" classname="source_cli" time="14.947" status="run">
+		<properties/>
+		<system-out>Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/source programs with spaces/architecture-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/source programs with spaces/architecture-optimized.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/source programs with spaces/loops-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/source programs with spaces/loops-optimized.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/source programs with spaces/functions-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/source programs with spaces/functions-optimized.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="modules_cli" classname="modules_cli" time="51.9929" status="run">
+		<properties/>
+		<system-out>Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/module native programs with spaces/acceptance-normal.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/module native programs with spaces/acceptance-optimized.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/module native programs with spaces/nested-normal.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/module native programs with spaces/nested-optimized.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/module native programs with spaces/cyclic-normal.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/module native programs with spaces/cyclic-optimized.o...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="analysis_cli" classname="analysis_cli" time="1.14439" status="run">
+		<properties/>
+		<system-out>Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/analysis native programs/analysis-53-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/analysis native programs/analysis-53-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/analysis native programs/analysis-61-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/analysis native programs/analysis-61-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/analysis native programs/analysis-62-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/analysis native programs/analysis-62-optimized.o
+</system-out>
+	</testcase>
+	<testcase name="numeric_cli" classname="numeric_cli" time="42.4999" status="run">
+		<properties/>
+		<system-out>-- Numeric source constants, JIT and native AOT passed in both optimization modes
+</system-out>
+	</testcase>
+</testsuite>

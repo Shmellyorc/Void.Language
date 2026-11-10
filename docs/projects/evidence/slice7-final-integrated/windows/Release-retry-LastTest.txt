@@ -1,0 +1,250 @@
+Start testing: Nov 09 12:41 Pacific Standard Time
+----------------------------------------------------------
+84/381 Testing: fixed_arrays_cli
+84/381 Test: fixed_arrays_cli
+Command: "C:/gcc/bin/cmake.exe" "-DCOMPILER=C:/Users/a/VS7I2/Release/voidc.exe" "-DROOT=C:/Users/a/VS7I2/src" "-DBIN=C:/Users/a/VS7I2/Release" "-DEXE_SUFFIX=.exe" "-P" "C:/Users/a/VS7I2/src/tests/integration/fixed_arrays.cmake"
+Directory: C:/Users/a/VS7I2/Release
+"fixed_arrays_cli" start time: Nov 09 12:41 Pacific Standard Time
+Output:
+----------------------------------------------------------
+-- Real numeric fixed-array programs passed JIT and linked AOT, normal/O2
+<end of output>
+Test time =  15.12 sec
+----------------------------------------------------------
+Test Passed.
+"fixed_arrays_cli" end time: Nov 09 12:42 Pacific Standard Time
+"fixed_arrays_cli" time elapsed: 00:00:15
+----------------------------------------------------------
+
+85/381 Testing: growable_arrays_cli
+85/381 Test: growable_arrays_cli
+Command: "C:/gcc/bin/cmake.exe" "-DCOMPILER=C:/Users/a/VS7I2/Release/voidc.exe" "-DROOT=C:/Users/a/VS7I2/src" "-DBIN=C:/Users/a/VS7I2/Release" "-DEXE_SUFFIX=.exe" "-P" "C:/Users/a/VS7I2/src/tests/integration/growable_arrays.cmake"
+Directory: C:/Users/a/VS7I2/Release
+"growable_arrays_cli" start time: Nov 09 12:42 Pacific Standard Time
+Output:
+----------------------------------------------------------
+-- Growable numeric/bool lists passed normal/O2 source JIT and native AOT
+<end of output>
+Test time =  11.66 sec
+----------------------------------------------------------
+Test Passed.
+"growable_arrays_cli" end time: Nov 09 12:42 Pacific Standard Time
+"growable_arrays_cli" time elapsed: 00:00:11
+----------------------------------------------------------
+
+86/381 Testing: arrays_cli
+86/381 Test: arrays_cli
+Command: "C:/gcc/bin/cmake.exe" "-DCOMPILER=C:/Users/a/VS7I2/Release/voidc.exe" "-DROOT=C:/Users/a/VS7I2/src" "-DBIN=C:/Users/a/VS7I2/Release" "-DEXE_SUFFIX=.exe" "-P" "C:/Users/a/VS7I2/src/tests/integration/arrays.cmake"
+Directory: C:/Users/a/VS7I2/Release
+"arrays_cli" start time: Nov 09 12:42 Pacific Standard Time
+Output:
+----------------------------------------------------------
+-- Phase 23 arrays/ranges passed normal/O2 source JIT and native AOT
+<end of output>
+Test time =  25.92 sec
+----------------------------------------------------------
+Test Passed.
+"arrays_cli" end time: Nov 09 12:42 Pacific Standard Time
+"arrays_cli" time elapsed: 00:00:25
+----------------------------------------------------------
+
+87/381 Testing: generics_cli
+87/381 Test: generics_cli
+Command: "C:/gcc/bin/cmake.exe" "-DCOMPILER=C:/Users/a/VS7I2/Release/voidc.exe" "-DROOT=C:/Users/a/VS7I2/src" "-DBIN=C:/Users/a/VS7I2/Release" "-DEXE_SUFFIX=.exe" "-P" "C:/Users/a/VS7I2/src/tests/integration/generics.cmake"
+Directory: C:/Users/a/VS7I2/Release
+"generics_cli" start time: Nov 09 12:42 Pacific Standard Time
+Output:
+----------------------------------------------------------
+-- Generic programs passed normal/O2 JIT and linked AOT
+<end of output>
+Test time =  12.58 sec
+----------------------------------------------------------
+Test Passed.
+"generics_cli" end time: Nov 09 12:43 Pacific Standard Time
+"generics_cli" time elapsed: 00:00:12
+----------------------------------------------------------
+
+88/381 Testing: collections_cli
+88/381 Test: collections_cli
+Command: "C:/gcc/bin/cmake.exe" "-DCOMPILER=C:/Users/a/VS7I2/Release/voidc.exe" "-DROOT=C:/Users/a/VS7I2/src" "-DBIN=C:/Users/a/VS7I2/Release" "-DEXE_SUFFIX=.exe" "-P" "C:/Users/a/VS7I2/src/tests/integration/collections.cmake"
+Directory: C:/Users/a/VS7I2/Release
+"collections_cli" start time: Nov 09 12:43 Pacific Standard Time
+Output:
+----------------------------------------------------------
+-- Collections: normal/O2 JIT and independently linked AOT passed
+<end of output>
+Test time =  22.77 sec
+----------------------------------------------------------
+Test Passed.
+"collections_cli" end time: Nov 09 12:43 Pacific Standard Time
+"collections_cli" time elapsed: 00:00:22
+----------------------------------------------------------
+
+89/381 Testing: dictionaries_cli
+89/381 Test: dictionaries_cli
+Command: "C:/gcc/bin/cmake.exe" "-DCOMPILER=C:/Users/a/VS7I2/Release/voidc.exe" "-DROOT=C:/Users/a/VS7I2/src" "-DBIN=C:/Users/a/VS7I2/Release" "-DEXE_SUFFIX=.exe" "-P" "C:/Users/a/VS7I2/src/tests/integration/dictionaries.cmake"
+Directory: C:/Users/a/VS7I2/Release
+"dictionaries_cli" start time: Nov 09 12:43 Pacific Standard Time
+Output:
+----------------------------------------------------------
+-- Dictionaries: normal/O2 JIT and independently linked AOT passed
+<end of output>
+Test time =  22.99 sec
+----------------------------------------------------------
+Test Passed.
+"dictionaries_cli" end time: Nov 09 12:43 Pacific Standard Time
+"dictionaries_cli" time elapsed: 00:00:22
+----------------------------------------------------------
+
+90/381 Testing: properties_cli
+90/381 Test: properties_cli
+Command: "C:/gcc/bin/cmake.exe" "-DCOMPILER=C:/Users/a/VS7I2/Release/voidc.exe" "-DROOT=C:/Users/a/VS7I2/src" "-DBIN=C:/Users/a/VS7I2/Release" "-DEXE_SUFFIX=.exe" "-P" "C:/Users/a/VS7I2/src/tests/integration/properties.cmake"
+Directory: C:/Users/a/VS7I2/Release
+"properties_cli" start time: Nov 09 12:43 Pacific Standard Time
+Output:
+----------------------------------------------------------
+-- Properties: 44 successful + 12 checked failures, normal/O2 JIT/independently linked AOT passed
+<end of output>
+Test time =  12.44 sec
+----------------------------------------------------------
+Test Passed.
+"properties_cli" end time: Nov 09 12:44 Pacific Standard Time
+"properties_cli" time elapsed: 00:00:12
+----------------------------------------------------------
+
+91/381 Testing: patterns_cli
+91/381 Test: patterns_cli
+Command: "C:/gcc/bin/cmake.exe" "-DCOMPILER=C:/Users/a/VS7I2/Release/voidc.exe" "-DROOT=C:/Users/a/VS7I2/src" "-DBIN=C:/Users/a/VS7I2/Release" "-DEXE_SUFFIX=.exe" "-P" "C:/Users/a/VS7I2/src/tests/integration/patterns.cmake"
+Directory: C:/Users/a/VS7I2/Release
+"patterns_cli" start time: Nov 09 12:44 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   9.46 sec
+----------------------------------------------------------
+Test Passed.
+"patterns_cli" end time: Nov 09 12:44 Pacific Standard Time
+"patterns_cli" time elapsed: 00:00:09
+----------------------------------------------------------
+
+92/381 Testing: advanced_cli
+92/381 Test: advanced_cli
+Command: "C:/gcc/bin/cmake.exe" "-DCOMPILER=C:/Users/a/VS7I2/Release/voidc.exe" "-DROOT=C:/Users/a/VS7I2/src" "-DBIN=C:/Users/a/VS7I2/Release" "-DEXE_SUFFIX=.exe" "-P" "C:/Users/a/VS7I2/src/tests/integration/advanced.cmake"
+Directory: C:/Users/a/VS7I2/Release
+"advanced_cli" start time: Nov 09 12:44 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =  20.48 sec
+----------------------------------------------------------
+Test Passed.
+"advanced_cli" end time: Nov 09 12:44 Pacific Standard Time
+"advanced_cli" time elapsed: 00:00:20
+----------------------------------------------------------
+
+96/381 Testing: managed_cli
+96/381 Test: managed_cli
+Command: "C:/gcc/bin/cmake.exe" "-DCOMPILER=C:/Users/a/VS7I2/Release/voidc.exe" "-DROOT=C:/Users/a/VS7I2/src" "-DBIN=C:/Users/a/VS7I2/Release" "-DEXE_SUFFIX=.exe" "-P" "C:/Users/a/VS7I2/src/tests/integration/managed.cmake"
+Directory: C:/Users/a/VS7I2/Release
+"managed_cli" start time: Nov 09 12:44 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   6.51 sec
+----------------------------------------------------------
+Test Passed.
+"managed_cli" end time: Nov 09 12:44 Pacific Standard Time
+"managed_cli" time elapsed: 00:00:06
+----------------------------------------------------------
+
+100/381 Testing: managed_initialization_cli
+100/381 Test: managed_initialization_cli
+Command: "C:/gcc/bin/cmake.exe" "-DCOMPILER=C:/Users/a/VS7I2/Release/voidc.exe" "-DROOT=C:/Users/a/VS7I2/src" "-DBIN=C:/Users/a/VS7I2/Release" "-DEXE_SUFFIX=.exe" "-P" "C:/Users/a/VS7I2/src/tests/integration/managed_initialization.cmake"
+Directory: C:/Users/a/VS7I2/Release
+"managed_initialization_cli" start time: Nov 09 12:44 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   9.08 sec
+----------------------------------------------------------
+Test Passed.
+"managed_initialization_cli" end time: Nov 09 12:44 Pacific Standard Time
+"managed_initialization_cli" time elapsed: 00:00:09
+----------------------------------------------------------
+
+104/381 Testing: reference_values_cli
+104/381 Test: reference_values_cli
+Command: "C:/gcc/bin/cmake.exe" "-DCOMPILER=C:/Users/a/VS7I2/Release/voidc.exe" "-DROOT=C:/Users/a/VS7I2/src" "-DBIN=C:/Users/a/VS7I2/Release" "-DEXE_SUFFIX=.exe" "-P" "C:/Users/a/VS7I2/src/tests/integration/reference_values.cmake"
+Directory: C:/Users/a/VS7I2/Release
+"reference_values_cli" start time: Nov 09 12:44 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =  12.13 sec
+----------------------------------------------------------
+Test Passed.
+"reference_values_cli" end time: Nov 09 12:45 Pacific Standard Time
+"reference_values_cli" time elapsed: 00:00:12
+----------------------------------------------------------
+
+108/381 Testing: composition_cli
+108/381 Test: composition_cli
+Command: "C:/gcc/bin/cmake.exe" "-DCOMPILER=C:/Users/a/VS7I2/Release/voidc.exe" "-DROOT=C:/Users/a/VS7I2/src" "-DBIN=C:/Users/a/VS7I2/Release" "-DEXE_SUFFIX=.exe" "-P" "C:/Users/a/VS7I2/src/tests/integration/composition.cmake"
+Directory: C:/Users/a/VS7I2/Release
+"composition_cli" start time: Nov 09 12:45 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   6.80 sec
+----------------------------------------------------------
+Test Passed.
+"composition_cli" end time: Nov 09 12:45 Pacific Standard Time
+"composition_cli" time elapsed: 00:00:06
+----------------------------------------------------------
+
+112/381 Testing: inheritance_cli
+112/381 Test: inheritance_cli
+Command: "C:/gcc/bin/cmake.exe" "-DCOMPILER=C:/Users/a/VS7I2/Release/voidc.exe" "-DROOT=C:/Users/a/VS7I2/src" "-DBIN=C:/Users/a/VS7I2/Release" "-DEXE_SUFFIX=.exe" "-P" "C:/Users/a/VS7I2/src/tests/integration/inheritance.cmake"
+Directory: C:/Users/a/VS7I2/Release
+"inheritance_cli" start time: Nov 09 12:45 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =  10.23 sec
+----------------------------------------------------------
+Test Passed.
+"inheritance_cli" end time: Nov 09 12:45 Pacific Standard Time
+"inheritance_cli" time elapsed: 00:00:10
+----------------------------------------------------------
+
+116/381 Testing: interfaces_cli
+116/381 Test: interfaces_cli
+Command: "C:/gcc/bin/cmake.exe" "-DCOMPILER=C:/Users/a/VS7I2/Release/voidc.exe" "-DROOT=C:/Users/a/VS7I2/src" "-DBIN=C:/Users/a/VS7I2/Release" "-DEXE_SUFFIX=.exe" "-P" "C:/Users/a/VS7I2/src/tests/integration/interfaces.cmake"
+Directory: C:/Users/a/VS7I2/Release
+"interfaces_cli" start time: Nov 09 12:45 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   8.85 sec
+----------------------------------------------------------
+Test Passed.
+"interfaces_cli" end time: Nov 09 12:45 Pacific Standard Time
+"interfaces_cli" time elapsed: 00:00:08
+----------------------------------------------------------
+
+120/381 Testing: strings_cli
+120/381 Test: strings_cli
+Command: "C:/gcc/bin/cmake.exe" "-DCOMPILER=C:/Users/a/VS7I2/Release/voidc.exe" "-DROOT=C:/Users/a/VS7I2/src" "-DBIN=C:/Users/a/VS7I2/Release" "-DEXE_SUFFIX=.exe" "-P" "C:/Users/a/VS7I2/src/tests/integration/strings.cmake"
+Directory: C:/Users/a/VS7I2/Release
+"strings_cli" start time: Nov 09 12:45 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   4.33 sec
+----------------------------------------------------------
+Test Passed.
+"strings_cli" end time: Nov 09 12:45 Pacific Standard Time
+"strings_cli" time elapsed: 00:00:04
+----------------------------------------------------------
+
+End testing: Nov 09 12:45 Pacific Standard Time

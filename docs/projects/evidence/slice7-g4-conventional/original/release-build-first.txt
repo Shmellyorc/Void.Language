@@ -1,0 +1,49 @@
+[  0%] Building CXX object CMakeFiles/void_application_objects.dir/src/application_metadata.cpp.o
+[  0%] Built target void_format_objects
+[  0%] Building CXX object CMakeFiles/void_application_objects.dir/src/project_identity.cpp.o
+[ 83%] Built target libcurl_static
+[ 83%] Building CXX object CMakeFiles/void_application_objects.dir/src/dynamic_closure.cpp.o
+[ 83%] Built target void_zone_objects
+[ 83%] Built target void_native_fixture
+[ 83%] Built target void_application_objects
+[ 83%] Building CXX object CMakeFiles/void_core.dir/src/frontend/project.cpp.o
+[ 83%] Building CXX object CMakeFiles/void_core.dir/src/frontend/project_creation.cpp.o
+[ 83%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/abi.cpp.o
+[ 83%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/c_span.cpp.o
+[ 83%] Building CXX object CMakeFiles/void_core.dir/src/frontend/source.cpp.o
+[ 83%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/c_resource.cpp.o
+[ 83%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[ 83%] Building CXX object CMakeFiles/void_core.dir/src/frontend/tooling.cpp.o
+[ 91%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/c_dynamic.cpp.o
+[ 91%] Building CXX object CMakeFiles/void_core.dir/src/ir/module.cpp.o
+[ 91%] Linking CXX static library libvoid_runtime.a
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_core.dir/src/ir/c_primitive.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/ir/module.cpp:1042:63: warning: misleading indentation; statement is not part of the previous 'if' [-Wmisleading-indentation]
+ 1042 |                         fail("invalid deterministic release");result=Type::boolean;break;
+      |                                                               ^
+/home/shmellyorc/Documents/Void.Language/src/ir/module.cpp:1040:21: note: previous statement is here
+ 1040 |                     if(!f.receiver || f.method_name!="deinit" || operand(i.a).kind!=Type::managed_ref || operand(i.a).nullable ||
+      |                     ^
+[100%] Generating void-native-resources.txt, native-resources-install-Release.txt
+[100%] Built target void_native_inventory
+1 warning generated.
+[100%] Linking CXX static library libvoid_core.a
+[100%] Built target void_core
+[100%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+[100%] Linking CXX static library libvoid_llvm.a
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/voidc_objects.dir/src/native_build.cpp.o
+[100%] Building CXX object CMakeFiles/voidc_objects.dir/src/main.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/native_build.cpp:220:78: error: member access into incomplete type 'element_type' (aka 'const vd::CPrimitiveAdmission')
+  220 |     if (analysis.c_primitive_admission() && !analysis.c_primitive_admission()->dynamic())
+      |                                                                              ^
+/home/shmellyorc/Documents/Void.Language/include/void/ir.hpp:9:22: note: forward declaration of 'vd::CPrimitiveAdmission'
+    9 | namespace vd { class CPrimitiveAdmission; class ValidatedAnalysis; }
+      |                      ^
+1 error generated.
+gmake[3]: *** [CMakeFiles/voidc_objects.dir/build.make:93: CMakeFiles/voidc_objects.dir/src/native_build.cpp.o] Error 1
+gmake[3]: *** Waiting for unfinished jobs....
+gmake[2]: *** [CMakeFiles/Makefile2:2399: CMakeFiles/voidc_objects.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:2487: CMakeFiles/voidc.dir/rule] Error 2
+gmake: *** [Makefile:401: voidc] Error 2

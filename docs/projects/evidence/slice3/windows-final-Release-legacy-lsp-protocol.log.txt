@@ -1,0 +1,14 @@
+editor: CRLF/UTF16, cross-file symbols, overlays, versions, invalid/repair, graph changes and cycles passed
+transport: fragmented/coalesced frames, IDs, malformed messages, bounded framing, lifecycle and EOF passed
+value structs: real LSP type/constructor/field navigation, references, readonly diagnostics and revision recovery passed
+receiver methods: imported native LSP navigation, references, effect changes and revision recovery passed
+initialization: imported initializer navigation/references, exact argument diagnostics and unsaved recovery passed
+managed structs: cyclic types, imported fields/methods, readonly aliases and unsaved recovery passed
+managed initialization: imported constructor, private helper navigation, required-field diagnostics and unsaved repair passed
+reference values: imported nested reference navigation, precise readonly diagnostics and unsaved recovery passed
+composition: imported promoted navigation, ambiguity and unsaved repair passed
+inheritance: original owners, static virtual/super navigation, exact override diagnostics and unsaved repair passed
+interfaces: original requirement navigation, imported signatures/effects and unsaved revision repair passed
+invalid disk UTF-8: original UTF16 ranges, overlay repair and close passed
+strings: imported constants, UTF16 escape spans and unsaved repair passed
+Stage 6 native host authorization, async/spawn/group references and stale-overlay repair: passed

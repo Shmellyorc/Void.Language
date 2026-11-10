@@ -1,0 +1,4 @@
+held file=C:\Users\a\VoidS7-G4W2-replay\pin\void_w2_gate.dll id=c60478b6:000a0000000bcb9c sha256=d2777f220e42ad4bf4590cd23c4507d3054d8f55e38e88af31fb1e157dc2039e
+pinned replacement error=5 ancestor rename error=5
+embedded manifest=1 active redirect=0 loaded basename=0
+mapped exact path=\Device\HarddiskVolume3\Users\a\VoidS7-G4W2-replay\pin\void_w2_gate.dll result=7

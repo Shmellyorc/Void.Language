@@ -1,0 +1,2 @@
+C: filesystem=NTFS
+restricted token read=1 write=0 delete=0 change-DACL=0 add-file=0

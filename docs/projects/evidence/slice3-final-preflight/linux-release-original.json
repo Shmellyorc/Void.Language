@@ -1,0 +1,220 @@
+{
+  "pinned-child-source": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review otkmk8ac",
+      "/tmp/VOID preflight review otkmk8ac/parent/child/launcher.void",
+      "/tmp/VOID preflight review otkmk8ac/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active document is outside the pinned project boundary: /tmp/VOID preflight review otkmk8ac/parent/child/launcher.void:1:1: error: Source path crosses nested project boundary '/child'.\\n    code: VOID5009\\n\\n 1 | \\n   | ^\\n    Module: /child/launcher.void\\n    H\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review otkmk8ac/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"856557ea821b75ac5a28dccb843a63370a7450bf05dac4d030985110a8d1ebc2\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "pinned-child-manifest": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review otkmk8ac",
+      "/tmp/VOID preflight review otkmk8ac/parent/child/void.project.toml",
+      "/tmp/VOID preflight review otkmk8ac/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":0,\"entry\":\"/tmp/VOID preflight review otkmk8ac/parent/main.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review otkmk8ac/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"856557ea821b75ac5a28dccb843a63370a7450bf05dac4d030985110a8d1ebc2\",\"standalone\":false,\"status\":\"ready\"}\n",
+    "stderr": ""
+  },
+  "pinned-outside": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review otkmk8ac",
+      "/tmp/VOID preflight review otkmk8ac/outside.void",
+      "/tmp/VOID preflight review otkmk8ac/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active document is outside the pinned project boundary: <document identity>:1:1: error: Import escapes the project root.\\n    code: VOID3001\\n\\n 1 | \\n   | ^\\n    Hint: External imports require an explicit permission/identity contract and are not enabled in thi\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review otkmk8ac/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"856557ea821b75ac5a28dccb843a63370a7450bf05dac4d030985110a8d1ebc2\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "invalid-source-identity": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review otkmk8ac",
+      "/tmp/VOID preflight review otkmk8ac/parent/notes.txt",
+      "/tmp/VOID preflight review otkmk8ac/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active document is outside the pinned project boundary: <document identity>:1:1: error: Import must name a .void source file.\\n    code: VOID3001\\n\\n 1 | \\n   | ^\\n    Hint: Supply an exact-case filename, not a directory.\\n\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review otkmk8ac/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"856557ea821b75ac5a28dccb843a63370a7450bf05dac4d030985110a8d1ebc2\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "virtual-source": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review otkmk8ac",
+      "/tmp/VOID preflight review otkmk8ac/parent/new/draft.void",
+      "/tmp/VOID preflight review otkmk8ac/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":0,\"entry\":\"/tmp/VOID preflight review otkmk8ac/parent/main.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review otkmk8ac/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"856557ea821b75ac5a28dccb843a63370a7450bf05dac4d030985110a8d1ebc2\",\"standalone\":false,\"status\":\"ready\"}\n",
+    "stderr": ""
+  },
+  "selected-manifest": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review otkmk8ac",
+      "/tmp/VOID preflight review otkmk8ac/parent/void.project.toml",
+      "/tmp/VOID preflight review otkmk8ac/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":0,\"entry\":\"/tmp/VOID preflight review otkmk8ac/parent/main.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review otkmk8ac/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"856557ea821b75ac5a28dccb843a63370a7450bf05dac4d030985110a8d1ebc2\",\"standalone\":false,\"status\":\"ready\"}\n",
+    "stderr": ""
+  },
+  "nearest-child": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review otkmk8ac",
+      "/tmp/VOID preflight review otkmk8ac/parent/child/launcher.void",
+      "",
+      ""
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":1,\"entry\":\"/tmp/VOID preflight review otkmk8ac/parent/child/launcher.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review otkmk8ac/parent/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review otkmk8ac/parent/child\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review otkmk8ac/parent/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"a46131d2bbfd61068263bf64762b5b8144683768b64f4e76455eaa5341eb456c\",\"standalone\":false,\"status\":\"ready\"}\n",
+    "stderr": ""
+  },
+  "pinned-malformed-child-source": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review otkmk8ac",
+      "/tmp/VOID preflight review otkmk8ac/parent/child/launcher.void",
+      "/tmp/VOID preflight review otkmk8ac/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active document is outside the pinned project boundary: /tmp/VOID preflight review otkmk8ac/parent/child/launcher.void:1:1: error: Source path crosses nested project boundary '/child'.\\n    code: VOID5009\\n\\n 1 | \\n   | ^\\n    Module: /child/launcher.void\\n    H\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review otkmk8ac/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"856557ea821b75ac5a28dccb843a63370a7450bf05dac4d030985110a8d1ebc2\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "pinned-malformed-child-manifest": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review otkmk8ac",
+      "/tmp/VOID preflight review otkmk8ac/parent/child/void.project.toml",
+      "/tmp/VOID preflight review otkmk8ac/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":0,\"entry\":\"/tmp/VOID preflight review otkmk8ac/parent/main.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review otkmk8ac/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"856557ea821b75ac5a28dccb843a63370a7450bf05dac4d030985110a8d1ebc2\",\"standalone\":false,\"status\":\"ready\"}\n",
+    "stderr": ""
+  },
+  "nearest-malformed-child": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review otkmk8ac",
+      "/tmp/VOID preflight review otkmk8ac/parent/child/launcher.void",
+      "",
+      ""
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5001\",\"message\":\"Invalid project TOML: Error while parsing table header: expected a bare or quoted key\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":0,\"kind\":null,\"manifest\":\"/tmp/VOID preflight review otkmk8ac/parent/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review otkmk8ac/parent/child\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review otkmk8ac/parent/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "pinned-wrong-case-child-source": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review otkmk8ac",
+      "/tmp/VOID preflight review otkmk8ac/parent/child/launcher.void",
+      "/tmp/VOID preflight review otkmk8ac/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active document is outside the pinned project boundary: /tmp/VOID preflight review otkmk8ac/parent/child/launcher.void:1:1: error: Manifest must use exact case without case siblings in '/child'.\\n    code: VOID5009\\n\\n 1 | \\n   | ^\\n    Module: /child/launcher.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review otkmk8ac/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"856557ea821b75ac5a28dccb843a63370a7450bf05dac4d030985110a8d1ebc2\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "pinned-wrong-case-child-manifest": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review otkmk8ac",
+      "/tmp/VOID preflight review otkmk8ac/parent/child/void.Project.toml",
+      "/tmp/VOID preflight review otkmk8ac/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active document is outside the pinned project boundary: <document identity>:1:1: error: Import must name a .void source file.\\n    code: VOID3001\\n\\n 1 | \\n   | ^\\n    Hint: Supply an exact-case filename, not a directory.\\n\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review otkmk8ac/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"856557ea821b75ac5a28dccb843a63370a7450bf05dac4d030985110a8d1ebc2\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "nearest-wrong-case-child": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review otkmk8ac",
+      "/tmp/VOID preflight review otkmk8ac/parent/child/launcher.void",
+      "",
+      ""
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Manifest must use exact case without case siblings in ''.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":0,\"kind\":null,\"manifest\":\"/tmp/VOID preflight review otkmk8ac/parent/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review otkmk8ac/parent/child\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review otkmk8ac/parent/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "bad-invocation": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review otkmk8ac"
+    ],
+    "exit": 2,
+    "stdout": "",
+    "stderr": "voidls: Usage: voidls --entry <project entry.void>\n"
+  },
+  "unpinned-invalid-discovery-path": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review otkmk8ac",
+      "/tmp/outside.void",
+      "",
+      ""
+    ],
+    "exit": 2,
+    "stdout": "",
+    "stderr": "voidls: Active file is outside selected workspace\n"
+  },
+  "physical-alias": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review otkmk8ac",
+      "/tmp/VOID preflight review otkmk8ac/parent/alias.void",
+      "/tmp/VOID preflight review otkmk8ac/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active document is outside the pinned project boundary: /tmp/VOID preflight review otkmk8ac/parent/alias.void:1:1: error: Symbolic links are not supported in module paths.\\n    code: VOID3001\\n\\n 1 | \\n   | ^\\n    Module: /alias.void\\n    Hint: Import a regular \"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review otkmk8ac/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"77189aa0dc8a1af6060596006871c730794efe6563bc14701fa932a5e5d80702\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "physically-unreadable": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review otkmk8ac",
+      "/tmp/VOID preflight review otkmk8ac/parent/unreadable.void",
+      "/tmp/VOID preflight review otkmk8ac/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":0,\"entry\":\"/tmp/VOID preflight review otkmk8ac/parent/main.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review otkmk8ac/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review otkmk8ac/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"a3d708a3e33700fbadbda57bb1bafde831ffdd5b860b41430b26805d0ede636b\",\"standalone\":false,\"status\":\"ready\"}\n",
+    "stderr": ""
+  }
+}

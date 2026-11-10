@@ -1,0 +1,487 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-release
+        Start   1: project_manifest_header
+        Start   2: project_manifest
+        Start   3: voidup_smoke
+        Start   4: voidup_ci_integration
+        Start   5: project_manifest_no_authority
+  1/443 Test   #1: project_manifest_header ...................   Passed    0.14 sec
+        Start   6: project_manifest_legacy
+  2/443 Test   #2: project_manifest ..........................   Passed    0.27 sec
+        Start   7: project_manifest_provenance
+  3/443 Test   #5: project_manifest_no_authority .............   Passed    0.23 sec
+        Start   8: project_selection
+  4/443 Test   #7: project_manifest_provenance ...............   Passed    0.41 sec
+        Start   9: project_sessions
+  5/443 Test   #9: project_sessions ..........................   Passed    1.84 sec
+        Start  10: project_creation
+  6/443 Test  #10: project_creation ..........................   Passed    0.23 sec
+        Start  11: project_creation_process
+  7/443 Test   #3: voidup_smoke ..............................   Passed    2.71 sec
+        Start  12: project_application
+  8/443 Test   #8: project_selection .........................   Passed    2.79 sec
+        Start  13: project_application_process
+  9/443 Test   #4: voidup_ci_integration .....................   Passed    3.64 sec
+        Start  14: project_discovery_cli
+ 10/443 Test   #6: project_manifest_legacy ...................   Passed    4.91 sec
+        Start  15: project_profiles
+ 11/443 Test  #15: project_profiles ..........................   Passed    1.34 sec
+        Start  16: project_protocol
+ 12/443 Test  #16: project_protocol ..........................   Passed    0.64 sec
+        Start  17: project_nested_cli
+ 13/443 Test  #17: project_nested_cli ........................   Passed    0.41 sec
+        Start  18: cli_contract
+ 14/443 Test  #11: project_creation_process ..................   Passed    5.15 sec
+        Start  19: cli_install
+ 15/443 Test  #14: project_discovery_cli .....................   Passed    4.25 sec
+        Start  20: cli_install_resources
+ 16/443 Test  #20: cli_install_resources .....................   Passed    0.20 sec
+        Start  21: target_triple
+ 17/443 Test  #21: target_triple .............................   Passed    0.04 sec
+        Start  22: http_native
+ 18/443 Test  #18: cli_contract ..............................   Passed    4.31 sec
+        Start  23: http_tls_memory
+ 19/443 Test  #12: project_application .......................   Passed   10.97 sec
+        Start  24: http_reload
+ 20/443 Test  #13: project_application_process ...............   Passed   11.69 sec
+        Start  25: http_timeouts
+ 21/443 Test  #19: cli_install ...............................   Passed   12.12 sec
+        Start  26: http_wire
+ 22/443 Test  #26: http_wire .................................   Passed    1.32 sec
+        Start  27: http_dns
+ 23/443 Test  #25: http_timeouts .............................   Passed    6.76 sec
+        Start  28: url_native
+ 24/443 Test  #28: url_native ................................   Passed    0.16 sec
+        Start  29: http_examples
+ 25/443 Test  #27: http_dns ..................................   Passed    6.36 sec
+        Start  30: http_ci_policy
+ 26/443 Test  #22: http_native ...............................   Passed   20.57 sec
+        Start  31: http_curl_objects
+ 27/443 Test  #31: http_curl_objects .........................   Passed    8.51 sec
+        Start  32: http_install
+ 28/443 Test  #24: http_reload ...............................   Passed   38.34 sec
+        Start  33: http_bulk
+ 29/443 Test  #33: http_bulk .................................   Passed   16.96 sec
+        Start  34: http_ir
+ 30/443 Test  #34: http_ir ...................................   Passed    4.07 sec
+        Start  35: http_source
+ 31/443 Test  #23: http_tls_memory ...........................   Passed   62.55 sec
+        Start  36: http_source_negative
+ 32/443 Test  #36: http_source_negative ......................   Passed    1.02 sec
+        Start  37: http_source_faults
+ 33/443 Test  #30: http_ci_policy ............................   Passed   59.43 sec
+        Start  38: url_ir
+ 34/443 Test  #38: url_ir ....................................   Passed    0.10 sec
+        Start  39: url_source
+ 35/443 Test  #39: url_source ................................   Passed    2.79 sec
+        Start  40: url_lsp
+ 36/443 Test  #40: url_lsp ...................................   Passed    0.15 sec
+        Start  41: http_lsp
+ 37/443 Test  #41: http_lsp ..................................   Passed    2.03 sec
+        Start  42: toolchain_stop_token
+ 38/443 Test  #42: toolchain_stop_token ......................   Passed    0.00 sec
+        Start  43: stage10_operator_reload
+ 39/443 Test  #32: http_install ..............................   Passed   72.66 sec
+        Start  44: stage10_operator_keys
+ 40/443 Test  #44: stage10_operator_keys .....................   Passed    0.26 sec
+        Start  45: stage10_operator_resolution
+ 41/443 Test  #45: stage10_operator_resolution ...............   Passed    1.28 sec
+        Start  46: stage10_operator_declarations
+ 42/443 Test  #46: stage10_operator_declarations .............   Passed    0.86 sec
+        Start  47: stage10_source_formatting
+ 43/443 Test  #47: stage10_source_formatting .................   Passed    0.45 sec
+        Start  48: stage10_tooling
+ 44/443 Test  #48: stage10_tooling ...........................   Passed    0.12 sec
+        Start  49: stage10_display_reload
+ 45/443 Test  #49: stage10_display_reload ....................   Passed    1.98 sec
+        Start  50: stage10_temporal_ir
+ 46/443 Test  #29: http_examples .............................   Passed   93.37 sec
+        Start  51: format_temporal
+ 47/443 Test  #51: format_temporal ...........................   Passed    0.04 sec
+        Start  52: stage10_hooks
+ 48/443 Test  #43: stage10_operator_reload ...................   Passed   24.35 sec
+        Start  53: stage10_interpolation
+ 49/443 Test  #50: stage10_temporal_ir .......................   Passed    2.29 sec
+        Start  54: decimal_float
+ 50/443 Test  #54: decimal_float .............................   Passed    0.02 sec
+        Start  55: stage10_conversion
+ 51/443 Test  #53: stage10_interpolation .....................   Passed    0.81 sec
+        Start  56: stage10_fields
+ 52/443 Test  #52: stage10_hooks .............................   Passed    2.52 sec
+        Start  57: format_numeric
+ 53/443 Test  #57: format_numeric ............................   Passed    0.05 sec
+        Start  58: format_zones
+ 54/443 Test  #56: stage10_fields ............................   Passed    0.46 sec
+        Start  59: json_readonly
+ 55/443 Test  #58: format_zones ..............................   Passed    0.28 sec
+        Start  60: json_dynamic
+ 56/443 Test  #59: json_readonly .............................   Passed    6.13 sec
+        Start  61: json_numbers
+ 57/443 Test  #60: json_dynamic ..............................   Passed   10.70 sec
+        Start  62: json_schema
+ 58/443 Test  #61: json_numbers ..............................   Passed   13.49 sec
+        Start  63: json_bounds
+ 59/443 Test  #35: http_source ...............................   Passed   68.53 sec
+        Start  64: json_install
+ 60/443 Test  #62: json_schema ...............................   Passed   19.86 sec
+        Start  65: json_adversarial
+ 61/443 Test  #63: json_bounds ...............................   Passed   20.46 sec
+        Start  66: json_metering
+ 62/443 Test  #64: json_install ..............................   Passed   29.66 sec
+        Start  67: json_execution_validated
+ 63/443 Test  #66: json_metering .............................   Passed   28.30 sec
+        Start  68: json_execution_accessors
+ 64/443 Test  #65: json_adversarial ..........................   Passed   42.13 sec
+        Start  69: json_execution_dynamic_smoke
+ 65/443 Test  #67: json_execution_validated ..................   Passed   20.28 sec
+        Start  70: json_execution_typed_smoke
+ 66/443 Test  #68: json_execution_accessors ..................   Passed   14.30 sec
+        Start  71: json_execution_shapes
+ 67/443 Test  #69: json_execution_dynamic_smoke ..............   Passed   12.50 sec
+        Start  72: json_execution_ownership
+ 68/443 Test  #72: json_execution_ownership ..................   Passed   20.59 sec
+        Start  73: json_execution_nested_inference
+ 69/443 Test  #70: json_execution_typed_smoke ................   Passed   34.87 sec
+        Start  74: json_stress_fixed
+ 70/443 Test  #73: json_execution_nested_inference ...........   Passed   20.01 sec
+        Start  75: json_stress_wide
+ 71/443 Test  #71: json_execution_shapes .....................   Passed   57.39 sec
+        Start  76: json_host
+ 72/443 Test  #74: json_stress_fixed .........................   Passed   64.04 sec
+        Start  77: json_preservation
+ 73/443 Test  #37: http_source_faults ........................   Passed  215.82 sec
+        Start  78: json_lsp
+ 74/443 Test  #77: json_preservation .........................   Passed    1.74 sec
+        Start  79: application_workflow_stage9
+ 75/443 Test  #78: json_lsp ..................................   Passed    2.00 sec
+        Start  80: native_output_paths_ci88
+ 76/443 Test  #75: json_stress_wide ..........................   Passed   51.76 sec
+        Start  81: long_physical_paths_ci89
+ 77/443 Test  #80: native_output_paths_ci88 ..................   Passed    3.11 sec
+        Start  82: gc_buffers
+ 78/443 Test  #82: gc_buffers ................................   Passed    1.79 sec
+        Start  83: gc_schemas
+ 79/443 Test  #83: gc_schemas ................................   Passed    0.16 sec
+        Start  84: arrays_foundation
+ 80/443 Test  #84: arrays_foundation .........................   Passed    0.13 sec
+        Start  85: runtime_console
+ 81/443 Test  #81: long_physical_paths_ci89 ..................   Passed    2.98 sec
+        Start  86: runtime_console_endpoints
+ 82/443 Test  #86: runtime_console_endpoints .................   Passed    0.19 sec
+        Start  87: runtime_console_transfers
+ 83/443 Test  #85: runtime_console ...........................   Passed    0.45 sec
+        Start  88: runtime_console_native_transfers
+ 84/443 Test  #87: runtime_console_transfers .................   Passed    0.06 sec
+        Start  89: runtime_console_keyboard
+ 85/443 Test  #89: runtime_console_keyboard ..................   Passed    0.03 sec
+        Start  90: runtime_console_terminal
+ 86/443 Test  #90: runtime_console_terminal ..................   Passed    0.04 sec
+        Start  91: runtime_console_native_keyboard
+ 87/443 Test  #91: runtime_console_native_keyboard ...........   Passed    0.35 sec
+        Start  92: runtime_console_native_terminal
+ 88/443 Test  #88: runtime_console_native_transfers ..........   Passed    0.77 sec
+        Start  93: runtime_console_wide
+ 89/443 Test  #93: runtime_console_wide ......................   Passed    0.07 sec
+        Start  94: runtime_console_input
+ 90/443 Test  #94: runtime_console_input .....................   Passed    0.05 sec
+        Start  95: runtime_console_native_input
+ 91/443 Test  #95: runtime_console_native_input ..............   Passed    0.41 sec
+        Start  96: runtime_coordination
+ 92/443 Test  #92: runtime_console_native_terminal ...........   Passed    0.91 sec
+        Start  97: runtime_generated
+ 93/443 Test  #97: runtime_generated .........................   Passed    1.29 sec
+        Start  98: fixed_arrays_source
+ 94/443 Test  #96: runtime_coordination ......................   Passed    2.10 sec
+        Start  99: growable_arrays_source
+ 95/443 Test  #98: fixed_arrays_source .......................   Passed    3.61 sec
+        Start 100: arrays_source
+ 96/443 Test  #99: growable_arrays_source ....................   Passed    2.87 sec
+        Start 101: generics_source
+ 97/443 Test  #55: stage10_conversion ........................   Passed  191.11 sec
+        Start 102: generics_hint_execution
+ 98/443 Test  #79: application_workflow_stage9 ...............   Passed   16.12 sec
+        Start 103: generics_hint_lsp
+ 99/443 Test #103: generics_hint_lsp .........................   Passed    0.26 sec
+        Start 104: collections_source
+100/443 Test #101: generics_source ...........................   Passed    5.00 sec
+        Start 105: dictionaries_source
+101/443 Test #100: arrays_source .............................   Passed    6.27 sec
+        Start 106: properties_source
+102/443 Test #106: properties_source .........................   Passed    4.25 sec
+        Start 107: patterns_source
+103/443 Test #105: dictionaries_source .......................   Passed    8.96 sec
+        Start 108: debug_cache
+104/443 Test #104: collections_source ........................   Passed   11.17 sec
+        Start 109: debug_cache_processes
+105/443 Test #102: generics_hint_execution ...................   Passed   12.20 sec
+        Start 110: automatic_cache_processes
+106/443 Test #108: debug_cache ...............................   Passed    2.80 sec
+        Start 111: advanced_source
+107/443 Test #110: automatic_cache_processes .................   Passed    1.31 sec
+        Start 112: fixed_arrays_cli
+108/443 Test #109: debug_cache_processes .....................   Passed    5.90 sec
+        Start 113: growable_arrays_cli
+109/443 Test #107: patterns_source ...........................   Passed   10.86 sec
+        Start 114: arrays_cli
+110/443 Test #111: advanced_source ...........................   Passed    6.27 sec
+        Start 115: generics_cli
+111/443 Test #112: fixed_arrays_cli ..........................   Passed    6.54 sec
+        Start 116: collections_cli
+112/443 Test #113: growable_arrays_cli .......................   Passed    6.10 sec
+        Start 117: dictionaries_cli
+113/443 Test #115: generics_cli ..............................   Passed    5.19 sec
+        Start 118: properties_cli
+114/443 Test #114: arrays_cli ................................   Passed    9.80 sec
+        Start 119: patterns_cli
+115/443 Test #117: dictionaries_cli ..........................   Passed    6.48 sec
+        Start 120: advanced_cli
+116/443 Test #116: collections_cli ...........................   Passed   11.90 sec
+        Start 121: managed_source
+117/443 Test #119: patterns_cli ..............................   Passed    4.38 sec
+        Start 122: managed_aot_normal
+118/443 Test #122: managed_aot_normal ........................   Passed    0.02 sec
+        Start 123: managed_aot_optimized
+119/443 Test #123: managed_aot_optimized .....................   Passed    0.03 sec
+        Start 124: managed_cli
+120/443 Test #121: managed_source ............................   Passed    1.85 sec
+        Start 125: managed_initialization_source
+121/443 Test #118: properties_cli ............................   Passed    9.00 sec
+        Start 126: managed_initialization_aot_normal
+122/443 Test #126: managed_initialization_aot_normal .........   Passed    0.03 sec
+        Start 127: managed_initialization_aot_optimized
+123/443 Test #127: managed_initialization_aot_optimized ......   Passed    0.04 sec
+        Start 128: managed_initialization_cli
+124/443 Test #124: managed_cli ...............................   Passed    2.48 sec
+        Start 129: reference_values_source
+125/443 Test #129: reference_values_source ...................   Passed    2.18 sec
+        Start 130: reference_values_aot_normal
+126/443 Test #130: reference_values_aot_normal ...............   Passed    0.03 sec
+        Start 131: reference_values_aot_optimized
+127/443 Test #131: reference_values_aot_optimized ............   Passed    0.03 sec
+        Start 132: reference_values_cli
+128/443 Test #128: managed_initialization_cli ................   Passed    3.15 sec
+        Start 133: composition_source
+129/443 Test #125: managed_initialization_source .............   Passed    4.63 sec
+        Start 134: composition_aot_normal
+130/443 Test #134: composition_aot_normal ....................   Passed    0.05 sec
+        Start 135: composition_aot_optimized
+131/443 Test #135: composition_aot_optimized .................   Passed    0.04 sec
+        Start 136: composition_cli
+132/443 Test #133: composition_source ........................   Passed    1.64 sec
+        Start 137: inheritance_source
+133/443 Test #120: advanced_cli ..............................   Passed   10.93 sec
+        Start 138: inheritance_aot_normal
+134/443 Test #138: inheritance_aot_normal ....................   Passed    0.04 sec
+        Start 139: inheritance_aot_optimized
+135/443 Test #139: inheritance_aot_optimized .................   Passed    0.05 sec
+        Start 140: inheritance_cli
+136/443 Test #136: composition_cli ...........................   Passed    2.66 sec
+        Start 141: interfaces_source
+137/443 Test #137: inheritance_source ........................   Passed    2.83 sec
+        Start 142: interfaces_aot_normal
+138/443 Test #132: reference_values_cli ......................   Passed    4.59 sec
+        Start 143: interfaces_aot_optimized
+139/443 Test #142: interfaces_aot_normal .....................   Passed    0.03 sec
+        Start 144: interfaces_cli
+140/443 Test #143: interfaces_aot_optimized ..................   Passed    0.03 sec
+        Start 145: strings_source
+141/443 Test #140: inheritance_cli ...........................   Passed    3.86 sec
+        Start 146: strings_aot_normal
+142/443 Test #145: strings_source ............................   Passed    3.38 sec
+        Start 147: strings_aot_optimized
+143/443 Test #144: interfaces_cli ............................   Passed    3.41 sec
+        Start 148: strings_cli
+144/443 Test #146: strings_aot_normal ........................   Passed    0.04 sec
+        Start 149: runtime_callbacks
+145/443 Test #147: strings_aot_optimized .....................   Passed    0.04 sec
+        Start 150: runtime_failures
+146/443 Test #150: runtime_failures ..........................   Passed    0.04 sec
+        Start 151: runtime_aot_normal
+147/443 Test #151: runtime_aot_normal ........................   Passed    0.06 sec
+        Start 152: runtime_aot_optimized
+148/443 Test #152: runtime_aot_optimized .....................   Passed    0.05 sec
+        Start 153: runtime_invariants
+149/443 Test #153: runtime_invariants ........................   Passed    0.14 sec
+        Start 154: lsp_positions
+150/443 Test #154: lsp_positions .............................   Passed    0.02 sec
+        Start 155: lsp_protocol
+151/443 Test #141: interfaces_source .........................   Passed    4.51 sec
+        Start 156: lsp_stage11_globals
+152/443 Test #149: runtime_callbacks .........................   Passed    0.71 sec
+        Start 157: lsp_stage8
+153/443 Test #156: lsp_stage11_globals .......................   Passed    0.28 sec
+        Start 158: documentation_execution
+154/443 Test #155: lsp_protocol ..............................   Passed    0.86 sec
+        Start 159: lsp_documentation
+155/443 Test #159: lsp_documentation .........................   Passed    0.47 sec
+        Start 160: math_host
+156/443 Test #148: strings_cli ...............................   Passed    1.74 sec
+        Start 161: math_ir
+157/443 Test #157: lsp_stage8 ................................   Passed    1.40 sec
+        Start 162: math_execution
+158/443 Test #161: math_ir ...................................   Passed    0.73 sec
+        Start 163: math_frontend
+159/443 Test #158: documentation_execution ...................   Passed    2.83 sec
+        Start 164: math_errors
+160/443 Test #160: math_host .................................   Passed    2.29 sec
+        Start 165: math_worker
+161/443 Test #165: math_worker ...............................   Passed    3.59 sec
+        Start 166: lsp_math
+162/443 Test #166: lsp_math ..................................   Passed    0.89 sec
+        Start 168: math_preservation
+163/443 Test #168: math_preservation .........................   Passed    1.80 sec
+        Start 169: math_stack
+164/443 Test #164: math_errors ...............................   Passed   15.93 sec
+        Start 170: math_frontend_stack
+165/443 Test  #76: json_host .................................   Passed  125.35 sec
+        Start 171: host_capabilities_dependencies
+166/443 Test #163: math_frontend .............................   Passed   29.41 sec
+        Start 172: host_capabilities_portable
+167/443 Test #172: host_capabilities_portable ................   Passed    0.36 sec
+        Start 173: host_capabilities_portable_source
+168/443 Test #171: host_capabilities_dependencies ............   Passed   12.32 sec
+        Start 174: host_capabilities
+169/443 Test #162: math_execution ............................   Passed   41.62 sec
+        Start 175: host_capabilities_stack
+170/443 Test #169: math_stack ................................   Passed   41.84 sec
+        Start 176: host_capabilities_frontend
+171/443 Test #170: math_frontend_stack .......................   Passed   34.13 sec
+        Start 177: host_capabilities_lsp
+172/443 Test #177: host_capabilities_lsp .....................   Passed    1.41 sec
+        Start 178: host_capabilities_native
+173/443 Test #178: host_capabilities_native ..................   Passed    0.53 sec
+        Start 180: os_execution
+174/443 Test #176: host_capabilities_frontend ................   Passed    4.89 sec
+        Start 181: os_stack
+175/443 Test #173: host_capabilities_portable_source .........   Passed   57.82 sec
+        Start 182: os_edges
+176/443 Test #182: os_edges ..................................   Passed    8.10 sec
+        Start 183: os_edges_stack
+177/443 Test #180: os_execution ..............................   Passed   50.02 sec
+        Start 184: os_host
+178/443 Test #183: os_edges_stack ............................   Passed    7.66 sec
+        Start 185: os_errors
+179/443 Test #181: os_stack ..................................   Passed   50.34 sec
+        Start 186: os_frontend
+180/443 Test #185: os_errors .................................   Passed    9.41 sec
+        Start 187: lsp_os
+181/443 Test #184: os_host ...................................   Passed   10.29 sec
+        Start 188: os_cache
+182/443 Test #187: lsp_os ....................................   Passed    2.52 sec
+        Start 189: os_owner
+183/443 Test #186: os_frontend ...............................   Passed   15.21 sec
+        Start 190: os_examples
+184/443 Test #188: os_cache ..................................   Passed    7.15 sec
+        Start 192: os_frontend_stack
+185/443 Test #190: os_examples ...............................   Passed    7.21 sec
+        Start 193: os_host_stack
+186/443 Test #192: os_frontend_stack .........................   Passed   15.63 sec
+        Start 194: random_host
+187/443 Test #193: os_host_stack .............................   Passed   10.26 sec
+        Start 195: random_execution
+188/443 Test #189: os_owner ..................................   Passed   24.28 sec
+        Start 196: random_frontend
+189/443 Test #174: host_capabilities .........................   Passed  100.68 sec
+        Start 197: lsp_random
+190/443 Test #175: host_capabilities_stack ...................   Passed   99.46 sec
+        Start 199: random_errors
+191/443 Test #197: lsp_random ................................   Passed    1.38 sec
+        Start 200: random_preservation
+192/443 Test #200: random_preservation .......................   Passed    0.80 sec
+        Start 201: random_worker
+193/443 Test #201: random_worker .............................   Passed    6.92 sec
+        Start 202: random_reference
+194/443 Test #202: random_reference ..........................   Passed    0.05 sec
+        Start 203: random_stack
+195/443 Test #199: random_errors .............................   Passed   11.48 sec
+        Start 204: random_frontend_stack
+196/443 Test #196: random_frontend ...........................   Passed   12.72 sec
+        Start 205: binary_execution
+197/443 Test #204: random_frontend_stack .....................   Passed   14.18 sec
+        Start 206: lsp_binary
+198/443 Test #206: lsp_binary ................................   Passed    0.39 sec
+        Start 207: binary_ownership
+199/443 Test #207: binary_ownership ..........................   Passed    0.61 sec
+        Start 208: binary_stack
+200/443 Test #208: binary_stack ..............................   Passed    1.79 sec
+        Start 209: lsp_const_recovery
+201/443 Test #209: lsp_const_recovery ........................   Passed    1.78 sec
+        Start 210: lsp_const_recovery_stack
+202/443 Test #210: lsp_const_recovery_stack ..................   Passed    1.77 sec
+        Start 211: combined_ownership
+203/443 Test #194: random_host ...............................   Passed   36.44 sec
+        Start 212: combined_async_normal
+204/443 Test #212: combined_async_normal .....................   Passed    0.14 sec
+        Start 213: combined_async_optimized
+205/443 Test #213: combined_async_optimized ..................   Passed    0.10 sec
+        Start 214: combined_execution
+206/443 Test #214: combined_execution ........................***Failed    3.23 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-release/tests/combined/execution.py", line 148, in <module>
+    run([compiler, 'build', source, '-o', executable, *flags])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-release/tests/combined/execution.py", line 27, in run
+    assert result.returncode == status, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ([PosixPath('/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-release/voidc'), 'build', PosixPath('/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-release/tests/combined/conversion.void'), '-o', PosixPath('/tmp/void-s7-link-release-full.PXdRW0/VOID combined yyp0z34p/executable-1-True'), '--no-opt'], -11, b'', b'')
+
+        Start 215: lsp_combined
+207/443 Test #215: lsp_combined ..............................   Passed    2.26 sec
+        Start 216: combined_stack
+208/443 Test #205: binary_execution ..........................   Passed   27.82 sec
+        Start 217: memory_execution
+209/443 Test #211: combined_ownership ........................   Passed   10.70 sec
+        Start 218: lsp_memory
+210/443 Test #218: lsp_memory ................................   Passed    1.14 sec
+        Start 219: text_encoding_text
+211/443 Test #195: random_execution ..........................   Passed   52.10 sec
+        Start 220: text_encoding_hex
+212/443 Test #220: text_encoding_hex .........................   Passed    2.79 sec
+        Start 221: text_encoding_base64
+213/443 Test #219: text_encoding_text ........................   Passed    9.21 sec
+        Start 222: text_encoding_ascii
+214/443 Test #222: text_encoding_ascii .......................   Passed    2.65 sec
+        Start 223: text_encoding_oracles
+215/443 Test #221: text_encoding_base64 ......................   Passed    4.60 sec
+        Start 224: text_encoding_interop
+216/443 Test #203: random_stack ..............................   Passed   53.06 sec
+        Start 225: text_encoding_large
+217/443 Test #224: text_encoding_interop .....................   Passed   10.27 sec
+        Start 226: text_encoding_errors
+218/443 Test #226: text_encoding_errors ......................   Passed    6.10 sec
+        Start 227: text_encoding_crash_preservation
+219/443 Test #227: text_encoding_crash_preservation ..........   Passed    3.22 sec
+        Start 228: lsp_text_encoding
+220/443 Test #228: lsp_text_encoding .........................   Passed    1.45 sec
+        Start 230: text_encoding_stack
+221/443 Test #216: combined_stack ............................   Passed   41.25 sec
+        Start 231: lsp_text_encoding_stack
+222/443 Test #231: lsp_text_encoding_stack ...................   Passed    1.40 sec
+        Start 232: text_encoding_depth
+223/443 Test #232: text_encoding_depth .......................   Passed    0.61 sec
+        Start 233: text_encoding_semantic_depth
+224/443 Test #230: text_encoding_stack .......................   Passed    4.42 sec
+        Start 234: text_encoding_ir
+225/443 Test #234: text_encoding_ir ..........................   Passed    0.74 sec
+        Start 235: text_encoding_inventory
+226/443 Test #233: text_encoding_semantic_depth ..............   Passed    1.61 sec
+        Start 236: text_encoding_ownership
+227/443 Test #235: text_encoding_inventory ...................   Passed    0.24 sec
+        Start 237: memory_ownership
+228/443 Test #237: memory_ownership ..........................   Passed    4.00 sec
+        Start 238: memory_stack
+229/443 Test #236: text_encoding_ownership ...................   Passed    6.38 sec
+        Start 239: lsp_stage7
+230/443 Test #239: lsp_stage7 ................................   Passed    0.54 sec
+        Start 240: lsp_demo
+231/443 Test #240: lsp_demo ..................................   Passed    0.27 sec
+        Start 241: stage10_operator_compounds
+232/443 Test #238: memory_stack ..............................   Passed    4.16 sec
+        Start 242: stage11_globals
+233/443 Test #225: text_encoding_large .......................   Passed   29.71 sec
+        Start 243: log_native
+234/443 Test #242: stage11_globals ...........................   Passed    1.71 sec
+        Start 244: log_execution
+235/443 Test #241: stage10_operator_compounds ................   Passed    5.00 sec
+        Start 245: log_frontend
+236/443 Test #245: log_frontend ..............................   Passed   10.65 sec
+        Start 246: log_files

@@ -1,0 +1,27 @@
+enum: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+enum initialized: accepted
+field: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+field initialized: accepted
+array: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+array initialized: accepted
+field-array: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+field-array initialized: accepted
+array-field: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+array-field initialized: accepted
+nested: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+nested initialized: accepted
+managed: rejected (VOID IR: non-nullable reference storage read before initialization in /enum-storage.void::probe)
+managed initialized: accepted
+zero-backed holder: rejected (VOID IR: nominal source objects require complete construction)
+zero-backed legacy_scalar: rejected (VOID IR: numeric enum fields require complete managed construction)
+zero-backed legacy_array: rejected (VOID IR: numeric enum fields require complete managed construction)
+managed missing field: rejected (VOID IR: invalid complete managed construction)
+managed partial buffer: rejected (VOID IR: incomplete numeric enum array escapes private construction)
+read allocated array before initialization: rejected (VOID IR: incomplete numeric enum array escapes private construction)
+partial buffer through private home: rejected (VOID IR: incomplete numeric enum array escapes private construction)
+partial buffer through ordinary store: rejected (VOID IR: incomplete numeric enum array escapes private construction)
+forged completion of ordinary value: rejected (VOID IR: invalid numeric enum array completion)
+complete private buffer published and projected: accepted
+private home absent on one predecessor: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+legacy array initialization of a finished value: rejected (VOID IR: invalid array element initialization)
+coordinated IR requires an explicit runtime owner

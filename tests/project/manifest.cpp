@@ -177,6 +177,26 @@ debug_info = "full"
     bad("native = 2\n" + application, Code::project_field);
     bad(application + "[native.raylib]\nlink = 'dynamic'\n", Code::project_reserved);
     bad(application + "[dependencies]\nurl = 'https://invalid.example/never-fetch'\n", Code::project_reserved);
+    const std::string dependency = R"([dependencies.geometry]
+id = "org.example.geometry"
+path = "../geometry"
+version = ">=1.4.0, <2.0.0"
+)";
+    auto dependent = good(application + dependency);
+    const auto& edge = dependent->dependencies().at("geometry");
+    check(edge.id == "org.example.geometry" && edge.path == "../geometry", "local dependency declaration");
+    check(edge.version.text() == ">=1.4.0,<2.0.0" &&
+        edge.version.accepts(*parse_version("1.4.0+revision")) &&
+        !edge.version.accepts(*parse_version("1.4.0-rc.1")) &&
+        !edge.version.accepts(*parse_version("2.0.0")), "bounded stable requirement");
+    check(good(library + "entry = 'src/api.void'\n")->package_entry() == "src/api.void", "package entry");
+    check(!good(library)->package_entry(), "standalone library keeps optional package entry");
+    bad(library + "entry = 'build/api.void'\n", Code::project_path);
+    bad(application + "entry = 'src/api.void'\n", Code::project_field);
+    bad(application + replace(dependency, "../geometry", "../.git/geometry"), Code::project_path);
+    bad(application + replace(dependency, ">=1.4.0, <2.0.0", ">=1.4.0+metadata"), Code::project_version);
+    bad(application + replace(dependency, ">=1.4.0, <2.0.0", ">1.4.99,<1.4.100"), Code::project_version);
+    bad(application + dependency + "git = 'https://invalid.example/never-fetch'\n", Code::project_field);
     for (auto s : {"1.2", "01.2.3", "1.0.0-01", "1.0.0+"}) bad(replace(application, "1.2.3-beta.1+build.7", s), Code::project_version);
     for (auto s : {"", " ", "\\n", "\\u0085", "　"}) bad(replace(application, "name = \"Orbit\"", "name = \"" + std::string(s) + "\""), Code::project_identity);
     good(replace(application, "Orbit\"", std::string(128, 'a') + "\""));

@@ -1,0 +1,12 @@
+{
+  "returncode": 1,
+  "command": [
+    "build/llvm23-debug/void_project_selection"
+  ],
+  "output": "root .. must retain physical meaning across permitted ancestor aliases\n",
+  "source_and_binary_sha256": {
+    "src/frontend/project_selection.inc": "c062c107bc46fb9601040ede99f7e4f8153e96f3edcc4cf36b3738b88828767e",
+    "tests/project/selection.cpp": "819b2167f6aa19acd107e70e0c0215104a114e24b43894b8ef6d7bda6dbe9e3d",
+    "build/llvm23-debug/void_project_selection": "f1838c844a2c664d65a6b2444d72bc34808ecfb4f44e8323a7324740ed89a1d1"
+  }
+}

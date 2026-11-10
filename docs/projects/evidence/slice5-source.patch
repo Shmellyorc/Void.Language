@@ -1,0 +1,2240 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e9c58e4..d4ae3b1 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -98,7 +98,7 @@ target_compile_definitions(void_zone_objects PRIVATE
+ target_link_libraries(void_zone_objects PRIVATE void_options)
+ add_library(void_application_objects OBJECT src/application_metadata.cpp src/project_identity.cpp)
+ target_link_libraries(void_application_objects PRIVATE void_options)
+-add_library(void_core src/frontend/project.cpp src/frontend/source.cpp src/frontend/compiler.cpp src/frontend/tooling.cpp src/numeric.cpp src/ir/module.cpp src/ir/native_storage.cpp src/ir/native_binding.cpp)
++add_library(void_core src/frontend/project.cpp src/frontend/project_creation.cpp src/frontend/source.cpp src/frontend/compiler.cpp src/frontend/tooling.cpp src/numeric.cpp src/ir/module.cpp src/ir/native_storage.cpp src/ir/native_binding.cpp)
+ target_sources(void_core PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects> $<TARGET_OBJECTS:void_application_objects>)
+ target_include_directories(void_core SYSTEM PRIVATE third_party/tomlplusplus)
+ target_compile_definitions(void_core PRIVATE VOID_STDLIB_ROOT="${VOID_STDLIB_ROOT}")
+@@ -227,6 +227,9 @@ target_include_directories(void_core SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
+ target_compile_options(void_core PRIVATE ${VOID_LLVM_DEFINITIONS})
+ llvm_map_components_to_libnames(VOID_NUMERIC_LIBS Support)
+ target_link_libraries(void_core PRIVATE ${VOID_NUMERIC_LIBS})
++if(WIN32)
++  target_link_libraries(void_core PRIVATE advapi32)
++endif()
+ target_link_libraries(void_llvm PUBLIC void_core void_runtime PRIVATE ${VOID_LLVM_LIBS})
+ add_library(void_lsp src/lsp/positions.cpp)
+ target_link_libraries(void_lsp PUBLIC void_core)
+@@ -356,6 +359,13 @@ if(BUILD_TESTING)
+   target_link_libraries(void_project_sessions PRIVATE void_llvm void_runtime)
+   add_test(NAME project_sessions COMMAND void_project_sessions)
+   set_tests_properties(project_sessions PROPERTIES TIMEOUT 180)
++  add_executable(void_project_creation tests/project/creation.cpp)
++  target_link_libraries(void_project_creation PRIVATE void_core)
++  add_test(NAME project_creation COMMAND void_project_creation)
++  add_test(NAME project_creation_process COMMAND "${Python3_EXECUTABLE}"
++    "${PROJECT_SOURCE_DIR}/tests/project/creation.py" "$<TARGET_FILE:voidc>" "$<TARGET_FILE:voidls>"
++    "${CMAKE_CURRENT_BINARY_DIR}/project-creation-evidence.json")
++  set_tests_properties(project_creation project_creation_process PROPERTIES TIMEOUT 300)
+   add_executable(void_project_application tests/project/application.cpp)
+   target_link_libraries(void_project_application PRIVATE void_llvm void_runtime)
+   add_test(NAME project_application COMMAND void_project_application)
+diff --git a/docs/CLI.md b/docs/CLI.md
+index 71f76c5..f349579 100644
+--- a/docs/CLI.md
++++ b/docs/CLI.md
+@@ -1,5 +1,36 @@
+ # voidc command reference
+ 
++## Project creation (Slice 5)
++
++```text
++voidc init [DIR]
++voidc new PATH
++voidc init . --name Orbit --app-id org.example.orbit
++voidc new orbit --source src/game.void --app-id org.example.orbit
++voidc new geometry --kind library --package-name geometry
++```
++
++Init writes a manifest in an existing admitted directory and defaults to the
++current directory. New publishes a fresh directory with a manifest and a starter.
++Both accept `--kind application|library`, `--name TEXT`, `--version SEMVER`,
++`--project-id ID`, and `--nested`. Use `--app-id ID` for applications or
++`--package-id ID` and `--package-name IDENTIFIER` for libraries. New also accepts
++`--source PATH`. The application and version defaults are `application` and
++`0.1.0`. Names default to the directory basename subject to the manifest validators.
++Generated project and role IDs use separate host entropy draws. The commands preview
++the manifest path, IDs and next check command before publication.
++
++Init preserves existing sources and works before a unique main has been written.
++New uses `src/app.void` for applications or `src/<package-name>.void` for libraries
++by default. A custom source path sets the source root to its parent. Neither command
++writes an entry override. Publication refuses existing or wrong-case destinations,
++and a child of a manifest project requires `--nested`. Completed creation returns
++0, validation or filesystem failures return 1, and malformed usage returns 2.
++Resolve and package workflows remain in the project roadmap. See
++[Slice 5](projects/SLICE5.md).
++
++The following sections retain the scope of their original implementation slices.
++
+ ## Manifest project profiles (Slice 3)
+ 
+ `--profile debug|release` is project-only on check/run/build/emit. An explicit
+diff --git a/docs/EDITOR_INTEGRATION.md b/docs/EDITOR_INTEGRATION.md
+index aa78fed..029c289 100644
+--- a/docs/EDITOR_INTEGRATION.md
++++ b/docs/EDITOR_INTEGRATION.md
+@@ -1,5 +1,25 @@
+ # VOID editor integration (Phase 11)
+ 
++## First-file project creation (Slice 5)
++
++In a trusted single filesystem workspace using automatic project selection, a
++new named VOID source can trigger one **Create VOID project** / **Keep standalone**
++offer. The matching native server inventories eligible sources. An established tree
++suppresses the offer. Simultaneous fresh files qualify as a single batch when they
++account for the full nonempty inventory. Opening an existing file does not prompt.
++
++Accepting opens a separate review showing the destination, kind, version and IDs.
++Choose **Create Manifest** to approve publication. Workspace storage records the
++offer before displaying it and remembers acceptance, decline and dismissal for
++the physical root. **VOID: Reset Project Creation Prompt** clears that suppression.
++**VOID: Create Project** deliberately opens creation for an admitted existing
++workspace, including one with multiple files. A created manifest switches the
++editor to the compiler-owned session with current dirty buffers. Restricted
++workspaces keep syntax highlighting without launching creation tools. See
++[Slice 5](projects/SLICE5.md).
++
++The following sections retain the scope of their original implementation slices.
++
+ ## Manifest project recognition and sessions (Slice 3)
+ 
+ The VS Code adapter uses compiler/voidls schema-2 preflight and project protocol 1.
+diff --git a/docs/LANGUAGE_SERVER.md b/docs/LANGUAGE_SERVER.md
+index fe371e0..0c3a62c 100644
+--- a/docs/LANGUAGE_SERVER.md
++++ b/docs/LANGUAGE_SERVER.md
+@@ -1,5 +1,17 @@
+ # Minimal VOID language server (Phase 10)
+ 
++## Creation subprocesses (Slice 5)
++
++The VS Code adapter uses an additive schema-1 subprocess contract. It calls
++`--discover-creation WORKSPACE ACTIVE` (empty ACTIVE means no active selector)
++for a bounded inventory without source parsing, then `--plan-project` for the
++reviewed manifest path and identities. Only after approval does it send the
++reviewed options and physical root identity to `--create-project`. A same-root
++manifest collision is reported explicitly, so the editor can preserve the existing
++file and run normal project selection. The regular schema-2 preflight, project LSP
++sessions and legacy endpoints keep their existing contracts. See
++[Slice 5](projects/SLICE5.md).
++
+ ## Manifest project protocol (Slice 3)
+ 
+ Legacy `--discover WORKSPACE ACTIVE ENTRY`, its three-field JSON, `--entry FILE`
+diff --git a/docs/PROJECT_ARCHITECTURE_ROADMAP.md b/docs/PROJECT_ARCHITECTURE_ROADMAP.md
+index b28d855..d715188 100644
+--- a/docs/PROJECT_ARCHITECTURE_ROADMAP.md
++++ b/docs/PROJECT_ARCHITECTURE_ROADMAP.md
+@@ -1,6 +1,16 @@
+ # First-class VOID projects and native application roadmap
+ 
+-## Current Slice 4 implementation
++## Current Slice 5 implementation
++
++Golden Wrench accepted S4 for local continuation. Slice 5 implements exclusive
++`voidc init` and `voidc new` and the optional VS Code first-file creation workflow.
++[Implementation and qualification](projects/SLICE5.md) records source changes and
++the P36–P40 evidence. Independent S5 review precedes S6. The integrated project,
++general C FFI and dynamically linked raylib milestone still precedes hosted CI.
++
++The following slice records retain their original review scope.
++
++## Slice 4 implementation
+ 
+ Golden Wrench accepted the [S3 final closeout](projects/SLICE3_FINAL_CLOSEOUT.md).
+ Slice 4 adds the versioned application record, per-Runtime admission before eager
+diff --git a/editors/vscode/package.json b/editors/vscode/package.json
+index ee3e78f..359c3da 100644
+--- a/editors/vscode/package.json
++++ b/editors/vscode/package.json
+@@ -17,6 +17,7 @@
+   ],
+   "main": "./dist/extension.js",
+   "activationEvents": [
++    "onStartupFinished",
+     "onLanguage:void",
+     "onLanguage:toml",
+     "workspaceContains:void.project.toml"
+@@ -64,6 +65,14 @@
+       {
+         "command": "void.refreshProject",
+         "title": "VOID: Refresh Project"
++      },
++      {
++        "command": "void.createProject",
++        "title": "VOID: Create Project"
++      },
++      {
++        "command": "void.resetCreationPrompt",
++        "title": "VOID: Reset Project Creation Prompt"
+       }
+     ],
+     "configuration": {
+diff --git a/editors/vscode/src/config.ts b/editors/vscode/src/config.ts
+index eaa30ba..d8beb54 100644
+--- a/editors/vscode/src/config.ts
++++ b/editors/vscode/src/config.ts
+@@ -30,10 +30,8 @@ export async function discoverServer(explicit: string, workspace?: string, bundl
+     }
+     throw new Error('Cannot find voidls. Configure void.server.path or install the native server on PATH.');
+ }
+-export async function resolveProject(settings: Settings, workspaces: readonly string[], active?: string, bundled?: string): Promise<Project> {
+-    if (workspaces.length > 1) throw new Error('VOID supports one project in one workspace folder. Open each project in a separate window.');
+-    const workspace = workspaces[0];
+-    const server = await discoverServer(settings.server, workspace, bundled);
++export async function resolveServer(explicit: string, workspace?: string, bundled?: string): Promise<string> {
++    const server = await discoverServer(explicit, workspace, bundled);
+     const stat = await fs.stat(server).catch(() => { throw new Error(`Cannot find voidls executable: ${server}. Build voidls and configure void.server.path.`); });
+     if (!stat.isFile()) throw new Error(`voidls is not a regular executable file: ${server}`);
+     if (process.platform === 'win32') {
+@@ -41,6 +39,12 @@ export async function resolveProject(settings: Settings, workspaces: readonly st
+     } else {
+         await fs.access(server, constants.X_OK).catch(() => { throw new Error(`voidls is not executable: ${server}. Check its execute permissions.`); });
+     }
++    return server;
++}
++export async function resolveProject(settings: Settings, workspaces: readonly string[], active?: string, bundled?: string): Promise<Project> {
++    if (workspaces.length > 1) throw new Error('VOID supports one project in one workspace folder. Open each project in a separate window.');
++    const workspace = workspaces[0];
++    const server = await resolveServer(settings.server, workspace, bundled);
+     const override = settings.entry ? resolveSetting(settings.entry, workspace) : '';
+     const selectedRoot = settings.root ? resolveSetting(settings.root, workspace) : '';
+     let entryOverride: string | undefined;
+diff --git a/editors/vscode/src/creation.ts b/editors/vscode/src/creation.ts
+new file mode 100644
+index 0000000..565bfca
+--- /dev/null
++++ b/editors/vscode/src/creation.ts
+@@ -0,0 +1,71 @@
++import {execFile} from 'node:child_process';
++import * as path from 'node:path';
++import {promisify} from 'node:util';
++
++export type Kind = 'application' | 'library';
++export type PromptState = 'unseen' | 'offered' | 'accepted' | 'declined' | 'dismissed';
++interface Root { root: string; rootIdentity: string; }
++export interface Inventory extends Root {
++    complete: boolean;
++    manifestPresent: boolean;
++    eligibleCount: number;
++    sources: string[];
++}
++export interface Plan extends Root {
++    manifest: string;
++    kind: Kind;
++    name: string;
++    version: string;
++    projectId: string;
++    roleId: string;
++    packageName: string;
++}
++async function request(server: string, args: string[]): Promise<unknown> {
++    try {
++        const {stdout} = await promisify(execFile)(server, args, {encoding: 'utf8', maxBuffer: 65536, timeout: 10000, windowsHide: true});
++        return JSON.parse(stdout);
++    } catch (error) {
++        throw new Error(`Project creation requires a matching voidls and an admitted directory. ${String(error)}`);
++    }
++}
++function rootValid<T extends Partial<Root>>(root: T): root is T & Root {
++    return typeof root.root === 'string' && path.isAbsolute(root.root) &&
++        typeof root.rootIdentity === 'string' && /^[0-9]+(?::[0-9]+)+$/.test(root.rootIdentity);
++}
++export async function probeCreation(server: string, workspace: string): Promise<Inventory> {
++    const envelope = await request(server, ['--discover-creation', workspace, '']) as {schema?: number; creation?: Partial<Inventory>};
++    const result = envelope?.creation;
++    if (envelope?.schema !== 1 || !result || !rootValid(result) || path.relative(workspace, result.root) !== '' || typeof result.complete !== 'boolean' ||
++        typeof result.manifestPresent !== 'boolean' || !Number.isSafeInteger(result.eligibleCount) ||
++        result.eligibleCount! < 0 || !Array.isArray(result.sources) || result.sources.length > 16 ||
++        result.sources.some(id => typeof id !== 'string' || !id.startsWith('/') || !id.endsWith('.void')) ||
++        new Set(result.sources).size !== result.sources.length ||
++        (result.complete && result.eligibleCount !== result.sources.length))
++        throw new Error('Invalid compiler creation inventory.');
++    return result as Inventory;
++}
++export function freshInventory(inventory: Inventory, paths: ReadonlySet<string>): boolean {
++    if (inventory.manifestPresent || !inventory.complete || !inventory.sources.length) return false;
++    const fresh = new Set(Array.from(paths, file => '/' + path.relative(inventory.root, file).split(path.sep).join('/')));
++    return inventory.sources.every(id => fresh.has(id));
++}
++export function promptKey(root: Root): string {
++    return 'void.creation.' + JSON.stringify([path.normalize(root.root), root.rootIdentity]);
++}
++export async function reviewPlan(server: string, root: Root, kind: Kind, name = '', packageName = ''): Promise<Plan|'collision'> {
++    const plan = await request(server, ['--plan-project', root.root, kind, name, packageName]) as Partial<Plan> & {schema?: number; status?: string};
++    if (!plan || plan.schema !== 1 || !rootValid(plan) || plan.root !== root.root || plan.rootIdentity !== root.rootIdentity)
++        throw new Error('Project directory changed after review.');
++    if (plan.status === 'collision') return 'collision';
++    if (plan.kind !== kind || typeof plan.manifest !== 'string' || path.normalize(plan.manifest) !== path.join(root.root, 'void.project.toml') ||
++        [plan.name, plan.version, plan.projectId, plan.roleId, plan.packageName].some(value => typeof value !== 'string'))
++        throw new Error('Project creation review changed or returned an invalid plan.');
++    return plan as Plan;
++}
++export async function createReviewed(server: string, plan: Plan): Promise<'created'|'collision'> {
++    const reply = await request(server, ['--create-project', plan.root, plan.rootIdentity, plan.kind, plan.name, plan.version,
++        plan.projectId, plan.roleId, plan.packageName]) as {schema?: number; root?: string; status?: 'created'|'collision'};
++    if (reply?.schema !== 1 || reply.root !== plan.root || (reply.status !== 'created' && reply.status !== 'collision'))
++        throw new Error('Invalid project creation result. Check the reviewed directory before retrying.');
++    return reply.status;
++}
+diff --git a/editors/vscode/src/creationWorkflow.ts b/editors/vscode/src/creationWorkflow.ts
+new file mode 100644
+index 0000000..87756b9
+--- /dev/null
++++ b/editors/vscode/src/creationWorkflow.ts
+@@ -0,0 +1,186 @@
++import * as vscode from 'vscode';
++import {promises as fs} from 'node:fs';
++import {basename} from 'node:path';
++import {inside, resolveServer} from './config';
++import {createReviewed, freshInventory, Inventory, Kind, probeCreation, promptKey, PromptState, reviewPlan} from './creation';
++
++interface Scope { root: string; server: string; }
++const offerAction = 'Create VOID project';
++const standaloneAction = 'Keep standalone';
++const publishAction = 'Create Manifest';
++
++export class CreationWorkflow implements vscode.Disposable {
++    private readonly pending = new Set<string>();
++    private readonly missingAtSave = new Set<string>();
++    private revision = 0;
++    private timer?: NodeJS.Timeout;
++    private busy = false;
++    private disposed = false;
++    private readonly subscriptions: vscode.Disposable[];
++
++    constructor(private readonly state: vscode.Memento, private readonly bundled: string,
++                private readonly selected: (root: string) => Promise<void>, private readonly report: (message: string) => void) {
++        const watcher = vscode.workspace.createFileSystemWatcher('**/*.void', false, true, true);
++        this.subscriptions = [
++            watcher, watcher.onDidCreate(uri => this.enqueue(uri)),
++            vscode.workspace.onDidCreateFiles(event => event.files.forEach(uri => this.enqueue(uri))),
++            vscode.workspace.onWillSaveTextDocument(event => {
++                const uri = event.document.uri;
++                if (!this.accepts(uri)) return;
++                event.waitUntil(fs.stat(uri.fsPath).then(() => [], (error: NodeJS.ErrnoException) => {
++                    if (error.code === 'ENOENT') this.missingAtSave.add(uri.fsPath);
++                    return [];
++                }));
++            }),
++            vscode.workspace.onDidSaveTextDocument(document => {
++                if (this.missingAtSave.delete(document.uri.fsPath)) this.enqueue(document.uri);
++            }),
++            vscode.workspace.onDidCloseTextDocument(document => this.missingAtSave.delete(document.uri.fsPath)),
++            vscode.workspace.onDidChangeWorkspaceFolders(() => this.invalidate()),
++            vscode.workspace.onDidChangeConfiguration(event => {
++                if (event.affectsConfiguration('void')) this.invalidate();
++            }),
++        ];
++    }
++    private scope(ignoreSelectors = false): Scope | undefined {
++        if (this.disposed || !vscode.workspace.isTrusted) return;
++        const folders = vscode.workspace.workspaceFolders;
++        if (folders?.length !== 1 || folders[0].uri.scheme !== 'file') return;
++        const settings = vscode.workspace.getConfiguration('void');
++        if (!ignoreSelectors && (settings.get('project.root', '') || settings.get('project.entry', ''))) return;
++        return {root: folders[0].uri.fsPath, server: settings.get('server.path', '')};
++    }
++    private current(before: Scope, ignoreSelectors = false): boolean {
++        const after = this.scope(ignoreSelectors);
++        return after?.root === before.root && after.server === before.server;
++    }
++    private activeOutside(scope: Scope): boolean {
++        const active = vscode.window.activeTextEditor?.document;
++        return !!active && active.uri.scheme === 'file' && active.languageId === 'void' && !inside(scope.root, active.uri.fsPath);
++    }
++    private accepts(uri: vscode.Uri): boolean {
++        const scope = this.scope();
++        return !!scope && uri.scheme === 'file' && uri.fsPath.endsWith('.void') && inside(scope.root, uri.fsPath);
++    }
++    private enqueue(uri: vscode.Uri): void {
++        if (!this.accepts(uri)) return;
++        this.pending.add(uri.fsPath);
++        ++this.revision;
++        this.schedule();
++    }
++    private schedule(): void {
++        if (this.timer) clearTimeout(this.timer);
++        if (!this.pending.size || this.busy) return;
++        this.timer = setTimeout(() => { this.timer = undefined; void this.automatic(); }, 180);
++    }
++    private invalidate(): void {
++        ++this.revision;
++        this.pending.clear();
++        this.missingAtSave.clear();
++        if (this.timer) clearTimeout(this.timer);
++        this.timer = undefined;
++    }
++    private async automatic(): Promise<void> {
++        const scope = this.scope();
++        if (!scope || this.busy || this.activeOutside(scope)) { this.pending.clear(); return; }
++        const revision = this.revision;
++        const fresh = new Set(this.pending);
++        this.busy = true;
++        try {
++            const server = await resolveServer(scope.server, scope.root, this.bundled);
++            if (!this.current(scope) || revision !== this.revision) return;
++            const root = await probeCreation(server, scope.root);
++            if (!this.current(scope) || revision !== this.revision) return;
++            this.pending.clear();
++            if (this.activeOutside(scope)) return;
++            const key = promptKey(root);
++            if (this.state.get<PromptState>(key, 'unseen') !== 'unseen' || !freshInventory(root, fresh)) return;
++            await this.state.update(key, 'offered' satisfies PromptState);
++            if (!this.current(scope)) return;
++            const choice = await vscode.window.showInformationMessage('Start a VOID project for these first sources?', offerAction, standaloneAction);
++            if (this.disposed) return;
++            await this.state.update(key, (choice === offerAction ? 'accepted' : choice === standaloneAction ? 'declined' : 'dismissed') satisfies PromptState);
++            if (choice === offerAction && this.current(scope)) await this.review(scope, server, root, 'application');
++        } catch (error) {
++            if (revision === this.revision) this.pending.clear();
++            if (this.current(scope)) this.report(String(error));
++        } finally {
++            this.busy = false;
++            this.schedule();
++        }
++    }
++    private async review(scope: Scope, server: string, root: Inventory, kind: Kind, name = '', packageName = ''): Promise<void> {
++        if (!this.current(scope)) return;
++        const plan = await reviewPlan(server, root, kind, name, packageName);
++        if (!this.current(scope)) return;
++        if (plan === 'collision') {
++            await this.selectCollision(root.root);
++            return;
++        }
++        const confirmed = await vscode.window.showQuickPick([
++            {label: 'Reviewed metadata', kind: vscode.QuickPickItemKind.Separator},
++            {label: plan.manifest, detail: `${plan.name} ${plan.version} (${plan.kind})`},
++            {label: `Project ID: ${plan.projectId}`},
++            {label: `${kind === 'application' ? 'Application' : 'Package'} ID: ${plan.roleId}`,
++                description: plan.packageName},
++            {label: 'Publish manifest', kind: vscode.QuickPickItemKind.Separator},
++            {label: 'Cancel'}, {label: publishAction},
++        ], {title: 'Review VOID project creation', placeHolder: 'Choose Create Manifest to publish the reviewed metadata'});
++        if (confirmed?.label !== publishAction || !this.current(scope)) return;
++        const result = await createReviewed(server, plan);
++        if (!this.current(scope)) return;
++        if (result === 'collision') await this.selectCollision(plan.root);
++        else await this.selected(plan.root);
++    }
++    private async selectCollision(root: string): Promise<void> {
++        void vscode.window.showWarningMessage('A manifest appeared during creation. VOID will select the existing project.');
++        await this.selected(root);
++    }
++    async create(): Promise<void> {
++        const scope = this.scope();
++        if (!scope || this.busy) return;
++        this.busy = true;
++        try {
++            const server = await resolveServer(scope.server, scope.root, this.bundled);
++            if (!this.current(scope)) return;
++            const root = await probeCreation(server, scope.root);
++            if (!this.current(scope)) return;
++            if (root.manifestPresent) { this.report('A VOID manifest already governs this workspace.'); return; }
++            const kind = await vscode.window.showQuickPick(['application', 'library'], {title: 'VOID project kind'});
++            if ((kind !== 'application' && kind !== 'library') || !this.current(scope)) return;
++            const name = await vscode.window.showInputBox({title: 'VOID project name', value: basename(root.root)});
++            if (name === undefined || !this.current(scope)) return;
++            const packageName = kind === 'library' ? await vscode.window.showInputBox({title: 'VOID package name', value: basename(root.root)}) : '';
++            if (packageName === undefined || !this.current(scope)) return;
++            await this.state.update(promptKey(root), 'accepted' satisfies PromptState);
++            await this.review(scope, server, root, kind, name, packageName);
++        } catch (error) {
++            if (this.current(scope)) this.report(String(error));
++        } finally {
++            this.busy = false;
++            this.schedule();
++        }
++    }
++    async reset(): Promise<void> {
++        const scope = this.scope(true);
++        if (!scope || this.busy) return;
++        this.busy = true;
++        try {
++            const server = await resolveServer(scope.server, scope.root, this.bundled);
++            if (!this.current(scope, true)) return;
++            const root = await probeCreation(server, scope.root);
++            if (this.current(scope, true)) await this.state.update(promptKey(root), 'unseen' satisfies PromptState);
++        } catch (error) {
++            if (this.current(scope, true)) this.report(String(error));
++        } finally {
++            this.busy = false;
++            this.schedule();
++        }
++    }
++    dispose(): void {
++        if (this.disposed) return;
++        this.disposed = true;
++        this.invalidate();
++        this.subscriptions.forEach(item => item.dispose());
++    }
++}
+diff --git a/editors/vscode/src/extension.ts b/editors/vscode/src/extension.ts
+index 08fddc5..a91f7dc 100644
+--- a/editors/vscode/src/extension.ts
++++ b/editors/vscode/src/extension.ts
+@@ -2,8 +2,10 @@ import * as vscode from 'vscode';
+ import {basename, join} from 'node:path';
+ import {LanguageClient, CloseAction, ErrorAction, Trace, State, RevealOutputChannelOn, ServerOptions, LanguageClientOptions} from 'vscode-languageclient/node';
+ import {inside, Project, resolveProject, Settings} from './config';
++import {CreationWorkflow} from './creationWorkflow';
+ 
+ let manager: ServerManager | undefined;
++let creation: CreationWorkflow | undefined;
+ class ServerManager {
+     private client?: LanguageClient;
+     private project?: Project;
+@@ -16,6 +18,7 @@ class ServerManager {
+     private projectRevision = 0n;
+     private warned = new Set<string>();
+     private fallback?: string;
++    private createdRoot?: string;
+     constructor(private readonly output: vscode.LogOutputChannel, private readonly bundled: string, private readonly statusBar: vscode.StatusBarItem) {}
+     async refreshProject(): Promise<void> { await this.serial; if (this.client?.isRunning()) await this.client.sendRequest('void/refreshProject', {}); }
+     async selectEntry(): Promise<void> {
+@@ -29,7 +32,7 @@ class ServerManager {
+             await vscode.workspace.getConfiguration('void').update('project.entry', files[0].fsPath, vscode.ConfigurationTarget.Workspace);
+         }
+     }
+-    private report(message: string, repeat = false): void {
++    report(message: string, repeat = false): void {
+         this.output.appendLine(message);
+         if (repeat || !this.warned.has(message)) { this.warned.add(message); void vscode.window.showErrorMessage(message + ' See Output → VOID.'); }
+     }
+@@ -42,10 +45,14 @@ class ServerManager {
+         this.serial = this.serial.then(async () => {
+             if (serial !== this.requestSerial) return;
+             await this.update(this.restartRequested, serial);
+-            if (serial === this.requestSerial) this.restartRequested = false;
++            if (serial === this.requestSerial) { this.restartRequested = false; this.createdRoot = undefined; }
+         }).catch(e => this.report(`VOID: ${String(e)}`));
+         return this.serial;
+     }
++    selectCreatedRoot(root: string): Promise<void> {
++        this.createdRoot = root;
++        return this.refresh(true);
++    }
+     private async stop(): Promise<void> {
+         ++this.epoch; this.projectRevision = 0n;
+         this.watcher?.dispose(); this.watcher = undefined;
+@@ -60,13 +67,17 @@ class ServerManager {
+         if (folders.some(f => f.uri.scheme !== 'file')) { await this.stop(); this.report('VOID requires a filesystem workspace on the extension host.'); return; }
+         const config = vscode.workspace.getConfiguration('void');
+         const settings: Settings = {server: config.get('server.path', ''), entry: config.get('project.entry', ''), root: config.get('project.root', ''), trace: config.get('trace.server', 'off')};
++        const creationRoot = !settings.root && !settings.entry && this.createdRoot && folders.length === 1 &&
++            inside(folders[0].uri.fsPath, this.createdRoot) && inside(this.createdRoot, folders[0].uri.fsPath) ? this.createdRoot : undefined;
+         const docs = this.documents();
+         const active = vscode.window.activeTextEditor?.document;
+         if (restart) this.fallback = undefined;
+         if (!settings.entry && !this.fallback) this.fallback = active && (active.languageId === 'void' || basename(active.uri.fsPath) === 'void.project.toml') && active.uri.scheme === 'file' ? active.uri.fsPath : docs[0]?.uri.fsPath;
+         if (!docs.length && !this.client && !restart && !settings.root) return;
+         let project: Project;
+-        try { project = !restart && this.project ? this.project : await resolveProject(settings, folders.map(f => f.uri.fsPath), this.fallback, this.bundled); }
++        try { project = !restart && this.project ? this.project : await resolveProject(
++            creationRoot ? {...settings, root: creationRoot} : settings,
++            folders.map(f => f.uri.fsPath), creationRoot ? undefined : this.fallback, this.bundled); }
+         catch (e) { await this.stop(); this.report(`VOID: ${e instanceof Error ? e.message : String(e)}`); return; }
+         for (const doc of docs) if (!inside(project.root, doc.uri.fsPath) || (project.singleFile && doc.uri.fsPath !== vscode.Uri.file(project.entry!).fsPath)) {
+             this.report('VOID: This document is outside the selected project or single-file entry. Configure void.project.entry for a multi-file project; use a separate window for unrelated projects.');
+@@ -179,8 +190,13 @@ export function activate(context: vscode.ExtensionContext): {ready: () => Promis
+     const output = vscode.window.createOutputChannel('VOID', {log: true});
+     const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10);
+     statusBar.command = 'void.selectEntry'; statusBar.text = 'VOID: stopped'; statusBar.show();
+-    const current = manager = new ServerManager(output, join(context.extensionPath, 'server', process.platform === 'win32' ? 'voidls.exe' : 'voidls'), statusBar);
+-    context.subscriptions.push(output, statusBar,
++    const bundled = join(context.extensionPath, 'server', process.platform === 'win32' ? 'voidls.exe' : 'voidls');
++    const current = manager = new ServerManager(output, bundled, statusBar);
++    const workflow = creation = new CreationWorkflow(context.workspaceState, bundled, root => current.selectCreatedRoot(root),
++        message => current.report(`VOID project creation: ${message}`));
++    context.subscriptions.push(output, statusBar, workflow,
++        vscode.commands.registerCommand('void.createProject', () => workflow.create()),
++        vscode.commands.registerCommand('void.resetCreationPrompt', () => workflow.reset()),
+         vscode.commands.registerCommand('void.selectEntry', () => current.selectEntry()),
+         vscode.commands.registerCommand('void.refreshProject', () => current.refreshProject()),
+         vscode.commands.registerCommand('void.restartLanguageServer', () => current.refresh(true)),
+@@ -193,4 +209,4 @@ export function activate(context: vscode.ExtensionContext): {ready: () => Promis
+     void current.refresh();
+     return {ready: () => current.refresh(), status: () => current.status(), deactivate};
+ }
+-export async function deactivate(): Promise<void> { await manager?.dispose(); manager = undefined; }
++export async function deactivate(): Promise<void> { creation?.dispose(); creation = undefined; await manager?.dispose(); manager = undefined; }
+diff --git a/editors/vscode/src/test/creationHost.ts b/editors/vscode/src/test/creationHost.ts
+new file mode 100644
+index 0000000..9de96a3
+--- /dev/null
++++ b/editors/vscode/src/test/creationHost.ts
+@@ -0,0 +1,206 @@
++import * as vscode from 'vscode';
++import assert from 'node:assert/strict';
++import * as path from 'node:path';
++import {promises as fs} from 'node:fs';
++
++import {offer, pause, until, workbench} from './creationWorkbench';
++const review = 'Review VOID project creation';
++
++export async function run(): Promise<void> {
++    const root = process.env.VOID_CREATION_ROOT!;
++    const mode = process.env.VOID_CREATION_MODE!;
++    const evidence = process.env.VOID_CREATION_EVIDENCE!;
++    const manifest = path.join(root, 'void.project.toml');
++    const events: string[] = [];
++    const pass = (label: string) => {events.push(label); console.log('PASS ' + label);};
++    const uri = (name: string) => vscode.Uri.file(path.join(root, name));
++    const exists = (file: string) => fs.access(file).then(() => true, () => false);
++    const extension = vscode.extensions.getExtension('void-language.void-language');
++    assert(extension);
++    let api: {ready(): Promise<void>; status(): {state: string; entry?: string}; deactivate(): Promise<void>} | undefined;
++    let ui: Awaited<ReturnType<typeof workbench>> | undefined;
++    let failure: string | undefined;
++    try {
++        assert.equal(vscode.workspace.isTrusted, mode !== 'untrusted');
++        api = await extension.activate();
++        await api!.ready();
++        if (mode === 'untrusted' || mode === 'multi-root') {
++            const file = uri('restricted.void');
++            await vscode.workspace.fs.writeFile(file, Buffer.from('func main():\n    return\n'));
++            const document = await vscode.workspace.openTextDocument(file);
++            await vscode.window.showTextDocument(document);
++            await vscode.commands.executeCommand('void.createProject');
++            await vscode.commands.executeCommand('void.resetCreationPrompt');
++            await pause(1300);
++            assert.equal(document.languageId, 'void');
++            assert.equal(api!.status().state, 'stopped');
++            assert(!await exists(process.env.VOID_CREATION_SPAWN!));
++            assert(!await exists(manifest));
++            pass(mode + ' workspace stays syntax-only with zero child launches or writes');
++            return;
++        }
++        ui = await workbench(process.env.VOID_CREATION_CDP!);
++        const toast = '.notification-toast';
++        const dialog = '.quick-input-widget';
++        if (mode === 'offered-close') {
++            const named = await vscode.workspace.openTextDocument(uri('first.void').with({scheme: 'untitled'}));
++            await vscode.window.showTextDocument(named);
++            const text = new vscode.WorkspaceEdit();
++            text.insert(named.uri, new vscode.Position(0, 0), 'func main():\n    return\n');
++            assert(await vscode.workspace.applyEdit(text));
++            await pause(400);
++            assert.equal(await ui.visible(offer, toast), 0);
++            assert(await named.save());
++            await until(() => ui!.visible(offer, toast), n => n === 1, 'an outstanding offer before host close');
++            assert(!await exists(manifest));
++            pass('first save of a named buffer offers, and host closes while offered');
++            return;
++        }
++        const noOffer = async () => {
++            await pause(950);
++            assert.equal(await ui!.visible(offer, toast), 0);
++            assert(!await exists(manifest));
++        };
++        async function add(name: string, bytes = '') {
++            const file = uri(name);
++            await vscode.workspace.fs.writeFile(file, Buffer.from(bytes));
++            return file;
++        }
++        const main = 'func main() -> i32:\n    return 27\n';
++        if (mode === 'old-tree') {
++            const document = await vscode.workspace.openTextDocument(uri('existing.void'));
++            await vscode.window.showTextDocument(document);
++            await noOffer();
++            pass('activation and opening a pre-existing source do not offer');
++            await add('later.void', main);
++            await noOffer();
++            pass('an unrelated pre-existing source suppresses a later-file offer');
++            return;
++        }
++        if (mode === 'outside') {
++            const outside = vscode.Uri.file(path.join(path.dirname(root), 'outside.void'));
++            await fs.writeFile(outside.fsPath, main);
++            await vscode.window.showTextDocument(await vscode.workspace.openTextDocument(outside));
++            await add('first.void', main);
++            await noOffer();
++            pass('an active document outside the workspace suppresses the automatic offer');
++            return;
++        }
++        if (mode === 'old-server') {
++            await add('first.void', main);
++            await until(() => ui!.visible('Project creation requires a matching voidls', toast), Boolean, 'older server rejection');
++            await noOffer();
++            pass('an older server fails visibly with no standalone creation fallback');
++            return;
++        }
++        if (mode === 'manual') {
++            const source = uri('existing.void');
++            const create = vscode.commands.executeCommand('void.createProject');
++            await until(() => ui!.visible('VOID project kind', dialog), Boolean, 'kind selection');
++            await ui.click('application', dialog);
++            await until(() => ui!.visible('VOID project name', dialog), Boolean, 'name selection');
++            ui.key('Enter', 'Enter', 13);
++            await until(() => ui!.visible(review, dialog), Boolean, 'deliberate metadata review');
++            assert(!await exists(manifest));
++            await ui.click('Create Manifest', dialog);
++            await create;
++            await until(() => api!.status().entry, entry => entry === source.fsPath, 'manual project entry');
++            assert(await exists(manifest));
++            pass('deliberate creation works around existing multiple sources');
++            return;
++        }
++        if (mode === 'collision') {
++            const source = await add('first.void', main);
++            await until(() => ui!.visible(offer, toast), n => n === 1, 'offer before collision');
++            await ui.click('Create VOID project', toast);
++            await until(() => ui!.visible(review, dialog), n => n === 1, 'review before collision');
++            const incoming = "schema=1\n[project]\nid='org.test.external'\nname='External'\nversion='1.0.0'\nkind='application'\n[application]\nid='org.test.external-app'\n";
++            await fs.writeFile(manifest, incoming, {flag: 'wx'});
++            await ui.click('Create Manifest', dialog);
++            await until(() => api!.status().entry, entry => entry === source.fsPath, 'same-root session after collision');
++            assert.equal(await fs.readFile(manifest, 'utf8'), incoming);
++            pass('a manifest arriving during review is preserved and selected in the same root');
++            return;
++        }
++
++        const first = await add('first.void', main);
++        await until(() => ui!.visible(offer, toast), n => n === 1, 'one initial offer');
++        await ui.click('Keep standalone', toast);
++        await until(() => ui!.visible(offer, toast), n => n === 0, 'standalone choice recorded');
++        await fs.unlink(first.fsPath);
++        const suppressed = await add('declined.void', main);
++        await noOffer();
++        pass('decline persists and prevents a repeat');
++        await fs.unlink(suppressed.fsPath);
++
++        await vscode.commands.executeCommand('void.resetCreationPrompt');
++        const dismissed = await add('dismissed.void', main);
++        await until(() => ui!.visible(offer, toast), n => n === 1, 'offer after deliberate reset');
++        await vscode.commands.executeCommand('notifications.clearAll');
++        await until(() => ui!.visible(offer, toast), n => n === 0, 'notification dismissed');
++        await fs.unlink(dismissed.fsPath);
++        const afterDismissal = await add('after-dismissal.void', main);
++        await noOffer();
++        pass('dismissal persists and reset is deliberate');
++        await fs.unlink(afterDismissal.fsPath);
++
++        await vscode.commands.executeCommand('void.resetCreationPrompt');
++        const cancel = await add('cancelled.void', main);
++        await until(() => ui!.visible(offer, toast), n => n === 1, 'offer before cancelled review');
++        await ui.click('Create VOID project', toast);
++        await until(() => ui!.visible(review, dialog), n => n === 1, 'review before cancellation');
++        await ui.click('Cancel', dialog);
++        await until(() => ui!.visible(review, dialog), n => n === 0, 'cancelled review');
++        await fs.unlink(cancel.fsPath);
++        const afterCancel = await add('after-cancel.void', main);
++        await noOffer();
++        await fs.unlink(afterCancel.fsPath);
++        pass('cancelled review writes nothing and acceptance suppresses another automatic offer');
++
++        await vscode.commands.executeCommand('void.resetCreationPrompt');
++        const source = uri('game.void');
++        const helper = uri('helper.void');
++        const edit = new vscode.WorkspaceEdit();
++        edit.createFile(source);
++        edit.createFile(helper);
++        assert(await vscode.workspace.applyEdit(edit));
++        await until(() => ui!.visible(offer, toast), n => n === 1, 'coalesced first-file offer');
++        assert(!await exists(manifest));
++        const dirty = await vscode.workspace.openTextDocument(source);
++        await vscode.window.showTextDocument(dirty);
++        const patch = new vscode.WorkspaceEdit();
++        patch.insert(source, new vscode.Position(0, 0), main);
++        assert(await vscode.workspace.applyEdit(patch));
++        assert(dirty.isDirty);
++        await ui.click('Create VOID project', toast);
++        await until(() => ui!.visible(review, dialog), n => n === 1, 'metadata review');
++        const detail = await ui.evaluate<string>("document.querySelector('.quick-input-widget').innerText");
++        assert(detail.includes(manifest) && /local\.p[0-9a-f]{32}/.test(detail) && /local\.a[0-9a-f]{32}/.test(detail));
++        assert(!await exists(manifest));
++        await ui.click('Create Manifest', dialog);
++        await until(() => exists(manifest), Boolean, 'exclusive manifest publication');
++        const manifestBytes = await fs.readFile(manifest, 'utf8');
++        for (const id of detail.match(/local\.[pa][0-9a-f]{32}/g)!) assert(manifestBytes.includes(id));
++        await until(() => api!.status().entry, entry => entry === source.fsPath, 'dirty main in a compiler project session');
++        assert(dirty.isDirty && dirty.getText() === main);
++        assert.equal(await fs.readFile(source.fsPath, 'utf8'), '');
++        assert.equal(await fs.readFile(helper.fsPath, 'utf8'), '');
++        pass('one real offer for a two-file batch, reviewed IDs, dirty source preserved in the project session');
++        assert(await dirty.save());
++        await vscode.commands.executeCommand('void.createProject');
++        assert.equal(await fs.readFile(manifest, 'utf8'), manifestBytes);
++        pass('deliberate creation preserves the existing project');
++    } catch (error) {
++        failure = String(error instanceof Error ? error.stack : error);
++        const body = await ui?.evaluate<string>('document.body.innerText').catch(() => undefined);
++        if (body) events.push(body);
++        events.push(JSON.stringify({status: api?.status(), open: vscode.workspace.textDocuments.map(d =>
++            ({file: d.uri.fsPath, dirty: d.isDirty, version: d.version})), diagnostics: vscode.languages.getDiagnostics().map(([file, ds]) =>
++            [file.fsPath, ds.map(d => ({message: d.message, code: d.code}))])}));
++        throw error;
++    } finally {
++        ui?.close();
++        await api?.deactivate();
++        await fs.writeFile(evidence, JSON.stringify({mode, editor: vscode.version, platform: process.platform, events, failure, status: failure ? 'FAIL' : 'PASS'}, null, 2) + '\n');
++    }
++}
+diff --git a/editors/vscode/src/test/creationWorkbench.ts b/editors/vscode/src/test/creationWorkbench.ts
+new file mode 100644
+index 0000000..39cebbf
+--- /dev/null
++++ b/editors/vscode/src/test/creationWorkbench.ts
+@@ -0,0 +1,62 @@
++import assert from 'node:assert/strict';
++
++export const pause = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
++export const offer = 'Start a VOID project for these first sources?';
++
++export async function until<T>(read: () => T | Promise<T>, accept: (value: T) => boolean, label: string): Promise<T> {
++    const end = Date.now() + 15000;
++    while (Date.now() < end) {
++        const value = await read();
++        if (accept(value)) return value;
++        await pause(100);
++    }
++    throw new Error('Timed out waiting for ' + label);
++}
++
++export async function workbench(port: string) {
++    const target = await until(async () => {
++        try {
++            const targets = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json() as {url: string; webSocketDebuggerUrl: string}[];
++            return targets.find(t => t.url.includes('workbench.html'));
++        } catch { return undefined; }
++    }, Boolean, 'the VS Code workbench');
++    assert(target);
++    const socket = new WebSocket(target.webSocketDebuggerUrl);
++    await new Promise<void>((resolve, reject) => {
++        socket.addEventListener('open', () => resolve(), {once: true});
++        socket.addEventListener('error', reject, {once: true});
++    });
++    let sequence = 0;
++    const replies = new Map<number, (value: unknown) => void>();
++    socket.addEventListener('message', event => {
++        const message = JSON.parse(String(event.data));
++        replies.get(message.id)?.(message.result?.result?.value);
++        replies.delete(message.id);
++    });
++    function send<T>(method: string, params: object): Promise<T> {
++        return new Promise(resolve => {
++            const id = ++sequence;
++            replies.set(id, result => resolve(result as T));
++            socket.send(JSON.stringify({id, method, params}));
++        });
++    }
++    const evaluate = <T>(expression: string) => send<T>('Runtime.evaluate', {expression, returnByValue: true});
++    const key = (value: string, code: string, windowsVirtualKeyCode: number, modifiers = 0) => {
++        // Fire both events without waiting for a reply. Quit can close the socket.
++        for (const type of ['keyDown', 'keyUp'])
++            socket.send(JSON.stringify({id: ++sequence, method: 'Input.dispatchKeyEvent',
++                params: {type, key: value, code, windowsVirtualKeyCode, modifiers}}));
++    };
++    const visible = (needle: string, region: string) => evaluate<number>(
++        `[...document.querySelectorAll(${JSON.stringify(region)})].filter(e => e.getBoundingClientRect().width && e.innerText.includes(${JSON.stringify(needle)})).length`);
++    const click = async (label: string, region: string) => {
++        await until(() => evaluate<boolean>(`(() => {
++            const buttons = [...document.querySelectorAll(${JSON.stringify(region + ' .monaco-button, ' + region + ' .monaco-list-row')})];
++            const button = buttons.find(e => e.getBoundingClientRect().width && (e.querySelector('.label-name')?.textContent ?? e.innerText).trim() === ${JSON.stringify(label)});
++            if (!button) return false;
++            button.click();
++            return true;
++        })()`), Boolean, label);
++    };
++    return {evaluate, visible, click, key, close: () => socket.close()};
++}
+diff --git a/editors/vscode/src/test/runCreationHost.ts b/editors/vscode/src/test/runCreationHost.ts
+new file mode 100644
+index 0000000..5b2fb38
+--- /dev/null
++++ b/editors/vscode/src/test/runCreationHost.ts
+@@ -0,0 +1,152 @@
++import {runTests} from '@vscode/test-electron';
++import {spawn} from 'node:child_process';
++import {promises as fs} from 'node:fs';
++import {createServer} from 'node:net';
++import * as path from 'node:path';
++import * as os from 'node:os';
++import {offer, pause, until, workbench} from './creationWorkbench';
++
++async function freePort(): Promise<number> {
++    return new Promise((resolve, reject) => {
++        const server = createServer().listen(0, '127.0.0.1');
++        server.once('error', reject);
++        server.once('listening', () => {
++            const address = server.address();
++            if (!address || typeof address === 'string') {server.close(); reject(new Error('No CDP port')); return;}
++            server.close(error => error ? reject(error) : resolve(address.port));
++        });
++    });
++}
++async function verifyPersistence(executable: string, server: string, root: string, evidence: string): Promise<void> {
++    const workspace = path.join(root, 'persistence');
++    const profile = path.join(root, 'persistent-profile');
++    await fs.mkdir(workspace);
++    await fs.mkdir(path.join(profile, 'User'), {recursive: true});
++    await fs.writeFile(path.join(profile, 'User/settings.json'), JSON.stringify({
++        'void.server.path': server, 'security.workspace.trust.enabled': false, 'workbench.startupEditor': 'none',
++        'telemetry.telemetryLevel': 'off', 'update.mode': 'none', 'chat.disableAIFeatures': true,
++        'window.confirmBeforeClose': 'never',
++    }));
++    const events: string[] = [];
++    let failure: string | undefined;
++    try {
++        for (const phase of ['offer', 'reopen']) {
++            const port = await freePort();
++            // The VS Code extension test launch uses ephemeral storage. The two
++            // windows below use one real user-data directory and graceful exit.
++            const child = spawn(executable, [workspace, '--user-data-dir=' + profile, '--shared-data-dir=' + path.join(root, 'shared-data'), '--disable-extensions',
++                '--disable-updates', '--disable-gpu', '--skip-welcome', '--skip-release-notes',
++                '--extensionDevelopmentPath=' + path.resolve(__dirname, '../..'), '--remote-debugging-port=' + port],
++                {stdio: 'inherit'});
++            const stopped = new Promise<void>((resolve, reject) => {
++                child.once('error', reject);
++                child.once('exit', status => status === 0 ? resolve() : reject(new Error('Editor exited ' + status)));
++            });
++            void stopped.catch(() => {});
++            let ui: Awaited<ReturnType<typeof workbench>> | undefined;
++            try {
++                ui = await workbench(String(port));
++                await until(() => ui!.visible('VOID: stopped', '.statusbar'), Boolean, 'startup of normal VS Code');
++                if (phase === 'reopen') await fs.unlink(path.join(workspace, 'offer.void'));
++                await fs.writeFile(path.join(workspace, phase + '.void'), 'func main():\n    return\n');
++                if (phase === 'offer') {
++                    await until(() => ui!.visible(offer, '.notification-toast'), Boolean, 'offer in a normal editor window');
++                    events.push('normal editor closes while the prompt remains offered');
++                } else {
++                    await pause(1500);
++                    if (await ui.visible(offer, '.notification-toast')) throw new Error('Offer repeated after normal editor restart');
++                    events.push('same physical root and persisted workspace storage suppress the next qualifying event');
++                }
++                ui.key('q', 'KeyQ', 81, 2);
++                let timer: NodeJS.Timeout | undefined;
++                try {
++                    await Promise.race([stopped, new Promise<never>((_, reject) => {
++                        timer = setTimeout(() => reject(new Error('Editor quit timed out')), 12000);
++                    })]);
++                } finally { clearTimeout(timer); }
++            } finally {
++                ui?.close();
++                if (child.exitCode === null && child.signalCode === null) {
++                    child.kill();
++                    await stopped.catch(() => {});
++                }
++            }
++        }
++    } catch (error) {
++        failure = String(error);
++        throw error;
++    } finally {
++        await fs.writeFile(evidence, JSON.stringify({events, failure, status: failure ? 'FAIL' : 'PASS'}, null, 2) + '\n');
++    }
++}
++
++async function main(): Promise<void> {
++    const {VOIDLS_PATH, VSCODE_EXECUTABLE_PATH, VOID_CREATION_EVIDENCE_DIR} = process.env;
++    if (!VOIDLS_PATH || !VSCODE_EXECUTABLE_PATH || !VOID_CREATION_EVIDENCE_DIR)
++        throw new Error('Set VOIDLS_PATH, VSCODE_EXECUTABLE_PATH, and VOID_CREATION_EVIDENCE_DIR.');
++    const older = process.env.VOID_OLDER_VOIDLS_PATH;
++    if (!older) throw new Error('Set VOID_OLDER_VOIDLS_PATH to the retained legacy server.');
++    const temporary = await fs.mkdtemp(path.join(os.tmpdir(), 'VOID S5 editor '));
++    try {
++        for (const mode of ['trusted', 'old-tree', 'offered-close', 'manual', 'collision', 'outside', 'old-server', 'multi-root', 'untrusted']) {
++            const group = mode.startsWith('offered-') ? 'offered' : mode;
++            const root = path.join(temporary, group);
++            const profile = path.join(temporary, group + '-profile');
++            await fs.mkdir(root, {recursive: true});
++            await fs.mkdir(path.join(profile, 'User'), {recursive: true});
++            const marker = path.join(temporary, 'native-launch');
++            const wrapper = path.join(temporary, 'voidls-launch-guard');
++            const restricted = mode === 'untrusted' || mode === 'multi-root';
++            if (restricted) {
++                await fs.writeFile(wrapper, `#!/bin/sh\ntouch "${marker}"\n`, {mode: 0o700});
++            } else if (mode === 'old-tree' || mode === 'manual') {
++                await fs.writeFile(path.join(root, 'existing.void'), 'func main() -> i32:\n    return 7\n');
++                if (mode === 'manual') await fs.writeFile(path.join(root, 'helper.void'), '');
++            }
++            await fs.writeFile(path.join(profile, 'User/settings.json'), JSON.stringify({
++                'void.server.path': restricted ? wrapper : await fs.realpath(mode === 'old-server' ? older : VOIDLS_PATH),
++                'void.trace.server': 'verbose',
++                'security.workspace.trust.startupPrompt': 'never', 'workbench.startupEditor': 'none',
++                'telemetry.telemetryLevel': 'off', 'update.mode': 'none', 'extensions.autoCheckUpdates': false,
++                'files.hotExit': 'off', 'files.enableTrash': false, 'chat.disableAIFeatures': true
++            }));
++            const port = await freePort();
++            let workspace = root;
++            if (mode === 'multi-root') {
++                const second = path.join(temporary, 'second-root');
++                await fs.mkdir(second);
++                workspace = path.join(temporary, 'multi.code-workspace');
++                await fs.writeFile(workspace, JSON.stringify({folders: [{path: root}, {path: second}]}));
++            }
++            const args = [workspace, '--user-data-dir=' + profile, '--extensions-dir=' + path.join(temporary, 'extensions'),
++                '--disable-extensions', '--disable-updates', '--disable-gpu', '--skip-welcome', '--skip-release-notes',
++                '--remote-debugging-port=' + port];
++            const env = {VOID_CREATION_ROOT: root, VOID_CREATION_MODE: mode, VOID_CREATION_CDP: String(port),
++                VOID_CREATION_SPAWN: marker, VOID_CREATION_EVIDENCE: path.join(VOID_CREATION_EVIDENCE_DIR, mode + '-host.json')};
++            const extension = path.resolve(__dirname, '../..');
++            const test = path.resolve(__dirname, 'creationHost.js');
++            if (mode !== 'untrusted') {
++                try { await runTests({vscodeExecutablePath: VSCODE_EXECUTABLE_PATH, extensionDevelopmentPath: extension,
++                    extensionTestsPath: test, extensionTestsEnv: env, launchArgs: args}); }
++                catch (error) {
++                    await fs.cp(path.join(profile, 'logs'), path.join(VOID_CREATION_EVIDENCE_DIR, 'failed-' + mode + '-logs'), {recursive: true});
++                    throw error;
++                }
++            } else {
++                await new Promise<void>((resolve, reject) => {
++                    const child = spawn(VSCODE_EXECUTABLE_PATH, [...args, '--no-sandbox', '--disable-gpu-sandbox',
++                        '--extensionDevelopmentPath=' + extension, '--extensionTestsPath=' + test], {
++                        env: {...process.env, ...env}, stdio: 'inherit'});
++                    const timeout = setTimeout(() => {child.kill(); reject(new Error('Restricted workspace test timed out'));}, 60000);
++                    child.once('error', error => {clearTimeout(timeout); reject(error);});
++                    child.once('exit', code => {clearTimeout(timeout); code === 0 ? resolve() : reject(new Error('Restricted workspace test exited ' + code));});
++                });
++            }
++        }
++        await verifyPersistence(VSCODE_EXECUTABLE_PATH, await fs.realpath(VOIDLS_PATH), temporary,
++            path.join(VOID_CREATION_EVIDENCE_DIR, 'persistence-host.json'));
++    } finally {
++        await fs.rm(temporary, {recursive: true, force: true});
++    }
++}
++main().catch(error => {console.error(error); process.exitCode = 1;});
+diff --git a/include/void/project_creation.hpp b/include/void/project_creation.hpp
+new file mode 100644
+index 0000000..c0b0f5a
+--- /dev/null
++++ b/include/void/project_creation.hpp
+@@ -0,0 +1,46 @@
++#pragma once
++#include "void/project.hpp"
++#include <cstddef>
++#include <filesystem>
++#include <memory>
++#include <optional>
++#include <stdexcept>
++#include <string>
++#include <system_error>
++#include <vector>
++
++namespace vd::project {
++struct CreationOptions {
++    Kind kind = Kind::application;
++    bool new_directory = false, nested = false;
++    std::optional<std::string> name, version, project_id, application_id, package_id, package_name, source;
++};
++struct CreationRoot {
++    std::filesystem::path path;
++    std::string identity;
++};
++struct CreationPlan {
++    CreationRoot parent; // init root, or new's existing parent
++    std::filesystem::path root;
++    std::optional<std::string> starter;
++    std::shared_ptr<const Manifest> manifest;
++    bool nested = false;
++};
++class CreationCollision : public std::runtime_error {
++public:
++    using std::runtime_error::runtime_error;
++};
++using CreationEntropy = std::error_code (*)(void*, std::size_t);
++CreationRoot inspect_creation_root(const std::filesystem::path&);
++bool creation_manifest_present(const std::filesystem::path&);
++CreationPlan plan_creation(const std::filesystem::path&, const CreationOptions&, CreationEntropy entropy = nullptr);
++using CreationCheckpoint = void (*)(const std::filesystem::path&);
++void publish_creation(const CreationPlan&, CreationCheckpoint before_publish = nullptr);
++struct CreationInventory {
++    CreationRoot root;
++    bool manifest_present = false, complete = false;
++    std::size_t eligible_count = 0;
++    std::vector<std::string> sources; // canonical VFS identities
++};
++CreationInventory discover_creation(const std::filesystem::path& workspace, const std::filesystem::path& active);
++}
+diff --git a/src/frontend/compiler.cpp b/src/frontend/compiler.cpp
+index 3fd3ec5..e4fe0b8 100644
+--- a/src/frontend/compiler.cpp
++++ b/src/frontend/compiler.cpp
+@@ -1,5 +1,6 @@
+ #include "void/frontend.hpp"
+ #include "void/path.hpp"
++#include "void/project_creation.hpp"
+ #include "void/numeric.hpp"
+ #include "void/math_ops.hpp"
+ #include "void/temporal_ops.hpp"
+diff --git a/src/frontend/project_creation.cpp b/src/frontend/project_creation.cpp
+new file mode 100644
+index 0000000..a2894a4
+--- /dev/null
++++ b/src/frontend/project_creation.cpp
+@@ -0,0 +1,457 @@
++#include "void/project_creation.hpp"
++#include "void/frontend.hpp"
++#include "void/path.hpp"
++#include "void/utf8.hpp"
++#include <llvm/Support/RandomNumberGenerator.h>
++#include <algorithm>
++#include <array>
++#include <cerrno>
++#include <map>
++#include <set>
++#include <utility>
++#ifdef _WIN32
++#ifndef WIN32_LEAN_AND_MEAN
++#define WIN32_LEAN_AND_MEAN
++#endif
++#include "../native_windows.hpp"
++#else
++#include <fcntl.h>
++#include <sys/file.h>
++#include <sys/stat.h>
++#include <unistd.h>
++#ifdef __linux__
++#include <sys/syscall.h>
++#include <linux/fs.h>
++#elif defined(__APPLE__)
++#include <stdio.h>
++#endif
++#endif
++
++namespace vd::project {
++namespace {
++namespace fs = std::filesystem;
++constexpr std::size_t entry_limit = 16384;
++constexpr std::string_view manifest_name = "void.project.toml";
++std::string fold(std::string text) {
++    for (auto& c : text) if (c >= 'A' && c <= 'Z') c += 'a' - 'A';
++    return text;
++}
++std::string random_hex(CreationEntropy entropy = nullptr) {
++    std::array<unsigned char,16> bytes{};
++    auto error = (entropy ? entropy : llvm::getRandomBytes)(bytes.data(),bytes.size());
++    if (error) throw std::system_error(error,"Cannot obtain project creation entropy");
++    constexpr char digits[]="0123456789abcdef";
++    std::string result;
++    for (auto byte : bytes) {result += digits[byte >> 4];result += digits[byte & 15];}
++    return result;
++}
++std::string toml_string(std::string_view text) {
++    std::string result = "\"";
++    constexpr char digits[]="0123456789abcdef";
++    for (unsigned char c : text) {
++        if (c < 32 || c == 127) {
++            result += "\\u00";result += digits[c >> 4];result += digits[c & 15];
++        } else {
++            if (c == '"' || c == '\\') result += '\\';
++            result += static_cast<char>(c);
++        }
++    }
++    return result + '"';
++}
++bool named(const fs::path& directory, const std::string& leaf, bool require_exact = false) {
++    std::size_t seen=0, matches=0;
++    bool exact=false;
++    auto expected=fold(leaf);
++    for (const auto& child : fs::directory_iterator(directory)) {
++        if (++seen > entry_limit) throw std::runtime_error("Project creation directory-entry limit exceeded.");
++        auto name=path_utf8(child.path().filename());
++        if (fold(name)==expected) {++matches;exact|=name==leaf;}
++    }
++    if (require_exact && (matches!=1 || !exact))
++        throw std::runtime_error("Project creation path has wrong case or a case collision: "+path_utf8(directory/utf8_path(leaf)));
++    return matches!=0;
++}
++fs::path absolute_target(const fs::path& path) {
++#ifdef _WIN32
++    if (!path.is_absolute() && (path.has_root_name() || path.has_root_directory()))
++        throw std::invalid_argument("Project creation paths must be absolute or relative to the current directory.");
++#endif
++    for (const auto& part : path.relative_path()) if (part=="..")
++        throw std::invalid_argument("Project creation paths cannot contain parent references.");
++    auto normalized=fs::absolute(path).lexically_normal();
++    if (normalized.has_relative_path() && normalized.filename().empty()) normalized=normalized.parent_path();
++    return normalized;
++}
++void require_destination(const fs::path& root, bool fresh, bool nested) {
++    if (fresh && named(root.parent_path(),path_utf8(root.filename())))
++        throw CreationCollision("Project destination already exists, including a possible case sibling: "+path_utf8(root));
++    if (!fresh && named(root,std::string(manifest_name)))
++        throw CreationCollision("Project manifest already exists, including a possible case sibling: "+path_utf8(root/manifest_name));
++    if (!nested) {
++        auto ancestor=root.parent_path();
++        while (!ancestor.empty()) {
++            if (named(ancestor,std::string(manifest_name)))
++                throw std::runtime_error("An enclosing project exists at "+path_utf8(ancestor)+". Use --nested for a deliberate child project.");
++            auto parent=ancestor.parent_path();
++            if (parent==ancestor) break;
++            ancestor=std::move(parent);
++        }
++    }
++}
++std::string starter_parent(const std::string& starter) {
++    if (starter.empty() || starter.front()=='/' || starter.find('\\')!=std::string::npos)
++        throw std::invalid_argument("Use a portable project-relative .void starter path.");
++    require_module_identity("/"+starter);
++    if(std::count(starter.begin(),starter.end(),'/')>64)
++        throw std::invalid_argument("Starter path exceeds the project directory-depth limit.");
++    auto parent=utf8_path(starter).parent_path();
++    Sources defaults;
++    bool first=true;
++    for (const auto& part : utf8_path(starter)) {
++        auto raw=path_utf8(part), name=fold(raw);
++        if (name==".git" || name==".void" || name=="build" || name=="libs" || name==manifest_name)
++            throw std::invalid_argument("Starter path uses a reserved discovery component.");
++        if (first) for (const auto& item:defaults.exclude) if (name==item)
++            throw std::invalid_argument("Starter path uses a default excluded discovery component.");
++        first=false;
++    }
++    return parent.empty()?".":path_utf8(parent);
++}
++
++#ifdef _WIN32
++using NativeHandle = native_windows::Handle;
++using NativeInfo = BY_HANDLE_FILE_INFORMATION;
++NativeInfo identity(const NativeHandle& handle) {return native_windows::information(handle.value);}
++std::string key(const NativeInfo& info) {
++    return std::to_string(info.dwVolumeSerialNumber)+":"+std::to_string(info.nFileIndexHigh)+":"+std::to_string(info.nFileIndexLow);
++}
++struct Parent {
++    fs::path path;
++    std::vector<NativeHandle> pins;
++    explicit Parent(fs::path requested):path(absolute_target(requested)),pins(native_windows::pin_directories(path)) {
++        auto current=path.root_path();
++        for (const auto& part:path.relative_path()) {named(current,path_utf8(part),true);current/=part;}
++        path=fs::canonical(path);
++    }
++    std::string identity_key() const {return key(identity(pins.back()));}
++};
++struct Node {
++    fs::path path;
++    NativeHandle handle;
++    NativeInfo original;
++    bool directory;
++    Node(fs::path p, NativeHandle h, bool d)
++        :path(std::move(p)),handle(std::move(h)),original(identity(handle)),directory(d) {}
++};
++NativeHandle open_node(const fs::path& path, bool directory, bool pin) {
++    NativeHandle handle(CreateFileW(path.c_str(),DELETE|FILE_READ_ATTRIBUTES|(directory?FILE_LIST_DIRECTORY|READ_CONTROL:0),
++        FILE_SHARE_READ|FILE_SHARE_WRITE|(pin?0:FILE_SHARE_DELETE),nullptr,OPEN_EXISTING,
++        FILE_FLAG_OPEN_REPARSE_POINT|(directory?FILE_FLAG_BACKUP_SEMANTICS:0),nullptr));
++    if(handle.value==INVALID_HANDLE_VALUE)native_windows::fail("Cannot pin project staging object");
++    if(bool(identity(handle).dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)!=directory)
++        throw std::runtime_error("Unexpected project staging object type.");
++    return handle;
++}
++Node make_directory(const fs::path& path, bool private_stage) {
++    std::optional<native_windows::PrivateAccess> access;
++    if(private_stage)access.emplace();
++    if(!CreateDirectoryW(path.c_str(),access?&access->attributes:nullptr))
++        native_windows::fail("Cannot create project staging directory");
++    try {
++        auto handle=open_node(path,true,private_stage);
++        if(access)access->verify(handle.value);
++        return {path,std::move(handle),true};
++    } catch(...) {throw std::runtime_error("Cannot prove staging ownership; retained "+path_utf8(path));}
++}
++Node make_file(const fs::path& path) {
++    NativeHandle handle(CreateFileW(path.c_str(),GENERIC_READ|GENERIC_WRITE|DELETE|FILE_READ_ATTRIBUTES,
++        FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,nullptr,CREATE_NEW,FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
++    if(handle.value==INVALID_HANDLE_VALUE)native_windows::fail("Cannot create staged project file");
++    return {path,std::move(handle),false};
++}
++void write_file(Node& node,std::string_view text) {
++    DWORD written=0;
++    if(!WriteFile(node.handle.value,text.data(),static_cast<DWORD>(text.size()),&written,nullptr) || written!=text.size() || !FlushFileBuffers(node.handle.value))
++        native_windows::fail("Cannot finish staged project file");
++}
++bool matches_file(const Node& node, std::string_view expected) {
++    LARGE_INTEGER start{};
++    if(!SetFilePointerEx(node.handle.value,start,nullptr,FILE_BEGIN))return false;
++    std::string observed(expected.size()+1,'\0');
++    DWORD read=0;
++    return ReadFile(node.handle.value,observed.data(),static_cast<DWORD>(observed.size()),&read,nullptr) &&
++        read==expected.size() && std::string_view(observed.data(),read)==expected;
++}
++bool owns(const Node& node) {
++    NativeHandle observed(CreateFileW(node.path.c_str(),FILE_READ_ATTRIBUTES,
++        FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,nullptr,OPEN_EXISTING,
++        FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
++    if(observed.value==INVALID_HANDLE_VALUE)return false;
++    auto observed_info=identity(observed);
++    return key(observed_info)==key(node.original) && (node.directory || observed_info.nNumberOfLinks==1);
++}
++void erase(Node& node) {
++    if(node.handle.value==INVALID_HANDLE_VALUE) {
++        auto reopened=open_node(node.path,node.directory,false);
++        auto current=identity(reopened);
++        if(key(current)!=key(node.original) || (!node.directory && current.nNumberOfLinks!=1))
++            throw std::runtime_error("Staging object changed before rollback: "+path_utf8(node.path));
++        node.handle.value=std::exchange(reopened.value,INVALID_HANDLE_VALUE);
++    }
++    FILE_DISPOSITION_INFO disposition{TRUE};
++    if(!owns(node) || !SetFileInformationByHandle(node.handle.value,FileDispositionInfo,&disposition,sizeof disposition))
++        throw std::runtime_error("Staging object could not be safely removed: "+path_utf8(node.path));
++    CloseHandle(std::exchange(node.handle.value,INVALID_HANDLE_VALUE));
++}
++void rename_exclusive(const Node& node,const fs::path& destination) {
++    auto text=destination.native();
++    std::vector<std::byte> bytes(sizeof(FILE_RENAME_INFO)+text.size()*sizeof(wchar_t));
++    auto* rename=reinterpret_cast<FILE_RENAME_INFO*>(bytes.data());
++    rename->ReplaceIfExists=FALSE;rename->RootDirectory=nullptr;
++    rename->FileNameLength=static_cast<DWORD>(text.size()*sizeof(wchar_t));
++    std::copy(text.begin(),text.end(),rename->FileName);
++    if(SetFileInformationByHandle(node.handle.value,FileRenameInfo,rename,static_cast<DWORD>(bytes.size())))return;
++    auto error=GetLastError();
++    if(error==ERROR_ALREADY_EXISTS || error==ERROR_FILE_EXISTS)
++        throw CreationCollision("Exclusive project publication collided with an existing destination.");
++    native_windows::fail("Cannot publish project exclusively",error);
++}
++#else
++struct NativeHandle {
++    int fd=-1;
++    explicit NativeHandle(int value=-1):fd(value) {}
++    NativeHandle(const NativeHandle&)=delete;
++    NativeHandle& operator=(const NativeHandle&)=delete;
++    NativeHandle(NativeHandle&& other) noexcept:fd(std::exchange(other.fd,-1)) {}
++    NativeHandle& operator=(NativeHandle&& other) noexcept {
++        if(this!=&other){if(fd>=0)::close(fd);fd=std::exchange(other.fd,-1);}
++        return *this;
++    }
++    ~NativeHandle(){if(fd>=0)::close(fd);}
++};
++[[noreturn]] void system_failure(const char* message) {
++    throw std::system_error(errno,std::generic_category(),message);
++}
++struct stat identity(const NativeHandle& handle) {
++    struct stat result{};
++    if(fstat(handle.fd,&result))system_failure("Cannot inspect project object");
++    return result;
++}
++std::string key(const struct stat& info) {
++    return std::to_string(info.st_dev)+":"+std::to_string(info.st_ino);
++}
++constexpr int dir_flags=O_RDONLY|O_DIRECTORY|O_NOFOLLOW|O_CLOEXEC;
++struct Parent {
++    fs::path path;
++    NativeHandle handle;
++    explicit Parent(fs::path requested):path(absolute_target(requested)),handle(open(path.root_path().c_str(),dir_flags)) {
++        if(handle.fd<0)system_failure("Cannot open project filesystem root");
++        auto current=path.root_path();
++        for (const auto& part:path.relative_path()) {
++            named(current,path_utf8(part),true);
++            NativeHandle next(openat(handle.fd,part.c_str(),dir_flags));
++            if(next.fd<0)system_failure("Cannot pin project directory");
++            handle=std::move(next);current/=part;
++        }
++        if(key(identity(handle))!=Parent::path_key(path))throw std::runtime_error("Project directory changed during admission.");
++    }
++    static std::string path_key(const fs::path& path) {
++        struct stat value{};
++        if(lstat(path.c_str(),&value) || !S_ISDIR(value.st_mode))throw std::runtime_error("Cannot verify project directory path.");
++        return key(value);
++    }
++    std::string identity_key() const {return key(identity(handle));}
++};
++struct Node {
++    int parent;
++    std::string name;
++    NativeHandle handle;
++    bool directory;
++};
++Node make_directory(int parent,std::string name) {
++    if(mkdirat(parent,name.c_str(),0700))system_failure("Cannot create project staging directory");
++    NativeHandle handle(openat(parent,name.c_str(),dir_flags));
++    if(handle.fd<0)throw std::runtime_error("Cannot prove staging directory ownership; retained "+name);
++    return {parent,std::move(name),std::move(handle),true};
++}
++Node make_file(int parent,std::string name) {
++    NativeHandle handle(openat(parent,name.c_str(),O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC,0600));
++    if(handle.fd<0)system_failure("Cannot create staged project file");
++    return {parent,std::move(name),std::move(handle),false};
++}
++void write_file(Node& node,std::string_view text) {
++    while(!text.empty()) {
++        auto count=write(node.handle.fd,text.data(),text.size());
++        if(count<0 && errno==EINTR)continue;
++        if(count<=0)system_failure("Cannot write staged project file");
++        text.remove_prefix(static_cast<std::size_t>(count));
++    }
++    if(fsync(node.handle.fd))system_failure("Cannot flush staged project file");
++}
++bool matches_file(const Node& node, std::string_view expected) {
++    std::string observed(expected.size()+1,'\0');
++    std::size_t total=0;
++    while(total<observed.size()) {
++        auto count=pread(node.handle.fd,observed.data()+total,observed.size()-total,static_cast<off_t>(total));
++        if(count<0 && errno==EINTR)continue;
++        if(count<0)return false;
++        if(count==0)break;
++        total+=static_cast<std::size_t>(count);
++    }
++    return total==expected.size() && std::string_view(observed.data(),total)==expected;
++}
++bool owns(const Node& node) {
++    struct stat observed{};
++    if(fstatat(node.parent,node.name.c_str(),&observed,AT_SYMLINK_NOFOLLOW))return false;
++    return key(observed)==key(identity(node.handle)) && (node.directory || observed.st_nlink==1);
++}
++void erase(Node& node) {
++    if(!owns(node) || unlinkat(node.parent,node.name.c_str(),node.directory?AT_REMOVEDIR:0))
++        throw std::runtime_error("Staging object could not be safely removed: "+node.name);
++}
++void rename_exclusive(const Node& node,int parent,const std::string& destination) {
++#if defined(__linux__)
++    if(!syscall(SYS_renameat2,node.parent,node.name.c_str(),parent,destination.c_str(),RENAME_NOREPLACE))return;
++#elif defined(__APPLE__)
++    if(!renameatx_np(node.parent,node.name.c_str(),parent,destination.c_str(),RENAME_EXCL))return;
++#else
++    errno=ENOTSUP;
++#endif
++    if(errno==EEXIST || errno==ENOTEMPTY)
++        throw CreationCollision("Exclusive project publication collided with an existing destination.");
++    system_failure("Cannot publish project exclusively");
++}
++#endif
++}
++
++CreationRoot inspect_creation_root(const fs::path& path) {
++    Parent admitted(path);
++    return {admitted.path,admitted.identity_key()};
++}
++bool creation_manifest_present(const fs::path& directory) {
++    return named(directory,std::string(manifest_name));
++}
++
++CreationPlan plan_creation(const fs::path& requested,const CreationOptions& options,CreationEntropy entropy) {
++    auto root=absolute_target(requested);
++    auto leaf=path_utf8(root.filename());
++    auto portable=leaf;
++    for(auto& c:portable)if(static_cast<unsigned char>(c)>=128)c='x';
++    if(options.new_directory && (!root.has_relative_path() || !valid_utf8(leaf) || !portable_path_component(portable) || fold(leaf)==manifest_name))
++        throw std::invalid_argument("New project destination requires a valid directory basename.");
++    auto parent=inspect_creation_root(options.new_directory?root.parent_path():root);
++    root=options.new_directory?parent.path/utf8_path(leaf):parent.path;
++    require_destination(root,options.new_directory,options.nested);
++    const auto basename=path_utf8(root.filename());
++    auto generated=[&](const std::optional<std::string>& supplied,std::string_view prefix) {
++        return supplied?*supplied:std::string(prefix)+random_hex(entropy);
++    };
++    const bool app=options.kind==Kind::application;
++    if((app && (options.package_id || options.package_name)) || (!app && options.application_id) || (!options.new_directory && options.source))
++        throw std::invalid_argument("Creation options conflict with the project kind or command.");
++    auto package=options.package_name.value_or(basename);
++    std::optional<std::string> starter;
++    if(options.new_directory)starter=options.source.value_or(app?"src/app.void":"src/"+package+".void");
++    auto version=options.version.value_or("0.1.0");
++    std::string text="schema = 1\n\n[project]\nid = "+toml_string(generated(options.project_id,"local.p"))+
++        "\nname = "+toml_string(options.name.value_or(basename))+"\nversion = "+toml_string(version)+
++        "\nkind = "+toml_string(app?"application":"library");
++    text+=app?"\n\n[application]\nid = ":"\n\n[package]\nid = ";
++    text+=toml_string(app?generated(options.application_id,"local.a"):generated(options.package_id,"local.l"));
++    if(!app)text+="\nname = "+toml_string(package);
++    if(starter)text+="\n\n[sources]\nroots = ["+toml_string(starter_parent(*starter))+"]";
++    text+='\n';
++    auto parsed=parse_manifest(SourceFile(path_utf8(root/manifest_name),std::move(text)));
++    if(!parsed.succeeded())throw CompilationError(std::move(parsed.diagnostics));
++    return {std::move(parent),std::move(root),std::move(starter),std::move(parsed.manifest),options.nested};
++}
++
++void publish_creation(const CreationPlan& plan,CreationCheckpoint before_publish) {
++    const auto& root=plan.root;
++    const bool fresh=plan.starter.has_value();
++    Parent parent(fresh?root.parent_path():root);
++    if(parent.path!=plan.parent.path || parent.identity_key()!=plan.parent.identity)
++        throw std::runtime_error("Project directory changed after review.");
++#ifndef _WIN32
++    if(flock(parent.handle.fd,LOCK_EX))system_failure("Cannot serialize project publication in its directory");
++#endif
++    require_destination(root,fresh,plan.nested);
++    const auto temporary=".void-create-"+random_hex();
++    const auto stage=parent.path/temporary;
++    std::map<fs::path,std::set<std::string>> layout{{stage,{std::string(manifest_name)}}};
++    if(fresh) {
++        auto directory=stage;
++        for(const auto& part:utf8_path(*plan.starter)) {layout[directory].insert(path_utf8(part));directory/=part;}
++    }
++    std::vector<Node> objects;
++    objects.reserve(68);
++    const auto& manifest_text=plan.manifest->source().text();
++    const std::string_view starter_text=plan.manifest->kind()==Kind::application?
++        "func main() -> i32:\n    return 0\n":"public func answer() -> i32:\n    return 42\n";
++    bool published=false;
++    try {
++#ifdef _WIN32
++        objects.push_back(make_directory(parent.path/temporary,true));
++        objects.push_back(make_file(objects[0].path/manifest_name));
++#else
++        objects.push_back(make_directory(parent.handle.fd,temporary));
++        objects.push_back(make_file(objects[0].handle.fd,std::string(manifest_name)));
++#endif
++        write_file(objects.back(),manifest_text);
++        if(fresh) {
++            (void)starter_parent(*plan.starter);
++            auto path=utf8_path(*plan.starter);
++#ifdef _WIN32
++            auto directory=objects[0].path;
++            for(const auto& part:path.parent_path()) {directory/=part;objects.push_back(make_directory(directory,false));}
++            objects.push_back(make_file(directory/path.filename()));
++#else
++            int directory=objects[0].handle.fd;
++            for(const auto& part:path.parent_path()) {
++                objects.push_back(make_directory(directory,path_utf8(part)));directory=objects.back().handle.fd;
++            }
++            objects.push_back(make_file(directory,path_utf8(path.filename())));
++#endif
++            write_file(objects.back(),starter_text);
++        }
++        if(before_publish)before_publish(stage);
++        auto rechecked=inspect_creation_root(parent.path);
++        if(rechecked.identity!=plan.parent.identity)throw std::runtime_error("Project directory changed before publication.");
++        require_destination(root,fresh,plan.nested);
++        for(const auto& object:objects)if(!owns(object))
++            throw std::runtime_error("Project staging ownership changed before publication.");
++        for(const auto& [directory,expected]:layout) {
++            std::set<std::string> actual;
++            for(const auto& item:fs::directory_iterator(directory)) {
++                if(actual.size()>=expected.size())throw std::runtime_error("Unexpected project staging content.");
++                actual.insert(path_utf8(item.path().filename()));
++            }
++            if(actual!=expected)throw std::runtime_error("Unexpected project staging content.");
++        }
++        if(!matches_file(objects[1],manifest_text) || (fresh && !matches_file(objects.back(),starter_text)))
++            throw std::runtime_error("Project staging contents changed before publication.");
++        const auto& selected=objects[fresh?0:1];
++#ifdef _WIN32
++        // NTFS will not rename a directory with open descendants. The root
++        // stays pinned; rollback must reopen descendants by their saved IDs.
++        if(fresh)for(auto it=objects.begin()+1;it!=objects.end();++it)
++            CloseHandle(std::exchange(it->handle.value,INVALID_HANDLE_VALUE));
++        rename_exclusive(selected,fresh?root:root/manifest_name);
++#else
++        rename_exclusive(selected,parent.handle.fd,fresh?path_utf8(root.filename()):std::string(manifest_name));
++#endif
++        published=true;
++        if(!fresh)erase(objects[0]);
++        named(fresh?parent.path:root,fresh?path_utf8(root.filename()):std::string(manifest_name),true);
++        if(inspect_creation_root(parent.path).identity!=plan.parent.identity)
++            throw std::runtime_error("Project directory changed during publication.");
++    } catch(const std::exception& error) {
++        if(published)
++            throw std::runtime_error(std::string(error.what())+" Publication may have completed; inspect "+path_utf8(root)+".");
++        bool uncertain=false;
++        for(auto it=objects.rbegin();it!=objects.rend();++it)try{erase(*it);}catch(const std::exception&){uncertain=true;}
++        if(uncertain)throw std::runtime_error(std::string(error.what())+" Retained uncertain staging content at "+path_utf8(parent.path/temporary)+".");
++        throw;
++    }
++}
++}
+diff --git a/src/frontend/project_selection.inc b/src/frontend/project_selection.inc
+index 9c215ca..c7bd1c1 100644
+--- a/src/frontend/project_selection.inc
++++ b/src/frontend/project_selection.inc
+@@ -25,6 +25,7 @@ struct ProjectCapture {
+     const ProjectCapture* original;
+     SourceFile anchor;
+     std::shared_ptr<const project::Manifest> manifest;
++    project::Sources creation_policy;
+     std::map<std::string,SourceFile> sources;
+     std::map<std::string,std::vector<std::string>> listings;
+     std::map<std::string,bool> boundaries;
+@@ -34,7 +35,7 @@ struct ProjectCapture {
+     Diagnostics diagnostics;
+     SourceGraph graph;
+     Unit from;
+-    ProjectCapture(const project_fs::path& requested,const SourceOverrides& o,const ManifestOverrides& m,const ProjectCapture* previous=nullptr)
++    ProjectCapture(const project_fs::path& requested,const SourceOverrides& o,const ManifestOverrides& m,const ProjectCapture* previous=nullptr,bool inventory_only=false)
+       :root(admit_root(requested)),overlays(bounded_overlays(o)),manifest_overlays(m),original(previous),anchor(path_utf8(root/"void.project.toml"),""),graph(root,diagnostics,overlays),from(anchor,"/") {
+         changed(original && root!=original->root);
+         if(manifest_overlays.size()>project_visit_limit)project_failure(anchor,Code::limit,"Manifest overlay work limit exceeded.");
+@@ -57,6 +58,10 @@ struct ProjectCapture {
+         }
+         graph.admit=[this](const auto& path,const auto& id,bool leaf){admit(path,id,leaf);};
+         graph.reader=[this](const auto& path,const auto& id){return capture(path,id);};
++        if(inventory_only) {
++            if(boundary(""))project_failure(anchor,Code::project_boundary,"A project manifest is present.");
++            return;
++        }
+         if(!boundary(""))project_failure(anchor,Code::project_boundary,"Selected project manifest is unavailable.","Select a directory containing an exact regular void.project.toml; a deleted manifest cannot fall back to legacy mode.");
+         auto overlay=manifest_overlays.find("/void.project.toml");
+         if(overlay!=manifest_overlays.end() && overlay->second->text().size()>project::manifest_byte_limit)project_failure(anchor,Code::limit,"Project manifest byte limit exceeded.");
+@@ -183,7 +188,8 @@ struct ProjectCapture {
+     bool excluded(const std::string& id) const {
+         auto relative=id.substr(1);
+         for(const auto& part:utf8_path(relative))if(auto s=folded(path_utf8(part));s==".git" || s==".void" || s=="build" || s=="libs")return true;
+-        for(const auto& item:manifest->sources().exclude)if(relative==item || (relative.starts_with(item) && relative.size()>item.size() && relative[item.size()]=='/'))return true;
++        const auto& policy=manifest?manifest->sources():creation_policy;
++        for(const auto& item:policy.exclude)if(relative==item || (relative.starts_with(item) && relative.size()>item.size() && relative[item.size()]=='/'))return true;
+         return false;
+     }
+     void inventory_directory(const std::string& id,std::set<std::string>& result,std::size_t depth) {
+@@ -204,13 +210,19 @@ struct ProjectCapture {
+                 inventory_directory(child,result,depth+1);
+             } else if(name.ends_with(".void")) {
+                 auto [key,physical]=graph.resolve(from,{TokenKind::path,child,0});
+-                capture(physical,key,true);result.insert(key);
++                if(manifest)capture(physical,key,true);
++                else {
++                    if(result.size()>=project_file_limit)project_failure(anchor,Code::limit,"Creation inventory source-file limit exceeded.");
++                    if(project_fs::hard_link_count(physical)!=1 || !std::ifstream(physical,std::ios::binary))
++                        project_failure(anchor,Code::project_boundary,"Creation inventory source cannot be admitted: '"+key+"'.");
++                }
++                result.insert(key);
+             }
+         }
+     }
+     std::set<std::string> inventory() {
+         std::set<std::string> result;
+-        for(const auto& name:manifest->sources().roots) {
++        for(const auto& name:(manifest?manifest->sources():creation_policy).roots) {
+             auto id=name=="."?std::string{}:"/"+name;
+             if(id.empty() || !excluded(id))inventory_directory(id,result,0);
+         }
+@@ -400,6 +412,34 @@ std::vector<Diagnostic> check_project_documents(const std::filesystem::path& roo
+     return check_project_documents_impl(root,sources,manifests,documents,false);
+ }
+ std::vector<std::filesystem::path> project_ancestor_directories(const std::filesystem::path&,const std::filesystem::path&);
++project::CreationInventory project::discover_creation(const std::filesystem::path& workspace,const std::filesystem::path& active) {
++    auto root=inspect_creation_root(workspace);
++    CreationInventory result;result.root=root;
++    for(const auto& directory:project_ancestor_directories(root.path,active))
++        if(creation_manifest_present(directory)){result.manifest_present=true;return result;}
++    for(auto directory=root.path.parent_path();!directory.empty();) {
++        if(creation_manifest_present(directory)){result.manifest_present=true;return result;}
++        auto parent=directory.parent_path();if(parent==directory)break;directory=std::move(parent);
++    }
++    try {
++        const SourceOverrides sources;
++        const ManifestOverrides manifests;
++        ProjectCapture inventory(root.path,sources,manifests,nullptr,true);
++        auto identities=inventory.inventory();
++        ProjectCapture again(root.path,sources,manifests,&inventory,true);
++        if(again.inventory()!=identities || again.listings!=inventory.listings || again.boundaries!=inventory.boundaries ||
++            inspect_creation_root(root.path).identity!=root.identity)return result;
++        result.eligible_count=identities.size();
++        std::size_t bytes=0;
++        for(const auto& id:identities)bytes+=id.size();
++        if(identities.size()>16 || bytes>8192)return result;
++        result.sources.assign(identities.begin(),identities.end());
++        result.complete=true;
++    } catch(const CompilationError&) {
++        // An incomplete observation cannot authorize an automatic offer.
++    } catch(const std::filesystem::filesystem_error&) {}
++    return result;
++}
+ ProjectPreflight discover_project_context(const std::filesystem::path& workspace,const std::filesystem::path& active,const std::filesystem::path& selected_root,const std::filesystem::path& selected_entry) {
+     ProjectPreflight result;auto root=selected_root;
+     if(root.empty() && selected_entry.empty() && !workspace.empty())
+diff --git a/src/lsp/main.cpp b/src/lsp/main.cpp
+index 51bd3b2..fadebeb 100644
+--- a/src/lsp/main.cpp
++++ b/src/lsp/main.cpp
+@@ -1,5 +1,6 @@
+ #include "void/lsp.hpp"
+ #include "void/tooling.hpp"
++#include "void/project_creation.hpp"
+ #include "void/numeric.hpp"
+ #include <bit>
+ #include <llvm/Support/JSON.h>
+@@ -743,6 +744,62 @@ int project_preflight(const fs::path& workspace,const fs::path& active,const fs:
+     if(text.size()+1>65536)throw std::invalid_argument("Project discovery summary exceeds the 64 KiB protocol limit");
+     llvm::outs()<<text<<"\n";return 0;
+ }
++int creation_preflight(const fs::path& workspace,const fs::path& active) {
++    auto selected=vd::project::discover_creation(workspace,active);
++    j::Array sources;
++    for(const auto& id:selected.sources)sources.push_back(id);
++    llvm::outs()<<j::Value(j::Object{{"schema",1},{"creation",j::Object{
++        {"root",vd::path_utf8(selected.root.path)},{"rootIdentity",selected.root.identity},
++        {"manifestPresent",selected.manifest_present},{"complete",selected.complete},
++        {"eligibleCount",static_cast<std::int64_t>(selected.eligible_count)},{"sources",std::move(sources)}}}})<<"\n";
++    return 0;
++}
++vd::project::CreationOptions creation_options(std::string_view kind,const std::string& name,const std::string& package_name) {
++    vd::project::CreationOptions options;
++    if(kind!="application" && kind!="library")throw std::invalid_argument("Invalid creation kind.");
++    options.kind=kind=="library"?vd::project::Kind::library:vd::project::Kind::application;
++    if(!name.empty())options.name=name;
++    if(!package_name.empty())options.package_name=package_name;
++    return options;
++}
++int creation_plan(const fs::path& root,const std::string& kind,const std::string& name,const std::string& package_name) {
++    std::optional<vd::project::CreationPlan> preview;
++    try {
++        preview=vd::project::plan_creation(root,creation_options(kind,name,package_name));
++    } catch(const vd::project::CreationCollision&) {
++        auto selected=vd::project::inspect_creation_root(root);
++        llvm::outs()<<j::Value(j::Object{{"schema",1},{"root",vd::path_utf8(selected.path)},
++            {"rootIdentity",selected.identity},{"status","collision"}})<<"\n";
++        return 0;
++    }
++    const auto& plan=*preview;
++    const auto& metadata=plan.manifest->project();
++    const auto& role=kind=="library"?*plan.manifest->package():*plan.manifest->application();
++    llvm::outs()<<j::Value(j::Object{{"schema",1},{"root",vd::path_utf8(plan.root)},{"rootIdentity",plan.parent.identity},
++        {"manifest",vd::path_utf8(plan.root/"void.project.toml")},{"name",metadata.name},{"kind",kind},
++        {"version",metadata.version.text()},{"projectId",metadata.id},{"roleId",role.id},
++        {"packageName",kind=="library"?role.name:""}})<<"\n";
++    return 0;
++}
++int creation_write(const fs::path& root,const std::string& identity,const std::string& kind,const std::string& name,
++                   const std::string& version,const std::string& project_id,const std::string& role_id,const std::string& package_name) {
++    auto admit=[&] {
++        auto current=vd::project::inspect_creation_root(root);
++        if(current.path!=root || current.identity!=identity)throw std::invalid_argument("Project root changed after creation review.");
++    };
++    admit();
++    auto options=creation_options(kind,name,package_name);
++    options.name=name;options.version=version;options.project_id=project_id;
++    if(kind=="application")options.application_id=role_id;else options.package_id=role_id;
++    std::string status="created";
++    try {
++        auto plan=vd::project::plan_creation(root,options);
++        if(plan.parent.identity!=identity)throw std::invalid_argument("Project root changed after creation review.");
++        vd::project::publish_creation(plan);
++    } catch(const vd::project::CreationCollision&) {admit();status="collision";}
++    llvm::outs()<<j::Value(j::Object{{"schema",1},{"root",vd::path_utf8(root)},{"status",status}})<<"\n";
++    return 0;
++}
+ int run(const fs::path& entry,bool project=false,const std::optional<std::string>& override={}) {
+ #ifdef _WIN32
+     if(_setmode(_fileno(stdin),_O_BINARY)==-1 || _setmode(_fileno(stdout),_O_BINARY)==-1) throw std::runtime_error("Cannot set binary protocol streams");
+@@ -795,6 +852,10 @@ int run(const fs::path& entry,bool project=false,const std::optional<std::string
+ int wmain(int argc,wchar_t** argv) {
+     try {
+         auto executable=vd::path_utf8(fs::path(argv[0]));vd::configure_standard_library_root(vd::utf8_path(llvm::sys::fs::getMainExecutable(executable.c_str(),reinterpret_cast<void*>(&wmain))));
++        auto text=[&](int index){auto utf8=fs::path(argv[index]).u8string();return std::string(utf8.begin(),utf8.end());};
++        if(argc==4 && std::wstring_view(argv[1])==L"--discover-creation")return creation_preflight(fs::path(argv[2]),fs::path(argv[3]));
++        if(argc==6 && std::wstring_view(argv[1])==L"--plan-project")return creation_plan(fs::path(argv[2]),text(3),text(4),text(5));
++        if(argc==10 && std::wstring_view(argv[1])==L"--create-project")return creation_write(fs::path(argv[2]),text(3),text(4),text(5),text(6),text(7),text(8),text(9));
+         if(argc==6 && std::wstring_view(argv[1])==L"--discover-project")return project_preflight(fs::path(argv[2]),fs::path(argv[3]),fs::path(argv[4]),fs::path(argv[5]));
+         if((argc==3 || (argc==5 && std::wstring_view(argv[3])==L"--entry")) && std::wstring_view(argv[1])==L"--project")return run(fs::path(argv[2]),true,argc==5?std::optional(vd::path_utf8(fs::path(argv[4]))):std::nullopt);
+         if(argc==5 && std::wstring_view(argv[1])==L"--discover")return preflight(fs::path(argv[2]),fs::path(argv[3]),fs::path(argv[4]));
+@@ -804,6 +865,9 @@ int wmain(int argc,wchar_t** argv) {
+ int main(int argc,char** argv) {
+     try {
+         vd::configure_standard_library_root(vd::utf8_path(llvm::sys::fs::getMainExecutable(argv[0],reinterpret_cast<void*>(&vd::configure_standard_library_root))));
++        if(argc==4 && std::string_view(argv[1])=="--discover-creation")return creation_preflight(vd::utf8_path(argv[2]),vd::utf8_path(argv[3]));
++        if(argc==6 && std::string_view(argv[1])=="--plan-project")return creation_plan(vd::utf8_path(argv[2]),argv[3],argv[4],argv[5]);
++        if(argc==10 && std::string_view(argv[1])=="--create-project")return creation_write(vd::utf8_path(argv[2]),argv[3],argv[4],argv[5],argv[6],argv[7],argv[8],argv[9]);
+         if(argc==6 && std::string_view(argv[1])=="--discover-project")return project_preflight(vd::utf8_path(argv[2]),vd::utf8_path(argv[3]),vd::utf8_path(argv[4]),vd::utf8_path(argv[5]));
+         if((argc==3 || (argc==5 && std::string_view(argv[3])=="--entry")) && std::string_view(argv[1])=="--project")return run(vd::utf8_path(argv[2]),true,argc==5?std::optional(std::string(argv[4])):std::nullopt);
+         if(argc==5 && std::string_view(argv[1])=="--discover")return preflight(vd::utf8_path(argv[2]),vd::utf8_path(argv[3]),vd::utf8_path(argv[4]));
+diff --git a/src/main.cpp b/src/main.cpp
+index c8f5996..42f7b16 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -2,6 +2,7 @@
+ #include "void/frontend.hpp"
+ #include "void/path.hpp"
+ #include "void/native_build.hpp"
++#include "void/project_creation.hpp"
+ #include "void/runtime.hpp"
+ #include <llvm/Support/FileSystem.h>
+ #include <llvm/Config/llvm-config.h>
+@@ -9,17 +10,20 @@
+ #include <cstdlib>
+ #include <iostream>
+ #include <limits>
++#include <set>
+ #include <vector>
+ namespace {
+ struct UsageError : std::invalid_argument {using std::invalid_argument::invalid_argument;};
+ bool known_command(const std::string& command) {
+-    return command=="check" || command=="run" || command=="build" || command=="emit";
++    return command=="check" || command=="run" || command=="build" || command=="emit" || command=="init" || command=="new";
+ }
+ void usage(std::ostream& out, const std::string& command={}) {
+     if(command.empty() || command=="check")out<<"Usage: voidc check <file-or-directory> [--no-opt]\n";
+     if(command.empty() || command=="run")out<<"Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\n";
+     if(command.empty() || command=="build")out<<"Usage: voidc build [file-or-directory] [-o executable] [--no-opt]\n";
+     if(command.empty() || command=="emit")out<<"Usage: voidc emit <file-or-directory> -o <object> [--no-opt]\n";
++    if(command.empty() || command=="init")out<<"Usage: voidc init [DIR] [project options]\n";
++    if(command.empty() || command=="new")out<<"Usage: voidc new PATH [project options] [--source PATH]\n";
+ }
+ void help(const std::string& command={}) {
+     std::cout<<"VOID Language Compiler v"<<VOID_COMPILER_VERSION<<" (development)\nLLVM "<<LLVM_VERSION_STRING<<"\n\n";
+@@ -30,6 +34,8 @@ void help(const std::string& command={}) {
+           "  run     Execute through the JIT.\n"
+           "  build   Compile and link a native executable with the matching Runtime.\n"
+           "  emit    Write a native object for manual linking.\n"
++          "  init    Add a project manifest to an existing directory.\n"
++          "  new     Create a project and starter source in a new directory.\n"
+           "\nOptions:\n"
+           "  -h, --help  Show help; use <command> --help for examples.\n"
+           "  --version   Show compiler, LLVM, target and build identity.\n"
+@@ -69,6 +75,10 @@ void help(const std::string& command={}) {
+       "  -o PATH     Required output object path (.o on Unix, .obj on Windows).\n"
+       "  --no-opt    Disable O2.\n"
+       "Example: voidc emit main.void -o main.o\n";
++    if(command=="init" || command=="new")std::cout<<"\nProject options: --kind application|library, --name TEXT, --version SEMVER,\n"
++      "  --project-id ID, --app-id ID or --package-id ID --package-name IDENTIFIER, --nested.\n"
++      "Default: application, destination basename, version 0.1.0 and independent local IDs.\n"
++      "--source is available with new. The destination and manifest are created exclusively.\n";
+     std::cout<<"\nA directory with void.project.toml selects its project; otherwise it selects main.void.\n"
+       "run/build default to the current directory. Bare explicit files retain their parent root.\n"
+       "Project discovery selects a unique eligible main in any filename; --entry bypasses scanning.\n"
+@@ -87,10 +97,60 @@ std::int32_t input(const char* text) {
+         throw UsageError("Expected a decimal i32 input (-2147483648 through 2147483647).");
+     return static_cast<std::int32_t>(value);
+ }
++int create_project(const std::string& command,int argc,char** argv) {
++    vd::project::CreationOptions options;options.new_directory=command=="new";
++    std::optional<std::filesystem::path> destination;
++    std::set<std::string> seen;
++    bool operands=false;
++    for(int i=2;i<argc;++i) {
++        std::string arg=argv[i];
++        if(!operands && arg=="--"){operands=true;continue;}
++        if(operands || !arg.starts_with('-')) {
++            if(destination || arg.empty())throw UsageError("Expected one project destination.");
++            destination=vd::utf8_path(arg);continue;
++        }
++        if(!seen.insert(arg).second)throw UsageError("Duplicate creation option "+arg+".");
++        if(arg=="--nested"){options.nested=true;continue;}
++        if(arg!="--kind" && arg!="--name" && arg!="--version" && arg!="--project-id" &&
++           arg!="--app-id" && arg!="--package-id" && arg!="--package-name" && arg!="--source")
++            throw UsageError("Unknown creation option "+arg+".");
++        if(++i==argc || std::string_view(argv[i]).starts_with("--"))throw UsageError("Missing value for "+arg+".");
++        std::string value=argv[i];
++        if(arg=="--kind") {
++            if(value!="application" && value!="library")throw UsageError("Expected --kind application or library.");
++            options.kind=value=="application"?vd::project::Kind::application:vd::project::Kind::library;
++        } else if(arg=="--name")options.name=value;
++        else if(arg=="--version")options.version=value;
++        else if(arg=="--project-id")options.project_id=value;
++        else if(arg=="--app-id")options.application_id=value;
++        else if(arg=="--package-id")options.package_id=value;
++        else if(arg=="--package-name")options.package_name=value;
++        else options.source=value;
++    }
++    const bool app=options.kind==vd::project::Kind::application;
++    if(!destination && options.new_directory)throw UsageError("new requires a destination PATH.");
++    if(options.source && !options.new_directory)throw UsageError("--source is only available with new.");
++    if((app && (options.package_name || options.package_id)) || (!app && options.application_id))
++        throw UsageError("Identity options must match the selected project kind.");
++    const auto plan=vd::project::plan_creation(destination?*destination:std::filesystem::current_path(),options);
++    const auto manifest=plan.root/"void.project.toml";
++    std::cout<<"Manifest: "<<vd::path_utf8(manifest)<<"\nProject ID: "<<plan.manifest->project().id<<'\n'
++             <<(app?"Application ID: ":"Package ID: ")<<(app?plan.manifest->application()->id:plan.manifest->package()->id)
++             <<"\nNext: from the displayed manifest directory, run voidc check --project .\n"<<std::flush;
++    vd::project::publish_creation(plan);
++    std::cout<<"Created project manifest.\n";
++    if(app)std::cout<<"Automatic application selection requires one eligible main(). Use --entry for a deliberate override.\n";
++    return 0;
++}
+ }
+ static int run_cli(int argc, char** argv) {
+     std::string command;
+     try {
++        if(argc>=2 && (std::string_view(argv[1])=="init" || std::string_view(argv[1])=="new")) {
++            command=argv[1];
++            if(argc==3 && (std::string_view(argv[2])=="--help" || std::string_view(argv[2])=="-h")){help(command);return 0;}
++            return create_project(command,argc,argv);
++        }
+         // Preserve the established early removed-option diagnostic, but never
+         // scan the explicit application's forwarded argument region.
+         bool source_seen=false, source_only=false, output_operand=false;
+@@ -115,7 +175,7 @@ static int run_cli(int argc, char** argv) {
+         }
+         if(argc>=2 && std::string(argv[1])=="help") {
+             if(argc==2) {help();return 0;}
+-            if(argc!=3 || !known_command(argv[2]))throw UsageError("Expected help [check|run|build|emit].");
++            if(argc!=3 || !known_command(argv[2]))throw UsageError("Expected help [check|run|build|emit|init|new].");
+             help(argv[2]);return 0;
+         }
+         vd::configure_standard_library_root(vd::utf8_path(llvm::sys::fs::getMainExecutable(argv[0],reinterpret_cast<void*>(&run_cli))));
+diff --git a/tests/cli/install.py b/tests/cli/install.py
+index 7c2eb43..6d0c742 100644
+--- a/tests/cli/install.py
++++ b/tests/cli/install.py
+@@ -15,8 +15,8 @@ environment = os.environ.copy()
+ environment.pop('VOID_STDLIB_ROOT', None)
+ 
+ 
+-def run(argv, status=0):
+-    result = subprocess.run(list(map(str, argv)), capture_output=True, env=environment, timeout=180)
++def run(argv, status=0, *, cwd=None):
++    result = subprocess.run(list(map(str, argv)), capture_output=True, env=environment, timeout=180, cwd=cwd)
+     assert result.returncode == status, (argv, result.returncode, result.stdout, result.stderr)
+     return result
+ 
+@@ -36,6 +36,16 @@ with tempfile.TemporaryDirectory(prefix='VOID CLI installation é ') as director
+     compiler = prefix / 'bin' / ('voidc' + suffix)
+     project = root / 'external project'
+     project.mkdir()
++    run([compiler, 'init', project, '--project-id', 'org.test.installed', '--app-id', 'org.test.installed-app'], cwd=root)
++    assert {path.name for path in project.iterdir()} == {'void.project.toml'}
++    generated = root / 'created outside checkout'
++    run([compiler, 'new', generated, '--source', 'nested/launcher.void'], cwd=root)
++    run([compiler, 'run', '--project', generated, '--profile', 'release'], cwd=root)
++    run([compiler, 'run', '--project', generated, '--profile', 'debug'], cwd=root)
++    generated_output = root / ('installed-app' + suffix)
++    run([compiler, 'build', '--project', generated, '-o', generated_output], cwd=root)
++    generated.rename(root / 'hidden application sources')
++    run([generated_output], cwd=root)
+     source = project / 'main.void'
+     source.write_text(HELLO, encoding='utf-8')
+     output = project / ('hello' + suffix)
+diff --git a/tests/project/creation.cpp b/tests/project/creation.cpp
+new file mode 100644
+index 0000000..10fdf82
+--- /dev/null
++++ b/tests/project/creation.cpp
+@@ -0,0 +1,112 @@
++#include "void/project_creation.hpp"
++#include <filesystem>
++#include <fstream>
++#include <iostream>
++#include <stdexcept>
++#include <string_view>
++#ifdef _WIN32
++#include <windows.h>
++#endif
++
++namespace fs = std::filesystem;
++using namespace vd::project;
++
++namespace {
++void check(bool condition,const char* reason) {
++    if (!condition) throw std::runtime_error(reason);
++}
++template<class Error = std::exception, class Operation>
++void fails(Operation operation) {
++    try {operation();}
++    catch (const Error&) {return;}
++    throw std::runtime_error("Expected failure");
++}
++struct Fixture {
++    fs::path root;
++    Fixture() {
++        auto base=fs::canonical(fs::temp_directory_path());
++        for (unsigned i=0;i<1000;++i) {
++            auto path=base/("void-creation-test-"+std::to_string(i));
++            if (fs::create_directory(path)) {root=path;return;}
++        }
++        throw std::runtime_error("Cannot create fixture");
++    }
++    ~Fixture() {std::error_code error;fs::remove_all(root,error);}
++};
++std::error_code fail_entropy(void*,std::size_t) {return std::make_error_code(std::errc::io_error);}
++bool modified_starter=false;
++void alter_starter(const fs::path& stage) {
++    const auto path=stage/"src/app.void";
++    constexpr std::string_view alteration="// changed";
++#ifdef _WIN32
++    // CRT streams do not share DELETE access with the held staging handle.
++    auto file=CreateFileW(path.c_str(),FILE_APPEND_DATA,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
++        nullptr,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,nullptr);
++    if(file==INVALID_HANDLE_VALUE)return;
++    DWORD written=0;
++    modified_starter=WriteFile(file,alteration.data(),static_cast<DWORD>(alteration.size()),&written,nullptr) &&
++        written==alteration.size();
++    CloseHandle(file);
++#else
++    std::ofstream file(path,std::ios::app);
++    file<<alteration;
++    file.close();
++    modified_starter=bool(file);
++#endif
++}
++std::string read(const fs::path& file) {
++    std::ifstream input(file,std::ios::binary);
++    return {std::istreambuf_iterator<char>(input),{}};
++}
++}
++
++int main() {
++    try {
++        Fixture fixture;
++        auto root=fixture.root/"existing";
++        fs::create_directory(root);
++        fails<std::system_error>([&]{plan_creation(root,{},fail_entropy);});
++        check(fs::is_empty(root),"Entropy failure wrote files");
++        auto original=plan_creation(root,{});
++        fs::rename(root,fixture.root/"original");
++        fs::create_directory(root);
++        fails([&]{publish_creation(original);});
++        check(fs::is_empty(root),"Replaced root was modified");
++
++        auto plan=plan_creation(root,{});
++        fails<CreationCollision>([&]{publish_creation(plan,[](const fs::path& stage){
++            std::ofstream(stage.parent_path()/"void.project.toml")<<"external manifest";
++        });});
++        check(read(root/"void.project.toml")=="external manifest","Collision altered external file");
++        check(std::distance(fs::directory_iterator(root),fs::directory_iterator{})==1,"Collision left owned staging files");
++
++        auto fresh=CreationOptions{};fresh.new_directory=true;
++        auto target=fixture.root/"new-project";
++        auto create=plan_creation(target,fresh);
++        fails([&]{publish_creation(create,[](const fs::path& stage) {
++            std::ofstream(stage/"foreign.txt")<<"foreign data";
++        });});
++        check(!fs::exists(target),"Unreviewed content was published");
++        unsigned retained=0;
++        for(const auto& item:fs::directory_iterator(fixture.root)) {
++            if(!item.path().filename().string().starts_with(".void-create-"))continue;
++            ++retained;
++            check(read(item.path()/"foreign.txt")=="foreign data","Rollback removed a foreign file");
++            check(std::distance(fs::directory_iterator(item),fs::directory_iterator{})==1,"Owned files remained after rollback");
++        }
++        check(retained==1,"Rollback discarded uncertain directory");
++        try {
++            publish_creation(create,alter_starter);
++            throw std::logic_error(modified_starter?"Changed staged bytes were published":"Stage tampering was never injected");
++        } catch(const std::runtime_error& error) {
++            check(modified_starter,"Stage tampering was never injected");
++            check(std::string_view(error.what()).find("staging contents changed")!=std::string_view::npos,
++                "Unexpected staging failure after tampering");
++        }
++        check(!fs::exists(target),"Changed staged bytes were published");
++        std::cout<<"creation: entropy, reviewed directory, external collision, rollback ownership, staged content passed\n";
++    } catch(const std::exception& error) {
++        std::cerr<<error.what()<<'\n';
++        return 1;
++    }
++}
+diff --git a/tests/project/creation.py b/tests/project/creation.py
+new file mode 100644
+index 0000000..a43f4f9
+--- /dev/null
++++ b/tests/project/creation.py
+@@ -0,0 +1,220 @@
++"""S5 process contracts for the compiler and editor's creation subprocesses."""
++from concurrent.futures import ThreadPoolExecutor
++import json
++import os
++from pathlib import Path
++import re
++import subprocess
++import sys
++import tempfile
++import tomllib
++
++compiler, server, evidence = map(lambda value: Path(value).resolve(), sys.argv[1:])
++calls = []
++manifest_name = "void.project.toml"
++main = "func main() -> i32:\n    return 19\n"
++suffix = ".exe" if os.name == "nt" else ""
++
++
++def invoke(binary, *args, cwd, status=0):
++    command = list(map(str, (binary, *args)))
++    result = subprocess.run(command, cwd=cwd, capture_output=True, timeout=80)
++    record = {
++        "argv": command, "cwd": str(cwd), "status": result.returncode,
++        "stdout": result.stdout.decode("utf-8", "replace"),
++        "stderr": result.stderr.decode("utf-8", "replace"),
++    }
++    calls.append(record)
++    if status is not None:
++        assert result.returncode == status, record
++    return record
++
++
++def manifest(root, role="application"):
++    data = tomllib.loads((root / manifest_name).read_text(encoding="utf-8"))
++    assert data["schema"] == 1 and data["project"]["kind"] == ("application" if role == "application" else "library")
++    assert "entry" not in data["project"]
++    return data
++
++
++try:
++    with tempfile.TemporaryDirectory(prefix="VOID S5 creation ") as folder:
++        base = Path(folder).resolve(strict=True)
++        def run(*args, status=0, cwd=base):
++            return invoke(compiler, *args, status=status, cwd=cwd)
++
++        def wire(*args):
++            return json.loads(invoke(server, *args, cwd=base)["stdout"])
++
++        def directory(name):
++            path = base / name
++            path.mkdir()
++            return path
++
++        root = directory("existing")
++        original = root / "game.void"
++        original.write_bytes(main.encode())
++        preview = run("init", cwd=root)
++        app = manifest(root)
++        project_id, role_id = app["project"]["id"], app["application"]["id"]
++        assert re.fullmatch(r"local\.p[0-9a-f]{32}", project_id) and re.fullmatch(r"local\.a[0-9a-f]{32}", role_id)
++        assert project_id[7:] != role_id[7:] and project_id in preview["stdout"] and role_id in preview["stdout"]
++        assert app["project"]["name"] == "existing" and app["project"]["version"] == "0.1.0"
++        assert {p.name for p in root.iterdir()} == {manifest_name, "game.void"} and original.read_bytes() == main.encode()
++        for options in ([], ["--no-opt"]):
++            run("run", "--project", root, *options, status=19)
++        before = (root / manifest_name).read_bytes()
++        run("init", root, status=1)
++        assert before == (root / manifest_name).read_bytes()
++
++        no_main = directory("empty")
++        run("init", no_main)
++        assert "main" in run("check", "--project", no_main, status=1)["stderr"]
++        many = directory("many")
++        for name in ("game.void", "launcher.void"):
++            (many / name).write_text(main, encoding="utf-8")
++        run("init", many)
++        diagnostic = run("check", "--project", many, status=1)["stderr"]
++        assert "game.void" in diagnostic and "launcher.void" in diagnostic
++
++        app_root = base / "arbitrary"
++        run("new", app_root, "--source", "tools/launcher.void", "--name", 'Orbit "Pilot" \\',
++            "--version", "1.2.3-beta.4+qual")
++        generated = manifest(app_root)
++        generated_id = generated["application"]["id"]
++        assert generated["project"]["id"] != project_id and generated_id != role_id
++        assert generated["project"]["name"] == 'Orbit "Pilot" \\' and generated["project"]["version"] == "1.2.3-beta.4+qual"
++        assert generated["sources"]["roots"] == ["tools"]
++        starter = app_root / "tools/launcher.void"
++        assert "func main" in starter.read_text(encoding="utf-8")
++        for profile in ("release", "debug"):
++            run("run", "--project", app_root, "--profile", profile)
++        native = base / ("generated" + suffix)
++        run("build", "--project", app_root, "-o", native)
++        invoke(native, cwd=base)
++        starter.write_text(
++            'use os\nfunc main() -> i32:\n'
++            '    if os.data_dir() is Ok(var automatic):\n'
++            f'        if os.data_dir("{generated_id}") is Ok(var explicit):\n'
++            '            if automatic == explicit:\n'
++            '                return 31\n'
++            '    return 1\n', encoding="utf-8")
++        for profile in ("release", "debug"):
++            run("run", "--project", app_root, "--profile", profile, status=31)
++        run("build", "--project", app_root, "-o", native)
++        invoke(native, cwd=base, status=31)
++
++        app_default = base / "default-app"
++        run("new", app_default, "--project-id", "org.test.project", "--app-id", "org.test.application")
++        defaults = manifest(app_default)
++        assert defaults["project"]["id"] == "org.test.project" and defaults["application"]["id"] == "org.test.application"
++        assert (app_default / "src/app.void").is_file() and defaults["sources"]["roots"] == ["src"]
++        lib = base / "lib"
++        run("new", lib, "--kind", "library", "--package-name", "toolkit", "--package-id", "org.test.toolkit")
++        package = manifest(lib, "package")
++        assert package["package"] == {"id": "org.test.toolkit", "name": "toolkit"}
++        assert "main" not in (lib / "src/toolkit.void").read_text(encoding="utf-8")
++        run("check", "--project", lib)
++        run("run", "--project", lib, status=1)
++        library_default = base / "toolkit"
++        run("new", library_default, "--kind", "library")
++        library = manifest(library_default, "package")
++        assert re.fullmatch(r"local\.l[0-9a-f]{32}", library["package"]["id"])
++
++        child = root / "child"
++        child.mkdir()
++        run("init", child, status=1)
++        assert not list(child.iterdir())
++        run("init", child, "--nested")
++        run("new", root / "other", status=1)
++        run("new", root / "other", "--nested")
++        run("new", root / "Other", "--nested", status=1)
++        assert before == (root / manifest_name).read_bytes()
++        for name in ("VOID.PROJECT.TOML", manifest_name):
++            collision = directory("case" if name.isupper() else "malformed")
++            (collision / name).write_bytes(b"[=roject]\n")
++            run("init", collision, status=1)
++            assert [p.name for p in collision.iterdir()] == [name]
++            assert (collision / name).read_bytes() == b"[=roject]\n"
++        for args in (("new",), ("init", "--source", "game.void"), ("init", "--kind", "other"),
++                     ("init", "--package-id", "a"), ("init", "--nested", "--nested"), ("init", "--unknown"),
++                     ("init", "--name")):
++            run(*args, status=2, cwd=base)
++        for starter_path in ("../escape.void", "tests/game.void", "src/BUILD/app.void", "game.txt", "src//game.void", "Tests/game.void", "void.project.toml/game.void"):
++            run("new", base / "invalid", "--source", starter_path, status=1)
++        run("new", base / "VOID.PROJECT.TOML", status=1)
++        run("new", base / "invalid", "--version", "01.2.3", status=1)
++        run("new", base / "non-identifier", "--kind", "library", status=1)
++        run("new", base / "absent-parent" / "app", status=1)
++        assert not (base / "invalid").exists()
++        assert not (base / "non-identifier").exists()
++
++        alias = base / "alias"
++        if os.name == "nt":
++            import _winapi
++            _winapi.CreateJunction(str(no_main), str(alias))
++        else:
++            alias.symlink_to(no_main, target_is_directory=True)
++        try:
++            run("init", alias, status=1)
++            run("new", alias / "attack", "--nested", status=1)
++            assert not (no_main / "attack").exists()
++        finally:
++            if os.name == "nt":
++                alias.rmdir()
++            else:
++                alias.unlink()
++        if os.name != "nt" and os.getuid() != 0:
++            protected = directory("readonly")
++            protected.chmod(0o500)
++            try:
++                run("init", protected, status=1)
++                run("new", protected / "attempt", status=1)
++                assert not list(protected.iterdir())
++            finally:
++                protected.chmod(0o700)
++
++        contested = directory("contested")
++        for args, target in ((("init", contested), contested), (("new", base / "contested-new"), base / "contested-new")):
++            with ThreadPoolExecutor(2) as pool:
++                winners = list(pool.map(lambda _: run(*args, status=None), range(2)))
++            assert sorted(result["status"] for result in winners) == [0, 1], winners
++            assert not list(target.parent.glob(".void-create-*")) and not list(target.glob(".void-create-*"))
++            manifest(target)
++
++        editor = directory("editor")
++        first = editor / "game.void"
++        first.write_bytes(b"invalid and intentionally not parsed")
++        excluded = editor / "tests"
++        excluded.mkdir()
++        (excluded / "test.void").write_text(main, encoding="utf-8")
++        child = editor / "child"
++        child.mkdir()
++        run("init", child)
++        (child / "game.void").write_text(main, encoding="utf-8")
++        inventory = wire("--discover-creation", editor, "")["creation"]
++        assert inventory["complete"] and not inventory["manifestPresent"] and inventory["sources"] == ["/game.void"], inventory
++        for n in range(16):
++            (editor / f"extra{n}.void").write_text(main, encoding="utf-8")
++        incomplete = wire("--discover-creation", editor, "")["creation"]
++        assert not incomplete["complete"] and incomplete["eligibleCount"] == 17 and not incomplete["sources"], incomplete
++        plan = wire("--plan-project", editor, "application", "", "")
++        assert not (editor / manifest_name).exists()
++        args = ("--create-project", editor, inventory["rootIdentity"], plan["kind"], plan["name"],
++                plan["version"], plan["projectId"], plan["roleId"], plan["packageName"])
++        assert wire(*args)["status"] == "created"
++        assert manifest(editor)["application"]["id"] == plan["roleId"]
++        saved = (editor / manifest_name).read_bytes()
++        assert wire(*args)["status"] == "collision" and (editor / manifest_name).read_bytes() == saved
++        assert wire("--plan-project", editor, "application", "", "")["status"] == "collision"
++        assert first.read_bytes() == b"invalid and intentionally not parsed"
++        renamed = base / "renamed"
++        editor.rename(renamed)
++        editor.mkdir()
++        assert "root changed" in invoke(server, *args, cwd=base, status=2)["stderr"]
++        assert not list(editor.iterdir())
++        nullable = wire("--discover-project", no_main, "", no_main, "")
++        assert nullable["schema"] == 2 and nullable["entry"] is None, nullable
++    print(f"S5 creation process: {len(calls)} invocations passed")
++finally:
++    evidence.write_text(json.dumps(calls, indent=2) + "\n", encoding="utf-8")
+diff --git a/tests/project/legacy.py b/tests/project/legacy.py
+index e66ff67..6cdbcdc 100644
+--- a/tests/project/legacy.py
++++ b/tests/project/legacy.py
+@@ -44,8 +44,8 @@ with tempfile.TemporaryDirectory(prefix="void manifest legacy ") as temporary:
+     assert b"main.void" in result.stderr
+     (root / "manifest-held.toml").rename(manifest)
+     run(["check", "--project", root], 1, root)
+-    # Creation remains unsupported; project selection now validates this manifest.
+-    for args in (["init", root], ["new", root / "new-project"]):
++    # Malformed creation commands cannot touch the existing manifest or source.
++    for args in (["init", root, "--source", "main.void"], ["new"]):
+         run(args, 2, root)
+     no_id = root / "missing_context.void"
+     no_id.write_text(

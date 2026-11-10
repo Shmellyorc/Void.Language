@@ -1,0 +1,39 @@
+Test project C:/Users/a/VoidS7-Raylib-Compiler/Release
+      Start   2: project_manifest
+      Start  17: cli_contract
+ 1/17 Test   #2: project_manifest .................   Passed    0.10 sec
+      Start 219: ffi_g1_primitive_jit_ir
+ 2/17 Test #219: ffi_g1_primitive_jit_ir ..........   Passed    0.63 sec
+      Start 220: ffi_g1_primitive_aot_normal
+ 3/17 Test #220: ffi_g1_primitive_aot_normal ......   Passed    0.28 sec
+      Start 221: ffi_g1_primitive_aot_optimized
+ 4/17 Test #221: ffi_g1_primitive_aot_optimized ...   Passed    0.24 sec
+      Start 222: ffi_g1_primitive_aot_mismatch
+ 5/17 Test #222: ffi_g1_primitive_aot_mismatch ....   Passed    0.21 sec
+      Start 223: ffi_g1_primitive_aot_missing
+ 6/17 Test #223: ffi_g1_primitive_aot_missing .....   Passed    0.82 sec
+      Start 224: ffi_g2_jit_ir
+ 7/17 Test #224: ffi_g2_jit_ir ....................   Passed    0.57 sec
+      Start 225: ffi_g2_aot_normal
+ 8/17 Test #225: ffi_g2_aot_normal ................   Passed    0.33 sec
+      Start 226: ffi_g2_aot_optimized
+ 9/17 Test #226: ffi_g2_aot_optimized .............   Passed    0.32 sec
+      Start 227: ffi_g3_jit_ir
+10/17 Test #227: ffi_g3_jit_ir ....................   Passed    1.30 sec
+      Start 228: ffi_g3_aot_normal
+11/17 Test #228: ffi_g3_aot_normal ................   Passed    0.36 sec
+      Start 229: ffi_g3_aot_optimized
+12/17 Test #229: ffi_g3_aot_optimized .............   Passed    0.28 sec
+      Start 331: reload
+13/17 Test #331: reload ...........................   Passed    1.10 sec
+      Start 332: gc
+14/17 Test #332: gc ...............................   Passed    0.05 sec
+      Start 338: analysis
+15/17 Test  #17: cli_contract .....................   Passed    6.72 sec
+      Start 345: ffi_g4_conventional
+16/17 Test #338: analysis .........................   Passed    2.48 sec
+17/17 Test #345: ffi_g4_conventional ..............   Passed   15.29 sec
+
+100% tests passed out of 17
+
+Total Test time (real) =  22.15 sec

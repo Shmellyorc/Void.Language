@@ -1,0 +1,7 @@
+processed file: C:\Users\a\VS7I2\Debug-li6zete2
+Successfully processed 1 files; Failed processing 0 files
+C:\Users\a\VS7I2\Debug-li6zete2 DESKTOP-N4VH0F7\a:(OI)(CI)(F)
+                                NT AUTHORITY\SYSTEM:(OI)(CI)(F)
+                                BUILTIN\Administrators:(OI)(CI)(F)
+
+Successfully processed 1 files; Failed processing 0 files

@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "C:\Users\a\VoidSlice3-Final-Preflight-20261108\tests\project\protocol.py", line 123, in <module>
+    preflight_boundaries(root/'preflight')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidSlice3-Final-Preflight-20261108\tests\project\protocol.py", line 82, in preflight_boundaries
+    handle=_winapi.CreateFile(str(unreadable),_winapi.GENERIC_READ,0,None,_winapi.OPEN_EXISTING,_winapi.FILE_ATTRIBUTE_NORMAL,0)
+                                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module '_winapi' has no attribute 'FILE_ATTRIBUTE_NORMAL'

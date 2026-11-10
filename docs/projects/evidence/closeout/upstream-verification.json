@@ -1,0 +1,12 @@
+{
+  "tag": "v3.4.0",
+  "commit": "30172438cee64926dc41fdd9c11fb3ba5b2ba9de",
+  "tag_ref_verified": true,
+  "upstream_header_sha256": "6b5172ad4dd6519aec67b919181fa7a38a2234131e5b2afa232dfe444819783e",
+  "license_sha256": "529bc3900a9571e49db285b0df432397e70b881cc3bf48de6667ae74ff4b06d8",
+  "patched_header_sha256": "7cd54af1a3497465eb26507f8d8a2ccfe661fccc27dac7a5121b885bee88d5e7",
+  "patch_application": "patching file toml.hpp",
+  "fuzz": 0,
+  "vendored_header_matches": true,
+  "license_matches": true
+}

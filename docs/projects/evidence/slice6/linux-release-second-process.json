@@ -1,0 +1,81 @@
+{
+  "boundary_cases": 574,
+  "records": [
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID S6 numeric enum o73dngrw/matrix.void",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "build",
+        "/tmp/VOID S6 numeric enum o73dngrw/matrix.void",
+        "-o",
+        "/tmp/VOID S6 numeric enum o73dngrw/matrix-normal",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID S6 numeric enum o73dngrw/matrix-normal\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/VOID S6 numeric enum o73dngrw/matrix-normal"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID S6 numeric enum o73dngrw/matrix.void",
+        "--no-cache"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "build",
+        "/tmp/VOID S6 numeric enum o73dngrw/matrix.void",
+        "-o",
+        "/tmp/VOID S6 numeric enum o73dngrw/matrix-o2"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID S6 numeric enum o73dngrw/matrix-o2\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/VOID S6 numeric enum o73dngrw/matrix-o2"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID S6 numeric enum o73dngrw/integration.void",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID S6 numeric enum o73dngrw/integration.void:45:63: error: Cannot infer generic parameter 't'; supply explicit type arguments.\n    code: VOID2001\n\n 45 |     if shadow.value != 21 or modes.score(loud) != 19 or modes.score_cast(next(255) as? modes.mode) != 19:\n    |                                                               ^^^^^^^^^^\n    Module: /integration.void\n\n"
+    }
+  ]
+}

@@ -1,0 +1,556 @@
+{
+  "boundary_cases": 542,
+  "records": [
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "run",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\matrix.void",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "build",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\matrix.void",
+        "-o",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\matrix-normal.exe",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/matrix-normal.exe\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\matrix-normal.exe"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "run",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\matrix.void",
+        "--no-cache"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "build",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\matrix.void",
+        "-o",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\matrix-o2.exe"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/matrix-o2.exe\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\matrix-o2.exe"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "run",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\integration.void",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "build",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\integration.void",
+        "-o",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\integration-normal.exe",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/integration-normal.exe\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\integration-normal.exe"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "run",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\integration.void",
+        "--no-cache"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "build",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\integration.void",
+        "-o",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\integration-o2.exe"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/integration-o2.exe\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\integration-o2.exe"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "run",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\integration.void",
+        "--cache"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": "Debug cache: unavailable\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "run",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\integration.void",
+        "--cache"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": "Debug cache: unavailable\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "run",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\integration.void",
+        "--cache"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "Debug cache: unavailable\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_0.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_0.void:3:5: error: Duplicate enum variant.\r\n    code: VOID2005\r\n\r\n 3 |     idle = 2\r\n   |     ^^^^\r\n    Module: /invalid_0.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_1.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_1.void:3:13: error: Duplicate numeric enum discriminant.\r\n    code: VOID2005\r\n\r\n 3 |     ready = +1\r\n   |             ^^\r\n    Module: /invalid_1.void\r\n    Previously declared value. at C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_1.void:2:12\r\n\r\n 2 |     idle = 1\r\n   |            ^\r\n    Module: /invalid_1.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_2.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_2.void:3:13: error: Duplicate numeric enum discriminant.\r\n    code: VOID2005\r\n\r\n 3 |     ready = 0\r\n   |             ^\r\n    Module: /invalid_2.void\r\n    Previously declared value. at C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_2.void:2:12\r\n\r\n 2 |     idle = -0\r\n   |            ^^\r\n    Module: /invalid_2.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_3.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_3.void:1:11: error: A numeric enum requires a fixed-width integer backing.\r\n    code: VOID1103\r\n\r\n 1 | enum mode(f32):\r\n   |           ^^^\r\n    Module: /invalid_3.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_4.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_4.void:2:12: error: Integer literal is outside the u64 range; unsigned types cannot represent negative values\r\n    code: VOID2014\r\n\r\n 2 |     idle = -1\r\n   |            ^^\r\n    Module: /invalid_4.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_5.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_5.void:3:10: error: Expected '=', found '('.\r\n    code: VOID1101\r\n\r\n 3 |     ready(x: i32)\r\n   |          ^\r\n    Module: /invalid_5.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_6.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_6.void:3:10: error: Expected '=', found '<newline>'.\r\n    code: VOID1101\r\n\r\n 3 |     ready\r\n   |          ^\r\n    Module: /invalid_6.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_7.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_7.void:3:15: error: Expected end of statement, found '+'.\r\n    code: VOID1101\r\n\r\n 3 |     ready = 2 + 3\r\n   |               ^\r\n    Module: /invalid_7.void\r\n    Hint: Put each statement on its own line; postfix ++/-- cannot be used as values.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_8.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_8.void:2:17: error: as? requires an integer operand and an integer or numeric enum destination.\r\n    code: VOID2015\r\n\r\n 2 |     var x = 1.0 as? i32\r\n   |                 ^^^\r\n    Module: /invalid_8.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_9.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_9.void:2:18: error: as? requires an integer operand and an integer or numeric enum destination.\r\n    code: VOID2015\r\n\r\n 2 |     var x = true as? i32\r\n   |                  ^^^\r\n    Module: /invalid_9.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_10.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_10.void:4:15: error: as? requires an integer operand and an integer or numeric enum destination.\r\n    code: VOID2015\r\n\r\n 4 |     var x = 1 as? tag\r\n   |               ^^^\r\n    Module: /invalid_10.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_11.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_11.void:4:23: error: as? requires an integer operand and an integer or numeric enum destination.\r\n    code: VOID2015\r\n\r\n 4 |     var x = mode.idle as? u8\r\n   |                       ^^^\r\n    Module: /invalid_11.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_12.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_12.void:6:25: error: Type mismatch: expected /invalid_12.void::mode, received /invalid_12.void::other.\r\n    code: VOID2001\r\n\r\n 6 |     var x: mode = other.idle\r\n   |                         ^^^^\r\n    Module: /invalid_12.void\r\n    Expected: /invalid_12.void::mode\r\n    Received: /invalid_12.void::other\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_13.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_13.void:4:18: error: Type mismatch: expected i32, received /invalid_13.void::mode.\r\n    code: VOID2001\r\n\r\n 4 |     var x = mode.idle + mode.idle\r\n   |                  ^^^^\r\n    Module: /invalid_13.void\r\n    Expected: i32\r\n    Received: /invalid_13.void::mode\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_14.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_14.void:4:19: error: Type mismatch: expected /invalid_14.void::mode, received i32.\r\n    code: VOID2001\r\n\r\n 4 |     var x: mode = 1\r\n   |                   ^\r\n    Module: /invalid_14.void\r\n    Expected: /invalid_14.void::mode\r\n    Received: i32\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_15.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_15.void:4:9: error: Numeric enum values require an explicit initializer.\r\n    code: VOID1106\r\n\r\n 4 |     var x: mode\r\n   |         ^\r\n    Module: /invalid_15.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_16.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_16.void:4:9: error: Numeric enum elements require explicit values.\r\n    code: VOID1106\r\n\r\n 4 |     var x: [mode, 2]\r\n   |         ^\r\n    Module: /invalid_16.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_17.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_17.void:4:27: error: Type mismatch: expected /invalid_17.void::option<i8>, received option<i8>.\r\n    code: VOID2001\r\n\r\n 4 |     var x: option<i8> = 1 as? i8\r\n   |                           ^^^\r\n    Module: /invalid_17.void\r\n    Expected: /invalid_17.void::option<i8>\r\n    Received: option<i8>\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_18.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_18.void:2:13: error: Some and None require a contextual option<T> type.\r\n    code: VOID2001\r\n\r\n 2 |     var x = None\r\n   |             ^^^^\r\n    Module: /invalid_18.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_19.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_19.void:2:17: error: Integer literal is outside the u8 range; literal magnitude is too large for this destination\r\n    code: VOID2015\r\n\r\n 2 |     var x = 256 as u8\r\n   |                 ^^\r\n    Module: /invalid_19.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_20.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_20.void:2:13: error: Fallible conversion literal is outside the fixed-width integer domain.\r\n    code: VOID2014\r\n\r\n 2 |     var x = 18446744073709551616 as? u64\r\n   |             ^^^^^^^^^^^^^^^^^^^^\r\n    Module: /invalid_20.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_21.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_21.void:2:13: error: Fallible conversion literal is outside the fixed-width integer domain.\r\n    code: VOID2014\r\n\r\n 2 |     var x = -9223372036854775809 as? i64\r\n   |             ^\r\n    Module: /invalid_21.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_22.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_22.void:2:18: error: Write the fallible conversion operator as? without an intervening space.\r\n    code: VOID1101\r\n\r\n 2 |     var x = 1 as ? i32\r\n   |                  ^\r\n    Module: /invalid_22.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_23.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_23.void:2:15: error: Integer literal is outside the i8 range; literal magnitude is too large for this destination\r\n    code: VOID2014\r\n\r\n 2 |     invalid = -129\r\n   |               ^^^^\r\n    Module: /invalid_23.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_24.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_24.void:2:15: error: Integer literal is outside the i8 range; literal magnitude is too large for this destination\r\n    code: VOID2014\r\n\r\n 2 |     invalid = 128\r\n   |               ^^^\r\n    Module: /invalid_24.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_25.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_25.void:2:15: error: Integer literal is outside the i16 range; literal magnitude is too large for this destination\r\n    code: VOID2014\r\n\r\n 2 |     invalid = -32769\r\n   |               ^^^^^^\r\n    Module: /invalid_25.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_26.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_26.void:2:15: error: Integer literal is outside the i16 range; literal magnitude is too large for this destination\r\n    code: VOID2014\r\n\r\n 2 |     invalid = 32768\r\n   |               ^^^^^\r\n    Module: /invalid_26.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_27.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_27.void:2:15: error: Integer literal is outside the i32 range; literal magnitude is too large for this destination\r\n    code: VOID2014\r\n\r\n 2 |     invalid = -2147483649\r\n   |               ^^^^^^^^^^^\r\n    Module: /invalid_27.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_28.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_28.void:2:15: error: Integer literal is outside the i32 range; literal magnitude is too large for this destination\r\n    code: VOID2014\r\n\r\n 2 |     invalid = 2147483648\r\n   |               ^^^^^^^^^^\r\n    Module: /invalid_28.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_29.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_29.void:2:15: error: Integer literal is outside the i64 range; literal magnitude is too large for this destination\r\n    code: VOID2014\r\n\r\n 2 |     invalid = -9223372036854775809\r\n   |               ^^^^^^^^^^^^^^^^^^^^\r\n    Module: /invalid_29.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_30.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_30.void:2:15: error: Integer literal is outside the i64 range; literal magnitude is too large for this destination\r\n    code: VOID2014\r\n\r\n 2 |     invalid = 9223372036854775808\r\n   |               ^^^^^^^^^^^^^^^^^^^\r\n    Module: /invalid_30.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_31.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_31.void:2:15: error: Integer literal is outside the u8 range; unsigned types cannot represent negative values\r\n    code: VOID2014\r\n\r\n 2 |     invalid = -1\r\n   |               ^^\r\n    Module: /invalid_31.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_32.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_32.void:2:15: error: Integer literal is outside the u8 range; literal magnitude is too large for this destination\r\n    code: VOID2014\r\n\r\n 2 |     invalid = 256\r\n   |               ^^^\r\n    Module: /invalid_32.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_33.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_33.void:2:15: error: Integer literal is outside the u16 range; unsigned types cannot represent negative values\r\n    code: VOID2014\r\n\r\n 2 |     invalid = -1\r\n   |               ^^\r\n    Module: /invalid_33.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_34.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_34.void:2:15: error: Integer literal is outside the u16 range; literal magnitude is too large for this destination\r\n    code: VOID2014\r\n\r\n 2 |     invalid = 65536\r\n   |               ^^^^^\r\n    Module: /invalid_34.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_35.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_35.void:2:15: error: Integer literal is outside the u32 range; unsigned types cannot represent negative values\r\n    code: VOID2014\r\n\r\n 2 |     invalid = -1\r\n   |               ^^\r\n    Module: /invalid_35.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_36.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_36.void:2:15: error: Integer literal is outside the u32 range; literal magnitude is too large for this destination\r\n    code: VOID2014\r\n\r\n 2 |     invalid = 4294967296\r\n   |               ^^^^^^^^^^\r\n    Module: /invalid_36.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_37.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_37.void:2:15: error: Integer literal is outside the u64 range; unsigned types cannot represent negative values\r\n    code: VOID2014\r\n\r\n 2 |     invalid = -1\r\n   |               ^^\r\n    Module: /invalid_37.void\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+        "check",
+        "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S6 numeric enum w15186q2\\invalid_38.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S6 numeric enum w15186q2/invalid_38.void:2:15: error: Integer literal is outside the u64 range; literal magnitude is too large for this destination\r\n    code: VOID2014\r\n\r\n 2 |     invalid = 18446744073709551616\r\n   |               ^^^^^^^^^^^^^^^^^^^^\r\n    Module: /invalid_38.void\r\n\r\n"
+    }
+  ]
+}

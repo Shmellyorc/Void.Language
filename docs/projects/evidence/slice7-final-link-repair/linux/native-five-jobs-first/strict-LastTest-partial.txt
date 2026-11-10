@@ -1,0 +1,809 @@
+Start testing: Nov 09 15:17 MST
+----------------------------------------------------------
+1/433 Testing: project_manifest_header
+1/433 Test: project_manifest_header
+Command: "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_project_header"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"project_manifest_header" start time: Nov 09 15:17 MST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"project_manifest_header" end time: Nov 09 15:17 MST
+"project_manifest_header" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/433 Testing: voidup_ci_integration
+4/433 Test: voidup_ci_integration
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/voidup/ci_integration.py"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"voidup_ci_integration" start time: Nov 09 15:17 MST
+Output:
+----------------------------------------------------------
+test_approved_host_patch_checkout_bytes (__main__.Integration.test_approved_host_patch_checkout_bytes) ... ok
+test_disk_preflight_checks_both_volumes (__main__.Integration.test_disk_preflight_checks_both_volumes) ... ok
+test_missing_disabled_and_private_tests_rejected (__main__.Integration.test_missing_disabled_and_private_tests_rejected) ... ok
+test_native_profile_layouts (__main__.Integration.test_native_profile_layouts) ... ok
+test_selected_workflow_order_and_no_credentials (__main__.Integration.test_selected_workflow_order_and_no_credentials) ... ok
+test_ambient_probe_override_fails_before_execution (__main__.Toolchain.test_ambient_probe_override_fails_before_execution) ... ok
+test_mismatched_headers_and_receipt_fail (__main__.Toolchain.test_mismatched_headers_and_receipt_fail) ... ok
+test_missing_components_fail (__main__.Toolchain.test_missing_components_fail) ... ok
+test_selector_is_resource_leaf (__main__.Toolchain.test_selector_is_resource_leaf) ... ok
+test_wrong_or_external_resource_fails (__main__.Toolchain.test_wrong_or_external_resource_fails) ... ok
+test_wrong_version_fails (__main__.Toolchain.test_wrong_version_fails) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.074s
+
+OK
+Host/VOIDUP test registration verified: 11 required tests
+<end of output>
+Test time =   0.51 sec
+----------------------------------------------------------
+Test Passed.
+"voidup_ci_integration" end time: Nov 09 15:17 MST
+"voidup_ci_integration" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/433 Testing: project_manifest
+2/433 Test: project_manifest
+Command: "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_project_manifest"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"project_manifest" start time: Nov 09 15:17 MST
+Output:
+----------------------------------------------------------
+project_manifest: 8787 checks passed
+<end of output>
+Test time =   0.54 sec
+----------------------------------------------------------
+Test Passed.
+"project_manifest" end time: Nov 09 15:17 MST
+"project_manifest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/433 Testing: project_manifest_no_authority
+5/433 Test: project_manifest_no_authority
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/project/authority.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_project_manifest"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"project_manifest_no_authority" start time: Nov 09 15:17 MST
+Output:
+----------------------------------------------------------
+project_manifest: 8788 checks passed under syscall denial
+project_manifest_no_authority: four live SIGSYS controls passed
+<end of output>
+Test time =   0.56 sec
+----------------------------------------------------------
+Test Passed.
+"project_manifest_no_authority" end time: Nov 09 15:17 MST
+"project_manifest_no_authority" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/433 Testing: project_manifest_provenance
+7/433 Test: project_manifest_provenance
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/project/provenance.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"project_manifest_provenance" start time: Nov 09 15:17 MST
+Output:
+----------------------------------------------------------
+project_manifest_provenance: 3 file hashes and exact pinned upstream reconstruction passed
+<end of output>
+Test time =   0.12 sec
+----------------------------------------------------------
+Test Passed.
+"project_manifest_provenance" end time: Nov 09 15:17 MST
+"project_manifest_provenance" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/433 Testing: project_creation
+10/433 Test: project_creation
+Command: "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_project_creation"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"project_creation" start time: Nov 09 15:17 MST
+Output:
+----------------------------------------------------------
+creation: entropy, reviewed directory, external collision, rollback ownership, staged content passed
+<end of output>
+Test time =   0.71 sec
+----------------------------------------------------------
+Test Passed.
+"project_creation" end time: Nov 09 15:18 MST
+"project_creation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/433 Testing: project_sessions
+9/433 Test: project_sessions
+Command: "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_project_sessions"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"project_sessions" start time: Nov 09 15:17 MST
+Output:
+----------------------------------------------------------
+project_sessions: 166 checks passed
+<end of output>
+Test time =   1.04 sec
+----------------------------------------------------------
+Test Passed.
+"project_sessions" end time: Nov 09 15:18 MST
+"project_sessions" time elapsed: 00:00:01
+----------------------------------------------------------
+
+3/433 Testing: voidup_smoke
+3/433 Test: voidup_smoke
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/voidup/smoke.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/voidup/voidup" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/voidup-smoke-evidence"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"voidup_smoke" start time: Nov 09 15:17 MST
+Output:
+----------------------------------------------------------
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOIDUP native smoke passed; no signing keys, catalog or network used; installation qualification remains separate
+<end of output>
+Test time =   2.70 sec
+----------------------------------------------------------
+Test Passed.
+"voidup_smoke" end time: Nov 09 15:18 MST
+"voidup_smoke" time elapsed: 00:00:02
+----------------------------------------------------------
+
+6/433 Testing: project_manifest_legacy
+6/433 Test: project_manifest_legacy
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/project/legacy.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"project_manifest_legacy" start time: Nov 09 15:17 MST
+Output:
+----------------------------------------------------------
+project_manifest_legacy: 18 checks passed
+<end of output>
+Test time =  10.97 sec
+----------------------------------------------------------
+Test Passed.
+"project_manifest_legacy" end time: Nov 09 15:18 MST
+"project_manifest_legacy" time elapsed: 00:00:10
+----------------------------------------------------------
+
+8/433 Testing: project_selection
+8/433 Test: project_selection
+Command: "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_project_selection"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"project_selection" start time: Nov 09 15:17 MST
+Output:
+----------------------------------------------------------
+project_selection: 476 checks passed
+<end of output>
+Test time =  13.60 sec
+----------------------------------------------------------
+Test Passed.
+"project_selection" end time: Nov 09 15:18 MST
+"project_selection" time elapsed: 00:00:13
+----------------------------------------------------------
+
+15/433 Testing: project_profiles
+15/433 Test: project_profiles
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/project/profiles.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-objdump" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/project-profiles-evidence.json"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"project_profiles" start time: Nov 09 15:18 MST
+Output:
+----------------------------------------------------------
+project_profiles: 43 process checks passed; compute instruction counts O0=6, O2=2, release --no-opt=6
+<end of output>
+Test time =   7.30 sec
+----------------------------------------------------------
+Test Passed.
+"project_profiles" end time: Nov 09 15:18 MST
+"project_profiles" time elapsed: 00:00:07
+----------------------------------------------------------
+
+16/433 Testing: project_protocol
+16/433 Test: project_protocol
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/project/protocol.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/voidls" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/project-protocol-evidence.json"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"project_protocol" start time: Nov 09 15:18 MST
+Output:
+----------------------------------------------------------
+project_protocol: 169 checks passed
+<end of output>
+Test time =   2.21 sec
+----------------------------------------------------------
+Test Passed.
+"project_protocol" end time: Nov 09 15:18 MST
+"project_protocol" time elapsed: 00:00:02
+----------------------------------------------------------
+
+17/433 Testing: project_nested_cli
+17/433 Test: project_nested_cli
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/project/nested.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/voidc" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/project-nested-evidence.json"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"project_nested_cli" start time: Nov 09 15:18 MST
+Output:
+----------------------------------------------------------
+project_nested_cli: 11 process checks passed
+<end of output>
+Test time =   3.13 sec
+----------------------------------------------------------
+Test Passed.
+"project_nested_cli" end time: Nov 09 15:18 MST
+"project_nested_cli" time elapsed: 00:00:03
+----------------------------------------------------------
+
+11/433 Testing: project_creation_process
+11/433 Test: project_creation_process
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/project/creation.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/voidc" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/voidls" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/project-creation-evidence.json"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"project_creation_process" start time: Nov 09 15:18 MST
+Output:
+----------------------------------------------------------
+S5 creation process: 64 invocations passed
+<end of output>
+Test time =  31.73 sec
+----------------------------------------------------------
+Test Passed.
+"project_creation_process" end time: Nov 09 15:18 MST
+"project_creation_process" time elapsed: 00:00:31
+----------------------------------------------------------
+
+14/433 Testing: project_discovery_cli
+14/433 Test: project_discovery_cli
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/project/discovery.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/voidc" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/project-discovery-evidence.json"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"project_discovery_cli" start time: Nov 09 15:18 MST
+Output:
+----------------------------------------------------------
+project_discovery_cli: 88 process checks passed
+<end of output>
+Test time =  34.92 sec
+----------------------------------------------------------
+Test Passed.
+"project_discovery_cli" end time: Nov 09 15:18 MST
+"project_discovery_cli" time elapsed: 00:00:34
+----------------------------------------------------------
+
+20/433 Testing: cli_install_resources
+20/433 Test: cli_install_resources
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/cli/install_resources.py"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"cli_install_resources" start time: Nov 09 15:18 MST
+Output:
+----------------------------------------------------------
+......s
+----------------------------------------------------------------------
+Ran 7 tests in 0.020s
+
+OK (skipped=1)
+<end of output>
+Test time =   0.24 sec
+----------------------------------------------------------
+Test Passed.
+"cli_install_resources" end time: Nov 09 15:18 MST
+"cli_install_resources" time elapsed: 00:00:00
+----------------------------------------------------------
+
+21/433 Testing: target_triple
+21/433 Test: target_triple
+Command: "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_target_triple"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"target_triple" start time: Nov 09 15:18 MST
+Output:
+----------------------------------------------------------
+arm64-apple-macosx14.0
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"target_triple" end time: Nov 09 15:18 MST
+"target_triple" time elapsed: 00:00:00
+----------------------------------------------------------
+
+19/433 Testing: cli_install
+19/433 Test: cli_install
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/cli/install.py" "/usr/bin/cmake" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict" "RelWithDebInfo"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"cli_install" start time: Nov 09 15:18 MST
+Output:
+----------------------------------------------------------
+VOID Language Compiler v0.1.0 (development)
+LLVM 23.1.4
+Target: x86_64-unknown-linux-gnu
+Build identity: f15f8e0e4c93b28d8d73bd2cab7f5368207347ae286ae2723ac5136f2c23c38c
+PASS: installed stdlib check, optimized/Debug run, native build/run, resource hashes and LSP handshake
+PASS: 25 installed stdlib sources, relocated compiler/LSP, missing-module/Runtime controls, native output preservation
+<end of output>
+Test time =  15.52 sec
+----------------------------------------------------------
+Test Passed.
+"cli_install" end time: Nov 09 15:18 MST
+"cli_install" time elapsed: 00:00:15
+----------------------------------------------------------
+
+18/433 Testing: cli_contract
+18/433 Test: cli_contract
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/cli/contract.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"cli_contract" start time: Nov 09 15:18 MST
+Output:
+----------------------------------------------------------
+76 CLI process checks passed on linux; native output and collision preservation passed
+<end of output>
+Test time =  26.59 sec
+----------------------------------------------------------
+Test Passed.
+"cli_contract" end time: Nov 09 15:18 MST
+"cli_contract" time elapsed: 00:00:26
+----------------------------------------------------------
+
+22/433 Testing: http_native
+22/433 Test: http_native
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/fixture.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_http_native" "--http2" "--evidence" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/http-native-evidence"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"http_native" start time: Nov 09 15:18 MST
+Output:
+----------------------------------------------------------
+{"http_latency":{"profile":"HTTP/1.1 plaintext","samples":64,"median_ms":43.6573,"p95_ms":46.1272,"process_cpu_seconds":0.114594}}
+{"http_latency":{"profile":"HTTP/1.1 verified TLS","samples":64,"median_ms":43.5582,"p95_ms":46.143,"process_cpu_seconds":0.144942}}
+{"http_latency":{"profile":"HTTP/2 verified TLS","samples":64,"median_ms":2.91673,"p95_ms":5.56893,"process_cpu_seconds":0.094531}}
+{"h2_paused_sample":{"sample":0,"rss_kib":658684,"live_native_bytes":35644899,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":1,"rss_kib":658712,"live_native_bytes":35644899,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":2,"rss_kib":658720,"live_native_bytes":35644899,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":3,"rss_kib":658728,"live_native_bytes":35644899,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":4,"rss_kib":658740,"live_native_bytes":35644899,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":5,"rss_kib":658748,"live_native_bytes":35644899,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":6,"rss_kib":658752,"live_native_bytes":35644899,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":7,"rss_kib":658764,"live_native_bytes":35644899,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_resume_sample":{"round":0,"rss_kib":696136,"live_native_bytes":52340611}}
+{"h2_resume_sample":{"round":1,"rss_kib":696500,"live_native_bytes":52340611}}
+{"h2_resume_sample":{"round":2,"rss_kib":696860,"live_native_bytes":52340611}}
+{"h2_resume_sample":{"round":3,"rss_kib":699268,"live_native_bytes":52340611}}
+{"h2_resume_sample":{"round":4,"rss_kib":699568,"live_native_bytes":52340611}}
+Three paused 512 MiB h2 responses and fast siblings: RSS 581952..699564 KiB; live requested native allocations 1299606..52340611 bytes; one connection, actual HTTP/2
+Native file producers outside async roots: mixed multipart, zero/known/unknown counts, repeated cursor and single-worker response independence passed
+{"http_async_sample":{"received":16052224,"heap_payload":65515,"handles":7,"tasks":3,"groups":0,"work":1,"rss_kib":769552,"network_reserved":75497554}}
+{"http_async_sample":{"received":32411648,"heap_payload":65515,"handles":7,"tasks":3,"groups":0,"work":1,"rss_kib":731324,"network_reserved":75497554}}
+{"http_async_sample":{"received":49188864,"heap_payload":65515,"handles":7,"tasks":3,"groups":0,"work":1,"rss_kib":727268,"network_reserved":75497554}}
+{"http_async_sample":{"received":65966080,"heap_payload":65515,"handles":7,"tasks":3,"groups":0,"work":1,"rss_kib":756884,"network_reserved":75497554}}
+{"http_async_sample":{"received":82743296,"heap_payload":65515,"handles":7,"tasks":3,"groups":0,"work":1,"rss_kib":745580,"network_reserved":75497554}}
+{"http_async_sample":{"received":99520512,"heap_payload":65515,"handles":7,"tasks":3,"groups":0,"work":1,"rss_kib":747592,"network_reserved":75497554}}
+{"http_async_sample":{"received":116297728,"heap_payload":65515,"handles":7,"tasks":3,"groups":0,"work":1,"rss_kib":767964,"network_reserved":75497554}}
+{"http_async_sample":{"received":133074944,"heap_payload":65515,"handles":7,"tasks":3,"groups":0,"work":1,"rss_kib":768024,"network_reserved":75497554}}
+{"http_async_sample":{"received":134217728,"heap_payload":65515,"handles":7,"tasks":3,"groups":0,"work":1,"rss_kib":768088,"network_reserved":75497554}}
+134217728 bytes actual HTTP async pulls: live payload 65515..65515; handles <= 7; tasks/groups/work <= 3/0/1; retained first task repeatedly awaited
+Actual HTTP Runtime driver, single-worker file producer and activation cleanup passed
+Native HTTP/1.1/TLS, streaming, decoding, policy and backpressure checks passed
+<end of output>
+Test time =  32.60 sec
+----------------------------------------------------------
+Test Passed.
+"http_native" end time: Nov 09 15:19 MST
+"http_native" time elapsed: 00:00:32
+----------------------------------------------------------
+
+25/433 Testing: http_timeouts
+25/433 Test: http_timeouts
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/timeouts.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_http_timeouts" "--evidence" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/http-timeouts-evidence"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"http_timeouts" start time: Nov 09 15:19 MST
+Output:
+----------------------------------------------------------
+TLS/proxy phases, resumed producers, blocked writes and Digest header deadlines passed
+<end of output>
+Test time =  11.58 sec
+----------------------------------------------------------
+Test Passed.
+"http_timeouts" end time: Nov 09 15:19 MST
+"http_timeouts" time elapsed: 00:00:11
+----------------------------------------------------------
+
+26/433 Testing: http_wire
+26/433 Test: http_wire
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/wire.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_http_wire" "--evidence" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/http-wire-evidence"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"http_wire" start time: Nov 09 15:19 MST
+Output:
+----------------------------------------------------------
+Independent malformed HTTP/1 framing, metadata, decoding, deadlines and redirect probes passed
+<end of output>
+Test time =   2.20 sec
+----------------------------------------------------------
+Test Passed.
+"http_wire" end time: Nov 09 15:19 MST
+"http_wire" time elapsed: 00:00:02
+----------------------------------------------------------
+
+12/433 Testing: project_application
+12/433 Test: project_application
+Command: "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_project_application"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"project_application" start time: Nov 09 15:18 MST
+Output:
+----------------------------------------------------------
+Application cache: miss/hit
+project_application: 63 checks passed
+<end of output>
+Test time =  94.70 sec
+----------------------------------------------------------
+Test Passed.
+"project_application" end time: Nov 09 15:19 MST
+"project_application" time elapsed: 00:01:34
+----------------------------------------------------------
+
+28/433 Testing: url_native
+28/433 Test: url_native
+Command: "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_url_native"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"url_native" start time: Nov 09 15:19 MST
+Output:
+----------------------------------------------------------
+URL/provider native checks passed: 8.23.0; AWS-LC/5.12.0; c-ares/1.34.9; libidn2/2.3.8
+<end of output>
+Test time =   0.79 sec
+----------------------------------------------------------
+Test Passed.
+"url_native" end time: Nov 09 15:19 MST
+"url_native" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/433 Testing: project_application_process
+13/433 Test: project_application_process
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/project/application.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/voidc" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/project-application-evidence.json"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"project_application_process" start time: Nov 09 15:18 MST
+Output:
+----------------------------------------------------------
+project_application_process: 61 checks passed
+<end of output>
+Test time =  94.78 sec
+----------------------------------------------------------
+Test Passed.
+"project_application_process" end time: Nov 09 15:19 MST
+"project_application_process" time elapsed: 00:01:34
+----------------------------------------------------------
+
+27/433 Testing: http_dns
+27/433 Test: http_dns
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/dns.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_http_dns" "--evidence" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/http-dns-evidence"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"http_dns" start time: Nov 09 15:19 MST
+Output:
+----------------------------------------------------------
+DNS retained live allocations: 261164; steady 303764..419353 bytes
+Native c-ares UDP/TCP, IPv4/IPv6, IDN, cache pressure, negative cache, cancellation and timeout passed
+<end of output>
+Test time =  10.06 sec
+----------------------------------------------------------
+Test Passed.
+"http_dns" end time: Nov 09 15:19 MST
+"http_dns" time elapsed: 00:00:10
+----------------------------------------------------------
+
+30/433 Testing: http_ci_policy
+30/433 Test: http_ci_policy
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/ci_triage_test.py"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"http_ci_policy" start time: Nov 09 15:19 MST
+Output:
+----------------------------------------------------------
+test_corrupted_cache_rejected_without_replacement (__main__.AcquisitionTests.test_corrupted_cache_rejected_without_replacement) ... ok
+test_http_error_body_and_status_retained (__main__.AcquisitionTests.test_http_error_body_and_status_retained) ... ok
+test_network_failure_does_not_report_a_stale_partial_as_response (__main__.AcquisitionTests.test_network_failure_does_not_report_a_stale_partial_as_response) ... ok
+test_redirect_records_final_location_and_verifies_bytes (__main__.AcquisitionTests.test_redirect_records_final_location_and_verifies_bytes) ... ok
+test_successful_http_with_wrong_bytes_never_enters_cache (__main__.AcquisitionTests.test_successful_http_with_wrong_bytes_never_enters_cache) ... ok
+test_verified_bytes_promoted_and_cache_reverified (__main__.AcquisitionTests.test_verified_bytes_promoted_and_cache_reverified) ... ok
+test_every_reviewed_blob_survives_windows_checkout_filter (__main__.CheckoutTests.test_every_reviewed_blob_survives_windows_checkout_filter) ... ok
+test_each_missing_or_disabled_native_feature_is_rejected (__main__.FeatureTests.test_each_missing_or_disabled_native_feature_is_rejected) ... ok
+test_enabled_generated_features_pass_despite_parent_scope (__main__.FeatureTests.test_enabled_generated_features_pass_despite_parent_scope) ... ok
+test_missing_configuration_fails_closed (__main__.FeatureTests.test_missing_configuration_fails_closed) ... ok
+test_psl_native_separators_and_spaces (__main__.WindowsPathTests.test_psl_native_separators_and_spaces) ... ok
+test_static_only_cares_import_in_both_profiles (__main__.WindowsPathTests.test_static_only_cares_import_in_both_profiles) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 6.253s
+
+OK
+Windows checkout filters: 1588 source/review blobs verified
+<end of output>
+Test time =   6.67 sec
+----------------------------------------------------------
+Test Passed.
+"http_ci_policy" end time: Nov 09 15:19 MST
+"http_ci_policy" time elapsed: 00:00:06
+----------------------------------------------------------
+
+31/433 Testing: http_curl_objects
+31/433 Test: http_curl_objects
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/curl_objects_test.py"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"http_curl_objects" start time: Nov 09 15:19 MST
+Output:
+----------------------------------------------------------
+test_static_and_object_library_compilation_policy (__main__.CurlObjectsTests.test_static_and_object_library_compilation_policy) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 1.654s
+
+OK
+Both curl layouts: static definitions, sanitizers and keylog ownership; six COFF import negative controls verified
+<end of output>
+Test time =   1.82 sec
+----------------------------------------------------------
+Test Passed.
+"http_curl_objects" end time: Nov 09 15:19 MST
+"http_curl_objects" time elapsed: 00:00:01
+----------------------------------------------------------
+
+33/433 Testing: http_bulk
+33/433 Test: http_bulk
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/bulk.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/voidc" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_http_source_runner" "--evidence" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/http-bulk-evidence"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"http_bulk" start time: Nov 09 15:19 MST
+Output:
+----------------------------------------------------------
+Public bulk: download 67108864, upload 67108865, SHA-256 67c93935aeb247ac244e23db4c28a099130f1ecff693a3260f7436c1ad59e4bc
+<end of output>
+Test time =  57.38 sec
+----------------------------------------------------------
+Test Passed.
+"http_bulk" end time: Nov 09 15:20 MST
+"http_bulk" time elapsed: 00:00:57
+----------------------------------------------------------
+
+34/433 Testing: http_ir
+34/433 Test: http_ir
+Command: "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_http_ir" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/source_sync.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"http_ir" start time: Nov 09 15:20 MST
+Output:
+----------------------------------------------------------
+43 HTTP IR module/type/arity/authority/worker/effect rejections passed
+<end of output>
+Test time =  40.47 sec
+----------------------------------------------------------
+Test Passed.
+"http_ir" end time: Nov 09 15:21 MST
+"http_ir" time elapsed: 00:00:40
+----------------------------------------------------------
+
+24/433 Testing: http_reload
+24/433 Test: http_reload
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/reload.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_http_reload" "--evidence" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/http-reload-evidence"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"http_reload" start time: Nov 09 15:18 MST
+Output:
+----------------------------------------------------------
+Public HTTP held-request reload passed
+<end of output>
+Test time = 156.47 sec
+----------------------------------------------------------
+Test Passed.
+"http_reload" end time: Nov 09 15:21 MST
+"http_reload" time elapsed: 00:02:36
+----------------------------------------------------------
+
+36/433 Testing: http_source_negative
+36/433 Test: http_source_negative
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/source_negative.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/voidc" "--evidence" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/http-source-negative-evidence"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"http_source_negative" start time: Nov 09 15:21 MST
+Output:
+----------------------------------------------------------
+5 HTTP source authority/private/worker rejections passed
+<end of output>
+Test time =  14.37 sec
+----------------------------------------------------------
+Test Passed.
+"http_source_negative" end time: Nov 09 15:21 MST
+"http_source_negative" time elapsed: 00:00:14
+----------------------------------------------------------
+
+23/433 Testing: http_tls_memory
+23/433 Test: http_tls_memory
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/tls_memory.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_http_tls_memory" "--evidence" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/http-tls-memory-evidence"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"http_tls_memory" start time: Nov 09 15:18 MST
+Output:
+----------------------------------------------------------
+/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/tls_memory.py:74: DeprecationWarning: ssl.TLSVersion.TLSv1 is deprecated
+  context.minimum_version = ssl.TLSVersion.TLSv1
+/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/tls_memory.py:75: DeprecationWarning: ssl.TLSVersion.TLSv1_1 is deprecated
+  context.maximum_version = ssl.TLSVersion.TLSv1_1
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/tls_memory.py", line 91, in <module>
+    if __name__ == '__main__': main()
+                               ~~~~^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/tls_memory.py", line 80, in main
+    run([binary, f'https://127.0.0.1:{peers[0].server_port}/',
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+         f'https://127.0.0.1:{peers[1].server_port}/', roots,
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+         *[f'https://127.0.0.1:{peer.server_port}/' for peer in peers[2:]]], 'probe', timeout=1200)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/tls_memory.py", line 52, in run
+    assert result.returncode == 0, (name, result.stderr.decode(errors='replace'))
+           ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('probe', 'TLS failure kind=14 code=28\nTLS corpus verified handshake\n')
+<end of output>
+Test time = 317.84 sec
+----------------------------------------------------------
+Test Failed.
+"http_tls_memory" end time: Nov 09 15:24 MST
+"http_tls_memory" time elapsed: 00:05:17
+----------------------------------------------------------
+
+38/433 Testing: url_ir
+38/433 Test: url_ir
+Command: "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_url_ir" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/url.void"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"url_ir" start time: Nov 09 15:24 MST
+Output:
+----------------------------------------------------------
+10 URL IR authority/type/arity/opcode rejections passed
+<end of output>
+Test time =   1.82 sec
+----------------------------------------------------------
+Test Passed.
+"url_ir" end time: Nov 09 15:24 MST
+"url_ir" time elapsed: 00:00:01
+----------------------------------------------------------
+
+39/433 Testing: url_source
+39/433 Test: url_source
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/url_source.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"url_source" start time: Nov 09 15:24 MST
+Output:
+----------------------------------------------------------
+URL source check/JIT/O2/AOT: 7 process checks passed
+<end of output>
+Test time =  19.31 sec
+----------------------------------------------------------
+Test Passed.
+"url_source" end time: Nov 09 15:24 MST
+"url_source" time elapsed: 00:00:19
+----------------------------------------------------------
+
+40/433 Testing: url_lsp
+40/433 Test: url_lsp
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/url_lsp.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"url_lsp" start time: Nov 09 15:24 MST
+Output:
+----------------------------------------------------------
+URL LSP import/docs/definition/rename/completion checks passed
+<end of output>
+Test time =   0.66 sec
+----------------------------------------------------------
+Test Passed.
+"url_lsp" end time: Nov 09 15:24 MST
+"url_lsp" time elapsed: 00:00:00
+----------------------------------------------------------
+
+32/433 Testing: http_install
+32/433 Test: http_install
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/install.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/voidc" "--evidence" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/http-install-evidence"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"http_install" start time: Nov 09 15:19 MST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time = 300.07 sec
+----------------------------------------------------------
+Test Failed.
+"http_install" end time: Nov 09 15:24 MST
+"http_install" time elapsed: 00:05:00
+----------------------------------------------------------
+
+42/433 Testing: toolchain_stop_token
+42/433 Test: toolchain_stop_token
+Command: "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_stop_token_probe"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"toolchain_stop_token" start time: Nov 09 15:24 MST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"toolchain_stop_token" end time: Nov 09 15:24 MST
+"toolchain_stop_token" time elapsed: 00:00:00
+----------------------------------------------------------
+
+41/433 Testing: http_lsp
+41/433 Test: http_lsp
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/http_lsp.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"http_lsp" start time: Nov 09 15:24 MST
+Output:
+----------------------------------------------------------
+HTTP LSP: module/member inventory, 25 documented methods, navigation and active parameter passed
+<end of output>
+Test time =  22.40 sec
+----------------------------------------------------------
+Test Passed.
+"http_lsp" end time: Nov 09 15:24 MST
+"http_lsp" time elapsed: 00:00:22
+----------------------------------------------------------
+
+44/433 Testing: stage10_operator_keys
+44/433 Test: stage10_operator_keys
+Command: "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_operator_keys" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"stage10_operator_keys" start time: Nov 09 15:24 MST
+Output:
+----------------------------------------------------------
+131 dictionary custom-equality checks passed
+<end of output>
+Test time =   1.50 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_keys" end time: Nov 09 15:24 MST
+"stage10_operator_keys" time elapsed: 00:00:01
+----------------------------------------------------------
+
+45/433 Testing: stage10_operator_resolution
+45/433 Test: stage10_operator_resolution
+Command: "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_operator_resolution" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"stage10_operator_resolution" start time: Nov 09 15:24 MST
+Output:
+----------------------------------------------------------
+184 operator resolution/call checks passed
+<end of output>
+Test time =   6.85 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_resolution" end time: Nov 09 15:24 MST
+"stage10_operator_resolution" time elapsed: 00:00:06
+----------------------------------------------------------
+
+46/433 Testing: stage10_operator_declarations
+46/433 Test: stage10_operator_declarations
+Command: "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_operator_declarations" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"stage10_operator_declarations" start time: Nov 09 15:24 MST
+Output:
+----------------------------------------------------------
+278 operator declaration/validation checks passed
+<end of output>
+Test time =   4.28 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_operator_declarations" end time: Nov 09 15:25 MST
+"stage10_operator_declarations" time elapsed: 00:00:04
+----------------------------------------------------------
+
+47/433 Testing: stage10_source_formatting
+47/433 Test: stage10_source_formatting
+Command: "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_source_formatting"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"stage10_source_formatting" start time: Nov 09 15:25 MST
+Output:
+----------------------------------------------------------
+321 source formatting/diagnostic checks passed
+<end of output>
+Test time =   2.91 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_source_formatting" end time: Nov 09 15:25 MST
+"stage10_source_formatting" time elapsed: 00:00:02
+----------------------------------------------------------
+
+48/433 Testing: stage10_tooling
+48/433 Test: stage10_tooling
+Command: "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict/void_stage10_tooling"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-strict
+"stage10_tooling" start time: Nov 09 15:25 MST
+Output:
+----------------------------------------------------------
+108 Stage 10 tooling metadata checks passed
+<end of output>
+Test time =   2.14 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_tooling" end time: Nov 09 15:25 MST
+"stage10_tooling" time elapsed: 00:00:02
+----------------------------------------------------------
+

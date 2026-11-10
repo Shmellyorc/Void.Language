@@ -1,0 +1,16 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start  6: project_manifest_legacy
+1/2 Test  #6: project_manifest_legacy ..........   Passed    1.10 sec
+    Start 10: project_application
+2/2 Test #10: project_application ..............***Failed    8.64 sec
+Application cache: miss/hit
+map::at
+
+
+50% tests passed, 1 tests failed out of 2
+
+Total Test time (real) =   9.75 sec
+
+The following tests FAILED:
+	 10 - project_application (Failed)
+Errors while running CTest

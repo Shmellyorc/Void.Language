@@ -1,0 +1,1583 @@
+
+File: loader-probe.exe
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+ImageFileHeader {
+  Machine: IMAGE_FILE_MACHINE_AMD64 (0x8664)
+  SectionCount: 7
+  TimeDateStamp: 2026-11-09 15:52:26 (0x6AF1EC3A)
+  PointerToSymbolTable: 0x0
+  SymbolCount: 0
+  StringTableSize: 0
+  OptionalHeaderSize: 240
+  Characteristics [ (0x22)
+    IMAGE_FILE_EXECUTABLE_IMAGE (0x2)
+    IMAGE_FILE_LARGE_ADDRESS_AWARE (0x20)
+  ]
+}
+ImageOptionalHeader {
+  Magic: 0x20B
+  MajorLinkerVersion: 14
+  MinorLinkerVersion: 0
+  SizeOfCode: 100352
+  SizeOfInitializedData: 60416
+  SizeOfUninitializedData: 0
+  AddressOfEntryPoint: 0x61F4
+  BaseOfCode: 0x1000
+  ImageBase: 0x140000000
+  SectionAlignment: 4096
+  FileAlignment: 512
+  MajorOperatingSystemVersion: 6
+  MinorOperatingSystemVersion: 0
+  MajorImageVersion: 0
+  MinorImageVersion: 0
+  MajorSubsystemVersion: 6
+  MinorSubsystemVersion: 0
+  SizeOfImage: 184320
+  SizeOfHeaders: 1024
+  CheckSum: 0x0
+  Subsystem: IMAGE_SUBSYSTEM_WINDOWS_CUI (0x3)
+  Characteristics [ (0x8160)
+    IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE (0x40)
+    IMAGE_DLL_CHARACTERISTICS_HIGH_ENTROPY_VA (0x20)
+    IMAGE_DLL_CHARACTERISTICS_NX_COMPAT (0x100)
+    IMAGE_DLL_CHARACTERISTICS_TERMINAL_SERVER_AWARE (0x8000)
+  ]
+  SizeOfStackReserve: 1048576
+  SizeOfStackCommit: 4096
+  SizeOfHeapReserve: 1048576
+  SizeOfHeapCommit: 4096
+  NumberOfRvaAndSize: 16
+  DataDirectory {
+    ExportTableRVA: 0x0
+    ExportTableSize: 0x0
+    ImportTableRVA: 0x23578
+    ImportTableSize: 0x28
+    ResourceTableRVA: 0x2B000
+    ResourceTableSize: 0x1D0
+    ExceptionTableRVA: 0x28000
+    ExceptionTableSize: 0x1944
+    CertificateTableRVA: 0x0
+    CertificateTableSize: 0x0
+    BaseRelocationTableRVA: 0x2C000
+    BaseRelocationTableSize: 0x684
+    DebugRVA: 0x0
+    DebugSize: 0x0
+    ArchitectureRVA: 0x0
+    ArchitectureSize: 0x0
+    GlobalPtrRVA: 0x0
+    GlobalPtrSize: 0x0
+    TLSTableRVA: 0x0
+    TLSTableSize: 0x0
+    LoadConfigTableRVA: 0x1A1E0
+    LoadConfigTableSize: 0x140
+    BoundImportRVA: 0x0
+    BoundImportSize: 0x0
+    IATRVA: 0x23840
+    IATSize: 0x2A0
+    DelayImportDescriptorRVA: 0x0
+    DelayImportDescriptorSize: 0x0
+    CLRRuntimeHeaderRVA: 0x0
+    CLRRuntimeHeaderSize: 0x0
+    ReservedRVA: 0x0
+    ReservedSize: 0x0
+  }
+}
+DOSHeader {
+  Magic: MZ
+  UsedBytesInTheLastPage: 120
+  FileSizeInPages: 1
+  NumberOfRelocationItems: 0
+  HeaderSizeInParagraphs: 4
+  MinimumExtraParagraphs: 0
+  MaximumExtraParagraphs: 0
+  InitialRelativeSS: 0
+  InitialSP: 0
+  Checksum: 0
+  InitialIP: 0
+  InitialRelativeCS: 0
+  AddressOfRelocationTable: 64
+  OverlayNumber: 0
+  OEMid: 0
+  OEMinfo: 0
+  AddressOfNewExeHeader: 120
+}
+Import {
+  Name: KERNEL32.dll
+  ImportLookupTableRVA: 0x235A0
+  ImportAddressTableRVA: 0x23840
+  Symbol: ActivateActCtx (2)
+  Symbol: CloseHandle (137)
+  Symbol: CompareStringW (158)
+  Symbol: CreateActCtxW (179)
+  Symbol: CreateFileMappingW (203)
+  Symbol: CreateFileW (206)
+  Symbol: DeactivateActCtx (262)
+  Symbol: DeleteCriticalSection (276)
+  Symbol: EncodePointer (308)
+  Symbol: EnterCriticalSection (312)
+  Symbol: ExitProcess (359)
+  Symbol: FindActCtxSectionStringW (378)
+  Symbol: FindClose (382)
+  Symbol: FindFirstFileExW (388)
+  Symbol: FindNextFileW (405)
+  Symbol: FlushFileBuffers (424)
+  Symbol: FreeEnvironmentStringsW (435)
+  Symbol: FreeLibrary (436)
+  Symbol: GetACP (443)
+  Symbol: GetCPInfo (458)
+  Symbol: GetCommandLineA (479)
+  Symbol: GetCommandLineW (480)
+  Symbol: GetConsoleMode (517)
+  Symbol: GetConsoleOutputCP (521)
+  Symbol: GetCurrentProcess (544)
+  Symbol: GetCurrentProcessId (545)
+  Symbol: GetCurrentThreadId (549)
+  Symbol: GetEnvironmentStringsW (577)
+  Symbol: GetFileInformationByHandle (593)
+  Symbol: GetFileSizeEx (598)
+  Symbol: GetFileType (600)
+  Symbol: GetFinalPathNameByHandleW (602)
+  Symbol: GetLastError (618)
+  Symbol: GetModuleFileNameW (637)
+  Symbol: GetModuleHandleExW (640)
+  Symbol: GetModuleHandleW (641)
+  Symbol: GetOEMCP (673)
+  Symbol: GetProcAddress (696)
+  Symbol: GetProcessHeap (702)
+  Symbol: GetStartupInfoW (730)
+  Symbol: GetStdHandle (732)
+  Symbol: GetStringTypeW (737)
+  Symbol: GetSystemTimeAsFileTime (755)
+  Symbol: HeapAlloc (849)
+  Symbol: HeapFree (853)
+  Symbol: HeapReAlloc (856)
+  Symbol: HeapSize (858)
+  Symbol: InitializeCriticalSectionAndSpinCount (875)
+  Symbol: InitializeSListHead (879)
+  Symbol: IsDebuggerPresent (901)
+  Symbol: IsProcessorFeaturePresent (908)
+  Symbol: IsValidCodePage (914)
+  Symbol: K32GetMappedFileNameW (934)
+  Symbol: LCMapStringW (952)
+  Symbol: LeaveCriticalSection (964)
+  Symbol: LoadLibraryExW (970)
+  Symbol: MapViewOfFile (997)
+  Symbol: MultiByteToWideChar (1014)
+  Symbol: QueryPerformanceCounter (1106)
+  Symbol: RaiseException (1129)
+  Symbol: ReleaseActCtx (1205)
+  Symbol: RtlCaptureContext (1238)
+  Symbol: RtlLookupFunctionEntry (1245)
+  Symbol: RtlPcToFileHeader (1247)
+  Symbol: RtlUnwindEx (1251)
+  Symbol: RtlVirtualUnwind (1252)
+  Symbol: SetDefaultDllDirectories (1309)
+  Symbol: SetEnvironmentVariableW (1317)
+  Symbol: SetFilePointerEx (1332)
+  Symbol: SetLastError (1346)
+  Symbol: SetStdHandle (1372)
+  Symbol: SetUnhandledExceptionFilter (1408)
+  Symbol: TerminateProcess (1439)
+  Symbol: TlsAlloc (1457)
+  Symbol: TlsFree (1458)
+  Symbol: TlsGetValue (1459)
+  Symbol: TlsSetValue (1460)
+  Symbol: UnhandledExceptionFilter (1473)
+  Symbol: UnmapViewOfFile (1476)
+  Symbol: VirtualQuery (1506)
+  Symbol: WideCharToMultiByte (1554)
+  Symbol: WriteConsoleW (1573)
+  Symbol: WriteFile (1574)
+}
+Resources [
+  Total Number of Resources: 1
+  Base Table Address: 0x26E00
+  
+  Number of String Entries: 0
+  Number of ID Entries: 1
+  Type: MANIFEST (ID 24) [
+    Table Offset: 0x18
+    Number of String Entries: 0
+    Number of ID Entries: 1
+    Name: (ID 1) [
+      Table Offset: 0x30
+      Number of String Entries: 0
+      Number of ID Entries: 1
+      Language: (ID 1033) [
+        Entry Offset: 0x48
+        Time/Date Stamp: 1970-01-01 00:00:00 (0x0)
+        Major Version: 0
+        Minor Version: 0
+        Characteristics: 0
+        Data [
+          DataRVA: 0x2B060
+          DataSize: 364
+          Codepage: 0
+          Reserved: 0
+          Data (
+            0000: 3C3F786D 6C207665 7273696F 6E3D2231  |<?xml version="1|
+            0010: 2E302220 7374616E 64616C6F 6E653D22  |.0" standalone="|
+            0020: 79657322 3F3E0A3C 61737365 6D626C79  |yes"?>.<assembly|
+            0030: 20786D6C 6E733D22 75726E3A 73636865  | xmlns="urn:sche|
+            0040: 6D61732D 6D696372 6F736F66 742D636F  |mas-microsoft-co|
+            0050: 6D3A6173 6D2E7631 220A2020 20202020  |m:asm.v1".      |
+            0060: 20202020 6D616E69 66657374 56657273  |    manifestVers|
+            0070: 696F6E3D 22312E30 223E0A20 203C7472  |ion="1.0">.  <tr|
+            0080: 75737449 6E666F20 786D6C6E 733D2275  |ustInfo xmlns="u|
+            0090: 726E3A73 6368656D 61732D6D 6963726F  |rn:schemas-micro|
+            00A0: 736F6674 2D636F6D 3A61736D 2E763322  |soft-com:asm.v3"|
+            00B0: 3E0A2020 20203C73 65637572 6974793E  |>.    <security>|
+            00C0: 0A202020 2020203C 72657175 65737465  |.      <requeste|
+            00D0: 64507269 76696C65 6765733E 0A202020  |dPrivileges>.   |
+            00E0: 20202020 20203C72 65717565 73746564  |      <requested|
+            00F0: 45786563 7574696F 6E4C6576 656C206C  |ExecutionLevel l|
+            0100: 6576656C 3D276173 496E766F 6B657227  |evel='asInvoker'|
+            0110: 20756941 63636573 733D2766 616C7365  | uiAccess='false|
+            0120: 272F3E0A 20202020 20203C2F 72657175  |'/>.      </requ|
+            0130: 65737465 64507269 76696C65 6765733E  |estedPrivileges>|
+            0140: 0A202020 203C2F73 65637572 6974793E  |.    </security>|
+            0150: 0A20203C 2F747275 7374496E 666F3E0A  |.  </trustInfo>.|
+            0160: 3C2F6173 73656D62 6C793E0A           |</assembly>.|
+          )
+        ]
+      ]
+    ]
+  ]
+]
+
+File: alternate/process-default.exe
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+ImageFileHeader {
+  Machine: IMAGE_FILE_MACHINE_AMD64 (0x8664)
+  SectionCount: 7
+  TimeDateStamp: 2026-11-09 15:52:27 (0x6AF1EC3B)
+  PointerToSymbolTable: 0x0
+  SymbolCount: 0
+  StringTableSize: 0
+  OptionalHeaderSize: 240
+  Characteristics [ (0x22)
+    IMAGE_FILE_EXECUTABLE_IMAGE (0x2)
+    IMAGE_FILE_LARGE_ADDRESS_AWARE (0x20)
+  ]
+}
+ImageOptionalHeader {
+  Magic: 0x20B
+  MajorLinkerVersion: 14
+  MinorLinkerVersion: 0
+  SizeOfCode: 100352
+  SizeOfInitializedData: 60928
+  SizeOfUninitializedData: 0
+  AddressOfEntryPoint: 0x61F4
+  BaseOfCode: 0x1000
+  ImageBase: 0x140000000
+  SectionAlignment: 4096
+  FileAlignment: 512
+  MajorOperatingSystemVersion: 6
+  MinorOperatingSystemVersion: 0
+  MajorImageVersion: 0
+  MinorImageVersion: 0
+  MajorSubsystemVersion: 6
+  MinorSubsystemVersion: 0
+  SizeOfImage: 184320
+  SizeOfHeaders: 1024
+  CheckSum: 0x0
+  Subsystem: IMAGE_SUBSYSTEM_WINDOWS_CUI (0x3)
+  Characteristics [ (0x8160)
+    IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE (0x40)
+    IMAGE_DLL_CHARACTERISTICS_HIGH_ENTROPY_VA (0x20)
+    IMAGE_DLL_CHARACTERISTICS_NX_COMPAT (0x100)
+    IMAGE_DLL_CHARACTERISTICS_TERMINAL_SERVER_AWARE (0x8000)
+  ]
+  SizeOfStackReserve: 1048576
+  SizeOfStackCommit: 4096
+  SizeOfHeapReserve: 1048576
+  SizeOfHeapCommit: 4096
+  NumberOfRvaAndSize: 16
+  DataDirectory {
+    ExportTableRVA: 0x0
+    ExportTableSize: 0x0
+    ImportTableRVA: 0x23578
+    ImportTableSize: 0x28
+    ResourceTableRVA: 0x2B000
+    ResourceTableSize: 0x268
+    ExceptionTableRVA: 0x28000
+    ExceptionTableSize: 0x1944
+    CertificateTableRVA: 0x0
+    CertificateTableSize: 0x0
+    BaseRelocationTableRVA: 0x2C000
+    BaseRelocationTableSize: 0x684
+    DebugRVA: 0x0
+    DebugSize: 0x0
+    ArchitectureRVA: 0x0
+    ArchitectureSize: 0x0
+    GlobalPtrRVA: 0x0
+    GlobalPtrSize: 0x0
+    TLSTableRVA: 0x0
+    TLSTableSize: 0x0
+    LoadConfigTableRVA: 0x1A1E0
+    LoadConfigTableSize: 0x140
+    BoundImportRVA: 0x0
+    BoundImportSize: 0x0
+    IATRVA: 0x23840
+    IATSize: 0x2A0
+    DelayImportDescriptorRVA: 0x0
+    DelayImportDescriptorSize: 0x0
+    CLRRuntimeHeaderRVA: 0x0
+    CLRRuntimeHeaderSize: 0x0
+    ReservedRVA: 0x0
+    ReservedSize: 0x0
+  }
+}
+DOSHeader {
+  Magic: MZ
+  UsedBytesInTheLastPage: 120
+  FileSizeInPages: 1
+  NumberOfRelocationItems: 0
+  HeaderSizeInParagraphs: 4
+  MinimumExtraParagraphs: 0
+  MaximumExtraParagraphs: 0
+  InitialRelativeSS: 0
+  InitialSP: 0
+  Checksum: 0
+  InitialIP: 0
+  InitialRelativeCS: 0
+  AddressOfRelocationTable: 64
+  OverlayNumber: 0
+  OEMid: 0
+  OEMinfo: 0
+  AddressOfNewExeHeader: 120
+}
+Import {
+  Name: KERNEL32.dll
+  ImportLookupTableRVA: 0x235A0
+  ImportAddressTableRVA: 0x23840
+  Symbol: ActivateActCtx (2)
+  Symbol: CloseHandle (137)
+  Symbol: CompareStringW (158)
+  Symbol: CreateActCtxW (179)
+  Symbol: CreateFileMappingW (203)
+  Symbol: CreateFileW (206)
+  Symbol: DeactivateActCtx (262)
+  Symbol: DeleteCriticalSection (276)
+  Symbol: EncodePointer (308)
+  Symbol: EnterCriticalSection (312)
+  Symbol: ExitProcess (359)
+  Symbol: FindActCtxSectionStringW (378)
+  Symbol: FindClose (382)
+  Symbol: FindFirstFileExW (388)
+  Symbol: FindNextFileW (405)
+  Symbol: FlushFileBuffers (424)
+  Symbol: FreeEnvironmentStringsW (435)
+  Symbol: FreeLibrary (436)
+  Symbol: GetACP (443)
+  Symbol: GetCPInfo (458)
+  Symbol: GetCommandLineA (479)
+  Symbol: GetCommandLineW (480)
+  Symbol: GetConsoleMode (517)
+  Symbol: GetConsoleOutputCP (521)
+  Symbol: GetCurrentProcess (544)
+  Symbol: GetCurrentProcessId (545)
+  Symbol: GetCurrentThreadId (549)
+  Symbol: GetEnvironmentStringsW (577)
+  Symbol: GetFileInformationByHandle (593)
+  Symbol: GetFileSizeEx (598)
+  Symbol: GetFileType (600)
+  Symbol: GetFinalPathNameByHandleW (602)
+  Symbol: GetLastError (618)
+  Symbol: GetModuleFileNameW (637)
+  Symbol: GetModuleHandleExW (640)
+  Symbol: GetModuleHandleW (641)
+  Symbol: GetOEMCP (673)
+  Symbol: GetProcAddress (696)
+  Symbol: GetProcessHeap (702)
+  Symbol: GetStartupInfoW (730)
+  Symbol: GetStdHandle (732)
+  Symbol: GetStringTypeW (737)
+  Symbol: GetSystemTimeAsFileTime (755)
+  Symbol: HeapAlloc (849)
+  Symbol: HeapFree (853)
+  Symbol: HeapReAlloc (856)
+  Symbol: HeapSize (858)
+  Symbol: InitializeCriticalSectionAndSpinCount (875)
+  Symbol: InitializeSListHead (879)
+  Symbol: IsDebuggerPresent (901)
+  Symbol: IsProcessorFeaturePresent (908)
+  Symbol: IsValidCodePage (914)
+  Symbol: K32GetMappedFileNameW (934)
+  Symbol: LCMapStringW (952)
+  Symbol: LeaveCriticalSection (964)
+  Symbol: LoadLibraryExW (970)
+  Symbol: MapViewOfFile (997)
+  Symbol: MultiByteToWideChar (1014)
+  Symbol: QueryPerformanceCounter (1106)
+  Symbol: RaiseException (1129)
+  Symbol: ReleaseActCtx (1205)
+  Symbol: RtlCaptureContext (1238)
+  Symbol: RtlLookupFunctionEntry (1245)
+  Symbol: RtlPcToFileHeader (1247)
+  Symbol: RtlUnwindEx (1251)
+  Symbol: RtlVirtualUnwind (1252)
+  Symbol: SetDefaultDllDirectories (1309)
+  Symbol: SetEnvironmentVariableW (1317)
+  Symbol: SetFilePointerEx (1332)
+  Symbol: SetLastError (1346)
+  Symbol: SetStdHandle (1372)
+  Symbol: SetUnhandledExceptionFilter (1408)
+  Symbol: TerminateProcess (1439)
+  Symbol: TlsAlloc (1457)
+  Symbol: TlsFree (1458)
+  Symbol: TlsGetValue (1459)
+  Symbol: TlsSetValue (1460)
+  Symbol: UnhandledExceptionFilter (1473)
+  Symbol: UnmapViewOfFile (1476)
+  Symbol: VirtualQuery (1506)
+  Symbol: WideCharToMultiByte (1554)
+  Symbol: WriteConsoleW (1573)
+  Symbol: WriteFile (1574)
+}
+Resources [
+  Total Number of Resources: 1
+  Base Table Address: 0x26E00
+  
+  Number of String Entries: 0
+  Number of ID Entries: 1
+  Type: MANIFEST (ID 24) [
+    Table Offset: 0x18
+    Number of String Entries: 0
+    Number of ID Entries: 1
+    Name: (ID 1) [
+      Table Offset: 0x30
+      Number of String Entries: 0
+      Number of ID Entries: 1
+      Language: (ID 1033) [
+        Entry Offset: 0x48
+        Time/Date Stamp: 1970-01-01 00:00:00 (0x0)
+        Major Version: 0
+        Minor Version: 0
+        Characteristics: 0
+        Data [
+          DataRVA: 0x2B060
+          DataSize: 518
+          Codepage: 0
+          Reserved: 0
+          Data (
+            0000: 3C3F786D 6C207665 7273696F 6E3D2231  |<?xml version="1|
+            0010: 2E302220 656E636F 64696E67 3D225554  |.0" encoding="UT|
+            0020: 462D3822 3F3E0A3C 61737365 6D626C79  |F-8"?>.<assembly|
+            0030: 20786D6C 6E733D22 75726E3A 73636865  | xmlns="urn:sche|
+            0040: 6D61732D 6D696372 6F736F66 742D636F  |mas-microsoft-co|
+            0050: 6D3A6173 6D2E7631 22206D61 6E696665  |m:asm.v1" manife|
+            0060: 73745665 7273696F 6E3D2231 2E30223E  |stVersion="1.0">|
+            0070: 0A20203C 74727573 74496E66 6F20786D  |.  <trustInfo xm|
+            0080: 6C6E733D 2275726E 3A736368 656D6173  |lns="urn:schemas|
+            0090: 2D6D6963 726F736F 66742D63 6F6D3A61  |-microsoft-com:a|
+            00A0: 736D2E76 33223E0A 20202020 3C736563  |sm.v3">.    <sec|
+            00B0: 75726974 793E0A20 20202020 203C7265  |urity>.      <re|
+            00C0: 71756573 74656450 72697669 6C656765  |questedPrivilege|
+            00D0: 733E0A20 20202020 2020203C 72657175  |s>.        <requ|
+            00E0: 65737465 64457865 63757469 6F6E4C65  |estedExecutionLe|
+            00F0: 76656C20 6C657665 6C3D2261 73496E76  |vel level="asInv|
+            0100: 6F6B6572 22207569 41636365 73733D22  |oker" uiAccess="|
+            0110: 66616C73 65222F3E 0A202020 2020203C  |false"/>.      <|
+            0120: 2F726571 75657374 65645072 6976696C  |/requestedPrivil|
+            0130: 65676573 3E0A2020 20203C2F 73656375  |eges>.    </secu|
+            0140: 72697479 3E0A2020 3C2F7472 75737449  |rity>.  </trustI|
+            0150: 6E666F3E 0A20203C 61737365 6D626C79  |nfo>.  <assembly|
+            0160: 4964656E 74697479 20747970 653D2277  |Identity type="w|
+            0170: 696E3332 22206E61 6D653D22 566F6964  |in32" name="Void|
+            0180: 47342E43 6865636B 706F696E 74446570  |G4.CheckpointDep|
+            0190: 656E6465 6E63794F 76657272 69646522  |endencyOverride"|
+            01A0: 20766572 73696F6E 3D22312E 302E302E  | version="1.0.0.|
+            01B0: 30222070 726F6365 73736F72 41726368  |0" processorArch|
+            01C0: 69746563 74757265 3D22616D 64363422  |itecture="amd64"|
+            01D0: 2F3E0A20 203C6669 6C65206E 616D653D  |/>.  <file name=|
+            01E0: 22766F69 645F6734 5F70726F 62655F64  |"void_g4_probe_d|
+            01F0: 65702E64 6C6C222F 3E0A3C2F 61737365  |ep.dll"/>.</asse|
+            0200: 6D626C79 3E0A                        |mbly>.|
+          )
+        ]
+      ]
+    ]
+  ]
+]
+
+File: launcher.exe
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+ImageFileHeader {
+  Machine: IMAGE_FILE_MACHINE_AMD64 (0x8664)
+  SectionCount: 7
+  TimeDateStamp: 2026-11-09 15:52:29 (0x6AF1EC3D)
+  PointerToSymbolTable: 0x0
+  SymbolCount: 0
+  StringTableSize: 0
+  OptionalHeaderSize: 240
+  Characteristics [ (0x22)
+    IMAGE_FILE_EXECUTABLE_IMAGE (0x2)
+    IMAGE_FILE_LARGE_ADDRESS_AWARE (0x20)
+  ]
+}
+ImageOptionalHeader {
+  Magic: 0x20B
+  MajorLinkerVersion: 14
+  MinorLinkerVersion: 0
+  SizeOfCode: 91648
+  SizeOfInitializedData: 66560
+  SizeOfUninitializedData: 0
+  AddressOfEntryPoint: 0x43A4
+  BaseOfCode: 0x1000
+  ImageBase: 0x140000000
+  SectionAlignment: 4096
+  FileAlignment: 512
+  MajorOperatingSystemVersion: 6
+  MinorOperatingSystemVersion: 0
+  MajorImageVersion: 0
+  MinorImageVersion: 0
+  MajorSubsystemVersion: 6
+  MinorSubsystemVersion: 0
+  SizeOfImage: 184320
+  SizeOfHeaders: 1024
+  CheckSum: 0x0
+  Subsystem: IMAGE_SUBSYSTEM_WINDOWS_CUI (0x3)
+  Characteristics [ (0x8160)
+    IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE (0x40)
+    IMAGE_DLL_CHARACTERISTICS_HIGH_ENTROPY_VA (0x20)
+    IMAGE_DLL_CHARACTERISTICS_NX_COMPAT (0x100)
+    IMAGE_DLL_CHARACTERISTICS_TERMINAL_SERVER_AWARE (0x8000)
+  ]
+  SizeOfStackReserve: 1048576
+  SizeOfStackCommit: 4096
+  SizeOfHeapReserve: 1048576
+  SizeOfHeapCommit: 4096
+  NumberOfRvaAndSize: 16
+  DataDirectory {
+    ExportTableRVA: 0x0
+    ExportTableSize: 0x0
+    ImportTableRVA: 0x23300
+    ImportTableSize: 0x28
+    ResourceTableRVA: 0x2B000
+    ResourceTableSize: 0x1D0
+    ExceptionTableRVA: 0x28000
+    ExceptionTableSize: 0x1698
+    CertificateTableRVA: 0x0
+    CertificateTableSize: 0x0
+    BaseRelocationTableRVA: 0x2C000
+    BaseRelocationTableSize: 0x6A0
+    DebugRVA: 0x0
+    DebugSize: 0x0
+    ArchitectureRVA: 0x0
+    ArchitectureSize: 0x0
+    GlobalPtrRVA: 0x0
+    GlobalPtrSize: 0x0
+    TLSTableRVA: 0x0
+    TLSTableSize: 0x0
+    LoadConfigTableRVA: 0x1A720
+    LoadConfigTableSize: 0x140
+    BoundImportRVA: 0x0
+    BoundImportSize: 0x0
+    IATRVA: 0x235A0
+    IATSize: 0x278
+    DelayImportDescriptorRVA: 0x0
+    DelayImportDescriptorSize: 0x0
+    CLRRuntimeHeaderRVA: 0x0
+    CLRRuntimeHeaderSize: 0x0
+    ReservedRVA: 0x0
+    ReservedSize: 0x0
+  }
+}
+DOSHeader {
+  Magic: MZ
+  UsedBytesInTheLastPage: 120
+  FileSizeInPages: 1
+  NumberOfRelocationItems: 0
+  HeaderSizeInParagraphs: 4
+  MinimumExtraParagraphs: 0
+  MaximumExtraParagraphs: 0
+  InitialRelativeSS: 0
+  InitialSP: 0
+  Checksum: 0
+  InitialIP: 0
+  InitialRelativeCS: 0
+  AddressOfRelocationTable: 64
+  OverlayNumber: 0
+  OEMid: 0
+  OEMinfo: 0
+  AddressOfNewExeHeader: 120
+}
+Import {
+  Name: KERNEL32.dll
+  ImportLookupTableRVA: 0x23328
+  ImportAddressTableRVA: 0x235A0
+  Symbol: CloseHandle (137)
+  Symbol: CompareStringW (158)
+  Symbol: CreateFileW (206)
+  Symbol: CreateProcessW (232)
+  Symbol: DeleteCriticalSection (276)
+  Symbol: EncodePointer (308)
+  Symbol: EnterCriticalSection (312)
+  Symbol: ExitProcess (359)
+  Symbol: FindClose (382)
+  Symbol: FindFirstFileExW (388)
+  Symbol: FindNextFileW (405)
+  Symbol: FlushFileBuffers (424)
+  Symbol: FreeEnvironmentStringsW (435)
+  Symbol: FreeLibrary (436)
+  Symbol: GetACP (443)
+  Symbol: GetCPInfo (458)
+  Symbol: GetCommandLineA (479)
+  Symbol: GetCommandLineW (480)
+  Symbol: GetConsoleMode (517)
+  Symbol: GetConsoleOutputCP (521)
+  Symbol: GetCurrentProcess (544)
+  Symbol: GetCurrentProcessId (545)
+  Symbol: GetCurrentThreadId (549)
+  Symbol: GetEnvironmentStringsW (577)
+  Symbol: GetExitCodeProcess (582)
+  Symbol: GetFileInformationByHandle (593)
+  Symbol: GetFileSizeEx (598)
+  Symbol: GetFileType (600)
+  Symbol: GetFinalPathNameByHandleW (602)
+  Symbol: GetLastError (618)
+  Symbol: GetModuleFileNameW (637)
+  Symbol: GetModuleHandleExW (640)
+  Symbol: GetModuleHandleW (641)
+  Symbol: GetOEMCP (673)
+  Symbol: GetProcAddress (696)
+  Symbol: GetProcessHeap (702)
+  Symbol: GetStartupInfoW (730)
+  Symbol: GetStdHandle (732)
+  Symbol: GetStringTypeW (737)
+  Symbol: GetSystemTimeAsFileTime (755)
+  Symbol: GetWindowsDirectoryW (818)
+  Symbol: HeapAlloc (849)
+  Symbol: HeapFree (853)
+  Symbol: HeapReAlloc (856)
+  Symbol: HeapSize (858)
+  Symbol: InitializeCriticalSectionAndSpinCount (875)
+  Symbol: InitializeSListHead (879)
+  Symbol: IsDebuggerPresent (901)
+  Symbol: IsProcessorFeaturePresent (908)
+  Symbol: IsValidCodePage (914)
+  Symbol: LCMapStringW (952)
+  Symbol: LeaveCriticalSection (964)
+  Symbol: LoadLibraryExW (970)
+  Symbol: MultiByteToWideChar (1014)
+  Symbol: QueryFullProcessImageNameW (1100)
+  Symbol: QueryPerformanceCounter (1106)
+  Symbol: RaiseException (1129)
+  Symbol: ResumeThread (1236)
+  Symbol: RtlCaptureContext (1238)
+  Symbol: RtlLookupFunctionEntry (1245)
+  Symbol: RtlPcToFileHeader (1247)
+  Symbol: RtlUnwindEx (1251)
+  Symbol: RtlVirtualUnwind (1252)
+  Symbol: SetEnvironmentVariableW (1317)
+  Symbol: SetFilePointerEx (1332)
+  Symbol: SetLastError (1346)
+  Symbol: SetStdHandle (1372)
+  Symbol: SetUnhandledExceptionFilter (1408)
+  Symbol: TerminateProcess (1439)
+  Symbol: TlsAlloc (1457)
+  Symbol: TlsFree (1458)
+  Symbol: TlsGetValue (1459)
+  Symbol: TlsSetValue (1460)
+  Symbol: UnhandledExceptionFilter (1473)
+  Symbol: WaitForSingleObject (1515)
+  Symbol: WideCharToMultiByte (1554)
+  Symbol: WriteConsoleW (1573)
+  Symbol: WriteFile (1574)
+}
+Resources [
+  Total Number of Resources: 1
+  Base Table Address: 0x26400
+  
+  Number of String Entries: 0
+  Number of ID Entries: 1
+  Type: MANIFEST (ID 24) [
+    Table Offset: 0x18
+    Number of String Entries: 0
+    Number of ID Entries: 1
+    Name: (ID 1) [
+      Table Offset: 0x30
+      Number of String Entries: 0
+      Number of ID Entries: 1
+      Language: (ID 1033) [
+        Entry Offset: 0x48
+        Time/Date Stamp: 1970-01-01 00:00:00 (0x0)
+        Major Version: 0
+        Minor Version: 0
+        Characteristics: 0
+        Data [
+          DataRVA: 0x2B060
+          DataSize: 364
+          Codepage: 0
+          Reserved: 0
+          Data (
+            0000: 3C3F786D 6C207665 7273696F 6E3D2231  |<?xml version="1|
+            0010: 2E302220 7374616E 64616C6F 6E653D22  |.0" standalone="|
+            0020: 79657322 3F3E0A3C 61737365 6D626C79  |yes"?>.<assembly|
+            0030: 20786D6C 6E733D22 75726E3A 73636865  | xmlns="urn:sche|
+            0040: 6D61732D 6D696372 6F736F66 742D636F  |mas-microsoft-co|
+            0050: 6D3A6173 6D2E7631 220A2020 20202020  |m:asm.v1".      |
+            0060: 20202020 6D616E69 66657374 56657273  |    manifestVers|
+            0070: 696F6E3D 22312E30 223E0A20 203C7472  |ion="1.0">.  <tr|
+            0080: 75737449 6E666F20 786D6C6E 733D2275  |ustInfo xmlns="u|
+            0090: 726E3A73 6368656D 61732D6D 6963726F  |rn:schemas-micro|
+            00A0: 736F6674 2D636F6D 3A61736D 2E763322  |soft-com:asm.v3"|
+            00B0: 3E0A2020 20203C73 65637572 6974793E  |>.    <security>|
+            00C0: 0A202020 2020203C 72657175 65737465  |.      <requeste|
+            00D0: 64507269 76696C65 6765733E 0A202020  |dPrivileges>.   |
+            00E0: 20202020 20203C72 65717565 73746564  |      <requested|
+            00F0: 45786563 7574696F 6E4C6576 656C206C  |ExecutionLevel l|
+            0100: 6576656C 3D276173 496E766F 6B657227  |evel='asInvoker'|
+            0110: 20756941 63636573 733D2766 616C7365  | uiAccess='false|
+            0120: 272F3E0A 20202020 20203C2F 72657175  |'/>.      </requ|
+            0130: 65737465 64507269 76696C65 6765733E  |estedPrivileges>|
+            0140: 0A202020 203C2F73 65637572 6974793E  |.    </security>|
+            0150: 0A20203C 2F747275 7374496E 666F3E0A  |.  </trustInfo>.|
+            0160: 3C2F6173 73656D62 6C793E0A           |</assembly>.|
+          )
+        ]
+      ]
+    ]
+  ]
+]
+
+File: startup.exe
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+ImageFileHeader {
+  Machine: IMAGE_FILE_MACHINE_AMD64 (0x8664)
+  SectionCount: 7
+  TimeDateStamp: 2026-11-09 15:52:29 (0x6AF1EC3D)
+  PointerToSymbolTable: 0x0
+  SymbolCount: 0
+  StringTableSize: 0
+  OptionalHeaderSize: 240
+  Characteristics [ (0x22)
+    IMAGE_FILE_EXECUTABLE_IMAGE (0x2)
+    IMAGE_FILE_LARGE_ADDRESS_AWARE (0x20)
+  ]
+}
+ImageOptionalHeader {
+  Magic: 0x20B
+  MajorLinkerVersion: 14
+  MinorLinkerVersion: 0
+  SizeOfCode: 54272
+  SizeOfInitializedData: 45568
+  SizeOfUninitializedData: 0
+  AddressOfEntryPoint: 0x1600
+  BaseOfCode: 0x1000
+  ImageBase: 0x140000000
+  SectionAlignment: 4096
+  FileAlignment: 512
+  MajorOperatingSystemVersion: 6
+  MinorOperatingSystemVersion: 0
+  MajorImageVersion: 0
+  MinorImageVersion: 0
+  MajorSubsystemVersion: 6
+  MinorSubsystemVersion: 0
+  SizeOfImage: 122880
+  SizeOfHeaders: 1024
+  CheckSum: 0x0
+  Subsystem: IMAGE_SUBSYSTEM_WINDOWS_CUI (0x3)
+  Characteristics [ (0x8160)
+    IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE (0x40)
+    IMAGE_DLL_CHARACTERISTICS_HIGH_ENTROPY_VA (0x20)
+    IMAGE_DLL_CHARACTERISTICS_NX_COMPAT (0x100)
+    IMAGE_DLL_CHARACTERISTICS_TERMINAL_SERVER_AWARE (0x8000)
+  ]
+  SizeOfStackReserve: 1048576
+  SizeOfStackCommit: 4096
+  SizeOfHeapReserve: 1048576
+  SizeOfHeapCommit: 4096
+  NumberOfRvaAndSize: 16
+  DataDirectory {
+    ExportTableRVA: 0x0
+    ExportTableSize: 0x0
+    ImportTableRVA: 0x16668
+    ImportTableSize: 0x3C
+    ResourceTableRVA: 0x1C000
+    ResourceTableSize: 0x1D0
+    ExceptionTableRVA: 0x1A000
+    ExceptionTableSize: 0xDBC
+    CertificateTableRVA: 0x0
+    CertificateTableSize: 0x0
+    BaseRelocationTableRVA: 0x1D000
+    BaseRelocationTableSize: 0x62C
+    DebugRVA: 0x0
+    DebugSize: 0x0
+    ArchitectureRVA: 0x0
+    ArchitectureSize: 0x0
+    GlobalPtrRVA: 0x0
+    GlobalPtrSize: 0x0
+    TLSTableRVA: 0x0
+    TLSTableSize: 0x0
+    LoadConfigTableRVA: 0xF010
+    LoadConfigTableSize: 0x140
+    BoundImportRVA: 0x0
+    BoundImportSize: 0x0
+    IATRVA: 0x168D8
+    IATSize: 0x230
+    DelayImportDescriptorRVA: 0x0
+    DelayImportDescriptorSize: 0x0
+    CLRRuntimeHeaderRVA: 0x0
+    CLRRuntimeHeaderSize: 0x0
+    ReservedRVA: 0x0
+    ReservedSize: 0x0
+  }
+}
+DOSHeader {
+  Magic: MZ
+  UsedBytesInTheLastPage: 120
+  FileSizeInPages: 1
+  NumberOfRelocationItems: 0
+  HeaderSizeInParagraphs: 4
+  MinimumExtraParagraphs: 0
+  MaximumExtraParagraphs: 0
+  InitialRelativeSS: 0
+  InitialSP: 0
+  Checksum: 0
+  InitialIP: 0
+  InitialRelativeCS: 0
+  AddressOfRelocationTable: 64
+  OverlayNumber: 0
+  OEMid: 0
+  OEMinfo: 0
+  AddressOfNewExeHeader: 120
+}
+Import {
+  Name: void_g4_probe_dep.dll
+  ImportLookupTableRVA: 0x166A8
+  ImportAddressTableRVA: 0x168D8
+  Symbol: g4_dependency (0)
+}
+Import {
+  Name: KERNEL32.dll
+  ImportLookupTableRVA: 0x166B8
+  ImportAddressTableRVA: 0x168E8
+  Symbol: CloseHandle (137)
+  Symbol: CompareStringW (158)
+  Symbol: CreateFileW (206)
+  Symbol: DeleteCriticalSection (276)
+  Symbol: EnterCriticalSection (312)
+  Symbol: ExitProcess (359)
+  Symbol: FindClose (382)
+  Symbol: FindFirstFileExW (388)
+  Symbol: FindNextFileW (405)
+  Symbol: FlushFileBuffers (424)
+  Symbol: FreeEnvironmentStringsW (435)
+  Symbol: FreeLibrary (436)
+  Symbol: GetACP (443)
+  Symbol: GetCPInfo (458)
+  Symbol: GetCommandLineA (479)
+  Symbol: GetCommandLineW (480)
+  Symbol: GetConsoleMode (517)
+  Symbol: GetConsoleOutputCP (521)
+  Symbol: GetCurrentProcess (544)
+  Symbol: GetCurrentProcessId (545)
+  Symbol: GetCurrentThreadId (549)
+  Symbol: GetEnvironmentStringsW (577)
+  Symbol: GetFileType (600)
+  Symbol: GetLastError (618)
+  Symbol: GetModuleFileNameW (637)
+  Symbol: GetModuleHandleExW (640)
+  Symbol: GetModuleHandleW (641)
+  Symbol: GetOEMCP (673)
+  Symbol: GetProcAddress (696)
+  Symbol: GetProcessHeap (702)
+  Symbol: GetStartupInfoW (730)
+  Symbol: GetStdHandle (732)
+  Symbol: GetStringTypeW (737)
+  Symbol: GetSystemTimeAsFileTime (755)
+  Symbol: HeapAlloc (849)
+  Symbol: HeapFree (853)
+  Symbol: HeapReAlloc (856)
+  Symbol: HeapSize (858)
+  Symbol: InitializeCriticalSectionAndSpinCount (875)
+  Symbol: InitializeSListHead (879)
+  Symbol: IsDebuggerPresent (901)
+  Symbol: IsProcessorFeaturePresent (908)
+  Symbol: IsValidCodePage (914)
+  Symbol: LCMapStringW (952)
+  Symbol: LeaveCriticalSection (964)
+  Symbol: LoadLibraryExW (970)
+  Symbol: MultiByteToWideChar (1014)
+  Symbol: QueryPerformanceCounter (1106)
+  Symbol: RaiseException (1129)
+  Symbol: RtlCaptureContext (1238)
+  Symbol: RtlLookupFunctionEntry (1245)
+  Symbol: RtlUnwindEx (1251)
+  Symbol: RtlVirtualUnwind (1252)
+  Symbol: SetEnvironmentVariableW (1317)
+  Symbol: SetFilePointerEx (1332)
+  Symbol: SetLastError (1346)
+  Symbol: SetStdHandle (1372)
+  Symbol: SetUnhandledExceptionFilter (1408)
+  Symbol: TerminateProcess (1439)
+  Symbol: TlsAlloc (1457)
+  Symbol: TlsFree (1458)
+  Symbol: TlsGetValue (1459)
+  Symbol: TlsSetValue (1460)
+  Symbol: UnhandledExceptionFilter (1473)
+  Symbol: WideCharToMultiByte (1554)
+  Symbol: WriteConsoleW (1573)
+  Symbol: WriteFile (1574)
+}
+Resources [
+  Total Number of Resources: 1
+  Base Table Address: 0x18000
+  
+  Number of String Entries: 0
+  Number of ID Entries: 1
+  Type: MANIFEST (ID 24) [
+    Table Offset: 0x18
+    Number of String Entries: 0
+    Number of ID Entries: 1
+    Name: (ID 1) [
+      Table Offset: 0x30
+      Number of String Entries: 0
+      Number of ID Entries: 1
+      Language: (ID 1033) [
+        Entry Offset: 0x48
+        Time/Date Stamp: 1970-01-01 00:00:00 (0x0)
+        Major Version: 0
+        Minor Version: 0
+        Characteristics: 0
+        Data [
+          DataRVA: 0x1C060
+          DataSize: 364
+          Codepage: 0
+          Reserved: 0
+          Data (
+            0000: 3C3F786D 6C207665 7273696F 6E3D2231  |<?xml version="1|
+            0010: 2E302220 7374616E 64616C6F 6E653D22  |.0" standalone="|
+            0020: 79657322 3F3E0A3C 61737365 6D626C79  |yes"?>.<assembly|
+            0030: 20786D6C 6E733D22 75726E3A 73636865  | xmlns="urn:sche|
+            0040: 6D61732D 6D696372 6F736F66 742D636F  |mas-microsoft-co|
+            0050: 6D3A6173 6D2E7631 220A2020 20202020  |m:asm.v1".      |
+            0060: 20202020 6D616E69 66657374 56657273  |    manifestVers|
+            0070: 696F6E3D 22312E30 223E0A20 203C7472  |ion="1.0">.  <tr|
+            0080: 75737449 6E666F20 786D6C6E 733D2275  |ustInfo xmlns="u|
+            0090: 726E3A73 6368656D 61732D6D 6963726F  |rn:schemas-micro|
+            00A0: 736F6674 2D636F6D 3A61736D 2E763322  |soft-com:asm.v3"|
+            00B0: 3E0A2020 20203C73 65637572 6974793E  |>.    <security>|
+            00C0: 0A202020 2020203C 72657175 65737465  |.      <requeste|
+            00D0: 64507269 76696C65 6765733E 0A202020  |dPrivileges>.   |
+            00E0: 20202020 20203C72 65717565 73746564  |      <requested|
+            00F0: 45786563 7574696F 6E4C6576 656C206C  |ExecutionLevel l|
+            0100: 6576656C 3D276173 496E766F 6B657227  |evel='asInvoker'|
+            0110: 20756941 63636573 733D2766 616C7365  | uiAccess='false|
+            0120: 272F3E0A 20202020 20203C2F 72657175  |'/>.      </requ|
+            0130: 65737465 64507269 76696C65 6765733E  |estedPrivileges>|
+            0140: 0A202020 203C2F73 65637572 6974793E  |.    </security>|
+            0150: 0A20203C 2F747275 7374496E 666F3E0A  |.  </trustInfo>.|
+            0160: 3C2F6173 73656D62 6C793E0A           |</assembly>.|
+          )
+        ]
+      ]
+    ]
+  ]
+]
+
+File: good/void_g4_probe_main.dll
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+ImageFileHeader {
+  Machine: IMAGE_FILE_MACHINE_AMD64 (0x8664)
+  SectionCount: 3
+  TimeDateStamp: 2026-11-09 15:52:25 (0x6AF1EC39)
+  PointerToSymbolTable: 0x0
+  SymbolCount: 0
+  StringTableSize: 0
+  OptionalHeaderSize: 240
+  Characteristics [ (0x2022)
+    IMAGE_FILE_DLL (0x2000)
+    IMAGE_FILE_EXECUTABLE_IMAGE (0x2)
+    IMAGE_FILE_LARGE_ADDRESS_AWARE (0x20)
+  ]
+}
+ImageOptionalHeader {
+  Magic: 0x20B
+  MajorLinkerVersion: 14
+  MinorLinkerVersion: 0
+  SizeOfCode: 512
+  SizeOfInitializedData: 1024
+  SizeOfUninitializedData: 0
+  AddressOfEntryPoint: 0x0
+  BaseOfCode: 0x1000
+  ImageBase: 0x180000000
+  SectionAlignment: 4096
+  FileAlignment: 512
+  MajorOperatingSystemVersion: 6
+  MinorOperatingSystemVersion: 0
+  MajorImageVersion: 0
+  MinorImageVersion: 0
+  MajorSubsystemVersion: 6
+  MinorSubsystemVersion: 0
+  SizeOfImage: 16384
+  SizeOfHeaders: 1024
+  CheckSum: 0x0
+  Subsystem: IMAGE_SUBSYSTEM_WINDOWS_GUI (0x2)
+  Characteristics [ (0x160)
+    IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE (0x40)
+    IMAGE_DLL_CHARACTERISTICS_HIGH_ENTROPY_VA (0x20)
+    IMAGE_DLL_CHARACTERISTICS_NX_COMPAT (0x100)
+  ]
+  SizeOfStackReserve: 1048576
+  SizeOfStackCommit: 4096
+  SizeOfHeapReserve: 1048576
+  SizeOfHeapCommit: 4096
+  NumberOfRvaAndSize: 16
+  DataDirectory {
+    ExportTableRVA: 0x2000
+    ExportTableSize: 0x75
+    ImportTableRVA: 0x2078
+    ImportTableSize: 0x28
+    ResourceTableRVA: 0x0
+    ResourceTableSize: 0x0
+    ExceptionTableRVA: 0x3000
+    ExceptionTableSize: 0xC
+    CertificateTableRVA: 0x0
+    CertificateTableSize: 0x0
+    BaseRelocationTableRVA: 0x0
+    BaseRelocationTableSize: 0x0
+    DebugRVA: 0x0
+    DebugSize: 0x0
+    ArchitectureRVA: 0x0
+    ArchitectureSize: 0x0
+    GlobalPtrRVA: 0x0
+    GlobalPtrSize: 0x0
+    TLSTableRVA: 0x0
+    TLSTableSize: 0x0
+    LoadConfigTableRVA: 0x0
+    LoadConfigTableSize: 0x0
+    BoundImportRVA: 0x0
+    BoundImportSize: 0x0
+    IATRVA: 0x20B0
+    IATSize: 0x10
+    DelayImportDescriptorRVA: 0x0
+    DelayImportDescriptorSize: 0x0
+    CLRRuntimeHeaderRVA: 0x0
+    CLRRuntimeHeaderSize: 0x0
+    ReservedRVA: 0x0
+    ReservedSize: 0x0
+  }
+}
+DOSHeader {
+  Magic: MZ
+  UsedBytesInTheLastPage: 120
+  FileSizeInPages: 1
+  NumberOfRelocationItems: 0
+  HeaderSizeInParagraphs: 4
+  MinimumExtraParagraphs: 0
+  MaximumExtraParagraphs: 0
+  InitialRelativeSS: 0
+  InitialSP: 0
+  Checksum: 0
+  InitialIP: 0
+  InitialRelativeCS: 0
+  AddressOfRelocationTable: 64
+  OverlayNumber: 0
+  OEMid: 0
+  OEMinfo: 0
+  AddressOfNewExeHeader: 120
+}
+Import {
+  Name: void_g4_probe_dep.dll
+  ImportLookupTableRVA: 0x20A0
+  ImportAddressTableRVA: 0x20B0
+  Symbol: g4_dependency (0)
+}
+Export {
+  Ordinal: 1
+  Name: g4_dependency_address
+  RVA: 0x1020
+}
+Export {
+  Ordinal: 2
+  Name: g4_provider
+  RVA: 0x1000
+}
+Resources [
+]
+
+File: good/void_g4_probe_dep.dll
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+ImageFileHeader {
+  Machine: IMAGE_FILE_MACHINE_AMD64 (0x8664)
+  SectionCount: 2
+  TimeDateStamp: 2026-11-09 15:52:25 (0x6AF1EC39)
+  PointerToSymbolTable: 0x0
+  SymbolCount: 0
+  StringTableSize: 0
+  OptionalHeaderSize: 240
+  Characteristics [ (0x2022)
+    IMAGE_FILE_DLL (0x2000)
+    IMAGE_FILE_EXECUTABLE_IMAGE (0x2)
+    IMAGE_FILE_LARGE_ADDRESS_AWARE (0x20)
+  ]
+}
+ImageOptionalHeader {
+  Magic: 0x20B
+  MajorLinkerVersion: 14
+  MinorLinkerVersion: 0
+  SizeOfCode: 512
+  SizeOfInitializedData: 512
+  SizeOfUninitializedData: 0
+  AddressOfEntryPoint: 0x0
+  BaseOfCode: 0x1000
+  ImageBase: 0x180000000
+  SectionAlignment: 4096
+  FileAlignment: 512
+  MajorOperatingSystemVersion: 6
+  MinorOperatingSystemVersion: 0
+  MajorImageVersion: 0
+  MinorImageVersion: 0
+  MajorSubsystemVersion: 6
+  MinorSubsystemVersion: 0
+  SizeOfImage: 12288
+  SizeOfHeaders: 1024
+  CheckSum: 0x0
+  Subsystem: IMAGE_SUBSYSTEM_WINDOWS_GUI (0x2)
+  Characteristics [ (0x160)
+    IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE (0x40)
+    IMAGE_DLL_CHARACTERISTICS_HIGH_ENTROPY_VA (0x20)
+    IMAGE_DLL_CHARACTERISTICS_NX_COMPAT (0x100)
+  ]
+  SizeOfStackReserve: 1048576
+  SizeOfStackCommit: 4096
+  SizeOfHeapReserve: 1048576
+  SizeOfHeapCommit: 4096
+  NumberOfRvaAndSize: 16
+  DataDirectory {
+    ExportTableRVA: 0x2000
+    ExportTableSize: 0x56
+    ImportTableRVA: 0x0
+    ImportTableSize: 0x0
+    ResourceTableRVA: 0x0
+    ResourceTableSize: 0x0
+    ExceptionTableRVA: 0x0
+    ExceptionTableSize: 0x0
+    CertificateTableRVA: 0x0
+    CertificateTableSize: 0x0
+    BaseRelocationTableRVA: 0x0
+    BaseRelocationTableSize: 0x0
+    DebugRVA: 0x0
+    DebugSize: 0x0
+    ArchitectureRVA: 0x0
+    ArchitectureSize: 0x0
+    GlobalPtrRVA: 0x0
+    GlobalPtrSize: 0x0
+    TLSTableRVA: 0x0
+    TLSTableSize: 0x0
+    LoadConfigTableRVA: 0x0
+    LoadConfigTableSize: 0x0
+    BoundImportRVA: 0x0
+    BoundImportSize: 0x0
+    IATRVA: 0x0
+    IATSize: 0x0
+    DelayImportDescriptorRVA: 0x0
+    DelayImportDescriptorSize: 0x0
+    CLRRuntimeHeaderRVA: 0x0
+    CLRRuntimeHeaderSize: 0x0
+    ReservedRVA: 0x0
+    ReservedSize: 0x0
+  }
+}
+DOSHeader {
+  Magic: MZ
+  UsedBytesInTheLastPage: 120
+  FileSizeInPages: 1
+  NumberOfRelocationItems: 0
+  HeaderSizeInParagraphs: 4
+  MinimumExtraParagraphs: 0
+  MaximumExtraParagraphs: 0
+  InitialRelativeSS: 0
+  InitialSP: 0
+  Checksum: 0
+  InitialIP: 0
+  InitialRelativeCS: 0
+  AddressOfRelocationTable: 64
+  OverlayNumber: 0
+  OEMid: 0
+  OEMinfo: 0
+  AddressOfNewExeHeader: 120
+}
+Export {
+  Ordinal: 1
+  Name: g4_dependency
+  RVA: 0x1000
+}
+Resources [
+]
+
+File: alternate/void_g4_probe_dep.dll
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+ImageFileHeader {
+  Machine: IMAGE_FILE_MACHINE_AMD64 (0x8664)
+  SectionCount: 4
+  TimeDateStamp: 2026-11-09 15:52:25 (0x6AF1EC39)
+  PointerToSymbolTable: 0x0
+  SymbolCount: 0
+  StringTableSize: 0
+  OptionalHeaderSize: 240
+  Characteristics [ (0x2022)
+    IMAGE_FILE_DLL (0x2000)
+    IMAGE_FILE_EXECUTABLE_IMAGE (0x2)
+    IMAGE_FILE_LARGE_ADDRESS_AWARE (0x20)
+  ]
+}
+ImageOptionalHeader {
+  Magic: 0x20B
+  MajorLinkerVersion: 14
+  MinorLinkerVersion: 0
+  SizeOfCode: 512
+  SizeOfInitializedData: 1024
+  SizeOfUninitializedData: 0
+  AddressOfEntryPoint: 0x1010
+  BaseOfCode: 0x1000
+  ImageBase: 0x180000000
+  SectionAlignment: 4096
+  FileAlignment: 512
+  MajorOperatingSystemVersion: 6
+  MinorOperatingSystemVersion: 0
+  MajorImageVersion: 0
+  MinorImageVersion: 0
+  MajorSubsystemVersion: 6
+  MinorSubsystemVersion: 0
+  SizeOfImage: 20480
+  SizeOfHeaders: 1024
+  CheckSum: 0x0
+  Subsystem: IMAGE_SUBSYSTEM_WINDOWS_GUI (0x2)
+  Characteristics [ (0x160)
+    IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE (0x40)
+    IMAGE_DLL_CHARACTERISTICS_HIGH_ENTROPY_VA (0x20)
+    IMAGE_DLL_CHARACTERISTICS_NX_COMPAT (0x100)
+  ]
+  SizeOfStackReserve: 1048576
+  SizeOfStackCommit: 4096
+  SizeOfHeapReserve: 1048576
+  SizeOfHeapCommit: 4096
+  NumberOfRvaAndSize: 16
+  DataDirectory {
+    ExportTableRVA: 0x2000
+    ExportTableSize: 0x6F
+    ImportTableRVA: 0x0
+    ImportTableSize: 0x0
+    ResourceTableRVA: 0x0
+    ResourceTableSize: 0x0
+    ExceptionTableRVA: 0x4000
+    ExceptionTableSize: 0xC
+    CertificateTableRVA: 0x0
+    CertificateTableSize: 0x0
+    BaseRelocationTableRVA: 0x0
+    BaseRelocationTableSize: 0x0
+    DebugRVA: 0x0
+    DebugSize: 0x0
+    ArchitectureRVA: 0x0
+    ArchitectureSize: 0x0
+    GlobalPtrRVA: 0x0
+    GlobalPtrSize: 0x0
+    TLSTableRVA: 0x0
+    TLSTableSize: 0x0
+    LoadConfigTableRVA: 0x0
+    LoadConfigTableSize: 0x0
+    BoundImportRVA: 0x0
+    BoundImportSize: 0x0
+    IATRVA: 0x0
+    IATSize: 0x0
+    DelayImportDescriptorRVA: 0x0
+    DelayImportDescriptorSize: 0x0
+    CLRRuntimeHeaderRVA: 0x0
+    CLRRuntimeHeaderSize: 0x0
+    ReservedRVA: 0x0
+    ReservedSize: 0x0
+  }
+}
+DOSHeader {
+  Magic: MZ
+  UsedBytesInTheLastPage: 120
+  FileSizeInPages: 1
+  NumberOfRelocationItems: 0
+  HeaderSizeInParagraphs: 4
+  MinimumExtraParagraphs: 0
+  MaximumExtraParagraphs: 0
+  InitialRelativeSS: 0
+  InitialSP: 0
+  Checksum: 0
+  InitialIP: 0
+  InitialRelativeCS: 0
+  AddressOfRelocationTable: 64
+  OverlayNumber: 0
+  OEMid: 0
+  OEMinfo: 0
+  AddressOfNewExeHeader: 120
+}
+Export {
+  Ordinal: 1
+  Name: g4_dependency
+  RVA: 0x1000
+}
+Export {
+  Ordinal: 2
+  Name: g4_init_marker
+  RVA: 0x3000
+}
+Resources [
+]
+
+File: good/void_g4w_explicit.dll
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+ImageFileHeader {
+  Machine: IMAGE_FILE_MACHINE_AMD64 (0x8664)
+  SectionCount: 4
+  TimeDateStamp: 2026-11-09 15:52:25 (0x6AF1EC39)
+  PointerToSymbolTable: 0x0
+  SymbolCount: 0
+  StringTableSize: 0
+  OptionalHeaderSize: 240
+  Characteristics [ (0x2022)
+    IMAGE_FILE_DLL (0x2000)
+    IMAGE_FILE_EXECUTABLE_IMAGE (0x2)
+    IMAGE_FILE_LARGE_ADDRESS_AWARE (0x20)
+  ]
+}
+ImageOptionalHeader {
+  Magic: 0x20B
+  MajorLinkerVersion: 14
+  MinorLinkerVersion: 0
+  SizeOfCode: 512
+  SizeOfInitializedData: 1024
+  SizeOfUninitializedData: 0
+  AddressOfEntryPoint: 0x0
+  BaseOfCode: 0x1000
+  ImageBase: 0x180000000
+  SectionAlignment: 4096
+  FileAlignment: 512
+  MajorOperatingSystemVersion: 6
+  MinorOperatingSystemVersion: 0
+  MajorImageVersion: 0
+  MinorImageVersion: 0
+  MajorSubsystemVersion: 6
+  MinorSubsystemVersion: 0
+  SizeOfImage: 20480
+  SizeOfHeaders: 1024
+  CheckSum: 0x0
+  Subsystem: IMAGE_SUBSYSTEM_WINDOWS_GUI (0x2)
+  Characteristics [ (0x160)
+    IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE (0x40)
+    IMAGE_DLL_CHARACTERISTICS_HIGH_ENTROPY_VA (0x20)
+    IMAGE_DLL_CHARACTERISTICS_NX_COMPAT (0x100)
+  ]
+  SizeOfStackReserve: 1048576
+  SizeOfStackCommit: 4096
+  SizeOfHeapReserve: 1048576
+  SizeOfHeapCommit: 4096
+  NumberOfRvaAndSize: 16
+  DataDirectory {
+    ExportTableRVA: 0x2008
+    ExportTableSize: 0x94
+    ImportTableRVA: 0x0
+    ImportTableSize: 0x0
+    ResourceTableRVA: 0x0
+    ResourceTableSize: 0x0
+    ExceptionTableRVA: 0x4000
+    ExceptionTableSize: 0x3C
+    CertificateTableRVA: 0x0
+    CertificateTableSize: 0x0
+    BaseRelocationTableRVA: 0x0
+    BaseRelocationTableSize: 0x0
+    DebugRVA: 0x0
+    DebugSize: 0x0
+    ArchitectureRVA: 0x0
+    ArchitectureSize: 0x0
+    GlobalPtrRVA: 0x0
+    GlobalPtrSize: 0x0
+    TLSTableRVA: 0x0
+    TLSTableSize: 0x0
+    LoadConfigTableRVA: 0x0
+    LoadConfigTableSize: 0x0
+    BoundImportRVA: 0x0
+    BoundImportSize: 0x0
+    IATRVA: 0x0
+    IATSize: 0x0
+    DelayImportDescriptorRVA: 0x0
+    DelayImportDescriptorSize: 0x0
+    CLRRuntimeHeaderRVA: 0x0
+    CLRRuntimeHeaderSize: 0x0
+    ReservedRVA: 0x0
+    ReservedSize: 0x0
+  }
+}
+DOSHeader {
+  Magic: MZ
+  UsedBytesInTheLastPage: 120
+  FileSizeInPages: 1
+  NumberOfRelocationItems: 0
+  HeaderSizeInParagraphs: 4
+  MinimumExtraParagraphs: 0
+  MaximumExtraParagraphs: 0
+  InitialRelativeSS: 0
+  InitialSP: 0
+  Checksum: 0
+  InitialIP: 0
+  InitialRelativeCS: 0
+  AddressOfRelocationTable: 64
+  OverlayNumber: 0
+  OEMid: 0
+  OEMinfo: 0
+  AddressOfNewExeHeader: 120
+}
+Export {
+  Ordinal: 1
+  Name: acquire
+  RVA: 0x10D0
+}
+Export {
+  Ordinal: 2
+  Name: fill
+  RVA: 0x1070
+}
+Export {
+  Ordinal: 3
+  Name: inspect
+  RVA: 0x1130
+}
+Export {
+  Ordinal: 4
+  Name: release
+  RVA: 0x1180
+}
+Export {
+  Ordinal: 5
+  Name: sample
+  RVA: 0x1000
+}
+Resources [
+]
+
+File: good/void_g4w_forwarder.dll
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+ImageFileHeader {
+  Machine: IMAGE_FILE_MACHINE_AMD64 (0x8664)
+  SectionCount: 2
+  TimeDateStamp: 2026-11-09 15:52:25 (0x6AF1EC39)
+  PointerToSymbolTable: 0x0
+  SymbolCount: 0
+  StringTableSize: 0
+  OptionalHeaderSize: 240
+  Characteristics [ (0x2022)
+    IMAGE_FILE_DLL (0x2000)
+    IMAGE_FILE_EXECUTABLE_IMAGE (0x2)
+    IMAGE_FILE_LARGE_ADDRESS_AWARE (0x20)
+  ]
+}
+ImageOptionalHeader {
+  Magic: 0x20B
+  MajorLinkerVersion: 14
+  MinorLinkerVersion: 0
+  SizeOfCode: 0
+  SizeOfInitializedData: 512
+  SizeOfUninitializedData: 0
+  AddressOfEntryPoint: 0x0
+  BaseOfCode: 0x0
+  ImageBase: 0x180000000
+  SectionAlignment: 4096
+  FileAlignment: 512
+  MajorOperatingSystemVersion: 6
+  MinorOperatingSystemVersion: 0
+  MajorImageVersion: 0
+  MinorImageVersion: 0
+  MajorSubsystemVersion: 6
+  MinorSubsystemVersion: 0
+  SizeOfImage: 12288
+  SizeOfHeaders: 1024
+  CheckSum: 0x0
+  Subsystem: IMAGE_SUBSYSTEM_WINDOWS_GUI (0x2)
+  Characteristics [ (0x160)
+    IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE (0x40)
+    IMAGE_DLL_CHARACTERISTICS_HIGH_ENTROPY_VA (0x20)
+    IMAGE_DLL_CHARACTERISTICS_NX_COMPAT (0x100)
+  ]
+  SizeOfStackReserve: 1048576
+  SizeOfStackCommit: 4096
+  SizeOfHeapReserve: 1048576
+  SizeOfHeapCommit: 4096
+  NumberOfRvaAndSize: 16
+  DataDirectory {
+    ExportTableRVA: 0x1000
+    ExportTableSize: 0x73
+    ImportTableRVA: 0x0
+    ImportTableSize: 0x0
+    ResourceTableRVA: 0x0
+    ResourceTableSize: 0x0
+    ExceptionTableRVA: 0x0
+    ExceptionTableSize: 0x0
+    CertificateTableRVA: 0x0
+    CertificateTableSize: 0x0
+    BaseRelocationTableRVA: 0x0
+    BaseRelocationTableSize: 0x0
+    DebugRVA: 0x0
+    DebugSize: 0x0
+    ArchitectureRVA: 0x0
+    ArchitectureSize: 0x0
+    GlobalPtrRVA: 0x0
+    GlobalPtrSize: 0x0
+    TLSTableRVA: 0x0
+    TLSTableSize: 0x0
+    LoadConfigTableRVA: 0x0
+    LoadConfigTableSize: 0x0
+    BoundImportRVA: 0x0
+    BoundImportSize: 0x0
+    IATRVA: 0x0
+    IATSize: 0x0
+    DelayImportDescriptorRVA: 0x0
+    DelayImportDescriptorSize: 0x0
+    CLRRuntimeHeaderRVA: 0x0
+    CLRRuntimeHeaderSize: 0x0
+    ReservedRVA: 0x0
+    ReservedSize: 0x0
+  }
+}
+DOSHeader {
+  Magic: MZ
+  UsedBytesInTheLastPage: 120
+  FileSizeInPages: 1
+  NumberOfRelocationItems: 0
+  HeaderSizeInParagraphs: 4
+  MinimumExtraParagraphs: 0
+  MaximumExtraParagraphs: 0
+  InitialRelativeSS: 0
+  InitialSP: 0
+  Checksum: 0
+  InitialIP: 0
+  InitialRelativeCS: 0
+  AddressOfRelocationTable: 64
+  OverlayNumber: 0
+  OEMid: 0
+  OEMinfo: 0
+  AddressOfNewExeHeader: 120
+}
+Export {
+  Ordinal: 1
+  Name: forwarded
+  ForwardedTo: void_g4_probe_dep.g4_dependency
+}
+Resources [
+]

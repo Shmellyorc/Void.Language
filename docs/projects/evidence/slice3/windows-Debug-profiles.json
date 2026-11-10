@@ -1,0 +1,559 @@
+{
+  "checks": 43,
+  "commands": [
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc"
+      ],
+      "status": 0,
+      "stdout": "Source checked successfully\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--no-cache"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--profile",
+        "release"
+      ],
+      "status": 0,
+      "stdout": "Source checked successfully\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--no-cache",
+        "--profile",
+        "release"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--profile",
+        "debug"
+      ],
+      "status": 0,
+      "stdout": "Source checked successfully\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--no-cache",
+        "--profile",
+        "debug"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "Source checked successfully\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--profile"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: Expected one debug|release value after --profile.\r\nUsage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\r\nTry 'voidc run --help' for examples.\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--profile",
+        "Debug"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --profile requires exactly debug or release.\r\nUsage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\r\nTry 'voidc run --help' for examples.\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--profile",
+        "other"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --profile requires exactly debug or release.\r\nUsage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\r\nTry 'voidc run --help' for examples.\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--profile",
+        "debug",
+        "--profile",
+        "release"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: Expected one debug|release value after --profile.\r\nUsage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\r\nTry 'voidc run --help' for examples.\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--profile",
+        "release",
+        "--cache"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --cache requires the debug profile with effective optimization='none'; it cannot override an explicit release profile or O2 setting.\r\nUsage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\r\nTry 'voidc run --help' for examples.\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--profile",
+        "release",
+        "--cache",
+        "--no-opt"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --cache requires the debug profile with effective optimization='none'; it cannot override an explicit release profile or O2 setting.\r\nUsage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\r\nTry 'voidc run --help' for examples.\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--profile",
+        "debug",
+        "--cache",
+        "--no-cache"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --cache and --no-cache cannot be combined.\r\nUsage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\r\nTry 'voidc run --help' for examples.\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\src\\game.void",
+        "--profile",
+        "debug"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --profile requires a manifest-selected project context.\r\nUsage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\r\nTry 'voidc run --help' for examples.\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\src\\game.void",
+        "--profile",
+        "debug"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --profile requires a manifest-selected project context.\r\nUsage: voidc check <file-or-directory> [--no-opt]\r\nTry 'voidc check --help' for examples.\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "build",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\src\\game.void",
+        "--profile",
+        "debug"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --profile requires a manifest-selected project context.\r\nUsage: voidc build [file-or-directory] [-o executable] [--no-opt]\r\nTry 'voidc build --help' for examples.\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "emit",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\src\\game.void",
+        "--profile",
+        "debug",
+        "-o",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\unused.o"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --profile requires a manifest-selected project context.\r\nUsage: voidc emit <file-or-directory> -o <object> [--no-opt]\r\nTry 'voidc emit --help' for examples.\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "emit",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--profile",
+        "debug",
+        "-o",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\debug.o"
+      ],
+      "status": 0,
+      "stdout": "Wrote native source object: C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/debug.o\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\llvm-objdump.exe",
+        "-d",
+        "--no-show-raw-insn",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\debug.o"
+      ],
+      "status": 0,
+      "stdout": "\nC:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\debug.o:\tfile format coff-x86-64\n\nDisassembly of section .text:\n\n0000000000000000 <__vd_2f7372632f67616d652e766f69643a3a636f6d70757465__void>:\n       0:      \tsubq\t$0x10, %rsp\n       4:      \tmovl\t%ecx, %eax\n       6:      \tmovl\t%ecx, 0xc(%rsp)\n       a:      \tmovl\t%ecx, 0x4(%rsp)\n       e:      \tmovl\t%ecx, 0x8(%rsp)\n      12:      \tmovl\t%ecx, (%rsp)\n      15:      \taddq\t$0x10, %rsp\n      19:      \tretq\n      1a:      \tnopw\t(%rax,%rax)\n\n0000000000000020 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void>:\n      20:      \tpushq\t%rsi\n      21:      \tsubq\t$0x30, %rsp\n      25:      \tmovq\t%rcx, %rsi\n      28:      \tmovl\t$0x17, 0x2c(%rsp)\n      30:      \tmovl\t$0x17, %ecx\n      35:      \tmovq\t%rsi, %rdx\n      38:      \tcallq\t0x3d <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x1d>\n      3d:      \tcmpq\t$0x0, (%rsi)\n      41:      \tje\t0x6a <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x4a>\n      43:      \tmovl\t0x8(%rsi), %eax\n      46:      \tcmpl\t$0x20, %eax\n      49:      \tjae\t0x61 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x41>\n      4b:      \tmovslq\t%eax, %rcx\n      4e:      \tleaq\t0x18(%rip), %rdx        # 0x6d <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x4d>\n      55:      \tmovq\t%rdx, 0x10(%rsi,%rcx,8)\n      5a:      \tincl\t%eax\n      5c:      \tmovl\t%eax, 0x8(%rsi)\n      5f:      \tjmp\t0x68 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x48>\n      61:      \tmovl\t$0x21, 0x8(%rsi)\n      68:      \txorl\t%eax, %eax\n      6a:      \taddq\t$0x30, %rsp\n      6e:      \tpopq\t%rsi\n      6f:      \tretq\n\n0000000000000070 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void>:\n      70:      \tpushq\t%rsi\n      71:      \tsubq\t$0x30, %rsp\n      75:      \tmovq\t%rdx, %rsi\n      78:      \tmovl\t$0x0, 0x2c(%rsp)\n      80:      \tmovq\t%rdx, %rcx\n      83:      \tcallq\t0x88 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x18>\n      88:      \tcmpq\t$0x0, (%rsi)\n      8c:      \tje\t0xb5 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x45>\n      8e:      \tmovl\t0x8(%rsi), %eax\n      91:      \tcmpl\t$0x20, %eax\n      94:      \tjae\t0xac <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x3c>\n      96:      \tmovslq\t%eax, %rcx\n      99:      \tleaq\t0xdf(%rip), %rdx        # 0x17f <wmain+0xbf>\n      a0:      \tmovq\t%rdx, 0x10(%rsi,%rcx,8)\n      a5:      \tincl\t%eax\n      a7:      \tmovl\t%eax, 0x8(%rsi)\n      aa:      \tjmp\t0xb3 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x43>\n      ac:      \tmovl\t$0x21, 0x8(%rsi)\n      b3:      \txorl\t%eax, %eax\n      b5:      \taddq\t$0x30, %rsp\n      b9:      \tpopq\t%rsi\n      ba:      \tretq\n      bb:      \tnopl\t(%rax,%rax)\n\n00000000000000c0 <wmain>:\n      c0:      \tpushq\t%rsi\n      c1:      \tpushq\t%rdi\n      c2:      \tpushq\t%rbp\n      c3:      \tpushq\t%rbx\n      c4:      \tsubq\t$0x138, %rsp            # imm = 0x138\n      cb:      \txorps\t%xmm0, %xmm0\n      ce:      \tmovups\t%xmm0, 0x128(%rsp)\n      d6:      \tmovups\t%xmm0, 0x118(%rsp)\n      de:      \tmovups\t%xmm0, 0x108(%rsp)\n      e6:      \tmovups\t%xmm0, 0xf8(%rsp)\n      ee:      \tmovups\t%xmm0, 0xe8(%rsp)\n      f6:      \tmovups\t%xmm0, 0xd8(%rsp)\n      fe:      \tmovups\t%xmm0, 0xc8(%rsp)\n     106:      \tmovups\t%xmm0, 0xb8(%rsp)\n     10e:      \tmovups\t%xmm0, 0xa8(%rsp)\n     116:      \tmovups\t%xmm0, 0x98(%rsp)\n     11e:      \tmovups\t%xmm0, 0x88(%rsp)\n     126:      \tmovups\t%xmm0, 0x78(%rsp)\n     12b:      \tmovups\t%xmm0, 0x68(%rsp)\n     130:      \tmovups\t%xmm0, 0x58(%rsp)\n     135:      \tmovups\t%xmm0, 0x48(%rsp)\n     13a:      \tmovups\t%xmm0, 0x38(%rsp)\n     13f:      \tmovl\t$0x0, 0x30(%rsp)\n     147:      \tmovq\t$0x0, 0x28(%rsp)\n     150:      \tleaq\t0x28(%rsp), %rdx\n     155:      \txorl\t%ecx, %ecx\n     157:      \tcallq\t0x15c <wmain+0x9c>\n     15c:      \tmovq\t0x28(%rsp), %rbx\n     161:      \ttestq\t%rbx, %rbx\n     164:      \tje\t0x1f2 <wmain+0x132>\n     16a:      \tmovl\t$0x2, %ecx\n     16f:      \tcallq\t0x174 <wmain+0xb4>\n     174:      \tmovq\t%rax, %rsi\n     177:      \tleaq\t0x189(%rip), %rdi       # 0x307 <wmain+0x247>\n     17e:      \tmovq\t%rax, %rcx\n     181:      \tmovq\t%rdi, %rdx\n     184:      \tmovq\t%rbx, %r8\n     187:      \tcallq\t0x18c <wmain+0xcc>\n     18c:      \txorl\t%ebx, %ebx\n     18e:      \tmovl\t0x30(%rsp), %ebp\n     192:      \tcmpl\t%ebp, %ebx\n     194:      \tjae\t0x1bc <wmain+0xfc>\n     196:      \tnopw\t%cs:(%rax,%rax)\n     1a0:      \tcmpl\t$0x1f, %ebx\n     1a3:      \tja\t0x1bc <wmain+0xfc>\n     1a5:      \tmovq\t0x38(%rsp,%rbx,8), %r8\n     1aa:      \tmovq\t%rsi, %rcx\n     1ad:      \tmovq\t%rdi, %rdx\n     1b0:      \tcallq\t0x1b5 <wmain+0xf5>\n     1b5:      \tincq\t%rbx\n     1b8:      \tcmpl\t%ebp, %ebx\n     1ba:      \tjb\t0x1a0 <wmain+0xe0>\n     1bc:      \tcmpl\t$0x21, %ebp\n     1bf:      \tjb\t0x1d7 <wmain+0x117>\n     1c1:      \tleaq\t0x189(%rip), %rdx       # 0x351 <wmain+0x291>\n     1c8:      \tleaq\t0x18c(%rip), %r8        # 0x35b <wmain+0x29b>\n     1cf:      \tmovq\t%rsi, %rcx\n     1d2:      \tcallq\t0x1d7 <wmain+0x117>\n     1d7:      \tleaq\t0x189(%rip), %rdx       # 0x367 <wmain+0x2a7>\n     1de:      \tleaq\t0x1b7(%rip), %r8        # 0x39c <wmain+0x2dc>\n     1e5:      \tmovq\t%rsi, %rcx\n     1e8:      \tcallq\t0x1ed <wmain+0x12d>\n     1ed:      \tmovl\t$0x1, %eax\n     1f2:      \taddq\t$0x138, %rsp            # imm = 0x138\n     1f9:      \tpopq\t%rbx\n     1fa:      \tpopq\t%rbp\n     1fb:      \tpopq\t%rdi\n     1fc:      \tpopq\t%rsi\n     1fd:      \tretq\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "emit",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--profile",
+        "release",
+        "-o",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\release.o"
+      ],
+      "status": 0,
+      "stdout": "Wrote native source object: C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/release.o\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\llvm-objdump.exe",
+        "-d",
+        "--no-show-raw-insn",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\release.o"
+      ],
+      "status": 0,
+      "stdout": "\nC:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\release.o:\tfile format coff-x86-64\n\nDisassembly of section .text:\n\n0000000000000000 <__vd_2f7372632f67616d652e766f69643a3a636f6d70757465__void>:\n       0:      \tmovl\t%ecx, %eax\n       2:      \tretq\n       3:      \tnopw\t%cs:(%rax,%rax)\n\n0000000000000010 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void>:\n      10:      \tcmpq\t$0x0, (%rcx)\n      14:      \tje\t0x39 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x29>\n      16:      \tmovl\t0x8(%rcx), %eax\n      19:      \tmovl\t$0x21, %edx\n      1e:      \tcmpq\t$0x20, %rax\n      22:      \tjae\t0x33 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x23>\n      24:      \tleaq\t0x10(%rip), %rdx        # 0x3b <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x2b>\n      2b:      \tmovq\t%rdx, 0x10(%rcx,%rax,8)\n      30:      \tleal\t0x1(%rax), %edx\n      33:      \tmovl\t%edx, 0x8(%rcx)\n      36:      \txorl\t%eax, %eax\n      38:      \tretq\n      39:      \tmovl\t$0x17, %eax\n      3e:      \tretq\n      3f:      \tnop\n\n0000000000000040 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void>:\n      40:      \tcmpq\t$0x0, (%rdx)\n      44:      \tje\t0x77 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x37>\n      46:      \tmovl\t0x8(%rdx), %eax\n      49:      \tmovl\t$0x21, %ecx\n      4e:      \tcmpq\t$0x1f, %rax\n      52:      \tja\t0x71 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x31>\n      54:      \tleaq\t0x10(%rip), %r8         # 0x6b <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x2b>\n      5b:      \tmovq\t%r8, 0x10(%rdx,%rax,8)\n      60:      \tje\t0x71 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x31>\n      62:      \tleaq\t0xd7(%rip), %rcx        # 0x140 <wmain+0xc0>\n      69:      \tmovq\t%rcx, 0x18(%rdx,%rax,8)\n      6e:      \tleal\t0x2(%rax), %ecx\n      71:      \tmovl\t%ecx, 0x8(%rdx)\n      74:      \txorl\t%eax, %eax\n      76:      \tretq\n      77:      \tmovl\t$0x17, %eax\n      7c:      \tretq\n      7d:      \tnopl\t(%rax)\n\n0000000000000080 <wmain>:\n      80:      \tmovl\t$0x17, %eax\n      85:      \tretq\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "emit",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--profile",
+        "release",
+        "--no-opt",
+        "-o",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\release-noopt.o"
+      ],
+      "status": 0,
+      "stdout": "Wrote native source object: C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/release-noopt.o\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\llvm-objdump.exe",
+        "-d",
+        "--no-show-raw-insn",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\release-noopt.o"
+      ],
+      "status": 0,
+      "stdout": "\nC:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\release-noopt.o:\tfile format coff-x86-64\n\nDisassembly of section .text:\n\n0000000000000000 <__vd_2f7372632f67616d652e766f69643a3a636f6d70757465__void>:\n       0:      \tsubq\t$0x10, %rsp\n       4:      \tmovl\t%ecx, %eax\n       6:      \tmovl\t%ecx, 0xc(%rsp)\n       a:      \tmovl\t%ecx, 0x4(%rsp)\n       e:      \tmovl\t%ecx, 0x8(%rsp)\n      12:      \tmovl\t%ecx, (%rsp)\n      15:      \taddq\t$0x10, %rsp\n      19:      \tretq\n      1a:      \tnopw\t(%rax,%rax)\n\n0000000000000020 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void>:\n      20:      \tpushq\t%rsi\n      21:      \tsubq\t$0x30, %rsp\n      25:      \tmovq\t%rcx, %rsi\n      28:      \tmovl\t$0x17, 0x2c(%rsp)\n      30:      \tmovl\t$0x17, %ecx\n      35:      \tmovq\t%rsi, %rdx\n      38:      \tcallq\t0x3d <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x1d>\n      3d:      \tcmpq\t$0x0, (%rsi)\n      41:      \tje\t0x6a <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x4a>\n      43:      \tmovl\t0x8(%rsi), %eax\n      46:      \tcmpl\t$0x20, %eax\n      49:      \tjae\t0x61 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x41>\n      4b:      \tmovslq\t%eax, %rcx\n      4e:      \tleaq\t0x18(%rip), %rdx        # 0x6d <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x4d>\n      55:      \tmovq\t%rdx, 0x10(%rsi,%rcx,8)\n      5a:      \tincl\t%eax\n      5c:      \tmovl\t%eax, 0x8(%rsi)\n      5f:      \tjmp\t0x68 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x48>\n      61:      \tmovl\t$0x21, 0x8(%rsi)\n      68:      \txorl\t%eax, %eax\n      6a:      \taddq\t$0x30, %rsp\n      6e:      \tpopq\t%rsi\n      6f:      \tretq\n\n0000000000000070 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void>:\n      70:      \tpushq\t%rsi\n      71:      \tsubq\t$0x30, %rsp\n      75:      \tmovq\t%rdx, %rsi\n      78:      \tmovl\t$0x0, 0x2c(%rsp)\n      80:      \tmovq\t%rdx, %rcx\n      83:      \tcallq\t0x88 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x18>\n      88:      \tcmpq\t$0x0, (%rsi)\n      8c:      \tje\t0xb5 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x45>\n      8e:      \tmovl\t0x8(%rsi), %eax\n      91:      \tcmpl\t$0x20, %eax\n      94:      \tjae\t0xac <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x3c>\n      96:      \tmovslq\t%eax, %rcx\n      99:      \tleaq\t0xdf(%rip), %rdx        # 0x17f <wmain+0xbf>\n      a0:      \tmovq\t%rdx, 0x10(%rsi,%rcx,8)\n      a5:      \tincl\t%eax\n      a7:      \tmovl\t%eax, 0x8(%rsi)\n      aa:      \tjmp\t0xb3 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x43>\n      ac:      \tmovl\t$0x21, 0x8(%rsi)\n      b3:      \txorl\t%eax, %eax\n      b5:      \taddq\t$0x30, %rsp\n      b9:      \tpopq\t%rsi\n      ba:      \tretq\n      bb:      \tnopl\t(%rax,%rax)\n\n00000000000000c0 <wmain>:\n      c0:      \tpushq\t%rsi\n      c1:      \tpushq\t%rdi\n      c2:      \tpushq\t%rbp\n      c3:      \tpushq\t%rbx\n      c4:      \tsubq\t$0x138, %rsp            # imm = 0x138\n      cb:      \txorps\t%xmm0, %xmm0\n      ce:      \tmovups\t%xmm0, 0x128(%rsp)\n      d6:      \tmovups\t%xmm0, 0x118(%rsp)\n      de:      \tmovups\t%xmm0, 0x108(%rsp)\n      e6:      \tmovups\t%xmm0, 0xf8(%rsp)\n      ee:      \tmovups\t%xmm0, 0xe8(%rsp)\n      f6:      \tmovups\t%xmm0, 0xd8(%rsp)\n      fe:      \tmovups\t%xmm0, 0xc8(%rsp)\n     106:      \tmovups\t%xmm0, 0xb8(%rsp)\n     10e:      \tmovups\t%xmm0, 0xa8(%rsp)\n     116:      \tmovups\t%xmm0, 0x98(%rsp)\n     11e:      \tmovups\t%xmm0, 0x88(%rsp)\n     126:      \tmovups\t%xmm0, 0x78(%rsp)\n     12b:      \tmovups\t%xmm0, 0x68(%rsp)\n     130:      \tmovups\t%xmm0, 0x58(%rsp)\n     135:      \tmovups\t%xmm0, 0x48(%rsp)\n     13a:      \tmovups\t%xmm0, 0x38(%rsp)\n     13f:      \tmovl\t$0x0, 0x30(%rsp)\n     147:      \tmovq\t$0x0, 0x28(%rsp)\n     150:      \tleaq\t0x28(%rsp), %rdx\n     155:      \txorl\t%ecx, %ecx\n     157:      \tcallq\t0x15c <wmain+0x9c>\n     15c:      \tmovq\t0x28(%rsp), %rbx\n     161:      \ttestq\t%rbx, %rbx\n     164:      \tje\t0x1f2 <wmain+0x132>\n     16a:      \tmovl\t$0x2, %ecx\n     16f:      \tcallq\t0x174 <wmain+0xb4>\n     174:      \tmovq\t%rax, %rsi\n     177:      \tleaq\t0x189(%rip), %rdi       # 0x307 <wmain+0x247>\n     17e:      \tmovq\t%rax, %rcx\n     181:      \tmovq\t%rdi, %rdx\n     184:      \tmovq\t%rbx, %r8\n     187:      \tcallq\t0x18c <wmain+0xcc>\n     18c:      \txorl\t%ebx, %ebx\n     18e:      \tmovl\t0x30(%rsp), %ebp\n     192:      \tcmpl\t%ebp, %ebx\n     194:      \tjae\t0x1bc <wmain+0xfc>\n     196:      \tnopw\t%cs:(%rax,%rax)\n     1a0:      \tcmpl\t$0x1f, %ebx\n     1a3:      \tja\t0x1bc <wmain+0xfc>\n     1a5:      \tmovq\t0x38(%rsp,%rbx,8), %r8\n     1aa:      \tmovq\t%rsi, %rcx\n     1ad:      \tmovq\t%rdi, %rdx\n     1b0:      \tcallq\t0x1b5 <wmain+0xf5>\n     1b5:      \tincq\t%rbx\n     1b8:      \tcmpl\t%ebp, %ebx\n     1ba:      \tjb\t0x1a0 <wmain+0xe0>\n     1bc:      \tcmpl\t$0x21, %ebp\n     1bf:      \tjb\t0x1d7 <wmain+0x117>\n     1c1:      \tleaq\t0x189(%rip), %rdx       # 0x351 <wmain+0x291>\n     1c8:      \tleaq\t0x18c(%rip), %r8        # 0x35b <wmain+0x29b>\n     1cf:      \tmovq\t%rsi, %rcx\n     1d2:      \tcallq\t0x1d7 <wmain+0x117>\n     1d7:      \tleaq\t0x189(%rip), %rdx       # 0x367 <wmain+0x2a7>\n     1de:      \tleaq\t0x1b7(%rip), %r8        # 0x39c <wmain+0x2dc>\n     1e5:      \tmovq\t%rsi, %rcx\n     1e8:      \tcallq\t0x1ed <wmain+0x12d>\n     1ed:      \tmovl\t$0x1, %eax\n     1f2:      \taddq\t$0x138, %rsp            # imm = 0x138\n     1f9:      \tpopq\t%rbx\n     1fa:      \tpopq\t%rbp\n     1fb:      \tpopq\t%rdi\n     1fc:      \tpopq\t%rsi\n     1fd:      \tretq\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "build",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--profile",
+        "debug",
+        "-o",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\debug.exe"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/debug.exe\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\debug.exe"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "build",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--profile",
+        "release",
+        "-o",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\release.exe"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/release.exe\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\release.exe"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--profile",
+        "debug"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--profile",
+        "debug",
+        "--cache"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nDebug cache: unavailable\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--profile",
+        "debug",
+        "--cache"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nDebug cache: unavailable\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--cache"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nDebug cache: unavailable\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "emit",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--profile",
+        "debug",
+        "-o",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\custom-debug.o"
+      ],
+      "status": 0,
+      "stdout": "Wrote native source object: C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/custom-debug.o\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\llvm-objdump.exe",
+        "-d",
+        "--no-show-raw-insn",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\custom-debug.o"
+      ],
+      "status": 0,
+      "stdout": "\nC:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\custom-debug.o:\tfile format coff-x86-64\n\nDisassembly of section .text:\n\n0000000000000000 <__vd_2f7372632f67616d652e766f69643a3a636f6d70757465__void>:\n       0:      \tmovl\t%ecx, %eax\n       2:      \tretq\n       3:      \tnopw\t%cs:(%rax,%rax)\n\n0000000000000010 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void>:\n      10:      \tcmpq\t$0x0, (%rcx)\n      14:      \tje\t0x39 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x29>\n      16:      \tmovl\t0x8(%rcx), %eax\n      19:      \tmovl\t$0x21, %edx\n      1e:      \tcmpq\t$0x20, %rax\n      22:      \tjae\t0x33 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x23>\n      24:      \tleaq\t0x10(%rip), %rdx        # 0x3b <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x2b>\n      2b:      \tmovq\t%rdx, 0x10(%rcx,%rax,8)\n      30:      \tleal\t0x1(%rax), %edx\n      33:      \tmovl\t%edx, 0x8(%rcx)\n      36:      \txorl\t%eax, %eax\n      38:      \tretq\n      39:      \tmovl\t$0x17, %eax\n      3e:      \tretq\n      3f:      \tnop\n\n0000000000000040 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void>:\n      40:      \tcmpq\t$0x0, (%rdx)\n      44:      \tje\t0x77 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x37>\n      46:      \tmovl\t0x8(%rdx), %eax\n      49:      \tmovl\t$0x21, %ecx\n      4e:      \tcmpq\t$0x1f, %rax\n      52:      \tja\t0x71 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x31>\n      54:      \tleaq\t0x10(%rip), %r8         # 0x6b <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x2b>\n      5b:      \tmovq\t%r8, 0x10(%rdx,%rax,8)\n      60:      \tje\t0x71 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x31>\n      62:      \tleaq\t0xd7(%rip), %rcx        # 0x140 <wmain+0xc0>\n      69:      \tmovq\t%rcx, 0x18(%rdx,%rax,8)\n      6e:      \tleal\t0x2(%rax), %ecx\n      71:      \tmovl\t%ecx, 0x8(%rdx)\n      74:      \txorl\t%eax, %eax\n      76:      \tretq\n      77:      \tmovl\t$0x17, %eax\n      7c:      \tretq\n      7d:      \tnopl\t(%rax)\n\n0000000000000080 <wmain>:\n      80:      \tmovl\t$0x17, %eax\n      85:      \tretq\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "emit",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--profile",
+        "release",
+        "-o",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\custom-release.o"
+      ],
+      "status": 0,
+      "stdout": "Wrote native source object: C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/custom-release.o\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/void.project.toml:16:12: warning: Project profile 'release' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 16 | debug_info='full'\r\n    |            ^^^^^^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\llvm-objdump.exe",
+        "-d",
+        "--no-show-raw-insn",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\custom-release.o"
+      ],
+      "status": 0,
+      "stdout": "\nC:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\custom-release.o:\tfile format coff-x86-64\n\nDisassembly of section .text:\n\n0000000000000000 <__vd_2f7372632f67616d652e766f69643a3a636f6d70757465__void>:\n       0:      \tsubq\t$0x10, %rsp\n       4:      \tmovl\t%ecx, %eax\n       6:      \tmovl\t%ecx, 0xc(%rsp)\n       a:      \tmovl\t%ecx, 0x4(%rsp)\n       e:      \tmovl\t%ecx, 0x8(%rsp)\n      12:      \tmovl\t%ecx, (%rsp)\n      15:      \taddq\t$0x10, %rsp\n      19:      \tretq\n      1a:      \tnopw\t(%rax,%rax)\n\n0000000000000020 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void>:\n      20:      \tpushq\t%rsi\n      21:      \tsubq\t$0x30, %rsp\n      25:      \tmovq\t%rcx, %rsi\n      28:      \tmovl\t$0x17, 0x2c(%rsp)\n      30:      \tmovl\t$0x17, %ecx\n      35:      \tmovq\t%rsi, %rdx\n      38:      \tcallq\t0x3d <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x1d>\n      3d:      \tcmpq\t$0x0, (%rsi)\n      41:      \tje\t0x6a <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x4a>\n      43:      \tmovl\t0x8(%rsi), %eax\n      46:      \tcmpl\t$0x20, %eax\n      49:      \tjae\t0x61 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x41>\n      4b:      \tmovslq\t%eax, %rcx\n      4e:      \tleaq\t0x18(%rip), %rdx        # 0x6d <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x4d>\n      55:      \tmovq\t%rdx, 0x10(%rsi,%rcx,8)\n      5a:      \tincl\t%eax\n      5c:      \tmovl\t%eax, 0x8(%rsi)\n      5f:      \tjmp\t0x68 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x48>\n      61:      \tmovl\t$0x21, 0x8(%rsi)\n      68:      \txorl\t%eax, %eax\n      6a:      \taddq\t$0x30, %rsp\n      6e:      \tpopq\t%rsi\n      6f:      \tretq\n\n0000000000000070 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void>:\n      70:      \tpushq\t%rsi\n      71:      \tsubq\t$0x30, %rsp\n      75:      \tmovq\t%rdx, %rsi\n      78:      \tmovl\t$0x0, 0x2c(%rsp)\n      80:      \tmovq\t%rdx, %rcx\n      83:      \tcallq\t0x88 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x18>\n      88:      \tcmpq\t$0x0, (%rsi)\n      8c:      \tje\t0xb5 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x45>\n      8e:      \tmovl\t0x8(%rsi), %eax\n      91:      \tcmpl\t$0x20, %eax\n      94:      \tjae\t0xac <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x3c>\n      96:      \tmovslq\t%eax, %rcx\n      99:      \tleaq\t0xdf(%rip), %rdx        # 0x17f <wmain+0xbf>\n      a0:      \tmovq\t%rdx, 0x10(%rsi,%rcx,8)\n      a5:      \tincl\t%eax\n      a7:      \tmovl\t%eax, 0x8(%rsi)\n      aa:      \tjmp\t0xb3 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x43>\n      ac:      \tmovl\t$0x21, 0x8(%rsi)\n      b3:      \txorl\t%eax, %eax\n      b5:      \taddq\t$0x30, %rsp\n      b9:      \tpopq\t%rsi\n      ba:      \tretq\n      bb:      \tnopl\t(%rax,%rax)\n\n00000000000000c0 <wmain>:\n      c0:      \tpushq\t%rsi\n      c1:      \tpushq\t%rdi\n      c2:      \tpushq\t%rbp\n      c3:      \tpushq\t%rbx\n      c4:      \tsubq\t$0x138, %rsp            # imm = 0x138\n      cb:      \txorps\t%xmm0, %xmm0\n      ce:      \tmovups\t%xmm0, 0x128(%rsp)\n      d6:      \tmovups\t%xmm0, 0x118(%rsp)\n      de:      \tmovups\t%xmm0, 0x108(%rsp)\n      e6:      \tmovups\t%xmm0, 0xf8(%rsp)\n      ee:      \tmovups\t%xmm0, 0xe8(%rsp)\n      f6:      \tmovups\t%xmm0, 0xd8(%rsp)\n      fe:      \tmovups\t%xmm0, 0xc8(%rsp)\n     106:      \tmovups\t%xmm0, 0xb8(%rsp)\n     10e:      \tmovups\t%xmm0, 0xa8(%rsp)\n     116:      \tmovups\t%xmm0, 0x98(%rsp)\n     11e:      \tmovups\t%xmm0, 0x88(%rsp)\n     126:      \tmovups\t%xmm0, 0x78(%rsp)\n     12b:      \tmovups\t%xmm0, 0x68(%rsp)\n     130:      \tmovups\t%xmm0, 0x58(%rsp)\n     135:      \tmovups\t%xmm0, 0x48(%rsp)\n     13a:      \tmovups\t%xmm0, 0x38(%rsp)\n     13f:      \tmovl\t$0x0, 0x30(%rsp)\n     147:      \tmovq\t$0x0, 0x28(%rsp)\n     150:      \tleaq\t0x28(%rsp), %rdx\n     155:      \txorl\t%ecx, %ecx\n     157:      \tcallq\t0x15c <wmain+0x9c>\n     15c:      \tmovq\t0x28(%rsp), %rbx\n     161:      \ttestq\t%rbx, %rbx\n     164:      \tje\t0x1f2 <wmain+0x132>\n     16a:      \tmovl\t$0x2, %ecx\n     16f:      \tcallq\t0x174 <wmain+0xb4>\n     174:      \tmovq\t%rax, %rsi\n     177:      \tleaq\t0x189(%rip), %rdi       # 0x307 <wmain+0x247>\n     17e:      \tmovq\t%rax, %rcx\n     181:      \tmovq\t%rdi, %rdx\n     184:      \tmovq\t%rbx, %r8\n     187:      \tcallq\t0x18c <wmain+0xcc>\n     18c:      \txorl\t%ebx, %ebx\n     18e:      \tmovl\t0x30(%rsp), %ebp\n     192:      \tcmpl\t%ebp, %ebx\n     194:      \tjae\t0x1bc <wmain+0xfc>\n     196:      \tnopw\t%cs:(%rax,%rax)\n     1a0:      \tcmpl\t$0x1f, %ebx\n     1a3:      \tja\t0x1bc <wmain+0xfc>\n     1a5:      \tmovq\t0x38(%rsp,%rbx,8), %r8\n     1aa:      \tmovq\t%rsi, %rcx\n     1ad:      \tmovq\t%rdi, %rdx\n     1b0:      \tcallq\t0x1b5 <wmain+0xf5>\n     1b5:      \tincq\t%rbx\n     1b8:      \tcmpl\t%ebp, %ebx\n     1ba:      \tjb\t0x1a0 <wmain+0xe0>\n     1bc:      \tcmpl\t$0x21, %ebp\n     1bf:      \tjb\t0x1d7 <wmain+0x117>\n     1c1:      \tleaq\t0x189(%rip), %rdx       # 0x351 <wmain+0x291>\n     1c8:      \tleaq\t0x18c(%rip), %r8        # 0x35b <wmain+0x29b>\n     1cf:      \tmovq\t%rsi, %rcx\n     1d2:      \tcallq\t0x1d7 <wmain+0x117>\n     1d7:      \tleaq\t0x189(%rip), %rdx       # 0x367 <wmain+0x2a7>\n     1de:      \tleaq\t0x1b7(%rip), %r8        # 0x39c <wmain+0x2dc>\n     1e5:      \tmovq\t%rsi, %rcx\n     1e8:      \tcallq\t0x1ed <wmain+0x12d>\n     1ed:      \tmovl\t$0x1, %eax\n     1f2:      \taddq\t$0x138, %rsp            # imm = 0x138\n     1f9:      \tpopq\t%rbx\n     1fa:      \tpopq\t%rbp\n     1fb:      \tpopq\t%rdi\n     1fc:      \tpopq\t%rsi\n     1fd:      \tretq\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--profile",
+        "debug",
+        "--cache"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --cache requires the debug profile with effective optimization='none'; it cannot override an explicit release profile or O2 setting.\r\nUsage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\r\nTry 'voidc run --help' for examples.\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--profile",
+        "debug",
+        "--cache",
+        "--no-opt"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": "Debug cache: unavailable\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc"
+      ],
+      "status": 0,
+      "stdout": "Source checked successfully\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "check",
+        "--project",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc",
+        "--profile",
+        "debug"
+      ],
+      "status": 0,
+      "stdout": "Source checked successfully\r\n",
+      "stderr": "C:/Users/a/VoidSlice3-Corrected-20261108/native-private-temp/VOID profile execution \u96ea 9e0nt4yc/void.project.toml:12:12: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 12 | debug_info='full'\r\n    |            ^^^^^^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\src\\game.void",
+        "--no-cache"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice3.exe",
+        "run",
+        "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID profile execution \u96ea 9e0nt4yc\\src\\game.void",
+        "--cache"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": "Debug cache: unavailable\r\n"
+    }
+  ]
+}

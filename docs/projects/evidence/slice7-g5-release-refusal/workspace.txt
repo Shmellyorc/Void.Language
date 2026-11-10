@@ -1,0 +1,7 @@
+Linux original fixture directory absent after CTest: /tmp/VOID G5 fmvc3yww
+Linux Release, Debug and strict profile temporary directories were empty after CTest.
+Linux correction workspace removed and absence verified: /tmp/void-g5-refusal.HQGAzs
+Windows host transfer workspace removed and absence verified: /home/shmellyorc/VM/slice7-g5-release-refusal
+Both Windows guest scratch roots were removed and their absence verified. The final cleanup receipt inventories any remnants left by the failed CLI cleanup before removal.
+Both guest source overlays were restored or removed with hash verification. See windows/cleanup.json and windows/overlay.json and the corresponding first-temp-acl receipts.
+Existing compiler build trees were reused. All pre-existing retained evidence and packages were kept.

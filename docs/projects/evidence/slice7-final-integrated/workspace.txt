@@ -1,0 +1,27 @@
+Source archive and 3440 input files verified against the checkout and Linux test mirror.
+Windows Release regression and public scratch verified absent by guest receipts.
+Windows Debug regression and public scratch verified absent by guest receipts.
+Windows Debug retry scratch verified absent by guest receipt.
+Windows Release retry scratch verified absent by guest receipt.
+Windows failed configure workspace verified absent: C:\Users\a\VS7I
+Windows retained build, packet, installs and packages: C:\Users\a\VS7I2
+Windows host transfer workspace removed after hash-checked collection: /home/shmellyorc/VM/slice7-final-integrated
+Windows Debug CLI fixture symbols retained as verified archives: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/windows-debug-fixture-symbols
+Linux scratch verified absent: /tmp/void-s7-integrated-debug.fNoCxq
+Linux scratch verified absent: /tmp/void-s7-integrated-release.0rTsFP
+Linux scratch verified absent: /tmp/void-s7-integrated-strict.Fl5qqW
+Linux scratch verified absent: /tmp/void-s7-public-debug.YY7109
+Linux scratch verified absent: /tmp/void-s7-integrated-debug.JnbvmC
+Linux scratch verified absent: /tmp/void-s7-integrated-debug.mzZ4Ua
+Linux scratch verified absent: /tmp/void-s7-integrated-release.bJbL5v
+Linux scratch verified absent: /tmp/void-s7-integrated-strict.vj1SVK
+Linux scratch verified absent: /tmp/void-s7-public-release.CAI0I8
+Linux scratch verified absent: /tmp/void-s7-integrated-release.Vt5YIR
+Linux scratch verified absent: /tmp/void-s7-public-strict.eQrxZD
+Linux scratch verified absent: /tmp/void-s7-integrated-strict.tk3gHC
+Layer replay scratch verified absent: /tmp/void-s7-layer-audit.EPLMvT
+Linux failed configure build verified absent: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/first-linux-release
+Linux failed configure build verified absent: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/first-linux-debug
+Linux failed configure build verified absent: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/first-linux-strict
+Linux retained builds, public packages, source archives and the isolated CTest source/evidence tree: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated
+Linux filesystem free bytes after cleanup: 307582459904

@@ -1,0 +1,31 @@
+
+> void-language@0.1.0 test
+> npm run build && node --test out/test/config.test.js
+
+
+> void-language@0.1.0 build
+> npm run typecheck && npm run compile
+
+
+> void-language@0.1.0 typecheck
+> tsc --noEmit
+
+
+> void-language@0.1.0 compile
+> tsc && node build.cjs
+
+✔ editor download reaps failed extractors before retry, preserving failure (143.621278ms)
+✔ editor download keeps non-retry errors and does not start more attempts (4.001511ms)
+✔ literal workspace paths, spaces, no shell expansion (0.454921ms)
+✔ Windows paths are literal, drive/root boundaries preserved (0.600622ms)
+✔ validate executable and deterministic canonical project selection (30.430742ms)
+✔ presentation covers approved keyword colors and space indentation (3.68672ms)
+✔ manifest projects preserve nullable entries and reject unsupported older servers (52.359952ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 345.986515

@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "C:\Users\a\VoidSlice2-20261108\tests\project\discovery.py", line 92, in <module>
+    run([compiler,'run','--project',root,'--entry','tools/legacy.void','--','9'],0,b'11\n')
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidSlice2-20261108\tests\project\discovery.py", line 18, in run
+    if stdout is not None:assert p.stdout==stdout,(args,p.stdout)
+                                 ^^^^^^^^^^^^^^^^
+AssertionError: ([WindowsPath('C:/Users/a/VoidCI42377496702-Native/build/Release/voidc-slice2.exe'), 'run', '--project', WindowsPath('C:/Users/a/VoidSlice2-20261108/native-private-temp/VOID project execution \u96ea h0ewpbp3'), '--entry', 'tools/legacy.void', '--', '9'], b'11\r\n')

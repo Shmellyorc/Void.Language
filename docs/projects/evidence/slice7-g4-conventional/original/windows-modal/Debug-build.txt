@@ -1,0 +1,27 @@
+[0/2] Re-checking globbed directories...
+[1/27] Building CXX object CMakeFiles\void_core.dir\src\ir\c_primitive.cpp.obj
+[2/27] Linking CXX static library void_core.lib
+[3/27] Building CXX object CMakeFiles\voidc_objects.dir\src\native_build.cpp.obj
+[4/27] Generating cache-identity-Debug.cpp
+[5/27] Linking CXX executable void_g2_tests.exe
+[6/27] Building CXX object CMakeFiles\void_cache_identity.dir\cache-identity-Debug.cpp.obj
+[7/27] Linking CXX static library void_cache_identity.lib
+[8/27] Linking CXX executable void_g3_tests.exe
+[9/27] Linking CXX executable void_g1_tests.exe
+[10/27] Generating ffi-g2/application-normal.obj
+[11/27] Generating ffi-g1/application-normal.obj
+[12/27] Generating ffi-g1/application-optimized.obj
+[13/27] Generating ffi-g3/application-normal.obj
+[14/27] Generating ffi-g2/application-optimized.obj
+[15/27] C:\Windows\system32\cmd.exe /C "cd /D C:\Users\a\VoidS7-G4Conventional\Debug-attested && C:\gcc\bin\cmake.exe -E make_directory C:/Users/a/VoidS7-G4Conventional/Debug-attested && C:\gcc\bin\cmake.exe -E copy_if_different C:/Users/a/VoidS7-G4Conventional/Debug-attested/void-native-resources.txt C:/Users/a/VoidS7-G4Conventional/Debug-attested/void-native-resources.txt"
+[16/27] Generating ffi-g3/application-optimized.obj
+[17/27] Linking CXX executable void_project_manifest.exe
+[18/27] Linking CXX executable void_g1_aot_normal.exe
+[19/27] Linking CXX executable void_g1_aot_optimized.exe
+[20/27] Linking CXX executable void_g1_aot_mismatch.exe
+[21/27] Linking CXX executable voidc.exe
+[22/27] Linking CXX executable void_g2_aot_normal.exe
+[23/27] Linking CXX executable void_g2_aot_optimized.exe
+[24/27] Linking CXX executable void_g3_aot_normal.exe
+[25/27] Linking CXX executable void_g3_aot_optimized.exe
+[26/27] Linking CXX executable void_tests.exe

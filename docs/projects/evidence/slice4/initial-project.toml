@@ -1,0 +1,10 @@
+schema=1
+[project]
+id='org.test.project'
+name='Project'
+version='1.0.0'
+kind='application'
+[application]
+id='org.test.runtime'
+[build.release]
+debug_info='none'

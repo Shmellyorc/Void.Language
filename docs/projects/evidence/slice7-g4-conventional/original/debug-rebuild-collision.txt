@@ -1,0 +1,400 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+      Start 419: ffi_g4_conventional
+      Start 296: ffi_g4_jit_ir
+      Start  18: cli_contract
+      Start 293: ffi_g3_jit_ir
+ 1/21 Test #293: ffi_g3_jit_ir ....................   Passed    1.97 sec
+      Start 289: ffi_g1_primitive_aot_missing
+ 2/21 Test #289: ffi_g1_primitive_aot_missing .....   Passed    0.82 sec
+      Start 290: ffi_g2_jit_ir
+ 3/21 Test #290: ffi_g2_jit_ir ....................   Passed    1.05 sec
+      Start 285: ffi_g1_primitive_jit_ir
+ 4/21 Test #285: ffi_g1_primitive_jit_ir ..........   Passed    0.69 sec
+      Start 412: analysis
+ 5/21 Test #412: analysis .........................   Passed    0.83 sec
+      Start   2: project_manifest
+ 6/21 Test #296: ffi_g4_jit_ir ....................   Passed    5.92 sec
+      Start 405: reload
+ 7/21 Test   #2: project_manifest .................   Passed    0.64 sec
+      Start 297: ffi_g4_aot_normal
+ 8/21 Test #297: ffi_g4_aot_normal ................   Passed    0.16 sec
+      Start 298: ffi_g4_aot_optimized
+ 9/21 Test #298: ffi_g4_aot_optimized .............   Passed    0.16 sec
+      Start 299: ffi_g4_aot_startup
+10/21 Test #299: ffi_g4_aot_startup ...............   Passed    0.16 sec
+      Start 406: gc
+11/21 Test #405: reload ...........................   Passed    0.59 sec
+      Start 294: ffi_g3_aot_normal
+12/21 Test #294: ffi_g3_aot_normal ................   Passed    0.05 sec
+      Start 292: ffi_g2_aot_optimized
+13/21 Test #406: gc ...............................   Passed    0.11 sec
+      Start 295: ffi_g3_aot_optimized
+14/21 Test #292: ffi_g2_aot_optimized .............   Passed    0.05 sec
+      Start 291: ffi_g2_aot_normal
+15/21 Test #291: ffi_g2_aot_normal ................   Passed    0.05 sec
+      Start 288: ffi_g1_primitive_aot_mismatch
+16/21 Test #295: ffi_g3_aot_optimized .............   Passed    0.06 sec
+      Start 286: ffi_g1_primitive_aot_normal
+17/21 Test #288: ffi_g1_primitive_aot_mismatch ....   Passed    0.03 sec
+      Start 287: ffi_g1_primitive_aot_optimized
+18/21 Test #286: ffi_g1_primitive_aot_normal ......   Passed    0.04 sec
+19/21 Test #287: ffi_g1_primitive_aot_optimized ...   Passed    0.04 sec
+20/21 Test  #18: cli_contract .....................   Passed    8.60 sec
+21/21 Test #419: ffi_g4_conventional ..............***Failed   19.19 sec
+cwd=/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/unrelated cwd argv=['/usr/bin/cmake', '--install', '/home/shmellyorc/Documents/Void.Language/build/llvm23-debug', '--prefix', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler', '--config', 'Debug', '--component', 'compiler']
+exit=0 -- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/VOID-MIT-LICENSE.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/LICENSING_SCOPE.md
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/REDISTRIBUTION.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/NOTICE_INVENTORY.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/llvm-23.1.4
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/llvm-23.1.4/LICENSE.TXT
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/llvm-23.1.4/ConvertUTF-NOTICES.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/llvm-23.1.4/xxhash-NOTICES.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/llvm-23.1.4/BLAKE3-LICENSE.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/llvm-23.1.4/Support-NOTICES.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/zstd-1.5.7
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/zstd-1.5.7/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/zstd-1.5.7/EMBEDDED-NOTICES.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/tomlplusplus/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/tomlplusplus/upstream.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/tomlplusplus/void-bounds-and-locations.patch
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/tomlplusplus/corresponding-source/toml.hpp
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/tomlplusplus/corresponding-source/README.md
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/zlib-1.3.2/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/libsodium
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/libsodium/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/libsodium/SOURCE-NOTICES.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/libarchive
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/libarchive/COPYING
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/libarchive/SOURCE-NOTICES.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/patches
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/patches/libsodium-1.0.22
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/patches/libsodium-1.0.22/asan-alignment.patch
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/patches/libsodium-1.0.22/PROVENANCE.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/host-versions.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/setup_host_deps.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/setup_host_deps_native.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/host-sodium.targets
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/verify_host_deps.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/corresponding-source/repro/tools/setup_host_deps.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/corresponding-source/repro/tools/setup_host_deps_native.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/corresponding-source/repro/tools/verify_host_deps.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/corresponding-source/repro/tools/verify_http_dependencies.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/corresponding-source/repro/tools/ci/llvm_sdk.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/corresponding-source/repro/cmake/host-sodium.targets
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/corresponding-source/repro/third_party/host-versions.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/corresponding-source/repro/third_party/http-versions.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/corresponding-source/repro/third_party/host-patches
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22/asan-alignment.patch
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22/PROVENANCE.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/UNICODE-LICENSE.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/time.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/console.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/encoding
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/encoding/binary.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/encoding/hex.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/encoding/base64.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/encoding/ascii.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/io
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/io/memory.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/error.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/convert.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/io.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/path.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/text.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/random.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/math.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/json.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/channel.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/os.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/collections.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/log.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/url.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/net
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/net/http.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/system_error.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/crypto.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/archive.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/stdlib/process.void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/LICENSE-Boost
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/LICENSE.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/NOTICE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/stage10-versions.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/bin/voidc
+-- Set non-toolchain portion of runtime path of "/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/bin/voidc" to "$ORIGIN/../lib/void"
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/libvoid_runtime.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/libvoid_native_fixture.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/libcurl.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/libarchive.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/libsodium.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/libpsl.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/libnghttp2.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/libssl.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/libcrypto.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/libcares.a
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/libz.a
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/cmake
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/cmake/nghttp2
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/cmake/c-ares
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/cmake/zlib
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/pkgconfig
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/crypto
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/crypto/cmake
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/crypto/cmake/static
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/ssl
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/ssl/cmake
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/ssl/cmake/static
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/libunistring.so.5
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/libunistring.so
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/libidn2.so.0
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/libidn2.so
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/libunistring.so.5.2.2
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/lib/void/libidn2.so.0.4.0
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/nghttp2-1.70.0
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/nghttp2-1.70.0/COPYING
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/nghttp2-1.70.0/README
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/c-ares-1.34.9
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/c-ares-1.34.9/LICENSE.md
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/zlib-1.3.2
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/zlib-1.3.2/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/zlib-1.3.2/README
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/openssl-3.5.9
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/openssl-3.5.9/LICENSE.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/libidn2-2.3.8
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/libidn2-2.3.8/COPYING
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/libidn2-2.3.8/COPYING.LESSERv3
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/libidn2-2.3.8/COPYING.unicode
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/libidn2-2.3.8/COPYINGv2
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/libidn2-2.3.8/README
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/libpsl-0.21.5
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/libpsl-0.21.5/README
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/libpsl-0.21.5/COPYING
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/libpsl-0.21.5/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/libpsl-0.21.5/LICENSE.chromium
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/libunistring-1.5
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/libunistring-1.5/COPYING.LIB
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/libunistring-1.5/README
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/libunistring-1.5/COPYING
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/aws-lc-5.12.0
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/aws-lc-5.12.0/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/aws-lc-5.12.0/NOTICE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/aws-lc-5.12.0/UPSTREAM.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/COPYING
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/NOTICE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/VOID-PROVENANCE.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/http-versions.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/publicsuffix
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/publicsuffix/public_suffix_list.dat
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/publicsuffix/UPSTREAM.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/publicsuffix/LICENSE
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/corresponding-source/libidn2-2.3.8.tar.gz
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/corresponding-source/libunistring-1.5.tar.xz
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/corresponding-source/setup_http_deps.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/corresponding-source/setup_http_deps_native.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/corresponding-source/http_archive.py
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/http/VOID-HTTP-DEPENDENCIES.json
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/bin/void-native.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/bin/void-native-resources.txt
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/VOID-HOST-DEPENDENCIES.json
+-- Up-to-date: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/corresponding-source
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/corresponding-source/libsodium-1.0.22.tar.gz
+-- Installing: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/share/void/licenses/host/corresponding-source/libarchive-3.8.11.tar.xz
+
+cwd=/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/unrelated cwd argv=['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/bin/voidc', 'new', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪', '--source', 'src/main.void', '--project-id', 'org.test.native-application', '--app-id', 'org.test.native-app']
+exit=0 Manifest: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/void.project.toml
+Project ID: org.test.native-application
+Application ID: org.test.native-app
+Next: from the displayed manifest directory, run voidc check --project .
+Created project manifest.
+Automatic application selection requires one eligible main(). Use --entry for a deliberate override.
+
+cwd=/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/unrelated cwd argv=['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/bin/voidc', 'check', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪']
+exit=0 Source checked successfully
+/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd=/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/unrelated cwd argv=['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/bin/voidc', 'run', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪', '--', 'ignored']
+exit=2 Invalid invocation: This project declares native code. Pass --allow-native to authorize its execution.
+Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]
+Try 'voidc run --help' for examples.
+
+cwd=/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/unrelated cwd argv=['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/bin/voidc', 'run', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪', '--allow-native', '--', 'ignored']
+exit=1 /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C dynamic library: missing or unreadable library /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/native/libvoid_g4_conventional_provider.so
+
+cwd=/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/unrelated cwd argv=['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/bin/voidc', 'native-bind', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/native/provider.descriptor', 'conventional_fixture.h', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/independent C sources/adapter.c']
+exit=0 
+cwd=/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/independent C sources argv=['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '-std=c++17', '-Wl,-soname,libvoid_g4_conventional_dependency.so', '-fuse-ld=lld', '-shared', '-O2', '-Wall', '-Wextra', '-Werror', '-fPIC', '-fvisibility=hidden', '-Wl,-rpath,$ORIGIN', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/independent C sources/conventional_dependency.cpp', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/native/libvoid_g4_conventional_dependency.so']
+exit=0 
+cwd=/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/independent C sources argv=['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '-std=c11', '-Wl,-soname,libvoid_g4_conventional_provider.so', '-fuse-ld=lld', '-shared', '-O2', '-Wall', '-Wextra', '-Werror', '-fPIC', '-fvisibility=hidden', '-Wl,-rpath,$ORIGIN', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/independent C sources/conventional_fixture.c', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/native/libvoid_g4_conventional_dependency.so', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/native/libvoid_g4_conventional_provider.so']
+exit=0 
+cwd=/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/independent C sources argv=['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '-std=c11', '-Wl,-soname,libvoid_g4_conventional_adapter.so', '-fuse-ld=lld', '-shared', '-O2', '-Wall', '-Wextra', '-Werror', '-fPIC', '-fvisibility=hidden', '-Wl,-rpath,$ORIGIN', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/independent C sources/conventional_rejection.c', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/native/libvoid_g4_conventional_provider.so', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/native/libvoid_g4_conventional_adapter.so']
+exit=0 
+cwd=/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/unrelated cwd argv=['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/bin/voidc', 'check', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪']
+exit=0 Source checked successfully
+/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd=/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/unrelated cwd argv=['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/bin/voidc', 'build', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/unauthorized']
+exit=2 Invalid invocation: This project declares native code. Pass --allow-native to authorize its execution.
+Usage: voidc build [file-or-directory] [-o executable] [--no-opt]
+Try 'voidc build --help' for examples.
+
+cwd=/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/independent C sources argv=['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '-std=c11', '-Wl,-soname,libvoid_g4_conventional_adapter.so', '-fuse-ld=lld', '-shared', '-O2', '-Wall', '-Wextra', '-Werror', '-fPIC', '-fvisibility=hidden', '-Wl,-rpath,$ORIGIN', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/independent C sources/adapter.c', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/native/libvoid_g4_conventional_provider.so', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/libvoid_g4_conventional_adapter.so']
+exit=0 
+cwd=/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/unrelated cwd argv=['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/bin/voidc', 'native-bind', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/mismatched adapter/provider.descriptor', 'conventional_fixture.h', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/mismatched adapter/adapter.c']
+exit=0 
+cwd=/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/independent C sources argv=['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '-std=c11', '-Wl,-soname,libvoid_g4_conventional_adapter.so', '-fuse-ld=lld', '-shared', '-O2', '-Wall', '-Wextra', '-Werror', '-fPIC', '-fvisibility=hidden', '-Wl,-rpath,$ORIGIN', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/mismatched adapter/adapter.c', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/native/libvoid_g4_conventional_provider.so', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/mismatched adapter/libvoid_g4_conventional_adapter.so']
+exit=0 
+cwd=/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/independent C sources argv=['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '-std=c11', '-fsyntax-only', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/wrong signature/adapter.c']
+exit=1 /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/wrong signature/adapter.c:15:16: error: static assertion failed: C signature g4_conventional_scale
+   15 | _Static_assert(_Generic(&g4_conventional_scale, double (*)(double, float): 1, default: 0), "C signature g4_conventional_scale");
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+
+cwd=/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/unrelated cwd argv=['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/bin/voidc', 'run', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪', '--allow-native', '--', 'payload 雪']
+exit=0 VOID native application payload 雪
+/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd=/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/unrelated cwd argv=['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/bin/voidc', 'run', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪', '--allow-native', '--no-cache', '--no-opt', '--', 'payload 雪']
+exit=0 VOID native application payload 雪
+/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd=/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/unrelated cwd argv=['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/bin/voidc', 'run', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪', '--allow-native', '--no-cache', '--no-opt', '--', 'reject']
+exit=1 /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/conventional_ffi.void:23:6: runtime error: C resource operation rejected org.voidlang.g4-conventional::g4_conventional_acquire
+In function /conventional_ffi.void::acquire
+Called from /src/main.void::main
+/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/src/main.void:12:32: source call
+            var rejected = ffi.acquire(-3)
+                               ^
+Called from /src/main.void::$app_adapter
+/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+cwd=/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/unrelated cwd argv=['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/bin/voidc', 'run', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪', '--allow-native', '--no-cache', '--no-opt', '--', 'closed']
+exit=1 /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/conventional_ffi.void:25:6: runtime error: C resource is closed, null or invalid
+In function /conventional_ffi.void::borrow
+Called from /src/main.void::main
+/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/src/main.void:17:24: source call
+            return ffi.borrow(owner)
+                       ^
+Called from /src/main.void::$app_adapter
+/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+cwd=/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/unrelated cwd argv=['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/bin/voidc', 'run', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪', '--allow-native', '--no-cache', '--no-opt', '--', 'capacity']
+exit=1 /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/conventional_ffi.void:17:6: runtime error: C byte span outside admitted extent
+In function /conventional_ffi.void::sum
+Called from /src/main.void::main
+/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/src/main.void:20:24: source call
+            return ffi.sum(too_short, 0, 2) as i32
+                       ^
+Called from /src/main.void::$app_adapter
+/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+cwd=/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/unrelated cwd argv=['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/bin/voidc', 'build', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪', '--allow-native', '--no-opt', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/normal/application']
+exit=0 Built native executable: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/normal/application
+/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd=/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/unrelated cwd argv=['/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/bin/voidc', 'build', '--project', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪', '--allow-native', '--no-opt', '-o', '/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/normal/application']
+exit=1 /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+filesystem error: cannot check file equivalence: No such file or directory [/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/normal/application] [/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/conventional_ffi.void]
+
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/conventional_process.py", line 232, in <module>
+    with work as name:
+        ^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/conventional_process.py", line 168, in verify
+    if mode == 'normal':
+        ^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/conventional_process.py", line 32, in run
+    else:
+    
+AssertionError: ([PosixPath('/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/installed compiler/bin/voidc'), 'build', '--project', PosixPath('/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪'), '--allow-native', '--no-opt', '-o', PosixPath('/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/normal/application')], 1, "/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 19 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\nfilesystem error: cannot check file equivalence: No such file or directory [/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/normal/application] [/home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/debug-final-artifacts/VOID G4 bjk4t955/sources outside checkout 雪/conventional_ffi.void]\n")
+
+
+95% tests passed, 1 tests failed out of 21
+
+Total Test time (real) =  19.20 sec
+
+The following tests FAILED:
+	419 - ffi_g4_conventional (Failed)
+Errors while running CTest

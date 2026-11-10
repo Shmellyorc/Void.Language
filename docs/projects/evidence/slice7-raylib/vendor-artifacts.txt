@@ -1,0 +1,323 @@
+Official raylib 6.0 release archive contents
+drwxr-xr-x runner/runner     0 2026-04-23 02:57 raylib-6.0_linux_amd64/
+-rw-r--r-- runner/runner 10546 2026-04-23 02:57 raylib-6.0_linux_amd64/README.md
+-rw-r--r-- runner/runner   877 2026-04-23 02:57 raylib-6.0_linux_amd64/LICENSE
+-rw-r--r-- runner/runner 230852 2026-04-23 02:57 raylib-6.0_linux_amd64/CHANGELOG
+drwxr-xr-x runner/runner      0 2026-04-23 02:57 raylib-6.0_linux_amd64/lib/
+lrwxrwxrwx runner/runner      0 2026-04-23 02:57 raylib-6.0_linux_amd64/lib/libraylib.so.600 -> libraylib.so.6.0.0
+lrwxrwxrwx runner/runner      0 2026-04-23 02:57 raylib-6.0_linux_amd64/lib/libraylib.so -> libraylib.so.600
+-rw-r--r-- runner/runner 2869420 2026-04-23 02:57 raylib-6.0_linux_amd64/lib/libraylib.a
+-rwxr-xr-x runner/runner 2100056 2026-04-23 02:57 raylib-6.0_linux_amd64/lib/libraylib.so.6.0.0
+drwxr-xr-x runner/runner       0 2026-04-23 02:57 raylib-6.0_linux_amd64/include/
+-rw-r--r-- runner/runner  134582 2026-04-23 02:57 raylib-6.0_linux_amd64/include/raylib.h
+-rw-r--r-- runner/runner  258136 2026-04-23 02:57 raylib-6.0_linux_amd64/include/rlgl.h
+-rw-r--r-- runner/runner   90849 2026-04-23 02:57 raylib-6.0_linux_amd64/include/raymath.h
+Archive:  build/slice7-raylib/downloads/raylib-6.0_win64_msvc16.zip
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+        0  2026-04-23 10:01   raylib-6.0_win64_msvc16/
+   234255  2026-04-23 10:00   raylib-6.0_win64_msvc16/CHANGELOG
+        0  2026-04-23 10:01   raylib-6.0_win64_msvc16/include/
+   136325  2026-04-23 10:00   raylib-6.0_win64_msvc16/include/raylib.h
+    93988  2026-04-23 10:00   raylib-6.0_win64_msvc16/include/raymath.h
+   263557  2026-04-23 10:00   raylib-6.0_win64_msvc16/include/rlgl.h
+        0  2026-04-23 10:01   raylib-6.0_win64_msvc16/lib/
+  1905152  2026-04-23 10:01   raylib-6.0_win64_msvc16/lib/raylib.dll
+  5297172  2026-04-23 10:01   raylib-6.0_win64_msvc16/lib/raylib.lib
+   406578  2026-04-23 10:01   raylib-6.0_win64_msvc16/lib/raylibdll.lib
+      893  2026-04-23 10:00   raylib-6.0_win64_msvc16/LICENSE
+    10698  2026-04-23 10:00   raylib-6.0_win64_msvc16/README.md
+---------                     -------
+  8348618                     12 files
+Exact dynamic artifacts, headers and import/static libraries
+1199fb5be52a663c099ed42eae5eabba83754ca9a8d7f82e1514ae4d6623874b  build/slice7-raylib/upstream/raylib-6.0_linux_amd64/lib/libraylib.a
+1041653dd5c1cb8c67494fa398a296520d3ffec20cf1bf71b1eaa4b96ac61aee  build/slice7-raylib/upstream/raylib-6.0_linux_amd64/lib/libraylib.so.6.0.0
+047e7255f93f8c34039cab906ad76136706b5c7b4c5b5b065d84141963ee9b6b  build/slice7-raylib/upstream/raylib-6.0_linux_amd64/include/raylib.h
+c62606798c3f736b479db7721aed884102060541b743fd81be3e687ac6de3e67  build/slice7-raylib/upstream/raylib-6.0_win64_msvc16/lib/raylib.dll
+e979fda995ea6b4ac0162156c6bc5d44c1ef6d995941f648a4f05ee19f3e00cb  build/slice7-raylib/upstream/raylib-6.0_win64_msvc16/lib/raylib.lib
+7320dd3a759d49f015da28738a1ac0a7f16714046038abbefb1f1035716a54da  build/slice7-raylib/upstream/raylib-6.0_win64_msvc16/lib/raylibdll.lib
+1842111e48260e622d0ff2e6f4ac6141508d6f369791265ba518e7502c760ccf  build/slice7-raylib/upstream/raylib-6.0_win64_msvc16/include/raylib.h
+build/slice7-raylib/upstream/raylib-6.0_linux_amd64/lib/libraylib.a:        current ar archive
+build/slice7-raylib/upstream/raylib-6.0_linux_amd64/lib/libraylib.so:       symbolic link to libraylib.so.600
+build/slice7-raylib/upstream/raylib-6.0_linux_amd64/lib/libraylib.so.6.0.0: ELF 64-bit LSB shared object, x86-64, version 1 (SYSV), dynamically linked, BuildID[sha1]=c0192de56454d5112d05832276c9e4725df70c8f, not stripped
+build/slice7-raylib/upstream/raylib-6.0_linux_amd64/lib/libraylib.so.600:   symbolic link to libraylib.so.6.0.0
+build/slice7-raylib/upstream/raylib-6.0_win64_msvc16/lib/raylib.dll:        PE32+ executable for MS Windows 6.00 (DLL), x86-64, 7 sections
+build/slice7-raylib/upstream/raylib-6.0_win64_msvc16/lib/raylib.lib:        current ar archive
+build/slice7-raylib/upstream/raylib-6.0_win64_msvc16/lib/raylibdll.lib:     current ar archive
+Linux upstream dynamic section
+
+Dynamic section at offset 0x1bca20 contains 27 entries:
+  Tag        Type                         Name/Value
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libX11.so.6]
+ 0x000000000000000e (SONAME)             Library soname: [libraylib.so.600]
+ 0x000000000000000c (INIT)               0x30000
+ 0x000000000000000d (FINI)               0x13dc48
+ 0x0000000000000019 (INIT_ARRAY)         0x1bcf30
+ 0x000000000000001b (INIT_ARRAYSZ)       8 (bytes)
+ 0x000000000000001a (FINI_ARRAY)         0x1bcf38
+ 0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)
+ 0x000000006ffffef5 (GNU_HASH)           0x2f0
+ 0x0000000000000005 (STRTAB)             0x11d38
+ 0x0000000000000006 (SYMTAB)             0x4b50
+ 0x000000000000000a (STRSZ)              46290 (bytes)
+ 0x000000000000000b (SYMENT)             24 (bytes)
+ 0x0000000000000003 (PLTGOT)             0x1bffe8
+ 0x0000000000000002 (PLTRELSZ)           12192 (bytes)
+ 0x0000000000000014 (PLTREL)             RELA
+ 0x0000000000000017 (JMPREL)             0x2c4a0
+ 0x0000000000000007 (RELA)               0x1e4a8
+ 0x0000000000000008 (RELASZ)             57336 (bytes)
+ 0x0000000000000009 (RELAENT)            24 (bytes)
+ 0x000000006ffffffe (VERNEED)            0x1e388
+ 0x000000006fffffff (VERNEEDNUM)         2
+ 0x000000006ffffff0 (VERSYM)             0x1d20a
+ 0x000000006ffffff9 (RELACOUNT)          1244
+ 0x0000000000000000 (NULL)               0x0
+Windows upstream imports
+
+File: build/slice7-raylib/upstream/raylib-6.0_win64_msvc16/lib/raylib.dll
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+Import {
+  Name: KERNEL32.dll
+  ImportLookupTableRVA: 0x1BBB20
+  ImportAddressTableRVA: 0x137070
+  Symbol: Sleep (1480)
+  Symbol: CreateSemaphoreW (265)
+  Symbol: CreateThread (271)
+  Symbol: SetThreadPriority (1447)
+  Symbol: FreeLibrary (468)
+  Symbol: GetProcAddress (733)
+  Symbol: LoadLibraryA (1012)
+  Symbol: WideCharToMultiByte (1612)
+  Symbol: GetModuleFileNameW (673)
+  Symbol: GlobalSize (883)
+  Symbol: GlobalLock (879)
+  Symbol: GlobalUnlock (886)
+  Symbol: VerSetConditionMask (1551)
+  Symbol: InitializeCriticalSection (917)
+  Symbol: EnterCriticalSection (343)
+  Symbol: LeaveCriticalSection (1008)
+  Symbol: DeleteCriticalSection (303)
+  Symbol: TlsAlloc (1514)
+  Symbol: TlsGetValue (1516)
+  Symbol: TlsSetValue (1518)
+  Symbol: TlsFree (1515)
+  Symbol: GetStartupInfoW (769)
+  Symbol: GetModuleHandleW (677)
+  Symbol: GetModuleHandleExW (676)
+  Symbol: GlobalAlloc (868)
+  Symbol: GlobalFree (875)
+  Symbol: SetThreadExecutionState (1440)
+  Symbol: FormatMessageW (464)
+  Symbol: MultiByteToWideChar (1059)
+  Symbol: WriteConsoleW (1631)
+  Symbol: SetEndOfFile (1366)
+  Symbol: HeapSize (901)
+  Symbol: GetTimeZoneInformation (835)
+  Symbol: GetStringTypeW (776)
+  Symbol: GetProcessHeap (740)
+  Symbol: FreeEnvironmentStringsW (467)
+  Symbol: GetEnvironmentStringsW (610)
+  Symbol: GetCommandLineW (512)
+  Symbol: GetCommandLineA (511)
+  Symbol: GetCPInfo (490)
+  Symbol: GetOEMCP (710)
+  Symbol: GetACP (475)
+  Symbol: IsValidCodePage (958)
+  Symbol: CreateDirectoryW (212)
+  Symbol: SetStdHandle (1427)
+  Symbol: MoveFileExW (1052)
+  Symbol: DeleteFileW (310)
+  Symbol: GetFileAttributesExW (621)
+  Symbol: CreateProcessW (258)
+  Symbol: GetExitCodeProcess (615)
+  Symbol: GetFileSizeEx (632)
+  Symbol: SetFilePointerEx (1385)
+  Symbol: ReadConsoleW (1190)
+  Symbol: CreateEventA (214)
+  Symbol: GetConsoleOutputCP (553)
+  Symbol: FlushFileBuffers (456)
+  Symbol: GetStdHandle (771)
+  Symbol: LCMapStringW (996)
+  Symbol: CompareStringW (179)
+  Symbol: VirtualProtect (1562)
+  Symbol: InitializeCriticalSectionEx (919)
+  Symbol: FlsFree (451)
+  Symbol: FlsSetValue (454)
+  Symbol: FlsGetValue (452)
+  Symbol: FlsAlloc (450)
+  Symbol: HeapReAlloc (899)
+  Symbol: HeapFree (896)
+  Symbol: HeapAlloc (892)
+  Symbol: GetCurrentDirectoryW (570)
+  Symbol: SetCurrentDirectoryW (1359)
+  Symbol: SetEnvironmentVariableW (1370)
+  Symbol: GetFullPathNameW (645)
+  Symbol: FindNextFileW (436)
+  Symbol: FindFirstFileExW (419)
+  Symbol: FindClose (413)
+  Symbol: FileTimeToSystemTime (402)
+  Symbol: SystemTimeToTzSpecificLocalTime (1493)
+  Symbol: PeekNamedPipe (1108)
+  Symbol: GetFileType (634)
+  Symbol: GetDriveTypeW (602)
+  Symbol: ExitProcess (390)
+  Symbol: RtlPcToFileHeader (1299)
+  Symbol: RaiseException (1176)
+  Symbol: EncodePointer (339)
+  Symbol: LoadLibraryExW (1014)
+  Symbol: InitializeCriticalSectionAndSpinCount (918)
+  Symbol: SetLastError (1400)
+  Symbol: InterlockedFlushSList (926)
+  Symbol: RtlUnwindEx (1303)
+  Symbol: IsDebuggerPresent (944)
+  Symbol: RtlUnwind (1302)
+  Symbol: InitializeSListHead (922)
+  Symbol: GetSystemTimeAsFileTime (794)
+  Symbol: GetCurrentThreadId (582)
+  Symbol: GetCurrentProcessId (578)
+  Symbol: IsProcessorFeaturePresent (952)
+  Symbol: TerminateProcess (1496)
+  Symbol: GetCurrentProcess (577)
+  Symbol: SetUnhandledExceptionFilter (1464)
+  Symbol: WaitForSingleObject (1573)
+  Symbol: ReleaseSemaphore (1260)
+  Symbol: ResetEvent (1280)
+  Symbol: SetEvent (1372)
+  Symbol: QueryPerformanceFrequency (1154)
+  Symbol: QueryPerformanceCounter (1153)
+  Symbol: GetLastError (653)
+  Symbol: CloseHandle (157)
+  Symbol: WriteFile (1632)
+  Symbol: ReadFile (1193)
+  Symbol: GetFileInformationByHandle (626)
+  Symbol: CreateFileW (230)
+  Symbol: GetConsoleMode (549)
+  Symbol: UnhandledExceptionFilter (1531)
+  Symbol: RtlVirtualUnwind (1304)
+  Symbol: RtlLookupFunctionEntry (1297)
+  Symbol: RtlCaptureContext (1289)
+}
+Import {
+  Name: USER32.dll
+  ImportLookupTableRVA: 0x1BBEF0
+  ImportAddressTableRVA: 0x137440
+  Symbol: OpenClipboard (682)
+  Symbol: CloseClipboard (80)
+  Symbol: GetClipboardData (317)
+  Symbol: GetRawInputDeviceList (453)
+  Symbol: RegisterRawInputDevices (770)
+  Symbol: GetRawInputDeviceInfoA (451)
+  Symbol: GetRawInputData (450)
+  Symbol: EnumDisplayMonitors (261)
+  Symbol: GetMonitorInfoW (405)
+  Symbol: MonitorFromWindow (670)
+  Symbol: EnumDisplayDevicesW (260)
+  Symbol: EnumDisplaySettingsExW (264)
+  Symbol: EnumDisplaySettingsW (265)
+  Symbol: ChangeDisplaySettingsExW (41)
+  Symbol: CreateIconIndirect (113)
+  Symbol: LoadImageW (619)
+  Symbol: DestroyIcon (181)
+  Symbol: LoadCursorW (615)
+  Symbol: GetClassLongPtrW (309)
+  Symbol: SetWindowLongW (917)
+  Symbol: GetWindowLongW (503)
+  Symbol: PtInRect (710)
+  Symbol: OffsetRect (681)
+  Symbol: SetRect (884)
+  Symbol: ClipCursor (79)
+  Symbol: WindowFromPoint (1032)
+  Symbol: ScreenToClient (798)
+  Symbol: ClientToScreen (78)
+  Symbol: GetCursorPos (330)
+  Symbol: SetCursor (831)
+  Symbol: SetCursorPos (833)
+  Symbol: AdjustWindowRectEx (4)
+  Symbol: GetWindowRect (510)
+  Symbol: GetClientRect (314)
+  Symbol: SetWindowTextW (925)
+  Symbol: RemovePropW (791)
+  Symbol: GetPropW (447)
+  Symbol: SetPropW (883)
+  Symbol: ReleaseDC (785)
+  Symbol: GetDC (331)
+  Symbol: SetForegroundWindow (848)
+  Symbol: GetSystemMetrics (469)
+  Symbol: MsgWaitForMultipleObjects (672)
+  Symbol: ReleaseCapture (784)
+  Symbol: SetCapture (818)
+  Symbol: MapVirtualKeyW (651)
+  Symbol: ToUnicode (969)
+  Symbol: GetKeyState (370)
+  Symbol: GetActiveWindow (289)
+  Symbol: SetFocus (846)
+  Symbol: EmptyClipboard (237)
+  Symbol: SetClipboardData (826)
+  Symbol: IsZoomed (606)
+  Symbol: BringWindowToTop (20)
+  Symbol: IsIconic (579)
+  Symbol: IsWindowVisible (604)
+  Symbol: SetWindowPlacement (919)
+  Symbol: GetWindowPlacement (508)
+  Symbol: SetWindowPos (920)
+  Symbol: MoveWindow (671)
+  Symbol: FlashWindow (284)
+  Symbol: SetLayeredWindowAttributes (854)
+  Symbol: GetLayeredWindowAttributes (379)
+  Symbol: ShowWindow (945)
+  Symbol: DestroyWindow (185)
+  Symbol: CreateWindowExW (122)
+  Symbol: RegisterClassExW (750)
+  Symbol: UnregisterClassW (989)
+  Symbol: DefWindowProcW (171)
+  Symbol: WaitMessage (1027)
+  Symbol: PostMessageW (700)
+  Symbol: UnregisterDeviceNotification (990)
+  Symbol: RegisterDeviceNotificationW (757)
+  Symbol: SendMessageW (813)
+  Symbol: GetMessageTime (402)
+  Symbol: PeekMessageW (696)
+  Symbol: DispatchMessageW (193)
+  Symbol: TranslateMessage (978)
+  Symbol: TrackMouseEvent (971)
+  Symbol: SystemParametersInfoW (962)
+}
+Import {
+  Name: GDI32.dll
+  ImportLookupTableRVA: 0x1BBAB0
+  ImportAddressTableRVA: 0x137000
+  Symbol: SwapBuffers (956)
+  Symbol: SetDeviceGammaRamp (911)
+  Symbol: GetDeviceGammaRamp (659)
+  Symbol: CreateDIBSection (55)
+  Symbol: SetPixelFormat (929)
+  Symbol: GetDeviceCaps (658)
+  Symbol: DescribePixelFormat (406)
+  Symbol: DeleteObject (405)
+  Symbol: DeleteDC (402)
+  Symbol: CreateRectRgn (83)
+  Symbol: CreateDCW (52)
+  Symbol: CreateBitmap (41)
+  Symbol: ChoosePixelFormat (25)
+}
+Import {
+  Name: WINMM.dll
+  ImportLookupTableRVA: 0x1BC178
+  ImportAddressTableRVA: 0x1376C8
+  Symbol: timeEndPeriod (135)
+  Symbol: timeBeginPeriod (134)
+}
+Import {
+  Name: SHELL32.dll
+  ImportLookupTableRVA: 0x1BBEC8
+  ImportAddressTableRVA: 0x137418
+  Symbol: DragAcceptFiles (37)
+  Symbol: DragFinish (38)
+  Symbol: DragQueryFileW (42)
+  Symbol: DragQueryPoint (43)
+}

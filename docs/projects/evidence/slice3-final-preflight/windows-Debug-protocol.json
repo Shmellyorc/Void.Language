@@ -1,0 +1,1200 @@
+{
+  "checks": 169,
+  "commands_and_requests": [
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ri86qdgb/bare.void"
+        },
+        "position": {
+          "line": 0,
+          "character": 6
+        }
+      },
+      "response": {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "range": {
+            "end": {
+              "character": 10,
+              "line": 0
+            },
+            "start": {
+              "character": 5,
+              "line": 0
+            }
+          },
+          "uri": "file:///C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ri86qdgb/bare.void"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+        "",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5010\",\"message\":\"No eligible main() in application project.\"}],\"discoveryCount\":1,\"entry\":null,\"executionCount\":0,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"7059e59ffde6986513daa08cb1016bca483d58047e3f96137b06803310510238\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "method": "initialize",
+      "params": {
+        "capabilities": {
+          "textDocument": {
+            "publishDiagnostics": {
+              "relatedInformation": true,
+              "versionSupport": true
+            }
+          },
+          "workspace": {
+            "workspaceEdit": {
+              "documentChanges": true,
+              "failureHandling": "textOnlyTransactional"
+            }
+          }
+        }
+      },
+      "response": {
+        "id": 1,
+        "jsonrpc": "2.0",
+        "result": {
+          "capabilities": {
+            "completionProvider": {
+              "triggerCharacters": [
+                ".",
+                " ",
+                "\"",
+                "/",
+                ":"
+              ]
+            },
+            "definitionProvider": true,
+            "documentFormattingProvider": true,
+            "documentSymbolProvider": true,
+            "experimental": {
+              "refreshProject": true,
+              "voidProjectProtocol": 1,
+              "voidToolingProtocol": 1
+            },
+            "hoverProvider": true,
+            "positionEncoding": "utf-16",
+            "referencesProvider": true,
+            "renameProvider": {
+              "prepareProvider": true
+            },
+            "signatureHelpProvider": {
+              "triggerCharacters": [
+                "(",
+                ","
+              ]
+            },
+            "textDocumentSync": {
+              "change": 1,
+              "openClose": true,
+              "save": {
+                "includeText": false
+              }
+            },
+            "workspace": {
+              "fileOperations": {
+                "didCreate": {
+                  "filters": [
+                    {
+                      "pattern": {
+                        "glob": "**/*"
+                      },
+                      "scheme": "file"
+                    }
+                  ]
+                },
+                "didDelete": {
+                  "filters": [
+                    {
+                      "pattern": {
+                        "glob": "**/*"
+                      },
+                      "scheme": "file"
+                    }
+                  ]
+                },
+                "didRename": {
+                  "filters": [
+                    {
+                      "pattern": {
+                        "glob": "**/*"
+                      },
+                      "scheme": "file"
+                    }
+                  ]
+                }
+              }
+            },
+            "workspaceSymbolProvider": true
+          },
+          "serverInfo": {
+            "name": "VOID",
+            "version": "0.2.0"
+          }
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 4,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/src/game.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+          "schema": 2,
+          "selectionRevision": "2",
+          "snapshotKey": "e9f7218765debb510511a979ef34e69ed5c892f3b834eee149aa7d1eb3ec84ae",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ri86qdgb/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 13
+        }
+      },
+      "response": {
+        "id": 5,
+        "jsonrpc": "2.0",
+        "result": {
+          "range": {
+            "end": {
+              "character": 17,
+              "line": 0
+            },
+            "start": {
+              "character": 12,
+              "line": 0
+            }
+          },
+          "uri": "file:///C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ri86qdgb/src/helper.void"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/hover",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ri86qdgb/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 14
+        }
+      },
+      "response": {
+        "id": 6,
+        "jsonrpc": "2.0",
+        "result": {
+          "contents": {
+            "kind": "plaintext",
+            "value": "value() -> i32"
+          },
+          "range": {
+            "end": {
+              "character": 18,
+              "line": 2
+            },
+            "start": {
+              "character": 13,
+              "line": 2
+            }
+          }
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/formatting",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ri86qdgb/src/game.void"
+        },
+        "options": {
+          "tabSize": 4,
+          "insertSpaces": true
+        }
+      },
+      "response": {
+        "id": 8,
+        "jsonrpc": "2.0",
+        "result": [
+          {
+            "newText": "use \"./helper.void\" as h\nfunc main() -> i32:\n    return h.value()\n",
+            "range": {
+              "end": {
+                "character": 0,
+                "line": 3
+              },
+              "start": {
+                "character": 0,
+                "line": 0
+              }
+            }
+          }
+        ]
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/rename",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ri86qdgb/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 14
+        },
+        "newName": "renamed_helper"
+      },
+      "response": {
+        "id": 10,
+        "jsonrpc": "2.0",
+        "result": {
+          "documentChanges": [
+            {
+              "edits": [
+                {
+                  "newText": "renamed_helper",
+                  "range": {
+                    "end": {
+                      "character": 18,
+                      "line": 2
+                    },
+                    "start": {
+                      "character": 13,
+                      "line": 2
+                    }
+                  }
+                }
+              ],
+              "textDocument": {
+                "uri": "file:///C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ri86qdgb/src/game.void",
+                "version": 3
+              }
+            },
+            {
+              "edits": [
+                {
+                  "newText": "renamed_helper",
+                  "range": {
+                    "end": {
+                      "character": 17,
+                      "line": 0
+                    },
+                    "start": {
+                      "character": 12,
+                      "line": 0
+                    }
+                  }
+                }
+              ],
+              "textDocument": {
+                "uri": "file:///C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ri86qdgb/src/helper.void",
+                "version": null
+              }
+            }
+          ]
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 12,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5001",
+              "message": "Invalid project TOML: Error while parsing table header: expected a bare or quoted key"
+            }
+          ],
+          "discoveryCount": 0,
+          "entry": null,
+          "executionCount": 0,
+          "kind": null,
+          "manifest": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+          "schema": 2,
+          "selectionRevision": "5",
+          "snapshotKey": "",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ri86qdgb/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 13
+        }
+      },
+      "response": {
+        "id": 13,
+        "jsonrpc": "2.0",
+        "result": null
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 15,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/src/game.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+          "schema": 2,
+          "selectionRevision": "6",
+          "snapshotKey": "e9f7218765debb510511a979ef34e69ed5c892f3b834eee149aa7d1eb3ec84ae",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ri86qdgb/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 13
+        }
+      },
+      "response": {
+        "id": 16,
+        "jsonrpc": "2.0",
+        "result": {
+          "range": {
+            "end": {
+              "character": 17,
+              "line": 0
+            },
+            "start": {
+              "character": 12,
+              "line": 0
+            }
+          },
+          "uri": "file:///C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ri86qdgb/src/helper.void"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 20,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5010",
+              "message": "Ambiguous project entry: 2 eligible main() declarations."
+            }
+          ],
+          "discoveryCount": 3,
+          "entry": null,
+          "executionCount": 0,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+          "schema": 2,
+          "selectionRevision": "9",
+          "snapshotKey": "b768e75508a91d69e017a6d08c79d0926d7ccc1df5a81ef50710a625480ac016",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 22,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/src/game.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+          "schema": 2,
+          "selectionRevision": "11",
+          "snapshotKey": "3fb9bb78d1c0925b2ebcd2bed6b23ce9f24a693f219015f7cebb02d674467176",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 25,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5010",
+              "message": "No eligible main() in application project."
+            }
+          ],
+          "discoveryCount": 1,
+          "entry": null,
+          "executionCount": 0,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+          "schema": 2,
+          "selectionRevision": "14",
+          "snapshotKey": "1033d793c3a02a3382bb1d4aeda22b063bf2636366d9db6e7c7cc49e2b919cfe",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 27,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+          "schema": 2,
+          "selectionRevision": "17",
+          "snapshotKey": "cab98f500e32b6e71e612e9c8768a262044e10f8e0c11580831b84aa998ed813",
+          "standalone": false,
+          "status": "reselection-required"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 30,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+          "schema": 2,
+          "selectionRevision": "19",
+          "snapshotKey": "0056f14f04ceac346512d893b9a0b870b38586c5a1a7726e1c0571675b1f1ac3",
+          "standalone": false,
+          "status": "reselection-required"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/reselectProject",
+      "params": {},
+      "response": {
+        "id": 31,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+          "schema": 2,
+          "selectionRevision": "20",
+          "snapshotKey": "0056f14f04ceac346512d893b9a0b870b38586c5a1a7726e1c0571675b1f1ac3",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": [
+        {
+          "diagnostics": [],
+          "uri": "file:///C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ri86qdgb/src/helper.void",
+          "voidProjectRevision": "20"
+        },
+        {
+          "diagnostics": [],
+          "uri": "file:///C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ri86qdgb/src/renamed.void",
+          "version": 1,
+          "voidProjectRevision": "20"
+        },
+        {
+          "diagnostics": [],
+          "uri": "file:///C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ri86qdgb/void.project.toml",
+          "version": 4,
+          "voidProjectRevision": "20"
+        }
+      ]
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 32,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+          "schema": 2,
+          "selectionRevision": "20",
+          "snapshotKey": "0056f14f04ceac346512d893b9a0b870b38586c5a1a7726e1c0571675b1f1ac3",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 34,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+          "schema": 2,
+          "selectionRevision": "20",
+          "snapshotKey": "0056f14f04ceac346512d893b9a0b870b38586c5a1a7726e1c0571675b1f1ac3",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 37,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5009",
+              "message": "Source path crosses nested project boundary '/src/child'."
+            }
+          ],
+          "discoveryCount": 2,
+          "entry": null,
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+          "schema": 2,
+          "selectionRevision": "22",
+          "snapshotKey": "7dfb3e375845c4f27dd3c3c0fdb7dd6bce00ae8eb5ae673a63a8caad16e0c7d7",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 40,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+          "schema": 2,
+          "selectionRevision": "24",
+          "snapshotKey": "1bb4ebe846b539fc9918b6457ad6e6ff3e3bf326b9efe5bc19701f8b9b4fe44c",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 42,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5009",
+              "message": "Manifest must use exact case without case siblings in '/src/child'."
+            }
+          ],
+          "discoveryCount": 0,
+          "entry": null,
+          "executionCount": 0,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+          "schema": 2,
+          "selectionRevision": "25",
+          "snapshotKey": "bbd86c162f887e9d037855841e5cef0f94491d4a5cb4c8de342b58d1090b2edc",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 44,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+          "schema": 2,
+          "selectionRevision": "26",
+          "snapshotKey": "1bb4ebe846b539fc9918b6457ad6e6ff3e3bf326b9efe5bc19701f8b9b4fe44c",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 46,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5009",
+              "message": "Selected project manifest is unavailable."
+            }
+          ],
+          "discoveryCount": 0,
+          "entry": null,
+          "executionCount": 0,
+          "kind": null,
+          "manifest": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+          "schema": 2,
+          "selectionRevision": "28",
+          "snapshotKey": "",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 48,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+          "schema": 2,
+          "selectionRevision": "29",
+          "snapshotKey": "1bb4ebe846b539fc9918b6457ad6e6ff3e3bf326b9efe5bc19701f8b9b4fe44c",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+        "",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":2,\"entry\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/src/game.void\",\"executionCount\":2,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"5fc931266aaa6fbd3bf79bf289c00a0eb38edaf1e1a19c0884003919af0f28e1\",\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\src\\child\\launcher.void",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":1,\"entry\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/src/child/launcher.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/src/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/src/child\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/src/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"e3ab33806d97d2024523274b7160442c2bf163586405ac6e486d9dd8df5b71af\",\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\src\\child\\launcher.void",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Source path crosses nested project boundary '/src/child'.\"}],\"discoveryCount\":2,\"entry\":null,\"executionCount\":2,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"3e8e3c33b4fb4f61ae6bdf95e657f936c57b043fbc17430188a76edd4dfe4d92\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\src\\game.void",
+        "",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\bare.void"
+      ],
+      "status": 0,
+      "stdout": "{\"entry\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/bare.void\",\"mode\":\"legacy\",\"root\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\",\"schema\":2,\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": null,
+          "executionCount": 2,
+          "kind": "library",
+          "manifest": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb",
+          "schema": 2,
+          "selectionRevision": "1",
+          "snapshotKey": "af3a061f360532ee1bb8514314c8e2e30211082a126d0e399efdb2ef2d33d0ed",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ri86qdgb/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 13
+        }
+      },
+      "response": {
+        "id": 3,
+        "jsonrpc": "2.0",
+        "result": {
+          "range": {
+            "end": {
+              "character": 17,
+              "line": 0
+            },
+            "start": {
+              "character": 12,
+              "line": 0
+            }
+          },
+          "uri": "file:///C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20ri86qdgb/src/helper.void"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent\\child\\launcher.void",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Source path crosses nested project boundary '/child'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"f8a9499b988ba21aa3ca2f3c21d2eabe0f3c5264e0ec8695212ed9c2180bfe8e\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent\\child\\void.project.toml",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active manifest is outside the pinned project boundary: '/child/void.project.toml'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"f8a9499b988ba21aa3ca2f3c21d2eabe0f3c5264e0ec8695212ed9c2180bfe8e\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\outside.void",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active document is outside the pinned project boundary.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"f8a9499b988ba21aa3ca2f3c21d2eabe0f3c5264e0ec8695212ed9c2180bfe8e\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent\\notes.txt",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3001\",\"message\":\"Import must name a .void source file.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"f8a9499b988ba21aa3ca2f3c21d2eabe0f3c5264e0ec8695212ed9c2180bfe8e\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent\\@stdlib\\main.void",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5006\",\"message\":\"Document identity must be an exact canonical root-relative .void path\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"f8a9499b988ba21aa3ca2f3c21d2eabe0f3c5264e0ec8695212ed9c2180bfe8e\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent\\Main.void",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3001\",\"message\":\"Filesystem case collision for 'Main.void'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"f8a9499b988ba21aa3ca2f3c21d2eabe0f3c5264e0ec8695212ed9c2180bfe8e\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent\\void.project.toml",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":0,\"entry\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/main.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"f8a9499b988ba21aa3ca2f3c21d2eabe0f3c5264e0ec8695212ed9c2180bfe8e\",\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent\\virtual\\draft.void",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":0,\"entry\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/main.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"f8a9499b988ba21aa3ca2f3c21d2eabe0f3c5264e0ec8695212ed9c2180bfe8e\",\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent\\child\\launcher.void",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":1,\"entry\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/child/launcher.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/child\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"953b6c141a7fb9f845bc0e863690c4c90e827c9c8f70ce6a021eafb5952ad9c9\",\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent\\child\\launcher.void",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Source path crosses nested project boundary '/child'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"f8a9499b988ba21aa3ca2f3c21d2eabe0f3c5264e0ec8695212ed9c2180bfe8e\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent\\child\\void.project.toml",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active manifest is outside the pinned project boundary: '/child/void.project.toml'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"f8a9499b988ba21aa3ca2f3c21d2eabe0f3c5264e0ec8695212ed9c2180bfe8e\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent\\child\\launcher.void",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5001\",\"message\":\"Invalid project TOML: Error while parsing table header: expected a bare or quoted key\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":0,\"kind\":null,\"manifest\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/child\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent\\child\\launcher.void",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Manifest must use exact case without case siblings in '/child'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"f8a9499b988ba21aa3ca2f3c21d2eabe0f3c5264e0ec8695212ed9c2180bfe8e\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent\\child\\void.Project.toml",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3001\",\"message\":\"Import must name a .void source file.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"f8a9499b988ba21aa3ca2f3c21d2eabe0f3c5264e0ec8695212ed9c2180bfe8e\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent\\child\\launcher.void",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Manifest must use exact case without case siblings in ''.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":0,\"kind\":null,\"manifest\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/child\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "voidls: Usage: voidls --entry <project entry.void>\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\outside.void",
+        "",
+        ""
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "voidls: Active file is outside selected workspace\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent\\junction\\outside.void",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3001\",\"message\":\"Module path contains a filesystem alias.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"1a859142074b69efdebbdc1db2eb61a8d601220ea926d5362eab56581cc685e2\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls-slice3-preflight-qualified.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent\\unreadable.void",
+        "C:\\Users\\a\\VoidSlice3-Preflight-Qualified-20261108\\tmp-Debug\\VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3002\",\"message\":\"Cannot read admitted project source.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidSlice3-Preflight-Qualified-20261108/tmp-Debug/VOID S3 protocol \u00e9\ud83d\ude00 ri86qdgb/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"92488c3dc15dedd53c865571bc8936045b620c3e387b304769f1060c5828b8d7\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    }
+  ]
+}

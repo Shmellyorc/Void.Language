@@ -1,0 +1,2 @@
+C: filesystem=NTFS
+denied before executable load: hardlinked image

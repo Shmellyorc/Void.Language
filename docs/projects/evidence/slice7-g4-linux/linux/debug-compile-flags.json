@@ -1,0 +1,18 @@
+{
+  "void_g4_main": [
+    "C_FLAGS = -g -std=c11 -fPIC -fvisibility=hidden -ffreestanding -fno-builtin -fno-stack-protector -Wall -Wextra -Wpedantic"
+  ],
+  "void_g4_dep": [
+    "C_FLAGS = -g -std=c11 -fPIC -fvisibility=hidden -ffreestanding -fno-builtin -fno-stack-protector -Wall -Wextra -Wpedantic"
+  ],
+  "void_g4_tests": [
+    "CXX_FLAGS = -g -std=c++20 -fno-rtti -Wall -Wextra -Wpedantic"
+  ],
+  "void_runtime": [
+    "C_FLAGS = -g -Wall -Wextra -Wpedantic",
+    "CXX_FLAGS = -g -std=c++20 -fno-rtti -Wall -Wextra -Wpedantic"
+  ],
+  "void_llvm": [
+    "CXX_FLAGS = -g -std=c++20 -D_GNU_SOURCE -D_GLIBCXX_USE_CXX11_ABI=1 -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fno-rtti -Wall -Wextra -Wpedantic"
+  ]
+}

@@ -1,0 +1,2 @@
+UNQUALIFIED: native persistent disk cache; project selection rejection is still exercised
+project_discovery_cli: 88 process checks passed

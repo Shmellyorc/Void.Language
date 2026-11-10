@@ -1,0 +1,51 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+      Start  11: project_creation_process
+      Start 426: numeric_cli
+      Start 377: reload
+ 1/11 Test #377: reload ...........................   Passed    0.34 sec
+      Start 389: frontend
+ 2/11 Test  #11: project_creation_process .........   Passed    3.17 sec
+      Start 385: numeric
+ 3/11 Test #385: numeric ..........................***Failed    1.98 sec
+FAILED: Wrong numeric diagnostic: numeric-invalid.void:2:17: error: as? requires an integer operand and an integer or numeric enum destination.
+    code: VOID2015
+
+ 2 |     var x = 1.0 as? i32
+   |                 ^^^
+    Module: numeric-invalid.void
+
+
+      Start 390: modules
+ 4/11 Test #389: frontend .........................   Passed    4.94 sec
+      Start 382: sessions
+ 5/11 Test #382: sessions .........................   Passed    0.06 sec
+      Start 378: gc
+ 6/11 Test #378: gc ...............................   Passed    0.02 sec
+      Start 386: numeric_enum_ir
+ 7/11 Test #386: numeric_enum_ir ..................***Failed    0.01 sec
+VOID IR: inconsistent function ownership
+
+      Start 387: numeric_enum_process
+ 8/11 Test #390: modules ..........................   Passed    0.67 sec
+      Start 388: numeric_enum_lsp
+ 9/11 Test #388: numeric_enum_lsp .................   Passed    0.09 sec
+10/11 Test #387: numeric_enum_process .............***Failed    3.26 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/numeric/enums.py", line 156, in <module>
+    row = invoke([compiler, "run", file, "--no-cache", *optimization], root)
+  File "/home/shmellyorc/Documents/Void.Language/tests/numeric/enums.py", line 23, in invoke
+    assert result.returncode == expected, row
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'argv': ['/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc', 'run', '/tmp/VOID S6 numeric enum 1zosfrwl/integration.void', '--no-cache', '--no-opt'], 'status': 1, 'stdout': '', 'stderr': "/tmp/VOID S6 numeric enum 1zosfrwl/modes.void:10:34: error: Type 'option' is not a generic struct.\n    code: VOID1103\n\n 10 | public func score_cast<t>(value: option<t>) -> i32:\n    |                                  ^^^^^^\n    Module: /modes.void\n\n"}
+
+11/11 Test #426: numeric_cli ......................   Passed   15.31 sec
+
+73% tests passed, 3 tests failed out of 11
+
+Total Test time (real) =  15.33 sec
+
+The following tests FAILED:
+	385 - numeric (Failed)
+	386 - numeric_enum_ir (Failed)
+	387 - numeric_enum_process (Failed)
+Errors while running CTest

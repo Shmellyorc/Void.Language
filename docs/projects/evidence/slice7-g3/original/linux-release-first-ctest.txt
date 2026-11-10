@@ -1,0 +1,106 @@
+UpdateCTestConfiguration  from :/home/shmellyorc/Documents/Void.Language/build/llvm23-release/DartConfiguration.tcl
+Parse Config file:/home/shmellyorc/Documents/Void.Language/build/llvm23-release/DartConfiguration.tcl
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 280
+    Start 280: ffi_g3_jit_ir
+
+280: Test command: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_g3_tests "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g3/resources.descriptor" "/home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g3/tests"
+280: Working Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+280: Test timeout computed to be: 180
+280: 3 2: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+280: integer null: C primitive descriptor line 10: unsupported or contradictory native resource contract
+280: pointer minus-one: C primitive descriptor line 10: unsupported or contradictory native resource contract
+280: shutdown-owner: C primitive descriptor line 10: unsupported or contradictory native resource contract
+280: retry-on-error: C primitive descriptor line 10: unsupported or contradictory native resource contract
+280: create missing owner: C primitive descriptor line 14: invalid native borrow or terminal release signature
+280: bind close_box g3_close i32 mut:box: C primitive descriptor line 15: missing exact native acquire or release contract
+280: i64 close:box: C primitive descriptor line 14: invalid native borrow or terminal release signature
+280: i32 close:box i32: C primitive descriptor line 14: invalid native borrow or terminal release signature
+280: i32 borrow:other i32: C primitive descriptor line 12: resource operation requires an earlier admitted identity
+280: i32 borrow:box mut:box: C primitive descriptor line 12: invalid native borrow or terminal release signature
+280: owner:box borrow:box i32: C primitive descriptor line 12: invalid native ownership transfer or mixed ABI
+280: vectorcall: C primitive descriptor line 8: unsupported descriptor, ABI revision or effects
+280: retains-owner no-callbacks: C primitive descriptor line 7: unsupported descriptor, ABI revision or effects
+280: org.voidlang.other: C primitive provider rejected the exact descriptor or fixture identity
+280: absent admission: VOID IR: invalid native resource identity
+280: wrong provider: VOID IR: invalid C primitive descriptor or exact call signature
+280: wrong release ordinal: VOID IR: invalid C primitive descriptor or exact call signature
+280: forged ownership movement: VOID IR: invalid C primitive descriptor or exact call signature
+280: forged convention operand: VOID IR: invalid C primitive descriptor or exact call signature
+280: scope bypass: VOID IR: C primitive binding requires the admitted direct import
+280: raw bridge escape: VOID IR: C primitive transport requires host admission and typed operations
+280: worker resource access: VOID IR: C primitive graphs require synchronous execution
+280: borrow as escaping callable: VOID IR: C primitive binding is direct-call only
+280: wrapper control flow bypass: VOID IR: invalid admitted C primitive wrapper
+280: fabricated second owning wrapper received VOID IR: nominal source objects require complete construction
+1/3 Test #280: ffi_g3_jit_ir ....................***Failed    0.02 sec
+test 281
+    Start 281: ffi_g3_aot_normal
+
+281: Test command: /usr/bin/python3 "/home/shmellyorc/Documents/Void.Language/tests/ffi/resources_process.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_g3_aot_normal"
+281: Working Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+281: Test timeout computed to be: 1500
+281: 7 0 104
+281: -1 1 <host binding /native_resources.void>:6:6: runtime error: C resource is closed, null or invalid
+281: In function /native_resources.void::read
+281: Called from /resources.void::entry
+281: /home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:29:20: source call
+281:         return ffi.read(alias, 0)
+281:                    ^
+281: -2 1 <host binding /native_resources.void>:10:6: runtime error: C resource is closed, null or invalid
+281: In function /native_resources.void::close_box
+281: Called from /resources.void::entry
+281: /home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:31:20: source call
+281:         return ffi.close_box(alias)
+281:                    ^
+281: -3 1 /home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:14:40: runtime error: Null managed reference in checked conversion
+281:         return ffi.read(ffi.create(-1) as ffi.box, 0)
+281:                                        ^
+281: In function /resources.void::entry
+281: -4 0 22
+2/3 Test #281: ffi_g3_aot_normal ................   Passed    0.04 sec
+test 282
+    Start 282: ffi_g3_aot_optimized
+
+282: Test command: /usr/bin/python3 "/home/shmellyorc/Documents/Void.Language/tests/ffi/resources_process.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_g3_aot_optimized"
+282: Working Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+282: Test timeout computed to be: 1500
+282: 7 0 104
+282: -1 1 <host binding /native_resources.void>:6:6: runtime error: C resource is closed, null or invalid
+282: In function /native_resources.void::read
+282: Called from /resources.void::entry
+282: /home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:29:20: source call
+282:         return ffi.read(alias, 0)
+282:                    ^
+282: -2 1 <host binding /native_resources.void>:10:6: runtime error: C resource is closed, null or invalid
+282: In function /native_resources.void::close_box
+282: Called from /resources.void::entry
+282: /home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:31:20: source call
+282:         return ffi.close_box(alias)
+282:                    ^
+282: -3 1 /home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:14:40: runtime error: Null managed reference in checked conversion
+282:         return ffi.read(ffi.create(-1) as ffi.box, 0)
+282:                                        ^
+282: In function /resources.void::entry
+282: -4 0 22
+3/3 Test #282: ffi_g3_aot_optimized .............   Passed    0.04 sec
+
+The following tests passed:
+	ffi_g3_aot_normal
+	ffi_g3_aot_optimized
+
+67% tests passed, 1 tests failed out of 3
+
+Total Test time (real) =   0.11 sec
+
+The following tests FAILED:
+	280 - ffi_g3_jit_ir (Failed)
+Errors while running CTest
+Output from these tests are in: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/Testing/Temporary/LastTest.log
+Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.

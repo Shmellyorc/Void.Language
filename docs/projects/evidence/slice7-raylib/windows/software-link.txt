@@ -1,0 +1,2 @@
+["C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\clang.exe", "--target=x86_64-pc-windows-msvc", "-fuse-ld=lld", "-std=c11", "-DUSE_LIBTYPE_SHARED", "-IC:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src", "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\compat.c", "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software-linked\\raylib.lib", "-o", "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\software-native-control\\compat.exe"]
+exit=0

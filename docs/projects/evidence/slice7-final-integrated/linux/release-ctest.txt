@@ -1,0 +1,1384 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release
+        Start   1: project_manifest_header
+        Start   2: project_manifest
+  1/443 Test   #1: project_manifest_header ...................   Passed    0.02 sec
+        Start   3: voidup_smoke
+  2/443 Test   #2: project_manifest ..........................   Passed    0.07 sec
+        Start   4: voidup_ci_integration
+  3/443 Test   #4: voidup_ci_integration .....................   Passed    0.31 sec
+        Start   5: project_manifest_no_authority
+  4/443 Test   #5: project_manifest_no_authority .............   Passed    0.10 sec
+        Start   6: project_manifest_legacy
+  5/443 Test   #3: voidup_smoke ..............................   Passed    0.50 sec
+        Start   7: project_manifest_provenance
+  6/443 Test   #7: project_manifest_provenance ...............   Passed    0.06 sec
+        Start   8: project_selection
+  7/443 Test   #6: project_manifest_legacy ...................   Passed    1.44 sec
+        Start   9: project_sessions
+  8/443 Test   #9: project_sessions ..........................   Passed    0.29 sec
+        Start  10: project_creation
+  9/443 Test  #10: project_creation ..........................   Passed    0.09 sec
+        Start  11: project_creation_process
+ 10/443 Test   #8: project_selection .........................   Passed    3.47 sec
+        Start  12: project_application
+ 11/443 Test  #11: project_creation_process ..................   Passed    3.78 sec
+        Start  13: project_application_process
+ 12/443 Test  #12: project_application .......................   Passed   10.61 sec
+        Start  14: project_discovery_cli
+ 13/443 Test  #13: project_application_process ...............   Passed   12.27 sec
+        Start  15: project_profiles
+ 14/443 Test  #14: project_discovery_cli .....................   Passed    4.38 sec
+        Start  16: project_protocol
+ 15/443 Test  #16: project_protocol ..........................   Passed    0.31 sec
+        Start  17: project_nested_cli
+ 16/443 Test  #15: project_profiles ..........................   Passed    1.08 sec
+        Start  18: cli_contract
+ 17/443 Test  #17: project_nested_cli ........................   Passed    0.48 sec
+        Start  19: cli_install
+ 18/443 Test  #19: cli_install ...............................   Passed    1.94 sec
+        Start  20: cli_install_resources
+ 19/443 Test  #20: cli_install_resources .....................   Passed    0.12 sec
+        Start  21: target_triple
+ 20/443 Test  #21: target_triple .............................   Passed    0.01 sec
+        Start  22: http_native
+ 21/443 Test  #18: cli_contract ..............................   Passed    3.47 sec
+        Start  23: http_tls_memory
+ 22/443 Test  #22: http_native ...............................   Passed   18.47 sec
+        Start  24: http_reload
+ 23/443 Test  #24: http_reload ...............................   Passed   36.36 sec
+        Start  25: http_timeouts
+ 24/443 Test  #25: http_timeouts .............................   Passed    6.36 sec
+        Start  26: http_wire
+ 25/443 Test  #26: http_wire .................................   Passed    1.25 sec
+        Start  27: http_dns
+ 26/443 Test  #23: http_tls_memory ...........................   Passed   66.05 sec
+        Start  28: url_native
+ 27/443 Test  #28: url_native ................................   Passed    0.06 sec
+        Start  29: http_examples
+ 28/443 Test  #27: http_dns ..................................   Passed    6.30 sec
+        Start  30: http_ci_policy
+ 29/443 Test  #30: http_ci_policy ............................   Passed    5.55 sec
+        Start  31: http_curl_objects
+ 30/443 Test  #31: http_curl_objects .........................   Passed    0.79 sec
+        Start  32: http_install
+ 31/443 Test  #32: http_install ..............................   Passed   79.86 sec
+        Start  33: http_bulk
+ 32/443 Test  #29: http_examples .............................   Passed   98.43 sec
+        Start  34: http_ir
+ 33/443 Test  #34: http_ir ...................................   Passed    3.91 sec
+        Start  35: http_source
+ 34/443 Test  #33: http_bulk .................................   Passed   15.63 sec
+        Start  36: http_source_negative
+ 35/443 Test  #36: http_source_negative ......................   Passed    1.17 sec
+        Start  37: http_source_faults
+ 36/443 Test  #35: http_source ...............................   Passed   72.10 sec
+        Start  38: url_ir
+ 37/443 Test  #38: url_ir ....................................   Passed    0.10 sec
+        Start  39: url_source
+ 38/443 Test  #39: url_source ................................   Passed    3.22 sec
+        Start  40: url_lsp
+ 39/443 Test  #40: url_lsp ...................................   Passed    0.17 sec
+        Start  41: http_lsp
+ 40/443 Test  #41: http_lsp ..................................   Passed    2.18 sec
+        Start  42: toolchain_stop_token
+ 41/443 Test  #42: toolchain_stop_token ......................   Passed    0.01 sec
+        Start  43: stage10_operator_reload
+ 42/443 Test  #43: stage10_operator_reload ...................   Passed   26.34 sec
+        Start  44: stage10_operator_keys
+ 43/443 Test  #44: stage10_operator_keys .....................   Passed    0.28 sec
+        Start  45: stage10_operator_resolution
+ 44/443 Test  #45: stage10_operator_resolution ...............   Passed    1.50 sec
+        Start  46: stage10_operator_declarations
+ 45/443 Test  #46: stage10_operator_declarations .............   Passed    0.66 sec
+        Start  47: stage10_source_formatting
+ 46/443 Test  #47: stage10_source_formatting .................   Passed    0.55 sec
+        Start  48: stage10_tooling
+ 47/443 Test  #48: stage10_tooling ...........................   Passed    0.15 sec
+        Start  49: stage10_display_reload
+ 48/443 Test  #49: stage10_display_reload ....................   Passed    2.31 sec
+        Start  50: stage10_temporal_ir
+ 49/443 Test  #50: stage10_temporal_ir .......................   Passed    2.23 sec
+        Start  51: format_temporal
+ 50/443 Test  #51: format_temporal ...........................   Passed    0.04 sec
+        Start  52: stage10_hooks
+ 51/443 Test  #52: stage10_hooks .............................   Passed    2.21 sec
+        Start  53: stage10_interpolation
+ 52/443 Test  #53: stage10_interpolation .....................   Passed    0.85 sec
+        Start  54: decimal_float
+ 53/443 Test  #54: decimal_float .............................   Passed    0.04 sec
+        Start  55: stage10_conversion
+ 54/443 Test  #37: http_source_faults ........................   Passed  199.76 sec
+        Start  56: stage10_fields
+ 55/443 Test  #56: stage10_fields ............................   Passed    0.46 sec
+        Start  57: format_numeric
+ 56/443 Test  #57: format_numeric ............................   Passed    0.05 sec
+        Start  58: format_zones
+ 57/443 Test  #58: format_zones ..............................   Passed    0.20 sec
+        Start  59: json_readonly
+ 58/443 Test  #59: json_readonly .............................***Failed    5.91 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/readonly.py", line 54, in <module>
+    (ROOT/'docs/json/evidence/implementation'/('readonly-'+profile+'-'+str(time.time_ns())+'.json')).write_text(json.dumps(report,indent=2)+'\n')
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 810, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/docs/json/evidence/implementation/readonly-Release-1794255039161675417.json'
+
+        Start  60: json_dynamic
+ 59/443 Test  #60: json_dynamic ..............................***Failed    2.28 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/dynamic.py", line 37, in <module>
+    h.run([h.compiler,'run',source_path,*flags],source_path,expected)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/harness.py", line 30, in run
+    receipt.write_text(json.dumps({'profile':profile,'compiler':str(compiler),'compiler_sha256':digest(compiler),'records':records,'environment':{k:os.environ[k] for k in ['ASAN_OPTIONS','UBSAN_OPTIONS'] if k in os.environ}},indent=2)+'\n')
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 810, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/docs/json/evidence/implementation/dynamic-Release-1794255039264269321.json'
+
+        Start  61: json_numbers
+ 60/443 Test  #61: json_numbers ..............................***Failed    3.38 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/numbers.py", line 33, in <module>
+    h.run([h.compiler,'run',src,*flags],src,expected)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/harness.py", line 30, in run
+    receipt.write_text(json.dumps({'profile':profile,'compiler':str(compiler),'compiler_sha256':digest(compiler),'records':records,'environment':{k:os.environ[k] for k in ['ASAN_OPTIONS','UBSAN_OPTIONS'] if k in os.environ}},indent=2)+'\n')
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 810, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/docs/json/evidence/implementation/numbers-Release-1794255041567087466.json'
+
+        Start  62: json_schema
+ 61/443 Test  #62: json_schema ...............................***Failed    4.08 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/schema.py", line 47, in <module>
+    h.run([h.compiler,'run',src,*flags],src,expected)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/harness.py", line 30, in run
+    receipt.write_text(json.dumps({'profile':profile,'compiler':str(compiler),'compiler_sha256':digest(compiler),'records':records,'environment':{k:os.environ[k] for k in ['ASAN_OPTIONS','UBSAN_OPTIONS'] if k in os.environ}},indent=2)+'\n')
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 810, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/docs/json/evidence/implementation/schema-Release-1794255044934384138.json'
+
+        Start  63: json_bounds
+ 62/443 Test  #63: json_bounds ...............................***Failed    5.47 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/bounds.py", line 66, in <module>
+    h.run([h.compiler,'run',src,*flags],src,expected)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/harness.py", line 30, in run
+    receipt.write_text(json.dumps({'profile':profile,'compiler':str(compiler),'compiler_sha256':digest(compiler),'records':records,'environment':{k:os.environ[k] for k in ['ASAN_OPTIONS','UBSAN_OPTIONS'] if k in os.environ}},indent=2)+'\n')
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 810, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/docs/json/evidence/implementation/bounds-Release-1794255049004300869.json'
+
+        Start  64: json_install
+ 63/443 Test  #64: json_install ..............................***Failed    0.58 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/install.py", line 7, in <module>
+    h.run(['cmake','--install',h.compiler.parent,'--prefix',prefix,'--component','compiler'],src)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/harness.py", line 30, in run
+    receipt.write_text(json.dumps({'profile':profile,'compiler':str(compiler),'compiler_sha256':digest(compiler),'records':records,'environment':{k:os.environ[k] for k in ['ASAN_OPTIONS','UBSAN_OPTIONS'] if k in os.environ}},indent=2)+'\n')
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 810, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/docs/json/evidence/implementation/install-Release-1794255054503631971.json'
+
+        Start  65: json_adversarial
+ 64/443 Test  #65: json_adversarial ..........................***Failed    6.95 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/adversarial.py", line 69, in <module>
+    h.run([h.compiler,'run',src,*flags],src,('\n'.join(expected)+'\n').encode(),timeout=300)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/harness.py", line 30, in run
+    receipt.write_text(json.dumps({'profile':profile,'compiler':str(compiler),'compiler_sha256':digest(compiler),'records':records,'environment':{k:os.environ[k] for k in ['ASAN_OPTIONS','UBSAN_OPTIONS'] if k in os.environ}},indent=2)+'\n')
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 810, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/docs/json/evidence/implementation/adversarial-Release-1794255055087417204.json'
+
+        Start  66: json_metering
+ 65/443 Test  #66: json_metering .............................***Failed    4.14 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/metering.py", line 11, in <module>
+    h.run([h.compiler, 'run', source, '--no-cache', *flags], source, expected)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/harness.py", line 30, in run
+    receipt.write_text(json.dumps({'profile':profile,'compiler':str(compiler),'compiler_sha256':digest(compiler),'records':records,'environment':{k:os.environ[k] for k in ['ASAN_OPTIONS','UBSAN_OPTIONS'] if k in os.environ}},indent=2)+'\n')
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 810, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/docs/json/evidence/implementation/metering-Release-1794255062032974716.json'
+
+        Start  67: json_execution_validated
+ 66/443 Test  #67: json_execution_validated ..................***Failed    3.98 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/execution.py", line 24, in <module>
+    h.run([h.compiler,'run',src,*flags],src,want,timeout=timeout)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/harness.py", line 30, in run
+    receipt.write_text(json.dumps({'profile':profile,'compiler':str(compiler),'compiler_sha256':digest(compiler),'records':records,'environment':{k:os.environ[k] for k in ['ASAN_OPTIONS','UBSAN_OPTIONS'] if k in os.environ}},indent=2)+'\n')
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 810, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/docs/json/evidence/implementation/execution-Release-1794255066173205395.json'
+
+        Start  68: json_execution_accessors
+ 67/443 Test  #68: json_execution_accessors ..................***Failed    2.26 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/execution.py", line 24, in <module>
+    h.run([h.compiler,'run',src,*flags],src,want,timeout=timeout)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/harness.py", line 30, in run
+    receipt.write_text(json.dumps({'profile':profile,'compiler':str(compiler),'compiler_sha256':digest(compiler),'records':records,'environment':{k:os.environ[k] for k in ['ASAN_OPTIONS','UBSAN_OPTIONS'] if k in os.environ}},indent=2)+'\n')
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 810, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/docs/json/evidence/implementation/execution-Release-1794255070132920373.json'
+
+        Start  69: json_execution_dynamic_smoke
+ 68/443 Test  #69: json_execution_dynamic_smoke ..............***Failed    1.76 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/execution.py", line 24, in <module>
+    h.run([h.compiler,'run',src,*flags],src,want,timeout=timeout)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/harness.py", line 30, in run
+    receipt.write_text(json.dumps({'profile':profile,'compiler':str(compiler),'compiler_sha256':digest(compiler),'records':records,'environment':{k:os.environ[k] for k in ['ASAN_OPTIONS','UBSAN_OPTIONS'] if k in os.environ}},indent=2)+'\n')
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 810, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/docs/json/evidence/implementation/execution-Release-1794255072398704458.json'
+
+        Start  70: json_execution_typed_smoke
+ 69/443 Test  #70: json_execution_typed_smoke ................***Failed    5.67 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/execution.py", line 24, in <module>
+    h.run([h.compiler,'run',src,*flags],src,want,timeout=timeout)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/harness.py", line 30, in run
+    receipt.write_text(json.dumps({'profile':profile,'compiler':str(compiler),'compiler_sha256':digest(compiler),'records':records,'environment':{k:os.environ[k] for k in ['ASAN_OPTIONS','UBSAN_OPTIONS'] if k in os.environ}},indent=2)+'\n')
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 810, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/docs/json/evidence/implementation/execution-Release-1794255074156715822.json'
+
+        Start  71: json_execution_shapes
+ 70/443 Test  #71: json_execution_shapes .....................***Failed    7.74 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/execution.py", line 24, in <module>
+    h.run([h.compiler,'run',src,*flags],src,want,timeout=timeout)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/harness.py", line 30, in run
+    receipt.write_text(json.dumps({'profile':profile,'compiler':str(compiler),'compiler_sha256':digest(compiler),'records':records,'environment':{k:os.environ[k] for k in ['ASAN_OPTIONS','UBSAN_OPTIONS'] if k in os.environ}},indent=2)+'\n')
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 810, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/docs/json/evidence/implementation/execution-Release-1794255079815280106.json'
+
+        Start  72: json_execution_ownership
+ 71/443 Test  #72: json_execution_ownership ..................***Failed    3.93 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/execution.py", line 24, in <module>
+    h.run([h.compiler,'run',src,*flags],src,want,timeout=timeout)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/harness.py", line 30, in run
+    receipt.write_text(json.dumps({'profile':profile,'compiler':str(compiler),'compiler_sha256':digest(compiler),'records':records,'environment':{k:os.environ[k] for k in ['ASAN_OPTIONS','UBSAN_OPTIONS'] if k in os.environ}},indent=2)+'\n')
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 810, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/docs/json/evidence/implementation/execution-Release-1794255087551680667.json'
+
+        Start  73: json_execution_nested_inference
+ 72/443 Test  #73: json_execution_nested_inference ...........***Failed    3.25 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/execution.py", line 24, in <module>
+    h.run([h.compiler,'run',src,*flags],src,want,timeout=timeout)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/harness.py", line 30, in run
+    receipt.write_text(json.dumps({'profile':profile,'compiler':str(compiler),'compiler_sha256':digest(compiler),'records':records,'environment':{k:os.environ[k] for k in ['ASAN_OPTIONS','UBSAN_OPTIONS'] if k in os.environ}},indent=2)+'\n')
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 810, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/docs/json/evidence/implementation/execution-Release-1794255091501770418.json'
+
+        Start  74: json_stress_fixed
+ 73/443 Test  #74: json_stress_fixed .........................***Failed    9.57 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/stress.py", line 41, in <module>
+    h.run([h.compiler,'run',src,*flags],src,want,timeout=600)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/harness.py", line 30, in run
+    receipt.write_text(json.dumps({'profile':profile,'compiler':str(compiler),'compiler_sha256':digest(compiler),'records':records,'environment':{k:os.environ[k] for k in ['ASAN_OPTIONS','UBSAN_OPTIONS'] if k in os.environ}},indent=2)+'\n')
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 810, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/docs/json/evidence/implementation/stress-Release-1794255094755722381.json'
+
+        Start  75: json_stress_wide
+ 74/443 Test  #55: stage10_conversion ........................   Passed  160.75 sec
+        Start  76: json_host
+ 75/443 Test  #75: json_stress_wide ..........................***Failed    9.22 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/stress.py", line 41, in <module>
+    h.run([h.compiler,'run',src,*flags],src,want,timeout=600)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/harness.py", line 30, in run
+    receipt.write_text(json.dumps({'profile':profile,'compiler':str(compiler),'compiler_sha256':digest(compiler),'records':records,'environment':{k:os.environ[k] for k in ['ASAN_OPTIONS','UBSAN_OPTIONS'] if k in os.environ}},indent=2)+'\n')
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 810, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/docs/json/evidence/implementation/stress-Release-1794255104310765453.json'
+
+        Start  77: json_preservation
+ 76/443 Test  #77: json_preservation .........................***Failed    0.26 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/preservation.py", line 24, in <module>
+    h.run([sys.executable, '-c', emit + 'raise SystemExit(1)', source], source,
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          cwd=work, expected=stdout, status=1)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/harness.py", line 30, in run
+    receipt.write_text(json.dumps({'profile':profile,'compiler':str(compiler),'compiler_sha256':digest(compiler),'records':records,'environment':{k:os.environ[k] for k in ['ASAN_OPTIONS','UBSAN_OPTIONS'] if k in os.environ}},indent=2)+'\n')
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 810, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/docs/json/evidence/implementation/preservation-Release-1794255113532730458.json'
+
+        Start  78: json_lsp
+ 77/443 Test  #78: json_lsp ..................................***Failed    1.27 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/json/lsp.py", line 95, in <module>
+    h.receipt.write_text(json.dumps({'profile':h.profile,'server_sha256':h.digest(h.compiler),'checks':checks,'stack_bytes_observed':1048576,'stdlib_hashes':{str(p):h.digest(p) for p in (h.ROOT/'stdlib').rglob('*.void')}},indent=2)+'\n')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 810, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/docs/json/evidence/implementation/lsp-Release-1794255113799542040.json'
+
+        Start  79: application_workflow_stage9
+ 78/443 Test  #79: application_workflow_stage9 ...............   Passed    7.80 sec
+        Start  80: native_output_paths_ci88
+ 79/443 Test  #80: native_output_paths_ci88 ..................   Passed    1.46 sec
+        Start  81: long_physical_paths_ci89
+ 80/443 Test  #81: long_physical_paths_ci89 ..................   Passed    1.60 sec
+        Start  82: gc_buffers
+ 81/443 Test  #82: gc_buffers ................................   Passed    1.13 sec
+        Start  83: gc_schemas
+ 82/443 Test  #83: gc_schemas ................................   Passed    0.05 sec
+        Start  84: arrays_foundation
+ 83/443 Test  #84: arrays_foundation .........................   Passed    0.07 sec
+        Start  85: runtime_console
+ 84/443 Test  #85: runtime_console ...........................   Passed    0.02 sec
+        Start  86: runtime_console_endpoints
+ 85/443 Test  #86: runtime_console_endpoints .................   Passed    0.07 sec
+        Start  87: runtime_console_transfers
+ 86/443 Test  #87: runtime_console_transfers .................   Passed    0.02 sec
+        Start  88: runtime_console_native_transfers
+ 87/443 Test  #88: runtime_console_native_transfers ..........   Passed    0.31 sec
+        Start  89: runtime_console_keyboard
+ 88/443 Test  #89: runtime_console_keyboard ..................   Passed    0.02 sec
+        Start  90: runtime_console_terminal
+ 89/443 Test  #90: runtime_console_terminal ..................   Passed    0.01 sec
+        Start  91: runtime_console_native_keyboard
+ 90/443 Test  #91: runtime_console_native_keyboard ...........   Passed    0.16 sec
+        Start  92: runtime_console_native_terminal
+ 91/443 Test  #92: runtime_console_native_terminal ...........   Passed    0.76 sec
+        Start  93: runtime_console_wide
+ 92/443 Test  #93: runtime_console_wide ......................   Passed    0.04 sec
+        Start  94: runtime_console_input
+ 93/443 Test  #94: runtime_console_input .....................   Passed    0.02 sec
+        Start  95: runtime_console_native_input
+ 94/443 Test  #95: runtime_console_native_input ..............   Passed    0.15 sec
+        Start  96: runtime_coordination
+ 95/443 Test  #96: runtime_coordination ......................   Passed    2.05 sec
+        Start  97: runtime_generated
+ 96/443 Test  #97: runtime_generated .........................   Passed    0.61 sec
+        Start  98: fixed_arrays_source
+ 97/443 Test  #98: fixed_arrays_source .......................   Passed    2.47 sec
+        Start  99: growable_arrays_source
+ 98/443 Test  #99: growable_arrays_source ....................   Passed    1.76 sec
+        Start 100: arrays_source
+ 99/443 Test #100: arrays_source .............................   Passed    3.83 sec
+        Start 101: generics_source
+100/443 Test #101: generics_source ...........................   Passed    2.97 sec
+        Start 102: generics_hint_execution
+101/443 Test #102: generics_hint_execution ...................   Passed    7.01 sec
+        Start 103: generics_hint_lsp
+102/443 Test #103: generics_hint_lsp .........................   Passed    0.13 sec
+        Start 104: collections_source
+103/443 Test #104: collections_source ........................   Passed    8.20 sec
+        Start 105: dictionaries_source
+104/443 Test #105: dictionaries_source .......................   Passed    6.73 sec
+        Start 106: properties_source
+105/443 Test #106: properties_source .........................   Passed    2.82 sec
+        Start 107: patterns_source
+106/443 Test #107: patterns_source ...........................   Passed    8.27 sec
+        Start 108: debug_cache
+107/443 Test #108: debug_cache ...............................   Passed    1.38 sec
+        Start 109: debug_cache_processes
+108/443 Test #109: debug_cache_processes .....................   Passed    3.80 sec
+        Start 110: automatic_cache_processes
+109/443 Test #110: automatic_cache_processes .................   Passed    0.70 sec
+        Start 111: advanced_source
+110/443 Test #111: advanced_source ...........................   Passed    4.48 sec
+        Start 112: fixed_arrays_cli
+111/443 Test #112: fixed_arrays_cli ..........................   Passed    3.29 sec
+        Start 113: growable_arrays_cli
+112/443 Test #113: growable_arrays_cli .......................   Passed    3.72 sec
+        Start 114: arrays_cli
+113/443 Test  #76: json_host .................................   Passed   89.26 sec
+        Start 115: generics_cli
+114/443 Test #115: generics_cli ..............................   Passed    2.98 sec
+        Start 116: collections_cli
+115/443 Test #114: arrays_cli ................................   Passed    5.76 sec
+        Start 117: dictionaries_cli
+116/443 Test #117: dictionaries_cli ..........................   Passed    3.87 sec
+        Start 118: properties_cli
+117/443 Test #116: collections_cli ...........................   Passed    7.75 sec
+        Start 119: patterns_cli
+118/443 Test #118: properties_cli ............................   Passed    8.19 sec
+        Start 120: advanced_cli
+119/443 Test #119: patterns_cli ..............................   Passed    5.58 sec
+        Start 121: managed_source
+120/443 Test #121: managed_source ............................   Passed    1.89 sec
+        Start 122: managed_aot_normal
+121/443 Test #122: managed_aot_normal ........................   Passed    0.13 sec
+        Start 123: managed_aot_optimized
+122/443 Test #123: managed_aot_optimized .....................   Passed    0.14 sec
+        Start 124: managed_cli
+123/443 Test #124: managed_cli ...............................   Passed    3.43 sec
+        Start 125: managed_initialization_source
+124/443 Test #125: managed_initialization_source .............   Passed    4.59 sec
+        Start 126: managed_initialization_aot_normal
+125/443 Test #126: managed_initialization_aot_normal .........   Passed    0.02 sec
+        Start 127: managed_initialization_aot_optimized
+126/443 Test #127: managed_initialization_aot_optimized ......   Passed    0.04 sec
+        Start 128: managed_initialization_cli
+127/443 Test #128: managed_initialization_cli ................   Passed    4.80 sec
+        Start 129: reference_values_source
+128/443 Test #120: advanced_cli ..............................   Passed   16.25 sec
+        Start 130: reference_values_aot_normal
+129/443 Test #130: reference_values_aot_normal ...............   Passed    0.04 sec
+        Start 131: reference_values_aot_optimized
+130/443 Test #131: reference_values_aot_optimized ............   Passed    0.03 sec
+        Start 132: reference_values_cli
+131/443 Test #129: reference_values_source ...................   Passed    1.90 sec
+        Start 133: composition_source
+132/443 Test #133: composition_source ........................   Passed    1.48 sec
+        Start 134: composition_aot_normal
+133/443 Test #134: composition_aot_normal ....................   Passed    0.24 sec
+        Start 135: composition_aot_optimized
+134/443 Test #135: composition_aot_optimized .................   Passed    0.16 sec
+        Start 136: composition_cli
+135/443 Test #132: reference_values_cli ......................   Passed    5.77 sec
+        Start 137: inheritance_source
+136/443 Test #136: composition_cli ...........................   Passed    4.77 sec
+        Start 138: inheritance_aot_normal
+137/443 Test #138: inheritance_aot_normal ....................   Passed    0.03 sec
+        Start 139: inheritance_aot_optimized
+138/443 Test #139: inheritance_aot_optimized .................   Passed    0.04 sec
+        Start 140: inheritance_cli
+139/443 Test #137: inheritance_source ........................   Passed    3.48 sec
+        Start 141: interfaces_source
+140/443 Test #141: interfaces_source .........................   Passed    3.94 sec
+        Start 142: interfaces_aot_normal
+141/443 Test #140: inheritance_cli ...........................   Passed    4.98 sec
+        Start 143: interfaces_aot_optimized
+142/443 Test #142: interfaces_aot_normal .....................   Passed    0.27 sec
+        Start 144: interfaces_cli
+143/443 Test #143: interfaces_aot_optimized ..................   Passed    0.17 sec
+        Start 145: strings_source
+144/443 Test #145: strings_source ............................   Passed    3.01 sec
+        Start 146: strings_aot_normal
+145/443 Test #146: strings_aot_normal ........................   Passed    0.03 sec
+        Start 147: strings_aot_optimized
+146/443 Test #147: strings_aot_optimized .....................   Passed    0.03 sec
+        Start 148: strings_cli
+147/443 Test #144: interfaces_cli ............................   Passed    4.42 sec
+        Start 149: runtime_callbacks
+148/443 Test #148: strings_cli ...............................   Passed    2.07 sec
+        Start 150: runtime_failures
+149/443 Test #150: runtime_failures ..........................   Passed    0.17 sec
+        Start 151: runtime_aot_normal
+150/443 Test #149: runtime_callbacks .........................   Passed    0.98 sec
+        Start 152: runtime_aot_optimized
+151/443 Test #151: runtime_aot_normal ........................   Passed    0.07 sec
+        Start 153: runtime_invariants
+152/443 Test #152: runtime_aot_optimized .....................   Passed    0.03 sec
+        Start 154: lsp_positions
+153/443 Test #154: lsp_positions .............................   Passed    0.01 sec
+        Start 155: lsp_protocol
+154/443 Test #153: runtime_invariants ........................   Passed    0.08 sec
+        Start 156: lsp_stage11_globals
+155/443 Test #156: lsp_stage11_globals .......................   Passed    0.36 sec
+        Start 157: lsp_stage8
+156/443 Test #155: lsp_protocol ..............................   Passed    0.79 sec
+        Start 158: documentation_execution
+157/443 Test #157: lsp_stage8 ................................   Passed    0.59 sec
+        Start 159: lsp_documentation
+158/443 Test #159: lsp_documentation .........................   Passed    0.25 sec
+        Start 160: math_host
+159/443 Test #158: documentation_execution ...................   Passed    1.51 sec
+        Start 161: math_ir
+160/443 Test #161: math_ir ...................................   Passed    0.64 sec
+        Start 162: math_execution
+161/443 Test #160: math_host .................................   Passed    2.40 sec
+        Start 163: math_frontend
+162/443 Test #163: math_frontend .............................   Passed   16.07 sec
+        Start 164: math_errors
+163/443 Test #162: math_execution ............................   Passed   27.37 sec
+        Start 165: math_worker
+164/443 Test #164: math_errors ...............................   Passed   10.98 sec
+        Start 166: lsp_math
+165/443 Test #166: lsp_math ..................................   Passed    1.55 sec
+        Start 168: math_preservation
+166/443 Test #168: math_preservation .........................   Passed    1.41 sec
+        Start 169: math_stack
+167/443 Test #165: math_worker ...............................   Passed    4.73 sec
+        Start 170: math_frontend_stack
+168/443 Test #170: math_frontend_stack .......................   Passed   18.02 sec
+        Start 171: host_capabilities_dependencies
+169/443 Test #171: host_capabilities_dependencies ............   Passed    7.30 sec
+        Start 172: host_capabilities_portable
+170/443 Test #172: host_capabilities_portable ................   Passed    0.09 sec
+        Start 173: host_capabilities_portable_source
+171/443 Test #169: math_stack ................................   Passed   27.15 sec
+        Start 174: host_capabilities
+172/443 Test #173: host_capabilities_portable_source .........   Passed   29.31 sec
+        Start 175: host_capabilities_stack
+173/443 Test #174: host_capabilities .........................   Passed   60.74 sec
+        Start 176: host_capabilities_frontend
+174/443 Test #176: host_capabilities_frontend ................   Passed    2.03 sec
+        Start 177: host_capabilities_lsp
+175/443 Test #177: host_capabilities_lsp .....................   Passed    0.46 sec
+        Start 178: host_capabilities_native
+176/443 Test #178: host_capabilities_native ..................   Passed    0.21 sec
+        Start 180: os_execution
+177/443 Test #175: host_capabilities_stack ...................   Passed   59.40 sec
+        Start 181: os_stack
+178/443 Test #180: os_execution ..............................   Passed   27.78 sec
+        Start 182: os_edges
+179/443 Test #182: os_edges ..................................   Passed    4.64 sec
+        Start 183: os_edges_stack
+180/443 Test #183: os_edges_stack ............................   Passed    4.21 sec
+        Start 184: os_host
+181/443 Test #184: os_host ...................................   Passed    7.29 sec
+        Start 185: os_errors
+182/443 Test #185: os_errors .................................   Passed    5.97 sec
+        Start 186: os_frontend
+183/443 Test #181: os_stack ..................................   Passed   29.32 sec
+        Start 187: lsp_os
+184/443 Test #187: lsp_os ....................................   Passed    1.85 sec
+        Start 188: os_cache
+185/443 Test #186: os_frontend ...............................   Passed    9.53 sec
+        Start 189: os_owner
+186/443 Test #188: os_cache ..................................   Passed    4.42 sec
+        Start 190: os_examples
+187/443 Test #190: os_examples ...............................   Passed    4.52 sec
+        Start 192: os_frontend_stack
+188/443 Test #192: os_frontend_stack .........................   Passed    8.29 sec
+        Start 193: os_host_stack
+189/443 Test #189: os_owner ..................................   Passed   17.02 sec
+        Start 194: random_host
+190/443 Test #193: os_host_stack .............................   Passed    7.33 sec
+        Start 195: random_execution
+191/443 Test #194: random_host ...............................   Passed   21.61 sec
+        Start 196: random_frontend
+192/443 Test #196: random_frontend ...........................   Passed    6.83 sec
+        Start 197: lsp_random
+193/443 Test #197: lsp_random ................................   Passed    0.85 sec
+        Start 199: random_errors
+194/443 Test #195: random_execution ..........................   Passed   29.56 sec
+        Start 200: random_preservation
+195/443 Test #200: random_preservation .......................   Passed    0.51 sec
+        Start 201: random_worker
+196/443 Test #199: random_errors .............................   Passed    7.36 sec
+        Start 202: random_reference
+197/443 Test #202: random_reference ..........................   Passed    0.02 sec
+        Start 203: random_stack
+198/443 Test #201: random_worker .............................   Passed    4.26 sec
+        Start 204: random_frontend_stack
+199/443 Test #204: random_frontend_stack .....................   Passed    7.27 sec
+        Start 205: binary_execution
+200/443 Test #205: binary_execution ..........................   Passed   16.46 sec
+        Start 206: lsp_binary
+201/443 Test #206: lsp_binary ................................   Passed    0.12 sec
+        Start 207: binary_ownership
+202/443 Test #207: binary_ownership ..........................   Passed    0.28 sec
+        Start 208: binary_stack
+203/443 Test #208: binary_stack ..............................   Passed    0.79 sec
+        Start 209: lsp_const_recovery
+204/443 Test #209: lsp_const_recovery ........................   Passed    0.75 sec
+        Start 210: lsp_const_recovery_stack
+205/443 Test #210: lsp_const_recovery_stack ..................   Passed    0.79 sec
+        Start 211: combined_ownership
+206/443 Test #203: random_stack ..............................   Passed   30.64 sec
+        Start 212: combined_async_normal
+207/443 Test #212: combined_async_normal .....................   Passed    0.04 sec
+        Start 213: combined_async_optimized
+208/443 Test #213: combined_async_optimized ..................   Passed    0.04 sec
+        Start 214: combined_execution
+209/443 Test #211: combined_ownership ........................   Passed    4.84 sec
+        Start 215: lsp_combined
+210/443 Test #215: lsp_combined ..............................   Passed    1.29 sec
+        Start 216: combined_stack
+211/443 Test #214: combined_execution ........................   Passed   21.34 sec
+        Start 217: memory_execution
+212/443 Test #216: combined_stack ............................   Passed   20.26 sec
+        Start 218: lsp_memory
+213/443 Test #218: lsp_memory ................................   Passed    0.47 sec
+        Start 219: text_encoding_text
+214/443 Test #219: text_encoding_text ........................   Passed    4.59 sec
+        Start 220: text_encoding_hex
+215/443 Test #220: text_encoding_hex .........................   Passed    1.60 sec
+        Start 221: text_encoding_base64
+216/443 Test #221: text_encoding_base64 ......................   Passed    2.77 sec
+        Start 222: text_encoding_ascii
+217/443 Test #222: text_encoding_ascii .......................   Passed    1.76 sec
+        Start 223: text_encoding_oracles
+218/443 Test #217: memory_execution ..........................   Passed   56.04 sec
+        Start 224: text_encoding_interop
+219/443 Test #224: text_encoding_interop .....................   Passed    6.23 sec
+        Start 225: text_encoding_large
+220/443 Test #225: text_encoding_large .......................   Passed   17.31 sec
+        Start 226: text_encoding_errors
+221/443 Test #226: text_encoding_errors ......................   Passed    3.14 sec
+        Start 227: text_encoding_crash_preservation
+222/443 Test #227: text_encoding_crash_preservation ..........   Passed    1.75 sec
+        Start 228: lsp_text_encoding
+223/443 Test #228: lsp_text_encoding .........................   Passed    0.66 sec
+        Start 230: text_encoding_stack
+224/443 Test #230: text_encoding_stack .......................   Passed    2.17 sec
+        Start 231: lsp_text_encoding_stack
+225/443 Test #231: lsp_text_encoding_stack ...................   Passed    0.74 sec
+        Start 232: text_encoding_depth
+226/443 Test #232: text_encoding_depth .......................   Passed    0.18 sec
+        Start 233: text_encoding_semantic_depth
+227/443 Test #233: text_encoding_semantic_depth ..............   Passed    0.83 sec
+        Start 234: text_encoding_ir
+228/443 Test #234: text_encoding_ir ..........................   Passed    0.49 sec
+        Start 235: text_encoding_inventory
+229/443 Test #235: text_encoding_inventory ...................   Passed    0.14 sec
+        Start 236: text_encoding_ownership
+230/443 Test #236: text_encoding_ownership ...................   Passed    3.91 sec
+        Start 237: memory_ownership
+231/443 Test #237: memory_ownership ..........................   Passed    1.85 sec
+        Start 238: memory_stack
+232/443 Test #238: memory_stack ..............................   Passed    2.17 sec
+        Start 239: lsp_stage7
+233/443 Test #239: lsp_stage7 ................................   Passed    0.29 sec
+        Start 240: lsp_demo
+234/443 Test #240: lsp_demo ..................................   Passed    0.13 sec
+        Start 241: stage10_operator_compounds
+235/443 Test #241: stage10_operator_compounds ................   Passed    3.49 sec
+        Start 242: stage11_globals
+236/443 Test #242: stage11_globals ...........................   Passed    0.96 sec
+        Start 243: log_native
+237/443 Test #223: text_encoding_oracles .....................   Passed  186.51 sec
+        Start 244: log_execution
+238/443 Test #243: log_native ................................   Passed  179.09 sec
+        Start 245: log_frontend
+239/443 Test #245: log_frontend ..............................   Passed    4.95 sec
+        Start 246: log_files
+240/443 Test #244: log_execution .............................   Passed  104.81 sec
+        Start 247: log_oracles
+241/443 Test #246: log_files .................................   Passed   31.38 sec
+        Start 248: log_cache
+242/443 Test #248: log_cache .................................   Passed   13.32 sec
+        Start 249: log_install
+243/443 Test #247: log_oracles ...............................   Passed   52.03 sec
+        Start 250: log_console
+244/443 Test #249: log_install ...............................   Passed   37.90 sec
+        Start 251: lsp_log
+245/443 Test #251: lsp_log ...................................   Passed    3.64 sec
+        Start 252: log_probe_normal
+246/443 Test #252: log_probe_normal ..........................   Passed    0.50 sec
+        Start 253: log_probe_optimized
+247/443 Test #253: log_probe_optimized .......................   Passed    0.45 sec
+        Start 254: collections_stdlib_host
+248/443 Test #250: log_console ...............................   Passed   30.56 sec
+        Start 255: collections_stdlib_execution
+249/443 Test #254: collections_stdlib_host ...................   Passed   31.25 sec
+        Start 256: collections_stdlib_failures
+250/443 Test #256: collections_stdlib_failures ...............   Passed   36.01 sec
+        Start 257: collections_stdlib_frontend
+251/443 Test #255: collections_stdlib_execution ..............   Passed   54.94 sec
+        Start 258: lsp_collections_stdlib
+252/443 Test #258: lsp_collections_stdlib ....................***Failed    0.42 sec
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/docs/collections/evidence/crashes/incident-ztcl_wxu
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/collections_stdlib/lsp.py", line 73, in <module>
+    check('error' not in response and 'main.void' in str(response.get('result')), response)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/collections_stdlib/lsp.py", line 18, in check
+    assert ok, detail
+           ^^
+AssertionError: {'error': {'code': -32602, 'message': '<document identity>:1:1: error: Import escapes the project root.\n    code: VOID3001\n\n 1 | \n   | ^\n    Hint: External imports require an explicit permission/identity contract and are not enabled in this phase.\n'}, 'id': 28, 'jsonrpc': '2.0'}
+
+        Start 259: collections_stdlib_oracles
+253/443 Test #257: collections_stdlib_frontend ...............   Passed    4.04 sec
+        Start 260: collections_stdlib_install
+254/443 Test #260: collections_stdlib_install ................   Passed    5.24 sec
+        Start 261: collections_stdlib_cache
+255/443 Test #261: collections_stdlib_cache ..................   Passed    1.16 sec
+        Start 262: collections_stdlib_operators
+256/443 Test #262: collections_stdlib_operators ..............   Passed    1.13 sec
+        Start 263: collections_stdlib_stack
+257/443 Test #259: collections_stdlib_oracles ................   Passed   13.70 sec
+        Start 264: channel_host
+258/443 Test #264: channel_host ..............................   Passed    9.29 sec
+        Start 265: channel_frontend
+259/443 Test #265: channel_frontend ..........................   Passed    2.75 sec
+        Start 266: channel_execution
+260/443 Test #266: channel_execution .........................   Passed   31.75 sec
+        Start 267: lsp_channel
+261/443 Test #267: lsp_channel ...............................   Passed    0.15 sec
+        Start 268: channel_receiver
+262/443 Test #268: channel_receiver ..........................   Passed    1.71 sec
+        Start 269: channel_stack
+263/443 Test #263: collections_stdlib_stack ..................   Passed   55.61 sec
+        Start 270: stage10_console_source
+264/443 Test #269: channel_stack .............................   Passed   30.81 sec
+        Start 271: stage10_operator_integration
+265/443 Test #271: stage10_operator_integration ..............   Passed   19.96 sec
+        Start 272: ffi_g1_primitive_jit_ir
+266/443 Test #270: stage10_console_source ....................   Passed   45.60 sec
+        Start 273: ffi_g1_primitive_aot_normal
+267/443 Test #272: ffi_g1_primitive_jit_ir ...................   Passed    0.48 sec
+        Start 274: ffi_g1_primitive_aot_optimized
+268/443 Test #273: ffi_g1_primitive_aot_normal ...............   Passed    0.04 sec
+        Start 275: ffi_g1_primitive_aot_mismatch
+269/443 Test #274: ffi_g1_primitive_aot_optimized ............   Passed    0.04 sec
+270/443 Test #275: ffi_g1_primitive_aot_mismatch .............   Passed    0.04 sec
+        Start 167: math_install
+271/443 Test #167: math_install ..............................   Passed    1.32 sec
+        Start 179: host_capabilities_install
+272/443 Test #179: host_capabilities_install .................   Passed   15.32 sec
+        Start 191: os_install
+273/443 Test #191: os_install ................................   Passed   10.57 sec
+        Start 198: random_install
+274/443 Test #198: random_install ............................   Passed    3.06 sec
+        Start 229: text_encoding_install
+275/443 Test #229: text_encoding_install .....................   Passed    4.64 sec
+        Start 276: ffi_g1_primitive_aot_missing
+        Start 277: ffi_g2_jit_ir
+276/443 Test #276: ffi_g1_primitive_aot_missing ..............   Passed    0.36 sec
+        Start 278: ffi_g2_aot_normal
+277/443 Test #278: ffi_g2_aot_normal .........................   Passed    0.05 sec
+        Start 279: ffi_g2_aot_optimized
+278/443 Test #279: ffi_g2_aot_optimized ......................   Passed    0.05 sec
+        Start 280: ffi_g3_jit_ir
+279/443 Test #277: ffi_g2_jit_ir .............................   Passed    0.73 sec
+        Start 281: ffi_g3_aot_normal
+280/443 Test #281: ffi_g3_aot_normal .........................   Passed    0.05 sec
+        Start 282: ffi_g3_aot_optimized
+281/443 Test #282: ffi_g3_aot_optimized ......................   Passed    0.05 sec
+        Start 283: ffi_g4_jit_ir
+282/443 Test #280: ffi_g3_jit_ir .............................   Passed    0.85 sec
+        Start 284: ffi_g4_aot_normal
+283/443 Test #284: ffi_g4_aot_normal .........................   Passed    0.55 sec
+        Start 285: ffi_g4_aot_optimized
+284/443 Test #283: ffi_g4_jit_ir .............................   Passed    1.14 sec
+        Start 286: ffi_g4_aot_startup
+285/443 Test #285: ffi_g4_aot_optimized ......................   Passed    0.15 sec
+        Start 287: native_source
+286/443 Test #286: ffi_g4_aot_startup ........................   Passed    0.18 sec
+        Start 288: stage6_integrated
+287/443 Test #287: native_source .............................   Passed    2.38 sec
+        Start 289: stage6_cache_processes
+288/443 Test #288: stage6_integrated .........................   Passed    4.43 sec
+        Start 290: native_aot_main_normal
+289/443 Test #290: native_aot_main_normal ....................   Passed    0.04 sec
+        Start 291: native_aot_main_optimized
+290/443 Test #291: native_aot_main_optimized .................   Passed    0.04 sec
+        Start 292: native_aot_terminated_nul_normal
+291/443 Test #292: native_aot_terminated_nul_normal ..........   Passed    0.04 sec
+        Start 293: native_aot_terminated_nul_optimized
+292/443 Test #293: native_aot_terminated_nul_optimized .......   Passed    0.04 sec
+        Start 294: native_aot_closed_normal
+293/443 Test #294: native_aot_closed_normal ..................   Passed    0.04 sec
+        Start 295: native_aot_closed_optimized
+294/443 Test #295: native_aot_closed_optimized ...............   Passed    0.04 sec
+        Start 296: native_aot_duplicate_normal
+295/443 Test #296: native_aot_duplicate_normal ...............   Passed    0.04 sec
+        Start 297: native_aot_duplicate_optimized
+296/443 Test #297: native_aot_duplicate_optimized ............   Passed    0.04 sec
+        Start 298: native_aot_cleanup_failure_normal
+297/443 Test #298: native_aot_cleanup_failure_normal .........   Passed    0.05 sec
+        Start 299: native_aot_cleanup_failure_optimized
+298/443 Test #299: native_aot_cleanup_failure_optimized ......   Passed    0.05 sec
+        Start 300: native_aot_integrated_normal
+299/443 Test #300: native_aot_integrated_normal ..............   Passed    0.04 sec
+        Start 301: native_aot_integrated_optimized
+300/443 Test #301: native_aot_integrated_optimized ...........   Passed    0.04 sec
+        Start 302: native_aot_integrated_cancel_normal
+301/443 Test #302: native_aot_integrated_cancel_normal .......   Passed    0.05 sec
+        Start 303: native_aot_integrated_cancel_optimized
+302/443 Test #303: native_aot_integrated_cancel_optimized ....   Passed    0.05 sec
+        Start 304: native_aot_integrated_failure_normal
+303/443 Test #304: native_aot_integrated_failure_normal ......   Passed    0.04 sec
+        Start 305: native_aot_integrated_failure_optimized
+304/443 Test #305: native_aot_integrated_failure_optimized ...   Passed    0.05 sec
+        Start 306: io_ownership
+305/443 Test #289: stage6_cache_processes ....................   Passed    4.11 sec
+        Start 307: io_execution
+306/443 Test #306: io_ownership ..............................   Passed   16.04 sec
+        Start 308: io_crash_preservation
+307/443 Test #308: io_crash_preservation .....................   Passed    0.29 sec
+        Start 309: io_async_execution
+308/443 Test #307: io_execution ..............................   Passed   24.42 sec
+        Start 310: io_wire_normal
+309/443 Test #310: io_wire_normal ............................   Passed    0.07 sec
+        Start 311: io_wire_optimized
+310/443 Test #311: io_wire_optimized .........................   Passed    0.09 sec
+        Start 312: lsp_io
+311/443 Test #312: lsp_io ....................................   Passed    1.05 sec
+        Start 313: io_stack
+312/443 Test #309: io_async_execution ........................   Passed   21.05 sec
+        Start 314: io_async_stack
+313/443 Test #313: io_stack ..................................   Passed   22.96 sec
+        Start 315: lsp_io_stack
+314/443 Test #315: lsp_io_stack ..............................   Passed    1.33 sec
+        Start 316: io_native_responsiveness
+315/443 Test #316: io_native_responsiveness ..................   Passed    7.94 sec
+        Start 317: io_native_close_failure
+316/443 Test #314: io_async_stack ............................   Passed   24.75 sec
+        Start 318: io_native_shutdown
+317/443 Test #317: io_native_close_failure ...................   Passed    6.95 sec
+        Start 319: io_native_opening_shutdown
+318/443 Test #318: io_native_shutdown ........................   Passed    6.96 sec
+        Start 320: io_native_whole_shutdown
+319/443 Test #319: io_native_opening_shutdown ................   Passed    6.45 sec
+        Start 321: io_native_pending_close
+320/443 Test #320: io_native_whole_shutdown ..................   Passed    6.40 sec
+        Start 322: io_native_cancelled
+321/443 Test #321: io_native_pending_close ...................   Passed    7.40 sec
+        Start 323: io_probe_normal
+322/443 Test #323: io_probe_normal ...........................   Passed    0.02 sec
+        Start 324: io_probe_optimized
+323/443 Test #324: io_probe_optimized ........................   Passed    0.02 sec
+        Start 325: io_async_source
+324/443 Test #322: io_native_cancelled .......................   Passed    6.92 sec
+        Start 326: io_errors_source
+325/443 Test #325: io_async_source ...........................   Passed    8.80 sec
+        Start 327: io_errors_async
+326/443 Test #326: io_errors_source ..........................   Passed    8.20 sec
+        Start 328: io_examples_install
+327/443 Test #327: io_errors_async ...........................   Passed    9.15 sec
+        Start 329: io_async_acquisition
+328/443 Test #329: io_async_acquisition ......................   Passed    0.15 sec
+        Start 330: io_async_normal
+329/443 Test #330: io_async_normal ...........................   Passed    0.06 sec
+        Start 331: io_async_optimized
+330/443 Test #331: io_async_optimized ........................   Passed    0.06 sec
+        Start 332: io_native_jobs
+331/443 Test #332: io_native_jobs ............................   Passed    0.01 sec
+        Start 333: native_workers
+332/443 Test #333: native_workers ............................   Passed    0.01 sec
+        Start 334: async_external
+333/443 Test #334: async_external ............................   Passed    0.40 sec
+        Start 335: io_kernel
+334/443 Test #335: io_kernel .................................   Passed    0.05 sec
+        Start 336: io_ir
+335/443 Test #336: io_ir .....................................   Passed    0.59 sec
+        Start 337: io_cross_volume
+336/443 Test #328: io_examples_install .......................   Passed    9.25 sec
+        Start 338: onboarding_examples
+337/443 Test #338: onboarding_examples .......................***Failed    0.09 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/cli/learning.py", line 25, in <module>
+    assert blocks == 9, blocks
+           ^^^^^^^^^^^
+AssertionError: 2
+
+        Start 339: async_source
+338/443 Test #337: io_cross_volume ...........................   Passed    1.48 sec
+        Start 340: async_syntax_source
+339/443 Test #340: async_syntax_source .......................   Passed    3.54 sec
+        Start 341: async_syntax_stack
+340/443 Test #339: async_source ..............................   Passed    6.74 sec
+        Start 342: async_ir
+341/443 Test #342: async_ir ..................................   Passed    0.04 sec
+        Start 343: async_parallel
+342/443 Test #341: async_syntax_stack ........................   Passed    3.14 sec
+        Start 344: async_lifecycle
+343/443 Test #343: async_parallel ............................   Passed    1.29 sec
+        Start 345: async_aot_spawn_normal
+344/443 Test #345: async_aot_spawn_normal ....................   Passed    0.04 sec
+        Start 346: async_aot_spawn_optimized
+345/443 Test #346: async_aot_spawn_optimized .................   Passed    0.04 sec
+        Start 347: async_aot_spawn_cancel_normal
+346/443 Test #347: async_aot_spawn_cancel_normal .............   Passed    0.04 sec
+        Start 348: async_aot_spawn_cancel_optimized
+347/443 Test #348: async_aot_spawn_cancel_optimized ..........   Passed    0.04 sec
+        Start 349: async_aot_spawn_failure_normal
+348/443 Test #349: async_aot_spawn_failure_normal ............   Passed    0.04 sec
+        Start 350: async_aot_spawn_failure_optimized
+349/443 Test #350: async_aot_spawn_failure_optimized .........   Passed    0.04 sec
+        Start 351: async_aot_activation_normal
+350/443 Test #351: async_aot_activation_normal ...............   Passed    0.04 sec
+        Start 352: async_aot_activation_optimized
+351/443 Test #352: async_aot_activation_optimized ............   Passed    0.05 sec
+        Start 353: async_aot_managed_normal
+352/443 Test #353: async_aot_managed_normal ..................   Passed    0.04 sec
+        Start 354: async_aot_managed_optimized
+353/443 Test #354: async_aot_managed_optimized ...............   Passed    0.04 sec
+        Start 355: async_aot_large_normal
+354/443 Test #344: async_lifecycle ...........................   Passed    2.28 sec
+        Start 356: async_aot_large_optimized
+355/443 Test #355: async_aot_large_normal ....................   Passed    1.44 sec
+        Start 357: async_aot_closures_normal
+356/443 Test #357: async_aot_closures_normal .................   Passed    0.05 sec
+        Start 358: async_aot_closures_optimized
+357/443 Test #358: async_aot_closures_optimized ..............   Passed    0.05 sec
+        Start 359: async_aot_loops_normal
+358/443 Test #359: async_aot_loops_normal ....................   Passed    0.05 sec
+        Start 360: async_aot_loops_optimized
+359/443 Test #360: async_aot_loops_optimized .................   Passed    0.05 sec
+        Start 361: async_aot_values_normal
+360/443 Test #361: async_aot_values_normal ...................   Passed    0.04 sec
+        Start 362: async_aot_values_optimized
+361/443 Test #362: async_aot_values_optimized ................   Passed    0.04 sec
+        Start 363: async_aot_methods_normal
+362/443 Test #363: async_aot_methods_normal ..................   Passed    0.04 sec
+        Start 364: async_aot_methods_optimized
+363/443 Test #364: async_aot_methods_optimized ...............   Passed    0.05 sec
+        Start 365: async_aot_lifecycle_normal
+364/443 Test #365: async_aot_lifecycle_normal ................   Passed    0.05 sec
+        Start 366: async_aot_lifecycle_optimized
+365/443 Test #366: async_aot_lifecycle_optimized .............   Passed    0.04 sec
+        Start 367: async_aot_lifecycle_exits_normal
+366/443 Test #367: async_aot_lifecycle_exits_normal ..........   Passed    0.05 sec
+        Start 368: async_aot_lifecycle_exits_optimized
+367/443 Test #368: async_aot_lifecycle_exits_optimized .......   Passed    0.05 sec
+        Start 369: async_aot_lifecycle_cancelled_normal
+368/443 Test #369: async_aot_lifecycle_cancelled_normal ......   Passed    0.05 sec
+        Start 370: async_aot_lifecycle_cancelled_optimized
+369/443 Test #370: async_aot_lifecycle_cancelled_optimized ...   Passed    0.05 sec
+        Start 371: async_aot_lifecycle_failures_normal
+370/443 Test #371: async_aot_lifecycle_failures_normal .......   Passed    0.05 sec
+        Start 372: async_aot_lifecycle_failures_optimized
+371/443 Test #372: async_aot_lifecycle_failures_optimized ....   Passed    0.05 sec
+        Start 373: async_aot_lifecycle_primary_normal
+372/443 Test #373: async_aot_lifecycle_primary_normal ........   Passed    0.05 sec
+        Start 374: async_aot_lifecycle_primary_optimized
+373/443 Test #374: async_aot_lifecycle_primary_optimized .....   Passed    0.05 sec
+        Start 375: async_aot_lifecycle_resources_normal
+374/443 Test #375: async_aot_lifecycle_resources_normal ......   Passed    0.05 sec
+        Start 376: async_aot_lifecycle_resources_optimized
+375/443 Test #376: async_aot_lifecycle_resources_optimized ...   Passed    0.05 sec
+        Start 377: async_aot_lifecycle_values_normal
+376/443 Test #377: async_aot_lifecycle_values_normal .........   Passed    0.06 sec
+        Start 378: async_aot_lifecycle_values_optimized
+377/443 Test #378: async_aot_lifecycle_values_optimized ......   Passed    0.05 sec
+        Start 379: async_syntax_aot_values_normal
+378/443 Test #356: async_aot_large_optimized .................   Passed    1.50 sec
+        Start 380: async_syntax_aot_values_optimized
+379/443 Test #379: async_syntax_aot_values_normal ............***Failed    0.38 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in <module>
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+
+        Start 381: async_syntax_aot_errors_normal
+380/443 Test #380: async_syntax_aot_values_optimized .........***Failed    0.47 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in <module>
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+
+        Start 382: async_syntax_aot_errors_optimized
+381/443 Test #381: async_syntax_aot_errors_normal ............***Failed    0.31 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in <module>
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+
+        Start 383: async_syntax_aot_cancelled_normal
+382/443 Test #383: async_syntax_aot_cancelled_normal .........***Failed    0.20 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in <module>
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+
+        Start 384: async_syntax_aot_cancelled_optimized
+383/443 Test #382: async_syntax_aot_errors_optimized .........***Failed    0.38 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in <module>
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+
+        Start 385: async_syntax_aot_failure_normal
+384/443 Test #384: async_syntax_aot_cancelled_optimized ......***Failed    0.26 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in <module>
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+
+        Start 386: async_syntax_aot_failure_optimized
+385/443 Test #385: async_syntax_aot_failure_normal ...........***Failed    0.27 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in <module>
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+
+        Start 387: async_syntax_aot_spawn_normal
+386/443 Test #386: async_syntax_aot_failure_optimized ........***Failed    0.36 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in <module>
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+
+        Start 388: async_syntax_aot_spawn_optimized
+387/443 Test #387: async_syntax_aot_spawn_normal .............***Failed    0.23 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in <module>
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+
+        Start 389: lsp_async_syntax
+388/443 Test #389: lsp_async_syntax ..........................   Passed    0.13 sec
+        Start 390: core
+389/443 Test #388: async_syntax_aot_spawn_optimized ..........***Failed    0.17 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in <module>
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+
+        Start 391: jit
+390/443 Test #390: core ......................................   Passed    0.13 sec
+        Start 392: reload
+391/443 Test #391: jit .......................................   Passed    0.15 sec
+        Start 393: gc
+392/443 Test #393: gc ........................................   Passed    0.04 sec
+        Start 394: native
+393/443 Test #394: native ....................................   Passed    0.03 sec
+        Start 395: sessions_demo
+394/443 Test #395: sessions_demo .............................   Passed    0.05 sec
+        Start 396: tooling_demo
+395/443 Test #396: tooling_demo ..............................   Passed    0.04 sec
+        Start 397: sessions
+396/443 Test #397: sessions ..................................   Passed    0.07 sec
+        Start 398: tooling
+397/443 Test #392: reload ....................................   Passed    0.35 sec
+        Start 399: analysis
+398/443 Test #398: tooling ...................................   Passed    0.23 sec
+        Start 400: numeric
+399/443 Test #399: analysis ..................................   Passed    0.53 sec
+        Start 401: numeric_enum_ir
+400/443 Test #401: numeric_enum_ir ...........................   Passed    0.39 sec
+        Start 402: numeric_enum_process
+401/443 Test #400: numeric ...................................   Passed    2.37 sec
+        Start 403: numeric_enum_lsp
+402/443 Test #403: numeric_enum_lsp ..........................   Passed    0.12 sec
+        Start 404: frontend
+403/443 Test #402: numeric_enum_process ......................   Passed    7.06 sec
+        Start 405: modules
+404/443 Test #404: frontend ..................................   Passed    5.70 sec
+        Start 406: ffi_g4_conventional
+405/443 Test #405: modules ...................................   Passed    0.79 sec
+        Start 407: ffi_g5_callbacks
+406/443 Test #407: ffi_g5_callbacks ..........................   Passed    5.97 sec
+        Start 408: numeric_sprint2
+407/443 Test #406: ffi_g4_conventional .......................   Passed    7.25 sec
+        Start 409: async_retention_sprint5
+408/443 Test #408: numeric_sprint2 ...........................   Passed    1.53 sec
+        Start 410: async_retention_aot_growth_normal
+409/443 Test #410: async_retention_aot_growth_normal .........   Passed    0.43 sec
+        Start 411: async_retention_aot_growth_optimized
+410/443 Test #411: async_retention_aot_growth_optimized ......   Passed    0.44 sec
+        Start 412: async_retention_aot_workers_normal
+411/443 Test #412: async_retention_aot_workers_normal ........   Passed    0.58 sec
+        Start 413: async_retention_aot_workers_optimized
+412/443 Test #413: async_retention_aot_workers_optimized .....   Passed    0.63 sec
+        Start 414: ergonomics_sprint6_host
+413/443 Test #414: ergonomics_sprint6_host ...................   Passed    0.52 sec
+        Start 415: ergonomics_sprint6
+414/443 Test #415: ergonomics_sprint6 ........................***Failed    0.48 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint6.py", line 24, in <module>
+    run([compiler,'emit',source,'-o',obj,*switches]);run([clang,*flags,obj,runtime,fixture,'-pthread','-o',exe])
+                                                     ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint6.py", line 12, in run
+    assert p.returncode==status,(args,p.returncode,p.stdout,p.stderr)
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID sprint6 ado31ie1/normal.o'), PosixPath('/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a'), PosixPath('/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a'), '-pthread', '-o', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID sprint6 ado31ie1/normal.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+
+        Start 416: stage10_fields_aot
+415/443 Test #416: stage10_fields_aot ........................***Failed    0.24 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/fields.py", line 68, in <module>
+    run([clang, *flags, obj, runtime, fixture, "-o", exe])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/fields.py", line 23, in run
+    assert p.returncode == 0, (args, p.returncode, p.stdout, p.stderr)
+           ^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '-pthread', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID Stage10 fields _1o9whnu/normal.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a', '-o', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID Stage10 fields _1o9whnu/normal.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+
+        Start 417: stage10_temporal_install
+416/443 Test #417: stage10_temporal_install ..................   Passed    2.91 sec
+        Start 418: stage10_temporal_aot
+417/443 Test #418: stage10_temporal_aot ......................***Failed    2.29 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/temporal.py", line 30, in <module>
+    execute([clang,*flags,obj,runtime,fixture,"-o",exe])
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/temporal.py", line 16, in execute
+    assert (result.returncode == 0) == success, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '-pthread', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID Stage10 time uncdaxf9/normal.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a', '-o', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID Stage10 time uncdaxf9/normal.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+
+        Start 419: stage11_globals_stack
+418/443 Test #419: stage11_globals_stack .....................   Passed    0.41 sec
+        Start 420: stage11_globals_aot
+419/443 Test #420: stage11_globals_aot .......................***Failed    0.22 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage11/globals.py", line 53, in <module>
+    execute("selected.void", {
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^
+        "selected.void": 'use "./game.void" as game\nvar score = 0\nfunc main():\n    game.reward_player()\n    print(score)\n    print(game.enemies_defeated)\n',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "game.void": 'var enemies_defeated = 0\nfunc reward_player():\n    score += 10\n    enemies_defeated += 1\n',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    }, b"10\n1\n")
+    ^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage11/globals.py", line 49, in execute
+    run([clang, obj, runtime, fixture, *flags, "-o", exe])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage11/globals.py", line 25, in run
+    assert result.returncode == expected, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID globals afu__jo1/program.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a', '--driver-mode=g++', '-pthread', '-ldl', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', '-o', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID globals afu__jo1/program')], 1, b'', b'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+
+        Start 421: stage10_console_aot
+420/443 Test #409: async_retention_sprint5 ...................   Passed   11.16 sec
+        Start 422: stage10_operators_aot
+421/443 Test #422: stage10_operators_aot .....................***Failed    0.35 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/operators.py", line 49, in <module>
+    run([clang, *flags, obj, runtime, fixture, "-o", exe])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/operators.py", line 31, in run
+    assert p.returncode == status, (args, p.returncode, p.stdout, p.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '-pthread', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID Stage10 operators q2j7cj1r/normal.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a', '-o', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID Stage10 operators q2j7cj1r/normal.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+
+        Start 423: stage10_conversion_aot
+422/443 Test #423: stage10_conversion_aot ....................***Failed    0.31 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/conversion.py", line 59, in <module>
+    run([clang, *flags, obj, runtime, fixture, "-o", exe])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/conversion.py", line 23, in run
+    assert p.returncode == 0, (args, p.returncode, p.stdout, p.stderr)
+           ^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '-pthread', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID Stage10 display y_h322hx/normal.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a', '-o', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID Stage10 display y_h322hx/normal.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+
+        Start 424: lsp_sprint6
+423/443 Test #424: lsp_sprint6 ...............................   Passed    0.30 sec
+        Start 425: lsp_stage10_fields
+424/443 Test #425: lsp_stage10_fields ........................   Passed    0.10 sec
+        Start 426: lsp_stage10_display
+425/443 Test #426: lsp_stage10_display .......................   Passed    2.60 sec
+        Start 427: lsp_stage10_intelligence
+426/443 Test #427: lsp_stage10_intelligence ..................   Passed    0.24 sec
+        Start 428: lsp_stage10_source_formatting
+427/443 Test #428: lsp_stage10_source_formatting .............   Passed    0.27 sec
+        Start 429: local_libraries
+428/443 Test #429: local_libraries ...........................   Passed    0.35 sec
+        Start 430: lsp_sprint4
+429/443 Test #430: lsp_sprint4 ...............................   Passed    0.11 sec
+        Start 431: application_native_sprint4_host
+430/443 Test #431: application_native_sprint4_host ...........   Passed    0.65 sec
+        Start 432: application_native_sprint4
+431/443 Test #432: application_native_sprint4 ................***Failed    0.21 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint4.py", line 39, in <module>
+    link(obj,exe);run([exe],status,'');run([exe,'7'],status,'')
+    ~~~~^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint4.py", line 20, in link
+    def link(obj,exe): run([clang,*flags,obj,runtime,fixture,'-pthread','-o',exe])
+                       ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint4.py", line 12, in run
+    assert result.returncode==status,(args,result.returncode,result.stdout,result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID Sprint 4 ps0dbkhc/app0-normal.obj'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a', '-pthread', '-o', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID Sprint 4 ps0dbkhc/app0-normal.exe')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+
+        Start 433: text_collections_sprint3
+432/443 Test #433: text_collections_sprint3 ..................***Failed    0.40 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint3.py", line 179, in <module>
+    run([compiler,'emit',path,'-o',obj,*flags]);run([clang,*link_flags,obj,runtime,fixture,'-o',exe]);assert run([exe,'0']).stdout.strip()=='1'
+                                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint3.py", line 12, in run
+    assert result.returncode==(0 if ok else 1),(args,result.returncode,result.stdout,result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID sprint3 vde29ru3/text0.o'), PosixPath('/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a'), PosixPath('/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a'), '-o', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID sprint3 vde29ru3/text0.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+
+        Start 434: lsp_sprint3
+433/443 Test #434: lsp_sprint3 ...............................   Passed    0.14 sec
+        Start 435: lsp_sprint2
+434/443 Test #435: lsp_sprint2 ...............................   Passed    0.12 sec
+        Start 436: aot
+435/443 Test #436: aot .......................................   Passed    0.14 sec
+        Start 437: source_cli
+436/443 Test #421: stage10_console_aot .......................***Failed    7.93 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/console.py", line 109, in <module>
+    run([clang, *flags, obj, runtime, fixture, "-o", executable])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/console.py", line 36, in run
+    assert p.returncode == status, (args, p.returncode, p.stdout, p.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '-pthread', '-ldl', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID console source _8mn2bfa/operator_console_systems-normal.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a', '-o', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID console source _8mn2bfa/operator_console_systems-normal.bin')], 1, b'', b'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+
+        Start 438: value_structs_cli
+437/443 Test #438: value_structs_cli .........................   Passed    0.99 sec
+        Start 439: receiver_methods_cli
+438/443 Test #439: receiver_methods_cli ......................   Passed    1.97 sec
+        Start 440: initialization_cli
+439/443 Test #437: source_cli ................................   Passed    4.40 sec
+        Start 441: modules_cli
+440/443 Test #440: initialization_cli ........................   Passed    2.29 sec
+        Start 442: analysis_cli
+441/443 Test #442: analysis_cli ..............................   Passed    0.59 sec
+        Start 443: numeric_cli
+442/443 Test #441: modules_cli ...............................   Passed   17.43 sec
+443/443 Test #443: numeric_cli ...............................   Passed   17.33 sec
+
+91% tests passed, 40 tests failed out of 443
+
+Total Test time (real) = 1662.04 sec
+
+The following tests FAILED:
+	 59 - json_readonly (Failed)
+	 60 - json_dynamic (Failed)
+	 61 - json_numbers (Failed)
+	 62 - json_schema (Failed)
+	 63 - json_bounds (Failed)
+	 64 - json_install (Failed)
+	 65 - json_adversarial (Failed)
+	 66 - json_metering (Failed)
+	 67 - json_execution_validated (Failed)
+	 68 - json_execution_accessors (Failed)
+	 69 - json_execution_dynamic_smoke (Failed)
+	 70 - json_execution_typed_smoke (Failed)
+	 71 - json_execution_shapes (Failed)
+	 72 - json_execution_ownership (Failed)
+	 73 - json_execution_nested_inference (Failed)
+	 74 - json_stress_fixed (Failed)
+	 75 - json_stress_wide (Failed)
+	 77 - json_preservation (Failed)
+	 78 - json_lsp (Failed)
+	258 - lsp_collections_stdlib (Failed)
+	338 - onboarding_examples (Failed)
+	379 - async_syntax_aot_values_normal (Failed)
+	380 - async_syntax_aot_values_optimized (Failed)
+	381 - async_syntax_aot_errors_normal (Failed)
+	382 - async_syntax_aot_errors_optimized (Failed)
+	383 - async_syntax_aot_cancelled_normal (Failed)
+	384 - async_syntax_aot_cancelled_optimized (Failed)
+	385 - async_syntax_aot_failure_normal (Failed)
+	386 - async_syntax_aot_failure_optimized (Failed)
+	387 - async_syntax_aot_spawn_normal (Failed)
+	388 - async_syntax_aot_spawn_optimized (Failed)
+	415 - ergonomics_sprint6 (Failed)
+	416 - stage10_fields_aot (Failed)
+	418 - stage10_temporal_aot (Failed)
+	420 - stage11_globals_aot (Failed)
+	421 - stage10_console_aot (Failed)
+	422 - stage10_operators_aot (Failed)
+	423 - stage10_conversion_aot (Failed)
+	432 - application_native_sprint4 (Failed)
+	433 - text_collections_sprint3 (Failed)
+Errors while running CTest

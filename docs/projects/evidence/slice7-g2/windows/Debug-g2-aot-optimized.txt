@@ -1,0 +1,25 @@
+7 0 103
+-1 1 <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:6:20: source call
+        return ffi.fill(bytes, 0, 5, 8) as i32
+                   ^
+-2 1 <host binding /native_records.void>:27:6: runtime error: overlapping C byte spans
+In function /native_records.void::move_bytes
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:8:20: source call
+        return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32
+                   ^
+-3 1 <host binding /native_records.void>:23:6: runtime error: C byte span returned an oversized written prefix
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:10:20: source call
+        return ffi.fill(bytes, 0, 4, 254) as i32
+                   ^
+-4 1 <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:12:20: source call
+        return ffi.fill(bytes, 18446744073709551615 as u64, 1, 8) as i32
+                   ^

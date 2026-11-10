@@ -1,0 +1,294 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start 407: ffi_g5_callbacks
+1/1 Test #407: ffi_g5_callbacks .................***Failed    1.00 sec
+cwd= /tmp/VOID G5 fmvc3yww/independent cwd argv= ['/usr/bin/cmake', '--install', '/home/shmellyorc/Documents/Void.Language/build/llvm23-release', '--prefix', '/tmp/VOID G5 fmvc3yww/compiler install', '--config', 'Release', '--component', 'compiler']
+exit=0
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/VOID-MIT-LICENSE.txt
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/LICENSING_SCOPE.md
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/REDISTRIBUTION.txt
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/NOTICE_INVENTORY.json
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/llvm-23.1.4
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/llvm-23.1.4/LICENSE.TXT
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/llvm-23.1.4/ConvertUTF-NOTICES.txt
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/llvm-23.1.4/xxhash-NOTICES.txt
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/llvm-23.1.4/BLAKE3-LICENSE.txt
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/llvm-23.1.4/Support-NOTICES.txt
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/zstd-1.5.7
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/zstd-1.5.7/LICENSE
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/zstd-1.5.7/EMBEDDED-NOTICES.txt
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/tomlplusplus/LICENSE
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/tomlplusplus/upstream.json
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/tomlplusplus/void-bounds-and-locations.patch
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/tomlplusplus/corresponding-source/toml.hpp
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/tomlplusplus/corresponding-source/README.md
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/zlib-1.3.2/LICENSE
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/libsodium
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/libsodium/LICENSE
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/libsodium/SOURCE-NOTICES.json
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/libarchive
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/libarchive/COPYING
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/libarchive/SOURCE-NOTICES.json
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/patches
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/patches/libsodium-1.0.22
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/patches/libsodium-1.0.22/asan-alignment.patch
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/patches/libsodium-1.0.22/PROVENANCE.json
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/host-versions.json
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/setup_host_deps.py
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/setup_host_deps_native.py
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/host-sodium.targets
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/verify_host_deps.py
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/corresponding-source/repro/tools/setup_host_deps.py
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/corresponding-source/repro/tools/setup_host_deps_native.py
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/corresponding-source/repro/tools/verify_host_deps.py
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/corresponding-source/repro/tools/verify_http_dependencies.py
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/corresponding-source/repro/tools/ci/llvm_sdk.py
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/corresponding-source/repro/cmake/host-sodium.targets
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-versions.json
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/corresponding-source/repro/third_party/http-versions.json
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22/asan-alignment.patch
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22/PROVENANCE.json
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/UNICODE-LICENSE.txt
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/time.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/console.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/encoding
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/encoding/binary.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/encoding/hex.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/encoding/base64.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/encoding/ascii.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/io
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/io/memory.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/error.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/convert.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/io.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/path.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/text.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/random.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/math.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/json.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/channel.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/os.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/collections.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/log.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/url.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/net
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/net/http.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/system_error.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/crypto.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/archive.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/stdlib/process.void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/LICENSE-Boost
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/LICENSE.txt
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/NOTICE
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/LICENSE
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/stage10-versions.json
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/bin/voidc
+-- Set non-toolchain portion of runtime path of "/tmp/VOID G5 fmvc3yww/compiler install/bin/voidc" to "$ORIGIN/../lib/void"
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/libvoid_runtime.a
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/libvoid_native_fixture.a
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/libcurl.a
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/libarchive.a
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/libsodium.a
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/libpsl.a
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/libnghttp2.a
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/libssl.a
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/libcrypto.a
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/libcares.a
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/libz.a
+-- Up-to-date: /tmp/VOID G5 fmvc3yww/compiler install/lib/void
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/cmake
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/cmake/nghttp2
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/cmake/c-ares
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/cmake/zlib
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/pkgconfig
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/crypto
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/crypto/cmake
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/crypto/cmake/static
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/ssl
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/ssl/cmake
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/ssl/cmake/static
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/libunistring.so.5
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/libunistring.so
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/libidn2.so.0
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/libidn2.so
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/libunistring.so.5.2.2
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/lib/void/libidn2.so.0.4.0
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/nghttp2-1.70.0
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/nghttp2-1.70.0/COPYING
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/nghttp2-1.70.0/README
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/c-ares-1.34.9
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/c-ares-1.34.9/LICENSE.md
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/zlib-1.3.2
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/zlib-1.3.2/LICENSE
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/zlib-1.3.2/README
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/openssl-3.5.9
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/openssl-3.5.9/LICENSE.txt
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/libidn2-2.3.8
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/libidn2-2.3.8/COPYING
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/libidn2-2.3.8/COPYING.LESSERv3
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/libidn2-2.3.8/COPYING.unicode
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/libidn2-2.3.8/COPYINGv2
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/libidn2-2.3.8/README
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/libpsl-0.21.5
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/libpsl-0.21.5/README
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/libpsl-0.21.5/COPYING
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/libpsl-0.21.5/LICENSE
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/libpsl-0.21.5/LICENSE.chromium
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/libunistring-1.5
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/libunistring-1.5/COPYING.LIB
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/libunistring-1.5/README
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/libunistring-1.5/COPYING
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/aws-lc-5.12.0
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/aws-lc-5.12.0/LICENSE
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/aws-lc-5.12.0/NOTICE
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/aws-lc-5.12.0/UPSTREAM.json
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/COPYING
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/NOTICE
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/VOID-PROVENANCE.json
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/http-versions.json
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/publicsuffix
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/publicsuffix/public_suffix_list.dat
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/publicsuffix/UPSTREAM.json
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/publicsuffix/LICENSE
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/corresponding-source/libidn2-2.3.8.tar.gz
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/corresponding-source/libunistring-1.5.tar.xz
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/corresponding-source/setup_http_deps.py
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/corresponding-source/setup_http_deps_native.py
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/corresponding-source/http_archive.py
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/http/VOID-HTTP-DEPENDENCIES.json
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/bin/void-native.txt
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/bin/void-native-resources.txt
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/VOID-HOST-DEPENDENCIES.json
+-- Up-to-date: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/corresponding-source
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/corresponding-source/libsodium-1.0.22.tar.gz
+-- Installing: /tmp/VOID G5 fmvc3yww/compiler install/share/void/licenses/host/corresponding-source/libarchive-3.8.11.tar.xz
+
+cwd= /tmp/VOID G5 fmvc3yww/independent cwd argv= ['/tmp/VOID G5 fmvc3yww/compiler install/bin/voidc', 'new', '/tmp/VOID G5 fmvc3yww/native callbacks project', '--source', 'src/main.void', '--project-id', 'org.voidlang.callback-qual']
+exit=0
+Manifest: /tmp/VOID G5 fmvc3yww/native callbacks project/void.project.toml
+Project ID: org.voidlang.callback-qual
+Application ID: local.a72963b8d165d602b27742167541582e3
+Next: from the displayed manifest directory, run voidc check --project .
+Created project manifest.
+Automatic application selection requires one eligible main(). Use --entry for a deliberate override.
+
+cwd= /tmp/VOID G5 fmvc3yww/independent cwd argv= ['/tmp/VOID G5 fmvc3yww/compiler install/bin/voidc', 'native-bind', '/tmp/VOID G5 fmvc3yww/native callbacks project/native/callback.descriptor', 'callback_fixture.h', '-o', '/tmp/VOID G5 fmvc3yww/callback_adapter.c']
+exit=0
+
+cwd= /tmp/VOID G5 fmvc3yww/independent cwd argv= ['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-shared', '-fuse-ld=lld', '-fPIC', '-fvisibility=hidden', '-pthread', '-Wl,-rpath,$ORIGIN', '-Wl,-soname,g5_fixture.so', '-DG5_FIXTURE_BUILD', '/home/shmellyorc/Documents/Void.Language/tests/ffi/callback_fixture.c', '-o', '/tmp/VOID G5 fmvc3yww/native callbacks project/native/g5_fixture.so']
+exit=0
+
+cwd= /tmp/VOID G5 fmvc3yww/independent cwd argv= ['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-shared', '-fuse-ld=lld', '-fPIC', '-fvisibility=hidden', '-pthread', '-Wl,-rpath,$ORIGIN', '-I/home/shmellyorc/Documents/Void.Language/tests/ffi', '/tmp/VOID G5 fmvc3yww/callback_adapter.c', '/tmp/VOID G5 fmvc3yww/native callbacks project/native/g5_fixture.so', '-o', '/tmp/VOID G5 fmvc3yww/native callbacks project/native/g5_adapter.so']
+exit=0
+
+cwd= /tmp/VOID G5 fmvc3yww/independent cwd argv= ['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '-std=c11', '-fsyntax-only', '/tmp/VOID G5 fmvc3yww/callback_adapter.c']
+exit=1
+/tmp/VOID G5 fmvc3yww/callback_adapter.c:56:16: error: static assertion failed: C signature g5_mix
+   56 | _Static_assert(_Generic(&g5_mix, double (*)(double, float, vd_cb_floating, void*): 1, default: 0), "C signature g5_mix");
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/VOID G5 fmvc3yww/callback_adapter.c:118:43: error: incompatible function pointer types passing 'double (void *, double, float)' to parameter of type 'G5Float' (aka 'double (*)(void *, double, double)') [-Wincompatible-function-pointer-types]
+  118 |         double value = g5_mix(arg0, arg1, vd_enter_floating, arg2);
+      |                                           ^~~~~~~~~~~~~~~~~
+/tmp/VOID G5 fmvc3yww/callback_fixture.h:20:44: note: passing argument to parameter here
+   20 | G5_API double g5_mix(double, float, G5Float, void*);
+      |                                            ^
+2 errors generated.
+
+cwd= /tmp/VOID G5 fmvc3yww/independent cwd argv= ['/tmp/VOID G5 fmvc3yww/compiler install/bin/voidc', 'native-bind', '/tmp/VOID G5 fmvc3yww/unsupported.descriptor', 'callback_fixture.h', '-o', '/tmp/VOID G5 fmvc3yww/bad.c']
+exit=1
+C primitive descriptor line 11: expected a fixed C callback signature with context-first
+
+cwd= /tmp/VOID G5 fmvc3yww/independent cwd argv= ['/tmp/VOID G5 fmvc3yww/compiler install/bin/voidc', 'check', '--project', '/tmp/VOID G5 fmvc3yww/native callbacks project']
+exit=0
+Source checked successfully
+/tmp/VOID G5 fmvc3yww/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd= /tmp/VOID G5 fmvc3yww/independent cwd argv= ['/tmp/VOID G5 fmvc3yww/compiler install/bin/voidc', 'run', '--project', '/tmp/VOID G5 fmvc3yww/native callbacks project']
+exit=2
+Invalid invocation: This project declares native code. Pass --allow-native to authorize its execution.
+Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]
+Try 'voidc run --help' for examples.
+
+cwd= /tmp/VOID G5 fmvc3yww/independent cwd argv= ['/tmp/VOID G5 fmvc3yww/compiler install/bin/voidc', 'check', '--project', '/tmp/VOID G5 fmvc3yww/native callbacks project']
+exit=1
+/tmp/VOID G5 fmvc3yww/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+/tmp/VOID G5 fmvc3yww/native callbacks project/src/main.void:48:21: error: Type mismatch: expected func(i32) -> i32, received func(f64, f32) -> f64.
+    code: VOID2001
+
+ 48 |     if g5.twice(-2, mix_value) != 5:
+    |                     ^^^^^^^^^
+    Module: /src/main.void
+    Expected: func(i32) -> i32
+    Received: func(f64, f32) -> f64
+
+
+cwd= /tmp/VOID G5 fmvc3yww/independent cwd argv= ['/tmp/VOID G5 fmvc3yww/compiler install/bin/voidc', 'check', '--project', '/tmp/VOID G5 fmvc3yww/native callbacks project']
+exit=1
+/tmp/VOID G5 fmvc3yww/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+/tmp/VOID G5 fmvc3yww/native callbacks project/src/main.void:49:21: error: A checked C callback must be supplied last as a directly named function, bound method or literal closure from this generation.
+    code: VOID1103
+
+ 49 |     if g5.twice(-2, indirect) != 5:
+    |                     ^^^^^^^^
+    Module: /src/main.void
+
+
+cwd= /tmp/VOID G5 fmvc3yww/independent cwd argv= ['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-shared', '-fuse-ld=lld', '-fPIC', '-fvisibility=hidden', '-pthread', '-Wl,-rpath,$ORIGIN', '-I/home/shmellyorc/Documents/Void.Language/tests/ffi', '/tmp/VOID G5 fmvc3yww/callback_refusal_adapter.c', '/tmp/VOID G5 fmvc3yww/native callbacks project/native/g5_fixture.so', '-o', '/tmp/VOID G5 fmvc3yww/native callbacks project/native/g5_refusal_adapter.so']
+exit=0
+
+cwd= /tmp/VOID G5 fmvc3yww/independent cwd argv= ['/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_g5_reload', '/tmp/VOID G5 fmvc3yww/reload.void', '/tmp/VOID G5 fmvc3yww/native callbacks project/native', 'g5_fixture.so', 'g5_refusal_adapter.so', '/tmp/VOID G5 fmvc3yww/native callbacks project/native/callback.descriptor']
+exit=1
+G5 transport refused before native unregister
+G5 native unregistered and drained
+G5 callback after refused release returned 0 (expected 44)
+refused release lost retained callback admission
+
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/callback_process.py", line 177, in <module>
+    qualify(Path(directory))
+    ~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/callback_process.py", line 127, in qualify
+    output = run(cwd, sys.argv[4], reload, native, provider.name, refusal_adapter.name, descriptor,
+                 expected='compatible/incompatible reload, refusal/retry, retirement and self-drain passed')
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/callback_process.py", line 32, in run
+    assert completed.returncode != 0 if status is None else completed.returncode == status, output
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: G5 transport refused before native unregister
+G5 native unregistered and drained
+G5 callback after refused release returned 0 (expected 44)
+refused release lost retained callback admission
+
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   1.01 sec
+
+The following tests FAILED:
+	407 - ffi_g5_callbacks (Failed)
+Errors while running CTest

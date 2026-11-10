@@ -1,0 +1,4 @@
+hardware #1 0x7b1fd7b188aa  (<unknown module>) -> /usr/lib/x86_64-linux-gnu/libgallium-26.2.6 - PikaOS YellowBirb Mesa Stable.so file offset 0x9188aa
+hardware #2 0x7b1fd7b18f92  (<unknown module>) -> /usr/lib/x86_64-linux-gnu/libgallium-26.2.6 - PikaOS YellowBirb Mesa Stable.so file offset 0x918f92
+software #1 0x7badfd5188aa  (<unknown module>) -> /usr/lib/x86_64-linux-gnu/libgallium-26.2.6 - PikaOS YellowBirb Mesa Stable.so file offset 0x9188aa
+software #2 0x7badfd518f92  (<unknown module>) -> /usr/lib/x86_64-linux-gnu/libgallium-26.2.6 - PikaOS YellowBirb Mesa Stable.so file offset 0x918f92

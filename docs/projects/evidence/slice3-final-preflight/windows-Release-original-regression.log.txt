@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "C:\Users\a\VoidSlice3-Final-Preflight-20261108\tests\project\protocol.py", line 123, in <module>
+    preflight_boundaries(root/'preflight')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidSlice3-Final-Preflight-20261108\tests\project\protocol.py", line 45, in preflight_boundaries
+    error(pinned(child_source),root,'VOID5009','crosses nested project boundary')
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidSlice3-Final-Preflight-20261108\tests\project\protocol.py", line 44, in error
+    check(diagnostic['code']==code and message in diagnostic['message'] and '\n' not in diagnostic['message'],diagnostic)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidSlice3-Final-Preflight-20261108\tests\project\protocol.py", line 13, in check
+    assert v,message
+           ^
+AssertionError: {'code': 'VOID5009', 'message': "Active document is outside the pinned project boundary: C:/Users/a/VoidSlice3-Final-Preflight-20261108/tmp/VOID S3 protocol é\U0001f600 tkctoo0a/preflight/parent/child/launcher.void:1:1: error: Source path crosses nested project boundary '/child'.\n    code: VOI"}

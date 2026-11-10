@@ -1,0 +1,12 @@
+{
+  "workspace": "VoidS7-G4W2",
+  "sources": {
+    "build.cmd": "e9bf2ba4105f136f676563371b82e973830f4c7eb26eceebfa235a0433ff43e8",
+    "native-run.py": "63610dd139dfc2f6391751fc4d1fd4d7742d00d4e9285fc40589222683c8af2b",
+    "image_probe.cpp": "ef9df811163bcac7cdad3af96579a3b6c14f49223feb9bfeb00b9202b0bde64c",
+    "redirect.manifest": "49caef4ad13493702cda8da006e0787c0a2089553d5119fbfedb522d1c7109bc",
+    "sentinel.c": "d96c5a42865e157eb9ee4d96ffe277ef777a8fc8967c1a5accb80c72fd55b592",
+    "dependency.c": "86e2dd69bd2394c4ccc11cb5fc709099a78482542bd9d9d21530434e9b084773"
+  },
+  "forwarder_sha256": "18c7676a6a7c338b126e9147a06fae89c05a1dad213098a877479339f0c309b2"
+}

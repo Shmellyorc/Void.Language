@@ -1,0 +1,17 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start  11: project_application_process
+    Start 190: os_frontend_stack
+1/6 Test #190: os_frontend_stack ................   Passed    8.20 sec
+    Start  10: project_application
+2/6 Test  #11: project_application_process ......   Passed   11.10 sec
+    Start 184: os_frontend
+3/6 Test  #10: project_application ..............   Passed    8.36 sec
+    Start 185: lsp_os
+4/6 Test #185: lsp_os ...........................   Passed    1.56 sec
+    Start   6: project_manifest_legacy
+5/6 Test #184: os_frontend ......................   Passed    8.25 sec
+6/6 Test   #6: project_manifest_legacy ..........   Passed    1.42 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Total Test time (real) =  19.55 sec

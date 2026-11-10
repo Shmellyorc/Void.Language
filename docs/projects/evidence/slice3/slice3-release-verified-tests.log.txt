@@ -1,0 +1,89 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+      Start   1: project_manifest_header
+ 1/42 Test   #1: project_manifest_header ..........   Passed    0.00 sec
+      Start   2: project_manifest
+ 2/42 Test   #2: project_manifest .................   Passed    0.04 sec
+      Start   5: project_manifest_no_authority
+ 3/42 Test   #5: project_manifest_no_authority ....   Passed    0.08 sec
+      Start   6: project_manifest_legacy
+ 4/42 Test   #6: project_manifest_legacy ..........   Passed    0.35 sec
+      Start   7: project_manifest_provenance
+ 5/42 Test   #7: project_manifest_provenance ......   Passed    0.04 sec
+      Start   8: project_selection
+ 6/42 Test   #8: project_selection ................   Passed    2.47 sec
+      Start   9: project_sessions
+ 7/42 Test   #9: project_sessions .................   Passed    0.29 sec
+      Start  10: project_discovery_cli
+ 8/42 Test  #10: project_discovery_cli ............   Passed    3.38 sec
+      Start  11: project_profiles
+ 9/42 Test  #11: project_profiles .................   Passed    0.87 sec
+      Start  12: project_protocol
+10/42 Test  #12: project_protocol .................   Passed    0.30 sec
+      Start  13: project_nested_cli
+11/42 Test  #13: project_nested_cli ...............   Passed    0.32 sec
+      Start  14: cli_contract
+12/42 Test  #14: cli_contract .....................   Passed    2.12 sec
+      Start  16: cli_install_resources
+13/42 Test  #16: cli_install_resources ............   Passed    0.08 sec
+      Start  75: application_workflow_stage9
+14/42 Test  #75: application_workflow_stage9 ......   Passed    6.61 sec
+      Start  97: generics_source
+15/42 Test  #97: generics_source ..................   Passed    2.70 sec
+      Start  98: generics_hint_execution
+16/42 Test  #98: generics_hint_execution ..........   Passed    5.06 sec
+      Start  99: generics_hint_lsp
+17/42 Test  #99: generics_hint_lsp ................   Passed    0.08 sec
+      Start 105: debug_cache_processes
+18/42 Test #105: debug_cache_processes ............   Passed    2.60 sec
+      Start 106: automatic_cache_processes
+19/42 Test #106: automatic_cache_processes ........   Passed    0.60 sec
+      Start 111: generics_cli
+20/42 Test #111: generics_cli .....................   Passed    2.31 sec
+      Start 151: lsp_protocol
+21/42 Test #151: lsp_protocol .....................   Passed    0.43 sec
+      Start 152: lsp_stage11_globals
+22/42 Test #152: lsp_stage11_globals ..............   Passed    0.15 sec
+      Start 153: lsp_stage8
+23/42 Test #153: lsp_stage8 .......................   Passed    0.45 sec
+      Start 181: os_errors
+24/42 Test #181: os_errors ........................   Passed    5.04 sec
+      Start 182: os_frontend
+25/42 Test #182: os_frontend ......................   Passed    5.90 sec
+      Start 183: lsp_os
+26/42 Test #183: lsp_os ...........................   Passed    1.28 sec
+      Start 235: lsp_stage7
+27/42 Test #235: lsp_stage7 .......................   Passed    0.18 sec
+      Start 238: stage11_globals
+28/42 Test #238: stage11_globals ..................   Passed    0.76 sec
+      Start 378: sessions
+29/42 Test #378: sessions .........................   Passed    0.06 sec
+      Start 379: tooling
+30/42 Test #379: tooling ..........................   Passed    0.20 sec
+      Start 380: analysis
+31/42 Test #380: analysis .........................   Passed    0.46 sec
+      Start 381: numeric
+32/42 Test #381: numeric ..........................   Passed    1.85 sec
+      Start 382: frontend
+33/42 Test #382: frontend .........................   Passed    4.23 sec
+      Start 383: modules
+34/42 Test #383: modules ..........................   Passed    0.65 sec
+      Start 395: stage11_globals_stack
+35/42 Test #395: stage11_globals_stack ............   Passed    0.38 sec
+      Start 396: stage11_globals_aot
+36/42 Test #396: stage11_globals_aot ..............   Passed    3.77 sec
+      Start 405: local_libraries
+37/42 Test #405: local_libraries ..................   Passed    0.33 sec
+      Start 411: lsp_sprint2
+38/42 Test #411: lsp_sprint2 ......................   Passed    0.08 sec
+      Start 413: source_cli
+39/42 Test #413: source_cli .......................   Passed    3.33 sec
+      Start 417: modules_cli
+40/42 Test #417: modules_cli ......................   Passed   13.23 sec
+      Start 418: analysis_cli
+41/42 Test #418: analysis_cli .....................   Passed    0.51 sec
+      Start 419: numeric_cli
+42/42 Test #419: numeric_cli ......................   Passed   16.03 sec
+
+100% tests passed, 0 tests failed out of 42
+
+Total Test time (real) =  89.59 sec

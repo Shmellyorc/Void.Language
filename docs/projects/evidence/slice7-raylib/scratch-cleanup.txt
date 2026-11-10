@@ -1,0 +1,7 @@
+Windows build source packet entries verified: 3313. Windows baseline paths restored or removed after byte verification: 222. See windows/overlay.json.
+The 10 changed compiler/runtime/test sources match the Windows build packet. The six example files match the local C: example source packet.
+All qualified native binding staging directories were removed by prepare.py. Verified absence under all three qualified Linux profiles and both qualified Windows profiles. The Windows private native link directories are empty.
+Relocation preserves the original projects and compilers under renamed archived paths. Qualified packages, downloaded originals, guest transfer copies, earlier failures and compiler builds were retained. The two Windows archive transfer copies match the original local archive hashes.
+Windows local build and run paths are on C:. VM shared storage carries inputs and receipts. No graphics settings, drivers or toolchains changed.
+Retained Windows compiler source.zip SHA-256 f08334d13b938d564522772ece8b84cfc71df41da6f8bf5e8dd3aa778b5f3e01
+Retained Windows gallery.zip SHA-256 ae50f6c51a77eceabe735b3a3d689350dfa8a11cda3f97ff5257f529baf90015

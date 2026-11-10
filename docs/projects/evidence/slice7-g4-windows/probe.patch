@@ -1,0 +1,743 @@
+diff --git a/docs/projects/evidence/slice7-g4-windows/probes/explicit.c b/docs/projects/evidence/slice7-g4-windows/probes/explicit.c
+new file mode 100644
+index 00000000..1ec23333
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-windows/probes/explicit.c
+@@ -0,0 +1,35 @@
++#include "explicit_abi.h"
++
++// MSVC ABI marker for freestanding floating-point code. No CRT is linked.
++int _fltused = 0;
++
++struct Token { int value; int active; };
++static Token owned;
++
++__declspec(dllexport) Sample sample(const Table* table, Sample in) {
++    in.tag += table->bias();
++    in.value *= 2.0;
++    return in;
++}
++
++__declspec(dllexport) size_t fill(const Table* table, unsigned char* data, size_t size) {
++    for (size_t n = 0; n < size; ++n) data[n] = (unsigned char)(table->bias() + n);
++    return size;
++}
++
++__declspec(dllexport) Token* acquire(const Table* table, int value) {
++    if (owned.active) return 0;
++    owned.value = value + table->bias();
++    owned.active = 1;
++    return &owned;
++}
++
++__declspec(dllexport) int inspect(Token* token) {
++    return token == &owned && owned.active ? token->value : -1;
++}
++
++__declspec(dllexport) int release(Token* token) {
++    if (token != &owned || !owned.active) return 1;
++    owned.active = 0;
++    return 0;
++}
+diff --git a/docs/projects/evidence/slice7-g4-windows/probes/explicit_abi.h b/docs/projects/evidence/slice7-g4-windows/probes/explicit_abi.h
+new file mode 100644
+index 00000000..87b30fae
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-windows/probes/explicit_abi.h
+@@ -0,0 +1,7 @@
++#pragma once
++#include <stddef.h>
++
++typedef int (*Bias)(void);
++typedef struct { Bias bias; } Table;
++typedef struct { int tag; double value; } Sample;
++typedef struct Token Token;
+diff --git a/docs/projects/evidence/slice7-g4-windows/probes/forwarder.def b/docs/projects/evidence/slice7-g4-windows/probes/forwarder.def
+new file mode 100644
+index 00000000..69e0f948
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-windows/probes/forwarder.def
+@@ -0,0 +1,3 @@
++LIBRARY void_g4w_forwarder
++EXPORTS
++    forwarded=void_g4_probe_dep.g4_dependency
+diff --git a/docs/projects/evidence/slice7-g4-windows/probes/forwarder_anchor.c b/docs/projects/evidence/slice7-g4-windows/probes/forwarder_anchor.c
+new file mode 100644
+index 00000000..83983248
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-windows/probes/forwarder_anchor.c
+@@ -0,0 +1,2 @@
++// LLD needs an object to produce an image as well as the import library.
++int g4w_forwarder_anchor;
+diff --git a/docs/projects/evidence/slice7-g4-windows/probes/launcher.cpp b/docs/projects/evidence/slice7-g4-windows/probes/launcher.cpp
+new file mode 100644
+index 00000000..bc5e74dc
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-windows/probes/launcher.cpp
+@@ -0,0 +1,50 @@
++#define WIN32_LEAN_AND_MEAN
++#include <windows.h>
++
++#include <cstdio>
++#include <string>
++#include <string_view>
++
++int wmain(int argc, wchar_t** argv) {
++    if (argc != 2) return 2;
++    const std::wstring path = argv[1];
++    if (path.size() < 4 || path[1] != L':' || path[2] != L'\\') return 2;
++    auto parent = path.substr(0,path.find_last_of(L'\\'));
++    HANDLE file = CreateFileW(path.c_str(),GENERIC_READ,FILE_SHARE_READ,nullptr,OPEN_EXISTING,
++                              FILE_FLAG_OPEN_REPARSE_POINT,nullptr);
++    BY_HANDLE_FILE_INFORMATION held{};
++    if (file == INVALID_HANDLE_VALUE || !GetFileInformationByHandle(file,&held) ||
++        held.nNumberOfLinks != 1 || (held.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)) return 3;
++    wchar_t expected[1024], actual[1024], windows[1024];
++    DWORD len = GetFinalPathNameByHandleW(file,expected,1024,VOLUME_NAME_NT);
++    UINT root_size = GetWindowsDirectoryW(windows,1024);
++    if (!len || len >= 1024 || !root_size || root_size >= 1024) return 4;
++    std::wstring environment = L"SystemRoot=" + std::wstring(windows);
++    environment.push_back(L'\0');
++    environment.push_back(L'\0');
++    STARTUPINFOW startup{};
++    startup.cb = sizeof(startup);
++    PROCESS_INFORMATION child{};
++    if (!CreateProcessW(path.c_str(),nullptr,nullptr,nullptr,FALSE,CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT,
++                        environment.data(),parent.c_str(),&startup,&child)) {
++        std::wprintf(L"CreateProcessW failed %lu\n",GetLastError());
++        return 5;
++    }
++    DWORD size = 1024;
++    const bool matching = QueryFullProcessImageNameW(child.hProcess,PROCESS_NAME_NATIVE,actual,&size) &&
++        std::wstring_view(actual,size) == expected;
++    std::wprintf(L"child image matches held executable path before resume=%d\n",matching);
++    DWORD result = 0;
++    const bool complete = matching && ResumeThread(child.hThread) != static_cast<DWORD>(-1) &&
++        WaitForSingleObject(child.hProcess,10000) == WAIT_OBJECT_0 && GetExitCodeProcess(child.hProcess,&result);
++    if (!complete) {
++        TerminateProcess(child.hProcess,6);
++        WaitForSingleObject(child.hProcess,10000);
++    }
++    CloseHandle(child.hThread);
++    CloseHandle(child.hProcess);
++    CloseHandle(file);
++    if (!complete) return 6;
++    std::wprintf(L"child first-entry observation=%lu\n",result);
++    return 0;
++}
+diff --git a/docs/projects/evidence/slice7-g4-windows/probes/loader_probe.cpp b/docs/projects/evidence/slice7-g4-windows/probes/loader_probe.cpp
+new file mode 100644
+index 00000000..2df50c2e
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-windows/probes/loader_probe.cpp
+@@ -0,0 +1,289 @@
++#define WIN32_LEAN_AND_MEAN
++#include <windows.h>
++#include <psapi.h>
++
++#include <cstddef>
++#include <cstdio>
++#include <cstring>
++#include <string>
++#include <string_view>
++
++#include "explicit_abi.h"
++
++namespace {
++constexpr auto dependency_name = L"void_g4_probe_dep.dll";
++constexpr auto provider_name = L"void_g4_probe_main.dll";
++constexpr DWORD restricted = LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_SYSTEM32;
++
++[[noreturn]] void fail(const char* what) {
++    std::printf("probe failed: %s (Win32 %lu)\n",what,GetLastError());
++    ExitProcess(1);
++}
++void check(bool condition, const char* what) {
++    if (!condition) fail(what);
++}
++
++struct File {
++    HANDLE value;
++    explicit File(const std::wstring& path, bool directory = false)
++        : value(CreateFileW(path.c_str(),directory ? FILE_READ_ATTRIBUTES : GENERIC_READ,
++            FILE_SHARE_READ,nullptr,OPEN_EXISTING,FILE_FLAG_OPEN_REPARSE_POINT |
++            (directory ? FILE_FLAG_BACKUP_SEMANTICS : 0),nullptr)) {
++        check(value != INVALID_HANDLE_VALUE,"hold approved file or directory");
++        BY_HANDLE_FILE_INFORMATION info{};
++        check(GetFileInformationByHandle(value,&info) &&
++              !(info.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) &&
++              (directory || info.nNumberOfLinks == 1),"ordinary single-link file");
++        std::printf("held %ls id=%08lx:%08lx%08lx\n",path.c_str(),
++                    info.dwVolumeSerialNumber,info.nFileIndexHigh,info.nFileIndexLow);
++    }
++    ~File() { CloseHandle(value); }
++    File(const File&) = delete;
++};
++struct Image {
++    HMODULE value;
++    explicit Image(const std::wstring& path) : value(LoadLibraryExW(path.c_str(),nullptr,restricted)) {
++        check(value != nullptr,"restricted executable load");
++    }
++    ~Image() { FreeLibrary(value); }
++    Image(const Image&) = delete;
++};
++
++struct Activation {
++    HANDLE context = INVALID_HANDLE_VALUE;
++    ULONG_PTR cookie = 0;
++    bool active = false;
++    void from(const std::wstring& manifest) {
++        ACTCTXW info{};
++        info.cbSize = sizeof(info);
++        info.lpSource = manifest.c_str();
++        context = CreateActCtxW(&info);
++        check(context != INVALID_HANDLE_VALUE,"create activation context");
++        active = ActivateActCtx(context,&cookie) != 0;
++        check(active,"activate context");
++    }
++    void process_default() {
++        active = ActivateActCtx(nullptr,&cookie) != 0;
++        check(active,"push process default");
++    }
++    ~Activation() {
++        if (active) DeactivateActCtx(0,cookie);
++        if (context != INVALID_HANDLE_VALUE) ReleaseActCtx(context);
++    }
++};
++bool redirected(const wchar_t* name) {
++    ACTCTX_SECTION_KEYED_DATA data{};
++    data.cbSize = sizeof(data);
++    if (FindActCtxSectionStringW(0,nullptr,ACTIVATION_CONTEXT_SECTION_DLL_REDIRECTION,name,&data))
++        return true;
++    check(GetLastError() == ERROR_SXS_KEY_NOT_FOUND || GetLastError() == ERROR_SXS_SECTION_NOT_FOUND,
++          "query active DLL redirection");
++    return false;
++}
++bool compare_path(const char* label, const void* address, const File& file) {
++    wchar_t expected[1024], mapped[1024];
++    MEMORY_BASIC_INFORMATION region{};
++    DWORD a = GetFinalPathNameByHandleW(file.value,expected,1024,VOLUME_NAME_NT);
++    DWORD b = GetMappedFileNameW(GetCurrentProcess(),const_cast<void*>(address),mapped,1024);
++    check(a && a < 1024 && b && b < 1024 && VirtualQuery(address,&region,sizeof(region)),
++          "mapped path and memory region");
++    bool match = region.Type == MEM_IMAGE && std::wstring_view(expected,a) == std::wstring_view(mapped,b);
++    std::printf("%s match=%d MEM_IMAGE=%d\n  held=%ls\n  mapped=%ls\n",label,match,region.Type == MEM_IMAGE,expected,mapped);
++    return match;
++}
++HMODULE owning_module(const void* address) {
++    HMODULE owner = nullptr;
++    check(GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
++                             GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
++                             static_cast<LPCWSTR>(address),&owner),"module from address");
++    return owner;
++}
++int marker(HMODULE owner) {
++    auto* sentinel = reinterpret_cast<const volatile int*>(GetProcAddress(owner,"g4_init_marker"));
++    return sentinel ? *sentinel : -1;
++}
++
++// Bounded inspection of the known, separately generated probe image. This
++// reads the bound IAT directly and never asks the provider for its dependency.
++struct PeView {
++    const unsigned char* base;
++    const IMAGE_NT_HEADERS64* header;
++    explicit PeView(const void* image) : base(static_cast<const unsigned char*>(image)) {
++        auto* dos = reinterpret_cast<const IMAGE_DOS_HEADER*>(base);
++        check(dos->e_magic == IMAGE_DOS_SIGNATURE && dos->e_lfanew >= 64 && dos->e_lfanew < 4096,
++              "probe DOS header");
++        header = reinterpret_cast<const IMAGE_NT_HEADERS64*>(base+dos->e_lfanew);
++        check(header->Signature == IMAGE_NT_SIGNATURE && header->FileHeader.Machine == IMAGE_FILE_MACHINE_AMD64 &&
++              header->OptionalHeader.Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC,"probe PE64 header");
++    }
++    template<class T>
++    const T* at(DWORD rva, size_t count = 1) const {
++        auto size = header->OptionalHeader.SizeOfImage;
++        check(rva < size && count <= (size-rva)/sizeof(T),"bounded PE view");
++        return reinterpret_cast<const T*>(base+rva);
++    }
++    bool named(DWORD rva, const char* expected) const {
++        return std::memcmp(at<char>(rva,std::strlen(expected)+1),expected,std::strlen(expected)+1) == 0;
++    }
++    const void* imported() const {
++        const auto dir = header->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
++        auto* rows = at<IMAGE_IMPORT_DESCRIPTOR>(dir.VirtualAddress,dir.Size/sizeof(IMAGE_IMPORT_DESCRIPTOR));
++        for (DWORD n=0; n<dir.Size/sizeof(*rows) && rows[n].Name; ++n) {
++            if (!named(rows[n].Name,"void_g4_probe_dep.dll")) continue;
++            for (DWORD index=0; index<32; ++index) {
++                const auto lookup = *at<ULONGLONG>(rows[n].OriginalFirstThunk+8*index);
++                if (!lookup) break;
++                if (lookup < UINT32_MAX-2 && named(static_cast<DWORD>(lookup)+2,"g4_dependency")) {
++                    const auto bound = *at<ULONGLONG>(rows[n].FirstThunk+8*index);
++                    return reinterpret_cast<const void*>(bound);
++                }
++            }
++        }
++        fail("dependency IAT slot");
++    }
++    const int* initializer_export() const {
++        const auto dir = header->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT];
++        auto* row = at<IMAGE_EXPORT_DIRECTORY>(dir.VirtualAddress);
++        auto* names = at<DWORD>(row->AddressOfNames,row->NumberOfNames);
++        auto* ordinals = at<WORD>(row->AddressOfNameOrdinals,row->NumberOfNames);
++        auto* addresses = at<DWORD>(row->AddressOfFunctions,row->NumberOfFunctions);
++        for (DWORD n=0; n<row->NumberOfNames; ++n)
++            if (named(names[n],"g4_init_marker") && ordinals[n] < row->NumberOfFunctions)
++                return at<int>(addresses[ordinals[n]]);
++        fail("initializer export in held data image");
++    }
++};
++template<class F>
++F export_from(const Image& image, const char* name) {
++    auto address = GetProcAddress(image.value,name);
++    check(address && owning_module(reinterpret_cast<const void*>(address)) == image.value,"owned exact export");
++    return reinterpret_cast<F>(address);
++}
++
++void imports(const std::wstring& root, std::wstring_view mode) {
++    const auto good = root+L"\\good", bad = root+L"\\alternate";
++    const auto approved = good+L"\\"+dependency_name, rogue = bad+L"\\"+dependency_name;
++    const auto provider = good+L"\\"+provider_name;
++    File directory(good,true), main_file(provider), dep_file(approved);
++    HANDLE write = CreateFileW(approved.c_str(),GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE,
++                               nullptr,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,nullptr);
++    const DWORD write_error = write == INVALID_HANDLE_VALUE ? GetLastError() : 0;
++    if (write != INVALID_HANDLE_VALUE) CloseHandle(write);
++    std::printf("write-open while held error=%lu\n",write_error);
++    check(write_error == ERROR_SHARING_VIOLATION,"held file denies writer");
++
++    const bool named_before = GetModuleHandleW(dependency_name) != nullptr;
++    std::printf("dependency basename loaded before setup=%d\n",named_before);
++    check(!named_before,"fresh application basename");
++    HMODULE preloaded = nullptr;
++    if (mode == L"collision" || mode == L"late") {
++        if (mode == L"late")
++            std::printf("preflight names and active redirects clear=%d\n",!redirected(dependency_name));
++        preloaded = LoadLibraryExW(rogue.c_str(),nullptr,restricted);
++        check(preloaded != nullptr,"load controlled competitor");
++    }
++    if (mode == L"preload-thread") {
++        preloaded = LoadLibraryExW(approved.c_str(),nullptr,restricted);
++        check(preloaded && compare_path("preloaded good dependency",preloaded,dep_file),"preload exact dependency");
++    }
++    Activation external, use_default;
++    if (mode == L"thread" || mode == L"thread-default" || mode == L"thread-deny" || mode == L"preload-thread")
++        external.from(bad+L"\\override-dependency.manifest");
++    if (mode == L"thread-default" || mode == L"process-default" || mode == L"process-deny")
++        use_default.process_default();
++    const bool redirect = redirected(dependency_name), redirect_main = redirected(provider_name);
++    std::printf("active redirect provider=%d dependency=%d\n",redirect_main,redirect);
++    if (mode == L"thread-deny" || mode == L"process-deny") {
++        check(redirect && !GetModuleHandleW(rogue.c_str()) && !GetModuleHandleW(provider.c_str()),
++              "preflight must reject before either DLL is mapped");
++        std::puts("denied active import redirect before executable load; alternate and provider absent");
++        return;
++    }
++
++    Image image(provider);
++    check(compare_path("provider",image.value,main_file),"approved top-level image");
++    const auto* actual = PeView(image.value).imported();
++    auto owner = owning_module(actual);
++    const bool matched = compare_path("bound IAT owner",actual,dep_file);
++    const int observed = marker(owner);
++    std::printf("initializer marker at first post-load observation=%d\n",observed);
++    const bool expected = mode == L"clean" || mode == L"thread-default";
++    check(expected == matched && observed == (expected ? -1 : 1),"expected import binding and initializer");
++    if (preloaded) FreeLibrary(preloaded);
++}
++
++void data_only(const std::wstring& root) {
++    auto path = root+L"\\alternate\\"+dependency_name;
++    File held(path);
++    HANDLE section = CreateFileMappingW(held.value,nullptr,PAGE_READONLY|SEC_IMAGE_NO_EXECUTE,0,0,nullptr);
++    check(section != nullptr,"create non-executing image view");
++    void* view = MapViewOfFile(section,FILE_MAP_READ,0,0,0);
++    check(view != nullptr,"map non-executing image view");
++    const int initial = *PeView(view).initializer_export();
++    const bool registered = GetModuleHandleW(path.c_str()) != nullptr;
++    std::printf("held-file image view initializer=%d registered as executable module=%d\n",initial,registered);
++    check(initial == 0 && !registered,"inspection must not initialize or register the image");
++    UnmapViewOfFile(view);
++    CloseHandle(section);
++    Image loaded(path);
++    std::printf("ordinary executable load initializer=%d\n",marker(loaded.value));
++    check(marker(loaded.value) == 1,"control initializer");
++}
++void forwarding(const std::wstring& root) {
++    const auto forwarder = root+L"\\good\\void_g4w_forwarder.dll";
++    const auto approved = root+L"\\good\\"+dependency_name;
++    const auto rogue = root+L"\\alternate\\"+dependency_name;
++    File held(forwarder), dep(approved);
++    Activation external;
++    external.from(root+L"\\alternate\\override-dependency.manifest");
++    check(redirected(dependency_name),"expected dependency redirection");
++    Image module(forwarder);
++    check(compare_path("forwarder image",module.value,held),"expected forwarder");
++    check(!GetModuleHandleW(rogue.c_str()),"forwarder mapped a dependency before lookup");
++    std::puts("alternate absent after loading import-free image");
++    auto address = GetProcAddress(module.value,"forwarded");
++    check(address != nullptr,"lookup forwarded export");
++    const auto* target = reinterpret_cast<const void*>(address);
++    const auto owner = owning_module(target);
++    const int initialized = marker(owner);
++    std::printf("forwarded export initializer after GetProcAddress=%d\n",initialized);
++    check(!compare_path("forwarded export owner",target,dep) && initialized == 1,
++          "forwarder must resolve alternate in this negative control");
++}
++void explicit_table(const std::wstring& root) {
++    const auto main = root+L"\\good\\void_g4w_explicit.dll", leaf = root+L"\\good\\"+dependency_name;
++    File main_file(main), leaf_file(leaf);
++    check(!redirected(L"void_g4w_explicit.dll") && !redirected(dependency_name) &&
++          !GetModuleHandleW(L"void_g4w_explicit.dll") && !GetModuleHandleW(dependency_name),
++          "closed explicit fixture preflight");
++    Image leaf_image(leaf), main_image(main);
++    check(compare_path("explicit leaf",leaf_image.value,leaf_file) &&
++          compare_path("explicit provider",main_image.value,main_file),"exact explicit fixture paths");
++    const Table table{export_from<Bias>(leaf_image,"g4_dependency")};
++    auto sample = export_from<Sample (*)(const Table*,Sample)>(main_image,"sample");
++    auto fill = export_from<size_t (*)(const Table*,unsigned char*,size_t)>(main_image,"fill");
++    auto acquire = export_from<Token* (*)(const Table*,int)>(main_image,"acquire");
++    auto inspect = export_from<int (*)(Token*)>(main_image,"inspect");
++    auto release = export_from<int (*)(Token*)>(main_image,"release");
++    auto record = sample(&table,{5,1.25});
++    unsigned char bytes[3]{};
++    auto count = fill(&table,bytes,3);
++    auto* token = acquire(&table,35);
++    check(record.tag == 12 && record.value == 2.5 && count == 3 &&
++          bytes[0] == 7 && bytes[1] == 8 && bytes[2] == 9 &&
++          token && inspect(token) == 42 && release(token) == 0 && release(token) == 1,
++          "exact typed table fixture result");
++    std::puts("explicit table used C record, byte span, opaque token and terminal release");
++}
++}
++int wmain(int argc, wchar_t** argv) {
++    if (argc != 3) return 2;
++    check(SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_SYSTEM32),"narrow process search default");
++    const std::wstring root = argv[2];
++    const std::wstring_view mode = argv[1];
++    if (mode == L"data") data_only(root);
++    else if (mode == L"forward") forwarding(root);
++    else if (mode == L"explicit") explicit_table(root);
++    else imports(root,mode);
++    return 0;
++}
+diff --git a/docs/projects/evidence/slice7-g4-windows/probes/native-run.cmd b/docs/projects/evidence/slice7-g4-windows/probes/native-run.cmd
+new file mode 100644
+index 00000000..0559a3b9
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-windows/probes/native-run.cmd
+@@ -0,0 +1,6 @@
++@echo off
++setlocal
++set "G4WSHARE=\\vboxsvr\VM\project-slice7-g4-windows"
++call "C:\BuildTools\VS2022\VC\Auxiliary\Build\vcvarsall.bat" x64 > "%G4WSHARE%\vcvars.log" 2>&1
++if errorlevel 1 exit /b 1
++"C:\Users\a\AppData\Local\Programs\Python\Python314\python.exe" "%~dp0replay-run.py" > "%G4WSHARE%\native-console.log" 2>&1
+diff --git a/docs/projects/evidence/slice7-g4-windows/probes/native-run.py b/docs/projects/evidence/slice7-g4-windows/probes/native-run.py
+new file mode 100644
+index 00000000..55f9ef0b
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-windows/probes/native-run.py
+@@ -0,0 +1,105 @@
++from hashlib import file_digest
++from pathlib import Path
++import json
++import platform
++import shutil
++import subprocess
++import sys
++import traceback
++
++share = Path(r'\\vboxsvr\VM\project-slice7-g4-windows')
++home = Path.home().resolve(strict=True)
++work = home/'VoidS7-G4W-architecture-final'
++toolchain = home/'VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin'
++clang = toolchain/'clang-cl.exe'
++linker = toolchain/'lld-link.exe'
++readobj = toolchain/'llvm-readobj.exe'
++record = {'status':'RUNNING','os':platform.platform(),'build':sys.getwindowsversion().build,
++          'work':str(work),'commands':[],'inputs':{},'artifacts':{}}
++
++def digest(path):
++    with path.open('rb') as raw:
++        return file_digest(raw,'sha256').hexdigest()
++
++def save():
++    (share/'native-results.json').write_text(json.dumps(record,indent=2)+'\n',encoding='utf-8')
++
++def run(label, *argv, required=True):
++    args = list(map(str,argv))
++    with (share/(label+'.log')).open('wb') as output:
++        result = subprocess.run(args,cwd=work,stdout=output,stderr=subprocess.STDOUT,timeout=45)
++    record['commands'].append({'label':label,'argv':args,'exit':result.returncode})
++    save()
++    if required and result.returncode:
++        raise RuntimeError(f'{label} failed with {result.returncode}')
++    return result.returncode
++
++def build_cpp(source, output, *extra):
++    run('build-'+Path(output).stem,clang,'/nologo','/std:c++20','/EHsc','/MT',source,
++        '/Fo'+Path(output).stem+'.obj','/Fe'+output,'/link','/manifest:embed',*extra)
++
++try:
++    assert record['build']==19045
++    work.mkdir()
++    for child in ('good','alternate','child-good','child-bad'):
++        (work/child).mkdir()
++    inputs = json.loads((share/'input-sha256.json').read_text())
++    for name, expected in inputs.items():
++        assert Path(name).name==name and digest(share/name)==expected,name
++        shutil.copyfile(share/name,work/name)
++        assert digest(work/name)==expected,name
++        record['inputs'][name]=expected
++    shutil.copyfile(work/'override-dependency.manifest',work/'alternate/override-dependency.manifest')
++    run('toolchain',clang,'--version')
++    common = (clang,'/nologo','/TC','/c','/GS-','/Zl')
++    run('build-dependency',*common,'dependency.c','/Fodependency.obj')
++    run('build-competitor',*common,'/DFIXTURE_VALUE=99','dependency.c','/Focompetitor.obj')
++    run('build-provider',*common,'provider.c','/Foprovider.obj')
++    run('build-marker',*common,'redirected.c','/Fomarker.obj')
++    run('build-explicit-object',*common,'explicit.c','/Foexplicit.obj')
++    run('link-good',linker,'/dll','/noentry','/nodefaultlib','/out:good/void_g4_probe_dep.dll',
++        '/implib:dep.lib','dependency.obj')
++    run('link-alternate',linker,'/dll','/entry:checkpoint_attach','/nodefaultlib',
++        '/out:alternate/void_g4_probe_dep.dll','competitor.obj','marker.obj')
++    run('link-provider',linker,'/dll','/noentry','/nodefaultlib','/out:good/void_g4_probe_main.dll',
++        'provider.obj','dep.lib')
++    run('link-explicit',linker,'/dll','/noentry','/nodefaultlib','/out:good/void_g4w_explicit.dll','explicit.obj')
++    run('build-forwarder-anchor',*common,'forwarder_anchor.c','/Foforwarder_anchor.obj')
++    run('link-forwarder',linker,'/dll','/noentry','/nodefaultlib','/machine:x64',
++        '/out:good/void_g4w_forwarder.dll','/def:forwarder.def','forwarder_anchor.obj')
++    build_cpp('loader_probe.cpp','loader-probe.exe')
++    build_cpp('loader_probe.cpp','alternate/process-default.exe',
++              '/manifestinput:alternate/override-dependency.manifest')
++    build_cpp('launcher.cpp','launcher.exe')
++    run('build-startup',clang,'/nologo','/TC','/MT','startup.c','dep.lib','/Festartup.exe','/link','/manifest:embed')
++    for label in ('good','bad'):
++        child=work/('child-'+label)
++        shutil.copyfile(work/'startup.exe',child/'startup.exe')
++        shutil.copyfile(work/('good' if label=='good' else 'alternate')/'void_g4_probe_dep.dll',
++                        child/'void_g4_probe_dep.dll')
++    run('pe-facts',readobj,'--file-headers','--coff-imports','--coff-exports','--coff-resources',
++        'loader-probe.exe','alternate/process-default.exe','launcher.exe','startup.exe',
++        'good/void_g4_probe_main.dll','good/void_g4_probe_dep.dll','alternate/void_g4_probe_dep.dll',
++        'good/void_g4w_explicit.dll','good/void_g4w_forwarder.dll')
++    run('dotlocal-policy','reg.exe','query',
++        r'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options',
++        '/v','DevOverrideEnable',required=False)
++    statuses = {}
++    for mode in ('clean','collision','late','thread','thread-default','thread-deny',
++                 'process-default','process-deny','preload-thread','data','forward','explicit'):
++        program=work/('alternate/process-default.exe' if mode.startswith('process-') else 'loader-probe.exe')
++        statuses[mode]=run('probe-'+mode,program,mode,work,required=False)
++    for label in ('good','bad'):
++        statuses['startup-'+label]=run('startup-'+label,work/'launcher.exe',
++                                      work/('child-'+label)/'startup.exe',required=False)
++    record['probes']=statuses
++    for path in sorted(work.rglob('*')):
++        if path.is_file():
++            assert path.resolve(strict=True)==path and path.stat().st_nlink==1,path
++            record['artifacts'][str(path.relative_to(work)).replace('\\','/')]=digest(path)
++    record['status']='PASS' if all(code==0 for code in statuses.values()) else 'PROBE_FAILURE'
++except BaseException:
++    record['status']='FAIL'
++    record['error']=traceback.format_exc()
++finally:
++    save()
+diff --git a/docs/projects/evidence/slice7-g4-windows/probes/startup.c b/docs/projects/evidence/slice7-g4-windows/probes/startup.c
+new file mode 100644
+index 00000000..4d56dd0c
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-windows/probes/startup.c
+@@ -0,0 +1,16 @@
++#define WIN32_LEAN_AND_MEAN
++#include <windows.h>
++
++__declspec(dllimport) int g4_dependency(void);
++
++int main(void) {
++    // This is the first observation in the child. Its static application
++    // import has already been resolved and DLL_PROCESS_ATTACH has run.
++    HMODULE dependency;
++    if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
++                            GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
++                            (LPCWSTR)g4_dependency, &dependency)) return 2;
++    const volatile int* marker = (const volatile int*)GetProcAddress(dependency, "g4_init_marker");
++    if (marker && *marker == 1) return 121;
++    return g4_dependency() == 7 ? 42 : 3;
++}
+diff --git a/docs/projects/evidence/slice7-g4-windows/probes/transfer-run.cmd b/docs/projects/evidence/slice7-g4-windows/probes/transfer-run.cmd
+new file mode 100644
+index 00000000..d1845a94
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-windows/probes/transfer-run.cmd
+@@ -0,0 +1,7 @@
++@echo off
++setlocal
++set "G4WSHARE=\\vboxsvr\VM\project-slice7-g4-windows"
++set "G4WLOCAL=%USERPROFILE%\VoidS7-G4W-architecture"
++copy /b /y "%G4WSHARE%\native-run.cmd" "%G4WLOCAL%\replay-launch.cmd" > "%G4WSHARE%\transfer.log" 2>&1 || exit /b 1
++copy /b /y "%G4WSHARE%\native-run.py" "%G4WLOCAL%\replay-run.py" >> "%G4WSHARE%\transfer.log" 2>&1 || exit /b 1
++call "%G4WLOCAL%\replay-launch.cmd"
+diff --git a/docs/projects/evidence/slice7-g4-windows/collect-windows.py b/docs/projects/evidence/slice7-g4-windows/collect-windows.py
+new file mode 100644
+index 00000000..7b6cf972
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-windows/collect-windows.py
+@@ -0,0 +1,69 @@
++from hashlib import sha256
++from pathlib import Path
++import json
++import re
++
++audit = Path(__file__).resolve().parent
++share = Path.home()/'VM/project-slice7-g4-windows'
++native = audit/'native'
++result = json.loads((share/'native-results.json').read_text())
++assert result['status']=='PASS' and result['build']==19045
++assert result['inputs']==json.loads((native/'input-sha256.json').read_text())
++assert len(result['probes'])==14 and set(result['probes'].values())=={0}
++assert result['artifacts']['child-good/startup.exe']==result['artifacts']['child-bad/startup.exe']==result['artifacts']['startup.exe']
++for artifact, owner in (('child-good/void_g4_probe_dep.dll','good/void_g4_probe_dep.dll'),
++                        ('child-bad/void_g4_probe_dep.dll','alternate/void_g4_probe_dep.dll')):
++    assert result['artifacts'][artifact]==result['artifacts'][owner]
++assert result['artifacts']['good/void_g4_probe_dep.dll']!=result['artifacts']['alternate/void_g4_probe_dep.dll']
++for name, expected in result['inputs'].items():
++    repository = audit/'probes'/name
++    if not repository.exists():
++        repository = audit.parent/'slice7-g4/checkpoint'/name
++    assert sha256(repository.read_bytes()).hexdigest()==expected
++    assert repository.read_bytes()==(share/name).read_bytes()
++checks = {
++    'probe-clean.log': ('bound IAT owner match=1','initializer marker at first post-load observation=-1'),
++    'probe-collision.log': ('bound IAT owner match=0','initializer marker at first post-load observation=1'),
++    'probe-late.log': ('preflight names and active redirects clear=1','bound IAT owner match=0'),
++    'probe-thread.log': ('dependency basename loaded before setup=0','active redirect provider=0 dependency=1',
++                         'bound IAT owner match=0','initializer marker at first post-load observation=1'),
++    'probe-thread-default.log': ('active redirect provider=0 dependency=0','bound IAT owner match=1'),
++    'probe-thread-deny.log': ('alternate and provider absent',),
++    'probe-process-default.log': ('active redirect provider=0 dependency=1','initializer marker at first post-load observation=1'),
++    'probe-process-deny.log': ('alternate and provider absent',),
++    'probe-preload-thread.log': ('preloaded good dependency match=1','bound IAT owner match=0'),
++    'probe-data.log': ('initializer=0 registered as executable module=0','ordinary executable load initializer=1'),
++    'probe-forward.log': ('alternate absent after loading import-free image',
++                          'forwarded export initializer after GetProcAddress=1','forwarded export owner match=0'),
++    'probe-explicit.log': ('explicit table used C record, byte span, opaque token and terminal release',),
++    'startup-good.log': ('child image matches held executable path before resume=1','child first-entry observation=42'),
++    'startup-bad.log': ('child image matches held executable path before resume=1','child first-entry observation=121'),
++}
++for name, fragments in checks.items():
++    output = (share/name).read_text()
++    assert all(item in output for item in fragments),name
++details = (share/'pe-facts.log').read_text()
++files = {name: body for name,body in re.findall(r'^File: ([^\n]+)\n(.*?)(?=^File: |\Z)',details,re.M|re.S)}
++for name in ('good/void_g4w_explicit.dll','good/void_g4w_forwarder.dll','good/void_g4_probe_dep.dll'):
++    assert all(marker in files[name] for marker in ('ImportTableRVA: 0x0','DelayImportDescriptorRVA: 0x0',
++               'TLSTableRVA: 0x0','AddressOfEntryPoint: 0x0'))
++assert 'ForwardedTo: void_g4_probe_dep.g4_dependency' in files['good/void_g4w_forwarder.dll']
++assert 'ForwardedTo:' not in files['good/void_g4w_explicit.dll']
++for name in ('loader-probe.exe','launcher.exe','alternate/process-default.exe','startup.exe'):
++    expected = ['KERNEL32.dll'] if name!='startup.exe' else ['KERNEL32.dll','void_g4_probe_dep.dll']
++    assert sorted(re.findall(r'^Import \{\n  Name: (.*)$',files[name],re.M))==expected
++outputs = ('native-results.json','input-sha256.json','native-console.log','vcvars.log','transfer.log',
++           *(step['label']+'.log' for step in result['commands']))
++preserved = {}
++for name in outputs:
++    path = share/name
++    data = path.read_bytes()
++    target = native/(path.stem+'.txt' if path.suffix=='.log' else name)
++    if target.exists():
++        assert target.read_bytes()==data,target
++    else:
++        target.write_bytes(data)
++    preserved[name]=sha256(data).hexdigest()
++for dest in (share/'preserved-evidence.json',native/'preserved-evidence.json'):
++    dest.write_text(json.dumps(preserved,indent=2)+'\n')
++print(f'Archived {len(outputs)} native outputs and verified {len(checks)} control transcripts.')
+diff --git a/docs/projects/evidence/slice7-g4-windows/cleanup-windows.py b/docs/projects/evidence/slice7-g4-windows/cleanup-windows.py
+new file mode 100644
+index 00000000..937674bb
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-windows/cleanup-windows.py
+@@ -0,0 +1,74 @@
++from hashlib import file_digest
++from pathlib import Path
++import csv
++import json
++import platform
++import shutil
++import subprocess
++import sys
++import traceback
++
++share = Path(r'\\vboxsvr\VM\project-slice7-g4-windows')
++home = Path.home().resolve(strict=True)
++system = Path(home.anchor)
++first = home/'VoidS7-G4W-architecture'
++replay = home/'VoidS7-G4W-architecture-replay'
++qualified = home/'VoidS7-G4W-architecture-final'
++receipt = {'status':'PENDING','os':platform.platform(),'build':sys.getwindowsversion().build,
++           'free_before':shutil.disk_usage(system).free,'deleted':[],'verified_retained':{}}
++
++def digest(path):
++    with path.open('rb') as raw:
++        return file_digest(raw,'sha256').hexdigest()
++
++def exact(path):
++    assert path.resolve(strict=True)==path and not path.is_symlink() and not path.is_junction(),path
++
++try:
++    assert receipt['build']==19045
++    final = json.loads((share/'native-results.json').read_text())
++    assert final['status']=='PASS' and Path(final['work'])==qualified
++    for name, expected in json.loads((share/'preserved-evidence.json').read_text()).items():
++        assert digest(share/name)==expected,name
++    tasks = subprocess.run(['tasklist.exe','/FO','CSV','/NH'],capture_output=True,text=True,check=True)
++    running = {row[0].lower() for row in csv.reader(tasks.stdout.splitlines()) if row}
++    assert not running.intersection({'launcher.exe','loader-probe.exe','process-default.exe','startup.exe',
++                                     'clang-cl.exe','lld-link.exe','llvm-readobj.exe'}),running
++    for root in (first,replay,qualified):
++        exact(root)
++    for name, expected in final['artifacts'].items():
++        path = qualified/name
++        assert path.is_relative_to(qualified) and '..' not in Path(name).parts,path
++        exact(path)
++        assert path.stat().st_nlink==1 and digest(path)==expected,path
++        receipt['verified_retained'][str(path)] = expected
++    targets = {first/'replay-launch.cmd':final['inputs']['native-run.cmd'],
++               first/'replay-run.py':final['inputs']['native-run.py']}
++    directories = []
++    for label, owner in (('good','good'),('bad','alternate')):
++        child = replay/f'child-{label}'
++        exact(child)
++        assert {p.name for p in child.iterdir()}=={'startup.exe','void_g4_probe_dep.dll'},child
++        for name, reference in (('startup.exe',replay/'startup.exe'),
++                               ('void_g4_probe_dep.dll',replay/owner/'void_g4_probe_dep.dll')):
++            exact(reference)
++            targets[child/name] = digest(reference)
++        directories.append(child)
++    for path, expected in targets.items():
++        exact(path)
++        assert path.is_file() and path.stat().st_nlink==1 and digest(path)==expected,path
++    for path, expected in targets.items():
++        assert digest(path)==expected,path
++        path.unlink()
++        receipt['deleted'].append(str(path))
++    for path in directories:
++        path.rmdir()
++        receipt['deleted'].append(str(path))
++    receipt['retained_roots'] = [str(root) for root in (first,replay,qualified)]
++    receipt['status']='PASS'
++except BaseException:
++    receipt['status']='RETAINED_OR_PARTIAL'
++    receipt['error']=traceback.format_exc()
++finally:
++    receipt['free_after']=shutil.disk_usage(system).free
++    (share/'cleanup-results.json').write_text(json.dumps(receipt,indent=2)+'\n')
+diff --git a/docs/projects/evidence/slice7-g4-windows/cleanup-windows.cmd b/docs/projects/evidence/slice7-g4-windows/cleanup-windows.cmd
+new file mode 100644
+index 00000000..46a5225c
+--- /dev/null
++++ b/docs/projects/evidence/slice7-g4-windows/cleanup-windows.cmd
+@@ -0,0 +1,2 @@
++@echo off
++"C:\Users\a\AppData\Local\Programs\Python\Python314\python.exe" "\\vboxsvr\VM\project-slice7-g4-windows\cleanup-windows.py" > "\\vboxsvr\VM\project-slice7-g4-windows\cleanup-console.log" 2>&1

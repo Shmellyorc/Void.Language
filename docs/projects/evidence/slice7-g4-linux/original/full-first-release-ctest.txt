@@ -1,0 +1,166 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+      Start  13: project_application_process
+      Start  12: project_application
+ 1/52 Test  #12: project_application ................   Passed    8.97 sec
+      Start 441: numeric_cli
+ 2/52 Test  #13: project_application_process ........   Passed   10.58 sec
+      Start 402: numeric_enum_process
+ 3/52 Test #402: numeric_enum_process ...............   Passed    6.25 sec
+      Start 289: stage6_cache_processes
+ 4/52 Test #289: stage6_cache_processes .............   Passed    5.20 sec
+      Start 288: stage6_integrated
+ 5/52 Test #288: stage6_integrated ..................   Passed    3.59 sec
+      Start  11: project_creation_process
+ 6/52 Test #441: numeric_cli ........................   Passed   18.77 sec
+      Start  14: project_discovery_cli
+ 7/52 Test  #11: project_creation_process ...........   Passed    3.22 sec
+      Start 287: native_source
+ 8/52 Test #287: native_source ......................   Passed    2.63 sec
+      Start   8: project_selection
+ 9/52 Test  #14: project_discovery_cli ..............   Passed    3.98 sec
+      Start 404: frontend
+10/52 Test   #8: project_selection ..................   Passed    2.78 sec
+      Start  98: fixed_arrays_source
+11/52 Test  #98: fixed_arrays_source ................   Passed    1.80 sec
+      Start  15: project_profiles
+12/52 Test #404: frontend ...........................   Passed    4.92 sec
+      Start 276: ffi_g1_primitive_aot_missing
+13/52 Test  #15: project_profiles ...................   Passed    1.10 sec
+      Start 400: numeric
+14/52 Test #276: ffi_g1_primitive_aot_missing .......   Passed    1.01 sec
+      Start 283: ffi_g4_jit_ir
+15/52 Test #283: ffi_g4_jit_ir ......................***Failed    0.52 sec
+bad closure revision: C dynamic closure: unsupported revision
+system library policy: C dynamic closure: unsupported target, system ABI or relocation policy
+foreign provider: C dynamic closure: exact descriptor provider or target mismatch
+aliased image: C dynamic closure: invalid or duplicate image
+missing descriptor export: C dynamic closure is missing an owned descriptor export
+wrong target thunk: C dynamic closure: exact descriptor thunk mismatch
+direct bridge import: VOID IR: C primitive transport requires host admission and typed operations
+erased closure admission: VOID IR: C primitive admission differs from analyzed source
+forged dynamic ordinal: VOID IR: C primitive call outside the admitted binding module
+forged provider and symbol: VOID IR: invalid C primitive descriptor or exact call signature
+missing provider: C dynamic artifact: libvoid_g4_main.so is missing, aliased or outside file bounds
+modified dependency: C dynamic digest: libvoid_g4_dep.so
+symlink provider: C dynamic artifact: libvoid_g4_main.so is missing, aliased or outside file bounds
+hardlinked provider: C dynamic artifact: libvoid_g4_main.so is missing, aliased or outside file bounds
+missing required export: C dynamic symbol: missing exact owned export g4_missing
+wrong symbol owner: C dynamic symbol: missing exact owned export g4_bias
+conflicting symbol across closure: C dynamic symbol: conflicting closure definition g4_add
+unapproved ELF target: C dynamic ELF: unsupported target or header
+unsupported dynamic tag 15: C dynamic ELF: unsupported dynamic tag 15
+unsupported dynamic tag 1879047932: C dynamic ELF: unsupported dynamic tag 1879047932
+unsupported dynamic tag 12: C dynamic ELF: unsupported dynamic tag 12
+system DT_NEEDED: C dynamic dependency: unapproved DT_NEEDED in libvoid_g4_main.so
+ELF program header 3: C dynamic ELF: unsupported program header 3
+ELF program header 7: C dynamic ELF: unsupported program header 7
+IFUNC resolver: C dynamic ELF: unsupported dynamic symbol (including weak, TLS and resolver symbols)
+IRELATIVE resolver: C dynamic ELF: unsupported relocation or target
+real initializer would exit 121 if mapped: C dynamic ELF: unsupported dynamic tag 1879048185
+G4 mapped libvoid_g4_dep.so inode 6429164 verified sealed SHA-256 8b65d8bb8321c959c73e7675b2e109817339f2b9b848b4ddadcc52058bc8fedb
+G4 mapped libvoid_g4_main.so inode 6429165 verified sealed SHA-256 80722c675d3d719fbb33943ce47bcf2cc2665f358fb8e424159a428d402d0f9b
+cross-Runtime binding transfer: C dynamic authority: native binding is already owned by a Runtime
+stale dynamic alias: <host binding /native_dynamic.void>:15:6: runtime error: C resource is closed, null or invalid
+In function /native_dynamic.void::read
+Called from /dynamic.void::entry
+/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/jit-probes/dynamic.void:46:20: source call
+        return ffi.read(alias, 0)
+                   ^
+
+dynamic double close: <host binding /native_dynamic.void>:17:6: runtime error: C resource is closed, null or invalid
+In function /native_dynamic.void::close_box
+Called from /dynamic.void::entry
+/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/jit-probes/dynamic.void:48:20: source call
+        return ffi.close_box(alias)
+                   ^
+
+refused dynamic acquisition containing a live pointer: <host binding /native_dynamic.void>:13:6: runtime error: C resource operation rejected org.voidlang.g4-fixture::g4_create
+In function /native_dynamic.void::create
+Called from /dynamic.void::entry
+/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/jit-probes/dynamic.void:16:28: source call
+        var rejected = ffi.create(-3)
+                           ^
+
+different closure in live Runtime received Runtime already owns an independent or incompatible global program
+
+      Start   6: project_manifest_legacy
+16/52 Test   #6: project_manifest_legacy ............   Passed    1.22 sec
+      Start 280: ffi_g3_jit_ir
+17/52 Test #400: numeric ............................   Passed    2.25 sec
+      Start 277: ffi_g2_jit_ir
+18/52 Test #277: ffi_g2_jit_ir ......................   Passed    0.61 sec
+      Start 272: ffi_g1_primitive_jit_ir
+19/52 Test #280: ffi_g3_jit_ir ......................   Passed    0.93 sec
+      Start   9: project_sessions
+20/52 Test #272: ffi_g1_primitive_jit_ir ............   Passed    0.58 sec
+      Start  16: project_protocol
+21/52 Test   #9: project_sessions ...................   Passed    0.53 sec
+      Start 405: modules
+22/52 Test  #16: project_protocol ...................   Passed    0.53 sec
+      Start  17: project_nested_cli
+23/52 Test  #17: project_nested_cli .................   Passed    0.39 sec
+      Start 392: reload
+24/52 Test #405: modules ............................   Passed    0.75 sec
+      Start  56: stage10_fields
+25/52 Test #392: reload .............................   Passed    0.44 sec
+      Start 401: numeric_enum_ir
+26/52 Test  #56: stage10_fields .....................   Passed    0.46 sec
+      Start 399: analysis
+27/52 Test #401: numeric_enum_ir ....................   Passed    0.40 sec
+      Start 284: ffi_g4_aot_normal
+28/52 Test #284: ffi_g4_aot_normal ..................   Passed    0.62 sec
+      Start 403: numeric_enum_lsp
+29/52 Test #403: numeric_enum_lsp ...................   Passed    0.11 sec
+      Start 285: ffi_g4_aot_optimized
+30/52 Test #399: analysis ...........................   Passed    1.07 sec
+      Start 286: ffi_g4_aot_startup
+31/52 Test #285: ffi_g4_aot_optimized ...............   Passed    0.16 sec
+      Start  10: project_creation
+32/52 Test #286: ffi_g4_aot_startup .................   Passed    0.13 sec
+      Start   5: project_manifest_no_authority
+33/52 Test  #10: project_creation ...................   Passed    0.07 sec
+      Start 342: async_ir
+34/52 Test   #5: project_manifest_no_authority ......   Passed    0.13 sec
+      Start 397: sessions
+35/52 Test #397: sessions ...........................   Passed    0.06 sec
+      Start 275: ffi_g1_primitive_aot_mismatch
+36/52 Test #275: ffi_g1_primitive_aot_mismatch ......   Passed    0.04 sec
+      Start 290: native_aot_main_normal
+37/52 Test #342: async_ir ...........................   Passed    0.23 sec
+      Start 296: native_aot_duplicate_normal
+38/52 Test #290: native_aot_main_normal .............   Passed    0.04 sec
+      Start 273: ffi_g1_primitive_aot_normal
+39/52 Test #296: native_aot_duplicate_normal ........   Passed    0.03 sec
+      Start 274: ffi_g1_primitive_aot_optimized
+40/52 Test #273: ffi_g1_primitive_aot_normal ........   Passed    0.05 sec
+      Start 295: native_aot_closed_optimized
+41/52 Test #274: ffi_g1_primitive_aot_optimized .....   Passed    0.04 sec
+      Start 278: ffi_g2_aot_normal
+42/52 Test #295: native_aot_closed_optimized ........   Passed    0.04 sec
+      Start 279: ffi_g2_aot_optimized
+43/52 Test #278: ffi_g2_aot_normal ..................   Passed    0.05 sec
+      Start 291: native_aot_main_optimized
+44/52 Test #279: ffi_g2_aot_optimized ...............   Passed    0.05 sec
+      Start 292: native_aot_terminated_nul_normal
+45/52 Test #291: native_aot_main_optimized ..........   Passed    0.03 sec
+      Start   7: project_manifest_provenance
+46/52 Test #292: native_aot_terminated_nul_normal ...   Passed    0.03 sec
+      Start   2: project_manifest
+47/52 Test   #7: project_manifest_provenance ........   Passed    0.05 sec
+      Start 393: gc
+48/52 Test   #2: project_manifest ...................   Passed    0.04 sec
+      Start 282: ffi_g3_aot_optimized
+49/52 Test #393: gc .................................   Passed    0.02 sec
+      Start 281: ffi_g3_aot_normal
+50/52 Test #282: ffi_g3_aot_optimized ...............   Passed    0.06 sec
+      Start   1: project_manifest_header
+51/52 Test   #1: project_manifest_header ............   Passed    0.00 sec
+52/52 Test #281: ffi_g3_aot_normal ..................   Passed    0.05 sec
+
+98% tests passed, 1 tests failed out of 52
+
+Total Test time (real) =  43.83 sec
+
+The following tests FAILED:
+	283 - ffi_g4_jit_ir (Failed)
+Errors while running CTest

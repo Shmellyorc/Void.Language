@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Win32-ninja"
+	tests="3"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="DESKTOP-N4VH0F7"
+	time="65"
+	timestamp="2026-11-08T20:49:19"
+	>
+	<testcase name="reload" classname="reload" time="1.55369" status="run">
+		<properties/>
+		<system-out>reload: passed
+</system-out>
+	</testcase>
+	<testcase name="analysis" classname="analysis" time="2.15036" status="run">
+		<properties/>
+		<system-out>normal: body edit 53 -&gt; 61, const edit rejected, old lease 53; concurrent calls 457863
+O2: body edit 53 -&gt; 61, const edit rejected, old lease 53; concurrent calls 1328358
+analysis: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric" classname="numeric" time="2.62547" status="run">
+		<properties/>
+		<system-out>210 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed
+numeric: passed
+</system-out>
+	</testcase>
+</testsuite>

@@ -1,0 +1,665 @@
+{
+  "workspace": "C:\\Users\\a\\VoidS7-G4W2-final",
+  "build": 19045,
+  "commands": [
+    {
+      "label": "toolchain-clang",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "--version"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "toolchain-lld",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe",
+        "--version"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "toolchain-readobj",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-readobj.exe",
+        "--version"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "compile-approved",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/TC",
+        "/c",
+        "/GS-",
+        "/Zl",
+        "/DFIXTURE_VALUE=7",
+        "dependency.c",
+        "/Foapproved.obj"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "link-approved",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe",
+        "/dll",
+        "/nodefaultlib",
+        "/out:approved/void_w2_gate.dll",
+        "approved.obj",
+        "/noentry"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "compile-collision",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/TC",
+        "/c",
+        "/GS-",
+        "/Zl",
+        "/DFIXTURE_VALUE=99",
+        "dependency.c",
+        "/Focollision.obj"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "link-collision",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe",
+        "/dll",
+        "/nodefaultlib",
+        "/out:collision/void_w2_gate.dll",
+        "collision.obj",
+        "/noentry"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "compile-sentinel121",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/TC",
+        "/c",
+        "/GS-",
+        "/Zl",
+        "/DW2_SENTINEL=121",
+        "sentinel.c",
+        "/Fosentinel121.obj"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "link-sentinel121",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe",
+        "/dll",
+        "/nodefaultlib",
+        "/out:sentinel121/void_w2_gate.dll",
+        "sentinel121.obj",
+        "/entry:sentinel_entry",
+        "kernel32.lib"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "compile-sentinel122",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/TC",
+        "/c",
+        "/GS-",
+        "/Zl",
+        "/DW2_SENTINEL=122",
+        "sentinel.c",
+        "/Fosentinel122.obj"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "link-sentinel122",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe",
+        "/dll",
+        "/nodefaultlib",
+        "/out:sentinel122/void_w2_gate.dll",
+        "sentinel122.obj",
+        "/entry:sentinel_entry",
+        "kernel32.lib"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "build-probe",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/std:c++20",
+        "/EHsc",
+        "/MT",
+        "-fuse-ld=lld",
+        "image_probe.cpp",
+        "/Foprobe.obj",
+        "/FeC:\\Users\\a\\VoidS7-G4W2-final\\probe.exe",
+        "/link",
+        "bcrypt.lib",
+        "advapi32.lib",
+        "/manifest:embed"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "build-embedded",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/std:c++20",
+        "/EHsc",
+        "/MT",
+        "-fuse-ld=lld",
+        "image_probe.cpp",
+        "/Foembedded.obj",
+        "/FeC:\\Users\\a\\VoidS7-G4W2-final\\embedded\\probe-embedded.exe",
+        "/link",
+        "bcrypt.lib",
+        "advapi32.lib",
+        "/manifest:embed",
+        "/manifestinput:redirect.manifest"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "build-external",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/std:c++20",
+        "/EHsc",
+        "/MT",
+        "-fuse-ld=lld",
+        "image_probe.cpp",
+        "/Foexternal.obj",
+        "/FeC:\\Users\\a\\VoidS7-G4W2-final\\external\\probe-external.exe",
+        "/link",
+        "bcrypt.lib",
+        "advapi32.lib",
+        "/manifest:no"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "pe-approved",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-readobj.exe",
+        "--file-headers",
+        "--coff-imports",
+        "--coff-exports",
+        "--coff-resources",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\approved\\void_w2_gate.dll"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "pe-collision",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-readobj.exe",
+        "--file-headers",
+        "--coff-imports",
+        "--coff-exports",
+        "--coff-resources",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\collision\\void_w2_gate.dll"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "pe-sentinel121",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-readobj.exe",
+        "--file-headers",
+        "--coff-imports",
+        "--coff-exports",
+        "--coff-resources",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\sentinel121\\void_w2_gate.dll"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "pe-sentinel122",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-readobj.exe",
+        "--file-headers",
+        "--coff-imports",
+        "--coff-exports",
+        "--coff-resources",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\sentinel122\\void_w2_gate.dll"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "pe-forwarder",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-readobj.exe",
+        "--file-headers",
+        "--coff-imports",
+        "--coff-exports",
+        "--coff-resources",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\forwarder\\void_w2_gate.dll"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "pe-embedded",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-readobj.exe",
+        "--file-headers",
+        "--coff-imports",
+        "--coff-exports",
+        "--coff-resources",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\embedded\\probe-embedded.exe"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "pe-external",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-readobj.exe",
+        "--file-headers",
+        "--coff-imports",
+        "--coff-exports",
+        "--coff-resources",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\external\\probe-external.exe"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "pe-probe",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-readobj.exe",
+        "--file-headers",
+        "--coff-imports",
+        "--coff-exports",
+        "--coff-resources",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\probe.exe"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "make-junction",
+      "argv": [
+        "C:\\Windows\\System32\\cmd.exe",
+        "/d",
+        "/c",
+        "mklink",
+        "/J",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\junction",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\approved"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [],
+      "passed": true
+    },
+    {
+      "label": "case-clean",
+      "argv": [
+        "C:\\Users\\a\\VoidS7-G4W2-final\\probe.exe",
+        "clean",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\approved\\void_w2_gate.dll",
+        "-",
+        "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [
+        "C: filesystem=NTFS",
+        "result=7"
+      ],
+      "passed": true
+    },
+    {
+      "label": "case-separate",
+      "argv": [
+        "C:\\Users\\a\\VoidS7-G4W2-final\\separate\\probe.exe",
+        "clean",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\approved\\void_w2_gate.dll",
+        "-",
+        "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [
+        "result=7"
+      ],
+      "passed": true
+    },
+    {
+      "label": "case-pin",
+      "argv": [
+        "C:\\Users\\a\\VoidS7-G4W2-final\\probe.exe",
+        "pin",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\pin\\void_w2_gate.dll",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\pin-replacement\\void_w2_gate.dll",
+        "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [
+        "pinned write error=",
+        "replacement error=",
+        "ancestor rename error=",
+        "result=7"
+      ],
+      "passed": true
+    },
+    {
+      "label": "case-alias",
+      "argv": [
+        "C:\\Users\\a\\VoidS7-G4W2-final\\probe.exe",
+        "alias",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\pin\\..\\pin\\void_w2_gate.dll",
+        "-",
+        "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [
+        "denied before executable load: path alias"
+      ],
+      "passed": true
+    },
+    {
+      "label": "case-junction",
+      "argv": [
+        "C:\\Users\\a\\VoidS7-G4W2-final\\probe.exe",
+        "junction",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\junction\\void_w2_gate.dll",
+        "-",
+        "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [
+        "denied before executable load: reparse ancestor"
+      ],
+      "passed": true
+    },
+    {
+      "label": "case-hardlink",
+      "argv": [
+        "C:\\Users\\a\\VoidS7-G4W2-final\\probe.exe",
+        "hardlink",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\hardlink\\void_w2_gate.dll",
+        "-",
+        "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [
+        "denied before executable load: hardlinked image"
+      ],
+      "passed": true
+    },
+    {
+      "label": "case-forward",
+      "argv": [
+        "C:\\Users\\a\\VoidS7-G4W2-final\\probe.exe",
+        "forward",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\forwarder\\void_w2_gate.dll",
+        "-",
+        "18c7676a6a7c338b126e9147a06fae89c05a1dad213098a877479339f0c309b2"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [
+        "denied before executable load: forwarded export"
+      ],
+      "passed": true
+    },
+    {
+      "label": "case-late",
+      "argv": [
+        "C:\\Users\\a\\VoidS7-G4W2-final\\probe.exe",
+        "late",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\approved\\void_w2_gate.dll",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\collision\\void_w2_gate.dll",
+        "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [
+        "initial namespace observation clear",
+        "denied before executable load: loaded basename"
+      ],
+      "passed": true
+    },
+    {
+      "label": "case-thread",
+      "argv": [
+        "C:\\Users\\a\\VoidS7-G4W2-final\\probe.exe",
+        "thread",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\approved\\void_w2_gate.dll",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\override\\redirect.manifest",
+        "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [
+        "active redirect=1",
+        "denied before executable load: active manifest redirect"
+      ],
+      "passed": true
+    },
+    {
+      "label": "case-embedded",
+      "argv": [
+        "C:\\Users\\a\\VoidS7-G4W2-final\\embedded\\probe-embedded.exe",
+        "embedded",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\approved\\void_w2_gate.dll",
+        "-",
+        "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [
+        "embedded manifest=1",
+        "denied before executable load: active manifest redirect"
+      ],
+      "passed": true
+    },
+    {
+      "label": "case-external",
+      "argv": [
+        "C:\\Users\\a\\VoidS7-G4W2-final\\external\\probe-external.exe",
+        "external",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\approved\\void_w2_gate.dll",
+        "-",
+        "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [
+        "embedded manifest=0",
+        "denied before executable load: active manifest redirect"
+      ],
+      "passed": true
+    },
+    {
+      "label": "case-acl",
+      "argv": [
+        "C:\\Users\\a\\VoidS7-G4W2-final\\probe.exe",
+        "acl",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\acl\\void_w2_gate.dll",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\acl",
+        "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33"
+      ],
+      "exit": 1,
+      "expected_exit": 0,
+      "expected_output": [
+        "read=1 write=0 delete=0 change-DACL=0 add-file=0"
+      ],
+      "passed": false
+    },
+    {
+      "label": "case-swap-open",
+      "argv": [
+        "C:\\Users\\a\\VoidS7-G4W2-final\\probe.exe",
+        "unguarded-substitute",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\swap-open\\void_w2_gate.dll",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\swap-open\\replacement.dll",
+        "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33"
+      ],
+      "exit": 121,
+      "expected_exit": 121,
+      "expected_output": [
+        "approved no-entry image replaced"
+      ],
+      "passed": true
+    },
+    {
+      "label": "case-calibrate122",
+      "argv": [
+        "C:\\Users\\a\\VoidS7-G4W2-final\\probe.exe",
+        "unguarded-substitute",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\calibrate122\\void_w2_gate.dll",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\calibrate122\\replacement.dll",
+        "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33"
+      ],
+      "exit": 122,
+      "expected_exit": 122,
+      "expected_output": [
+        "approved no-entry image replaced"
+      ],
+      "passed": true
+    },
+    {
+      "label": "case-swap-guarded",
+      "argv": [
+        "C:\\Users\\a\\VoidS7-G4W2-final\\probe.exe",
+        "guarded-substitute",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\swap-guarded\\void_w2_gate.dll",
+        "C:\\Users\\a\\VoidS7-G4W2-final\\swap-guarded\\replacement.dll",
+        "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "expected_output": [
+        "denied before executable load: image digest"
+      ],
+      "passed": true
+    }
+  ],
+  "artifacts": {
+    "probe.exe": "dfb439cbd27d185315d02b4e12481a6851a03d272b0910d687e4786b74d9070d",
+    "redirect.manifest": "49caef4ad13493702cda8da006e0787c0a2089553d5119fbfedb522d1c7109bc",
+    "acl/void_w2_gate.dll": "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33",
+    "approved/void_w2_gate.dll": "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33",
+    "calibrate122/void_w2_gate.dll": "d3b56fd114946e6e421d2b8778a02c4623413cf146c1c4680aa9422cf41bb2d3",
+    "collision/void_w2_gate.dll": "7f81cf565422f6ec915592c83c692441922357e6e80e467ed223329aa2b22ce5",
+    "embedded/probe-embedded.exe": "7492062fc62f1530898fa57e330fef2a77b32c9e70a740d6ac0022d1e10f7587",
+    "embedded/void_w2_gate.dll": "d3b56fd114946e6e421d2b8778a02c4623413cf146c1c4680aa9422cf41bb2d3",
+    "external/probe-external.exe": "736539f014bd6d34a950ee5587f799a67b5b9c560b2d18394c437b5f84e7f5b0",
+    "external/probe-external.exe.manifest": "49caef4ad13493702cda8da006e0787c0a2089553d5119fbfedb522d1c7109bc",
+    "external/void_w2_gate.dll": "d3b56fd114946e6e421d2b8778a02c4623413cf146c1c4680aa9422cf41bb2d3",
+    "forwarder/void_w2_gate.dll": "18c7676a6a7c338b126e9147a06fae89c05a1dad213098a877479339f0c309b2",
+    "hardlink/second.dll": "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33",
+    "hardlink/void_w2_gate.dll": "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33",
+    "override/redirect.manifest": "49caef4ad13493702cda8da006e0787c0a2089553d5119fbfedb522d1c7109bc",
+    "override/void_w2_gate.dll": "d3b56fd114946e6e421d2b8778a02c4623413cf146c1c4680aa9422cf41bb2d3",
+    "pin/void_w2_gate.dll": "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33",
+    "pin-replacement/void_w2_gate.dll": "f2ed0b3705b6b76eee27171a96738d7fe93396819be5b57f36307cd9cb811913",
+    "sentinel121/void_w2_gate.dll": "f2ed0b3705b6b76eee27171a96738d7fe93396819be5b57f36307cd9cb811913",
+    "sentinel122/void_w2_gate.dll": "d3b56fd114946e6e421d2b8778a02c4623413cf146c1c4680aa9422cf41bb2d3",
+    "separate/probe.exe": "dfb439cbd27d185315d02b4e12481a6851a03d272b0910d687e4786b74d9070d",
+    "separate/void_w2_gate.dll": "d3b56fd114946e6e421d2b8778a02c4623413cf146c1c4680aa9422cf41bb2d3",
+    "swap-guarded/void_w2_gate.dll": "d3b56fd114946e6e421d2b8778a02c4623413cf146c1c4680aa9422cf41bb2d3",
+    "swap-open/void_w2_gate.dll": "f2ed0b3705b6b76eee27171a96738d7fe93396819be5b57f36307cd9cb811913"
+  },
+  "inputs": {
+    "workspace": "VoidS7-G4W2-final",
+    "sources": {
+      "build.cmd": "e9bf2ba4105f136f676563371b82e973830f4c7eb26eceebfa235a0433ff43e8",
+      "native-run.py": "3041329ddb51050218e80d295ed5d6b4c436ac05c3d604e098b1e15b9ffacc78",
+      "image_probe.cpp": "22d233d555dd3ca2f025a8b56ba74e9a5de1e89fa2b4433f769f20233cb3fdc4",
+      "redirect.manifest": "49caef4ad13493702cda8da006e0787c0a2089553d5119fbfedb522d1c7109bc",
+      "sentinel.c": "d96c5a42865e157eb9ee4d96ffe277ef777a8fc8967c1a5accb80c72fd55b592",
+      "dependency.c": "86e2dd69bd2394c4ccc11cb5fc709099a78482542bd9d9d21530434e9b084773"
+    },
+    "forwarder_sha256": "18c7676a6a7c338b126e9147a06fae89c05a1dad213098a877479339f0c309b2"
+  },
+  "status": "failed controls",
+  "prebuild_free_bytes": 24750739456,
+  "leaf_symlink": "[WinError 1314] A required privilege is not held by the client: 'C:\\\\Users\\\\a\\\\VoidS7-G4W2-final\\\\approved\\\\void_w2_gate.dll' -> 'C:\\\\Users\\\\a\\\\VoidS7-G4W2-final\\\\symlink\\\\void_w2_gate.dll'"
+}

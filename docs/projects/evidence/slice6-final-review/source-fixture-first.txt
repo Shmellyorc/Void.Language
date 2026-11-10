@@ -1,0 +1,30 @@
++ /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc check /home/shmellyorc/Documents/Void.Language/build/slice6-final-review/storage.void
+/home/shmellyorc/Documents/Void.Language/build/slice6-final-review/storage.void:21:10: error: Expected an expression, found ':'.
+    code: VOID1101
+
+ 21 |     defer:
+    |          ^
+    Module: /storage.void
+
+/home/shmellyorc/Documents/Void.Language/build/slice6-final-review/storage.void:22:9: error: Expected an expression, found '<indent>'.
+    code: VOID1101
+
+ 22 |         cleanups += 1
+    |         ^
+    Module: /storage.void
+
++ /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc run --no-opt --no-cache /home/shmellyorc/Documents/Void.Language/build/slice6-final-review/storage.void
+/home/shmellyorc/Documents/Void.Language/build/slice6-final-review/storage.void:21:10: error: Expected an expression, found ':'.
+    code: VOID1101
+
+ 21 |     defer:
+    |          ^
+    Module: /storage.void
+
+/home/shmellyorc/Documents/Void.Language/build/slice6-final-review/storage.void:22:9: error: Expected an expression, found '<indent>'.
+    code: VOID1101
+
+ 22 |         cleanups += 1
+    |         ^
+    Module: /storage.void
+

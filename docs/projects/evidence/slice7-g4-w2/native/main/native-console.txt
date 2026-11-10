@@ -1,0 +1,38 @@
+toolchain-clang C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\clang-cl.exe --version
+toolchain-lld C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\lld-link.exe --version
+toolchain-readobj C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\llvm-readobj.exe --version
+compile-approved C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\clang-cl.exe /nologo /TC /c /GS- /Zl /DFIXTURE_VALUE=7 dependency.c /Foapproved.obj
+link-approved C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\lld-link.exe /dll /nodefaultlib /out:approved/void_w2_gate.dll approved.obj /noentry
+compile-collision C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\clang-cl.exe /nologo /TC /c /GS- /Zl /DFIXTURE_VALUE=99 dependency.c /Focollision.obj
+link-collision C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\lld-link.exe /dll /nodefaultlib /out:collision/void_w2_gate.dll collision.obj /noentry
+compile-sentinel121 C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\clang-cl.exe /nologo /TC /c /GS- /Zl /DW2_SENTINEL=121 sentinel.c /Fosentinel121.obj
+link-sentinel121 C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\lld-link.exe /dll /nodefaultlib /out:sentinel121/void_w2_gate.dll sentinel121.obj /entry:sentinel_entry kernel32.lib
+compile-sentinel122 C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\clang-cl.exe /nologo /TC /c /GS- /Zl /DW2_SENTINEL=122 sentinel.c /Fosentinel122.obj
+link-sentinel122 C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\lld-link.exe /dll /nodefaultlib /out:sentinel122/void_w2_gate.dll sentinel122.obj /entry:sentinel_entry kernel32.lib
+build-probe C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\clang-cl.exe /nologo /std:c++20 /EHsc /MT -fuse-ld=lld image_probe.cpp /Foprobe.obj /FeC:\Users\a\VoidS7-G4W2-final\probe.exe /link bcrypt.lib advapi32.lib /manifest:embed
+build-embedded C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\clang-cl.exe /nologo /std:c++20 /EHsc /MT -fuse-ld=lld image_probe.cpp /Foembedded.obj /FeC:\Users\a\VoidS7-G4W2-final\embedded\probe-embedded.exe /link bcrypt.lib advapi32.lib /manifest:embed /manifestinput:redirect.manifest
+build-external C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\clang-cl.exe /nologo /std:c++20 /EHsc /MT -fuse-ld=lld image_probe.cpp /Foexternal.obj /FeC:\Users\a\VoidS7-G4W2-final\external\probe-external.exe /link bcrypt.lib advapi32.lib /manifest:no
+pe-approved C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\llvm-readobj.exe --file-headers --coff-imports --coff-exports --coff-resources C:\Users\a\VoidS7-G4W2-final\approved\void_w2_gate.dll
+pe-collision C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\llvm-readobj.exe --file-headers --coff-imports --coff-exports --coff-resources C:\Users\a\VoidS7-G4W2-final\collision\void_w2_gate.dll
+pe-sentinel121 C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\llvm-readobj.exe --file-headers --coff-imports --coff-exports --coff-resources C:\Users\a\VoidS7-G4W2-final\sentinel121\void_w2_gate.dll
+pe-sentinel122 C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\llvm-readobj.exe --file-headers --coff-imports --coff-exports --coff-resources C:\Users\a\VoidS7-G4W2-final\sentinel122\void_w2_gate.dll
+pe-forwarder C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\llvm-readobj.exe --file-headers --coff-imports --coff-exports --coff-resources C:\Users\a\VoidS7-G4W2-final\forwarder\void_w2_gate.dll
+pe-embedded C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\llvm-readobj.exe --file-headers --coff-imports --coff-exports --coff-resources C:\Users\a\VoidS7-G4W2-final\embedded\probe-embedded.exe
+pe-external C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\llvm-readobj.exe --file-headers --coff-imports --coff-exports --coff-resources C:\Users\a\VoidS7-G4W2-final\external\probe-external.exe
+pe-probe C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\llvm-readobj.exe --file-headers --coff-imports --coff-exports --coff-resources C:\Users\a\VoidS7-G4W2-final\probe.exe
+make-junction C:\Windows\System32\cmd.exe /d /c mklink /J C:\Users\a\VoidS7-G4W2-final\junction C:\Users\a\VoidS7-G4W2-final\approved
+case-clean C:\Users\a\VoidS7-G4W2-final\probe.exe clean C:\Users\a\VoidS7-G4W2-final\approved\void_w2_gate.dll - 845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33
+case-separate C:\Users\a\VoidS7-G4W2-final\separate\probe.exe clean C:\Users\a\VoidS7-G4W2-final\approved\void_w2_gate.dll - 845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33
+case-pin C:\Users\a\VoidS7-G4W2-final\probe.exe pin C:\Users\a\VoidS7-G4W2-final\pin\void_w2_gate.dll C:\Users\a\VoidS7-G4W2-final\pin-replacement\void_w2_gate.dll 845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33
+case-alias C:\Users\a\VoidS7-G4W2-final\probe.exe alias C:\Users\a\VoidS7-G4W2-final\pin\..\pin\void_w2_gate.dll - 845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33
+case-junction C:\Users\a\VoidS7-G4W2-final\probe.exe junction C:\Users\a\VoidS7-G4W2-final\junction\void_w2_gate.dll - 845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33
+case-hardlink C:\Users\a\VoidS7-G4W2-final\probe.exe hardlink C:\Users\a\VoidS7-G4W2-final\hardlink\void_w2_gate.dll - 845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33
+case-forward C:\Users\a\VoidS7-G4W2-final\probe.exe forward C:\Users\a\VoidS7-G4W2-final\forwarder\void_w2_gate.dll - 18c7676a6a7c338b126e9147a06fae89c05a1dad213098a877479339f0c309b2
+case-late C:\Users\a\VoidS7-G4W2-final\probe.exe late C:\Users\a\VoidS7-G4W2-final\approved\void_w2_gate.dll C:\Users\a\VoidS7-G4W2-final\collision\void_w2_gate.dll 845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33
+case-thread C:\Users\a\VoidS7-G4W2-final\probe.exe thread C:\Users\a\VoidS7-G4W2-final\approved\void_w2_gate.dll C:\Users\a\VoidS7-G4W2-final\override\redirect.manifest 845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33
+case-embedded C:\Users\a\VoidS7-G4W2-final\embedded\probe-embedded.exe embedded C:\Users\a\VoidS7-G4W2-final\approved\void_w2_gate.dll - 845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33
+case-external C:\Users\a\VoidS7-G4W2-final\external\probe-external.exe external C:\Users\a\VoidS7-G4W2-final\approved\void_w2_gate.dll - 845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33
+case-acl C:\Users\a\VoidS7-G4W2-final\probe.exe acl C:\Users\a\VoidS7-G4W2-final\acl\void_w2_gate.dll C:\Users\a\VoidS7-G4W2-final\acl 845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33
+case-swap-open C:\Users\a\VoidS7-G4W2-final\probe.exe unguarded-substitute C:\Users\a\VoidS7-G4W2-final\swap-open\void_w2_gate.dll C:\Users\a\VoidS7-G4W2-final\swap-open\replacement.dll 845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33
+case-calibrate122 C:\Users\a\VoidS7-G4W2-final\probe.exe unguarded-substitute C:\Users\a\VoidS7-G4W2-final\calibrate122\void_w2_gate.dll C:\Users\a\VoidS7-G4W2-final\calibrate122\replacement.dll 845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33
+case-swap-guarded C:\Users\a\VoidS7-G4W2-final\probe.exe guarded-substitute C:\Users\a\VoidS7-G4W2-final\swap-guarded\void_w2_gate.dll C:\Users\a\VoidS7-G4W2-final\swap-guarded\replacement.dll 845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33

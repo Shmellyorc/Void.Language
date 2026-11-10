@@ -1,0 +1,87 @@
+HEAD 2f667ea338127b8f91c3136804377ef3fa5218d6
+Index empty; no staged paths. All rows are working-tree status against HEAD.
+{"modified": 23, "total": 83, "untracked": 60}
+
+ M CMakeLists.txt
+ M cmake/InstallLicenses.cmake
+ M docs/CLI.md
+ M docs/DECISIONS.md
+ M docs/DIAGNOSTICS.md
+ M docs/EDITOR_INTEGRATION.md
+ M docs/LANGUAGE_BIBLE.md
+ M docs/LANGUAGE_SERVER.md
+ M docs/LOCAL_LIBRARIES.md
+ M docs/MODULE_SYSTEM.md
+ M docs/NATIVE_LIBRARIES.md
+ M docs/PROJECT_ARCHITECTURE_ROADMAP.md
+ M docs/README.md
+ M docs/RUNTIME_GLOBALS.md
+ M docs/SOURCE_COMPILER.md
+ M docs/STAGE8_DISCOVERY.md
+ M docs/STAGE9_APPLICATION_WORKFLOW.md
+ M docs/os/API.md
+ M docs/release/NOTICE_INVENTORY.json
+ M docs/release/REDISTRIBUTION_NOTICES.md
+ M include/void/diagnostic.hpp
+ M include/void/path.hpp
+ M src/frontend/compiler.cpp
+?? docs/projects/SLICE1.md
+?? docs/projects/SLICE1_CLOSEOUT.md
+?? docs/projects/evidence/closeout/header-target-first-build.log.txt
+?? docs/projects/evidence/closeout/linux-debug.xml
+?? docs/projects/evidence/closeout/linux-install.xml
+?? docs/projects/evidence/closeout/linux-release.xml
+?? docs/projects/evidence/closeout/linux-strict.xml
+?? docs/projects/evidence/closeout/notice-corrected.json
+?? docs/projects/evidence/closeout/notice-failure.json
+?? docs/projects/evidence/closeout/original-debug-failure.log.txt
+?? docs/projects/evidence/closeout/original-debug-failure.xml
+?? docs/projects/evidence/closeout/original-strict-failure.log.txt
+?? docs/projects/evidence/closeout/original-strict-failure.xml
+?? docs/projects/evidence/closeout/upstream-verification.json
+?? docs/projects/evidence/closeout/windows-debug-header-build.log.txt
+?? docs/projects/evidence/closeout/windows-debug-header.log.txt
+?? docs/projects/evidence/closeout/windows-debug-host-verified.log.txt
+?? docs/projects/evidence/closeout/windows-debug-http-verified.log.txt
+?? docs/projects/evidence/closeout/windows-debug-manifest-compile.log.txt
+?? docs/projects/evidence/closeout/windows-debug-manifest-link.log.txt
+?? docs/projects/evidence/closeout/windows-debug-manifest.log.txt
+?? docs/projects/evidence/closeout/windows-debug-project-compile.log.txt
+?? docs/projects/evidence/closeout/windows-first-transfer-failure.json
+?? docs/projects/evidence/closeout/windows-focused.cmd
+?? docs/projects/evidence/closeout/windows-focused.json
+?? docs/projects/evidence/closeout/windows-focused.py
+?? docs/projects/evidence/closeout/windows-missing-host-archives-Release-configure.log.txt
+?? docs/projects/evidence/closeout/windows-missing-host-archives-native-results.json
+?? docs/projects/evidence/closeout/windows-missing-http-archives-Release-configure.log.txt
+?? docs/projects/evidence/closeout/windows-missing-http-archives-native-results.json
+?? docs/projects/evidence/closeout/windows-missing-reviewed-patches-Release-configure.log.txt
+?? docs/projects/evidence/closeout/windows-missing-reviewed-patches-native-results.json
+?? docs/projects/evidence/closeout/windows-release-header-build.log.txt
+?? docs/projects/evidence/closeout/windows-release-header.log.txt
+?? docs/projects/evidence/closeout/windows-release-host-verified.log.txt
+?? docs/projects/evidence/closeout/windows-release-http-verified.log.txt
+?? docs/projects/evidence/closeout/windows-release-manifest-compile.log.txt
+?? docs/projects/evidence/closeout/windows-release-manifest-link.log.txt
+?? docs/projects/evidence/closeout/windows-release-manifest.log.txt
+?? docs/projects/evidence/closeout/windows-release-project-compile.log.txt
+?? docs/projects/evidence/closeout/windows-sdk-layout-Release-configure.log.txt
+?? docs/projects/evidence/closeout/windows-sdk-layout-native-results.json
+?? docs/projects/evidence/slice1-baseline-source.patch
+?? docs/projects/evidence/slice1-closeout-inventory.txt
+?? docs/projects/evidence/slice1-closeout-source.patch
+?? docs/projects/evidence/slice1-closeout.json
+?? docs/projects/evidence/slice1-local.json
+?? docs/projects/evidence/slice1-malformed-header.toml
+?? include/void/project.hpp
+?? src/frontend/project.cpp
+?? tests/project/authority.py
+?? tests/project/header.cpp
+?? tests/project/legacy.py
+?? tests/project/manifest.cpp
+?? tests/project/provenance.py
+?? third_party/tomlplusplus/LICENSE
+?? third_party/tomlplusplus/README.md
+?? third_party/tomlplusplus/toml.hpp
+?? third_party/tomlplusplus/upstream.json
+?? third_party/tomlplusplus/void-bounds-and-locations.patch

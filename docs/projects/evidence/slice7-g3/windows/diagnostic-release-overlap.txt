@@ -1,0 +1,142 @@
+Test project C:/Users/a/VoidS7-G3-concurrency
+    Start 1: analysis
+    Start 2: reload
+    Test #2: reload ...........................   Passed    1.56 sec
+    Start 2: reload
+    Test #1: analysis .........................***Failed    2.51 sec
+analysis control optimize=0 calls=0 wrong=0 old_checked=0 old_value=0
+FAILED: concurrent call/lease failure
+
+    Start 3: numeric
+    Test #2: reload ...........................   Passed    1.86 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    1.43 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    1.52 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    1.32 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    1.15 sec
+    Start 2: reload
+    Test #3: numeric ..........................   Passed    7.73 sec
+    Start 3: numeric
+    Test #2: reload ...........................   Passed    1.18 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    1.12 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    1.47 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    1.56 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    1.26 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    1.81 sec
+    Start 2: reload
+    Test #3: numeric ..........................   Passed    7.83 sec
+    Start 3: numeric
+    Test #2: reload ...........................   Passed    2.01 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    2.01 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    1.96 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    1.74 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    1.73 sec
+    Start 2: reload
+    Test #3: numeric ..........................   Passed    9.94 sec
+    Start 3: numeric
+    Test #2: reload ...........................   Passed    1.92 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    2.21 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    2.21 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    1.72 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    1.97 sec
+    Start 2: reload
+    Test #3: numeric ..........................   Passed    9.98 sec
+    Start 3: numeric
+    Test #2: reload ...........................   Passed    1.82 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    1.96 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    2.05 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    2.23 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    2.38 sec
+    Start 2: reload
+    Test #3: numeric ..........................   Passed   10.90 sec
+    Start 3: numeric
+    Test #2: reload ...........................   Passed    2.02 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    1.97 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    1.58 sec
+    Start 2: reload
+    Test #2: reload ...........................   Passed    1.62 sec
+    Start 2: reload
+2/3 Test #2: reload ...........................   Passed    1.98 sec
+    Test #3: numeric ..........................   Passed    9.73 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    7.73 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    6.37 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    5.68 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    2.87 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    2.95 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    2.88 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    2.95 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    2.88 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    3.01 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    2.87 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    3.20 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    2.90 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    2.74 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    2.72 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    2.72 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    2.72 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    2.68 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    2.83 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    2.91 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    2.84 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    2.85 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    3.02 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    2.78 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    2.96 sec
+    Start 3: numeric
+    Test #3: numeric ..........................   Passed    3.02 sec
+    Start 3: numeric
+3/3 Test #3: numeric ..........................   Passed    2.89 sec
+
+67% tests passed, 1 tests failed out of 3
+
+Total Test time (real) = 144.65 sec
+
+The following tests FAILED:
+	  1 - analysis (Failed)
+Errors while running CTest

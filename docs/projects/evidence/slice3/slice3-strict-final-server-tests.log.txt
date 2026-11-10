@@ -1,0 +1,65 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-strict
+      Start  12: project_protocol
+ 1/30 Test  #12: project_protocol .................   Passed    1.79 sec
+      Start  99: generics_hint_lsp
+ 2/30 Test  #99: generics_hint_lsp ................   Passed    0.11 sec
+      Start 150: lsp_positions
+ 3/30 Test #150: lsp_positions ....................   Passed    0.02 sec
+      Start 151: lsp_protocol
+ 4/30 Test #151: lsp_protocol .....................   Passed    1.33 sec
+      Start 152: lsp_stage11_globals
+ 5/30 Test #152: lsp_stage11_globals ..............   Passed    0.18 sec
+      Start 153: lsp_stage8
+ 6/30 Test #153: lsp_stage8 .......................   Passed    2.07 sec
+      Start 155: lsp_documentation
+ 7/30 Test #155: lsp_documentation ................   Passed    0.39 sec
+      Start 162: lsp_math
+ 8/30 Test #162: lsp_math .........................   Passed    1.20 sec
+      Start 183: lsp_os
+ 9/30 Test #183: lsp_os ...........................   Passed    6.92 sec
+      Start 193: lsp_random
+10/30 Test #193: lsp_random .......................   Passed    3.03 sec
+      Start 202: lsp_binary
+11/30 Test #202: lsp_binary .......................   Passed    0.29 sec
+      Start 204: lsp_const_recovery
+12/30 Test #204: lsp_const_recovery ...............   Passed    3.70 sec
+      Start 209: lsp_combined
+13/30 Test #209: lsp_combined .....................   Passed    5.38 sec
+      Start 211: lsp_memory
+14/30 Test #211: lsp_memory .......................   Passed    1.70 sec
+      Start 221: lsp_text_encoding
+15/30 Test #221: lsp_text_encoding ................   Passed    3.17 sec
+      Start 229: lsp_stage7
+16/30 Test #229: lsp_stage7 .......................   Passed    0.47 sec
+      Start 230: lsp_demo
+17/30 Test #230: lsp_demo .........................   Passed    0.11 sec
+      Start 241: lsp_log
+18/30 Test #241: lsp_log ..........................   Passed   13.27 sec
+      Start 248: lsp_collections_stdlib
+19/30 Test #248: lsp_collections_stdlib ...........   Passed    0.81 sec
+      Start 257: lsp_channel
+20/30 Test #257: lsp_channel ......................   Passed    0.51 sec
+      Start 286: lsp_io
+21/30 Test #286: lsp_io ...........................   Passed    5.15 sec
+      Start 360: lsp_async_syntax
+22/30 Test #360: lsp_async_syntax .................   Passed    0.19 sec
+      Start 390: lsp_sprint6
+23/30 Test #390: lsp_sprint6 ......................   Passed    0.87 sec
+      Start 391: lsp_stage10_fields
+24/30 Test #391: lsp_stage10_fields ...............   Passed    0.12 sec
+      Start 392: lsp_stage10_display
+25/30 Test #392: lsp_stage10_display ..............   Passed   12.49 sec
+      Start 393: lsp_stage10_intelligence
+26/30 Test #393: lsp_stage10_intelligence .........   Passed    0.66 sec
+      Start 394: lsp_stage10_source_formatting
+27/30 Test #394: lsp_stage10_source_formatting ....   Passed    1.14 sec
+      Start 396: lsp_sprint4
+28/30 Test #396: lsp_sprint4 ......................   Passed    0.10 sec
+      Start 400: lsp_sprint3
+29/30 Test #400: lsp_sprint3 ......................   Passed    0.16 sec
+      Start 401: lsp_sprint2
+30/30 Test #401: lsp_sprint2 ......................   Passed    0.12 sec
+
+100% tests passed, 0 tests failed out of 30
+
+Total Test time (real) =  67.45 sec

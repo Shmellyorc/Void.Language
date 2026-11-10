@@ -1,0 +1,20 @@
+{
+  "checks": 6,
+  "processes": [
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS4-Final-Debug\\voidc.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidS4-tmp-Debug\\VOID S4 metadata \u96ea f9a8mguy\\checkout",
+        "--profile",
+        "debug",
+        "--no-cache"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS4-tmp-Debug\\VOID S4 metadata \u96ea f9a8mguy\\unrelated",
+      "status": 0,
+      "stdout": "eager-data|C:/Users/a/AppData/Local/org.test.context-game\neager-config|C:/Users/a/AppData/Roaming/org.test.context-game\neager-cache|C:/Users/a/AppData/Local/org.test.context-game/cache\neager-state|C:/Users/a/AppData/Local/org.test.context-game/state\nbody-data|C:/Users/a/AppData/Local/org.test.context-game\nbody-config|C:/Users/a/AppData/Roaming/org.test.context-game\nbody-cache|C:/Users/a/AppData/Local/org.test.context-game/cache\nbody-state|C:/Users/a/AppData/Local/org.test.context-game/state\nfunction-value|C:/Users/a/AppData/Local/org.test.context-game\nnamed-explicit|C:/Users/a/AppData/Roaming/org.test.context-game\ninvalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false\n",
+      "stderr": "C:/Users/a/VoidS4-tmp-Debug/VOID S4 metadata \u96ea f9a8mguy/checkout/launcher.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /launcher.void\n\n"
+    }
+  ]
+}

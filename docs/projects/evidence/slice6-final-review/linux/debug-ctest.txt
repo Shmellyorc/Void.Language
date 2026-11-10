@@ -1,0 +1,45 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+      Start 399: numeric_enum_ir
+      Start 400: numeric_enum_process
+ 1/20 Test #399: numeric_enum_ir ..................   Passed    0.75 sec
+      Start  14: project_discovery_cli
+ 2/20 Test  #14: project_discovery_cli ............   Passed   10.24 sec
+      Start 439: numeric_cli
+ 3/20 Test #400: numeric_enum_process .............   Passed   18.53 sec
+      Start 125: fixed_arrays_cli
+ 4/20 Test #125: fixed_arrays_cli .................   Passed    4.76 sec
+      Start 111: fixed_arrays_source
+ 5/20 Test #111: fixed_arrays_source ..............   Passed    3.35 sec
+      Start 404: numeric_sprint2
+ 6/20 Test #404: numeric_sprint2 ..................   Passed    2.91 sec
+      Start 402: frontend
+ 7/20 Test #439: numeric_cli ......................   Passed   20.33 sec
+      Start 398: numeric
+ 8/20 Test #398: numeric ..........................   Passed    5.88 sec
+      Start  56: stage10_fields
+ 9/20 Test  #56: stage10_fields ...................   Passed    0.37 sec
+      Start  17: project_nested_cli
+10/20 Test  #17: project_nested_cli ...............   Passed    0.65 sec
+      Start 412: stage10_fields_aot
+11/20 Test #412: stage10_fields_aot ...............   Passed    0.60 sec
+      Start 390: reload
+12/20 Test #390: reload ...........................   Passed    0.37 sec
+      Start 403: modules
+13/20 Test #403: modules ..........................   Passed    1.04 sec
+      Start 397: analysis
+14/20 Test #402: frontend .........................   Passed   10.90 sec
+      Start 401: numeric_enum_lsp
+15/20 Test #401: numeric_enum_lsp .................   Passed    0.49 sec
+      Start 395: sessions
+16/20 Test #395: sessions .........................   Passed    0.22 sec
+      Start 391: gc
+17/20 Test #391: gc ...............................   Passed    0.22 sec
+      Start 340: async_ir
+18/20 Test #340: async_ir .........................   Passed    0.05 sec
+      Start 392: native
+19/20 Test #392: native ...........................   Passed    0.09 sec
+20/20 Test #397: analysis .........................   Passed    3.09 sec
+
+100% tests passed, 0 tests failed out of 20
+
+Total Test time (real) =  43.33 sec

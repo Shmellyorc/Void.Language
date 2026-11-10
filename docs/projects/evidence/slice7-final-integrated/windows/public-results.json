@@ -1,0 +1,16 @@
+{
+  "Release": {
+    "scratch": "C:\\Users\\a\\VS7I2\\public-h40ru8ir",
+    "acl": "C:\\Users\\a\\VS7I2\\public-h40ru8ir DESKTOP-N4VH0F7\\a:(OI)(CI)(F)\n                                 NT AUTHORITY\\SYSTEM:(OI)(CI)(F)\n                                 BUILTIN\\Administrators:(OI)(CI)(F)\n\nSuccessfully processed 1 files; Failed processing 0 files\n",
+    "exit": 0,
+    "leftovers": [],
+    "removed": true
+  },
+  "Debug": {
+    "scratch": "C:\\Users\\a\\VS7I2\\public-qrpt_r2x",
+    "acl": "C:\\Users\\a\\VS7I2\\public-qrpt_r2x DESKTOP-N4VH0F7\\a:(OI)(CI)(F)\n                                 NT AUTHORITY\\SYSTEM:(OI)(CI)(F)\n                                 BUILTIN\\Administrators:(OI)(CI)(F)\n\nSuccessfully processed 1 files; Failed processing 0 files\n",
+    "exit": 0,
+    "leftovers": [],
+    "removed": true
+  }
+}

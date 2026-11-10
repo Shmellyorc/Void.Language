@@ -1,0 +1,276 @@
+[0/2] Re-checking globbed directories...
+[1/329] Building C object CMakeFiles\void_native_fixture.dir\src\native\fixture.c.obj
+[2/329] Building C object CMakeFiles\void_native_fixture.dir\src\native\sink.c.obj
+[3/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\altsvc.c.obj
+[4/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\amigaos.c.obj
+[5/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\api.c.obj
+[6/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\bufq.c.obj
+[7/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\bufref.c.obj
+[8/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cf-h1-proxy.c.obj
+[9/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cf-haproxy.c.obj
+[10/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cf-h2-proxy.c.obj
+[11/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cf-https-connect.c.obj
+[12/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cf-ip-happy.c.obj
+[13/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cf-recvbuf.c.obj
+[14/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cf-setup.c.obj
+[15/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cf-socket.c.obj
+[16/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cfilters.c.obj
+[17/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\conncache.c.obj
+[18/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\connect.c.obj
+[19/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\content_encoding.c.obj
+[20/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cookie.c.obj
+[21/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\creds.c.obj
+[22/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cshutdn.c.obj
+[23/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_addrinfo.c.obj
+[24/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_endian.c.obj
+[25/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_fnmatch.c.obj
+[26/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_fopen.c.obj
+[27/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_get_line.c.obj
+[28/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_gethostname.c.obj
+[29/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_gssapi.c.obj
+[30/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_memrchr.c.obj
+[31/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_ntlm_core.c.obj
+[32/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_range.c.obj
+[33/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_sasl.c.obj
+[34/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_sha512_256.c.obj
+[35/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_share.c.obj
+[36/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_sspi.c.obj
+[37/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_threads.c.obj
+[38/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_trc.c.obj
+[39/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cw-out.c.obj
+[40/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cw-pause.c.obj
+[41/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\dict.c.obj
+[42/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\dynhds.c.obj
+[43/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\easy.c.obj
+[44/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\easygetopt.c.obj
+[45/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\easyoptions.c.obj
+[46/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\escape.c.obj
+[47/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\fake_addrinfo.c.obj
+[48/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\file.c.obj
+[49/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\fileinfo.c.obj
+[50/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\ftp.c.obj
+[51/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\formdata.c.obj
+[52/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\ftplistparser.c.obj
+[53/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\getenv.c.obj
+[54/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\gopher.c.obj
+[55/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\getinfo.c.obj
+[56/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\hash.c.obj
+[57/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\headers.c.obj
+[58/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\hsts.c.obj
+[59/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\hmac.c.obj
+[60/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\http1.c.obj
+[61/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\http.c.obj
+[62/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\http2.c.obj
+[63/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\http_aws_sigv4.c.obj
+[64/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\http_httpsig.c.obj
+[65/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_ed25519.c.obj
+[66/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\http_chunks.c.obj
+[67/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\http_digest.c.obj
+[68/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\http_negotiate.c.obj
+[69/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\http_ntlm.c.obj
+[70/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\idn.c.obj
+[71/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\http_proxy.c.obj
+[72/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\if2ip.c.obj
+[73/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\imap.c.obj
+[74/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\ldap.c.obj
+[75/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\llist.c.obj
+[76/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\macos.c.obj
+[77/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\md4.c.obj
+[78/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\md5.c.obj
+[79/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\memdebug.c.obj
+[80/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\mprintf.c.obj
+[81/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\mime.c.obj
+[82/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\mqtt.c.obj
+[83/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\multi_ev.c.obj
+[84/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\multi.c.obj
+[85/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\netrc.c.obj
+[86/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\multi_ntfy.c.obj
+[87/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\openldap.c.obj
+[88/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\parsedate.c.obj
+[89/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\pingpong.c.obj
+[90/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\peer.c.obj
+[91/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\pop3.c.obj
+[92/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\progress.c.obj
+[93/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\protocol.c.obj
+[94/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\proxy.c.obj
+[95/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\psl.c.obj
+[96/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\ptrarray.c.obj
+[97/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\rand.c.obj
+[98/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\ratelimit.c.obj
+[99/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\rtsp.c.obj
+[100/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\request.c.obj
+[101/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\select.c.obj
+[102/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\sendf.c.obj
+[103/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\sha256.c.obj
+[104/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\setopt.c.obj
+[105/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\slist.c.obj
+[106/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\smtp.c.obj
+[107/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\socketpair.c.obj
+[108/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\socks.c.obj
+[109/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\socks_gssapi.c.obj
+[110/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\splay.c.obj
+[111/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\socks_sspi.c.obj
+[112/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\strcase.c.obj
+[113/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\strequal.c.obj
+[114/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\strerror.c.obj
+[115/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\telnet.c.obj
+[116/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\tftp.c.obj
+[117/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\thrdpool.c.obj
+[118/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\thrdqueue.c.obj
+[119/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\transfer.c.obj
+[120/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\u8_strset.c.obj
+[121/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\u32_ptrset.c.obj
+[122/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\uint-bset.c.obj
+[123/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\uint-spbset.c.obj
+[124/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\uint-table.c.obj
+[125/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\url.c.obj
+[126/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\urlapi.c.obj
+[127/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\version.c.obj
+[128/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\ws.c.obj
+[129/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\cleartext.c.obj
+[130/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\cram.c.obj
+[131/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\digest.c.obj
+[132/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\digest_sspi.c.obj
+[133/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\gsasl.c.obj
+[134/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\krb5_gssapi.c.obj
+[135/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\krb5_sspi.c.obj
+[136/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\ntlm.c.obj
+[137/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\ntlm_sspi.c.obj
+[138/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\oauth2.c.obj
+[139/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\spnego_gssapi.c.obj
+[140/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\spnego_sspi.c.obj
+[141/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\vauth.c.obj
+[142/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vdns\asyn-ares.c.obj
+[143/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vdns\asyn-base.c.obj
+[144/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vdns\asyn-thrdd.c.obj
+[145/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vdns\cf-dns.c.obj
+[146/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vdns\doh.c.obj
+[147/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vdns\dnscache.c.obj
+[148/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vdns\hostip4.c.obj
+[149/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vdns\hostip.c.obj
+[150/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vdns\hostip6.c.obj
+[151/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vdns\httpsrr.c.obj
+[152/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\apple.c.obj
+[153/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\cipher_suite.c.obj
+[154/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\gtls.c.obj
+[155/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\hostcheck.c.obj
+[156/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\mbedtls.c.obj
+[157/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\openssl.c.obj
+[158/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\rustls.c.obj
+[159/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\schannel_verify.c.obj
+[160/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\schannel.c.obj
+[161/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\vtls_config.c.obj
+[162/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\vtls.c.obj
+[163/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\vtls_scache.c.obj
+[164/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\vtls_spack.c.obj
+[165/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\wolfssl.c.obj
+[166/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\x509asn1.c.obj
+[167/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vquic\capsule.c.obj
+[168/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vquic\cf-capsule.c.obj
+[169/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vquic\cf-ngtcp2.c.obj
+[170/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vquic\cf-ngtcp2-cmn.c.obj
+[171/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vquic\cf-ngtcp2-proxy.c.obj
+[172/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vquic\cf-quiche.c.obj
+[173/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vquic\vquic.c.obj
+[174/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vquic\vquic-tls.c.obj
+[175/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vssh\libssh.c.obj
+[176/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vssh\libssh2.c.obj
+[177/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vssh\vssh.c.obj
+[178/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\base64.c.obj
+[179/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\basename.c.obj
+[180/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\dynbuf.c.obj
+[181/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\win32-fopen.c.obj
+[182/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\inet_ntop.c.obj
+[183/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\inet_pton.c.obj
+[184/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\multibyte.c.obj
+[185/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\nonblock.c.obj
+[186/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\snprintf.c.obj
+[187/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\strcopy.c.obj
+[188/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\strdup.c.obj
+[189/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\strerr.c.obj
+[190/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\strparse.c.obj
+[191/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\timediff.c.obj
+[192/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\timeval.c.obj
+[193/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\version_win32.c.obj
+[194/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\wait.c.obj
+[195/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\warnless.c.obj
+[196/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\winapi.c.obj
+[197/329] Building C object curl\lib\CMakeFiles\libcurl_object.dir\__\__\__\src\runtime\curl_keylog_disabled.c.obj
+[198/329] Building C object CMakeFiles\void_format_objects.dir\third_party\ryu\ryu\d2s.c.obj
+[199/329] Building C object CMakeFiles\void_format_objects.dir\third_party\ryu\ryu\f2s.c.obj
+[200/329] Building CXX object CMakeFiles\void_format_objects.dir\src\format.cpp.obj
+[201/329] Building C object CMakeFiles\void_format_objects.dir\third_party\ryu\ryu\d2fixed.c.obj
+[202/329] Building CXX object CMakeFiles\void_zone_objects.dir\src\temporal.cpp.obj
+In file included from C:\Users\a\VoidCI42377496702-Native\src\temporal.cpp:3:
+In file included from C:\Users\a\VoidCI42377496702-Native\third_party\date\include\date/tz.h:99:
+C:\Users\a\VoidCI42377496702-Native\third_party\date\include\date\date.h(966,34): warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  966 | CONSTCD11 date::day  operator "" _d(unsigned long long d) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_d
+C:\Users\a\VoidCI42377496702-Native\third_party\date\include\date\date.h(967,34): warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  967 | CONSTCD11 date::year operator "" _y(unsigned long long y) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_y
+C:\Users\a\VoidCI42377496702-Native\third_party\date\include\date\date.h(1975,13): warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1975 | operator "" _d(unsigned long long d) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_d
+C:\Users\a\VoidCI42377496702-Native\third_party\date\include\date\date.h(1983,13): warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1983 | operator "" _y(unsigned long long y) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_y
+4 warnings generated.
+[203/329] Building CXX object CMakeFiles\void_application_objects.dir\src\application_metadata.cpp.obj
+[204/329] Building CXX object CMakeFiles\void_application_objects.dir\src\project_identity.cpp.obj
+[205/329] Building CXX object CMakeFiles\void_zone_objects.dir\third_party\date\src\tz.cpp.obj
+In file included from C:\Users\a\VoidCI42377496702-Native\third_party\date\src\tz.cpp:86:
+In file included from C:\Users\a\VoidCI42377496702-Native\third_party\date\include\date/tz_private.h:31:
+In file included from C:\Users\a\VoidCI42377496702-Native\third_party\date\include\date\tz.h:99:
+C:\Users\a\VoidCI42377496702-Native\third_party\date\include\date\date.h(966,34): warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  966 | CONSTCD11 date::day  operator "" _d(unsigned long long d) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_d
+C:\Users\a\VoidCI42377496702-Native\third_party\date\include\date\date.h(967,34): warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  967 | CONSTCD11 date::year operator "" _y(unsigned long long y) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_y
+C:\Users\a\VoidCI42377496702-Native\third_party\date\include\date\date.h(1975,13): warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1975 | operator "" _d(unsigned long long d) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_d
+C:\Users\a\VoidCI42377496702-Native\third_party\date\include\date\date.h(1983,13): warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1983 | operator "" _y(unsigned long long y) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_y
+C:\Users\a\VoidCI42377496702-Native\third_party\date\src\tz.cpp(199,23): warning: unused variable 'folder_delimiter' [-Wunused-const-variable]
+  199 | static CONSTDATA char folder_delimiter = '\\';
+      |                       ^~~~~~~~~~~~~~~~
+C:\Users\a\VoidCI42377496702-Native\third_party\date\src\tz.cpp(458,1): warning: unused function 'get_install' [-Wunused-function]
+  458 | get_install()
+      | ^~~~~~~~~~~
+C:\Users\a\VoidCI42377496702-Native\third_party\date\src\tz.cpp(695,1): warning: unused function 'sort_zone_mappings' [-Wunused-function]
+  695 | sort_zone_mappings(std::vector<date::detail::timezone_mapping>& mappings)
+      | ^~~~~~~~~~~~~~~~~~
+C:\Users\a\VoidCI42377496702-Native\third_party\date\src\tz.cpp(751,1): warning: unused function 'load_timezone_mappings_from_xml_file' [-Wunused-function]
+  751 | load_timezone_mappings_from_xml_file(const std::string& input_path)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\a\VoidCI42377496702-Native\third_party\date\src\tz.cpp(3728,1): warning: unused function 'get_version' [-Wunused-function]
+ 3728 | get_version(const std::string& path)
+      | ^~~~~~~~~~~
+9 warnings generated.
+[206/329] Building CXX object CMakeFiles\void_application_objects.dir\src\dynamic_closure.cpp.obj
+[207/329] Building CXX object CMakeFiles\void_core.dir\src\frontend\project_creation.cpp.obj
+[208/329] Building CXX object CMakeFiles\void_core.dir\src\frontend\project.cpp.obj
+[209/329] Building CXX object CMakeFiles\void_core.dir\src\frontend\source.cpp.obj
+[210/329] Building CXX object CMakeFiles\void_core.dir\src\frontend\compiler.cpp.obj
+FAILED: [code=1] CMakeFiles/void_core.dir/src/frontend/compiler.cpp.obj 
+C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\clang-cl.exe  /nologo -TP -DVOID_STDLIB_ROOT=\"C:/Users/a/VoidCI42377496702-Native/stdlib\" -D_ITERATOR_DEBUG_LEVEL=0 -IC:\Users\a\VoidCI42377496702-Native\include -imsvcC:\Users\a\VoidCI42377496702-Native\third_party\tomlplusplus -imsvc"C:\Users\a\Documents\ChatGPT\Void TEMP\Void-native\.toolchains\native-schannel\sdk\clang+llvm-23.1.4-x86_64-pc-windows-msvc\include" -imsvcC:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4-deps\include /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MT -D_CRT_SECURE_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_NONSTDC_NO_WARNINGS -D_SCL_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_WARNINGS -DUNICODE -D_UNICODE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS /GR- /W4 /permissive- /EHsc -clang:-MD -clang:-MTCMakeFiles\void_core.dir\src\frontend\compiler.cpp.obj -clang:-MFCMakeFiles\void_core.dir\src\frontend\compiler.cpp.obj.d /FoCMakeFiles\void_core.dir\src\frontend\compiler.cpp.obj /FdCMakeFiles\void_core.dir\void_core.pdb -c -- C:\Users\a\VoidCI42377496702-Native\src\frontend\compiler.cpp
+C:\Users\a\VoidCI42377496702-Native\src\frontend\compiler.cpp(7016,26): error: no matching function for call to 'analyze_manifest_project_impl'
+ 7016 |         if(project)(void)analyze_manifest_project_impl(project->root,project_entry,frozen,project->manifest_overlays,&probe);
+      |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\a\VoidCI42377496702-Native\src\frontend\project_selection.inc(319,23): note: candidate function not viable: requires 6 arguments, but 5 were provided
+  319 | ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path& root,const std::optional<std::string>& entry_override,const SourceOverrides& sources,const ManifestOverrides& manifests,EditorProbe* editor,bool authorize_native) {
+      |                       ^                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+[211/329] Building CXX object CMakeFiles\void_core.dir\src\frontend\tooling.cpp.obj
+ninja: build stopped: subcommand failed.

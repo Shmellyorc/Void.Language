@@ -1,0 +1,7 @@
+held C:\Users\a\VoidS7-G4W-architecture-final\good id=c60478b6:000a0000000bcb2c
+held C:\Users\a\VoidS7-G4W-architecture-final\good\void_g4_probe_main.dll id=c60478b6:00090000000bcb49
+held C:\Users\a\VoidS7-G4W-architecture-final\good\void_g4_probe_dep.dll id=c60478b6:00090000000bcb45
+write-open while held error=32
+dependency basename loaded before setup=0
+active redirect provider=0 dependency=1
+denied active import redirect before executable load; alternate and provider absent

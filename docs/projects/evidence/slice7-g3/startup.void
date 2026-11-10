@@ -1,0 +1,4 @@
+use "/native_resources.void" as ffi
+var eager = ffi.create(8)
+func main():
+    pass

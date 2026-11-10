@@ -1,0 +1,18 @@
+{
+  "binary_sha256": "bbd62c27dbc8a4f29c82974a413cc63fb612f5738a665b21781af3a6bfa61383",
+  "expected": "VOID1107 before opening source 129",
+  "observed": "VOID1001: source 129 was read first",
+  "input_recipe": "128 files module0..module127 each imports its successor; module128 contains byte FF",
+  "commands": [
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "check",
+        "/tmp/VOID import-depth ordering z4m7ziw5/module0.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID import-depth ordering z4m7ziw5/module128.void:1:1: error: Invalid UTF-8 source.\n    code: VOID1001\n\n 1 | \\xFF\n   | ^^^^\n    Module: /module128.void\n    Hint: Save this file as UTF-8.\n\n"
+    }
+  ]
+}

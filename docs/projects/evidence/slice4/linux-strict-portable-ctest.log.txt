@@ -1,0 +1,77 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-strict
+      Start  10: project_application
+      Start 179: os_stack
+ 1/36 Test  #10: project_application ..............   Passed   50.18 sec
+      Start 178: os_execution
+ 2/36 Test #179: os_stack .........................   Passed  109.82 sec
+      Start  11: project_application_process
+ 3/36 Test #178: os_execution .....................   Passed  104.90 sec
+      Start 190: os_frontend_stack
+ 4/36 Test  #11: project_application_process ......   Passed   46.59 sec
+      Start 187: os_owner
+ 5/36 Test #187: os_owner .........................   Passed   35.59 sec
+      Start 182: os_host
+ 6/36 Test #190: os_frontend_stack ................   Passed   54.62 sec
+      Start 191: os_host_stack
+ 7/36 Test #182: os_host ..........................   Passed   37.21 sec
+      Start 186: os_cache
+ 8/36 Test #191: os_host_stack ....................   Passed   37.67 sec
+      Start 180: os_edges
+ 9/36 Test #186: os_cache .........................   Passed   19.79 sec
+      Start 181: os_edges_stack
+10/36 Test #180: os_edges .........................   Passed   21.88 sec
+      Start 188: os_examples
+11/36 Test #181: os_edges_stack ...................   Passed   22.28 sec
+      Start  12: project_discovery_cli
+12/36 Test #188: os_examples ......................   Passed   18.13 sec
+      Start 264: stage6_integrated
+13/36 Test  #12: project_discovery_cli ............   Passed   18.09 sec
+      Start 184: os_frontend
+14/36 Test #264: stage6_integrated ................   Passed    8.31 sec
+      Start 263: native_source
+15/36 Test #263: native_source ....................   Passed    5.67 sec
+      Start  13: project_profiles
+16/36 Test  #13: project_profiles .................   Passed    4.44 sec
+      Start   8: project_selection
+17/36 Test   #8: project_selection ................   Passed    8.62 sec
+      Start 183: os_errors
+18/36 Test #183: os_errors ........................   Passed   22.43 sec
+      Start 388: stage11_globals_aot
+19/36 Test #184: os_frontend ......................   Passed   51.84 sec
+      Start  80: gc_buffers
+20/36 Test  #80: gc_buffers .......................   Passed    3.80 sec
+      Start   9: project_sessions
+21/36 Test   #9: project_sessions .................   Passed    1.86 sec
+      Start  14: project_protocol
+22/36 Test #388: stage11_globals_aot ..............   Passed   11.49 sec
+      Start 185: lsp_os
+23/36 Test  #14: project_protocol .................   Passed    2.26 sec
+      Start  15: project_nested_cli
+24/36 Test  #15: project_nested_cli ...............   Passed    1.59 sec
+      Start   6: project_manifest_legacy
+25/36 Test #185: lsp_os ...........................   Passed    7.40 sec
+      Start 155: lsp_stage8
+26/36 Test   #6: project_manifest_legacy ..........   Passed    5.80 sec
+      Start 153: lsp_protocol
+27/36 Test #155: lsp_stage8 .......................   Passed    2.10 sec
+      Start 234: stage11_globals
+28/36 Test #153: lsp_protocol .....................   Passed    1.33 sec
+      Start 387: stage11_globals_stack
+29/36 Test #387: stage11_globals_stack ............   Passed    1.34 sec
+      Start  81: gc_schemas
+30/36 Test  #81: gc_schemas .......................   Passed    0.26 sec
+      Start 370: sessions
+31/36 Test #234: stage11_globals ..................   Passed    1.98 sec
+      Start   5: project_manifest_no_authority
+32/36 Test #370: sessions .........................   Passed    0.49 sec
+      Start   2: project_manifest
+33/36 Test   #5: project_manifest_no_authority ....   Passed    0.31 sec
+      Start   7: project_manifest_provenance
+34/36 Test   #7: project_manifest_provenance ......   Passed    0.04 sec
+      Start   1: project_manifest_header
+35/36 Test   #2: project_manifest .................   Passed    0.23 sec
+36/36 Test   #1: project_manifest_header ..........   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 36
+
+Total Test time (real) = 360.22 sec

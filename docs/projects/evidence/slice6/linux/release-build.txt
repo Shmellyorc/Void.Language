@@ -1,0 +1,49 @@
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 76%] Built target libcurl_static
+[ 76%] Built target void_application_objects
+[ 92%] Built target void_runtime
+[100%] Built target void_native_inventory
+Built target void_application_objects
+Built target void_format_objects
+Built target void_zone_objects
+Built target void_core
+Linking CXX executable void_project_creation
+Built target void_project_creation
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[ 83%] Built target libcurl_static
+[ 83%] Built target void_zone_objects
+[ 83%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_project_application.dir/tests/project/application.cpp.o
+[100%] Linking CXX executable void_project_application
+[100%] Built target void_project_application
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[ 83%] Built target libcurl_static
+[ 83%] Built target void_zone_objects
+[ 83%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_project_sessions.dir/tests/project/sessions.cpp.o
+[100%] Linking CXX executable void_project_sessions
+[100%] Built target void_project_sessions
+Built target void_application_objects
+Built target void_format_objects
+Built target void_zone_objects
+Built target void_core
+Building CXX object CMakeFiles/void_project_selection.dir/tests/project/selection.cpp.o
+Linking CXX executable void_project_selection
+Built target void_project_selection
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[  0%] Built target void_core
+[100%] Building CXX object CMakeFiles/void_project_manifest.dir/tests/project/manifest.cpp.o
+[100%] Linking CXX executable void_project_manifest
+[100%] Built target void_project_manifest

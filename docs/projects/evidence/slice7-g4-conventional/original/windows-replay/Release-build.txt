@@ -1,0 +1,225 @@
+[0/2] Re-checking globbed directories...
+[1/126] Building CXX object CMakeFiles\void_application_objects.dir\src\application_metadata.cpp.obj
+[2/126] Building CXX object CMakeFiles\void_application_objects.dir\src\project_identity.cpp.obj
+[3/126] Building CXX object CMakeFiles\void_application_objects.dir\src\dynamic_closure.cpp.obj
+[4/126] Building CXX object CMakeFiles\void_core.dir\src\frontend\project.cpp.obj
+[5/126] Building CXX object CMakeFiles\void_core.dir\src\frontend\project_creation.cpp.obj
+[6/126] Building CXX object CMakeFiles\void_core.dir\src\frontend\source.cpp.obj
+[7/126] Building CXX object CMakeFiles\void_core.dir\src\frontend\tooling.cpp.obj
+[8/126] Building CXX object CMakeFiles\void_core.dir\src\numeric.cpp.obj
+[9/126] Building CXX object CMakeFiles\void_core.dir\src\ir\module.cpp.obj
+C:\Users\a\VoidCI42377496702-Native\src\ir\module.cpp(1042,63): warning: misleading indentation; statement is not part of the previous 'if' [-Wmisleading-indentation]
+ 1042 |                         fail("invalid deterministic release");result=Type::boolean;break;
+      |                                                               ^
+C:\Users\a\VoidCI42377496702-Native\src\ir\module.cpp(1040,21): note: previous statement is here
+ 1040 |                     if(!f.receiver || f.method_name!="deinit" || operand(i.a).kind!=Type::managed_ref || operand(i.a).nullable ||
+      |                     ^
+1 warning generated.
+[10/126] Building CXX object CMakeFiles\void_core.dir\src\ir\native_storage.cpp.obj
+[11/126] Building CXX object CMakeFiles\void_core.dir\src\ir\native_binding.cpp.obj
+[12/126] Building CXX object CMakeFiles\void_core.dir\src\ir\c_primitive.cpp.obj
+[13/126] Linking C static library void_native_fixture.lib
+[14/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\application.cpp.obj
+[15/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\os.cpp.obj
+[16/126] Building CXX object CMakeFiles\void_core.dir\src\frontend\compiler.cpp.obj
+[17/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\os_abi.cpp.obj
+[18/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\random.cpp.obj
+[19/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\filesystem_abi.cpp.obj
+[20/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\native_resource.cpp.obj
+[21/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\filesystem.cpp.obj
+C:\Users\a\VoidCI42377496702-Native\src\runtime\filesystem.cpp(20,9): warning: 'NOMINMAX' macro redefined [-Wmacro-redefined]
+   20 | #define NOMINMAX
+      |         ^
+<command line>(4,9): note: previous definition is here
+    4 | #define NOMINMAX 1
+      |         ^
+1 warning generated.
+[22/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\native_binding.cpp.obj
+[23/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\temporal_abi.cpp.obj
+[24/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\conversion.cpp.obj
+[25/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\text_case.cpp.obj
+[26/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\buffer.cpp.obj
+[27/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\list.cpp.obj
+[28/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\dictionary.cpp.obj
+[29/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\array.cpp.obj
+[30/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\fixed_abi.cpp.obj
+[31/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\gc_schema.cpp.obj
+[32/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\heap.cpp.obj
+[33/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\coordination.cpp.obj
+[34/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\console.cpp.obj
+C:\Users\a\VoidCI42377496702-Native\src\runtime\console.cpp(16,9): warning: 'WIN32_LEAN_AND_MEAN' macro redefined [-Wmacro-redefined]
+   16 | #define WIN32_LEAN_AND_MEAN
+      |         ^
+<command line>(6,9): note: previous definition is here
+    6 | #define WIN32_LEAN_AND_MEAN 1
+      |         ^
+C:\Users\a\VoidCI42377496702-Native\src\runtime\console.cpp(17,9): warning: 'NOMINMAX' macro redefined [-Wmacro-redefined]
+   17 | #define NOMINMAX
+      |         ^
+<command line>(4,9): note: previous definition is here
+    4 | #define NOMINMAX 1
+      |         ^
+C:\Users\a\VoidCI42377496702-Native\src\runtime\console.cpp(669,137): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  669 |                 if(data.key && !request.keys && (!data.key->down || data.key->repeat!=1))return {-1,false,false,{ErrorKind::unsupported}};
+      |                                                                                                                                         ^
+C:\Users\a\VoidCI42377496702-Native\src\runtime\console.cpp(672,69): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  672 |                 if(data.after)return {-1,false,false,data.after,true};
+      |                                                                     ^
+C:\Users\a\VoidCI42377496702-Native\src\runtime\console.cpp(675,41): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  675 |             if(queue.eof)return {-1,true};
+      |                                         ^
+C:\Users\a\VoidCI42377496702-Native\src\runtime\console.cpp(676,44): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  676 |             if(!fetch)return {-1,false,true};
+      |                                            ^
+C:\Users\a\VoidCI42377496702-Native\src\runtime\console.cpp(677,91): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  677 |             if(auto error=stopped(request,op.adapter());error)return {-1,false,false,error};
+      |                                                                                           ^
+C:\Users\a\VoidCI42377496702-Native\src\runtime\console.cpp(690,137): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  690 |                 if(poll && !native.completed && native.error.kind==ErrorKind::would_block){queue.blocks.pop_back();return {-1,false,true};}
+      |                                                                                                                                         ^
+8 warnings generated.
+[35/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\console_abi.cpp.obj
+[36/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\callback.cpp.obj
+[37/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\reload.cpp.obj
+[38/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\native.cpp.obj
+[39/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\abi.cpp.obj
+[40/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\c_span.cpp.obj
+[41/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\async.cpp.obj
+[42/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\c_resource.cpp.obj
+[43/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\c_dynamic.cpp.obj
+C:\Users\a\VoidCI42377496702-Native\src\runtime\c_dynamic.cpp(10,9): warning: 'NOMINMAX' macro redefined [-Wmacro-redefined]
+   10 | #define NOMINMAX
+      |         ^
+<command line>(4,9): note: previous definition is here
+    4 | #define NOMINMAX 1
+      |         ^
+1 warning generated.
+[44/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_abi.cpp.obj
+[45/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_error.cpp.obj
+[46/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_crypto.cpp.obj
+[47/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_archive.cpp.obj
+[48/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_directory.cpp.obj
+[49/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_process.cpp.obj
+[50/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_process_windows.cpp.obj
+[51/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\http_provider.cpp.obj
+[52/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_directory_windows.cpp.obj
+[53/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\url.cpp.obj
+[54/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\url_abi.cpp.obj
+[55/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\http_bulk.cpp.obj
+[56/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\http.cpp.obj
+[57/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\http_resource.cpp.obj
+[58/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\http_file.cpp.obj
+[59/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\http_abi.cpp.obj
+C:\Users\a\VoidCI42377496702-Native\src\runtime\http_abi.cpp(118,67): warning: unused parameter 'upper' [-Wunused-parameter]
+  118 |             auto environment = [&](const char* lower, const char* upper) {
+      |                                                                   ^
+1 warning generated.
+[60/126] Linking C static library curl\lib\libcurl.lib
+[61/126] Linking CXX static library void_core.lib
+[62/126] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\native_work.cpp.obj
+[63/126] Linking CXX static library void_runtime.lib
+[64/126] Building CXX object CMakeFiles\void_llvm.dir\src\backend\llvm\native_cache.cpp.obj
+[65/126] Building CXX object CMakeFiles\voidc_objects.dir\src\main.cpp.obj
+[66/126] Building CXX object CMakeFiles\voidc_objects.dir\src\native_build.cpp.obj
+[67/126] Building CXX object CMakeFiles\voidc_objects.dir\examples\proof.cpp.obj
+C:\Users\a\VoidCI42377496702-Native\examples\proof.cpp(7,46): warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+    7 |         {Terminator::Kind::return_value, 2}}}};
+      |                                              ^
+C:\Users\a\VoidCI42377496702-Native\examples\proof.cpp(13,6): warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+   13 |     }};
+      |      ^
+2 warnings generated.
+[68/126] Building C object CMakeFiles\void_g1_fixture.dir\tests\ffi\primitives_fixture.c.obj
+[69/126] Building C object CMakeFiles\void_g1_thunk.dir\tests\ffi\primitives_thunk.c.obj
+[70/126] Building C object CMakeFiles\void_g2_fixture.dir\tests\ffi\records_fixture.c.obj
+[71/126] Building C object CMakeFiles\void_g2_thunk.dir\tests\ffi\records_thunk.c.obj
+[72/126] Building CXX object CMakeFiles\void_g2_tests.dir\tests\ffi\records.cpp.obj
+[73/126] Building C object CMakeFiles\void_g3_fixture.dir\tests\ffi\resources_fixture.c.obj
+[74/126] Building C object CMakeFiles\void_g3_thunk.dir\tests\ffi\resources_thunk.c.obj
+[75/126] Building CXX object CMakeFiles\void_g3_tests.dir\tests\ffi\resources.cpp.obj
+[76/126] Building C object CMakeFiles\native_fixture.dir\tests\integration\native_fixture.c.obj
+[77/126] Generating void-native-resources.txt, native-resources-install-Release.txt
+[78/126] Building CXX object CMakeFiles\void_project_manifest.dir\tests\project\manifest.cpp.obj
+[79/126] Linking C static library native_fixture.lib
+[80/126] Building C object CMakeFiles\void_g1_wrong_fixture.dir\tests\ffi\primitives_fixture.c.obj
+[81/126] Building CXX object CMakeFiles\void_tests.dir\tests\sessions\tests.cpp.obj
+[82/126] Building CXX object CMakeFiles\void_tests.dir\tests\tooling\tests.cpp.obj
+C:\Users\a\VoidCI42377496702-Native\tests\tooling\tests.cpp(236,31): warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  236 |     std::string previous=std::getenv("VOID_STDLIB_ROOT")?std::getenv("VOID_STDLIB_ROOT"):"";
+      |                               ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt\stdlib.h(1183,20): note: 'getenv' has been explicitly marked deprecated here
+ 1183 |     _Check_return_ _CRT_INSECURE_DEPRECATE(_dupenv_s)
+      |                    ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\a\VoidCI42377496702-Native\tests\tooling\tests.cpp(236,63): warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  236 |     std::string previous=std::getenv("VOID_STDLIB_ROOT")?std::getenv("VOID_STDLIB_ROOT"):"";
+      |                                                               ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt\stdlib.h(1183,20): note: 'getenv' has been explicitly marked deprecated here
+ 1183 |     _Check_return_ _CRT_INSECURE_DEPRECATE(_dupenv_s)
+      |                    ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+2 warnings generated.
+[83/126] Building CXX object CMakeFiles\void_tests.dir\tests\analysis\tests.cpp.obj
+[84/126] Building CXX object CMakeFiles\void_tests.dir\tests\tests.cpp.obj
+C:\Users\a\VoidCI42377496702-Native\tests\tests.cpp(174,57): warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+  174 |             {vd::ir::Terminator::Kind::return_value,1}}}};
+      |                                                         ^
+1 warning generated.
+[85/126] Building CXX object CMakeFiles\void_llvm.dir\src\backend\llvm\backend.cpp.obj
+[86/126] Linking CXX static library void_llvm.lib
+[87/126] Generating cache-identity-Release.cpp
+[88/126] Building CXX object CMakeFiles\void_cache_identity.dir\cache-identity-Release.cpp.obj
+[89/126] Linking CXX static library void_cache_identity.lib
+[90/126] Building CXX object CMakeFiles\void_tests.dir\tests\frontend\tests.cpp.obj
+[91/126] Linking CXX executable void_g2_tests.exe
+[92/126] Linking CXX executable void_g3_tests.exe
+[93/126] Generating ffi-g2/application-normal.obj
+[94/126] Generating ffi-g2/application-optimized.obj
+[95/126] Generating ffi-g3/application-normal.obj
+[96/126] Generating ffi-g3/application-optimized.obj
+[97/126] Building CXX object CMakeFiles\void_g2_aot_normal.dir\tests\async\aot.cpp.obj
+[98/126] Building CXX object CMakeFiles\void_g2_aot_optimized.dir\tests\async\aot.cpp.obj
+[99/126] Building CXX object CMakeFiles\void_g3_aot_normal.dir\tests\ffi\resources_exit.cpp.obj
+[100/126] Building CXX object CMakeFiles\void_g3_aot_optimized.dir\tests\ffi\resources_exit.cpp.obj
+[101/126] Building CXX object CMakeFiles\void_g1_tests.dir\tests\ffi\primitives.cpp.obj
+[102/126] Linking CXX executable void_g1_tests.exe
+[103/126] Generating ffi-g1/application-normal.obj
+[104/126] Generating ffi-g1/application-optimized.obj
+[105/126] Building CXX object CMakeFiles\void_g1_aot_normal.dir\tests\async\aot.cpp.obj
+[106/126] Building CXX object CMakeFiles\void_g1_aot_optimized.dir\tests\async\aot.cpp.obj
+[107/126] Building CXX object CMakeFiles\void_g1_aot_mismatch.dir\tests\async\aot.cpp.obj
+[108/126] Building CXX object CMakeFiles\void_tests.dir\tests\frontend\values.cpp.obj
+[109/126] Building CXX object CMakeFiles\void_tests.dir\tests\frontend\structs.cpp.obj
+[110/126] Building CXX object CMakeFiles\void_tests.dir\tests\frontend\methods.cpp.obj
+[111/126] Building CXX object CMakeFiles\void_tests.dir\tests\frontend\initialization.cpp.obj
+[112/126] Building CXX object CMakeFiles\void_tests.dir\tests\numeric\tests.cpp.obj
+[113/126] Building CXX object CMakeFiles\void_tests.dir\examples\proof.cpp.obj
+C:\Users\a\VoidCI42377496702-Native\examples\proof.cpp(7,46): warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+    7 |         {Terminator::Kind::return_value, 2}}}};
+      |                                              ^
+C:\Users\a\VoidCI42377496702-Native\examples\proof.cpp(13,6): warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+   13 |     }};
+      |      ^
+2 warnings generated.
+[114/126] C:\Windows\system32\cmd.exe /C "cd /D C:\Users\a\VoidS7-G4Conventional\Release-attested && C:\gcc\bin\cmake.exe -E make_directory C:/Users/a/VoidS7-G4Conventional/Release-attested && C:\gcc\bin\cmake.exe -E copy_if_different C:/Users/a/VoidS7-G4Conventional/Release-attested/void-native-resources.txt C:/Users/a/VoidS7-G4Conventional/Release-attested/void-native-resources.txt"
+[115/126] Linking CXX executable voidc.exe
+[116/126] Linking CXX executable void_project_manifest.exe
+[117/126] Linking CXX executable void_g1_aot_normal.exe
+[118/126] Linking CXX executable void_g1_aot_optimized.exe
+[119/126] Linking CXX executable void_g1_aot_mismatch.exe
+[120/126] Linking CXX executable void_g2_aot_normal.exe
+[121/126] Linking CXX executable void_g2_aot_optimized.exe
+[122/126] Linking CXX executable void_g3_aot_normal.exe
+[123/126] Linking CXX executable void_g3_aot_optimized.exe
+[124/126] Building CXX object CMakeFiles\void_tests.dir\tests\modules\tests.cpp.obj
+[125/126] Linking CXX executable void_tests.exe

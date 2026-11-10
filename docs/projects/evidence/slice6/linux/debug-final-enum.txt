@@ -1,0 +1,9 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+    Start 400: numeric_enum_process
+    Start 399: numeric_enum_ir
+1/2 Test #399: numeric_enum_ir ..................   Passed    0.72 sec
+2/2 Test #400: numeric_enum_process .............   Passed   15.16 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =  15.17 sec

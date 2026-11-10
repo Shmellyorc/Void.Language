@@ -1,0 +1,331 @@
+{
+  "status": "PASS",
+  "scope": "New parser and isolated header compiled from exact current inputs, linked with preexisting baseline void_core/LLVM dependency closure; not a full current-tree native compiler rebuild",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "commands": [
+    {
+      "label": "Release-http-verified",
+      "argv": [
+        "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\tools\\verify_http_dependencies.py",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\http\\prefix\\windows-schannel-x86_64\\Release",
+        "Release",
+        "Windows",
+        "x86_64"
+      ],
+      "cwd": "C:\\Users\\a\\VoidCI42377496702-Native",
+      "returncode": 0,
+      "seconds": 0.21405119999690214
+    },
+    {
+      "label": "Release-host-verified",
+      "argv": [
+        "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\tools\\verify_host_deps.py",
+        "--prefix",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\host\\prefix\\windows-x86_64\\Release",
+        "--profile",
+        "Release",
+        "--platform",
+        "Windows",
+        "--architecture",
+        "x86_64"
+      ],
+      "cwd": "C:\\Users\\a\\VoidCI42377496702-Native",
+      "returncode": 0,
+      "seconds": 1.3052213999981177
+    },
+    {
+      "label": "Release-header-build",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/std:c++20",
+        "/EHsc",
+        "/MT",
+        "/GR-",
+        "/W4",
+        "/permissive-",
+        "/D_ITERATOR_DEBUG_LEVEL=0",
+        "/DWIN32_LEAN_AND_MEAN",
+        "/DNOMINMAX",
+        "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\include",
+        "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\third_party\\tomlplusplus",
+        "/O2",
+        "/DNDEBUG",
+        "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\tests\\project\\header.cpp",
+        "/FeC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Release\\header.exe",
+        "/FoC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Release\\header.obj",
+        "/FdC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Release\\header.pdb",
+        "/link",
+        "/INCREMENTAL:NO"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+      "returncode": 0,
+      "seconds": 2.849843600000895
+    },
+    {
+      "label": "Release-header",
+      "argv": [
+        "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Release\\header.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+      "returncode": 0,
+      "seconds": 0.13647759999730624
+    },
+    {
+      "label": "Release-project-compile",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/std:c++20",
+        "/EHsc",
+        "/MT",
+        "/GR-",
+        "/W4",
+        "/permissive-",
+        "/D_ITERATOR_DEBUG_LEVEL=0",
+        "/DWIN32_LEAN_AND_MEAN",
+        "/DNOMINMAX",
+        "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\include",
+        "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\third_party\\tomlplusplus",
+        "/O2",
+        "/DNDEBUG",
+        "/c",
+        "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\src\\frontend\\project.cpp",
+        "/FoC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Release\\project.obj",
+        "/FdC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Release\\project.pdb"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+      "returncode": 0,
+      "seconds": 8.850236199999927
+    },
+    {
+      "label": "Release-manifest-compile",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/std:c++20",
+        "/EHsc",
+        "/MT",
+        "/GR-",
+        "/W4",
+        "/permissive-",
+        "/D_ITERATOR_DEBUG_LEVEL=0",
+        "/DWIN32_LEAN_AND_MEAN",
+        "/DNOMINMAX",
+        "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\include",
+        "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\third_party\\tomlplusplus",
+        "/O2",
+        "/DNDEBUG",
+        "/c",
+        "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\tests\\project\\manifest.cpp",
+        "/FoC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Release\\manifest.obj",
+        "/FdC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Release\\manifest.pdb"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+      "returncode": 0,
+      "seconds": 6.122111700002279
+    },
+    {
+      "label": "Release-manifest-link",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe",
+        "@C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Release\\manifest-link.rsp"
+      ],
+      "cwd": "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Release",
+      "returncode": 0,
+      "seconds": 0.7217939000038314
+    },
+    {
+      "label": "Release-manifest",
+      "argv": [
+        "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Release\\manifest.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+      "returncode": 0,
+      "seconds": 0.1607471999959671
+    },
+    {
+      "label": "Debug-http-verified",
+      "argv": [
+        "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\tools\\verify_http_dependencies.py",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\http\\prefix\\windows-schannel-x86_64\\Debug",
+        "Debug",
+        "Windows",
+        "x86_64"
+      ],
+      "cwd": "C:\\Users\\a\\VoidCI42377496702-Native",
+      "returncode": 0,
+      "seconds": 0.3672267000001739
+    },
+    {
+      "label": "Debug-host-verified",
+      "argv": [
+        "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\tools\\verify_host_deps.py",
+        "--prefix",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\host\\prefix\\windows-x86_64\\Debug",
+        "--profile",
+        "Debug",
+        "--platform",
+        "Windows",
+        "--architecture",
+        "x86_64"
+      ],
+      "cwd": "C:\\Users\\a\\VoidCI42377496702-Native",
+      "returncode": 0,
+      "seconds": 1.318375399998331
+    },
+    {
+      "label": "Debug-header-build",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/std:c++20",
+        "/EHsc",
+        "/MT",
+        "/GR-",
+        "/W4",
+        "/permissive-",
+        "/D_ITERATOR_DEBUG_LEVEL=0",
+        "/DWIN32_LEAN_AND_MEAN",
+        "/DNOMINMAX",
+        "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\include",
+        "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\third_party\\tomlplusplus",
+        "/Od",
+        "/Zi",
+        "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\tests\\project\\header.cpp",
+        "/FeC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Debug\\header.exe",
+        "/FoC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Debug\\header.obj",
+        "/FdC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Debug\\header.pdb",
+        "/link",
+        "/INCREMENTAL:NO"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+      "returncode": 0,
+      "seconds": 1.3233752000014647
+    },
+    {
+      "label": "Debug-header",
+      "argv": [
+        "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Debug\\header.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+      "returncode": 0,
+      "seconds": 0.1315907000025618
+    },
+    {
+      "label": "Debug-project-compile",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/std:c++20",
+        "/EHsc",
+        "/MT",
+        "/GR-",
+        "/W4",
+        "/permissive-",
+        "/D_ITERATOR_DEBUG_LEVEL=0",
+        "/DWIN32_LEAN_AND_MEAN",
+        "/DNOMINMAX",
+        "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\include",
+        "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\third_party\\tomlplusplus",
+        "/Od",
+        "/Zi",
+        "/c",
+        "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\src\\frontend\\project.cpp",
+        "/FoC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Debug\\project.obj",
+        "/FdC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Debug\\project.pdb"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+      "returncode": 0,
+      "seconds": 5.5346678999994765
+    },
+    {
+      "label": "Debug-manifest-compile",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/std:c++20",
+        "/EHsc",
+        "/MT",
+        "/GR-",
+        "/W4",
+        "/permissive-",
+        "/D_ITERATOR_DEBUG_LEVEL=0",
+        "/DWIN32_LEAN_AND_MEAN",
+        "/DNOMINMAX",
+        "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\include",
+        "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\third_party\\tomlplusplus",
+        "/Od",
+        "/Zi",
+        "/c",
+        "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\tests\\project\\manifest.cpp",
+        "/FoC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Debug\\manifest.obj",
+        "/FdC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Debug\\manifest.pdb"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+      "returncode": 0,
+      "seconds": 3.583577500001411
+    },
+    {
+      "label": "Debug-manifest-link",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe",
+        "@C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Debug\\manifest-link.rsp"
+      ],
+      "cwd": "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug",
+      "returncode": 0,
+      "seconds": 0.9240161000052467
+    },
+    {
+      "label": "Debug-manifest",
+      "argv": [
+        "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Debug\\manifest.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+      "returncode": 0,
+      "seconds": 0.49036220000562025
+    },
+    {
+      "label": "provenance",
+      "argv": [
+        "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+        "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\tests\\project\\provenance.py",
+        "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2"
+      ],
+      "cwd": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+      "returncode": 0,
+      "seconds": 0.14268689999880735
+    }
+  ],
+  "current_inputs_sha256": {
+    "src/frontend/project.cpp": "b69965d50db29d90af030378bee57288d9ac7cd1928c6244bc3febcc9a3f1f42",
+    "include/void/project.hpp": "945b3cc02d0da73045ab7741ee7a3ed3829fcccad92ae42ec3156314c983ba3f",
+    "tests/project/manifest.cpp": "4fd4e5c2550f27e89bea7a7377f8fcf101580e6be4f231b0f81eaedaef217a3c",
+    "tests/project/header.cpp": "62a8621869e8fdb923b8cc7db1703473f389f629b23d8004a8abffffae72a98a",
+    "third_party/tomlplusplus/toml.hpp": "7cd54af1a3497465eb26507f8d8a2ccfe661fccc27dac7a5121b885bee88d5e7",
+    "third_party/tomlplusplus/void-bounds-and-locations.patch": "d131e7ff7daa6373904406403b8f23def1b0dc02127de8230c1a09cdace3330f",
+    "third_party/tomlplusplus/upstream.json": "98e2bf14bd9c8765aae02725a494affa31585ecb352e494d88f5eaccb806adfc",
+    "third_party/tomlplusplus/LICENSE": "529bc3900a9571e49db285b0df432397e70b881cc3bf48de6667ae74ff4b06d8"
+  },
+  "stage": "provenance",
+  "Release_baseline_inputs_sha256": {
+    "void_core.lib": "a462af19fff32ef2fbcb56e58d8de7aa764234a617e52a160f2b918c61705b6c",
+    "build.ninja": "5c2e38dc684ba4996c2f8613963dd918ad65cbbcc3deda3084461d549ccfce25"
+  },
+  "Release_binaries_sha256": {
+    "header.exe": "1e15a236e456cafdcc56f1166cf59e191d39cd632b5f186f1d85bc6d60ef7349",
+    "manifest.exe": "a7a3efa171a513f193fcd7bba5a978e104fc9be3bc88eccd8a2ba59ef5a4b710"
+  },
+  "Debug_baseline_inputs_sha256": {
+    "void_core.lib": "08785153ab9001c2462ca43cfd11fe400e98d6873cabf3038527564db943df60",
+    "build.ninja": "a465724934f8f080e1f149d6a3d1a840583196ece4f9fb0c220969b5bc96e75e"
+  },
+  "Debug_binaries_sha256": {
+    "header.exe": "0c17b5a5a2aee631bacafce7aa1d5aa402b3ccbd0fed7b193991c0a019ea9d06",
+    "manifest.exe": "2ab905355877812eab79a374af8706d3ac50ffb142d95acc1f701a6105c08e1d"
+  }
+}

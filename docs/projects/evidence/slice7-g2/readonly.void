@@ -1,0 +1,4 @@
+use "/native_records.void" as ffi
+func entry(value: i32) -> i32:
+    const bytes: [u8] = [1]
+    return ffi.fill(bytes, 0, 1, 7) as i32

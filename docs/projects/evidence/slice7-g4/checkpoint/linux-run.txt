@@ -1,0 +1,61 @@
+clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)
+Target: x86_64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin
+x86_64
+ldd (Debian GLIBC 2.44-2) 2.44
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+Written by Roland McGrath and Ulrich Drepper.
+
+File: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-checkpoint/provider.so
+
+Dynamic section at offset 0x410 contains 15 entries:
+  Tag        Type                         Name/Value
+ 0x0000000000000001 (NEEDED)             Shared library: [libvoid_g4_probe_dep.so]
+ 0x000000000000000e (SONAME)             Library soname: [libvoid_g4_probe_main.so]
+ 0x0000000000000007 (RELA)               0x320
+ 0x0000000000000008 (RELASZ)             24 (bytes)
+ 0x0000000000000009 (RELAENT)            24 (bytes)
+ 0x0000000000000017 (JMPREL)             0x338
+ 0x0000000000000002 (PLTRELSZ)           24 (bytes)
+ 0x0000000000000003 (PLTGOT)             0x3508
+ 0x0000000000000014 (PLTREL)             RELA
+ 0x0000000000000006 (SYMTAB)             0x238
+ 0x000000000000000b (SYMENT)             24 (bytes)
+ 0x0000000000000005 (STRTAB)             0x2bc
+ 0x000000000000000a (STRSZ)              98 (bytes)
+ 0x000000006ffffef5 (GNU_HASH)           0x298
+ 0x0000000000000000 (NULL)               0x0
+
+File: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-checkpoint/libvoid_g4_probe_dep.so
+
+Dynamic section at offset 0x2e0 contains 7 entries:
+  Tag        Type                         Name/Value
+ 0x000000000000000e (SONAME)             Library soname: [libvoid_g4_probe_dep.so]
+ 0x0000000000000006 (SYMTAB)             0x200
+ 0x000000000000000b (SYMENT)             24 (bytes)
+ 0x0000000000000005 (STRTAB)             0x250
+ 0x000000000000000a (STRSZ)              39 (bytes)
+ 0x000000006ffffef5 (GNU_HASH)           0x230
+ 0x0000000000000000 (NULL)               0x0
+5dbc77056d3f3997bb2b537e4b0c6442f389e998cf66bbc0cd5245d4a6a7cc5d  /home/shmellyorc/Documents/Void.Language/build/slice7-g4-checkpoint/provider.so
+6e5f4159757ca77e34037d3f60a7053259b34f4c126995d363a52250d0c9b724  /home/shmellyorc/Documents/Void.Language/build/slice7-g4-checkpoint/libvoid_g4_probe_dep.so
+8e2951c13d333ad1547ebbef2a14aeafdc952c9e9b14f7da0ca2ff036ed1caf6  /home/shmellyorc/Documents/Void.Language/build/slice7-g4-checkpoint/competitor.so
+9172a909466226fd02e4bb393dcb4ab42cbcf25661b4d10653073387fd84c53a  /home/shmellyorc/Documents/Void.Language/build/slice7-g4-checkpoint/probe
+sealed file /home/shmellyorc/Documents/Void.Language/build/slice7-g4-checkpoint/provider.so (seals=0xf), write rejected
+sealed file /home/shmellyorc/Documents/Void.Language/build/slice7-g4-checkpoint/libvoid_g4_probe_dep.so (seals=0xf), write rejected
+replaced original dependency path after seal; competing SONAME mapped in base namespace
+namespace module /proc/self/fd/5
+namespace module /proc/self/fd/4
+provider owner /proc/self/fd/4, sealed device 0:1 inode 6424951
+  7f49eec7c000-7f49eec7d000 r-xp 00000000 00:01 6424951                    /memfd:void-g4-checkpoint (deleted)
+dependency reached by provider owner /proc/self/fd/5, sealed device 0:1 inode 6424952
+  7f49eec80000-7f49eec81000 r-xp 00000000 00:01 6424952                    /memfd:void-g4-checkpoint (deleted)
+exact-handle lookup for dependency-only export owner /proc/self/fd/5, sealed device 0:1 inode 6424952
+  7f49eec80000-7f49eec81000 r-xp 00000000 00:01 6424952                    /memfd:void-g4-checkpoint (deleted)
+result=42
+5dbc77056d3f3997bb2b537e4b0c6442f389e998cf66bbc0cd5245d4a6a7cc5d  /home/shmellyorc/Documents/Void.Language/build/slice7-g4-checkpoint/provider.so
+8e2951c13d333ad1547ebbef2a14aeafdc952c9e9b14f7da0ca2ff036ed1caf6  /home/shmellyorc/Documents/Void.Language/build/slice7-g4-checkpoint/libvoid_g4_probe_dep.so
+9172a909466226fd02e4bb393dcb4ab42cbcf25661b4d10653073387fd84c53a  /home/shmellyorc/Documents/Void.Language/build/slice7-g4-checkpoint/probe

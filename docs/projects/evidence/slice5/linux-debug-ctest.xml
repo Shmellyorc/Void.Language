@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="17"
+	failures="1"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="69"
+	timestamp="2026-11-08T18:09:55"
+	>
+	<testcase name="project_manifest_header" classname="project_manifest_header" time="0.00731651" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="project_manifest" classname="project_manifest" time="0.625979" status="run">
+		<properties/>
+		<system-out>project_manifest: 8787 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_no_authority" classname="project_manifest_no_authority" time="0.677045" status="run">
+		<properties/>
+		<system-out>project_manifest: 8788 checks passed under syscall denial
+project_manifest_no_authority: four live SIGSYS controls passed
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_legacy" classname="project_manifest_legacy" time="5.54747" status="run">
+		<properties/>
+		<system-out>project_manifest_legacy: 18 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_provenance" classname="project_manifest_provenance" time="0.0535206" status="run">
+		<properties/>
+		<system-out>project_manifest_provenance: 3 file hashes and exact pinned upstream reconstruction passed
+</system-out>
+	</testcase>
+	<testcase name="project_selection" classname="project_selection" time="35.8219" status="run">
+		<properties/>
+		<system-out>project_selection: 476 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_sessions" classname="project_sessions" time="1.22377" status="run">
+		<properties/>
+		<system-out>project_sessions: 166 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_creation" classname="project_creation" time="0.172931" status="run">
+		<properties/>
+		<system-out>creation: entropy, reviewed directory, external collision, rollback ownership, staged content passed
+</system-out>
+	</testcase>
+	<testcase name="project_creation_process" classname="project_creation_process" time="12.2655" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/project/creation.py", line 213, in &lt;module&gt;
+    invoke(server, *args, cwd=base, status=1)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/project/creation.py", line 29, in invoke
+    assert result.returncode == status, record
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'argv': ['/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls', '--create-project', '/tmp/VOID S5 creation b0dt9kxg/editor', '35:790059', 'application', 'editor', '0.1.0', 'local.pa8d72576ea1005234be25d98d96ac968', 'local.a38f8aa2e3581ebe92672f8614a71cb86', ''], 'cwd': '/tmp/VOID S5 creation b0dt9kxg', 'status': 2, 'stdout': '', 'stderr': 'voidls: Project root changed after creation review.\n'}
+</system-out>
+	</testcase>
+	<testcase name="project_application" classname="project_application" time="59.179" status="run">
+		<properties/>
+		<system-out>Application cache: miss/hit
+project_application: 63 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_application_process" classname="project_application_process" time="47.7486" status="run">
+		<properties/>
+		<system-out>project_application_process: 61 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_discovery_cli" classname="project_discovery_cli" time="10.2938" status="run">
+		<properties/>
+		<system-out>project_discovery_cli: 88 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_profiles" classname="project_profiles" time="2.01993" status="run">
+		<properties/>
+		<system-out>project_profiles: 43 process checks passed; compute instruction counts O0=6, O2=2, release --no-opt=6
+</system-out>
+	</testcase>
+	<testcase name="project_protocol" classname="project_protocol" time="1.15592" status="run">
+		<properties/>
+		<system-out>project_protocol: 169 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_nested_cli" classname="project_nested_cli" time="0.674313" status="run">
+		<properties/>
+		<system-out>project_nested_cli: 11 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="cli_contract" classname="cli_contract" time="7.76983" status="run">
+		<properties/>
+		<system-out>76 CLI process checks passed on linux; native output and collision preservation passed
+</system-out>
+	</testcase>
+	<testcase name="cli_install" classname="cli_install" time="4.6153" status="run">
+		<properties/>
+		<system-out>VOID Language Compiler v0.1.0 (development)
+LLVM 23.1.4
+Target: x86_64-unknown-linux-gnu
+Build identity: 80bbf853ec9e0e1ccbb3c1a2409135b9b5e777bb41a7817ab1902c000f0d9ec4
+PASS: installed stdlib check, optimized/Debug run, native build/run, resource hashes and LSP handshake
+PASS: 25 installed stdlib sources, relocated compiler/LSP, missing-module/Runtime controls, native output preservation
+</system-out>
+	</testcase>
+</testsuite>

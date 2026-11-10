@@ -1,0 +1,1084 @@
+{
+  "platform": "linux",
+  "checks_completed": 88,
+  "commands": [
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Source checked successfully\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "--no-cache"
+      ],
+      "cwd": "/tmp/VOID project execution \u96ea rlf3vc0r",
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "build",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "-o",
+        "/tmp/VOID project execution \u96ea rlf3vc0r/native/app"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID project execution \u96ea rlf3vc0r/native/app\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/tmp/VOID project execution \u96ea rlf3vc0r/native/app"
+      ],
+      "cwd": "/tmp/VOID project execution \u96ea rlf3vc0r",
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "build",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "-o",
+        "/tmp/VOID project execution \u96ea rlf3vc0r/native/app",
+        "--no-opt"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID project execution \u96ea rlf3vc0r/native/app\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/tmp/VOID project execution \u96ea rlf3vc0r/native/app"
+      ],
+      "cwd": "/tmp/VOID project execution \u96ea rlf3vc0r",
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Source checked successfully\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "--no-cache"
+      ],
+      "cwd": "/tmp/VOID project execution \u96ea rlf3vc0r",
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "build",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "-o",
+        "/tmp/VOID project execution \u96ea rlf3vc0r/native/program"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID project execution \u96ea rlf3vc0r/native/program\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/tmp/VOID project execution \u96ea rlf3vc0r/native/program"
+      ],
+      "cwd": "/tmp/VOID project execution \u96ea rlf3vc0r",
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "build",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "-o",
+        "/tmp/VOID project execution \u96ea rlf3vc0r/native/program",
+        "--no-opt"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID project execution \u96ea rlf3vc0r/native/program\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/tmp/VOID project execution \u96ea rlf3vc0r/native/program"
+      ],
+      "cwd": "/tmp/VOID project execution \u96ea rlf3vc0r",
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Source checked successfully\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "--no-cache"
+      ],
+      "cwd": "/tmp/VOID project execution \u96ea rlf3vc0r",
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "build",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "-o",
+        "/tmp/VOID project execution \u96ea rlf3vc0r/native/game"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID project execution \u96ea rlf3vc0r/native/game\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/tmp/VOID project execution \u96ea rlf3vc0r/native/game"
+      ],
+      "cwd": "/tmp/VOID project execution \u96ea rlf3vc0r",
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "build",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "-o",
+        "/tmp/VOID project execution \u96ea rlf3vc0r/native/game",
+        "--no-opt"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID project execution \u96ea rlf3vc0r/native/game\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/tmp/VOID project execution \u96ea rlf3vc0r/native/game"
+      ],
+      "cwd": "/tmp/VOID project execution \u96ea rlf3vc0r",
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Source checked successfully\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "--no-cache"
+      ],
+      "cwd": "/tmp/VOID project execution \u96ea rlf3vc0r",
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "build",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "-o",
+        "/tmp/VOID project execution \u96ea rlf3vc0r/native/launcher"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID project execution \u96ea rlf3vc0r/native/launcher\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/tmp/VOID project execution \u96ea rlf3vc0r/native/launcher"
+      ],
+      "cwd": "/tmp/VOID project execution \u96ea rlf3vc0r",
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "build",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "-o",
+        "/tmp/VOID project execution \u96ea rlf3vc0r/native/launcher",
+        "--no-opt"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID project execution \u96ea rlf3vc0r/native/launcher\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/tmp/VOID project execution \u96ea rlf3vc0r/native/launcher"
+      ],
+      "cwd": "/tmp/VOID project execution \u96ea rlf3vc0r",
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "build",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "-o",
+        "/tmp/VOID project execution \u96ea rlf3vc0r/graph-program"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID project execution \u96ea rlf3vc0r/graph-program\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/tmp/VOID project execution \u96ea rlf3vc0r/graph-program"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:1:1: error: Ambiguous project entry: 2 eligible main() declarations.\n    code: VOID5010\n\n 1 | schema=1\n   | ^\n    Module: /void.project.toml\n    Candidate /src/features/launcher.void at /tmp/VOID project execution \u96ea rlf3vc0r/src/features/launcher.void:4:6\n\n 4 | func main() -> i32:\n   |      ^^^^\n    Module: /src/features/launcher.void\n    Candidate /src/main.void at /tmp/VOID project execution \u96ea rlf3vc0r/src/main.void:1:6\n\n 1 | func main() -> i32:\n   |      ^^^^\n    Module: /src/main.void\n    Hint: Set project.entry/--entry or narrow sources.roots/exclude.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:1:1: error: Ambiguous project entry: 2 eligible main() declarations.\n    code: VOID5010\n\n 1 | schema=1\n   | ^\n    Module: /void.project.toml\n    Candidate /src/features/launcher.void at /tmp/VOID project execution \u96ea rlf3vc0r/src/features/launcher.void:2:6\n\n 2 | func main() -> i32:\n   |      ^^^^\n    Module: /src/features/launcher.void\n    Candidate /src/main.void at /tmp/VOID project execution \u96ea rlf3vc0r/src/main.void:1:6\n\n 1 | func main() -> i32:\n   |      ^^^^\n    Module: /src/main.void\n    Hint: Set project.entry/--entry or narrow sources.roots/exclude.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--entry",
+        "src/main.void",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--entry",
+        "src/missing.void"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:1:1: error: Cannot find imported file '/src/missing.void'.\n    code: VOID3002\n\n 1 | schema=1\n   | ^^^^^^^^\n    Module: /void.project.toml\n    Hint: Check this path relative to the importing file or virtual project root.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--entry",
+        "../outside.void"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:1:1: error: Explicit entry must be a canonical portable manifest-relative .void path.\n    code: VOID5006\n\n 1 | schema=1\n   | ^\n    Module: /void.project.toml\n    Hint: Use an exact relative path without ., .., drive prefixes or reserved components; no fallback is attempted.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--entry",
+        "src/main.void",
+        "/tmp/VOID project execution \u96ea rlf3vc0r/src/features/launcher.void"
+      ],
+      "cwd": null,
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --project cannot accompany a positional file or directory selector.\nUsage: voidc check <file-or-directory> [--no-opt]\nTry 'voidc check --help' for examples.\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "/tmp/VOID project execution \u96ea rlf3vc0r/src/features/launcher.void",
+        "--entry",
+        "src/main.void"
+      ],
+      "cwd": null,
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --entry requires a manifest-selected project context.\nUsage: voidc check <file-or-directory> [--no-opt]\nTry 'voidc check --help' for examples.\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n/tmp/VOID project execution \u96ea rlf3vc0r/src/unrelated.void:2:5: error: Type mismatch: expected i32, received bool.\n    code: VOID2001\n\n 2 |     return false\n   |     ^^^^^^\n    Module: /src/unrelated.void\n    Expected: i32\n    Received: bool\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n/tmp/VOID project execution \u96ea rlf3vc0r/src/unrelated.void:1:13: error: Expected a lowercase identifier.\n    code: VOID1102\n\n 1 | func broken(:\n   |             ^\n    Module: /src/unrelated.void\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n/tmp/VOID project execution \u96ea rlf3vc0r/src/helper.void:1:1: error: Imported modules cannot contain executable top-level statements.\n    code: VOID4001\n\n 1 | print(\"MUST NOT INITIALIZE\")\n   | ^\n    Module: /src/helper.void\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 12 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "IMPORTED\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 12 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "IMPORTED\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 12 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "build",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "-o",
+        "/tmp/VOID project execution \u96ea rlf3vc0r/graph-program"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID project execution \u96ea rlf3vc0r/graph-program\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 12 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/tmp/VOID project execution \u96ea rlf3vc0r/graph-program"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "IMPORTED\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "build",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID project execution \u96ea rlf3vc0r/build/launcher\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 12 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/tmp/VOID project execution \u96ea rlf3vc0r/build/launcher"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "IMPORTED\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Source checked successfully\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 12 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--entry",
+        "src/child/child.void"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 12 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:1:1: error: Source path crosses nested project boundary '/src/child'.\n    code: VOID5009\n\n 1 | schema=1\n   | ^\n    Module: /void.project.toml\n    Hint: Select the child project explicitly; parent imports and entry overrides cannot cross it.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 12 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:1:1: error: Source path crosses nested project boundary '/src/child'.\n    code: VOID5009\n\n 1 | schema=1\n   | ^\n    Module: /void.project.toml\n    Hint: Select the child project explicitly; parent imports and entry overrides cannot cross it.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--entry",
+        "tools/script.void",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "SCRIPT\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 12 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--entry",
+        "tools/script.void",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "SCRIPT\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 12 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--entry",
+        "tools/legacy.void",
+        "--",
+        "9"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "11\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 12 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--entry",
+        "tools/args.void",
+        "--",
+        "--app",
+        "two words"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "--app\ntwo words\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 12 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "SCRIPT\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 12 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--entry",
+        "tools/legacy.void",
+        "--",
+        "5"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "7\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 12 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 12 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:1:1: error: Cannot find imported file '/tools/missing.void'.\n    code: VOID3002\n\n 1 | schema=1\n   | ^^^^^^^^\n    Module: /void.project.toml\n    Hint: Check this path relative to the importing file or virtual project root.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:1:1: error: No eligible main() in application project.\n    code: VOID5010\n\n 1 | schema=1\n   | ^\n    Module: /void.project.toml\n    Hint: Add a valid main() in the admitted source roots or set project.entry/--entry for an explicit script or source.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:1:1: error: No eligible main() in application project.\n    code: VOID5010\n\n 1 | schema=1\n   | ^\n    Module: /void.project.toml\n    Hint: Add a valid main() in the admitted source roots or set project.entry/--entry for an explicit script or source.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "build",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:1:1: error: No eligible main() in application project.\n    code: VOID5010\n\n 1 | schema=1\n   | ^\n    Module: /void.project.toml\n    Hint: Add a valid main() in the admitted source roots or set project.entry/--entry for an explicit script or source.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "/tmp/VOID project execution \u96ea rlf3vc0r/src/features/launcher.void"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Source checked successfully\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "Library project checked successfully\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 12 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 12 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\nLibrary project run/build/emit is unsupported; use check for source analysis.\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "build",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 12 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\nLibrary project run/build/emit is unsupported; use check for source analysis.\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "emit",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "-o",
+        "/tmp/VOID project execution \u96ea rlf3vc0r/library.o"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 12 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\nLibrary project run/build/emit is unsupported; use check for source analysis.\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--entry",
+        "src/helper.void"
+      ],
+      "cwd": null,
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --entry cannot select an application entry in a library project.\nUsage: voidc check <file-or-directory> [--no-opt]\nTry 'voidc check --help' for examples.\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\nDebug cache: miss\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\nDebug cache: hit\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--cache"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:1:1: error: Ambiguous project entry: 2 eligible main() declarations.\n    code: VOID5010\n\n 1 | schema=1\n   | ^\n    Module: /void.project.toml\n    Candidate /src/features/launcher.void at /tmp/VOID project execution \u96ea rlf3vc0r/src/features/launcher.void:1:6\n\n 1 | func main() -> i32:\n   |      ^^^^\n    Module: /src/features/launcher.void\n    Candidate /src/second.void at /tmp/VOID project execution \u96ea rlf3vc0r/src/second.void:1:6\n\n 1 | func main() -> i32:\n   |      ^^^^\n    Module: /src/second.void\n    Hint: Set project.entry/--entry or narrow sources.roots/exclude.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\nDebug cache: miss\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:12:12: warning: Project profile 'debug' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 12 | debug_info='line'\n    |            ^^^^^^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\nDebug cache: miss\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\nDebug cache: miss\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID project execution \u96ea rlf3vc0r/src/features/launcher.void",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:1:2: error: Invalid project TOML: Error while parsing table header: expected a bare or quoted key\n    code: VOID5001\n\n 1 | [=roject]\n   |  ^\n    Module: /void.project.toml\n    Hint: Use TOML 1.0 syntax; no configuration code is executed.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:1:1: error: Manifest must use exact case without case siblings in ''.\n    code: VOID5009\n\n 1 | \n   | ^\n    Module: /void.project.toml\n    Hint: Correct the project path or source policy and retry.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:1:1: error: Selected project manifest is unavailable.\n    code: VOID5009\n\n 1 | \n   | ^\n    Module: /void.project.toml\n    Hint: Select a directory containing an exact regular void.project.toml; a deleted manifest cannot fall back to legacy mode.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID project execution \u96ea rlf3vc0r"
+      ],
+      "cwd": null,
+      "status": 1,
+      "stdout": "",
+      "stderr": "No main.void in selected workspace\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID project execution \u96ea rlf3vc0r/src/features/launcher.void",
+        "--no-cache"
+      ],
+      "cwd": null,
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID project execution \u96ea rlf3vc0r/tools/legacy.void",
+        "3"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "4\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "4"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "5\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:12:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 12 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID project execution \u96ea rlf3vc0r",
+        "--",
+        "4"
+      ],
+      "cwd": null,
+      "status": 0,
+      "stdout": "5\n",
+      "stderr": "/tmp/VOID project execution \u96ea rlf3vc0r/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    }
+  ]
+}

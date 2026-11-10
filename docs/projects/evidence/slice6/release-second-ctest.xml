@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="17"
+	failures="1"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="26"
+	timestamp="2026-11-08T19:04:13"
+	>
+	<testcase name="project_sessions" classname="project_sessions" time="0.586037" status="run">
+		<properties/>
+		<system-out>project_sessions: 166 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_creation" classname="project_creation" time="0.0706445" status="run">
+		<properties/>
+		<system-out>creation: entropy, reviewed directory, external collision, rollback ownership, staged content passed
+</system-out>
+	</testcase>
+	<testcase name="project_creation_process" classname="project_creation_process" time="3.79627" status="run">
+		<properties/>
+		<system-out>S5 creation process: 64 invocations passed
+</system-out>
+	</testcase>
+	<testcase name="project_application" classname="project_application" time="10.4712" status="run">
+		<properties/>
+		<system-out>Application cache: miss/hit
+project_application: 63 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_profiles" classname="project_profiles" time="1.20412" status="run">
+		<properties/>
+		<system-out>project_profiles: 43 process checks passed; compute instruction counts O0=6, O2=2, release --no-opt=6
+</system-out>
+	</testcase>
+	<testcase name="project_protocol" classname="project_protocol" time="0.589494" status="run">
+		<properties/>
+		<system-out>project_protocol: 169 checks passed
+</system-out>
+	</testcase>
+	<testcase name="reload" classname="reload" time="0.430066" status="run">
+		<properties/>
+		<system-out>reload: passed
+</system-out>
+	</testcase>
+	<testcase name="gc" classname="gc" time="0.0396811" status="run">
+		<properties/>
+		<system-out>gc: passed
+</system-out>
+	</testcase>
+	<testcase name="sessions" classname="sessions" time="0.0707054" status="run">
+		<properties/>
+		<system-out>sessions: passed
+</system-out>
+	</testcase>
+	<testcase name="analysis" classname="analysis" time="0.731071" status="run">
+		<properties/>
+		<system-out>normal: body edit 53 -&gt; 61, const edit rejected, old lease 53; concurrent calls 425528
+O2: body edit 53 -&gt; 61, const edit rejected, old lease 53; concurrent calls 500879
+analysis: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric" classname="numeric" time="2.88615" status="run">
+		<properties/>
+		<system-out>210 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed
+numeric: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric_enum_ir" classname="numeric_enum_ir" time="0.0709898" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>thread is not attached to this runtime
+</system-out>
+	</testcase>
+	<testcase name="numeric_enum_process" classname="numeric_enum_process" time="6.51311" status="run">
+		<properties/>
+		<system-out>S6 542 boundary pairs, 39 invalid sources and 56 executed processes
+</system-out>
+	</testcase>
+	<testcase name="numeric_enum_lsp" classname="numeric_enum_lsp" time="0.139731" status="run">
+		<properties/>
+		<system-out>S6 LSP passed 15 recorded requests and overlay revisions
+</system-out>
+	</testcase>
+	<testcase name="frontend" classname="frontend" time="6.39419" status="run">
+		<properties/>
+		<system-out>Frontend begin: diagnostics
+50+ source diagnostic cases and UTF-8/ABI checks passed
+Frontend passed: diagnostics
+Frontend begin: programs
+Real .void files and independent programs executed through normal/O2 JIT
+Frontend passed: programs
+Frontend begin: numeric values
+1216 constant/normal/O2 numeric matrix comparisons passed
+Readonly/compile-time constants, numeric boundaries, concurrent failures, bounded traces and restart checks passed
+Frontend passed: numeric values
+Frontend begin: diagnostic recovery/resource limits
+Frontend resource case: combined expression/constant depth
+Structured diagnostics: independent files, recovery, bounded cascades, snapshots and failed reload verified
+Frontend passed: diagnostic recovery/resource limits
+Frontend begin: value structs
+Frontend resource case: bounded expanded value layouts
+Value struct source: nested/mixed layouts, copies, normal/O2 JIT, diagnostics, tooling and reload passed
+Frontend passed: value structs
+Frontend begin: receiver methods
+Frontend resource case: b...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="modules" classname="modules" time="0.887808" status="run">
+		<properties/>
+		<system-out>Project constants, forwards, visibility, cycles, imports and restart checks passed
+Project-local library identities, cycles, ownership, overlays, native JIT and invalidation passed
+Multi-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed
+modules: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric_cli" classname="numeric_cli" time="20.2448" status="run">
+		<properties/>
+		<system-out>-- Numeric source constants, JIT and native AOT passed in both optimization modes
+</system-out>
+	</testcase>
+</testsuite>

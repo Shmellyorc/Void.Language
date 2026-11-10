@@ -1,0 +1,102 @@
+
+Relocation section '.rela.dyn' at offset 0x428 contains 1 entry:
+    Offset             Info             Type               Symbol's Value  Symbol's Name + Addend
+0000000000002fa0  0000000200000006 R_X86_64_GLOB_DAT      0000000000000000 g4_bias + 0
+
+Relocation section '.rela.plt' at offset 0x440 contains 9 entries:
+    Offset             Info             Type               Symbol's Value  Symbol's Name + Addend
+0000000000002fc0  0000000100000007 R_X86_64_JUMP_SLOT     0000000000001910 g4_add + 0
+0000000000002fc8  0000000300000007 R_X86_64_JUMP_SLOT     0000000000001980 g4_sample + 0
+0000000000002fd0  0000000400000007 R_X86_64_JUMP_SLOT     0000000000001a00 g4_fill + 0
+0000000000002fd8  0000000500000007 R_X86_64_JUMP_SLOT     0000000000001b10 g4_create + 0
+0000000000002fe0  0000000600000007 R_X86_64_JUMP_SLOT     0000000000001b90 g4_read + 0
+0000000000002fe8  0000000700000007 R_X86_64_JUMP_SLOT     0000000000001ba0 g4_close + 0
+0000000000002ff0  0000000800000007 R_X86_64_JUMP_SLOT     0000000000001bb0 g4_live + 0
+0000000000002ff8  0000000900000007 R_X86_64_JUMP_SLOT     0000000000001be8 g4_releases + 0
+0000000000003000  0000000a00000007 R_X86_64_JUMP_SLOT     0000000000001bf0 g4_gate + 0
+0000000000002fa0  0000000200000006 R_X86_64_GLOB_DAT      0000000000000000 g4_bias + 0
+0000000000002fe8  0000000700000007 R_X86_64_JUMP_SLOT     0000000000001ba0 g4_close + 0
+bad closure revision: C dynamic closure: unsupported revision
+system library policy: C dynamic closure: unsupported target, system ABI or relocation policy
+foreign provider: C dynamic closure: exact descriptor provider or target mismatch
+aliased image: C dynamic closure: invalid or duplicate image
+missing descriptor export: C dynamic closure is missing an owned descriptor export
+wrong target thunk: C dynamic closure: exact descriptor thunk mismatch
+direct bridge import: VOID IR: C primitive transport requires host admission and typed operations
+erased closure admission: VOID IR: C primitive admission differs from analyzed source
+forged dynamic ordinal: VOID IR: C primitive call outside the admitted binding module
+forged provider and symbol: VOID IR: invalid C primitive descriptor or exact call signature
+missing provider: C dynamic artifact: libvoid_g4_main.so is missing, aliased or outside file bounds
+modified dependency: C dynamic digest: libvoid_g4_dep.so
+symlink provider: C dynamic artifact: libvoid_g4_main.so is missing, aliased or outside file bounds
+hardlinked provider: C dynamic artifact: libvoid_g4_main.so is missing, aliased or outside file bounds
+missing required export: C dynamic symbol: missing exact owned export g4_missing
+wrong symbol owner: C dynamic symbol: missing exact owned export g4_bias
+conflicting symbol across closure: C dynamic symbol: conflicting closure definition g4_add
+unapproved ELF target: C dynamic ELF: unsupported target or header
+unsupported dynamic tag 15: C dynamic ELF: unsupported dynamic tag 15
+unsupported dynamic tag 1879047932: C dynamic ELF: unsupported dynamic tag 1879047932
+unsupported dynamic tag 12: C dynamic ELF: unsupported dynamic tag 12
+system DT_NEEDED: C dynamic dependency: unapproved DT_NEEDED in libvoid_g4_main.so
+ELF program header 3: C dynamic ELF: unsupported program header 3
+ELF program header 7: C dynamic ELF: unsupported program header 7
+IFUNC resolver: C dynamic ELF: unsupported dynamic symbol (including weak, TLS and resolver symbols)
+IRELATIVE resolver: C dynamic ELF: unsupported relocation or target
+real initializer would exit 121 if mapped: C dynamic ELF: unsupported dynamic tag 1879048185
+G4 mapped libvoid_g4_dep.so inode 6431094 verified sealed SHA-256 8b65d8bb8321c959c73e7675b2e109817339f2b9b848b4ddadcc52058bc8fedb
+G4 mapped libvoid_g4_main.so inode 6431095 verified sealed SHA-256 9f5ed19fb79c4cda22fabdd6ed92633d04f9506c50d155c2766a85d3394319b8
+cross-Runtime binding transfer: C dynamic authority: native binding is already owned by a Runtime
+stale dynamic alias: <host binding /native_dynamic.void>:15:6: runtime error: C resource is closed, null or invalid
+In function /native_dynamic.void::read
+Called from /dynamic.void::entry
+/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4-got/probes/dynamic.void:46:20: source call
+        return ffi.read(alias, 0)
+                   ^
+
+dynamic double close: <host binding /native_dynamic.void>:17:6: runtime error: C resource is closed, null or invalid
+In function /native_dynamic.void::close_box
+Called from /dynamic.void::entry
+/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4-got/probes/dynamic.void:48:20: source call
+        return ffi.close_box(alias)
+                   ^
+
+refused dynamic acquisition containing a live pointer: <host binding /native_dynamic.void>:13:6: runtime error: C resource operation rejected org.voidlang.g4-fixture::g4_create
+In function /native_dynamic.void::create
+Called from /dynamic.void::entry
+/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4-got/probes/dynamic.void:16:28: source call
+        var rejected = ffi.create(-3)
+                           ^
+
+different closure in live Runtime: C dynamic closure is incompatible with the Runtime binding
+G4 normal JIT returned 104; refusal, reload, live call, teardown and unmap passed
+G4 mapped libvoid_g4_dep.so inode 6374322 verified sealed SHA-256 8b65d8bb8321c959c73e7675b2e109817339f2b9b848b4ddadcc52058bc8fedb
+G4 mapped libvoid_g4_main.so inode 6374323 verified sealed SHA-256 9f5ed19fb79c4cda22fabdd6ed92633d04f9506c50d155c2766a85d3394319b8
+cross-Runtime binding transfer: C dynamic authority: native binding is already owned by a Runtime
+stale dynamic alias: <host binding /native_dynamic.void>:15:6: runtime error: C resource is closed, null or invalid
+In function /native_dynamic.void::read
+Called from /dynamic.void::entry
+/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4-got/probes/dynamic.void:46:20: source call
+        return ffi.read(alias, 0)
+                   ^
+
+dynamic double close: <host binding /native_dynamic.void>:17:6: runtime error: C resource is closed, null or invalid
+In function /native_dynamic.void::close_box
+Called from /dynamic.void::entry
+/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4-got/probes/dynamic.void:48:20: source call
+        return ffi.close_box(alias)
+                   ^
+
+refused dynamic acquisition containing a live pointer: <host binding /native_dynamic.void>:13:6: runtime error: C resource operation rejected org.voidlang.g4-fixture::g4_create
+In function /native_dynamic.void::create
+Called from /dynamic.void::entry
+/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4-got/probes/dynamic.void:16:28: source call
+        var rejected = ffi.create(-3)
+                           ^
+
+different closure in live Runtime: C dynamic closure is incompatible with the Runtime binding
+G4 O2 JIT returned 104; refusal, reload, live call, teardown and unmap passed
+new Runtime after on-disk dependency replacement: C dynamic digest: libvoid_g4_dep.so
+05816a22fc90f944cd1615787a096934296b98d9882ac60d8aa677d607f95d04  /home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4-got/closure.txt
+9c0ca95779c70986d147690bae0d2f901d4bf9a6c76e564f37ee867fc6e8d4d7  /home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4-got/provider-got.o
+9f5ed19fb79c4cda22fabdd6ed92633d04f9506c50d155c2766a85d3394319b8  /home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4-got/native/libvoid_g4_main.so
+8b65d8bb8321c959c73e7675b2e109817339f2b9b848b4ddadcc52058bc8fedb  /home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4-got/native/libvoid_g4_dep.so

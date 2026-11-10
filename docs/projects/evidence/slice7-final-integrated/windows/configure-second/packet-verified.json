@@ -1,0 +1,18 @@
+{
+  "inputs": 3440,
+  "archive_sha256": "5cf21e1e755a5fdf30a2614ac3486d609b5c81a363fab25e4c78c7c13469ef48",
+  "source": "C:\\Users\\a\\VS7I2\\src",
+  "host_verifier": "C:\\Users\\a\\VoidCI42377496702-Native\\tools\\verify_host_deps.py",
+  "host_recipes": {
+    "tools/setup_host_deps.py": "f0337524e09c5d407c6106ebccfb1622a22a858beb0da4f149fad75e7af36b95",
+    "tools/setup_host_deps_native.py": "42b30dc4d52bd66d55ad779ed3c2162c0ac0043654b5326011a4eee3a6f67bca",
+    "tools/verify_host_deps.py": "f14ab068ed336b275e61fb70fcbfdbd98f53a5f666f74647ce5d339f64d6a94c",
+    "tools/ci/llvm_sdk.py": "7dad9c894eec0d83e6a435013d69a70db87522cc10aef53d9405ab562f70b149",
+    "cmake/host-sodium.targets": "34639af7817a33cdee517a41321958ea48271878beaeb48e32c795891e7af57a",
+    "third_party/host-versions.json": "dea223fa0debd0d2e666e66f14508964f3204340c00fec0a57dcdf20d20656ca",
+    "third_party/host-patches/libsodium-1.0.22/PROVENANCE.json": "4841bfe7f283b250bb2b6fa1872b602416bb91a0e67c5f6179742d8c4bc0c0c8",
+    "third_party/host-patches/libsodium-1.0.22/asan-alignment.patch": "f0de9004b8129626e14750437f51eb9524f030149607b50bb75ce0b6c998af74"
+  },
+  "free_bytes": 15060566016,
+  "platform": "Windows-10-10.0.19045-SP0"
+}

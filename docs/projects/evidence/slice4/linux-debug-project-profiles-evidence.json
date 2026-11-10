@@ -1,0 +1,559 @@
+{
+  "checks": 43,
+  "commands": [
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "check",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9"
+      ],
+      "status": 0,
+      "stdout": "Source checked successfully\n",
+      "stderr": "/tmp/VOID profile execution \u96ea b0tzrwy9/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--no-cache"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID profile execution \u96ea b0tzrwy9/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "check",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--profile",
+        "release"
+      ],
+      "status": 0,
+      "stdout": "Source checked successfully\n",
+      "stderr": "/tmp/VOID profile execution \u96ea b0tzrwy9/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--no-cache",
+        "--profile",
+        "release"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID profile execution \u96ea b0tzrwy9/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "check",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--profile",
+        "debug"
+      ],
+      "status": 0,
+      "stdout": "Source checked successfully\n",
+      "stderr": "/tmp/VOID profile execution \u96ea b0tzrwy9/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--no-cache",
+        "--profile",
+        "debug"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID profile execution \u96ea b0tzrwy9/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "check",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "Source checked successfully\n",
+      "stderr": "/tmp/VOID profile execution \u96ea b0tzrwy9/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID profile execution \u96ea b0tzrwy9/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--profile"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: Expected one debug|release value after --profile.\nUsage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\nTry 'voidc run --help' for examples.\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--profile",
+        "Debug"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --profile requires exactly debug or release.\nUsage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\nTry 'voidc run --help' for examples.\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--profile",
+        "other"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --profile requires exactly debug or release.\nUsage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\nTry 'voidc run --help' for examples.\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--profile",
+        "debug",
+        "--profile",
+        "release"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: Expected one debug|release value after --profile.\nUsage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\nTry 'voidc run --help' for examples.\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--profile",
+        "release",
+        "--cache"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --cache requires the debug profile with effective optimization='none'; it cannot override an explicit release profile or O2 setting.\nUsage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\nTry 'voidc run --help' for examples.\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--profile",
+        "release",
+        "--cache",
+        "--no-opt"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --cache requires the debug profile with effective optimization='none'; it cannot override an explicit release profile or O2 setting.\nUsage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\nTry 'voidc run --help' for examples.\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--profile",
+        "debug",
+        "--cache",
+        "--no-cache"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --cache and --no-cache cannot be combined.\nUsage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\nTry 'voidc run --help' for examples.\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9/src/game.void",
+        "--profile",
+        "debug"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --profile requires a manifest-selected project context.\nUsage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\nTry 'voidc run --help' for examples.\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "check",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9/src/game.void",
+        "--profile",
+        "debug"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --profile requires a manifest-selected project context.\nUsage: voidc check <file-or-directory> [--no-opt]\nTry 'voidc check --help' for examples.\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "build",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9/src/game.void",
+        "--profile",
+        "debug"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --profile requires a manifest-selected project context.\nUsage: voidc build [file-or-directory] [-o executable] [--no-opt]\nTry 'voidc build --help' for examples.\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "emit",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9/src/game.void",
+        "--profile",
+        "debug",
+        "-o",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9/unused.o"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --profile requires a manifest-selected project context.\nUsage: voidc emit <file-or-directory> -o <object> [--no-opt]\nTry 'voidc emit --help' for examples.\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "emit",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--profile",
+        "debug",
+        "-o",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9/debug.o"
+      ],
+      "status": 0,
+      "stdout": "Wrote native source object: /tmp/VOID profile execution \u96ea b0tzrwy9/debug.o\n",
+      "stderr": "/tmp/VOID profile execution \u96ea b0tzrwy9/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-objdump",
+        "-d",
+        "--no-show-raw-insn",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9/debug.o"
+      ],
+      "status": 0,
+      "stdout": "\n/tmp/VOID profile execution \u96ea b0tzrwy9/debug.o:\tfile format elf64-x86-64\n\nDisassembly of section .text:\n\n0000000000000000 <__vd_2f7372632f67616d652e766f69643a3a636f6d70757465__void>:\n       0:      \tmovl\t%edi, %eax\n       2:      \tmovl\t%edi, -0x4(%rsp)\n       6:      \tmovl\t%edi, -0xc(%rsp)\n       a:      \tmovl\t%edi, -0x8(%rsp)\n       e:      \tmovl\t%edi, -0x10(%rsp)\n      12:      \tretq\n      13:      \tnopw\t%cs:(%rax,%rax)\n\n0000000000000020 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void>:\n      20:      \tpushq\t%rbx\n      21:      \tsubq\t$0x10, %rsp\n      25:      \tmovq\t%rdi, %rbx\n      28:      \tmovl\t$0x17, 0xc(%rsp)\n      30:      \tmovl\t$0x17, %edi\n      35:      \tmovq\t%rbx, %rsi\n      38:      \tcallq\t0x3d <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x1d>\n      3d:      \tcmpq\t$0x0, (%rbx)\n      41:      \tje\t0x6a <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x4a>\n      43:      \tmovl\t0x8(%rbx), %eax\n      46:      \tcmpl\t$0x20, %eax\n      49:      \tjae\t0x61 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x41>\n      4b:      \tmovslq\t%eax, %rcx\n      4e:      \tleaq\t(%rip), %rdx            # 0x55 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x35>\n      55:      \tmovq\t%rdx, 0x10(%rbx,%rcx,8)\n      5a:      \tincl\t%eax\n      5c:      \tmovl\t%eax, 0x8(%rbx)\n      5f:      \tjmp\t0x68 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x48>\n      61:      \tmovl\t$0x21, 0x8(%rbx)\n      68:      \txorl\t%eax, %eax\n      6a:      \taddq\t$0x10, %rsp\n      6e:      \tpopq\t%rbx\n      6f:      \tretq\n\n0000000000000070 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void>:\n      70:      \tpushq\t%rbx\n      71:      \tsubq\t$0x10, %rsp\n      75:      \tmovq\t%rsi, %rbx\n      78:      \tmovl\t$0x0, 0xc(%rsp)\n      80:      \tmovq\t%rsi, %rdi\n      83:      \tcallq\t0x88 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x18>\n      88:      \tcmpq\t$0x0, (%rbx)\n      8c:      \tje\t0xb5 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x45>\n      8e:      \tmovl\t0x8(%rbx), %eax\n      91:      \tcmpl\t$0x20, %eax\n      94:      \tjae\t0xac <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x3c>\n      96:      \tmovslq\t%eax, %rcx\n      99:      \tleaq\t(%rip), %rdx            # 0xa0 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x30>\n      a0:      \tmovq\t%rdx, 0x10(%rbx,%rcx,8)\n      a5:      \tincl\t%eax\n      a7:      \tmovl\t%eax, 0x8(%rbx)\n      aa:      \tjmp\t0xb3 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x43>\n      ac:      \tmovl\t$0x21, 0x8(%rbx)\n      b3:      \txorl\t%eax, %eax\n      b5:      \taddq\t$0x10, %rsp\n      b9:      \tpopq\t%rbx\n      ba:      \tretq\n      bb:      \tnopl\t(%rax,%rax)\n\n00000000000000c0 <main>:\n      c0:      \tpushq\t%rbp\n      c1:      \tpushq\t%r15\n      c3:      \tpushq\t%r14\n      c5:      \tpushq\t%rbx\n      c6:      \tsubq\t$0x118, %rsp            # imm = 0x118\n      cd:      \txorps\t%xmm0, %xmm0\n      d0:      \tmovups\t%xmm0, 0x108(%rsp)\n      d8:      \tmovups\t%xmm0, 0xf8(%rsp)\n      e0:      \tmovups\t%xmm0, 0xe8(%rsp)\n      e8:      \tmovups\t%xmm0, 0xd8(%rsp)\n      f0:      \tmovups\t%xmm0, 0xc8(%rsp)\n      f8:      \tmovups\t%xmm0, 0xb8(%rsp)\n     100:      \tmovups\t%xmm0, 0xa8(%rsp)\n     108:      \tmovups\t%xmm0, 0x98(%rsp)\n     110:      \tmovups\t%xmm0, 0x88(%rsp)\n     118:      \tmovups\t%xmm0, 0x78(%rsp)\n     11d:      \tmovups\t%xmm0, 0x68(%rsp)\n     122:      \tmovups\t%xmm0, 0x58(%rsp)\n     127:      \tmovups\t%xmm0, 0x48(%rsp)\n     12c:      \tmovups\t%xmm0, 0x38(%rsp)\n     131:      \tmovups\t%xmm0, 0x28(%rsp)\n     136:      \tmovups\t%xmm0, 0x18(%rsp)\n     13b:      \tmovl\t$0x0, 0x10(%rsp)\n     143:      \tmovq\t$0x0, 0x8(%rsp)\n     14c:      \tleaq\t0x8(%rsp), %rsi\n     151:      \txorl\t%edi, %edi\n     153:      \tcallq\t0x158 <main+0x98>\n     158:      \tmovq\t0x8(%rsp), %rdx\n     15d:      \ttestq\t%rdx, %rdx\n     160:      \tje\t0x1ea <main+0x12a>\n     166:      \tmovq\t(%rip), %rax            # 0x16d <main+0xad>\n     16d:      \tmovq\t(%rax), %rbx\n     170:      \tleaq\t(%rip), %r14            # 0x177 <main+0xb7>\n     177:      \tmovq\t%rbx, %rdi\n     17a:      \tmovq\t%r14, %rsi\n     17d:      \txorl\t%eax, %eax\n     17f:      \tcallq\t0x184 <main+0xc4>\n     184:      \tmovl\t0x10(%rsp), %ebp\n     188:      \txorl\t%r15d, %r15d\n     18b:      \tcmpl\t%ebp, %r15d\n     18e:      \tjae\t0x1b0 <main+0xf0>\n     190:      \tcmpl\t$0x1f, %r15d\n     194:      \tja\t0x1b0 <main+0xf0>\n     196:      \tmovq\t0x18(%rsp,%r15,8), %rdx\n     19b:      \tmovq\t%rbx, %rdi\n     19e:      \tmovq\t%r14, %rsi\n     1a1:      \txorl\t%eax, %eax\n     1a3:      \tcallq\t0x1a8 <main+0xe8>\n     1a8:      \tincq\t%r15\n     1ab:      \tcmpl\t%ebp, %r15d\n     1ae:      \tjb\t0x190 <main+0xd0>\n     1b0:      \tcmpl\t$0x21, %ebp\n     1b3:      \tjb\t0x1cd <main+0x10d>\n     1b5:      \tleaq\t(%rip), %rsi            # 0x1bc <main+0xfc>\n     1bc:      \tleaq\t(%rip), %rdx            # 0x1c3 <main+0x103>\n     1c3:      \tmovq\t%rbx, %rdi\n     1c6:      \txorl\t%eax, %eax\n     1c8:      \tcallq\t0x1cd <main+0x10d>\n     1cd:      \tleaq\t(%rip), %rsi            # 0x1d4 <main+0x114>\n     1d4:      \tleaq\t(%rip), %rdx            # 0x1db <main+0x11b>\n     1db:      \tmovq\t%rbx, %rdi\n     1de:      \txorl\t%eax, %eax\n     1e0:      \tcallq\t0x1e5 <main+0x125>\n     1e5:      \tmovl\t$0x1, %eax\n     1ea:      \taddq\t$0x118, %rsp            # imm = 0x118\n     1f1:      \tpopq\t%rbx\n     1f2:      \tpopq\t%r14\n     1f4:      \tpopq\t%r15\n     1f6:      \tpopq\t%rbp\n     1f7:      \tretq\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "emit",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--profile",
+        "release",
+        "-o",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9/release.o"
+      ],
+      "status": 0,
+      "stdout": "Wrote native source object: /tmp/VOID profile execution \u96ea b0tzrwy9/release.o\n",
+      "stderr": "/tmp/VOID profile execution \u96ea b0tzrwy9/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-objdump",
+        "-d",
+        "--no-show-raw-insn",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9/release.o"
+      ],
+      "status": 0,
+      "stdout": "\n/tmp/VOID profile execution \u96ea b0tzrwy9/release.o:\tfile format elf64-x86-64\n\nDisassembly of section .text:\n\n0000000000000000 <__vd_2f7372632f67616d652e766f69643a3a636f6d70757465__void>:\n       0:      \tmovl\t%edi, %eax\n       2:      \tretq\n       3:      \tnopw\t%cs:(%rax,%rax)\n\n0000000000000010 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void>:\n      10:      \tcmpq\t$0x0, (%rdi)\n      14:      \tje\t0x39 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x29>\n      16:      \tmovl\t0x8(%rdi), %eax\n      19:      \tmovl\t$0x21, %ecx\n      1e:      \tcmpq\t$0x20, %rax\n      22:      \tjae\t0x33 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x23>\n      24:      \tleaq\t(%rip), %rcx            # 0x2b <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x1b>\n      2b:      \tmovq\t%rcx, 0x10(%rdi,%rax,8)\n      30:      \tleal\t0x1(%rax), %ecx\n      33:      \tmovl\t%ecx, 0x8(%rdi)\n      36:      \txorl\t%eax, %eax\n      38:      \tretq\n      39:      \tmovl\t$0x17, %eax\n      3e:      \tretq\n      3f:      \tnop\n\n0000000000000040 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void>:\n      40:      \tcmpq\t$0x0, (%rsi)\n      44:      \tje\t0x77 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x37>\n      46:      \tmovl\t0x8(%rsi), %eax\n      49:      \tmovl\t$0x21, %ecx\n      4e:      \tcmpq\t$0x1f, %rax\n      52:      \tja\t0x71 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x31>\n      54:      \tleaq\t(%rip), %rdx            # 0x5b <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x1b>\n      5b:      \tmovq\t%rdx, 0x10(%rsi,%rax,8)\n      60:      \tje\t0x71 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x31>\n      62:      \tleaq\t(%rip), %rcx            # 0x69 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x29>\n      69:      \tmovq\t%rcx, 0x18(%rsi,%rax,8)\n      6e:      \tleal\t0x2(%rax), %ecx\n      71:      \tmovl\t%ecx, 0x8(%rsi)\n      74:      \txorl\t%eax, %eax\n      76:      \tretq\n      77:      \tmovl\t$0x17, %eax\n      7c:      \tretq\n      7d:      \tnopl\t(%rax)\n\n0000000000000080 <main>:\n      80:      \tmovl\t$0x17, %eax\n      85:      \tretq\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "emit",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--profile",
+        "release",
+        "--no-opt",
+        "-o",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9/release-noopt.o"
+      ],
+      "status": 0,
+      "stdout": "Wrote native source object: /tmp/VOID profile execution \u96ea b0tzrwy9/release-noopt.o\n",
+      "stderr": "/tmp/VOID profile execution \u96ea b0tzrwy9/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-objdump",
+        "-d",
+        "--no-show-raw-insn",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9/release-noopt.o"
+      ],
+      "status": 0,
+      "stdout": "\n/tmp/VOID profile execution \u96ea b0tzrwy9/release-noopt.o:\tfile format elf64-x86-64\n\nDisassembly of section .text:\n\n0000000000000000 <__vd_2f7372632f67616d652e766f69643a3a636f6d70757465__void>:\n       0:      \tmovl\t%edi, %eax\n       2:      \tmovl\t%edi, -0x4(%rsp)\n       6:      \tmovl\t%edi, -0xc(%rsp)\n       a:      \tmovl\t%edi, -0x8(%rsp)\n       e:      \tmovl\t%edi, -0x10(%rsp)\n      12:      \tretq\n      13:      \tnopw\t%cs:(%rax,%rax)\n\n0000000000000020 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void>:\n      20:      \tpushq\t%rbx\n      21:      \tsubq\t$0x10, %rsp\n      25:      \tmovq\t%rdi, %rbx\n      28:      \tmovl\t$0x17, 0xc(%rsp)\n      30:      \tmovl\t$0x17, %edi\n      35:      \tmovq\t%rbx, %rsi\n      38:      \tcallq\t0x3d <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x1d>\n      3d:      \tcmpq\t$0x0, (%rbx)\n      41:      \tje\t0x6a <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x4a>\n      43:      \tmovl\t0x8(%rbx), %eax\n      46:      \tcmpl\t$0x20, %eax\n      49:      \tjae\t0x61 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x41>\n      4b:      \tmovslq\t%eax, %rcx\n      4e:      \tleaq\t(%rip), %rdx            # 0x55 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x35>\n      55:      \tmovq\t%rdx, 0x10(%rbx,%rcx,8)\n      5a:      \tincl\t%eax\n      5c:      \tmovl\t%eax, 0x8(%rbx)\n      5f:      \tjmp\t0x68 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x48>\n      61:      \tmovl\t$0x21, 0x8(%rbx)\n      68:      \txorl\t%eax, %eax\n      6a:      \taddq\t$0x10, %rsp\n      6e:      \tpopq\t%rbx\n      6f:      \tretq\n\n0000000000000070 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void>:\n      70:      \tpushq\t%rbx\n      71:      \tsubq\t$0x10, %rsp\n      75:      \tmovq\t%rsi, %rbx\n      78:      \tmovl\t$0x0, 0xc(%rsp)\n      80:      \tmovq\t%rsi, %rdi\n      83:      \tcallq\t0x88 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x18>\n      88:      \tcmpq\t$0x0, (%rbx)\n      8c:      \tje\t0xb5 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x45>\n      8e:      \tmovl\t0x8(%rbx), %eax\n      91:      \tcmpl\t$0x20, %eax\n      94:      \tjae\t0xac <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x3c>\n      96:      \tmovslq\t%eax, %rcx\n      99:      \tleaq\t(%rip), %rdx            # 0xa0 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x30>\n      a0:      \tmovq\t%rdx, 0x10(%rbx,%rcx,8)\n      a5:      \tincl\t%eax\n      a7:      \tmovl\t%eax, 0x8(%rbx)\n      aa:      \tjmp\t0xb3 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x43>\n      ac:      \tmovl\t$0x21, 0x8(%rbx)\n      b3:      \txorl\t%eax, %eax\n      b5:      \taddq\t$0x10, %rsp\n      b9:      \tpopq\t%rbx\n      ba:      \tretq\n      bb:      \tnopl\t(%rax,%rax)\n\n00000000000000c0 <main>:\n      c0:      \tpushq\t%rbp\n      c1:      \tpushq\t%r15\n      c3:      \tpushq\t%r14\n      c5:      \tpushq\t%rbx\n      c6:      \tsubq\t$0x118, %rsp            # imm = 0x118\n      cd:      \txorps\t%xmm0, %xmm0\n      d0:      \tmovups\t%xmm0, 0x108(%rsp)\n      d8:      \tmovups\t%xmm0, 0xf8(%rsp)\n      e0:      \tmovups\t%xmm0, 0xe8(%rsp)\n      e8:      \tmovups\t%xmm0, 0xd8(%rsp)\n      f0:      \tmovups\t%xmm0, 0xc8(%rsp)\n      f8:      \tmovups\t%xmm0, 0xb8(%rsp)\n     100:      \tmovups\t%xmm0, 0xa8(%rsp)\n     108:      \tmovups\t%xmm0, 0x98(%rsp)\n     110:      \tmovups\t%xmm0, 0x88(%rsp)\n     118:      \tmovups\t%xmm0, 0x78(%rsp)\n     11d:      \tmovups\t%xmm0, 0x68(%rsp)\n     122:      \tmovups\t%xmm0, 0x58(%rsp)\n     127:      \tmovups\t%xmm0, 0x48(%rsp)\n     12c:      \tmovups\t%xmm0, 0x38(%rsp)\n     131:      \tmovups\t%xmm0, 0x28(%rsp)\n     136:      \tmovups\t%xmm0, 0x18(%rsp)\n     13b:      \tmovl\t$0x0, 0x10(%rsp)\n     143:      \tmovq\t$0x0, 0x8(%rsp)\n     14c:      \tleaq\t0x8(%rsp), %rsi\n     151:      \txorl\t%edi, %edi\n     153:      \tcallq\t0x158 <main+0x98>\n     158:      \tmovq\t0x8(%rsp), %rdx\n     15d:      \ttestq\t%rdx, %rdx\n     160:      \tje\t0x1ea <main+0x12a>\n     166:      \tmovq\t(%rip), %rax            # 0x16d <main+0xad>\n     16d:      \tmovq\t(%rax), %rbx\n     170:      \tleaq\t(%rip), %r14            # 0x177 <main+0xb7>\n     177:      \tmovq\t%rbx, %rdi\n     17a:      \tmovq\t%r14, %rsi\n     17d:      \txorl\t%eax, %eax\n     17f:      \tcallq\t0x184 <main+0xc4>\n     184:      \tmovl\t0x10(%rsp), %ebp\n     188:      \txorl\t%r15d, %r15d\n     18b:      \tcmpl\t%ebp, %r15d\n     18e:      \tjae\t0x1b0 <main+0xf0>\n     190:      \tcmpl\t$0x1f, %r15d\n     194:      \tja\t0x1b0 <main+0xf0>\n     196:      \tmovq\t0x18(%rsp,%r15,8), %rdx\n     19b:      \tmovq\t%rbx, %rdi\n     19e:      \tmovq\t%r14, %rsi\n     1a1:      \txorl\t%eax, %eax\n     1a3:      \tcallq\t0x1a8 <main+0xe8>\n     1a8:      \tincq\t%r15\n     1ab:      \tcmpl\t%ebp, %r15d\n     1ae:      \tjb\t0x190 <main+0xd0>\n     1b0:      \tcmpl\t$0x21, %ebp\n     1b3:      \tjb\t0x1cd <main+0x10d>\n     1b5:      \tleaq\t(%rip), %rsi            # 0x1bc <main+0xfc>\n     1bc:      \tleaq\t(%rip), %rdx            # 0x1c3 <main+0x103>\n     1c3:      \tmovq\t%rbx, %rdi\n     1c6:      \txorl\t%eax, %eax\n     1c8:      \tcallq\t0x1cd <main+0x10d>\n     1cd:      \tleaq\t(%rip), %rsi            # 0x1d4 <main+0x114>\n     1d4:      \tleaq\t(%rip), %rdx            # 0x1db <main+0x11b>\n     1db:      \tmovq\t%rbx, %rdi\n     1de:      \txorl\t%eax, %eax\n     1e0:      \tcallq\t0x1e5 <main+0x125>\n     1e5:      \tmovl\t$0x1, %eax\n     1ea:      \taddq\t$0x118, %rsp            # imm = 0x118\n     1f1:      \tpopq\t%rbx\n     1f2:      \tpopq\t%r14\n     1f4:      \tpopq\t%r15\n     1f6:      \tpopq\t%rbp\n     1f7:      \tretq\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "build",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--profile",
+        "debug",
+        "-o",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9/debug"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID profile execution \u96ea b0tzrwy9/debug\n",
+      "stderr": "/tmp/VOID profile execution \u96ea b0tzrwy9/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/tmp/VOID profile execution \u96ea b0tzrwy9/debug"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "build",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--profile",
+        "release",
+        "-o",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9/release"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID profile execution \u96ea b0tzrwy9/release\n",
+      "stderr": "/tmp/VOID profile execution \u96ea b0tzrwy9/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/tmp/VOID profile execution \u96ea b0tzrwy9/release"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--profile",
+        "debug"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID profile execution \u96ea b0tzrwy9/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--profile",
+        "debug",
+        "--cache"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID profile execution \u96ea b0tzrwy9/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\nDebug cache: miss\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--profile",
+        "debug",
+        "--cache"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID profile execution \u96ea b0tzrwy9/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\nDebug cache: hit\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--cache"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": "/tmp/VOID profile execution \u96ea b0tzrwy9/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\nDebug cache: hit\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "emit",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--profile",
+        "debug",
+        "-o",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9/custom-debug.o"
+      ],
+      "status": 0,
+      "stdout": "Wrote native source object: /tmp/VOID profile execution \u96ea b0tzrwy9/custom-debug.o\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-objdump",
+        "-d",
+        "--no-show-raw-insn",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9/custom-debug.o"
+      ],
+      "status": 0,
+      "stdout": "\n/tmp/VOID profile execution \u96ea b0tzrwy9/custom-debug.o:\tfile format elf64-x86-64\n\nDisassembly of section .text:\n\n0000000000000000 <__vd_2f7372632f67616d652e766f69643a3a636f6d70757465__void>:\n       0:      \tmovl\t%edi, %eax\n       2:      \tretq\n       3:      \tnopw\t%cs:(%rax,%rax)\n\n0000000000000010 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void>:\n      10:      \tcmpq\t$0x0, (%rdi)\n      14:      \tje\t0x39 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x29>\n      16:      \tmovl\t0x8(%rdi), %eax\n      19:      \tmovl\t$0x21, %ecx\n      1e:      \tcmpq\t$0x20, %rax\n      22:      \tjae\t0x33 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x23>\n      24:      \tleaq\t(%rip), %rcx            # 0x2b <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x1b>\n      2b:      \tmovq\t%rcx, 0x10(%rdi,%rax,8)\n      30:      \tleal\t0x1(%rax), %ecx\n      33:      \tmovl\t%ecx, 0x8(%rdi)\n      36:      \txorl\t%eax, %eax\n      38:      \tretq\n      39:      \tmovl\t$0x17, %eax\n      3e:      \tretq\n      3f:      \tnop\n\n0000000000000040 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void>:\n      40:      \tcmpq\t$0x0, (%rsi)\n      44:      \tje\t0x77 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x37>\n      46:      \tmovl\t0x8(%rsi), %eax\n      49:      \tmovl\t$0x21, %ecx\n      4e:      \tcmpq\t$0x1f, %rax\n      52:      \tja\t0x71 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x31>\n      54:      \tleaq\t(%rip), %rdx            # 0x5b <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x1b>\n      5b:      \tmovq\t%rdx, 0x10(%rsi,%rax,8)\n      60:      \tje\t0x71 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x31>\n      62:      \tleaq\t(%rip), %rcx            # 0x69 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x29>\n      69:      \tmovq\t%rcx, 0x18(%rsi,%rax,8)\n      6e:      \tleal\t0x2(%rax), %ecx\n      71:      \tmovl\t%ecx, 0x8(%rsi)\n      74:      \txorl\t%eax, %eax\n      76:      \tretq\n      77:      \tmovl\t$0x17, %eax\n      7c:      \tretq\n      7d:      \tnopl\t(%rax)\n\n0000000000000080 <main>:\n      80:      \tmovl\t$0x17, %eax\n      85:      \tretq\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "emit",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--profile",
+        "release",
+        "-o",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9/custom-release.o"
+      ],
+      "status": 0,
+      "stdout": "Wrote native source object: /tmp/VOID profile execution \u96ea b0tzrwy9/custom-release.o\n",
+      "stderr": "/tmp/VOID profile execution \u96ea b0tzrwy9/void.project.toml:16:12: warning: Project profile 'release' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 16 | debug_info='full'\n    |            ^^^^^^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-objdump",
+        "-d",
+        "--no-show-raw-insn",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9/custom-release.o"
+      ],
+      "status": 0,
+      "stdout": "\n/tmp/VOID profile execution \u96ea b0tzrwy9/custom-release.o:\tfile format elf64-x86-64\n\nDisassembly of section .text:\n\n0000000000000000 <__vd_2f7372632f67616d652e766f69643a3a636f6d70757465__void>:\n       0:      \tmovl\t%edi, %eax\n       2:      \tmovl\t%edi, -0x4(%rsp)\n       6:      \tmovl\t%edi, -0xc(%rsp)\n       a:      \tmovl\t%edi, -0x8(%rsp)\n       e:      \tmovl\t%edi, -0x10(%rsp)\n      12:      \tretq\n      13:      \tnopw\t%cs:(%rax,%rax)\n\n0000000000000020 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void>:\n      20:      \tpushq\t%rbx\n      21:      \tsubq\t$0x10, %rsp\n      25:      \tmovq\t%rdi, %rbx\n      28:      \tmovl\t$0x17, 0xc(%rsp)\n      30:      \tmovl\t$0x17, %edi\n      35:      \tmovq\t%rbx, %rsi\n      38:      \tcallq\t0x3d <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x1d>\n      3d:      \tcmpq\t$0x0, (%rbx)\n      41:      \tje\t0x6a <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x4a>\n      43:      \tmovl\t0x8(%rbx), %eax\n      46:      \tcmpl\t$0x20, %eax\n      49:      \tjae\t0x61 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x41>\n      4b:      \tmovslq\t%eax, %rcx\n      4e:      \tleaq\t(%rip), %rdx            # 0x55 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x35>\n      55:      \tmovq\t%rdx, 0x10(%rbx,%rcx,8)\n      5a:      \tincl\t%eax\n      5c:      \tmovl\t%eax, 0x8(%rbx)\n      5f:      \tjmp\t0x68 <__vd_2f7372632f67616d652e766f69643a3a6d61696e__void+0x48>\n      61:      \tmovl\t$0x21, 0x8(%rbx)\n      68:      \txorl\t%eax, %eax\n      6a:      \taddq\t$0x10, %rsp\n      6e:      \tpopq\t%rbx\n      6f:      \tretq\n\n0000000000000070 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void>:\n      70:      \tpushq\t%rbx\n      71:      \tsubq\t$0x10, %rsp\n      75:      \tmovq\t%rsi, %rbx\n      78:      \tmovl\t$0x0, 0xc(%rsp)\n      80:      \tmovq\t%rsi, %rdi\n      83:      \tcallq\t0x88 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x18>\n      88:      \tcmpq\t$0x0, (%rbx)\n      8c:      \tje\t0xb5 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x45>\n      8e:      \tmovl\t0x8(%rbx), %eax\n      91:      \tcmpl\t$0x20, %eax\n      94:      \tjae\t0xac <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x3c>\n      96:      \tmovslq\t%eax, %rcx\n      99:      \tleaq\t(%rip), %rdx            # 0xa0 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x30>\n      a0:      \tmovq\t%rdx, 0x10(%rbx,%rcx,8)\n      a5:      \tincl\t%eax\n      a7:      \tmovl\t%eax, 0x8(%rbx)\n      aa:      \tjmp\t0xb3 <__vd_2f7372632f67616d652e766f69643a3a246170705f61646170746572__void+0x43>\n      ac:      \tmovl\t$0x21, 0x8(%rbx)\n      b3:      \txorl\t%eax, %eax\n      b5:      \taddq\t$0x10, %rsp\n      b9:      \tpopq\t%rbx\n      ba:      \tretq\n      bb:      \tnopl\t(%rax,%rax)\n\n00000000000000c0 <main>:\n      c0:      \tpushq\t%rbp\n      c1:      \tpushq\t%r15\n      c3:      \tpushq\t%r14\n      c5:      \tpushq\t%rbx\n      c6:      \tsubq\t$0x118, %rsp            # imm = 0x118\n      cd:      \txorps\t%xmm0, %xmm0\n      d0:      \tmovups\t%xmm0, 0x108(%rsp)\n      d8:      \tmovups\t%xmm0, 0xf8(%rsp)\n      e0:      \tmovups\t%xmm0, 0xe8(%rsp)\n      e8:      \tmovups\t%xmm0, 0xd8(%rsp)\n      f0:      \tmovups\t%xmm0, 0xc8(%rsp)\n      f8:      \tmovups\t%xmm0, 0xb8(%rsp)\n     100:      \tmovups\t%xmm0, 0xa8(%rsp)\n     108:      \tmovups\t%xmm0, 0x98(%rsp)\n     110:      \tmovups\t%xmm0, 0x88(%rsp)\n     118:      \tmovups\t%xmm0, 0x78(%rsp)\n     11d:      \tmovups\t%xmm0, 0x68(%rsp)\n     122:      \tmovups\t%xmm0, 0x58(%rsp)\n     127:      \tmovups\t%xmm0, 0x48(%rsp)\n     12c:      \tmovups\t%xmm0, 0x38(%rsp)\n     131:      \tmovups\t%xmm0, 0x28(%rsp)\n     136:      \tmovups\t%xmm0, 0x18(%rsp)\n     13b:      \tmovl\t$0x0, 0x10(%rsp)\n     143:      \tmovq\t$0x0, 0x8(%rsp)\n     14c:      \tleaq\t0x8(%rsp), %rsi\n     151:      \txorl\t%edi, %edi\n     153:      \tcallq\t0x158 <main+0x98>\n     158:      \tmovq\t0x8(%rsp), %rdx\n     15d:      \ttestq\t%rdx, %rdx\n     160:      \tje\t0x1ea <main+0x12a>\n     166:      \tmovq\t(%rip), %rax            # 0x16d <main+0xad>\n     16d:      \tmovq\t(%rax), %rbx\n     170:      \tleaq\t(%rip), %r14            # 0x177 <main+0xb7>\n     177:      \tmovq\t%rbx, %rdi\n     17a:      \tmovq\t%r14, %rsi\n     17d:      \txorl\t%eax, %eax\n     17f:      \tcallq\t0x184 <main+0xc4>\n     184:      \tmovl\t0x10(%rsp), %ebp\n     188:      \txorl\t%r15d, %r15d\n     18b:      \tcmpl\t%ebp, %r15d\n     18e:      \tjae\t0x1b0 <main+0xf0>\n     190:      \tcmpl\t$0x1f, %r15d\n     194:      \tja\t0x1b0 <main+0xf0>\n     196:      \tmovq\t0x18(%rsp,%r15,8), %rdx\n     19b:      \tmovq\t%rbx, %rdi\n     19e:      \tmovq\t%r14, %rsi\n     1a1:      \txorl\t%eax, %eax\n     1a3:      \tcallq\t0x1a8 <main+0xe8>\n     1a8:      \tincq\t%r15\n     1ab:      \tcmpl\t%ebp, %r15d\n     1ae:      \tjb\t0x190 <main+0xd0>\n     1b0:      \tcmpl\t$0x21, %ebp\n     1b3:      \tjb\t0x1cd <main+0x10d>\n     1b5:      \tleaq\t(%rip), %rsi            # 0x1bc <main+0xfc>\n     1bc:      \tleaq\t(%rip), %rdx            # 0x1c3 <main+0x103>\n     1c3:      \tmovq\t%rbx, %rdi\n     1c6:      \txorl\t%eax, %eax\n     1c8:      \tcallq\t0x1cd <main+0x10d>\n     1cd:      \tleaq\t(%rip), %rsi            # 0x1d4 <main+0x114>\n     1d4:      \tleaq\t(%rip), %rdx            # 0x1db <main+0x11b>\n     1db:      \tmovq\t%rbx, %rdi\n     1de:      \txorl\t%eax, %eax\n     1e0:      \tcallq\t0x1e5 <main+0x125>\n     1e5:      \tmovl\t$0x1, %eax\n     1ea:      \taddq\t$0x118, %rsp            # imm = 0x118\n     1f1:      \tpopq\t%rbx\n     1f2:      \tpopq\t%r14\n     1f4:      \tpopq\t%r15\n     1f6:      \tpopq\t%rbp\n     1f7:      \tretq\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--profile",
+        "debug",
+        "--cache"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "Invalid invocation: --cache requires the debug profile with effective optimization='none'; it cannot override an explicit release profile or O2 setting.\nUsage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\nTry 'voidc run --help' for examples.\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--profile",
+        "debug",
+        "--cache",
+        "--no-opt"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": "Debug cache: miss\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "check",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9"
+      ],
+      "status": 0,
+      "stdout": "Source checked successfully\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "check",
+        "--project",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9",
+        "--profile",
+        "debug"
+      ],
+      "status": 0,
+      "stdout": "Source checked successfully\n",
+      "stderr": "/tmp/VOID profile execution \u96ea b0tzrwy9/void.project.toml:12:12: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 12 | debug_info='full'\n    |            ^^^^^^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9/src/game.void",
+        "--no-cache"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "/tmp/VOID profile execution \u96ea b0tzrwy9/src/game.void",
+        "--cache"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": "Debug cache: miss\n"
+    }
+  ]
+}

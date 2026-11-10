@@ -1,0 +1,17 @@
+[0/2] Re-checking globbed directories...
+[1/17] Building CXX object CMakeFiles\void_numeric_enum_ir.dir\tests\numeric\enums_ir.cpp.obj
+[2/17] C:\Windows\system32\cmd.exe /C "cd /D C:\Users\a\VoidS6-Final-Debug && C:\gcc\bin\cmake.exe -E make_directory C:/Users/a/VoidS6-Final-Debug && C:\gcc\bin\cmake.exe -E copy_if_different C:/Users/a/VoidS6-Final-Debug/void-native-resources.txt C:/Users/a/VoidS6-Final-Debug/void-native-resources.txt"
+[3/17] Building CXX object CMakeFiles\void_core.dir\src\frontend\compiler.cpp.obj
+[4/17] Linking CXX static library void_core.lib
+[5/17] Linking CXX executable voidls.exe
+[6/17] Generating cache-identity-Debug.cpp
+[7/17] Building CXX object CMakeFiles\void_cache_identity.dir\cache-identity-Debug.cpp.obj
+[8/17] Linking CXX static library void_cache_identity.lib
+[9/17] Linking CXX executable void_project_manifest.exe
+[10/17] Linking CXX executable void_project_selection.exe
+[11/17] Linking CXX executable voidc.exe
+[12/17] Linking CXX executable void_project_creation.exe
+[13/17] Linking CXX executable void_project_sessions.exe
+[14/17] Linking CXX executable void_project_application.exe
+[15/17] Linking CXX executable void_tests.exe
+[16/17] Linking CXX executable void_numeric_enum_ir.exe

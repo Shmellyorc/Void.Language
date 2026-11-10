@@ -1,0 +1,3 @@
+held: \Device\HarddiskVolume3\Users\a\VoidS7-G4-checkpoint\good\void_g4_probe_main.dll
+mapped: \Device\HarddiskVolume3\Users\a\VoidS7-G4-checkpoint\good\void_g4_probe_main.dll
+path-match=1 initializer-marker=-1

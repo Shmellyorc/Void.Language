@@ -1,0 +1,9 @@
+{
+  "mode": "multi-root",
+  "editor": "1.141.0",
+  "platform": "linux",
+  "events": [
+    "multi-root workspace stays syntax-only with zero child launches or writes"
+  ],
+  "status": "PASS"
+}

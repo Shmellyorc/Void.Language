@@ -1,0 +1,67 @@
+{
+  "removed": [
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice6/vm-native-command.png",
+      "sha256": "adf65101b451fc88299a25cf5cf361b361c7b4ae086318737bb7ec2d729e2c3f"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice6/vm-native-final-command.png",
+      "sha256": "6daa22c68f15f64e0a81c92ad21c6b4d51a2ce4257d1da1ee9d727b8e330526c"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice6/vm-capture-times-command.png",
+      "sha256": "3a86c630dbb996de1db1384e89829aa19f2dc1694427df175e30ac268bb5e4c1"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice6/vm-cleanup-command.png",
+      "sha256": "3c699aacc15209aec14554db4a101fe29bc30f579600b04d3d57026abf4de833"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice6/managed-default.void",
+      "sha256": "a1527a2ee909d5b8f827aa25b6c55204487ca72a895ece8dd039ddaa8f197b79"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice6/docs-example.void",
+      "sha256": "ab780c808f6a75d590eb0a19c52006dcb7f1c5f7e62c7661f79656bba86e0f38"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice6/smoke.void",
+      "sha256": "6ae287e3002d8bf2d05b76748203e336404d0fdf3ce80ec6a65dedf200b40da6"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice6/__pycache__/types.cpython-314.pyc",
+      "sha256": "48dc635f367314443403adeca53b3c2e3e0dab02633c387fcf5aa0af1f2d292b"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice6/edit-backend.py",
+      "sha256": "afad1d70a71f429996a344366cf6b5fddddc203b7ba11cf7cb5b20f250d3d928"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice6/edit-front.py",
+      "sha256": "74da07037b7fe110a2c6fe9ad17c8cd80807ad817fa5d34d6164865db224c66d"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice6/edit-ir.py",
+      "sha256": "cfeb701210e2e926977885d134ddbcddee8a3c23322472613d9ad5385e062179"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice6/edit-types.py",
+      "sha256": "b9c51e7204222b4cec0d9a2492843b77ee2183404eca659073d4f93e45bd0ee4"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice6/__pycache__"
+    }
+  ],
+  "retained": [
+    "/home/shmellyorc/Documents/Void.Language/build/slice6",
+    "/home/shmellyorc/Documents/Void.Language/build/slice6/start",
+    "/home/shmellyorc/Documents/Void.Language/docs/projects/evidence/slice6",
+    "/home/shmellyorc/Documents/Void.Language/docs/projects/evidence/slice6-source.patch",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict",
+    "/home/shmellyorc/VM/project-slice6"
+  ],
+  "retention_reason": "Build trees, binaries, prior-byte checkpoint, reproduction scripts, transcripts and native packets support independent review.",
+  "test_fixtures": "CTest and VS Code fixtures removed their owned temporary directories after subprocess exit."
+}

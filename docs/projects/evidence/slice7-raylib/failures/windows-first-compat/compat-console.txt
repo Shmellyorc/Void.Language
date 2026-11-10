@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "C:\Users\a\VoidS7-Raylib-Compatibility\compat.py", line 30, in <module>
+    run('configure',[cmake,'-S',src,'-B',build,'-G','Ninja',
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '-DCMAKE_MAKE_PROGRAM='+str(ninja),'-DCMAKE_C_COMPILER='+str(sdk/'clang-cl.exe'),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '-DCMAKE_LINKER='+str(sdk/'lld-link.exe'),'-DCMAKE_BUILD_TYPE=Release','-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '-DBUILD_SHARED_LIBS=ON','-DBUILD_EXAMPLES=OFF','-DPLATFORM=Desktop','-DOPENGL_VERSION=1.1'])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidS7-Raylib-Compatibility\compat.py", line 28, in run
+    completed.check_returncode()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\subprocess.py", line 509, in check_returncode
+    raise CalledProcessError(self.returncode, self.args, self.stdout,
+                             self.stderr)
+subprocess.CalledProcessError: Command '['C:\\gcc\\bin\\cmake.exe', '-S', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0', '-B', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build', '-G', 'Ninja', '-DCMAKE_MAKE_PROGRAM=C:\\gcc\\bin\\ninja.exe', '-DCMAKE_C_COMPILER=C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\clang-cl.exe', '-DCMAKE_LINKER=C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\lld-link.exe', '-DCMAKE_BUILD_TYPE=Release', '-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded', '-DBUILD_SHARED_LIBS=ON', '-DBUILD_EXAMPLES=OFF', '-DPLATFORM=Desktop', '-DOPENGL_VERSION=1.1']' returned non-zero exit status 1.

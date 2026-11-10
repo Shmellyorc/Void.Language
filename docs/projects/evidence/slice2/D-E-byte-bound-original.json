@@ -1,0 +1,28 @@
+{
+  "binary_sha256": "97111ceb905e02df82a99660db7f5844e2dd3abb8a255e2c1d973b2751b0fda4",
+  "D_bytes": 67108864,
+  "E_extra_source": "libs/tool/tool.void, 23 bytes; execution sources keep existing VFS/parser limits",
+  "commands": [
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "check",
+        "/tmp/VOID D E byte bound 1ccgkkzi/app.void"
+      ],
+      "status": 0,
+      "stdout": "Source checked successfully\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "check",
+        "--project",
+        "/tmp/VOID D E byte bound 1ccgkkzi"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID D E byte bound 1ccgkkzi/void.project.toml:1:1: error: Project source/input byte limit exceeded.\n    code: VOID9001\n\n 1 | schema=1\n   | ^\n    Module: /libs/tool/tool.void\n    Hint: Reduce the admitted source set or manifest size; selection is never truncated.\n\n"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+      Start 400: numeric_enum_process
+      Start  14: project_discovery_cli
+ 1/15 Test  #14: project_discovery_cli ............   Passed   11.13 sec
+      Start 439: numeric_cli
+ 2/15 Test #400: numeric_enum_process .............   Passed   18.59 sec
+      Start 404: numeric_sprint2
+ 3/15 Test #404: numeric_sprint2 ..................   Passed    3.95 sec
+      Start 402: frontend
+ 4/15 Test #402: frontend .........................   Passed   10.70 sec
+      Start 399: numeric_enum_ir
+ 5/15 Test #399: numeric_enum_ir ..................***Failed    0.22 sec
+enum: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+enum initialized: accepted
+field: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+field initialized: accepted
+array: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+array initialized: accepted
+field-array: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+field-array initialized: accepted
+array-field: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+array-field initialized: accepted
+nested: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+nested initialized: accepted
+managed: rejected (VOID IR: non-nullable reference storage read before initialization in /enum-storage.void::probe)
+managed initialized: accepted
+zero-backed holder: rejected (VOID IR: nominal source objects require complete construction)
+zero-backed legacy_scalar: rejected (VOID IR: numeric enum fields require complete managed construction)
+zero-backed legacy_array: rejected (VOID IR: numeric enum fields require complete managed construction)
+managed missing field: rejected (VOID IR: invalid complete managed construction)
+managed partial buffer: rejected (VOID IR: incomplete numeric enum array escapes private construction)
+read allocated array before initialization: rejected (VOID IR: incomplete numeric enum array escapes private construction)
+partial buffer through private home: rejected (VOID IR: incomplete numeric enum array escapes private construction)
+partial buffer through ordinary store: rejected (VOID IR: incomplete numeric enum array escapes private construction)
+forged completion of ordinary value: rejected (VOID IR: invalid numeric enum array completion)
+complete private buffer published and projected: accepted
+private home absent on one predecessor: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+legacy array initialization of a finished value: rejected (VOID IR: invalid array element initialization)
+Invalid fixed value contractCalled from /enum-storage.void::entry
+:1:1: source call
+
+
+      Start 398: numeric
+ 6/15 Test #439: numeric_cli ......................   Passed   27.36 sec
+      Start  17: project_nested_cli
+ 7/15 Test #398: numeric ..........................   Passed    5.28 sec
+      Start 390: reload
+ 8/15 Test #390: reload ...........................   Passed    0.40 sec
+      Start 403: modules
+ 9/15 Test  #17: project_nested_cli ...............   Passed    0.70 sec
+      Start 397: analysis
+10/15 Test #397: analysis .........................   Passed    0.81 sec
+      Start 401: numeric_enum_lsp
+11/15 Test #401: numeric_enum_lsp .................   Passed    0.14 sec
+      Start 395: sessions
+12/15 Test #403: modules ..........................   Passed    1.03 sec
+      Start 391: gc
+13/15 Test #391: gc ...............................   Passed    0.11 sec
+      Start 392: native
+14/15 Test #392: native ...........................   Passed    0.03 sec
+15/15 Test #395: sessions .........................   Passed    0.21 sec
+
+93% tests passed, 1 tests failed out of 15
+
+Total Test time (real) =  40.36 sec
+
+The following tests FAILED:
+	399 - numeric_enum_ir (Failed)
+Errors while running CTest

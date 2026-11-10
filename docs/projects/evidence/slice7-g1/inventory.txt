@@ -1,0 +1,1214 @@
+HEAD 2f667ea338127b8f91c3136804377ef3fa5218d6
+Index tuple SHA-256 c9b3a3ca23a36c7c11fac5839d50c9f3d07311f5ec61f8577182f1abb0715fc0
+Index tuples match the prior audit checkpoint and HEAD. Staged diff is empty.
+All 1,108 unaffected starting paths retain their previous bytes. The 7 amended starting paths match the starting hashes in source-hashes.json.
+{"g1_report_evidence_paths": 82, "g1_source_test_paths": 17, "index_entries": 68996, "modified": 69, "paths": 1207, "starting_paths": 1115, "starting_paths_amended": 7, "starting_paths_unchanged": 1108, "untracked": 1138}
+
+STATUS | LAYER | EXACT PATH | SHA-256
+ M | S7 G1 amendment; original layer: S6 implementation amendment; original layer: S5 amendment; original layer: S4 amendment; original layer: S3 amendment; original layer: S1 amended by S2 | CMakeLists.txt | acf3d8623293f623ef8a785e65b5e1fe2be8308923c255360694554e9d7c764b
+ M | S1 preserved | cmake/InstallLicenses.cmake | dd650c5bea430b8e0fd3f923e99b803a4364a0c84c60e4923457eebf8336177c
+ M | S5 amendment; original layer: S3 amendment; original layer: S1 amended by S2 | docs/CLI.md | 7a4506b08f3e7c171a48710e7d1e413e5a0e7e6413d5668aa77b5ce3cc5337c2
+ M | S1 amended by S2 | docs/DECISIONS.md | bfc3c1fcbd0e497077d53e53b25682cd93e6cb6a3f564bafd8f2b2eecbca10ee
+ M | S3 amendment; original layer: S1 amended by S2 | docs/DIAGNOSTICS.md | 4c52e63924aa8afe0ec1ac29cbc9971c7b2c22c11f56e222dd8bf713dc6241bc
+ M | S5 amendment; original layer: S3 amendment; original layer: S1 preserved | docs/EDITOR_INTEGRATION.md | cec88a456c2795df9df93c6b9a3e2b9d0bbf58473d4a9951e22065f0240347df
+ M | S6 implementation amendment; original layer: S1 preserved | docs/LANGUAGE_BIBLE.md | e3e90cc9ff01e42926a6b825472f5170f9a6ea1ca1bfd5738bf606580e36c63a
+ M | S5 amendment; original layer: S3 amendment; original layer: S1 preserved | docs/LANGUAGE_SERVER.md | 5a2753144bd58914b7716011d6e2695987984a5f5f63de6933f8c8b8cedfeb65
+ M | S1 preserved | docs/LOCAL_LIBRARIES.md | daec3f9e7a86773bbd932f266a797c4044cb1618542948cbb0c894abaaea504d
+ M | S1 amended by S2 | docs/MODULE_SYSTEM.md | 650a4207de55e9c57b5a909f3076dd8e38d4ef17a495540681f6bf1466d23758
+ M | S1 preserved | docs/NATIVE_LIBRARIES.md | 6574fe7e217115e9bb8f355f8f94ffc2e13be24dc4b9c3894fd4e94b772e5a98
+ M | S6 source/test/documentation | docs/NUMERIC_TYPES.md | 9e58be735259b3b72aefc4aee165b7450dea342b9c75b3ba5ad16a19d40608ef
+ M | S6 implementation amendment; original layer: S5 amendment; original layer: S4 amendment; original layer: S3 amendment; original layer: S1 amended by S2 | docs/PROJECT_ARCHITECTURE_ROADMAP.md | b3d1f06bcb0c730ba26a5e29ac0ad413c704e3823f7ef9a04685bf10d7d3718b
+ M | S1 amended by S2 | docs/README.md | cdab0706722b9f05add1d3aea19499ab99d1c9c748162258f54e8362145f5076
+ M | S4 amendment; original layer: S1 preserved | docs/RUNTIME_GLOBALS.md | 8b70b88ae945b7bff06d75b8c4e71a74e31893e0491323e4933b398abf2bf3dc
+ M | S1 amended by S2 | docs/SOURCE_COMPILER.md | 3c9a8f43557554f66f6c4d79f66b10c0dcf0481e052732309d3498ebc09f4253
+ M | S1 preserved | docs/STAGE8_DISCOVERY.md | 2a66b7dd2da18d3edbdd35a83dcbd9d4f15d46f67a7934a6d3d5521dafd0c3c6
+ M | S1 preserved | docs/STAGE9_APPLICATION_WORKFLOW.md | 231248b42c945cb8378511fc00643482699392dc613524eeb3aafb0231e11df2
+ M | S3 new source/documentation | docs/TOOLING_SESSIONS.md | 785a163df916a10b18dd70b57ace86f8ce21fed635246a0755e8a4bce8b4b5ed
+?? | S3 new report/evidence | docs/log/evidence/lsp-llvm23-debug-xw88aa_p/receipt.json | efa18623d01cd3cadaa1edb72c48bf471f1af34d4fa40c1744460b9bdec8a7f9
+?? | S3 new report/evidence | docs/log/evidence/lsp-llvm23-release-dyit2nor/receipt.json | d384387a918e0daf62dda81f72ac3d826179ba9fa3dd58a3a145cd00dd30c88b
+?? | S3 new report/evidence | docs/log/evidence/lsp-llvm23-strict-8a388way/receipt.json | 3f5d8d638bb891fd249e4c7b89df8ec21449aa39ce119f971a374b5c1e580b21
+ M | S4 amendment; original layer: S1 preserved | docs/os/API.md | 64c40e0069e3c8ea5b05d272cb297f530d5c7bd7d0aed8222d3802bb58aeb4b7
+?? | S1 preserved | docs/projects/SLICE1.md | e444c4c29e5e2ed0bc04973a42edd72718a43302cacab93ae084ef50b5a64623
+?? | S1 preserved | docs/projects/SLICE1_CLOSEOUT.md | 3373ff0423cd77ef5c1a22dc1a976bbef1837c3c51b9e3006bdb19ab0ce772d9
+?? | S2 new | docs/projects/SLICE2.md | acddef9284ebce49d222b84b486898ce23b229419d76e4ad8d0b6ff10a9e79ad
+?? | S2 final review: new report/evidence | docs/projects/SLICE2_FINAL_CLOSEOUT.md | 30f7195f067546967a9b99645fd9e22990fa7dc034ab9d9dbbd8d03b9425485b
+?? | S3 new report/evidence | docs/projects/SLICE3.md | d274a6c4f2343294261804e1bf31c177e00553c5ab5f2fa1647d3b9b24316d32
+?? | S3 final review report/evidence | docs/projects/SLICE3_FINAL_CLOSEOUT.md | 02fa6142ff71a9eec8d0dbc1b3a443197a00212e205bdb9f64f989660c6349dc
+?? | S4 report/evidence | docs/projects/SLICE4.md | 5136fc038d9c62f4eff835e1298a48db7426af93ccc51db5bd192bb5a6094b79
+?? | S5 report/evidence | docs/projects/SLICE5.md | a80a5548f07bb3e965a4f3a37d1da14e294f1212c6be1dace433990c01ed2877
+?? | S6 implementation amendment; original layer: S6 audit | docs/projects/SLICE6.md | a43a7b060f028f493dc3179b155b560c48ceaa70288e2e7412cc7f2102cb7c75
+?? | S6 final-review evidence | docs/projects/SLICE6_FINAL_CLOSEOUT.md | d24a147d93f18790adf6c257e2377be7c6f53d7611e99d5f8ec8dd022eb4977e
+?? | S7 architecture/evidence | docs/projects/SLICE7_ARCHITECTURE_REVIEW.md | 7d31b4d878df819006a6cbe9b148b10ae2e7748aea0dca4d2b250a65bb0cda3b
+?? | S7 G1 report/evidence | docs/projects/SLICE7_G1.md | 638b8357422fe1b36365edf9337be82c1253c34df04432303fa1b752343e283d
+?? | S1 preserved | docs/projects/evidence/closeout/header-target-first-build.log.txt | 0eabe90e683e7543c8e063ee4b37d6e64cd7de2858c8008bcda27ce68a9e1763
+?? | S1 preserved | docs/projects/evidence/closeout/linux-debug.xml | 12593d92fd478abc36c04cb0970930ef5287be0455e30c89c9c832fca2ac2871
+?? | S1 preserved | docs/projects/evidence/closeout/linux-install.xml | ce98af742b9f6abf79e9c2a2928a1336caba11da8396bcbf50a109639359874a
+?? | S1 preserved | docs/projects/evidence/closeout/linux-release.xml | 21692c038e692e757d315ec96f9f0d8e5303d77455b0bf668d34990f99435f37
+?? | S1 preserved | docs/projects/evidence/closeout/linux-strict.xml | fc964aac9dfaf0a57c2c1167ea6ec25147074ad8cbc452d0906e6c5a9065ae5f
+?? | S1 preserved | docs/projects/evidence/closeout/notice-corrected.json | 2340ae7ffa52b8bff71b4f8ec3e4d850c5dc2f2ae998e679311b3c3c98e143c2
+?? | S1 preserved | docs/projects/evidence/closeout/notice-failure.json | 9e2fe1d26bf19ffdaab1551f5dd7035be1ce93eca578f3aece462a9ab381f41c
+?? | S1 preserved | docs/projects/evidence/closeout/original-debug-failure.log.txt | 874bf705d693a32ca640500cd5c95e322aa1a34ce447ee8a9902497c9f3e247e
+?? | S1 preserved | docs/projects/evidence/closeout/original-debug-failure.xml | 8f8f19a589b642752f0a5aeddef2985238f3a4967374ac660b10848c5f6b8cf8
+?? | S1 preserved | docs/projects/evidence/closeout/original-strict-failure.log.txt | a4887e8a7c7c3bc8ccefe2820613cc00fbceb37e427b9645eda7ed39ac6beba4
+?? | S1 preserved | docs/projects/evidence/closeout/original-strict-failure.xml | 7b862217c3970a7de9ab0fc29c55b8d0363b244771b59b3c43f272db4ff38b89
+?? | S1 preserved | docs/projects/evidence/closeout/upstream-verification.json | 08296215161f51f70247aeba9ba6e43efa3bde8758c2e4ad0403108724782cdb
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-header-build.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-header.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-host-verified.log.txt | f8268f61956284ea7441be34b10bd2daf2502669e676eccedd4a5b5eaa5fb188
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-http-verified.log.txt | a0674edab6b3249be87077e6fbbb7c9f861f88ecd56e4f8d9a834b59aeb9b38e
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-manifest-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-manifest-link.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-manifest.log.txt | 1c19ddcd22048fad5eece177776c0b5ce8adae83623459a977719565a31311c0
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-project-compile.log.txt | 75e608194836a90675c29d3fe1b924588b54df3db497989e93a4f58bbb77969d
+?? | S1 preserved | docs/projects/evidence/closeout/windows-first-transfer-failure.json | 49f5d7ca83916c1f9a16f284abe2128e71cf63ad15296e75166143414c99b466
+?? | S1 preserved | docs/projects/evidence/closeout/windows-focused.cmd | 6200d60e0c27779723a9f5374f1465cdc5febd8ebee5950d91d83d2b4c9adcfa
+?? | S1 preserved | docs/projects/evidence/closeout/windows-focused.json | 04bc283c30127c6643b86c78df55ba55068f89f0ffc6166fe6e4fcf781e0259f
+?? | S1 preserved | docs/projects/evidence/closeout/windows-focused.py | 528d2a7d1c4413d2f8800a131a3e0766998aa3d12932a557266c2be38393b383
+?? | S1 preserved | docs/projects/evidence/closeout/windows-missing-host-archives-Release-configure.log.txt | a0cb3fca7fd64dbbe7f5ef20ac3d4ed9a216db8eb4926218e0d820eb892197bc
+?? | S1 preserved | docs/projects/evidence/closeout/windows-missing-host-archives-native-results.json | d335bb3299af4345f5f8d56e9fedeab66f5206e4d1f595f5ea225777f49e1cf8
+?? | S1 preserved | docs/projects/evidence/closeout/windows-missing-http-archives-Release-configure.log.txt | e3896eb60b6245bb407e8320c61972815605445f13cf90c0eb5405b517deb414
+?? | S1 preserved | docs/projects/evidence/closeout/windows-missing-http-archives-native-results.json | f32de66a9d4762f1092d9e32a58a5f2085c777e19cf535885d114e1ac15e3472
+?? | S1 preserved | docs/projects/evidence/closeout/windows-missing-reviewed-patches-Release-configure.log.txt | 2be8925a2900b278e9fa92d64e7559575ffe41cda2c7769d429c6fb7c36e43ee
+?? | S1 preserved | docs/projects/evidence/closeout/windows-missing-reviewed-patches-native-results.json | 5d8233311185a6fedf08dcbe173c04748d76102764cf24e8e2bd6f7941ba2f1d
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-header-build.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-header.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-host-verified.log.txt | 79b579d6fea2e609b6a4f7204582422e2fc1f782356115f1fc0aa12f0f09c2bd
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-http-verified.log.txt | b396cccb0dfc96a025bd3f3359d7c087034856e9b838f83763407b03fbf449be
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-manifest-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-manifest-link.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-manifest.log.txt | 1c19ddcd22048fad5eece177776c0b5ce8adae83623459a977719565a31311c0
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-project-compile.log.txt | 75e608194836a90675c29d3fe1b924588b54df3db497989e93a4f58bbb77969d
+?? | S1 preserved | docs/projects/evidence/closeout/windows-sdk-layout-Release-configure.log.txt | 23a0528a47a341ccea6738a19055851e0c8ae7cd290634fcc1bc600ec852d684
+?? | S1 preserved | docs/projects/evidence/closeout/windows-sdk-layout-native-results.json | a73e55dc525547100041a14a036cf5c24f7fbad03c676022f20320fa6f727285
+?? | S1 preserved | docs/projects/evidence/slice1-baseline-source.patch | c0ce96261e44bd6fa930050e5a0e6bfbaf57d5e9f6949be3db87dd42eb4fc99e
+?? | S1 preserved | docs/projects/evidence/slice1-closeout-inventory.txt | 167e9fe1e11450c707cf5d0d52e3fa1198b562e054e7a0dc8e1bf3a79090c5fb
+?? | S1 preserved | docs/projects/evidence/slice1-closeout-source.patch | f1d0a349a343facded33e6a5dbdeb0eae9903404ab5d0765035a554c146879a7
+?? | S1 preserved | docs/projects/evidence/slice1-closeout.json | 2e08de2f88853ea0f9ee70d858095d2cd0b22723d519d66cc3151f87c54dc44d
+?? | S1 preserved | docs/projects/evidence/slice1-local.json | 374d72c751d42e6fb929eb6509ab5a74f24ba243660aafebd051d6cd9c77cca3
+?? | S1 preserved | docs/projects/evidence/slice1-malformed-header.toml | 7904b2e1a98cfa5dbd6d3aa82ad6b605a00bbe4e3c1ddb58dd787d6620d7405e
+?? | S2 new | docs/projects/evidence/slice2-baseline-source.patch | b0451461aa43b95429694a8c95dcd1abaa9568231897c23aee63c4450518d458
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-baseline-source.patch | f9eb593b6c38b382b877be73dfc3d8c19819771b5cb98e43c73d615b7d6f9af8
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review-inventory.txt | f849c5fb452f5f54184d6b4f93dcd36ca924f9ff64845777c2523bbdfcb4e506
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review-source.patch | 3cf934aa21bb27654618c22b84bf52a9cf37ec482e4d3125e93370c7b821c5be
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review.json | df936fb5eaca942607d322b33fb5e0d2919f310721cff4d965e550367637f45f
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/artifacts.py | 53ec8579f6287fd43b2b1ad8755cc1f22ad9aac608d1163bd15b1ac98e10bcc3
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/audit.py | e4302388606de850e73d79a6e716d86491dc21b5f7a11e1830f0fceed4d6333c
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/original-focused-source.cpp.txt | 1ceb0ada90cb91c735d34948e7e6003352fee33952bb219a3f7730353a585d16
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/original-focused.json | 2b6b70c4641acf836bec106127dd082d00b02dbd2e8cae7e4539b0d4b4771814
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/original-oracle.cpp.txt | 9812e9ae939e9fb514ca11cdd94efffa65da2bd4471c196676f7ee0aba3cf694
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/patches.json | fbae5c100ab5f7ff277b68702e11dc9a71dd60e63f9a779f2125f87e3b8343c9
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/patches.py | d741d6b86b084bd32c045f12368c30d3bfef1af22e8f809cda8aaebc9c322194
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/regressions-before-repair.cpp.txt | b62c48c4e267cb71b70058e7caf38b0d24a031ca0b9b68a46d08952123cfd669
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-debug-build.log.txt | c90f500c04fd0a743c01a7eb423a2ed08039a800f6c27705fa3a4095a964d667
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-debug-final-build.log.txt | 3e2142d66c9cc2c510f60d0ba56db32d74fc6b79a083ee168c1de116ddf01c0d
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-debug-tests.log.txt | 89d4023b78bed60b91a4ee9b863261ef15660a5a54391449e0f98a0b6db36d07
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-debug.xml | c23d47989b2caad2573b51d0ee7ecba4d14825745c861f3362af397fd41b82ae
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-original-build.log.txt | b5ec214cd879d697b03ecfe17bc79a851d77c1bd31d28122afccfa3646b14555
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-original-corrected-oracle-build.log.txt | b5ec214cd879d697b03ecfe17bc79a851d77c1bd31d28122afccfa3646b14555
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-original-corrected-oracle-tests.log.txt | fc03c2af0d21dc6d4840668aad8bfbae5569f69d218b9121b2c076d904ee8593
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-original-focused-build.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-original-focused-tests.log.txt | b8c03fcb36d6873ace996fa18bf07511705daf502df5508d04c64e580d8b52ec
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-original-tests.log.txt | afb8341f2aa6951142f45f0f39d7838bd354e70117584148e0db4039b9bba74a
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-release-build.log.txt | f8c925e46f5f5d80c20d29756360a0d05c425bd4823a07d1d20ce063c9fc6877
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-release-final-build.log.txt | d2f1a080ea36158a7517d0f921c0a904036581507830663b9ada984f7ec63910
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-release-focused.log.txt | 875c66ff832719ba1ecb7c40bc6d707096a2b720259f870c8744c48d1d012a73
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-release-tests.log.txt | 50b9254e0857e68951f37796a35d2fc66b2b4436508622e3cdadb68dd158c10a
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-release.xml | 313d8df5124eb0b0f41c9f2f234875b7ae391dc75838688ee9d30221df01e10a
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-strict-build.log.txt | ed5da67134ade96d58fcb5242c8c2c9fcfab70db48b975459ee68afc98bff65c
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-strict-tests.log.txt | b64e38bdc9c05d9df5c193e6aff2e29a05cc59a993f43910f008dae1ef92e1ca
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/slice2-final-review-strict.xml | cc8487120c1ba83cc4f3fdd926e7f2ffec6775afc09e84565c584bb17de9fc69
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/starting-checkpoint.json | 7d21673dbc5e3febee415904c521fbfb75d34f7960183e0f4696a300a63edec3
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-CMakeCache.txt | 5d6ec3da1ccd316e3095d7a486e4a1f010c3bd7fc9bdfcbe65e4d118a2f6a70e
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-cli-link.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-cli-link.rsp | ce0328ee114b70b4f25ebddc726e91d20841664184af79fa7c629e817a577dac
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-compiler-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-host-verified.log.txt | f8268f61956284ea7441be34b10bd2daf2502669e676eccedd4a5b5eaa5fb188
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-http-verified.log.txt | a0674edab6b3249be87077e6fbbb7c9f861f88ecd56e4f8d9a834b59aeb9b38e
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-identity-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-identity-generate.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-legacy.log.txt | a6da4aef36c039b87cc5a0cf3cecae7f7fcccbe1c87312f2bdb5ca8e204d2082
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-main-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-nested-corrective.log.txt | f4a5e01c14adfe13e80babf2903870ff1de1cce1f585be76fb45364f528dccf2
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-nested.json | 1ad4aa41c94e64ad4b5565ed4decab2b28d57159eed09313659665b479487e19
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-nested.log.txt | 4dfe37df5fd301635bbad9e423a6dee817fd2d832218ed9eea134a6ce2fb75d5
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-project-cli.json | 068677f17996010ee7f8dbe4f627d1231cd19e01939bc2f19dd098638bcbcf0d
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-project-cli.log.txt | eb0967de8e40016e500566fe1c440e8c86117b853fd7c6c1aaf9cb024d71918c
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-project-compile.log.txt | fc8cc2aa0075a3b476999993a28dc96af0d73de3ca8a3b6ff4da9350f7316aca
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-selection-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-selection-link.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-selection-link.rsp | 3e1a5fff00f7c37f9e8d973767a65ea5003675d57eeb1a677642fd745f4b67d4
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Debug-selection.log.txt | d746123c0e722745d74df7a220bf8bb0206ea46e99363c25b9aa5233fa331dd9
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-CMakeCache.txt | fe8c451bbf087cecc81e3807e17b028c36a6e414bc182d0288621e558fec7d72
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-cli-link.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-cli-link.rsp | bb319d91ebd42484ee0e8df5f31cd0ef0a4de4e5762c37dd558be68a304160de
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-compiler-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-host-verified.log.txt | 79b579d6fea2e609b6a4f7204582422e2fc1f782356115f1fc0aa12f0f09c2bd
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-http-verified.log.txt | b396cccb0dfc96a025bd3f3359d7c087034856e9b838f83763407b03fbf449be
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-identity-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-identity-generate.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-legacy.log.txt | a6da4aef36c039b87cc5a0cf3cecae7f7fcccbe1c87312f2bdb5ca8e204d2082
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-main-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-nested-corrective.log.txt | f4a5e01c14adfe13e80babf2903870ff1de1cce1f585be76fb45364f528dccf2
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-nested.json | 7e41186289b95c08eef7b2bd9c1e71155ff695c3809d0a4dc71b9321daa2b624
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-project-cli.json | 1ba6ffeff0839945cdce410529d86e974b8bf579deb158d1fe4758e6e48721d8
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-project-cli.log.txt | eb0967de8e40016e500566fe1c440e8c86117b853fd7c6c1aaf9cb024d71918c
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-project-compile.log.txt | fc8cc2aa0075a3b476999993a28dc96af0d73de3ca8a3b6ff4da9350f7316aca
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-selection-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-selection-link.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-selection-link.rsp | 81512d596ead1cf32802a186b58cf9cd26c804fce15553a9484aa50b2d07f84d
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-Release-selection.log.txt | d746123c0e722745d74df7a220bf8bb0206ea46e99363c25b9aa5233fa331dd9
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-native-console.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-native-results.json | bfbbba8b47b519fb75e03792f4b2e2d1ed93d0a299e54c808a2a626ec5d21eda
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-native.cmd | 553cda22504a6ebbcb880309a6483b5491a4f7991db468f3f1104e04e8fcfeda
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-native.py | cf370afed50b8f8cc021f3d9cbe19aa78db1cd2450d02828e99fb7bf7dfd0172
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-nested-corrective-console.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-nested-corrective-native-results.json | 2d9593cf41f7bf3d87a4383965e2a488b385d5615970ab7786e6bf7c5c6164ff
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-nested-corrective-native.cmd | 7c865881267627434d448873f3b96fc895f716b80aeaff550c44f30ffbc9eb60
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-nested-corrective-native.py | 69cd8ca7b436ba286fb7b2b73ff3a12f6aedbfffb256b6b66dcf2158e75f1727
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-nested-corrective-vcvars.log.txt | 9a47202059fffaa236cbcc04b1d4434d5d165bb2f94d73ea21538334e840fd81
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-nested.py | 647dad971b57dc880a04c710f4a200fc036dd65477f9ef83dc23e2d86f8fc0f3
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-probe.json | 294d2c26a56d28235b594df0634ca638bb0922f23e65fadc49c360fbca571c6e
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-source-hashes.json | 1501ee1ca1af8a415ecac1196ad9b78eefe34f18e70db52d588ebd6cec012ac7
+?? | S2 final review: new report/evidence | docs/projects/evidence/slice2-final-review/windows-vcvars.log.txt | 9a47202059fffaa236cbcc04b1d4434d5d165bb2f94d73ea21538334e840fd81
+?? | S2 new | docs/projects/evidence/slice2-inventory.txt | a6c7b90e7e58525a5205d4a476097273e3448bab91a05ca6248008a245c2670a
+?? | S2 new | docs/projects/evidence/slice2-local.json | 56ff04bb71b14d499e2b2a04cc9ec3ffc6614349249ce72c6bf9b5a33c2f2b74
+?? | S2 new | docs/projects/evidence/slice2-source.patch | ae5e427a8b49f788b6fd8a4f6366f44d5fed1ef375610053d7bfdea1bd20f475
+?? | S2 new | docs/projects/evidence/slice2/D-E-byte-bound-original.json | c8ed6de2305ae437c7b7322ccf6355c2eb5117dcff79b1896af9f2ed1b6abdfb
+?? | S2 new | docs/projects/evidence/slice2/cli-install.xml | fcb63413dea30d1d6a1772f71df0a7d9d5c4a15437637c7744b83246c67b2e98
+?? | S2 new | docs/projects/evidence/slice2/first-build-failure.log.txt | 2122d342c502efcaf333364ed6514b0b474f5b1c3c4bf6c51a4141ed2ae7b6cc
+?? | S2 new | docs/projects/evidence/slice2/first-corrected-tests.xml | 8ee63043598c2cc7b0f94e7861561a0ae2a4632467c71c993bf443f23a8852db
+?? | S2 new | docs/projects/evidence/slice2/first-smoke.json | 780aa7ec9dbb39b5de66562878d4acaa304205315be4d3e04807703242f75788
+?? | S2 new | docs/projects/evidence/slice2/first-tests.xml | 624d54b15271b912ca94309c4156f58678123032aa3a620f18164ae39bb49e19
+?? | S2 new | docs/projects/evidence/slice2/import-depth-original.json | c092eba8ea4fc06881e817583f4db5e85b9d5226bb03cca9dd86f52f6cbc8eb2
+?? | S2 new | docs/projects/evidence/slice2/import-depth-pre-fix.cpp.txt | 52d2512852e0286b309f0eff292d4dece19c673be5df77cb8c1280bc463db1db
+?? | S2 new | docs/projects/evidence/slice2/incorrect-target-build.log.txt | a2d425a65e795cdbdcb7a93c539d1d7a450422fe04dc452ca3ebe750464b2ac1
+?? | S2 new | docs/projects/evidence/slice2/installed.json | f0e476c1b7539dd8cbde5769b7dc64a8ee1d7cf7e5985e15e6bbac60a2c015d5
+?? | S2 new | docs/projects/evidence/slice2/linux-debug-nested-processes.json | bf9f06f144f5e8d66462668a8a07ace27c7d67a66935205a9dbe90926f302019
+?? | S2 new | docs/projects/evidence/slice2/linux-debug-nested.xml | 13c2d4c92b3e9a313254a747aa04fdf81e97a730c668c57917d003f2152dfb46
+?? | S2 new | docs/projects/evidence/slice2/linux-debug-processes.json | dd35f89172cd34952f558ebf4bc63b50a662df36974871700b5612481cb5cb27
+?? | S2 new | docs/projects/evidence/slice2/linux-debug.xml | 0cc9d3805d220c2bf0908a0d2a2965a3e966b9740335a97ceabe03ab8e9bd75b
+?? | S2 new | docs/projects/evidence/slice2/linux-release-nested-processes.json | 60ae3814be336edbf2fdd0e23974c619b5d2167eb1727bed5ad42321dacdc7bd
+?? | S2 new | docs/projects/evidence/slice2/linux-release-nested.xml | 07fb3e517e55967d990831fb6ca914845ada5640d156e8462936d3e75965350a
+?? | S2 new | docs/projects/evidence/slice2/linux-release-processes.json | 20b06397ed8dd0a12ed18c8010c4b9f85fe1f55e345ef9f9278052f0080ecfef
+?? | S2 new | docs/projects/evidence/slice2/linux-release.xml | 4893ef264f2098bc9d79fd4cbf14d906cdcdd48d255d490eaf65b5eb65ab4c14
+?? | S2 new | docs/projects/evidence/slice2/linux-strict-nested-processes.json | 4433e259e20cc37a1492d968186aa4fba464270c26a16b20c144fa2988035957
+?? | S2 new | docs/projects/evidence/slice2/linux-strict-nested.xml | 6439700a83ca744221326c24cdd11eae082caae842993c562e90c3e4a81066c9
+?? | S2 new | docs/projects/evidence/slice2/linux-strict-processes.json | 0b19010f6250f02058b81d4c77a7a573902736b724c19144982b51a6daae1156
+?? | S2 new | docs/projects/evidence/slice2/linux-strict.xml | 4fc01eb0c07c1247949e3a1f7264992da72f31f18147b591b15885182896c77e
+?? | S2 new | docs/projects/evidence/slice2/low-stack.json | ef368e15a761a84608f8ada0644df21a76024eff6af06854e0a8efd90c2438bd
+?? | S2 new | docs/projects/evidence/slice2/pre-final-debug.xml | 4fd2895e9d1986523d2fa96d224fff7e06e0af1e66d129b28f732d9f8567473e
+?? | S2 new | docs/projects/evidence/slice2/pre-final-release.xml | f4a61282c1f64f778178ec3f14f8bbcfb11995fde7336952a2b968eb52e4484f
+?? | S2 new | docs/projects/evidence/slice2/pre-final-strict.xml | 3263f5c8b52500cb825bf26a62054fa979ead7ac5f5858614741889e890ea928
+?? | S2 new | docs/projects/evidence/slice2/root-alias-original.json | 0e5b841cce52ba809bdf3476a02dc64256f71c2aea13da43acec190dc501e0b9
+?? | S2 new | docs/projects/evidence/slice2/root-alias-pre-fix.inc.txt | c062c107bc46fb9601040ede99f7e4f8153e96f3edcc4cf36b3738b88828767e
+?? | S2 new | docs/projects/evidence/slice2/second-tests.xml | 3cf4936e3eeb887993d6d6a6c5fe512267b32ffe43a5ad3d01bd43b3b245d71c
+?? | S2 new | docs/projects/evidence/slice2/source-hardlink-original.json | e06c965fbfddb5812ff21ab2e7e8e6d831d0083c2da551631efa174b4091bd6a
+?? | S2 new | docs/projects/evidence/slice2/source-hardlink-pre-correction.inc.txt | 5cff515e619ce08a863755ba5e92e56a460cf5f4661ee2d171fc8d00914e0224
+?? | S2 new | docs/projects/evidence/slice2/third-tests.xml | fb03c5533218f3a0f0a17e8da2e1b4c31bac1d75128e85472ee16b49101b5642
+?? | S2 new | docs/projects/evidence/slice2/virtual-root-original.json | 65c002dca87124495c3e9fd869361c00ec76a186f5352ff9949f9e3504a7bd18
+?? | S2 new | docs/projects/evidence/slice2/virtual-root-pre-fix.inc.txt | c832738724d3db5d963c0133fdb08263c3be713d9a6e4d9c1a520d68b52c06d1
+?? | S2 new | docs/projects/evidence/slice2/windows-Debug-nested.json | 885d6c8e39e89e68ceb8b5d7d7a8ffc8921c029cfbda9e40ef72c59382681387
+?? | S2 new | docs/projects/evidence/slice2/windows-Debug-nested.log.txt | f4a5e01c14adfe13e80babf2903870ff1de1cce1f585be76fb45364f528dccf2
+?? | S2 new | docs/projects/evidence/slice2/windows-Release-nested.json | 2729c001105252109fe0f20782fa8a4c82500c6ef2ace2254dd111ed8ab30675
+?? | S2 new | docs/projects/evidence/slice2/windows-Release-nested.log.txt | f4a5e01c14adfe13e80babf2903870ff1de1cce1f585be76fb45364f528dccf2
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-cli-link.rsp | cef9611fabd6a66ba8538929613a4ea2563d7d35456bb87b38b4586857e2f4d9
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-compiler-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-host-verified.log.txt | f8268f61956284ea7441be34b10bd2daf2502669e676eccedd4a5b5eaa5fb188
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-http-verified.log.txt | a0674edab6b3249be87077e6fbbb7c9f861f88ecd56e4f8d9a834b59aeb9b38e
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-legacy.log.txt | a6da4aef36c039b87cc5a0cf3cecae7f7fcccbe1c87312f2bdb5ca8e204d2082
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-project-cli.json | 46ab3c74189d57fe15ba5c5ebeb34e4ced5c83a5891b905f6a8c797a5db249d7
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-project-cli.log.txt | eb0967de8e40016e500566fe1c440e8c86117b853fd7c6c1aaf9cb024d71918c
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-project-compile.log.txt | 00f884b9ab38873a65a11b75f79cbb32bbe4bb568fd7014fc982885940fcdf52
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-selection-link.rsp | 7166691401f36454ffd10116180ad260905a0ac22b27e3980cb36f4282ca1e48
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-selection.log.txt | c2584975831bd4e529f9b8fd6cee42ed2e5f01dc950f74113eea1ea5dfde444d
+?? | S2 new | docs/projects/evidence/slice2/windows-native.cmd | fc67b714af1632148ad72019da4db0a6cba852ad2df162d45298d425ac900e6d
+?? | S2 new | docs/projects/evidence/slice2/windows-native.json | e0c4a83a0df65e4b876684a1d241017324500997fd3240d94e239892441d8656
+?? | S2 new | docs/projects/evidence/slice2/windows-native.py | 7ac542a8d44b4a716c9ccd866758c54ef63e414434e1c69f68e528d82e32a461
+?? | S2 new | docs/projects/evidence/slice2/windows-nested-native-results.json | f77c4ce8bc06f70c147a508c0b11b3779cf8ee2a12106c674e556b5a44638f94
+?? | S2 new | docs/projects/evidence/slice2/windows-nested-native.cmd | f891dc1d2d07876c5153a452ed6110a550a6529b7abb347943e7b4588b0e9fd1
+?? | S2 new | docs/projects/evidence/slice2/windows-nested-native.py | 156e76ee876f10e388675aecf641b3d697cf73895d3aecb54a988519b73650af
+?? | S2 new | docs/projects/evidence/slice2/windows-original-failure.json | d888ebb92f14be5b9d7768acb6e77a06bb8fb1a554e0945cdb8ab9e5d625acd4
+?? | S2 new | docs/projects/evidence/slice2/windows-original-failure.log.txt | 3701cc6d3743d6ef6a00490c2362ec1db9fba0e165fb86a7fad824f71e2b0048
+?? | S2 new | docs/projects/evidence/slice2/windows-original-oracle.py | 1ff2fdc252d8ae6f64ea8888929235be1c3d4d7cd4b82f15669c35c82e40494e
+?? | S2 new | docs/projects/evidence/slice2/windows-original-processes.json | 20503a3eaf70cdb1309e2bc096c8cb1eff28c8238aefa1d6a5772612940be3dc
+?? | S2 new | docs/projects/evidence/slice2/windows-release-cli-link.rsp | 2456bb3cd2cc01cfe041deb387c80f87c458b590dbdcede5a38f23b88bd6b572
+?? | S2 new | docs/projects/evidence/slice2/windows-release-compiler-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S2 new | docs/projects/evidence/slice2/windows-release-host-verified.log.txt | 79b579d6fea2e609b6a4f7204582422e2fc1f782356115f1fc0aa12f0f09c2bd
+?? | S2 new | docs/projects/evidence/slice2/windows-release-http-verified.log.txt | b396cccb0dfc96a025bd3f3359d7c087034856e9b838f83763407b03fbf449be
+?? | S2 new | docs/projects/evidence/slice2/windows-release-legacy.log.txt | a6da4aef36c039b87cc5a0cf3cecae7f7fcccbe1c87312f2bdb5ca8e204d2082
+?? | S2 new | docs/projects/evidence/slice2/windows-release-project-cli.json | 012a7ecf2ea3817627701f6ec55730d2fea2d1f96895f68b14367e9239de4d07
+?? | S2 new | docs/projects/evidence/slice2/windows-release-project-cli.log.txt | eb0967de8e40016e500566fe1c440e8c86117b853fd7c6c1aaf9cb024d71918c
+?? | S2 new | docs/projects/evidence/slice2/windows-release-project-compile.log.txt | 00f884b9ab38873a65a11b75f79cbb32bbe4bb568fd7014fc982885940fcdf52
+?? | S2 new | docs/projects/evidence/slice2/windows-release-selection-link.rsp | be0079482d24a3b83ef90c0c3f318ca4fdff30c1bfd5c1a3fd74e732c54501cb
+?? | S2 new | docs/projects/evidence/slice2/windows-release-selection.log.txt | c2584975831bd4e529f9b8fd6cee42ed2e5f01dc950f74113eea1ea5dfde444d
+?? | S2 new | docs/projects/evidence/slice2/windows-source-hashes.json | 19bf6379d0af1d050bdb23dc9b0291dd4d179d397fb6c8048c499d1caf78abfd
+?? | S3 new report/evidence | docs/projects/evidence/slice3-baseline-source.patch | af05625c57307cfcfc9e14e3d8b6a2282acba2b66dd64d9a946ff1220152d858
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight-inventory.txt | a13ba078c8aee435abf6291c481e4d1556ee8f945df85ed25c316caf58551c66
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight-source.patch | 639dfad6cf52fe6b8e49d3d40d36c0d24e4f819edda2c29efcf2d62e7ca6a6fe
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight.json | 61d24394f1a754d3aecb064009b5cf56645097a61e74aedd0f05354622178b7e
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-debug-build.log.txt | dcbc9ccc2d9da9abed153e6a10d64ac81c06497d7f078a78d915cd184e2ef78a
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-debug-protocol.json | aadbb7ae66be38b6810c479dbb211ed375bb389f9008fe99377aefce877e1a41
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-debug.xml | 323d1b52aa47f29597abad568074369864e8a5034c3328987e8bb9ef09253608
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-launch-failure.json | 685530562c6878f5455a8a573116569d974c33ff685a66b6355f4c9f48a7fe25
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-release-build.log.txt | 724286474c91bf1972d9ee726329ea32524170cc1233fbb84bacd159e656e43a
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-release-final-probe.json | 585608e6e82d46068e0a1107878caffcbf651833a089199d4fd716e86fa4150a
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-release-original-protocol.json | 400705c3b0c29e8ccee95476bd70063a3e433923cc909361f52811320b87cdfd
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-release-original-protocol.log.txt | f39a54d611d9d03df321a23ddb0ca98ebfbd201b6b0b8037a73225733cd630b1
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-release-original.json | a950a5d55260193a25d6e40a391412f5b769e4dbfcbb23ef92f835b324fa553b
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-release-protocol.json | 534927b172a8deb5c14ede99759c916b590bcdd8e37392a81f56b78efab7cde9
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-release-readable-large.json | c101dd8cece5f202e6eddc0dd7a29f05c163c3c0e74c9d6847fc906bb535e7eb
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-release.xml | 80babf705114e336aef2966ba4fb8e0c5a9232983bf8c98360d45f241465e5bd
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-strict-build.log.txt | a10bb04ac1d42e42dce0490afed7603c7eb2ea59a429e9db0f9b1d75f2d7b065
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-strict-protocol.json | 28bd690cd8ba37ba9ad5f75938d212d274a1eb5bf0ae827302023cd0991d1b8c
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/linux-strict.xml | debfef2c9dc5d2a55cce608f29ea2517c4fe1361c9b8dac07a9efc8f01fcb9fe
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/probe.py | afcb16414510ee42692cf350838f8081140370695869a3c06e68a34c0335925d
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/vscode-project-host-final.json | 81bd86365f4d54358ba6e558eea0b2cd12e7b27ce82867643d0f31e5c7a65f1d
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/vscode-tests-final.log.txt | 25e2f681e79b90fad3827a2a5f4b1a328cceb75bd3e5da468f23e2ff67945dee
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-Debug-original-preflight.json | cf8f4d04a3dac1ea94aa690d38d4f037a140074fc47992e5346de36e485c3d7a
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-Debug-original-regression.log.txt | ffd57a63313eda2a6483e4a8b7510cf3f287713b8c9336cb56fee3a201e45307
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-Debug-protocol.json | c43eeb136d93ed07216ac5f627107c688c82552204a1d25a36cc4209246552a0
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-Debug-server-link.rsp | 01c541087e37a00d7f19e96413df07bfc2411e826abf799f6ddc6c23ce5a63ee
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-Debug-sessions-link.rsp | 6463b7abb9d58eef0cdcd614b510d809c2df118bf6d1eef1a195292228592771
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-Release-original-preflight.json | 9cbd6edb4be6030181fbf855528ed66e9c336b9cae8a6fc59b1ff5d865ea7115
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-Release-original-regression.log.txt | b437b661e9392e2c2672108ed971a4af414a5a5db7d1a364e91c6f79f5a34c58
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-Release-protocol.json | cf9aa24061f8bc064cd1ddcb3adbdd8d6103b393f006831df52a3fd3abda615c
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-Release-server-link.rsp | 75ecad704e298e12ad01440df5a78a001463b717ce47826a02b5ca6033514c0b
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-Release-sessions-link.rsp | aa965a9f9f01c559e40fa9b74ef9c4dac07074f3ef31d982c643a3e7725022a8
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-attempt1-Release-project-protocol.json | 1bb9f6aedde1d05a94bb545fc33ee85888bf5c38fa432475918112660e6875ee
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-attempt1-Release-project-protocol.log.txt | 11b965296746070ad64b36751aaea6f81813a48fd4907751b59c1b7404973e31
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-attempt1-native-results.json | 6601d91072c52fe6727407133b7d9b8d6e9ec3a534ab5fbe6414b2a30b7429b9
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-attempt2-Release-project-protocol.json | 28730a04ed08eac5f2b4b2f29dd7f673117cf1701ca26a832a88b5c48561924c
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-attempt2-Release-project-protocol.log.txt | 14045ce5811f0f175d81955a71a4b164b74d370c79ea8697648d950535f4925a
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-attempt2-native-results.json | e207deb295496e76c66832d67898b2f3f42322701e33cec630a0ab70c269df1c
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-native-results.json | bb56f831bc6b37af9491b8618a960042a8195f6cfc99c8b3fbdfee8d6830551b
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-native.py | 613dc34ff6f7a09e6b337c13304ad7a4ed005ef965fc10755ba708de1e478ed9
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-qualified-native-results.json | 5e696c6da56d1a06620f79331865e5c7ea9ed612c3fef44749b8a8b642879190
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-qualify.py | 161f7b71e4fe1eba727440192761419f65485c9c7f6af5b8b3d2859b4cd6e2dc
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-resume.py | afc2ff2080f3184ebfd7a2f8ec02ee2c027f6a1057c24aa213d4551210f374df
+?? | S3 final review report/evidence | docs/projects/evidence/slice3-final-preflight/windows-resume2.py | 65756d3a217be0711aea467fe62b746011d19cb6c1bce26be4b7503f7d816de1
+?? | S3 new report/evidence | docs/projects/evidence/slice3-inventory.txt | a1a51b4c95539746bb7f09625a9c4507c444c0e174ea47b875c0ab91226c0611
+?? | S3 new report/evidence | docs/projects/evidence/slice3-local.json | 1225c26ef67b8c75b8a83e3af3e6ce81dd5161d9e76833fc791637e3270e90fe
+?? | S3 new report/evidence | docs/projects/evidence/slice3-profile-decision.txt | b5348ed26fbad167ba7732e1e6f1d2a553a51c019ea6214f28c561e9298807d5
+?? | S3 new report/evidence | docs/projects/evidence/slice3-source.patch | 0845044cd0d2195be1aced809fdd6cef32ed9624fdad5417129dc122c173a423
+?? | S3 new report/evidence | docs/projects/evidence/slice3/installed-final-protocol.json | 9394129ed85aa380951c66f041a071c1c586434908232cd929b8f608396f8cf3
+?? | S3 new report/evidence | docs/projects/evidence/slice3/installed-final-results.json | 35c681034bea6fafbd235a6dd8a4f7bb78547a8fee052dd32072d8e8112b65a8
+?? | S3 new report/evidence | docs/projects/evidence/slice3/installed-protocol.json | 0be458caf83ae400853c35d9a010ee5bfb474b1cd2c979aa37f4d5daf2f39c52
+?? | S3 new report/evidence | docs/projects/evidence/slice3/installed-results.json | 6b7cc843e1866b125664aad94d1c10b0d70bee4b2466267545589da4e3eecf3d
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-debug-project-discovery.json | 928f3f09b05304cd43a73612fd7ad5a42c42e433d72fc0ed34b23fa09cd60049
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-debug-project-nested.json | a6b8b235ec6ab1d274eeb0eeefdcf1060b47d4b615e9b3bbda87f786d67d629b
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-debug-project-profiles.json | fbb7bb707e6cda396cd586521b8dd61418c36807c189d6f7a5c4af744980a978
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-debug-project-protocol.json | 9790ae28e880ef78cf251dc78f40f2da62255bed408583a3d87de3084c56a9d4
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-release-project-discovery.json | bdc547798672bc4cb106ed3cf38a891efeafdedd1fc97aa1d42fd9b4caa9d8af
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-release-project-nested.json | 50c89d0cf2486b5c5f4a5551da4afa78da6c153da18385c77949faf5b89605e4
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-release-project-profiles.json | 46911a35b2f59ac1e53b43aafe5d99d4a6013d43d1be59417b31f1a380aadbb3
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-release-project-protocol.json | c678f411a4a7c531e7d25181b52c2cf5a3b5d20b4656b13a7443ddfa64fcf3f0
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-strict-project-discovery.json | cb90d020e3fc31a44286af5a2d00cebe3889d71d2f3dffcea3275ede7d617cce
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-strict-project-nested.json | ae99a333e17613acc421b7e830bb3d210ba6c563168fe4de1fe134b4122c85a3
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-strict-project-profiles.json | 7445406382bdd1dda6ba55df2b82aa04b949364abf2ebbc5f1cd57f2a98340c2
+?? | S3 new report/evidence | docs/projects/evidence/slice3/linux-strict-project-protocol.json | 647289c50aa84fe991353ca05442a7562ec401c7d42a6e02a90212ecfae7780d
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-audit.py | 60c20a47cc6253f9dc119861ee07acdb3950dd31076fe52db25951d80a2c7406
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-cli-install-tests.log.txt | 436596af4ad32636e509b15d33cbaf27c0659356dd06867538c8e9f4a2d0ade1
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-cli-install.xml | 48e0b4217d8b1a0cc44a2b26f478b8eec9329769eb4f77faac6f6acc1b282fc1
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-core-first-build.log.txt | c8f3bc60b7ad982dff1957331f297524b1e7fc24e625a7d83c895529f46759c5
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-corrected-tests.log.txt | 69a92dbd89b0d8f6f41da13b99aacf03422d5b1ae8a45366d36299fce3e25582
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-corrected-tests.xml | 1a450e2bd11b5a84e6888c8f8c77409a88bd5c0337e1e64fbce2fcebec73277f
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-corrective-build.log.txt | 0372c17decc45a60af2a224892bb64f139933e8402054dc89bb63e7c6a065e30
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-debug-build.log.txt | 985d697061603d967a5ca7dfd3ad69d1990ce72ee95fc36a895b8ecdfed29cad
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-debug-configure.log.txt | 2f195f2e9140fff983d212458e1d771ced973252b09f0c058177a90ab4b03cda
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-debug-final-build.log.txt | 8a120131a891a41ab01475d7a3c45ba6d117f70236a27c8313950978cc455888
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-debug-final-server-build.log.txt | 272b63004f521f11cf3b73edfbd5e154346efeb152fead4e06a4216b86593538
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-debug-final-server-tests.log.txt | d7e1f0dde2642cd432f0ed78880ae8352cd9e0d519737992cd65de3e036ebf80
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-debug-final-server.xml | 409fa92e05bb2b56c21a60c7b26b57090cf1a75f1146bd268f085d5f3ba46677
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-debug-tests.log.txt | c336e63a6006324e896f0edb25ac0abf873ddbb804854bc3e0bf7e35027097a2
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-debug-verified-tests.log.txt | 0011f1198537493d7eedff389f3f03d364322b60bc3724604b4e8d7a00144757
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-debug-verified.xml | 0332904e9097413de1f75c7c625c1716c59e362cf94ae50fb8d1360fc9cbd84a
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-debug.xml | ea6e539e80585a699be982cbb40981a3dcce29f406eb668561c3b5d9cfada235
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-complete-tests.log.txt | ad6d70194fc5e9fa404f66013c9989f5e73e726005b2a859f197d73817d596c2
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-corrected-tests.log.txt | 44373ad5184e3e1907bfa4520e8f8f733057eea55a8d237ee6624f92f22db3bb
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-corrected-typecheck.log.txt | 88163adeac7cf0e197a120b22d3349740bc963719ede5bda7fd122b582075d45
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-final-tests.log.txt | 711f11239e0d41f018523f46f0c6574d1cce7ea00eca240d78ef68b61c6364f6
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-first-tests.log.txt | 21d01a3217548c6dfc2e66c159b631acc9ea8dc5d5209abd95adbe4b91ea08ba
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-first-typecheck.log.txt | 852b9ee664a8a9830d0aef49ff6f282a956edc7c6d25b05a0f1dd03ce655eaef
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-guard-typecheck.log.txt | e6243e624010972abdd075b6e4160381f91e1122c94dbe231a5e88e5ae5924eb
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-legacy-host-complete.log.txt | e184765b805a38ef75d82b63ee9f9ba6954f68a2ed6f024db37379ff91559f6f
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-legacy-host-serial.log.txt | b6b74a983ccb0cbb9809d6348e8aa73ce894439993db851e2364bddb88890f87
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-legacy-host-verified.log.txt | cf31582f57b7d32746fbdf904807a7a26d922fe9ab979c852c9dd9c66a87dd44
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-legacy-host.log.txt | 631ff26989662a54e1ea637e4f13303319a9fbb875e8cb7b545f598045ea08a8
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host-complete.json | 81bd86365f4d54358ba6e558eea0b2cd12e7b27ce82867643d0f31e5c7a65f1d
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host-complete.log.txt | 828fa2f2d3211880b296bae3ee202f6d0cb6851618de407ef896dd74fdd73164
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host-corrected.json | 6a446677edae7075ae8c4a433cd32fcdd846143985d53f66b0911b5f031d0370
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host-corrected.log.txt | 063c31640390421e5fa9f423b192b177b1b213cdb410f10122ac3df3003ddfe2
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host-final.json | dcd434996bf0c2ac30a766ad35a9cd010ed7823dc7c99d77446b3f09b472fc09
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host-final.log.txt | 17101027dee3d9140a859d4b1a6a1dacd3e9fa1ebff05a9f97fa7aa4d02b1b47
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host-original-runner.ts.txt | e83c1bc98249abaa9a365988a8faea9296470ff5ce631857fe717a70bccaae96
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host-original.json | 3f58ae070040f160b120c700b78cd3e59bba3339fed8ebd0a1dcb2791d05f17f
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host-original.log.txt | da8bfc39bf058d53d632c36206fdb6169a06f34e705cdc3d6e12b3575f83f1ed
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host-verified.json | dcd434996bf0c2ac30a766ad35a9cd010ed7823dc7c99d77446b3f09b472fc09
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host-verified.log.txt | c00626bc60f33db4b16ef8a788a24135b005748c372c227377d7faf2ad78e8b5
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host.json | 3f58ae070040f160b120c700b78cd3e59bba3339fed8ebd0a1dcb2791d05f17f
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-host.log.txt | da8bfc39bf058d53d632c36206fdb6169a06f34e705cdc3d6e12b3575f83f1ed
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-switch-original.json | 6a446677edae7075ae8c4a433cd32fcdd846143985d53f66b0911b5f031d0370
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-project-switch-original.log.txt | 063c31640390421e5fa9f423b192b177b1b213cdb410f10122ac3df3003ddfe2
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-symbol-guards-tests.log.txt | 40dc3e7efc6101c466945509cb48326d448b33e3a07d8bf3ea3b8b245aa9483e
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-editor-verified-tests.log.txt | e8c49346ec87dd412ff5bb9fdb1b4e162e111e1d6c79fb0e9c10f64a367aa78e
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-first-integrated-build.log.txt | 911ff7a53bc9e2840ab260b3bdd01e7ffc4a417d546c8bfbca0e7a28246b15c5
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-index-audit.json | 9e29073bfb262702a4dc54d395eb34ad1e962399b6116a873ee1fe1b2d3f71c4
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-inherited-selection-first.log.txt | 875c66ff832719ba1ecb7c40bc6d707096a2b720259f870c8744c48d1d012a73
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-initial-tests.log.txt | b4626baf73b2f0af25bf915de21bd7e2314d334bcf710db2b129d14a859f018e
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-initial-tests.xml | 527342ccdc792d6be56532730768c36ddbbcaad11789ed79ca69ad563d18ab82
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-installed-identity.json | 8884bbba55f1a17b938990f31d889d52ed1102fe96595efa201f596e5055680b
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-installed-identity.py | dee1b64a2113db723c4d2a42b29c2f818cce9994d838cecbe8a9eaeeaef36173
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-installed.log.txt | f92bdbac655610efb0d454ac56de35650a44225be5ffc49e07704989a9df71da
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-installed.py | 376e9b97bae1eaae563aa2c84ba37ddf3c96115384ee851086c47640a55ee2ea
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-original-cache-fixture.py | 59182e1ffa97a491c5f5ab514fa6087677db966c043155c7f6ad2cf52f4f8e62
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-original-index-receipt.py | bcbdfef27203f222a5fdb8c60421fc79699ba2069d539c6a506a6718b0e47ea5
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-original-manifest-hints-tooling.cpp.txt | ccf0d5bcd8655839370354ae64dc4e7454c12a1ed406e939ba8120ca516a81c6
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-original-project-switch-extension.ts.txt | 2358f38d26c557fbb6571ba41c8a0022bb390af81aaa80388b427b702644a6b9
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-original-receipt.py | b768620664ce11cc594cac5d5e6e80b968abb13618802686a927cb38a714be4a
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-original-relative-entry-lsp.cpp.txt | 8e323d0a52560da78a5f810598d89ebdc841160b0c80f26003532c2e7a7bf225
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-patches.json | a9667f74ba56980fb01b25e4687f1eafb8e4d7be77df7b32f2b5b03b731c34e0
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-portable-protocol-tests.log.txt | eb2d091b469bfd1973b7bb767b8b50a2e8cae560f490260275ae4651166352f7
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-portable-protocol.xml | 7553a46caa8a07dc776aa215a1cc52317c60195e6d3d511ec3efb4a4303c768e
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-project-integrated-build.log.txt | cf9bb3739a2128599234ddabc75eaf95ec28247905ef1aae2670852d8fddff73
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-queries-tests.log.txt | 7d4246e48c31374714d574656c589b37bebcf5b742258fcbb88dc95a3f7e845c
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-queries-tests.xml | 141e6c508902df565a90b8e6091210a6573f0630366465766a87247366a88f3a
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-receipt.py | 894bc2e848c915cd656b3ff49b8826bec273682964ce266c84bc3b483e030ff8
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-relative-entry-probe.json | d773afb96a7537e267e3b542930b3754f6eb306466f0a78f2fcf9e42b603185c
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-release-configure.log.txt | e0980d85e459b671504a14b545e60ff7a93782e1891ae526ef2c3ad31b52244d
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-release-final-build.log.txt | 9f56bb6ec684ef12af57785d0f072f071efb22905dad9b4b9a20578dc27ac50e
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-release-final-server-build.log.txt | 13dcc19a354088f69aba75aa1204c70d75a476ad9fb9afac6f35ccdc32d65d50
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-release-final-server-tests.log.txt | f38515a7ddd4fffc331b6b326b36808943425ce1c6353a8763255a7f3d73b488
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-release-final-server.xml | 817e20ba561ba8210b175de8787951d3e0853cddddda37cc5cc18786c47862b8
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-release-second-configure.log.txt | c98c0df03face3ff7129d4aaf8c82d47b6f379db1a77aa1b65e597f56cf47a1d
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-release-verified-tests.log.txt | 3f0b36a2b8fc87fbe5202dcd68e6a1eb5459d6bbe689c55ed4ff3a54019763b0
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-release-verified.xml | 583ad3a227be2600f314ef0389ec34e7c5edf48971f1315f3e8135bada742f38
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-sessions-first-build.log.txt | 5bec78d2eabe0cd8f20dd2b47925815be52dfe423db992b3702ac9b40e67ec81
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-source-artifacts.py | 329e56224bf3c4d76a1d7be5f6df280834527301a2f0f7cdc859a5bfd35bb4e6
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-strict-build.log.txt | 3748341e859078bbabfec053ada19ebea5912c102b687c6088e009963ee52aae
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-strict-configure.log.txt | 4c11b50a1d70d82c9d4252d3ebbb843eb8e38ae771d2748de732a21f4883a738
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-strict-final-server-build.log.txt | 13dcc19a354088f69aba75aa1204c70d75a476ad9fb9afac6f35ccdc32d65d50
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-strict-final-server-tests.log.txt | 8ff8809850ff8979e3674549998f32f7152ecdd4242c48b3df0a16abcbc419e5
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-strict-final-server.xml | 1edef03fa9e422524d734aafa6ca02b56002013eadb04052a79af3e0e1d66d82
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-strict-portable-protocol-tests.log.txt | e8b5db6a0e693c35360cd25b093fa69aa15e4ef84ec5846532aacb622fde28a3
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-strict-portable-protocol.xml | 6876f66b3dde295347b18a166c5e348a38dfaf1ce27425201e3c4ee9ad36c0f8
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-strict-verified-tests.log.txt | 69eb14be75ae9275b046cc0914e4cae7a260975f90acdd8ca8ea879652840dce
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-strict-verified.xml | 8072276111cc703133fef3afe8337f53f0141316adb75604ffc80c73067806a1
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-tests-build.log.txt | cb50b512abfb280003a9db117bb37f9e470abfa5b56279254b02085e1ea5a0e3
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-watch-build.log.txt | 13dcc19a354088f69aba75aa1204c70d75a476ad9fb9afac6f35ccdc32d65d50
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-watch-tests.log.txt | a0e0827449584318fe1b339a5f794915fd88400e7e0047ff732bfd53e745c342
+?? | S3 new report/evidence | docs/projects/evidence/slice3/slice3-watch-tests.xml | a225cbf1c60a81315a2e2a9e645bbf6dff316ac4e5ab556ae0a6f5c27b8207ee
+?? | S3 new report/evidence | docs/projects/evidence/slice3/starting-checkpoint.json | 71b66c10dc25d85f4c7dada8034c5a156205b6d690d533bd35e7fab4b73283bd
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Debug-CMakeCache.txt | 5d6ec3da1ccd316e3095d7a486e4a1f010c3bd7fc9bdfcbe65e4d118a2f6a70e
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Debug-final-project-protocol.json | 977ecc461bb8f4397cfc8f250ba37775eab184e26d2c8909182612c9f7b7cd97
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Debug-final-server.rsp | e6287ca87396d188d3175a2665a7ee3d504e6ef3d1349b2be48723bf676a9520
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Debug-nested.json | cf478fd43c1be568361299f30576825fc361123b874ea88de064570b3434cc69
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Debug-profiles.json | 3dce5020862af7630366af94782275bfb83ae6559708e543d78f817346616077
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Debug-project-cli.json | 93fbf0d3c5fdb12874c959a6c0f866e89ce8fe83b28f3112d97c57ca94c8bc2b
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Debug-protocol.json | ba80e5bda41f31ff1438242290dc8599957cd253da325611f5248e64f9b69507
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-CMakeCache.txt | fe8c451bbf087cecc81e3807e17b028c36a6e414bc182d0288621e558fec7d72
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-backend-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-cli-link.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-cli-link.rsp | 60fdaacddb2f5589f952a5c03e21092ee5de25b367ee70486f5e06ad9b04dd7a
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-compiler-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-final-project-protocol.json | 0d8d3a3ae2913a7bee84916775aa512c3d2a9eede81d5fe5d2d14c6630dea1a8
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-final-server.rsp | afe42cabf2c3113239fdaa5d6a4eaf7fe30cd63af9c6c26364be46bf0439514c
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-header-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-header-link.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-header-link.rsp | 90e8cd001e34d81c820d0077a86bc3891bb8ccaa0648c8dc6096daf91f7f7d74
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-header.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-host-verified.log.txt | 79b579d6fea2e609b6a4f7204582422e2fc1f782356115f1fc0aa12f0f09c2bd
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-http-verified.log.txt | b396cccb0dfc96a025bd3f3359d7c087034856e9b838f83763407b03fbf449be
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-identity-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-identity-generate.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-lsp-compile.log.txt | 3193ecbaa9ef8f85b3fce638cf634174f9afda3b3d6e2532e645890c387075fd
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-lsp-link.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-lsp-link.rsp | 13114cc2bf3d31807b86b6f63924a9c442cff3716bd1767ca640661ac1b8b2b4
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-main-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-manifest-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-manifest-link.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-manifest-link.rsp | ac69b8dc709bae95e1018aff45c81722ac199e9e876e3e26d4b998d648882524
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-manifest.log.txt | 1c19ddcd22048fad5eece177776c0b5ce8adae83623459a977719565a31311c0
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-nested.json | d53f3dc9987a6a535b8d0f76d90196c1031f816fb54bc0f4d2e885d248c24dea
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-profiles.json | 7579f36a164dc15f48ae6089b4b4eb870b1f5d9b0cb49e716ece45fc7e7fe18c
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-profiles.log.txt | aa4b478264dfc5dd21b495a0ec85efbb6e620b7fad6cdcc66bf5b2e145098982
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-project-cli.json | 5927cdc987bf658f709f0b71b9a16d91d8bc91c9207c08ca81ac3cd1f0cc02ea
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-project-compile.log.txt | d36ca8e0e7298cf32c2c3d48f9631d605f83802a413650135a38663b5a68efea
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-protocol.json | 7c8ef3aa8c40b5449bb3a12391c7b09046803a69618b9fa2bb357efe5b3129c9
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-protocol.log.txt | 5661bf82083e0f7f5abb45b7a298413892dfb71fe7c5c2d96b1e5fbfd7b7c4d9
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-provenance.log.txt | 47f1d3155413518698577212355884d335b694b63a3223afe149f5bc7a3977c5
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-selection-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-selection-link.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-selection-link.rsp | ffa4a4262ca230e52b3c02c04a4a9e020bbc2e45517f2e68a1246e47e0f24aef
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-selection.log.txt | d746123c0e722745d74df7a220bf8bb0206ea46e99363c25b9aa5233fa331dd9
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-sessions-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-sessions-link.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-sessions-link.rsp | 534f64db15dec7777f8b2cf1a12eabfad57e983af0e7f0fb8bd215d3a417ab53
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-sessions.log.txt | d7b9f988ab844edef13b8abcb954f4396258d322e4dbbd532ef0aa9e9a418ea7
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-source-compile.log.txt | c5348d74a4c450e3eaf12136c0ae805e68f811757d3a8fea458367cbd72e85a2
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-Release-tooling-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-baseline-source.json | a29e3f65465e080d21c2007e5edef4ec0a36036aa63ec446fdb76a6bc837036f
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-before-final-server-source-hashes.json | 638a470ba027fd9cfafb1c63bfec9bee17b5236508081563b7b98faa2d8f9d8d
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continue-native.cmd | d1dc18076b0316949410ca2ee44625839ae20b663707ee277e21390e10b6498c
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continue-native.py | a4c8099824688a7a7d52885ef06042202087459843282d5fdd937b7d7b11dca3
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Debug-cli-link.rsp | 959e538ec51dba12b1224845c349cff7e44e30c9339827d340537a4a2dc501b0
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Debug-header-link.rsp | 4326e82b73ff3a1fdc4665e1a695ff010882c813104a7a85c17dd0cfb2f0a479
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Debug-lsp-link.rsp | 35711ab7a916cd9bb139bb6091e1ff765b958cd6465a232baf1ba2fb83458b41
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Debug-manifest-link.rsp | 37bf7ac9eda0a72b2165e9149678b3c8e260c93e44a169fda717694d06091ef3
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Debug-selection-link.rsp | 9e44857ca9bb90ed6f8a4673df8ba1c75075022a6073b52df672627ef23cf550
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Debug-sessions-link.rsp | 9ef6f150001c6fb5df2043d234a7ba767e4a7db8184cc77d1849b4fc5adffabd
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Release-header.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Release-legacy-lsp-protocol.log.txt | f02d16b25689ffc4c210b7f5a851bad13d32b9d7b4a000f8b2be4d8c385313c1
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Release-legacy.log.txt | a6da4aef36c039b87cc5a0cf3cecae7f7fcccbe1c87312f2bdb5ca8e204d2082
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Release-manifest.log.txt | 1c19ddcd22048fad5eece177776c0b5ce8adae83623459a977719565a31311c0
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Release-nested.log.txt | f4a5e01c14adfe13e80babf2903870ff1de1cce1f585be76fb45364f528dccf2
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Release-profiles.log.txt | aa4b478264dfc5dd21b495a0ec85efbb6e620b7fad6cdcc66bf5b2e145098982
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Release-project-cli.log.txt | eb0967de8e40016e500566fe1c440e8c86117b853fd7c6c1aaf9cb024d71918c
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Release-protocol.log.txt | c92adadaab8bbe4f82edd0ff9a1ac8fe09b1d8da430939ba121b895037a8289a
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Release-provenance.log.txt | 47f1d3155413518698577212355884d335b694b63a3223afe149f5bc7a3977c5
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Release-selection.log.txt | d746123c0e722745d74df7a220bf8bb0206ea46e99363c25b9aa5233fa331dd9
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-Release-sessions.log.txt | d7b9f988ab844edef13b8abcb954f4396258d322e4dbbd532ef0aa9e9a418ea7
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-native-console.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-native-results.json | d995710918bf430dc5e814f2c95c69296bf18911fbe5cccfc352619222d14d24
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-continued-vcvars.log.txt | 9a47202059fffaa236cbcc04b1d4434d5d165bb2f94d73ea21538334e840fd81
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-backend-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-cli-link.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-compiler-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-header-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-header-link.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-header.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-host-verified.log.txt | f8268f61956284ea7441be34b10bd2daf2502669e676eccedd4a5b5eaa5fb188
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-http-verified.log.txt | a0674edab6b3249be87077e6fbbb7c9f861f88ecd56e4f8d9a834b59aeb9b38e
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-identity-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-identity-generate.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-legacy-lsp-protocol.log.txt | ddc4f5dded5f1ff1f635b1899c020251a961f34e03f858adc4c159e556a181f4
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-legacy-lsp-sprint2.log.txt | 28ea3e03e72638934ad59ff2c3eedc324187dbe227cc2efab029f4fbbe5ee3c6
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-legacy-lsp-stage7.log.txt | ce7d1dd743df5e768c4c1f1ee9513748cbb31efaa0152b05218999aebb1f599c
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-legacy-lsp-stage8.log.txt | cd679b26aab3c6c60b8a897826794f17eaf6bd4ec473fd64e8c4e8955d339872
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-legacy.log.txt | a6da4aef36c039b87cc5a0cf3cecae7f7fcccbe1c87312f2bdb5ca8e204d2082
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-lsp-compile.log.txt | 3193ecbaa9ef8f85b3fce638cf634174f9afda3b3d6e2532e645890c387075fd
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-lsp-link.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-main-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-manifest-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-manifest-link.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-manifest.log.txt | 1c19ddcd22048fad5eece177776c0b5ce8adae83623459a977719565a31311c0
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-nested.log.txt | f4a5e01c14adfe13e80babf2903870ff1de1cce1f585be76fb45364f528dccf2
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-profiles.log.txt | aa4b478264dfc5dd21b495a0ec85efbb6e620b7fad6cdcc66bf5b2e145098982
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-project-cli.log.txt | eb0967de8e40016e500566fe1c440e8c86117b853fd7c6c1aaf9cb024d71918c
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-project-compile.log.txt | d36ca8e0e7298cf32c2c3d48f9631d605f83802a413650135a38663b5a68efea
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-protocol.log.txt | c92adadaab8bbe4f82edd0ff9a1ac8fe09b1d8da430939ba121b895037a8289a
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-provenance.log.txt | 47f1d3155413518698577212355884d335b694b63a3223afe149f5bc7a3977c5
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-selection-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-selection-link.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-selection.log.txt | d746123c0e722745d74df7a220bf8bb0206ea46e99363c25b9aa5233fa331dd9
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-sessions-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-sessions-link.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-sessions.log.txt | d7b9f988ab844edef13b8abcb954f4396258d322e4dbbd532ef0aa9e9a418ea7
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-source-compile.log.txt | c5348d74a4c450e3eaf12136c0ae805e68f811757d3a8fea458367cbd72e85a2
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Debug-tooling-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Release-legacy-lsp-protocol.log.txt | ddc4f5dded5f1ff1f635b1899c020251a961f34e03f858adc4c159e556a181f4
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Release-legacy-lsp-sprint2.log.txt | 28ea3e03e72638934ad59ff2c3eedc324187dbe227cc2efab029f4fbbe5ee3c6
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Release-legacy-lsp-stage7.log.txt | ce7d1dd743df5e768c4c1f1ee9513748cbb31efaa0152b05218999aebb1f599c
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-Release-legacy-lsp-stage8.log.txt | 7be969769253913c104e6fce4d44a94ed48ff30bade7298037405b56bd4d48db
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-native-console.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-native-results.json | 6bd4b43be5861acf743f99b85b188039e66fa62ee412c9b22b472c4666632389
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-server-console.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-server-native-results.json | 1c620338b3f0f1d23dcbfad9cdf46c90555161d746c24eef3fc28bca76e447f7
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-server-native.cmd | 2560af4b21f7ad7dbc80e8719dde72309727b6c510fa0727bd641f89a809f7cb
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-server-native.py | 762db07448ede592b70c02b4b478cbb04fdbb14f5fe4b2fd391fa4c2a0931e85
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-server-vcvars.log.txt | 9a47202059fffaa236cbcc04b1d4434d5d165bb2f94d73ea21538334e840fd81
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-final-vcvars.log.txt | 9a47202059fffaa236cbcc04b1d4434d5d165bb2f94d73ea21538334e840fd81
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-finish-native.cmd | 45214e599be2ba1fe9aa44d4eba29d9361313c5aa4ccff7820fb65d37f2127cd
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-finish-native.py | f987fa9a9a3f14ff6fcafb90358dca3a73114027ec4516d0426d72bc83ea77dc
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-legacy-argv-original-continue-native.py | a4c8099824688a7a7d52885ef06042202087459843282d5fdd937b7d7b11dca3
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-legacy-argv-original-continued-Release-legacy-lsp-protocol.log.txt | f02d16b25689ffc4c210b7f5a851bad13d32b9d7b4a000f8b2be4d8c385313c1
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-legacy-argv-original-continued-native-results.json | d995710918bf430dc5e814f2c95c69296bf18911fbe5cccfc352619222d14d24
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-native-console.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-native-results.json | ef60ea1959dd12e3d14114e62a1f1eb4b93c383ff2f3570c1918b2e7823fdb97
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-native.cmd | 938b8f6c3d7a68c7d70ae45b093534e2d5b464056615283d319cdc14519a92d7
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-native.py | d154e7c0731eb99780131eaf9cff3c352af8ddd43d1f1fd734e289fd03893d32
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-original-native-console.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-original-native-results.json | 7575bf772ba565b5334cc53783ab7b2fa68d922b1a17e99b93917c58b89a5bae
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-original-native.py | f97046d63af241c4511d84e2aa23cab1a94f1dad0ffd68e8489d618fbbb7d551
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-original-source-hashes.json | 9710fe5a42d48297d8347e180a90cc27fef21b21d3fe0eed9bbb9ef6e38cd4f7
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-probe-console.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-probe.cmd | ccac8ab316cc647fe17923dcda1544728940dbd1cd4f050a50651384985eddc3
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-probe.json | b53fd3df3a77debb69c6ae94e97093261b03921a07e43b4f6c2830fa513a02ea
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-probe.py | d72c3c04da2448c2e25487dccc3e728c844fc7c34cbdee433a650e0ba6a43f13
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-protocol-corrected.py | 0612a6d7d50804db1087e5427c5ec1ce2a516326a2906e0fa8868d5338805b67
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-protocol-original-Release-protocol.json | a024660ba2442b6b5001b9d66071bf34dba96d5e45a4c929edb08bc594cead07
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-protocol-original-Release-protocol.log.txt | 5661bf82083e0f7f5abb45b7a298413892dfb71fe7c5c2d96b1e5fbfd7b7c4d9
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-protocol-original-native-results.json | ef60ea1959dd12e3d14114e62a1f1eb4b93c383ff2f3570c1918b2e7823fdb97
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-protocol-original-native.py | d154e7c0731eb99780131eaf9cff3c352af8ddd43d1f1fd734e289fd03893d32
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-protocol-original-source-hashes.json | 56f716b930f0779dc8e59e5069d966f1db1b2f4a5143e4f0796eb7894a4e0cfe
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Debug-compile.log.txt | 3193ecbaa9ef8f85b3fce638cf634174f9afda3b3d6e2532e645890c387075fd
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Debug-legacy-protocol.log.txt | ddc4f5dded5f1ff1f635b1899c020251a961f34e03f858adc4c159e556a181f4
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Debug-legacy-sprint2.log.txt | 28ea3e03e72638934ad59ff2c3eedc324187dbe227cc2efab029f4fbbe5ee3c6
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Debug-legacy-stage7.log.txt | ce7d1dd743df5e768c4c1f1ee9513748cbb31efaa0152b05218999aebb1f599c
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Debug-legacy-stage8.log.txt | 66273e44f7817da058b3f981c1940adfe26f33be501e615a52a258d9e9af3a84
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Debug-link.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Debug-project-protocol.log.txt | ad83b97ab21544d493f04c91c1af95309b68279ffccec4916253709f3a15b5c1
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Release-compile.log.txt | 3193ecbaa9ef8f85b3fce638cf634174f9afda3b3d6e2532e645890c387075fd
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Release-legacy-protocol.log.txt | ddc4f5dded5f1ff1f635b1899c020251a961f34e03f858adc4c159e556a181f4
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Release-legacy-sprint2.log.txt | 28ea3e03e72638934ad59ff2c3eedc324187dbe227cc2efab029f4fbbe5ee3c6
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Release-legacy-stage7.log.txt | ce7d1dd743df5e768c4c1f1ee9513748cbb31efaa0152b05218999aebb1f599c
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Release-legacy-stage8.log.txt | 5c71fc1f212a477157ac119d5b6fd2702d60f1631e11e859c49ad3a633212c29
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Release-link.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-Release-project-protocol.log.txt | ad83b97ab21544d493f04c91c1af95309b68279ffccec4916253709f3a15b5c1
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-src_lsp_main.cpp.txt | 628ec7c6a22ba7e61259b38923724ffaf6153dc99b437e338fb8165b025b32c2
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-tests_project_protocol.py | e52463880a098ccd24cdf8589cf88b39bab017741c02932f2749debf130dd3f4
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-server-final-tools_lsp_client.py | de52f28be28b08d392ea292e4f0c5b6b2174274ee3d49db4223cb7e8ccb7b3bd
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-source-hashes.json | b7df6de0adc3423da9793085ecdfc5ee3e0cf1fc3c9bb9b9deb0f5294c46394a
+?? | S3 new report/evidence | docs/projects/evidence/slice3/windows-vcvars.log.txt | 9a47202059fffaa236cbcc04b1d4434d5d165bb2f94d73ea21538334e840fd81
+?? | S4 report/evidence | docs/projects/evidence/slice4-inventory.txt | d4dbda3d1f8e60f2245f0e1755ae4bc805c3888799d25fd626ff051562f27517
+?? | S4 report/evidence | docs/projects/evidence/slice4-local.json | fa69d3683415ed46df7a4779a8ae2d10389394cbf91de6f62404a72612cdcb5b
+?? | S4 report/evidence | docs/projects/evidence/slice4-source.patch | aea478a65cb795af0d23bc8da494dc0f71ed05d9a0f1c65b5124b1d2da256ee0
+?? | S4 report/evidence | docs/projects/evidence/slice4/aot-corrupt-context.py | a4e64c5d4b90bed8306a8bbefe6d745e2dd270c1d9e921e16c65368f735d676f
+?? | S4 report/evidence | docs/projects/evidence/slice4/deleted-image-llvm23-debug-stack.json | b186f84f0298bf7fcf271c720256fde865c931e2eada0aa87cf8dba8f943a305
+?? | S4 report/evidence | docs/projects/evidence/slice4/deleted-image-llvm23-debug.json | 6013c6fc1796c43c442f552aa0aa85b65154eed672c9ef3334906116d22dc053
+?? | S4 report/evidence | docs/projects/evidence/slice4/deleted-image-llvm23-release-stack.json | 258e0044a1d21343b6b40a4db674de297e382aaab846ad55dde317d07faac9bc
+?? | S4 report/evidence | docs/projects/evidence/slice4/deleted-image-llvm23-release.json | 83c68912db800a55fdf2419103403cb44ad4b54c5827c4c82ca6070fa8292bc3
+?? | S4 report/evidence | docs/projects/evidence/slice4/deleted-image-llvm23-strict-stack.json | be4246dce366240f940919325d60c4cd92926a4952293a77fec7cb0384195ad4
+?? | S4 report/evidence | docs/projects/evidence/slice4/deleted-image-llvm23-strict.json | c946afa014a4563a696a2dda59e4e0ea2512076051059ff7302f2fa2316ba09e
+?? | S4 report/evidence | docs/projects/evidence/slice4/first-aot.log.txt | 068146c8c2c93dc7bf351ed64405f3d6a638b931bef14cf701502c1bf1e8c09d
+?? | S4 report/evidence | docs/projects/evidence/slice4/first-jit.log.txt | 962fa87605185a22cf1947f82fb3c6a363616d0847ea386914fad3b79f341a6e
+?? | S4 report/evidence | docs/projects/evidence/slice4/initial-game.void | ca86978b364c6dbd0e8bc82f095b982381b29dfc78d6627ac1ce9849952404e4
+?? | S4 report/evidence | docs/projects/evidence/slice4/initial-project.toml | a78c39bf0ebe5ae7de2dcc9f4a49829e964746e4ef77676474a2ebf42438b875
+?? | S4 report/evidence | docs/projects/evidence/slice4/legacy-context.py | 66203d18146d4f523a0cb6a3f19e4c912bbac4a80a1b8039602ff0c936dc6ec1
+?? | S4 report/evidence | docs/projects/evidence/slice4/library-first-backtrace.log.txt | 717196aa3eaf6d9ef6436b3490cbac5a2fe6447aa66c7af3d706c1541d3b1f10
+?? | S4 report/evidence | docs/projects/evidence/slice4/library-repro.toml | be8036a1019b054eaaeebd2474256be7c5c10526d2613b5582397376edcf048e
+?? | S4 report/evidence | docs/projects/evidence/slice4/library-repro.void | 3379a8ecc2a38b2989262dfa4d480f1277541878c794071130c49a8003f18c9b
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-cleanup-s4-results.json | bd9d0182e81d6cb7893111c5eb86a7b9127cddd914dba6113da10703ad04ead3
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-allocator-ctest.log.txt | 82c6d5a7e00211a78271d24c397c649f9fce759b02bce73abd909c02bad11b17
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-allocator.xml | 201afe1673d8b3669c4699580007c63c4db561cb77c9be7be6a0d1ac595b16a9
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-corrected.log.txt | fec1d67c63dcaabb987c51d3e96a7a895588d05aab684ea8ba67cc4714e1fb9c
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-corrected.xml | 9960af68a5f6edbebd862f0daf8442e1e097a882344cf5b26e87931ca91ed61a
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-oracle-ctest.log.txt | a73be23b1949b4cfbc6578420d2a8e80d8c5b080fba56fa94132ebf2ddd8f6bb
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-oracle.xml | 65b55c3d2c33dda448e2947a89dbe2a54245b75fe692075bdcf69e604a8fa507
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-portable-build.log.txt | d60de8caa2242ff105f5bebe63f70bb51d4d0f5ebfec6fc16839b466cd58bb76
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-portable-ctest.log.txt | 7fd3a58db32ba3451cf3ef224de4a89d077bc9b3ad01e43ed0aa9d00e7106d72
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-portable.xml | b0131f75df17667a37d21b5b98d8b456f22e384adfae56d81187c8cbdfbfcec0
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-project-application-evidence.json | e0e9000c99cae884f065e1f6e672a9cf69a90678b4d795e6f9c697a7acc770d2
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-project-discovery-evidence.json | a47ecafdfad60fbe7f1b1ad288044a979dd3e1d2900b863d8264e88e1d22f9cc
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-project-profiles-evidence.json | 491617dfa75bb0c57289ddca84f1e23ea8c0ce4c5a17c6eb62e814dbfc8c8e16
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-project-protocol-evidence.json | c352fcc7fff6247414e7ebf3625f2933c8e072f105c8d7667152185887fbf47f
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-qualification-build.log.txt | 4ddca650abf091d134dae98f50334048ed179c22c28ff5b546cd5a9e322cd04e
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-debug-qualified.xml | fd773a3f2edbbcc2a33274d59b5c38c9e7795c91724564db01a3fcf1cc49d9ae
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-lean-preprocess.json | e794013b36c089f05b4e7f07dccf312c04bf2c97c927228c07c0a4478c65d95b
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-adapter-lsp-original.log.txt | 53bec7c05f4964e6bcbd262b22af0083bee2023df85fbbd26142fe8172cb95d6
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-adapter-lsp.log.txt | a3a15dc8fc7b15c59db1dc6f5ce93a71f2c88918a5fc20fd83b596bb36d1c040
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-allocator-ctest.log.txt | 9fcd59d5a00ac60c07d389a34d75cdc67ff62ae11cb47291b208e5bbc3934989
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-allocator.xml | 9cccd39aceebea33e942184265bf253be974067bb4c82cb86afd5687aaca134d
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-aot-corrupt-context.json | 4c36f6f52a4600ae30bd155bd352db032d17e768da93264cbe30f3e516e0ec86
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-aot-corrupt-context.log.txt | 479adcf03b33405c706f2412655a35e907701e7d37c3ce4019650a911f587a66
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-application-build.log.txt | f10b47ad2d622ee7a05b44cd7ae3e6e6b00657fa90b21efa702138d5aebbaf8d
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-corrected.log.txt | ab641feefd35b2dcbaf67449028cdecc7c3a886f5c516d5af597ba9e87b1881a
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-corrected.xml | d7634e455a3f1356805acff7b10879bc975881ad452711f05b8c510462274c90
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-final-ctest.log.txt | 72e07fa7fc597c641d835b9c4c1b452a44a5b9387ee0b30a0df91ac3b6351200
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-final.xml | 34a07441388ba67e35810e0e1653d57febec672f83525148d09d6e0b42306d31
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-first-application.log.txt | 3834770855c9b83d2e2905c685702bb9325bc6922dc37172acbaa56977d95ca8
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-first-build.log.txt | 0eae4c6f653bca2c8ea6831099fb301d7d1be198b28a6e1764df7ff239d77a18
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-initial-process.json | 0895adf1c716baf27b463315f775fa28dbce2f9ac183f6d781f943deae488e76
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-initial-process.log.txt | f30880cbf345b60a0ce1e3ce495297133a76a29556b06b3ace02219b3570f8d9
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-legacy-context.json | fdb3008329d517b8e2fe0811fdb8f236f676034ef54ac829863066f58dc03f64
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-oracle-ctest.log.txt | a3cedd6e3454220b55fe73568f6e43ccf74738f6ad603ec60bd8308e9b67e50c
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-oracle.xml | 2af8558549217e1773eb4bcd19d61efbe63c3a8411ad56c39ff06209863e9122
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-portable-build.log.txt | c4be857b6ad5a993ea00797186a5ebd6c5b7ceab29ef0d50311876cdadedcc0c
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-portable-ctest.log.txt | a7f0926b1f941351846a3cbeba8a09a9f18526772cb9031de3dc2c46535f98f8
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-portable.xml | aac8fb520430da6938cfaf6f0cc67986522aa53844d3ced696b5596144c713c7
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-project-application-evidence.json | 22ea0edf3fd8892fde7c162362d3a26890349052a15d8ae01f393253e0a96759
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-project-discovery-evidence.json | 7f13d9e4a01e01e180520ed7881efa30ecc21f2deba334dadb79bda62d3b4748
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-project-profiles-evidence.json | 426a4f576d21b89dc4aa9cef8f74aef0c8736843be05176b4cf0605c261a4c4e
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-project-protocol-evidence.json | 6d8de2101f661958bee19155f6add8ffbad42d33172887b951344c84cd92dcff
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-qualified.xml | a9bfb5cdae331d006e6e15965c6cd41092eb5e41126eeade28d20530cfc6a015
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-second-process.json | 1a4ef5e3bda31bad2293c7828b428ac6562f50576281c9ba5fd1a1f5c088bc54
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-second-process.log.txt | a8502b1ea7d2eb086bda7d7adc56c821e510315e1563067bf1e83a0a1de0ba0e
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-stdlib-doc-rerun.log.txt | 99a23261f791d8f48128eea3b1880d98e4c34c843523d6c832377639fe34c254
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-release-stdlib-doc-rerun.xml | 224280d964ed21e922ee1a7e94f091b7064e66c3fc3972fc002b6bc29de29559
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-strict-allocator-direct.log.txt | 971144f180775c9049926b6cf7b2ad87ffd1b4545080d5ef0aa06c48f7fc9169
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-strict-portable-build.log.txt | cb240cd1f2122d8f1f575319fe6b50dc9e1bb656c5c54adbd2221e4300190256
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-strict-portable-ctest.log.txt | bdb2e4d25e310d9fb123c8f431728540895dc2b4405fb9557df134ab9654b755
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-strict-portable.xml | e9fdd43ea33fbb532761e7dca0bfa1e3fa7588aac96169eb2753039b4ce21282
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-strict-project-application-evidence.json | 3ec64065c03d0387ce67d2f190a126a39595659076286a7890ce104dd0cdf552
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-strict-project-discovery-evidence.json | 829ffde25187faed3ea298f34f3ae415cb3cabd12b17120c064fa04219d33c43
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-strict-project-profiles-evidence.json | bbf96a4856dc6777d7061e30d8f440461834f7ff90236c727d9d70adf4857dd4
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-strict-project-protocol-evidence.json | edcc8e549bc9f18407b362c570c833850533a1bbcad6cf2a252cf29acfc26767
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-strict-qualification-build.log.txt | b992bd36ea338a8aa509bc0c5715e26179e7ca552d2580d3be0701b7b803dbbd
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-strict-qualified-ctest.log.txt | 87a207592a8a7cc13ca52a2239ac1e1441bcf6ba75b91dcf1208c62f128f7495
+?? | S4 report/evidence | docs/projects/evidence/slice4/linux-strict-qualified.xml | 43c088608febceaf4ef27b0ff0ba050b0f3c9632dc04c24bd288c94712b7289e
+?? | S4 report/evidence | docs/projects/evidence/slice4/os-location-lsp-original.py | ba8f8aaff8ba1627c2f099636b37a31b7d40794ed68fc114273d17e935c108cb
+?? | S4 report/evidence | docs/projects/evidence/slice4/os-location-lsp.py | 778d58b5dbd8c8b3ad88346fa66678e47a698c53a4ce50b9f99eefbb4957d52f
+?? | S4 report/evidence | docs/projects/evidence/slice4/s3-original-matched.log.txt | 1d28af13e0c9a2a27acb1dd2ab6378b3d1ec4fe2324380bf0921a17ba4a43f67
+?? | S4 report/evidence | docs/projects/evidence/slice4/s3-original-no-id.log.txt | d4b75896897174df54824db542ba4c8be56488d51af6aa066327119499c8a442
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-allocator-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-allocator-link.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-allocator-process.log.txt | 5f915934c159c400c6712126356f007dd0211b7d0b49b148ec437e22a3762313
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-allocator-test.log.txt | 5740372e5400413c5ceb01d2128f8d6fb4621e174e37545fc89030a4e68e46d9
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-build.log.txt | 3a82cb7ee6cc4c88796f5c99c159d08dd18bd6ba88e7235d01953c1df968f050
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-configure.log.txt | 712cd2bef63933966dc96c4ea288a9273ab0d1c47241917b4d32dd16f2926b97
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-corrected-process.json | 88e9266546454a0a06ddb3d5e387e0966327598477646d440149f893dd7dd6b6
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-ctest.log.txt | 58a424bd6aeafe87213f418e128b829f2e11b495f344e6b030f30878a79b8bf6
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-disk-full-process.json | 834822bad62f6db1ac91e8ad3aafea422fe81fd87ee10980d815d6a5274c43c9
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-disk-full-process.log.txt | 627bad9715ba140de3a9ff8ed264992815832af250ab80d9afc46147187542d2
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-first-build-result.json | d36273016a76b93083bffbf62cbc78d3389fedbb2e841f5711f0461368ed6210
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-first-build.log.txt | 2865301e3e1f1b1e373b8952c655bfe973995a2957a706c7c372059f37f5e9ae
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-first-configure-result.json | fe1ab93406d2eed8464e466b3fcd3908b7cdf68c6ef3c8c99c54395a718135ee
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-first-configure.log.txt | 81538d4737e83ab1f732841fc37ab1c11b8a5f1bfe89990abb3ed06f7a381a03
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-fourth-configure-result.json | 7018325880f4b0f1f71d7cd7f303603a3586c45719a1fa4c0d958054987617f8
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-fourth-configure.log.txt | 650a69194d3212ff5e5973a028d61e855872003c0b4639037a6597fb351b7b12
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-original-ctest.xml | cf735af1886067f42074e77b985160c56bfc38a7361fad19ff93dc0989f8645e
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-original-process.json | c3341a895c79d80ef915a98c0b433214d904df61d80fbdc01c5f5a48895eb095
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-retained-CMakeCache.txt | 812e2d78bd9cdf72270033d6fe593bfd261e81c3b4eb016cc64989c0ed40b9a3
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-retained-project-discovery-evidence.json | 6a2ffe0c6b09e4a2ee7b658a17cddf97c3241105cc36c074181613baff25924e
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-retained-project-profiles-evidence.json | 428cf38454f78b94fe5aae2f54a61eb84ee2ae91774d6e68c6c88548da7f384a
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-retained-project-protocol-evidence.json | 0138c05b19ed056d9a09775e80809073577ae456c9f50537692a95857c46196c
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-retained-void-native-resources.txt | 5a8a6bbcc49d7d400053c035340cb7d1caeccd4405ef4e80dbecf5884bca2e5e
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-retained-void-native.txt | 0923ae56b1855f43275d1a0b6a95564b50424b115b0105c6fcd74b1a5fd95249
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-second-build-result.json | 25bac9e1a80f4c1fff4d7b94b9885ce0911ad326cd16201a325a930ae0c178a4
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-second-build.log.txt | 20f03343965d5132ace2b9429fe798c3d340e658abbba66c617f4c8e3044a0fd
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-second-configure-result.json | 88403bf4e31f25dfd53abae9bbbd6e63df67fc94258ddde95e2eef04b697efc1
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-second-configure.log.txt | 3651821439069264f22df1040ce7895d8d3dd26210a7cf58de0bf70a93be5918
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-third-configure-result.json | dab9defb5d4e614174bf41389825e1f2857841574ac539cb83bbc8a8029618e7
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Debug-third-configure.log.txt | d965a1fa4eb842488f4441aae72185c55d9a60ae6e3994188646ad850ddf97e5
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-allocator-compile.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-allocator-link.log.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-allocator-process.log.txt | 5f915934c159c400c6712126356f007dd0211b7d0b49b148ec437e22a3762313
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-allocator-test.log.txt | 5740372e5400413c5ceb01d2128f8d6fb4621e174e37545fc89030a4e68e46d9
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-build.log.txt | 5ec123f67e94f0eeae487302f178e7d1f29c1e84d1d4c941c91d959e35ca9daa
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-configure.log.txt | ab253cbc4abef5b7c9daf0e1dbdf7754976f618110ef8248f60962b4ae23f162
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-corrected-process.json | c233f4450f97073cca0e6bbd033ce14aab1ebddb35d857cf92dc4ca596ff49aa
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-ctest.log.txt | 81bc698345385216bbb9612e3d64f672f2aca6372fa4f6781509473e60e31e39
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-first-build-result.json | edacc68acd589a0eeb46e6ecfb0c09279f3dc8137b44ffe10e4c2d020e76fc9a
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-first-build.log.txt | 841da6e424a5869a8449afc71e66b69cc5efab805939e623583437dd8f37034e
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-first-configure-result.json | 99c57c513a6433f5b99be915e8d9a2b5600a3f79cfc7a8410a3d8c7c88efc101
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-first-configure.log.txt | 81538d4737e83ab1f732841fc37ab1c11b8a5f1bfe89990abb3ed06f7a381a03
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-fourth-configure-result.json | 315fce0ef519038ab44393b52c7b270f4dbbf1737c8f46613f4283fc658a406c
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-fourth-configure.log.txt | 08691eb04946315650d4f26297b59f7b6ae9f1690e88084be1d07afbf59b4687
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-original-ctest.xml | b0d2ad4b7fe8e2ad9550753ab2669524e3a711c346b91507a0f2ffc5088129aa
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-original-process.json | 7f69b4067211b21111c7697b057d5717f8144831e50fced10942938ba68f830a
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-retained-CMakeCache.txt | 1c6d64a8365a40e8824dde5ec3a0e8a44c876b983e86ba69650416307a2ee7eb
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-retained-project-discovery-evidence.json | 75e327f233b78ec20a08a53b3e13153824528328cff7c065aefbaf88310261a4
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-retained-project-profiles-evidence.json | abe78059a7165fb692f6260d245bc03c0558760956161db3e8cce762064b67e6
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-retained-project-protocol-evidence.json | 27e44d559fd359203fc359255a89229a8de8b1f7296dc74ec2f9a91f9eb97339
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-retained-void-native-resources.txt | ea80124a71536de873e8acd363b8f3e93daee87412465ac0d2be8c9ec29f7230
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-retained-void-native.txt | 3f1389938ef355e150a7a1d6c8c89b3d08850666012779d38737d15db6cffe49
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-second-build-result.json | 0882250541e8693d89f1b37b5e3841ad9513d3d8c9a3a5214584bd424d474764
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-second-build.log.txt | 87cb36fa1d54f3768833338c4119d8c8380719e421ce9431e9494723bf77a19b
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-second-configure-result.json | d2e3dbe9d761b28d8d35233a9a0fa33d5037028f16adc17d21651f9e93090898
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-second-configure.log.txt | 3651821439069264f22df1040ce7895d8d3dd26210a7cf58de0bf70a93be5918
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-third-configure-result.json | d04f5355bad30367e09667f98cd1f2975f334f96949a4014c05c28e0a3d90c2a
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-Release-third-configure.log.txt | 0fec178c59f8ca1a7afac2ccd4de444cfacf33b9c3b6f9e64ff669f91288ecce
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-allocator-final-results.json | 0848331edcef22cc05ca00717430d93901fb2ef875367e79b55fc100295e34b0
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-allocator-first-results.json | 7ccde9da092d49045a88fdd6344680a263a2605a4357ce7dec69221125a1df94
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-allocator-first.py | fd19ff99b58a9bdf08decc3ce703c7ab8cd413fbd7ecaa2df0d33e62c1cc8ac0
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-allocator-resume.py | 4c9b7c06180004d8e092cc4e3276a74635d5b582e004688b2802e836d6411c9a
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-allocator-resumed-results.json | 5eb81494b077b33551b8b542549a5b93bb02ee14319880177b742899bcf9e63d
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-allocator-shared.py | 736e866c8d6d51ed7c13792a88586a59a34045a7a2643c72157687e42fc28133
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-cleanup-s4-results.json | 49119406f668e35c7aebbfe0721741daee64514be3a18d34b1056d3144e966f2
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-cleanup-s4.py | 78061247a76c89263e78c8cc64d561c174228d547332f15d5a6b0d2ac082b780
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-native-archives.py | b8bd7a64487618869eef3215fcfe8cbd7732064900bb4c86e6f41725775780d0
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-native-attested.py | bd502f94fbb18837c30a5d0a80edfdd38485cd67914b59b93f2ede126ef7bdea
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-native-corrected.py | 68017e8e2e793cb89598ba83db32ac29fbaebe40885f42d77ec0b5fb54505c69
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-native-lean.py | b85567dc6e5f64bf1629da1b0f36aca8425a7d209da9b8df660e848b83c82128
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-native-original-results.json | 84a440dec8018063b24ac8182dad406defbdc748d79c30fb896b91a5901ce7ec
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-native-original.py | 8d360bf6775b2272513b1c300d89e6be635d488efc00b5b4da1c86decbe8ef46
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-native-packet.py | 2b97b582bc9dcdba745a784df63bb572539991bacb5e16fe9084c3938db473a9
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-native-portable.py | 2aad3c5ab49f58be446d31173f04ecdff60261d8a596010a44a68b0d0cf9149f
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-native-results.json | 86a09e5f28328940b1be05335a1b84270671c3e116bb57d57297b52550e7fe0d
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-native-resume.py | b2a3878d66e92ca0ec8b184d3efdea2169ece641ee6259ce2976542a218e55b7
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-os-doc-update.json | 56acaeee7f670f5bd4fbdfc12f5945b00fe66c5d5065f86eaeb26ad214669aa6
+?? | S4 report/evidence | docs/projects/evidence/slice4/windows-update-os.py | 399db0e00660765d217d85ab7a1a45f182f5ea8ced95ed61f918e888c5b52df4
+?? | S5 report/evidence | docs/projects/evidence/slice5-inventory.txt | 3c8c1f5d27a59a63a0080895219bf6aeda112ff52d331c73f3a11230e94d0dd8
+?? | S5 report/evidence | docs/projects/evidence/slice5-source.patch | ebcd16844dfa32326dd11d45b51fdfca53e1178d2e4615c370535437d1dbdc97
+?? | S5 report/evidence | docs/projects/evidence/slice5/cleanup-host.py | c466ed4683dab4986032adee7db9c814c8a5b02c7007f6bc11ac334cb56bd8fd
+?? | S5 report/evidence | docs/projects/evidence/slice5/cleanup.cmd | 508ab13d041b688e6a87a89fde64e5551db59b4f6cc8aeeafcd056e00db108f7
+?? | S5 report/evidence | docs/projects/evidence/slice5/cleanup.py | 68374ee60106e587311aee5e66596eefc1dedea02e3e5874d8aad73be47094b0
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor-creation-close-fixture-host.json | f51a181c7be144abe7973c33e9c703e5bd4006490f1b1dc7f467dee3328e640b
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor-creation-diagnostic-host.json | e1d5ccf02a2e90f37b924c64b8cc534e4504ce57ce28d3e26f84377f80fd76e3
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor-creation-first-host.json | b658e9d994a3fc236a8770bc71dbb5ba1b3a45bdc0ad2b9c562c28b8a65aeb08
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor-creation-fourth-host.json | 0626afe6aaf5012a5e23b39e1f73a5f2a9827435a09d2086fe89a1577fd521cf
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor-creation-second-host.json | c7d8e88fbd1feaaf326a1a5568f669b67a757a2f42d29a856e6e8d4cae74264e
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor-creation-storage-test-host.json | f952ff491c2f647247dfdc83fbbc07a41f1c264a8e157aaa03d500eefabad78d
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor-creation-third-host.json | 98019fd164bac9d71c800f723ba1561bd249e9c25120dc2b92f33462810cb99d
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor/collision-host.json | 0c20f31e939317d063f0f77d2a7517d17e11cc71d2ddbb6d7c3fee2adf77863c
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor/manual-host.json | 57a13a34757417705c9dff597dc09048724151e174d1099df025dbedc54e0556
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor/multi-root-host.json | 0d538dc9fc5217d74763486f5d37a6dbf9f429db95bc43cff9fb3891f7fd1423
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor/offered-close-host.json | 9ae8677b8955606c607097e6e9a342f6c13980cab94761f437ab3356ec06d829
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor/old-server-host.json | 1e50bd4e6076e4816fcc466b9971e757234865e3dc7ca4159b7107433584bd18
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor/old-tree-host.json | 6dd156924093fdba2311a025feb0c4ef2de2ed6da8f224f435b253fbeeea08a4
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor/outside-host.json | 9b4eca4748d09b8bb52f3f6ded9e8953d22292ef3d61113d280debe1c9f84595
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor/persistence-host.json | 03e674b55f432a4241dc274a1aa5c5e758799b8d0bc86f35d7d293b7af1aae8f
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor/s3-project-host.json | 81bd86365f4d54358ba6e558eea0b2cd12e7b27ce82867643d0f31e5c7a65f1d
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor/trusted-host.json | 1be85a40e08d0eab8536579147d8c1cda3d623b73ba88ec0d46a71d3b8f281a7
+?? | S5 report/evidence | docs/projects/evidence/slice5/editor/untrusted-host.json | e56bd0533d1a685715612d2be0714c209219ddbe1a7cdc816b56ad8c4be06214
+?? | S5 report/evidence | docs/projects/evidence/slice5/host-cleanup-results.json | 405f8657661d302a2aa9959aaaed83b42c6a57a512161b79fda0f5560db8aea5
+?? | S5 report/evidence | docs/projects/evidence/slice5/invalid-id.py | 44422dbfeafa46398859c38c85d12222320c326f557d77177795bcdd575fa348
+?? | S5 report/evidence | docs/projects/evidence/slice5/inventory.py | afe1a544fa3481d1e55bd4f33b308f42cff576cac96e82f93cfd9522a083399a
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux-debug-ctest.xml | a481a151c9552872b5726887235130b9d7cb9718ed31b5445896485ae136f3ca
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux-debug-original-creation.json | 9c027519b530c9dac07007831e7325212c6babea50c6cb45bed6730e81ad2168
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/debug-binaries.sha256 | a2929ecf91a1bdd1b720c59c091b8a051c29c7d9de0f2122f338446dc008e75c
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/debug-configuration.txt | 4ab41bf6947ba4289471013347a8be4e9f36530aa1b9368de39d3ffa77849cde
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/debug-creation.json | 15e47d64760ec35a19126556b89c7711407a3ec7b33a2f6ee5fc17e5684c8063
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/debug-ctest.xml | d81637323a17928ba9d14062b56591500215c241911a326541f848be14493b92
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/invalid-id-linux.json | 1516d517e2ae1edf5ca063b2abfae0e7279bb822d4c80c61bb386ba5bcb82b54
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/release-binaries.sha256 | 3f3f0556dc50aedb2e5bd769bf8e7c3ff06f0ea137b4986d15bd4de63ae568b0
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/release-configuration.txt | 2b28923d60ec5e7cab9046c51e1d31d894524179e5c0bfacac495eeca0148b56
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/release-creation.json | 2b41cab29c4bd7032ae434fbdc2ca05e904258cee0df655b699d1c76a24653d9
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/release-ctest.xml | 0207cf114a87124ec3057a55ab57081167f20357622e364f2cb741ff0954e88a
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/strict-binaries.sha256 | f1bc99a4486aff9ccaab3447be3b8cc811137413783c8f413ae49ec11434b574
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/strict-configuration.txt | 6e30a7536b21dd1657d3ae6587ad4b67c32a42c37e16ecd6a0d96578ba43779b
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/strict-creation.json | 2cfbaa9b85d176d93ccdaacae82f5d5ac89042faf62ed8bc84b0efe410da83a2
+?? | S5 report/evidence | docs/projects/evidence/slice5/linux/strict-ctest.xml | 4e5514cf9e313ee96600991b2b7e02e2255d2ac7c9b5d9eec835ba157f7e6c25
+?? | S5 report/evidence | docs/projects/evidence/slice5/packet.py | b452efbc5711db1b3d678f0d05a5ad4eb47baff2d2867938432be8609c3b28ea
+?? | S5 report/evidence | docs/projects/evidence/slice5/qualify-linux.sh | f575fd038b7193f49b66b667ebf17bf5c7b491c9d33d8fc1e5a0b628abecd664
+?? | S5 report/evidence | docs/projects/evidence/slice5/run-editor.sh | 0828878bb23d2c7c7783d5b6ec4b33305dde551037b82b74fadb8845eda80807
+?? | S5 report/evidence | docs/projects/evidence/slice5/source-hashes.json | 2168cffa4217bfc5bab75f569b8d116037d5abc4ccc9a775cfb30805a5873d60
+?? | S5 report/evidence | docs/projects/evidence/slice5/source.py | 9add999a9a01d9955ecd8f6ab923a8b43c3234bc88488e767937a743ceb55a19
+?? | S5 report/evidence | docs/projects/evidence/slice5/verify-native-packet.py | b573a76a15eeb08010297ecd3eda3a7d7bc3a43f73bcaf2dead0578c612948ed
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-cleanup-results.json | 834995a1fcdc914d8b881b6141a6a40ca30b912fbe0002346b6a77e0655ff28d
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/Debug-ctest.xml | 694379e9a7c658815800aafb0c5732ec5a21a80a2645a71b3fd0b178afc1dc28
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/Debug-project-application-evidence.json | 014dee3bccead5cc2655219b8dfcf4c6627b7cb0060f32497c2922103502a813
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/Debug-project-creation-evidence.json | 2d0de1861fac6a059937df6df89116b7d72ba6962f6300535c034ffbc3b3fc73
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/Debug-result.json | 79e1c998939a5066c2fb0753c43f6f8e06dc5c07421c9d7b9f6ccf030304e5f0
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/Release-ctest.xml | 6f032c9c750201874d08d34597e5b1799571f3558bc7cfc57b2977413e611d0d
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/Release-project-application-evidence.json | 4e03d0346cd4b87ac3d8206ec222819be7873336db20c28e7655ff119727ab07
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/Release-project-creation-evidence.json | 6197b2dbdff0cab4f8d7cd67bfa0c06ebe5d43d269298e2ddcbd7fbae76f94cb
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/Release-result.json | 1cdb0d08b0983b6c857b390d922d9b9a6079597da64dde50c36466c6e9292548
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/native-results.json | 7adf2b717dd2d82c3e1a181b0c07f30607ce86a423d33e98c9c3c63cf8c8a715
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/native.cmd | 70d938425fd9d37dda034b4a871cc3c7d0dfd4c24aaac076f3e1f9c1e5149dbd
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/native.py | 6026ff554ffcfa6f6baf03374a75a83bb1f36f68804dae3f2fd4361e43b23765
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-final/source-packet-sha256.json | 506c9fd8fbdafb98f9546d320da944c8985139133f361a93ea648bf0b15bb096
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-fixture/Debug-corrected.xml | 05d3421d8cbec5d3c58dc9ed6a54aa7ef11e2d112687ff4c7ec69234fd648ade
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-fixture/Release-corrected.xml | aa33068406c7a11ebdc01fc02c28b9ab9126edc4f57b3d7473d29d5421d47350
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-fixture/creation.sha256 | a8f3e4adb551fa29e0919b0acd410a088c9f09afd997478b7da288854af501c4
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-fixture/rerun.cmd | 97c63f6596b426d5a063840d2cbf061e68b1ba01c613ffe089441ceb45962b12
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-fixture/rerun.json | bdd6dd0d2b2145682cd7d8a1a463aa8f350441ee033cadda5aa5f5119ae1f9eb
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-fixture/rerun.py | e7633a75caa211fdd4e6592bd6b11435729e698a491907778eeb0bbeffe579e2
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-original/Debug-ctest.xml | 34c16bda1797c1e69eaee4cfc6564aff7817d9d49da2d8ad0e916fa0254554d9
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-original/Debug-project-creation-evidence.json | 591e3155c50d815796e2f5efdb5871aa75cdf14eb1e32037c53b123997c66a4e
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-original/Debug-result.json | c104445e77b4fdaaee805cb388b5df86d8226aa4ef79924b1d7fe2965bdd7e3a
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-original/Release-ctest.xml | 5fdca9b15e845fef67173fb263f5cf63d8afc96af02556d53c37d37c5eee5d74
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-original/Release-project-creation-evidence.json | cc96a7ce39a45010eae07c049bb5a6d41b8c0b58929542fcba6dc8e54bee86cb
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-original/Release-result.json | 28a4454918c47d66d8ce705b3237389030f239a3b043ab5c1b953222f590a8a8
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-original/native-results.json | 159baea13e09356cd68fede8338e1bc7090a384f554798fbff77541eb32d0408
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-original/native.cmd | 1f27dd292031b68e0c1fb37e6deb840db0f629bc3c439e83dc7ff2e759535fc2
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-original/native.py | fb55a66973f2bac3af93b80103796966d4fd9a54bfa80ccf162acd783548cd16
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-original/source-packet-sha256.json | 63a55949a581774a201602dac494c643204e756cecae241d968caa94ed73a764
+?? | S5 report/evidence | docs/projects/evidence/slice5/windows-packet-archives.sha256 | cdde2e52b717f976c25ab432652aaee97d01f22e59c238c2a2e000929a7fbec8
+?? | S6 audit | docs/projects/evidence/slice6-baseline-audit.json | ffed88041d1ad1786ed562727a494d828305daff8987bfc5ff46c3eaec57f74c
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review-inventory.txt | 3465bee50272d183b17fdbd46a009f93429e05f2a91c3496fbe332de9690bf18
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review-source-hashes.json | e24348024e81b2ce35996f6ef34fa7beb18d0679bcb2717a829e9d45c7183a6e
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review-source.patch | 3374714192ba333680c07c4b21460ed085c2341fad2293e4945a9d7b71e6e1c3
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/cleanup-failure.void | 58dc571157dbcdd54c3e7aba7ebfdeb8b67ea4acff37f6ab64758c291a8f3300
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/host-cleanup-results.json | cd8f34fa35ff383cfd1b8650452996baa156c8aea9c8f89c247885f7d3e653b8
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux-debug-abi-diagnostic-first.txt | bccc3ffb1815ad48e0292b2c733adfa27d56d17580754681d661d7b473eac06b
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux-debug-abi-diagnostic-first.xml | 24dab6e06773b203c5c7b9776cdb695da0afb2fb421532ebfb4f49ab89114375
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux-debug-first-corrected.txt | a3a94981585e4be4230b68e60f8a95a1cab1819eb468159c07166f8360be3449
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux-original-binary.sha256 | 51f4fc3704c1f73116d99acf7ba2e6000f2b4680958b5ba53f7d04c7cd721a54
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux-original-build.txt | c07a435e6367a92472c903c5ae56b8be0a54881f94cb178eb831cd5f7a29a60a
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux-original-unwind-binary.sha256 | b19cbbee1727e01e6c4a919da6bd74852c019a5602aefaf3afaa9c5aac7e1510
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux-original-unwind-build.txt | c07a435e6367a92472c903c5ae56b8be0a54881f94cb178eb831cd5f7a29a60a
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux-original-unwind.txt | 579b3999ca304b694c2f8f72a286d85ef1eb139ebea74a44c481722a46771a46
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux-original.txt | 51f23c1823f179ee62e65b13be703219a73eae3989bf1af74ee001e49ab6a04e
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux-release-stale-backend.txt | e5c10e20355221d713a34d972fa43b1c1ec2faa28d11c1d0afe8450f46b13093
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux-release-stale-backend.xml | fe268adcd7136272c777e25766c28200c64bd42f5d10fabe02adc1c9855cc2f1
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/build-configurations.txt | 009a3da596ea68149a6215fe900180a5781b513eb05563da1778e525c2bc8238
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/debug-binaries.sha256 | cdcdc620d21a1317b87e17914ff8217c7094cbef617f5187b03982b4293247f2
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/debug-build.txt | f63a9ebda4a3516758d7c8d64f4ce0d5ad93d2beb9f0285150239ff001212b37
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/debug-cleanup-failure.json | 5511007932f45190302e66ed1c6dfaf7f2dd54970556d13fd7bc80691beb8924
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/debug-ctest.txt | e1db992377c6102292423b393a125716c2e13534f85a160e839945ee166f51fb
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/debug-ctest.xml | ab605f5a1feef8987c1e99aab1a2a2b48f6f6ffb0c634326f9a82695d6e72671
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/debug-direct-ir.txt | 411f663f0f9086afa76ad3f8c4629e93d313a31ed161c9d28b280ab499f8ed39
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/debug-lsp.json | 9aa5fc993e994a093e1e62cdc01daad21a7213406029afa1ce7a417a6a0bbd70
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/debug-process.json | f3ad4eb0ff79747b81f474b2896d26f6e05e55d2432818213e973b12cd69a772
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/debug-version.txt | b4998b0548157b3c6cc5a53ce87c07a999c42e4405e3468408e885ec6a0ef386
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/release-binaries.sha256 | bbde1b6a8d39326868640e485537502f3069b67bf45317016fdfdf5d30961536
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/release-build.txt | 8b4908adca21f4fb1ef9014b8ca6ac2a7699ae6e5363fede6962bfce38f54cf1
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/release-cleanup-failure.json | 5bd8e51f7ceaaea807e58924dbb7e8aac3c61bd2e4bc982c0eeebb21e8b5f351
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/release-ctest.txt | 75f5ef7a38db940e99234cca0638cbd71f49bbc756127eb170e9b68b789c3a9f
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/release-ctest.xml | c5c07d2e54d0feec68486be9a41076c4f521bd153477a562ed8818643d1d2604
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/release-direct-ir.txt | 411f663f0f9086afa76ad3f8c4629e93d313a31ed161c9d28b280ab499f8ed39
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/release-lsp.json | 12828a5de33d0c9f7fea9c9751d860ecabe99779c9d6f97013e7961eb6f3bf01
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/release-process.json | 07407aaabfa3506ac28438bb59ea225d2c2a0898fe3e051b590eaf3b5c2e9d3e
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/release-version.txt | 75f2ec32ff571514edfaa7527b031f0160b9f5a8ccf220fc8e16a9c7cd3a0da0
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/strict-binaries.sha256 | a07bcb55aa011441940b5301ba01618748cb0badb8c914f6f00d7f7aa73e8cfe
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/strict-build.txt | b11e088a2d093c7f843ed28e5f480fbb3c9e49425fa94193229415f96f61ee60
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/strict-cleanup-failure.json | e26e05d0ce29677c19166a1e45b918bd44b3957b3d74336e7fcfbeafc1a09d3c
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/strict-ctest.txt | 442cb871320024d20c160af5ad6e2c8025bfff49f5c7ac3793ae21a397f709a7
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/strict-ctest.xml | 834817e9c9ae6269b9a754bd05e6e2ef1a1ab276c43a85e985595a3e464be79e
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/strict-direct-ir.txt | 411f663f0f9086afa76ad3f8c4629e93d313a31ed161c9d28b280ab499f8ed39
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/strict-lsp.json | 1e2e76e4fa34cbd93fdcb6edd5096e142fbf0a7719727ba677274a3b78a7b86a
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/strict-process.json | 8417bf2bfa3ce79d91734befb9b6aa0ea51e967efac59a0917a5a2c802f57eeb
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/linux/strict-version.txt | 946162a0a2aa454a9c7c4150c3205e664af0d82319236b30283700b65938b42d
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/original-typed-ir-fixture.txt | c21d11c7cd8313199becd184907726fb84d6a6e521266d455e8097206e439d13
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/original-unwind-fixture.txt | 4f2c11c7a00be286320f380527f28aebe9cfacc381b060d11b5ef1fdee8031f0
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/replay-cleanup.py | 4784096a6f491716baea10f61a22c4963b955c9108e1f514e804268755b1b80b
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/run-linux.sh | 673034e667f75901a7346af75f7a2082a96994e8bef56470de892c55611a9e15
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/source-fixture-first.txt | caecf43ace8ced762b5f5ad58c07a3135a56937382373760a5714e4ae5e8901e
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/source-fixture-first.void | 5f36126a921b0b7cd36babc7f9c26a552a73fc17d5ae9f44b82e5c5d43a74034
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows-cleanup-results.json | dd9aa48cdf8bf86b228fd41f0c7419cdd8a9c11153b1c3fa2a390277e8ca441f
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows-interrupted-packet.sha256 | 184c5938fdbedcb5e39bc703dde81fa670aeefdffcb4ec7f2b2e482aae1d31bc
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows-interrupted-process-check.json | 2ed3ad99547d206c9b785aaaebfe4a73d3e50674ddee3eaa1fe7ce8e6ce9b970
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows-interrupted-runner.json | 6c228683a4bc608cc707846cd77cf17cc6e7ac24a35e8283deca976e8ef57b5a
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows-launch-status.py | cc6f8275a2fb4897fc59394b03d5a24f27222952fd9cb03c756da43c6096c665
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Debug-LastTest.txt | 8092d5a581ce0ffaa0bae84ba21016f6ba6ebe19d5fa15ceeb414f1e4c4b7815
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Debug-build.txt | b6c202fc416b06d47852428d6bddab8327d3f605844401e174bf3da955e061a2
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Debug-configure.txt | 4bbe96d40091a73bee1eab62fc3cff9f75a4b818cc3c4819217ca77753b86329
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Debug-ctest.txt | 3c125c656840227b6b3752878faa5e19e9529e384fc956cb04302d7958662f12
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Debug-ctest.xml | 1358b68cc335089c616adc8c320587c107bcba18f7bcd9df6e9a55c36307e0d0
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Debug-direct-ir.txt | 91053c88057f9b34e5b0d8d379adcb12dabace21d601273a899891dcfb29cb03
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Debug-numeric-enum-lsp.json | 5b4ad4eefdb8de280b2936afb32230e151d79b052429b9564b4684a2ea348f34
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Debug-numeric-enum-process.json | 7c20eef1466a63c69dc3b96750aa4037615d35068af5dee380dbd8b97a65a637
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Debug-project-application-evidence.json | 22b123ca8bf0327b4a88c2539e5e29808b35900e426fb09e919dbcd8aaf2bcb2
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Debug-project-creation-evidence.json | 8284c2046c175044394af1b051e0942ba9635470cea6ee6d2e16ee1caca2639f
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Debug-project-discovery-evidence.json | 20d5faebe54711c0d183e40bdfd4906744966eeb7c1bfa14d1096dfc48958919
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Debug-project-nested-evidence.json | d9143fa80293c1df78e0a1fa792000fd60c849ec4f06834837fc9f49df919857
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Debug-project-profiles-evidence.json | 498085ddce15daa6c230346236d087278b6bdb27956aa8a87c9b324385737886
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Debug-project-protocol-evidence.json | 486f88d5174f6f2f49061692c7dfea8933a127162aab17ea323ca25ef99ec95c
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Debug-result.json | bfffc07646b3a6a02e5ff7fb05f52e0b0e0d57657e3c2128b6b9c918ba4f7279
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Release-LastTest.txt | a6bd261510a353c411d73bf51c76f4f43d68cb78cb6f281b8aec6f5834081daf
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Release-build.txt | 65c7ee944d6e28c47bcf72e67f9715a9430c64483a98168c7e796e30a849d303
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Release-configure.txt | d3288016b2f64e5d6a7b92c97985b89039cbd3bf1b750740382d7dd1cd5ab97f
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Release-ctest.txt | 575593e6bb5fdca7b19d92e86fc48a0efcae80d9fc03d0a7cc9751472bab1bd1
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Release-ctest.xml | 6f61c0a65bd9f11bcc5aba315bcd278e8e410232bf66cacb0718a78ffda06949
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Release-direct-ir.txt | 91053c88057f9b34e5b0d8d379adcb12dabace21d601273a899891dcfb29cb03
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Release-numeric-enum-lsp.json | 658a71c900fff6a1ff08b8e48dbc77f88fa9a98d76575d993cd9897b72db4fd2
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Release-numeric-enum-process.json | 156f4893d3b0dbc8bf79302839323a1f19bfa34e2a562475b0ac778b48e3f070
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Release-project-application-evidence.json | 74a48b2e21bce038000a028a416b2f041b095c52559c9dbeb30b2a32e29261b0
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Release-project-creation-evidence.json | fff4485ef37957ae060a696ceb3dd4efb50f6cf71ea0c941b5071b68320fd45c
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Release-project-discovery-evidence.json | a836a78c0616eca7efb641216fd9cd0e693286c129ce361c9487ad854fb69c0e
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Release-project-nested-evidence.json | 394cf058d549ecbc77682f943c891b580f86f68278d4cb6a9101c7d9b99282a3
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Release-project-profiles-evidence.json | 1b3df9211d925ce5c2c538492303cbf51d9a9cf74536fadb492bcfb95b938c23
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Release-project-protocol-evidence.json | 11939ae017cb5448a3707d42c7676a7a34bd119fd6db586f33123056ced3e035
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/Release-result.json | c14629395cb17850c01979f5bc68f650699d2e853ca50c61814a4249fbc012c0
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/cleanup.cmd | 3c19f48427e4a3ed785030b9468ca4b3c3a317eb2aca36be5837f7ca1556c1d7
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/cleanup.py | 616651ca88b0df4e788b9da326631f48efda0f72dbcf6279005aa138c4e86b85
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/console.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/direct-console.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/direct-results.json | d2a72a48867c7c71a33a37cb9e07446fe85dcb3241800940eb3dbacd3ddf0754
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/direct.cmd | 09fdc071369f2d2ed4d2637cde019e8f3a0635984daa27010f68fb2c0874ec11
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/direct.py | 99d6ff25d9c232888721f0f1de6c3f909f66e101c6a68a74c2f059b76b812c43
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/launch-status-console.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/launch-status.json | 2ed3ad99547d206c9b785aaaebfe4a73d3e50674ddee3eaa1fe7ce8e6ce9b970
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/native-results.json | 6d72f6ffe54070d19baf5f2ae9ff9203610ca733f93c40ea27234a652e8a091b
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/native.cmd | 5fd65debb133e8414994a9d579f741da252facf196eb3a6d2f0a05933e9ee283
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/native.py | cf51058745619ca33b567eb5d9890052e25fe7f8a2b2f95a87414474decedf78
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/preserved-evidence.json | f548b7791a5834b617a3e0e34083843da4dcdd6e3d64860099c854f55d69b507
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/source-packet-sha256.json | c1e8aef2d25afa5451792f0ca52768f96918454e61aaf04a132ce7515ba3d558
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/status.cmd | 98c7caec55b7f6b60ec641a0ba68e1947d94d16edae78fca24542f851408b0fc
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/status.py | cc6f8275a2fb4897fc59394b03d5a24f27222952fd9cb03c756da43c6096c665
+?? | S6 final-review evidence | docs/projects/evidence/slice6-final-review/windows/vcvars.txt | 9a47202059fffaa236cbcc04b1d4434d5d165bb2f94d73ea21538334e840fd81
+?? | S6 evidence | docs/projects/evidence/slice6-implementation-inventory.txt | 1617ece397cc17ed12c9ab7d3206ffbe187737f0412c9ecc215f0b65285bf7e1
+?? | S6 audit | docs/projects/evidence/slice6-inventory.txt | 09028572571e706223c37e264ae4efb5e786d48587d5a54d204d038cba0508b4
+?? | S6 evidence | docs/projects/evidence/slice6-source-hashes.json | 6961dc4e005ef87dd300328dc60e314ca970d0ee18c6339a8dade9115f8aa5ac
+?? | S6 evidence | docs/projects/evidence/slice6-source.patch | f4a54cb29f40abd71274d2d961662c35a925e11cc4b35908a25ae5ae30e4a928
+?? | S6 evidence | docs/projects/evidence/slice6/editor-config.txt | b949fe079777cc036ba58b3a255cb2b4e1c3f0ae750cd417d44eece604e8a3de
+?? | S6 evidence | docs/projects/evidence/slice6/editor-fifth.json | bc14f449dfbce9ee8c53d2a72fd2023a4dfd56c0123736b5a7fd07f0fa808ee0
+?? | S6 evidence | docs/projects/evidence/slice6/editor-fifth.txt | f40aafe1bac14529919b3eadca897be9f252367e2dff50038ea5f44d87b3cfb0
+?? | S6 evidence | docs/projects/evidence/slice6/editor-first.txt | fb258b7a8963c178f821446e098b0d2f871dd27dcf0d8abd328568fd70edf4c3
+?? | S6 evidence | docs/projects/evidence/slice6/editor-fourth.json | 7aa7a60780d8d0e82fc9c8fbdaded70581eab0e2873e0fa802c8d750df0b6fe7
+?? | S6 evidence | docs/projects/evidence/slice6/editor-fourth.txt | 84b7521a09cf060c12a9f71064ccdf2ea6ebb128903d2c2c324bc236af7ed653
+?? | S6 evidence | docs/projects/evidence/slice6/editor-host.json | ccad4cf3483ed097a05f131e7a2b78c6e89929cfb7825d844f50002af12c2a8c
+?? | S6 evidence | docs/projects/evidence/slice6/editor-host.txt | c492c28d55fdcbe3567f486074991d3f5ea34ecfc088059a832e95859009fd9a
+?? | S6 evidence | docs/projects/evidence/slice6/editor-second.json | 7aa7a60780d8d0e82fc9c8fbdaded70581eab0e2873e0fa802c8d750df0b6fe7
+?? | S6 evidence | docs/projects/evidence/slice6/editor-second.txt | 88f48bb7eafcd195f7876ae3d11ffe9eb7241f6f397e799c447e6b97ae9699bd
+?? | S6 evidence | docs/projects/evidence/slice6/editor-third.json | 7aa7a60780d8d0e82fc9c8fbdaded70581eab0e2873e0fa802c8d750df0b6fe7
+?? | S6 evidence | docs/projects/evidence/slice6/editor-third.txt | 09eae8f2650e6c98ec975c5f97b83fa3aaf2c0f32ffb549d7712b7d95dfa8990
+?? | S6 evidence | docs/projects/evidence/slice6/host-cleanup-results.json | 7bcf09bc0c5e75354d88471ad5313c67838ad0b60ca6909724689c4e94054406
+?? | S6 evidence | docs/projects/evidence/slice6/linux-debug-target-refresh.txt | 20b618d54b84c39e987668d04a8e1136c8335fe498301d13b82210bdcef060e2
+?? | S6 evidence | docs/projects/evidence/slice6/linux-managed-default-corrected.txt | eef5b0e1edb77c881626c1385f3e019404d10d3c3fc53c2cde26c0b514d722aa
+?? | S6 evidence | docs/projects/evidence/slice6/linux-managed-default-option-typo.txt | 7c1ec61885246fbde129739a76ce2bf0dd9ec033c6efbd3d0761f10c1b0ecaef
+?? | S6 evidence | docs/projects/evidence/slice6/linux-managed-default-original.txt | ecc622fa72ab51e0713a447cb761ea0508fe11c61fbb4aa5364ea18177be15a6
+?? | S6 evidence | docs/projects/evidence/slice6/linux-release-first-process.json | 7490b4a561bee915a27bbdf94ef4d6769f5e05b99c042f8a808eb49ad5e3f355
+?? | S6 evidence | docs/projects/evidence/slice6/linux-release-first-process.txt | c2dd8bdb740fb4a4b2e68a6031c368ecc67fdb6547f8a672e89210eb1cebbfb0
+?? | S6 evidence | docs/projects/evidence/slice6/linux-release-second-process.json | 50735bb80d190ed96c63f9238b9f39cb99e19454a155b4be316fbebdc99232c4
+?? | S6 evidence | docs/projects/evidence/slice6/linux-release-second-process.txt | 3e41fb79f55c22695fd2ce3710897f882b867f96079f4d8d0aba7bc466f62cad
+?? | S6 evidence | docs/projects/evidence/slice6/linux-release-third-process.json | 5b32218b94d1f7f82722be0af1ad294f6a02299d15337808d254f8ffa6c7a7cb
+?? | S6 evidence | docs/projects/evidence/slice6/linux-release-third-process.txt | 47c44e22efa6f40a6b761a32f30d49a488885027df7b65e1d727189a20e9ce97
+?? | S6 evidence | docs/projects/evidence/slice6/linux-strict-managed-default-corrected.txt | 77e5dab93602bb5e08e3bb0f42427a09bd837144f8658177eca1baf9e4ac8c95
+?? | S6 evidence | docs/projects/evidence/slice6/linux-strict-managed-default-stale-repro.txt | 45ac2ce64dc8ab67399581b6ece2bafc75027d61d5ddd2a8e335f795ef371679
+?? | S6 evidence | docs/projects/evidence/slice6/linux-strict-stale-binary-ctest.txt | 3354fa747007d8f02f693d8a498b4d26c1325aecec710055d45941945e4536bd
+?? | S6 evidence | docs/projects/evidence/slice6/linux-strict-stale-binary-ctest.xml | f8953e97c59ef5b1812fd3093c951d924e8b371ce507dee1992bce5e3e2aef8c
+?? | S6 evidence | docs/projects/evidence/slice6/linux-strict-stale-binary-process.json | 426e527324a5fd3a71df29d9ea93f093a89564c32ce92f2833853c1057b366c2
+?? | S6 evidence | docs/projects/evidence/slice6/linux-strict-stale-replay-ctest.txt | 576d361c7b1e52c598fb7da207da7c862095a97704cc458c62bfa659eb7e0210
+?? | S6 evidence | docs/projects/evidence/slice6/linux-strict-stale-replay-ctest.xml | bb399ed4823a346d84663fd7467c60dc38cb5eed698548a9a128d95d7502b343
+?? | S6 evidence | docs/projects/evidence/slice6/linux-strict-stale-replay-process.json | 18651617d4cf422a70688bbf9118f917f96ed0b3c47d6449de4de44fa57b4480
+?? | S6 evidence | docs/projects/evidence/slice6/linux/build-configurations.txt | 009a3da596ea68149a6215fe900180a5781b513eb05563da1778e525c2bc8238
+?? | S6 evidence | docs/projects/evidence/slice6/linux/debug-binaries.sha256 | 8b0eb48142391391b4cd1f073d4f1d772a5d987d6a42516c8227278c7010b7fb
+?? | S6 evidence | docs/projects/evidence/slice6/linux/debug-build.txt | 2ee32daba199d4d760fd608a4f1dd03ebc56491084ba633c0b4e752b4dd4e12f
+?? | S6 evidence | docs/projects/evidence/slice6/linux/debug-ctest.txt | 231cac46d86f6c5dfeff3c2a4ef4c93b5650834ba244985c091d6c3036eee0bb
+?? | S6 evidence | docs/projects/evidence/slice6/linux/debug-ctest.xml | 49c4ce9e653a2289f170f03ac349be55a7100b35f93be9aed43ad9300de73a04
+?? | S6 evidence | docs/projects/evidence/slice6/linux/debug-final-enum.txt | 6f54b805b682f7121f35582026e089c4c18c725e726b120b7ba92ed14d228035
+?? | S6 evidence | docs/projects/evidence/slice6/linux/debug-final-enum.xml | 90a2f99a42e4182e4cbd2a62d99fc1eebee9510b12d75a242f8c571001b870cd
+?? | S6 evidence | docs/projects/evidence/slice6/linux/debug-literal-proof.txt | 217363debf189e83eefbabcdda121bcec1fb580066f73755110b0ce15aec8607
+?? | S6 evidence | docs/projects/evidence/slice6/linux/debug-lsp.json | 2c2880db5666d322b6163203fecda73c1277e487d8ca2a6e7fe9951c12895f15
+?? | S6 evidence | docs/projects/evidence/slice6/linux/debug-process.json | 40f7b7b6d45596427c40778c7dec29dc3de65f95a0297fc58d919dcc7bb5f981
+?? | S6 evidence | docs/projects/evidence/slice6/linux/debug-version.txt | 52f7a1dd03a51e69a3cfa6e88cf03cc68b2fcba674f20cdf74c9abe23af9fadd
+?? | S6 evidence | docs/projects/evidence/slice6/linux/release-binaries.sha256 | a116c7b46b895f104112b1a24e92d4f654cc1a1f6e1816c8dff381bfb5725294
+?? | S6 evidence | docs/projects/evidence/slice6/linux/release-build.txt | 6ee767e314cfd70ad190c4cf84bd51de10f26d4a2af31393d3ce66f014047cef
+?? | S6 evidence | docs/projects/evidence/slice6/linux/release-ctest.txt | d0543af4cc1a35c737ec6a7fe69d8a6c4c4784a1c3ba29dbc3eb18752b4e4574
+?? | S6 evidence | docs/projects/evidence/slice6/linux/release-ctest.xml | 18080348887615102736683c146d12d56f72bd94e82eaa0921a2fae6a1ea40de
+?? | S6 evidence | docs/projects/evidence/slice6/linux/release-final-enum.txt | f51ba1568a3d86526ede86e28b5f3db625995cd48c9dbe92aa7f16a52f9a4ed3
+?? | S6 evidence | docs/projects/evidence/slice6/linux/release-final-enum.xml | 38f2566bb17a615cd15cdbde1a4831f40e6ca08c369b8c57c526bdec418a4932
+?? | S6 evidence | docs/projects/evidence/slice6/linux/release-literal-proof.txt | 217363debf189e83eefbabcdda121bcec1fb580066f73755110b0ce15aec8607
+?? | S6 evidence | docs/projects/evidence/slice6/linux/release-lsp.json | 0ee07a828a890893b3cc6e047e0a095e4716d4600e374f335db1a8cc89ff3547
+?? | S6 evidence | docs/projects/evidence/slice6/linux/release-process.json | e3488fa3aa7b85b54943c53817d2d53c4bb008619292c19d4466bf28b8a97d2a
+?? | S6 evidence | docs/projects/evidence/slice6/linux/release-version.txt | 8399146c26c074568cefca013edc5627d86e8efd369e9d3fecd50fd031210165
+?? | S6 evidence | docs/projects/evidence/slice6/linux/strict-binaries.sha256 | a21477d2291056fb15b70a9cabca7ddcf6533b9424b5919f7a8d3245988b25c6
+?? | S6 evidence | docs/projects/evidence/slice6/linux/strict-build.txt | 4c8a5969563ec2b2904110a97297f40a82f11582a623922d8b94e8c65d2407e2
+?? | S6 evidence | docs/projects/evidence/slice6/linux/strict-ctest.txt | 767aab9a18188379d08e502dea97e588e14d9a9620c42df66a811417827afedc
+?? | S6 evidence | docs/projects/evidence/slice6/linux/strict-ctest.xml | 7f9015281b6a5b9da0ccf616cebc927e3262b25d1c75bab230199e07cae0ba0c
+?? | S6 evidence | docs/projects/evidence/slice6/linux/strict-lsp.json | 023c6cc6562da00449f10519d952de250a06ab61aa25cf17b62746cf353486ab
+?? | S6 evidence | docs/projects/evidence/slice6/linux/strict-process.json | 2bb08e4982b46a5c602c6911028861477391f4320139f92c9eaad90583d993eb
+?? | S6 evidence | docs/projects/evidence/slice6/linux/strict-version.txt | 416413e47bdb63ef07e01b6cbe7e0b36f6168252fe1338e630b5f8a52fa707f5
+?? | S6 evidence | docs/projects/evidence/slice6/managed-default-original.void | a1527a2ee909d5b8f827aa25b6c55204487ca72a895ece8dd039ddaa8f197b79
+?? | S6 evidence | docs/projects/evidence/slice6/preapproval-audit.txt | 9b7f1a856714b5839f65437c8dd76ac03aa740fdbcfb279065de1a59d5b53104
+?? | S6 evidence | docs/projects/evidence/slice6/release-first-ctest.txt | 8f6a48132bf265603552f150fc669411573930b6c4e38ee6bfc069755b97aac2
+?? | S6 evidence | docs/projects/evidence/slice6/release-first-ctest.xml | c048bb6321a0bc916aeec2f5c1713c2a425e891a2912182d3e1ef54ec1250030
+?? | S6 evidence | docs/projects/evidence/slice6/release-second-ctest.txt | 15b7ca9b7120d4de404971abe2fe64967fd59f55f0feb6525b0292e93c8e4aaa
+?? | S6 evidence | docs/projects/evidence/slice6/release-second-ctest.xml | d50497910f4b37336aa5081e08a4ef59a5b8f20f01b132a7a78b8e3bdbb78e98
+?? | S6 evidence | docs/projects/evidence/slice6/run-linux.sh | 164145af175a8d00bdfc5625f2b6ebdbd2ae4f8be306ce4aeac39a32feaed8d4
+?? | S6 evidence | docs/projects/evidence/slice6/source-verification.txt | fe4eebc3aab5839c828f2811e503d5e13a10ffc6c7dc813073658e69c5d4a14f
+?? | S6 evidence | docs/projects/evidence/slice6/windows-cleanup-results.json | 18d4cbc9b940d301dbda27c5367885931af9122c9763c1b80fedc080ca6d8bf0
+?? | S6 evidence | docs/projects/evidence/slice6/windows-cleanup.cmd | 483a28b0e8ad601e0f37e8e5ab35d59490c74064e81dad514151604002f62e00
+?? | S6 evidence | docs/projects/evidence/slice6/windows-cleanup.py | 97683cac57082ec371cfd04789a47002ad71e87f166f928e164f9624b0670480
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Debug-build.txt | 544815fd6a17a4a254e52df760cd599d9221fab23512d6c7fab75aaf61bccf0f
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Debug-configure.txt | 74b747a566dbcb6aec2a5779e5013e42c12d7dc928d710d8df4a294eb4e1f3a3
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Debug-ctest.txt | 7e1724ce37f84179b933bb2512386968dfc10f3b096c530b4900fab5dc558e22
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Debug-ctest.xml | 21427371b46917920ea268250d0cd405ca914b76c5c6e3b895236dbe1480475a
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Debug-numeric-enum-lsp.json | 83c1fb4d12daa4eb5a2f3cba7e42895a56be733b65293d8b9102b95af11eb9a6
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Debug-numeric-enum-process.json | 286f5cb0803d08030a9419d58ccc9f6ae6c1a53c502f520b387ba0d4ad663a72
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Debug-project-application-evidence.json | a4e4443a6b34be8cf479765b3909da77feb5381d4e20e8a147767027da86f0bb
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Debug-project-creation-evidence.json | 3a530b4f5023452b8072c59c897c4eabae3e7933bd541027ed06b98b956bd7f0
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Debug-project-discovery-evidence.json | 0a093b1541b9321402d2d6c622ee2af05ed40111ec233ce684ee61661c0a97c6
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Debug-project-profiles-evidence.json | ffa15e7ad9dd7c5618a495bf63c844fc50c0d290b918a2c6dbfd66a47e592839
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Debug-project-protocol-evidence.json | 0252cc0cfc5acfcdedfb25fb50c651f576db84d5e6951ddef614f3d53c25dcfe
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Debug-result.json | dcb809a2874fb482cf94078c8f6a75bbd4d0e9cbc18d3da5cba16e3da538f7be
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Release-build.txt | 72c83b4214a723a18654eb5e04e963131954d7cf8ad54d5df36d56e63c182996
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Release-configure.txt | aa6a10eca4ecf3209e56bb668fa8088e2fdd52821dd45b6e794d2b827425f490
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Release-ctest.txt | da069def34bda279edf1468094faf71dfdc0b66ab858f064ff8ac9e6450695ae
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Release-ctest.xml | 4a4a18a34d4bec2826d53a414ce25a3e6a7642de38d6993f3caeb48d09dbcf06
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Release-numeric-enum-lsp.json | f156922a9c54837e26ea6a61430ba25ed5f695ec6054fe3f023d5240b3f6c34c
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Release-numeric-enum-process.json | d3e582dc3000d30bcdb238287994fd37eba1f11cf66f88a50428c5ba13a6d154
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Release-project-application-evidence.json | 10ebde4571fb019aafc50cf238159bb5d9723bfc542779b84b4be496f68c15e7
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Release-project-creation-evidence.json | 0e7d6ab22ac68396af81d0488c6750666f418c4a16c96b0f084da55936483c6a
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Release-project-discovery-evidence.json | 5f60d4e31aa853d927f824195024fc824ebe2daa5d9ead8f9f208e6d30b526d3
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Release-project-profiles-evidence.json | 4767867e8def34f11b4b37607d78b463f63c4e2edeb51658bd5cd7293a09ff00
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Release-project-protocol-evidence.json | 564385779020cdd0d641803e1ac860f71def89621fc11dd502318145962af850
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/Release-result.json | 347d7983191613956a26be3b7930120205462e9d66a78243481efc30092cd65e
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/console.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/native-results.json | c1afb5d94c05bf179640e31a76c72beaf03975048e511f7709674592ed88662d
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/native.cmd | 1559a3ba216d9973d796d7f66c7ea2db4ccebb34ec614c270f7fad5b25da0c27
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/native.py | 9346f97d80884f6889d2f4bbc1203380d7f923d030902a3a0cf06d23f76e7b2a
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/source-packet-sha256.json | 3c9f8cc9b55d278d10594718bf5166abac0f37dbb07565bb73bd7da5e58a6df7
+?? | S6 evidence | docs/projects/evidence/slice6/windows-final/vcvars.txt | 9a47202059fffaa236cbcc04b1d4434d5d165bb2f94d73ea21538334e840fd81
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/Debug-build.txt | 5e37c3e463ac1722e121d60b8d9f2373aef98909143e86d6b7abc7c462fba987
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/Debug-configure.txt | a014467016c02de0a548d4d091966b9c14ed1982ecf4d502fc4bbce68a55713c
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/Debug-ctest.txt | 49e952939a42a1161e6e9484394511752bfc092b05f6b919b32e85ad60d99249
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/Debug-ctest.xml | 647f6c0af5ce316d7769eea829c7b5d8a13a2d6914e1151481ec32ce46925ec0
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/Debug-numeric-enum-lsp.json | 66d76d96e209d953eac316fb7c72e23fc9463257594988eb82a4e99ac8263c5b
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/Debug-numeric-enum-process.json | d0a3d74f53f6efdd20d872c1435d330145de55c04a953c2e33e7a25053682855
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/Debug-project-creation-evidence.json | 98ea76c57aa435d81a67cae71c286f1b3bede3d1f1c46ab85e70b02c04a475b0
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/Debug-result.json | c9f52d3f9d1c2126fdb61284125cadf5748ea8ba8c03b4af260459c6a66c9d20
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/Release-build.txt | 5a07ea7339712cb94cf2696374305c2a37431c496f74737040435897688eff84
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/Release-configure.txt | 07439b8493da8396dc0e06783450fc987fa7339829d9aa6a065fcba93c4cfff8
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/Release-ctest.txt | 2a562e7581d66443555738a476c49b4adf41246791778e247256116c6ba47af7
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/Release-ctest.xml | 813f98c85b7ca9305b1469b3c1f915fbf505440c3b78dadd7e58ca46a07080d8
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/Release-numeric-enum-lsp.json | cf3e9e4e33f5d6071150bd1b65217cc724a1a30dd0d0c3dfb7a56abc730f8b64
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/Release-numeric-enum-process.json | eb8efb1c784dc2f538d860a0f3a9a1ae1c92ebdbdfd4c8cb884f2bd6f9149b0e
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/Release-project-creation-evidence.json | 8c0dbb6f273e9b8079c43143ec124cd3c896225ba2996ea040ec8cc5328ee693
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/Release-result.json | a9ff83f3042c861c19c0eda80f9c5f42438ca950b7460a817e355a849cf29455
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/capture-source-times.cmd | ad2c856d1b2052f72ae32d6befbc63b4b2268633f2891e3d419eccd4026dd7b8
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/capture-source-times.py | d830ea068929a7fed76776cd112768f7c122d3b4008841d43854085d354d06dd
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/capture-source-times.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/console.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/first-source-times.json | 384fa284a2f2c78633903a43f110d4da6dd702591c5edebe583e365d9046e481
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/native-results.json | 8caf4976c8918ad63e46f3baa6f4d170e71adef396c9a594427b5e9b5a9147a8
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/native.cmd | 864f76a864f8e95f1ec1ace1f0b676ff24aa0367d7c6a61d675460f734de665e
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/native.py | b21e53795746e205ca3dd2b5ec969a452bed4035ff6f1007c60d73e19796b709
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/source-packet-sha256.json | 114165808afc56c142d0b74bde13d94c856a3e5952f2b0c5600b6211d99604c1
+?? | S6 evidence | docs/projects/evidence/slice6/windows-original/vcvars.txt | 9a47202059fffaa236cbcc04b1d4434d5d165bb2f94d73ea21538334e840fd81
+?? | S6 evidence | docs/projects/evidence/slice6/windows-preserved-evidence.json | 2dbf53124fd1e8d120b0b681c704f93ad5299e3afccafed6776024e88226e772
+?? | S7 architecture/evidence | docs/projects/evidence/slice7-audit.json | b44dfec5d0854eb783af65769cac4341ecf7a4d31eb2bf7e4cf3266a111a6035
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/cleanup-host.py | f537571bbf8c3082579a863a749d8a310d7fe9e26ead1f9464ee60fed6b1a229
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/collect-linux.py | 94e6b5cc42c2ab98d773b142d88d5152a0dc7e308a9db2e48245bf361a2180f1
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/collect-windows.py | 1e6ca5d9d6582dd0e22d80887fbed93a3e67f90904a9359ff5a3896e111998df
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/host-cleanup.json | ee9bbe1ad0f08fa6b20cebce8d087c0f352b88346469558fcdd42171fb69f00a
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/inventory.py | c821dbd3970529fc8ec845698cd20b10b340a127b06a1808b71e76fc4cfb45b7
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/inventory.txt | (self)
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/debug-LastTest.txt | db9bbd7f79c43adcf0685331e1814472706f97185cfb56ea4f6a2ad10a147d50
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/debug-artifacts.json | 4b240281d6afe9a74b95e2f7acd040b19c73d496354e1fc590cfa89e3c7e265d
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/debug-build.txt | 392c32116612c78933f1331a2ba8536f7cff9fc8c0211af6018908cb8c9dbe93
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/debug-configure.txt | 13b844988132796350e02002d171c388af8c4ed2e01bb1cfcd015af95e2778a3
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/debug-ctest.txt | 4caaf9d5ed48ec5d47e778924b816a0b4c642b23974139b5d892a71a47109967
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/debug-ctest.xml | be31b3859b3a1c54ee0c6107d6b6e6684f5313fa2d9188f23cc546b9a0ae00e8
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/debug-primitives.descriptor | 044560cab14ec1aeee266724b1b27ca6c71127152822a07357711e1897e1fcff
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/debug-primitives.void | f0f3e781505b1448552fd82048f625df3437e70aad769facb30c3847cc8fdb7b
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/release-LastTest.txt | 7eb50a57bc869927a6cc50de0e4c34edb03e4c80dc3cb2517c46785490898fcf
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/release-artifacts.json | 0fd5b9cdf78f53462f6b1eb2b922414cff23441aa9ebd6e671335b64f57c798a
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/release-build.txt | 10b4fb5a6869438a274a33ea3e6242f7830698a144a7f69983edbdf928899539
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/release-configure.txt | c97ee85746405ca59f7011e2d6c14605a516ae18a29fbbe1d6d08fabc4cb8251
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/release-ctest.txt | 6b9e5c064dbef91396714139d12c90c89d1beb8034243ab614d85fc228e4fb5d
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/release-ctest.xml | 210fef36664392c572adee0c785b785915befd7c4f4ae12f76b9a022e62be031
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/release-primitives.descriptor | 044560cab14ec1aeee266724b1b27ca6c71127152822a07357711e1897e1fcff
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/release-primitives.void | f0f3e781505b1448552fd82048f625df3437e70aad769facb30c3847cc8fdb7b
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/strict-LastTest.txt | 4ad4ffa7bd24848ac88cec6770900fad94013ce4c01e4627b8eab0ec961b44c1
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/strict-artifacts.json | 337432d31668a47d664026413f7d971ad08f7c7b42f47133be3c6dd9c09580b0
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/strict-build.txt | e1e8310f16b7e97fb07be90206a9e31e54dfe7cd9a3bb72fc150f9e1c35a057f
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/strict-configure.txt | b0b7f8a4d5a3f9bfa753b335c7847526388b9b4c0dcf9495204e66837b219fb7
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/strict-corrective-command.txt | 7fd560140be5d044808800bb68e95cfdaca2999f99173dffc1e1ccdee2c21671
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/strict-ctest.txt | 9e93e5e730a567f86ff7d6232674d4345517ae3dd476ec16b64635f87f46edd8
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/strict-ctest.xml | ba150f755fffa574227628dcfc4c7bd583757329753876101262a5bf10d8818e
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/strict-primitives.descriptor | 044560cab14ec1aeee266724b1b27ca6c71127152822a07357711e1897e1fcff
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/linux/strict-primitives.void | f0f3e781505b1448552fd82048f625df3437e70aad769facb30c3847cc8fdb7b
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/original/linux-debug-g1-ctest-first.txt | d5f3eeacccb173d7154afeaa230a4a7a94c9b3d9690528f8350e362ab4a7201c
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/original/linux-release-g1-diagnostic-field-original.txt | 99eb3536c3d12c6e32c4a1f604c0d57fb456792b193bfef3ebd360d0cf55ce79
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/original/linux-release-g1-first.txt | 09274884603b58d5a046401ddbe4f27711cffe53c1604781e95b0fd908fc1f65
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/original/linux-strict-async-stale-ctest.txt | 0eafa0ed34f78213c0d53da45605b91fec37c2ba825ea259e17a938d3498f14b
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/original/linux-strict-async-stale-ctest.xml | 7b3315cd446f82e2c745df3863ff2ceb05f8dbd35658859dacc381add13a12c8
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/original/linux-strict-async-stale-direct.txt | cf2f1809ae06183735f7bff3a9dd20107852d8c4b2999adfa5e02c8ba9f08073
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/replay-linux.sh | 85be4d3ec56301bc03ac2d8f858878046a9446aec3a0634239915efd14ad3b81
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/source-hashes.json | cfdc52a737bc0f615fbf94bbccfd849c9d5c43225c6c1842c8637885f099a624
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/source.patch | 40aa370b9477af67198e1d8b5aec67515dda3625328a5cbe9cf5bfb67460938e
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Debug-LastTest.txt | f02f27708ddc833281e924054d259638d6ff2cd277d2edb7578eb59d9f5098bc
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Debug-build.txt | 3749dd936bbc5c61f740c89c42024657c511ee72172100c2f916b45440f17d01
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Debug-configure.txt | e2ad9b0cf3e83b1c6f2d0e3ed5825f12f693c54ce3a6e89396da09f27589be51
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Debug-ctest.txt | d5d708bed41085ca821d630c92219c062ca3984e664e057c0cb400e10ebff712
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Debug-ctest.xml | 57aca24c7138278dceb451f05985b382f6ba4dea3c22074e63cfb576110dd52b
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Debug-g1-aot-mismatch.txt | 056c9cd07af2866a003ddc5a56f6d0c21865d2492d5ccc35699ecb2e5dd0bcfb
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Debug-g1-aot-normal.txt | a148ad619d7a780fcc32f11eebe6a9ab5b8647c701a7bbc0d75e4fe2967bd7c9
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Debug-g1-aot-optimized.txt | a148ad619d7a780fcc32f11eebe6a9ab5b8647c701a7bbc0d75e4fe2967bd7c9
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Debug-g1-c-compile-commands.json | bce032f5eddb7d51905f9ff77cae844a367aaa3b47f004f1eea37167add7aaa2
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Debug-g1-direct.txt | bc013b2eec350a143d208d23d9ccac2dd6b3eb011fe7d1e4a103eb145e4811c6
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Debug-primitives.descriptor | 26bbdd8041cf04936068bb500ed0c0afb8310169f46dd194bbf4fc25bac6a929
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Debug-primitives.void | f391b6911c1d3f7bacd1767543708cbd6523e86bbb06aa3e0a5a7d59c9b9bbf1
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Debug-result.json | e6a876e9abc989506762507c3086241f5dc4435f6ba894ef1ca634b51fd90d3d
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Release-LastTest.txt | b06182de0ab7ae607818234c4b35d15cc864d8108dc031143c9802c072a2b8e4
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Release-build.txt | 9b900641d0d891fba6802a247087ba557b60f30ddf7158e331463096f5fecba6
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Release-configure.txt | a8aaf699886ad255e75d97916598923217531c77c43ee776e17f19f94a40eea6
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Release-ctest.txt | 8e22e073715fde5a1b39c44417fded9165bc918a4900fb59dd64cdd5fcea0440
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Release-ctest.xml | c32c26beeab166bf2e7621e63c25141cfab579c55c435a3def735f89e6ec48a4
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Release-g1-aot-mismatch.txt | 056c9cd07af2866a003ddc5a56f6d0c21865d2492d5ccc35699ecb2e5dd0bcfb
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Release-g1-aot-normal.txt | a148ad619d7a780fcc32f11eebe6a9ab5b8647c701a7bbc0d75e4fe2967bd7c9
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Release-g1-aot-optimized.txt | a148ad619d7a780fcc32f11eebe6a9ab5b8647c701a7bbc0d75e4fe2967bd7c9
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Release-g1-c-compile-commands.json | 7f8210e6972dab8397932f5c4233c2954561b38c1fb034f2c02d40d420a20e95
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Release-g1-direct.txt | bc013b2eec350a143d208d23d9ccac2dd6b3eb011fe7d1e4a103eb145e4811c6
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Release-primitives.descriptor | 26bbdd8041cf04936068bb500ed0c0afb8310169f46dd194bbf4fc25bac6a929
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Release-primitives.void | f391b6911c1d3f7bacd1767543708cbd6523e86bbb06aa3e0a5a7d59c9b9bbf1
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/Release-result.json | d3171f4a6eb06fa7ffbe0c4f6b6c0527123a43c39b62eb313d7bb5a5ac38fc03
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/cleanup-console.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/cleanup-results.json | e903664961b5d80477cfc6de96134ea398718af70afa7a1a43e023f08f5ddc9c
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/cleanup.cmd | 1b58996a35b1bfd36025e85eeff5a31afc521850f15a6e9d3da06bb1038d385f
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/cleanup.py | 7d3301ed01f3eaa998e39ff1199308055e8a478903c8359c5f0f4d6cec017a51
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/console.txt | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/copy-ctest.cmd | 06d1fe93df49923cdaccaf27f25bfe09e5be59b1c23c8df483e1d42b154ba00f
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/native-results.json | 714ac4e9387be4f6e1b8e724d8643085977d6d616ff0c1adf273e3a11f219de5
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/native.cmd | d782569b65ff459ad8a84358a6bc26e90c0d0dc8a20430b3f30fbbb5842b42cb
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/native.py | 2d62a587e0b8626dd39a9ec0e8f683b9adb6cc40ef030df6114d314a8b472f39
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/preserved-evidence.json | ef2cb69d0e773f35a186f81466a550b3dca2ffcb932517b2d0265d729a242d8d
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/source-packet-sha256.json | 06b732d3485e3338fe51130166b8fbffecc7143f1624d44aba2085ca5bff1bb6
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/storage.cmd | 2662ad7f6a9493cfa2d07bcfda85866ed86a963c0aee85f96d58c0a443778e13
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/storage.json | affec67e78181a0ec3cf778f81873af1e16b70b04d63ea7b7e60d2a1a415a25b
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/storage.ps1 | 4358e3ba07297d38f59ca263a371b535c480d55563ec255501afa3e603b3fea4
+?? | S7 G1 report/evidence | docs/projects/evidence/slice7-g1/windows/vcvars.txt | 9a47202059fffaa236cbcc04b1d4434d5d165bb2f94d73ea21538334e840fd81
+?? | S7 architecture/evidence | docs/projects/evidence/slice7-inventory.txt | fd6d0175c7584276df31f6e528a01ebddf8892b287bae594ae310fc8411c9bf6
+ M | S1 preserved | docs/release/NOTICE_INVENTORY.json | 70ac3eaee93754c4e1def58985da12e14d5f4bf17310fb85243d1163aa1a1aa1
+ M | S1 preserved | docs/release/REDISTRIBUTION_NOTICES.md | a20d087b2ebd7e9f88786c256ad53c6ac62b18c4468734b2d81325a83a044fa1
+ M | S3 new source/documentation | editors/vscode/README.md | 2c511c7c3906b89fa2095a5aec988f98a13952c0a0a07fb7300e1f7349c6c8b4
+ M | S5 amendment; original layer: S3 new source/documentation | editors/vscode/package.json | 51b27e30c058c91201ecd1d7a94fafea2f98276042e53cc5c621217daf797c84
+ M | S5 amendment; original layer: S3 new source/documentation | editors/vscode/src/config.ts | 02bd8372728001a27a9cf4c41a432da883e833236620342c2dd2a2227e4324f2
+?? | S5 source/documentation | editors/vscode/src/creation.ts | 3ed6e2a8d9268135add6f1689d7d2cd1720a90842d9698440920fd308febcd17
+?? | S5 source/documentation | editors/vscode/src/creationWorkflow.ts | 062334a3569a235502d126d6ce61262f666770f309963a5a5c677d6a638232d9
+ M | S5 amendment; original layer: S3 new source/documentation | editors/vscode/src/extension.ts | f5e75422509a29e86b7ebb174359ae591dd18b9a6a792bad6ba7cf60d15483e9
+ M | S3 new source/documentation | editors/vscode/src/test/config.test.ts | 9b4dbbff9df7d16f156926f27b23192be3d750a3fad8a307ba45f1fe4be2815a
+?? | S5 source/documentation | editors/vscode/src/test/creationHost.ts | 232ab18af64b7fa914e551a7bac3cc600d7e3d324b9e9857b8e3ef561546065a
+?? | S5 source/documentation | editors/vscode/src/test/creationWorkbench.ts | 993bccfda801b35cb3ebaf64538eed7979b3b875c9d60d7e364b96a0e798bc2f
+?? | S6 source/test/documentation | editors/vscode/src/test/numericHost.ts | 35c6116434f208130a5c9564db0f5519804daaa1be1f15cc42cbc32ec5abc3bf
+?? | S3 new source/documentation | editors/vscode/src/test/projectHost.ts | 1ea02a0965e04b244be1356a1dfcc7dcc248372b2857a4db2800aea3387fb37b
+?? | S5 source/documentation | editors/vscode/src/test/runCreationHost.ts | f66599e563b2c669c5636488f46c6206d6773e175ed7fd53cbb94c851de115b5
+?? | S6 source/test/documentation | editors/vscode/src/test/runNumericHost.ts | c0589fecf5fef272bc854cffe7245dd8b2d11f9798176a7b8fa93a6a7941f8c7
+?? | S3 new source/documentation | editors/vscode/src/test/runProjectHost.ts | 5f71f1a4fcf98ccbfbcc399f65f5df88a36940695d35e5f8684946fa3dfe3a3c
+ M | S6 source/test/documentation | editors/vscode/syntaxes/void.tmLanguage.json | 081ecf31d7de75bdfbdb911f58981c24d6b1db3c1bc0828ead13a4826e48ebcc
+?? | S4 source/documentation | include/void/application_metadata.hpp | 617251f0f0b2cd572d45591282ea52ef4fcc072b20ea6d144d3d7cd2e1529616
+ M | S4 source/documentation | include/void/backend.hpp | 20958020abdd4761793083597f6689d402654e3a1842bdef478c19b23b57086c
+?? | S7 G1 source/test | include/void/c_primitive.hpp | 332a9fffbd5028e7f1f4ca6739c019f764d2c0481e167a45dfbb15b598d5535f
+ M | S3 amendment; original layer: S1 amended by S2 | include/void/diagnostic.hpp | d2c6a589797dcf0bc5b908a08ad772b3718dd3a365871221e16c5e4bac038381
+ M | S4 source/documentation | include/void/execution.hpp | 3cabeac28b886adf6bd8b34ab3751a59370f48e196d9c3dec3e028643714e634
+ M | S7 G1 amendment; original layer: S4 amendment; original layer: S3 amendment; original layer: S2 baseline modification | include/void/frontend.hpp | b8d92dce0af4f3ac636a0933c8ed35015b516e473adae6a899b497dba2082237
+ M | S7 G1 amendment; original layer: S6 final-review amendment; original layer: S6 implementation amendment; original layer: S4 source/documentation | include/void/ir.hpp | 9183ef2158543f957b408d0c7822821119191544a66d860738abf0d66f17c528
+ M | S4 source/documentation | include/void/native_build.hpp | d0defdd654cebe684ca741dec61a2b18562b674f6ed219411b50faff8cb8e1a7
+ M | S6 source/test/documentation | include/void/numeric.hpp | 1a076b4934dbc5f06f0f08258aa06581361fe9378f80fc69b2a49bd06cb27766
+ M | S4 source/documentation | include/void/os.hpp | 528bfec45347fd7c724929de74fb1ae31b6647da6c26e08ece9bffc2fe85fd96
+ M | S1 preserved | include/void/path.hpp | 8d8e8cd9cb33f22c3481eb609cad0108ec6791d15eba6540bf8c555f13251b04
+?? | S4 amendment; original layer: S3 amendment; original layer: S1 preserved | include/void/project.hpp | c35e32087733ce3179e8d82d414bf3779e39c0430c6e4634b035fecb5ec2f686
+?? | S5 source/documentation | include/void/project_creation.hpp | 4d635db78819abe081db9cda3b09c8a9f746ab0cd19c3221f9bf65297b3c7a45
+ M | S4 source/documentation | include/void/runtime.hpp | 3a4c3772b664bdedccfcad7fa7341cf11cfa3735a7d28fe514186a224cdac9c5
+ M | S6 final-review amendment; original layer: S4 source/documentation | include/void/runtime_abi.hpp | b0433cb8c3b8f5bee6f106f5c6e22b5521f7b08d407df1872596098f9a5a9608
+ M | S3 new source/documentation | include/void/tooling.hpp | 3ee689e27b6c0ffdc2c252eacffee54f29e6e05f5b90ae207f9a2d4906962131
+?? | S4 source/documentation | src/application_metadata.cpp | c7ccbe15573db068fe179d645c50907c29465691f3d0703dfbb09f2a682499c4
+ M | S7 G1 amendment; original layer: S6 final-review amendment; original layer: S6 implementation amendment; original layer: S4 source/documentation | src/backend/llvm/backend.cpp | 81464cc541b2369e13ed851b762f459c6f4a8a7572a6ec3228f97a574d67b796
+ M | S7 G1 amendment; original layer: S6 final-review amendment; original layer: S6 implementation amendment; original layer: S5 amendment; original layer: S4 amendment; original layer: S3 amendment; original layer: S2 final review amendment; original layer: S1 amended by S2 | src/frontend/compiler.cpp | 1c5f87693fa7a6a8dc0281843f7b0553c2e8f19647bfa8a3c284f14da1ae8313
+ M | S6 source/test/documentation | src/frontend/construction.inc | ec7b4cdec002697349e616648427f83015e1c788f652e2f8d58da6345ba5eab7
+ M | S6 source/test/documentation | src/frontend/generic_declarations.inc | 4761195beeb8794bbd2f37a23f5839b559bcf8d1fdbb2c53cc3d27f0b515e8fb
+ M | S6 source/test/documentation | src/frontend/generic_inference.inc | ee34fbea164048e6e4097f4ff12d38c087d6523aaae82d9673c622b1fe058bce
+ M | S4 source/documentation | src/frontend/generic_tooling.inc | d6abe9816b913232f3c532171cd04294b251a292b4ac9c76b2ce5217fd3a85b9
+ M | S6 source/test/documentation | src/frontend/generics.inc | 22d1a99cbe45d08498334cc296e13ab03d7bc761e03c7e2aed8fa9dfbaacd99c
+ M | S6 source/test/documentation | src/frontend/pattern_parser.inc | afca1dbb37f088759acada61007ab315b7e4508cc34711d4fb173b91a3de7b0a
+ M | S6 source/test/documentation | src/frontend/pattern_semantics.inc | 15c89a74c0cc326cbeb05b6ad0092bdb91484f6abcb22b0f09eda8ce1909984f
+?? | S4 amendment; original layer: S3 amendment; original layer: S1 preserved | src/frontend/project.cpp | f80ed4608e999bd1bd1e5c83fa74e67a7ff6d4ca0b156933b490d1de94b0b32d
+?? | S5 source/documentation | src/frontend/project_creation.cpp | 86ce642e2cf6b4ffd87c3ab45c752a6c24a393c5a8a79306a0fa16932d6a68da
+?? | S5 amendment; original layer: S4 amendment; original layer: S3 final review amendment; original layer: S3 amendment; original layer: S2 final review amendment; original layer: S2 new | src/frontend/project_selection.inc | e1c10cbab8684f69a0287a38e82aecd49c62054de08169286b4adc1df5094e5f
+ M | S3 new source/documentation | src/frontend/source.cpp | 59c8a228fba834fa14ac2d40dae0e400348ee3c8f10838aadd2aefe09c71d6f7
+ M | S3 new source/documentation | src/frontend/tooling.cpp | 1b7e1cbe51d73089988547708ce1fcbec5dfc0fb6b81ab8fe712768774808a4d
+?? | S7 G1 source/test | src/ir/c_primitive.cpp | 62ba76e2abb89af2acbd896194b17a31cf0d902b093cebba6c2eea71247ae949
+ M | S7 G1 amendment; original layer: S6 final-review amendment; original layer: S6 implementation amendment; original layer: S4 source/documentation | src/ir/module.cpp | 2a8ea7150449aaa1e1aa0fe0a259da4d0c39a101ec80a881561b700f46445601
+?? | S6 final-review amendment; original layer: S6 source/test/documentation | src/ir/numeric_enum_storage.inc | 2b18017bb39149c096c87a906d9ff7e52d72d2bcf7eae88a2b898c26ae06630e
+ M | S4 source/documentation | src/ir/os.inc | f596707794cd3ee27c5249d178f2ae4096c33b3342f4f584bec355bd7b913991
+ M | S6 final-review source/test | src/ir/reference_capabilities.inc | 8975ed3e5c07d482b2ed3ca8a5bf61c6ff6b0238d03b5810ea6d5115f114fe55
+ M | S5 amendment; original layer: S3 new source/documentation | src/lsp/main.cpp | 21d177b8c52d417d5b4b4e0bfb3ab4211cda59830a51dfdcde86502b0e492906
+ M | S5 amendment; original layer: S4 amendment; original layer: S3 amendment; original layer: S2 baseline modification | src/main.cpp | 3d78ed9e69367394ef331add0b5f1812e08f3d27ad9a978d1981c8b22f1c9e7f
+ M | S7 G1 amendment; original layer: S4 source/documentation | src/native_build.cpp | f009797d7967cce179dda39802cf54d8e98e5c3fc42eb7cafc7bbe89aeab32aa
+ M | S6 source/test/documentation | src/numeric.cpp | 07ae952f13f9ff8eeb9a6e291366c85b720a1829415d247fccaafb9bb5b22d50
+?? | S4 source/documentation | src/project_identity.cpp | 4540c589536ee47b47a6427b8167a7dfc5aa212bba61ea08c418808d7e723379
+ M | S4 source/documentation | src/runtime/abi.cpp | 350dc1311a2d6e183e43198444ff0ee5f7e0b0637cca28f9f667e68a8ae71226
+ M | S4 source/documentation | src/runtime/application.cpp | 0c84cf42db12d5c3975387ef854bbc8e10d586846145c1bed61f24d28d87a375
+ M | S6 final-review source/test | src/runtime/fixed_abi.cpp | 73d629cf5fdb407686731de1be52e5f140d9a5d2d87eeace4f1cfde58027903e
+ M | S4 source/documentation | src/runtime/os.cpp | d33bf8a816bd49fad781ac3e8b6d3d564a985e70154a7a8c87024c822df1755b
+ M | S4 source/documentation | src/runtime/os_abi.cpp | 7f5cc8fda6f4e2628127a95c5c96b77efa24355cb60d05ea95331dcce9cfabb3
+ M | S4 source/documentation | src/runtime/reload.cpp | f0099a1cc55aa6687a30da4a7a542faeb73afc3ee9817dfdff51c58b2f783c10
+ M | S4 source/documentation | stdlib/os.void | 82bb841147540af6363d23de4db1dc1ad37daaae5a309d65d55fe3446de9d2d6
+ M | S5 source/documentation | tests/cli/install.py | 615a6887446c141c231f496c605e4f01a4043a7262cf1c7172587f83de66274b
+?? | S7 G1 source/test | tests/ffi/g1_descriptor.h.in | 667adc692bab006e226b5fd405bfe19c6c9e8b055dfc764050cd130b49598e7f
+?? | S7 G1 source/test | tests/ffi/missing.py | 832b7d727b1b294d7a343a7870045cd401bbd1900a21798c819e907430d1e3e8
+?? | S7 G1 source/test | tests/ffi/primitives.cmake | 0e24384adbe291af8a8a279968be2bd2b79b5ee4a1bef91bc2692bfd644d088f
+?? | S7 G1 source/test | tests/ffi/primitives.cpp | 0c124c4e5e5ace900f014d277c3efce23396b6248739c763aa6cc9a54de3a2e8
+?? | S7 G1 source/test | tests/ffi/primitives.descriptor.in | 26a86a074a0a49a7a739dfb8b992bd520a169f0e3be035334bab5633246b3ea3
+?? | S7 G1 source/test | tests/ffi/primitives.void.in | d883a632b9bff2ab49d93c1d520a648f0c24b7afeea388d7ce8243005b9b20f7
+?? | S7 G1 source/test | tests/ffi/primitives_fixture.c | 7b65c2c5583114556c4d940903ed6b003742832380abbbac07f5bf8f06c11a63
+?? | S7 G1 source/test | tests/ffi/primitives_thunk.c | 910dfb4ad0a26f5eecf4c19bbfb7e48d551dba326ad1facf0d78e1a2f62bd98c
+?? | S6 final-review source/test | tests/numeric/enum_storage.inc | a710c200d24ba4cfab4759739ac4aabebbac7d282cc3aa39ed257927346f1fb4
+?? | S6 final-review amendment; original layer: S6 source/test/documentation | tests/numeric/enums.py | 007014e26d1b777b9874e382f2348e85ce8118f8671971ec19600dfe415ba99c
+?? | S6 final-review amendment; original layer: S6 source/test/documentation | tests/numeric/enums_ir.cpp | 1f04cbce43eccb31c415c7bdfb33677bf906a156fe983d113fd1a4b3f2c0bc5c
+?? | S6 source/test/documentation | tests/numeric/enums_lsp.py | 5121b8a9fa57fe5685e5f23bff05c0e23334957e03170cb343f8534382893cdf
+ M | S6 source/test/documentation | tests/numeric/tests.cpp | 08aa4dd230230ee06d07fc46312964435b8571cb6bd522d2d8a9604a6ae61269
+ M | S4 source/documentation | tests/os/frontend.py | 45a7986fcb813532a0fe03afb880ef1b629a7010ff755fbb8e22b5c3ac1dc90b
+?? | S4 source/documentation | tests/project/application.cpp | 02dbf89588a3d312ec0ff9ebde1884c80df179a5c33e14b1bc48117f4d0e9911
+?? | S4 source/documentation | tests/project/application.py | 4a0e4f84519036b5a43ed1565631785d045c05b01ee97a2f107046a59cc25f2d
+?? | S1 preserved | tests/project/authority.py | 83db8358c3182671fc2c10d65636ed88953fcf1219ed9b31fcca67667a516345
+?? | S5 source/documentation | tests/project/creation.cpp | d729c111f883723f00d153894e9c11433fd0ff90c56861aaab79bd2c717eef2c
+?? | S5 source/documentation | tests/project/creation.py | 76cc53fdc21c725833e1bf87af0afc6cba3ae6b9ee40f0769d2b890386b90fea
+?? | S2 new | tests/project/discovery.py | dfd4d250b175dd230ad1d08630a834088db97c4b6d3f36b29675796b68f81056
+?? | S1 preserved | tests/project/header.cpp | 62a8621869e8fdb923b8cc7db1703473f389f629b23d8004a8abffffae72a98a
+?? | S5 amendment; original layer: S4 amendment; original layer: S1 amended by S2 | tests/project/legacy.py | 5400b55db1c13c7c7c7791ddb42642ea00fec0117d5d1f3e1e86a728877f1746
+?? | S1 preserved | tests/project/manifest.cpp | 4fd4e5c2550f27e89bea7a7377f8fcf101580e6be4f231b0f81eaedaef217a3c
+?? | S2 new | tests/project/nested.py | 647dad971b57dc880a04c710f4a200fc036dd65477f9ef83dc23e2d86f8fc0f3
+?? | S3 new source/documentation | tests/project/profiles.py | ca6c21f47b4901c6d7f6bc96a96ff2eedb35735197e855d89c2816355b23da79
+?? | S3 final review amendment; original layer: S3 new source/documentation | tests/project/protocol.py | 91cf3e12bd841a9745ac7e74d77176b3d3eb6b8029e00f8f39d951652f00783e
+?? | S1 preserved | tests/project/provenance.py | 118d45ecfe89e44dfac03b1667b1b99daf8a3dd3497124fb9e2551fe22325b47
+?? | S2 final review amendment; original layer: S2 new | tests/project/selection.cpp | d53ce88daf7af4c46bb84edb7980d4618a71431eeb42ccabab75145b7be82b9e
+?? | S3 final review amendment; original layer: S3 new source/documentation | tests/project/sessions.cpp | 3d4aad75cf64d83189325186e5bcf7fbfb4d5f821f9d0c38aa0b587fac66ed4d
+?? | S1 preserved | third_party/tomlplusplus/LICENSE | 529bc3900a9571e49db285b0df432397e70b881cc3bf48de6667ae74ff4b06d8
+?? | S1 preserved | third_party/tomlplusplus/README.md | 794360d588216c468ce40627042ff4ce0238fb8d72616688f04892f861765c7c
+?? | S1 preserved | third_party/tomlplusplus/toml.hpp | 7cd54af1a3497465eb26507f8d8a2ccfe661fccc27dac7a5121b885bee88d5e7
+?? | S1 preserved | third_party/tomlplusplus/upstream.json | 98e2bf14bd9c8765aae02725a494affa31585ecb352e494d88f5eaccb806adfc
+?? | S1 preserved | third_party/tomlplusplus/void-bounds-and-locations.patch | d131e7ff7daa6373904406403b8f23def1b0dc02127de8230c1a09cdace3330f
+ M | S3 new source/documentation | tools/lsp_client.py | de52f28be28b08d392ea292e4f0c5b6b2174274ee3d49db4223cb7e8ccb7b3bd

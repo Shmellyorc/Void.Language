@@ -1,0 +1,1330 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -346,6 +346,18 @@
+   set_tests_properties(project_manifest_legacy PROPERTIES TIMEOUT 180)
+   add_test(NAME project_manifest_provenance COMMAND "${Python3_EXECUTABLE}"
+     "${PROJECT_SOURCE_DIR}/tests/project/provenance.py" "${PROJECT_SOURCE_DIR}")
++  add_executable(void_project_selection tests/project/selection.cpp)
++  target_link_libraries(void_project_selection PRIVATE void_core)
++  add_test(NAME project_selection COMMAND void_project_selection)
++  set_tests_properties(project_selection PROPERTIES TIMEOUT 300)
++  add_test(NAME project_discovery_cli COMMAND "${Python3_EXECUTABLE}"
++    "${PROJECT_SOURCE_DIR}/tests/project/discovery.py" "$<TARGET_FILE:voidc>"
++    "${CMAKE_CURRENT_BINARY_DIR}/project-discovery-evidence.json")
++  set_tests_properties(project_discovery_cli PROPERTIES TIMEOUT 300)
++  add_test(NAME project_nested_cli COMMAND "${Python3_EXECUTABLE}"
++    "${PROJECT_SOURCE_DIR}/tests/project/nested.py" "$<TARGET_FILE:voidc>"
++    "${CMAKE_CURRENT_BINARY_DIR}/project-nested-evidence.json")
++  set_tests_properties(project_nested_cli PROPERTIES TIMEOUT 180)
+   add_test(NAME cli_contract COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/cli/contract.py" "$<TARGET_FILE:voidc>")
+   set_tests_properties(cli_contract PROPERTIES TIMEOUT 180)
+   add_test(NAME cli_install COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/cli/install.py"
+diff --git a/docs/CLI.md b/docs/CLI.md
+--- a/docs/CLI.md
++++ b/docs/CLI.md
+@@ -1,21 +1,42 @@
+ # voidc command reference
+ 
+-Slice 1 adds an explicit compiler-library parser only. It introduces no command,
+-option or automatic manifest lookup; the future forms below still reject in current
+-voidc. [Qualification](projects/SLICE1.md) includes malformed manifests beside ordinary
+-source, unchanged directory/main.void selection, explicit JIT/AOT and absent zero-ID
+-OS calls. Later project-command integration remains deferred.
++Slice 1's compiler-library manifest parser is now used by Slice 2's compiler-owned
++project selection. [Slice 1 evidence](projects/SLICE1_CLOSEOUT.md) remains historical;
++[Slice 2 engineering and platform limits](projects/SLICE2.md) describe the current
++local implementation. Bare explicit files and manifestless directories retain
++their legacy root, classification, argument, JIT and AOT behavior.
+ 
+-The [Phase 1 command/compatibility proposal](PROJECT_ARCHITECTURE_ROADMAP.md#phase-1-ownership-and-data-flow)
+-freezes `--project DIR`, manifest-relative `--entry PATH` and `--profile debug|release`
+-as future project options. A selected manifest enables new discovery; bare explicit
+-files and manifestless directories retain current semantics. Project default profile
+-is release/O2, and conflicting explicit profile/cache choices diagnose. Proposed
+-examples only, **not executable baseline commands**:
++A directory operand (or run/build cwd) with `void.project.toml` selects that exact
++manifest. No parent search or fallback after invalid configuration occurs. An
++application automatically selects one eligible main in any filename, with no
++main.void preference; missing/competing/wrong-signature mains diagnose. Only the
++selected import graph gets semantic validation and global initialization. Libraries
++check their admitted source union without an application entry; project run/build/
++emit of libraries is unsupported.
++
++Implemented selectors:
+ 
+ ```text
+ voidc check --project .
+ voidc run --project . -- literal-application-argument
++voidc build --project . --entry src/launcher.void
++voidc run . --entry tools/script.void --no-opt
++```
++
++`--project DIR` conflicts with positional file/directory selectors. `--entry PATH`
++requires a manifest context, is manifest-relative, overrides `project.entry` and
++bypasses automatic seed scanning; invalid overrides never fall back. Bare explicit
++files never acquire project context from an adjacent manifest. A library `--entry`
++is a usage conflict. Paths cannot cross child project boundaries. API callers can
++supply frozen named source and TOML overlays separately; editor protocol integration
++remains Slice 3. No editor resolver or UI is introduced here.
++
++`--profile debug|release`, creation and resolver/package commands remain future
++syntax from the [Phase 1 ownership contract](PROJECT_ARCHITECTURE_ROADMAP.md#phase-1-ownership-and-data-flow).
++Slice 2 retains O2 default, `--no-opt` and existing cache flags; parsed profile fields
++are metadata, not yet an applied CLI profile. Proposed examples only:
++
++```text
+ voidc build --project . --entry src/launcher.void --profile debug
+ voidc init . --name Orbit --app-id org.example.orbit
+ voidc new orbit --source src/game.void --app-id org.example.orbit
+@@ -24,24 +45,25 @@
+ The [creation contract](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-first-file-creation-and-terminal-workflows)
+ creates no dependency installation authority, never overwrites manifests or renames
+ sources, and omits entry by default. Detailed options remain proposed pending review.
+-Implementation is HOLD.
++Creation implementation awaits its later reviewed slice.
+ 
+ ## Future project commands, 8 November 2026
+ 
+ The [project roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) proposes `voidc init` and
+-`voidc new`, manifest-aware check/run/build, profile selection and eventual
+-resolve/package workflows. These are not current commands or accepted option
+-syntax. The approved entry direction requires no filename convention or mandatory
++`voidc new`, profile selection and eventual resolve/package workflows. Those
++forms remain future commands/options; manifest-aware check/run/build/emit and the
++selectors above are locally implemented in Slice 2. The approved entry direction requires no filename convention or mandatory
+ entry field: one valid main is selected by compiler analysis; ambiguity diagnoses.
+-The current command forms and `main.void` directory behavior below remain the
+-implemented baseline. Explicit source paths and standalone/top-level/legacy
++The command forms below remain compatible; `main.void` directory discovery
++applies when no manifest is selected. Explicit source paths and standalone/top-level/legacy
+ execution must remain compatible. Init/new perform no implicit dependency install.
+ 
+ ## Implemented command contract
+ 
+ This is the baseline public command contract. Its help/version output and
+ conventional `--` operand delimiter retain the existing source, entry, JIT/cache
+-and native-linking behavior. The project redesign above remains future work.
++and native-linking behavior. The selectors above add explicit manifest context;
++the remaining project roadmap is future work.
+ 
+ ```text
+ voidc --help | -h
+@@ -56,13 +78,14 @@
+ 
+ | Command | Result | Example |
+ | --- | --- | --- |
+-| `check` | Analyze source and imports without executing startup. An entry is not required. | `voidc check main.void` |
++| `check` | Analyze without executing startup. Bare sources/libraries need no app entry; automatic app projects require main. | `voidc check main.void` |
+ | `run` | JIT-execute the selected entry. | `voidc run .` |
+ | `build` | Compile/link a native application with matching Runtime/resources. | `voidc build . -o "output folder/hello"` |
+ | `emit` | Write a host-native object for manual linking. | `voidc emit main.void -o main.o` |
+ 
+ Run/build default to the current directory. Every directory argument selects its
+-exact `main.void`; explicit file paths may use other names. Options can occur
++exact `main.void` when no manifest is present; a selected manifest uses the
++compiler-owned discovery above. Explicit file paths may use other names. Options can occur
+ before or after operands. Quote paths with spaces. For a source filename starting
+ with a dash, use `voidc check -- -example.void` or `./-example.void`. The delimiter
+ ends option parsing; put `-o` and other options before it. Empty and malformed
+@@ -101,14 +124,20 @@
+ The two cache options conflict and are available only for run. Eligible Debug JIT
+ runs use the existing automatic source-root cache, with its existing safe
+ unavailable fallback. `check --no-opt` remains a compatibility no-op. Other
+-non-run commands reject cache options. Cache policy and identity rules are unchanged. Rebuilding the changed driver
++non-run commands reject cache options. Legacy cache policy and identity rules are unchanged. Project mode revalidates
++its full applicable inventory/graph before lookup and adds a distinct selection
++key binding manifest bytes, physical root, source membership/bytes, boundaries
++and entry mode. A newly added second main cannot be hidden by a cache hit.
++Rebuilding the changed driver
+ changes the whole-compiler fingerprint normally; old compiled cache entries are
+ not promised to survive that rebuild.
+ 
+ ## Native output and installation
+ 
+ `build` defaults to `<entry-directory>/build/<entry-stem>` with `.exe` on Windows.
+-`-o` is caller-relative or absolute; absent parent directories are created.
++Manifest-selected builds instead default to `<manifest-root>/build/<entry-stem>`
++with the same executable suffix. `-o` is caller-relative or absolute; absent parent
++directories are created.
+ Output/source collisions, `.void` outputs and non-file destinations reject; failed
+ builds preserve an existing good executable. Emit does not link; use `.o` on Unix
+ or `.obj` on Windows, and supply matching Runtime/dependencies when linking by hand.
+diff --git a/docs/DECISIONS.md b/docs/DECISIONS.md
+--- a/docs/DECISIONS.md
++++ b/docs/DECISIONS.md
+@@ -1,4 +1,16 @@
+ # Architectural decisions
++
++## 8 November 2026 — Slice 2 local project discovery authorized
++
++Golden Wrench accepts Slice 1 closeout for local continuation. Boss authorizes
++manifest-selected compiler discovery and entry selection, bounded VFS admission,
++immutable source/TOML overlays, D/E separation and declarationless-root library
++checking. The [Slice 2 record](projects/SLICE2.md) separates source changes, executed
++local/native results and qualification gaps. Bare explicit files and manifestless
++main.void selection keep their existing semantics. S3 sessions/protocol, Runtime
++metadata and later roadmap features remain beyond this review boundary. No hosted
++CI until the complete project/raylib milestone; Git/publication authority remains
++with Boss. The full dynamic-default raylib gate below is preserved.
+ 
+ ## 8 November 2026 — continuous local project roadmap; integrated hosted gate
+ 
+diff --git a/docs/DIAGNOSTICS.md b/docs/DIAGNOSTICS.md
+--- a/docs/DIAGNOSTICS.md
++++ b/docs/DIAGNOSTICS.md
+@@ -1,4 +1,16 @@
+ # Structured diagnostics and compiler recovery (Phase 5)
++
++## Slice 2 project admission and entry diagnostics, 8 November 2026
++
++The compiler-owned manifest project API/CLI adds VOID5009 for physical root/file
++admission and nested boundaries; VOID5010 for missing, ambiguous, wrong-signature
++or conflicting project entry selection; and VOID5011 for changed snapshots
++("Project changed during discovery; retry."). Ambiguity locations carry sorted
++canonical VFS identities and exact main-name spans. Source lexer/parser/import/
++semantic failures retain their existing codes; work/input limits remain VOID9001.
++Failed selection publishes no ProjectAnalysis or executable program. A valid
++Manifest may accompany an error result without granting entry or native authority.
++[Implementation and evidence](projects/SLICE2.md).
+ 
+ Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
+ 
+diff --git a/docs/MODULE_SYSTEM.md b/docs/MODULE_SYSTEM.md
+--- a/docs/MODULE_SYSTEM.md
++++ b/docs/MODULE_SYSTEM.md
+@@ -1,21 +1,30 @@
+ # Module system and multi-file native compilation
++
++Slice 2 locally implements the manifest-selected D/E contract through the existing
++SourceGraph and Parser. A manifest fixes VFS `/`; the selected source still owns
++application root declarations. Libraries check with a declarationless root scope.
++Source hard-link identity collisions are checked across parsed D and loaded E,
++including overlaid host files; the existing single-identity source policy remains.
++Manifest files require exactly one native link. Physical source/execution graphs
++retain existing import/parser limits; the new 4,096-file/64 MiB discovery budget
++applies to D. [Engineering, tests and platform gaps](projects/SLICE2.md).
+ 
+ The [Phase 1 discovery contract](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-compiler-owned-entry-discovery)
+ now distinguishes the parsed discovery inventory D from selected entry import graph
+ E: only E receives application semantic/startup treatment. Root declarations remain
+ owned by the selected source module; the manifest fixes VFS `/`. Library-kind check
+ uses no application root declaration privileges. Bare explicit-file roots remain
+-unchanged. This refines the earlier all-seed validation suggestion; implementation
+-is HOLD and no module/visibility feature is delivered by this record.
++unchanged. This refines the earlier all-seed validation suggestion. The new project
++API/CLI is locally implemented; S3 editor/session integration remains future work.
+ 
+ ## Approved project direction, 8 November 2026
+ 
+ The [project architecture roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) proposes
+ manifest-root source sets, persistent project/package identity and compiler-owned
+ entry discovery without a required filename or `entry` key. One valid main is
+-selected; multiple application candidates diagnose ambiguity. This is not
+-implemented: baseline automatic selection still uses exact `main.void`, while
+-explicit files can have any valid name. A manifest root would be independent of
++selected; multiple application candidates diagnose ambiguity. Slice 2 implements
++that selection only with a manifest. Manifestless automatic selection still uses
++exact `main.void`, while explicit files can have any valid name. A manifest root is independent of
+ the selected entry's directory; explicit standalone files keep existing behavior.
+ Imported libraries gain neither entry eligibility nor native authority by import.
+ The proposed broader application seed graph and external package domain must pass
+diff --git a/docs/PROJECT_ARCHITECTURE_ROADMAP.md b/docs/PROJECT_ARCHITECTURE_ROADMAP.md
+--- a/docs/PROJECT_ARCHITECTURE_ROADMAP.md
++++ b/docs/PROJECT_ARCHITECTURE_ROADMAP.md
+@@ -1,4 +1,25 @@
+ # First-class VOID projects and native application roadmap
++
++## Current Slice 2 implementation, 8 November 2026
++
++Golden Wrench accepts Slice 1 closeout for local continuation. Boss authorizes
++compiler-owned manifest selection, bounded physical admission/inventory, shared
++parse-only D versus semantic/execution E selection, explicit entry overrides and
++library source checking. [Slice 2 report and evidence](projects/SLICE2.md) record
++the implementation against unchanged HEAD `2f667ea338127b8f91c3136804377ef3fa5218d6`.
++The reviewed Slice 1 working tree is retained as the layer beneath this slice.
++
++The API and CLI use the existing SourceGraph lexer/Parser, semantic validator,
++typed IR gate and LLVM pipeline. Library checking has an explicit declarationless
++root scope, without an executable entry. Source/TOML overlays are supported by the
++compiler API; project-aware ToolingSession/voidls/editor protocol remains S3.
++CLI profile application, Runtime metadata/OS adapters and creation remain later
++slices. S1's historical implementation paragraph below describes its original
++handoff; S2 status here supersedes only its discovery/selection deferral.
++
++Stop for Golden Wrench review before S3. No hosted CI until the complete dynamic-
++default raylib milestone and single integrated acceptance gate below. No pin,
++native-provider authority, Runtime or accepted language/security contract changes.
+ 
+ ## Continuing local authorization and final hosted gate, 8 November 2026
+ 
+@@ -6,7 +27,7 @@
+ Golden Wrench's independent review at each architectural boundary. Slice 1 closes
+ at that boundary; [the closeout record](projects/SLICE1_CLOSEOUT.md) separates its
+ new evidence from the original [implementation record](projects/SLICE1.md).
+-Later slices remain unimplemented. Material unresolved schema, ABI, resolver or
++Slices after the current S2 boundary remain unimplemented. Material unresolved schema, ABI, resolver or
+ language decisions require Boss/Golden Wrench resolution before dependent work.
+ Existing compiler, Runtime, VFS and editor ownership and language compatibility
+ remain the implementation constraints.
+diff --git a/docs/README.md b/docs/README.md
+--- a/docs/README.md
++++ b/docs/README.md
+@@ -30,13 +30,17 @@
+ 
+ ## Engineering documentation
+ 
++- [Slice 2 project discovery and entry selection](projects/SLICE2.md): compiler-owned
++  manifest/VFS admission, immutable D/E snapshots, any-name main, library checking,
++  explicit overrides, actual execution tests and independent-review boundary.
+ - [Slice 1 project manifest implementation](projects/SLICE1.md): schema-only
+   compiler API, validation/diagnostics, executed local qualification and explicit
+   deferred integration/platform limits.
+ - [First-class projects and C interoperability roadmap](PROJECT_ARCHITECTURE_ROADMAP.md):
+   Phase 1 schema/identity/discovery/metadata/creation contract proposal, source
+   audit, compatibility matrix, 42 acceptance cases and six implementation slices.
+-  Implementation HOLD; later enum/FFI/raylib/package direction retained.
++  Local Slice 2 implementation/review boundary; later enum/FFI/raylib/package
++  direction and the single final hosted acceptance gate are retained.
+ - [Current status/strategy](DEVELOPMENT_STRATEGY.md), [Wrench instructions](WRENCH_CLANKER.md),
+   [Research role](RESEARCH_CLANKER.md), [known issues](KNOWN_ISSUES.md).
+ - VOIDUP: [Phase A](voidup/REPORT.md), [Phase B](voidup/PHASE_B_REPORT.md),
+diff --git a/docs/SOURCE_COMPILER.md b/docs/SOURCE_COMPILER.md
+--- a/docs/SOURCE_COMPILER.md
++++ b/docs/SOURCE_COMPILER.md
+@@ -1,19 +1,33 @@
+ # Source compiler and engineering build guide
+ 
+-Slice 1 now supplies the explicit compiler-library manifest parser in
+-[project.hpp](../include/void/project.hpp), with [actual engineering evidence](projects/SLICE1.md).
+-Schema parsing is isolated from current compilation: no project discovery, Runtime
+-identity or command changes ship. S2–S6 integration remains HOLD/deferred; the prior
+-Phase 1 proposal below still describes those future inputs and ownership changes.
++Slice 1 supplies the compiler-library [manifest parser](../include/void/project.hpp).
++Slice 2 adds `analyze_manifest_project(root, entry_override, sources, manifests)`
++in [frontend.hpp](../include/void/frontend.hpp), returning an owning immutable
++ProjectAnalysis with separate discovery/execution source snapshots and a selection
++key. Applications retain the existing ValidatedAnalysis/IR/LLVM pipeline. Libraries
++have no executable program or entry: their source union is checked with an explicit
++declarationless root scope. [Engineering/evidence](projects/SLICE2.md).
++
++SourceGraph now separates its ordinary Parser pass from import expansion. D Units
++are retained and moved into E as needed, so unimported helpers are not semantically
++checked, emitted or initialized. The manifest fixes the physical VFS root; the
++selected entry fixes application declaration ownership. Disk membership, boundary
++observations and bytes are recaptured before successful acceptance. This detects
++changes and requests retry; it is not an OS filesystem transaction or sandbox.
++
++Legacy `analyze_project(entry)` and existing ToolingSession/voidls entry-only modes
++remain adapters with their original semantics. Slice 3 will integrate project
++sessions/protocol; Runtime metadata, zero-ID OS calls and creation remain later
++slices. No second source parser, editor resolver or LLVM path is introduced.
+ 
+ The [Phase 1 ownership contract](PROJECT_ARCHITECTURE_ROADMAP.md#phase-1-ownership-and-data-flow)
+ requires explicit project root, source inventory, selected declaration owner and
+-metadata inputs. Current `analyze_project(entry)`/ToolingSession are entry-only;
+-they do not already supply these records. Keep them as legacy adapters when adding
+-project-aware analysis. Separate existing parser capture from recursive imports,
+-retain one semantic/IR/LLVM path, and validate library mode without inventing an
+-application entry. Concrete tests/slices are specified in the roadmap; implementation
+-remains HOLD.
++metadata inputs. Legacy `analyze_project(entry)`/ToolingSession remain entry-only;
++they do not supply the new records. S2's separate project API implements root,
++inventory and declaration-owner selection while keeping those legacy adapters.
++Parser capture is separate from recursive imports, with one semantic/IR/LLVM path
++and no fabricated library application entry. Project sessions/protocol, metadata
++and later slices await their architectural review boundaries in the roadmap.
+ 
+ ## Approved project/compiler roadmap, 8 November 2026
+ 
+@@ -24,8 +38,9 @@
+ select one valid main or report ambiguity. Reuse the current frontend, typed IR
+ validation, Runtime context, LLVM JIT/AOT, explicit native admission, resource
+ inventories and staged artifact publication. Dynamic linking is the approved
+-default; static remains optional. These are unimplemented future additions, not
+-changes to current commands or a new compiler/backend. Baseline exact `main.void`
++default; static remains optional. S1/S2 deliver parsing/discovery locally; metadata,
++numeric enums and general C ABI remain future additions through this compiler.
++Legacy exact `main.void`
+ automatic discovery and explicit-file compatibility still apply below.
+ 
+ For onboarding, start with [source installation](install/README.md),
+diff --git a/include/void/diagnostic.hpp b/include/void/diagnostic.hpp
+--- a/include/void/diagnostic.hpp
++++ b/include/void/diagnostic.hpp
+@@ -20,7 +20,8 @@
+     entry = 4001,
+     project_syntax = 5001, project_schema = 5002, project_field = 5003,
+     project_identity = 5004, project_version = 5005, project_path = 5006,
+-    project_duplicate = 5007, project_reserved = 5008, limit = 9001
++    project_duplicate = 5007, project_reserved = 5008,
++    project_boundary = 5009, project_entry = 5010, project_changed = 5011, limit = 9001
+ };
+ struct SourceSpan {
+     std::shared_ptr<const SourceFile> source;
+diff --git a/include/void/frontend.hpp b/include/void/frontend.hpp
+--- a/include/void/frontend.hpp
++++ b/include/void/frontend.hpp
+@@ -2,6 +2,7 @@
+ #include "void/ir.hpp"
+ #include "void/native_binding.hpp"
+ #include "void/diagnostic.hpp"
++#include "void/project.hpp"
+ #include <filesystem>
+ #include <functional>
+ #include <optional>
+@@ -117,6 +118,39 @@
+ AnalysisResult analyze_project(const std::filesystem::path& entry);
+ AnalysisResult analyze_project(const std::filesystem::path& entry,const NativeProject&);
+ AnalysisResult analyze_project(const std::filesystem::path& entry, const SourceOverrides& overrides);
++// Manifest-selected mode is separate from the legacy entry-parent adapter above.
++// TOML overlays have their own canonical root-relative namespace.
++using ManifestOverrides = std::map<std::string, std::optional<SourceFile>>;
++class ProjectAnalysis {
++    friend struct ProjectAnalysisAccess;
++    std::filesystem::path root_;
++    std::optional<std::filesystem::path> entry_;
++    std::shared_ptr<const project::Manifest> manifest_;
++    std::shared_ptr<const ValidatedAnalysis> program_;
++    std::map<std::string, SourceFile> discovery_, execution_;
++    std::string selection_key_;
++    ProjectAnalysis() = default;
++public:
++    const auto& root() const { return root_; }
++    const auto& entry() const { return entry_; }
++    const auto& manifest() const { return manifest_; }
++    const auto& program() const { return program_; } // Absent for a checked library.
++    const auto& discovery_sources() const { return discovery_; }
++    const auto& execution_sources() const { return execution_; }
++    const auto& selection_key() const { return selection_key_; }
++};
++struct ProjectAnalysisResult {
++    std::shared_ptr<const ProjectAnalysis> project;
++    std::vector<Diagnostic> diagnostics;
++    // Validated metadata may accompany failed selection; it grants no entry/IR.
++    std::shared_ptr<const project::Manifest> manifest;
++    bool succeeded() const { return bool(project); }
++};
++// Also recognizes malformed/wrong-case manifest presence so callers fail closed.
++bool project_manifest_present(const std::filesystem::path& root);
++ProjectAnalysisResult analyze_manifest_project(const std::filesystem::path& root,
++    const std::optional<std::string>& entry_override = {},
++    const SourceOverrides& sources = {}, const ManifestOverrides& manifests = {});
+ struct EditorCandidate { std::string name, detail; int kind = 6; std::string insert_text = {}, documentation = {}; };
+ struct EditorAssistance {
+     std::vector<EditorCandidate> candidates;
+diff --git a/src/frontend/compiler.cpp b/src/frontend/compiler.cpp
+--- a/src/frontend/compiler.cpp
++++ b/src/frontend/compiler.cpp
+@@ -26,6 +26,11 @@
+ #include <stdexcept>
+ #include <tuple>
+ #include <type_traits>
++#include <llvm/Support/SHA256.h>
++#include <llvm/ADT/StringRef.h>
++#ifdef _WIN32
++#include <windows.h>
++#endif
+ // These handler boundaries keep unrelated temporaries out of recursive semantic
+ // frames even in Release. The existing depth budget must fit a 1 MiB stack.
+ #if defined(_MSC_VER)
+@@ -5160,6 +5165,10 @@
+     }
+ public:
+     std::map<std::string, std::unique_ptr<Unit>> units;
++    // Parsed discovery trees are not execution members until load follows them.
++    std::map<std::string, std::unique_ptr<Unit>> parsed;
++    std::function<void(const std::filesystem::path&,const std::string&,bool)> admit;
++    std::function<SourceFile(const std::filesystem::path&,const std::string&)> reader;
+     explicit SourceGraph(std::filesystem::path project_root, Diagnostics& d, const SourceOverrides& o,const NativeProject* bindings=nullptr) : root(std::move(project_root)), diagnostics(d), overrides(o),native(bindings) {
+         for(const auto& [key,value]:overrides) {
+             std::string parent;
+@@ -5231,6 +5240,7 @@
+                 auto resolved_part = std::filesystem::canonical(physical, ec);
+                 if (ec || resolved_part != physical) error(from.source, path, Code::import_path, "Module path contains a filesystem alias.");
+             }
++            if (!standard && admit) admit(physical,prefix,prefix==relative && !directory);
+         }
+         if (directory) {
+             if(!std::filesystem::is_directory(physical,ec) && ec!=std::errc::no_such_file_or_directory)error(from.source,path,Code::import_read,"Import directory is unavailable.");
+@@ -5243,7 +5253,7 @@
+         if (!directory && std::filesystem::exists(physical, ec)) {
+             if (!std::filesystem::is_regular_file(physical, ec) || ec)
+                 error(from.source, path, Code::import_path, "Module path names a non-file host object.");
+-            for (const auto& [other_id, other] : units) {
++            for (const auto* store : {&units,&parsed}) for (const auto& [other_id, other] : *store) {
+                 if(other_id==id)continue;
+                 auto other_path = standard_module(other_id) ? *standard_root / utf8_path(other_id.substr(9)) : root / utf8_path(other_id).relative_path();
+                 if (std::filesystem::equivalent(physical, other_path, ec) && !ec)
+@@ -5253,39 +5263,49 @@
+         }
+         return {id,physical};
+     }
+-    Unit& load(const Unit& from, const Token& path) {
++    Unit& parse(const Unit& from, const Token& path) {
+         auto [id,physical]=resolve(from,path);
++        return parse_resolved(from,path,id,physical);
++    }
++    Unit& parse_resolved(const Unit& from,const Token& path,const std::string& id,const std::filesystem::path& physical) {
+         if(auto found=units.find(id);found!=units.end())return *found->second;
+-        Depth guard(depth,from.source,path);
++        if(auto found=parsed.find(id);found!=parsed.end())return *found->second;
+         auto overlay=overrides.find(id);
+-        // Publish before traversing imports: function-only declaration cycles are safe.
+         std::unique_ptr<Unit> unit;
+-        try { unit = std::make_unique<Unit>(overlay == overrides.end() ? read_source(physical) : *overlay->second, id); }
++        try { unit = std::make_unique<Unit>(reader ? reader(physical,id) : overlay == overrides.end() ? read_source(physical) : *overlay->second, id); }
+         catch (const SourceReadError&) { error(from.source, path, Code::import_read, "Cannot read imported file '" + id + "'.", "Check source file permissions and storage availability."); }
+         catch (const CompilationError& failure) {
+             auto records = failure.diagnostics();
+             for (auto& record : records) record.primary.module_identity = id;
+             throw CompilationError(std::move(records));
+         }
+-        auto* result = unit.get(); units.emplace(id, std::move(unit));
++        auto* result = unit.get(); parsed.emplace(id, std::move(unit));
+         diagnostics.bind(result->source, id);
+         auto before = diagnostics.size();
+         Parser(result->source, diagnostics).parse(*result);
+         result->parse_failed |= diagnostics.size() != before;
+         if(id==console::source_module)for(auto& structure:result->structures)if(structure.token.text=="terminal_session"){structure.definition->native_resource=true;structure.definition->native_provider="void.console.v1";}
+         if(native && id==native->module){for(auto& structure:result->structures){structure.definition->native_resource=true;structure.definition->native_provider=native->library;}for(auto& f:result->functions)for(const auto& b:native->bindings)if(f.token.text==b.name)f.native_symbol=b.symbol;}
+-
+-        for (auto& import : result->imports) {
++        return *result;
++    }
++    Unit& load(const Unit& from, const Token& path) {
++        auto [id,physical]=resolve(from,path);
++        if(auto found=units.find(id);found!=units.end())return *found->second;
++        Depth guard(depth,from.source,path);
++        auto& result=parse_resolved(from,path,id,physical);
++        // Publish before traversing imports: function-only declaration cycles are safe.
++        units.insert(parsed.extract(result.identity));
++        for (auto& import : result.imports) {
+             try {
+-                auto& target = load(*result, import.path);
++                auto& target = load(result, import.path);
+                 import.target = target.identity;
+             } catch (const CompilationError& failure) {
+-                diagnostics.add(failure); result->failed_import = true;
++                diagnostics.add(failure); result.failed_import = true;
+                 auto qualifier = import.explicit_alias ? import.alias.text : path_utf8(utf8_path(import.path.text).stem());
+-                result->failed_qualifiers.insert(qualifier);
+-            }
+-        }
+-        return *result;
++                result.failed_qualifiers.insert(qualifier);
++            }
++        }
++        return result;
+     }
+ };
+ // Only typed, pure ASTs reach this evaluator. The shared software kernel
+@@ -5420,7 +5440,7 @@
+             module.generic_instances.emplace(structure.definition->identity,ir::Module::GenericInstance{structure.generic_origin->definition->identity,structure.type_arguments});
+     }
+ }
+-void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry, Diagnostics& diagnostics) {
++void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry, Diagnostics& diagnostics, Unit* library_scope=nullptr) {
+     for(auto& [id,u]:units)if(u->application_body) {
+         try {
+             if(id!=entry)error(u->source,{TokenKind::name,"",0},Code::entry,"Imported modules cannot contain executable top-level statements.");
+@@ -5449,7 +5469,7 @@
+         }
+     }
+     }
+-    auto& root = *units.at(entry);
++    auto& root = library_scope ? *library_scope : *units.at(entry);
+     for(auto& [id,u]:units)for(auto& s:u->generic_structures) {
+         s.definition->identity=id+"::"+s.token.text;s.definition->module_identity=id;s.definition->visibility=s.visibility;
+         if(u->declarations.contains(s.token.text) || !u->structure_names.emplace(s.token.text,&s).second)
+@@ -5922,7 +5942,7 @@
+     }
+     diagnostics.finish();
+     try {root.member_catalog->interface_bindings=ir::interface_universe(*root.member_catalog);}
+-    catch(const std::length_error& failure) {error(root.source,root.structures.front().token,Code::limit,failure.what(),"Split unrelated providers into separately compiled projects.");}
++    catch(const std::length_error& failure) {error(root.source,root.structures.empty()?Token{TokenKind::end,"",0}:root.structures.front().token,Code::limit,failure.what(),"Split unrelated providers into separately compiled projects.");}
+     std::map<std::string,Function*> functions;
+     std::map<std::string,std::set<std::string>> dependencies;
+     std::vector<std::string> pending;
+@@ -6109,7 +6129,7 @@
+ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path&, const SourceOverrides& = {}, bool verify_disk = false,const NativeProject* = nullptr,EditorProbe* = nullptr);
+ // This factory is the only way to construct a successful result.
+ struct AnalysisAccess {
+-    static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry,std::vector<Diagnostic> warnings={}) {
++    static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry,std::vector<Diagnostic> warnings={},const std::string& selection_key={}) {
+         auto result = std::shared_ptr<ValidatedAnalysis>(new ValidatedAnalysis);result->warnings_=std::move(warnings);
+         result->entry_ = entry;
+         const auto& selected=*units.at(entry);
+@@ -6129,6 +6149,7 @@
+         }
+         for(const auto& [id,u]:units)for(const auto& [symbol,record]:u->builtins)if(std::none_of(result->editor_declarations_.begin(),result->editor_declarations_.end(),[&](const auto& d){return d.identity==symbol;}))result->editor_declarations_.push_back(record);
+         result->contract_="18:numeric-prelude-v1:20:text-collections-v1:unicode-case-16-v1:display-v1:console-v2:terminal-v2:application-args-v2:host-primitives-v1:"+result->entry_symbol_;
++        if(!selection_key.empty())result->contract_+="|project-selection-v1:"+selection_key;
+         for(const auto& [id,u]:units)for(const auto& f:u->functions)if(!f.native_symbol.empty())result->contract_+=":"+id+":"+f.native_symbol;
+ 
+         result->contract_+=std::string(formatting::abi_version)+"|"+std::string(temporal::abi_version);
+@@ -6603,6 +6624,7 @@
+     try {auto program=validated_project(entry,overrides,true);return {program,program->warnings()};}
+     catch (const CompilationError& failure) { return {{}, failure.diagnostics()}; }
+ }
++#include "project_selection.inc"
+ // Import recovery reads metadata only. Full imports still pass SourceGraph::load.
+ std::optional<EditorAssistance> import_assistance(const std::filesystem::path& entry,const SourceOverrides& overrides,
+     const std::string& module,const SourceFile& source,std::size_t cursor) {
+diff --git a/src/frontend/project_selection.inc b/src/frontend/project_selection.inc
+new file mode 100644
+--- /dev/null
++++ b/src/frontend/project_selection.inc
+@@ -0,0 +1,301 @@
++// Compiler-owned manifest admission, discovery snapshots and E selection.
++// Uses SourceGraph::parse/load and the ordinary Parser/validator below the API.
++namespace {
++namespace project_fs = std::filesystem;
++constexpr std::size_t project_file_limit=4096, project_source_limit=64*1024*1024;
++constexpr std::size_t project_visit_limit=16384, project_depth_limit=64;
++bool project_native_alias(const project_fs::path& path) {
++    std::error_code ec;auto status=project_fs::symlink_status(path,ec);
++    if(ec==std::errc::no_such_file_or_directory)return false;
++    if(ec)throw SourceReadError(path_utf8(path),"Cannot inspect project path.");
++    if(project_fs::is_symlink(status))return true;
++#ifdef _WIN32
++    auto attributes=GetFileAttributesW(path.c_str());
++    if(attributes!=INVALID_FILE_ATTRIBUTES && (attributes&FILE_ATTRIBUTE_REPARSE_POINT))return true;
++#endif
++    return false;
++}
++[[noreturn]] void project_failure(const SourceFile& source,Code code,const std::string& message,const std::string& hint="Correct the project path or source policy and retry.") {
++    error(source,{TokenKind::end,"",0},code,message,hint);
++}
++struct ProjectCapture {
++    project_fs::path root;
++    const SourceOverrides& overlays;
++    const ManifestOverrides& manifest_overlays;
++    SourceFile anchor;
++    std::shared_ptr<const project::Manifest> manifest;
++    std::map<std::string,SourceFile> sources;
++    std::map<std::string,std::vector<std::string>> listings;
++    std::map<std::string,bool> boundaries;
++    std::map<std::string,std::set<std::string>> virtual_children;
++    std::set<std::string> virtual_directories;
++    std::size_t visited=0,bytes=0;
++    Diagnostics diagnostics;
++    SourceGraph graph;
++    Unit from;
++    ProjectCapture(const project_fs::path& requested,const SourceOverrides& o,const ManifestOverrides& m)
++      :root(admit_root(requested)),overlays(bounded_overlays(o)),manifest_overlays(m),anchor(path_utf8(root/"void.project.toml"),""),graph(root,diagnostics,overlays),from(anchor,"/") {
++        if(manifest_overlays.size()>project_visit_limit)project_failure(anchor,Code::limit,"Manifest overlay work limit exceeded.");
++        for(const auto& [id,value]:overlays) {
++            require_module_identity(id);
++            std::string parent;
++            for(const auto& component:utf8_path(id).relative_path()) {
++                auto name=path_utf8(component);virtual_children[parent].insert(name);
++                parent+="/"+name;
++                if(value && parent!=id)virtual_directories.insert(parent);
++            }
++        }
++        for(const auto& [id,value]:manifest_overlays) {
++            (void)value;
++            if(id.empty() || id.front()!='/' || path_utf8(utf8_path(id).filename())!="void.project.toml")
++                project_failure(anchor,Code::project_path,"Manifest overlay must name an exact root-relative void.project.toml.");
++            for(const auto& component:utf8_path(id).relative_path())if(component=="." || component==".." || !portable_path_component(path_utf8(component)))
++                project_failure(anchor,Code::project_path,"Invalid manifest overlay identity.");
++            if(path_utf8(utf8_path(id).lexically_normal())!=id)project_failure(anchor,Code::project_path,"Manifest overlay identity is not canonical.");
++        }
++        graph.admit=[this](const auto& path,const auto& id,bool leaf){admit(path,id,leaf);};
++        graph.reader=[this](const auto& path,const auto& id){return capture(path,id);};
++        if(!boundary(""))project_failure(anchor,Code::project_boundary,"Selected project manifest is unavailable.","Select a directory containing an exact regular void.project.toml; a deleted manifest cannot fall back to legacy mode.");
++        auto overlay=manifest_overlays.find("/void.project.toml");
++        if(overlay!=manifest_overlays.end() && overlay->second->text().size()>project::manifest_byte_limit)project_failure(anchor,Code::limit,"Project manifest byte limit exceeded.");
++        auto source=overlay==manifest_overlays.end()?read_bounded(root/"void.project.toml",project::manifest_byte_limit):SourceFile(path_utf8(root/"void.project.toml"),overlay->second->text());
++        auto parsed=project::parse_manifest(source);
++        if(!parsed.succeeded())throw CompilationError(std::move(parsed.diagnostics));
++        manifest=std::move(parsed.manifest);
++        anchor=manifest->source();from.source=anchor;
++        for(const auto& name:manifest->sources().roots) {
++            if(name!=".") {
++                graph.resolve(from,{TokenKind::path,"/"+name+"/.void",0},true);
++                std::error_code ec;
++                if(!project_fs::is_directory(root/utf8_path(name),ec) || ec)project_failure(anchor,Code::project_boundary,"Configured source root must be an existing physical directory: '"+name+"'.", "Named overlays may add virtual descendants beneath admitted physical roots, not invent a source root.");
++            }
++        }
++        // Absent exclusions are valid. Inspect only their existing parent spelling;
++        // never enumerate the excluded subtree to search for boundaries or errors.
++        for(const auto& excluded:manifest->sources().exclude) {
++            std::string parent;
++            for(const auto& part:utf8_path(excluded)) {
++                auto name=path_utf8(part);auto names=directory(parent);
++                std::set<std::string> matches;for(const auto& child:names)if(folded(child)==folded(name))matches.insert(child);
++                if(matches.empty())break;
++                if(matches.size()!=1 || *matches.begin()!=name)project_failure(anchor,Code::project_path,"Source exclusion has wrong case or a case collision: '"+excluded+"'.");
++                parent+="/"+name;
++                if(parent!="/"+excluded) {
++                    auto p=root/utf8_path(parent).relative_path();
++                    if(project_native_alias(p))project_failure(anchor,Code::project_boundary,"Source exclusion parent contains an alias.");
++                    std::error_code ec;if(!project_fs::is_directory(p,ec))break;
++                }
++            }
++        }
++    }
++    static const SourceOverrides& bounded_overlays(const SourceOverrides& sources) {
++        if(sources.size()>project_visit_limit)project_failure(SourceFile("<project overlays>",""),Code::limit,"Source overlay work limit exceeded.");
++        return sources;
++    }
++    static project_fs::path admit_root(const project_fs::path& requested) {
++        // Canonicalize the actual OS path before removing parent references:
++        // link/../project need not mean the lexical sibling of link.
++        auto absolute=project_fs::absolute(requested);
++        while(absolute.has_relative_path() && (absolute.filename().empty() || absolute.filename()=="."))absolute=absolute.parent_path();
++        SourceFile site(path_utf8(absolute),"");
++        if(project_native_alias(absolute))project_failure(site,Code::project_boundary,"Selected project root is an alias.");
++        auto root=project_fs::canonical(absolute);
++        if(!project_fs::is_directory(root))project_failure(site,Code::project_boundary,"Selected project root is not a directory.");
++        // Canonical ancestors are permitted; a root's own spelling is exact.
++        if(root!=root.root_path()) {
++            auto expected=path_utf8(absolute.filename()==".."?root.filename():absolute.filename());std::set<std::string> matches;
++            for(const auto& child:project_fs::directory_iterator(root.parent_path()))if(folded(path_utf8(child.path().filename()))==folded(expected))matches.insert(path_utf8(child.path().filename()));
++            if(matches.size()!=1 || *matches.begin()!=expected)project_failure(site,Code::project_boundary,"Selected project root has wrong case or a case collision.");
++        }
++        return root;
++    }
++    SourceFile read_bounded(const project_fs::path& path,std::size_t limit) {
++        std::ifstream stream(path,std::ios::binary);
++        if(!stream)throw SourceReadError(path_utf8(path),"Cannot read admitted project source.");
++        std::string text;char buffer[4096];
++        while(stream) {
++            stream.read(buffer,sizeof buffer);auto count=static_cast<std::size_t>(stream.gcount());
++            if(count>limit-text.size())project_failure(anchor,Code::limit,"Project source/input byte limit exceeded.","Reduce the admitted source set or manifest size; selection is never truncated.");
++            text.append(buffer,count);
++        }
++        if(!stream.eof())throw SourceReadError(path_utf8(path),"Cannot finish reading admitted project source.");
++        return SourceFile(path_utf8(path),std::move(text));
++    }
++    const std::vector<std::string>& directory(const std::string& id) {
++        if(auto found=listings.find(id);found!=listings.end())return found->second;
++        auto path=root/utf8_path(id).relative_path();std::error_code ec;std::set<std::string> names;
++        for(project_fs::directory_iterator it(path,ec),end;!ec && it!=end;it.increment(ec)) {
++            if(++visited>project_visit_limit)project_failure(anchor,Code::limit,"Project directory-entry limit exceeded.");
++            names.insert(path_utf8(it->path().filename()));
++        }
++        if(ec && !(ec==std::errc::no_such_file_or_directory && virtual_directories.contains(id)))
++            project_failure(anchor,Code::project_boundary,"Cannot enumerate project directory '"+id+"'.");
++        if(auto virtuals=virtual_children.find(id);virtuals!=virtual_children.end())for(const auto& name:virtuals->second)if(names.insert(name).second && ++visited>project_visit_limit)
++            project_failure(anchor,Code::limit,"Project directory-entry limit exceeded by named overlays.");
++        return listings.emplace(id,std::vector<std::string>(names.begin(),names.end())).first->second;
++    }
++    bool boundary(const std::string& id) {
++        if(auto found=boundaries.find(id);found!=boundaries.end())return found->second;
++        const auto& names=directory(id);std::set<std::string> matches;
++        for(const auto& name:names)if(folded(name)=="void.project.toml")matches.insert(name);
++        if(matches.size()>1 || (!matches.empty() && *matches.begin()!="void.project.toml"))
++            project_failure(anchor,Code::project_boundary,"Manifest must use exact case without case siblings in '"+id+"'.");
++        auto path=root/utf8_path(id).relative_path()/"void.project.toml";
++        if(!matches.empty())admit_file(path,true);
++        bool present=!matches.empty();
++        if(auto o=manifest_overlays.find(id+"/void.project.toml");o!=manifest_overlays.end())present=bool(o->second);
++        boundaries.emplace(id,present);return present;
++    }
++    void admit_file(const project_fs::path& path,bool manifest_file=false) {
++        std::error_code ec;
++        if(project_native_alias(path) || !project_fs::is_regular_file(path,ec) || ec || project_fs::canonical(path,ec)!=path || ec)
++            project_failure(anchor,Code::project_boundary,"Project file must be regular, exact-case and free of symlink/reparse aliases: '"+path_utf8(path)+"'.");
++        if(manifest_file && (project_fs::hard_link_count(path,ec)!=1 || ec))project_failure(anchor,Code::project_boundary,"Project manifest must have exactly one native link: '"+path_utf8(path)+"'.");
++        // SourceGraph checks conflicting physical identities across parsed D and
++        // loaded E, including overlaid host files. Retain its source-file policy.
++    }
++    void admit(const project_fs::path& path,const std::string& id,bool leaf) {
++        if(project_native_alias(path))project_failure(anchor,Code::project_boundary,"Project source path contains an alias: '"+id+"'.");
++        if(leaf) {std::error_code ec;if(project_fs::exists(path,ec))admit_file(path);}
++        else if(boundary(id))project_failure(anchor,Code::project_boundary,"Source path crosses nested project boundary '"+id+"'.", "Select the child project explicitly; parent imports and entry overrides cannot cross it.");
++    }
++    SourceFile capture(const project_fs::path& path,const std::string& id,bool discovery=false) {
++        if(standard_module(id))return read_source(path);
++        if(auto found=sources.find(id);found!=sources.end())return found->second;
++        // D is inventoried before E expansion. Its new work/byte budgets must
++        // not replace the existing import/parser limits for E-only sources.
++        if(discovery && sources.size()>=project_file_limit)project_failure(anchor,Code::limit,"Project discovery source-file limit exceeded.");
++        auto o=overlays.find(id);
++        if(discovery && o!=overlays.end() && o->second->text().size()>project_source_limit-bytes)project_failure(anchor,Code::limit,"Project discovery aggregate source-byte limit exceeded.");
++        auto source=o!=overlays.end()?SourceFile(path_utf8(path),o->second->text()):discovery?read_bounded(path,project_source_limit-bytes):read_source(path);
++        if(discovery)bytes+=source.text().size();sources.emplace(id,source);return source;
++    }
++    bool excluded(const std::string& id) const {
++        auto relative=id.substr(1);
++        for(const auto& part:utf8_path(relative))if(auto s=folded(path_utf8(part));s==".git" || s==".void" || s=="build" || s=="libs")return true;
++        for(const auto& item:manifest->sources().exclude)if(relative==item || (relative.starts_with(item) && relative.size()>item.size() && relative[item.size()]=='/'))return true;
++        return false;
++    }
++    void inventory_directory(const std::string& id,std::set<std::string>& result,std::size_t depth) {
++        if(depth>project_depth_limit || static_cast<std::size_t>(std::count(id.begin(),id.end(),'/'))>project_depth_limit)project_failure(anchor,Code::limit,"Project directory-depth limit exceeded.");
++        std::set<std::string> children;for(const auto& n:directory(id))children.insert(n);
++        if(auto found=virtual_children.find(id);found!=virtual_children.end())children.insert(found->second.begin(),found->second.end());
++        for(const auto& name:children) {
++            auto child=id+"/"+name;if(excluded(child))continue;
++            auto o=overlays.find(child);if(o!=overlays.end() && !o->second)continue;
++            auto path=root/utf8_path(child).relative_path();std::error_code ec;auto status=project_fs::symlink_status(path,ec);
++            if(ec==std::errc::no_such_file_or_directory)ec.clear();
++            if(ec)project_failure(anchor,Code::project_boundary,"Cannot inspect inventory path '"+child+"'.");
++            if(project_native_alias(path))project_failure(anchor,Code::project_boundary,"Alias in project inventory: '"+child+"'.");
++            if(project_fs::is_directory(status) || virtual_directories.contains(child)) {
++                if(!portable_path_component(name))project_failure(anchor,Code::project_path,"Invalid project directory component '"+name+"'.");
++                if(boundary(child))continue;
++                graph.resolve(from,{TokenKind::path,child+"/.void",0},true);
++                inventory_directory(child,result,depth+1);
++            } else if(name.ends_with(".void")) {
++                auto [key,physical]=graph.resolve(from,{TokenKind::path,child,0});
++                capture(physical,key,true);result.insert(key);
++            }
++        }
++    }
++    std::set<std::string> inventory() {
++        std::set<std::string> result;
++        for(const auto& name:manifest->sources().roots) {
++            auto id=name=="."?std::string{}:"/"+name;
++            if(id.empty() || !excluded(id))inventory_directory(id,result,0);
++        }
++        return result;
++    }
++    SourceFile recapture_source(const std::string& id) {
++        Token path{TokenKind::path,id,0};
++        if(standard_module(id)) {path.kind=TokenKind::name;path.text=id.substr(9,id.size()-9-5);}
++        auto [key,physical]=graph.resolve(from,path);return capture(physical,key);
++    }
++};
++std::string project_snapshot_key(const ProjectCapture& capture,const std::string& entry,bool automatic) {
++    llvm::SHA256 hash;
++    auto field=[&](std::string_view s){auto length=std::to_string(s.size())+":";hash.update(llvm::StringRef(length));hash.update(llvm::StringRef(s.data(),s.size()));};
++    field("void-project-selection-v1");field(path_utf8(capture.root));field(capture.manifest->source().text());field(entry);field(automatic?"automatic":"explicit");
++    for(const auto& [id,source]:capture.sources){field(id);field(source.text());}
++    for(const auto& [id,present]:capture.boundaries){field(id);field(present?"present":"absent");}
++    for(const auto& [id,names]:capture.listings){field(id);for(const auto& name:names)field(name);field("end-directory");}
++    constexpr char hex[]="0123456789abcdef";std::string result;for(auto byte:hash.final()){result+=hex[byte>>4];result+=hex[byte&15];}return result;
++}
++}
++struct ProjectAnalysisAccess {
++    static std::shared_ptr<const ProjectAnalysis> build(ProjectCapture& capture,const std::set<std::string>& seeds,const std::string& entry,bool automatic) {
++        auto result=std::shared_ptr<ProjectAnalysis>(new ProjectAnalysis);
++        result->root_=capture.root;result->manifest_=capture.manifest;
++        for(const auto& id:seeds)result->discovery_.emplace(id,capture.sources.at(id));
++        for(const auto& [id,unit]:capture.graph.units)result->execution_.emplace(id,unit->source);
++        result->selection_key_=project_snapshot_key(capture,entry,automatic);
++        if(!entry.empty()) {
++            result->entry_=capture.root/utf8_path(entry).relative_path();
++            result->program_=AnalysisAccess::build(std::move(capture.graph.units),entry,capture.diagnostics.warnings(),result->selection_key_);
++        }
++        return result;
++    }
++};
++bool project_manifest_present(const std::filesystem::path& root) {
++    for(const auto& item:std::filesystem::directory_iterator(root))if(folded(path_utf8(item.path().filename()))=="void.project.toml")return true;
++    return false;
++}
++ProjectAnalysisResult analyze_manifest_project(const std::filesystem::path& root,const std::optional<std::string>& entry_override,const SourceOverrides& sources,const ManifestOverrides& manifests) {
++    ProjectAnalysisResult result;
++    try {
++        ProjectCapture capture(root,sources,manifests);result.manifest=capture.manifest;
++        const bool library=capture.manifest->kind()==project::Kind::library;
++        if(library && entry_override)project_failure(capture.anchor,Code::project_entry,"A library project cannot select an application entry.");
++        auto explicit_entry=entry_override?entry_override:capture.manifest->entry();
++        bool automatic=!explicit_entry;std::set<std::string> seeds;std::string entry;
++        if(automatic) {
++            seeds=capture.inventory();
++            for(const auto& id:seeds)capture.graph.parse(capture.from,{TokenKind::path,id,0});
++            capture.diagnostics.finish();
++            if(!library) {
++                std::vector<std::pair<Unit*,const Function*>> candidates;
++                for(const auto& [id,unit]:capture.graph.parsed)for(const auto* functions:{&unit->functions,&unit->generic_functions})for(const auto& f:*functions)if(f.token.text=="main" && !f.receiver && !f.anonymous) {
++                    if(f.asynchronous || !f.generics.empty() || !f.parameters.empty() || (f.result!=Type::none && f.result!=Type::i32)) {
++                        try {error(unit->source,f.token,Code::project_entry,"Automatic project main must be synchronous, nongeneric, parameterless and return no result or exact i32.","Correct this declaration or use an explicit project entry.");}catch(const CompilationError& failure){capture.diagnostics.add(failure);}
++                    } else candidates.emplace_back(unit.get(),&f);
++                }
++                capture.diagnostics.finish();
++                std::sort(candidates.begin(),candidates.end(),[](const auto& a,const auto& b){return std::tie(a.first->identity,a.second->token.offset)<std::tie(b.first->identity,b.second->token.offset);});
++                if(candidates.empty())project_failure(capture.manifest->source(),Code::project_entry,"No eligible main() in application project.","Add a valid main() in the admitted source roots or set project.entry/--entry for an explicit script or source.");
++                if(candidates.size()!=1) {
++                    std::vector<RelatedLocation> locations;
++                    for(std::size_t n=0;n<std::min<std::size_t>(candidates.size(),128);++n) {
++                        auto location=span(candidates[n].first->source,candidates[n].second->token);location.module_identity=candidates[n].first->identity;
++                        locations.push_back({std::move(location),"Candidate "+candidates[n].first->identity});
++                    }
++                    auto message="Ambiguous project entry: "+std::to_string(candidates.size())+" eligible main() declarations.";
++                    if(candidates.size()>128)message+=" Locations truncated to 128; all candidates were considered.";
++                    error(capture.manifest->source(),{TokenKind::end,"",0},Code::project_entry,message,"Set project.entry/--entry or narrow sources.roots/exclude.",std::move(locations));
++                }
++                entry=candidates[0].first->identity;
++            }
++        } else {
++            entry="/"+*explicit_entry;
++            if(explicit_entry->empty() || explicit_entry->front()=='/' || entry.find('\\')!=std::string::npos)project_failure(capture.anchor,Code::project_path,"Explicit entry must be a portable manifest-relative .void path.");
++            try {require_module_identity(entry);}
++            catch(const std::invalid_argument&) {project_failure(capture.manifest->source(),Code::project_path,"Explicit entry must be a canonical portable manifest-relative .void path.","Use an exact relative path without ., .., drive prefixes or reserved components; no fallback is attempted.");}
++        }
++        if(library)for(const auto& id:seeds)capture.graph.load(capture.from,{TokenKind::path,id,0});
++        else capture.graph.load(capture.from,{TokenKind::path,entry,0});
++        capture.diagnostics.finish();
++        if(library) {Unit scope(capture.manifest->source(),"");validate_graph(capture.graph.units,"",capture.diagnostics,&scope);}
++        else validate_graph(capture.graph.units,entry,capture.diagnostics);
++        // Recapture membership, boundary observations, spelling/aliases and bytes.
++        // No second source parse, no OS-transaction claim, and no stale success.
++        try {
++            ProjectCapture fresh(root,sources,manifests);
++            if(automatic && fresh.inventory()!=seeds)throw std::invalid_argument("membership");
++            for(const auto& [id,unit]:capture.graph.units)if(fresh.recapture_source(id).text()!=unit->source.text())throw std::invalid_argument("execution bytes");
++            if(fresh.manifest->source().text()!=capture.manifest->source().text() || fresh.root!=capture.root || fresh.boundaries!=capture.boundaries || fresh.listings!=capture.listings || fresh.sources.size()!=capture.sources.size())throw std::invalid_argument("project boundary/policy");
++            for(const auto& [id,source]:capture.sources)if(fresh.sources.at(id).text()!=source.text())throw std::invalid_argument("discovery bytes");
++        }catch(const std::exception&) {project_failure(capture.anchor,Code::project_changed,"Project changed during discovery; retry.","Retry after filesystem changes finish; no partial selection or cached entry was accepted.");}
++        result.project=ProjectAnalysisAccess::build(capture,seeds,entry,automatic);result.diagnostics=capture.diagnostics.warnings();return result;
++    } catch(const CompilationError& failure) {result.diagnostics=failure.diagnostics();return result;}
++      catch(const std::filesystem::filesystem_error& failure) {Diagnostic d{Code::project_boundary};d.primary={std::make_shared<const SourceFile>(path_utf8(root),""),{},0,0};d.description=failure.what();d.hint="Check the selected project root, permissions and exact path spelling.";result.diagnostics.push_back(std::move(d));return result;}
++      catch(const std::invalid_argument& failure) {Diagnostic d{Code::project_path};d.primary={std::make_shared<const SourceFile>(path_utf8(root),""),{},0,0};d.description=failure.what();d.hint="Use exact canonical root-relative source identities and a manifest-relative .void entry.";result.diagnostics.push_back(std::move(d));return result;}
++}
+diff --git a/src/main.cpp b/src/main.cpp
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -36,6 +36,8 @@
+           "  --no-opt    Disable O2 (accepted as a no-op by check).\n"
+           "  --cache     Select Debug code and report cache status (run only).\n"
+           "  --no-cache  Disable disk caching (run only).\n"
++          "  --project DIR  Select exactly DIR/void.project.toml.\n"
++          "  --entry PATH   Override its entry with a manifest-relative source.\n"
+           "  -o PATH     Set output path (build/emit only; required by emit).\n"
+           "  --          End options before a source path.\n";
+     }
+@@ -65,7 +67,10 @@
+       "  -o PATH     Required output object path (.o on Unix, .obj on Windows).\n"
+       "  --no-opt    Disable O2.\n"
+       "Example: voidc emit main.void -o main.o\n";
+-    std::cout<<"\nA directory selects main.void. run/build default to the current directory.\n"
++    std::cout<<"\nA directory with void.project.toml selects its project; otherwise it selects main.void.\n"
++      "run/build default to the current directory. Bare explicit files retain their parent root.\n"
++      "Project discovery selects a unique eligible main in any filename; --entry bypasses scanning.\n"
++      "Library projects support check only. Project build output defaults to <project-root>/build/<entry-stem>.\n"
+       "Application entry selection is automatic (main or executable top-level code);\n"
+       "--app has been removed. Use -- before a source path beginning with '-'.\n"
+       "Quote paths containing spaces. Options may precede or follow operands.\n"
+@@ -131,10 +136,12 @@
+         bool forwarded=false;
+         std::vector<std::string> application_arguments;
+         std::vector<std::string> operands;std::optional<std::filesystem::path> output;
++        std::optional<std::filesystem::path> project_root;
++        std::optional<std::string> project_entry;
+         for(int i=2;i<argc;++i) {
+             const std::string arg=argv[i];
+-            if(arg=="--" && command=="run" && !operands.empty()) {
+-                if(operands.size()!=1)throw UsageError("Application arguments require one explicit source operand.");
++            if(arg=="--" && command=="run" && (!operands.empty() || project_root)) {
++                if(operands.size()>1)throw UsageError("Application arguments require one explicit source or project selector.");
+                 forwarded=true;
+                 for(++i;i<argc;++i)application_arguments.emplace_back(argv[i]);
+                 break;
+@@ -145,6 +152,14 @@
+             else if(arg=="--no-opt") {if(no_opt)throw UsageError("Duplicate --no-opt.");no_opt=true;optimize=false;}
+             else if(arg=="--cache") {if(cache)throw UsageError("Duplicate --cache.");cache=true;optimize=false;}
+             else if(arg=="--no-cache") {if(no_cache)throw UsageError("Duplicate --no-cache.");no_cache=true;}
++            else if(arg=="--project") {
++                if(project_root || ++i==argc || !*argv[i] || argv[i][0]=='-')throw UsageError("Expected one directory after --project.");
++                project_root=vd::utf8_path(argv[i]);
++            }
++            else if(arg=="--entry") {
++                if(project_entry || ++i==argc || !*argv[i] || argv[i][0]=='-')throw UsageError("Expected one manifest-relative source after --entry.");
++                project_entry=argv[i];
++            }
+             else if(arg=="-o") {
+                 if(output || ++i==argc || !*argv[i] || argv[i][0]=='-')throw UsageError("Expected one output path after -o.");
+                 output=vd::utf8_path(argv[i]);
+@@ -157,13 +172,29 @@
+         if(cache && no_cache)throw UsageError("--cache and --no-cache cannot be combined.");
+         if(output && command!="emit" && command!="build")throw UsageError("-o is available only for emit/build.");
+         if(command=="emit" && !output)throw UsageError("emit requires -o <object>.");
+-        if((command=="check" || command=="emit") && operands.empty())throw UsageError("Expected a file or directory.");
++        if(project_root && !operands.empty())throw UsageError("--project cannot accompany a positional file or directory selector.");
++        if((command=="check" || command=="emit") && operands.empty() && !project_root)throw UsageError("Expected a file or directory.");
+         if(operands.size()>(command=="run"?2u:1u))throw UsageError("Too many operands.");
+         // Parse legacy input syntax before analysis, but its admission follows classification.
+         auto value=operands.size()==2?input(operands[1].c_str()):0;
+-        auto path=operands.empty()?std::filesystem::current_path():vd::utf8_path(operands[0]);
+-        auto selected=std::filesystem::is_directory(path)?vd::discover_project(path).entry:path;
+-        auto analysis=vd::analyze_project(selected);
++        auto path=project_root?*project_root:operands.empty()?std::filesystem::current_path():vd::utf8_path(operands[0]);
++        const bool project_mode=project_root || (std::filesystem::is_directory(path) && vd::project_manifest_present(path));
++        if(project_entry && !project_mode)throw UsageError("--entry requires a manifest-selected project context.");
++        std::shared_ptr<const vd::ProjectAnalysis> project;
++        std::filesystem::path selected;
++        vd::AnalysisResult analysis;
++        if(project_mode) {
++            auto result=vd::analyze_manifest_project(path,project_entry);
++            if(result.manifest && result.manifest->kind()==vd::project::Kind::library && project_entry)throw UsageError("--entry cannot select an application entry in a library project.");
++            if(!result.succeeded())throw vd::CompilationError(std::move(result.diagnostics));
++            project=std::move(result.project);
++            if(project->manifest()->kind()==vd::project::Kind::library) {
++                if(command!="check")throw std::invalid_argument("Library project run/build/emit is unsupported; use check for source analysis.");
++                for(const auto& warning:result.diagnostics)std::cerr<<vd::render_diagnostic(warning)<<'\n';
++                std::cout<<"Library project checked successfully\n";return 0;
++            }
++            selected=*project->entry();analysis={project->program(),std::move(result.diagnostics)};
++        } else {selected=std::filesystem::is_directory(path)?vd::discover_project(path).entry:path;analysis=vd::analyze_project(selected);}
+         if(!analysis.succeeded())throw vd::CompilationError(std::move(analysis.diagnostics));
+         for(const auto& warning:analysis.program->warnings())std::cerr<<vd::render_diagnostic(warning)<<'\n';
+         if(command=="check") {std::cout<<"Source checked successfully\n";return 0;}
+@@ -177,7 +208,7 @@
+         vd::require_source_entry(*analysis.program);
+         if(command=="run") {
+             std::unique_ptr<vd::Jit> jit;
+-            if(!no_cache)jit=std::make_unique<vd::Jit>(vd::DebugCache{std::filesystem::canonical(selected.parent_path().empty()?std::filesystem::path("."):selected.parent_path()),std::string(vd::compiler_build_identity())},vd::ir::Emission::entry);
++            if(!no_cache)jit=std::make_unique<vd::Jit>(vd::DebugCache{project?project->root():std::filesystem::canonical(selected.parent_path().empty()?std::filesystem::path("."):selected.parent_path()),std::string(vd::compiler_build_identity())+(project?":project-selection-v1:"+project->selection_key():"")},vd::ir::Emission::entry);
+             else jit=std::make_unique<vd::Jit>(vd::DebugCache{},vd::ir::Emission::entry);
+             auto code=jit->compile(*analysis.program,optimize);
+             if(auto runtime=code->runtime_owner())
+@@ -194,7 +225,7 @@
+ #ifdef _WIN32
+                 name+=".exe";
+ #endif
+-                output=entry.parent_path()/"build"/name;
++                output=(project?project->root():entry.parent_path())/"build"/name;
+             }
+             vd::build_executable(*analysis.program,*output,optimize,argv[0]);
+             std::cout<<"Built native executable: "<<vd::path_utf8(*output)<<'\n';
+diff --git a/tests/project/discovery.py b/tests/project/discovery.py
+new file mode 100644
+--- /dev/null
++++ b/tests/project/discovery.py
+@@ -0,0 +1,152 @@
++"""Real project selection, legacy compatibility and independent native execution."""
++from pathlib import Path
++import json, os, subprocess, sys, tempfile
++
++compiler=Path(sys.argv[1]).resolve()
++evidence=Path(sys.argv[2]).resolve() if len(sys.argv)>2 else None
++checks=0
++commands=[]
++app="schema=1\n[project]\nid='org.example.sources'\nname='Example'\nversion='1.0.0'\nkind='application'\n[application]\nid='org.example.app'\n[sources]\nroots=['src']\n"
++lib="schema=1\n[project]\nid='org.example.sources'\nname='Example'\nversion='1.0.0'\nkind='library'\n[package]\nid='org.example.library'\nname='example'\n[sources]\nroots=['src']\n"
++main="func main() -> i32:\n    return 23\n"
++
++def legacy(value):
++    return str(value).encode()+ (b'\r\n' if os.name=='nt' else b'\n')
++
++def run(args,status=0,stdout=None,contains=None,cwd=None):
++    global checks
++    p=subprocess.run(list(map(str,args)),capture_output=True,cwd=cwd,timeout=120)
++    commands.append({'argv':list(map(str,args)),'cwd':str(cwd) if cwd else None,'status':p.returncode,'stdout':p.stdout.decode('utf-8','replace'),'stderr':p.stderr.decode('utf-8','replace')})
++    assert p.returncode==status,(args,status,p.returncode,p.stdout,p.stderr)
++    if stdout is not None:assert p.stdout==stdout,(args,p.stdout)
++    if contains is not None:assert contains in p.stderr,(args,p.stderr)
++    checks+=1
++    return p
++
++try:
++ with tempfile.TemporaryDirectory(prefix='VOID project execution 雪 ') as temporary:
++    root=Path(temporary)
++    def write(name,text):
++        p=root/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(text,encoding='utf-8');return p
++    manifest=write('void.project.toml',app)
++    selected=write('src/app.void',main)
++    # P01-P03: names have no priority; normal/O2 JIT and independent AOT.
++    for name in ['app.void','program.void','game.void','features/launcher.void']:
++        target=root/'src'/name;target.parent.mkdir(parents=True,exist_ok=True)
++        if target!=selected:selected.rename(target);selected=target
++        run([compiler,'check','--project',root])
++        for flags in [[],['--no-opt']]:
++            run([compiler,'run',root,'--no-cache',*flags],23,b'')
++        run([compiler,'run','--no-cache'],23,b'',cwd=root)
++        exe=root/'native'/(selected.stem+('.exe' if os.name=='nt' else ''))
++        for flags in [[],['--no-opt']]:
++            run([compiler,'build','--project',root,'-o',exe,*flags])
++            run([exe],23,b'',cwd=root)
++    # Rooted imports and selected-entry root scope; unrelated D semantics/globals.
++    helper=write('src/helper.void','var local = 2\nfunc read() -> i32:\n    return root_number + local\n')
++    write('src/unrelated.void','var number = initialize()\nfunc initialize() -> i32:\n    print("UNRELATED")\n    return 9\nfunc semantically_bad() -> i32:\n    return false\n')
++    write('libs/helper/helper.void','func main() -> i32:\n    return 99\nfunc value() -> i32:\n    return 0\n')
++    selected.write_text('use "/src/helper.void" as helper\nuse lib/helper as library\nconst root_number = 21\nfunc main() -> i32:\n    return helper.read() + library.value()\n')
++    run([compiler,'run','--project',root,'--no-cache'],23,b'')
++    exe=root/('graph-program.exe' if os.name=='nt' else 'graph-program')
++    run([compiler,'build','--project',root,'-o',exe]);run([exe],23,b'')
++    # P04/P08: an import does not remove another independently eligible seed.
++    other=write('src/main.void',main)
++    ambiguity=run([compiler,'run',root],1,contains=b'Ambiguous project entry')
++    assert ambiguity.stderr.find(b'/src/features/launcher.void')<ambiguity.stderr.find(b'/src/main.void')
++    selected.write_text('use "/src/main.void"\n'+main)
++    run([compiler,'check',root],1,contains=b'Ambiguous project entry')
++    # Explicit mode bypasses both D ambiguity and unrelated syntax errors.
++    write('src/unrelated.void','func broken(:\n')
++    run([compiler,'run','--project',root,'--entry','src/main.void','--no-cache'],23,b'')
++    run([compiler,'run','--project',root,'--entry','src/missing.void'],1)
++    run([compiler,'check','--project',root,'--entry','../outside.void'],1)
++    run([compiler,'check','--project',root,'--entry','src/main.void',selected],2)
++    run([compiler,'check',selected,'--entry','src/main.void'],2)
++    other.unlink();selected.write_text(main);write('src/unrelated.void','func helper() -> i32:\n    return false\n')
++    run([compiler,'run',root,'--no-cache'],23,b'')
++    # P10/P11: only E gets semantic validation, D still gets syntax validation.
++    selected.write_text('use "/src/unrelated.void"\n'+main)
++    run([compiler,'check',root],1,contains=b'VOID2001')
++    selected.write_text(main);write('src/unrelated.void','func broken(:\n')
++    run([compiler,'check',root],1,contains=b'VOID1102')
++    (root/'src/unrelated.void').unlink()
++    helper.write_text('print("MUST NOT INITIALIZE")\n');selected.write_text('use "/src/helper.void"\n'+main)
++    run([compiler,'check',root],1,contains=b'VOID4001');selected.write_text(main)
++    # Excluded imports and unimported eager globals remain ordinary E behavior.
++    manifest.write_text(app+"exclude=['src/scratch']\n")
++    write('src/scratch/helper.void','var count = initialize()\nfunc initialize() -> i32:\n    print("IMPORTED")\n    return 23\nfunc main() -> i32:\n    return 99\n')
++    run([compiler,'run',root,'--no-cache'],23,b'')
++    selected.write_text('use "/src/scratch/helper.void" as helper\nfunc main() -> i32:\n    return helper.count\n')
++    for flags in [[],['--no-opt']]:run([compiler,'run',root,'--no-cache',*flags],23,b'IMPORTED\n')
++    run([compiler,'build','--project',root,'-o',exe]);run([exe],23,b'IMPORTED\n')
++    # Default output belongs to the manifest root, not the nested entry directory.
++    run([compiler,'build',root]);default=root/'build'/('launcher.exe' if os.name=='nt' else 'launcher');assert default.is_file();run([default],23,b'IMPORTED\n')
++    # Nested malformed manifests still exclude children and reject E crossings.
++    write('src/child/void.project.toml','[=roject]');write('src/child/child.void',main)
++    run([compiler,'check',root]);run([compiler,'run','--project',root,'--entry','src/child/child.void'],1,contains=b'VOID5009')
++    selected.write_text('use "/src/child/child.void"\n'+main)
++    run([compiler,'check',root],1,contains=b'VOID5009')
++    selected.write_text(main)
++    # Explicit project scripts/legacy entries, argument forwarding and output.
++    write('tools/script.void','print("SCRIPT")\n')
++    for flags in [[],['--no-opt']]:run([compiler,'run','--project',root,'--entry','tools/script.void','--no-cache',*flags],0,b'SCRIPT\n')
++    write('tools/legacy.void','func entry(value: i32) -> i32:\n    return value + 2\n')
++    run([compiler,'run','--project',root,'--entry','tools/legacy.void','--','9'],0,legacy(11))
++    write('tools/args.void','use os\nfunc main():\n    if os.args() is Ok(var values):\n        for arg in values:\n            print(arg)\n')
++    run([compiler,'run','--project',root,'--entry','tools/args.void','--','--app','two words'],0,b'--app\ntwo words\n')
++    # Manifest override wins over scanning, CLI override wins over authored entry.
++    manifest.write_text(app.replace("kind='application'","kind='application'\nentry='tools/script.void'"))
++    run([compiler,'run',root,'--no-cache'],0,b'SCRIPT\n')
++    run([compiler,'run','--project',root,'--entry','tools/legacy.void','--','5'],0,legacy(7))
++    manifest.write_text(app.replace("kind='application'","kind='application'\nentry='tools/missing.void'"))
++    run([compiler,'run',root],1)
++    # Automatic missing main fails even check; bare explicit check stays valid.
++    (root/'src/scratch/helper.void').unlink()
++    manifest.write_text(app);selected.write_text('func helper():\n    pass\n')
++    for command in ['check','run','build']:run([compiler,command,root],1,contains=b'No eligible main')
++    run([compiler,'check',selected])
++    # Library check union has no implicit root privilege and no execution entry.
++    manifest.write_text(lib);helper.write_text('func helper():\n    pass\n')
++    run([compiler,'check','--project',root])
++    for command in ['run','build','emit']:
++        options=['-o',root/'library.o'] if command=='emit' else []
++        run([compiler,command,'--project',root,*options],1,contains=b'unsupported')
++    run([compiler,'check','--project',root,'--entry','src/helper.void'],2)
++    # Cached selection must revalidate D before any hit or application execution.
++    manifest.write_text(app);selected.write_text(main)
++    cold=run([compiler,'run','--project',root,'--cache'],23,b'')
++    warm=run([compiler,'run','--project',root,'--cache'],23,b'')
++    cache_supported=b'Debug cache: unavailable' not in cold.stderr
++    if cache_supported:assert b'Debug cache: miss' in cold.stderr and b'Debug cache: hit' in warm.stderr
++    else:print('UNQUALIFIED: native persistent disk cache; project selection rejection is still exercised')
++    other=write('src/second.void',main);run([compiler,'run','--project',root,'--cache'],1,contains=b'Ambiguous')
++    other.unlink();manifest.write_text(app.replace("name='Example'","name='Changed'"));changed=run([compiler,'run','--project',root,'--cache'],23,b'')
++    if cache_supported:assert b'Debug cache: miss' in changed.stderr
++    manifest.write_text(app+"[build.debug]\ndebug_info='line'\n");changed=run([compiler,'run','--project',root,'--cache'],23,b'')
++    if cache_supported:assert b'Debug cache: miss' in changed.stderr
++    manifest.write_text(app.replace("id='org.example.sources'","id='org.example.other_sources'"));changed=run([compiler,'run','--project',root,'--cache'],23,b'')
++    if cache_supported:assert b'Debug cache: miss' in changed.stderr
++    # Bare explicit file ignores adjacent invalid manifest; directory fails closed.
++    manifest.write_text('[=roject]')
++    run([compiler,'run',selected,'--no-cache'],23,b'')
++    run([compiler,'check',root],1,contains=b'VOID5001')
++    wrong_case=root/'Void.Project.toml';manifest.rename(wrong_case);write('main.void',main)
++    run([compiler,'check',root],1,contains=b'VOID5009');wrong_case.rename(manifest)
++    manifest.unlink();write('main.void',main)
++    run([compiler,'check','--project',root],1,contains=b'VOID5009')
++    run([compiler,'run',root,'--no-cache'],23,b'')
++    (root/'main.void').unlink();run([compiler,'run',root],1,contains=b'main.void')
++    run([compiler,'run',selected,'--no-cache'],23,b'')
++    # Existing explicit legacy precedence stays exact beside project context.
++    write('tools/legacy.void','func main() -> i32:\n    return 99\nfunc entry(value: i32) -> i32:\n    return value+1\n')
++    run([compiler,'run',root/'tools/legacy.void','3'],0,legacy(4))
++    write('void.project.toml',app.replace("kind='application'","kind='application'\nentry='tools/legacy.void'"))
++    run([compiler,'run',root,'4'],0,legacy(5))
++    manifest.write_text(app);selected.write_text('func main() -> i32:\n    return 99\nfunc entry(value: i32) -> i32:\n    return value+1\n')
++    run([compiler,'run','--project',root,'--','4'],0,legacy(5))
++ print(f'project_discovery_cli: {checks} process checks passed')
++finally:
++ if evidence:
++    evidence.parent.mkdir(parents=True,exist_ok=True)
++    evidence.write_text(json.dumps({'platform':sys.platform,'checks_completed':checks,'commands':commands},indent=2)+'\n')
+diff --git a/tests/project/legacy.py b/tests/project/legacy.py
+--- a/tests/project/legacy.py
++++ b/tests/project/legacy.py
+@@ -31,14 +31,21 @@
+     for options in ([], ["--no-opt"]):
+         result = run(["run", app, *options], 23, root)
+         assert not result.stdout and not result.stderr
++        # Slice 2 selects an adjacent manifest only for directory operands.
++        run(["run", root, *options], 1, root)
++        manifest.rename(root / "manifest-held.toml")
+         result = run(["run", root, *options], 5, root)
+         assert not result.stdout and not result.stderr
++        (root / "manifest-held.toml").rename(manifest)
+     run(["check", app], 0, root)
+     main.unlink()
++    manifest.rename(root / "manifest-held.toml")
+     result = run(["check", root], 1, root)
+     assert b"main.void" in result.stderr
+-    # No project-aware command or project-root option is enabled by a library parser.
+-    for args in (["check", "--project", root], ["init", root], ["new", root / "new-project"]):
++    (root / "manifest-held.toml").rename(manifest)
++    run(["check", "--project", root], 1, root)
++    # Creation remains unsupported; project selection now validates this manifest.
++    for args in (["init", root], ["new", root / "new-project"]):
+         run(args, 2, root)
+     no_id = root / "missing_context.void"
+     no_id.write_text("use os\nfunc main():\n    var directory = os.data_dir()\n", encoding="utf-8")
+diff --git a/tests/project/nested.py b/tests/project/nested.py
+new file mode 100644
+--- /dev/null
++++ b/tests/project/nested.py
+@@ -0,0 +1,22 @@
++"""Deliberate child selection keeps its own root; parent discovery stays isolated."""
++from pathlib import Path
++import json,os,subprocess,sys,tempfile
++compiler=Path(sys.argv[1]).resolve();evidence=Path(sys.argv[2]) if len(sys.argv)>2 else None;rows=[]
++manifest="schema=1\n[project]\nid='org.test.parent.sources'\nname='Parent'\nversion='1.0.0'\nkind='application'\n[application]\nid='org.test.parent'\n"
++def run(args,status=0,error=None):
++ p=subprocess.run(list(map(str,args)),capture_output=True,timeout=120);rows.append({'argv':list(map(str,args)),'status':p.returncode,'stdout':p.stdout.decode('utf-8','replace'),'stderr':p.stderr.decode('utf-8','replace')});assert p.returncode==status,rows[-1]
++ if error is not None:assert error in p.stderr,rows[-1]
++ return p
++try:
++ with tempfile.TemporaryDirectory(prefix='VOID deliberate child 雪 ') as d:
++  root=Path(d);child=root/'nested';child.mkdir();(root/'void.project.toml').write_text(manifest);(child/'void.project.toml').write_text(manifest.replace('parent','child').replace('Parent','Child'))
++  (root/'program.void').write_text('func main() -> i32:\n    return 17\n');(child/'launcher.void').write_text('func main() -> i32:\n    return 23\n')
++  for path,status in [(root,17),(child,23)]:
++   run([compiler,'check','--project',path])
++   for flags in [[],['--no-opt']]:assert run([compiler,'run','--project',path,'--no-cache',*flags],status).stdout==b''
++  exe=root/('child-native.exe' if os.name=='nt' else 'child-native');run([compiler,'build','--project',child,'-o',exe]);assert run([exe],23).stdout==b''
++  run([compiler,'run','--project',root,'--entry','nested/launcher.void'],1,b'VOID5009')
++  (child/'void.project.toml').write_text('[=roject]');run([compiler,'run','--project',root,'--no-cache'],17);run([compiler,'check','--project',child],1,b'VOID5001')
++ print(f'project_nested_cli: {len(rows)} process checks passed')
++finally:
++ if evidence:evidence.parent.mkdir(parents=True,exist_ok=True);evidence.write_text(json.dumps({'platform':sys.platform,'commands':rows},indent=2)+'\n')
+diff --git a/tests/project/selection.cpp b/tests/project/selection.cpp
+new file mode 100644
+--- /dev/null
++++ b/tests/project/selection.cpp
+@@ -0,0 +1,129 @@
++#include "void/frontend.hpp"
++#include "void/path.hpp"
++#include <chrono>
++#include <fstream>
++#include <iostream>
++#include <stdexcept>
++#include <thread>
++#include <atomic>
++#ifdef __linux__
++#include <sys/inotify.h>
++#include <poll.h>
++#include <unistd.h>
++#endif
++namespace {
++namespace fs=std::filesystem;
++using Code=vd::DiagnosticCode;
++std::size_t checks=0;
++void check(bool v,const std::string& what){++checks;if(!v)throw std::runtime_error(what);}
++const std::string app="schema=1\n[project]\nid='org.example.sources'\nname='Example'\nversion='1.0.0'\nkind='application'\n[application]\nid='org.example.app'\n[sources]\nroots=['src']\n";
++const std::string lib="schema=1\n[project]\nid='org.example.sources'\nname='Example'\nversion='1.0.0'\nkind='library'\n[package]\nid='org.example.library'\nname='example'\n[sources]\nroots=['src']\n";
++const std::string main_source="func main() -> i32:\n    return 23\n";
++struct Fixture {
++ fs::path root;
++ Fixture(){root=fs::temp_directory_path()/vd::utf8_path("VOID project 雪 "+std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));fs::create_directories(root/"src");write("void.project.toml",app);}
++ ~Fixture(){std::error_code ec;fs::remove_all(root,ec);}
++ void write(const std::string& name,const std::string& text){auto p=root/vd::utf8_path(name);fs::create_directories(p.parent_path());std::ofstream stream(p,std::ios::binary);stream<<text;check(bool(stream),"fixture write");}
++ auto analyze(const std::optional<std::string>& entry={},const vd::SourceOverrides& sources={},const vd::ManifestOverrides& manifests={}){return vd::analyze_manifest_project(root,entry,sources,manifests);}
++ auto good(const std::optional<std::string>& entry={},const vd::SourceOverrides& sources={},const vd::ManifestOverrides& manifests={}){auto r=analyze(entry,sources,manifests);if(!r.succeeded())throw vd::CompilationError(r.diagnostics);check(bool(r.project),"success snapshot");return r.project;}
++ auto bad(Code code,const std::optional<std::string>& entry={},const vd::SourceOverrides& sources={},const vd::ManifestOverrides& manifests={}){auto r=analyze(entry,sources,manifests);check(!r.succeeded() && !r.project,"failure cannot publish a project/entry");bool found=false;for(const auto& d:r.diagnostics){found|=d.code==code;check(d.primary.source && d.primary.begin<=d.primary.end && d.primary.end<=d.primary.source->text().size(),"owned bounded diagnostic");}std::string details;for(const auto& d:r.diagnostics)details+=vd::render_diagnostic(d);check(found,"expected "+vd::diagnostic_code(code)+"; actual diagnostics:\n"+details);return r;}
++};
++void selection_and_snapshots(){
++ Fixture f;f.write("src/features/launcher.void",main_source);f.write("src/unrelated.void","func unused() -> i32:\n    return false\n");
++ auto p=f.good();check(p->program()->entry_identity()=="/src/features/launcher.void","deep any-name entry");check(p->root()==fs::canonical(f.root),"manifest root");check(p->discovery_sources().size()==2 && p->execution_sources().size()==1,"D differs from E");
++ check(&p->discovery_sources().at("/src/features/launcher.void").text()==&p->execution_sources().at("/src/features/launcher.void").text(),"D/E share captured snapshot");
++ auto old=p->selection_key();f.write("src/second.void",main_source);auto ambiguous=f.bad(Code::project_entry);auto again=f.analyze();check(vd::render_diagnostic(ambiguous.diagnostics[0])==vd::render_diagnostic(again.diagnostics[0]),"deterministic ambiguity");check(ambiguous.diagnostics[0].related.size()==2 && ambiguous.diagnostics[0].related[0].span.module_identity=="/src/features/launcher.void" && ambiguous.diagnostics[0].related[0].span.begin==5 && ambiguous.diagnostics[0].related[0].span.end==9,"exact canonical ambiguity source locations");
++ check(p->discovery_sources().size()==2 && p->program()->entry_identity()=="/src/features/launcher.void","returned snapshot independent of later disk changes");
++ auto explicit_p=f.good("src/features/launcher.void");check(explicit_p->discovery_sources().empty() && explicit_p->selection_key()!=old,"explicit mode distinct without D");
++ f.bad(Code::import_read,"src/missing.void");f.bad(Code::project_path,"../outside.void");f.bad(Code::project_path,"/src/features/launcher.void");
++ fs::remove(f.root/"src/second.void");f.write("src/features/launcher.void","func main(value: i32) -> i32:\n    return value\n");f.bad(Code::project_entry);
++ for(const auto& text:{std::string("async func main():\n    pass\n"),std::string("func main<t>():\n    pass\n"),std::string("func main() -> bool:\n    return false\n"),std::string("func main(value: i32 = 0):\n    pass\n")}){f.write("src/features/launcher.void",text);f.bad(Code::project_entry);}
++ f.write("src/features/launcher.void",main_source);f.write("src/unrelated.void","func broken(:\n");f.bad(Code::identifier);f.good("src/features/launcher.void");
++ f.write("void.project.toml","[=roject]");f.bad(Code::project_syntax);
++}
++void boundaries_and_overlays(){
++ Fixture f;f.write("src/app.void",main_source);f.write("src/child/void.project.toml","invalid child remains boundary");f.write("src/child/second.void",main_source);f.good();f.bad(Code::project_boundary,"src/child/second.void");
++ f.write("src/app.void","use \"/src/child/second.void\"\n"+main_source);f.bad(Code::project_boundary);f.write("src/app.void",main_source);
++ vd::SourceOverrides overlays;overlays.emplace("/src/new/deep/game.void",vd::SourceFile("dirty game",main_source));f.bad(Code::project_entry,{},overlays);
++ overlays.insert_or_assign("/src/app.void",std::nullopt);auto p=f.good({},overlays);check(p->program()->entry_identity()=="/src/new/deep/game.void","virtual parents and tombstone");
++ overlays.insert_or_assign("/src/new/deep/game.void",vd::SourceFile("dirty signature","func main(value: i32):\n    pass\n"));f.bad(Code::project_entry,{},overlays);
++ vd::ManifestOverrides manifests;manifests.emplace("/src/void.project.toml",vd::SourceFile("new child","invalid"));f.bad(Code::project_boundary,{}, {},manifests);f.bad(Code::project_boundary,"src/app.void",{},manifests);
++ manifests.clear();manifests.emplace("/void.project.toml",std::nullopt);f.bad(Code::project_boundary,{}, {},manifests);
++ manifests.clear();manifests.emplace("/src/child/void.project.toml",std::nullopt);f.bad(Code::project_entry,{}, {},manifests);
++ vd::SourceOverrides invalid;invalid.emplace("/@stdlib/os.void",vd::SourceFile("external",""));f.bad(Code::project_path,{},invalid);
++ f.write("src/other.VOID","not source syntax");f.good();
++ std::error_code ec;fs::create_hard_link(f.root/"src/app.void",f.root/"src/alias.void",ec);
++ if(!ec){f.bad(Code::import_path);vd::SourceOverrides dirty;dirty.emplace("/src/alias.void",vd::SourceFile("dirty",main_source));f.bad(Code::import_path,{},dirty);fs::remove(f.root/"src/alias.void");
++   Fixture outside;outside.write("source.void",main_source);fs::remove(f.root/"src/app.void");fs::create_hard_link(outside.root/"source.void",f.root/"src/app.void");check(vd::analyze_project(f.root/"src/app.void").succeeded(),"legacy single-identity hard-link policy");f.good();fs::remove(f.root/"src/app.void");f.write("src/app.void",main_source);
++   fs::create_hard_link(f.root/"void.project.toml",outside.root/"manifest-alias.toml");f.bad(Code::project_boundary);fs::remove(outside.root/"manifest-alias.toml");
++ }
++ else std::cout<<"UNQUALIFIED: native hard-link fixture "<<ec.message()<<'\n';
++ fs::create_symlink(f.root/"src/app.void",f.root/"src/link.void",ec);
++ if(!ec){auto r=f.analyze();check(!r.succeeded(),"source symlink rejected");fs::remove(f.root/"src/link.void");}else std::cout<<"UNQUALIFIED: native symlink privilege "<<ec.message()<<'\n';
++ fs::create_directory_symlink(f.root/"src/child",f.root/"src/linkdir",ec);
++ if(!ec){f.bad(Code::project_boundary);fs::remove(f.root/"src/linkdir");}
++#ifdef __linux__
++ f.write("src/APP.VOID",main_source);f.bad(Code::import_path);fs::remove(f.root/"src/APP.VOID");
++ f.write("src/closed.void","");fs::permissions(f.root/"src/closed.void",fs::perms::none);
++ if(geteuid()!=0){try{f.bad(Code::import_read);}catch(...){fs::permissions(f.root/"src/closed.void",fs::perms::owner_all);throw;}}
++ fs::permissions(f.root/"src/closed.void",fs::perms::owner_all);fs::remove(f.root/"src/closed.void");
++ Fixture manifest_alias;fs::rename(manifest_alias.root/"void.project.toml",manifest_alias.root/"manifest-held.toml");fs::create_symlink(manifest_alias.root/"manifest-held.toml",manifest_alias.root/"void.project.toml");manifest_alias.bad(Code::project_boundary);
++#endif
++ f.write("src/wrong/void.Project.toml","invalid");f.bad(Code::project_boundary);
++}
++void library_scope(){
++ Fixture f;f.write("void.project.toml",lib);auto empty=f.good();check(!empty->entry() && !empty->program() && empty->execution_sources().empty(),"empty library has no fabricated executable");
++ f.write("src/a.void","const hidden_root = 7\nfunc main() -> i32:\n    return hidden_root\n");f.good();
++ f.write("src/b.void","func value() -> i32:\n    return hidden_root\n");f.bad(Code::unknown_identifier);
++ f.write("src/b.void","use \"./a.void\" as a\nfunc value() -> i32:\n    return a.hidden_root\n");f.good();
++ f.write("src/b.void","print(\"must not run\")\n");f.bad(Code::entry);f.bad(Code::project_entry,"src/a.void");
++}
++void physical_root_policy(){
++ Fixture f;auto policy=app;const std::string before="roots=['src']";policy.replace(policy.find(before),before.size(),"roots=['future']");f.write("void.project.toml",policy);
++ vd::SourceOverrides virtual_root;virtual_root.emplace("/future/app.void",vd::SourceFile("virtual",main_source));f.bad(Code::project_boundary,{},virtual_root);
++#ifdef __linux__
++ Fixture local,remote;local.write("sibling/void.project.toml",app);local.write("sibling/src/app.void","func main() -> i32:\n    return 99\n");remote.write("sibling/void.project.toml",app);remote.write("sibling/src/app.void",main_source);fs::create_directories(remote.root/"target");fs::create_directory_symlink(remote.root/"target",local.root/"ancestor");
++ auto requested=local.root/"ancestor/../sibling";auto selected=vd::analyze_manifest_project(requested);check(selected.succeeded() && selected.project->root()==fs::canonical(requested),"root .. must retain physical meaning across permitted ancestor aliases");
++#endif
++}
++void non_entry_names(){
++ Fixture f;f.write("src/method.void","value struct box:\n    item: i32\nfunc (self box) main() -> i32:\n    return self.item\n");f.bad(Code::project_entry);
++ f.write("src/method.void","func outer():\n    var main = func() -> i32:\n        return 23\n");f.bad(Code::project_entry);
++}
++void import_depth_admission(){
++ Fixture f;
++ for(unsigned i=0;i<128;++i)f.write("src/module"+std::to_string(i)+".void","use \"./module"+std::to_string(i+1)+".void\"\n");
++ f.write("src/module128.void",std::string(1,char(0xff)));
++ auto legacy=vd::analyze_project(f.root/"src/module0.void");check(!legacy.succeeded(),"legacy import depth failure");bool guarded=false;
++ for(const auto& d:legacy.diagnostics){guarded|=d.code==Code::nesting;check(d.code!=Code::utf8,"over-depth source must not be opened/parsed");}check(guarded,"legacy depth guard before source read");
++ f.bad(Code::nesting,"src/module0.void");
++}
++void bounds_and_changes(){
++ Fixture f;f.write("src/app.void",main_source);vd::SourceOverrides overlays;
++ for(std::size_t i=0;i<4095;++i)overlays.emplace("/src/file"+std::to_string(i)+".void",vd::SourceFile("empty",""));
++ auto p=f.good({},overlays);check(p->discovery_sources().size()==4096,"4096-file inclusive bound");
++ overlays.emplace("/src/overflow.void",vd::SourceFile("overflow",""));f.bad(Code::limit,{},overlays);
++ overlays.clear();std::string id="/src";for(unsigned i=0;i<64;++i)id+="/d";overlays.emplace(id+"/too_deep.void",vd::SourceFile("deep",""));f.bad(Code::limit,{},overlays);
++ const std::string with_import="use \"/libs/tool/tool.void\"\n"+main_source;f.write("src/app.void",with_import);f.write("libs/tool/tool.void","func value():\n    pass\n");
++ overlays.clear();overlays.emplace("/src/huge.void",vd::SourceFile("huge",std::string(64*1024*1024-with_import.size(),' ')));auto exact_bytes=f.good({},overlays);check(exact_bytes->discovery_sources().size()==2 && exact_bytes->execution_sources().size()==2,"exact 64 MiB D bound permits additional E-only imports");exact_bytes.reset();
++ overlays.insert_or_assign("/src/huge.void",vd::SourceFile("huge",std::string(64*1024*1024,' ')));f.bad(Code::limit,{},overlays);
++ f.write("src/app.void",main_source);
++ f.write("src/slow.void",std::string(2*1024*1024,' '));f.write("src/changing.void","# "+std::string(32,'0')+"\n");std::atomic<bool> stop=false;std::atomic<unsigned> writes=0;
++ std::thread writer([&]{while(!stop){auto digits=std::to_string(++writes);std::fstream s(f.root/"src/changing.void",std::ios::in|std::ios::out|std::ios::binary);s<<"# "<<std::string(32-digits.size(),'0')<<digits<<'\n';}});
++ bool rejected=false;
++ for(unsigned i=0;i<12 && !rejected;++i){auto r=f.analyze();for(const auto& d:r.diagnostics)rejected|=d.code==Code::project_changed || d.code==Code::project_boundary;}
++ stop=true;writer.join();check(writes>0 && rejected,"concurrent membership mutation cannot be accepted as stable");
++ Fixture entries;entries.write("src/app.void",main_source);
++ for(unsigned i=0;i<16381;++i){std::ofstream s(entries.root/"src"/("entry"+std::to_string(i)+".txt"));if(!s)throw std::runtime_error("entry bound fixture creation");}
++ entries.good();entries.write("src/one-more.txt","");entries.bad(Code::limit);
++#ifdef __linux__
++ // A real read event changes a previously observed child boundary after capture
++ // starts, before acceptance. The hook is the OS notification, not a parser seam.
++ Fixture boundary;boundary.write("src/app.void",main_source);boundary.write("src/race-child/helper.void","");boundary.write("src/slow.void",std::string(2*1024*1024,' '));
++ int fd=inotify_init1(IN_CLOEXEC);check(fd>=0,"inotify admission");int watch=inotify_add_watch(fd,(boundary.root/"src/slow.void").c_str(),IN_ACCESS);check(watch>=0,"read notification");std::atomic<bool> changed=false;
++ std::thread child([&]{pollfd wait{fd,POLLIN,0};if(poll(&wait,1,5000)>0){char data[4096];if(read(fd,data,sizeof data)>0){std::ofstream stream(boundary.root/"src/race-child/void.project.toml");stream<<"invalid child boundary";stream.close();changed=bool(stream);}}});
++ auto changed_result=boundary.analyze();child.join();close(fd);bool retry=false;for(const auto& d:changed_result.diagnostics)retry|=d.code==Code::project_changed;check(changed && !changed_result.succeeded() && retry,"concurrent child boundary causes exact retry diagnostic");
++#endif
++}
++}
++int main(){try{selection_and_snapshots();boundaries_and_overlays();library_scope();physical_root_policy();non_entry_names();import_depth_admission();bounds_and_changes();std::cout<<"project_selection: "<<checks<<" checks passed\n";return 0;}catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}

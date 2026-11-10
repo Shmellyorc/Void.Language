@@ -1,0 +1,4 @@
+[0/2] Re-checking globbed directories...
+[1/3] C:\Windows\system32\cmd.exe /C "cd /D C:\Users\a\VS7I2\Release && C:\gcc\bin\cmake.exe -E make_directory C:/Users/a/VS7I2/Release && C:\gcc\bin\cmake.exe -E copy_if_different C:/Users/a/VS7I2/Release/void-native-resources.txt C:/Users/a/VS7I2/Release/void-native-resources.txt"
+[2/3] Generating voidup/voidup.exe
+Built native executable: C:/Users/a/VS7I2/Release/voidup/voidup.exe

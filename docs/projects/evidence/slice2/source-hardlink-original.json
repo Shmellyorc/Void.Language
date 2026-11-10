@@ -1,0 +1,28 @@
+{
+  "scope": "Unreviewed Slice 2 scratch admission was stricter than the existing source VFS policy; final correction retains single-identity source links and rejects collisions across D/E; manifest links remain forbidden",
+  "binary_sha256": "97111ceb905e02df82a99660db7f5844e2dd3abb8a255e2c1d973b2751b0fda4",
+  "scratch_source_sha256": "5cff515e619ce08a863755ba5e92e56a460cf5f4661ee2d171fc8d00914e0224",
+  "commands": [
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "check",
+        "/tmp/VOID hardlink policy regression wlpql32i/project/src/app.void"
+      ],
+      "status": 0,
+      "stdout": "Source checked successfully\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "check",
+        "--project",
+        "/tmp/VOID hardlink policy regression wlpql32i/project"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID hardlink policy regression wlpql32i/project/void.project.toml:1:1: error: Project file must be regular, exact-case and free of symlink/reparse/hard-link aliases: '/tmp/VOID hardlink policy regression wlpql32i/project/src/app.void'.\n    code: VOID5009\n\n 1 | schema=1\n   | ^\n    Hint: Correct the project path or source policy and retry.\n\n"
+    }
+  ]
+}

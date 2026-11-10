@@ -1,0 +1,26 @@
+toolchain-clang C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\clang-cl.exe --version
+toolchain-lld C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\lld-link.exe --version
+toolchain-readobj C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\llvm-readobj.exe --version
+compile-approved C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\clang-cl.exe /nologo /TC /c /GS- /Zl /DFIXTURE_VALUE=7 dependency.c /Foapproved.obj
+link-approved C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\lld-link.exe /dll /nodefaultlib /out:approved/void_w2_gate.dll approved.obj /noentry
+compile-collision C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\clang-cl.exe /nologo /TC /c /GS- /Zl /DFIXTURE_VALUE=99 dependency.c /Focollision.obj
+link-collision C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\lld-link.exe /dll /nodefaultlib /out:collision/void_w2_gate.dll collision.obj /noentry
+compile-sentinel121 C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\clang-cl.exe /nologo /TC /c /GS- /Zl /DW2_SENTINEL=121 sentinel.c /Fosentinel121.obj
+link-sentinel121 C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\lld-link.exe /dll /nodefaultlib /out:sentinel121/void_w2_gate.dll sentinel121.obj /entry:sentinel_entry kernel32.lib
+compile-sentinel122 C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\clang-cl.exe /nologo /TC /c /GS- /Zl /DW2_SENTINEL=122 sentinel.c /Fosentinel122.obj
+link-sentinel122 C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\lld-link.exe /dll /nodefaultlib /out:sentinel122/void_w2_gate.dll sentinel122.obj /entry:sentinel_entry kernel32.lib
+build-probe C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\clang-cl.exe /nologo /std:c++20 /EHsc /MT image_probe.cpp bcrypt.lib advapi32.lib /Foprobe.obj /FeC:\Users\a\VoidS7-G4W2\probe.exe /link /manifest:embed
+Traceback (most recent call last):
+  File "C:\Users\a\VoidS7-G4W2-io\native-run.py", line 186, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "C:\Users\a\VoidS7-G4W2-io\native-run.py", line 103, in main
+    require(f"build-{label}", [clang, "/nologo", "/std:c++20", "/EHsc", "/MT",
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               "image_probe.cpp", "bcrypt.lib", "advapi32.lib", f"/Fo{label}.obj",
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                               f"/Fe{program}", "/link", *manifest])
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidS7-G4W2-io\native-run.py", line 46, in require
+    raise RuntimeError(f"{label} did not meet its control")
+RuntimeError: build-probe did not meet its control

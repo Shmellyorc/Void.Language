@@ -1,0 +1,28 @@
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_native_fixture
+[  0%] Built target void_zone_objects
+[ 83%] Built target libcurl_static
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Generating void-native-resources.txt, native-resources-install-RelWithDebInfo.txt
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/voidc_objects.dir/src/main.cpp.o
+[100%] Building CXX object CMakeFiles/voidc_objects.dir/src/native_build.cpp.o
+[100%] Built target void_native_inventory
+[100%] Built target voidc_objects
+[100%] Generating cache-identity-RelWithDebInfo.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-RelWithDebInfo.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+ld.lld: error: undefined symbol: vd::analyze_manifest_project(std::filesystem::__cxx11::path const&, std::optional<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>> const&, std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::optional<vd::SourceFile>, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const, std::optional<vd::SourceFile>>>> const&, std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::optional<vd::SourceFile>, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const, std::optional<vd::SourceFile>>>> const&, bool)
+>>> referenced by main.cpp:300 (/home/shmellyorc/Documents/Void.Language/src/main.cpp:300)
+>>>               CMakeFiles/voidc_objects.dir/src/main.cpp.o:(run_cli(int, char**))
+>>> did you mean: vd::analyze_manifest_project(std::filesystem::__cxx11::path const&, std::optional<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>> const&, std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::optional<vd::SourceFile>, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const, std::optional<vd::SourceFile>>>> const&, std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::optional<vd::SourceFile>, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const, std::optional<vd::SourceFile>>>> const&)
+>>> defined in: libvoid_core.a(compiler.cpp.o)
+clang++: error: linker command failed with exit code 1 (use -v to see invocation)
+gmake[3]: *** [CMakeFiles/voidc.dir/build.make:176: voidc] Error 1
+gmake[2]: *** [CMakeFiles/Makefile2:2480: CMakeFiles/voidc.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:2487: CMakeFiles/voidc.dir/rule] Error 2
+gmake: *** [Makefile:401: voidc] Error 2

@@ -1,0 +1,219 @@
+diff --git a/src/frontend/project_selection.inc b/src/frontend/project_selection.inc
+index d8be9fe..80fc5d1 100644
+--- a/src/frontend/project_selection.inc
++++ b/src/frontend/project_selection.inc
+@@ -364,12 +364,23 @@ ProjectAnalysisResult analyze_manifest_project(const std::filesystem::path& root
+     return analyze_manifest_project_impl(root,entry,sources,manifests,nullptr);
+ }
+ 
+-std::vector<Diagnostic> check_project_documents(const std::filesystem::path& root,const SourceOverrides& sources,const ManifestOverrides& manifests,const std::vector<std::string>& documents) {
++static std::vector<Diagnostic> check_project_documents_impl(const std::filesystem::path& root,const SourceOverrides& sources,const ManifestOverrides& manifests,const std::vector<std::string>& documents,bool read_physical) {
+     std::vector<Diagnostic> records;
+     try {
+         ProjectCapture capture(root,sources,manifests);
+         for(const auto& id:documents) {
+-            try{require_module_identity(id);capture.graph.resolve(capture.from,{TokenKind::path,id,0});}
++            try {
++                require_module_identity(id);
++                auto path=capture.graph.resolve(capture.from,{TokenKind::path,id,0}).second;
++                // Preflight supplies a virtual name for an unsaved document.
++                // An existing host file must still be readable.
++                if(read_physical) {
++                    std::error_code ec;
++                    if(std::filesystem::exists(path,ec) && !std::ifstream(path,std::ios::binary))
++                        throw SourceReadError(path_utf8(path),"Cannot read admitted project source.");
++                    if(ec)throw SourceReadError(path_utf8(path),"Cannot inspect admitted project source.");
++                }
++            }
+             catch(const CompilationError& failure) {
+                 for(auto diagnostic:failure.diagnostics()) {
+                     auto overlay=sources.find(id);auto source=overlay!=sources.end() && overlay->second?*overlay->second:SourceFile(path_utf8(capture.root/utf8_path(id).relative_path()),"");
+@@ -382,6 +393,9 @@ std::vector<Diagnostic> check_project_documents(const std::filesystem::path& roo
+     catch(const std::filesystem::filesystem_error& failure){Diagnostic d(Code::project_boundary);d.primary={std::make_shared<const SourceFile>(path_utf8(root/"void.project.toml"),""),"/void.project.toml",0,0};d.description=failure.what();records.push_back(std::move(d));}
+     return records;
+ }
++std::vector<Diagnostic> check_project_documents(const std::filesystem::path& root,const SourceOverrides& sources,const ManifestOverrides& manifests,const std::vector<std::string>& documents) {
++    return check_project_documents_impl(root,sources,manifests,documents,false);
++}
+ std::vector<std::filesystem::path> project_ancestor_directories(const std::filesystem::path&,const std::filesystem::path&);
+ ProjectPreflight discover_project_context(const std::filesystem::path& workspace,const std::filesystem::path& active,const std::filesystem::path& selected_root,const std::filesystem::path& selected_entry) {
+     ProjectPreflight result;auto root=selected_root;
+@@ -396,18 +410,41 @@ ProjectPreflight discover_project_context(const std::filesystem::path& workspace
+     result.manifest_mode=true;result.analysis=analyze_manifest_project(root,entry);
+     result.root=result.analysis.state->root;
+     if(result.analysis.manifest && !active.empty()) {
+-        auto relative=std::filesystem::absolute(active).lexically_relative(result.root);auto id="/"+path_utf8(relative);
++        SourceFile active_source(path_utf8(active),"");
++        std::string identity;
++        std::vector<Diagnostic> failures;
+         try {
+-            if(id.ends_with("/void.project.toml"))require_manifest_identity(id);
++            auto relative=std::filesystem::absolute(active).lexically_relative(result.root);
++            if(relative.empty() || *relative.begin()=="..")
++                project_failure(active_source,Code::project_boundary,"Active document is outside the pinned project boundary.");
++            auto id="/"+path_utf8(relative);
++            if(id.ends_with("/void.project.toml")) {
++                require_manifest_identity(id);
++                identity=id;
++                if(id!="/void.project.toml")
++                    project_failure(active_source,Code::project_boundary,"Active manifest is outside the pinned project boundary: '"+id+"'.");
++            }
+             else {
+-                require_module_identity(id);SourceOverrides overlay{{id,SourceFile(path_utf8(active),"")}};
++                require_module_identity(id);
++                SourceOverrides overlay{{id,active_source}};
+                 ManifestOverrides manifest{{"/void.project.toml",result.analysis.manifest->source()}};
+-                auto failures=check_project_documents(root,overlay,manifest,{id});
+-                if(!failures.empty())throw CompilationError(std::move(failures));
++                failures=check_project_documents_impl(root,overlay,manifest,{id},true);
+             }
++        }catch(const CompilationError& failure) {
++            failures=failure.diagnostics();
++            for(auto& diagnostic:failures)diagnostic.primary={std::make_shared<const SourceFile>(active_source),identity,0,0};
++        }catch(const std::filesystem::filesystem_error& failure) {
++            Diagnostic diagnostic(Code::project_boundary);
++            diagnostic.primary={std::make_shared<const SourceFile>(active_source),{},0,0};
++            diagnostic.description=failure.what();failures.push_back(std::move(diagnostic));
+         }catch(const std::invalid_argument& failure) {
+-            Diagnostic diagnostic(Code::project_boundary);diagnostic.primary={std::make_shared<const SourceFile>(path_utf8(result.root/"void.project.toml"),""),"/void.project.toml",0,0};
+-            diagnostic.description="Active document is outside the pinned project boundary: "+std::string(failure.what());result.analysis.diagnostics.push_back(std::move(diagnostic));result.analysis.project.reset();
++            Diagnostic diagnostic(Code::project_path);
++            diagnostic.primary={std::make_shared<const SourceFile>(active_source),{},0,0};
++            diagnostic.description=failure.what();failures.push_back(std::move(diagnostic));
++        }
++        if(!failures.empty()) {
++            for(auto& diagnostic:failures)result.analysis.diagnostics.push_back(std::move(diagnostic));
++            result.analysis.project.reset();
+             auto state=std::make_shared<ProjectState>(*result.analysis.state);state->validated=false;result.analysis.state=std::move(state);
+         }
+     }
+diff --git a/tests/project/protocol.py b/tests/project/protocol.py
+index 42103dd..08f50d8 100644
+--- a/tests/project/protocol.py
++++ b/tests/project/protocol.py
+@@ -1,6 +1,6 @@
+ """S3 real-pipe project preflight, overlays, diagnostics, navigation and file events."""
+ from pathlib import Path
+-import sys,json,tempfile,subprocess
++import os,sys,json,tempfile,subprocess
+ sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'tools'))
+ from lsp_client import Client,frame
+ server=Path(sys.argv[1]).resolve();evidence=Path(sys.argv[2]) if len(sys.argv)>2 else None
+@@ -11,8 +11,10 @@ def check(v,message):
+  global checks
+  checks+=1
+  assert v,message
++def invoke_preflight(*operands):
++ args=list(map(str,[server,'--discover-project',*operands]));p=subprocess.run(args,capture_output=True,timeout=30);rows.append({'argv':args,'status':p.returncode,'stdout':p.stdout.decode(),'stderr':p.stderr.decode(errors='replace')});return p
+ def preflight(workspace,active='',root='',entry=''):
+- args=[server,'--discover-project',workspace,active,root,entry];p=subprocess.run(list(map(str,args)),capture_output=True,timeout=30);rows.append({'argv':list(map(str,args)),'status':p.returncode,'stdout':p.stdout.decode(),'stderr':p.stderr.decode()});check(p.returncode==0,p.stderr);check(len(p.stdout)<=65536,'summary bounded');return json.loads(p.stdout)
++ p=invoke_preflight(workspace,active,root,entry);check(p.returncode==0 and not p.stderr,p.stderr);check(len(p.stdout)<=65536,'summary bounded');return json.loads(p.stdout)
+ def query(c,method,params=None):
+  response,notes=c.request(method,params or {});rows.append({'method':method,'params':params,'response':response,'diagnostics':notes});check('error' not in response,response);return response['result'],notes
+ def state(c):return query(c,'void/projectState')[0]
+@@ -24,6 +26,62 @@ def close(c,path):c.notify('textDocument/didClose',{'textDocument':{'uri':path.a
+ def codes(notes):return [d['code'] for n in notes for d in n['diagnostics']]
+ def definition(c,path,text,word):
+  at=text.index(word);prefix=text[:at];return query(c,'textDocument/definition',{'textDocument':{'uri':path.as_uri()},'position':{'line':prefix.count('\n'),'character':len(prefix.rsplit('\n',1)[-1].encode('utf-16-le'))//2}})[0]
++def preflight_boundaries(workspace):
++ root=workspace/'parent';child=root/'child';child.mkdir(parents=True)
++ policy=manifest.replace("roots=['src']","roots=['.']")
++ root_manifest=root/'void.project.toml';root_manifest.write_bytes(policy.encode())
++ child_manifest=child/'void.project.toml';child_manifest.write_bytes(policy.encode())
++ entry=root/'main.void';child_source=child/'launcher.void'
++ body=b'func main() -> i32:\n    return 2\n'
++ entry.write_bytes(body);child_source.write_bytes(body)
++ outside=workspace/'outside.void';outside.write_bytes(body)
++ def pinned(active):return preflight(workspace,active,root,'main.void')
++ def error(info,selected,code,message):
++  check(info['schema']==2 and info['mode']=='project' and info['root']==selected.as_posix() and info['manifest']==(selected/'void.project.toml').as_posix(),'selected project stays pinned')
++  check(info['status']=='error' and info['entry'] is None,'domain error cannot publish an entry')
++  check(info['diagnosticCount']==1 and len(info['diagnostics'])==1,info)
++  diagnostic=info['diagnostics'][0]
++  check(diagnostic['code']==code and message in diagnostic['message'] and '\n' not in diagnostic['message'],diagnostic)
++ error(pinned(child_source),root,'VOID5009','crosses nested project boundary')
++ error(pinned(child_manifest),root,'VOID5009','Active manifest is outside')
++ error(pinned(outside),root,'VOID5009','Active document is outside')
++ error(pinned(root/'notes.txt'),root,'VOID3001','must name a .void source file')
++ error(pinned(root/'@stdlib'/'main.void'),root,'VOID5006','exact canonical root-relative')
++ error(pinned(root/'Main.void'),root,'VOID3001','case collision')
++ for active in (root_manifest,root/'virtual'/'draft.void'):
++  info=pinned(active);check(info['status']=='ready' and info['entry']==entry.as_posix(),info)
++ nearest=preflight(workspace,child_source)
++ check(nearest['status']=='ready' and nearest['root']==child.as_posix() and nearest['entry']==child_source.as_posix(),nearest)
++ child_manifest.write_bytes(b'[=roject]\n')
++ error(pinned(child_source),root,'VOID5009','crosses nested project boundary')
++ error(pinned(child_manifest),root,'VOID5009','Active manifest is outside')
++ error(preflight(workspace,child_source),child,'VOID5001','Invalid project TOML')
++ child_manifest.unlink();wrong=child/'void.Project.toml';wrong.write_bytes(policy.encode())
++ error(pinned(child_source),root,'VOID5009','Manifest must use exact case')
++ error(pinned(wrong),root,'VOID3001','must name a .void source file')
++ error(preflight(workspace,child_source),child,'VOID5009','Manifest must use exact case')
++ for args,message in (((workspace,),b'Usage:'),((root,outside,'',''),b'outside selected workspace')):
++  process=invoke_preflight(*args)
++  check(process.returncode==2 and not process.stdout and message in process.stderr,'invocation and unpinned path discovery are process errors')
++ if os.name!='nt':
++  alias=root/'alias.void';alias.symlink_to(outside)
++  error(pinned(alias),root,'VOID3001','Symbolic links are not supported')
++  unreadable=root/'unreadable.void';unreadable.write_bytes(body);unreadable.chmod(0)
++  try:
++   try:unreadable.read_bytes()
++   except PermissionError:error(pinned(unreadable),root,'VOID3002','Cannot read admitted project source')
++   else:rows.append({'skip':'chmod did not deny this process read access'})
++  finally:unreadable.chmod(0o600)
++ else:
++  import _winapi,stat
++  alias=root/'junction';_winapi.CreateJunction(str(workspace),str(alias))
++  try:error(pinned(alias/'outside.void'),root,'VOID3001','filesystem alias')
++  finally:alias.rmdir()
++  unreadable=root/'unreadable.void';unreadable.write_bytes(body)
++  # Deny reads to another process without changing the machine or fixture ACLs.
++  handle=_winapi.CreateFile(str(unreadable),_winapi.GENERIC_READ,0,0,_winapi.OPEN_EXISTING,stat.FILE_ATTRIBUTE_NORMAL,0)
++  try:error(pinned(unreadable),root,'VOID3002','Cannot read admitted project source')
++  finally:_winapi.CloseHandle(handle)
+ try:
+  with tempfile.TemporaryDirectory(prefix='VOID S3 protocol é😀 ') as temporary:
+   root=Path(temporary);(root/'src').mkdir();toml=root/'void.project.toml';toml.write_bytes(manifest.encode());(root/'src/helper.void').write_bytes(b'public func value() -> i32:\n    return 23\n');game=root/'src/game.void';other=root/'src/other.void'
+@@ -62,6 +120,7 @@ try:
+   library=manifest.replace("kind='application'","kind='library'").replace("[application]\nid='org.test.app'","[package]\nid='org.test.lib'\nname='library'");toml.write_bytes(library.encode())
+   with Client(server,root,project=True) as c:
+    c.initialize();info=state(c);check(info['kind']=='library' and info['entry'] is None and info['status']=='ready','library session no fabricated entry');check(definition(c,game,main,'value()') is not None,'library semantic navigation');c.shutdown()
++  preflight_boundaries(root/'preflight')
+  print(f'project_protocol: {checks} checks passed')
+ finally:
+  if evidence:evidence.write_text(json.dumps({'checks':checks,'commands_and_requests':rows},indent=2)+'\n')
+diff --git a/tests/project/sessions.cpp b/tests/project/sessions.cpp
+index 325e621..f6719c6 100644
+--- a/tests/project/sessions.cpp
++++ b/tests/project/sessions.cpp
+@@ -45,6 +45,24 @@ void libraries(){
+  s.open("/src/a.void",1,"public func value() -> i32:\n    return 7\n");s.open("/src/b.void",1,"use \"./a.void\" as a\nfunc main() -> i32:\n    return a.value()\n");auto indexed=analyze(s,true);check(indexed->index()->definition_at("/src/b.void",std::string("use \"./a.void\" as a\nfunc main() -> i32:\n    return a.").size())->module=="/src/a.void","library import navigation uses declarationless root");
+  s.replace("/src/b.void",2,"func read() -> i32:\n    return hidden\n");analyze(s,false);
+ }
++void preflight_ownership(){
++ vd::ProjectPreflight rejected;
++ fs::path active;
++ {
++  Fixture f;f.write("src/main.void",source);
++  f.write("src/child/void.project.toml","[=roject]");
++  f.write("src/child/launcher.void",source);
++  active=f.root/"src/child/launcher.void";
++  rejected=vd::discover_project_context(f.root,active,f.root,"src/main.void");
++  check(rejected.manifest_mode && rejected.root==f.root && rejected.analysis.manifest,"preflight retains pinned manifest metadata");
++  check(!rejected.entry && !rejected.analysis.project && !rejected.analysis.state->validated,"rejected active document grants no validated selection");
++ }
++ const auto& diagnostic=rejected.analysis.diagnostics.at(0);
++ check(rejected.analysis.diagnostics.size()==1 && diagnostic.code==vd::DiagnosticCode::project_boundary,"structured nested-project diagnostic retained");
++ const auto& span=diagnostic.primary;
++ check(span.source && span.source->path()==vd::path_utf8(active) && span.module_identity=="/src/child/launcher.void","diagnostic owns the active source identity after project removal");
++ check(span.begin==0 && span.end==0 && span.source->text().empty(),"preflight owns an empty span without reading a denied child source");
++}
+ void reload(){
+  for(bool optimize:{false,true}) {
+   Fixture f;const std::string body="var state = 0\nfunc main() -> i32:\n    state += 1\n    return state + ";f.write("src/game.void",body+"10\n");vd::ToolingSession s(vd::ProjectSession{f.root});auto before=analyze(s,true);
+@@ -70,4 +88,4 @@ void profiles(){
+  rejected=false;try{(void)vd::project::resolve_profile(*override.manifest,{},false,true);}catch(const std::invalid_argument&){rejected=true;}check(rejected,"custom O2 debug conflicts with cache");check(!vd::project::resolve_profile(*override.manifest,{},true,true).optimize,"explicit no-opt resolves effective debug optimization");
+ }
+ }
+-int main(){try{sessions();libraries();reload();profiles();std::cout<<"project_sessions: "<<checks<<" checks passed\n";return 0;}catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}}
++int main(){try{sessions();libraries();preflight_ownership();reload();profiles();std::cout<<"project_sessions: "<<checks<<" checks passed\n";return 0;}catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}}

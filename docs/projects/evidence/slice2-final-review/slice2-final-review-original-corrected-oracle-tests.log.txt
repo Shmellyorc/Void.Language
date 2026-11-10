@@ -1,0 +1,7 @@
+recapture expected VOID5011; got:
+/tmp/VOID project 雪 111009214439991/void.project.toml:1:1: error: Cannot inspect imported path '/src/app.void'.
+    code: VOID3002
+
+ 1 | schema=1
+   | ^^^^^^^^
+

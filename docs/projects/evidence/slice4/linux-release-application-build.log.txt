@@ -1,0 +1,48 @@
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[  6%] Built target void_native_fixture
+[ 13%] Built target void_core
+[ 80%] Built target libcurl_static
+[ 93%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_project_application.dir/tests/project/application.cpp.o
+/home/shmellyorc/Documents/Void.Language/tests/project/application.cpp:98:55: error: no member named 'Operation' in namespace 'vd::os'; did you mean 'vd::console::Operation'?
+   98 |     vd_os_call(&reply,&geometry,static_cast<unsigned>(vd::os::Operation::application_id),nullptr,&failure);
+      |                                                       ^~~~~~~~~~~~~~~~~
+      |                                                       vd::console::Operation
+/home/shmellyorc/Documents/Void.Language/include/void/console.hpp:167:7: note: 'vd::console::Operation' declared here
+  167 | class Operation {
+      |       ^
+/home/shmellyorc/Documents/Void.Language/tests/project/application.cpp:98:63: error: no member named 'application_id' in 'vd::console::Operation'; did you mean 'vd::ApplicationMetadata::application_id'?
+   98 |     vd_os_call(&reply,&geometry,static_cast<unsigned>(vd::os::Operation::application_id),nullptr,&failure);
+      |                                                               ^~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                               vd::ApplicationMetadata::application_id
+/home/shmellyorc/Documents/Void.Language/include/void/application_metadata.hpp:22:22: note: 'vd::ApplicationMetadata::application_id' declared here
+   22 |     std::string_view application_id() const;
+      |                      ^
+/home/shmellyorc/Documents/Void.Language/tests/project/application.cpp:98:74: error: call to non-static member function without an object argument
+   98 |     vd_os_call(&reply,&geometry,static_cast<unsigned>(vd::os::Operation::application_id),nullptr,&failure);
+      |                                                                          ^~~~~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/tests/project/application.cpp:102:55: error: no member named 'Operation' in namespace 'vd::os'; did you mean 'vd::console::Operation'?
+  102 |     vd_os_call(&reply,&geometry,static_cast<unsigned>(vd::os::Operation::application_id),nullptr,&failure);
+      |                                                       ^~~~~~~~~~~~~~~~~
+      |                                                       vd::console::Operation
+/home/shmellyorc/Documents/Void.Language/include/void/console.hpp:167:7: note: 'vd::console::Operation' declared here
+  167 | class Operation {
+      |       ^
+/home/shmellyorc/Documents/Void.Language/tests/project/application.cpp:102:63: error: no member named 'application_id' in 'vd::console::Operation'; did you mean 'vd::ApplicationMetadata::application_id'?
+  102 |     vd_os_call(&reply,&geometry,static_cast<unsigned>(vd::os::Operation::application_id),nullptr,&failure);
+      |                                                               ^~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                               vd::ApplicationMetadata::application_id
+/home/shmellyorc/Documents/Void.Language/include/void/application_metadata.hpp:22:22: note: 'vd::ApplicationMetadata::application_id' declared here
+   22 |     std::string_view application_id() const;
+      |                      ^
+/home/shmellyorc/Documents/Void.Language/tests/project/application.cpp:102:74: error: call to non-static member function without an object argument
+  102 |     vd_os_call(&reply,&geometry,static_cast<unsigned>(vd::os::Operation::application_id),nullptr,&failure);
+      |                                                                          ^~~~~~~~~~~~~~
+6 errors generated.
+gmake[3]: *** [CMakeFiles/void_project_application.dir/build.make:79: CMakeFiles/void_project_application.dir/tests/project/application.cpp.o] Error 1
+gmake[2]: *** [CMakeFiles/Makefile2:3537: CMakeFiles/void_project_application.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:3544: CMakeFiles/void_project_application.dir/rule] Error 2
+gmake: *** [Makefile:856: void_project_application] Error 2

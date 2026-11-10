@@ -1,0 +1,47 @@
+-- The C compiler identification is Clang 23.1.4 with MSVC-like command-line
+-- The CXX compiler identification is Clang 23.1.4 with MSVC-like command-line
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin/clang-cl.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin/clang-cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found ZLIB: C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4-deps/lib/zlibstatic.lib (found version "1.3.2")
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - not found
+-- Found Threads: TRUE
+-- Could NOT find zstd (missing: zstd_LIBRARY zstd_INCLUDE_DIR) 
+-- Found LibXml2: C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4-deps/lib/libxml2s.lib (found version "2.15.4")
+-- Found DIASDK: C:/BuildTools/VS2022/DIA SDK/include
+-- VOID LLVM: 23.1.4 at C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\lib\cmake\llvm
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- Found Python3: C:\Users\a\AppData\Local\Programs\Python\Python314\python.exe (found suitable version "3.14.8", minimum required is "3.12") found components: Interpreter
+CMake Error at cmake/CurlProvider.cmake:13 (message):
+  Vendored curl verification failed: Traceback (most recent call last):
+
+    File "C:\Users\a\VoidS7-G4Conventional\source\tools\verify_curl_source.py", line 32, in <module>
+      if hashlib.sha256(patch.read_bytes()).hexdigest() != review["sha256"]:
+                        ~~~~~~~~~~~~~~~~^^
+    File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 777, in read_bytes
+      with self.open(mode='rb', buffering=0) as f:
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+    File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 771, in open
+      return io.open(self, mode, buffering, encoding, errors, newline)
+             ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  FileNotFoundError: [Errno 2] No such file or directory:
+  'C:\\Users\\a\\VoidS7-G4Conventional\\source\\docs\\net\\http\\evidence\\curl-8.23.0-cookie-oom-candidate.patch'
+
+Call Stack (most recent call first):
+  CMakeLists.txt:114 (void_add_curl_provider)
+
+
+-- Configuring incomplete, errors occurred!

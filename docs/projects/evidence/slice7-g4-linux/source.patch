@@ -1,0 +1,2093 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -96,7 +96,7 @@
+ target_compile_definitions(void_zone_objects PRIVATE
+   USE_OS_TZDB=0 HAS_REMOTE_API=0 AUTO_DOWNLOAD=0 VOID_EMBEDDED_TZDB=1)
+ target_link_libraries(void_zone_objects PRIVATE void_options)
+-add_library(void_application_objects OBJECT src/application_metadata.cpp src/project_identity.cpp)
++add_library(void_application_objects OBJECT src/application_metadata.cpp src/project_identity.cpp src/dynamic_closure.cpp)
+ target_link_libraries(void_application_objects PRIVATE void_options)
+ add_library(void_core src/frontend/project.cpp src/frontend/project_creation.cpp src/frontend/source.cpp src/frontend/compiler.cpp src/frontend/tooling.cpp src/numeric.cpp src/ir/module.cpp src/ir/native_storage.cpp src/ir/native_binding.cpp)
+ target_sources(void_core PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects> $<TARGET_OBJECTS:void_application_objects>)
+@@ -107,7 +107,7 @@
+ add_library(void_native_fixture STATIC src/native/fixture.c src/native/sink.c)
+ target_link_libraries(void_native_fixture PRIVATE void_options)
+ add_library(void_runtime STATIC src/runtime/application.cpp src/runtime/os.cpp src/runtime/os_abi.cpp src/runtime/random.cpp src/runtime/filesystem_abi.cpp src/runtime/filesystem.cpp src/runtime/native_resource.cpp src/runtime/native_binding.cpp src/runtime/temporal_abi.cpp src/runtime/conversion.cpp src/runtime/text_case.cpp src/runtime/buffer.cpp src/runtime/list.cpp src/runtime/array.cpp src/runtime/dictionary.cpp src/runtime/fixed_abi.cpp src/runtime/gc_schema.cpp src/runtime/heap.cpp src/runtime/coordination.cpp src/runtime/console.cpp src/runtime/console_abi.cpp src/runtime/callback.cpp src/runtime/abi.cpp src/runtime/reload.cpp src/runtime/native.cpp src/runtime/async.cpp)
+-target_sources(void_runtime PRIVATE src/runtime/c_span.cpp src/runtime/c_resource.cpp)
++target_sources(void_runtime PRIVATE src/runtime/c_span.cpp src/runtime/c_resource.cpp src/runtime/c_dynamic.cpp)
+ target_sources(void_runtime PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects> $<TARGET_OBJECTS:void_application_objects>)
+ target_link_libraries(void_runtime PUBLIC void_options Threads::Threads void_native_fixture ${CMAKE_DL_LIBS})
+ include(cmake/CurlProvider.cmake)
+@@ -1307,6 +1307,7 @@
+   include(tests/ffi/primitives.cmake)
+   include(tests/ffi/records.cmake)
+   include(tests/ffi/resources.cmake)
++  include(tests/ffi/dynamic.cmake)
+   add_executable(void_native_tests tests/native/tests.cpp tests/native/integrated.cpp tests/native/probe.cpp $<TARGET_OBJECTS:void_native_test_fixture> tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
+   target_link_libraries(void_native_tests PRIVATE void_llvm void_cache_identity)
+   add_test(NAME native_source COMMAND void_native_tests "${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/native fixtures")
+diff --git a/include/void/c_dynamic.hpp b/include/void/c_dynamic.hpp
+new file mode 100644
+--- /dev/null
++++ b/include/void/c_dynamic.hpp
+@@ -0,0 +1,43 @@
++#pragma once
++
++#include <filesystem>
++#include <memory>
++#include <string>
++#include <string_view>
++#include <vector>
++
++namespace vd {
++
++// Pure offline data. Only the embedding host or a linked AOT plan may
++// authorize its use. Parsing neither opens artifacts nor runs a probe.
++class DynamicClosure final {
++public:
++    struct Image {
++        std::string name, sha256;
++        std::vector<std::string> needed;
++    };
++    struct Export {
++        std::string image, symbol;
++    };
++    using Owner = std::shared_ptr<const DynamicClosure>;
++    static Owner parse(std::string_view);
++    const std::string& bytes() const { return bytes_; }
++    const std::string& provider() const { return provider_; }
++    const std::string& thunk_identity() const { return thunk_; }
++    const std::string& descriptor() const { return descriptor_; }
++    const std::vector<Image>& images() const { return images_; }
++    const std::vector<Export>& exports() const { return exports_; }
++    static constexpr std::string_view transport = "vd_c_primitive_dispatch_v3";
++private:
++    DynamicClosure() = default;
++    std::string bytes_, provider_, thunk_, descriptor_;
++    std::vector<Image> images_;
++    std::vector<Export> exports_;
++};
++
++class DynamicBinding;
++std::shared_ptr<const DynamicBinding> load_dynamic(DynamicClosure::Owner, const std::filesystem::path&);
++bool matches_dynamic(const DynamicBinding&, const DynamicClosure&, const std::filesystem::path&);
++std::filesystem::path installed_dynamic_root();
++
++} // namespace vd
+diff --git a/include/void/c_primitive.hpp b/include/void/c_primitive.hpp
+--- a/include/void/c_primitive.hpp
++++ b/include/void/c_primitive.hpp
+@@ -1,4 +1,5 @@
+ #pragma once
++#include "void/c_dynamic.hpp"
+ #include "void/ir.hpp"
+ #include <cstdint>
+ #include <memory>
+@@ -17,6 +18,9 @@
+ inline constexpr std::string_view c_record_transport = "vd_c_primitive_dispatch_v2";
+ inline constexpr std::string_view c_resource_transport = "vd_c_primitive_dispatch_v3";
+ inline constexpr std::string_view c_resource_bridge = "vd_c_resource_dispatch_v3";
++inline constexpr std::string_view c_dynamic_resolve = "vd_c_dynamic_resolve_v1";
++inline constexpr std::string_view c_dynamic_call = "vd_c_dynamic_call_v1";
++extern "C" CPrimitiveThunk* vd_c_dynamic_resolve_v1(const char*, std::uint32_t) noexcept;
+ enum class CResourceRole : std::uint32_t { none, acquire, borrow, mutate, close };
+ 
+ extern "C" std::uint32_t vd_c_resource_dispatch_v3(CPrimitiveThunk*, const char*, std::uint32_t,
+@@ -31,6 +35,8 @@
+     std::uint32_t argument, direction; // 1 input, 2 output, 3 input/output
+     std::uint32_t offset_argument, length_argument;
+ };
++extern "C" std::uint32_t vd_c_dynamic_call_v1(const char*, std::uint32_t, std::uint32_t,
++    const std::uint64_t*, std::uint32_t, std::uint64_t*, const CSpanRequest*, std::uint32_t) noexcept;
+ extern "C" std::uint32_t vd_c_span_dispatch_v2(CPrimitiveThunk*, const char*, std::uint32_t,
+     std::uint32_t, const std::uint64_t*, std::uint32_t, std::uint64_t*,
+     const CSpanRequest*, std::uint32_t) noexcept;
+@@ -38,7 +44,8 @@
+ inline bool reserved_c_transport(std::string_view symbol) {
+     return symbol.starts_with(c_primitive_transport) || symbol.starts_with(c_record_transport) ||
+         symbol.starts_with(c_span_bridge) || symbol.starts_with(c_resource_transport) ||
+-        symbol.starts_with(c_resource_bridge);
++        symbol.starts_with(c_resource_bridge) || symbol.starts_with(c_dynamic_resolve) ||
++        symbol.starts_with(c_dynamic_call) || symbol.starts_with("vd_runtime_entry_dynamic_v1");
+ }
+ inline constexpr std::uint32_t c_primitive_probe = UINT32_MAX;
+ inline constexpr unsigned c_primitive_max_arguments = 16;
+@@ -82,12 +89,16 @@
+     // Parse independently before asking the trusted C transport to attest its
+     // exact descriptor and independently compiled fixture.
+     static Owner admit(std::string_view descriptor, CPrimitiveThunk* linked_thunk);
++    static Owner admit_dynamic(std::string_view closure, std::filesystem::path host_root);
+     const std::string& descriptor() const { return descriptor_; }
+     const std::string& provider() const { return provider_; }
+     const std::string& target() const { return target_; }
+     const std::string& module() const { return module_; }
+     const std::vector<Binding>& bindings() const { return bindings_; }
+     CPrimitiveThunk* thunk() const { return thunk_; }
++    const DynamicClosure::Owner& dynamic() const { return dynamic_; }
++    const std::filesystem::path& dynamic_root() const { return dynamic_root_; }
++    std::string dynamic_contract() const;
+     unsigned revision() const { return revision_; }
+     std::string_view transport() const {
+         if (revision_ == 3) return c_resource_transport;
+@@ -106,6 +117,7 @@
+     std::string source() const;
+ private:
+     CPrimitiveAdmission() = default;
++    static std::shared_ptr<CPrimitiveAdmission> parse(std::string_view);
+     std::string descriptor_, provider_, target_, module_;
+     unsigned revision_ = 1;
+     std::vector<Binding> bindings_;
+@@ -113,5 +125,8 @@
+     std::vector<Resource> resources_;
+     std::string source_type(const Shape&) const;
+     CPrimitiveThunk* thunk_ = nullptr;
++    std::string thunk_identity_;
++    DynamicClosure::Owner dynamic_;
++    std::filesystem::path dynamic_root_;
+ };
+ }
+diff --git a/include/void/execution.hpp b/include/void/execution.hpp
+--- a/include/void/execution.hpp
++++ b/include/void/execution.hpp
+@@ -38,11 +38,12 @@
+     ApplicationMetadata::Owner application_metadata = {};
+     std::string build_provenance = {}; // Generation-only, excluded from reload compatibility.
+     std::uintptr_t native_thunk_identity = 0; // In-process G3 ownership authority.
++    std::string native_dynamic_contract = {};
+     bool operator==(const Compatibility& other) const {
+         return function_id == other.function_id && signature == other.signature &&
+             layout == other.layout && captures == other.captures && constants == other.constants &&
+             constant_contract == other.constant_contract && source_contract == other.source_contract && runtime_identity == other.runtime_identity && async_root == other.async_root &&
+-            native_thunk_identity == other.native_thunk_identity &&
++            native_thunk_identity == other.native_thunk_identity && native_dynamic_contract == other.native_dynamic_contract &&
+             (application_metadata == other.application_metadata || (application_metadata && other.application_metadata && *application_metadata == *other.application_metadata));
+     }
+ };
+diff --git a/include/void/runtime.hpp b/include/void/runtime.hpp
+--- a/include/void/runtime.hpp
++++ b/include/void/runtime.hpp
+@@ -27,6 +27,7 @@
+ // These are runtime embedding interfaces, not source-language thread features.
+ struct NativeDictionary {const NativeArrayElement* entry;const NativeArrayElement* key;std::size_t value_offset,hash_offset;};
+ class NativeLibrary;
++class DynamicBinding;
+ class NativeWorkers;
+ struct NativeWake;
+ class Runtime {
+@@ -171,6 +172,8 @@
+     // acquisitions before retiring resources; it does not cancel source tasks.
+     void begin_native_job();
+     void end_native_job() noexcept;
++    std::shared_ptr<const DynamicBinding> dynamic_binding() const;
++    void bind_dynamic(std::shared_ptr<const DynamicBinding>);
+     std::int64_t console_checkpoint() const;
+     console::Error console_finish(std::int64_t checkpoint);
+     console::Error close(); // Reject new attachments; existing participants must drain.
+@@ -184,6 +187,7 @@
+     friend class NativeWorkers;
+     friend std::error_code native_shutdown(Runtime&);
+     std::shared_ptr<NativeLibrary> native_library_;
++    std::shared_ptr<const DynamicBinding> native_dynamic_;
+     std::shared_ptr<NativeWorkers> native_workers_;
+     std::shared_ptr<console::Context> console_context_;
+     unsigned async_worker_limit_ = 4;
+diff --git a/src/backend/llvm/backend.cpp b/src/backend/llvm/backend.cpp
+--- a/src/backend/llvm/backend.cpp
++++ b/src/backend/llvm/backend.cpp
+@@ -126,6 +126,13 @@
+ static llvm::CallInst* call_c_primitive(llvm::IRBuilder<>& b, llvm::Module& module, const CPrimitiveAdmission& admission,
+                                       std::uint32_t ordinal, llvm::Value* words, std::uint32_t count, llvm::Value* result,
+                                       llvm::Value* spans = nullptr, unsigned span_count = 0) {
++    if (const auto& plan = admission.dynamic()) {
++        auto bridge = module.getOrInsertFunction(c_dynamic_call, b.getInt32Ty(), b.getPtrTy(), b.getInt32Ty(),
++            b.getInt32Ty(), b.getPtrTy(), b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(), b.getInt32Ty());
++        return b.CreateCall(bridge, {b.CreateGlobalString(plan->bytes()), b.getInt32(plan->bytes().size()),
++            b.getInt32(ordinal), words, b.getInt32(count), result,
++            spans ? spans : llvm::ConstantPointerNull::get(b.getPtrTy()), b.getInt32(span_count)});
++    }
+     auto transport = module.getOrInsertFunction(admission.transport(), b.getInt32Ty(), b.getPtrTy(),
+         b.getInt32Ty(), b.getInt32Ty(), b.getPtrTy(), b.getInt32Ty(), b.getPtrTy());
+     const auto& descriptor = admission.descriptor();
+@@ -1347,8 +1354,15 @@
+                             static_cast<llvm::Value*>(absent) : b.CreateAlloca(b.getInt64Ty());
+                         if (scalar != absent) b.CreateStore(b.getInt64(0), scalar);
+                         auto* bytes = b.CreateGlobalString(admission.descriptor());
+-                        auto* transport = module->getOrInsertFunction(admission.transport(), b.getInt32Ty(), b.getPtrTy(),
+-                            b.getInt32Ty(), b.getInt32Ty(), b.getPtrTy(), b.getInt32Ty(), b.getPtrTy()).getCallee();
++                        llvm::Value* transport;
++                        if (const auto& plan = admission.dynamic()) {
++                            auto resolve = module->getOrInsertFunction(c_dynamic_resolve, b.getPtrTy(), b.getPtrTy(), b.getInt32Ty());
++                            transport = b.CreateCall(resolve, {b.CreateGlobalString(plan->bytes()), b.getInt32(plan->bytes().size())});
++                            fail_if(b.CreateIsNull(transport), "C dynamic Runtime binding is unavailable");
++                        } else {
++                            transport = module->getOrInsertFunction(admission.transport(), b.getInt32Ty(), b.getPtrTy(),
++                                b.getInt32Ty(), b.getInt32Ty(), b.getPtrTy(), b.getInt32Ty(), b.getPtrTy()).getCallee();
++                        }
+                         auto bridge = module->getOrInsertFunction(c_resource_bridge, b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(),
+                             b.getInt32Ty(), b.getInt32Ty(), b.getPtrTy(), b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(),
+                             b.getPtrTy(), b.getInt32Ty(), b.getInt32Ty());
+@@ -2118,6 +2132,7 @@
+         std::shared_ptr<std::atomic<std::size_t>> live;
+         ApplicationMetadata::Owner application_metadata;
+         std::string build_provenance;
++        std::shared_ptr<const DynamicBinding> dynamic;
+         llvm::orc::ResourceTrackerSP tracker;
+         llvm::orc::JITDylib* dylib=nullptr;
+         ~Generation() {
+@@ -2130,7 +2145,7 @@
+     };
+     std::shared_ptr<const NativeCode> load(std::unique_ptr<llvm::Module> module,
+         std::unique_ptr<llvm::LLVMContext> context, const std::string& symbol,
+-        Compatibility contract, const std::shared_ptr<Impl>&, bool checked = false, std::shared_ptr<Runtime> runtime = {}, const std::string& suffix = {}, bool isolated = false, std::unique_ptr<llvm::MemoryBuffer> object = {}, CPrimitiveAdmission::Owner primitives = {}) {
++        Compatibility contract, const std::shared_ptr<Impl>&, bool checked = false, std::shared_ptr<Runtime> runtime = {}, const std::string& suffix = {}, bool isolated = false, std::unique_ptr<llvm::MemoryBuffer> object = {}, CPrimitiveAdmission::Owner primitives = {}, std::shared_ptr<const DynamicBinding> dynamic = {}) {
+ #ifdef VOID_FUNCTION_SANITIZER_HASH
+         // The host ABI is checked before reaching this boundary. Match the
+         // compiler-generated plain/checked entry metadata without disabling UBSan.
+@@ -2162,10 +2177,18 @@
+         }
+         auto& dylib=*target;
+         generation->tracker=dylib.createResourceTracker();
++        generation->dynamic = std::move(dynamic);
+         if (primitives) {
+             llvm::orc::SymbolMap symbols;
+-            symbols[jit->mangleAndIntern(primitives->transport())] = llvm::orc::ExecutorSymbolDef(
+-                llvm::orc::ExecutorAddr::fromPtr(primitives->thunk()), llvm::JITSymbolFlags::Exported);
++            if (primitives->dynamic()) {
++                symbols[jit->mangleAndIntern(c_dynamic_resolve)] = llvm::orc::ExecutorSymbolDef(
++                    llvm::orc::ExecutorAddr::fromPtr(vd_c_dynamic_resolve_v1), llvm::JITSymbolFlags::Exported);
++                symbols[jit->mangleAndIntern(c_dynamic_call)] = llvm::orc::ExecutorSymbolDef(
++                    llvm::orc::ExecutorAddr::fromPtr(vd_c_dynamic_call_v1), llvm::JITSymbolFlags::Exported);
++            } else {
++                symbols[jit->mangleAndIntern(primitives->transport())] = llvm::orc::ExecutorSymbolDef(
++                    llvm::orc::ExecutorAddr::fromPtr(primitives->thunk()), llvm::JITSymbolFlags::Exported);
++            }
+             if (primitives->revision() >= 2)
+                 symbols[jit->mangleAndIntern(c_span_bridge)] = llvm::orc::ExecutorSymbolDef(
+                     llvm::orc::ExecutorAddr::fromPtr(vd_c_span_dispatch_v2), llvm::JITSymbolFlags::Exported);
+@@ -2293,7 +2316,8 @@
+         return compile(coordinated,entry,optimize,std::move(contract),std::move(runtime));
+     }
+     if (input.coordinated && input.analysis && !runtime) {
+-        if (input.application_metadata || !input.globals.empty()) runtime = std::make_shared<Runtime>(256);
++        if (input.application_metadata || !input.globals.empty() ||
++            (input.c_primitives && input.c_primitives->dynamic())) runtime = std::make_shared<Runtime>(256);
+         else { if (!impl_->source_runtime) impl_->source_runtime=std::make_shared<Runtime>(256); runtime=impl_->source_runtime; }
+     }
+     std::map<std::string,ir::ReferenceEffects> checked_effects;ir::validate(input,nullptr,&checked_effects);
+@@ -2329,6 +2353,7 @@
+     contract.runtime_identity = reinterpret_cast<std::uintptr_t>(runtime.get());
+     contract.native_thunk_identity = input.c_primitives && input.c_primitives->revision() == 3 ?
+         reinterpret_cast<std::uintptr_t>(input.c_primitives->thunk()) : 0;
++    contract.native_dynamic_contract = input.c_primitives ? input.c_primitives->dynamic_contract() : std::string{};
+     if (input.coordinated && !input.analysis) {
+         std::map<std::string,std::string> layouts;
+         auto encoded = [](const std::string& text) { return std::to_string(text.size()) + ":" + text; };
+@@ -2376,7 +2401,17 @@
+     module->setDataLayout(impl_->jit->getDataLayout());
+     module->setTargetTriple(impl_->jit->getTargetTriple());
+     finish(*module, optimize);
+-    auto result = impl_->load(std::move(module), std::move(context), native_symbol(*selected, suffix), std::move(contract), impl_, !selected->module_identity.empty() || input.coordinated, runtime,suffix,!selected->module_identity.empty() || bool(input.c_primitives),{},input.c_primitives);
++    std::shared_ptr<const DynamicBinding> dynamic;
++    if (input.c_primitives && input.c_primitives->dynamic()) {
++        const auto& plan = input.c_primitives->dynamic();
++        const auto& root = input.c_primitives->dynamic_root();
++        dynamic = runtime->dynamic_binding();
++        if (!dynamic) dynamic = load_dynamic(plan, root);
++        else if (!matches_dynamic(*dynamic, *plan, root))
++            throw std::invalid_argument("C dynamic closure is incompatible with the Runtime binding");
++    }
++    auto result = impl_->load(std::move(module), std::move(context), native_symbol(*selected, suffix), std::move(contract), impl_, !selected->module_identity.empty() || input.coordinated, runtime,suffix,!selected->module_identity.empty() || bool(input.c_primitives),{},input.c_primitives,dynamic);
++    if (dynamic) runtime->bind_dynamic(std::move(dynamic));
+     if (!input.globals.empty()) runtime->admit_globals(global_contract(input), impl_->replacing_globals);
+     return result;
+ }
+@@ -2456,6 +2491,7 @@
+     const auto& native = analysis.c_primitive_admission();
+     contract.native_thunk_identity = native && native->revision() == 3 ?
+         reinterpret_cast<std::uintptr_t>(native->thunk()) : 0;
++    contract.native_dynamic_contract = native ? native->dynamic_contract() : std::string{};
+     if(!(current.compatibility()==contract))return {};
+     struct Replacement { bool& flag; explicit Replacement(bool& value) : flag(value) { flag = true; } ~Replacement() { flag = false; } } replacement(impl_->replacing_globals);
+     return compile_analysis(analysis,optimize,std::move(contract),current.runtime_owner(),current.compatibility().async_root);
+@@ -2607,7 +2643,8 @@
+         arguments.push_back(failure);
+     }
+     llvm::CallInst* result;
+-    if (input.c_primitives) {
++    const auto* dynamic = input.c_primitives ? input.c_primitives->dynamic().get() : nullptr;
++    if (input.c_primitives && !dynamic) {
+         auto* absent = llvm::ConstantPointerNull::get(b.getPtrTy());
+         auto* status = call_c_primitive(b, *module, *input.c_primitives, c_primitive_probe, absent, 0, absent);
+         auto* mismatch = llvm::BasicBlock::Create(context, "c_primitive_mismatch", main);
+@@ -2624,7 +2661,20 @@
+         auto* count=module->getNamedGlobal("__vd_type_count"+(source_program ? std::string("__void") : std::string{}));
+         auto* size_type=b.getIntNTy(module->getDataLayout().getPointerSizeInBits());
+         auto* witnesses=module->getNamedGlobal("__vd_witnesses"+(source_program ? std::string("__void") : std::string{}));auto* witness_count=module->getNamedGlobal("__vd_witness_count"+(source_program ? std::string("__void") : std::string{}));
+-        if (application_record) {
++        if (dynamic) {
++            const bool forward = source_program && input.application;
++            auto* absent = llvm::ConstantPointerNull::get(b.getPtrTy());
++            auto bootstrap = module->getOrInsertFunction("vd_runtime_entry_dynamic_v1", b.getInt32Ty(), b.getPtrTy(),
++                b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(), size_type, b.getPtrTy(), size_type,
++                b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(), size_type, b.getPtrTy(), size_type);
++            result = b.CreateCall(bootstrap, {entry,input_value,failure,catalog,b.CreateLoad(size_type,count),
++                witnesses,b.CreateLoad(size_type,witness_count),
++                forward ? static_cast<llvm::Value*>(main->getArg(0)) : b.getInt32(0),
++                forward ? static_cast<llvm::Value*>(main->getArg(1)) : absent,
++                application_record ? static_cast<llvm::Value*>(application_record) : absent,
++                llvm::ConstantInt::get(size_type, application_record ? input.application_metadata->bytes().size() : 0),
++                b.CreateGlobalString(dynamic->bytes()),llvm::ConstantInt::get(size_type,dynamic->bytes().size())});
++        } else if (application_record) {
+             const bool forward = source_program && input.application;
+             const bool wide = forward && llvm::Triple(module->getTargetTriple()).isOSWindows();
+             auto bootstrap=module->getOrInsertFunction("vd_runtime_entry_context_v1",b.getInt32Ty(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy(),size_type,b.getInt32Ty(),b.getPtrTy(),b.getInt1Ty(),b.getPtrTy(),size_type);
+diff --git a/src/dynamic_closure.cpp b/src/dynamic_closure.cpp
+new file mode 100644
+--- /dev/null
++++ b/src/dynamic_closure.cpp
+@@ -0,0 +1,108 @@
++#include "void/c_dynamic.hpp"
++#include "void/project.hpp"
++
++#include <algorithm>
++#include <set>
++#include <span>
++#include <stdexcept>
++
++namespace vd {
++namespace {
++[[noreturn]] void bad(std::string_view message) {
++    throw std::invalid_argument("C dynamic closure: " + std::string(message));
++}
++bool digest(std::string_view token) {
++    return token.size() == 64 && std::all_of(token.begin(), token.end(), [](char c) {
++        return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f');
++    });
++}
++bool component(std::string_view token) {
++    return token.size() <= 96 && token.starts_with("lib") && token.ends_with(".so") &&
++        project::valid_identity(token);
++}
++bool symbol(std::string_view token) {
++    auto letter = [](char c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'; };
++    return !token.empty() && token.size() <= 128 && letter(token.front()) &&
++        std::all_of(token.begin(), token.end(), [&](char c) { return letter(c) || (c >= '0' && c <= '9'); });
++}
++std::vector<std::string_view> words(std::string_view line) {
++    std::vector<std::string_view> result;
++    while (!line.empty()) {
++        auto end = line.find(' ');
++        auto token = line.substr(0, end);
++        if (token.empty() || result.size() == 11) bad("noncanonical row");
++        result.push_back(token);
++        if (end == line.npos) return result;
++        line.remove_prefix(end + 1);
++    }
++    bad("empty row or trailing space");
++}
++}
++
++DynamicClosure::Owner DynamicClosure::parse(std::string_view bytes) {
++    if (bytes.empty() || bytes.size() > 32768 || bytes.back() != '\n' ||
++        std::any_of(bytes.begin(), bytes.end(), [](char c) { return c != '\n' && (c < ' ' || c > '~'); }))
++        bad("invalid size or encoding");
++    auto plan = std::shared_ptr<DynamicClosure>(new DynamicClosure);
++    plan->bytes_ = bytes;
++    auto next = [&] {
++        auto end = bytes.find('\n');
++        if (end == bytes.npos) bad("incomplete header");
++        auto line = bytes.substr(0, end);
++        bytes.remove_prefix(end + 1);
++        return line;
++    };
++    if (next() != "void-native-closure 1") bad("unsupported revision");
++    auto provider = words(next());
++    if (provider.size() != 2 || provider[0] != "provider" || !project::valid_identity(provider[1]))
++        bad("invalid provider");
++    plan->provider_ = provider[1];
++    if (next() != "target x86_64-unknown-linux-gnu sysv-x64" || next() != "system none" ||
++        next() != "layout executable-sibling-native") bad("unsupported target, system ABI or relocation policy");
++    auto thunk = words(next());
++    if (thunk.size() != 3 || thunk[0] != "thunk" || !digest(thunk[1]) || thunk[2] != transport)
++        bad("invalid target thunk identity");
++    plan->thunk_ = thunk[1];
++    std::set<std::string_view> images, exports;
++    for (auto line = next(); line != "descriptor"; line = next()) {
++        auto row = words(line);
++        if (row[0] == "image") {
++            if (row.size() < 3 || !plan->exports_.empty() || plan->images_.size() == 8 ||
++                !component(row[1]) || images.contains(row[1]) || !digest(row[2]))
++                bad("invalid or duplicate image");
++            Image image{std::string(row[1]), std::string(row[2]), {}};
++            std::set<std::string_view> needed;
++            for (auto item : std::span(row).subspan(3)) {
++                if (!images.contains(item) || !needed.insert(item).second) bad("invalid dependency order or duplicate edge");
++                image.needed.emplace_back(item);
++            }
++            images.insert(row[1]);
++            plan->images_.push_back(std::move(image));
++        } else if (row[0] == "export") {
++            if (row.size() != 3 || plan->exports_.size() == 128 || !images.contains(row[1]) ||
++                !symbol(row[2]) || !exports.insert(row[2]).second)
++                bad("invalid or conflicting required export");
++            plan->exports_.push_back({std::string(row[1]), std::string(row[2])});
++        } else bad("unknown row");
++    }
++    if (plan->images_.empty() || bytes.size() > 16384 || !bytes.starts_with("void-c-primitive 3 3\n"))
++        bad("missing closure or exact revision 3 descriptor");
++    const auto& main = plan->images_.back().name;
++    if (std::none_of(plan->exports_.begin(), plan->exports_.end(), [&](const auto& e) {
++        return e.image == main && e.symbol == transport;
++    })) bad("missing main-image transport");
++    std::set<std::string_view> reachable{main};
++    for (auto it = plan->images_.rbegin(); it != plan->images_.rend(); ++it)
++        if (reachable.contains(it->name)) reachable.insert(it->needed.begin(), it->needed.end());
++    if (reachable.size() != images.size()) bad("unreachable image");
++    const auto descriptor = bytes;
++    const auto prefix = "void-c-primitive 3 3\nprovider " + plan->provider_ +
++        "\ntarget x86_64-unknown-linux-gnu sysv-x64\n";
++    if (!bytes.starts_with(prefix)) bad("exact descriptor provider or target mismatch");
++    bytes.remove_prefix(prefix.size());
++    if (!next().starts_with("source ") || next() != "thunk " + plan->thunk_)
++        bad("exact descriptor thunk mismatch");
++    plan->descriptor_ = descriptor;
++    return plan;
++}
++} // namespace vd
+diff --git a/src/ir/c_primitive.cpp b/src/ir/c_primitive.cpp
+--- a/src/ir/c_primitive.cpp
++++ b/src/ir/c_primitive.cpp
+@@ -92,7 +92,7 @@
+ }
+ }
+ 
+-CPrimitiveAdmission::Owner CPrimitiveAdmission::admit(std::string_view descriptor, CPrimitiveThunk* linked_thunk) {
++std::shared_ptr<CPrimitiveAdmission> CPrimitiveAdmission::parse(std::string_view descriptor) {
+     if (descriptor.empty() || descriptor.size() > descriptor_limit) reject(1, "descriptor size outside 1..16384 bytes");
+     auto admitted = std::shared_ptr<CPrimitiveAdmission>(new CPrimitiveAdmission);
+     admitted->descriptor_ = descriptor;
+@@ -118,7 +118,8 @@
+         !identifier(module.substr(1, module.size() - 6)))
+         reject(reader.line, "expected a canonical single-file VFS identity");
+     admitted->module_ = module;
+-    if (!digest(reader.value("thunk"))) reject(reader.line, "invalid thunk SHA-256 identity");
++    admitted->thunk_identity_ = reader.value("thunk");
++    if (!digest(admitted->thunk_identity_)) reject(reader.line, "invalid thunk SHA-256 identity");
+     if (!digest(reader.value("fixture"))) reject(reader.line, "invalid fixture SHA-256 identity");
+     reader.exact({"effects", "direct-sync", "nonblocking", "no-callbacks"});
+     reader.exact({"call", "c-default"});
+@@ -296,12 +297,37 @@
+         }
+         if (!acquired || !released) reject(reader.line, "missing exact native acquire or release contract");
+     }
++    return admitted;
++}
++
++CPrimitiveAdmission::Owner CPrimitiveAdmission::admit(std::string_view descriptor, CPrimitiveThunk* linked_thunk) {
++    auto admitted = parse(descriptor);
+     if (!linked_thunk) throw std::invalid_argument("C primitive provider transport is unavailable");
+     if (linked_thunk(admitted->descriptor_.data(), static_cast<std::uint32_t>(admitted->descriptor_.size()),
+                      c_primitive_probe, nullptr, 0, nullptr))
+         throw std::invalid_argument("C primitive provider rejected the exact descriptor or fixture identity");
+     admitted->thunk_ = linked_thunk;
+     return admitted;
++}
++
++CPrimitiveAdmission::Owner CPrimitiveAdmission::admit_dynamic(std::string_view closure, std::filesystem::path root) {
++    auto plan = DynamicClosure::parse(closure);
++    auto admitted = parse(plan->descriptor());
++    if (admitted->target() != "x86_64-unknown-linux-gnu" || admitted->revision() != 3 ||
++        admitted->provider() != plan->provider() || admitted->thunk_identity_ != plan->thunk_identity() ||
++        !root.is_absolute() || root != root.lexically_normal())
++        throw std::invalid_argument("C dynamic closure does not match the exact descriptor or host root");
++    for (const auto& binding : admitted->bindings())
++        if (std::none_of(plan->exports().begin(), plan->exports().end(), [&](const auto& e) {
++            return e.image == plan->images().back().name && e.symbol == binding.export_name;
++        })) throw std::invalid_argument("C dynamic closure is missing an owned descriptor export");
++    admitted->dynamic_ = std::move(plan);
++    admitted->dynamic_root_ = std::move(root);
++    return admitted;
++}
++
++std::string CPrimitiveAdmission::dynamic_contract() const {
++    return dynamic_ ? dynamic_->bytes() + '\0' + dynamic_root_.generic_string() : std::string{};
+ }
+ 
+ unsigned CPrimitiveAdmission::scalar_bytes(Type type) {
+diff --git a/src/runtime/abi.cpp b/src/runtime/abi.cpp
+--- a/src/runtime/abi.cpp
++++ b/src/runtime/abi.cpp
+@@ -1,5 +1,6 @@
+ #include "void/runtime_abi.hpp"
+ #include "void/async.hpp"
++#include "void/c_dynamic.hpp"
+ #include "void/format.hpp"
+ #include "void/native_runtime.hpp"
+ #include <new>
+@@ -116,9 +117,10 @@
+ VD_DISPLAY_ENCODING(f32);VD_DISPLAY_ENCODING(f64);
+ #undef VD_DISPLAY_ENCODING
+ static_assert(static_cast<unsigned>(vd::ScalarEncoding::boolean)==10);
+-std::int32_t runtime_entry(vd::NativeCode::CheckedEntry entry,std::int32_t value,vd::RuntimeFailure* failure,const vd::RuntimeTypeRecord* records,std::size_t count,const vd::RuntimeWitnessRecord* witnesses=nullptr,std::size_t witness_count=0,int argc=0,const void* argv=nullptr,bool wide=false,vd::ApplicationMetadata::Owner application={}) noexcept {
++std::int32_t runtime_entry(vd::NativeCode::CheckedEntry entry,std::int32_t value,vd::RuntimeFailure* failure,const vd::RuntimeTypeRecord* records,std::size_t count,const vd::RuntimeWitnessRecord* witnesses=nullptr,std::size_t witness_count=0,int argc=0,const void* argv=nullptr,bool wide=false,vd::ApplicationMetadata::Owner application={},std::shared_ptr<const vd::DynamicBinding> dynamic={}) noexcept {
+     try {
+         vd::Runtime runtime(256);
++        if (dynamic) runtime.bind_dynamic(std::move(dynamic));
+         runtime.application_arguments(argc ? vd::capture_application_arguments(argc, argv, wide) : vd::checked_application_arguments({}));
+         runtime.start_application(std::move(application));
+         vd::Runtime::Attachment attachment(runtime);
+@@ -157,6 +159,22 @@
+         return runtime_entry(entry,value,failure,records,count,witnesses,witness_count,argc,argv,wide,std::move(metadata));
+     } catch (const std::invalid_argument&) {failure->message="Invalid compiled application metadata.";}
+       catch (const std::bad_alloc&) {failure->message="Runtime startup allocation failed.";}
++    return 0;
++}
++std::int32_t vd_runtime_entry_dynamic_v1(vd::NativeCode::CheckedEntry entry, std::int32_t value,
++    vd::RuntimeFailure* failure, const vd::RuntimeTypeRecord* records, std::size_t count,
++    const vd::RuntimeWitnessRecord* witnesses, std::size_t witness_count, int argc, const void* argv,
++    const char* metadata, std::size_t metadata_size, const char* closure, std::size_t closure_size) noexcept {
++    try {
++        if (!closure || !closure_size) throw std::invalid_argument("C dynamic authority: missing embedded closure");
++        auto application = metadata ? vd::ApplicationMetadata::decode({metadata,metadata_size}) : vd::ApplicationMetadata::Owner{};
++        auto binding = vd::load_dynamic(vd::DynamicClosure::parse({closure,closure_size}), vd::installed_dynamic_root());
++        return runtime_entry(entry,value,failure,records,count,witnesses,witness_count,argc,argv,false,
++                             std::move(application),std::move(binding));
++    } catch (const std::exception& error) {
++        failure->message = error.what();
++        vd::export_native_failure(failure);
++    }
+     return 0;
+ }
+ void vd_display_enter(const char* hook,void* identity,vd::RuntimeFailure* failure) noexcept {
+diff --git a/src/runtime/c_dynamic.cpp b/src/runtime/c_dynamic.cpp
+new file mode 100644
+--- /dev/null
++++ b/src/runtime/c_dynamic.cpp
+@@ -0,0 +1,596 @@
++#include "void/c_primitive.hpp"
++#include "void/runtime.hpp"
++
++#include <algorithm>
++#include <atomic>
++#include <stdexcept>
++
++#if defined(__linux__) && defined(__GLIBC__) && defined(__x86_64__)
++#include <dlfcn.h>
++#include <elf.h>
++#include <fcntl.h>
++#include <link.h>
++#include <linux/magic.h>
++#include <sodium.h>
++#include <sys/mman.h>
++#include <sys/auxv.h>
++#include <sys/stat.h>
++#include <sys/sysmacros.h>
++#include <sys/vfs.h>
++#include <unistd.h>
++
++#include <cerrno>
++#include <cstring>
++#include <cstdio>
++#include <map>
++#include <set>
++#include <utility>
++#endif
++
++namespace vd {
++
++namespace {
++[[noreturn]] void denied(std::string_view stage, std::string_view reason) {
++    throw std::runtime_error("C dynamic " + std::string(stage) + ": " + std::string(reason));
++}
++
++#if defined(__linux__) && defined(__GLIBC__) && defined(__x86_64__)
++constexpr std::uint64_t page = 4096;
++constexpr std::size_t image_limit = 16 * 1024 * 1024;
++constexpr std::size_t symbol_limit = 512;
++constexpr std::size_t relocation_limit = 4096;
++
++struct File {
++    int fd;
++    explicit File(int value) : fd(value) {}
++    File(File&& other) noexcept : fd(std::exchange(other.fd, -1)) {}
++    File& operator=(File&& other) noexcept {
++        if (fd >= 0) close(fd);
++        fd = std::exchange(other.fd, -1);
++        return *this;
++    }
++    ~File() { if (fd >= 0) close(fd); }
++};
++struct Module {
++    void* handle;
++    explicit Module(void* value) : handle(value) {}
++    Module(Module&& other) noexcept : handle(std::exchange(other.handle, nullptr)) {}
++    ~Module() { if (handle) dlclose(handle); }
++};
++struct Mapped {
++    File file;
++    struct stat identity;
++    Module module;
++    link_map* link;
++};
++
++File proc(const char* name) {
++    File file(open(name, O_RDONLY | O_CLOEXEC));
++    struct statfs fs{};
++    if (file.fd < 0 || fstatfs(file.fd, &fs) || fs.f_type != PROC_SUPER_MAGIC)
++        denied("namespace", "required process view is unavailable");
++    return file;
++}
++
++std::string read_bounded(int fd, std::size_t limit) {
++    std::string result;
++    char buffer[8192];
++    for (;;) {
++        const auto n = read(fd, buffer, sizeof buffer);
++        if (n == 0) return result;
++        if (n < 0 && errno == EINTR) continue;
++        if (n < 0 || static_cast<std::size_t>(n) > limit - result.size())
++            denied("read", "native input is unavailable or exceeds its limit");
++        result.append(buffer, static_cast<std::size_t>(n));
++    }
++}
++bool loader_setting(std::string_view setting) {
++    return setting.starts_with("LD_") || setting.starts_with("GLIBC_TUNABLES=");
++}
++bool c_symbol(std::string_view name) {
++    auto letter = [](char c) { return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_'; };
++    return !name.empty() && letter(name.front()) &&
++        std::all_of(name.begin(), name.end(), [&](char c) { return letter(c) || (c >= '0' && c <= '9'); });
++}
++void launch_policy() {
++    errno = 0;
++    const auto secure = getauxval(AT_SECURE);
++    if (secure || errno || sysconf(_SC_PAGESIZE) != page)
++        denied("namespace", "unsupported page geometry or secure execution mode");
++    struct stat preload{};
++    if (lstat("/etc/ld.so.preload", &preload) == 0 || errno != ENOENT)
++        denied("namespace", "system loader preload configuration is unsupported");
++    for (auto p = ::environ; p && *p; ++p)
++        if (loader_setting(*p)) denied("namespace", "ambient loader environment");
++    auto environment = proc("/proc/self/environ");
++    auto startup = read_bounded(environment.fd, 4 * 1024 * 1024);
++    std::string_view entries = startup;
++    while (!entries.empty()) {
++        auto end = entries.find('\0');
++        if (end == entries.npos || loader_setting(entries.substr(0, end)))
++            denied("namespace", "initial loader environment");
++        entries.remove_prefix(end + 1);
++    }
++}
++
++File root_directory(const std::filesystem::path& root) {
++    if (!root.is_absolute() || root != root.lexically_normal() || root.native().find('\0') != std::string::npos ||
++        root.native().size() > 4096)
++        denied("path", "expected a bounded canonical absolute root");
++    constexpr auto flags = O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC;
++    File directory(open("/", flags));
++    for (const auto& part : root.relative_path()) {
++        if (directory.fd < 0 || part.empty() || part == "." || part == "..")
++            denied("path", "invalid root component");
++        directory = File(openat(directory.fd, part.c_str(), flags));
++    }
++    if (directory.fd < 0) denied("path", "root is unavailable or aliased");
++    return directory;
++}
++
++std::string approved_bytes(int directory, const DynamicClosure::Image& image) {
++    File file(openat(directory, image.name.c_str(), O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC));
++    struct stat before{}, after{};
++    if (file.fd < 0 || fstat(file.fd, &before) || !S_ISREG(before.st_mode) || before.st_nlink != 1 ||
++        before.st_size <= 0 || static_cast<std::uint64_t>(before.st_size) > image_limit)
++        denied("artifact", image.name + " is missing, aliased or outside file bounds");
++    auto bytes = read_bounded(file.fd, image_limit);
++    if (fstat(file.fd, &after) || after.st_nlink != 1 || before.st_size != after.st_size ||
++        static_cast<std::uint64_t>(after.st_size) != bytes.size())
++        denied("artifact", image.name + " changed while captured");
++    unsigned char hash[crypto_hash_sha256_BYTES];
++    char hex[crypto_hash_sha256_BYTES * 2 + 1];
++    if (crypto_hash_sha256(hash, reinterpret_cast<const unsigned char*>(bytes.data()), bytes.size()) != 0 ||
++        sodium_bin2hex(hex, sizeof hex, hash, sizeof hash) == nullptr || image.sha256 != hex)
++        denied("digest", image.name);
++    return bytes;
++}
++
++template<class T>
++T read_at(std::string_view bytes, std::uint64_t at) {
++    if (at > bytes.size() || sizeof(T) > bytes.size() - at) denied("ELF", "truncated record");
++    T value;
++    std::memcpy(&value, bytes.data() + at, sizeof value);
++    return value;
++}
++
++struct Elf {
++    std::string_view bytes;
++    std::vector<Elf64_Phdr> loads;
++    std::vector<Elf64_Sym> symbols;
++    std::vector<std::string> names;
++    std::vector<Elf64_Rela> relocations;
++    std::map<std::string, unsigned, std::less<>> definitions;
++    std::vector<std::pair<std::uint64_t, std::uint64_t>> metadata;
++
++    const Elf64_Phdr* segment(std::uint64_t address, std::uint64_t size, unsigned flags, bool file) const {
++        for (const auto& p : loads) {
++            const auto extent = file ? p.p_filesz : p.p_memsz;
++            if (address >= p.p_vaddr && address - p.p_vaddr <= extent &&
++                size <= extent - (address - p.p_vaddr) && (p.p_flags & flags) == flags) return &p;
++        }
++        return nullptr;
++    }
++    std::uint64_t offset(std::uint64_t address, std::uint64_t size, bool table = true) {
++        auto p = segment(address, size, PF_R, true);
++        if (!p) denied("ELF", "dynamic table is outside a file-backed segment");
++        if (table && size) metadata.emplace_back(address, address + size);
++        return p->p_offset + (address - p->p_vaddr);
++    }
++    Elf(std::string_view image, const DynamicClosure::Image& expected) : bytes(image) {
++        const auto header = read_at<Elf64_Ehdr>(bytes, 0);
++        const auto* id = header.e_ident;
++        if (std::memcmp(id, ELFMAG, SELFMAG) || id[EI_CLASS] != ELFCLASS64 || id[EI_DATA] != ELFDATA2LSB ||
++            id[EI_VERSION] != EV_CURRENT || (id[EI_OSABI] != ELFOSABI_NONE && id[EI_OSABI] != ELFOSABI_GNU) ||
++            id[EI_ABIVERSION] != 0 || header.e_type != ET_DYN || header.e_machine != EM_X86_64 ||
++            header.e_version != EV_CURRENT || header.e_flags || header.e_entry || header.e_ehsize != sizeof header ||
++            header.e_phentsize != sizeof(Elf64_Phdr) || header.e_phnum == 0 || header.e_phnum > 16 ||
++            header.e_phoff != sizeof header)
++            denied("ELF", "unsupported target or header");
++        Elf64_Phdr dynamic{}, program_headers{}, relro{}, eh_frame{};
++        bool stack = false;
++        for (unsigned n = 0; n < header.e_phnum; ++n) {
++            const auto p = read_at<Elf64_Phdr>(bytes, header.e_phoff + n * sizeof(Elf64_Phdr));
++            if (p.p_offset > bytes.size() || p.p_filesz > bytes.size() - p.p_offset ||
++                p.p_filesz > p.p_memsz || p.p_vaddr > image_limit || p.p_memsz > image_limit - p.p_vaddr)
++                denied("ELF", "segment extent outside image bounds");
++            switch (p.p_type) {
++                case PT_LOAD:
++                    if (!p.p_memsz || !(p.p_flags & PF_R) || (p.p_flags & ~(PF_R | PF_W | PF_X)) ||
++                        ((p.p_flags & PF_X) && ((p.p_flags & PF_W) || p.p_filesz != p.p_memsz)) ||
++                        p.p_align != page || p.p_offset % page != p.p_vaddr % page ||
++                        (!loads.empty() && p.p_vaddr / page <
++                            (loads.back().p_vaddr + loads.back().p_memsz + page - 1) / page))
++                        denied("ELF", "unsupported load segment permissions or geometry");
++                    loads.push_back(p);
++                    break;
++                case PT_DYNAMIC:
++                    if (dynamic.p_type) denied("ELF", "duplicate dynamic segment");
++                    dynamic = p;
++                    break;
++                case PT_GNU_STACK:
++                    if (stack || p.p_flags != (PF_R | PF_W) || p.p_filesz || p.p_memsz)
++                        denied("ELF", "unsupported stack");
++                    stack = true;
++                    break;
++                case PT_PHDR:
++                    if (program_headers.p_type) denied("ELF", "duplicate program-header mapping");
++                    program_headers = p;
++                    break;
++                case PT_GNU_RELRO:
++                    if (relro.p_type) denied("ELF", "duplicate RELRO");
++                    relro = p;
++                    break;
++                case PT_GNU_EH_FRAME:
++                    if (eh_frame.p_type) denied("ELF", "duplicate unwind header");
++                    eh_frame = p;
++                    break;
++                default:
++                    denied("ELF", "unsupported program header " + std::to_string(p.p_type));
++            }
++        }
++        if (!stack || loads.empty() || loads.front().p_offset != 0 || loads.front().p_vaddr != 0 ||
++            loads.front().p_filesz < header.e_phoff + header.e_phnum * sizeof(Elf64_Phdr) ||
++            !dynamic.p_filesz || dynamic.p_filesz % sizeof(Elf64_Dyn) ||
++            dynamic.p_filesz / sizeof(Elf64_Dyn) > 128 ||
++            offset(dynamic.p_vaddr, dynamic.p_filesz) != dynamic.p_offset)
++            denied("ELF", "invalid dynamic segment");
++        const auto header_extent = header.e_phnum * sizeof(Elf64_Phdr);
++        if (program_headers.p_type && (program_headers.p_offset != header.e_phoff ||
++            program_headers.p_vaddr != header.e_phoff || program_headers.p_filesz != header_extent ||
++            program_headers.p_memsz != header_extent || program_headers.p_flags != PF_R))
++            denied("ELF", "invalid in-memory program-header table");
++        if (relro.p_type && (relro.p_flags != PF_R || !relro.p_memsz ||
++            !segment(relro.p_vaddr, relro.p_memsz, PF_W, false) ||
++            offset(relro.p_vaddr, relro.p_filesz, false) != relro.p_offset))
++            denied("ELF", "invalid RELRO mapping");
++        if (eh_frame.p_type && (eh_frame.p_flags != PF_R ||
++            offset(eh_frame.p_vaddr, eh_frame.p_filesz) != eh_frame.p_offset))
++            denied("ELF", "invalid unwind header mapping");
++        metadata.emplace_back(0, header.e_phoff + header.e_phnum * sizeof(Elf64_Phdr));
++        std::map<Elf64_Sxword, std::uint64_t> tags;
++        std::vector<std::uint64_t> needed;
++        bool ended = false;
++        for (std::uint64_t n = 0; n < dynamic.p_filesz; n += sizeof(Elf64_Dyn)) {
++            const auto entry = read_at<Elf64_Dyn>(bytes, dynamic.p_offset + n);
++            const auto value = entry.d_un.d_val;
++            if (entry.d_tag == DT_NULL && value == 0) { ended = true; continue; }
++            if (ended) denied("ELF", "data after dynamic terminator");
++            switch (entry.d_tag) {
++                case DT_NEEDED: needed.push_back(value); continue;
++                case DT_SONAME: case DT_HASH: case DT_STRTAB: case DT_STRSZ: case DT_SYMTAB: case DT_SYMENT:
++                case DT_PLTGOT: case DT_PLTREL: case DT_PLTRELSZ: case DT_JMPREL:
++                case DT_RELA: case DT_RELASZ: case DT_RELAENT: case DT_FLAGS: case DT_FLAGS_1:
++                    break;
++                default: denied("ELF", "unsupported dynamic tag " + std::to_string(entry.d_tag));
++            }
++            if (!tags.emplace(entry.d_tag, value).second) denied("ELF", "duplicate dynamic tag");
++        }
++        auto get = [&](Elf64_Sxword tag) {
++            auto it = tags.find(tag);
++            if (it == tags.end()) denied("ELF", "missing dynamic tag");
++            return it->second;
++        };
++        if (!ended || (tags.contains(DT_FLAGS) && (get(DT_FLAGS) & ~std::uint64_t(DF_BIND_NOW))) ||
++            (tags.contains(DT_FLAGS_1) && (get(DT_FLAGS_1) & ~std::uint64_t(DF_1_NOW))))
++            denied("ELF", "unsupported dynamic flags or terminator");
++        const auto string_size = get(DT_STRSZ);
++        if (!string_size || string_size > 65536) denied("ELF", "string table limit");
++        auto strings = bytes.substr(offset(get(DT_STRTAB), string_size), string_size);
++        if (strings.front() || strings.back()) denied("ELF", "invalid string table sentinels");
++        auto name = [&](std::uint64_t n) {
++            if (n >= strings.size()) denied("ELF", "string index outside table");
++            auto text = strings.substr(n, strings.find('\0', n) - n);
++            if (text.size() > 128) denied("ELF", "native name limit");
++            return text;
++        };
++        if (name(get(DT_SONAME)) != expected.name || needed.size() != expected.needed.size())
++            denied("dependency", expected.name + " SONAME or DT_NEEDED differs");
++        for (std::size_t n = 0; n < needed.size(); ++n)
++            if (name(needed[n]) != expected.needed[n]) denied("dependency", "unapproved DT_NEEDED in " + expected.name);
++
++        const auto hash = get(DT_HASH);
++        const auto hash_head = offset(hash, 8);
++        const auto buckets = read_at<std::uint32_t>(bytes, hash_head);
++        const auto count = read_at<std::uint32_t>(bytes, hash_head + 4);
++        if (!buckets || buckets > symbol_limit || !count || count > symbol_limit || get(DT_SYMENT) != sizeof(Elf64_Sym))
++            denied("ELF", "symbol/hash table limit");
++        const auto hash_table = offset(hash, 8 + (buckets + count) * 4);
++        auto index = [&](unsigned n) {
++            const auto value = read_at<std::uint32_t>(bytes, hash_table + 8 + n * 4);
++            if (value >= count) denied("ELF", "invalid hash link");
++            return value;
++        };
++        for (unsigned n = 0; n < buckets + count; ++n) (void)index(n);
++        for (unsigned n = 0; n < buckets; ++n) {
++            unsigned traversed = 0;
++            for (auto chain = index(n); chain; chain = index(buckets + chain))
++                if (++traversed >= count) denied("ELF", "cyclic hash link");
++        }
++        const auto symtab = offset(get(DT_SYMTAB), count * sizeof(Elf64_Sym));
++        for (unsigned n = 0; n < count; ++n) {
++            auto sym = read_at<Elf64_Sym>(bytes, symtab + n * sizeof(Elf64_Sym));
++            symbols.push_back(sym);
++            names.emplace_back(name(sym.st_name));
++            if (!n) {
++                if (sym.st_name || sym.st_info || sym.st_other || sym.st_shndx || sym.st_value || sym.st_size)
++                    denied("ELF", "invalid null symbol");
++                continue;
++            }
++            const auto kind = ELF64_ST_TYPE(sym.st_info);
++            if (!c_symbol(names.back()) || ELF64_ST_BIND(sym.st_info) != STB_GLOBAL || sym.st_other != STV_DEFAULT ||
++                (kind != STT_FUNC && (kind != STT_NOTYPE || sym.st_shndx != SHN_UNDEF)))
++                denied("ELF", "unsupported dynamic symbol (including weak, TLS and resolver symbols)");
++            if (sym.st_shndx == SHN_UNDEF) {
++                if (sym.st_value || sym.st_size) denied("ELF", "invalid undefined function");
++            } else if (sym.st_shndx >= SHN_LORESERVE || !sym.st_size ||
++                !segment(sym.st_value, sym.st_size, PF_X, true) || !definitions.emplace(names.back(), n).second)
++                denied("ELF", "invalid or conflicting function definition");
++        }
++        auto table = [&](std::uint64_t address, std::uint64_t size, unsigned kind) {
++            if (!size || size % sizeof(Elf64_Rela) || size / sizeof(Elf64_Rela) > relocation_limit)
++                denied("ELF", "invalid relocation extent");
++            auto start = offset(address, size);
++            for (std::uint64_t n = 0; n < size; n += sizeof(Elf64_Rela)) {
++                const auto entry = read_at<Elf64_Rela>(bytes, start + n);
++                if (ELF64_R_TYPE(entry.r_info) != kind || !ELF64_R_SYM(entry.r_info) ||
++                    ELF64_R_SYM(entry.r_info) >= count || entry.r_addend || entry.r_offset % 8 ||
++                    !segment(entry.r_offset, 8, PF_W, false))
++                    denied("ELF", "unsupported relocation or target");
++                relocations.push_back(entry);
++            }
++        };
++        if (tags.contains(DT_RELA) || tags.contains(DT_RELASZ) || tags.contains(DT_RELAENT)) {
++            if (get(DT_RELAENT) != sizeof(Elf64_Rela)) denied("ELF", "unsupported RELA entry");
++            table(get(DT_RELA), get(DT_RELASZ), R_X86_64_GLOB_DAT);
++        }
++        if (tags.contains(DT_JMPREL) || tags.contains(DT_PLTREL) || tags.contains(DT_PLTRELSZ) || tags.contains(DT_PLTGOT)) {
++            if (get(DT_PLTREL) != DT_RELA || !segment(get(DT_PLTGOT), 24, PF_W, true))
++                denied("ELF", "unsupported PLT");
++            table(get(DT_JMPREL), get(DT_PLTRELSZ), R_X86_64_JUMP_SLOT);
++        }
++        std::set<std::uint64_t> targets;
++        for (const auto& entry : relocations) {
++            auto address = entry.r_offset;
++            if (!targets.insert(address).second || std::any_of(metadata.begin(), metadata.end(), [&](auto range) {
++                return address < range.second && range.first < address + 8;
++            })) denied("ELF", "relocation overlaps loader metadata or another relocation");
++        }
++    }
++};
++
++File sealed_image(std::string_view bytes) {
++    File file(memfd_create("void-admitted-native", MFD_CLOEXEC | MFD_ALLOW_SEALING));
++    if (file.fd < 0) denied("seal", "memfd unavailable");
++    while (!bytes.empty()) {
++        auto written = write(file.fd, bytes.data(), bytes.size());
++        if (written < 0 && errno == EINTR) continue;
++        if (written <= 0) denied("seal", "failed to write sealed image");
++        bytes.remove_prefix(static_cast<std::size_t>(written));
++    }
++    constexpr int seals = F_SEAL_WRITE | F_SEAL_SHRINK | F_SEAL_GROW | F_SEAL_SEAL;
++    if (fcntl(file.fd, F_ADD_SEALS, seals) || fcntl(file.fd, F_GET_SEALS) != seals)
++        denied("seal", "unable to verify image seals");
++    return file;
++}
++
++void mapping(std::string_view maps, const Mapped& image, const Elf64_Phdr& segment) {
++    const auto lo = image.link->l_addr + segment.p_vaddr / page * page;
++    const auto end = image.link->l_addr + segment.p_vaddr + segment.p_filesz;
++    auto current = lo;
++    while (!maps.empty() && current < end) {
++        auto line = maps.substr(0, maps.find('\n'));
++        maps.remove_prefix(std::min(maps.size(), line.size() + 1));
++        unsigned long low, high, offset, inode;
++        unsigned device_major, device_minor;
++        char permissions[5];
++        // This is a trusted procfs line, bounded by the captured mapping view.
++        std::string row(line);
++        if (std::sscanf(row.c_str(), "%lx-%lx %4s %lx %x:%x %lu",
++                        &low, &high, permissions, &offset, &device_major, &device_minor, &inode) != 7 ||
++            current < low || current >= high) continue;
++        if (permissions[2] != 'x' || permissions[1] == 'w' || inode != image.identity.st_ino ||
++            device_major != major(image.identity.st_dev) || device_minor != minor(image.identity.st_dev) ||
++            offset + (current - low) != segment.p_offset / page * page + (current - lo))
++            denied("mapping", "executable region differs from sealed image");
++        current = high;
++    }
++    if (current < end) denied("mapping", "incomplete executable mapping");
++}
++
++void map_images(std::vector<Mapped>& result, const std::vector<std::string>& bytes, const std::vector<Elf>& elf) {
++    struct Staged { File file; struct stat identity; std::string path; };
++    std::vector<Staged> staged;
++    staged.reserve(bytes.size());
++    result.reserve(bytes.size());
++    for (const auto& data : bytes) {
++        auto file = sealed_image(data);
++        struct stat identity{}, via_proc{};
++        auto path = "/proc/self/fd/" + std::to_string(file.fd);
++        if (fstat(file.fd, &identity) || stat(path.c_str(), &via_proc) ||
++            identity.st_ino != via_proc.st_ino || identity.st_dev != via_proc.st_dev)
++            denied("mapping", "proc descriptor identity mismatch");
++        staged.push_back({std::move(file), identity, std::move(path)});
++    }
++    Lmid_t ns = LM_ID_NEWLM;
++    for (auto& item : staged) {
++        Module module(dlmopen(ns, item.path.c_str(), RTLD_NOW | RTLD_LOCAL));
++        if (!module.handle) {
++            const char* message = dlerror();
++            denied("load", message ? message : "dlmopen failed");
++        }
++        link_map* link = nullptr;
++        Lmid_t actual;
++        if (dlinfo(module.handle, RTLD_DI_LMID, &actual) || actual == LM_ID_BASE ||
++            (ns != LM_ID_NEWLM && actual != ns) ||
++            dlinfo(module.handle, RTLD_DI_LINKMAP, &link) || !link)
++            denied("mapping", "wrong loader namespace or link map");
++        ns = actual;
++        result.push_back({std::move(item.file), item.identity, std::move(module), link});
++        while (link->l_prev) link = link->l_prev;
++        for (const auto& admitted : result) {
++            if (link != admitted.link) denied("mapping", "unexpected member or order in native namespace");
++            link = link->l_next;
++        }
++        if (link) denied("mapping", "unexpected native namespace member");
++    }
++    auto file = proc("/proc/self/maps");
++    auto maps = read_bounded(file.fd, 4 * 1024 * 1024);
++    for (std::size_t n = 0; n < result.size(); ++n)
++        for (const auto& p : elf[n].loads)
++            if (p.p_flags & PF_X) mapping(maps, result[n], p);
++}
++#endif
++} // namespace
++
++class DynamicBinding final {
++public:
++    DynamicClosure::Owner plan;
++    std::filesystem::path root;
++    CPrimitiveThunk* thunk = nullptr;
++    mutable std::atomic<bool> claimed{false};
++#if defined(__linux__) && defined(__GLIBC__) && defined(__x86_64__)
++    std::vector<Mapped> modules;
++    ~DynamicBinding() { while (!modules.empty()) modules.pop_back(); }
++#endif
++};
++
++bool matches_dynamic(const DynamicBinding& binding, const DynamicClosure& plan, const std::filesystem::path& root) {
++    return binding.plan->bytes() == plan.bytes() && binding.root == root;
++}
++
++std::shared_ptr<const DynamicBinding> load_dynamic(DynamicClosure::Owner plan, const std::filesystem::path& root) {
++#if defined(__linux__) && defined(__GLIBC__) && defined(__x86_64__)
++    if (!plan) denied("authority", "missing host closure");
++    if (auto* runtime = Runtime::attached(); runtime && runtime->is_managed())
++        denied("authority", "loader admission requires NativeSafe state");
++    launch_policy();
++    if (sodium_init() < 0) denied("digest", "SHA-256 provider initialization failed");
++    auto directory = root_directory(root);
++    const auto& images = plan->images();
++    std::vector<std::string> bytes;
++    std::vector<Elf> elf;
++    bytes.reserve(images.size());
++    elf.reserve(images.size());
++    for (const auto& image : images) {
++        bytes.push_back(approved_bytes(directory.fd, image));
++        elf.emplace_back(bytes.back(), image);
++    }
++
++    struct Definition { std::size_t image; std::uint64_t value; };
++    std::map<std::string, Definition, std::less<>> definitions;
++    for (std::size_t n = 0; n < elf.size(); ++n)
++        for (const auto& [name, index] : elf[n].definitions)
++            if (!definitions.emplace(name, Definition{n, elf[n].symbols[index].st_value}).second)
++                denied("symbol", "conflicting closure definition " + name);
++    for (std::size_t n = 0; n < elf.size(); ++n)
++        for (std::size_t k = 1; k < elf[n].symbols.size(); ++k) {
++            if (elf[n].symbols[k].st_shndx != SHN_UNDEF) continue;
++            auto it = definitions.find(elf[n].names[k]);
++            if (it == definitions.end() || std::find(images[n].needed.begin(), images[n].needed.end(),
++                    images[it->second.image].name) == images[n].needed.end())
++                denied("dependency", "unapproved symbol import " + elf[n].names[k]);
++        }
++    for (const auto& e : plan->exports()) {
++        auto it = definitions.find(e.symbol);
++        if (it == definitions.end() || images[it->second.image].name != e.image)
++            denied("symbol", "missing exact owned export " + e.symbol);
++    }
++
++    auto result = std::make_shared<DynamicBinding>();
++    result->plan = std::move(plan);
++    result->root = root;
++    map_images(result->modules, bytes, elf);
++    const auto& loaded = result->modules;
++    for (std::size_t n = 0; n < elf.size(); ++n)
++        for (const auto& relocation : elf[n].relocations) {
++            const auto& target = definitions.at(elf[n].names[ELF64_R_SYM(relocation.r_info)]);
++            std::uintptr_t actual;
++            std::memcpy(&actual, reinterpret_cast<const void*>(loaded[n].link->l_addr + relocation.r_offset), sizeof actual);
++            if (actual != loaded[target.image].link->l_addr + target.value)
++                denied("symbol", "relocation resolved outside its admitted owner");
++        }
++    for (const auto& e : result->plan->exports()) {
++        const auto& target = definitions.at(e.symbol);
++        const auto& owner = loaded[target.image];
++        dlerror();
++        void* address = dlsym(owner.module.handle, e.symbol.c_str());
++        Dl_info info{};
++        void* link = nullptr;
++        if (dlerror() || !address ||
++            reinterpret_cast<std::uintptr_t>(address) != owner.link->l_addr + target.value ||
++            !dladdr1(address, &info, &link, RTLD_DL_LINKMAP) || link != owner.link)
++            denied("symbol", "mapped export belongs to another image: " + e.symbol);
++        if (e.symbol == DynamicClosure::transport) result->thunk = reinterpret_cast<CPrimitiveThunk*>(address);
++    }
++    const auto& descriptor = result->plan->descriptor();
++    if (!result->thunk || result->thunk(descriptor.data(), static_cast<std::uint32_t>(descriptor.size()),
++                                      c_primitive_probe, nullptr, 0, nullptr))
++        denied("transport", "provider rejected the exact descriptor or thunk identity");
++    return result;
++#else
++    (void)plan;
++    (void)root;
++    denied("target", "verified loading requires Linux x86-64 GNU");
++#endif
++}
++
++std::filesystem::path installed_dynamic_root() {
++#if defined(__linux__) && defined(__GLIBC__) && defined(__x86_64__)
++    char path[4097];
++    auto count = readlink("/proc/self/exe", path, sizeof path);
++    if (count <= 0 || count >= static_cast<ssize_t>(sizeof path))
++        denied("path", "executable location is unavailable");
++    std::string_view name(path, static_cast<std::size_t>(count));
++    if (!name.starts_with('/') || name.ends_with(" (deleted)"))
++        denied("path", "executable location is not stable");
++    return std::filesystem::path(name).parent_path() / "native";
++#else
++    denied("target", "verified loading requires Linux x86-64 GNU");
++#endif
++}
++
++std::shared_ptr<const DynamicBinding> Runtime::dynamic_binding() const {
++    std::lock_guard lock(mutex_);
++    return native_dynamic_;
++}
++
++void Runtime::bind_dynamic(std::shared_ptr<const DynamicBinding> binding) {
++    std::lock_guard lock(mutex_);
++    if (closing_ || !binding || (native_dynamic_ && native_dynamic_ != binding))
++        denied("authority", "Runtime already has a different binding or is closing");
++    if (!native_dynamic_ && binding->claimed.exchange(true))
++        denied("authority", "native binding is already owned by a Runtime");
++    native_dynamic_ = std::move(binding);
++}
++
++extern "C" CPrimitiveThunk* vd_c_dynamic_resolve_v1(const char* bytes, std::uint32_t size) noexcept {
++    try {
++        auto& runtime = Runtime::current();
++        if (!runtime.is_managed() || !bytes || !size || size > 32768) return nullptr;
++        auto binding = runtime.dynamic_binding();
++        if (binding && binding->plan->bytes() == std::string_view(bytes, size)) return binding->thunk;
++    } catch (const std::exception&) {}
++    return nullptr;
++}
++
++extern "C" std::uint32_t vd_c_dynamic_call_v1(const char* bytes, std::uint32_t size, std::uint32_t ordinal,
++    const std::uint64_t* words, std::uint32_t count, std::uint64_t* result,
++    const CSpanRequest* spans, std::uint32_t span_count) noexcept {
++    try {
++        auto& runtime = Runtime::current();
++        if (!runtime.is_managed() || !bytes || !size || size > 32768 || ordinal >= 64 ||
++            count > c_primitive_max_arguments || (count && !words)) return 7;
++        auto binding = runtime.dynamic_binding();
++        if (!binding || binding->plan->bytes() != std::string_view(bytes, size)) return 7;
++        runtime.begin_native_job();
++        struct Job { Runtime& runtime; ~Job() { runtime.end_native_job(); } } job{runtime};
++        const auto& descriptor = binding->plan->descriptor();
++        if (span_count)
++            return vd_c_span_dispatch_v2(binding->thunk, descriptor.data(), descriptor.size(),
++                                        ordinal, words, count, result, spans, span_count);
++        Runtime::Native native(runtime);
++        return binding->thunk(descriptor.data(), descriptor.size(), ordinal, words, count, result);
++    } catch (const std::exception&) { return 7; }
++}
++} // namespace vd
+diff --git a/tests/ffi/dynamic.cmake b/tests/ffi/dynamic.cmake
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/dynamic.cmake
+@@ -0,0 +1,74 @@
++if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux" OR NOT TARGET void_g3_tests)
++  return()
++endif()
++
++set(g4_src "${PROJECT_SOURCE_DIR}/tests/ffi")
++set(g4_bin "${CMAKE_CURRENT_BINARY_DIR}/ffi-g4")
++set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
++  "${g4_src}/dynamic_thunk.c" "${g4_src}/dynamic_fixture.c" "${g4_src}/dynamic_fixture.h" "${g4_src}/dynamic_dep.c")
++file(SHA256 "${g4_src}/dynamic_thunk.c" G4_THUNK_SHA)
++file(SHA256 "${g4_src}/dynamic_fixture.c" g4_provider_sha)
++file(SHA256 "${g4_src}/dynamic_fixture.h" g4_header_sha)
++file(SHA256 "${g4_src}/dynamic_dep.c" g4_dependency_sha)
++string(SHA256 G4_FIXTURE_SHA "${g4_provider_sha}${g4_header_sha}${g4_dependency_sha}")
++configure_file("${g4_src}/dynamic.descriptor.in" "${g4_bin}/dynamic.descriptor" @ONLY NEWLINE_STYLE LF)
++file(READ "${g4_bin}/dynamic.descriptor" G4_DESCRIPTOR_STRING)
++string(REPLACE "\n" "\\n\"\n\"" G4_DESCRIPTOR_STRING "${G4_DESCRIPTOR_STRING}")
++configure_file("${g4_src}/g4_descriptor.h.in" "${g4_bin}/g4_descriptor.h" @ONLY NEWLINE_STYLE LF)
++
++function(g4_image target output root)
++  add_library(${target} SHARED ${ARGN})
++  set_target_properties(${target} PROPERTIES OUTPUT_NAME "${output}"
++    LIBRARY_OUTPUT_DIRECTORY "${g4_bin}/${root}" SKIP_BUILD_RPATH TRUE
++    C_STANDARD 11 C_STANDARD_REQUIRED YES C_EXTENSIONS NO
++    C_VISIBILITY_PRESET hidden INTERPROCEDURAL_OPTIMIZATION OFF)
++  target_compile_options(${target} PRIVATE -ffreestanding -fno-builtin -fno-stack-protector -Wall -Wextra -Wpedantic)
++  target_link_options(${target} PRIVATE -nostdlib -fuse-ld=lld
++    "LINKER:--hash-style=sysv,-z,now,-z,relro,-z,defs")
++  # This profile admits no dynamic CRT, sanitizer runtime or initializer.
++  # Use freestanding UBSan traps for these C images in the strict build.
++  if(VOID_SANITIZERS)
++    target_compile_options(${target} PRIVATE -fsanitize=undefined -fsanitize-trap=undefined)
++  endif()
++endfunction()
++
++g4_image(void_g4_dep void_g4_dep native "${g4_src}/dynamic_dep.c")
++g4_image(void_g4_main void_g4_main native "${g4_src}/dynamic_fixture.c" "${g4_src}/dynamic_thunk.c")
++target_include_directories(void_g4_main PRIVATE "${g4_bin}")
++target_link_libraries(void_g4_main PRIVATE void_g4_dep)
++g4_image(void_g4_competitor void_g4_dep outside "${g4_src}/dynamic_dep.c")
++target_compile_definitions(void_g4_competitor PRIVATE G4_BIAS=99)
++g4_image(void_g4_initializer void_g4_dep initializer "${g4_src}/dynamic_dep.c" "${g4_src}/dynamic_constructor.c")
++
++set(g4_plan "${g4_bin}/closure.txt")
++add_custom_command(OUTPUT "${g4_plan}"
++  COMMAND "${Python3_EXECUTABLE}" "${g4_src}/dynamic_plan.py" "${g4_bin}/dynamic.descriptor"
++    "$<TARGET_FILE:void_g4_main>" "$<TARGET_FILE:void_g4_dep>" "${g4_plan}"
++  DEPENDS void_g4_main void_g4_dep "${g4_bin}/dynamic.descriptor" "${g4_src}/dynamic_plan.py" VERBATIM)
++add_custom_target(void_g4_plan DEPENDS "${g4_plan}")
++add_executable(void_g4_tests "${g4_src}/dynamic.cpp")
++target_include_directories(void_g4_tests SYSTEM PRIVATE "${VOID_HOST_DEPS_ROOT}/include")
++target_link_libraries(void_g4_tests PRIVATE void_llvm)
++add_dependencies(void_g4_tests void_g4_plan void_g4_competitor void_g4_initializer)
++add_test(NAME ffi_g4_jit_ir COMMAND void_g4_tests "${g4_plan}" "${g4_src}/dynamic.void" "${g4_bin}/native"
++  "${g4_bin}/jit-probes" "$<TARGET_FILE:void_g4_competitor>" "$<TARGET_FILE:void_g4_initializer>")
++set_tests_properties(ffi_g4_jit_ir PROPERTIES TIMEOUT 180)
++
++foreach(mode IN ITEMS normal optimized startup)
++  set(source "${g4_src}/dynamic.void")
++  if(mode STREQUAL "startup")
++    set(source "${g4_src}/dynamic_startup.void")
++  endif()
++  set(object "${g4_bin}/application-${mode}.o")
++  add_custom_command(OUTPUT "${object}" BYPRODUCTS "${object}.source.txt"
++    COMMAND "${Python3_EXECUTABLE}" "${g4_src}/dynamic_process.py" --emit "$<TARGET_FILE:void_g4_tests>"
++      "${g4_plan}" "${source}" "${object}" "${mode}"
++    DEPENDS void_g4_tests "${g4_plan}" "${source}" "${g4_src}/dynamic_process.py" VERBATIM)
++  set_source_files_properties("${object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
++  add_executable("void_g4_aot_${mode}" "${object}")
++  set_target_properties("void_g4_aot_${mode}" PROPERTIES LINKER_LANGUAGE CXX SKIP_BUILD_RPATH TRUE)
++  target_link_libraries("void_g4_aot_${mode}" PRIVATE void_runtime)
++  add_test(NAME "ffi_g4_aot_${mode}" COMMAND "${Python3_EXECUTABLE}" "${g4_src}/dynamic_process.py"
++    "$<TARGET_FILE:void_g4_aot_${mode}>" "${g4_bin}/native" "${object}.source.txt" "${mode}"
++    "$<TARGET_FILE:void_g4_competitor>")
++endforeach()
+diff --git a/tests/ffi/dynamic.cpp b/tests/ffi/dynamic.cpp
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/dynamic.cpp
+@@ -0,0 +1,448 @@
++#include "void/backend.hpp"
++#include "void/c_primitive.hpp"
++#include "void/frontend.hpp"
++#include "void/native_resource.hpp"
++#include "void/runtime.hpp"
++
++#include <dlfcn.h>
++#include <elf.h>
++#include <fcntl.h>
++#include <link.h>
++#include <sodium.h>
++#include <sys/stat.h>
++#include <unistd.h>
++
++#include <array>
++#include <atomic>
++#include <chrono>
++#include <cstring>
++#include <fstream>
++#include <iostream>
++#include <iterator>
++#include <semaphore>
++#include <stdexcept>
++#include <thread>
++
++namespace {
++using namespace vd;
++using namespace vd::ir;
++namespace fs = std::filesystem;
++
++void require(bool condition, std::string_view message) {
++    if (!condition) throw std::runtime_error(std::string(message));
++}
++template<class Work>
++void rejects(std::string_view label, std::string_view expected, Work work) {
++    try { work(); }
++    catch (const std::exception& error) {
++        require(std::string_view(error.what()).find(expected) != std::string_view::npos,
++            std::string(label) + " received " + error.what());
++        std::cout << label << ": " << error.what() << '\n';
++        return;
++    }
++    throw std::runtime_error(std::string(label) + " unexpectedly accepted");
++}
++std::string read(const fs::path& path) {
++    std::ifstream input(path, std::ios::binary);
++    require(bool(input), "cannot read " + path.string());
++    return {std::istreambuf_iterator<char>(input), {}};
++}
++void write(const fs::path& path, std::string_view text) {
++    std::ofstream output(path, std::ios::binary);
++    output.write(text.data(), text.size());
++    require(bool(output), "cannot write " + path.string());
++}
++std::string change(std::string text, std::string_view from, std::string_view to) {
++    auto at = text.find(from);
++    require(at != text.npos, "missing fixture marker");
++    return text.replace(at, from.size(), to);
++}
++std::string digest(std::string_view bytes) {
++    unsigned char hash[crypto_hash_sha256_BYTES];
++    char text[sizeof hash * 2 + 1];
++    require(!crypto_hash_sha256(hash, reinterpret_cast<const unsigned char*>(bytes.data()), bytes.size()),
++            "fixture hash");
++    return sodium_bin2hex(text, sizeof text, hash, sizeof hash);
++}
++auto analyze(const fs::path& source, const CPrimitiveAdmission::Owner& admission) {
++    auto result = analyze_project(source, admission);
++    if (!result.succeeded()) throw CompilationError(result.diagnostics);
++    return result.program;
++}
++
++void offline_denials(const std::string& recipe, const fs::path& root, const ValidatedAnalysis& analysis) {
++    auto reject_plan = [&](std::string_view label, std::string_view from, std::string_view to, std::string_view expected) {
++        rejects(label, expected, [&] { (void)CPrimitiveAdmission::admit_dynamic(change(recipe, from, to), root); });
++    };
++    reject_plan("bad closure revision", "closure 1", "closure 2", "unsupported revision");
++    reject_plan("system library policy", "system none", "system ambient", "system ABI");
++    reject_plan("foreign provider", "provider org.voidlang.g4-fixture", "provider org.voidlang.wrong", "exact descriptor");
++    reject_plan("aliased image", "image libvoid_g4_dep.so", "image ../libvoid_g4_dep.so", "invalid or duplicate image");
++    reject_plan("missing descriptor export", "export libvoid_g4_main.so g4_add\n", "", "missing an owned descriptor export");
++    const auto thunk = analysis.c_primitive_admission()->dynamic()->thunk_identity();
++    auto wrong = thunk;
++    wrong.front() = wrong.front() == 'a' ? 'b' : 'a';
++    reject_plan("wrong target thunk", "thunk " + thunk, "thunk " + wrong, "exact descriptor");
++    auto good = analysis.lower();
++    {
++        auto forged = good;
++        forged.imports.push_back(std::string(c_dynamic_resolve));
++        rejects("direct bridge import", "requires host admission", [&] { validate(forged); });
++    }
++    {
++        auto forged = good;
++        forged.c_primitives.reset();
++        rejects("erased closure admission", "differs from analyzed source", [&] { validate(forged); });
++    }
++    {
++        auto forged = good;
++        forged.analysis.reset();
++        bool changed = false;
++        for (auto& function : forged.functions)
++            for (auto& block : function.blocks)
++                for (auto& instruction : block.instructions)
++                    if (instruction.op == Op::c_primitive_call) {
++                        instruction.immediate = 63;
++                        changed = true;
++                    }
++        require(changed, "expected dynamic IR call");
++        rejects("forged dynamic ordinal", "outside the admitted binding module", [&] { validate(forged); });
++    }
++    {
++        auto forged = good;
++        forged.analysis.reset();
++        for (auto& function : forged.functions)
++            for (auto& block : function.blocks)
++                for (auto& instruction : block.instructions)
++                    if (instruction.op == Op::c_primitive_call) instruction.callee = "other::g4_add";
++        rejects("forged provider and symbol", "exact call signature", [&] { validate(forged); });
++    }
++}
++
++template<class T>
++T at(const std::string& bytes, std::size_t offset) {
++    require(offset <= bytes.size() && sizeof(T) <= bytes.size() - offset, "test ELF read bounds");
++    T value;
++    std::memcpy(&value, bytes.data() + offset, sizeof value);
++    return value;
++}
++template<class T>
++void put(std::string& bytes, std::size_t offset, T value) {
++    require(offset <= bytes.size() && sizeof(T) <= bytes.size() - offset, "test ELF write bounds");
++    std::memcpy(bytes.data() + offset, &value, sizeof value);
++}
++struct EditableElf {
++    std::string bytes;
++    Elf64_Ehdr header;
++    std::vector<Elf64_Phdr> segments;
++    Elf64_Phdr dynamic{};
++    explicit EditableElf(std::string input) : bytes(std::move(input)), header(at<Elf64_Ehdr>(bytes,0)) {
++        for (unsigned n = 0; n < header.e_phnum; ++n) {
++            auto p = at<Elf64_Phdr>(bytes, header.e_phoff + n * sizeof(Elf64_Phdr));
++            segments.push_back(p);
++            if (p.p_type == PT_DYNAMIC) dynamic = p;
++        }
++    }
++    std::size_t tag(Elf64_Sxword wanted) const {
++        for (std::size_t pos = dynamic.p_offset; pos < dynamic.p_offset + dynamic.p_filesz; pos += sizeof(Elf64_Dyn))
++            if (at<Elf64_Dyn>(bytes, pos).d_tag == wanted) return pos;
++        throw std::runtime_error("missing test dynamic tag");
++    }
++    std::size_t offset(Elf64_Addr address) const {
++        for (const auto& p : segments)
++            if (p.p_type == PT_LOAD && address >= p.p_vaddr && address - p.p_vaddr < p.p_filesz)
++                return p.p_offset + address - p.p_vaddr;
++        throw std::runtime_error("missing test ELF address");
++    }
++    std::size_t table(Elf64_Sxword wanted) const {
++        return offset(at<Elf64_Dyn>(bytes, tag(wanted)).d_un.d_ptr);
++    }
++};
++void loader_denials(const std::string& recipe, const fs::path& root, const fs::path& sandbox,
++                    const fs::path& constructor, const fs::path& source) {
++    const auto plan = DynamicClosure::parse(recipe);
++    const auto& main = plan->images().back();
++    const auto& dep = plan->images().front();
++    const auto isolated = sandbox / "negative";
++    fs::create_directories(isolated);
++    const auto main_bytes = read(root / main.name), dep_bytes = read(root / dep.name);
++    auto setup = [&] {
++        write(isolated / main.name, main_bytes);
++        write(isolated / dep.name, dep_bytes);
++    };
++    auto reject_load = [&](std::string_view label, std::string_view expected, std::string_view bytes) {
++        auto admission = CPrimitiveAdmission::admit_dynamic(bytes, isolated);
++        auto program = analyze(source, admission);
++        auto module = program->lower();
++        auto runtime = std::make_shared<Runtime>();
++        Jit jit;
++        rejects(label, expected, [&] { (void)jit.compile(module, module.entry_symbol, false, {}, runtime); });
++        require(!runtime->dynamic_binding() && !jit.live_generations(), "failed admission published a binding");
++    };
++    setup();
++    fs::remove(isolated / main.name);
++    reject_load("missing provider", "C dynamic artifact", recipe);
++    setup();
++    write(isolated / dep.name, dep_bytes + 'x');
++    reject_load("modified dependency", "C dynamic digest", recipe);
++    setup();
++    fs::remove(isolated / main.name);
++    fs::create_symlink(root / main.name, isolated / main.name);
++    reject_load("symlink provider", "C dynamic artifact", recipe);
++    fs::remove(isolated / main.name);
++    fs::create_hard_link(root / main.name, isolated / main.name);
++    reject_load("hardlinked provider", "C dynamic artifact", recipe);
++    fs::remove(isolated / main.name);
++    setup();
++    const auto extra = "export " + main.name + " g4_missing\n";
++    reject_load("missing required export", "missing exact owned export",
++                change(recipe,"\ndescriptor\n","\n"+extra+"descriptor\n"));
++    reject_load("wrong symbol owner", "missing exact owned export",
++                change(recipe,"export "+dep.name+" g4_bias","export "+main.name+" g4_bias"));
++    auto conflict = change(dep_bytes, "g4_bias", std::string("g4_add\0",7));
++    write(isolated / dep.name, conflict);
++    reject_load("conflicting symbol across closure", "conflicting closure definition",
++                change(recipe,dep.sha256,digest(conflict)));
++    setup();
++
++    auto mutated = [&](std::string_view label, std::string_view expected, auto edit) {
++        EditableElf image(main_bytes);
++        edit(image);
++        write(isolated / main.name, image.bytes);
++        reject_load(label, expected, change(recipe, main.sha256, digest(image.bytes)));
++    };
++    mutated("unapproved ELF target", "unsupported target", [](auto& image) {
++        image.header.e_machine = EM_AARCH64;
++        put(image.bytes, 0, image.header);
++    });
++    for (auto forbidden : {DT_RPATH, DT_AUDIT, DT_INIT})
++        mutated("unsupported dynamic tag " + std::to_string(forbidden), "unsupported dynamic tag", [&](auto& image) {
++            auto pos = image.tag(DT_FLAGS);
++            auto entry = at<Elf64_Dyn>(image.bytes,pos);
++            entry.d_tag = forbidden;
++            put(image.bytes,pos,entry);
++        });
++    mutated("system DT_NEEDED", "unapproved DT_NEEDED", [](auto& image) {
++        auto needed = at<Elf64_Dyn>(image.bytes, image.tag(DT_NEEDED));
++        image.bytes.replace(image.table(DT_STRTAB) + needed.d_un.d_val, 10, "libc.so.6\0", 10);
++    });
++    for (auto unsupported : {PT_INTERP, PT_TLS})
++    mutated("ELF program header " + std::to_string(unsupported), "unsupported program header", [&](auto& image) {
++        for (std::size_t n = 0; n < image.segments.size(); ++n) {
++            auto p = image.segments[n];
++            if (p.p_type != PT_GNU_STACK) continue;
++            p.p_type = unsupported;
++            put(image.bytes, image.header.e_phoff + n * sizeof(Elf64_Phdr), p);
++            return;
++        }
++        throw std::runtime_error("missing test stack segment");
++    });
++    mutated("IFUNC resolver", "resolver symbols", [](auto& image) {
++        auto pos = image.table(DT_SYMTAB) + sizeof(Elf64_Sym);
++        auto symbol = at<Elf64_Sym>(image.bytes,pos);
++        symbol.st_info = ELF64_ST_INFO(STB_GLOBAL, STT_GNU_IFUNC);
++        put(image.bytes,pos,symbol);
++    });
++    mutated("IRELATIVE resolver", "unsupported relocation", [](auto& image) {
++        auto pos = image.table(DT_JMPREL);
++        auto relocation = at<Elf64_Rela>(image.bytes,pos);
++        relocation.r_info = ELF64_R_INFO(0, R_X86_64_IRELATIVE);
++        put(image.bytes,pos,relocation);
++    });
++    setup();
++    auto init = read(constructor);
++    write(isolated / dep.name, init);
++    reject_load("real initializer would exit 121 if mapped", "unsupported dynamic tag",
++                change(recipe, dep.sha256, digest(init)));
++}
++
++CPrimitiveThunk* observed_thunk(Runtime& runtime, const std::string& recipe) {
++    Runtime::Attachment attached(runtime);
++    Runtime::Managed managed(runtime);
++    return vd_c_dynamic_resolve_v1(recipe.data(),recipe.size());
++}
++std::uint64_t inspect(CPrimitiveThunk* thunk, const std::string& descriptor, unsigned ordinal,
++                      const std::uint64_t* words = nullptr, unsigned count = 0) {
++    std::uint64_t value = 0;
++    require(thunk(descriptor.data(), descriptor.size(), ordinal, words, count, &value) == 0,
++            "host fixture inspection transport");
++    return value;
++}
++bool mapped(CPrimitiveThunk* thunk) {
++    Dl_info image{};
++    return dladdr(reinterpret_cast<void*>(thunk), &image) != 0;
++}
++void observe_images(CPrimitiveThunk* thunk, const DynamicClosure& plan) {
++    Dl_info info{};
++    void* owner = nullptr;
++    require(dladdr1(reinterpret_cast<void*>(thunk), &info, &owner, RTLD_DL_LINKMAP) && owner,
++            "cannot inspect actual dynamic namespace");
++    auto* link = static_cast<link_map*>(owner);
++    while (link->l_prev) link = link->l_prev;
++    for (const auto& image : plan.images()) {
++        require(link && std::string_view(link->l_name).starts_with("/proc/self/fd/"),
++                "namespace did not map from a sealed descriptor");
++        int fd = open(link->l_name, O_RDONLY | O_CLOEXEC);
++        struct stat identity{};
++        const bool sealed = fd >= 0 && fstat(fd,&identity) == 0 &&
++            fcntl(fd,F_GET_SEALS) == (F_SEAL_WRITE | F_SEAL_SHRINK | F_SEAL_GROW | F_SEAL_SEAL);
++        if (fd >= 0) close(fd);
++        require(sealed && digest(read(link->l_name)) == image.sha256, "mapped closure hash or seals differ");
++        std::cout << "G4 mapped " << image.name << " inode " << identity.st_ino
++                  << " verified sealed SHA-256 " << image.sha256 << '\n';
++        link = link->l_next;
++    }
++    require(!link, "unexpected namespace member");
++}
++void drain_call(const std::shared_ptr<const NativeCode>& code, CPrimitiveThunk* thunk, const std::string& descriptor) {
++    auto& runtime = *code->runtime_owner();
++    std::atomic<bool> invoked{false}, closed{false};
++    const std::uint64_t query = 0, resume = 2;
++    bool entered = false, protected_call = false;
++    std::binary_semaphore begin_close(0);
++    std::thread closer([&] { begin_close.acquire(); closed = !runtime.close(); });
++    std::thread observer([&] {
++        for (unsigned attempt = 0; attempt < 5000 && !invoked; ++attempt) {
++            if (inspect(thunk,descriptor,8,&query,1) == 1) { entered = true; break; }
++            std::this_thread::sleep_for(std::chrono::milliseconds(1));
++        }
++        begin_close.release();
++        bool closing = false;
++        for (unsigned attempt = 0; attempt < 5000; ++attempt) {
++            try { (void)NativeLibrary::get(runtime); }
++            catch (const std::runtime_error&) { closing = true; break; }
++            std::this_thread::sleep_for(std::chrono::milliseconds(1));
++        }
++        protected_call = closing && !closed && !invoked && mapped(thunk) && inspect(thunk,descriptor,6) == 1;
++        inspect(thunk,descriptor,8,&resume,1);
++    });
++    int value = -1;
++    std::exception_ptr invocation_error;
++    try { value = code->invoke(95); }
++    catch (...) { invocation_error = std::current_exception(); }
++    invoked = true;
++    observer.join();
++    closer.join();
++    if (invocation_error) std::rethrow_exception(invocation_error);
++    require(entered && protected_call && closed && value == 200, "shutdown did not drain the live dynamic call");
++}
++
++void lifecycle(const std::string& recipe, const fs::path& source, const fs::path& bundle,
++               const fs::path& root, bool optimize) {
++    auto admission = CPrimitiveAdmission::admit_dynamic(recipe, root);
++    const auto probe = bundle / "dynamic.void";
++    const auto original = read(source);
++    write(probe, original);
++    CPrimitiveThunk* thunk = nullptr;
++    std::weak_ptr<const DynamicBinding> lease;
++    {
++        Jit jit;
++        auto program = analyze(probe, admission);
++        auto first = jit.compile(*program,optimize);
++        auto runtime = first->runtime_owner();
++        ReloadSlot slot(first);
++        thunk = observed_thunk(*runtime,recipe);
++        require(thunk && mapped(thunk), "dynamic binding absent");
++        observe_images(thunk,*admission->dynamic());
++        {
++            Runtime unrelated;
++            require(!observed_thunk(unrelated,recipe), "foreign Runtime can resolve another binding");
++            rejects("cross-Runtime binding transfer", "already owned", [&] {
++                unrelated.bind_dynamic(runtime->dynamic_binding());
++            });
++        }
++        lease = runtime->dynamic_binding();
++        require(slot.invoke(7) == 104, "primitive/record/span/resource execution");
++        rejects("stale dynamic alias", "closed, null or invalid", [&] { (void)slot.invoke(-1); });
++        rejects("dynamic double close", "closed, null or invalid", [&] { (void)slot.invoke(-2); });
++        require(slot.invoke(90) == 31, "live native owner");
++        const auto releases = slot.invoke(93);
++        rejects("refused dynamic acquisition containing a live pointer", "operation rejected", [&] { (void)slot.invoke(94); });
++        require(slot.invoke(91) == 38 && slot.invoke(93) == releases, "refusal released a foreign-owned pointer");
++
++        write(probe, change(original, " + 7", " + 8"));
++        auto updated = analyze(probe, admission);
++        auto incompatible = analyze(probe, CPrimitiveAdmission::admit_dynamic(recipe, bundle));
++        require(!jit.replace(slot,*incompatible,optimize) && slot.invoke(91) == 38, "wrong closure root replaced live authority");
++        auto changed_hash = admission->dynamic()->images().front().sha256;
++        changed_hash.front() = changed_hash.front() == 'a' ? 'b' : 'a';
++        auto changed_recipe = change(recipe,admission->dynamic()->images().front().sha256,changed_hash);
++        auto changed_admission = CPrimitiveAdmission::admit_dynamic(changed_recipe,root);
++        auto changed_closure = analyze(probe,changed_admission);
++        require(!jit.replace(slot,*changed_closure,optimize), "wrong digest replaced live authority");
++        const auto isolated_call = bundle / "binding_authority.void";
++        write(isolated_call,"use \"/native_dynamic.void\" as ffi\n\n"
++                            "func entry(value: i32) -> i32:\n    return ffi.add(value, 0)\n");
++        auto forged_runtime = analyze(isolated_call,changed_admission)->lower();
++        rejects("different closure in live Runtime", "incompatible with the Runtime binding", [&] {
++            (void)jit.compile(forged_runtime,forged_runtime.entry_symbol,optimize,{},runtime);
++        });
++        require(jit.replace(slot,*updated,optimize), "compatible reload failed");
++        first.reset();
++        require(jit.live_generations() == 2 && slot.invoke(91) == 39 &&
++                observed_thunk(*runtime,recipe) == thunk, "reload lost binding or acquisition lease");
++        require(slot.invoke(92) == 0 && slot.invoke(93) == releases + 1 &&
++                jit.live_generations() == 1, "terminal release did not retire acquisition generation");
++        require(slot.invoke(90) == 31, "live shutdown owner");
++        drain_call(slot.acquire(),thunk,admission->descriptor());
++        require(inspect(thunk,admission->descriptor(),6) == 0 &&
++                inspect(thunk,admission->descriptor(),7) == static_cast<unsigned>(releases + 2) &&
++                mapped(thunk), "shutdown did not release once while provider was still mapped");
++    }
++    require(lease.expired() && !mapped(thunk), "provider retained after Runtime and generation retirement");
++    std::cout << "G4 " << (optimize ? "O2" : "normal")
++              << " JIT returned 104; refusal, reload, live call, teardown and unmap passed\n";
++}
++
++void replacement(const std::string& recipe, const fs::path& source, const fs::path& root,
++                 const fs::path& sandbox, const fs::path& competitor) {
++    auto plan = DynamicClosure::parse(recipe);
++    const auto stage = sandbox / "replacement";
++    fs::create_directories(stage);
++    for (const auto& image : plan->images())
++        fs::copy_file(root/image.name, stage/image.name, fs::copy_options::overwrite_existing);
++    auto program = analyze(source, CPrimitiveAdmission::admit_dynamic(recipe, stage));
++    Jit jit;
++    auto code = jit.compile(*program, false);
++    const auto staged = stage/"replace.tmp";
++    fs::copy_file(competitor, staged, fs::copy_options::overwrite_existing);
++    fs::rename(staged, stage/plan->images().front().name);
++    require(code->invoke(7) == 104, "replacement changed a sealed mapping");
++    rejects("new Runtime after on-disk dependency replacement", "C dynamic digest", [&] {
++        (void)jit.compile(*program, false);
++    });
++}
++}
++
++int main(int argc, char** argv) try {
++    if (argc == 6 && std::string_view(argv[1]) == "--emit") {
++        const auto source = fs::absolute(argv[3]);
++        const auto absent = source.parent_path() / "not-installed";
++        require(!fs::exists(absent), "offline emission unexpectedly has a provider root");
++        auto admission = CPrimitiveAdmission::admit_dynamic(read(argv[2]), absent);
++        auto program = analyze(source,admission);
++        emit_object(program->lower(Emission::entry),argv[4],std::string_view(argv[5])=="optimized",true);
++        return 0;
++    }
++    require(argc == 7, "expected closure, source, bundle, scratch, competitor and initializer");
++    require(sodium_init() >= 0, "fixture SHA-256 initialization");
++    const auto recipe = read(argv[1]);
++    const auto root = fs::canonical(argv[3]);
++    const auto sandbox = fs::absolute(argv[4]);
++    fs::create_directories(sandbox);
++    const auto offline = CPrimitiveAdmission::admit_dynamic(recipe, sandbox/"absent");
++    auto program = analyze(argv[2],offline);
++    require(!analyze_project(argv[2]).succeeded(), "source granted dynamic loading authority");
++    offline_denials(recipe,root,*program);
++    loader_denials(recipe,root,sandbox,argv[6],argv[2]);
++    void* competitor = dlopen(argv[5],RTLD_NOW|RTLD_LOCAL);
++    require(competitor, "base namespace competitor missing");
++    lifecycle(recipe,argv[2],sandbox,root,false);
++    lifecycle(recipe,argv[2],sandbox,root,true);
++    replacement(recipe,argv[2],root,sandbox,argv[5]);
++    require(!dlclose(competitor), "competitor unload failed");
++    return 0;
++} catch (const std::exception& error) {
++    std::cerr << error.what() << '\n';
++    return 1;
++}
+diff --git a/tests/ffi/dynamic.descriptor.in b/tests/ffi/dynamic.descriptor.in
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/dynamic.descriptor.in
+@@ -0,0 +1,22 @@
++void-c-primitive 3 3
++provider org.voidlang.g4-fixture
++target x86_64-unknown-linux-gnu sysv-x64
++source /native_dynamic.void
++thunk @G4_THUNK_SHA@
++fixture @G4_FIXTURE_SHA@
++effects direct-sync nonblocking no-callbacks
++call c-default
++aliases c_int:i32 c_long:i64 c_size:u64 c_bool:bool
++resource box G4Box pointer null create close_box owner-calls shutdown-any consume-always
++record sample G4Sample 16 8 2
++field tag tag i32 0
++field reading reading f64 8
++bind add g4_add i32 i32 i32
++bind calibrate g4_sample record:sample record:sample
++bind fill g4_fill i64 out:1:2:64 c_size c_size u8
++bind create g4_create owner:box i32
++bind read g4_read i32 borrow:box i32
++bind close_box g4_close i32 close:box
++bind live g4_live i32
++bind releases g4_releases i32
++bind gate g4_gate i32 i32
+diff --git a/tests/ffi/dynamic.void b/tests/ffi/dynamic.void
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/dynamic.void
+@@ -0,0 +1,49 @@
++use "/native_dynamic.void" as ffi
++
++var saved: ffi.box? = null
++
++func entry(value: i32) -> i32:
++    if value == 90:
++        saved = ffi.create(31)
++        return ffi.read(saved as ffi.box, 0)
++    if value == 91:
++        return ffi.read(saved as ffi.box, 0) + 7
++    if value == 92:
++        return ffi.close_box(saved as ffi.box)
++    if value == 93:
++        return ffi.releases()
++    if value == 94:
++        var rejected = ffi.create(-3)
++        return ffi.live()
++    if value == 95:
++        return ffi.add(200, 0)
++    if value == -3:
++        saved = ffi.create(31)
++        var rejected = ffi.create(-3)
++        return ffi.live()
++    if value == -4:
++        var live = ffi.create(22) as ffi.box
++        return ffi.read(live, 0)
++    if ffi.add(value, -2) != value + 5:
++        return 1
++    var sample = ffi.calibrate(ffi.sample(tag = -9, reading = 3.25))
++    if sample.tag != -2 or sample.reading != 6.5:
++        return 2
++    var bytes: [u8] = [10, 20, 30, 40]
++    if ffi.fill(bytes, 1, 2, 255) != -7 or bytes[1] != 20 or bytes[2] != 30:
++        return 3
++    if ffi.fill(bytes, 1, 2, 5) != 2 or bytes[0] != 10 or bytes[1] != 5 or bytes[2] != 6 or bytes[3] != 40:
++        return 4
++    if ffi.create(-1) != null:
++        return 5
++    var owner = ffi.create(-2) as ffi.box
++    var alias = owner
++    if ffi.read(alias, 1) != -13 or ffi.read(owner, 0) != -2:
++        return 6
++    if ffi.close_box(owner) != 17 or ffi.live() != 0:
++        return 7
++    if value == -1:
++        return ffi.read(alias, 0)
++    if value == -2:
++        return ffi.close_box(alias)
++    return value + 97
+diff --git a/tests/ffi/dynamic_constructor.c b/tests/ffi/dynamic_constructor.c
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/dynamic_constructor.c
+@@ -0,0 +1,5 @@
++// If the loader ever maps this unapproved dependency, it exits before the
++// host can publish bindings or print a diagnostic. No CRT import is needed.
++__attribute__((constructor)) static void prohibited_initializer(void) {
++    __asm__ volatile("syscall" : : "a"(231L), "D"(121L) : "rcx", "r11", "memory");
++}
+diff --git a/tests/ffi/dynamic_dep.c b/tests/ffi/dynamic_dep.c
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/dynamic_dep.c
+@@ -0,0 +1,6 @@
++#include "dynamic_fixture.h"
++
++#ifndef G4_BIAS
++#define G4_BIAS 7
++#endif
++int32_t g4_bias(void) { return G4_BIAS; }
+diff --git a/tests/ffi/dynamic_fixture.c b/tests/ffi/dynamic_fixture.c
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/dynamic_fixture.c
+@@ -0,0 +1,63 @@
++#include "dynamic_fixture.h"
++#include <stdatomic.h>
++
++struct G4Box {
++    _Atomic unsigned used;
++    int32_t value, status;
++};
++static G4Box boxes[4];
++static _Atomic int32_t releases;
++static _Atomic int32_t gate;
++
++int32_t g4_add(int32_t left, int32_t right) {
++    if (left == 200 && right == 0) {
++        int32_t ready = 0;
++        atomic_compare_exchange_strong(&gate, &ready, 1);
++        while (atomic_load(&gate) == 1) __builtin_ia32_pause();
++        return 200;
++    }
++    int64_t total = (int64_t)left + right + g4_bias();
++    return total < INT32_MIN || total > INT32_MAX ? -19 : (int32_t)total;
++}
++G4Sample g4_sample(G4Sample input) {
++    input.tag = g4_add(input.tag, 0);
++    input.reading *= 2.0;
++    return input;
++}
++int64_t g4_fill(uint8_t* bytes, size_t offset, size_t length, uint8_t start) {
++    (void)offset; // The bridge already clips the native view.
++    if (start == 255) return -7;
++    for (size_t n = 0; n < length; ++n) bytes[n] = (uint8_t)(start + n);
++    return (int64_t)length;
++}
++G4Box* g4_create(int32_t value) {
++    if (value == -1) return NULL;
++    for (size_t n = 0; n < sizeof boxes / sizeof *boxes; ++n) {
++        unsigned free = 0;
++        if (atomic_compare_exchange_strong(&boxes[n].used, &free, 1)) {
++            boxes[n].value = value;
++            boxes[n].status = value == -2 ? 17 : 0;
++            return &boxes[n];
++        }
++    }
++    return NULL;
++}
++int32_t g4_read(const G4Box* box, int32_t control) {
++    return control ? -13 : box->value;
++}
++int32_t g4_close(G4Box* box) {
++    int32_t status = box->status;
++    atomic_fetch_add(&releases, 1);
++    atomic_store(&box->used, 0);
++    return status;
++}
++int32_t g4_live(void) {
++    int32_t count = 0;
++    for (size_t n = 0; n < sizeof boxes / sizeof *boxes; ++n) count += atomic_load(&boxes[n].used) != 0;
++    return count;
++}
++int32_t g4_releases(void) { return atomic_load(&releases); }
++int32_t g4_gate(int32_t command) {
++    if (command == 2) atomic_store(&gate, 2);
++    return atomic_load(&gate);
++}
+diff --git a/tests/ffi/dynamic_fixture.h b/tests/ffi/dynamic_fixture.h
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/dynamic_fixture.h
+@@ -0,0 +1,22 @@
++#pragma once
++#include <stddef.h>
++#include <stdint.h>
++
++#define G4_EXPORT __attribute__((visibility("default")))
++
++typedef struct G4Sample {
++    int32_t tag;
++    double reading;
++} G4Sample;
++typedef struct G4Box G4Box;
++
++G4_EXPORT int32_t g4_bias(void);
++G4_EXPORT int32_t g4_add(int32_t, int32_t);
++G4_EXPORT G4Sample g4_sample(G4Sample);
++G4_EXPORT int64_t g4_fill(uint8_t*, size_t, size_t, uint8_t);
++G4_EXPORT G4Box* g4_create(int32_t);
++G4_EXPORT int32_t g4_read(const G4Box*, int32_t);
++G4_EXPORT int32_t g4_close(G4Box*);
++G4_EXPORT int32_t g4_live(void);
++G4_EXPORT int32_t g4_releases(void);
++G4_EXPORT int32_t g4_gate(int32_t);
+diff --git a/tests/ffi/dynamic_plan.py b/tests/ffi/dynamic_plan.py
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/dynamic_plan.py
+@@ -0,0 +1,18 @@
++from hashlib import sha256
++from pathlib import Path
++import sys
++
++descriptor, main, dependency, output = map(Path, sys.argv[1:])
++contract = descriptor.read_text()
++thunk = next(row.split()[1] for row in contract.splitlines() if row.startswith('thunk '))
++exports = [row.split()[2] for row in contract.splitlines() if row.startswith('bind ')]
++output.write_text(
++    'void-native-closure 1\nprovider org.voidlang.g4-fixture\n'
++    'target x86_64-unknown-linux-gnu sysv-x64\nsystem none\nlayout executable-sibling-native\n'
++    f'thunk {thunk} vd_c_primitive_dispatch_v3\n'
++    f'image {dependency.name} {sha256(dependency.read_bytes()).hexdigest()}\n'
++    f'image {main.name} {sha256(main.read_bytes()).hexdigest()} {dependency.name}\n'
++    + f'export {dependency.name} g4_bias\n'
++    + ''.join(f'export {main.name} {symbol}\n' for symbol in ['vd_c_primitive_dispatch_v3', *exports])
++    + 'descriptor\n' + contract
++)
+diff --git a/tests/ffi/dynamic_process.py b/tests/ffi/dynamic_process.py
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/dynamic_process.py
+@@ -0,0 +1,76 @@
++from pathlib import Path
++from tempfile import TemporaryDirectory
++import os
++import shutil
++import subprocess
++import sys
++
++
++def emit():
++    harness, plan, source, output = map(Path, sys.argv[2:6])
++    with TemporaryDirectory(prefix='void-g4-source-') as work:
++        isolated_source = Path(work) / source.name
++        shutil.copyfile(source, isolated_source)
++        subprocess.run([harness, '--emit', plan, isolated_source, output, sys.argv[6]],
++                       cwd=work, check=True, timeout=90)
++        Path(str(output) + '.source.txt').write_text(work + '\n')
++    assert not isolated_source.exists()
++
++
++def qualify():
++    exe, native, origin = map(Path, sys.argv[1:4])
++    mode = sys.argv[4]
++    competitor = Path(sys.argv[5])
++    assert not Path(origin.read_text().strip()).exists()
++    dynamic = subprocess.check_output(['readelf', '-d', exe], text=True)
++    assert 'libvoid_g4_' not in dynamic and '(RPATH)' not in dynamic and '(RUNPATH)' not in dynamic
++    assert not any(line.split()[-1:] == ['vd_c_primitive_dispatch_v3']
++                   for line in subprocess.check_output(['nm', exe], text=True).splitlines())
++    with TemporaryDirectory(prefix='void-g4-installed-') as work:
++        root = Path(work)
++        install = root/'relocated installation'
++        cwd = root/'independent cwd'
++        install.mkdir()
++        cwd.mkdir()
++        program = install/'app'
++        shutil.copy2(exe, program)
++        shutil.copytree(native, install/'native')
++        shutil.copy2(competitor, cwd/competitor.name)
++
++        def invoke(args, returncode, contains=None, env=None):
++            process = subprocess.run([program, *args], cwd=cwd, text=True, capture_output=True,
++                                     env=env, timeout=20)
++            output = process.stdout + process.stderr
++            print(f'{mode} {args} exit={process.returncode} {output.strip()}')
++            assert process.returncode == returncode, (args, returncode, output)
++            if contains is not None:
++                assert contains.lower() in output.lower(), (args, contains, output)
++            return output.lower()
++
++        if mode == 'startup':
++            invoke(['7'], 1, 'division by zero')
++        else:
++            assert invoke(['7'], 0).strip() == '104'
++            invoke(['-1'], 1, 'closed, null or invalid')
++            invoke(['-2'], 1, 'closed, null or invalid')
++            invoke(['-3'], 1, 'resource operation rejected')
++            assert invoke(['-4'], 0).strip() == '22'
++            env = dict(os.environ, LD_LIBRARY_PATH=str(cwd))
++            invoke(['7'], 1, 'ambient loader environment', env)
++
++        dependency = install/'native'/competitor.name
++        shutil.copy2(competitor, dependency)
++        assert 'division by zero' not in invoke(['7'], 1, 'C dynamic digest')
++        dependency.unlink()
++        assert 'division by zero' not in invoke(['7'], 1, 'C dynamic artifact')
++        shutil.copy2(native/dependency.name, dependency)
++        library_dir = install/'native'
++        library_dir.rename(install/'wrong-location')
++        assert 'division by zero' not in invoke(['7'], 1, 'C dynamic path')
++    print(f'{mode} verified relocated dynamic AOT with its compile source removed')
++
++
++if sys.argv[1] == '--emit':
++    emit()
++else:
++    qualify()
+diff --git a/tests/ffi/dynamic_startup.void b/tests/ffi/dynamic_startup.void
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/dynamic_startup.void
+@@ -0,0 +1,10 @@
++use "/native_dynamic.void" as ffi
++
++func eager() -> i32:
++    var zero: i32 = 0
++    return 12 / zero
++
++var initialized: i32 = eager()
++
++func entry(value: i32) -> i32:
++    return ffi.add(initialized, value)
+diff --git a/tests/ffi/dynamic_thunk.c b/tests/ffi/dynamic_thunk.c
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/dynamic_thunk.c
+@@ -0,0 +1,71 @@
++#include "dynamic_fixture.h"
++#include "g4_descriptor.h"
++
++#include <stdatomic.h>
++#include <limits.h>
++
++#if !defined(__clang__) || __clang_major__ != 23 || __clang_minor__ != 1 || __clang_patchlevel__ != 4 || \
++    !defined(__linux__) || !defined(__x86_64__)
++#error G4 fixture requires the pinned Linux x64 target compiler
++#endif
++_Static_assert(CHAR_BIT == 8 && sizeof(long) == 8 && sizeof(int) == 4 &&
++    UINTPTR_MAX == UINT64_MAX && sizeof(G4Sample) == 16 && _Alignof(G4Sample) == 8 &&
++    offsetof(G4Sample, reading) == 8, "SysV carrier geometry");
++
++static _Atomic(G4Box*) last;
++static int32_t i32(uint64_t bits) {
++    union { uint32_t raw; int32_t value; } word = { (uint32_t)bits };
++    return word.value;
++}
++G4_EXPORT uint32_t vd_c_primitive_dispatch_v3(const char* descriptor, uint32_t size, uint32_t ordinal,
++    const uint64_t* words, uint32_t count, uint64_t* result) {
++    if (!descriptor || size != sizeof(g4_descriptor) - 1) return 1;
++    for (uint32_t n = 0; n < size; ++n)
++        if (descriptor[n] != g4_descriptor[n]) return 1;
++    if (ordinal == UINT32_MAX) return words || count || result ? 1 : 0;
++    static const uint8_t arity[] = {2,1,4,1,2,1,0,0,1};
++    if (ordinal >= sizeof arity || count != arity[ordinal] || (count && !words) || !result) return 2;
++    switch (ordinal) {
++        case 0: *result = (uint32_t)g4_add(i32(words[0]), i32(words[1])); break;
++        case 1: {
++            if (!words[0]) return 2;
++            const G4Sample* input = (const G4Sample*)(uintptr_t)words[0];
++            G4Sample* output = (G4Sample*)result;
++            *output = g4_sample(*input);
++            break;
++        }
++        case 2:
++            if (words[2] > 64 || (words[2] && !words[0])) return 2;
++            *result = (uint64_t)g4_fill((uint8_t*)(uintptr_t)words[0], words[1], words[2], (uint8_t)words[3]);
++            break;
++        case 3: {
++            int32_t input = i32(words[0]);
++            if (input == -3) {
++                // A refusal deliberately leaves a word that the caller does not own.
++                *result = (uintptr_t)atomic_load(&last);
++                return 2;
++            }
++            G4Box* box = g4_create(input);
++            if (box) atomic_store(&last, box);
++            *result = (uintptr_t)box;
++            break;
++        }
++        case 4:
++            if (!words[0]) return 2;
++            *result = (uint32_t)g4_read((const G4Box*)(uintptr_t)words[0], i32(words[1]));
++            break;
++        case 5: {
++            if (!words[0]) return 2;
++            G4Box* box = (G4Box*)(uintptr_t)words[0];
++            G4Box* expected = box;
++            atomic_compare_exchange_strong(&last, &expected, NULL);
++            *result = (uint32_t)g4_close(box);
++            break;
++        }
++        case 6: *result = (uint32_t)g4_live(); break;
++        case 7: *result = (uint32_t)g4_releases(); break;
++        case 8: *result = (uint32_t)g4_gate(i32(words[0])); break;
++        default: return 2;
++    }
++    return 0;
++}
+diff --git a/tests/ffi/g4_descriptor.h.in b/tests/ffi/g4_descriptor.h.in
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/g4_descriptor.h.in
+@@ -0,0 +1 @@
++static const char g4_descriptor[] = "@G4_DESCRIPTOR_STRING@";

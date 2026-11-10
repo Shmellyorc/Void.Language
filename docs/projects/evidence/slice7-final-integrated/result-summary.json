@@ -1,0 +1,585 @@
+{
+  "linux-release": {
+    "ctest": {
+      "selected": 443,
+      "first": {
+        "pass": 403,
+        "fail": 40,
+        "skip": 0
+      },
+      "failures": [
+        "application_native_sprint4",
+        "async_syntax_aot_cancelled_normal",
+        "async_syntax_aot_cancelled_optimized",
+        "async_syntax_aot_errors_normal",
+        "async_syntax_aot_errors_optimized",
+        "async_syntax_aot_failure_normal",
+        "async_syntax_aot_failure_optimized",
+        "async_syntax_aot_spawn_normal",
+        "async_syntax_aot_spawn_optimized",
+        "async_syntax_aot_values_normal",
+        "async_syntax_aot_values_optimized",
+        "ergonomics_sprint6",
+        "json_adversarial",
+        "json_bounds",
+        "json_dynamic",
+        "json_execution_accessors",
+        "json_execution_dynamic_smoke",
+        "json_execution_nested_inference",
+        "json_execution_ownership",
+        "json_execution_shapes",
+        "json_execution_typed_smoke",
+        "json_execution_validated",
+        "json_install",
+        "json_lsp",
+        "json_metering",
+        "json_numbers",
+        "json_preservation",
+        "json_readonly",
+        "json_schema",
+        "json_stress_fixed",
+        "json_stress_wide",
+        "lsp_collections_stdlib",
+        "onboarding_examples",
+        "stage10_console_aot",
+        "stage10_conversion_aot",
+        "stage10_fields_aot",
+        "stage10_operators_aot",
+        "stage10_temporal_aot",
+        "stage11_globals_aot",
+        "text_collections_sprint3"
+      ],
+      "skipped": [],
+      "retries": [
+        {
+          "path": "linux/release-retry.xml",
+          "totals": {
+            "pass": 20,
+            "fail": 20,
+            "skip": 0
+          },
+          "cases": {
+            "json_readonly": "pass",
+            "json_dynamic": "pass",
+            "json_numbers": "pass",
+            "json_schema": "pass",
+            "json_bounds": "pass",
+            "json_install": "pass",
+            "json_adversarial": "pass",
+            "json_metering": "pass",
+            "json_execution_validated": "pass",
+            "json_execution_accessors": "pass",
+            "json_execution_dynamic_smoke": "pass",
+            "json_execution_typed_smoke": "pass",
+            "json_execution_shapes": "pass",
+            "json_execution_ownership": "pass",
+            "json_execution_nested_inference": "pass",
+            "json_stress_fixed": "pass",
+            "json_stress_wide": "pass",
+            "json_preservation": "pass",
+            "json_lsp": "pass",
+            "lsp_collections_stdlib": "pass",
+            "onboarding_examples": "fail",
+            "async_syntax_aot_values_normal": "fail",
+            "async_syntax_aot_values_optimized": "fail",
+            "async_syntax_aot_errors_normal": "fail",
+            "async_syntax_aot_errors_optimized": "fail",
+            "async_syntax_aot_cancelled_normal": "fail",
+            "async_syntax_aot_cancelled_optimized": "fail",
+            "async_syntax_aot_failure_normal": "fail",
+            "async_syntax_aot_failure_optimized": "fail",
+            "async_syntax_aot_spawn_normal": "fail",
+            "async_syntax_aot_spawn_optimized": "fail",
+            "ergonomics_sprint6": "fail",
+            "stage10_fields_aot": "fail",
+            "stage10_temporal_aot": "fail",
+            "stage11_globals_aot": "fail",
+            "stage10_console_aot": "fail",
+            "stage10_operators_aot": "fail",
+            "stage10_conversion_aot": "fail",
+            "application_native_sprint4": "fail",
+            "text_collections_sprint3": "fail"
+          }
+        },
+        {
+          "path": "linux/release-retry2.xml",
+          "totals": {
+            "pass": 11,
+            "fail": 9,
+            "skip": 0
+          },
+          "cases": {
+            "onboarding_examples": "pass",
+            "async_syntax_aot_values_normal": "pass",
+            "async_syntax_aot_values_optimized": "pass",
+            "async_syntax_aot_errors_normal": "pass",
+            "async_syntax_aot_errors_optimized": "pass",
+            "async_syntax_aot_cancelled_normal": "pass",
+            "async_syntax_aot_cancelled_optimized": "pass",
+            "async_syntax_aot_failure_normal": "pass",
+            "async_syntax_aot_failure_optimized": "pass",
+            "async_syntax_aot_spawn_normal": "pass",
+            "async_syntax_aot_spawn_optimized": "pass",
+            "ergonomics_sprint6": "fail",
+            "stage10_fields_aot": "fail",
+            "stage10_temporal_aot": "fail",
+            "stage11_globals_aot": "fail",
+            "stage10_console_aot": "fail",
+            "stage10_operators_aot": "fail",
+            "stage10_conversion_aot": "fail",
+            "application_native_sprint4": "fail",
+            "text_collections_sprint3": "fail"
+          }
+        }
+      ],
+      "final": {
+        "pass": 434,
+        "fail": 9,
+        "skip": 0
+      },
+      "unresolved": [
+        "application_native_sprint4",
+        "ergonomics_sprint6",
+        "stage10_console_aot",
+        "stage10_conversion_aot",
+        "stage10_fields_aot",
+        "stage10_operators_aot",
+        "stage10_temporal_aot",
+        "stage11_globals_aot",
+        "text_collections_sprint3"
+      ],
+      "gates": {
+        "runtime_callbacks": "pass",
+        "ffi_g1_primitive_jit_ir": "pass",
+        "ffi_g1_primitive_aot_normal": "pass",
+        "ffi_g1_primitive_aot_optimized": "pass",
+        "ffi_g1_primitive_aot_mismatch": "pass",
+        "ffi_g1_primitive_aot_missing": "pass",
+        "ffi_g2_jit_ir": "pass",
+        "ffi_g2_aot_normal": "pass",
+        "ffi_g2_aot_optimized": "pass",
+        "ffi_g3_jit_ir": "pass",
+        "ffi_g3_aot_normal": "pass",
+        "ffi_g3_aot_optimized": "pass",
+        "ffi_g4_jit_ir": "pass",
+        "ffi_g4_aot_normal": "pass",
+        "ffi_g4_aot_optimized": "pass",
+        "ffi_g4_aot_startup": "pass",
+        "ffi_g4_conventional": "pass",
+        "ffi_g5_callbacks": "pass"
+      }
+    },
+    "installed_workflow": true,
+    "initial_receipt_sha256": "6e9ed92d0a56616b00255aae330f07d05bf7366518904b34196dd2b883ec847e",
+    "public_log_sha256": "c05afae9e0792d49874084b5fa2f8f903e283707b379e2af1322bc896cd3e24b",
+    "raylib_trace_proofs": 4,
+    "direct_link_controls": {
+      "pass": 9,
+      "fail": 0,
+      "skip": 0
+    },
+    "compiler_sha256": "71973e6fad8448643a7352e802224af2ca700370ec7d6074318f9cd0eb3d3d39",
+    "language_server_sha256": "607c9da709a8831b51dc8be2b65fe4838f6c5136fec329bb7fad5b34270f3cd7",
+    "isolated_package": true
+  },
+  "linux-debug": {
+    "ctest": {
+      "selected": 456,
+      "first": {
+        "pass": 436,
+        "fail": 20,
+        "skip": 0
+      },
+      "failures": [
+        "application_native_sprint4",
+        "async_syntax_aot_cancelled_normal",
+        "async_syntax_aot_cancelled_optimized",
+        "async_syntax_aot_errors_normal",
+        "async_syntax_aot_errors_optimized",
+        "async_syntax_aot_failure_normal",
+        "async_syntax_aot_failure_optimized",
+        "async_syntax_aot_spawn_normal",
+        "async_syntax_aot_spawn_optimized",
+        "async_syntax_aot_values_normal",
+        "async_syntax_aot_values_optimized",
+        "ergonomics_sprint6",
+        "lsp_collections_stdlib",
+        "stage10_console_aot",
+        "stage10_conversion_aot",
+        "stage10_fields_aot",
+        "stage10_operators_aot",
+        "stage10_temporal_aot",
+        "stage11_globals_aot",
+        "text_collections_sprint3"
+      ],
+      "skipped": [],
+      "retries": [
+        {
+          "path": "linux/debug-retry.xml",
+          "totals": {
+            "pass": 11,
+            "fail": 9,
+            "skip": 0
+          },
+          "cases": {
+            "lsp_collections_stdlib": "pass",
+            "async_syntax_aot_values_normal": "pass",
+            "async_syntax_aot_values_optimized": "pass",
+            "async_syntax_aot_errors_normal": "pass",
+            "async_syntax_aot_errors_optimized": "pass",
+            "async_syntax_aot_cancelled_normal": "pass",
+            "async_syntax_aot_cancelled_optimized": "pass",
+            "async_syntax_aot_failure_normal": "pass",
+            "async_syntax_aot_failure_optimized": "pass",
+            "async_syntax_aot_spawn_normal": "pass",
+            "async_syntax_aot_spawn_optimized": "pass",
+            "ergonomics_sprint6": "fail",
+            "stage10_fields_aot": "fail",
+            "stage10_temporal_aot": "fail",
+            "stage11_globals_aot": "fail",
+            "stage10_console_aot": "fail",
+            "stage10_operators_aot": "fail",
+            "stage10_conversion_aot": "fail",
+            "application_native_sprint4": "fail",
+            "text_collections_sprint3": "fail"
+          }
+        }
+      ],
+      "final": {
+        "pass": 447,
+        "fail": 9,
+        "skip": 0
+      },
+      "unresolved": [
+        "application_native_sprint4",
+        "ergonomics_sprint6",
+        "stage10_console_aot",
+        "stage10_conversion_aot",
+        "stage10_fields_aot",
+        "stage10_operators_aot",
+        "stage10_temporal_aot",
+        "stage11_globals_aot",
+        "text_collections_sprint3"
+      ],
+      "gates": {
+        "runtime_callbacks": "pass",
+        "ffi_g1_primitive_jit_ir": "pass",
+        "ffi_g1_primitive_aot_normal": "pass",
+        "ffi_g1_primitive_aot_optimized": "pass",
+        "ffi_g1_primitive_aot_mismatch": "pass",
+        "ffi_g1_primitive_aot_missing": "pass",
+        "ffi_g2_jit_ir": "pass",
+        "ffi_g2_aot_normal": "pass",
+        "ffi_g2_aot_optimized": "pass",
+        "ffi_g3_jit_ir": "pass",
+        "ffi_g3_aot_normal": "pass",
+        "ffi_g3_aot_optimized": "pass",
+        "ffi_g4_jit_ir": "pass",
+        "ffi_g4_aot_normal": "pass",
+        "ffi_g4_aot_optimized": "pass",
+        "ffi_g4_aot_startup": "pass",
+        "ffi_g4_conventional": "pass",
+        "ffi_g5_callbacks": "pass"
+      }
+    },
+    "installed_workflow": true,
+    "initial_receipt_sha256": "3e0114fc65d087124bfde6125aa4505266f1914e6a56f53ebb91ab66055be608",
+    "public_log_sha256": "cfead940ff1970ecb59e22425f939d39f96b543d06c4557040c7866892727eb1",
+    "raylib_trace_proofs": 4,
+    "direct_link_controls": {
+      "pass": 9,
+      "fail": 0,
+      "skip": 0
+    },
+    "compiler_sha256": "590a6cad96d64d586ced52044b4ef302aece6797b99f5b7e8ebe872005cfc4f8",
+    "language_server_sha256": "70dd5305a9b80d0332dd75887746d6060cf13f80027f18e07d881457ebdd1648",
+    "isolated_package": true
+  },
+  "linux-strict": {
+    "ctest": {
+      "selected": 433,
+      "first": {
+        "pass": 413,
+        "fail": 20,
+        "skip": 0
+      },
+      "failures": [
+        "application_native_sprint4",
+        "async_syntax_aot_cancelled_normal",
+        "async_syntax_aot_cancelled_optimized",
+        "async_syntax_aot_errors_normal",
+        "async_syntax_aot_errors_optimized",
+        "async_syntax_aot_failure_normal",
+        "async_syntax_aot_failure_optimized",
+        "async_syntax_aot_spawn_normal",
+        "async_syntax_aot_spawn_optimized",
+        "async_syntax_aot_values_normal",
+        "async_syntax_aot_values_optimized",
+        "ergonomics_sprint6",
+        "lsp_collections_stdlib",
+        "stage10_console_aot",
+        "stage10_conversion_aot",
+        "stage10_fields_aot",
+        "stage10_operators_aot",
+        "stage10_temporal_aot",
+        "stage11_globals_aot",
+        "text_collections_sprint3"
+      ],
+      "skipped": [],
+      "retries": [
+        {
+          "path": "linux/strict-retry.xml",
+          "totals": {
+            "pass": 11,
+            "fail": 9,
+            "skip": 0
+          },
+          "cases": {
+            "lsp_collections_stdlib": "pass",
+            "async_syntax_aot_values_normal": "pass",
+            "async_syntax_aot_values_optimized": "pass",
+            "async_syntax_aot_errors_normal": "pass",
+            "async_syntax_aot_errors_optimized": "pass",
+            "async_syntax_aot_cancelled_normal": "pass",
+            "async_syntax_aot_cancelled_optimized": "pass",
+            "async_syntax_aot_failure_normal": "pass",
+            "async_syntax_aot_failure_optimized": "pass",
+            "async_syntax_aot_spawn_normal": "pass",
+            "async_syntax_aot_spawn_optimized": "pass",
+            "ergonomics_sprint6": "fail",
+            "stage10_fields_aot": "fail",
+            "stage10_temporal_aot": "fail",
+            "stage11_globals_aot": "fail",
+            "stage10_console_aot": "fail",
+            "stage10_operators_aot": "fail",
+            "stage10_conversion_aot": "fail",
+            "application_native_sprint4": "fail",
+            "text_collections_sprint3": "fail"
+          }
+        }
+      ],
+      "final": {
+        "pass": 424,
+        "fail": 9,
+        "skip": 0
+      },
+      "unresolved": [
+        "application_native_sprint4",
+        "ergonomics_sprint6",
+        "stage10_console_aot",
+        "stage10_conversion_aot",
+        "stage10_fields_aot",
+        "stage10_operators_aot",
+        "stage10_temporal_aot",
+        "stage11_globals_aot",
+        "text_collections_sprint3"
+      ],
+      "gates": {
+        "runtime_callbacks": "pass",
+        "ffi_g1_primitive_jit_ir": "pass",
+        "ffi_g1_primitive_aot_normal": "pass",
+        "ffi_g1_primitive_aot_optimized": "pass",
+        "ffi_g1_primitive_aot_mismatch": "pass",
+        "ffi_g1_primitive_aot_missing": "pass",
+        "ffi_g2_jit_ir": "pass",
+        "ffi_g2_aot_normal": "pass",
+        "ffi_g2_aot_optimized": "pass",
+        "ffi_g3_jit_ir": "pass",
+        "ffi_g3_aot_normal": "pass",
+        "ffi_g3_aot_optimized": "pass",
+        "ffi_g4_jit_ir": "pass",
+        "ffi_g4_aot_normal": "pass",
+        "ffi_g4_aot_optimized": "pass",
+        "ffi_g4_aot_startup": "pass",
+        "ffi_g4_conventional": "pass",
+        "ffi_g5_callbacks": "pass"
+      }
+    },
+    "installed_workflow": true,
+    "initial_receipt_sha256": "fa5a9b7ac45898b79df7c0ee7c01822f2f66d58640bc6375c7a52d9d60cb7f92",
+    "public_log_sha256": "fa8254051c8fa377337ef9014c8f4ecb8d69e1e00c714700e381ef1b0181923b",
+    "raylib_trace_proofs": 4,
+    "direct_link_controls": {
+      "pass": 9,
+      "fail": 0,
+      "skip": 0
+    },
+    "compiler_sha256": "e9ab852fb7dd6cddeb01da5e3bc0122e42d6915f60f7d623a82b98498ce71306",
+    "language_server_sha256": "a6962d392023a641f57aec187d29b1093997e12a8029db0233001cca11cc8b20",
+    "isolated_package": true
+  },
+  "windows-Release": {
+    "ctest": {
+      "selected": 150,
+      "first": {
+        "pass": 134,
+        "fail": 16,
+        "skip": 0
+      },
+      "failures": [
+        "advanced_cli",
+        "arrays_cli",
+        "collections_cli",
+        "composition_cli",
+        "dictionaries_cli",
+        "fixed_arrays_cli",
+        "generics_cli",
+        "growable_arrays_cli",
+        "inheritance_cli",
+        "interfaces_cli",
+        "managed_cli",
+        "managed_initialization_cli",
+        "patterns_cli",
+        "properties_cli",
+        "reference_values_cli",
+        "strings_cli"
+      ],
+      "skipped": [],
+      "retries": [
+        {
+          "path": "windows/Release-retry.xml",
+          "totals": {
+            "pass": 16,
+            "fail": 0,
+            "skip": 0
+          },
+          "cases": {
+            "fixed_arrays_cli": "pass",
+            "growable_arrays_cli": "pass",
+            "arrays_cli": "pass",
+            "generics_cli": "pass",
+            "collections_cli": "pass",
+            "dictionaries_cli": "pass",
+            "properties_cli": "pass",
+            "patterns_cli": "pass",
+            "advanced_cli": "pass",
+            "managed_cli": "pass",
+            "managed_initialization_cli": "pass",
+            "reference_values_cli": "pass",
+            "composition_cli": "pass",
+            "inheritance_cli": "pass",
+            "interfaces_cli": "pass",
+            "strings_cli": "pass"
+          }
+        }
+      ],
+      "final": {
+        "pass": 150,
+        "fail": 0,
+        "skip": 0
+      },
+      "unresolved": [],
+      "gates": {
+        "runtime_callbacks": "pass",
+        "ffi_g1_primitive_jit_ir": "pass",
+        "ffi_g1_primitive_aot_normal": "pass",
+        "ffi_g1_primitive_aot_optimized": "pass",
+        "ffi_g1_primitive_aot_mismatch": "pass",
+        "ffi_g1_primitive_aot_missing": "pass",
+        "ffi_g2_jit_ir": "pass",
+        "ffi_g2_aot_normal": "pass",
+        "ffi_g2_aot_optimized": "pass",
+        "ffi_g3_jit_ir": "pass",
+        "ffi_g3_aot_normal": "pass",
+        "ffi_g3_aot_optimized": "pass",
+        "ffi_g4_conventional": "pass",
+        "ffi_g5_callbacks": "pass"
+      }
+    },
+    "installed_workflow": true,
+    "initial_receipt_sha256": "fc2202d28ed10b3ae4348318efbd7add0b9c8a566201453168fabd2dc8bf0cfa",
+    "public_log_sha256": "67b7b593c499089e277df192b9536d788cd3d973982ac2139dbe9ef1ad4ce8ab",
+    "raylib_trace_proofs": 4,
+    "configured_tests": 381,
+    "compiler_sha256": "a13169c49e568475080e70f0f8821c8abd2eff31332820f92bf58771d7d81764"
+  },
+  "windows-Debug": {
+    "ctest": {
+      "selected": 150,
+      "first": {
+        "pass": 132,
+        "fail": 18,
+        "skip": 0
+      },
+      "failures": [
+        "advanced_cli",
+        "arrays_cli",
+        "collections_cli",
+        "composition_cli",
+        "dictionaries_cli",
+        "fixed_arrays_cli",
+        "generics_cli",
+        "growable_arrays_cli",
+        "http_install",
+        "http_reload",
+        "inheritance_cli",
+        "interfaces_cli",
+        "managed_cli",
+        "managed_initialization_cli",
+        "patterns_cli",
+        "properties_cli",
+        "reference_values_cli",
+        "strings_cli"
+      ],
+      "skipped": [],
+      "retries": [
+        {
+          "path": "windows/Debug-retry.xml",
+          "totals": {
+            "pass": 18,
+            "fail": 0,
+            "skip": 0
+          },
+          "cases": {
+            "http_reload": "pass",
+            "http_install": "pass",
+            "fixed_arrays_cli": "pass",
+            "growable_arrays_cli": "pass",
+            "arrays_cli": "pass",
+            "generics_cli": "pass",
+            "collections_cli": "pass",
+            "dictionaries_cli": "pass",
+            "properties_cli": "pass",
+            "patterns_cli": "pass",
+            "advanced_cli": "pass",
+            "managed_cli": "pass",
+            "managed_initialization_cli": "pass",
+            "reference_values_cli": "pass",
+            "composition_cli": "pass",
+            "inheritance_cli": "pass",
+            "interfaces_cli": "pass",
+            "strings_cli": "pass"
+          }
+        }
+      ],
+      "final": {
+        "pass": 150,
+        "fail": 0,
+        "skip": 0
+      },
+      "unresolved": [],
+      "gates": {
+        "runtime_callbacks": "pass",
+        "ffi_g1_primitive_jit_ir": "pass",
+        "ffi_g1_primitive_aot_normal": "pass",
+        "ffi_g1_primitive_aot_optimized": "pass",
+        "ffi_g1_primitive_aot_mismatch": "pass",
+        "ffi_g1_primitive_aot_missing": "pass",
+        "ffi_g2_jit_ir": "pass",
+        "ffi_g2_aot_normal": "pass",
+        "ffi_g2_aot_optimized": "pass",
+        "ffi_g3_jit_ir": "pass",
+        "ffi_g3_aot_normal": "pass",
+        "ffi_g3_aot_optimized": "pass",
+        "ffi_g4_conventional": "pass",
+        "ffi_g5_callbacks": "pass"
+      }
+    },
+    "installed_workflow": true,
+    "initial_receipt_sha256": "69b68207cf5250cc76111d61e201aafdb4cec80835e9f1885f1902f7f71b53bf",
+    "public_log_sha256": "a0d3917bb60a837b0687d88df7a02a5068b3fb6b15e9f2ac692f033b9e3dcf74",
+    "raylib_trace_proofs": 4,
+    "configured_tests": 381,
+    "compiler_sha256": "77f5025c74a01444dd689998c7a4d831c859fbbfc541218652e2983a77fdcd42"
+  }
+}

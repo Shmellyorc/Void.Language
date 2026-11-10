@@ -1,0 +1,810 @@
+[0/2] Re-checking globbed directories...
+[1/512] Building C object CMakeFiles\void_native_fixture.dir\src\native\fixture.c.obj
+[2/512] Building C object CMakeFiles\void_native_fixture.dir\src\native\sink.c.obj
+[3/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\altsvc.c.obj
+[4/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\amigaos.c.obj
+[5/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\api.c.obj
+[6/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\bufq.c.obj
+[7/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\bufref.c.obj
+[8/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cf-h1-proxy.c.obj
+[9/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cf-h2-proxy.c.obj
+[10/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cf-haproxy.c.obj
+[11/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cf-https-connect.c.obj
+[12/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cf-recvbuf.c.obj
+[13/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cf-ip-happy.c.obj
+[14/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cf-setup.c.obj
+[15/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cf-socket.c.obj
+[16/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cfilters.c.obj
+[17/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\conncache.c.obj
+[18/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\connect.c.obj
+[19/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\content_encoding.c.obj
+[20/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cookie.c.obj
+[21/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\creds.c.obj
+[22/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cshutdn.c.obj
+[23/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_addrinfo.c.obj
+[24/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_endian.c.obj
+[25/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_fnmatch.c.obj
+[26/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_fopen.c.obj
+[27/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_get_line.c.obj
+[28/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_gethostname.c.obj
+[29/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_gssapi.c.obj
+[30/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_memrchr.c.obj
+[31/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_ntlm_core.c.obj
+[32/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_range.c.obj
+[33/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_sasl.c.obj
+[34/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_sha512_256.c.obj
+[35/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_share.c.obj
+[36/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_sspi.c.obj
+[37/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_threads.c.obj
+[38/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_trc.c.obj
+[39/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cw-out.c.obj
+[40/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\cw-pause.c.obj
+[41/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\dict.c.obj
+[42/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\dynhds.c.obj
+[43/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\easy.c.obj
+[44/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\easygetopt.c.obj
+[45/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\easyoptions.c.obj
+[46/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\escape.c.obj
+[47/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\fake_addrinfo.c.obj
+[48/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\file.c.obj
+[49/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\fileinfo.c.obj
+[50/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\formdata.c.obj
+[51/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\ftp.c.obj
+[52/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\ftplistparser.c.obj
+[53/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\getenv.c.obj
+[54/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\getinfo.c.obj
+[55/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\gopher.c.obj
+[56/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\hash.c.obj
+[57/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\hmac.c.obj
+[58/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\headers.c.obj
+[59/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\hsts.c.obj
+[60/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\http1.c.obj
+[61/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\http.c.obj
+[62/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\http2.c.obj
+[63/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\http_aws_sigv4.c.obj
+[64/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\http_httpsig.c.obj
+[65/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curl_ed25519.c.obj
+[66/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\http_chunks.c.obj
+[67/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\http_digest.c.obj
+[68/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\http_negotiate.c.obj
+[69/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\http_ntlm.c.obj
+[70/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\http_proxy.c.obj
+[71/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\idn.c.obj
+[72/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\if2ip.c.obj
+[73/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\imap.c.obj
+[74/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\ldap.c.obj
+[75/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\llist.c.obj
+[76/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\macos.c.obj
+[77/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\md4.c.obj
+[78/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\md5.c.obj
+[79/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\memdebug.c.obj
+[80/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\mime.c.obj
+[81/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\mprintf.c.obj
+[82/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\mqtt.c.obj
+[83/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\multi_ev.c.obj
+[84/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\multi.c.obj
+[85/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\multi_ntfy.c.obj
+[86/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\netrc.c.obj
+[87/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\openldap.c.obj
+[88/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\parsedate.c.obj
+[89/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\peer.c.obj
+[90/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\pingpong.c.obj
+[91/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\pop3.c.obj
+[92/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\progress.c.obj
+[93/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\protocol.c.obj
+[94/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\proxy.c.obj
+[95/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\ptrarray.c.obj
+[96/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\psl.c.obj
+[97/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\rand.c.obj
+[98/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\request.c.obj
+[99/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\ratelimit.c.obj
+[100/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\rtsp.c.obj
+[101/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\select.c.obj
+[102/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\sendf.c.obj
+[103/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\setopt.c.obj
+[104/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\sha256.c.obj
+[105/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\slist.c.obj
+[106/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\smtp.c.obj
+[107/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\socketpair.c.obj
+[108/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\socks.c.obj
+[109/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\socks_gssapi.c.obj
+[110/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\socks_sspi.c.obj
+[111/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\splay.c.obj
+[112/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\strcase.c.obj
+[113/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\strequal.c.obj
+[114/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\strerror.c.obj
+[115/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\telnet.c.obj
+[116/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\thrdpool.c.obj
+[117/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\tftp.c.obj
+[118/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\thrdqueue.c.obj
+[119/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\transfer.c.obj
+[120/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\u8_strset.c.obj
+[121/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\u32_ptrset.c.obj
+[122/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\uint-spbset.c.obj
+[123/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\uint-bset.c.obj
+[124/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\uint-table.c.obj
+[125/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\version.c.obj
+[126/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\url.c.obj
+[127/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\urlapi.c.obj
+[128/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\ws.c.obj
+[129/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\cleartext.c.obj
+[130/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\cram.c.obj
+[131/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\digest.c.obj
+[132/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\gsasl.c.obj
+[133/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\digest_sspi.c.obj
+[134/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\krb5_gssapi.c.obj
+[135/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\krb5_sspi.c.obj
+[136/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\ntlm.c.obj
+[137/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\ntlm_sspi.c.obj
+[138/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\oauth2.c.obj
+[139/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\spnego_gssapi.c.obj
+[140/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\spnego_sspi.c.obj
+[141/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vauth\vauth.c.obj
+[142/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vdns\asyn-ares.c.obj
+[143/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vdns\asyn-base.c.obj
+[144/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vdns\asyn-thrdd.c.obj
+[145/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vdns\cf-dns.c.obj
+[146/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vdns\dnscache.c.obj
+[147/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vdns\doh.c.obj
+[148/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vdns\hostip.c.obj
+[149/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vdns\hostip4.c.obj
+[150/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vdns\hostip6.c.obj
+[151/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vdns\httpsrr.c.obj
+[152/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\apple.c.obj
+[153/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\cipher_suite.c.obj
+[154/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\gtls.c.obj
+[155/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\hostcheck.c.obj
+[156/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\mbedtls.c.obj
+[157/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\openssl.c.obj
+[158/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\rustls.c.obj
+[159/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\schannel.c.obj
+[160/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\schannel_verify.c.obj
+[161/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\vtls.c.obj
+[162/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\vtls_config.c.obj
+[163/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\vtls_scache.c.obj
+[164/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\vtls_spack.c.obj
+[165/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\wolfssl.c.obj
+[166/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vtls\x509asn1.c.obj
+[167/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vquic\capsule.c.obj
+[168/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vquic\cf-capsule.c.obj
+[169/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vquic\cf-ngtcp2.c.obj
+[170/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vquic\cf-ngtcp2-cmn.c.obj
+[171/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vquic\cf-ngtcp2-proxy.c.obj
+[172/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vquic\cf-quiche.c.obj
+[173/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vquic\vquic-tls.c.obj
+[174/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vquic\vquic.c.obj
+[175/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vssh\libssh.c.obj
+[176/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vssh\libssh2.c.obj
+[177/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\vssh\vssh.c.obj
+[178/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\base64.c.obj
+[179/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\basename.c.obj
+[180/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\win32-fopen.c.obj
+[181/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\dynbuf.c.obj
+[182/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\inet_ntop.c.obj
+[183/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\multibyte.c.obj
+[184/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\inet_pton.c.obj
+[185/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\nonblock.c.obj
+[186/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\snprintf.c.obj
+[187/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\strcopy.c.obj
+[188/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\strdup.c.obj
+[189/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\strerr.c.obj
+[190/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\strparse.c.obj
+[191/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\timediff.c.obj
+[192/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\timeval.c.obj
+[193/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\version_win32.c.obj
+[194/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\wait.c.obj
+[195/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\warnless.c.obj
+[196/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\curlx\winapi.c.obj
+[197/512] Building C object curl\lib\CMakeFiles\libcurl_object.dir\__\__\__\src\runtime\curl_keylog_disabled.c.obj
+[198/512] Building C object CMakeFiles\void_format_objects.dir\third_party\ryu\ryu\f2s.c.obj
+[199/512] Building C object CMakeFiles\void_format_objects.dir\third_party\ryu\ryu\d2fixed.c.obj
+[200/512] Building C object CMakeFiles\void_format_objects.dir\third_party\ryu\ryu\d2s.c.obj
+[201/512] Building CXX object CMakeFiles\void_format_objects.dir\src\format.cpp.obj
+[202/512] Building CXX object CMakeFiles\void_application_objects.dir\src\application_metadata.cpp.obj
+[203/512] Building CXX object CMakeFiles\void_application_objects.dir\src\project_identity.cpp.obj
+[204/512] Building CXX object CMakeFiles\void_zone_objects.dir\src\temporal.cpp.obj
+In file included from C:\Users\a\VS7I2\src\src\temporal.cpp:3:
+In file included from C:\Users\a\VS7I2\src\third_party\date\include\date/tz.h:99:
+C:\Users\a\VS7I2\src\third_party\date\include\date\date.h(966,34): warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  966 | CONSTCD11 date::day  operator "" _d(unsigned long long d) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_d
+C:\Users\a\VS7I2\src\third_party\date\include\date\date.h(967,34): warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  967 | CONSTCD11 date::year operator "" _y(unsigned long long y) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_y
+C:\Users\a\VS7I2\src\third_party\date\include\date\date.h(1975,13): warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1975 | operator "" _d(unsigned long long d) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_d
+C:\Users\a\VS7I2\src\third_party\date\include\date\date.h(1983,13): warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1983 | operator "" _y(unsigned long long y) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_y
+4 warnings generated.
+[205/512] Building CXX object CMakeFiles\void_application_objects.dir\src\dynamic_closure.cpp.obj
+[206/512] Building CXX object CMakeFiles\void_zone_objects.dir\third_party\date\src\tz.cpp.obj
+In file included from C:\Users\a\VS7I2\src\third_party\date\src\tz.cpp:86:
+In file included from C:\Users\a\VS7I2\src\third_party\date\include\date/tz_private.h:31:
+In file included from C:\Users\a\VS7I2\src\third_party\date\include\date\tz.h:99:
+C:\Users\a\VS7I2\src\third_party\date\include\date\date.h(966,34): warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  966 | CONSTCD11 date::day  operator "" _d(unsigned long long d) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_d
+C:\Users\a\VS7I2\src\third_party\date\include\date\date.h(967,34): warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+  967 | CONSTCD11 date::year operator "" _y(unsigned long long y) NOEXCEPT;
+      |                      ~~~~~~~~~~~~^~
+      |                      operator""_y
+C:\Users\a\VS7I2\src\third_party\date\include\date\date.h(1975,13): warning: identifier '_d' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1975 | operator "" _d(unsigned long long d) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_d
+C:\Users\a\VS7I2\src\third_party\date\include\date\date.h(1983,13): warning: identifier '_y' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 1983 | operator "" _y(unsigned long long y) NOEXCEPT
+      | ~~~~~~~~~~~~^~
+      | operator""_y
+C:\Users\a\VS7I2\src\third_party\date\src\tz.cpp(199,23): warning: unused variable 'folder_delimiter' [-Wunused-const-variable]
+  199 | static CONSTDATA char folder_delimiter = '\\';
+      |                       ^~~~~~~~~~~~~~~~
+C:\Users\a\VS7I2\src\third_party\date\src\tz.cpp(458,1): warning: unused function 'get_install' [-Wunused-function]
+  458 | get_install()
+      | ^~~~~~~~~~~
+C:\Users\a\VS7I2\src\third_party\date\src\tz.cpp(695,1): warning: unused function 'sort_zone_mappings' [-Wunused-function]
+  695 | sort_zone_mappings(std::vector<date::detail::timezone_mapping>& mappings)
+      | ^~~~~~~~~~~~~~~~~~
+C:\Users\a\VS7I2\src\third_party\date\src\tz.cpp(751,1): warning: unused function 'load_timezone_mappings_from_xml_file' [-Wunused-function]
+  751 | load_timezone_mappings_from_xml_file(const std::string& input_path)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\a\VS7I2\src\third_party\date\src\tz.cpp(3728,1): warning: unused function 'get_version' [-Wunused-function]
+ 3728 | get_version(const std::string& path)
+      | ^~~~~~~~~~~
+9 warnings generated.
+[207/512] Building CXX object CMakeFiles\void_core.dir\src\frontend\project.cpp.obj
+[208/512] Building CXX object CMakeFiles\void_core.dir\src\frontend\source.cpp.obj
+[209/512] Building CXX object CMakeFiles\void_core.dir\src\frontend\project_creation.cpp.obj
+[210/512] Building CXX object CMakeFiles\void_core.dir\src\numeric.cpp.obj
+[211/512] Building CXX object CMakeFiles\void_core.dir\src\frontend\tooling.cpp.obj
+[212/512] Building CXX object CMakeFiles\void_core.dir\src\ir\native_storage.cpp.obj
+[213/512] Building CXX object CMakeFiles\void_core.dir\src\ir\native_binding.cpp.obj
+[214/512] Building CXX object CMakeFiles\void_core.dir\src\ir\module.cpp.obj
+C:\Users\a\VS7I2\src\src\ir\module.cpp(1042,63): warning: misleading indentation; statement is not part of the previous 'if' [-Wmisleading-indentation]
+ 1042 |                         fail("invalid deterministic release");result=Type::boolean;break;
+      |                                                               ^
+C:\Users\a\VS7I2\src\src\ir\module.cpp(1040,21): note: previous statement is here
+ 1040 |                     if(!f.receiver || f.method_name!="deinit" || operand(i.a).kind!=Type::managed_ref || operand(i.a).nullable ||
+      |                     ^
+1 warning generated.
+[215/512] Linking C static library void_native_fixture.lib
+[216/512] Building CXX object CMakeFiles\void_core.dir\src\ir\c_primitive.cpp.obj
+[217/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\application.cpp.obj
+[218/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\os.cpp.obj
+[219/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\os_abi.cpp.obj
+[220/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\random.cpp.obj
+[221/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\filesystem_abi.cpp.obj
+[222/512] Building CXX object CMakeFiles\void_core.dir\src\frontend\compiler.cpp.obj
+[223/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\filesystem.cpp.obj
+C:\Users\a\VS7I2\src\src\runtime\filesystem.cpp(20,9): warning: 'NOMINMAX' macro redefined [-Wmacro-redefined]
+   20 | #define NOMINMAX
+      |         ^
+<command line>(4,9): note: previous definition is here
+    4 | #define NOMINMAX 1
+      |         ^
+1 warning generated.
+[224/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\native_resource.cpp.obj
+[225/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\native_binding.cpp.obj
+[226/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\temporal_abi.cpp.obj
+[227/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\conversion.cpp.obj
+[228/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\text_case.cpp.obj
+[229/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\buffer.cpp.obj
+[230/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\list.cpp.obj
+[231/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\array.cpp.obj
+[232/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\dictionary.cpp.obj
+[233/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\fixed_abi.cpp.obj
+[234/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\heap.cpp.obj
+[235/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\gc_schema.cpp.obj
+[236/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\coordination.cpp.obj
+[237/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\console_abi.cpp.obj
+[238/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\console.cpp.obj
+C:\Users\a\VS7I2\src\src\runtime\console.cpp(16,9): warning: 'WIN32_LEAN_AND_MEAN' macro redefined [-Wmacro-redefined]
+   16 | #define WIN32_LEAN_AND_MEAN
+      |         ^
+<command line>(6,9): note: previous definition is here
+    6 | #define WIN32_LEAN_AND_MEAN 1
+      |         ^
+C:\Users\a\VS7I2\src\src\runtime\console.cpp(17,9): warning: 'NOMINMAX' macro redefined [-Wmacro-redefined]
+   17 | #define NOMINMAX
+      |         ^
+<command line>(4,9): note: previous definition is here
+    4 | #define NOMINMAX 1
+      |         ^
+C:\Users\a\VS7I2\src\src\runtime\console.cpp(669,137): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  669 |                 if(data.key && !request.keys && (!data.key->down || data.key->repeat!=1))return {-1,false,false,{ErrorKind::unsupported}};
+      |                                                                                                                                         ^
+C:\Users\a\VS7I2\src\src\runtime\console.cpp(672,69): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  672 |                 if(data.after)return {-1,false,false,data.after,true};
+      |                                                                     ^
+C:\Users\a\VS7I2\src\src\runtime\console.cpp(675,41): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  675 |             if(queue.eof)return {-1,true};
+      |                                         ^
+C:\Users\a\VS7I2\src\src\runtime\console.cpp(676,44): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  676 |             if(!fetch)return {-1,false,true};
+      |                                            ^
+C:\Users\a\VS7I2\src\src\runtime\console.cpp(677,91): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  677 |             if(auto error=stopped(request,op.adapter());error)return {-1,false,false,error};
+      |                                                                                           ^
+C:\Users\a\VS7I2\src\src\runtime\console.cpp(690,137): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  690 |                 if(poll && !native.completed && native.error.kind==ErrorKind::would_block){queue.blocks.pop_back();return {-1,false,true};}
+      |                                                                                                                                         ^
+8 warnings generated.
+[239/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\callback.cpp.obj
+[240/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\native.cpp.obj
+[241/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\abi.cpp.obj
+[242/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\reload.cpp.obj
+[243/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\async.cpp.obj
+[244/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\c_span.cpp.obj
+[245/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\c_resource.cpp.obj
+[246/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\c_dynamic.cpp.obj
+C:\Users\a\VS7I2\src\src\runtime\c_dynamic.cpp(10,9): warning: 'NOMINMAX' macro redefined [-Wmacro-redefined]
+   10 | #define NOMINMAX
+      |         ^
+<command line>(4,9): note: previous definition is here
+    4 | #define NOMINMAX 1
+      |         ^
+1 warning generated.
+[247/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_abi.cpp.obj
+[248/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_error.cpp.obj
+[249/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_crypto.cpp.obj
+[250/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_archive.cpp.obj
+[251/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_directory.cpp.obj
+[252/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_process.cpp.obj
+[253/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\http_provider.cpp.obj
+[254/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_directory_windows.cpp.obj
+[255/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\host_process_windows.cpp.obj
+[256/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\url.cpp.obj
+[257/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\url_abi.cpp.obj
+[258/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\http_bulk.cpp.obj
+[259/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\http.cpp.obj
+[260/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\http_resource.cpp.obj
+[261/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\http_file.cpp.obj
+[262/512] Linking C static library curl\lib\libcurl.lib
+[263/512] Linking CXX static library void_core.lib
+[264/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\http_abi.cpp.obj
+C:\Users\a\VS7I2\src\src\runtime\http_abi.cpp(118,67): warning: unused parameter 'upper' [-Wunused-parameter]
+  118 |             auto environment = [&](const char* lower, const char* upper) {
+      |                                                                   ^
+1 warning generated.
+[265/512] Building CXX object CMakeFiles\void_runtime.dir\src\runtime\native_work.cpp.obj
+[266/512] Linking CXX static library void_runtime.lib
+[267/512] Building CXX object CMakeFiles\void_llvm.dir\src\backend\llvm\native_cache.cpp.obj
+[268/512] Building CXX object CMakeFiles\voidc_objects.dir\src\main.cpp.obj
+[269/512] Building CXX object CMakeFiles\voidc_objects.dir\examples\proof.cpp.obj
+C:\Users\a\VS7I2\src\examples\proof.cpp(7,46): warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+    7 |         {Terminator::Kind::return_value, 2}}}};
+      |                                              ^
+C:\Users\a\VS7I2\src\examples\proof.cpp(13,6): warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+   13 |     }};
+      |      ^
+2 warnings generated.
+[270/512] Building CXX object CMakeFiles\voidc_objects.dir\src\native_build.cpp.obj
+[271/512] Building CXX object CMakeFiles\void_runtime_generated_abi.dir\src\runtime\abi.cpp.obj
+[272/512] Building CXX object CMakeFiles\void_runtime_generated.dir\tests\runtime\generated.cpp.obj
+In file included from C:\Users\a\VS7I2\src\tests\runtime\generated.cpp:5:
+C:\Users\a\VS7I2\src\tests\runtime\proof.hpp(6,100): warning: missing field 'enum_backing' initializer [-Wmissing-field-initializers]
+    6 |     auto leaf = std::make_shared<ValueType>(ValueType{"runtime.Leaf","Leaf",{{"payload",Type::i32}}});
+      |                                                                                                    ^
+C:\Users\a\VS7I2\src\tests\runtime\proof.hpp(9,128): warning: missing field 'enum_backing' initializer [-Wmissing-field-initializers]
+    9 |     auto inner = std::make_shared<ValueType>(ValueType{"runtime.Inner","Inner",{{"reference",reference},{"flag",Type::boolean}}});
+      |                                                                                                                                ^
+C:\Users\a\VS7I2\src\tests\runtime\proof.hpp(11,117): warning: missing field 'enum_backing' initializer [-Wmissing-field-initializers]
+   11 |     auto outer = std::make_shared<ValueType>(ValueType{"runtime.Outer","Outer",{{"tag",Type::i32},{"nested",nested}}});
+      |                                                                                                                     ^
+C:\Users\a\VS7I2\src\tests\runtime\proof.hpp(41,142): warning: missing field 'enum_backing' initializer [-Wmissing-field-initializers]
+   41 |     auto container_definition = std::make_shared<ValueType>(ValueType{"runtime.Container","Container",{{"value",value},{"padding",Type::i32}}});
+      |                                                                                                                                              ^
+4 warnings generated.
+[273/512] Building C object CMakeFiles\void_native_test_fixture.dir\src\native\fixture.c.obj
+[274/512] Building C object CMakeFiles\void_g1_fixture.dir\tests\ffi\primitives_fixture.c.obj
+[275/512] Building C object CMakeFiles\void_g1_thunk.dir\tests\ffi\primitives_thunk.c.obj
+[276/512] Building C object CMakeFiles\void_g2_fixture.dir\tests\ffi\records_fixture.c.obj
+[277/512] Building C object CMakeFiles\void_g2_thunk.dir\tests\ffi\records_thunk.c.obj
+[278/512] Building CXX object CMakeFiles\void_managed_test_abi.dir\src\runtime\abi.cpp.obj
+[279/512] Building C object CMakeFiles\void_g3_fixture.dir\tests\ffi\resources_fixture.c.obj
+[280/512] Building C object CMakeFiles\void_g3_thunk.dir\tests\ffi\resources_thunk.c.obj
+[281/512] Building CXX object CMakeFiles\void_g2_tests.dir\tests\ffi\records.cpp.obj
+[282/512] Building CXX object CMakeFiles\void_llvm.dir\src\backend\llvm\backend.cpp.obj
+[283/512] Building CXX object CMakeFiles\void_http_windows_identity.dir\tests\net\http\windows_identity.cpp.obj
+C:\Users\a\VS7I2\src\tests\net\http\windows_identity.cpp(212,63): warning: comparison of integers of different signs: 'DWORD' (aka 'unsigned long') and 'HRESULT' (aka 'long') [-Wsign-compare]
+  212 |                     matching &= public_only && GetLastError() == CRYPT_E_NOT_FOUND;
+      |                                                ~~~~~~~~~~~~~~ ^  ~~~~~~~~~~~~~~~~~
+1 warning generated.
+[284/512] Linking CXX static library void_llvm.lib
+[285/512] Building CXX object CMakeFiles\void_g3_tests.dir\tests\ffi\resources.cpp.obj
+[286/512] Generating void-native-resources.txt, native-resources-install-Debug.txt
+[287/512] Generating cache-identity-Debug.cpp
+[288/512] Building CXX object CMakeFiles\void_cache_identity.dir\cache-identity-Debug.cpp.obj
+[289/512] Linking CXX static library void_cache_identity.lib
+[290/512] Linking CXX executable void_runtime_generated.exe
+[291/512] Linking CXX executable void_g2_tests.exe
+[292/512] Building CXX object CMakeFiles\void_g1_tests.dir\tests\ffi\primitives.cpp.obj
+[293/512] Building CXX object CMakeFiles\void_native_tests.dir\tests\native\probe.cpp.obj
+[294/512] Building CXX object CMakeFiles\void_native_tests.dir\tests\native\integrated.cpp.obj
+[295/512] Building CXX object CMakeFiles\void_native_tests.dir\tests\native\tests.cpp.obj
+[296/512] Building CXX object CMakeFiles\void_native_tests.dir\tests\managed\probe.cpp.obj
+[297/512] Linking CXX executable void_g1_tests.exe
+[298/512] Linking CXX executable void_g3_tests.exe
+[299/512] Linking CXX executable void_http_windows_identity.exe
+[300/512] Building C object CMakeFiles\native_fixture.dir\tests\integration\native_fixture.c.obj
+[301/512] C:\Windows\system32\cmd.exe /C "cd /D C:\Users\a\VS7I2\Debug && C:\gcc\bin\cmake.exe -E make_directory C:/Users/a/VS7I2/Debug && C:\gcc\bin\cmake.exe -E copy_if_different C:/Users/a/VS7I2/Debug/void-native-resources.txt C:/Users/a/VS7I2/Debug/void-native-resources.txt"
+[302/512] Generating runtime-normal.obj
+[303/512] Generating runtime-optimized.obj
+[304/512] Linking CXX executable void_native_tests.exe
+[305/512] Generating ffi-g1/application-normal.obj
+[306/512] Generating ffi-g1/application-optimized.obj
+[307/512] Building CXX object CMakeFiles\void_lsp.dir\src\lsp\positions.cpp.obj
+[308/512] Generating ffi-g2/application-normal.obj
+[309/512] Generating ffi-g2/application-optimized.obj
+[310/512] Generating ffi-g3/application-normal.obj
+[311/512] Generating ffi-g3/application-optimized.obj
+[312/512] Generating native-main-normal.obj
+[313/512] Generating native-cleanup_failure-normal.obj
+[314/512] Generating native-main-optimized.obj
+[315/512] Generating native-cleanup_failure-optimized.obj
+[316/512] Generating native-integrated-normal.obj
+[317/512] Generating native-integrated-optimized.obj
+[318/512] Generating native-integrated_cancel-normal.obj
+[319/512] Generating native-integrated_cancel-optimized.obj
+[320/512] Linking CXX static library void_lsp.lib
+[321/512] Generating native-integrated_failure-normal.obj
+[322/512] Generating native-integrated_failure-optimized.obj
+[323/512] Building CXX object CMakeFiles\void_project_header.dir\tests\project\header.cpp.obj
+[324/512] Linking CXX executable voidc.exe
+[325/512] Building CXX object CMakeFiles\void_project_manifest.dir\tests\project\manifest.cpp.obj
+[326/512] Building CXX object CMakeFiles\voidls.dir\src\lsp\main.cpp.obj
+[327/512] Building CXX object CMakeFiles\void_project_selection.dir\tests\project\selection.cpp.obj
+[328/512] Building CXX object CMakeFiles\void_project_sessions.dir\tests\project\sessions.cpp.obj
+[329/512] Building CXX object CMakeFiles\void_target_triple.dir\tests\toolchain\Target.cpp.obj
+[330/512] Building CXX object CMakeFiles\void_project_creation.dir\tests\project\creation.cpp.obj
+[331/512] Building CXX object CMakeFiles\void_project_application.dir\tests\project\application.cpp.obj
+[332/512] Building CXX object CMakeFiles\void_http_native.dir\tests\net\http\native.cpp.obj
+C:\Users\a\VS7I2\src\tests\net\http\native.cpp(577,40): warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  577 |         if (const auto* setting = std::getenv("VOID_HTTP_TEST_SOAK_BYTES")) {
+      |                                        ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt\stdlib.h(1183,20): note: 'getenv' has been explicitly marked deprecated here
+ 1183 |     _Check_return_ _CRT_INSECURE_DEPRECATE(_dupenv_s)
+      |                    ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+1 warning generated.
+[333/512] Building CXX object CMakeFiles\void_http_native.dir\tests\net\http\runtime.cpp.obj
+C:\Users\a\VS7I2\src\tests\net\http\runtime.cpp(473,51): warning: missing field 'client' initializer [-Wmissing-field-initializers]
+  473 |         Context context{runtime, base, mode, count}; current = &context;
+      |                                                   ^
+1 warning generated.
+[334/512] Building CXX object CMakeFiles\void_url_native.dir\tests\net\http\url.cpp.obj
+[335/512] Building CXX object CMakeFiles\void_http_source_runner.dir\tests\net\http\source_runner.cpp.obj
+[336/512] Building CXX object CMakeFiles\void_http_reload.dir\tests\net\http\reload.cpp.obj
+[337/512] Building CXX object CMakeFiles\void_http_source_runner.dir\tests\managed\probe.cpp.obj
+[338/512] Building CXX object CMakeFiles\void_stop_token_probe.dir\cmake\probes\StopToken.cpp.obj
+[339/512] Building CXX object CMakeFiles\void_url_ir.dir\tests\net\http\url_ir.cpp.obj
+[340/512] Building CXX object CMakeFiles\void_http_ir.dir\tests\net\http\http_ir.cpp.obj
+[341/512] Building CXX object CMakeFiles\void_operator_reload.dir\tests\stage10\operator_reload.cpp.obj
+[342/512] Building CXX object CMakeFiles\void_stage10_tooling.dir\tests\stage10\tooling.cpp.obj
+[343/512] Building CXX object CMakeFiles\void_operator_resolution.dir\tests\stage10\operator_resolution.cpp.obj
+C:\Users\a\VS7I2\src\tests\stage10\operator_resolution.cpp(11,32): warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+   11 |     const auto* directory=std::getenv("VOID_TEST_SOURCE_SNAPSHOTS");if(!directory)return;
+      |                                ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt\stdlib.h(1183,20): note: 'getenv' has been explicitly marked deprecated here
+ 1183 |     _Check_return_ _CRT_INSECURE_DEPRECATE(_dupenv_s)
+      |                    ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+1 warning generated.
+[344/512] Building CXX object CMakeFiles\void_display_reload.dir\tests\stage10\display_reload.cpp.obj
+[345/512] Building CXX object CMakeFiles\void_stage10_fields.dir\tests\stage10\fields.cpp.obj
+[346/512] Building CXX object CMakeFiles\void_gc_buffers.dir\tests\runtime\fixed_call.cpp.obj
+[347/512] Building CXX object CMakeFiles\void_windows_native_staging.dir\tests\stage9\windows_native_staging.cpp.obj
+[348/512] Building CXX object CMakeFiles\void_gc_buffers.dir\tests\runtime\buffers.cpp.obj
+C:\Users\a\VS7I2\src\tests\runtime\buffers.cpp(285,59): warning: unused variable 'half_zeroed' [-Wunused-variable]
+  285 |     std::latch entered(1),resume(1),prepared(1),finish(1),half_zeroed(1),zero_resume(1);std::atomic<void*> result{nullptr};
+      |                                                           ^~~~~~~~~~~
+C:\Users\a\VS7I2\src\tests\runtime\buffers.cpp(285,74): warning: unused variable 'zero_resume' [-Wunused-variable]
+  285 |     std::latch entered(1),resume(1),prepared(1),finish(1),half_zeroed(1),zero_resume(1);std::atomic<void*> result{nullptr};
+      |                                                                          ^~~~~~~~~~~
+C:\Users\a\VS7I2\src\tests\runtime\buffers.cpp(31,26): warning: variable 'zeroing_entered' set but not used [-Wunused-but-set-global]
+   31 | thread_local std::latch* zeroing_entered=nullptr;
+      |                          ^
+C:\Users\a\VS7I2\src\tests\runtime\buffers.cpp(32,26): warning: variable 'zeroing_resume' set but not used [-Wunused-but-set-global]
+   32 | thread_local std::latch* zeroing_resume=nullptr;
+      |                          ^
+4 warnings generated.
+[349/512] Building CXX object CMakeFiles\void_gc_schemas.dir\tests\runtime\schemas.cpp.obj
+[350/512] Building CXX object CMakeFiles\void_arrays_foundation.dir\tests\arrays\foundation.cpp.obj
+[351/512] Building CXX object CMakeFiles\void_runtime_console.dir\tests\runtime\console.cpp.obj
+C:\Users\a\VS7I2\src\tests\runtime\console.cpp(212,14): warning: unused parameter 'argc' [-Wunused-parameter]
+  212 | int main(int argc,char** argv){try{
+      |              ^
+C:\Users\a\VS7I2\src\tests\runtime\console.cpp(212,26): warning: unused parameter 'argv' [-Wunused-parameter]
+  212 | int main(int argc,char** argv){try{
+      |                          ^
+2 warnings generated.
+[352/512] Building CXX object CMakeFiles\void_runtime_console_transfers.dir\tests\runtime\console_windows_trace.cpp.obj
+C:\Users\a\VS7I2\src\tests\runtime\console_windows_trace.cpp(108,121): warning: cast from 'NTSTATUS (*)(HANDLE, PIO_STATUS_BLOCK, PVOID, ULONG, FILE_INFORMATION_CLASS) __attribute__((stdcall))' (aka 'long (*)(void *, struct _IO_STATUS_BLOCK *, void *, unsigned long, enum _FILE_INFORMATION_CLASS)') to 'FARPROC' (aka 'long long (*)()') converts to incompatible function type [-Wcast-function-type-mismatch]
+  108 |     if(address && reinterpret_cast<std::uintptr_t>(name)>65535 && std::strcmp(name,"NtQueryInformationFile")==0)address=reinterpret_cast<FARPROC>(&observe_query);
+      |                                                                                                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 warning generated.
+[353/512] Building CXX object CMakeFiles\void_runtime_console_transfers.dir\tests\runtime\console_transfers.cpp.obj
+[354/512] Building CXX object CMakeFiles\void_runtime_console_keyboard.dir\tests\runtime\console_windows_trace.cpp.obj
+C:\Users\a\VS7I2\src\tests\runtime\console_windows_trace.cpp(108,121): warning: cast from 'NTSTATUS (*)(HANDLE, PIO_STATUS_BLOCK, PVOID, ULONG, FILE_INFORMATION_CLASS) __attribute__((stdcall))' (aka 'long (*)(void *, struct _IO_STATUS_BLOCK *, void *, unsigned long, enum _FILE_INFORMATION_CLASS)') to 'FARPROC' (aka 'long long (*)()') converts to incompatible function type [-Wcast-function-type-mismatch]
+  108 |     if(address && reinterpret_cast<std::uintptr_t>(name)>65535 && std::strcmp(name,"NtQueryInformationFile")==0)address=reinterpret_cast<FARPROC>(&observe_query);
+      |                                                                                                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 warning generated.
+[355/512] Building CXX object CMakeFiles\void_runtime_console_transfers.dir\tests\runtime\console_windows_native.cpp.obj
+[356/512] Building CXX object CMakeFiles\void_runtime_console_keyboard.dir\tests\runtime\console_keyboard.cpp.obj
+C:\Users\a\VS7I2\src\tests\runtime\console_keyboard.cpp(73,75): warning: unused variable 'mode' [-Wunused-variable]
+   73 |     {auto f=std::make_shared<Fake>();Context c(Streams::isolated(f));auto mode=c.begin_mode({false,false,true});f->restore_fault={ErrorKind::io_failure,77};check(c.close().os_code==77 && f->mode==0,"shutdown restoration failure not reported");f->restore_fault={};check(!c.close() && f->mode==7,"shutdown restoration retry lost original mode");}
+      |                                                                           ^~~~
+C:\Users\a\VS7I2\src\tests\runtime\console_keyboard.cpp(107,764): warning: unused variable 'a' [-Wunused-variable]
+  107 |     {auto f=std::make_shared<Fake>();Context c(Streams::isolated(f));auto outer=c.begin_mode({false,false,true});check(!outer.error && f->mode==0,"outer mode failed");auto inner=c.begin_mode({true,true,false});check(!inner.error && f->mode==7,"nested mode failed");check(c.end_mode(outer.token).kind==ErrorKind::would_block && f->mode==7,"non-LIFO restore accepted");auto other=std::async(std::launch::async,[&]{return c.begin_mode();}).get();check(other.error.kind==ErrorKind::would_block,"foreign session owner accepted");check(!c.end_mode(inner.token) && f->mode==0,"inner exact restoration failed");check(!c.end_mode(outer.token) && f->mode==7,"outer exact restoration failed");check(c.end_mode(outer.token).kind==ErrorKind::closed,"closed mode reused");auto a=c.begin_mode({false,false,true});auto b=c.begin_mode({true,false,true});c.close();check(f->mode==7 && c.snapshot().admitted==0,"shutdown did not restore nested modes");}
+      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ^
+C:\Users\a\VS7I2\src\tests\runtime\console_keyboard.cpp(107,804): warning: unused variable 'b' [-Wunused-variable]
+  107 |     {auto f=std::make_shared<Fake>();Context c(Streams::isolated(f));auto outer=c.begin_mode({false,false,true});check(!outer.error && f->mode==0,"outer mode failed");auto inner=c.begin_mode({true,true,false});check(!inner.error && f->mode==7,"nested mode failed");check(c.end_mode(outer.token).kind==ErrorKind::would_block && f->mode==7,"non-LIFO restore accepted");auto other=std::async(std::launch::async,[&]{return c.begin_mode();}).get();check(other.error.kind==ErrorKind::would_block,"foreign session owner accepted");check(!c.end_mode(inner.token) && f->mode==0,"inner exact restoration failed");check(!c.end_mode(outer.token) && f->mode==7,"outer exact restoration failed");check(c.end_mode(outer.token).kind==ErrorKind::closed,"closed mode reused");auto a=c.begin_mode({false,false,true});auto b=c.begin_mode({true,false,true});c.close();check(f->mode==7 && c.snapshot().admitted==0,"shutdown did not restore nested modes");}
+      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ^
+3 warnings generated.
+[357/512] Building CXX object CMakeFiles\void_runtime_console_keyboard.dir\tests\runtime\console_windows_native.cpp.obj
+[358/512] Building CXX object CMakeFiles\void_runtime_console_terminal.dir\tests\runtime\console_terminal.cpp.obj
+[359/512] Building CXX object CMakeFiles\void_runtime_console_wide.dir\tests\runtime\console_wide.cpp.obj
+C:\Users\a\VS7I2\src\tests\runtime\console_wide.cpp(75,10): warning: 'codecvt_utf8_utf16<char16_t>' is deprecated: warning STL4017: std::wbuffer_convert, std::wstring_convert, and the <codecvt> header (containing std::codecvt_mode, std::codecvt_utf8, std::codecvt_utf16, and std::codecvt_utf8_utf16) are deprecated in C++17. (The std::codecvt class template is NOT deprecated.) The C++ Standard doesn't provide equivalent non-deprecated functionality; consider using MultiByteToWideChar() and WideCharToMultiByte() from <Windows.h> instead. You can define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING or _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS to suppress this warning. [-Wdeprecated-declarations]
+   75 |     std::codecvt_utf8_utf16<char16_t> codec;std::mbstate_t state{};
+      |          ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\codecvt(442,7): note: 'codecvt_utf8_utf16<char16_t>' has been explicitly marked deprecated here
+  442 | class _CXX17_DEPRECATE_CODECVT_HEADER codecvt_utf8_utf16
+      |       ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\yvals_core.h(1224,7): note: expanded from macro '_CXX17_DEPRECATE_CODECVT_HEADER'
+ 1224 |     [[deprecated(                                                                                              \
+      |       ^
+1 warning generated.
+[360/512] Building CXX object CMakeFiles\void_runtime_console_wide.dir\tests\runtime\console_windows_trace.cpp.obj
+C:\Users\a\VS7I2\src\tests\runtime\console_windows_trace.cpp(108,121): warning: cast from 'NTSTATUS (*)(HANDLE, PIO_STATUS_BLOCK, PVOID, ULONG, FILE_INFORMATION_CLASS) __attribute__((stdcall))' (aka 'long (*)(void *, struct _IO_STATUS_BLOCK *, void *, unsigned long, enum _FILE_INFORMATION_CLASS)') to 'FARPROC' (aka 'long long (*)()') converts to incompatible function type [-Wcast-function-type-mismatch]
+  108 |     if(address && reinterpret_cast<std::uintptr_t>(name)>65535 && std::strcmp(name,"NtQueryInformationFile")==0)address=reinterpret_cast<FARPROC>(&observe_query);
+      |                                                                                                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 warning generated.
+[361/512] Building CXX object CMakeFiles\void_runtime_console_wide.dir\tests\runtime\console_windows_native.cpp.obj
+[362/512] Building CXX object CMakeFiles\void_runtime_console_input.dir\tests\runtime\console_input.cpp.obj
+C:\Users\a\VS7I2\src\tests\runtime\console_input.cpp(233,14): warning: unused parameter 'argc' [-Wunused-parameter]
+  233 | int main(int argc,char** argv){try{
+      |              ^
+C:\Users\a\VS7I2\src\tests\runtime\console_input.cpp(233,26): warning: unused parameter 'argv' [-Wunused-parameter]
+  233 | int main(int argc,char** argv){try{
+      |                          ^
+2 warnings generated.
+[363/512] Building CXX object CMakeFiles\void_console_windows_observed.dir\src\runtime\console.cpp.obj
+C:\Users\a\VS7I2\src\src\runtime\console.cpp(669,137): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  669 |                 if(data.key && !request.keys && (!data.key->down || data.key->repeat!=1))return {-1,false,false,{ErrorKind::unsupported}};
+      |                                                                                                                                         ^
+C:\Users\a\VS7I2\src\src\runtime\console.cpp(672,69): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  672 |                 if(data.after)return {-1,false,false,data.after,true};
+      |                                                                     ^
+C:\Users\a\VS7I2\src\src\runtime\console.cpp(675,41): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  675 |             if(queue.eof)return {-1,true};
+      |                                         ^
+C:\Users\a\VS7I2\src\src\runtime\console.cpp(676,44): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  676 |             if(!fetch)return {-1,false,true};
+      |                                            ^
+C:\Users\a\VS7I2\src\src\runtime\console.cpp(677,91): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  677 |             if(auto error=stopped(request,op.adapter());error)return {-1,false,false,error};
+      |                                                                                           ^
+C:\Users\a\VS7I2\src\src\runtime\console.cpp(690,137): warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  690 |                 if(poll && !native.completed && native.error.kind==ErrorKind::would_block){queue.blocks.pop_back();return {-1,false,true};}
+      |                                                                                                                                         ^
+6 warnings generated.
+[364/512] Building CXX object CMakeFiles\void_fixed_arrays_tests.dir\tests\fixed_arrays\tests.cpp.obj
+[365/512] Building CXX object CMakeFiles\void_fixed_arrays_tests.dir\tests\managed\probe.cpp.obj
+[366/512] Building CXX object CMakeFiles\void_runtime_tests.dir\tests\runtime\coordination.cpp.obj
+[367/512] Building CXX object CMakeFiles\void_growable_arrays_tests.dir\tests\managed\probe.cpp.obj
+[368/512] Building CXX object CMakeFiles\void_growable_arrays_tests.dir\tests\growable_arrays\tests.cpp.obj
+[369/512] Building CXX object CMakeFiles\void_arrays_source.dir\tests\managed\probe.cpp.obj
+[370/512] Building CXX object CMakeFiles\void_arrays_source.dir\tests\arrays\source.cpp.obj
+[371/512] Building CXX object CMakeFiles\void_generics_tests.dir\tests\managed\probe.cpp.obj
+[372/512] Building CXX object CMakeFiles\void_generics_tests.dir\tests\generics\tests.cpp.obj
+[373/512] Building CXX object CMakeFiles\void_collections_tests.dir\tests\collections\tests.cpp.obj
+[374/512] Building CXX object CMakeFiles\void_collections_tests.dir\tests\managed\probe.cpp.obj
+[375/512] Building CXX object CMakeFiles\void_dictionaries_tests.dir\tests\managed\probe.cpp.obj
+[376/512] Building CXX object CMakeFiles\void_dictionaries_tests.dir\tests\dictionaries\tests.cpp.obj
+[377/512] Building CXX object CMakeFiles\void_properties_tests.dir\tests\properties\tests.cpp.obj
+[378/512] Building CXX object CMakeFiles\void_properties_tests.dir\tests\managed\probe.cpp.obj
+[379/512] Building CXX object CMakeFiles\void_patterns_tests.dir\tests\managed\probe.cpp.obj
+[380/512] Building CXX object CMakeFiles\void_patterns_tests.dir\tests\patterns\tests.cpp.obj
+[381/512] Building CXX object CMakeFiles\void_advanced_tests.dir\tests\advanced\tests.cpp.obj
+[382/512] Building CXX object CMakeFiles\void_advanced_tests.dir\tests\managed\probe.cpp.obj
+[383/512] Building CXX object CMakeFiles\void_runtime_failures.dir\tests\runtime\failures.cpp.obj
+[384/512] Building CXX object CMakeFiles\void_runtime_callbacks.dir\tests\runtime\callbacks.cpp.obj
+In file included from C:\Users\a\VS7I2\src\tests\runtime\callbacks.cpp:3:
+C:\Users\a\VS7I2\src\tests\runtime\proof.hpp(6,100): warning: missing field 'enum_backing' initializer [-Wmissing-field-initializers]
+    6 |     auto leaf = std::make_shared<ValueType>(ValueType{"runtime.Leaf","Leaf",{{"payload",Type::i32}}});
+      |                                                                                                    ^
+C:\Users\a\VS7I2\src\tests\runtime\proof.hpp(9,128): warning: missing field 'enum_backing' initializer [-Wmissing-field-initializers]
+    9 |     auto inner = std::make_shared<ValueType>(ValueType{"runtime.Inner","Inner",{{"reference",reference},{"flag",Type::boolean}}});
+      |                                                                                                                                ^
+C:\Users\a\VS7I2\src\tests\runtime\proof.hpp(11,117): warning: missing field 'enum_backing' initializer [-Wmissing-field-initializers]
+   11 |     auto outer = std::make_shared<ValueType>(ValueType{"runtime.Outer","Outer",{{"tag",Type::i32},{"nested",nested}}});
+      |                                                                                                                     ^
+C:\Users\a\VS7I2\src\tests\runtime\proof.hpp(41,142): warning: missing field 'enum_backing' initializer [-Wmissing-field-initializers]
+   41 |     auto container_definition = std::make_shared<ValueType>(ValueType{"runtime.Container","Container",{{"value",value},{"padding",Type::i32}}});
+      |                                                                                                                                              ^
+4 warnings generated.
+[385/512] Building CXX object CMakeFiles\void_runtime_aot_normal.dir\tests\runtime\aot.cpp.obj
+[386/512] Building CXX object CMakeFiles\void_runtime_invariants.dir\tests\runtime\invariants.cpp.obj
+[387/512] Building CXX object CMakeFiles\void_runtime_aot_optimized.dir\tests\runtime\aot.cpp.obj
+[388/512] Building CXX object CMakeFiles\void_lsp_tests.dir\tests\lsp\positions.cpp.obj
+[389/512] Linking C static library native_fixture.lib
+[390/512] Building CXX object CMakeFiles\void_binary_ownership.dir\tests\managed\probe.cpp.obj
+[391/512] Building CXX object CMakeFiles\void_binary_ownership.dir\tests\binary\ownership.cpp.obj
+[392/512] Building CXX object CMakeFiles\void_operator_integration.dir\tests\stage10\operator_integration.cpp.obj
+[393/512] Building C object CMakeFiles\void_g1_wrong_fixture.dir\tests\ffi\primitives_fixture.c.obj
+[394/512] Building CXX object CMakeFiles\void_g1_aot_normal.dir\tests\async\aot.cpp.obj
+[395/512] Building CXX object CMakeFiles\void_g1_aot_optimized.dir\tests\async\aot.cpp.obj
+[396/512] Building CXX object CMakeFiles\void_g1_aot_mismatch.dir\tests\async\aot.cpp.obj
+[397/512] Building CXX object CMakeFiles\void_g2_aot_normal.dir\tests\async\aot.cpp.obj
+[398/512] Building CXX object CMakeFiles\void_g2_aot_optimized.dir\tests\async\aot.cpp.obj
+[399/512] Building CXX object CMakeFiles\void_g3_aot_normal.dir\tests\ffi\resources_exit.cpp.obj
+[400/512] Building CXX object CMakeFiles\void_operator_integration.dir\tests\native\probe.cpp.obj
+[401/512] Building CXX object CMakeFiles\void_g3_aot_optimized.dir\tests\ffi\resources_exit.cpp.obj
+[402/512] Building CXX object CMakeFiles\void_native_aot_main_normal.dir\tests\async\aot.cpp.obj
+[403/512] Building CXX object CMakeFiles\void_native_aot_main_optimized.dir\tests\async\aot.cpp.obj
+[404/512] Building CXX object CMakeFiles\void_native_aot_cleanup_failure_normal.dir\tests\async\aot.cpp.obj
+[405/512] Building CXX object CMakeFiles\void_native_aot_cleanup_failure_optimized.dir\tests\async\aot.cpp.obj
+[406/512] Building CXX object CMakeFiles\void_native_aot_integrated_normal.dir\tests\async\aot.cpp.obj
+[407/512] Building CXX object CMakeFiles\void_native_aot_integrated_optimized.dir\tests\async\aot.cpp.obj
+[408/512] Building CXX object CMakeFiles\void_native_aot_integrated_cancel_normal.dir\tests\async\aot.cpp.obj
+[409/512] Building CXX object CMakeFiles\void_native_aot_integrated_cancel_optimized.dir\tests\async\aot.cpp.obj
+[410/512] Building CXX object CMakeFiles\void_native_aot_integrated_failure_normal.dir\tests\async\aot.cpp.obj
+[411/512] Building CXX object CMakeFiles\void_native_aot_integrated_failure_optimized.dir\tests\async\aot.cpp.obj
+[412/512] Building CXX object CMakeFiles\void_operator_integration.dir\tests\managed\probe.cpp.obj
+[413/512] Building CXX object CMakeFiles\void_io_native_jobs.dir\tests\io\native_jobs.cpp.obj
+[414/512] Building CXX object CMakeFiles\void_native_workers_tests.dir\tests\async\native_workers.cpp.obj
+[415/512] Building CXX object CMakeFiles\void_async_tests.dir\tests\async\tests.cpp.obj
+[416/512] Building CXX object CMakeFiles\void_async_tests.dir\tests\async\syntax.cpp.obj
+[417/512] Building CXX object CMakeFiles\void_async_tests.dir\tests\async\ir.cpp.obj
+[418/512] Building CXX object CMakeFiles\void_async_tests.dir\tests\async\parallel.cpp.obj
+C:\Users\a\VS7I2\src\tests\async\parallel.cpp(31,379): warning: variable 'foreign' is uninitialized when passed as a const pointer argument here [-Wuninitialized-const-pointer]
+   31 | void* fifo_start(std::int32_t,vd::RuntimeFailure* failure){void* task=nullptr;void* frame=nullptr;const std::size_t zero=0;vd::Runtime::Slot slots[]={{&task,sizeof(task),&zero,1},{&frame,sizeof(frame),&zero,1}};vd::Runtime::Frame roots(vd::Runtime::current(),slots,2);char foreign;vd::RuntimeFailure wrong;vd_async_new(&task,&frame,8,nullptr,0,8,nullptr,0,"parallel-fifo-task",&foreign,fifo_resume,&wrong,1);foreign_rejected=wrong.message && !task && !frame;return fifo_create(-1,failure);}
+      |                                                                                                                                                                                                                                                                                                                                                                                           ^~~~~~~
+1 warning generated.
+[419/512] Building CXX object CMakeFiles\void_async_tests.dir\tests\managed\probe.cpp.obj
+[420/512] Building CXX object CMakeFiles\void_async_tests.dir\tests\async\lifecycle.cpp.obj
+[421/512] Building CXX object CMakeFiles\void_async_tests.dir\tests\async\lifetime.cpp.obj
+[422/512] Building CXX object CMakeFiles\void_tests.dir\tests\sessions\tests.cpp.obj
+[423/512] Building CXX object CMakeFiles\void_tests.dir\tests\tooling\tests.cpp.obj
+C:\Users\a\VS7I2\src\tests\tooling\tests.cpp(236,31): warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  236 |     std::string previous=std::getenv("VOID_STDLIB_ROOT")?std::getenv("VOID_STDLIB_ROOT"):"";
+      |                               ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt\stdlib.h(1183,20): note: 'getenv' has been explicitly marked deprecated here
+ 1183 |     _Check_return_ _CRT_INSECURE_DEPRECATE(_dupenv_s)
+      |                    ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\a\VS7I2\src\tests\tooling\tests.cpp(236,63): warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  236 |     std::string previous=std::getenv("VOID_STDLIB_ROOT")?std::getenv("VOID_STDLIB_ROOT"):"";
+      |                                                               ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt\stdlib.h(1183,20): note: 'getenv' has been explicitly marked deprecated here
+ 1183 |     _Check_return_ _CRT_INSECURE_DEPRECATE(_dupenv_s)
+      |                    ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\BuildTools\VS2022\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+2 warnings generated.
+[424/512] Building CXX object CMakeFiles\void_tests.dir\tests\analysis\tests.cpp.obj
+[425/512] Building CXX object CMakeFiles\void_tests.dir\tests\frontend\tests.cpp.obj
+[426/512] Building CXX object CMakeFiles\void_tests.dir\tests\frontend\values.cpp.obj
+[427/512] Building CXX object CMakeFiles\void_tests.dir\tests\tests.cpp.obj
+C:\Users\a\VS7I2\src\tests\tests.cpp(174,57): warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+  174 |             {vd::ir::Terminator::Kind::return_value,1}}}};
+      |                                                         ^
+1 warning generated.
+[428/512] Building CXX object CMakeFiles\void_tests.dir\tests\frontend\structs.cpp.obj
+[429/512] Building CXX object CMakeFiles\void_tests.dir\tests\frontend\methods.cpp.obj
+[430/512] Building CXX object CMakeFiles\void_tests.dir\tests\frontend\initialization.cpp.obj
+[431/512] Building CXX object CMakeFiles\void_tests.dir\examples\proof.cpp.obj
+C:\Users\a\VS7I2\src\examples\proof.cpp(7,46): warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+    7 |         {Terminator::Kind::return_value, 2}}}};
+      |                                              ^
+C:\Users\a\VS7I2\src\examples\proof.cpp(13,6): warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+   13 |     }};
+      |      ^
+2 warnings generated.
+[432/512] Building CXX object CMakeFiles\void_tests.dir\tests\numeric\tests.cpp.obj
+[433/512] Building CXX object CMakeFiles\void_tests.dir\tests\modules\tests.cpp.obj
+[434/512] Building CXX object CMakeFiles\void_sessions_example.dir\examples\sessions.cpp.obj
+[435/512] Building CXX object CMakeFiles\void_tooling_example.dir\examples\tooling.cpp.obj
+[436/512] Linking CXX executable voidls.exe
+[437/512] Linking CXX executable void_project_header.exe
+[438/512] Building CXX object CMakeFiles\void_g5_reload.dir\tests\ffi\callback_reload.cpp.obj
+[439/512] Building CXX object CMakeFiles\void_numeric_enum_ir.dir\tests\numeric\enums_ir.cpp.obj
+[440/512] Linking CXX executable void_project_manifest.exe
+[441/512] Linking CXX executable void_project_selection.exe
+[442/512] Linking CXX executable void_project_creation.exe
+[443/512] Linking CXX executable void_target_triple.exe
+[444/512] Linking CXX executable void_project_sessions.exe
+[445/512] Linking CXX executable void_http_native.exe
+[446/512] Linking CXX executable void_url_native.exe
+[447/512] Linking CXX executable void_project_application.exe
+[448/512] Linking CXX executable void_http_ir.exe
+[449/512] Linking CXX executable void_url_ir.exe
+[450/512] Linking CXX executable void_http_reload.exe
+[451/512] Linking CXX executable void_stop_token_probe.exe
+[452/512] Linking CXX executable void_http_source_runner.exe
+[453/512] Linking CXX executable void_stage10_tooling.exe
+[454/512] Linking CXX executable void_operator_reload.exe
+[455/512] Linking CXX executable void_operator_resolution.exe
+[456/512] Linking CXX executable void_windows_native_staging.exe
+[457/512] Linking CXX executable void_display_reload.exe
+[458/512] Linking CXX executable void_gc_buffers.exe
+[459/512] Linking CXX executable void_gc_schemas.exe
+[460/512] Linking CXX executable void_runtime_console.exe
+[461/512] Linking CXX executable void_arrays_foundation.exe
+[462/512] Linking CXX executable void_stage10_fields.exe
+[463/512] Linking CXX executable void_runtime_console_terminal.exe
+[464/512] Linking CXX executable void_runtime_console_input.exe
+[465/512] Linking CXX executable void_runtime_console_transfers.exe
+[466/512] Linking CXX executable void_runtime_console_keyboard.exe
+[467/512] Linking CXX executable void_runtime_console_wide.exe
+[468/512] Linking CXX executable void_runtime_tests.exe
+[469/512] Linking CXX executable void_arrays_source.exe
+[470/512] Linking CXX executable void_fixed_arrays_tests.exe
+[471/512] Linking CXX executable void_growable_arrays_tests.exe
+[472/512] Linking CXX executable void_collections_tests.exe
+[473/512] Linking CXX executable void_dictionaries_tests.exe
+[474/512] Linking CXX executable void_generics_tests.exe
+[475/512] Linking CXX executable void_advanced_tests.exe
+[476/512] Linking CXX executable void_patterns_tests.exe
+[477/512] Linking CXX executable void_properties_tests.exe
+[478/512] Linking CXX executable void_runtime_failures.exe
+[479/512] Linking CXX executable void_runtime_aot_normal.exe
+[480/512] Linking CXX executable void_runtime_aot_optimized.exe
+[481/512] Linking CXX executable void_runtime_invariants.exe
+[482/512] Linking CXX executable void_lsp_tests.exe
+[483/512] Linking CXX executable void_runtime_callbacks.exe
+[484/512] Linking CXX executable void_g1_aot_normal.exe
+[485/512] Linking CXX executable void_g1_aot_optimized.exe
+[486/512] Linking CXX executable void_binary_ownership.exe
+[487/512] Linking CXX executable void_g1_aot_mismatch.exe
+[488/512] Linking CXX executable void_g2_aot_normal.exe
+[489/512] Linking CXX executable void_operator_integration.exe
+[490/512] Linking CXX executable void_g2_aot_optimized.exe
+[491/512] Linking CXX executable void_g3_aot_normal.exe
+[492/512] Linking CXX executable void_g3_aot_optimized.exe
+[493/512] Linking CXX executable void_native_aot_main_normal.exe
+[494/512] Linking CXX executable void_native_aot_main_optimized.exe
+[495/512] Linking CXX executable void_native_aot_cleanup_failure_normal.exe
+[496/512] Linking CXX executable void_native_aot_cleanup_failure_optimized.exe
+[497/512] Linking CXX executable void_native_aot_integrated_normal.exe
+[498/512] Linking CXX executable void_native_aot_integrated_optimized.exe
+[499/512] Linking CXX executable void_native_aot_integrated_cancel_normal.exe
+[500/512] Linking CXX executable void_native_aot_integrated_cancel_optimized.exe
+[501/512] Linking CXX executable void_native_aot_integrated_failure_normal.exe
+[502/512] Linking CXX executable void_native_aot_integrated_failure_optimized.exe
+[503/512] Linking CXX executable void_io_native_jobs.exe
+[504/512] Linking CXX executable void_native_workers_tests.exe
+[505/512] Linking CXX executable void_sessions_example.exe
+[506/512] Linking CXX executable void_tooling_example.exe
+[507/512] Linking CXX executable void_async_tests.exe
+[508/512] Linking CXX executable void_tests.exe
+[509/512] Linking CXX executable void_numeric_enum_ir.exe
+[510/512] Linking CXX executable void_g5_reload.exe
+[511/512] Generating voidup/voidup.exe
+Built native executable: C:/Users/a/VS7I2/Debug/voidup/voidup.exe

@@ -1,0 +1,17 @@
+enum mode(u8):
+    ready = 7
+
+func close():
+    print("STORAGE CLEANUP")
+
+func choose(raw: i32) -> mode:
+    defer close()
+    var quotient = 10 / raw
+    if quotient == 10:
+        return mode.ready
+    return mode.ready
+
+func main() -> i32:
+    if choose(0) is mode.ready:
+        return 2
+    return 3

@@ -1,0 +1,49 @@
+{
+  "platform": "Windows-10-10.0.19045-SP0",
+  "files": {
+    "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Release\\void_lsp.lib": {
+      "exists": true,
+      "sha256": "5bf5dae1080d6b69cc81629cf9061c0e0250c3b8648e6e8a964b7c228311befc"
+    },
+    "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Release\\void_llvm.lib": {
+      "exists": true,
+      "sha256": "ab019c73cab0bfe16e0a87f37f3239cf543d1142a6b1ca648e12f5726ce7a0e6"
+    },
+    "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Release\\void_core.lib": {
+      "exists": true,
+      "sha256": "a462af19fff32ef2fbcb56e58d8de7aa764234a617e52a160f2b918c61705b6c"
+    },
+    "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Release\\voidls.exe": {
+      "exists": true,
+      "sha256": "4e4ed22440d9c4f2a2719e0e6319c8a32bf440e09f9c4d5552974988c0d66748"
+    },
+    "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Release\\voidc.exe": {
+      "exists": true,
+      "sha256": "27773598300a69981a84a365a2009731c3f9cfd0208e63a55db0051a81c243d7"
+    },
+    "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\void_lsp.lib": {
+      "exists": true,
+      "sha256": "64ce11a1aab8d4cb0029b3b1f8f62d54f93f79f3040cc9c1d42bfa7d0badadbc"
+    },
+    "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\void_llvm.lib": {
+      "exists": true,
+      "sha256": "39af6d5de2d11637cc990b11b38f340a637bd99f281f60440421c894bc9fc973"
+    },
+    "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\void_core.lib": {
+      "exists": true,
+      "sha256": "08785153ab9001c2462ca43cfd11fe400e98d6873cabf3038527564db943df60"
+    },
+    "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidls.exe": {
+      "exists": true,
+      "sha256": "e2d469f094eaa28df1bd69dc0ba6e909d03d31c2ce16bd67f81ee3709267fcae"
+    },
+    "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc.exe": {
+      "exists": true,
+      "sha256": "0ab63988da8e6557e1744cb222eabc208af98d132905755b8220d15b9616eba4"
+    },
+    "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-objdump.exe": true,
+    "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe": true,
+    "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe": true
+  },
+  "source_sha256": {}
+}

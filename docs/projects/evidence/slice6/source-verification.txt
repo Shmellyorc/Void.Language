@@ -1,0 +1,25 @@
+24 source, test and language documentation paths
+CMakeLists.txt
+docs/LANGUAGE_BIBLE.md
+docs/NUMERIC_TYPES.md
+docs/PROJECT_ARCHITECTURE_ROADMAP.md
+editors/vscode/src/test/numericHost.ts
+editors/vscode/src/test/runNumericHost.ts
+editors/vscode/syntaxes/void.tmLanguage.json
+include/void/ir.hpp
+include/void/numeric.hpp
+src/backend/llvm/backend.cpp
+src/frontend/compiler.cpp
+src/frontend/construction.inc
+src/frontend/generic_declarations.inc
+src/frontend/generic_inference.inc
+src/frontend/generics.inc
+src/frontend/pattern_parser.inc
+src/frontend/pattern_semantics.inc
+src/ir/module.cpp
+src/ir/numeric_enum_storage.inc
+src/numeric.cpp
+tests/numeric/enums.py
+tests/numeric/enums_ir.cpp
+tests/numeric/enums_lsp.py
+tests/numeric/tests.cpp

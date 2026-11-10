@@ -1,0 +1,134 @@
+{
+  "platform": "linux",
+  "commands": [
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "check",
+        "--project",
+        "/tmp/VOID deliberate child \u96ea jhojt5fm"
+      ],
+      "status": 0,
+      "stdout": "Source checked successfully\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID deliberate child \u96ea jhojt5fm",
+        "--no-cache"
+      ],
+      "status": 17,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID deliberate child \u96ea jhojt5fm",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "status": 17,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "check",
+        "--project",
+        "/tmp/VOID deliberate child \u96ea jhojt5fm/nested"
+      ],
+      "status": 0,
+      "stdout": "Source checked successfully\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID deliberate child \u96ea jhojt5fm/nested",
+        "--no-cache"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID deliberate child \u96ea jhojt5fm/nested",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "build",
+        "--project",
+        "/tmp/VOID deliberate child \u96ea jhojt5fm/nested",
+        "-o",
+        "/tmp/VOID deliberate child \u96ea jhojt5fm/child-native"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID deliberate child \u96ea jhojt5fm/child-native\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/VOID deliberate child \u96ea jhojt5fm/child-native"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID deliberate child \u96ea jhojt5fm",
+        "--entry",
+        "nested/launcher.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID deliberate child \u96ea jhojt5fm/void.project.toml:1:1: error: Source path crosses nested project boundary '/nested'.\n    code: VOID5009\n\n 1 | schema=1\n   | ^\n    Hint: Select the child project explicitly; parent imports and entry overrides cannot cross it.\n\n"
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "run",
+        "--project",
+        "/tmp/VOID deliberate child \u96ea jhojt5fm",
+        "--no-cache"
+      ],
+      "status": 17,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+        "check",
+        "--project",
+        "/tmp/VOID deliberate child \u96ea jhojt5fm/nested"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID deliberate child \u96ea jhojt5fm/nested/void.project.toml:1:2: error: Invalid project TOML: Error while parsing table header: expected a bare or quoted key\n    code: VOID5001\n\n 1 | [=roject]\n   |  ^\n    Hint: Use TOML 1.0 syntax; no configuration code is executed.\n\n"
+    }
+  ]
+}

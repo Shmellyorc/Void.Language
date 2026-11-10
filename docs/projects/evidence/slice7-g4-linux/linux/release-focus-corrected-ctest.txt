@@ -1,0 +1,13 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start 283: ffi_g4_jit_ir
+    Start 284: ffi_g4_aot_normal
+1/4 Test #284: ffi_g4_aot_normal ................   Passed    0.19 sec
+    Start 285: ffi_g4_aot_optimized
+2/4 Test #285: ffi_g4_aot_optimized .............   Passed    0.11 sec
+    Start 286: ffi_g4_aot_startup
+3/4 Test #286: ffi_g4_aot_startup ...............   Passed    0.10 sec
+4/4 Test #283: ffi_g4_jit_ir ....................   Passed    0.81 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   0.82 sec

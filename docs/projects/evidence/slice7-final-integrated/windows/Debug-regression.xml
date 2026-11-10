@@ -1,0 +1,1274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Win32-ninja"
+	tests="150"
+	failures="18"
+	disabled="0"
+	skipped="0"
+	hostname="DESKTOP-N4VH0F7"
+	time="2849"
+	timestamp="2026-11-09T12:27:01"
+	>
+	<testcase name="project_manifest_header" classname="project_manifest_header" time="0.108769" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="project_manifest" classname="project_manifest" time="0.476154" status="run">
+		<properties/>
+		<system-out>project_manifest: 8788 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_legacy" classname="project_manifest_legacy" time="11.039" status="run">
+		<properties/>
+		<system-out>project_manifest_legacy: 18 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_provenance" classname="project_manifest_provenance" time="0.20571" status="run">
+		<properties/>
+		<system-out>project_manifest_provenance: 3 file hashes and exact pinned upstream reconstruction passed
+</system-out>
+	</testcase>
+	<testcase name="project_selection" classname="project_selection" time="64.5814" status="run">
+		<properties/>
+		<system-out>UNQUALIFIED: native symlink privilege A required privilege is not held by the client.
+project_selection: 353 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_sessions" classname="project_sessions" time="1.50352" status="run">
+		<properties/>
+		<system-out>project_sessions: 166 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_creation" classname="project_creation" time="0.313179" status="run">
+		<properties/>
+		<system-out>creation: entropy, reviewed directory, external collision, rollback ownership, staged content passed
+</system-out>
+	</testcase>
+	<testcase name="project_creation_process" classname="project_creation_process" time="28.8619" status="run">
+		<properties/>
+		<system-out>S5 creation process: 62 invocations passed
+</system-out>
+	</testcase>
+	<testcase name="project_application" classname="project_application" time="131.361" status="run">
+		<properties/>
+		<system-out>Application cache: unavailable/unavailable
+project_application: 63 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_application_process" classname="project_application_process" time="116.215" status="run">
+		<properties/>
+		<system-out>project_application_process: 61 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_discovery_cli" classname="project_discovery_cli" time="33.8177" status="run">
+		<properties/>
+		<system-out>UNQUALIFIED: native persistent disk cache; project selection rejection is still exercised
+project_discovery_cli: 88 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_profiles" classname="project_profiles" time="6.21851" status="run">
+		<properties/>
+		<system-out>UNQUALIFIED: native persistent disk cache warm hit
+project_profiles: 43 process checks passed; compute instruction counts O0=8, O2=2, release --no-opt=8
+</system-out>
+	</testcase>
+	<testcase name="project_protocol" classname="project_protocol" time="2.95972" status="run">
+		<properties/>
+		<system-out>project_protocol: 169 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_nested_cli" classname="project_nested_cli" time="2.25958" status="run">
+		<properties/>
+		<system-out>project_nested_cli: 11 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="cli_contract" classname="cli_contract" time="23.3995" status="run">
+		<properties/>
+		<system-out>76 CLI process checks passed on win32; native output and collision preservation passed
+</system-out>
+	</testcase>
+	<testcase name="cli_install" classname="cli_install" time="14.385" status="run">
+		<properties/>
+		<system-out>VOID Language Compiler v0.1.0 (development)
+LLVM 23.1.4
+Target: x86_64-pc-windows-msvc
+Build identity: 594ad2df03df0c380272a8cc6a288667ee3e51b6371cb8581923ca3563639844
+PASS: installed stdlib check, optimized/Debug run, native build/run, resource hashes and LSP handshake
+PASS: 25 installed stdlib sources, relocated compiler/LSP, missing-module/Runtime controls, native output preservation
+</system-out>
+	</testcase>
+	<testcase name="cli_install_resources" classname="cli_install_resources" time="0.714856" status="run">
+		<properties/>
+		<system-out>..ss...
+----------------------------------------------------------------------
+Ran 7 tests in 0.210s
+
+OK (skipped=2)
+</system-out>
+	</testcase>
+	<testcase name="target_triple" classname="target_triple" time="0.09684" status="run">
+		<properties/>
+		<system-out>arm64-apple-macosx14.0
+</system-out>
+	</testcase>
+	<testcase name="http_native" classname="http_native" time="19.77" status="run">
+		<properties/>
+		<system-out>----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 55672)
+Traceback (most recent call last):
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\socketserver.py", line 766, in __init__
+    self.handle()
+    ~~~~~~~~~~~^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\http\server.py", line 502, in handle
+    self.handle_one_request()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\http\server.py", line 488, in handle_one_request
+    method()
+    ~~...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="http_reload" classname="http_reload" time="187.902" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>CRASH EVIDENCE: C:\Users\a\VS7I2\src\docs\text-encoding\evidence\crashes\incident-jbpv7kow
+Traceback (most recent call last):
+  File "C:\Users\a\VS7I2\src\tests\text_encoding\crash.py", line 254, in run
+    stdout, stderr = process.communicate(supplied, timeout=timeout)
+                     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\subprocess.py", line 1221, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\subprocess.py", line 1664, in _communicate
+    raise TimeoutExpired(self.args, orig_timeout)
+subprocess.TimeoutExpired: Command '['C:\\Users\\a\\VS7I2\\Debug\\void_http_reload.exe', 'C:\\Users\\a\\VS7I2\\Debug-li6zete2\\VOID HTTP reload pl7f6dxb\\main.void', 'http://127.0.0.1:55734', 'C:\\Users\\a\\VS7I2\\Debug-li6zete2\\VOID HTTP reload pl7f6dxb\\cache']' timed out after 180 seconds
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\a\VS7I2\src\tests\net\http\reload.py", line 68, in &lt;module&gt;
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "C:\Users\a\VS7I2\src\tests\net\http\reload.py", line 56, in main
+    result=crash.run([str(binary),str(path),base,str(work/'cache')],cwd=work,capture_output=True,timeout=180,
+        env=environment,expected_returncode=0,source_inputs=[path,ROOT/'stdlib'],
+        provenance_inputs=[Path(__file__),Path(__file__).with_suffix('.cpp'),ROOT/'CMakeLists.txt',ROOT/'src/runtime',ROOT/'include'])
+  File "C:\Users\a\VS7I2\src\tests\text_encoding\crash.py", line 263, in run
+    raise subprocess.TimeoutExpired(command, timeout, output=stdout, stderr=stderr)
+subprocess.TimeoutExpired: Command '['C:\\Users\\a\\VS7I2\\Debug\\void_http_reload.exe', 'C:\\Users\\a\\VS7I2\\Debug-li6zete2\\VOID HTTP reload pl7f6dxb\\main.void', 'http://127.0.0.1:55734', 'C:\\Users\\a\\VS7I2\\Debug-li6zete2\\VOID HTTP reload pl7f6dxb\\cache']' timed out after 180 seconds
+</system-out>
+	</testcase>
+	<testcase name="url_native" classname="url_native" time="0.208056" status="run">
+		<properties/>
+		<system-out>URL/provider native checks passed: 8.23.0; Schannel; c-ares/1.34.9; WinIDN
+</system-out>
+	</testcase>
+	<testcase name="http_install" classname="http_install" time="300.033" status="fail">
+		<failure message="Timeout"/>
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="http_ir" classname="http_ir" time="48.5939" status="run">
+		<properties/>
+		<system-out>43 HTTP IR module/type/arity/authority/worker/effect rejections passed
+</system-out>
+	</testcase>
+	<testcase name="http_source" classname="http_source" time="337.651" status="run">
+		<properties/>
+		<system-out>----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 55772)
+Traceback (most recent call last):
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\socketserver.py", line 766, in __init__
+    self.handle()
+    ~~~~~~~~~~~^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\http\server.py", line 502, in handle
+    self.handle_one_request()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\http\server.py", line 468, in handle_one_request
+    self.raw_reques...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="http_source_negative" classname="http_source_negative" time="13.0807" status="run">
+		<properties/>
+		<system-out>5 HTTP source authority/private/worker rejections passed
+</system-out>
+	</testcase>
+	<testcase name="http_source_faults" classname="http_source_faults" time="233.504" status="run">
+		<properties/>
+		<system-out>----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 56325)
+Traceback (most recent call last):
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\socketserver.py", line 766, in __init__
+    self.handle()
+    ~~~~~~~~~~~^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\http\server.py", line 502, in handle
+    self.handle_one_request()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\http\server.py", line 488, in handle_one_request
+    method()
+    ~~...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="url_ir" classname="url_ir" time="1.25883" status="run">
+		<properties/>
+		<system-out>10 URL IR authority/type/arity/opcode rejections passed
+</system-out>
+	</testcase>
+	<testcase name="url_source" classname="url_source" time="12.447" status="run">
+		<properties/>
+		<system-out>URL source check/JIT/O2/AOT: 7 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="toolchain_stop_token" classname="toolchain_stop_token" time="0.18617" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="stage10_operator_reload" classname="stage10_operator_reload" time="113.174" status="run">
+		<properties/>
+		<system-out>246 operator/format compatibility/cache/reload checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_operator_resolution" classname="stage10_operator_resolution" time="4.71371" status="run">
+		<properties/>
+		<system-out>184 operator resolution/call checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_tooling" classname="stage10_tooling" time="1.56718" status="run">
+		<properties/>
+		<system-out>108 Stage 10 tooling metadata checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_display_reload" classname="stage10_display_reload" time="7.21911" status="run">
+		<properties/>
+		<system-out>280 display dependency/reload checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_fields" classname="stage10_fields" time="1.61416" status="run">
+		<properties/>
+		<system-out>54 field policy checks passed
+</system-out>
+	</testcase>
+	<testcase name="application_workflow_stage9" classname="application_workflow_stage9" time="49.6512" status="run">
+		<properties/>
+		<system-out>rename_probe=metadata_only returned=1 failure=0 source_exists=0 destination_exists=1 source_original=0 destination_original=1 handles_original=1 handles=2 original_volume=3322181814 original_file_id=851968:965835
+rename_probe=list_directory returned=0 failure=32 source_exists=1 destination_exists=0 source_original=1 destination_original=0 handles_original=1 handles=13 original_volume=3322181814 original_file_id=262144:966054
+Cross-volume copy pending: supply a writable second-volume directory
+Windows staging ownership, collisions, cleanup, copies and effective access passed
+root_acl=inherited sddl=O:S-1-5-21-3818684358-2809787848-1824589013-1001D:(A;OICIID;FA;;;SY)(A;OICIID;FA;;;BA)(A;OICIID;FA;;;OW)
+inherited_root_admitted=0 reason=Native temporary root permits untrusted modification.
+private_root_path= 'C:\\Users\\a\\VS7I2\\Debug-li6zete2\\VOID Stage9 \xe9 \U0001f3ae # % 6b0hc8zo\\native link \xe9 # %'
+root_acl=private sddl=O:S-1-5-21-3818684358-2809787848-1824589013-1001D:P(A;OICI;FA;;;S-1-5-21-3818684358-...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="native_output_paths_ci88" classname="native_output_paths_ci88" time="11.9828" status="run">
+		<properties/>
+		<system-out>OS 8.3 ancestor: C:\Users\a\VS7I2\DEBUG-~1\VOID CI88 \xe9 \U0001f3ae # % oj60ti54
+Windows file symlink privilege 1314 unavailable; mandatory junction checks still execute.
+CI #88 physical output checks passed: 34
+</system-out>
+	</testcase>
+	<testcase name="long_physical_paths_ci89" classname="long_physical_paths_ci89" time="4.89588" status="run">
+		<properties/>
+		<system-out>Source symlink privilege 1314 unavailable; hard-link and junction gates remain.
+File symlink privilege 1314 unavailable; junction checks remain mandatory.
+Deep executable launched via explicit extended application: '\\\\?\\C:\\Users\\a\\VS7I2\\Debug-li6zete2\\VOID CI89 \xe9 \U0001f3ae # % catn63aa\\nested-0-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\nested-1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\nested-2-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\nested-3-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\nested-4-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\nested-5-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\Exact Artifact \xe9 \U0001f3ae # %.exe'
+File symlink privilege 1314 unavailable; junction checks remain mandatory.
+CI #89 long physical path checks passed: 29
+</system-out>
+	</testcase>
+	<testcase name="gc_buffers" classname="gc_buffers" time="10.2836" status="run">
+		<properties/>
+		<system-out>reference sweep before owner teardown: baseline=1 ordinal=-1 sites=12 failed=0 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=1 ordinal=-1 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=0 sites=0 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=0 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=1 sites=1 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=1 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=2 sites=2 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=2 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=3 sites=3 failed=1 released_source=0 native_cou...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="gc_schemas" classname="gc_schemas" time="1.26668" status="run">
+		<properties/>
+		<system-out>schema admission requested bytes: one=2860, million=2892; cursor next allocations=0
+schema admission allocation-site rollback/retry: 55 sites
+compact GC schemas/shared cursor checks passed
+</system-out>
+	</testcase>
+	<testcase name="arrays_foundation" classname="arrays_foundation" time="0.457055" status="run">
+		<properties/>
+		<system-out>arrays_foundation: source_and_ir
+arrays_foundation: negatives
+arrays_foundation: compact_shapes
+arrays_foundation: indexes_and_budget
+arrays_foundation: owned_ir
+Scalar fixed-array analysis, owned IR and storage-contract checks passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_console" classname="runtime_console" time="0.340019" status="run">
+		<properties/>
+		<system-out>347 console foundation identity/lifecycle/GC checks passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_transfers" classname="runtime_console_transfers" time="0.174877" status="run">
+		<properties/>
+		<system-out>closed native pipe: completed=0 os_code=232 borrowed_writer_open=1
+closed native pipe: completed=0 os_code=232 borrowed_writer_open=1
+closed native pipe: completed=0 os_code=232 borrowed_writer_open=1
+175 checked console transfer/deadline/cancellation checks passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_keyboard" classname="runtime_console_keyboard" time="0.303358" status="run">
+		<properties/>
+		<system-out>131 key/mode checks passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_terminal" classname="runtime_console_terminal" time="0.29028" status="run">
+		<properties/>
+		<system-out>482 terminal ownership/presentation checks passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_wide" classname="runtime_console_wide" time="1.14004" status="run">
+		<properties/>
+		<system-out>console wide checks: 271656
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_input" classname="runtime_console_input" time="1.83139" status="run">
+		<properties/>
+		<system-out>2261 shared input/UTF8/line/progress/allocation checks passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_coordination" classname="runtime_coordination" time="2.21969" status="run">
+		<properties/>
+		<system-out>NativeSafe rendezvous baseline (1000, one frozen object): mean 2.6013 us, max 19.2 us
+runtime coordinator: states, nested roots, timeout, competing collectors, NativeSafe and stress passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_generated" classname="runtime_generated" time="1.89641" status="run">
+		<properties/>
+		<system-out>numeric loop normal: 2000003 polls, 100 collections, 3 parks
+numeric loop O2: 2000003 polls, 100 collections, 11 parks
+shared IR JIT roots: normal/O2, nested aggregates, temporaries, parameters, returns, loops, failure cleanup passed
+</system-out>
+	</testcase>
+	<testcase name="fixed_arrays_source" classname="fixed_arrays_source" time="6.01671" status="run">
+		<properties/>
+		<system-out>source array normal: 158 failing allocation budgets, recovery and cleanup passed
+source array O2: 158 failing allocation budgets, recovery and cleanup passed
+Numeric fixed arrays: source execution, roots, publication and failure recovery passed
+</system-out>
+	</testcase>
+	<testcase name="growable_arrays_source" classname="growable_arrays_source" time="10.7155" status="run">
+		<properties/>
+		<system-out>list transaction 0: 15 failing allocation budgets passed
+list transaction 1: 0 failing allocation budgets passed
+list transaction 2: 0 failing allocation budgets passed
+list transaction 3: 8 failing allocation budgets passed
+cold list construction: 69 failing allocation budgets passed
+growable source normal: 21 failing allocation budgets, recovery and cleanup passed
+growable source O2: 21 failing allocation budgets, recovery and cleanup passed
+Growable lists: source, aliases, roots, transactions and failures passed
+</system-out>
+	</testcase>
+	<testcase name="arrays_source" classname="arrays_source" time="13.7516" status="run">
+		<properties/>
+		<system-out>reference transaction 0: 19 failing budgets passed
+reference transaction 1: 2 failing budgets passed
+reference transaction 2: 1 failing budgets passed
+cold reference construction: 88 failing budgets passed
+failures source normal: 292 failing allocation budgets; cleanup/retry passed
+defaults source normal: 309 failing allocation budgets; cleanup/retry passed
+failures source O2: 292 failing allocation budgets; cleanup/retry passed
+defaults source O2: 309 failing allocation budgets; cleanup/retry passed
+Phase 23 arrays/ranges: source, GC, readonly, publication and failure checks passed
+</system-out>
+	</testcase>
+	<testcase name="generics_source" classname="generics_source" time="11.8744" status="run">
+		<properties/>
+		<system-out>failures normal: 402 allocation failures; roots/cleanup/retry passed
+initialization normal: 242 allocation failures; roots/cleanup/retry passed
+failures O2: 402 allocation failures; roots/cleanup/retry passed
+initialization O2: 242 allocation failures; roots/cleanup/retry passed
+Generic source, diagnostics, tooling, GC, failures and reload passed
+</system-out>
+	</testcase>
+	<testcase name="collections_source" classname="collections_source" time="67.0347" status="run">
+		<properties/>
+		<system-out>native operation 0: 19 allocation failures; rollback passed
+native operation 1: 2 allocation failures; rollback passed
+native operation 2: 35 allocation failures; rollback passed
+main normal: 219 allocation failures, roots/publication/cleanup/retry passed
+nested normal: 2238 allocation failures, roots/publication/cleanup/retry passed
+main O2: 219 allocation failures, roots/publication/cleanup/retry passed
+nested O2: 2238 allocation failures, roots/publication/cleanup/retry passed
+Collections: source/GC/rollback/readonly/iteration/reload passed
+</system-out>
+	</testcase>
+	<testcase name="dictionaries_source" classname="dictionaries_source" time="44.4392" status="run">
+		<properties/>
+		<system-out>native dictionary 0: 11 failures; rollback/version/collection passed
+native dictionary 1: 39 failures; rollback/version/collection passed
+native dictionary 2: 1 failures; rollback/version/collection passed
+native dictionary 3: 1 failures; rollback/version/collection passed
+native dictionary 4: 0 failures; rollback/version/collection passed
+native dictionary 5: 0 failures; rollback/version/collection passed
+native dictionary 6: 0 failures; rollback/version/collection passed
+main normal: 552 allocation failures; cleanup/retry passed
+transactions normal: 1959 allocation failures; cleanup/retry passed
+main O2: 552 allocation failures; cleanup/retry passed
+transactions O2: 1959 allocation failures; cleanup/retry passed
+Dictionaries: source/GC/order/readonly/rollback/reload passed
+</system-out>
+	</testcase>
+	<testcase name="properties_source" classname="properties_source" time="22.8087" status="run">
+		<properties/>
+		<system-out>normal property allocation failures: 202
+O2 property allocation failures: 202
+</system-out>
+	</testcase>
+	<testcase name="patterns_source" classname="patterns_source" time="10.4935" status="run">
+		<properties/>
+		<system-out>normal values allocation failures: 458
+normal large allocation failures: 256
+normal combined allocation failures: 126
+O2 values allocation failures: 458
+O2 large allocation failures: 256
+O2 combined allocation failures: 126
+</system-out>
+	</testcase>
+	<testcase name="advanced_source" classname="advanced_source" time="25.329" status="run">
+		<properties/>
+		<system-out>normal captures allocation failures: 257
+normal with allocation failures: 266
+normal events allocation failures: 394
+normal fixed_capture allocation failures: 150
+normal with semantic fault=resource-acquisition observed ordinal=2 passed
+normal with semantic fault=first-body-allocation observed ordinal=3 passed
+O2 captures allocation failures: 257
+O2 with allocation failures: 266
+O2 events allocation failures: 394
+O2 fixed_capture allocation failures: 150
+O2 with semantic fault=resource-acquisition observed ordinal=2 passed
+O2 with semantic fault=first-body-allocation observed ordinal=3 passed
+</system-out>
+	</testcase>
+	<testcase name="fixed_arrays_cli" classname="fixed_arrays_cli" time="0.144967" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>CMake Error at C:/Users/a/VS7I2/src/tests/integration/fixed_arrays.cmake:57 (message):
+  main/normal/aot(0): expected 10; got no such file or directory:
+
+
+</system-out>
+	</testcase>
+	<testcase name="growable_arrays_cli" classname="growable_arrays_cli" time="0.204754" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>CMake Error at C:/Users/a/VS7I2/src/tests/integration/growable_arrays.cmake:44 (message):
+  main/normal/aot(0): expected 13; got no such file or directory:
+
+
+</system-out>
+	</testcase>
+	<testcase name="arrays_cli" classname="arrays_cli" time="0.336555" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>CMake Error at C:/Users/a/VS7I2/src/tests/integration/arrays.cmake:54 (message):
+  strings/normal/aot(0): expected 3; got no such file or directory:
+
+
+</system-out>
+	</testcase>
+	<testcase name="generics_cli" classname="generics_cli" time="0.177923" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>CMake Error at C:/Users/a/VS7I2/src/tests/integration/generics.cmake:25 (message):
+  main/normal/aot(0): expected 0; got no such file or directory:
+
+
+</system-out>
+	</testcase>
+	<testcase name="collections_cli" classname="collections_cli" time="0.333022" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>CMake Error at C:/Users/a/VS7I2/src/tests/integration/collections.cmake:42 (message):
+  main/normal/aot(0): expected 5; got no such file or directory:
+
+
+</system-out>
+	</testcase>
+	<testcase name="dictionaries_cli" classname="dictionaries_cli" time="0.340554" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>CMake Error at C:/Users/a/VS7I2/src/tests/integration/dictionaries.cmake:39 (message):
+  main/normal/aot(0): expected 3; got no such file or directory:
+
+
+</system-out>
+	</testcase>
+	<testcase name="properties_cli" classname="properties_cli" time="0.322686" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>CMake Error at C:/Users/a/VS7I2/src/tests/integration/properties.cmake:34 (message):
+  main/normal/aot: expected 20, got no such file or directory:
+
+
+</system-out>
+	</testcase>
+	<testcase name="patterns_cli" classname="patterns_cli" time="0.175565" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>CMake Error at C:/Users/a/VS7I2/src/tests/integration/patterns.cmake:44 (message):
+  results/normal/aot: expected 28, got no such file or directory:
+
+
+</system-out>
+	</testcase>
+	<testcase name="advanced_cli" classname="advanced_cli" time="0.141266" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>CMake Error at C:/Users/a/VS7I2/src/tests/integration/advanced.cmake:17 (message):
+  closures/normal/aot: expected 17, got no such file or directory:
+
+
+</system-out>
+	</testcase>
+	<testcase name="managed_cli" classname="managed_cli" time="0.203495" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>CMake Error at C:/Users/a/VS7I2/src/tests/integration/managed.cmake:35 (message):
+  Managed source main/normal/aot(-1): no such file or directory, ,
+
+
+</system-out>
+	</testcase>
+	<testcase name="managed_initialization_cli" classname="managed_initialization_cli" time="0.232991" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>CMake Error at C:/Users/a/VS7I2/src/tests/integration/managed_initialization.cmake:39 (message):
+  Constructor source main/normal/aot(-1): no such file or directory, ,
+
+
+</system-out>
+	</testcase>
+	<testcase name="reference_values_cli" classname="reference_values_cli" time="0.199589" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>CMake Error at C:/Users/a/VS7I2/src/tests/integration/reference_values.cmake:41 (message):
+  Reference values copies/normal/aot(-1): no such file or directory, ,
+
+
+</system-out>
+	</testcase>
+	<testcase name="composition_cli" classname="composition_cli" time="0.188527" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>CMake Error at C:/Users/a/VS7I2/src/tests/integration/composition.cmake:29 (message):
+  Composition main/normal/aot: no such file or directory, , ; expected 100
+
+
+</system-out>
+	</testcase>
+	<testcase name="inheritance_cli" classname="inheritance_cli" time="0.168437" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>CMake Error at C:/Users/a/VS7I2/src/tests/integration/inheritance.cmake:43 (message):
+  Inheritance main/normal/aot: no such file or directory, , ; expected 97
+
+
+</system-out>
+	</testcase>
+	<testcase name="interfaces_cli" classname="interfaces_cli" time="0.17289" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>CMake Error at C:/Users/a/VS7I2/src/tests/integration/interfaces.cmake:31 (message):
+  Interface main/normal/aot: no such file or directory, , ; expected 6
+
+
+</system-out>
+	</testcase>
+	<testcase name="strings_cli" classname="strings_cli" time="0.154211" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>CMake Error at C:/Users/a/VS7I2/src/tests/integration/strings.cmake:25 (message):
+  String main/normal/aot: no such file or directory, , ; expected 0
+
+
+</system-out>
+	</testcase>
+	<testcase name="runtime_callbacks" classname="runtime_callbacks" time="1.5467" status="run">
+		<properties/>
+		<system-out>callback provider quiescence, shutdown, self-drain, generated native roots/reentry, exceptions and code leases passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_failures" classname="runtime_failures" time="0.237962" status="run">
+		<properties/>
+		<system-out>deterministic allocation failures: enumeration, partial marking, rollback and recovery passed (10)
+</system-out>
+	</testcase>
+	<testcase name="runtime_aot_normal" classname="runtime_aot_normal" time="0.626677" status="run">
+		<properties/>
+		<system-out>separately linked AOT precise roots and failure cleanup passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_aot_optimized" classname="runtime_aot_optimized" time="0.630454" status="run">
+		<properties/>
+		<system-out>separately linked AOT precise roots and failure cleanup passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_invariants" classname="runtime_invariants" time="0.34424" status="run">
+		<properties/>
+		<system-out>corrupt roots and frame order cannot resume managed execution
+</system-out>
+	</testcase>
+	<testcase name="lsp_positions" classname="lsp_positions" time="0.098818" status="run">
+		<properties/>
+		<system-out>UTF16 positions, owned snapshots and URI mapping passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_protocol" classname="lsp_protocol" time="5.24051" status="run">
+		<properties/>
+		<system-out>editor: CRLF/UTF16, cross-file symbols, overlays, versions, invalid/repair, graph changes and cycles passed
+transport: fragmented/coalesced frames, IDs, malformed messages, bounded framing, lifecycle and EOF passed
+value structs: real LSP type/constructor/field navigation, references, readonly diagnostics and revision recovery passed
+receiver methods: imported native LSP navigation, references, effect changes and revision recovery passed
+initialization: imported initializer navigation/references, exact argument diagnostics and unsaved recovery passed
+managed structs: cyclic types, imported fields/methods, readonly aliases and unsaved recovery passed
+managed initialization: imported constructor, private helper navigation, required-field diagnostics and unsaved repair passed
+reference values: imported nested reference navigation, precise readonly diagnostics and unsaved recovery passed
+composition: imported promoted navigation, ambiguity and unsaved repair passed
+inheritance: original owners, static virtual/sup...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage11_globals" classname="lsp_stage11_globals" time="1.033" status="run">
+		<properties/>
+		<system-out>Global hover, completion, cross-file definition/references/rename, overlays and stale-version checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage8" classname="lsp_stage8" time="6.46188" status="run">
+		<properties/>
+		<system-out>Debug cache: unavailable
+Debug cache: unavailable
+Windows drive discovery fixture: {"original": "C:\\Users\\a\\VS7I2\\Debug-li6zete2\\VOID discovery \u00e9\ud83d\ude00 # % ics8g6jr", "canonical": "C:\\Users\\a\\VS7I2\\Debug-li6zete2\\VOID discovery \u00e9\ud83d\ude00 # % ics8g6jr", "expanded_lower": "c:\\Users\\a\\VS7I2\\Debug-li6zete2\\VOID discovery \u00e9\ud83d\ude00 # % ics8g6jr"}
+Windows unrelated mapped-drive rejection passed
+Windows short/long workspace ancestor checks passed
+Windows upper/lower drive workspace and active checks passed
+Stage 8 compiler-backed LSP discovery/docs/readonly checks passed
+</system-out>
+	</testcase>
+	<testcase name="documentation_execution" classname="documentation_execution" time="7.018" status="run">
+		<properties/>
+		<system-out>Documentation execution: 18 processes passed (check, normal/O2 JIT, emit, linked build and native execution)
+</system-out>
+	</testcase>
+	<testcase name="os_errors" classname="os_errors" time="51.2825" status="run">
+		<properties/>
+		<system-out>OS errors: 8 process checks, 9 valid/61 invalid IDs x four getters; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="os_frontend" classname="os_frontend" time="113.576" status="run">
+		<properties/>
+		<system-out>OS frontend: 75 processes passed; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="binary_ownership" classname="binary_ownership" time="1.65324" status="run">
+		<properties/>
+		<system-out>normal: 62 allocation failure budgets, collection and retry passed
+O2: 62 allocation failure budgets, collection and retry passed
+Binary ownership: 801 checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_operator_integration" classname="stage10_operator_integration" time="79.0083" status="run">
+		<properties/>
+		<system-out>1163 operator GC/effect/failure integration checks passed
+</system-out>
+	</testcase>
+	<testcase name="ffi_g1_primitive_jit_ir" classname="ffi_g1_primitive_jit_ir" time="2.37785" status="run">
+		<properties/>
+		<system-out>void-c-primitive 2 1: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+void-c-primitive 1 2: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+call vectorcall: C primitive descriptor line 8: unsupported descriptor, ABI revision or effects
+effects direct-sync blocking no-callbacks: C primitive descriptor line 7: unsupported descriptor, ABI revision or effects
+c_size:i64: C primitive descriptor line 9: unsupported descriptor, ABI revision or effects
+c_bool:u8: C primitive descriptor line 9: unsupported descriptor, ABI revision or effects
+bind signed8 g1_signed8 i8 ptr: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 record: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 void: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 u8: C primitive provider rejected the exact descriptor or fixture identity
+bind signed8 g1_missing i8 i8: C primi...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g1_primitive_aot_normal" classname="ffi_g1_primitive_aot_normal" time="0.342557" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="ffi_g1_primitive_aot_optimized" classname="ffi_g1_primitive_aot_optimized" time="0.413487" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="ffi_g1_primitive_aot_mismatch" classname="ffi_g1_primitive_aot_mismatch" time="0.265328" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="ffi_g1_primitive_aot_missing" classname="ffi_g1_primitive_aot_missing" time="1.04062" status="run">
+		<properties/>
+		<system-out>[0/2] Re-checking globbed directories...
+[1/3] Building CXX object CMakeFiles\void_g1_aot_missing.dir\tests\async\aot.cpp.obj
+[2/3] Linking CXX executable void_g1_aot_missing.exe
+FAILED: [code=4294967295] void_g1_aot_missing.exe 
+C:\Windows\system32\cmd.exe /C "cd . &amp;&amp; C:\gcc\bin\cmake.exe -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\void_g1_aot_missing.dir --rc="C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\rc.exe" --mt=C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\llvm-mt.exe --manifests  -- C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\lld-link.exe /nologo ffi-g1\application-optimized.obj CMakeFiles\void_g1_aot_missing.dir\tests\async\aot.cpp.obj  /out:void_g1_aot_missing.exe /implib:void_g1_aot_missing.lib /pdb:void_g1_aot_missing.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console  void_runtime.lib  void_native_fixture.lib  curl\lib\libcurl.lib  C:\Users\a\VoidCI42377496702-Native\.toolchains\http\prefix\windows-schannel-x86_64\Debu...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g2_jit_ir" classname="ffi_g2_jit_ir" time="2.57403" status="run">
+		<properties/>
+		<system-out>2 1: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+sample G2Sample 16 4 2: C primitive descriptor line 17: C record size, alignment or tail padding disagrees with natural layout
+packet G2Packet 31 8 4: C primitive descriptor line 22: C record size, alignment or tail padding disagrees with natural layout
+reading f64 4: C primitive descriptor line 17: C record field offset or padding disagrees with natural layout
+reading ptr 8: C primitive descriptor line 17: unsupported C primitive type
+reading u64 8: C primitive provider rejected the exact descriptor or fixture identity
+tag tag u32: C primitive provider rejected the exact descriptor or fixture identity
+array:u16:3:1: C primitive descriptor line 20: invalid inline array extent or stride
+array:u16:0:2: C primitive descriptor line 20: invalid inline array extent or stride
+array:u16:03:2: C primitive descriptor line 20: invalid bounded canonical decimal field
+datum datum record:packet: C primitive descriptor line 22: record must n...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g2_aot_normal" classname="ffi_g2_aot_normal" time="0.822797" status="run">
+		<properties/>
+		<system-out>7 0 103
+-1 1 &lt;host binding /native_records.void&gt;:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VS7I2/src/tests/ffi/records.void:6:20: source call
+        return ffi.fill(bytes, 0, 5, 8) as i32
+                   ^
+-2 1 &lt;host binding /native_records.void&gt;:27:6: runtime error: overlapping C byte spans
+In function /native_records.void::move_bytes
+Called from /records.void::entry
+C:/Users/a/VS7I2/src/tests/ffi/records.void:8:20: source call
+        return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32
+                   ^
+-3 1 &lt;host binding /native_records.void&gt;:23:6: runtime error: C byte span returned an oversized written prefix
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VS7I2/src/tests/ffi/records.void:10:20: source call
+        return ffi.fill(bytes, 0, 4, 254) as i32
+                   ^
+-4 1 &lt;host binding /native_records.void&gt;:23:6: runtime error: C byte span outside admitte...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g2_aot_optimized" classname="ffi_g2_aot_optimized" time="0.88162" status="run">
+		<properties/>
+		<system-out>7 0 103
+-1 1 &lt;host binding /native_records.void&gt;:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VS7I2/src/tests/ffi/records.void:6:20: source call
+        return ffi.fill(bytes, 0, 5, 8) as i32
+                   ^
+-2 1 &lt;host binding /native_records.void&gt;:27:6: runtime error: overlapping C byte spans
+In function /native_records.void::move_bytes
+Called from /records.void::entry
+C:/Users/a/VS7I2/src/tests/ffi/records.void:8:20: source call
+        return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32
+                   ^
+-3 1 &lt;host binding /native_records.void&gt;:23:6: runtime error: C byte span returned an oversized written prefix
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VS7I2/src/tests/ffi/records.void:10:20: source call
+        return ffi.fill(bytes, 0, 4, 254) as i32
+                   ^
+-4 1 &lt;host binding /native_records.void&gt;:23:6: runtime error: C byte span outside admitte...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g3_jit_ir" classname="ffi_g3_jit_ir" time="4.02858" status="run">
+		<properties/>
+		<system-out>3 2: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+integer null: C primitive descriptor line 10: unsupported or contradictory native resource contract
+pointer minus-one: C primitive descriptor line 10: unsupported or contradictory native resource contract
+shutdown-owner: C primitive descriptor line 10: unsupported or contradictory native resource contract
+retry-on-error: C primitive descriptor line 10: unsupported or contradictory native resource contract
+create missing owner: C primitive descriptor line 14: invalid native borrow or terminal release signature
+bind close_box g3_close i32 mut:box: C primitive descriptor line 15: missing exact native acquire or release contract
+i64 close:box: C primitive descriptor line 14: invalid native borrow or terminal release signature
+i32 close:box i32: C primitive descriptor line 14: invalid native borrow or terminal release signature
+i32 borrow:other i32: C primitive descriptor line 12: resource operation requires an earlier admitted ide...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g3_aot_normal" classname="ffi_g3_aot_normal" time="0.638659" status="run">
+		<properties/>
+		<system-out>7 0 104
+-1 1 &lt;host binding /native_resources.void&gt;:6:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::read
+Called from /resources.void::entry
+C:/Users/a/VS7I2/src/tests/ffi/resources.void:29:20: source call
+        return ffi.read(alias, 0)
+                   ^
+-2 1 &lt;host binding /native_resources.void&gt;:10:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::close_box
+Called from /resources.void::entry
+C:/Users/a/VS7I2/src/tests/ffi/resources.void:31:20: source call
+        return ffi.close_box(alias)
+                   ^
+-3 1 C:/Users/a/VS7I2/src/tests/ffi/resources.void:14:40: runtime error: Null managed reference in checked conversion
+        return ffi.read(ffi.create(-1) as ffi.box, 0)
+                                       ^
+In function /resources.void::entry
+-4 0 22
+</system-out>
+	</testcase>
+	<testcase name="ffi_g3_aot_optimized" classname="ffi_g3_aot_optimized" time="0.6014" status="run">
+		<properties/>
+		<system-out>7 0 104
+-1 1 &lt;host binding /native_resources.void&gt;:6:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::read
+Called from /resources.void::entry
+C:/Users/a/VS7I2/src/tests/ffi/resources.void:29:20: source call
+        return ffi.read(alias, 0)
+                   ^
+-2 1 &lt;host binding /native_resources.void&gt;:10:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::close_box
+Called from /resources.void::entry
+C:/Users/a/VS7I2/src/tests/ffi/resources.void:31:20: source call
+        return ffi.close_box(alias)
+                   ^
+-3 1 C:/Users/a/VS7I2/src/tests/ffi/resources.void:14:40: runtime error: Null managed reference in checked conversion
+        return ffi.read(ffi.create(-1) as ffi.box, 0)
+                                       ^
+In function /resources.void::entry
+-4 0 22
+</system-out>
+	</testcase>
+	<testcase name="native_source" classname="native_source" time="10.8711" status="run">
+		<properties/>
+		<system-out>native source passed
+</system-out>
+	</testcase>
+	<testcase name="stage6_integrated" classname="stage6_integrated" time="16.7887" status="run">
+		<properties/>
+		<system-out>combined cached old root=0; old roots at barrier=14; retired generations=1; post-drain objects=0
+combined cached old root=0; old roots at barrier=14; retired generations=1; post-drain objects=0
+</system-out>
+	</testcase>
+	<testcase name="native_aot_main_normal" classname="native_aot_main_normal" time="0.506438" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_main_optimized" classname="native_aot_main_optimized" time="0.439394" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_cleanup_failure_normal" classname="native_aot_cleanup_failure_normal" time="0.398616" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_cleanup_failure_optimized" classname="native_aot_cleanup_failure_optimized" time="0.395298" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_integrated_normal" classname="native_aot_integrated_normal" time="0.509017" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_integrated_optimized" classname="native_aot_integrated_optimized" time="0.481746" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_integrated_cancel_normal" classname="native_aot_integrated_cancel_normal" time="0.501398" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_integrated_cancel_optimized" classname="native_aot_integrated_cancel_optimized" time="0.547897" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_integrated_failure_normal" classname="native_aot_integrated_failure_normal" time="0.43732" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_integrated_failure_optimized" classname="native_aot_integrated_failure_optimized" time="0.463634" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="io_native_jobs" classname="io_native_jobs" time="0.217608" status="run">
+		<properties/>
+		<system-out>native jobs: result, blocked-owner progress, queued/pending cancellation, publication failure, acquisition rollback, nested cancellation drain and cleanup diagnostics passed (7 scenarios)
+</system-out>
+	</testcase>
+	<testcase name="native_workers" classname="native_workers" time="0.212373" status="run">
+		<properties/>
+		<system-out>Runtime workers: native-only admission, three roots, same pool/thread, idle reconfiguration, busy rejection and shutdown passed
+</system-out>
+	</testcase>
+	<testcase name="async_source" classname="async_source" time="48.2211" status="run">
+		<properties/>
+		<system-out>async activations passed
+</system-out>
+	</testcase>
+	<testcase name="async_syntax_source" classname="async_syntax_source" time="14.1389" status="run">
+		<properties/>
+		<system-out>await error allocation sweep: 224 injected failures passed; O2=0
+await error allocation sweep: 224 injected failures passed; O2=1
+await syntax: 14 positive source/CFG checks, 12 rejected cases, 6 recovery checks, 20 JIT/GC executions passed; stack=default
+</system-out>
+	</testcase>
+	<testcase name="async_ir" classname="async_ir" time="0.108595" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_parallel" classname="async_parallel" time="4.79745" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_lifecycle" classname="async_lifecycle" time="8.45461" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="core" classname="core" time="0.311271" status="run">
+		<properties/>
+		<system-out>core: passed
+</system-out>
+	</testcase>
+	<testcase name="jit" classname="jit" time="0.388699" status="run">
+		<properties/>
+		<system-out>jit: passed
+</system-out>
+	</testcase>
+	<testcase name="reload" classname="reload" time="3.40425" status="run">
+		<properties/>
+		<system-out>reload: passed
+</system-out>
+	</testcase>
+	<testcase name="gc" classname="gc" time="0.167169" status="run">
+		<properties/>
+		<system-out>gc: passed
+</system-out>
+	</testcase>
+	<testcase name="native" classname="native" time="0.06745" status="run">
+		<properties/>
+		<system-out>JIT session error: Symbols not found: [ missing_native ]
+native: passed
+</system-out>
+	</testcase>
+	<testcase name="sessions_demo" classname="sessions_demo" time="0.285888" status="run">
+		<properties/>
+		<system-out>-- revision 1: /worker.void::calculate; references 1
+unsaved edit: previous analysis stale; full validation required
+fresh query: /worker.void::calculate; body exact match; affected dependencies: /main.void
+revision 3 diagnostics:
+/worker.void:2:12: error: Unknown identifier 'missing'.
+    code: VOID2002
+
+ 2 |     return missing
+   |            ^^^^^^^
+    Module: /worker.void
+    Hint: Declare it with var before use.
+
+repair: fresh successful analysis
+constant edit: restart required; no native publication
+
+</system-out>
+	</testcase>
+	<testcase name="tooling_demo" classname="tooling_demo" time="0.302992" status="run">
+		<properties/>
+		<system-out>-- /worker.void::calculate declared in /worker.void; references: 1
+edit plan: full validation required; fresh body source contract: exact match
+fresh constant source contract: restart required; no native generation modified
+
+</system-out>
+	</testcase>
+	<testcase name="sessions" classname="sessions" time="0.711987" status="run">
+		<properties/>
+		<system-out>sessions: passed
+</system-out>
+	</testcase>
+	<testcase name="tooling" classname="tooling" time="1.81625" status="run">
+		<properties/>
+		<system-out>queries: aliased/direct definitions, 2 callers, root/local constants, byte spans and retained snapshots
+plan: /leaf.void -&gt; /middle.void::wrapper -&gt; /main.void::entry; validated 53 -&gt; 61, const restart required
+tooling: passed
+</system-out>
+	</testcase>
+	<testcase name="analysis" classname="analysis" time="3.86055" status="run">
+		<properties/>
+		<system-out>normal: body edit 53 -&gt; 61, const edit rejected, old lease 53; concurrent calls 332043
+O2: body edit 53 -&gt; 61, const edit rejected, old lease 53; concurrent calls 503544
+analysis: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric" classname="numeric" time="9.04528" status="run">
+		<properties/>
+		<system-out>210 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed
+numeric: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric_enum_ir" classname="numeric_enum_ir" time="1.82901" status="run">
+		<properties/>
+		<system-out>enum: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+enum initialized: accepted
+field: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+field initialized: accepted
+array: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+array initialized: accepted
+field-array: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+field-array initialized: accepted
+array-field: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+array-field initialized: accepted
+nested: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+nested initialized: accepted
+managed: rejected (VOID IR: non-nullable reference storage read before initialization in /enum-storage.void::probe)
+managed initialized: accepted
+zero-backed holder: rejected (VOID IR: nominal source objects require complete construction)...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="numeric_enum_process" classname="numeric_enum_process" time="37.6875" status="run">
+		<properties/>
+		<system-out>S6 542 boundary pairs, 39 invalid sources and 60 executed processes
+</system-out>
+	</testcase>
+	<testcase name="numeric_enum_lsp" classname="numeric_enum_lsp" time="0.689266" status="run">
+		<properties/>
+		<system-out>S6 LSP passed 15 recorded requests and overlay revisions
+</system-out>
+	</testcase>
+	<testcase name="frontend" classname="frontend" time="20.2406" status="run">
+		<properties/>
+		<system-out>Frontend begin: diagnostics
+50+ source diagnostic cases and UTF-8/ABI checks passed
+Frontend passed: diagnostics
+Frontend begin: programs
+Real .void files and independent programs executed through normal/O2 JIT
+Frontend passed: programs
+Frontend begin: numeric values
+1216 constant/normal/O2 numeric matrix comparisons passed
+Readonly/compile-time constants, numeric boundaries, concurrent failures, bounded traces and restart checks passed
+Frontend passed: numeric values
+Frontend begin: diagnostic recovery/resource limits
+Frontend resource case: combined expression/constant depth
+Structured diagnostics: independent files, recovery, bounded cascades, snapshots and failed reload verified
+Frontend passed: diagnostic recovery/resource limits
+Frontend begin: value structs
+Frontend resource case: bounded expanded value layouts
+Value struct source: nested/mixed layouts, copies, normal/O2 JIT, diagnostics, tooling and reload passed
+Frontend passed: value structs
+Frontend begin: receiver methods
+Frontend resource case: b...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="modules" classname="modules" time="3.47038" status="run">
+		<properties/>
+		<system-out>Case-only siblings cannot be created on this filesystem; exact-case rejection still tested
+Host cannot create symlinks: A required privilege is not held by the client.
+Project constants, forwards, visibility, cycles, imports and restart checks passed
+Project-local library identities, cycles, ownership, overlays, native JIT and invalidation passed
+Multi-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed
+modules: passed
+</system-out>
+	</testcase>
+	<testcase name="ffi_g4_conventional" classname="ffi_g4_conventional" time="62.8769" status="run">
+		<properties/>
+		<system-out>cwd=C:\Users\a\VS7I2\Debug-li6zete2\VOID G4 pcufsm7z\unrelated cwd argv=['C:/gcc/bin/cmake.exe', '--install', 'C:/Users/a/VS7I2/Debug', '--prefix', 'C:\\Users\\a\\VS7I2\\Debug-li6zete2\\VOID G4 pcufsm7z\\installed compiler', '--config', 'Debug', '--component', 'compiler']
+exit=0 -- Installing: C:\Users\a\VS7I2\Debug-li6zete2\VOID G4 pcufsm7z\installed compiler/share/void/licenses/VOID-MIT-LICENSE.txt
+-- Installing: C:\Users\a\VS7I2\Debug-li6zete2\VOID G4 pcufsm7z\installed compiler/share/void/licenses/LICENSING_SCOPE.md
+-- Installing: C:\Users\a\VS7I2\Debug-li6zete2\VOID G4 pcufsm7z\installed compiler/share/void/licenses/REDISTRIBUTION.txt
+-- Installing: C:\Users\a\VS7I2\Debug-li6zete2\VOID G4 pcufsm7z\installed compiler/share/void/licenses/NOTICE_INVENTORY.json
+-- Installing: C:\Users\a\VS7I2\Debug-li6zete2\VOID G4 pcufsm7z\installed compiler/share/void/licenses/llvm-23.1.4
+-- Installing: C:\Users\a\VS7I2\Debug-li6zete2\VOID G4 pcufsm7z\installed compiler/share/void/licenses/llvm-23.1.4/BLAKE3-LICENSE.txt
+--...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g5_callbacks" classname="ffi_g5_callbacks" time="46.9331" status="run">
+		<properties/>
+		<system-out>cwd= C:\Users\a\VS7I2\Debug-li6zete2\VOID G5 2jdzxt0w\independent cwd argv= ['C:/gcc/bin/cmake.exe', '--install', 'C:/Users/a/VS7I2/Debug', '--prefix', 'C:\\Users\\a\\VS7I2\\Debug-li6zete2\\VOID G5 2jdzxt0w\\compiler install', '--config', 'Debug', '--component', 'compiler']
+exit=0
+-- Installing: C:\Users\a\VS7I2\Debug-li6zete2\VOID G5 2jdzxt0w\compiler install/share/void/licenses/VOID-MIT-LICENSE.txt
+-- Installing: C:\Users\a\VS7I2\Debug-li6zete2\VOID G5 2jdzxt0w\compiler install/share/void/licenses/LICENSING_SCOPE.md
+-- Installing: C:\Users\a\VS7I2\Debug-li6zete2\VOID G5 2jdzxt0w\compiler install/share/void/licenses/REDISTRIBUTION.txt
+-- Installing: C:\Users\a\VS7I2\Debug-li6zete2\VOID G5 2jdzxt0w\compiler install/share/void/licenses/NOTICE_INVENTORY.json
+-- Installing: C:\Users\a\VS7I2\Debug-li6zete2\VOID G5 2jdzxt0w\compiler install/share/void/licenses/llvm-23.1.4
+-- Installing: C:\Users\a\VS7I2\Debug-li6zete2\VOID G5 2jdzxt0w\compiler install/share/void/licenses/llvm-23.1.4/BLAKE3-LICENSE.txt
+-- Installin...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="numeric_sprint2" classname="numeric_sprint2" time="8.43703" status="run">
+		<properties/>
+		<system-out>Sprint 2: 71 argument/numeric/diagnostic normal/O2 JIT and linked AOT checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_fields_aot" classname="stage10_fields_aot" time="4.31448" status="run">
+		<properties/>
+		<system-out>16 field JIT/AOT checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_sprint6" classname="lsp_sprint6" time="8.29751" status="run">
+		<properties/>
+		<system-out>Sprint 6 LSP navigation, UTF-16, hover, rename, completion, signature, diagnostics and formatting passed
+</system-out>
+	</testcase>
+	<testcase name="local_libraries" classname="local_libraries" time="2.85784" status="run">
+		<properties/>
+		<system-out>Local libraries: 16 compiler/JIT/AOT/cache/application checks and same-server LSP completion/overlay/refresh checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_sprint4" classname="lsp_sprint4" time="0.566446" status="run">
+		<properties/>
+		<system-out>Sprint 4 nonexecuting application analysis and native trust checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_sprint3" classname="lsp_sprint3" time="1.1939" status="run">
+		<properties/>
+		<system-out>Sprint 3 text/collection completion, hover, signatures, references and builtin protections passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_sprint2" classname="lsp_sprint2" time="0.800959" status="run">
+		<properties/>
+		<system-out>Sprint 2 numeric completion/hover/signatures/readonly and named-label navigation passed
+</system-out>
+	</testcase>
+	<testcase name="aot" classname="aot" time="0.474488" status="run">
+		<properties/>
+		<system-out>Wrote native architecture proof object
+Verifying C:/Users/a/VS7I2/Debug/aot proof/proof.o:	file format COFF-x86-64
+Verifying .debug_abbrev...
+Verifying .debug_info Unit Header Chain...
+Verifying .debug_types Unit Header Chain...
+Verifying non-dwo Units...
+Verifying unit: 1 / 1, "architecture.void"
+Verifying dwo Units...
+Verifying .debug_line...
+Verifying .debug_str_offsets...
+No errors.
+-- LLVM object linked, debug information verified, and three native paths executed
+</system-out>
+	</testcase>
+	<testcase name="source_cli" classname="source_cli" time="19.4858" status="run">
+		<properties/>
+		<system-out>Source checked successfully
+Wrote native source object: C:/Users/a/VS7I2/Debug/source programs with spaces/architecture-normal.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/source programs with spaces/architecture-optimized.o
+Source checked successfully
+Wrote native source object: C:/Users/a/VS7I2/Debug/source programs with spaces/loops-normal.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/source programs with spaces/loops-optimized.o
+Source checked successfully
+Wrote native source object: C:/Users/a/VS7I2/Debug/source programs with spaces/functions-normal.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/source programs with spaces/functions-optimized.o
+Source checked successfully
+Wrote native source object: C:/Users/a/VS7I2/Debug/source programs with spaces/pass-normal.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/source programs with spaces/pass-optimized.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/source programs with spaces/edited.o
+-- Actual source compiled, linked, debug...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="value_structs_cli" classname="value_structs_cli" time="6.58075" status="run">
+		<properties/>
+		<system-out>Wrote native source object: C:/Users/a/VS7I2/Debug/value struct programs with spaces/main-normal.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/value struct programs with spaces/main-optimized.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/value struct programs with spaces/numeric-normal.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/value struct programs with spaces/numeric-optimized.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/value struct programs with spaces/order-normal.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/value struct programs with spaces/order-optimized.o
+-- Value source normal/O2 JIT/AOT, target layouts, DWARF and failure traces passed
+</system-out>
+	</testcase>
+	<testcase name="receiver_methods_cli" classname="receiver_methods_cli" time="10.5357" status="run">
+		<properties/>
+		<system-out>Wrote native source object: C:/Users/a/VS7I2/Debug/receiver method programs with spaces/main-normal.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/receiver method programs with spaces/main-optimized.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/receiver method programs with spaces/order-normal.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/receiver method programs with spaces/order-optimized.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/receiver method programs with spaces/recursive-normal.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/receiver method programs with spaces/recursive-optimized.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/receiver method programs with spaces/failure-normal.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/receiver method programs with spaces/failure-optimized.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/receiver method programs with spaces/numeric-normal.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/receiver method progra...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="initialization_cli" classname="initialization_cli" time="12.3306" status="run">
+		<properties/>
+		<system-out>Wrote native source object: C:/Users/a/VS7I2/Debug/initialization programs with spaces/main-normal.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/initialization programs with spaces/main-optimized.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/initialization programs with spaces/order-normal.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/initialization programs with spaces/order-optimized.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/initialization programs with spaces/required-normal.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/initialization programs with spaces/required-optimized.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/initialization programs with spaces/numeric-normal.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/initialization programs with spaces/numeric-optimized.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/initialization programs with spaces/failure-normal.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/initialization programs with spac...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="modules_cli" classname="modules_cli" time="54.7629" status="run">
+		<properties/>
+		<system-out>Source checked successfully
+Wrote native source object: C:/Users/a/VS7I2/Debug/module native programs with spaces/acceptance-normal.o
+Source checked successfully
+Wrote native source object: C:/Users/a/VS7I2/Debug/module native programs with spaces/acceptance-optimized.o
+Source checked successfully
+Wrote native source object: C:/Users/a/VS7I2/Debug/module native programs with spaces/nested-normal.o
+Source checked successfully
+Wrote native source object: C:/Users/a/VS7I2/Debug/module native programs with spaces/nested-optimized.o
+Source checked successfully
+Wrote native source object: C:/Users/a/VS7I2/Debug/module native programs with spaces/cyclic-normal.o
+Source checked successfully
+Wrote native source object: C:/Users/a/VS7I2/Debug/module native programs with spaces/cyclic-optimized.o
+Source checked successfully
+Wrote native source object: C:/Users/a/VS7I2/Debug/module native programs with spaces/edited_import-normal.o
+Source checked successfully
+Wrote native source object: C:/Users/a/VS7I2/Debug/module nati...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="analysis_cli" classname="analysis_cli" time="2.57982" status="run">
+		<properties/>
+		<system-out>Wrote native source object: C:/Users/a/VS7I2/Debug/analysis native programs/analysis-53-normal.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/analysis native programs/analysis-53-optimized.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/analysis native programs/analysis-61-normal.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/analysis native programs/analysis-61-optimized.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/analysis native programs/analysis-62-normal.o
+Wrote native source object: C:/Users/a/VS7I2/Debug/analysis native programs/analysis-62-optimized.o
+</system-out>
+	</testcase>
+	<testcase name="numeric_cli" classname="numeric_cli" time="96.9632" status="run">
+		<properties/>
+		<system-out>-- Numeric source constants, JIT and native AOT passed in both optimization modes
+</system-out>
+	</testcase>
+</testsuite>

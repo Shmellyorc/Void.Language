@@ -1,0 +1,5 @@
+C: filesystem=NTFS
+held file=C:\Users\a\VoidS7-G4W2-final\swap-guarded\void_w2_gate.dll id=c60478b6:00050000000bdd57 sha256=845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33
+approved no-entry image replaced after dropping the held identity
+held file=C:\Users\a\VoidS7-G4W2-final\swap-guarded\void_w2_gate.dll id=c60478b6:00050000000bdd58 sha256=d3b56fd114946e6e421d2b8778a02c4623413cf146c1c4680aa9422cf41bb2d3
+denied before executable load: image digest

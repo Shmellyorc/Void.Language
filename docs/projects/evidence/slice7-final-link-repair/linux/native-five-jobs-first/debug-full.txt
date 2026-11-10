@@ -1,0 +1,119 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/native-linux-debug
+        Start   1: project_manifest_header
+        Start   2: project_manifest
+        Start   3: voidup_smoke
+        Start   4: voidup_ci_integration
+        Start   5: project_manifest_no_authority
+  1/456 Test   #1: project_manifest_header ...........................   Passed    0.02 sec
+        Start   6: project_manifest_legacy
+  2/456 Test   #4: voidup_ci_integration .............................   Passed    0.26 sec
+        Start   7: project_manifest_provenance
+  3/456 Test   #7: project_manifest_provenance .......................   Passed    0.06 sec
+        Start   8: project_selection
+  4/456 Test   #2: project_manifest ..................................   Passed    0.77 sec
+        Start   9: project_sessions
+  5/456 Test   #5: project_manifest_no_authority .....................   Passed    0.88 sec
+        Start  10: project_creation
+  6/456 Test  #10: project_creation ..................................   Passed    0.24 sec
+        Start  11: project_creation_process
+  7/456 Test   #9: project_sessions ..................................   Passed    0.41 sec
+        Start  12: project_application
+  8/456 Test   #3: voidup_smoke ......................................   Passed    1.27 sec
+        Start  13: project_application_process
+  9/456 Test   #6: project_manifest_legacy ...........................   Passed    6.37 sec
+        Start  14: project_discovery_cli
+ 10/456 Test  #11: project_creation_process ..........................   Passed   16.73 sec
+        Start  15: project_profiles
+ 11/456 Test  #14: project_discovery_cli .............................   Passed   11.52 sec
+        Start  16: project_protocol
+ 12/456 Test  #16: project_protocol ..................................   Passed    0.52 sec
+        Start  17: project_nested_cli
+ 13/456 Test  #17: project_nested_cli ................................   Passed    0.97 sec
+        Start  18: cli_contract
+ 14/456 Test  #15: project_profiles ..................................   Passed    2.25 sec
+        Start  19: cli_install
+ 15/456 Test  #19: cli_install .......................................   Passed    6.62 sec
+        Start  20: cli_install_resources
+ 16/456 Test  #20: cli_install_resources .............................   Passed    0.16 sec
+        Start  21: target_triple
+ 17/456 Test  #21: target_triple .....................................   Passed    0.01 sec
+        Start  22: http_native
+ 18/456 Test  #18: cli_contract ......................................   Passed   10.94 sec
+        Start  23: http_tls_memory
+ 19/456 Test   #8: project_selection .................................   Passed   40.33 sec
+        Start  24: http_reload
+ 20/456 Test  #22: http_native .......................................   Passed   26.07 sec
+        Start  25: http_timeouts
+ 21/456 Test  #13: project_application_process .......................   Passed   55.16 sec
+        Start  26: http_wire
+ 22/456 Test  #26: http_wire .........................................   Passed    1.22 sec
+        Start  27: http_dns
+ 23/456 Test  #25: http_timeouts .....................................   Passed    6.33 sec
+        Start  28: url_native
+ 24/456 Test  #28: url_native ........................................   Passed    0.13 sec
+        Start  29: http_examples
+ 25/456 Test  #27: http_dns ..........................................   Passed    6.33 sec
+        Start  30: http_ci_policy
+ 26/456 Test  #12: project_application ...............................   Passed   67.18 sec
+        Start  31: http_curl_objects
+ 27/456 Test  #30: http_ci_policy ....................................   Passed    6.55 sec
+        Start  32: http_install
+ 28/456 Test  #31: http_curl_objects .................................   Passed    2.19 sec
+        Start  33: http_bulk
+ 29/456 Test  #33: http_bulk .........................................   Passed   42.86 sec
+        Start  34: http_ir
+ 30/456 Test  #34: http_ir ...........................................   Passed   38.71 sec
+        Start  35: http_source
+ 31/456 Test  #24: http_reload .......................................   Passed  117.21 sec
+        Start  36: http_source_negative
+ 32/456 Test  #36: http_source_negative ..............................   Passed   11.11 sec
+        Start  37: http_source_faults
+ 33/456 Test  #32: http_install ......................................***Timeout 300.18 sec
+
+        Start  38: url_ir
+ 34/456 Test  #38: url_ir ............................................   Passed    1.01 sec
+        Start  39: url_source
+ 35/456 Test  #39: url_source ........................................   Passed   11.95 sec
+        Start  40: url_lsp
+ 36/456 Test  #40: url_lsp ...........................................   Passed    0.65 sec
+        Start  41: http_lsp
+ 37/456 Test  #41: http_lsp ..........................................   Passed   23.62 sec
+        Start  42: toolchain_stop_token
+ 38/456 Test  #42: toolchain_stop_token ..............................   Passed    0.01 sec
+        Start  43: stage10_operator_reload
+ 39/456 Test  #29: http_examples .....................................   Passed  386.84 sec
+        Start  44: stage10_operator_keys
+ 40/456 Test  #44: stage10_operator_keys .............................   Passed    1.03 sec
+        Start  45: stage10_operator_resolution
+ 41/456 Test  #35: http_source .......................................   Passed  296.03 sec
+        Start  46: stage10_operator_declarations
+ 42/456 Test  #46: stage10_operator_declarations .....................   Passed    2.28 sec
+        Start  47: stage10_source_formatting
+ 43/456 Test  #45: stage10_operator_resolution .......................   Passed    3.98 sec
+        Start  48: stage10_tooling
+ 44/456 Test  #48: stage10_tooling ...................................   Passed    1.18 sec
+        Start  49: stage10_display_reload
+ 45/456 Test  #47: stage10_source_formatting .........................   Passed    2.62 sec
+        Start  50: stage10_temporal_ir
+ 46/456 Test  #49: stage10_display_reload ............................   Passed    7.43 sec
+        Start  51: format_temporal
+ 47/456 Test  #51: format_temporal ...................................   Passed    0.51 sec
+        Start  52: stage10_hooks
+ 48/456 Test  #50: stage10_temporal_ir ...............................   Passed    8.10 sec
+        Start  53: stage10_interpolation
+ 49/456 Test  #53: stage10_interpolation .............................   Passed    1.58 sec
+        Start  54: decimal_float
+ 50/456 Test  #54: decimal_float .....................................   Passed    0.05 sec
+        Start  55: stage10_conversion
+ 51/456 Test  #52: stage10_hooks .....................................   Passed    5.60 sec
+        Start  56: stage10_fields
+ 52/456 Test  #56: stage10_fields ....................................   Passed    0.89 sec
+        Start  57: format_numeric
+ 53/456 Test  #57: format_numeric ....................................   Passed    1.80 sec
+        Start  58: format_zones
+ 54/456 Test  #58: format_zones ......................................   Passed   10.00 sec
+        Start  59: json_readonly
+ 55/456 Test  #43: stage10_operator_reload ...........................   Passed   84.99 sec
+        Start  60: json_dynamic
+ 56/456 Test  #59: json_readonly .....................................   Passed   21.94 sec
+        Start  61: json_numbers

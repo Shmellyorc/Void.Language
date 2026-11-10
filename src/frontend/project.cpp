@@ -1,6 +1,7 @@
 #include "void/project.hpp"
 #include "void/frontend.hpp"
 #include "void/path.hpp"
+#include "project_files.hpp"
 #include <algorithm>
 #include <set>
 #include <tuple>
@@ -34,6 +35,157 @@ std::string folded(std::string s) {
 bool ancestor(std::string_view a, std::string_view b) {
     return a == "." || a == b || (b.starts_with(a) && b.size() > a.size() && b[a.size()] == '/');
 }
+}
+
+std::string fold_project_name(std::string_view name) { return folded(std::string(name)); }
+
+bool dependency_admin_directory(std::string_view name) {
+    const auto folded_name = fold_project_name(name);
+    return folded_name == ".git" || folded_name == ".void" || folded_name == "build";
+}
+
+bool valid_dependency_path(std::string_view path) {
+    if (path.empty() || path.size() > 4096 || path.back() == '/') return false;
+    std::size_t components = 0;
+    while (!path.empty()) {
+        const auto slash = path.find('/');
+        const auto part = path.substr(0, slash);
+        if (++components > 64 || (part != ".." &&
+            (!portable_path_component(part) || dependency_admin_directory(part) ||
+             fold_project_name(part) == lock_name))) return false;
+        if (slash == path.npos) break;
+        path.remove_prefix(slash + 1);
+    }
+    return true;
+}
+
+bool VersionRequirement::accepts(const SemanticVersion& version) const {
+    if (exact) return version == *exact;
+    if (!version.prerelease().empty()) return false;
+    if (lower) {
+        const auto order = version.compare_precedence(lower->version);
+        if (order < 0 || (order == 0 && !lower->inclusive)) return false;
+    }
+    if (upper) {
+        const auto order = version.compare_precedence(upper->version);
+        if (order > 0 || (order == 0 && !upper->inclusive)) return false;
+    }
+    return true;
+}
+
+std::string VersionRequirement::text() const {
+    if (exact) return "=" + exact->text();
+    std::string result;
+    if (lower) result = (lower->inclusive ? ">=" : ">") + lower->version.text();
+    if (upper) {
+        if (lower) result += ',';
+        result += (upper->inclusive ? "<=" : "<") + upper->version.text();
+    }
+    return result;
+}
+
+std::optional<VersionRequirement> parse_version_requirement(std::string_view input) {
+    if (input.size() > 1024) return {};
+    auto trim = [](std::string_view text) {
+        const auto start = text.find_first_not_of(" \t");
+        if (start == text.npos) return std::string_view{};
+        return text.substr(start, text.find_last_not_of(" \t") - start + 1);
+    };
+    input = trim(input);
+    VersionRequirement requirement;
+    if (input.starts_with('=')) {
+        requirement.exact = parse_version(trim(input.substr(1)));
+        if (!requirement.exact) return {};
+        return requirement;
+    }
+    for (unsigned count = 0;; ++count) {
+        const auto comma = input.find(',');
+        auto term = trim(input.substr(0, comma));
+        if (count == 16 || term.empty() || (term.front() != '<' && term.front() != '>')) return {};
+        const bool lower = term.front() == '>';
+        term.remove_prefix(1);
+        const bool inclusive = term.starts_with('=');
+        if (inclusive) term.remove_prefix(1);
+        auto version = parse_version(trim(term));
+        if (!version || !version->prerelease().empty() || !version->build().empty()) return {};
+        auto& bound = lower ? requirement.lower : requirement.upper;
+        const auto order = bound ? version->compare_precedence(bound->version) : std::strong_ordering::equal;
+        if (!bound || (lower ? order > 0 : order < 0) || (order == 0 && !inclusive))
+            bound = VersionRequirement::Bound{std::move(*version), inclusive};
+        if (comma == input.npos) break;
+        input.remove_prefix(comma + 1);
+    }
+    if (requirement.lower && requirement.upper) {
+        const auto& lower = *requirement.lower;
+        const auto& upper = *requirement.upper;
+        const auto order = lower.version.compare_precedence(upper.version);
+        if (order > 0 || (order == 0 && (!lower.inclusive || !upper.inclusive))) return {};
+        const auto& a = lower.version.core();
+        const auto& b = upper.version.core();
+        if (!lower.inclusive && !upper.inclusive && a[0] == b[0] && a[1] == b[1]) {
+            // An exclusive interval between consecutive patches has no stable version.
+            auto next = a[2];
+            const auto digit = next.find_last_not_of('9');
+            if (digit == next.npos) next = "1" + std::string(next.size(), '0');
+            else {
+                ++next[digit];
+                std::fill(next.begin() + static_cast<std::ptrdiff_t>(digit + 1), next.end(), '0');
+            }
+            if (next == b[2]) return {};
+        }
+    }
+    // Stable versions cannot be below the first stable release.
+    if (requirement.upper && !requirement.upper->inclusive && requirement.upper->version.text() == "0.0.0") return {};
+    return requirement;
+}
+
+LockShape dependency_lock_shape(std::string_view bytes) {
+    const auto parsed = toml::parse(bytes);
+    if (!parsed) return LockShape::malformed;
+    const auto& lock = parsed.table();
+    const auto format = lock["format"].value_exact<std::int64_t>();
+    const auto resolver = lock["resolver"].value_exact<std::int64_t>();
+    if (!format || !resolver) return LockShape::malformed;
+    if (*format != 1 || *resolver != 1) return LockShape::unsupported;
+    auto id = [](const auto& node) {
+        const auto value = node.template value_exact<std::string_view>();
+        return value && valid_identity(*value);
+    };
+    auto digest = [](const auto& node) {
+        const auto value = node.template value_exact<std::string_view>();
+        return value && value->size() == 64 && value->find_first_not_of("0123456789abcdef") == value->npos;
+    };
+    std::size_t edge_count = 0;
+    auto edges = [&](const toml::table* entries) {
+        if (!entries || entries->size() > dependency_edge_limit - edge_count) return false;
+        edge_count += entries->size();
+        for (const auto& [alias, target] : *entries)
+            if (alias.str().size() > 128 || !valid_editor_identifier(std::string(alias.str())) || !id(target)) return false;
+        return true;
+    };
+    const auto* root = lock["root"].as_table();
+    if (!root || root->size() != 4 || !id((*root)["id"]) || !digest((*root)["inputs"]) ||
+        !edges((*root)["dependencies"].as_table())) return LockShape::malformed;
+    const auto kind = (*root)["kind"].value_exact<std::string_view>();
+    if (!kind || (*kind != "application" && *kind != "library")) return LockShape::malformed;
+    if (!lock.contains("package")) return lock.size() == 3 ? LockShape::valid : LockShape::malformed;
+    const auto* packages = lock["package"].as_array();
+    if (lock.size() != 4 || !packages || packages->empty() || packages->size() > dependency_package_limit)
+        return LockShape::malformed;
+    std::set<std::string_view> ids, paths;
+    for (const auto& item : *packages) {
+        const auto* package = item.as_table();
+        if (!package || package->size() != 6 || !id((*package)["id"]) ||
+            !digest((*package)["manifest"]) || !digest((*package)["tree"]) ||
+            !edges((*package)["dependencies"].as_table())) return LockShape::malformed;
+        const auto version = (*package)["version"].value_exact<std::string_view>();
+        const auto path = (*package)["path"].value_exact<std::string_view>();
+        if (!version || !parse_version(*version) || !path || !relative_path(*path, false) || !valid_dependency_path(*path))
+            return LockShape::malformed;
+        if (!ids.insert(*(*package)["id"].value_exact<std::string_view>()).second || !paths.insert(*path).second)
+            return LockShape::conflicting;
+    }
+    return LockShape::valid;
 }
 
 class ManifestParser {
@@ -116,6 +268,37 @@ class ManifestParser {
             if (!parsed) fail(Code::project_version, span(table.get("version")->source()), "Invalid semantic version.",
                 "Use major.minor.patch with optional -prerelease and +build identifiers; numeric core/prerelease identifiers cannot have leading zeroes. Limit: 255 ASCII bytes.");
             else target.version = std::move(*parsed);
+        }
+    }
+    void dependencies(const toml::table& entries) {
+        if (entries.size() > dependency_edge_limit) {
+            fail(Code::limit, span(entries.source()), "Project dependency count exceeds 1024.", "Reduce the number of declared dependencies.");
+            return;
+        }
+        for (const auto& [key, node] : entries) {
+            const std::string alias(key.str());
+            if (alias.size() > 128 || !valid_editor_identifier(alias)) {
+                fail(Code::project_identity, span(key.source()), "Invalid dependency alias.", "Use a lowercase non-keyword compiler identifier of at most 128 bytes.");
+                continue;
+            }
+            const auto* settings = node.as_table();
+            if (!settings) {
+                fail(Code::project_reserved, span(node.source()), "Dependency declarations require a local library table.", "Declare id, path and version under [dependencies." + alias + "].");
+                continue;
+            }
+            fields(*settings, "dependencies." + alias, {"id", "path", "version"});
+            auto id = text(*settings, "id", true);
+            auto path = text(*settings, "path", true);
+            auto version = text(*settings, "version", true);
+            auto requirement = version ? parse_version_requirement(*version) : std::nullopt;
+            if (id && !valid_identity(*id))
+                fail(Code::project_identity, span(settings->get("id")->source()), "Invalid dependency package ID.", "Use a portable package identity.");
+            if (path && !valid_dependency_path(*path))
+                fail(Code::project_path, span(settings->get("path")->source()), "Invalid local dependency path.", "Use portable relative components outside reserved administrative directories.");
+            if (version && !requirement)
+                fail(Code::project_version, span(settings->get("version")->source()), "Invalid dependency version constraint.", "Use = followed by an exact SemVer or comma-separated stable bounds.");
+            if (id && path && requirement)
+                manifest_->dependencies_.emplace(alias, Dependency{std::move(*id), std::move(*path), std::move(*requirement)});
         }
     }
     void paths(const toml::table& source, std::string_view key, std::vector<std::string>& target, bool roots) {
@@ -239,11 +422,19 @@ public:
             auto forbidden = *kind == "application" ? "package" : "application";
             if (auto* other = root.get(forbidden)) fail(Code::project_field, span(other->source()), "Section is forbidden for this project kind.", "Use one application or library target; keep application and package identity separate.");
             if (auto* selected = table(root, section, true)) {
-                fields(*selected, section, {"id", "name", "version"});
+                if (*kind == "library") fields(*selected, section, {"id", "name", "version", "entry"});
+                else fields(*selected, section, {"id", "name", "version"});
                 Identity info{{}, manifest_->project_.name, manifest_->project_.version};
                 identity(*selected, info, *kind == "library");
                 if (*kind == "application") manifest_->application_ = std::move(info);
-                else manifest_->package_ = std::move(info);
+                else {
+                    manifest_->package_ = std::move(info);
+                    if (auto entry = text(*selected, "entry", false)) {
+                        if (!relative_path(*entry, false) || !valid_dependency_path(*entry) || !entry->ends_with(".void"))
+                            fail(Code::project_path, span(selected->get("entry")->source()), "Invalid package entry path.", "Use an exact portable package-relative .void file path.");
+                        else manifest_->package_entry_ = std::move(*entry);
+                    }
+                }
             }
         }
         if (auto entry = text(*project, "entry", false)) {
@@ -261,8 +452,7 @@ public:
             profile(*build, "debug", manifest_->debug_);
             profile(*build, "release", manifest_->release_);
         }
-        if (auto* reserved = table(root, "dependencies"); reserved && !reserved->empty())
-            fail(Code::project_reserved, span(reserved->source()), "Project dependency resolution is reserved.", "Remove the declarations.");
+        if (auto* declarations = table(root, "dependencies")) dependencies(*declarations);
         if (auto* native = table(root, "native")) for (const auto& [key, value] : *native) {
             const auto platform = key.str();
             if ((platform != "linux" && platform != "windows") || manifest_->kind_ != Kind::application) {

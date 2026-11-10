@@ -1,0 +1,7 @@
+Mirrored test evidence directory build/slice7-final-integrated/src/docs/json/evidence/implementation
+Mirrored test evidence directory build/slice7-final-integrated/src/docs/math/evidence
+Mirrored test evidence directory build/slice7-final-integrated/src/docs/text-encoding/evidence
+Mirrored test evidence directory build/slice7-final-integrated/src/docs/random/evidence
+Mirrored test evidence directory build/slice7-final-integrated/src/docs/os/evidence
+Mirrored test evidence directory build/slice7-final-integrated/src/docs/log/evidence
+Mirrored test evidence directory build/slice7-final-integrated/src/docs/io/evidence

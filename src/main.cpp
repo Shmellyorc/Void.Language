@@ -4,6 +4,7 @@
 #include "void/path.hpp"
 #include "void/native_build.hpp"
 #include "void/project_creation.hpp"
+#include "void/project_resolution.hpp"
 #include "void/runtime.hpp"
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Config/llvm-config.h>
@@ -18,7 +19,7 @@
 namespace {
 struct UsageError : std::invalid_argument {using std::invalid_argument::invalid_argument;};
 bool known_command(const std::string& command) {
-    return command=="check" || command=="run" || command=="build" || command=="emit" || command=="init" || command=="new" || command=="native-bind";
+    return command=="check" || command=="run" || command=="build" || command=="emit" || command=="init" || command=="new" || command=="resolve" || command=="native-bind";
 }
 void usage(std::ostream& out, const std::string& command={}) {
     if(command.empty() || command=="check")out<<"Usage: voidc check <file-or-directory> [--no-opt]\n";
@@ -27,6 +28,7 @@ void usage(std::ostream& out, const std::string& command={}) {
     if(command.empty() || command=="emit")out<<"Usage: voidc emit <file-or-directory> -o <object> [--no-opt]\n";
     if(command.empty() || command=="init")out<<"Usage: voidc init [DIR] [project options]\n";
     if(command.empty() || command=="new")out<<"Usage: voidc new PATH [project options] [--source PATH]\n";
+    if(command.empty() || command=="resolve")out<<"Usage: voidc resolve --project DIR [--locked | --refresh]\n";
     if(command.empty() || command=="native-bind")out<<"Usage: voidc native-bind <descriptor> <C-header> -o <adapter.c>\n";
 }
 void help(const std::string& command={}) {
@@ -40,6 +42,7 @@ void help(const std::string& command={}) {
           "  emit    Write a native object for manual linking.\n"
           "  init    Add a project manifest to an existing directory.\n"
           "  new     Create a project and starter source in a new directory.\n"
+          "  resolve Resolve local library dependencies and verify or write void.lock.\n"
           "  native-bind  Generate a checked C11 adapter for a native library.\n"
           "\nOptions:\n"
           "  -h, --help  Show help; use <command> --help for examples.\n"
@@ -85,6 +88,9 @@ void help(const std::string& command={}) {
       "  --project-id ID, --app-id ID or --package-id ID --package-name IDENTIFIER, --nested.\n"
       "Default: application, destination basename, version 0.1.0 and independent local IDs.\n"
       "--source is available with new. The destination and manifest are created exclusively.\n";
+    if(command=="resolve")std::cout<<"\nVerify an existing local dependency lock or create one.\n"
+      "  --locked   Require an existing lock when dependencies are declared.\n"
+      "  --refresh  Replace a stale lock after recomputing the local graph.\n";
     std::cout<<"\nA directory with void.project.toml selects its project; otherwise it selects main.void.\n"
       "run/build default to the current directory. Bare explicit files retain their parent root.\n"
       "Project discovery selects a unique eligible main in any filename; --entry bypasses scanning.\n"
@@ -102,6 +108,30 @@ std::int32_t input(const char* text) {
     if (end == text || *end || errno == ERANGE || value < std::numeric_limits<std::int32_t>::min() || value > std::numeric_limits<std::int32_t>::max())
         throw UsageError("Expected a decimal i32 input (-2147483648 through 2147483647).");
     return static_cast<std::int32_t>(value);
+}
+int resolve_project(int argc,char** argv) {
+    using namespace vd::project;
+    std::optional<std::filesystem::path> root;
+    auto mode=ResolveMode::create;
+    for(int i=2;i<argc;++i) {
+        const std::string_view option=argv[i];
+        if(option=="--project") {
+            if(root || ++i==argc || !*argv[i] || argv[i][0]=='-')
+                throw UsageError("Expected one directory after --project.");
+            root=vd::utf8_path(argv[i]);
+        } else if(option=="--locked" || option=="--refresh") {
+            if(mode!=ResolveMode::create)throw UsageError("Use at most one of --locked and --refresh.");
+            mode=option=="--locked"?ResolveMode::locked:ResolveMode::refresh;
+        } else throw UsageError("Unknown resolve option: "+std::string(option));
+    }
+    if(!root)throw UsageError("resolve requires --project DIR.");
+    switch(resolve_dependencies(*root,mode)) {
+    case ResolveResult::no_dependencies: std::cout<<"No project dependencies.\n"; break;
+    case ResolveResult::verified: std::cout<<"Verified void.lock.\n"; break;
+    case ResolveResult::created: std::cout<<"Created void.lock.\n"; break;
+    case ResolveResult::refreshed: std::cout<<"Refreshed void.lock.\n"; break;
+    }
+    return 0;
 }
 int create_project(const std::string& command,int argc,char** argv) {
     vd::project::CreationOptions options;options.new_directory=command=="new";
@@ -211,7 +241,7 @@ static int run_cli(int argc, char** argv) {
         }
         if(argc>=2 && std::string(argv[1])=="help") {
             if(argc==2) {help();return 0;}
-            if(argc!=3 || !known_command(argv[2]))throw UsageError("Expected help [check|run|build|emit|init|new|native-bind].");
+            if(argc!=3 || !known_command(argv[2]))throw UsageError("Expected help [check|run|build|emit|init|new|resolve|native-bind].");
             help(argv[2]);return 0;
         }
         vd::configure_standard_library_root(vd::utf8_path(llvm::sys::fs::getMainExecutable(argv[0],reinterpret_cast<void*>(&run_cli))));
@@ -229,6 +259,7 @@ static int run_cli(int argc, char** argv) {
         if(!known_command(command))
             throw UsageError("Unknown command: "+command);
         if(argc==3 && (std::string(argv[2])=="--help" || std::string(argv[2])=="-h")) {help(command);return 0;}
+        if(command=="resolve")return resolve_project(argc,argv);
         if(command=="native-bind") {generate_native_binding(argc,argv);return 0;}
         bool optimize=true,cache=false,no_cache=false,no_opt=false;
         bool allow_native=false;

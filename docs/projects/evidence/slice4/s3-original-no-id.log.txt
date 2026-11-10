@@ -1,0 +1,55 @@
+/home/shmellyorc/Documents/Void.Language/stdlib/os.void:238:20: error: Unknown function '_os_application_id'.
+    code: VOID2003
+
+ 238 |     var identity = _os_application_id()
+     |                    ^^^^^^^^^^^^^^^^^^
+    Module: /@stdlib/os.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/os.void:245:20: error: Unknown function '_os_application_id'.
+    code: VOID2003
+
+ 245 |     var identity = _os_application_id()
+     |                    ^^^^^^^^^^^^^^^^^^
+    Module: /@stdlib/os.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/os.void:252:20: error: Unknown function '_os_application_id'.
+    code: VOID2003
+
+ 252 |     var identity = _os_application_id()
+     |                    ^^^^^^^^^^^^^^^^^^
+    Module: /@stdlib/os.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/home/shmellyorc/Documents/Void.Language/stdlib/os.void:259:20: error: Unknown function '_os_application_id'.
+    code: VOID2003
+
+ 259 |     var identity = _os_application_id()
+     |                    ^^^^^^^^^^^^^^^^^^
+    Module: /@stdlib/os.void
+    Hint: Declare it here or import its declaring file; imports are not transitive exports.
+
+/tmp/tmp.SQN0tAdqq3/game.void:2:23: error: Incorrect argument count: missing required argument 'app_id'.
+    code: VOID2004
+
+ 2 | var location = system.data_dir()
+   |                       ^^^^^^^^
+    Module: /game.void
+    Hint: Supply an explicit constructed value or every required argument.
+
+/tmp/tmp.SQN0tAdqq3/game.void:4:20: error: Unknown struct type in pattern.
+    code: VOID1103
+
+ 4 |     if location is Ok(var path):
+   |                    ^^
+    Module: /game.void
+
+/tmp/tmp.SQN0tAdqq3/game.void:5:15: error: Unknown identifier 'path'.
+    code: VOID2002
+
+ 5 |         print(path)
+   |               ^^^^
+    Module: /game.void
+    Hint: Declare it with var before use.
+

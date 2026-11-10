@@ -1,0 +1,25 @@
+VOID native 23.1.4 v2
+C:/Users/a/Documents/ChatGPT/Void TEMP/Void-native/.toolchains/native-schannel/sdk/clang+llvm-23.1.4-x86_64-pc-windows-msvc/bin/clang.exe
+
+C:/Users/a/VoidS4-Final-Release/void_runtime.lib
+C:/Users/a/VoidS4-Final-Release/void_native_fixture.lib
+C:/Users/a/VoidCI42377496702-Native/.toolchains/host/prefix/windows-x86_64/Release/lib/archive.lib
+C:/Users/a/VoidCI42377496702-Native/.toolchains/host/prefix/windows-x86_64/Release/lib/libsodium.lib
+C:/Users/a/VoidS4-Final-Release/curl/lib/libcurl.lib
+C:/Users/a/VoidCI42377496702-Native/.toolchains/http/prefix/windows-schannel-x86_64/Release/lib/psl.lib
+C:/Users/a/VoidCI42377496702-Native/.toolchains/http/prefix/windows-schannel-x86_64/Release/lib/nghttp2.lib
+C:/Users/a/VoidCI42377496702-Native/.toolchains/http/prefix/windows-schannel-x86_64/Release/lib/cares.lib
+C:/Users/a/VoidCI42377496702-Native/.toolchains/http/prefix/windows-schannel-x86_64/Release/lib/zs.lib
+-fms-runtime-lib=static
+-llegacy_stdio_definitions
+-lbcrypt
+-lshell32
+-lole32
+-luuid
+-lws2_32
+-lcrypt32
+-lsecur32
+-lnormaliz
+-liphlpapi
+-ladvapi32
+-lbcrypt

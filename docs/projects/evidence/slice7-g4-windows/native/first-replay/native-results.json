@@ -1,0 +1,251 @@
+{
+  "status": "FAIL",
+  "os": "Windows-10-10.0.19045-SP0",
+  "build": 19045,
+  "work": "C:\\Users\\a\\VoidS7-G4W-architecture-replay",
+  "commands": [
+    {
+      "label": "toolchain",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "--version"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "build-dependency",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/TC",
+        "/c",
+        "/GS-",
+        "/Zl",
+        "dependency.c",
+        "/Fodependency.obj"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "build-competitor",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/TC",
+        "/c",
+        "/GS-",
+        "/Zl",
+        "/DFIXTURE_VALUE=99",
+        "dependency.c",
+        "/Focompetitor.obj"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "build-provider",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/TC",
+        "/c",
+        "/GS-",
+        "/Zl",
+        "provider.c",
+        "/Foprovider.obj"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "build-marker",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/TC",
+        "/c",
+        "/GS-",
+        "/Zl",
+        "redirected.c",
+        "/Fomarker.obj"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "build-explicit-object",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/TC",
+        "/c",
+        "/GS-",
+        "/Zl",
+        "explicit.c",
+        "/Foexplicit.obj"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "link-good",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe",
+        "/dll",
+        "/noentry",
+        "/nodefaultlib",
+        "/out:good/void_g4_probe_dep.dll",
+        "/implib:dep.lib",
+        "dependency.obj"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "link-alternate",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe",
+        "/dll",
+        "/entry:checkpoint_attach",
+        "/nodefaultlib",
+        "/out:alternate/void_g4_probe_dep.dll",
+        "competitor.obj",
+        "marker.obj"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "link-provider",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe",
+        "/dll",
+        "/noentry",
+        "/nodefaultlib",
+        "/out:good/void_g4_probe_main.dll",
+        "provider.obj",
+        "dep.lib"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "link-explicit",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe",
+        "/dll",
+        "/noentry",
+        "/nodefaultlib",
+        "/out:good/void_g4w_explicit.dll",
+        "explicit.obj"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "link-forwarder",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe",
+        "/dll",
+        "/noentry",
+        "/nodefaultlib",
+        "/machine:x64",
+        "/out:good/void_g4w_forwarder.dll",
+        "/def:forwarder.def"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "build-loader-probe",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/std:c++20",
+        "/EHsc",
+        "/MT",
+        "loader_probe.cpp",
+        "/Foloader-probe.obj",
+        "/Feloader-probe.exe",
+        "/link",
+        "/manifest:embed"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "build-process-default",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/std:c++20",
+        "/EHsc",
+        "/MT",
+        "loader_probe.cpp",
+        "/Foprocess-default.obj",
+        "/Fealternate/process-default.exe",
+        "/link",
+        "/manifest:embed",
+        "/manifestinput:alternate/override-dependency.manifest"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "build-launcher",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/std:c++20",
+        "/EHsc",
+        "/MT",
+        "launcher.cpp",
+        "/Folauncher.obj",
+        "/Felauncher.exe",
+        "/link",
+        "/manifest:embed"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "build-startup",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/TC",
+        "/MT",
+        "startup.c",
+        "dep.lib",
+        "/Festartup.exe",
+        "/link",
+        "/manifest:embed"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "pe-facts",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-readobj.exe",
+        "--file-headers",
+        "--coff-imports",
+        "--coff-exports",
+        "--coff-resources",
+        "loader-probe.exe",
+        "alternate/process-default.exe",
+        "launcher.exe",
+        "startup.exe",
+        "good/void_g4_probe_main.dll",
+        "good/void_g4_probe_dep.dll",
+        "alternate/void_g4_probe_dep.dll",
+        "good/void_g4w_explicit.dll",
+        "good/void_g4w_forwarder.dll"
+      ],
+      "exit": 1
+    }
+  ],
+  "inputs": {
+    "dependency.c": "86e2dd69bd2394c4ccc11cb5fc709099a78482542bd9d9d21530434e9b084773",
+    "provider.c": "5cbbb27ad31058d5d445f9f69a4bc2d2e7a073888aba2867ebf8948de31cdbde",
+    "redirected.c": "be95976eefb42c3e565efa81f23a4462b323118c50b68f89b9b24ea0303f021d",
+    "override-dependency.manifest": "dbcafe32764879187ebf30497dfabb439da8d03dcd56139221b2a2dd0c28e335",
+    "explicit.c": "e81c6e1e631edf269bc7e21962b5d129f770e7e5b936c01e4694cf7f3d33e333",
+    "explicit_abi.h": "c3f38e1b63f798a518ff10c19c0b64c7dc1a62269b0f3790f2b45ed8bafe9ee2",
+    "forwarder.def": "e3a44f13889f278021dd27357cecd9d7fa373f6a41cdb74e0ba29a528651bf9a",
+    "launcher.cpp": "4d316366808d495aefe1e311975c719c285c1e114600936fe61ba386d0ae7d5f",
+    "loader_probe.cpp": "0523b8628975c27eb48475ebd4f0b81a1f122f925a2883466c00b0d328529096",
+    "native-run.cmd": "c532729bc8a2867f6023089f663083c49ea1417ece16285bf2b5bce53939ecf8",
+    "native-run.py": "2c1cc15574abd464afc4ad9c36e928d68aa576480df8a334731895c22ad5a20d",
+    "startup.c": "79c824f303e1a5f264bf67a7f238c7d91da29db0b0c39f2c4aa1cca3807ecf8c"
+  },
+  "artifacts": {},
+  "error": "Traceback (most recent call last):\n  File \"C:\\Users\\a\\VoidS7-G4W-architecture\\replay-run.py\", line 79, in <module>\n    run('pe-facts',readobj,'--file-headers','--coff-imports','--coff-exports','--coff-resources',\n    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        'loader-probe.exe','alternate/process-default.exe','launcher.exe','startup.exe',\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        'good/void_g4_probe_main.dll','good/void_g4_probe_dep.dll','alternate/void_g4_probe_dep.dll',\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        'good/void_g4w_explicit.dll','good/void_g4w_forwarder.dll')\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\a\\VoidS7-G4W-architecture\\replay-run.py\", line 34, in run\n    raise RuntimeError(f'{label} failed with {result.returncode}')\nRuntimeError: pe-facts failed with 1\n"
+}

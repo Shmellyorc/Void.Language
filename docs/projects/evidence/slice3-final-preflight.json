@@ -1,0 +1,239 @@
+{
+  "baseline": "2f667ea338127b8f91c3136804377ef3fa5218d6",
+  "reviewed_source_sha256": {
+    "src/frontend/project_selection.inc": {
+      "before": "558eff323c3617385e00569dfd13eb3be5b7960740844a3c3b95d5051c30058d",
+      "after": "e9af504e39f5a30c65dbc0833a2f23f16d51eeae579a16d40d45a17d9f1c2a42"
+    },
+    "tests/project/protocol.py": {
+      "before": "e52463880a098ccd24cdf8589cf88b39bab017741c02932f2749debf130dd3f4",
+      "after": "91cf3e12bd841a9745ac7e74d77176b3d3eb6b8029e00f8f39d951652f00783e"
+    },
+    "tests/project/sessions.cpp": {
+      "before": "5a80f2bad345a6a914209d8c5d8784df8e51350ccb69238bb6329ed6483eed07",
+      "after": "3d4aad75cf64d83189325186e5bcf7fbfb4d5f821f9d0c38aa0b587fac66ed4d"
+    }
+  },
+  "source_patch_sha256": "639dfad6cf52fe6b8e49d3d40d36c0d24e4f819edda2c29efcf2d62e7ca6a6fe",
+  "linux": {
+    "release": {
+      "build_type": "Release",
+      "environment": {},
+      "build_command": [
+        "cmake",
+        "--build",
+        "build/llvm23-release",
+        "-j2",
+        "--target",
+        "voidls",
+        "voidc",
+        "void_project_sessions",
+        "void_project_selection",
+        "void_tests"
+      ],
+      "ctest_command": [
+        "ctest",
+        "--test-dir",
+        "build/llvm23-release",
+        "--output-on-failure",
+        "-j2",
+        "-R",
+        "^(project_(protocol|sessions|selection|discovery_cli|nested_cli|manifest_legacy)|lsp_(protocol|stage7|stage8|sprint2)|sessions)$",
+        "--output-junit",
+        "/home/shmellyorc/Documents/Void.Language/build/slice3-final-preflight/final-release/tests.xml"
+      ],
+      "passed": 11,
+      "wire_assertions": 169,
+      "session_assertions": 166,
+      "binaries_sha256": {
+        "voidls": "d5ab8686283e2cba69208b52fdf370a1ec9036562d5a9fa0e022b03132f207d7",
+        "voidc": "921b2a204f456e6d1acdf10f7cb7367d19cf1ea3368e778754018456ae3512c1",
+        "void_project_sessions": "6203eef73b157ece6d0788d99c6a088b40d453531092189eb586c51700ae37fb",
+        "void_project_selection": "ec8049a581539f4a52c17739cf7727a14bf745b9fb112263a1a8411f2f47f507",
+        "void_tests": "fb412f80d8b3f86e6f7da70d0b4b6e8f36e0bf4c59554f7d2a5c0996bf0c8825"
+      }
+    },
+    "debug": {
+      "build_type": "Debug",
+      "environment": {},
+      "build_command": [
+        "cmake",
+        "--build",
+        "build/llvm23-debug",
+        "-j2",
+        "--target",
+        "voidls",
+        "voidc",
+        "void_project_sessions",
+        "void_project_selection",
+        "void_tests"
+      ],
+      "ctest_command": [
+        "ctest",
+        "--test-dir",
+        "build/llvm23-debug",
+        "--output-on-failure",
+        "-j2",
+        "-R",
+        "^(project_(protocol|sessions|selection|discovery_cli|nested_cli|manifest_legacy)|lsp_(protocol|stage7|stage8|sprint2)|sessions)$",
+        "--output-junit",
+        "/home/shmellyorc/Documents/Void.Language/build/slice3-final-preflight/final-debug/tests.xml"
+      ],
+      "passed": 11,
+      "wire_assertions": 169,
+      "session_assertions": 166,
+      "binaries_sha256": {
+        "voidls": "950b7731af9a20264b3082ab66f413586e15263c966466b21e3a74e9dbfaaa4c",
+        "voidc": "0045b5c0895251c4ba8bb3c582ed6abb67768ebf5adf3c695751bc401ba58499",
+        "void_project_sessions": "88911cd2661f0326724cf5ab9dc555276ccba67ec7efd7e6d540104c80f013e2",
+        "void_project_selection": "e164b765ed84853f06340fd169ebc4b1c6736be6caa8f4ab0de57dcdcdc90424",
+        "void_tests": "1037f46c62ee969b3f1d37a5b5be13736b99125569cbbc1a245aab705389736f"
+      }
+    },
+    "strict": {
+      "build_type": "RelWithDebInfo",
+      "environment": {
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+      },
+      "build_command": [
+        "cmake",
+        "--build",
+        "build/llvm23-strict",
+        "-j2",
+        "--target",
+        "voidls",
+        "voidc",
+        "void_project_sessions",
+        "void_project_selection",
+        "void_tests"
+      ],
+      "ctest_command": [
+        "ctest",
+        "--test-dir",
+        "build/llvm23-strict",
+        "--output-on-failure",
+        "-j2",
+        "-R",
+        "^(project_(protocol|sessions|selection|discovery_cli|nested_cli|manifest_legacy)|lsp_(protocol|stage7|stage8|sprint2)|sessions)$",
+        "--output-junit",
+        "/home/shmellyorc/Documents/Void.Language/build/slice3-final-preflight/final-strict/tests.xml"
+      ],
+      "passed": 11,
+      "wire_assertions": 169,
+      "session_assertions": 166,
+      "binaries_sha256": {
+        "voidls": "5e5e8c1f3d292ef11424b80acb812b2c0eec76271b71d95d8333abc4af0d13ce",
+        "voidc": "ee528d36cae970d019e7242aeacccb854535ac0399d8c6915a2e2a86d519e34d",
+        "void_project_sessions": "561eed3c8e01fc7d01ef14dfb2c68602e1fb36f59eb39cd8443216f63f0dbeed",
+        "void_project_selection": "3b9561ff371060b813df1cace9f89b3dbf8d3bb5cebb35fa02b205d14e8f459a",
+        "void_tests": "dbcb3c52ddd4121bca6996de6059d0a9e135169e956ef64ceeaeea6bf52d2185"
+      }
+    }
+  },
+  "windows_10": {
+    "Release": {
+      "status": "PASS",
+      "platform": "Windows-10-10.0.19045-SP0",
+      "wire_assertions": 169,
+      "session_assertions": 166,
+      "outputs": {
+        "sessions": "project_sessions: 166 checks passed\n",
+        "project-protocol": "project_protocol: 169 checks passed\n",
+        "legacy-protocol": "editor: CRLF/UTF16, cross-file symbols, overlays, versions, invalid/repair, graph changes and cycles passed\ntransport: fragmented/coalesced frames, IDs, malformed messages, bounded framing, lifecycle and EOF passed\nvalue structs: real LSP type/constructor/field navigation, references, readonly diagnostics and revision recovery passed\nreceiver methods: imported native LSP navigation, references, effect changes and revision recovery passed\ninitialization: imported initializer navigation/references, exact argument diagnostics and unsaved recovery passed\nmanaged structs: cyclic types, imported fields/methods, readonly aliases and unsaved recovery passed\nmanaged initialization: imported constructor, private helper navigation, required-field diagnostics and unsaved repair passed\nreference values: imported nested reference navigation, precise readonly diagnostics and unsaved recovery passed\ncomposition: imported promoted navigation, ambiguity and unsaved repair passed\ninheritance: original owners, static virtual/super navigation, exact override diagnostics and unsaved repair passed\ninterfaces: original requirement navigation, imported signatures/effects and unsaved revision repair passed\ninvalid disk UTF-8: original UTF16 ranges, overlay repair and close passed\nstrings: imported constants, UTF16 escape spans and unsaved repair passed\nStage 6 native host authorization, async/spawn/group references and stale-overlay repair: passed\n",
+        "legacy-stage7": "Stage 7: completion/recovery, signatures, hover, bindings, symbols, guarded rename, formatting, refresh, batching, cancellation passed\n",
+        "legacy-stage8": "Debug cache: unavailable\nDebug cache: unavailable\nWindows drive discovery fixture: {\"original\": \"C:\\\\Users\\\\a\\\\VoidSlice3-Preflight-Qualified-20261108\\\\tmp-Release\\\\VOID discovery \\u00e9\\ud83d\\ude00 # % rf0to1kv\", \"canonical\": \"C:\\\\Users\\\\a\\\\VoidSlice3-Preflight-Qualified-20261108\\\\tmp-Release\\\\VOID discovery \\u00e9\\ud83d\\ude00 # % rf0to1kv\", \"expanded_lower\": \"c:\\\\Users\\\\a\\\\VoidSlice3-Preflight-Qualified-20261108\\\\tmp-Release\\\\VOID discovery \\u00e9\\ud83d\\ude00 # % rf0to1kv\"}\nWindows unrelated mapped-drive rejection passed\nWindows short/long workspace ancestor checks passed\nWindows upper/lower drive workspace and active checks passed\nStage 8 compiler-backed LSP discovery/docs/readonly checks passed\n",
+        "legacy-sprint2": "Sprint 2 numeric completion/hover/signatures/readonly and named-label navigation passed\n"
+      }
+    },
+    "Debug": {
+      "status": "PASS",
+      "platform": "Windows-10-10.0.19045-SP0",
+      "wire_assertions": 169,
+      "session_assertions": 166,
+      "outputs": {
+        "sessions": "project_sessions: 166 checks passed\n",
+        "project-protocol": "project_protocol: 169 checks passed\n",
+        "legacy-protocol": "editor: CRLF/UTF16, cross-file symbols, overlays, versions, invalid/repair, graph changes and cycles passed\ntransport: fragmented/coalesced frames, IDs, malformed messages, bounded framing, lifecycle and EOF passed\nvalue structs: real LSP type/constructor/field navigation, references, readonly diagnostics and revision recovery passed\nreceiver methods: imported native LSP navigation, references, effect changes and revision recovery passed\ninitialization: imported initializer navigation/references, exact argument diagnostics and unsaved recovery passed\nmanaged structs: cyclic types, imported fields/methods, readonly aliases and unsaved recovery passed\nmanaged initialization: imported constructor, private helper navigation, required-field diagnostics and unsaved repair passed\nreference values: imported nested reference navigation, precise readonly diagnostics and unsaved recovery passed\ncomposition: imported promoted navigation, ambiguity and unsaved repair passed\ninheritance: original owners, static virtual/super navigation, exact override diagnostics and unsaved repair passed\ninterfaces: original requirement navigation, imported signatures/effects and unsaved revision repair passed\ninvalid disk UTF-8: original UTF16 ranges, overlay repair and close passed\nstrings: imported constants, UTF16 escape spans and unsaved repair passed\nStage 6 native host authorization, async/spawn/group references and stale-overlay repair: passed\n",
+        "legacy-stage7": "Stage 7: completion/recovery, signatures, hover, bindings, symbols, guarded rename, formatting, refresh, batching, cancellation passed\n",
+        "legacy-stage8": "Debug cache: unavailable\nDebug cache: unavailable\nWindows drive discovery fixture: {\"original\": \"C:\\\\Users\\\\a\\\\VoidSlice3-Preflight-Qualified-20261108\\\\tmp-Debug\\\\VOID discovery \\u00e9\\ud83d\\ude00 # % jk6ca44v\", \"canonical\": \"C:\\\\Users\\\\a\\\\VoidSlice3-Preflight-Qualified-20261108\\\\tmp-Debug\\\\VOID discovery \\u00e9\\ud83d\\ude00 # % jk6ca44v\", \"expanded_lower\": \"c:\\\\Users\\\\a\\\\VoidSlice3-Preflight-Qualified-20261108\\\\tmp-Debug\\\\VOID discovery \\u00e9\\ud83d\\ude00 # % jk6ca44v\"}\nWindows unrelated mapped-drive rejection passed\nWindows short/long workspace ancestor checks passed\nWindows upper/lower drive workspace and active checks passed\nStage 8 compiler-backed LSP discovery/docs/readonly checks passed\n",
+        "legacy-sprint2": "Sprint 2 numeric completion/hover/signatures/readonly and named-label navigation passed\n"
+      }
+    }
+  },
+  "editor": {
+    "adapter_passed": 7,
+    "real_host_passed": 14,
+    "version": "1.141.0",
+    "older_server_sha256": "a5182047042b1494aa0774f80616503b8049b091ff46c5432ef7238fe78e3e51",
+    "adapter_command": [
+      "npm",
+      "test",
+      "--prefix",
+      "editors/vscode"
+    ],
+    "host_command": [
+      "node",
+      "editors/vscode/out/test/runProjectHost.js"
+    ]
+  },
+  "failure_and_correction": [
+    {
+      "observed": "Old server flattened VOID5009 into rendered text; child manifests and unreadable out-of-graph active sources could return ready.",
+      "rerun": "linux-release-final-probe.json and focused final Linux and native wire suites"
+    },
+    {
+      "observed": "Windows Python fixture used absent _winapi.FILE_ATTRIBUTE_NORMAL.",
+      "rerun": "Switched to stat.FILE_ATTRIBUTE_NORMAL; attempt 2 retained."
+    },
+    {
+      "observed": "Windows Python CreateFile expects an integer security attributes pointer.",
+      "rerun": "Passed 0; final native wire tests used denied read sharing."
+    }
+  ],
+  "limitations": [
+    "Native Windows tests were incremental local rebuilds. Stage 8 used the verified S3 CLI. Windows sanitizers, Windows VS Code, Windows Server 2022 and macOS were unexecuted."
+  ],
+  "evidence_sha256": {
+    "linux-debug-build.log.txt": "dcbc9ccc2d9da9abed153e6a10d64ac81c06497d7f078a78d915cd184e2ef78a",
+    "linux-debug-protocol.json": "aadbb7ae66be38b6810c479dbb211ed375bb389f9008fe99377aefce877e1a41",
+    "linux-debug.xml": "323d1b52aa47f29597abad568074369864e8a5034c3328987e8bb9ef09253608",
+    "linux-launch-failure.json": "685530562c6878f5455a8a573116569d974c33ff685a66b6355f4c9f48a7fe25",
+    "linux-release-build.log.txt": "724286474c91bf1972d9ee726329ea32524170cc1233fbb84bacd159e656e43a",
+    "linux-release-final-probe.json": "585608e6e82d46068e0a1107878caffcbf651833a089199d4fd716e86fa4150a",
+    "linux-release-original-protocol.json": "400705c3b0c29e8ccee95476bd70063a3e433923cc909361f52811320b87cdfd",
+    "linux-release-original-protocol.log.txt": "f39a54d611d9d03df321a23ddb0ca98ebfbd201b6b0b8037a73225733cd630b1",
+    "linux-release-original.json": "a950a5d55260193a25d6e40a391412f5b769e4dbfcbb23ef92f835b324fa553b",
+    "linux-release-protocol.json": "534927b172a8deb5c14ede99759c916b590bcdd8e37392a81f56b78efab7cde9",
+    "linux-release-readable-large.json": "c101dd8cece5f202e6eddc0dd7a29f05c163c3c0e74c9d6847fc906bb535e7eb",
+    "linux-release.xml": "80babf705114e336aef2966ba4fb8e0c5a9232983bf8c98360d45f241465e5bd",
+    "linux-strict-build.log.txt": "a10bb04ac1d42e42dce0490afed7603c7eb2ea59a429e9db0f9b1d75f2d7b065",
+    "linux-strict-protocol.json": "28bd690cd8ba37ba9ad5f75938d212d274a1eb5bf0ae827302023cd0991d1b8c",
+    "linux-strict.xml": "debfef2c9dc5d2a55cce608f29ea2517c4fe1361c9b8dac07a9efc8f01fcb9fe",
+    "probe.py": "afcb16414510ee42692cf350838f8081140370695869a3c06e68a34c0335925d",
+    "vscode-project-host-final.json": "81bd86365f4d54358ba6e558eea0b2cd12e7b27ce82867643d0f31e5c7a65f1d",
+    "vscode-tests-final.log.txt": "25e2f681e79b90fad3827a2a5f4b1a328cceb75bd3e5da468f23e2ff67945dee",
+    "windows-Debug-original-preflight.json": "cf8f4d04a3dac1ea94aa690d38d4f037a140074fc47992e5346de36e485c3d7a",
+    "windows-Debug-original-regression.log.txt": "ffd57a63313eda2a6483e4a8b7510cf3f287713b8c9336cb56fee3a201e45307",
+    "windows-Debug-protocol.json": "c43eeb136d93ed07216ac5f627107c688c82552204a1d25a36cc4209246552a0",
+    "windows-Debug-server-link.rsp": "01c541087e37a00d7f19e96413df07bfc2411e826abf799f6ddc6c23ce5a63ee",
+    "windows-Debug-sessions-link.rsp": "6463b7abb9d58eef0cdcd614b510d809c2df118bf6d1eef1a195292228592771",
+    "windows-Release-original-preflight.json": "9cbd6edb4be6030181fbf855528ed66e9c336b9cae8a6fc59b1ff5d865ea7115",
+    "windows-Release-original-regression.log.txt": "b437b661e9392e2c2672108ed971a4af414a5a5db7d1a364e91c6f79f5a34c58",
+    "windows-Release-protocol.json": "cf9aa24061f8bc064cd1ddcb3adbdd8d6103b393f006831df52a3fd3abda615c",
+    "windows-Release-server-link.rsp": "75ecad704e298e12ad01440df5a78a001463b717ce47826a02b5ca6033514c0b",
+    "windows-Release-sessions-link.rsp": "aa965a9f9f01c559e40fa9b74ef9c4dac07074f3ef31d982c643a3e7725022a8",
+    "windows-attempt1-Release-project-protocol.json": "1bb9f6aedde1d05a94bb545fc33ee85888bf5c38fa432475918112660e6875ee",
+    "windows-attempt1-Release-project-protocol.log.txt": "11b965296746070ad64b36751aaea6f81813a48fd4907751b59c1b7404973e31",
+    "windows-attempt1-native-results.json": "6601d91072c52fe6727407133b7d9b8d6e9ec3a534ab5fbe6414b2a30b7429b9",
+    "windows-attempt2-Release-project-protocol.json": "28730a04ed08eac5f2b4b2f29dd7f673117cf1701ca26a832a88b5c48561924c",
+    "windows-attempt2-Release-project-protocol.log.txt": "14045ce5811f0f175d81955a71a4b164b74d370c79ea8697648d950535f4925a",
+    "windows-attempt2-native-results.json": "e207deb295496e76c66832d67898b2f3f42322701e33cec630a0ab70c269df1c",
+    "windows-native-results.json": "bb56f831bc6b37af9491b8618a960042a8195f6cfc99c8b3fbdfee8d6830551b",
+    "windows-native.py": "613dc34ff6f7a09e6b337c13304ad7a4ed005ef965fc10755ba708de1e478ed9",
+    "windows-qualified-native-results.json": "5e696c6da56d1a06620f79331865e5c7ea9ed612c3fef44749b8a8b642879190",
+    "windows-qualify.py": "161f7b71e4fe1eba727440192761419f65485c9c7f6af5b8b3d2859b4cd6e2dc",
+    "windows-resume.py": "afc2ff2080f3184ebfd7a2f8ec02ee2c027f6a1057c24aa213d4551210f374df",
+    "windows-resume2.py": "65756d3a217be0711aea467fe62b746011d19cb6c1bce26be4b7503f7d816de1"
+  }
+}

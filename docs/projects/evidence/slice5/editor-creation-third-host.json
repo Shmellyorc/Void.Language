@@ -1,0 +1,14 @@
+{
+  "mode": "trusted",
+  "editor": "1.141.0",
+  "platform": "linux",
+  "events": [
+    "activation and opening a pre-existing source do not offer",
+    "an unrelated pre-existing source suppresses a later-file offer",
+    "decline persists and prevents a repeat",
+    "dismissal persists and reset is deliberate",
+    "File\nEdit\nSelection\nView\nGo\nRun\nExplorer\ntrusted\ncancelled.void\nOutline\nTimeline\nexisting\n.void\nexisting.void\nmain\n1\n2\n3\nfunc main() -> i32:\n    return 7\n 0 \n 0\nVOID: standalone existing.void\nVOID\nLF\nUTF-8\nSpaces: 4\nLn 1, Col 1\nInfo: Start a VOID project for these first sources?\nReview VOID project creation\n5 Results\n/tmp/VOID S5 editor oWwNTL/trusted/void.project.toml\ntrusted 0.1.0 (application)\nReviewed metadata\nProject ID: local.pdccc6c8046a309176a8e33a477f0be2d\nApplication ID: local.aedbe8534b31bd367abd3a3b3f72e7013\nCancel\nPublish manifest\nCreate Manifest"
+  ],
+  "failure": "Error: Timed out waiting for Cancel\n\tat until (/home/shmellyorc/Documents/Void.Language/editors/vscode/out/test/creationHost.js:55:11)\n\tat async Object.click (/home/shmellyorc/Documents/Void.Language/editors/vscode/out/test/creationHost.js:85:9)\n\tat async Object.run (/home/shmellyorc/Documents/Void.Language/editors/vscode/out/test/creationHost.js:192:9)",
+  "status": "FAIL"
+}

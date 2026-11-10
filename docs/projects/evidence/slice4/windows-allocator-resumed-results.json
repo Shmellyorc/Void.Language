@@ -1,0 +1,160 @@
+{
+  "status": "PASS",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "commands": [
+    {
+      "profile": "Release",
+      "label": "compile",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/std:c++20",
+        "/EHsc",
+        "/MT",
+        "/GR-",
+        "/W4",
+        "/permissive-",
+        "/D_ITERATOR_DEBUG_LEVEL=0",
+        "/IC:\\Users\\a\\VoidS4-source2\\include",
+        "/O2",
+        "/DNDEBUG",
+        "/c",
+        "C:\\Users\\a\\VoidS4-Allocator-Final\\application.cpp",
+        "/Fo\\\\vboxsvr\\VM\\project-slice4\\allocator-local-artifacts\\Release\\application.obj",
+        "/Fd\\\\vboxsvr\\VM\\project-slice4\\allocator-local-artifacts\\Release\\application.pdb"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS4-Final-Release",
+      "status": 0
+    },
+    {
+      "profile": "Release",
+      "label": "link",
+      "argv": [
+        "C:\\gcc\\bin\\cmake.exe",
+        "-E",
+        "vs_link_exe",
+        "--msvc-ver=1944",
+        "--intdir=C:\\Users\\a\\VoidS4-Allocator-Final\\Release\\link",
+        "--rc=C:/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0/x64/rc.exe",
+        "--mt=C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-mt.exe",
+        "--manifests",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\cmake\\LongPathAware.manifest",
+        "--",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe",
+        "@C:\\Users\\a\\VoidS4-Allocator-Final\\Release\\link.rsp"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS4-Final-Release",
+      "status": 0
+    },
+    {
+      "profile": "Release",
+      "label": "test",
+      "argv": [
+        "\\\\vboxsvr\\VM\\project-slice4\\allocator-local-artifacts\\Release\\void_project_application-allocator.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS4-Final-Release",
+      "status": 0
+    },
+    {
+      "profile": "Debug",
+      "label": "compile",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+        "/nologo",
+        "/std:c++20",
+        "/EHsc",
+        "/MT",
+        "/GR-",
+        "/W4",
+        "/permissive-",
+        "/D_ITERATOR_DEBUG_LEVEL=0",
+        "/IC:\\Users\\a\\VoidS4-source2\\include",
+        "/Od",
+        "/Zi",
+        "/c",
+        "C:\\Users\\a\\VoidS4-Allocator-Final\\application.cpp",
+        "/Fo\\\\vboxsvr\\VM\\project-slice4\\allocator-local-artifacts\\Debug\\application.obj",
+        "/Fd\\\\vboxsvr\\VM\\project-slice4\\allocator-local-artifacts\\Debug\\application.pdb"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS4-Final-Debug",
+      "status": 0
+    },
+    {
+      "profile": "Debug",
+      "label": "process",
+      "argv": [
+        "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+        "C:\\Users\\a\\VoidS4-Allocator-Final\\application.py",
+        "C:\\Users\\a\\VoidS4-Final-Debug\\voidc.exe",
+        "\\\\vboxsvr\\VM\\project-slice4\\Debug-corrected-process.json"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS4-Final-Debug",
+      "status": 1
+    },
+    {
+      "profile": "Debug",
+      "label": "link",
+      "argv": [
+        "C:\\gcc\\bin\\cmake.exe",
+        "-E",
+        "vs_link_exe",
+        "--msvc-ver=1944",
+        "--intdir=C:\\Users\\a\\VoidS4-Allocator-Final\\Debug\\link",
+        "--rc=C:/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0/x64/rc.exe",
+        "--mt=C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-mt.exe",
+        "--manifests",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\cmake\\LongPathAware.manifest",
+        "--",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe",
+        "@C:\\Users\\a\\VoidS4-Allocator-Final\\Debug\\link.rsp"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS4-Final-Debug",
+      "status": 0
+    },
+    {
+      "profile": "Debug",
+      "label": "test",
+      "argv": [
+        "\\\\vboxsvr\\VM\\project-slice4\\allocator-local-artifacts\\Debug\\void_project_application-allocator.exe"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS4-Final-Debug",
+      "status": 0
+    },
+    {
+      "profile": "Debug",
+      "label": "process",
+      "argv": [
+        "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+        "C:\\Users\\a\\VoidS4-Allocator-Final\\application.py",
+        "C:\\Users\\a\\VoidS4-Final-Debug\\voidc.exe",
+        "\\\\vboxsvr\\VM\\project-slice4\\Debug-corrected-process.json"
+      ],
+      "cwd": "C:\\Users\\a\\VoidS4-Final-Debug",
+      "status": 0
+    }
+  ],
+  "test_sha256": "02dbf89588a3d312ec0ff9ebde1884c80df179a5c33e14b1bc48117f4d0e9911",
+  "source_stdlib_sha256": "82bb841147540af6363d23de4db1dc1ad37daaae5a309d65d55fe3446de9d2d6",
+  "process_test_sha256": "4a0e4f84519036b5a43ed1565631785d045c05b01ee97a2f107046a59cc25f2d",
+  "profiles": {
+    "Release": {
+      "binary_sha256": "b2396712bf18da33c1e3f0bea89d0d6236f6b593cee48ad9a9e27e6c6d38b0c4",
+      "stdout": "Application cache: unavailable/unavailable\nproject_application: 63 checks passed\n",
+      "guest_free_bytes": 69885952
+    },
+    "Debug": {
+      "binary_sha256": "1ab89a2207f125956c1413f4b80be9f96588037739bb76e7bf2de450afc16306",
+      "stdout": "Application cache: unavailable/unavailable\nproject_application: 63 checks passed\n",
+      "guest_free_bytes": 7076491264
+    }
+  },
+  "compiler_sha256": {
+    "Release": "308dd02d019cecb44ba191cd40f87126feeddb1fc4585525f8c1be51f0d269b0",
+    "Debug": "c83c75d29cc0519099a7eb1b259ec1b75fa08763e8e58ed781999815b00ff2b4"
+  },
+  "release_process_receipt": "allocator-first-results.json",
+  "prior_disk_full_receipt": "allocator-final-results.json",
+  "debug_object_sha256": "9905ecd1987bb8d524948652d5786553b9f11cc69afb0f31fd3208bae26ae880",
+  "guest_free_bytes_before_debug_rerun": 7110295552,
+  "guest_free_bytes_after_debug_rerun": 6997364736
+}

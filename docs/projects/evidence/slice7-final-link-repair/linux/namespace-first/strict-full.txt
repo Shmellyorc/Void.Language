@@ -1,0 +1,113 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict
+        Start 411: stage10_console_aot
+        Start 412: stage10_operators_aot
+        Start 423: text_collections_sprint3
+        Start 408: stage10_temporal_aot
+        Start 410: stage11_globals_aot
+  1/433 Test #410: stage11_globals_aot .......................   Passed   24.94 sec
+        Start 422: application_native_sprint4
+  2/433 Test #408: stage10_temporal_aot ......................   Passed   27.15 sec
+        Start 405: ergonomics_sprint6
+  3/433 Test #405: ergonomics_sprint6 ........................   Passed   10.00 sec
+        Start 413: stage10_conversion_aot
+  4/433 Test #413: stage10_conversion_aot ....................   Passed    2.84 sec
+        Start 406: stage10_fields_aot
+  5/433 Test #422: application_native_sprint4 ................   Passed   16.47 sec
+        Start   1: project_manifest_header
+  6/433 Test   #1: project_manifest_header ...................   Passed    0.04 sec
+        Start   2: project_manifest
+  7/433 Test   #2: project_manifest ..........................   Passed    0.46 sec
+        Start   3: voidup_smoke
+  8/433 Test #406: stage10_fields_aot ........................   Passed    2.03 sec
+        Start   4: voidup_ci_integration
+  9/433 Test   #4: voidup_ci_integration .....................   Passed    0.52 sec
+        Start   5: project_manifest_no_authority
+ 10/433 Test   #5: project_manifest_no_authority .............   Passed    0.56 sec
+        Start   6: project_manifest_legacy
+ 11/433 Test   #3: voidup_smoke ..............................***Failed    1.94 sec
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidup-smoke-evidence/crashes/incident-uv9yjj_4
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/voidup/smoke.py", line 47, in <module>
+    run(['--root',root,'doctor']);run(['--root',root,'list'])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/voidup/smoke.py", line 31, in run
+    raise AssertionError(records[-1])
+AssertionError: {'command': ['/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidup/voidup', '--root', '/tmp/void-s7-link-strict-full.56AkOl/VOIDUP CI 雪 # % b8mrmpjm/private', 'doctor'], 'status': 1, 'expected': 0, 'stdout': '', 'stderr': 'VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}\n{"message":"io.create_private_directory failed; native code 0","operation":"io.create_private_directory","kind":"/@stdlib/io.void::error_kind.permission_denied","phase":"","status":0,"code":1,"native_domain":"filesystem","native_code":0,"cleanup_code":0,"progress":0,"published":false,"durable":false}\n'}
+
+        Start   7: project_manifest_provenance
+ 12/433 Test   #7: project_manifest_provenance ...............   Passed    0.08 sec
+        Start   8: project_selection
+ 13/433 Test   #6: project_manifest_legacy ...................   Passed   10.64 sec
+        Start   9: project_sessions
+ 14/433 Test   #9: project_sessions ..........................   Passed    0.89 sec
+        Start  10: project_creation
+ 15/433 Test  #10: project_creation ..........................   Passed    0.62 sec
+        Start  11: project_creation_process
+ 16/433 Test   #8: project_selection .........................   Passed   12.75 sec
+        Start  12: project_application
+ 17/433 Test #423: text_collections_sprint3 ..................   Passed   66.09 sec
+        Start  13: project_application_process
+ 18/433 Test  #11: project_creation_process ..................   Passed   31.38 sec
+        Start  14: project_discovery_cli
+ 19/433 Test  #14: project_discovery_cli .....................   Passed   32.58 sec
+        Start  15: project_profiles
+ 20/433 Test  #15: project_profiles ..........................   Passed    7.92 sec
+        Start  16: project_protocol
+ 21/433 Test  #16: project_protocol ..........................   Passed    1.86 sec
+        Start  17: project_nested_cli
+ 22/433 Test  #17: project_nested_cli ........................   Passed    2.67 sec
+        Start  18: cli_contract
+ 23/433 Test  #12: project_application .......................   Passed   87.55 sec
+        Start  19: cli_install
+ 24/433 Test  #13: project_application_process ...............   Passed   87.77 sec
+        Start  20: cli_install_resources
+ 25/433 Test  #20: cli_install_resources .....................   Passed    0.23 sec
+        Start  21: target_triple
+ 26/433 Test  #21: target_triple .............................   Passed    0.04 sec
+        Start  22: http_native
+ 27/433 Test  #18: cli_contract ..............................   Passed   23.31 sec
+        Start  23: http_tls_memory
+ 28/433 Test  #19: cli_install ...............................   Passed   12.43 sec
+        Start  24: http_reload
+ 29/433 Test  #22: http_native ...............................   Passed   26.66 sec
+        Start  25: http_timeouts
+ 30/433 Test  #25: http_timeouts .............................   Passed   10.56 sec
+        Start  26: http_wire
+ 31/433 Test  #26: http_wire .................................   Passed    2.11 sec
+        Start  27: http_dns
+ 32/433 Test  #27: http_dns ..................................   Passed    9.43 sec
+        Start  28: url_native
+ 33/433 Test  #28: url_native ................................   Passed    0.81 sec
+        Start  29: http_examples
+ 34/433 Test  #24: http_reload ...............................   Passed  134.87 sec
+        Start  30: http_ci_policy
+ 35/433 Test  #30: http_ci_policy ............................   Passed    8.92 sec
+        Start  31: http_curl_objects
+ 36/433 Test  #31: http_curl_objects .........................   Passed    2.74 sec
+        Start  32: http_install
+ 37/433 Test  #23: http_tls_memory ...........................***Failed  164.26 sec
+/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/tls_memory.py:74: DeprecationWarning: ssl.TLSVersion.TLSv1 is deprecated
+  context.minimum_version = ssl.TLSVersion.TLSv1
+/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/tls_memory.py:75: DeprecationWarning: ssl.TLSVersion.TLSv1_1 is deprecated
+  context.maximum_version = ssl.TLSVersion.TLSv1_1
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/tls_memory.py", line 91, in <module>
+    if __name__ == '__main__': main()
+                               ~~~~^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/tls_memory.py", line 80, in main
+    run([binary, f'https://127.0.0.1:{peers[0].server_port}/',
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+         f'https://127.0.0.1:{peers[1].server_port}/', roots,
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+         *[f'https://127.0.0.1:{peer.server_port}/' for peer in peers[2:]]], 'probe', timeout=1200)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict/tests/net/http/tls_memory.py", line 52, in run
+    assert result.returncode == 0, (name, result.stderr.decode(errors='replace'))
+           ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('probe', 'TLS failure kind=14 code=0\nTLS corpus verified handshake\n')
+
+        Start  33: http_bulk

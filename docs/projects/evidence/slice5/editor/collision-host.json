@@ -1,0 +1,9 @@
+{
+  "mode": "collision",
+  "editor": "1.141.0",
+  "platform": "linux",
+  "events": [
+    "a manifest arriving during review is preserved and selected in the same root"
+  ],
+  "status": "PASS"
+}

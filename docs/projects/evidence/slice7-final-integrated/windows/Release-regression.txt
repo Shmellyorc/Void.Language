@@ -1,0 +1,404 @@
+Test project C:/Users/a/VS7I2/Release
+        Start   1: project_manifest_header
+  1/150 Test   #1: project_manifest_header ...................   Passed    0.08 sec
+        Start   2: project_manifest
+  2/150 Test   #2: project_manifest ..........................   Passed    0.18 sec
+        Start   5: project_manifest_legacy
+  3/150 Test   #5: project_manifest_legacy ...................   Passed    4.98 sec
+        Start   6: project_manifest_provenance
+  4/150 Test   #6: project_manifest_provenance ...............   Passed    0.74 sec
+        Start   7: project_selection
+  5/150 Test   #7: project_selection .........................   Passed   44.74 sec
+        Start   8: project_sessions
+  6/150 Test   #8: project_sessions ..........................   Passed    3.34 sec
+        Start   9: project_creation
+  7/150 Test   #9: project_creation ..........................   Passed    0.69 sec
+        Start  10: project_creation_process
+  8/150 Test  #10: project_creation_process ..................   Passed   14.42 sec
+        Start  11: project_application
+  9/150 Test  #11: project_application .......................   Passed   26.28 sec
+        Start  12: project_application_process
+ 10/150 Test  #12: project_application_process ...............   Passed   36.80 sec
+        Start  13: project_discovery_cli
+ 11/150 Test  #13: project_discovery_cli .....................   Passed   19.83 sec
+        Start  14: project_profiles
+ 12/150 Test  #14: project_profiles ..........................   Passed    5.10 sec
+        Start  15: project_protocol
+ 13/150 Test  #15: project_protocol ..........................   Passed    3.36 sec
+        Start  16: project_nested_cli
+ 14/150 Test  #16: project_nested_cli ........................   Passed    2.21 sec
+        Start  17: cli_contract
+ 15/150 Test  #17: cli_contract ..............................   Passed   11.17 sec
+        Start  18: cli_install
+ 16/150 Test  #18: cli_install ...............................   Passed    9.77 sec
+        Start  19: cli_install_resources
+ 17/150 Test  #19: cli_install_resources .....................   Passed    1.45 sec
+        Start  20: target_triple
+ 18/150 Test  #20: target_triple .............................   Passed    0.11 sec
+        Start  21: http_native
+ 19/150 Test  #21: http_native ...............................   Passed   16.50 sec
+        Start  22: http_reload
+ 20/150 Test  #22: http_reload ...............................   Passed   66.25 sec
+        Start  26: url_native
+ 21/150 Test  #26: url_native ................................   Passed    0.33 sec
+        Start  31: http_install
+ 22/150 Test  #31: http_install ..............................   Passed  179.19 sec
+        Start  33: http_ir
+ 23/150 Test  #33: http_ir ...................................   Passed    8.30 sec
+        Start  34: http_source
+ 24/150 Test  #34: http_source ...............................   Passed  108.33 sec
+        Start  35: http_source_negative
+ 25/150 Test  #35: http_source_negative ......................   Passed    3.74 sec
+        Start  36: http_source_faults
+ 26/150 Test  #36: http_source_faults ........................   Passed   88.52 sec
+        Start  37: url_ir
+ 27/150 Test  #37: url_ir ....................................   Passed    0.33 sec
+        Start  38: url_source
+ 28/150 Test  #38: url_source ................................   Passed    6.26 sec
+        Start  41: toolchain_stop_token
+ 29/150 Test  #41: toolchain_stop_token ......................   Passed    0.14 sec
+        Start  43: stage10_operator_reload
+ 30/150 Test  #43: stage10_operator_reload ...................   Passed   50.87 sec
+        Start  45: stage10_operator_resolution
+ 31/150 Test  #45: stage10_operator_resolution ...............   Passed    2.24 sec
+        Start  48: stage10_tooling
+ 32/150 Test  #48: stage10_tooling ...........................   Passed    0.30 sec
+        Start  49: stage10_display_reload
+ 33/150 Test  #49: stage10_display_reload ....................   Passed    4.19 sec
+        Start  55: stage10_fields
+ 34/150 Test  #55: stage10_fields ............................   Passed    1.12 sec
+        Start  58: application_workflow_stage9
+ 35/150 Test  #58: application_workflow_stage9 ...............   Passed   27.79 sec
+        Start  59: native_output_paths_ci88
+ 36/150 Test  #59: native_output_paths_ci88 ..................   Passed    6.08 sec
+        Start  60: long_physical_paths_ci89
+ 37/150 Test  #60: long_physical_paths_ci89 ..................   Passed    3.21 sec
+        Start  61: gc_buffers
+ 38/150 Test  #61: gc_buffers ................................   Passed    2.33 sec
+        Start  62: gc_schemas
+ 39/150 Test  #62: gc_schemas ................................   Passed    0.44 sec
+        Start  63: arrays_foundation
+ 40/150 Test  #63: arrays_foundation .........................   Passed    0.21 sec
+        Start  64: runtime_console
+ 41/150 Test  #64: runtime_console ...........................   Passed    0.92 sec
+        Start  65: runtime_console_transfers
+ 42/150 Test  #65: runtime_console_transfers .................   Passed    0.15 sec
+        Start  66: runtime_console_keyboard
+ 43/150 Test  #66: runtime_console_keyboard ..................   Passed    0.13 sec
+        Start  67: runtime_console_terminal
+ 44/150 Test  #67: runtime_console_terminal ..................   Passed    0.14 sec
+        Start  68: runtime_console_wide
+ 45/150 Test  #68: runtime_console_wide ......................   Passed    0.88 sec
+        Start  69: runtime_console_input
+ 46/150 Test  #69: runtime_console_input .....................   Passed    0.29 sec
+        Start  70: runtime_coordination
+ 47/150 Test  #70: runtime_coordination ......................   Passed    2.20 sec
+        Start  71: runtime_generated
+ 48/150 Test  #71: runtime_generated .........................   Passed    1.36 sec
+        Start  72: fixed_arrays_source
+ 49/150 Test  #72: fixed_arrays_source .......................   Passed    4.30 sec
+        Start  73: growable_arrays_source
+ 50/150 Test  #73: growable_arrays_source ....................   Passed    3.47 sec
+        Start  74: arrays_source
+ 51/150 Test  #74: arrays_source .............................   Passed    7.19 sec
+        Start  75: generics_source
+ 52/150 Test  #75: generics_source ...........................   Passed    5.66 sec
+        Start  76: collections_source
+ 53/150 Test  #76: collections_source ........................   Passed   12.19 sec
+        Start  77: dictionaries_source
+ 54/150 Test  #77: dictionaries_source .......................   Passed    9.83 sec
+        Start  78: properties_source
+ 55/150 Test  #78: properties_source .........................   Passed    5.03 sec
+        Start  79: patterns_source
+ 56/150 Test  #79: patterns_source ...........................   Passed    6.58 sec
+        Start  83: advanced_source
+ 57/150 Test  #83: advanced_source ...........................   Passed    6.81 sec
+        Start  84: fixed_arrays_cli
+ 58/150 Test  #84: fixed_arrays_cli ..........................***Failed    0.14 sec
+CMake Error at C:/Users/a/VS7I2/src/tests/integration/fixed_arrays.cmake:57 (message):
+  main/normal/aot(0): expected 10; got no such file or directory:
+
+
+
+        Start  85: growable_arrays_cli
+ 59/150 Test  #85: growable_arrays_cli .......................***Failed    0.11 sec
+CMake Error at C:/Users/a/VS7I2/src/tests/integration/growable_arrays.cmake:44 (message):
+  main/normal/aot(0): expected 13; got no such file or directory:
+
+
+
+        Start  86: arrays_cli
+ 60/150 Test  #86: arrays_cli ................................***Failed    0.22 sec
+CMake Error at C:/Users/a/VS7I2/src/tests/integration/arrays.cmake:54 (message):
+  strings/normal/aot(0): expected 3; got no such file or directory:
+
+
+
+        Start  87: generics_cli
+ 61/150 Test  #87: generics_cli ..............................***Failed    0.15 sec
+CMake Error at C:/Users/a/VS7I2/src/tests/integration/generics.cmake:25 (message):
+  main/normal/aot(0): expected 0; got no such file or directory:
+
+
+
+        Start  88: collections_cli
+ 62/150 Test  #88: collections_cli ...........................***Failed    0.21 sec
+CMake Error at C:/Users/a/VS7I2/src/tests/integration/collections.cmake:42 (message):
+  main/normal/aot(0): expected 5; got no such file or directory:
+
+
+
+        Start  89: dictionaries_cli
+ 63/150 Test  #89: dictionaries_cli ..........................***Failed    0.24 sec
+CMake Error at C:/Users/a/VS7I2/src/tests/integration/dictionaries.cmake:39 (message):
+  main/normal/aot(0): expected 3; got no such file or directory:
+
+
+
+        Start  90: properties_cli
+ 64/150 Test  #90: properties_cli ............................***Failed    0.19 sec
+CMake Error at C:/Users/a/VS7I2/src/tests/integration/properties.cmake:34 (message):
+  main/normal/aot: expected 20, got no such file or directory:
+
+
+
+        Start  91: patterns_cli
+ 65/150 Test  #91: patterns_cli ..............................***Failed    0.17 sec
+CMake Error at C:/Users/a/VS7I2/src/tests/integration/patterns.cmake:44 (message):
+  results/normal/aot: expected 28, got no such file or directory:
+
+
+
+        Start  92: advanced_cli
+ 66/150 Test  #92: advanced_cli ..............................***Failed    0.17 sec
+CMake Error at C:/Users/a/VS7I2/src/tests/integration/advanced.cmake:17 (message):
+  closures/normal/aot: expected 17, got no such file or directory:
+
+
+
+        Start  96: managed_cli
+ 67/150 Test  #96: managed_cli ...............................***Failed    0.21 sec
+CMake Error at C:/Users/a/VS7I2/src/tests/integration/managed.cmake:35 (message):
+  Managed source main/normal/aot(-1): no such file or directory, ,
+
+
+
+        Start 100: managed_initialization_cli
+ 68/150 Test #100: managed_initialization_cli ................***Failed    0.14 sec
+CMake Error at C:/Users/a/VS7I2/src/tests/integration/managed_initialization.cmake:39 (message):
+  Constructor source main/normal/aot(-1): no such file or directory, ,
+
+
+
+        Start 104: reference_values_cli
+ 69/150 Test #104: reference_values_cli ......................***Failed    0.15 sec
+CMake Error at C:/Users/a/VS7I2/src/tests/integration/reference_values.cmake:41 (message):
+  Reference values copies/normal/aot(-1): no such file or directory, ,
+
+
+
+        Start 108: composition_cli
+ 70/150 Test #108: composition_cli ...........................***Failed    0.16 sec
+CMake Error at C:/Users/a/VS7I2/src/tests/integration/composition.cmake:29 (message):
+  Composition main/normal/aot: no such file or directory, , ; expected 100
+
+
+
+        Start 112: inheritance_cli
+ 71/150 Test #112: inheritance_cli ...........................***Failed    0.16 sec
+CMake Error at C:/Users/a/VS7I2/src/tests/integration/inheritance.cmake:43 (message):
+  Inheritance main/normal/aot: no such file or directory, , ; expected 97
+
+
+
+        Start 116: interfaces_cli
+ 72/150 Test #116: interfaces_cli ............................***Failed    0.16 sec
+CMake Error at C:/Users/a/VS7I2/src/tests/integration/interfaces.cmake:31 (message):
+  Interface main/normal/aot: no such file or directory, , ; expected 6
+
+
+
+        Start 120: strings_cli
+ 73/150 Test #120: strings_cli ...............................***Failed    0.16 sec
+CMake Error at C:/Users/a/VS7I2/src/tests/integration/strings.cmake:25 (message):
+  String main/normal/aot: no such file or directory, , ; expected 0
+
+
+
+        Start 121: runtime_callbacks
+ 74/150 Test #121: runtime_callbacks .........................   Passed    1.05 sec
+        Start 122: runtime_failures
+ 75/150 Test #122: runtime_failures ..........................   Passed    0.12 sec
+        Start 123: runtime_aot_normal
+ 76/150 Test #123: runtime_aot_normal ........................   Passed    0.37 sec
+        Start 124: runtime_aot_optimized
+ 77/150 Test #124: runtime_aot_optimized .....................   Passed    0.35 sec
+        Start 125: runtime_invariants
+ 78/150 Test #125: runtime_invariants ........................   Passed    0.48 sec
+        Start 126: lsp_positions
+ 79/150 Test #126: lsp_positions .............................   Passed    0.09 sec
+        Start 127: lsp_protocol
+ 80/150 Test #127: lsp_protocol ..............................   Passed    5.44 sec
+        Start 128: lsp_stage11_globals
+ 81/150 Test #128: lsp_stage11_globals .......................   Passed    1.36 sec
+        Start 129: lsp_stage8
+ 82/150 Test #129: lsp_stage8 ................................   Passed    6.30 sec
+        Start 130: documentation_execution
+ 83/150 Test #130: documentation_execution ...................   Passed    5.60 sec
+        Start 145: os_errors
+ 84/150 Test #145: os_errors .................................   Passed   15.47 sec
+        Start 146: os_frontend
+ 85/150 Test #146: os_frontend ...............................   Passed   26.62 sec
+        Start 163: binary_ownership
+ 86/150 Test #163: binary_ownership ..........................   Passed    1.06 sec
+        Start 218: stage10_operator_integration
+ 87/150 Test #218: stage10_operator_integration ..............   Passed   35.98 sec
+        Start 219: ffi_g1_primitive_jit_ir
+ 88/150 Test #219: ffi_g1_primitive_jit_ir ...................   Passed    3.02 sec
+        Start 220: ffi_g1_primitive_aot_normal
+ 89/150 Test #220: ffi_g1_primitive_aot_normal ...............   Passed    0.84 sec
+        Start 221: ffi_g1_primitive_aot_optimized
+ 90/150 Test #221: ffi_g1_primitive_aot_optimized ............   Passed    0.85 sec
+        Start 222: ffi_g1_primitive_aot_mismatch
+ 91/150 Test #222: ffi_g1_primitive_aot_mismatch .............   Passed    0.72 sec
+        Start 223: ffi_g1_primitive_aot_missing
+ 92/150 Test #223: ffi_g1_primitive_aot_missing ..............   Passed    3.67 sec
+        Start 224: ffi_g2_jit_ir
+ 93/150 Test #224: ffi_g2_jit_ir .............................   Passed    2.31 sec
+        Start 225: ffi_g2_aot_normal
+ 94/150 Test #225: ffi_g2_aot_normal .........................   Passed    0.93 sec
+        Start 226: ffi_g2_aot_optimized
+ 95/150 Test #226: ffi_g2_aot_optimized ......................   Passed    0.96 sec
+        Start 227: ffi_g3_jit_ir
+ 96/150 Test #227: ffi_g3_jit_ir .............................   Passed    2.88 sec
+        Start 228: ffi_g3_aot_normal
+ 97/150 Test #228: ffi_g3_aot_normal .........................   Passed    0.88 sec
+        Start 229: ffi_g3_aot_optimized
+ 98/150 Test #229: ffi_g3_aot_optimized ......................   Passed    0.95 sec
+        Start 230: native_source
+ 99/150 Test #230: native_source .............................   Passed    6.96 sec
+        Start 231: stage6_integrated
+100/150 Test #231: stage6_integrated .........................   Passed   10.09 sec
+        Start 233: native_aot_main_normal
+101/150 Test #233: native_aot_main_normal ....................   Passed    0.95 sec
+        Start 234: native_aot_main_optimized
+102/150 Test #234: native_aot_main_optimized .................   Passed    1.19 sec
+        Start 241: native_aot_cleanup_failure_normal
+103/150 Test #241: native_aot_cleanup_failure_normal .........   Passed    1.10 sec
+        Start 242: native_aot_cleanup_failure_optimized
+104/150 Test #242: native_aot_cleanup_failure_optimized ......   Passed    0.82 sec
+        Start 243: native_aot_integrated_normal
+105/150 Test #243: native_aot_integrated_normal ..............   Passed    0.78 sec
+        Start 244: native_aot_integrated_optimized
+106/150 Test #244: native_aot_integrated_optimized ...........   Passed    0.75 sec
+        Start 245: native_aot_integrated_cancel_normal
+107/150 Test #245: native_aot_integrated_cancel_normal .......   Passed    0.63 sec
+        Start 246: native_aot_integrated_cancel_optimized
+108/150 Test #246: native_aot_integrated_cancel_optimized ....   Passed    0.67 sec
+        Start 247: native_aot_integrated_failure_normal
+109/150 Test #247: native_aot_integrated_failure_normal ......   Passed    0.72 sec
+        Start 248: native_aot_integrated_failure_optimized
+110/150 Test #248: native_aot_integrated_failure_optimized ...   Passed    1.06 sec
+        Start 272: io_native_jobs
+111/150 Test #272: io_native_jobs ............................   Passed    0.17 sec
+        Start 273: native_workers
+112/150 Test #273: native_workers ............................   Passed    0.15 sec
+        Start 279: async_source
+113/150 Test #279: async_source ..............................   Passed   12.80 sec
+        Start 280: async_syntax_source
+114/150 Test #280: async_syntax_source .......................   Passed    6.43 sec
+        Start 281: async_ir
+115/150 Test #281: async_ir ..................................   Passed    0.12 sec
+        Start 282: async_parallel
+116/150 Test #282: async_parallel ............................   Passed    2.97 sec
+        Start 283: async_lifecycle
+117/150 Test #283: async_lifecycle ...........................   Passed    3.99 sec
+        Start 329: core
+118/150 Test #329: core ......................................   Passed    0.27 sec
+        Start 330: jit
+119/150 Test #330: jit .......................................   Passed    0.38 sec
+        Start 331: reload
+120/150 Test #331: reload ....................................   Passed    1.20 sec
+        Start 332: gc
+121/150 Test #332: gc ........................................   Passed    0.14 sec
+        Start 333: native
+122/150 Test #333: native ....................................   Passed    0.09 sec
+        Start 334: sessions_demo
+123/150 Test #334: sessions_demo .............................   Passed    0.26 sec
+        Start 335: tooling_demo
+124/150 Test #335: tooling_demo ..............................   Passed    0.24 sec
+        Start 336: sessions
+125/150 Test #336: sessions ..................................   Passed    0.40 sec
+        Start 337: tooling
+126/150 Test #337: tooling ...................................   Passed    1.43 sec
+        Start 338: analysis
+127/150 Test #338: analysis ..................................   Passed    3.67 sec
+        Start 339: numeric
+128/150 Test #339: numeric ...................................   Passed    4.60 sec
+        Start 340: numeric_enum_ir
+129/150 Test #340: numeric_enum_ir ...........................   Passed    1.06 sec
+        Start 341: numeric_enum_process
+130/150 Test #341: numeric_enum_process ......................   Passed   17.43 sec
+        Start 342: numeric_enum_lsp
+131/150 Test #342: numeric_enum_lsp ..........................   Passed    0.95 sec
+        Start 343: frontend
+132/150 Test #343: frontend ..................................   Passed    9.53 sec
+        Start 344: modules
+133/150 Test #344: modules ...................................   Passed    2.38 sec
+        Start 345: ffi_g4_conventional
+134/150 Test #345: ffi_g4_conventional .......................   Passed   23.31 sec
+        Start 346: ffi_g5_callbacks
+135/150 Test #346: ffi_g5_callbacks ..........................   Passed   21.50 sec
+        Start 347: numeric_sprint2
+136/150 Test #347: numeric_sprint2 ...........................   Passed   12.92 sec
+        Start 355: stage10_fields_aot
+137/150 Test #355: stage10_fields_aot ........................   Passed    5.02 sec
+        Start 362: lsp_sprint6
+138/150 Test #362: lsp_sprint6 ...............................   Passed    8.36 sec
+        Start 367: local_libraries
+139/150 Test #367: local_libraries ...........................   Passed    5.62 sec
+        Start 368: lsp_sprint4
+140/150 Test #368: lsp_sprint4 ...............................   Passed    1.62 sec
+        Start 372: lsp_sprint3
+141/150 Test #372: lsp_sprint3 ...............................   Passed    2.82 sec
+        Start 373: lsp_sprint2
+142/150 Test #373: lsp_sprint2 ...............................   Passed    2.47 sec
+        Start 374: aot
+143/150 Test #374: aot .......................................   Passed    2.05 sec
+        Start 375: source_cli
+144/150 Test #375: source_cli ................................   Passed   49.03 sec
+        Start 376: value_structs_cli
+145/150 Test #376: value_structs_cli .........................   Passed    6.36 sec
+        Start 377: receiver_methods_cli
+146/150 Test #377: receiver_methods_cli ......................   Passed   12.88 sec
+        Start 378: initialization_cli
+147/150 Test #378: initialization_cli ........................   Passed   14.34 sec
+        Start 379: modules_cli
+148/150 Test #379: modules_cli ...............................   Passed   39.67 sec
+        Start 380: analysis_cli
+149/150 Test #380: analysis_cli ..............................   Passed    3.53 sec
+        Start 381: numeric_cli
+150/150 Test #381: numeric_cli ...............................   Passed   96.33 sec
+
+89% tests passed, 16 tests failed out of 150
+
+Total Test time (real) = 1361.93 sec
+
+The following tests FAILED:
+	 84 - fixed_arrays_cli (Failed)
+	 85 - growable_arrays_cli (Failed)
+	 86 - arrays_cli (Failed)
+	 87 - generics_cli (Failed)
+	 88 - collections_cli (Failed)
+	 89 - dictionaries_cli (Failed)
+	 90 - properties_cli (Failed)
+	 91 - patterns_cli (Failed)
+	 92 - advanced_cli (Failed)
+	 96 - managed_cli (Failed)
+	100 - managed_initialization_cli (Failed)
+	104 - reference_values_cli (Failed)
+	108 - composition_cli (Failed)
+	112 - inheritance_cli (Failed)
+	116 - interfaces_cli (Failed)
+	120 - strings_cli (Failed)
+Errors while running CTest

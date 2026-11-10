@@ -1,0 +1,904 @@
+Start testing: Nov 08 20:42 MST
+----------------------------------------------------------
+285/444 Testing: ffi_g1_primitive_jit_ir
+285/444 Test: ffi_g1_primitive_jit_ir
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g1_tests" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/primitives.descriptor" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/primitives.void" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g1/tests"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"ffi_g1_primitive_jit_ir" start time: Nov 08 20:42 MST
+Output:
+----------------------------------------------------------
+void-c-primitive 2 1: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+void-c-primitive 1 2: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+call vectorcall: C primitive descriptor line 8: unsupported descriptor, ABI revision or effects
+effects direct-sync blocking no-callbacks: C primitive descriptor line 7: unsupported descriptor, ABI revision or effects
+c_size:i64: C primitive descriptor line 9: unsupported descriptor, ABI revision or effects
+c_bool:u8: C primitive descriptor line 9: unsupported descriptor, ABI revision or effects
+bind signed8 g1_signed8 i8 ptr: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 record: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 void: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 u8: C primitive provider rejected the exact descriptor or fixture identity
+bind signed8 g1_missing i8 i8: C primitive provider rejected the exact descriptor or fixture identity
+bind signed16 g1_signed8 i8 i8: C primitive descriptor line 11: invalid or duplicate binding name or export
+bind signed8 g1_signed16 i8 i8: C primitive descriptor line 11: invalid or duplicate binding name or export
+extra signed8 g1_signed8 i8 i8: C primitive descriptor line 10: expected a bounded primitive binding record
+provider org.voidlang.forged: C primitive provider rejected the exact descriptor or fixture identity
+source /other.void: C primitive provider rejected the exact descriptor or fixture identity
+source /../other.void: C primitive descriptor line 4: expected a canonical single-file VFS identity
+target aarch64-: C primitive descriptor line 3: unsupported target/profile combination
+artifact identity: C primitive provider rejected the exact descriptor or fixture identity
+descriptor bounds: C primitive descriptor line 1: descriptor size outside 1..16384 bytes
+unavailable fixture: C primitive provider transport is unavailable
+missing independent admission: VOID IR: C primitive call outside the admitted binding module
+wrong provider: VOID IR: invalid C primitive descriptor or exact call signature
+wrong export: VOID IR: invalid C primitive descriptor or exact call signature
+wrong ordinal: VOID IR: invalid C primitive descriptor or exact call signature
+negative ordinal: VOID IR: C primitive call outside the admitted binding module
+missing operand: VOID IR: invalid C primitive descriptor or exact call signature
+extra operand: VOID IR: invalid C primitive descriptor or exact call signature
+argument signedness: VOID IR: invalid C primitive descriptor or exact call signature
+argument width: VOID IR: invalid C primitive descriptor or exact call signature
+return signedness: VOID IR: invalid C primitive descriptor or exact call signature
+return count: VOID IR: invalid C primitive descriptor or exact call signature
+aggregate result: VOID IR: invalid C primitive descriptor or exact call signature
+pointer-like result: VOID IR: invalid C primitive descriptor or exact call signature
+nondefault ABI operand: VOID IR: invalid C primitive descriptor or exact call signature
+receiver: VOID IR: invalid C primitive descriptor or exact call signature
+unadmitted scope: VOID IR: C primitive binding requires the admitted direct import
+unadmitted body: VOID IR: C primitive call outside the admitted binding module
+plain import bypass: VOID IR: C primitive transport requires host admission and typed operations
+first class binding: VOID IR: C primitive binding is direct-call only
+async activation: VOID IR: C primitive graphs require synchronous execution
+runtime-free bypass: VOID IR: invalid C primitive module admission
+ORC untrusted symbol bypass: C primitive transport requires per-generation admission
+JIT normal returned 73; direct C oracle agreed; long=64 bits
+JIT O2 returned 73; direct C oracle agreed; long=64 bits
+<end of output>
+Test time =   0.92 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g1_primitive_jit_ir" end time: Nov 08 20:42 MST
+"ffi_g1_primitive_jit_ir" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/444 Testing: project_application_process
+13/444 Test: project_application_process
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/project/application.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/project-application-evidence.json"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"project_application_process" start time: Nov 08 20:42 MST
+Output:
+----------------------------------------------------------
+project_application_process: 61 checks passed
+<end of output>
+Test time =  51.89 sec
+----------------------------------------------------------
+Test Passed.
+"project_application_process" end time: Nov 08 20:43 MST
+"project_application_process" time elapsed: 00:00:51
+----------------------------------------------------------
+
+12/444 Testing: project_application
+12/444 Test: project_application
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_project_application"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"project_application" start time: Nov 08 20:42 MST
+Output:
+----------------------------------------------------------
+Application cache: miss/hit
+project_application: 63 checks passed
+<end of output>
+Test time =  58.92 sec
+----------------------------------------------------------
+Test Passed.
+"project_application" end time: Nov 08 20:43 MST
+"project_application" time elapsed: 00:00:58
+----------------------------------------------------------
+
+405/444 Testing: numeric_enum_process
+405/444 Test: numeric_enum_process
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/numeric/enums.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/numeric-enum-process.json"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"numeric_enum_process" start time: Nov 08 20:43 MST
+Output:
+----------------------------------------------------------
+S6 542 boundary pairs, 39 invalid sources and 62 executed processes
+<end of output>
+Test time =  19.48 sec
+----------------------------------------------------------
+Test Passed.
+"numeric_enum_process" end time: Nov 08 20:43 MST
+"numeric_enum_process" time elapsed: 00:00:19
+----------------------------------------------------------
+
+8/444 Testing: project_selection
+8/444 Test: project_selection
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_project_selection"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"project_selection" start time: Nov 08 20:43 MST
+Output:
+----------------------------------------------------------
+project_selection: 476 checks passed
+<end of output>
+Test time =  31.20 sec
+----------------------------------------------------------
+Test Passed.
+"project_selection" end time: Nov 08 20:43 MST
+"project_selection" time elapsed: 00:00:31
+----------------------------------------------------------
+
+11/444 Testing: project_creation_process
+11/444 Test: project_creation_process
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/project/creation.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/project-creation-evidence.json"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"project_creation_process" start time: Nov 08 20:43 MST
+Output:
+----------------------------------------------------------
+S5 creation process: 64 invocations passed
+<end of output>
+Test time =  12.68 sec
+----------------------------------------------------------
+Test Passed.
+"project_creation_process" end time: Nov 08 20:43 MST
+"project_creation_process" time elapsed: 00:00:12
+----------------------------------------------------------
+
+292/444 Testing: stage6_cache_processes
+292/444 Test: stage6_cache_processes
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/native/processes.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_native_tests" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"stage6_cache_processes" start time: Nov 08 20:43 MST
+Output:
+----------------------------------------------------------
+Integrated fresh-process cold/hit/corrupt fallback (or safe bypass): passed
+Integrated fresh-process cold/hit/corrupt fallback (or safe bypass): passed
+<end of output>
+Test time =  12.18 sec
+----------------------------------------------------------
+Test Passed.
+"stage6_cache_processes" end time: Nov 08 20:43 MST
+"stage6_cache_processes" time elapsed: 00:00:12
+----------------------------------------------------------
+
+291/444 Testing: stage6_integrated
+291/444 Test: stage6_integrated
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_native_tests" "--integrated" "/home/shmellyorc/Documents/Void.Language" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/stage6 integrated fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"stage6_integrated" start time: Nov 08 20:43 MST
+Output:
+----------------------------------------------------------
+combined cached old root=1; old roots at barrier=14; retired generations=1; post-drain objects=0
+combined cached old root=1; old roots at barrier=14; retired generations=1; post-drain objects=0
+<end of output>
+Test time =   8.21 sec
+----------------------------------------------------------
+Test Passed.
+"stage6_integrated" end time: Nov 08 20:43 MST
+"stage6_integrated" time elapsed: 00:00:08
+----------------------------------------------------------
+
+14/444 Testing: project_discovery_cli
+14/444 Test: project_discovery_cli
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/project/discovery.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/project-discovery-evidence.json"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"project_discovery_cli" start time: Nov 08 20:43 MST
+Output:
+----------------------------------------------------------
+project_discovery_cli: 88 process checks passed
+<end of output>
+Test time =  12.24 sec
+----------------------------------------------------------
+Test Passed.
+"project_discovery_cli" end time: Nov 08 20:43 MST
+"project_discovery_cli" time elapsed: 00:00:12
+----------------------------------------------------------
+
+290/444 Testing: native_source
+290/444 Test: native_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_native_tests" "/home/shmellyorc/Documents/Void.Language" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/native fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"native_source" start time: Nov 08 20:43 MST
+Output:
+----------------------------------------------------------
+native source passed
+<end of output>
+Test time =   6.05 sec
+----------------------------------------------------------
+Test Passed.
+"native_source" end time: Nov 08 20:44 MST
+"native_source" time elapsed: 00:00:06
+----------------------------------------------------------
+
+111/444 Testing: fixed_arrays_source
+111/444 Test: fixed_arrays_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_fixed_arrays_tests" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"fixed_arrays_source" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+source array normal: 158 failing allocation budgets, recovery and cleanup passed
+source array O2: 158 failing allocation budgets, recovery and cleanup passed
+Numeric fixed arrays: source execution, roots, publication and failure recovery passed
+<end of output>
+Test time =   3.72 sec
+----------------------------------------------------------
+Test Passed.
+"fixed_arrays_source" end time: Nov 08 20:44 MST
+"fixed_arrays_source" time elapsed: 00:00:03
+----------------------------------------------------------
+
+444/444 Testing: numeric_cli
+444/444 Test: numeric_cli
+Command: "/usr/bin/cmake" "-DLINKER=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld" "-DCOMPILER=/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc" "-DCLANG=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang" "-DWINDOWS=" "-DROOT=/home/shmellyorc/Documents/Void.Language" "-DOUTPUT=/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/numeric native programs" "-DEXE_SUFFIX=" "-P" "/home/shmellyorc/Documents/Void.Language/tests/integration/numeric.cmake"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"numeric_cli" start time: Nov 08 20:43 MST
+Output:
+----------------------------------------------------------
+-- Numeric source constants, JIT and native AOT passed in both optimization modes
+<end of output>
+Test time =  29.86 sec
+----------------------------------------------------------
+Test Passed.
+"numeric_cli" end time: Nov 08 20:44 MST
+"numeric_cli" time elapsed: 00:00:29
+----------------------------------------------------------
+
+407/444 Testing: frontend
+407/444 Test: frontend
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_tests" "frontend" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"frontend" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+Frontend begin: diagnostics
+50+ source diagnostic cases and UTF-8/ABI checks passed
+Frontend passed: diagnostics
+Frontend begin: programs
+Real .void files and independent programs executed through normal/O2 JIT
+Frontend passed: programs
+Frontend begin: numeric values
+1216 constant/normal/O2 numeric matrix comparisons passed
+Readonly/compile-time constants, numeric boundaries, concurrent failures, bounded traces and restart checks passed
+Frontend passed: numeric values
+Frontend begin: diagnostic recovery/resource limits
+Frontend resource case: combined expression/constant depth
+Structured diagnostics: independent files, recovery, bounded cascades, snapshots and failed reload verified
+Frontend passed: diagnostic recovery/resource limits
+Frontend begin: value structs
+Frontend resource case: bounded expanded value layouts
+Value struct source: nested/mixed layouts, copies, normal/O2 JIT, diagnostics, tooling and reload passed
+Frontend passed: value structs
+Frontend begin: receiver methods
+Frontend resource case: bounded receiver-chain semantics
+Receiver methods: actual storage, copies, imports, source order, effects, cycles, diagnostics, tooling and reload passed
+Frontend passed: receiver methods
+Frontend begin: initialization
+Initialization project main optimized=0
+Initialization project main optimized=1
+Initialization project order optimized=0
+Initialization project order optimized=1
+Initialization project required optimized=0
+Initialization project required optimized=1
+Initialization project numeric optimized=0
+Initialization project numeric optimized=1
+Initialization project failure optimized=0
+Initialization project failure optimized=1
+Initialization project copies optimized=0
+Initialization project copies optimized=1
+Initialization begin: layout retirement
+Initialization layout generation 0 fields=1
+Initialization layout generation 1 fields=8
+Initialization layout generation 2 fields=15
+Initialization layout generation 3 fields=5
+Initialization layout generation 4 fields=12
+Initialization layout generation 5 fields=2
+Initialization layout generation 6 fields=9
+Initialization layout generation 7 fields=16
+Initialization layout generation 8 fields=6
+Initialization layout generation 9 fields=13
+Initialization layout generation 10 fields=3
+Initialization layout generation 11 fields=10
+Initialization layout generation 12 fields=17
+Initialization layout generation 13 fields=7
+Initialization layout generation 14 fields=14
+Initialization layout generation 15 fields=4
+Initialization layout generation 16 fields=11
+Initialization layout generation 17 fields=1
+Initialization layout generation 18 fields=8
+Initialization layout generation 19 fields=15
+Initialization layout generation 20 fields=5
+Initialization layout generation 21 fields=12
+Initialization layout generation 22 fields=2
+Initialization layout generation 23 fields=9
+Initialization layout generation 24 fields=16
+Initialization layout generation 25 fields=6
+Initialization layout generation 26 fields=13
+Initialization layout generation 27 fields=3
+Initialization layout generation 28 fields=10
+Initialization layout generation 29 fields=17
+Initialization layout generation 30 fields=7
+Initialization layout generation 31 fields=14
+Initialization layout generation 32 fields=4
+Initialization layout generation 33 fields=11
+Initialization layout generation 34 fields=1
+Initialization layout generation 35 fields=8
+Initialization layout generation 36 fields=15
+Initialization layout generation 37 fields=5
+Initialization layout generation 38 fields=12
+Initialization layout generation 39 fields=2
+Initialization layout generation 40 fields=9
+Initialization layout generation 41 fields=16
+Initialization layout generation 42 fields=6
+Initialization layout generation 43 fields=13
+Initialization layout generation 44 fields=3
+Initialization layout generation 45 fields=10
+Initialization layout generation 46 fields=17
+Initialization layout generation 47 fields=7
+Initialization layout generation 48 fields=14
+Initialization layout generation 49 fields=4
+Initialization layout generation 50 fields=11
+Initialization layout generation 51 fields=1
+Initialization layout generation 52 fields=8
+Initialization layout generation 53 fields=15
+Initialization layout generation 54 fields=5
+Initialization layout generation 55 fields=12
+Initialization layout generation 56 fields=2
+Initialization layout generation 57 fields=9
+Initialization layout generation 58 fields=16
+Initialization layout generation 59 fields=6
+Initialization layout generation 60 fields=13
+Initialization layout generation 61 fields=3
+Initialization layout generation 62 fields=10
+Initialization layout generation 63 fields=17
+Initialization nested layout generation 0 padding=i8
+Initialization nested layout generation 1 padding=i64
+Initialization nested layout generation 2 padding=i8
+Initialization nested layout generation 3 padding=i64
+Initialization nested layout generation 4 padding=i8
+Initialization nested layout generation 5 padding=i64
+Initialization nested layout generation 6 padding=i8
+Initialization nested layout generation 7 padding=i64
+Initialization nested layout generation 8 padding=i8
+Initialization nested layout generation 9 padding=i64
+Initialization nested layout generation 10 padding=i8
+Initialization nested layout generation 11 padding=i64
+Initialization nested layout generation 12 padding=i8
+Initialization nested layout generation 13 padding=i64
+Initialization nested layout generation 14 padding=i8
+Initialization nested layout generation 15 padding=i64
+80 aggregate layout generations retired through normal/O2 JIT
+Initialization: parameters/defaults, recursive values, order, copies, lifecycle diagnostics, visibility, tooling, failure and reload passed
+Frontend passed: initialization
+frontend: passed
+<end of output>
+Test time =  11.50 sec
+----------------------------------------------------------
+Test Passed.
+"frontend" end time: Nov 08 20:44 MST
+"frontend" time elapsed: 00:00:11
+----------------------------------------------------------
+
+15/444 Testing: project_profiles
+15/444 Test: project_profiles
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/project/profiles.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/llvm-objdump" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/project-profiles-evidence.json"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"project_profiles" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+project_profiles: 43 process checks passed; compute instruction counts O0=6, O2=2, release --no-opt=6
+<end of output>
+Test time =   2.08 sec
+----------------------------------------------------------
+Test Passed.
+"project_profiles" end time: Nov 08 20:44 MST
+"project_profiles" time elapsed: 00:00:02
+----------------------------------------------------------
+
+6/444 Testing: project_manifest_legacy
+6/444 Test: project_manifest_legacy
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/project/legacy.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"project_manifest_legacy" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+project_manifest_legacy: 18 checks passed
+<end of output>
+Test time =   5.28 sec
+----------------------------------------------------------
+Test Passed.
+"project_manifest_legacy" end time: Nov 08 20:44 MST
+"project_manifest_legacy" time elapsed: 00:00:05
+----------------------------------------------------------
+
+9/444 Testing: project_sessions
+9/444 Test: project_sessions
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_project_sessions"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"project_sessions" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+project_sessions: 166 checks passed
+<end of output>
+Test time =   0.96 sec
+----------------------------------------------------------
+Test Passed.
+"project_sessions" end time: Nov 08 20:44 MST
+"project_sessions" time elapsed: 00:00:00
+----------------------------------------------------------
+
+16/444 Testing: project_protocol
+16/444 Test: project_protocol
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/project/protocol.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/project-protocol-evidence.json"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"project_protocol" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+project_protocol: 169 checks passed
+<end of output>
+Test time =   1.06 sec
+----------------------------------------------------------
+Test Passed.
+"project_protocol" end time: Nov 08 20:44 MST
+"project_protocol" time elapsed: 00:00:01
+----------------------------------------------------------
+
+403/444 Testing: numeric
+403/444 Test: numeric
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_tests" "numeric" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"numeric" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+210 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed
+numeric: passed
+<end of output>
+Test time =   5.54 sec
+----------------------------------------------------------
+Test Passed.
+"numeric" end time: Nov 08 20:44 MST
+"numeric" time elapsed: 00:00:05
+----------------------------------------------------------
+
+289/444 Testing: ffi_g1_primitive_aot_missing
+289/444 Test: ffi_g1_primitive_aot_missing
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/ffi/missing.py" "/usr/bin/cmake" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug" "Debug"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"ffi_g1_primitive_aot_missing" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+[ 62%] Built target libcurl_static
+[ 68%] Built target void_native_fixture
+[ 68%] Built target void_format_objects
+[ 68%] Built target void_zone_objects
+[ 68%] Built target void_application_objects
+[ 81%] Built target void_runtime
+[ 87%] Built target void_core
+[ 87%] Built target void_llvm
+[ 87%] Built target voidc_objects
+[ 93%] Built target void_cache_identity
+[ 93%] Built target void_g1_fixture
+[ 93%] Built target void_g1_thunk
+[ 93%] Built target void_g1_tests
+[ 93%] Linking CXX executable void_g1_aot_missing
+ld.lld: error: undefined symbol: vd_c_primitive_dispatch_v1
+>>> referenced by native_primitives.void>:2 (<host binding /native_primitives.void>:2)
+>>>               ffi-g1/application-optimized.o:(__vd_2f6e61746976655f7072696d6974697665732e766f69643a3a7369676e656438__void)
+>>> referenced by native_primitives.void>:4 (<host binding /native_primitives.void>:4)
+>>>               ffi-g1/application-optimized.o:(__vd_2f6e61746976655f7072696d6974697665732e766f69643a3a7369676e65643136__void)
+>>> referenced by native_primitives.void>:6 (<host binding /native_primitives.void>:6)
+>>>               ffi-g1/application-optimized.o:(__vd_2f6e61746976655f7072696d6974697665732e766f69643a3a7369676e65643332__void)
+>>> referenced 16 more times
+clang++: error: linker command failed with exit code 1 (use -v to see invocation)
+gmake[3]: *** [CMakeFiles/void_g1_aot_missing.dir/build.make:122: void_g1_aot_missing] Error 1
+gmake[2]: *** [CMakeFiles/Makefile2:19821: CMakeFiles/void_g1_aot_missing.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:19828: CMakeFiles/void_g1_aot_missing.dir/rule] Error 2
+gmake: *** [Makefile:6849: void_g1_aot_missing] Error 2
+<end of output>
+Test time =   0.88 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g1_primitive_aot_missing" end time: Nov 08 20:44 MST
+"ffi_g1_primitive_aot_missing" time elapsed: 00:00:00
+----------------------------------------------------------
+
+56/444 Testing: stage10_fields
+56/444 Test: stage10_fields
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_stage10_fields"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"stage10_fields" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+54 field policy checks passed
+<end of output>
+Test time =   0.41 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_fields" end time: Nov 08 20:44 MST
+"stage10_fields" time elapsed: 00:00:00
+----------------------------------------------------------
+
+404/444 Testing: numeric_enum_ir
+404/444 Test: numeric_enum_ir
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_numeric_enum_ir"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"numeric_enum_ir" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+enum: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+enum initialized: accepted
+field: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+field initialized: accepted
+array: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+array initialized: accepted
+field-array: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+field-array initialized: accepted
+array-field: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+array-field initialized: accepted
+nested: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+nested initialized: accepted
+managed: rejected (VOID IR: non-nullable reference storage read before initialization in /enum-storage.void::probe)
+managed initialized: accepted
+zero-backed holder: rejected (VOID IR: nominal source objects require complete construction)
+zero-backed legacy_scalar: rejected (VOID IR: numeric enum fields require complete managed construction)
+zero-backed legacy_array: rejected (VOID IR: numeric enum fields require complete managed construction)
+managed missing field: rejected (VOID IR: invalid complete managed construction)
+managed partial buffer: rejected (VOID IR: incomplete numeric enum array escapes private construction)
+read allocated array before initialization: rejected (VOID IR: incomplete numeric enum array escapes private construction)
+partial buffer through private home: rejected (VOID IR: incomplete numeric enum array escapes private construction)
+partial buffer through ordinary store: rejected (VOID IR: incomplete numeric enum array escapes private construction)
+forged completion of ordinary value: rejected (VOID IR: invalid numeric enum array completion)
+complete private buffer published and projected: accepted
+private home absent on one predecessor: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+legacy array initialization of a finished value: rejected (VOID IR: invalid array element initialization)
+early completion: rejected at the live-prefix guard in normal and O2 JIT
+incomplete managed initializer: rejected (VOID IR: uninitialized construction field at call/exit/commit in /enum-storage.void::holder::method::init)
+complete managed initializer: accepted
+join missing true write: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+join missing false write: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+join with both writes: accepted
+unwind before explicit write: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+cleanup terminal return load: accepted
+unset option: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+constructed None: accepted
+unchecked inactive payload: rejected (VOID IR: sum payload requires checked access)
+storage audit: 24 negative, 12 positive, 0 mismatches
+numeric enum IR rejection, normal/O2 GC and reload passed
+<end of output>
+Test time =   0.89 sec
+----------------------------------------------------------
+Test Passed.
+"numeric_enum_ir" end time: Nov 08 20:44 MST
+"numeric_enum_ir" time elapsed: 00:00:00
+----------------------------------------------------------
+
+17/444 Testing: project_nested_cli
+17/444 Test: project_nested_cli
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/project/nested.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/project-nested-evidence.json"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"project_nested_cli" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+project_nested_cli: 11 process checks passed
+<end of output>
+Test time =   0.70 sec
+----------------------------------------------------------
+Test Passed.
+"project_nested_cli" end time: Nov 08 20:44 MST
+"project_nested_cli" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/444 Testing: project_manifest
+2/444 Test: project_manifest
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_project_manifest"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"project_manifest" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+project_manifest: 8787 checks passed
+<end of output>
+Test time =   0.67 sec
+----------------------------------------------------------
+Test Passed.
+"project_manifest" end time: Nov 08 20:44 MST
+"project_manifest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+395/444 Testing: reload
+395/444 Test: reload
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_tests" "reload"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"reload" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+reload: passed
+<end of output>
+Test time =   0.48 sec
+----------------------------------------------------------
+Test Passed.
+"reload" end time: Nov 08 20:44 MST
+"reload" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/444 Testing: project_manifest_no_authority
+5/444 Test: project_manifest_no_authority
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/project/authority.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_project_manifest"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"project_manifest_no_authority" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+project_manifest: 8788 checks passed under syscall denial
+project_manifest_no_authority: four live SIGSYS controls passed
+<end of output>
+Test time =   0.69 sec
+----------------------------------------------------------
+Test Passed.
+"project_manifest_no_authority" end time: Nov 08 20:44 MST
+"project_manifest_no_authority" time elapsed: 00:00:00
+----------------------------------------------------------
+
+402/444 Testing: analysis
+402/444 Test: analysis
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_tests" "analysis" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/analysis fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"analysis" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+normal: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 213292
+O2: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 418522
+analysis: passed
+<end of output>
+Test time =   0.83 sec
+----------------------------------------------------------
+Test Passed.
+"analysis" end time: Nov 08 20:44 MST
+"analysis" time elapsed: 00:00:00
+----------------------------------------------------------
+
+406/444 Testing: numeric_enum_lsp
+406/444 Test: numeric_enum_lsp
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/numeric/enums_lsp.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/numeric-enum-lsp.json"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"numeric_enum_lsp" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+S6 LSP passed 15 recorded requests and overlay revisions
+<end of output>
+Test time =   0.12 sec
+----------------------------------------------------------
+Test Passed.
+"numeric_enum_lsp" end time: Nov 08 20:44 MST
+"numeric_enum_lsp" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/444 Testing: project_creation
+10/444 Test: project_creation
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_project_creation"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"project_creation" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+creation: entropy, reviewed directory, external collision, rollback ownership, staged content passed
+<end of output>
+Test time =   0.16 sec
+----------------------------------------------------------
+Test Passed.
+"project_creation" end time: Nov 08 20:44 MST
+"project_creation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+400/444 Testing: sessions
+400/444 Test: sessions
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_tests" "sessions" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/session fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"sessions" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+sessions: passed
+<end of output>
+Test time =   0.23 sec
+----------------------------------------------------------
+Test Passed.
+"sessions" end time: Nov 08 20:44 MST
+"sessions" time elapsed: 00:00:00
+----------------------------------------------------------
+
+396/444 Testing: gc
+396/444 Test: gc
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_tests" "gc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"gc" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+gc: passed
+<end of output>
+Test time =   0.10 sec
+----------------------------------------------------------
+Test Passed.
+"gc" end time: Nov 08 20:44 MST
+"gc" time elapsed: 00:00:00
+----------------------------------------------------------
+
+295/444 Testing: native_aot_terminated_nul_normal
+295/444 Test: native_aot_terminated_nul_normal
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_native_aot_terminated_nul_normal" "failure:native text cannot contain NUL"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"native_aot_terminated_nul_normal" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"native_aot_terminated_nul_normal" end time: Nov 08 20:44 MST
+"native_aot_terminated_nul_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+294/444 Testing: native_aot_main_optimized
+294/444 Test: native_aot_main_optimized
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_native_aot_main_optimized" "19"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"native_aot_main_optimized" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"native_aot_main_optimized" end time: Nov 08 20:44 MST
+"native_aot_main_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+298/444 Testing: native_aot_closed_optimized
+298/444 Test: native_aot_closed_optimized
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_native_aot_closed_optimized" "failure:Native resource is closed or invalid"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"native_aot_closed_optimized" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"native_aot_closed_optimized" end time: Nov 08 20:44 MST
+"native_aot_closed_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+299/444 Testing: native_aot_duplicate_normal
+299/444 Test: native_aot_duplicate_normal
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_native_aot_duplicate_normal" "failure:Native resource is closed or invalid"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"native_aot_duplicate_normal" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"native_aot_duplicate_normal" end time: Nov 08 20:44 MST
+"native_aot_duplicate_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+345/444 Testing: async_ir
+345/444 Test: async_ir
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_async_tests" "--ir"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"async_ir" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"async_ir" end time: Nov 08 20:44 MST
+"async_ir" time elapsed: 00:00:00
+----------------------------------------------------------
+
+293/444 Testing: native_aot_main_normal
+293/444 Test: native_aot_main_normal
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_native_aot_main_normal" "19"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"native_aot_main_normal" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"native_aot_main_normal" end time: Nov 08 20:44 MST
+"native_aot_main_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+288/444 Testing: ffi_g1_primitive_aot_mismatch
+288/444 Test: ffi_g1_primitive_aot_mismatch
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g1_aot_mismatch" "failure:C primitive provider rejected the exact descriptor or fixture identity"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"ffi_g1_primitive_aot_mismatch" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g1_primitive_aot_mismatch" end time: Nov 08 20:44 MST
+"ffi_g1_primitive_aot_mismatch" time elapsed: 00:00:00
+----------------------------------------------------------
+
+286/444 Testing: ffi_g1_primitive_aot_normal
+286/444 Test: ffi_g1_primitive_aot_normal
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g1_aot_normal" "73"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"ffi_g1_primitive_aot_normal" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g1_primitive_aot_normal" end time: Nov 08 20:44 MST
+"ffi_g1_primitive_aot_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+408/444 Testing: modules
+408/444 Test: modules
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_tests" "modules" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/module fixtures with spaces"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"modules" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+Project constants, forwards, visibility, cycles, imports and restart checks passed
+Project-local library identities, cycles, ownership, overlays, native JIT and invalidation passed
+Multi-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed
+modules: passed
+<end of output>
+Test time =   1.09 sec
+----------------------------------------------------------
+Test Passed.
+"modules" end time: Nov 08 20:44 MST
+"modules" time elapsed: 00:00:01
+----------------------------------------------------------
+
+287/444 Testing: ffi_g1_primitive_aot_optimized
+287/444 Test: ffi_g1_primitive_aot_optimized
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/async/aot.py" "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g1_aot_optimized" "73"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"ffi_g1_primitive_aot_optimized" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g1_primitive_aot_optimized" end time: Nov 08 20:44 MST
+"ffi_g1_primitive_aot_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1/444 Testing: project_manifest_header
+1/444 Test: project_manifest_header
+Command: "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_project_header"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"project_manifest_header" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"project_manifest_header" end time: Nov 08 20:44 MST
+"project_manifest_header" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/444 Testing: project_manifest_provenance
+7/444 Test: project_manifest_provenance
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/tests/project/provenance.py" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+"project_manifest_provenance" start time: Nov 08 20:44 MST
+Output:
+----------------------------------------------------------
+project_manifest_provenance: 3 file hashes and exact pinned upstream reconstruction passed
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"project_manifest_provenance" end time: Nov 08 20:44 MST
+"project_manifest_provenance" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 08 20:44 MST

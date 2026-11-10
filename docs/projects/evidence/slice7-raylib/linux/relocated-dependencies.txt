@@ -1,0 +1,141 @@
+Relocated executable and shim dependency resolution with compiler and project at archived paths.
+
+build/slice7-raylib/linux/release-final/relocated normal 雪
+5506bcfe4093129a7aa1877d156b7752579e6dd01da924c5739daf31b80a3462  build/slice7-raylib/linux/release-final/relocated normal 雪/gallery
+882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799  build/slice7-raylib/linux/release-final/relocated normal 雪/native/RAYLIB-LICENSE.txt
+1041653dd5c1cb8c67494fa398a296520d3ffec20cf1bf71b1eaa4b96ac61aee  build/slice7-raylib/linux/release-final/relocated normal 雪/native/libraylib.so.600
+a63eedd587632f4f139f6b0e9dd1e1c956913d50403bc268f9f02ae8940104b7  build/slice7-raylib/linux/release-final/relocated normal 雪/native/libvoid_raylib.so
+	linux-vdso.so.1 (0x00007f25f9421000)
+	libidn2.so.0 => /usr/lib/x86_64-linux-gnu/libidn2.so.0 (0x00007f25f93bc000)
+	libunistring.so.5 => /usr/lib/x86_64-linux-gnu/libunistring.so.5 (0x00007f25f8e16000)
+	libstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f25f8a00000)
+	libm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007f25f92a1000)
+	libgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f25f8de8000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007f25f8800000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f25f9423000)
+	linux-vdso.so.1 (0x00007faf31e24000)
+	libraylib.so.600 => /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/relocated normal 雪/native/libraylib.so.600 (0x00007faf31bf8000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007faf31800000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007faf31e26000)
+	libm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007faf31add000)
+	libX11.so.6 => /usr/lib/x86_64-linux-gnu/libX11.so.6 (0x00007faf31693000)
+	libxcb.so.1 => /usr/lib/x86_64-linux-gnu/libxcb.so.1 (0x00007faf31aae000)
+	libXau.so.6 => /usr/lib/x86_64-linux-gnu/libXau.so.6 (0x00007faf31aa9000)
+	libXdmcp.so.6 => /usr/lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007faf31aa1000)
+
+build/slice7-raylib/linux/release-final/relocated optimized 雪
+dd4602459d81e1fc21a3742d0299b8e0bfc2f40055f98516ae246b6922baa8b8  build/slice7-raylib/linux/release-final/relocated optimized 雪/gallery
+882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799  build/slice7-raylib/linux/release-final/relocated optimized 雪/native/RAYLIB-LICENSE.txt
+1041653dd5c1cb8c67494fa398a296520d3ffec20cf1bf71b1eaa4b96ac61aee  build/slice7-raylib/linux/release-final/relocated optimized 雪/native/libraylib.so.600
+a63eedd587632f4f139f6b0e9dd1e1c956913d50403bc268f9f02ae8940104b7  build/slice7-raylib/linux/release-final/relocated optimized 雪/native/libvoid_raylib.so
+	linux-vdso.so.1 (0x00007f1c39948000)
+	libidn2.so.0 => /usr/lib/x86_64-linux-gnu/libidn2.so.0 (0x00007f1c398e3000)
+	libunistring.so.5 => /usr/lib/x86_64-linux-gnu/libunistring.so.5 (0x00007f1c39416000)
+	libstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f1c39000000)
+	libm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007f1c392fb000)
+	libgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f1c398b3000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007f1c38e00000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f1c3994a000)
+	linux-vdso.so.1 (0x00007f0adb943000)
+	libraylib.so.600 => /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/relocated optimized 雪/native/libraylib.so.600 (0x00007f0adb717000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007f0adb400000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f0adb945000)
+	libm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007f0adb2e5000)
+	libX11.so.6 => /usr/lib/x86_64-linux-gnu/libX11.so.6 (0x00007f0adb178000)
+	libxcb.so.1 => /usr/lib/x86_64-linux-gnu/libxcb.so.1 (0x00007f0adb6e8000)
+	libXau.so.6 => /usr/lib/x86_64-linux-gnu/libXau.so.6 (0x00007f0adb6e3000)
+	libXdmcp.so.6 => /usr/lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007f0adb6db000)
+
+build/slice7-raylib/linux/debug-final/relocated normal 雪
+4c7230d08e2cd21aab3856fc1399960818fe5a8f4f25886de830b38825e229a4  build/slice7-raylib/linux/debug-final/relocated normal 雪/gallery
+882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799  build/slice7-raylib/linux/debug-final/relocated normal 雪/native/RAYLIB-LICENSE.txt
+1041653dd5c1cb8c67494fa398a296520d3ffec20cf1bf71b1eaa4b96ac61aee  build/slice7-raylib/linux/debug-final/relocated normal 雪/native/libraylib.so.600
+a63eedd587632f4f139f6b0e9dd1e1c956913d50403bc268f9f02ae8940104b7  build/slice7-raylib/linux/debug-final/relocated normal 雪/native/libvoid_raylib.so
+	linux-vdso.so.1 (0x00007fd5af8ab000)
+	libidn2.so.0 => /usr/lib/x86_64-linux-gnu/libidn2.so.0 (0x00007fd5af846000)
+	libunistring.so.5 => /usr/lib/x86_64-linux-gnu/libunistring.so.5 (0x00007fd5af216000)
+	libstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007fd5aee00000)
+	libm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007fd5af0fb000)
+	libgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fd5af816000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007fd5aec00000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007fd5af8ad000)
+	linux-vdso.so.1 (0x00007f53cf357000)
+	libraylib.so.600 => /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/debug-final/relocated normal 雪/native/libraylib.so.600 (0x00007f53cf12b000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007f53cee00000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f53cf359000)
+	libm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007f53cf010000)
+	libX11.so.6 => /usr/lib/x86_64-linux-gnu/libX11.so.6 (0x00007f53cec93000)
+	libxcb.so.1 => /usr/lib/x86_64-linux-gnu/libxcb.so.1 (0x00007f53cec66000)
+	libXau.so.6 => /usr/lib/x86_64-linux-gnu/libXau.so.6 (0x00007f53cf009000)
+	libXdmcp.so.6 => /usr/lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007f53cf001000)
+
+build/slice7-raylib/linux/debug-final/relocated optimized 雪
+6bae219fb4686bdae805ecd989c4275a15f59b6ac6d8236a990b3d1b07ba0a91  build/slice7-raylib/linux/debug-final/relocated optimized 雪/gallery
+882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799  build/slice7-raylib/linux/debug-final/relocated optimized 雪/native/RAYLIB-LICENSE.txt
+1041653dd5c1cb8c67494fa398a296520d3ffec20cf1bf71b1eaa4b96ac61aee  build/slice7-raylib/linux/debug-final/relocated optimized 雪/native/libraylib.so.600
+a63eedd587632f4f139f6b0e9dd1e1c956913d50403bc268f9f02ae8940104b7  build/slice7-raylib/linux/debug-final/relocated optimized 雪/native/libvoid_raylib.so
+	linux-vdso.so.1 (0x00007f0b21e67000)
+	libidn2.so.0 => /usr/lib/x86_64-linux-gnu/libidn2.so.0 (0x00007f0b21e02000)
+	libunistring.so.5 => /usr/lib/x86_64-linux-gnu/libunistring.so.5 (0x00007f0b21816000)
+	libstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f0b21400000)
+	libm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007f0b216fb000)
+	libgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f0b216cd000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007f0b21200000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f0b21e69000)
+	linux-vdso.so.1 (0x00007fc4f0fab000)
+	libraylib.so.600 => /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/debug-final/relocated optimized 雪/native/libraylib.so.600 (0x00007fc4f0d7f000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007fc4f0a00000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007fc4f0fad000)
+	libm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007fc4f0c64000)
+	libX11.so.6 => /usr/lib/x86_64-linux-gnu/libX11.so.6 (0x00007fc4f0893000)
+	libxcb.so.1 => /usr/lib/x86_64-linux-gnu/libxcb.so.1 (0x00007fc4f0c35000)
+	libXau.so.6 => /usr/lib/x86_64-linux-gnu/libXau.so.6 (0x00007fc4f0c30000)
+	libXdmcp.so.6 => /usr/lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007fc4f0c28000)
+
+build/slice7-raylib/linux/strict-driver-lsan-excluded/relocated normal 雪
+45346676fe5aae881d3f3242ce86c1f0100fca4978cba3f875cddde0e782efb8  build/slice7-raylib/linux/strict-driver-lsan-excluded/relocated normal 雪/gallery
+882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799  build/slice7-raylib/linux/strict-driver-lsan-excluded/relocated normal 雪/native/RAYLIB-LICENSE.txt
+1041653dd5c1cb8c67494fa398a296520d3ffec20cf1bf71b1eaa4b96ac61aee  build/slice7-raylib/linux/strict-driver-lsan-excluded/relocated normal 雪/native/libraylib.so.600
+e4a2c85dabcbed06c9c749cbfed365145abb2d1017df01ba7f292db0b9cb14ff  build/slice7-raylib/linux/strict-driver-lsan-excluded/relocated normal 雪/native/libvoid_raylib.so
+	linux-vdso.so.1 (0x00007f7f2cfa9000)
+	libidn2.so.0 => /usr/lib/x86_64-linux-gnu/libidn2.so.0 (0x00007f7f2cf44000)
+	libunistring.so.5 => /usr/lib/x86_64-linux-gnu/libunistring.so.5 (0x00007f7f2ba16000)
+	libstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f7f2b600000)
+	libm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007f7f2b8fb000)
+	libresolv.so.2 => /usr/lib/x86_64-linux-gnu/libresolv.so.2 (0x00007f7f2cf30000)
+	libgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f7f2cf02000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007f7f2b400000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f7f2cfab000)
+	linux-vdso.so.1 (0x00007fa89ddfc000)
+	libraylib.so.600 => /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/relocated normal 雪/native/libraylib.so.600 (0x00007fa89dbcc000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007fa89d800000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007fa89ddfe000)
+	libm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007fa89dab1000)
+	libX11.so.6 => /usr/lib/x86_64-linux-gnu/libX11.so.6 (0x00007fa89d693000)
+	libxcb.so.1 => /usr/lib/x86_64-linux-gnu/libxcb.so.1 (0x00007fa89da82000)
+	libXau.so.6 => /usr/lib/x86_64-linux-gnu/libXau.so.6 (0x00007fa89da7d000)
+	libXdmcp.so.6 => /usr/lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007fa89da75000)
+
+build/slice7-raylib/linux/strict-driver-lsan-excluded/relocated optimized 雪
+33e3e9d3925375cb603c44ef1cb48b4f58209be8800b5ed43ae3f325be6d8093  build/slice7-raylib/linux/strict-driver-lsan-excluded/relocated optimized 雪/gallery
+882a5a819cf562aa3583aae3af3f2211dda15c63de9fc8cc4b399a2f9e78d799  build/slice7-raylib/linux/strict-driver-lsan-excluded/relocated optimized 雪/native/RAYLIB-LICENSE.txt
+1041653dd5c1cb8c67494fa398a296520d3ffec20cf1bf71b1eaa4b96ac61aee  build/slice7-raylib/linux/strict-driver-lsan-excluded/relocated optimized 雪/native/libraylib.so.600
+e4a2c85dabcbed06c9c749cbfed365145abb2d1017df01ba7f292db0b9cb14ff  build/slice7-raylib/linux/strict-driver-lsan-excluded/relocated optimized 雪/native/libvoid_raylib.so
+	linux-vdso.so.1 (0x00007f16c2755000)
+	libidn2.so.0 => /usr/lib/x86_64-linux-gnu/libidn2.so.0 (0x00007f16c13cd000)
+	libunistring.so.5 => /usr/lib/x86_64-linux-gnu/libunistring.so.5 (0x00007f16c11e3000)
+	libstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f16c0e00000)
+	libm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007f16c10c8000)
+	libresolv.so.2 => /usr/lib/x86_64-linux-gnu/libresolv.so.2 (0x00007f16c270f000)
+	libgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f16c0dd2000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007f16c0a00000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f16c2757000)
+	linux-vdso.so.1 (0x00007f974813c000)
+	libraylib.so.600 => /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/relocated optimized 雪/native/libraylib.so.600 (0x00007f9747f0c000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007f9747c00000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f974813e000)
+	libm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007f9747ae5000)
+	libX11.so.6 => /usr/lib/x86_64-linux-gnu/libX11.so.6 (0x00007f9747978000)
+	libxcb.so.1 => /usr/lib/x86_64-linux-gnu/libxcb.so.1 (0x00007f9747edd000)
+	libXau.so.6 => /usr/lib/x86_64-linux-gnu/libXau.so.6 (0x00007f9747ed8000)
+	libXdmcp.so.6 => /usr/lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007f9747ed0000)

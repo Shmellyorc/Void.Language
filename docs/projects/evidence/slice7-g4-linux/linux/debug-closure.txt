@@ -1,0 +1,42 @@
+void-native-closure 1
+provider org.voidlang.g4-fixture
+target x86_64-unknown-linux-gnu sysv-x64
+system none
+layout executable-sibling-native
+thunk 3ec7cd91d226c483d5c7053c24e8764563e133d7e1cbdf0ee30825a63b023d05 vd_c_primitive_dispatch_v3
+image libvoid_g4_dep.so 5d418c763d810ee16b4107985313d4c7ba3680d6637e1bf9872f4eba016201a5
+image libvoid_g4_main.so 425ff03ef4ae41cf3c0fc711afe97630145ebb15a2550d87866ad59cfe902add libvoid_g4_dep.so
+export libvoid_g4_dep.so g4_bias
+export libvoid_g4_main.so vd_c_primitive_dispatch_v3
+export libvoid_g4_main.so g4_add
+export libvoid_g4_main.so g4_sample
+export libvoid_g4_main.so g4_fill
+export libvoid_g4_main.so g4_create
+export libvoid_g4_main.so g4_read
+export libvoid_g4_main.so g4_close
+export libvoid_g4_main.so g4_live
+export libvoid_g4_main.so g4_releases
+export libvoid_g4_main.so g4_gate
+descriptor
+void-c-primitive 3 3
+provider org.voidlang.g4-fixture
+target x86_64-unknown-linux-gnu sysv-x64
+source /native_dynamic.void
+thunk 3ec7cd91d226c483d5c7053c24e8764563e133d7e1cbdf0ee30825a63b023d05
+fixture 1dc49d50dbbba1a40484037b13335d3c048406907534e578115b6294b255b1aa
+effects direct-sync nonblocking no-callbacks
+call c-default
+aliases c_int:i32 c_long:i64 c_size:u64 c_bool:bool
+resource box G4Box pointer null create close_box owner-calls shutdown-any consume-always
+record sample G4Sample 16 8 2
+field tag tag i32 0
+field reading reading f64 8
+bind add g4_add i32 i32 i32
+bind calibrate g4_sample record:sample record:sample
+bind fill g4_fill i64 out:1:2:64 c_size c_size u8
+bind create g4_create owner:box i32
+bind read g4_read i32 borrow:box i32
+bind close_box g4_close i32 close:box
+bind live g4_live i32
+bind releases g4_releases i32
+bind gate g4_gate i32 i32

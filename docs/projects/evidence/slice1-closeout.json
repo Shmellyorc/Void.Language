@@ -1,0 +1,2154 @@
+{
+  "date": "2026-11-08",
+  "baseline": "2f667ea338127b8f91c3136804377ef3fa5218d6",
+  "status": "LOCAL SLICE 1 CLOSEOUT; GOLDEN WRENCH REVIEW PENDING",
+  "host": {
+    "system": "Linux",
+    "machine": "x86_64",
+    "os_release": [
+      "PRETTY_NAME=\"PikaOS 4\"",
+      "NAME=\"PikaOS\"",
+      "VERSION_ID=\"4\"",
+      "VERSION=\"4\"",
+      "VERSION_CODENAME=nest"
+    ],
+    "clang": [
+      "clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)",
+      "Target: x86_64-unknown-linux-gnu"
+    ]
+  },
+  "fatal_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+  },
+  "source_scope_note": "Exact source patches exclude docs/projects/ reports and evidence; separate expanded Git inventory includes every working-tree path. Receipt does not hash itself.",
+  "starting_checkpoint": {
+    "baseline": "2f667ea338127b8f91c3136804377ef3fa5218d6",
+    "files_sha256": {
+      "CMakeLists.txt": "86cf2c51f0cf8795f675a7bd2670396be6257bf462e1e6a738737fb0b1b1f9dd",
+      "cmake/InstallLicenses.cmake": "0bcff2b4a650c9464773c87e681d7d0dff50fe039f3510d4ef708a0d1ec3caa2",
+      "docs/CLI.md": "57a273519e9a8d72c1659c2a74067515797a699fd9797d82f5b13c3ccdc8a5a6",
+      "docs/DECISIONS.md": "981143bdee939d1a38ba7a07aafee25e6901402079eb5fdbb89302fd41db4065",
+      "docs/DIAGNOSTICS.md": "b81c1b4179861bb8e2846f6bf80bbd2f37e2d84f650c4a61a1d3322e91d6e95d",
+      "docs/EDITOR_INTEGRATION.md": "e94f2602072d0a9cfa2b4fc6c3ad8c973aceda712bae29b4927ef5fc6d449459",
+      "docs/LANGUAGE_BIBLE.md": "e77fd6641c60b3f8eb80c81db173b56e0e2e9b438c8b89f173d948f57d390160",
+      "docs/LANGUAGE_SERVER.md": "1cce2de734a89ca0a7ee0ff2d6e548071b789a27b91679a2396023f67da39c4d",
+      "docs/LOCAL_LIBRARIES.md": "daec3f9e7a86773bbd932f266a797c4044cb1618542948cbb0c894abaaea504d",
+      "docs/MODULE_SYSTEM.md": "ec9c0e8b8f92ebcf6394d2f428932089f9c3398bf797812a9e16447ca3b9e421",
+      "docs/NATIVE_LIBRARIES.md": "6574fe7e217115e9bb8f355f8f94ffc2e13be24dc4b9c3894fd4e94b772e5a98",
+      "docs/PROJECT_ARCHITECTURE_ROADMAP.md": "94442bb7fa23bcc5aaaeb4a46179ebfceb855474539f2b6ad3ac2ee9608928ed",
+      "docs/README.md": "f2b0ec60be27e53e83dd92e9233076e06b1008cd546d10baed74e5dbb0106afb",
+      "docs/RUNTIME_GLOBALS.md": "f7877dd6a8aa2fe0cda163fa8f552286511130f18116ae53e07201d0f7e13090",
+      "docs/SOURCE_COMPILER.md": "bbd79f32eca8a31e992f85fc0e11d98fdb895f4fa69cdece85fee8ca51a8c3a0",
+      "docs/STAGE8_DISCOVERY.md": "2a66b7dd2da18d3edbdd35a83dcbd9d4f15d46f67a7934a6d3d5521dafd0c3c6",
+      "docs/STAGE9_APPLICATION_WORKFLOW.md": "231248b42c945cb8378511fc00643482699392dc613524eeb3aafb0231e11df2",
+      "docs/os/API.md": "83beb1261a0f24b6e2dcd5fa25707a16b5216c3476e3d65af24631a0e460f92b",
+      "include/void/diagnostic.hpp": "d04d4a22f310d98ca84a365a8729fbe1036d397ccf5656c847c46cb68267dfab",
+      "include/void/path.hpp": "8d8e8cd9cb33f22c3481eb609cad0108ec6791d15eba6540bf8c555f13251b04",
+      "src/frontend/compiler.cpp": "06a35d0a760da06e489920fe3ef56369cddad0385a2d1c2eaa4c56cee9b6ae24",
+      "docs/projects/SLICE1.md": "e444c4c29e5e2ed0bc04973a42edd72718a43302cacab93ae084ef50b5a64623",
+      "docs/projects/evidence/slice1-local.json": "374d72c751d42e6fb929eb6509ab5a74f24ba243660aafebd051d6cd9c77cca3",
+      "docs/projects/evidence/slice1-malformed-header.toml": "7904b2e1a98cfa5dbd6d3aa82ad6b605a00bbe4e3c1ddb58dd787d6620d7405e",
+      "include/void/project.hpp": "b7e57ee7ab26330ade1eb538e880d2bbbcd9c604b4b25b01c4ee1c256dbe5d84",
+      "src/frontend/project.cpp": "b69965d50db29d90af030378bee57288d9ac7cd1928c6244bc3febcc9a3f1f42",
+      "tests/project/authority.py": "83db8358c3182671fc2c10d65636ed88953fcf1219ed9b31fcca67667a516345",
+      "tests/project/legacy.py": "fc438093b7f7557c53452a383615eef537b24a62b7e3f3d77f97b7b292d1a60a",
+      "tests/project/manifest.cpp": "8cf566f9e2ecc2964b6c5c2dcf6ca0d84398454e8c0202f8552659a1a61af43f",
+      "tests/project/provenance.py": "5ae8694013a61450297b31b7926ba7ec45f339873cdcd8397053605f33dfe7c6",
+      "third_party/tomlplusplus/LICENSE": "529bc3900a9571e49db285b0df432397e70b881cc3bf48de6667ae74ff4b06d8",
+      "third_party/tomlplusplus/README.md": "a975f5d05f6d02669920eaafc5ee508079e364fd2fdd8153d9d020d0beb6fd26",
+      "third_party/tomlplusplus/toml.hpp": "7cd54af1a3497465eb26507f8d8a2ccfe661fccc27dac7a5121b885bee88d5e7",
+      "third_party/tomlplusplus/upstream.json": "98e2bf14bd9c8765aae02725a494affa31585ecb352e494d88f5eaccb806adfc",
+      "third_party/tomlplusplus/void-bounds-and-locations.patch": "d131e7ff7daa6373904406403b8f23def1b0dc02127de8230c1a09cdace3330f"
+    }
+  },
+  "phase1_preservation": {
+    "docs/CLI.md": {
+      "start_sha256": "57a273519e9a8d72c1659c2a74067515797a699fd9797d82f5b13c3ccdc8a5a6",
+      "current_sha256": "57a273519e9a8d72c1659c2a74067515797a699fd9797d82f5b13c3ccdc8a5a6",
+      "status": "unchanged from closeout start"
+    },
+    "docs/DECISIONS.md": {
+      "start_sha256": "981143bdee939d1a38ba7a07aafee25e6901402079eb5fdbb89302fd41db4065",
+      "current_sha256": "452cee21579e3ec013d3d05c8dd4e7e20a2e196f8dbc5af85e2906b3501eaf98",
+      "status": "continuation authorization appended/reconciled"
+    },
+    "docs/EDITOR_INTEGRATION.md": {
+      "start_sha256": "e94f2602072d0a9cfa2b4fc6c3ad8c973aceda712bae29b4927ef5fc6d449459",
+      "current_sha256": "e94f2602072d0a9cfa2b4fc6c3ad8c973aceda712bae29b4927ef5fc6d449459",
+      "status": "unchanged from closeout start"
+    },
+    "docs/LANGUAGE_BIBLE.md": {
+      "start_sha256": "e77fd6641c60b3f8eb80c81db173b56e0e2e9b438c8b89f173d948f57d390160",
+      "current_sha256": "e77fd6641c60b3f8eb80c81db173b56e0e2e9b438c8b89f173d948f57d390160",
+      "status": "unchanged from closeout start"
+    },
+    "docs/LANGUAGE_SERVER.md": {
+      "start_sha256": "1cce2de734a89ca0a7ee0ff2d6e548071b789a27b91679a2396023f67da39c4d",
+      "current_sha256": "1cce2de734a89ca0a7ee0ff2d6e548071b789a27b91679a2396023f67da39c4d",
+      "status": "unchanged from closeout start"
+    },
+    "docs/LOCAL_LIBRARIES.md": {
+      "start_sha256": "daec3f9e7a86773bbd932f266a797c4044cb1618542948cbb0c894abaaea504d",
+      "current_sha256": "daec3f9e7a86773bbd932f266a797c4044cb1618542948cbb0c894abaaea504d",
+      "status": "unchanged from closeout start"
+    },
+    "docs/MODULE_SYSTEM.md": {
+      "start_sha256": "ec9c0e8b8f92ebcf6394d2f428932089f9c3398bf797812a9e16447ca3b9e421",
+      "current_sha256": "ec9c0e8b8f92ebcf6394d2f428932089f9c3398bf797812a9e16447ca3b9e421",
+      "status": "unchanged from closeout start"
+    },
+    "docs/NATIVE_LIBRARIES.md": {
+      "start_sha256": "6574fe7e217115e9bb8f355f8f94ffc2e13be24dc4b9c3894fd4e94b772e5a98",
+      "current_sha256": "6574fe7e217115e9bb8f355f8f94ffc2e13be24dc4b9c3894fd4e94b772e5a98",
+      "status": "unchanged from closeout start"
+    },
+    "docs/PROJECT_ARCHITECTURE_ROADMAP.md": {
+      "start_sha256": "94442bb7fa23bcc5aaaeb4a46179ebfceb855474539f2b6ad3ac2ee9608928ed",
+      "current_sha256": "5e3cc5bfc064b4f00c06cd17ca4ec0452f5eeb9757b4f8e6996cdc4b052d55fa",
+      "status": "continuation authorization appended/reconciled"
+    },
+    "docs/README.md": {
+      "start_sha256": "f2b0ec60be27e53e83dd92e9233076e06b1008cd546d10baed74e5dbb0106afb",
+      "current_sha256": "f2b0ec60be27e53e83dd92e9233076e06b1008cd546d10baed74e5dbb0106afb",
+      "status": "unchanged from closeout start"
+    },
+    "docs/RUNTIME_GLOBALS.md": {
+      "start_sha256": "f7877dd6a8aa2fe0cda163fa8f552286511130f18116ae53e07201d0f7e13090",
+      "current_sha256": "f7877dd6a8aa2fe0cda163fa8f552286511130f18116ae53e07201d0f7e13090",
+      "status": "unchanged from closeout start"
+    },
+    "docs/SOURCE_COMPILER.md": {
+      "start_sha256": "bbd79f32eca8a31e992f85fc0e11d98fdb895f4fa69cdece85fee8ca51a8c3a0",
+      "current_sha256": "bbd79f32eca8a31e992f85fc0e11d98fdb895f4fa69cdece85fee8ca51a8c3a0",
+      "status": "unchanged from closeout start"
+    },
+    "docs/STAGE8_DISCOVERY.md": {
+      "start_sha256": "2a66b7dd2da18d3edbdd35a83dcbd9d4f15d46f67a7934a6d3d5521dafd0c3c6",
+      "current_sha256": "2a66b7dd2da18d3edbdd35a83dcbd9d4f15d46f67a7934a6d3d5521dafd0c3c6",
+      "status": "unchanged from closeout start"
+    },
+    "docs/STAGE9_APPLICATION_WORKFLOW.md": {
+      "start_sha256": "231248b42c945cb8378511fc00643482699392dc613524eeb3aafb0231e11df2",
+      "current_sha256": "231248b42c945cb8378511fc00643482699392dc613524eeb3aafb0231e11df2",
+      "status": "unchanged from closeout start"
+    },
+    "docs/os/API.md": {
+      "start_sha256": "83beb1261a0f24b6e2dcd5fa25707a16b5216c3476e3d65af24631a0e460f92b",
+      "current_sha256": "83beb1261a0f24b6e2dcd5fa25707a16b5216c3476e3d65af24631a0e460f92b",
+      "status": "unchanged from closeout start"
+    }
+  },
+  "source_inputs_sha256": {
+    "CMakeLists.txt": "6d8a8cf0a2d97c9f626c831585d156e24b475bb1ff73b72cfa64c9c8f6c447df",
+    "cmake/InstallLicenses.cmake": "dd650c5bea430b8e0fd3f923e99b803a4364a0c84c60e4923457eebf8336177c",
+    "docs/CLI.md": "57a273519e9a8d72c1659c2a74067515797a699fd9797d82f5b13c3ccdc8a5a6",
+    "docs/DECISIONS.md": "452cee21579e3ec013d3d05c8dd4e7e20a2e196f8dbc5af85e2906b3501eaf98",
+    "docs/DIAGNOSTICS.md": "b81c1b4179861bb8e2846f6bf80bbd2f37e2d84f650c4a61a1d3322e91d6e95d",
+    "docs/EDITOR_INTEGRATION.md": "e94f2602072d0a9cfa2b4fc6c3ad8c973aceda712bae29b4927ef5fc6d449459",
+    "docs/LANGUAGE_BIBLE.md": "e77fd6641c60b3f8eb80c81db173b56e0e2e9b438c8b89f173d948f57d390160",
+    "docs/LANGUAGE_SERVER.md": "1cce2de734a89ca0a7ee0ff2d6e548071b789a27b91679a2396023f67da39c4d",
+    "docs/LOCAL_LIBRARIES.md": "daec3f9e7a86773bbd932f266a797c4044cb1618542948cbb0c894abaaea504d",
+    "docs/MODULE_SYSTEM.md": "ec9c0e8b8f92ebcf6394d2f428932089f9c3398bf797812a9e16447ca3b9e421",
+    "docs/NATIVE_LIBRARIES.md": "6574fe7e217115e9bb8f355f8f94ffc2e13be24dc4b9c3894fd4e94b772e5a98",
+    "docs/PROJECT_ARCHITECTURE_ROADMAP.md": "5e3cc5bfc064b4f00c06cd17ca4ec0452f5eeb9757b4f8e6996cdc4b052d55fa",
+    "docs/README.md": "f2b0ec60be27e53e83dd92e9233076e06b1008cd546d10baed74e5dbb0106afb",
+    "docs/RUNTIME_GLOBALS.md": "f7877dd6a8aa2fe0cda163fa8f552286511130f18116ae53e07201d0f7e13090",
+    "docs/SOURCE_COMPILER.md": "bbd79f32eca8a31e992f85fc0e11d98fdb895f4fa69cdece85fee8ca51a8c3a0",
+    "docs/STAGE8_DISCOVERY.md": "2a66b7dd2da18d3edbdd35a83dcbd9d4f15d46f67a7934a6d3d5521dafd0c3c6",
+    "docs/STAGE9_APPLICATION_WORKFLOW.md": "231248b42c945cb8378511fc00643482699392dc613524eeb3aafb0231e11df2",
+    "docs/os/API.md": "83beb1261a0f24b6e2dcd5fa25707a16b5216c3476e3d65af24631a0e460f92b",
+    "docs/release/NOTICE_INVENTORY.json": "70ac3eaee93754c4e1def58985da12e14d5f4bf17310fb85243d1163aa1a1aa1",
+    "docs/release/REDISTRIBUTION_NOTICES.md": "a20d087b2ebd7e9f88786c256ad53c6ac62b18c4468734b2d81325a83a044fa1",
+    "include/void/diagnostic.hpp": "d04d4a22f310d98ca84a365a8729fbe1036d397ccf5656c847c46cb68267dfab",
+    "include/void/path.hpp": "8d8e8cd9cb33f22c3481eb609cad0108ec6791d15eba6540bf8c555f13251b04",
+    "include/void/project.hpp": "945b3cc02d0da73045ab7741ee7a3ed3829fcccad92ae42ec3156314c983ba3f",
+    "src/frontend/compiler.cpp": "06a35d0a760da06e489920fe3ef56369cddad0385a2d1c2eaa4c56cee9b6ae24",
+    "src/frontend/project.cpp": "b69965d50db29d90af030378bee57288d9ac7cd1928c6244bc3febcc9a3f1f42",
+    "tests/project/authority.py": "83db8358c3182671fc2c10d65636ed88953fcf1219ed9b31fcca67667a516345",
+    "tests/project/header.cpp": "62a8621869e8fdb923b8cc7db1703473f389f629b23d8004a8abffffae72a98a",
+    "tests/project/legacy.py": "fc438093b7f7557c53452a383615eef537b24a62b7e3f3d77f97b7b292d1a60a",
+    "tests/project/manifest.cpp": "4fd4e5c2550f27e89bea7a7377f8fcf101580e6be4f231b0f81eaedaef217a3c",
+    "tests/project/provenance.py": "118d45ecfe89e44dfac03b1667b1b99daf8a3dd3497124fb9e2551fe22325b47",
+    "third_party/tomlplusplus/LICENSE": "529bc3900a9571e49db285b0df432397e70b881cc3bf48de6667ae74ff4b06d8",
+    "third_party/tomlplusplus/README.md": "794360d588216c468ce40627042ff4ce0238fb8d72616688f04892f861765c7c",
+    "third_party/tomlplusplus/toml.hpp": "7cd54af1a3497465eb26507f8d8a2ccfe661fccc27dac7a5121b885bee88d5e7",
+    "third_party/tomlplusplus/upstream.json": "98e2bf14bd9c8765aae02725a494affa31585ecb352e494d88f5eaccb806adfc",
+    "third_party/tomlplusplus/void-bounds-and-locations.patch": "d131e7ff7daa6373904406403b8f23def1b0dc02127de8230c1a09cdace3330f"
+  },
+  "protected_inputs_unchanged_sha256": {
+    "README.md": "f21e6822e36bfcde1c3631bde88171c5eb8c529620c3d6b270795e146ecba2bb",
+    "src/main.cpp": "2067a7672eef5eeeeb7b3b4de41429e6074a9f86252927001bc448be193704ae",
+    "src/frontend/source.cpp": "8c9093cbe42f49083eafd35e88a58a6d94bad2073ec1cb8877d5a5bd45374874",
+    "src/runtime/application.cpp": "8bb9491be9c3e649080bf1016521141a90fee541eb6802df12a63ad2e0edd699",
+    "src/runtime/abi.cpp": "5ec5010ea22b086e97c37f57f2ff6ad35b296001727006271683a339dbc84f48",
+    "stdlib/os.void": "a05158eb5978aea445715c3c6cc173ec84b7c97a3335a1332a80aa58c7726d20",
+    "src/lsp/main.cpp": "e725f9a854a930a367390bcd5597227ee4eca6f969e8907a9f4eb6bf6a0158c2",
+    "editors/vscode/src/extension.ts": "de6883acf9d958bc31ef7435b06fe00ddb063de6151ff759fe1eb825ab88fed5",
+    "editors/vscode/src/config.ts": "518f8e85c85af88e8cab20bac188d4d99f5357669d90e41806d5de583dfef08b",
+    ".github/workflows/ci-link-experiment.yml": "8b62b4363215a9cb52e004e1869146f1f64842895c8597ec6e702d2ee1fd6189"
+  },
+  "original_records_unchanged": {
+    "docs/projects/SLICE1.md": "e444c4c29e5e2ed0bc04973a42edd72718a43302cacab93ae084ef50b5a64623",
+    "docs/projects/evidence/slice1-local.json": "374d72c751d42e6fb929eb6509ab5a74f24ba243660aafebd051d6cd9c77cca3",
+    "docs/projects/evidence/slice1-malformed-header.toml": "7904b2e1a98cfa5dbd6d3aa82ad6b605a00bbe4e3c1ddb58dd787d6620d7405e"
+  },
+  "upstream_independent_verification": {
+    "tag": "v3.4.0",
+    "commit": "30172438cee64926dc41fdd9c11fb3ba5b2ba9de",
+    "tag_ref_verified": true,
+    "upstream_header_sha256": "6b5172ad4dd6519aec67b919181fa7a38a2234131e5b2afa232dfe444819783e",
+    "license_sha256": "529bc3900a9571e49db285b0df432397e70b881cc3bf48de6667ae74ff4b06d8",
+    "patched_header_sha256": "7cd54af1a3497465eb26507f8d8a2ccfe661fccc27dac7a5121b885bee88d5e7",
+    "patch_application": "patching file toml.hpp",
+    "fuzz": 0,
+    "vendored_header_matches": true,
+    "license_matches": true,
+    "retrieval": {
+      "tag_ref": "https://api.github.com/repos/marzer/tomlplusplus/git/ref/tags/v3.4.0",
+      "header": "https://raw.githubusercontent.com/marzer/tomlplusplus/30172438cee64926dc41fdd9c11fb3ba5b2ba9de/toml.hpp",
+      "license": "https://raw.githubusercontent.com/marzer/tomlplusplus/30172438cee64926dc41fdd9c11fb3ba5b2ba9de/LICENSE",
+      "transport": "Fresh HTTPS fetch via Python urllib; patch applied using system patch --batch --fuzz=0 -p1; exact byte comparison",
+      "publisher_signature_authenticated": false
+    }
+  },
+  "linux_profiles": [
+    {
+      "profile": "release",
+      "build_type": "Release",
+      "sanitizers": false,
+      "tests_passed": 25,
+      "tests_failed": 0,
+      "ctest_argv": [
+        "ctest",
+        "--test-dir",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+        "-R",
+        "^(project_manifest.*|cli_contract|cli_install_resources|frontend|modules|numeric|analysis|tooling|sessions|source_cli|modules_cli|analysis_cli|numeric_cli|local_libraries|application_workflow_stage9|debug_cache_processes|automatic_cache_processes|os_frontend|lsp_os|os_errors|lsp_stage7)$",
+        "--output-on-failure",
+        "--output-junit",
+        "../slice1-closeout-release.xml"
+      ],
+      "configure_argv": [
+        "cmake",
+        "-S",
+        ".",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release"
+      ],
+      "build_argv": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+        "--target",
+        "void_project_manifest",
+        "void_project_header",
+        "void_tests",
+        "voidc",
+        "voidls",
+        "-j2"
+      ],
+      "junit": {
+        "path": "docs/projects/evidence/closeout/linux-release.xml",
+        "sha256": "21692c038e692e757d315ec96f9f0d8e5303d77455b0bf668d34990f99435f37",
+        "bytes": 10128
+      },
+      "cases": [
+        {
+          "name": "project_manifest_header",
+          "seconds": 0.00261668,
+          "stdout": "",
+          "result": "PASS"
+        },
+        {
+          "name": "project_manifest",
+          "seconds": 0.0370019,
+          "stdout": "project_manifest: 8787 checks passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "project_manifest_no_authority",
+          "seconds": 0.0782312,
+          "stdout": "project_manifest: 8788 checks passed under syscall denial\nproject_manifest_no_authority: four live SIGSYS controls passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "project_manifest_legacy",
+          "seconds": 0.325063,
+          "stdout": "project_manifest_legacy: 15 checks passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "project_manifest_provenance",
+          "seconds": 0.0350445,
+          "stdout": "project_manifest_provenance: 3 file hashes and exact pinned upstream reconstruction passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "cli_contract",
+          "seconds": 2.09172,
+          "stdout": "76 CLI process checks passed on linux; native output and collision preservation passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "cli_install_resources",
+          "seconds": 0.10039,
+          "stdout": "......s\n----------------------------------------------------------------------\nRan 7 tests in 0.006s\n\nOK (skipped=1)\n",
+          "result": "PASS"
+        },
+        {
+          "name": "application_workflow_stage9",
+          "seconds": 5.72998,
+          "stdout": "Stage 9 real workflow checks passed: 111\n",
+          "result": "PASS"
+        },
+        {
+          "name": "debug_cache_processes",
+          "seconds": 2.20375,
+          "stdout": "Fresh processes, corruption, concurrent publication, imports, diagnostics and large arrays passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "automatic_cache_processes",
+          "seconds": 0.476901,
+          "stdout": "Automatic O2/no-IR-O2 caching, bypass, fresh globals and diagnostics passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "os_errors",
+          "seconds": 4.59106,
+          "stdout": "OS errors: 8 process checks, 9 valid/61 invalid IDs x four getters; hard_stack_1MiB=False\n",
+          "result": "PASS"
+        },
+        {
+          "name": "os_frontend",
+          "seconds": 5.55385,
+          "stdout": "OS frontend: 62 processes passed; hard_stack_1MiB=False\n",
+          "result": "PASS"
+        },
+        {
+          "name": "lsp_os",
+          "seconds": 1.21653,
+          "stdout": "OS LSP: 44 checks passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "lsp_stage7",
+          "seconds": 0.162189,
+          "stdout": "Stage 7: completion/recovery, signatures, hover, bindings, symbols, guarded rename, formatting, refresh, batching, cancellation passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "sessions",
+          "seconds": 0.0520545,
+          "stdout": "sessions: passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "tooling",
+          "seconds": 0.18199,
+          "stdout": "queries: aliased/direct definitions, 2 callers, root/local constants, byte spans and retained snapshots\nplan: /leaf.void -> /middle.void::wrapper -> /main.void::entry; validated 53 -> 61, const restart required\ntooling: passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "analysis",
+          "seconds": 0.422876,
+          "stdout": "normal: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 202196\nO2: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 273326\nanalysis: passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "numeric",
+          "seconds": 1.85127,
+          "stdout": "210 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed\nnumeric: passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "frontend",
+          "seconds": 3.93627,
+          "stdout": "Frontend begin: diagnostics\n50+ source diagnostic cases and UTF-8/ABI checks passed\nFrontend passed: diagnostics\nFrontend begin: programs\nReal .void files and independent programs executed through normal/O2 JIT\nFrontend passed: programs\nFrontend begin: numeric values\n1216 constant/normal/O2 numeric matrix comparisons passed\nReadonly/compile-time constants, numeric boundaries, concurrent failures, bounded traces and restart checks passed\nFrontend passed: numeric values\nFrontend begin: diagnostic recovery/resource limits\nFrontend resource case: combined expression/constant depth\nStructured diagnostics: independent files, recovery, bounded cascades, snapshots and failed reload verified\nFrontend passed: diagnostic recovery/resource limits\nFrontend begin: value structs\nFrontend resource case: bounded expanded value layouts\nValue struct source: nested/mixed layouts, copies, normal/O2 JIT, diagnostics, tooling and reload passed\nFrontend passed: value structs\nFrontend begin: receiver methods\nFrontend resource case: b...\n[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]\n",
+          "result": "PASS"
+        },
+        {
+          "name": "modules",
+          "seconds": 0.625013,
+          "stdout": "Project constants, forwards, visibility, cycles, imports and restart checks passed\nProject-local library identities, cycles, ownership, overlays, native JIT and invalidation passed\nMulti-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed\nmodules: passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "local_libraries",
+          "seconds": 0.292957,
+          "stdout": "Local libraries: 16 compiler/JIT/AOT/cache/application checks and same-server LSP completion/overlay/refresh checks passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "source_cli",
+          "seconds": 2.79842,
+          "stdout": "Source checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/source programs with spaces/architecture-normal.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/source programs with spaces/architecture-optimized.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/source programs with spaces/loops-normal.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/source programs with spaces/loops-optimized.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/source programs with spaces/functions-normal.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/source programs with spaces/functions-optimized.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-r...\n[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]\n",
+          "result": "PASS"
+        },
+        {
+          "name": "modules_cli",
+          "seconds": 6.89883,
+          "stdout": "Source checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/module native programs with spaces/acceptance-normal.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/module native programs with spaces/acceptance-optimized.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/module native programs with spaces/nested-normal.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/module native programs with spaces/nested-optimized.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/module native programs with spaces/cyclic-normal.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/module native programs with spaces/cyclic-optim...\n[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]\n",
+          "result": "PASS"
+        },
+        {
+          "name": "analysis_cli",
+          "seconds": 0.382081,
+          "stdout": "Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/analysis native programs/analysis-53-normal.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/analysis native programs/analysis-53-optimized.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/analysis native programs/analysis-61-normal.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/analysis native programs/analysis-61-optimized.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/analysis native programs/analysis-62-normal.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-release/analysis native programs/analysis-62-optimized.o\n",
+          "result": "PASS"
+        },
+        {
+          "name": "numeric_cli",
+          "seconds": 11.7091,
+          "stdout": "-- Numeric source constants, JIT and native AOT passed in both optimization modes\n",
+          "result": "PASS"
+        }
+      ],
+      "binaries_sha256": {
+        "void_project_manifest": "b55492eb4854b4858740369b7b535a849953080dea2357f09a34a32715e836e8",
+        "void_project_header": "d2f05e5a05e34fc24bbc87858933dacfd8e6e7562ebd632ca8c666fd916b37b2",
+        "voidc": "fe49588471b2426d04408c20b68b41e9e3af8e1ae3e73a0c91b71e0623e65cc3",
+        "voidls": "e1fdbf46f3b6d01dcb9fa6a1cde05c75735320cb5e572b892f959fc9b3ecee7d",
+        "void_tests": "c490a5a54c473cfd65dcf66902117399315d4c0fa6105aefa29984fba8627aea"
+      },
+      "build_log": {
+        "path": "build/slice1-closeout-release-build.log",
+        "sha256": "c6f275e03dd5de7bcc7a1df542e535d5b1b40fcf6f226ad554a1f0f6e4db1aa3",
+        "bytes": 1775
+      }
+    },
+    {
+      "profile": "debug",
+      "build_type": "Debug",
+      "sanitizers": false,
+      "tests_passed": 25,
+      "tests_failed": 0,
+      "ctest_argv": [
+        "ctest",
+        "--test-dir",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+        "-R",
+        "^(project_manifest.*|cli_contract|cli_install_resources|frontend|modules|numeric|analysis|tooling|sessions|source_cli|modules_cli|analysis_cli|numeric_cli|local_libraries|application_workflow_stage9|debug_cache_processes|automatic_cache_processes|os_frontend|lsp_os|os_errors|lsp_stage7)$",
+        "--output-on-failure",
+        "--output-junit",
+        "../slice1-closeout-debug.xml"
+      ],
+      "configure_argv": [
+        "cmake",
+        "-S",
+        ".",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug"
+      ],
+      "build_argv": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+        "--target",
+        "void_project_manifest",
+        "void_project_header",
+        "void_tests",
+        "voidc",
+        "voidls",
+        "-j2"
+      ],
+      "junit": {
+        "path": "docs/projects/evidence/closeout/linux-debug.xml",
+        "sha256": "12593d92fd478abc36c04cb0970930ef5287be0455e30c89c9c832fca2ac2871",
+        "bytes": 10112
+      },
+      "cases": [
+        {
+          "name": "project_manifest_header",
+          "seconds": 0.00283785,
+          "stdout": "",
+          "result": "PASS"
+        },
+        {
+          "name": "project_manifest",
+          "seconds": 0.59273,
+          "stdout": "project_manifest: 8787 checks passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "project_manifest_no_authority",
+          "seconds": 0.632897,
+          "stdout": "project_manifest: 8788 checks passed under syscall denial\nproject_manifest_no_authority: four live SIGSYS controls passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "project_manifest_legacy",
+          "seconds": 0.737964,
+          "stdout": "project_manifest_legacy: 15 checks passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "project_manifest_provenance",
+          "seconds": 0.0380238,
+          "stdout": "project_manifest_provenance: 3 file hashes and exact pinned upstream reconstruction passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "cli_contract",
+          "seconds": 7.37105,
+          "stdout": "76 CLI process checks passed on linux; native output and collision preservation passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "cli_install_resources",
+          "seconds": 0.0904712,
+          "stdout": "......s\n----------------------------------------------------------------------\nRan 7 tests in 0.007s\n\nOK (skipped=1)\n",
+          "result": "PASS"
+        },
+        {
+          "name": "application_workflow_stage9",
+          "seconds": 14.0418,
+          "stdout": "Stage 9 real workflow checks passed: 111\n",
+          "result": "PASS"
+        },
+        {
+          "name": "debug_cache_processes",
+          "seconds": 17.7315,
+          "stdout": "Fresh processes, corruption, concurrent publication, imports, diagnostics and large arrays passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "automatic_cache_processes",
+          "seconds": 0.604603,
+          "stdout": "Automatic O2/no-IR-O2 caching, bypass, fresh globals and diagnostics passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "os_errors",
+          "seconds": 21.3285,
+          "stdout": "OS errors: 8 process checks, 9 valid/61 invalid IDs x four getters; hard_stack_1MiB=False\n",
+          "result": "PASS"
+        },
+        {
+          "name": "os_frontend",
+          "seconds": 43.1558,
+          "stdout": "OS frontend: 62 processes passed; hard_stack_1MiB=False\n",
+          "result": "PASS"
+        },
+        {
+          "name": "lsp_os",
+          "seconds": 9.07999,
+          "stdout": "OS LSP: 44 checks passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "lsp_stage7",
+          "seconds": 0.316694,
+          "stdout": "Stage 7: completion/recovery, signatures, hover, bindings, symbols, guarded rename, formatting, refresh, batching, cancellation passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "sessions",
+          "seconds": 0.2272,
+          "stdout": "sessions: passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "tooling",
+          "seconds": 0.441158,
+          "stdout": "queries: aliased/direct definitions, 2 callers, root/local constants, byte spans and retained snapshots\nplan: /leaf.void -> /middle.void::wrapper -> /main.void::entry; validated 53 -> 61, const restart required\ntooling: passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "analysis",
+          "seconds": 0.751712,
+          "stdout": "normal: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 287668\nO2: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 259514\nanalysis: passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "numeric",
+          "seconds": 5.21992,
+          "stdout": "210 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed\nnumeric: passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "frontend",
+          "seconds": 9.88594,
+          "stdout": "Frontend begin: diagnostics\n50+ source diagnostic cases and UTF-8/ABI checks passed\nFrontend passed: diagnostics\nFrontend begin: programs\nReal .void files and independent programs executed through normal/O2 JIT\nFrontend passed: programs\nFrontend begin: numeric values\n1216 constant/normal/O2 numeric matrix comparisons passed\nReadonly/compile-time constants, numeric boundaries, concurrent failures, bounded traces and restart checks passed\nFrontend passed: numeric values\nFrontend begin: diagnostic recovery/resource limits\nFrontend resource case: combined expression/constant depth\nStructured diagnostics: independent files, recovery, bounded cascades, snapshots and failed reload verified\nFrontend passed: diagnostic recovery/resource limits\nFrontend begin: value structs\nFrontend resource case: bounded expanded value layouts\nValue struct source: nested/mixed layouts, copies, normal/O2 JIT, diagnostics, tooling and reload passed\nFrontend passed: value structs\nFrontend begin: receiver methods\nFrontend resource case: b...\n[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]\n",
+          "result": "PASS"
+        },
+        {
+          "name": "modules",
+          "seconds": 1.06459,
+          "stdout": "Project constants, forwards, visibility, cycles, imports and restart checks passed\nProject-local library identities, cycles, ownership, overlays, native JIT and invalidation passed\nMulti-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed\nmodules: passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "local_libraries",
+          "seconds": 0.449993,
+          "stdout": "Local libraries: 16 compiler/JIT/AOT/cache/application checks and same-server LSP completion/overlay/refresh checks passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "source_cli",
+          "seconds": 3.81627,
+          "stdout": "Source checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/source programs with spaces/architecture-normal.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/source programs with spaces/architecture-optimized.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/source programs with spaces/loops-normal.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/source programs with spaces/loops-optimized.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/source programs with spaces/functions-normal.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/source programs with spaces/functions-optimized.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/source ...\n[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]\n",
+          "result": "PASS"
+        },
+        {
+          "name": "modules_cli",
+          "seconds": 41.182,
+          "stdout": "Source checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/module native programs with spaces/acceptance-normal.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/module native programs with spaces/acceptance-optimized.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/module native programs with spaces/nested-normal.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/module native programs with spaces/nested-optimized.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/module native programs with spaces/cyclic-normal.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/module native programs with spaces/cyclic-optimized.o\nSourc...\n[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]\n",
+          "result": "PASS"
+        },
+        {
+          "name": "analysis_cli",
+          "seconds": 0.561156,
+          "stdout": "Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/analysis native programs/analysis-53-normal.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/analysis native programs/analysis-53-optimized.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/analysis native programs/analysis-61-normal.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/analysis native programs/analysis-61-optimized.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/analysis native programs/analysis-62-normal.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/analysis native programs/analysis-62-optimized.o\n",
+          "result": "PASS"
+        },
+        {
+          "name": "numeric_cli",
+          "seconds": 24.7287,
+          "stdout": "-- Numeric source constants, JIT and native AOT passed in both optimization modes\n",
+          "result": "PASS"
+        }
+      ],
+      "binaries_sha256": {
+        "void_project_manifest": "e71bde00d26408f3490664ddd0421871adfb7f120333e431e397fe67c5840cd9",
+        "void_project_header": "d16930aa22471cd341f3e5879e0cdcee22fa8a334cd423c944c9c555d4cf1c99",
+        "voidc": "41a4cb59e6a962880bb6405573fbbe4af41df923f3a5a486f825ba340fde9214",
+        "voidls": "589398d86ea11a87b4081b7c80cef204121961d0b90aa91de907340b8fb4f990",
+        "void_tests": "a2c4e0b206410695a75eed30c137bdee6eb69d6b06d87130cd2d90ede6bfda56"
+      },
+      "build_log": {
+        "path": "build/slice1-closeout-debug-build.log",
+        "sha256": "a81f5fc07cbd900ec0c7b9d71461a8239a34e7ce07701439bcebf97b0098bab7",
+        "bytes": 1352
+      }
+    },
+    {
+      "profile": "strict",
+      "build_type": "RelWithDebInfo",
+      "sanitizers": true,
+      "tests_passed": 25,
+      "tests_failed": 0,
+      "ctest_argv": [
+        "ctest",
+        "--test-dir",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict",
+        "-R",
+        "^(project_manifest.*|cli_contract|cli_install_resources|frontend|modules|numeric|analysis|tooling|sessions|source_cli|modules_cli|analysis_cli|numeric_cli|local_libraries|application_workflow_stage9|debug_cache_processes|automatic_cache_processes|os_frontend|lsp_os|os_errors|lsp_stage7)$",
+        "--output-on-failure",
+        "--output-junit",
+        "../slice1-closeout-strict.xml"
+      ],
+      "configure_argv": [
+        "cmake",
+        "-S",
+        ".",
+        "-B",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict"
+      ],
+      "build_argv": [
+        "cmake",
+        "--build",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict",
+        "--target",
+        "void_project_manifest",
+        "void_project_header",
+        "void_tests",
+        "voidc",
+        "voidls",
+        "-j2"
+      ],
+      "junit": {
+        "path": "docs/projects/evidence/closeout/linux-strict.xml",
+        "sha256": "fc964aac9dfaf0a57c2c1167ea6ec25147074ad8cbc452d0906e6c5a9065ae5f",
+        "bytes": 10112
+      },
+      "cases": [
+        {
+          "name": "project_manifest_header",
+          "seconds": 0.0140956,
+          "stdout": "",
+          "result": "PASS"
+        },
+        {
+          "name": "project_manifest",
+          "seconds": 0.21878,
+          "stdout": "project_manifest: 8787 checks passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "project_manifest_no_authority",
+          "seconds": 0.271699,
+          "stdout": "project_manifest: 8788 checks passed under syscall denial\nproject_manifest_no_authority: four live SIGSYS controls passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "project_manifest_legacy",
+          "seconds": 1.57628,
+          "stdout": "project_manifest_legacy: 15 checks passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "project_manifest_provenance",
+          "seconds": 0.0389881,
+          "stdout": "project_manifest_provenance: 3 file hashes and exact pinned upstream reconstruction passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "cli_contract",
+          "seconds": 12.2547,
+          "stdout": "76 CLI process checks passed on linux; native output and collision preservation passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "cli_install_resources",
+          "seconds": 0.0812943,
+          "stdout": "......s\n----------------------------------------------------------------------\nRan 7 tests in 0.006s\n\nOK (skipped=1)\n",
+          "result": "PASS"
+        },
+        {
+          "name": "application_workflow_stage9",
+          "seconds": 31.6198,
+          "stdout": "Stage 9 real workflow checks passed: 111\n",
+          "result": "PASS"
+        },
+        {
+          "name": "debug_cache_processes",
+          "seconds": 9.02298,
+          "stdout": "Fresh processes, corruption, concurrent publication, imports, diagnostics and large arrays passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "automatic_cache_processes",
+          "seconds": 1.6259,
+          "stdout": "Automatic O2/no-IR-O2 caching, bypass, fresh globals and diagnostics passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "os_errors",
+          "seconds": 21.3583,
+          "stdout": "OS errors: 8 process checks, 9 valid/61 invalid IDs x four getters; hard_stack_1MiB=False\n",
+          "result": "PASS"
+        },
+        {
+          "name": "os_frontend",
+          "seconds": 39.8852,
+          "stdout": "OS frontend: 62 processes passed; hard_stack_1MiB=False\n",
+          "result": "PASS"
+        },
+        {
+          "name": "lsp_os",
+          "seconds": 7.63171,
+          "stdout": "OS LSP: 44 checks passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "lsp_stage7",
+          "seconds": 0.542101,
+          "stdout": "Stage 7: completion/recovery, signatures, hover, bindings, symbols, guarded rename, formatting, refresh, batching, cancellation passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "sessions",
+          "seconds": 0.471276,
+          "stdout": "sessions: passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "tooling",
+          "seconds": 0.620396,
+          "stdout": "queries: aliased/direct definitions, 2 callers, root/local constants, byte spans and retained snapshots\nplan: /leaf.void -> /middle.void::wrapper -> /main.void::entry; validated 53 -> 61, const restart required\ntooling: passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "analysis",
+          "seconds": 1.27004,
+          "stdout": "normal: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 497725\nO2: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 650334\nanalysis: passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "numeric",
+          "seconds": 6.85892,
+          "stdout": "210 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed\nnumeric: passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "frontend",
+          "seconds": 12.5079,
+          "stdout": "Frontend begin: diagnostics\n50+ source diagnostic cases and UTF-8/ABI checks passed\nFrontend passed: diagnostics\nFrontend begin: programs\nReal .void files and independent programs executed through normal/O2 JIT\nFrontend passed: programs\nFrontend begin: numeric values\n1216 constant/normal/O2 numeric matrix comparisons passed\nReadonly/compile-time constants, numeric boundaries, concurrent failures, bounded traces and restart checks passed\nFrontend passed: numeric values\nFrontend begin: diagnostic recovery/resource limits\nFrontend resource case: combined expression/constant depth\nStructured diagnostics: independent files, recovery, bounded cascades, snapshots and failed reload verified\nFrontend passed: diagnostic recovery/resource limits\nFrontend begin: value structs\nFrontend resource case: bounded expanded value layouts\nValue struct source: nested/mixed layouts, copies, normal/O2 JIT, diagnostics, tooling and reload passed\nFrontend passed: value structs\nFrontend begin: receiver methods\nFrontend resource case: b...\n[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]\n",
+          "result": "PASS"
+        },
+        {
+          "name": "modules",
+          "seconds": 1.78468,
+          "stdout": "Project constants, forwards, visibility, cycles, imports and restart checks passed\nProject-local library identities, cycles, ownership, overlays, native JIT and invalidation passed\nMulti-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed\nmodules: passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "local_libraries",
+          "seconds": 1.09287,
+          "stdout": "Local libraries: 16 compiler/JIT/AOT/cache/application checks and same-server LSP completion/overlay/refresh checks passed\n",
+          "result": "PASS"
+        },
+        {
+          "name": "source_cli",
+          "seconds": 15.3422,
+          "stdout": "Source checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/source programs with spaces/architecture-normal.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/source programs with spaces/architecture-optimized.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/source programs with spaces/loops-normal.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/source programs with spaces/loops-optimized.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/source programs with spaces/functions-normal.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/source programs with spaces/functions-optimized.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/...\n[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]\n",
+          "result": "PASS"
+        },
+        {
+          "name": "modules_cli",
+          "seconds": 52.999,
+          "stdout": "Source checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/module native programs with spaces/acceptance-normal.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/module native programs with spaces/acceptance-optimized.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/module native programs with spaces/nested-normal.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/module native programs with spaces/nested-optimized.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/module native programs with spaces/cyclic-normal.o\nSource checked successfully\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/module native programs with spaces/cyclic-optimized.o...\n[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]\n",
+          "result": "PASS"
+        },
+        {
+          "name": "analysis_cli",
+          "seconds": 1.13344,
+          "stdout": "Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/analysis native programs/analysis-53-normal.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/analysis native programs/analysis-53-optimized.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/analysis native programs/analysis-61-normal.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/analysis native programs/analysis-61-optimized.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/analysis native programs/analysis-62-normal.o\nWrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/analysis native programs/analysis-62-optimized.o\n",
+          "result": "PASS"
+        },
+        {
+          "name": "numeric_cli",
+          "seconds": 43.001,
+          "stdout": "-- Numeric source constants, JIT and native AOT passed in both optimization modes\n",
+          "result": "PASS"
+        }
+      ],
+      "binaries_sha256": {
+        "void_project_manifest": "83b054cdd5c113ce983107bd1da7462017b6e949c85dda5046a481665344beaa",
+        "void_project_header": "42d278acceb71032d8b8049c6776e7da5cdf332cba75a8424bc4d129522fdc56",
+        "voidc": "8b733d2ed9b7d984d9ca820d3d553ff9aaf6f50a69e6660b83d135e29142179c",
+        "voidls": "8017cdd61ddc84ee7b5628801d41d5e4ebf3215467559abe920ac14780324fec",
+        "void_tests": "fba753b96086c4a7109df62052c2a1dff9358fd492280412094bdba02696a327"
+      },
+      "build_log": {
+        "path": "build/slice1-closeout-strict-build.log",
+        "sha256": "83e357d4f3529e815521ead4cefcc539c39e3fa47330a4ce1c6b23a3cdb055e1",
+        "bytes": 1789
+      }
+    }
+  ],
+  "linux_selected_outcomes": {
+    "passed": 75,
+    "failed": 0,
+    "entire_suite": false
+  },
+  "low_stack": [
+    {
+      "profile": "release",
+      "argv": [
+        "bash",
+        "-c",
+        "ulimit -s 1024; exec \"$1\"",
+        "slice1-stack",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_project_manifest"
+      ],
+      "returncode": 0,
+      "seconds": 0.046488947002217174,
+      "log": "build/slice1-closeout-release-stack.log"
+    },
+    {
+      "profile": "debug",
+      "argv": [
+        "bash",
+        "-c",
+        "ulimit -s 1024; exec \"$1\"",
+        "slice1-stack",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_project_manifest"
+      ],
+      "returncode": 0,
+      "seconds": 0.588720383006148,
+      "log": "build/slice1-closeout-debug-stack.log"
+    },
+    {
+      "profile": "strict",
+      "argv": [
+        "bash",
+        "-c",
+        "ulimit -s 1024; exec \"$1\"",
+        "slice1-stack",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_project_manifest"
+      ],
+      "returncode": 0,
+      "seconds": 0.24377234200073872,
+      "log": "build/slice1-closeout-strict-stack.log"
+    }
+  ],
+  "independent_component_installation": [
+    {
+      "component": "compiler",
+      "install_argv": [
+        "cmake",
+        "--install",
+        "build/llvm23-release",
+        "--prefix",
+        "/home/shmellyorc/Documents/Void.Language/build/slice1-closeout-install/compiler",
+        "--component",
+        "compiler"
+      ],
+      "install_returncode": 0,
+      "verify_argv": [
+        "python3",
+        "tests/project/provenance.py",
+        "--installed",
+        "/home/shmellyorc/Documents/Void.Language/build/slice1-closeout-install/compiler/share/void/licenses/tomlplusplus"
+      ],
+      "verify_returncode": 0,
+      "files_sha256": {
+        "LICENSE": "529bc3900a9571e49db285b0df432397e70b881cc3bf48de6667ae74ff4b06d8",
+        "upstream.json": "98e2bf14bd9c8765aae02725a494affa31585ecb352e494d88f5eaccb806adfc",
+        "void-bounds-and-locations.patch": "d131e7ff7daa6373904406403b8f23def1b0dc02127de8230c1a09cdace3330f",
+        "corresponding-source/toml.hpp": "7cd54af1a3497465eb26507f8d8a2ccfe661fccc27dac7a5121b885bee88d5e7",
+        "corresponding-source/README.md": "794360d588216c468ce40627042ff4ce0238fb8d72616688f04892f861765c7c"
+      }
+    },
+    {
+      "component": "tooling",
+      "install_argv": [
+        "cmake",
+        "--install",
+        "build/llvm23-release",
+        "--prefix",
+        "/home/shmellyorc/Documents/Void.Language/build/slice1-closeout-install/tooling",
+        "--component",
+        "tooling"
+      ],
+      "install_returncode": 0,
+      "verify_argv": [
+        "python3",
+        "tests/project/provenance.py",
+        "--installed",
+        "/home/shmellyorc/Documents/Void.Language/build/slice1-closeout-install/tooling/share/void/licenses/tomlplusplus"
+      ],
+      "verify_returncode": 0,
+      "files_sha256": {
+        "LICENSE": "529bc3900a9571e49db285b0df432397e70b881cc3bf48de6667ae74ff4b06d8",
+        "upstream.json": "98e2bf14bd9c8765aae02725a494affa31585ecb352e494d88f5eaccb806adfc",
+        "void-bounds-and-locations.patch": "d131e7ff7daa6373904406403b8f23def1b0dc02127de8230c1a09cdace3330f",
+        "corresponding-source/toml.hpp": "7cd54af1a3497465eb26507f8d8a2ccfe661fccc27dac7a5121b885bee88d5e7",
+        "corresponding-source/README.md": "794360d588216c468ce40627042ff4ce0238fb8d72616688f04892f861765c7c"
+      }
+    }
+  ],
+  "notice_failure_retained": {
+    "path": "docs/projects/evidence/closeout/notice-failure.json",
+    "sha256": "9e2fe1d26bf19ffdaab1551f5dd7035be1ce93eca578f3aece462a9ab381f41c",
+    "bytes": 2804
+  },
+  "notice_corrected": {
+    "scope": "Focused licensing checks, not platform/installation qualification",
+    "commands": [
+      {
+        "argv": [
+          "cmake",
+          "--install",
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+          "--prefix",
+          "/tmp/VOID license installs kujj88sq/compiler",
+          "--component",
+          "compiler"
+        ],
+        "exit_code": 0,
+        "log": "linux-compiler.log"
+      },
+      {
+        "argv": [
+          "cmake",
+          "--install",
+          "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+          "--prefix",
+          "/tmp/VOID license installs kujj88sq/tooling",
+          "--component",
+          "tooling"
+        ],
+        "exit_code": 0,
+        "log": "linux-tooling.log"
+      },
+      {
+        "argv": [
+          "cmake",
+          "-S",
+          "/tmp/VOID license installs kujj88sq/windows-notice-rules",
+          "-B",
+          "/tmp/VOID license installs kujj88sq/windows-notice-rules/build"
+        ],
+        "exit_code": 0,
+        "log": "windows-rules-configure.log"
+      },
+      {
+        "argv": [
+          "cmake",
+          "--install",
+          "/tmp/VOID license installs kujj88sq/windows-notice-rules/build",
+          "--prefix",
+          "/tmp/VOID license installs kujj88sq/windows-compiler",
+          "--component",
+          "compiler"
+        ],
+        "exit_code": 0,
+        "log": "windows-rules-compiler.log"
+      },
+      {
+        "argv": [
+          "cmake",
+          "--install",
+          "/tmp/VOID license installs kujj88sq/windows-notice-rules/build",
+          "--prefix",
+          "/tmp/VOID license installs kujj88sq/windows-tooling",
+          "--component",
+          "tooling"
+        ],
+        "exit_code": 0,
+        "log": "windows-rules-tooling.log"
+      }
+    ],
+    "results": [
+      {
+        "name": "source-inventory",
+        "result": "PASS",
+        "detail": {
+          "verified_inventory_entries": 58,
+          "editor_original_license_metadata": "MIT"
+        }
+      },
+      {
+        "name": "linux-compiler-install",
+        "result": "PASS",
+        "detail": {
+          "verified_license_entries": 56,
+          "stdlib_sources": 25,
+          "scope": "Linux existing component install; no requalification"
+        }
+      },
+      {
+        "name": "linux-tooling-install",
+        "result": "PASS",
+        "detail": {
+          "verified_license_entries": 22,
+          "stdlib_sources": 25,
+          "scope": "Linux existing component install; no requalification"
+        }
+      },
+      {
+        "name": "windows-notice-rules-compiler",
+        "result": "PASS",
+        "detail": {
+          "verified_license_entries": 22,
+          "stdlib_sources": 0,
+          "scope": "Windows file rules only; no native execution"
+        }
+      },
+      {
+        "name": "windows-notice-rules-tooling",
+        "result": "PASS",
+        "detail": {
+          "verified_license_entries": 18,
+          "stdlib_sources": 0,
+          "scope": "Windows file rules only; no native execution"
+        }
+      }
+    ],
+    "native_windows_macos": "NOT RUN / UNKNOWN"
+  },
+  "extra_release_install": {
+    "passed": 1,
+    "failed": 0,
+    "junit": {
+      "path": "docs/projects/evidence/closeout/linux-install.xml",
+      "sha256": "ce98af742b9f6abf79e9c2a2928a1336caba11da8396bcbf50a109639359874a",
+      "bytes": 734
+    }
+  },
+  "windows_native": {
+    "status": "PASS",
+    "scope": "New parser and isolated header compiled from exact current inputs, linked with preexisting baseline void_core/LLVM dependency closure; not a full current-tree native compiler rebuild",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "commands": [
+      {
+        "label": "Release-http-verified",
+        "argv": [
+          "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "C:\\Users\\a\\VoidCI42377496702-Native\\tools\\verify_http_dependencies.py",
+          "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\http\\prefix\\windows-schannel-x86_64\\Release",
+          "Release",
+          "Windows",
+          "x86_64"
+        ],
+        "cwd": "C:\\Users\\a\\VoidCI42377496702-Native",
+        "returncode": 0,
+        "seconds": 0.21405119999690214
+      },
+      {
+        "label": "Release-host-verified",
+        "argv": [
+          "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "C:\\Users\\a\\VoidCI42377496702-Native\\tools\\verify_host_deps.py",
+          "--prefix",
+          "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\host\\prefix\\windows-x86_64\\Release",
+          "--profile",
+          "Release",
+          "--platform",
+          "Windows",
+          "--architecture",
+          "x86_64"
+        ],
+        "cwd": "C:\\Users\\a\\VoidCI42377496702-Native",
+        "returncode": 0,
+        "seconds": 1.3052213999981177
+      },
+      {
+        "label": "Release-header-build",
+        "argv": [
+          "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+          "/nologo",
+          "/std:c++20",
+          "/EHsc",
+          "/MT",
+          "/GR-",
+          "/W4",
+          "/permissive-",
+          "/D_ITERATOR_DEBUG_LEVEL=0",
+          "/DWIN32_LEAN_AND_MEAN",
+          "/DNOMINMAX",
+          "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\include",
+          "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\third_party\\tomlplusplus",
+          "/O2",
+          "/DNDEBUG",
+          "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\tests\\project\\header.cpp",
+          "/FeC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Release\\header.exe",
+          "/FoC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Release\\header.obj",
+          "/FdC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Release\\header.pdb",
+          "/link",
+          "/INCREMENTAL:NO"
+        ],
+        "cwd": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+        "returncode": 0,
+        "seconds": 2.849843600000895
+      },
+      {
+        "label": "Release-header",
+        "argv": [
+          "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Release\\header.exe"
+        ],
+        "cwd": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+        "returncode": 0,
+        "seconds": 0.13647759999730624
+      },
+      {
+        "label": "Release-project-compile",
+        "argv": [
+          "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+          "/nologo",
+          "/std:c++20",
+          "/EHsc",
+          "/MT",
+          "/GR-",
+          "/W4",
+          "/permissive-",
+          "/D_ITERATOR_DEBUG_LEVEL=0",
+          "/DWIN32_LEAN_AND_MEAN",
+          "/DNOMINMAX",
+          "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\include",
+          "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\third_party\\tomlplusplus",
+          "/O2",
+          "/DNDEBUG",
+          "/c",
+          "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\src\\frontend\\project.cpp",
+          "/FoC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Release\\project.obj",
+          "/FdC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Release\\project.pdb"
+        ],
+        "cwd": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+        "returncode": 0,
+        "seconds": 8.850236199999927
+      },
+      {
+        "label": "Release-manifest-compile",
+        "argv": [
+          "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+          "/nologo",
+          "/std:c++20",
+          "/EHsc",
+          "/MT",
+          "/GR-",
+          "/W4",
+          "/permissive-",
+          "/D_ITERATOR_DEBUG_LEVEL=0",
+          "/DWIN32_LEAN_AND_MEAN",
+          "/DNOMINMAX",
+          "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\include",
+          "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\third_party\\tomlplusplus",
+          "/O2",
+          "/DNDEBUG",
+          "/c",
+          "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\tests\\project\\manifest.cpp",
+          "/FoC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Release\\manifest.obj",
+          "/FdC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Release\\manifest.pdb"
+        ],
+        "cwd": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+        "returncode": 0,
+        "seconds": 6.122111700002279
+      },
+      {
+        "label": "Release-manifest-link",
+        "argv": [
+          "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe",
+          "@C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Release\\manifest-link.rsp"
+        ],
+        "cwd": "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Release",
+        "returncode": 0,
+        "seconds": 0.7217939000038314
+      },
+      {
+        "label": "Release-manifest",
+        "argv": [
+          "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Release\\manifest.exe"
+        ],
+        "cwd": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+        "returncode": 0,
+        "seconds": 0.1607471999959671
+      },
+      {
+        "label": "Debug-http-verified",
+        "argv": [
+          "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "C:\\Users\\a\\VoidCI42377496702-Native\\tools\\verify_http_dependencies.py",
+          "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\http\\prefix\\windows-schannel-x86_64\\Debug",
+          "Debug",
+          "Windows",
+          "x86_64"
+        ],
+        "cwd": "C:\\Users\\a\\VoidCI42377496702-Native",
+        "returncode": 0,
+        "seconds": 0.3672267000001739
+      },
+      {
+        "label": "Debug-host-verified",
+        "argv": [
+          "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "C:\\Users\\a\\VoidCI42377496702-Native\\tools\\verify_host_deps.py",
+          "--prefix",
+          "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\host\\prefix\\windows-x86_64\\Debug",
+          "--profile",
+          "Debug",
+          "--platform",
+          "Windows",
+          "--architecture",
+          "x86_64"
+        ],
+        "cwd": "C:\\Users\\a\\VoidCI42377496702-Native",
+        "returncode": 0,
+        "seconds": 1.318375399998331
+      },
+      {
+        "label": "Debug-header-build",
+        "argv": [
+          "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+          "/nologo",
+          "/std:c++20",
+          "/EHsc",
+          "/MT",
+          "/GR-",
+          "/W4",
+          "/permissive-",
+          "/D_ITERATOR_DEBUG_LEVEL=0",
+          "/DWIN32_LEAN_AND_MEAN",
+          "/DNOMINMAX",
+          "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\include",
+          "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\third_party\\tomlplusplus",
+          "/Od",
+          "/Zi",
+          "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\tests\\project\\header.cpp",
+          "/FeC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Debug\\header.exe",
+          "/FoC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Debug\\header.obj",
+          "/FdC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Debug\\header.pdb",
+          "/link",
+          "/INCREMENTAL:NO"
+        ],
+        "cwd": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+        "returncode": 0,
+        "seconds": 1.3233752000014647
+      },
+      {
+        "label": "Debug-header",
+        "argv": [
+          "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Debug\\header.exe"
+        ],
+        "cwd": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+        "returncode": 0,
+        "seconds": 0.1315907000025618
+      },
+      {
+        "label": "Debug-project-compile",
+        "argv": [
+          "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+          "/nologo",
+          "/std:c++20",
+          "/EHsc",
+          "/MT",
+          "/GR-",
+          "/W4",
+          "/permissive-",
+          "/D_ITERATOR_DEBUG_LEVEL=0",
+          "/DWIN32_LEAN_AND_MEAN",
+          "/DNOMINMAX",
+          "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\include",
+          "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\third_party\\tomlplusplus",
+          "/Od",
+          "/Zi",
+          "/c",
+          "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\src\\frontend\\project.cpp",
+          "/FoC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Debug\\project.obj",
+          "/FdC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Debug\\project.pdb"
+        ],
+        "cwd": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+        "returncode": 0,
+        "seconds": 5.5346678999994765
+      },
+      {
+        "label": "Debug-manifest-compile",
+        "argv": [
+          "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe",
+          "/nologo",
+          "/std:c++20",
+          "/EHsc",
+          "/MT",
+          "/GR-",
+          "/W4",
+          "/permissive-",
+          "/D_ITERATOR_DEBUG_LEVEL=0",
+          "/DWIN32_LEAN_AND_MEAN",
+          "/DNOMINMAX",
+          "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\include",
+          "/IC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\third_party\\tomlplusplus",
+          "/Od",
+          "/Zi",
+          "/c",
+          "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\tests\\project\\manifest.cpp",
+          "/FoC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Debug\\manifest.obj",
+          "/FdC:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Debug\\manifest.pdb"
+        ],
+        "cwd": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+        "returncode": 0,
+        "seconds": 3.583577500001411
+      },
+      {
+        "label": "Debug-manifest-link",
+        "argv": [
+          "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe",
+          "@C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Debug\\manifest-link.rsp"
+        ],
+        "cwd": "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug",
+        "returncode": 0,
+        "seconds": 0.9240161000052467
+      },
+      {
+        "label": "Debug-manifest",
+        "argv": [
+          "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\focused\\Debug\\manifest.exe"
+        ],
+        "cwd": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+        "returncode": 0,
+        "seconds": 0.49036220000562025
+      },
+      {
+        "label": "provenance",
+        "argv": [
+          "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+          "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2\\tests\\project\\provenance.py",
+          "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2"
+        ],
+        "cwd": "C:\\Users\\a\\VoidSlice1Closeout-20261108-r2",
+        "returncode": 0,
+        "seconds": 0.14268689999880735
+      }
+    ],
+    "current_inputs_sha256": {
+      "src/frontend/project.cpp": "b69965d50db29d90af030378bee57288d9ac7cd1928c6244bc3febcc9a3f1f42",
+      "include/void/project.hpp": "945b3cc02d0da73045ab7741ee7a3ed3829fcccad92ae42ec3156314c983ba3f",
+      "tests/project/manifest.cpp": "4fd4e5c2550f27e89bea7a7377f8fcf101580e6be4f231b0f81eaedaef217a3c",
+      "tests/project/header.cpp": "62a8621869e8fdb923b8cc7db1703473f389f629b23d8004a8abffffae72a98a",
+      "third_party/tomlplusplus/toml.hpp": "7cd54af1a3497465eb26507f8d8a2ccfe661fccc27dac7a5121b885bee88d5e7",
+      "third_party/tomlplusplus/void-bounds-and-locations.patch": "d131e7ff7daa6373904406403b8f23def1b0dc02127de8230c1a09cdace3330f",
+      "third_party/tomlplusplus/upstream.json": "98e2bf14bd9c8765aae02725a494affa31585ecb352e494d88f5eaccb806adfc",
+      "third_party/tomlplusplus/LICENSE": "529bc3900a9571e49db285b0df432397e70b881cc3bf48de6667ae74ff4b06d8"
+    },
+    "stage": "provenance",
+    "Release_baseline_inputs_sha256": {
+      "void_core.lib": "a462af19fff32ef2fbcb56e58d8de7aa764234a617e52a160f2b918c61705b6c",
+      "build.ninja": "5c2e38dc684ba4996c2f8613963dd918ad65cbbcc3deda3084461d549ccfce25"
+    },
+    "Release_binaries_sha256": {
+      "header.exe": "1e15a236e456cafdcc56f1166cf59e191d39cd632b5f186f1d85bc6d60ef7349",
+      "manifest.exe": "a7a3efa171a513f193fcd7bba5a978e104fc9be3bc88eccd8a2ba59ef5a4b710"
+    },
+    "Debug_baseline_inputs_sha256": {
+      "void_core.lib": "08785153ab9001c2462ca43cfd11fe400e98d6873cabf3038527564db943df60",
+      "build.ninja": "a465724934f8f080e1f149d6a3d1a840583196ece4f9fb0c220969b5bc96e75e"
+    },
+    "Debug_binaries_sha256": {
+      "header.exe": "0c17b5a5a2aee631bacafce7aa1d5aa402b3ccbd0fed7b193991c0a019ea9d06",
+      "manifest.exe": "2ab905355877812eab79a374af8706d3ac50ffb142d95acc1f701a6105c08e1d"
+    }
+  },
+  "windows_unqualified": [
+    "full current-tree CMake/compiler/CLI integration",
+    "Windows fatal strict",
+    "Windows Server 2022",
+    "editor UI",
+    "packaging"
+  ],
+  "other_unqualified": [
+    "macOS",
+    "hosted acceptance",
+    "S2 and later implementation"
+  ],
+  "original_pre_repair_failures": [
+    {
+      "profile": "debug",
+      "passed": 22,
+      "failed": 2,
+      "failures": [
+        {
+          "name": "project_manifest",
+          "output": "void_project_manifest: /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15487: bool toml::impl::parser::parse_key(): Assertion `is_bare_key_character(*cp) || is_string_delimiter(*cp)' failed.\n"
+        },
+        {
+          "name": "project_manifest_no_authority",
+          "output": "void_project_manifest: /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15487: bool toml::impl::parser::parse_key(): Assertion `is_bare_key_character(*cp) || is_string_delimiter(*cp)' failed.\n"
+        }
+      ],
+      "xml": "build/project-slice1-debug-first-tests.xml",
+      "xml_sha256": "8f8f19a589b642752f0a5aeddef2985238f3a4967374ac660b10848c5f6b8cf8",
+      "log": "build/project-slice1-debug-tests.log",
+      "log_sha256": "874bf705d693a32ca640500cd5c95e322aa1a34ce447ee8a9902497c9f3e247e"
+    },
+    {
+      "profile": "strict",
+      "passed": 22,
+      "failed": 2,
+      "failures": [
+        {
+          "name": "project_manifest",
+          "output": "/home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15487:4: runtime error: assumption is violated during execution\n    #0 0x5644a765aacb in toml::v3::impl::impl_noex::parser::parse_key() /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15487:4\n    #1 0x5644a764fb35 in toml::v3::impl::impl_noex::parser::parse_table_header() /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15609:5\n    #2 0x5644a764c862 in toml::v3::impl::impl_noex::parser::parse_document() /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15916:22\n    #3 0x5644a764b997 in toml::v3::impl::impl_noex::parser::parser(toml::v3::impl::utf8_reader_interface&&) /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:16001:6\n    #4 0x5644a762f3c6 in toml::v3::impl::do_parse(toml::v3::impl::utf8_reader_interface&&) /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:16212:10\n    #5 0x5644a762f3c6 in toml::v3::noex::parse(std::basic_string_view<char, std::char_traits<char>>, std::basic_string_view<char, std::char_traits<char>>) /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:16279:10\n    #6 0x5644a762f3c6 in vd::project::ManifestParser::parse() /home/shmellyorc/Documents/Void.Language/src/frontend/project.cpp:304:23\n    #7 0x5644a762db5c in vd::project::parse_manifest(vd::SourceFile const&) /home/shmellyorc/Documents/Void.Language/src/frontend/project.cpp:366:86\n    #8 0x5644a76267d2 in (anonymous namespace)::parse(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>) /home/shmellyorc/Documents/Void.Language/tests/project/manifest.cpp:62:12\n    #9 0x5644a76126cb in (anonymous namespace)::mutations() /home/shmellyorc/Documents/Void.Language/tests/project/manifest.cpp:232:27\n    #10 0x5644a76126cb in main /home/shmellyorc/Documents/Void.Language/tests/project/manifest.cpp:293:89\n    #11 0x7f2c1ca2a3fd  (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a3fd) (BuildId: a6ece0eae08c71f58eaefb817ae72b57782127d3)\n    #12 0x7f2c1ca2a51a in __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a51a) (BuildId: a6ece0eae08c71f58eaefb817ae72b57782127d3)\n    #13 0x5644a75193f4 in _start (/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_project_manifest+0x4a63f4)\n\nSUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15487:4 \n"
+        },
+        {
+          "name": "project_manifest_no_authority",
+          "output": "/home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15487:4: runtime error: assumption is violated during execution\n"
+        }
+      ],
+      "xml": "build/project-slice1-strict-first-tests.xml",
+      "xml_sha256": "7b862217c3970a7de9ab0fc29c55b8d0363b244771b59b3c43f272db4ff38b89",
+      "log": "build/project-slice1-strict-tests.log",
+      "log_sha256": "a4887e8a7c7c3bc8ccefe2820613cc00fbceb37e427b9645eda7ed39ac6beba4"
+    }
+  ],
+  "patches": [
+    {
+      "kind": "baseline",
+      "path": "docs/projects/evidence/slice1-baseline-source.patch",
+      "sha256": "c0ce96261e44bd6fa930050e5a0e6bfbaf57d5e9f6949be3db87dd42eb4fc99e",
+      "bytes": 706915,
+      "changed_paths": [
+        "CMakeLists.txt",
+        "cmake/InstallLicenses.cmake",
+        "docs/CLI.md",
+        "docs/DECISIONS.md",
+        "docs/DIAGNOSTICS.md",
+        "docs/EDITOR_INTEGRATION.md",
+        "docs/LANGUAGE_BIBLE.md",
+        "docs/LANGUAGE_SERVER.md",
+        "docs/LOCAL_LIBRARIES.md",
+        "docs/MODULE_SYSTEM.md",
+        "docs/NATIVE_LIBRARIES.md",
+        "docs/PROJECT_ARCHITECTURE_ROADMAP.md",
+        "docs/README.md",
+        "docs/RUNTIME_GLOBALS.md",
+        "docs/SOURCE_COMPILER.md",
+        "docs/STAGE8_DISCOVERY.md",
+        "docs/STAGE9_APPLICATION_WORKFLOW.md",
+        "docs/os/API.md",
+        "docs/release/NOTICE_INVENTORY.json",
+        "docs/release/REDISTRIBUTION_NOTICES.md",
+        "include/void/diagnostic.hpp",
+        "include/void/path.hpp",
+        "include/void/project.hpp",
+        "src/frontend/compiler.cpp",
+        "src/frontend/project.cpp",
+        "tests/project/authority.py",
+        "tests/project/header.cpp",
+        "tests/project/legacy.py",
+        "tests/project/manifest.cpp",
+        "tests/project/provenance.py",
+        "third_party/tomlplusplus/LICENSE",
+        "third_party/tomlplusplus/README.md",
+        "third_party/tomlplusplus/toml.hpp",
+        "third_party/tomlplusplus/upstream.json",
+        "third_party/tomlplusplus/void-bounds-and-locations.patch"
+      ],
+      "source_scope": [
+        "CMakeLists.txt",
+        "cmake/InstallLicenses.cmake",
+        "docs/CLI.md",
+        "docs/DECISIONS.md",
+        "docs/DIAGNOSTICS.md",
+        "docs/EDITOR_INTEGRATION.md",
+        "docs/LANGUAGE_BIBLE.md",
+        "docs/LANGUAGE_SERVER.md",
+        "docs/LOCAL_LIBRARIES.md",
+        "docs/MODULE_SYSTEM.md",
+        "docs/NATIVE_LIBRARIES.md",
+        "docs/PROJECT_ARCHITECTURE_ROADMAP.md",
+        "docs/README.md",
+        "docs/RUNTIME_GLOBALS.md",
+        "docs/SOURCE_COMPILER.md",
+        "docs/STAGE8_DISCOVERY.md",
+        "docs/STAGE9_APPLICATION_WORKFLOW.md",
+        "docs/os/API.md",
+        "docs/release/NOTICE_INVENTORY.json",
+        "docs/release/REDISTRIBUTION_NOTICES.md",
+        "include/void/diagnostic.hpp",
+        "include/void/path.hpp",
+        "include/void/project.hpp",
+        "src/frontend/compiler.cpp",
+        "src/frontend/project.cpp",
+        "tests/project/authority.py",
+        "tests/project/header.cpp",
+        "tests/project/legacy.py",
+        "tests/project/manifest.cpp",
+        "tests/project/provenance.py",
+        "third_party/tomlplusplus/LICENSE",
+        "third_party/tomlplusplus/README.md",
+        "third_party/tomlplusplus/toml.hpp",
+        "third_party/tomlplusplus/upstream.json",
+        "third_party/tomlplusplus/void-bounds-and-locations.patch"
+      ],
+      "reverse_check": "PASS",
+      "forward_reconstruction": "PASS"
+    },
+    {
+      "kind": "closeout",
+      "path": "docs/projects/evidence/slice1-closeout-source.patch",
+      "sha256": "f1d0a349a343facded33e6a5dbdeb0eae9903404ab5d0765035a554c146879a7",
+      "bytes": 29597,
+      "changed_paths": [
+        "CMakeLists.txt",
+        "cmake/InstallLicenses.cmake",
+        "docs/DECISIONS.md",
+        "docs/PROJECT_ARCHITECTURE_ROADMAP.md",
+        "docs/release/NOTICE_INVENTORY.json",
+        "docs/release/REDISTRIBUTION_NOTICES.md",
+        "include/void/project.hpp",
+        "tests/project/header.cpp",
+        "tests/project/manifest.cpp",
+        "tests/project/provenance.py",
+        "third_party/tomlplusplus/README.md"
+      ],
+      "source_scope": [
+        "CMakeLists.txt",
+        "cmake/InstallLicenses.cmake",
+        "docs/CLI.md",
+        "docs/DECISIONS.md",
+        "docs/DIAGNOSTICS.md",
+        "docs/EDITOR_INTEGRATION.md",
+        "docs/LANGUAGE_BIBLE.md",
+        "docs/LANGUAGE_SERVER.md",
+        "docs/LOCAL_LIBRARIES.md",
+        "docs/MODULE_SYSTEM.md",
+        "docs/NATIVE_LIBRARIES.md",
+        "docs/PROJECT_ARCHITECTURE_ROADMAP.md",
+        "docs/README.md",
+        "docs/RUNTIME_GLOBALS.md",
+        "docs/SOURCE_COMPILER.md",
+        "docs/STAGE8_DISCOVERY.md",
+        "docs/STAGE9_APPLICATION_WORKFLOW.md",
+        "docs/os/API.md",
+        "docs/release/NOTICE_INVENTORY.json",
+        "docs/release/REDISTRIBUTION_NOTICES.md",
+        "include/void/diagnostic.hpp",
+        "include/void/path.hpp",
+        "include/void/project.hpp",
+        "src/frontend/compiler.cpp",
+        "src/frontend/project.cpp",
+        "tests/project/authority.py",
+        "tests/project/header.cpp",
+        "tests/project/legacy.py",
+        "tests/project/manifest.cpp",
+        "tests/project/provenance.py",
+        "third_party/tomlplusplus/LICENSE",
+        "third_party/tomlplusplus/README.md",
+        "third_party/tomlplusplus/toml.hpp",
+        "third_party/tomlplusplus/upstream.json",
+        "third_party/tomlplusplus/void-bounds-and-locations.patch"
+      ],
+      "reverse_check": "PASS",
+      "forward_reconstruction": "PASS"
+    }
+  ],
+  "report": {
+    "path": "docs/projects/SLICE1_CLOSEOUT.md",
+    "sha256": "3373ff0423cd77ef5c1a22dc1a976bbef1837c3c51b9e3006bdb19ab0ce772d9",
+    "bytes": 12387
+  },
+  "raw_evidence": [
+    {
+      "path": "docs/projects/evidence/closeout/header-target-first-build.log.txt",
+      "sha256": "0eabe90e683e7543c8e063ee4b37d6e64cd7de2858c8008bcda27ce68a9e1763",
+      "bytes": 3154
+    },
+    {
+      "path": "docs/projects/evidence/closeout/linux-debug.xml",
+      "sha256": "12593d92fd478abc36c04cb0970930ef5287be0455e30c89c9c832fca2ac2871",
+      "bytes": 10112
+    },
+    {
+      "path": "docs/projects/evidence/closeout/linux-install.xml",
+      "sha256": "ce98af742b9f6abf79e9c2a2928a1336caba11da8396bcbf50a109639359874a",
+      "bytes": 734
+    },
+    {
+      "path": "docs/projects/evidence/closeout/linux-release.xml",
+      "sha256": "21692c038e692e757d315ec96f9f0d8e5303d77455b0bf668d34990f99435f37",
+      "bytes": 10128
+    },
+    {
+      "path": "docs/projects/evidence/closeout/linux-strict.xml",
+      "sha256": "fc964aac9dfaf0a57c2c1167ea6ec25147074ad8cbc452d0906e6c5a9065ae5f",
+      "bytes": 10112
+    },
+    {
+      "path": "docs/projects/evidence/closeout/notice-corrected.json",
+      "sha256": "2340ae7ffa52b8bff71b4f8ec3e4d850c5dc2f2ae998e679311b3c3c98e143c2",
+      "bytes": 2941
+    },
+    {
+      "path": "docs/projects/evidence/closeout/notice-failure.json",
+      "sha256": "9e2fe1d26bf19ffdaab1551f5dd7035be1ce93eca578f3aece462a9ab381f41c",
+      "bytes": 2804
+    },
+    {
+      "path": "docs/projects/evidence/closeout/original-debug-failure.log.txt",
+      "sha256": "874bf705d693a32ca640500cd5c95e322aa1a34ce447ee8a9902497c9f3e247e",
+      "bytes": 3318
+    },
+    {
+      "path": "docs/projects/evidence/closeout/original-debug-failure.xml",
+      "sha256": "8f8f19a589b642752f0a5aeddef2985238f3a4967374ac660b10848c5f6b8cf8",
+      "bytes": 10310
+    },
+    {
+      "path": "docs/projects/evidence/closeout/original-strict-failure.log.txt",
+      "sha256": "a4887e8a7c7c3bc8ccefe2820613cc00fbceb37e427b9645eda7ed39ac6beba4",
+      "bytes": 5454
+    },
+    {
+      "path": "docs/projects/evidence/closeout/original-strict-failure.xml",
+      "sha256": "7b862217c3970a7de9ab0fc29c55b8d0363b244771b59b3c43f272db4ff38b89",
+      "bytes": 12543
+    },
+    {
+      "path": "docs/projects/evidence/closeout/upstream-verification.json",
+      "sha256": "08296215161f51f70247aeba9ba6e43efa3bde8758c2e4ad0403108724782cdb",
+      "bytes": 509
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-debug-header-build.log.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-debug-header.log.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-debug-host-verified.log.txt",
+      "sha256": "f8268f61956284ea7441be34b10bd2daf2502669e676eccedd4a5b5eaa5fb188",
+      "bytes": 129
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-debug-http-verified.log.txt",
+      "sha256": "a0674edab6b3249be87077e6fbbb7c9f861f88ecd56e4f8d9a834b59aeb9b38e",
+      "bytes": 50
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-debug-manifest-compile.log.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-debug-manifest-link.log.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-debug-manifest.log.txt",
+      "sha256": "1c19ddcd22048fad5eece177776c0b5ce8adae83623459a977719565a31311c0",
+      "bytes": 38
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-debug-project-compile.log.txt",
+      "sha256": "75e608194836a90675c29d3fe1b924588b54df3db497989e93a4f58bbb77969d",
+      "bytes": 1333
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-first-transfer-failure.json",
+      "sha256": "49f5d7ca83916c1f9a16f284abe2128e71cf63ad15296e75166143414c99b466",
+      "bytes": 797
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-focused.cmd",
+      "sha256": "6200d60e0c27779723a9f5374f1465cdc5febd8ebee5950d91d83d2b4c9adcfa",
+      "bytes": 320
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-focused.json",
+      "sha256": "04bc283c30127c6643b86c78df55ba55068f89f0ffc6166fe6e4fcf781e0259f",
+      "bytes": 12995
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-focused.py",
+      "sha256": "528d2a7d1c4413d2f8800a131a3e0766998aa3d12932a557266c2be38393b383",
+      "bytes": 4143
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-missing-host-archives-Release-configure.log.txt",
+      "sha256": "a0cb3fca7fd64dbbe7f5ef20ac3d4ed9a216db8eb4926218e0d820eb892197bc",
+      "bytes": 4387
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-missing-host-archives-native-results.json",
+      "sha256": "d335bb3299af4345f5f8d56e9fedeab66f5206e4d1f595f5ea225777f49e1cf8",
+      "bytes": 3372
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-missing-http-archives-Release-configure.log.txt",
+      "sha256": "e3896eb60b6245bb407e8320c61972815605445f13cf90c0eb5405b517deb414",
+      "bytes": 707
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-missing-http-archives-native-results.json",
+      "sha256": "f32de66a9d4762f1092d9e32a58a5f2085c777e19cf535885d114e1ac15e3472",
+      "bytes": 3372
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-missing-reviewed-patches-Release-configure.log.txt",
+      "sha256": "2be8925a2900b278e9fa92d64e7559575ffe41cda2c7769d429c6fb7c36e43ee",
+      "bytes": 2844
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-missing-reviewed-patches-native-results.json",
+      "sha256": "5d8233311185a6fedf08dcbe173c04748d76102764cf24e8e2bd6f7941ba2f1d",
+      "bytes": 3371
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-release-header-build.log.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-release-header.log.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-release-host-verified.log.txt",
+      "sha256": "79b579d6fea2e609b6a4f7204582422e2fc1f782356115f1fc0aa12f0f09c2bd",
+      "bytes": 131
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-release-http-verified.log.txt",
+      "sha256": "b396cccb0dfc96a025bd3f3359d7c087034856e9b838f83763407b03fbf449be",
+      "bytes": 52
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-release-manifest-compile.log.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-release-manifest-link.log.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-release-manifest.log.txt",
+      "sha256": "1c19ddcd22048fad5eece177776c0b5ce8adae83623459a977719565a31311c0",
+      "bytes": 38
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-release-project-compile.log.txt",
+      "sha256": "75e608194836a90675c29d3fe1b924588b54df3db497989e93a4f58bbb77969d",
+      "bytes": 1333
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-sdk-layout-Release-configure.log.txt",
+      "sha256": "23a0528a47a341ccea6738a19055851e0c8ae7cd290634fcc1bc600ec852d684",
+      "bytes": 4006
+    },
+    {
+      "path": "docs/projects/evidence/closeout/windows-sdk-layout-native-results.json",
+      "sha256": "a73e55dc525547100041a14a036cf5c24f7fbad03c676022f20320fa6f727285",
+      "bytes": 3371
+    }
+  ],
+  "operational_boundaries": {
+    "index_empty": true,
+    "head_unchanged": true,
+    "staged_committed_pushed": false,
+    "hosted_ci_dispatched": false,
+    "binary_published": false,
+    "dependency_pins_changed": false,
+    "security_checks_weakened": false,
+    "next_boundary": "Golden Wrench independent Slice 1 review before S2 engineering",
+    "hosted_gate": "Single integrated seven-job acceptance only after full project/raylib milestone"
+  },
+  "git_inventory": [
+    {
+      "status": " M",
+      "path": "CMakeLists.txt"
+    },
+    {
+      "status": " M",
+      "path": "cmake/InstallLicenses.cmake"
+    },
+    {
+      "status": " M",
+      "path": "docs/CLI.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/DECISIONS.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/DIAGNOSTICS.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/EDITOR_INTEGRATION.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/LANGUAGE_BIBLE.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/LANGUAGE_SERVER.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/LOCAL_LIBRARIES.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/MODULE_SYSTEM.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/NATIVE_LIBRARIES.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/PROJECT_ARCHITECTURE_ROADMAP.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/README.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/RUNTIME_GLOBALS.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/SOURCE_COMPILER.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/STAGE8_DISCOVERY.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/STAGE9_APPLICATION_WORKFLOW.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/os/API.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/release/NOTICE_INVENTORY.json"
+    },
+    {
+      "status": " M",
+      "path": "docs/release/REDISTRIBUTION_NOTICES.md"
+    },
+    {
+      "status": " M",
+      "path": "include/void/diagnostic.hpp"
+    },
+    {
+      "status": " M",
+      "path": "include/void/path.hpp"
+    },
+    {
+      "status": " M",
+      "path": "src/frontend/compiler.cpp"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/SLICE1.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/SLICE1_CLOSEOUT.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/header-target-first-build.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/linux-debug.xml"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/linux-install.xml"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/linux-release.xml"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/linux-strict.xml"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/notice-corrected.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/notice-failure.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/original-debug-failure.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/original-debug-failure.xml"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/original-strict-failure.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/original-strict-failure.xml"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/upstream-verification.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-debug-header-build.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-debug-header.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-debug-host-verified.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-debug-http-verified.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-debug-manifest-compile.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-debug-manifest-link.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-debug-manifest.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-debug-project-compile.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-first-transfer-failure.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-focused.cmd"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-focused.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-focused.py"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-missing-host-archives-Release-configure.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-missing-host-archives-native-results.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-missing-http-archives-Release-configure.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-missing-http-archives-native-results.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-missing-reviewed-patches-Release-configure.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-missing-reviewed-patches-native-results.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-release-header-build.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-release-header.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-release-host-verified.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-release-http-verified.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-release-manifest-compile.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-release-manifest-link.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-release-manifest.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-release-project-compile.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-sdk-layout-Release-configure.log.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/closeout/windows-sdk-layout-native-results.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/slice1-baseline-source.patch"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/slice1-closeout-inventory.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/slice1-closeout-source.patch"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/slice1-closeout.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/slice1-local.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/projects/evidence/slice1-malformed-header.toml"
+    },
+    {
+      "status": "??",
+      "path": "include/void/project.hpp"
+    },
+    {
+      "status": "??",
+      "path": "src/frontend/project.cpp"
+    },
+    {
+      "status": "??",
+      "path": "tests/project/authority.py"
+    },
+    {
+      "status": "??",
+      "path": "tests/project/header.cpp"
+    },
+    {
+      "status": "??",
+      "path": "tests/project/legacy.py"
+    },
+    {
+      "status": "??",
+      "path": "tests/project/manifest.cpp"
+    },
+    {
+      "status": "??",
+      "path": "tests/project/provenance.py"
+    },
+    {
+      "status": "??",
+      "path": "third_party/tomlplusplus/LICENSE"
+    },
+    {
+      "status": "??",
+      "path": "third_party/tomlplusplus/README.md"
+    },
+    {
+      "status": "??",
+      "path": "third_party/tomlplusplus/toml.hpp"
+    },
+    {
+      "status": "??",
+      "path": "third_party/tomlplusplus/upstream.json"
+    },
+    {
+      "status": "??",
+      "path": "third_party/tomlplusplus/void-bounds-and-locations.patch"
+    }
+  ],
+  "git_inventory_counts": {
+    "modified": 23,
+    "untracked": 60,
+    "total": 83
+  },
+  "final_audit": {
+    "receipt_source_patch_index_evidence_checks": 146,
+    "local_markdown_links_and_anchors": 384,
+    "documents": 19,
+    "result": "PASS",
+    "git_diff_check": "PASS",
+    "head_unchanged": true,
+    "index_empty": true
+  }
+}

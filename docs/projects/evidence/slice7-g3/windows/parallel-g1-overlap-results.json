@@ -1,0 +1,45 @@
+{
+  "os_build": 19045,
+  "free_bytes_before": 29924098048,
+  "runs": [
+    {
+      "profile": "Release",
+      "argv": [
+        "C:\\gcc\\bin\\ctest.exe",
+        "--test-dir",
+        "C:\\Users\\a\\VoidS7-G1-Release",
+        "--output-on-failure",
+        "-j",
+        "2",
+        "-R",
+        "^(analysis|reload|numeric)$",
+        "--repeat",
+        "until-fail:24",
+        "--output-junit",
+        "\\\\vboxsvr\\VM\\project-slice7-g3\\parallel-g1-overlap-Release.xml"
+      ],
+      "exit": 8,
+      "void_tests_sha256": "1ba5b0a4b2c208406e6718f64895d3e373ba77d40ef9b51a981b3eb6f4ea4a03"
+    },
+    {
+      "profile": "Debug",
+      "argv": [
+        "C:\\gcc\\bin\\ctest.exe",
+        "--test-dir",
+        "C:\\Users\\a\\VoidS7-G1-Debug",
+        "--output-on-failure",
+        "-j",
+        "2",
+        "-R",
+        "^(analysis|reload|numeric)$",
+        "--repeat",
+        "until-fail:24",
+        "--output-junit",
+        "\\\\vboxsvr\\VM\\project-slice7-g3\\parallel-g1-overlap-Debug.xml"
+      ],
+      "exit": 8,
+      "void_tests_sha256": "110c28253b312ce42a7c2da7540c684c8eae03d4d4a266aad4a9d8e0a6236488"
+    }
+  ],
+  "status": "complete"
+}

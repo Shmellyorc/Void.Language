@@ -1,0 +1,9 @@
+{
+  "mode": "offered-close",
+  "editor": "1.141.0",
+  "platform": "linux",
+  "events": [
+    "first save of a named buffer offers, and host closes while offered"
+  ],
+  "status": "PASS"
+}

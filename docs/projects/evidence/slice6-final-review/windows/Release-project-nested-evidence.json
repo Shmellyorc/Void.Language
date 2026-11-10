@@ -1,0 +1,134 @@
+{
+  "platform": "win32",
+  "commands": [
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "check",
+        "--project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID deliberate child \u96ea cbcidtoa"
+      ],
+      "status": 0,
+      "stdout": "Source checked successfully\r\n",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID deliberate child \u96ea cbcidtoa/void.project.toml:9:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 9 | \r\n   | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID deliberate child \u96ea cbcidtoa",
+        "--no-cache"
+      ],
+      "status": 17,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID deliberate child \u96ea cbcidtoa/void.project.toml:9:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 9 | \r\n   | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID deliberate child \u96ea cbcidtoa",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "status": 17,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID deliberate child \u96ea cbcidtoa/void.project.toml:9:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 9 | \r\n   | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "check",
+        "--project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID deliberate child \u96ea cbcidtoa\\nested"
+      ],
+      "status": 0,
+      "stdout": "Source checked successfully\r\n",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID deliberate child \u96ea cbcidtoa/nested/void.project.toml:9:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 9 | \r\n   | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID deliberate child \u96ea cbcidtoa\\nested",
+        "--no-cache"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID deliberate child \u96ea cbcidtoa/nested/void.project.toml:9:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 9 | \r\n   | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID deliberate child \u96ea cbcidtoa\\nested",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID deliberate child \u96ea cbcidtoa/nested/void.project.toml:9:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 9 | \r\n   | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "build",
+        "--project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID deliberate child \u96ea cbcidtoa\\nested",
+        "-o",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID deliberate child \u96ea cbcidtoa\\child-native.exe"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: C:/Users/a/VoidS6-Storage-tmp-Release/VOID deliberate child \u96ea cbcidtoa/child-native.exe\r\n",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID deliberate child \u96ea cbcidtoa/nested/void.project.toml:9:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 9 | \r\n   | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID deliberate child \u96ea cbcidtoa\\child-native.exe"
+      ],
+      "status": 23,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID deliberate child \u96ea cbcidtoa",
+        "--entry",
+        "nested/launcher.void"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID deliberate child \u96ea cbcidtoa/void.project.toml:9:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 9 | \r\n   | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nC:/Users/a/VoidS6-Storage-tmp-Release/VOID deliberate child \u96ea cbcidtoa/void.project.toml:1:1: error: Source path crosses nested project boundary '/nested'.\r\n    code: VOID5009\r\n\r\n 1 | schema=1\r\n   | ^\r\n    Module: /void.project.toml\r\n    Hint: Select the child project explicitly; parent imports and entry overrides cannot cross it.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "run",
+        "--project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID deliberate child \u96ea cbcidtoa",
+        "--no-cache"
+      ],
+      "status": 17,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID deliberate child \u96ea cbcidtoa/void.project.toml:9:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 9 | \r\n   | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidc.exe",
+        "check",
+        "--project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID deliberate child \u96ea cbcidtoa\\nested"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID deliberate child \u96ea cbcidtoa/nested/void.project.toml:1:2: error: Invalid project TOML: Error while parsing table header: expected a bare or quoted key\r\n    code: VOID5001\r\n\r\n 1 | [=roject]\r\n   |  ^\r\n    Module: /void.project.toml\r\n    Hint: Use TOML 1.0 syntax; no configuration code is executed.\r\n\r\n"
+    }
+  ]
+}

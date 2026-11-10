@@ -1,0 +1,65 @@
+Test project C:/Users/a/VoidS4-Final-Debug
+      Start   2: project_manifest
+      Start   5: project_manifest_legacy
+ 1/22 Test   #2: project_manifest .................   Passed    0.52 sec
+      Start   7: project_selection
+ 2/22 Test   #5: project_manifest_legacy ..........   Passed   16.75 sec
+      Start   8: project_sessions
+ 3/22 Test   #8: project_sessions .................   Passed    0.83 sec
+      Start   9: project_application
+ 4/22 Test   #7: project_selection ................   Passed   49.57 sec
+      Start  10: project_application_process
+ 5/22 Test  #10: project_application_process ......***Failed    7.85 sec
+Traceback (most recent call last):
+  File "C:\Users\a\VoidCI42377496702-Native\tests\project\application.py", line 170, in <module>
+    success(output, locations)
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidCI42377496702-Native\tests\project\application.py", line 151, in success
+    check(lines[:-1] == paths, lines)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidCI42377496702-Native\tests\project\application.py", line 24, in check
+    assert condition, detail
+           ^^^^^^^^^
+AssertionError: ['eager-data|C:/Users/a/AppData/Local/org.test.context-game', 'eager-config|C:/Users/a/AppData/Roaming/org.test.context-game', 'eager-cache|C:/Users/a/AppData/Local/org.test.context-game/cache', 'eager-state|C:/Users/a/AppData/Local/org.test.context-game/state', 'body-data|C:/Users/a/AppData/Local/org.test.context-game', 'body-config|C:/Users/a/AppData/Roaming/org.test.context-game', 'body-cache|C:/Users/a/AppData/Local/org.test.context-game/cache', 'body-state|C:/Users/a/AppData/Local/org.test.context-game/state', 'function-value|C:/Users/a/AppData/Local/org.test.context-game', 'named-explicit|C:/Users/a/AppData/Roaming/org.test.context-game', 'invalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false']
+
+      Start  11: project_discovery_cli
+ 6/22 Test  #11: project_discovery_cli ............   Passed   27.58 sec
+      Start  12: project_profiles
+ 7/22 Test  #12: project_profiles .................   Passed    5.38 sec
+      Start  13: project_protocol
+ 8/22 Test  #13: project_protocol .................   Passed    4.39 sec
+      Start  14: project_nested_cli
+ 9/22 Test  #14: project_nested_cli ...............   Passed    2.75 sec
+      Start 125: lsp_protocol
+10/22 Test #125: lsp_protocol .....................   Passed    6.45 sec
+      Start 127: lsp_stage8
+11/22 Test #127: lsp_stage8 .......................   Passed    8.82 sec
+      Start 142: os_host
+12/22 Test   #9: project_application ..............   Passed  112.74 sec
+      Start 143: os_errors
+13/22 Test #143: os_errors ........................   Passed   57.11 sec
+      Start 144: os_frontend
+14/22 Test #142: os_host ..........................   Passed   98.03 sec
+      Start 145: lsp_os
+15/22 Test #145: lsp_os ...........................   Passed   16.52 sec
+      Start 147: os_owner
+16/22 Test #147: os_owner .........................   Passed   65.94 sec
+      Start 189: stage11_globals
+17/22 Test #189: stage11_globals ..................   Passed    2.26 sec
+      Start 217: native_source
+18/22 Test #144: os_frontend ......................   Passed  114.10 sec
+      Start 218: stage6_integrated
+19/22 Test #217: native_source ....................   Passed    9.71 sec
+      Start 323: sessions
+20/22 Test #323: sessions .........................   Passed    0.72 sec
+      Start 340: stage11_globals_aot
+21/22 Test #218: stage6_integrated ................   Passed   14.84 sec
+22/22 Test #340: stage11_globals_aot ..............   Passed   25.22 sec
+
+95% tests passed, 1 tests failed out of 22
+
+Total Test time (real) = 332.07 sec
+
+The following tests FAILED:
+	 10 - project_application_process (Failed)
+Errors while running CTest

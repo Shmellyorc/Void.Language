@@ -1,0 +1,267 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release
+      Start  59: json_readonly
+      Start  60: json_dynamic
+ 1/40 Test  #59: json_readonly ..........................   Passed    3.76 sec
+      Start  61: json_numbers
+ 2/40 Test  #60: json_dynamic ...........................   Passed    9.75 sec
+      Start  62: json_schema
+ 3/40 Test  #61: json_numbers ...........................   Passed   13.00 sec
+      Start  63: json_bounds
+ 4/40 Test  #62: json_schema ............................   Passed   16.81 sec
+      Start  64: json_install
+ 5/40 Test  #63: json_bounds ............................   Passed   20.14 sec
+      Start  65: json_adversarial
+ 6/40 Test  #64: json_install ...........................   Passed   24.06 sec
+      Start  66: json_metering
+ 7/40 Test  #66: json_metering ..........................   Passed   18.04 sec
+      Start  67: json_execution_validated
+ 8/40 Test  #65: json_adversarial .......................   Passed   33.42 sec
+      Start  68: json_execution_accessors
+ 9/40 Test  #68: json_execution_accessors ...............   Passed    8.89 sec
+      Start  69: json_execution_dynamic_smoke
+10/40 Test  #67: json_execution_validated ...............   Passed   11.47 sec
+      Start  70: json_execution_typed_smoke
+11/40 Test  #69: json_execution_dynamic_smoke ...........   Passed    7.49 sec
+      Start  71: json_execution_shapes
+12/40 Test  #70: json_execution_typed_smoke .............   Passed   20.81 sec
+      Start  72: json_execution_ownership
+13/40 Test  #72: json_execution_ownership ...............   Passed   11.78 sec
+      Start  73: json_execution_nested_inference
+14/40 Test  #71: json_execution_shapes ..................   Passed   30.65 sec
+      Start  74: json_stress_fixed
+15/40 Test  #73: json_execution_nested_inference ........   Passed    9.90 sec
+      Start  75: json_stress_wide
+16/40 Test  #75: json_stress_wide .......................   Passed   31.15 sec
+      Start  77: json_preservation
+17/40 Test  #77: json_preservation ......................   Passed    1.21 sec
+      Start  78: json_lsp
+18/40 Test  #78: json_lsp ...............................   Passed    1.26 sec
+      Start 258: lsp_collections_stdlib
+19/40 Test #258: lsp_collections_stdlib .................   Passed    0.30 sec
+      Start 338: onboarding_examples
+20/40 Test #338: onboarding_examples ....................***Failed    0.08 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/cli/learning.py", line 25, in <module>
+    assert blocks == 9, blocks
+           ^^^^^^^^^^^
+AssertionError: 2
+
+      Start 379: async_syntax_aot_values_normal
+21/40 Test #379: async_syntax_aot_values_normal .........***Failed    0.52 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in <module>
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+
+      Start 380: async_syntax_aot_values_optimized
+22/40 Test #380: async_syntax_aot_values_optimized ......***Failed    0.46 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in <module>
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+
+      Start 381: async_syntax_aot_errors_normal
+23/40 Test #381: async_syntax_aot_errors_normal .........***Failed    0.28 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in <module>
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+
+      Start 382: async_syntax_aot_errors_optimized
+24/40 Test #382: async_syntax_aot_errors_optimized ......***Failed    0.33 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in <module>
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+
+      Start 383: async_syntax_aot_cancelled_normal
+25/40 Test #383: async_syntax_aot_cancelled_normal ......***Failed    0.20 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in <module>
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+
+      Start 384: async_syntax_aot_cancelled_optimized
+26/40 Test #384: async_syntax_aot_cancelled_optimized ...***Failed    0.23 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in <module>
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+
+      Start 385: async_syntax_aot_failure_normal
+27/40 Test #385: async_syntax_aot_failure_normal ........***Failed    0.23 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in <module>
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+
+      Start 386: async_syntax_aot_failure_optimized
+28/40 Test #386: async_syntax_aot_failure_optimized .....***Failed    0.25 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in <module>
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+
+      Start 387: async_syntax_aot_spawn_normal
+29/40 Test #387: async_syntax_aot_spawn_normal ..........***Failed    0.18 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in <module>
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+
+      Start 388: async_syntax_aot_spawn_optimized
+30/40 Test #388: async_syntax_aot_spawn_optimized .......***Failed    0.16 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in <module>
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+
+      Start 415: ergonomics_sprint6
+31/40 Test #415: ergonomics_sprint6 .....................***Failed    0.50 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint6.py", line 24, in <module>
+    run([compiler,'emit',source,'-o',obj,*switches]);run([clang,*flags,obj,runtime,fixture,'-pthread','-o',exe])
+                                                     ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint6.py", line 12, in run
+    assert p.returncode==status,(args,p.returncode,p.stdout,p.stderr)
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID sprint6 ouqq4kl8/normal.o'), PosixPath('/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a'), PosixPath('/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a'), '-pthread', '-o', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID sprint6 ouqq4kl8/normal.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+
+      Start 416: stage10_fields_aot
+32/40 Test  #74: json_stress_fixed ......................   Passed   42.75 sec
+      Start 418: stage10_temporal_aot
+33/40 Test #416: stage10_fields_aot .....................***Failed    0.28 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/fields.py", line 68, in <module>
+    run([clang, *flags, obj, runtime, fixture, "-o", exe])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/fields.py", line 23, in run
+    assert p.returncode == 0, (args, p.returncode, p.stdout, p.stderr)
+           ^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '-pthread', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID Stage10 fields 1o5e1yeu/normal.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a', '-o', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID Stage10 fields 1o5e1yeu/normal.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+
+      Start 420: stage11_globals_aot
+34/40 Test #420: stage11_globals_aot ....................***Failed    0.22 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage11/globals.py", line 53, in <module>
+    execute("selected.void", {
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^
+        "selected.void": 'use "./game.void" as game\nvar score = 0\nfunc main():\n    game.reward_player()\n    print(score)\n    print(game.enemies_defeated)\n',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "game.void": 'var enemies_defeated = 0\nfunc reward_player():\n    score += 10\n    enemies_defeated += 1\n',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    }, b"10\n1\n")
+    ^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage11/globals.py", line 49, in execute
+    run([clang, obj, runtime, fixture, *flags, "-o", exe])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage11/globals.py", line 25, in run
+    assert result.returncode == expected, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID globals peltflok/program.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a', '--driver-mode=g++', '-pthread', '-ldl', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', '-o', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID globals peltflok/program')], 1, b'', b'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+
+      Start 421: stage10_console_aot
+35/40 Test #418: stage10_temporal_aot ...................***Failed    2.55 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/temporal.py", line 30, in <module>
+    execute([clang,*flags,obj,runtime,fixture,"-o",exe])
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/temporal.py", line 16, in execute
+    assert (result.returncode == 0) == success, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '-pthread', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID Stage10 time 1k8rryy3/normal.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a', '-o', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID Stage10 time 1k8rryy3/normal.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+
+      Start 422: stage10_operators_aot
+36/40 Test #422: stage10_operators_aot ..................***Failed    0.39 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/operators.py", line 49, in <module>
+    run([clang, *flags, obj, runtime, fixture, "-o", exe])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/operators.py", line 31, in run
+    assert p.returncode == status, (args, p.returncode, p.stdout, p.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '-pthread', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID Stage10 operators 07mbqxxd/normal.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a', '-o', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID Stage10 operators 07mbqxxd/normal.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+
+      Start 423: stage10_conversion_aot
+37/40 Test #423: stage10_conversion_aot .................***Failed    0.40 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/conversion.py", line 59, in <module>
+    run([clang, *flags, obj, runtime, fixture, "-o", exe])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/conversion.py", line 23, in run
+    assert p.returncode == 0, (args, p.returncode, p.stdout, p.stderr)
+           ^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '-pthread', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID Stage10 display oqb7lvt1/normal.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a', '-o', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID Stage10 display oqb7lvt1/normal.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+
+      Start 432: application_native_sprint4
+38/40 Test #432: application_native_sprint4 .............***Failed    0.30 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint4.py", line 39, in <module>
+    link(obj,exe);run([exe],status,'');run([exe,'7'],status,'')
+    ~~~~^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint4.py", line 20, in link
+    def link(obj,exe): run([clang,*flags,obj,runtime,fixture,'-pthread','-o',exe])
+                       ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint4.py", line 12, in run
+    assert result.returncode==status,(args,result.returncode,result.stdout,result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID Sprint 4 yy3cb895/app0-normal.obj'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a', '-pthread', '-o', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID Sprint 4 yy3cb895/app0-normal.exe')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+
+      Start 433: text_collections_sprint3
+39/40 Test #433: text_collections_sprint3 ...............***Failed    0.48 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint3.py", line 179, in <module>
+    run([compiler,'emit',path,'-o',obj,*flags]);run([clang,*link_flags,obj,runtime,fixture,'-o',exe]);assert run([exe,'0']).stdout.strip()=='1'
+                                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint3.py", line 12, in run
+    assert result.returncode==(0 if ok else 1),(args,result.returncode,result.stdout,result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID sprint3 dfkhn0zv/text0.o'), PosixPath('/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a'), PosixPath('/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a'), '-o', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID sprint3 dfkhn0zv/text0.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+
+40/40 Test #421: stage10_console_aot ....................***Failed    9.18 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/console.py", line 109, in <module>
+    run([clang, *flags, obj, runtime, fixture, "-o", executable])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/console.py", line 36, in run
+    assert p.returncode == status, (args, p.returncode, p.stdout, p.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '-pthread', '-ldl', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID console source xh0u1p3m/operator_console_systems-normal.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_native_fixture.a', '-o', PosixPath('/tmp/void-s7-integrated-release.Vt5YIR/VOID console source xh0u1p3m/operator_console_systems-normal.bin')], 1, b'', b'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+
+
+50% tests passed, 20 tests failed out of 40
+
+Total Test time (real) = 169.66 sec
+
+The following tests FAILED:
+	338 - onboarding_examples (Failed)
+	379 - async_syntax_aot_values_normal (Failed)
+	380 - async_syntax_aot_values_optimized (Failed)
+	381 - async_syntax_aot_errors_normal (Failed)
+	382 - async_syntax_aot_errors_optimized (Failed)
+	383 - async_syntax_aot_cancelled_normal (Failed)
+	384 - async_syntax_aot_cancelled_optimized (Failed)
+	385 - async_syntax_aot_failure_normal (Failed)
+	386 - async_syntax_aot_failure_optimized (Failed)
+	387 - async_syntax_aot_spawn_normal (Failed)
+	388 - async_syntax_aot_spawn_optimized (Failed)
+	415 - ergonomics_sprint6 (Failed)
+	416 - stage10_fields_aot (Failed)
+	418 - stage10_temporal_aot (Failed)
+	420 - stage11_globals_aot (Failed)
+	421 - stage10_console_aot (Failed)
+	422 - stage10_operators_aot (Failed)
+	423 - stage10_conversion_aot (Failed)
+	432 - application_native_sprint4 (Failed)
+	433 - text_collections_sprint3 (Failed)
+Errors while running CTest

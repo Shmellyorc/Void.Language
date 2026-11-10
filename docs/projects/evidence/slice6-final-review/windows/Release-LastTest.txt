@@ -1,0 +1,589 @@
+Start testing: Nov 08 18:46 Pacific Standard Time
+----------------------------------------------------------
+2/368 Testing: project_manifest
+2/368 Test: project_manifest
+Command: "C:/Users/a/VoidS6-Storage-Release/void_project_manifest.exe"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"project_manifest" start time: Nov 08 18:46 Pacific Standard Time
+Output:
+----------------------------------------------------------
+project_manifest: 8788 checks passed
+<end of output>
+Test time =   0.12 sec
+----------------------------------------------------------
+Test Passed.
+"project_manifest" end time: Nov 08 18:46 Pacific Standard Time
+"project_manifest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/368 Testing: project_manifest_legacy
+5/368 Test: project_manifest_legacy
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/project/legacy.py" "C:/Users/a/VoidS6-Storage-Release/voidc.exe"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"project_manifest_legacy" start time: Nov 08 18:46 Pacific Standard Time
+Output:
+----------------------------------------------------------
+project_manifest_legacy: 18 checks passed
+<end of output>
+Test time =   2.81 sec
+----------------------------------------------------------
+Test Passed.
+"project_manifest_legacy" end time: Nov 08 18:46 Pacific Standard Time
+"project_manifest_legacy" time elapsed: 00:00:02
+----------------------------------------------------------
+
+8/368 Testing: project_sessions
+8/368 Test: project_sessions
+Command: "C:/Users/a/VoidS6-Storage-Release/void_project_sessions.exe"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"project_sessions" start time: Nov 08 18:46 Pacific Standard Time
+Output:
+----------------------------------------------------------
+project_sessions: 166 checks passed
+<end of output>
+Test time =   0.63 sec
+----------------------------------------------------------
+Test Passed.
+"project_sessions" end time: Nov 08 18:46 Pacific Standard Time
+"project_sessions" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/368 Testing: project_creation
+9/368 Test: project_creation
+Command: "C:/Users/a/VoidS6-Storage-Release/void_project_creation.exe"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"project_creation" start time: Nov 08 18:46 Pacific Standard Time
+Output:
+----------------------------------------------------------
+creation: entropy, reviewed directory, external collision, rollback ownership, staged content passed
+<end of output>
+Test time =   0.19 sec
+----------------------------------------------------------
+Test Passed.
+"project_creation" end time: Nov 08 18:46 Pacific Standard Time
+"project_creation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/368 Testing: project_creation_process
+10/368 Test: project_creation_process
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/project/creation.py" "C:/Users/a/VoidS6-Storage-Release/voidc.exe" "C:/Users/a/VoidS6-Storage-Release/voidls.exe" "C:/Users/a/VoidS6-Storage-Release/project-creation-evidence.json"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"project_creation_process" start time: Nov 08 18:46 Pacific Standard Time
+Output:
+----------------------------------------------------------
+S5 creation process: 62 invocations passed
+<end of output>
+Test time =   8.23 sec
+----------------------------------------------------------
+Test Passed.
+"project_creation_process" end time: Nov 08 18:47 Pacific Standard Time
+"project_creation_process" time elapsed: 00:00:08
+----------------------------------------------------------
+
+7/368 Testing: project_selection
+7/368 Test: project_selection
+Command: "C:/Users/a/VoidS6-Storage-Release/void_project_selection.exe"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"project_selection" start time: Nov 08 18:46 Pacific Standard Time
+Output:
+----------------------------------------------------------
+UNQUALIFIED: native symlink privilege A required privilege is not held by the client.
+project_selection: 353 checks passed
+<end of output>
+Test time =  25.91 sec
+----------------------------------------------------------
+Test Passed.
+"project_selection" end time: Nov 08 18:47 Pacific Standard Time
+"project_selection" time elapsed: 00:00:25
+----------------------------------------------------------
+
+11/368 Testing: project_application
+11/368 Test: project_application
+Command: "C:/Users/a/VoidS6-Storage-Release/void_project_application.exe"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"project_application" start time: Nov 08 18:47 Pacific Standard Time
+Output:
+----------------------------------------------------------
+Application cache: unavailable/unavailable
+project_application: 63 checks passed
+<end of output>
+Test time =  20.16 sec
+----------------------------------------------------------
+Test Passed.
+"project_application" end time: Nov 08 18:47 Pacific Standard Time
+"project_application" time elapsed: 00:00:20
+----------------------------------------------------------
+
+13/368 Testing: project_discovery_cli
+13/368 Test: project_discovery_cli
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/project/discovery.py" "C:/Users/a/VoidS6-Storage-Release/voidc.exe" "C:/Users/a/VoidS6-Storage-Release/project-discovery-evidence.json"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"project_discovery_cli" start time: Nov 08 18:47 Pacific Standard Time
+Output:
+----------------------------------------------------------
+UNQUALIFIED: native persistent disk cache; project selection rejection is still exercised
+project_discovery_cli: 88 process checks passed
+<end of output>
+Test time =  11.79 sec
+----------------------------------------------------------
+Test Passed.
+"project_discovery_cli" end time: Nov 08 18:47 Pacific Standard Time
+"project_discovery_cli" time elapsed: 00:00:11
+----------------------------------------------------------
+
+14/368 Testing: project_profiles
+14/368 Test: project_profiles
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/project/profiles.py" "C:/Users/a/VoidS6-Storage-Release/voidc.exe" "C:/Users/a/Documents/ChatGPT/Void TEMP/Void-native/.toolchains/native-schannel/sdk/clang+llvm-23.1.4-x86_64-pc-windows-msvc/bin/llvm-objdump.exe" "C:/Users/a/VoidS6-Storage-Release/project-profiles-evidence.json"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"project_profiles" start time: Nov 08 18:47 Pacific Standard Time
+Output:
+----------------------------------------------------------
+UNQUALIFIED: native persistent disk cache warm hit
+project_profiles: 43 process checks passed; compute instruction counts O0=8, O2=2, release --no-opt=8
+<end of output>
+Test time =   4.08 sec
+----------------------------------------------------------
+Test Passed.
+"project_profiles" end time: Nov 08 18:47 Pacific Standard Time
+"project_profiles" time elapsed: 00:00:04
+----------------------------------------------------------
+
+15/368 Testing: project_protocol
+15/368 Test: project_protocol
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/project/protocol.py" "C:/Users/a/VoidS6-Storage-Release/voidls.exe" "C:/Users/a/VoidS6-Storage-Release/project-protocol-evidence.json"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"project_protocol" start time: Nov 08 18:47 Pacific Standard Time
+Output:
+----------------------------------------------------------
+project_protocol: 169 checks passed
+<end of output>
+Test time =   2.29 sec
+----------------------------------------------------------
+Test Passed.
+"project_protocol" end time: Nov 08 18:47 Pacific Standard Time
+"project_protocol" time elapsed: 00:00:02
+----------------------------------------------------------
+
+12/368 Testing: project_application_process
+12/368 Test: project_application_process
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/project/application.py" "C:/Users/a/VoidS6-Storage-Release/voidc.exe" "C:/Users/a/VoidS6-Storage-Release/project-application-evidence.json"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"project_application_process" start time: Nov 08 18:47 Pacific Standard Time
+Output:
+----------------------------------------------------------
+project_application_process: 61 checks passed
+<end of output>
+Test time =  24.67 sec
+----------------------------------------------------------
+Test Passed.
+"project_application_process" end time: Nov 08 18:47 Pacific Standard Time
+"project_application_process" time elapsed: 00:00:24
+----------------------------------------------------------
+
+55/368 Testing: stage10_fields
+55/368 Test: stage10_fields
+Command: "C:/Users/a/VoidS6-Storage-Release/void_stage10_fields.exe"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"stage10_fields" start time: Nov 08 18:47 Pacific Standard Time
+Output:
+----------------------------------------------------------
+54 field policy checks passed
+<end of output>
+Test time =   0.43 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_fields" end time: Nov 08 18:47 Pacific Standard Time
+"stage10_fields" time elapsed: 00:00:00
+----------------------------------------------------------
+
+16/368 Testing: project_nested_cli
+16/368 Test: project_nested_cli
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/project/nested.py" "C:/Users/a/VoidS6-Storage-Release/voidc.exe" "C:/Users/a/VoidS6-Storage-Release/project-nested-evidence.json"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"project_nested_cli" start time: Nov 08 18:47 Pacific Standard Time
+Output:
+----------------------------------------------------------
+project_nested_cli: 11 process checks passed
+<end of output>
+Test time =   1.13 sec
+----------------------------------------------------------
+Test Passed.
+"project_nested_cli" end time: Nov 08 18:47 Pacific Standard Time
+"project_nested_cli" time elapsed: 00:00:01
+----------------------------------------------------------
+
+270/368 Testing: async_ir
+270/368 Test: async_ir
+Command: "C:/Users/a/VoidS6-Storage-Release/void_async_tests.exe" "--ir"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"async_ir" start time: Nov 08 18:47 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.15 sec
+----------------------------------------------------------
+Test Passed.
+"async_ir" end time: Nov 08 18:47 Pacific Standard Time
+"async_ir" time elapsed: 00:00:00
+----------------------------------------------------------
+
+320/368 Testing: reload
+320/368 Test: reload
+Command: "C:/Users/a/VoidS6-Storage-Release/void_tests.exe" "reload"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"reload" start time: Nov 08 18:47 Pacific Standard Time
+Output:
+----------------------------------------------------------
+reload: passed
+<end of output>
+Test time =   0.79 sec
+----------------------------------------------------------
+Test Passed.
+"reload" end time: Nov 08 18:47 Pacific Standard Time
+"reload" time elapsed: 00:00:00
+----------------------------------------------------------
+
+321/368 Testing: gc
+321/368 Test: gc
+Command: "C:/Users/a/VoidS6-Storage-Release/void_tests.exe" "gc"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"gc" start time: Nov 08 18:47 Pacific Standard Time
+Output:
+----------------------------------------------------------
+gc: passed
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"gc" end time: Nov 08 18:47 Pacific Standard Time
+"gc" time elapsed: 00:00:00
+----------------------------------------------------------
+
+325/368 Testing: sessions
+325/368 Test: sessions
+Command: "C:/Users/a/VoidS6-Storage-Release/void_tests.exe" "sessions" "C:/Users/a/VoidS6-Storage-Release/session fixtures"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"sessions" start time: Nov 08 18:47 Pacific Standard Time
+Output:
+----------------------------------------------------------
+sessions: passed
+<end of output>
+Test time =   0.33 sec
+----------------------------------------------------------
+Test Passed.
+"sessions" end time: Nov 08 18:47 Pacific Standard Time
+"sessions" time elapsed: 00:00:00
+----------------------------------------------------------
+
+72/368 Testing: fixed_arrays_source
+72/368 Test: fixed_arrays_source
+Command: "C:/Users/a/VoidS6-Storage-Release/void_fixed_arrays_tests.exe" "C:/Users/a/VoidCI42377496702-Native"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"fixed_arrays_source" start time: Nov 08 18:47 Pacific Standard Time
+Output:
+----------------------------------------------------------
+source array normal: 158 failing allocation budgets, recovery and cleanup passed
+source array O2: 158 failing allocation budgets, recovery and cleanup passed
+Numeric fixed arrays: source execution, roots, publication and failure recovery passed
+<end of output>
+Test time =   3.00 sec
+----------------------------------------------------------
+Test Passed.
+"fixed_arrays_source" end time: Nov 08 18:47 Pacific Standard Time
+"fixed_arrays_source" time elapsed: 00:00:02
+----------------------------------------------------------
+
+327/368 Testing: analysis
+327/368 Test: analysis
+Command: "C:/Users/a/VoidS6-Storage-Release/void_tests.exe" "analysis" "C:/Users/a/VoidS6-Storage-Release/analysis fixtures"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"analysis" start time: Nov 08 18:47 Pacific Standard Time
+Output:
+----------------------------------------------------------
+normal: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 627750
+O2: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 749443
+analysis: passed
+<end of output>
+Test time =   3.15 sec
+----------------------------------------------------------
+Test Passed.
+"analysis" end time: Nov 08 18:47 Pacific Standard Time
+"analysis" time elapsed: 00:00:03
+----------------------------------------------------------
+
+329/368 Testing: numeric_enum_ir
+329/368 Test: numeric_enum_ir
+Command: "C:/Users/a/VoidS6-Storage-Release/void_numeric_enum_ir.exe"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"numeric_enum_ir" start time: Nov 08 18:47 Pacific Standard Time
+Output:
+----------------------------------------------------------
+enum: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+enum initialized: accepted
+field: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+field initialized: accepted
+array: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+array initialized: accepted
+field-array: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+field-array initialized: accepted
+array-field: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+array-field initialized: accepted
+nested: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+nested initialized: accepted
+managed: rejected (VOID IR: non-nullable reference storage read before initialization in /enum-storage.void::probe)
+managed initialized: accepted
+zero-backed holder: rejected (VOID IR: nominal source objects require complete construction)
+zero-backed legacy_scalar: rejected (VOID IR: numeric enum fields require complete managed construction)
+zero-backed legacy_array: rejected (VOID IR: numeric enum fields require complete managed construction)
+managed missing field: rejected (VOID IR: invalid complete managed construction)
+managed partial buffer: rejected (VOID IR: incomplete numeric enum array escapes private construction)
+read allocated array before initialization: rejected (VOID IR: incomplete numeric enum array escapes private construction)
+partial buffer through private home: rejected (VOID IR: incomplete numeric enum array escapes private construction)
+partial buffer through ordinary store: rejected (VOID IR: incomplete numeric enum array escapes private construction)
+forged completion of ordinary value: rejected (VOID IR: invalid numeric enum array completion)
+complete private buffer published and projected: accepted
+private home absent on one predecessor: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+legacy array initialization of a finished value: rejected (VOID IR: invalid array element initialization)
+early completion: rejected at the live-prefix guard in normal and O2 JIT
+incomplete managed initializer: rejected (VOID IR: uninitialized construction field at call/exit/commit in /enum-storage.void::holder::method::init)
+complete managed initializer: accepted
+join missing true write: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+join missing false write: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+join with both writes: accepted
+unwind before explicit write: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+cleanup terminal return load: accepted
+unset option: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+constructed None: accepted
+unchecked inactive payload: rejected (VOID IR: sum payload requires checked access)
+storage audit: 24 negative, 12 positive, 0 mismatches
+numeric enum IR rejection, normal/O2 GC and reload passed
+<end of output>
+Test time =   0.45 sec
+----------------------------------------------------------
+Test Passed.
+"numeric_enum_ir" end time: Nov 08 18:47 Pacific Standard Time
+"numeric_enum_ir" time elapsed: 00:00:00
+----------------------------------------------------------
+
+328/368 Testing: numeric
+328/368 Test: numeric
+Command: "C:/Users/a/VoidS6-Storage-Release/void_tests.exe" "numeric" "C:/Users/a/VoidCI42377496702-Native"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"numeric" start time: Nov 08 18:47 Pacific Standard Time
+Output:
+----------------------------------------------------------
+210 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed
+numeric: passed
+<end of output>
+Test time =   3.26 sec
+----------------------------------------------------------
+Test Passed.
+"numeric" end time: Nov 08 18:47 Pacific Standard Time
+"numeric" time elapsed: 00:00:03
+----------------------------------------------------------
+
+331/368 Testing: numeric_enum_lsp
+331/368 Test: numeric_enum_lsp
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/numeric/enums_lsp.py" "C:/Users/a/VoidS6-Storage-Release/voidls.exe" "C:/Users/a/VoidS6-Storage-Release/numeric-enum-lsp.json"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"numeric_enum_lsp" start time: Nov 08 18:47 Pacific Standard Time
+Output:
+----------------------------------------------------------
+S6 LSP passed 15 recorded requests and overlay revisions
+<end of output>
+Test time =   0.61 sec
+----------------------------------------------------------
+Test Passed.
+"numeric_enum_lsp" end time: Nov 08 18:47 Pacific Standard Time
+"numeric_enum_lsp" time elapsed: 00:00:00
+----------------------------------------------------------
+
+332/368 Testing: frontend
+332/368 Test: frontend
+Command: "C:/Users/a/VoidS6-Storage-Release/void_tests.exe" "frontend" "C:/Users/a/VoidCI42377496702-Native"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"frontend" start time: Nov 08 18:47 Pacific Standard Time
+Output:
+----------------------------------------------------------
+Frontend begin: diagnostics
+50+ source diagnostic cases and UTF-8/ABI checks passed
+Frontend passed: diagnostics
+Frontend begin: programs
+Real .void files and independent programs executed through normal/O2 JIT
+Frontend passed: programs
+Frontend begin: numeric values
+1216 constant/normal/O2 numeric matrix comparisons passed
+Readonly/compile-time constants, numeric boundaries, concurrent failures, bounded traces and restart checks passed
+Frontend passed: numeric values
+Frontend begin: diagnostic recovery/resource limits
+Frontend resource case: combined expression/constant depth
+Structured diagnostics: independent files, recovery, bounded cascades, snapshots and failed reload verified
+Frontend passed: diagnostic recovery/resource limits
+Frontend begin: value structs
+Frontend resource case: bounded expanded value layouts
+Value struct source: nested/mixed layouts, copies, normal/O2 JIT, diagnostics, tooling and reload passed
+Frontend passed: value structs
+Frontend begin: receiver methods
+Frontend resource case: bounded receiver-chain semantics
+Receiver methods: actual storage, copies, imports, source order, effects, cycles, diagnostics, tooling and reload passed
+Frontend passed: receiver methods
+Frontend begin: initialization
+Initialization project main optimized=0
+Initialization project main optimized=1
+Initialization project order optimized=0
+Initialization project order optimized=1
+Initialization project required optimized=0
+Initialization project required optimized=1
+Initialization project numeric optimized=0
+Initialization project numeric optimized=1
+Initialization project failure optimized=0
+Initialization project failure optimized=1
+Initialization project copies optimized=0
+Initialization project copies optimized=1
+Initialization begin: layout retirement
+Initialization layout generation 0 fields=1
+Initialization layout generation 1 fields=8
+Initialization layout generation 2 fields=15
+Initialization layout generation 3 fields=5
+Initialization layout generation 4 fields=12
+Initialization layout generation 5 fields=2
+Initialization layout generation 6 fields=9
+Initialization layout generation 7 fields=16
+Initialization layout generation 8 fields=6
+Initialization layout generation 9 fields=13
+Initialization layout generation 10 fields=3
+Initialization layout generation 11 fields=10
+Initialization layout generation 12 fields=17
+Initialization layout generation 13 fields=7
+Initialization layout generation 14 fields=14
+Initialization layout generation 15 fields=4
+Initialization layout generation 16 fields=11
+Initialization layout generation 17 fields=1
+Initialization layout generation 18 fields=8
+Initialization layout generation 19 fields=15
+Initialization layout generation 20 fields=5
+Initialization layout generation 21 fields=12
+Initialization layout generation 22 fields=2
+Initialization layout generation 23 fields=9
+Initialization layout generation 24 fields=16
+Initialization layout generation 25 fields=6
+Initialization layout generation 26 fields=13
+Initialization layout generation 27 fields=3
+Initialization layout generation 28 fields=10
+Initialization layout generation 29 fields=17
+Initialization layout generation 30 fields=7
+Initialization layout generation 31 fields=14
+Initialization layout generation 32 fields=4
+Initialization layout generation 33 fields=11
+Initialization layout generation 34 fields=1
+Initialization layout generation 35 fields=8
+Initialization layout generation 36 fields=15
+Initialization layout generation 37 fields=5
+Initialization layout generation 38 fields=12
+Initialization layout generation 39 fields=2
+Initialization layout generation 40 fields=9
+Initialization layout generation 41 fields=16
+Initialization layout generation 42 fields=6
+Initialization layout generation 43 fields=13
+Initialization layout generation 44 fields=3
+Initialization layout generation 45 fields=10
+Initialization layout generation 46 fields=17
+Initialization layout generation 47 fields=7
+Initialization layout generation 48 fields=14
+Initialization layout generation 49 fields=4
+Initialization layout generation 50 fields=11
+Initialization layout generation 51 fields=1
+Initialization layout generation 52 fields=8
+Initialization layout generation 53 fields=15
+Initialization layout generation 54 fields=5
+Initialization layout generation 55 fields=12
+Initialization layout generation 56 fields=2
+Initialization layout generation 57 fields=9
+Initialization layout generation 58 fields=16
+Initialization layout generation 59 fields=6
+Initialization layout generation 60 fields=13
+Initialization layout generation 61 fields=3
+Initialization layout generation 62 fields=10
+Initialization layout generation 63 fields=17
+Initialization nested layout generation 0 padding=i8
+Initialization nested layout generation 1 padding=i64
+Initialization nested layout generation 2 padding=i8
+Initialization nested layout generation 3 padding=i64
+Initialization nested layout generation 4 padding=i8
+Initialization nested layout generation 5 padding=i64
+Initialization nested layout generation 6 padding=i8
+Initialization nested layout generation 7 padding=i64
+Initialization nested layout generation 8 padding=i8
+Initialization nested layout generation 9 padding=i64
+Initialization nested layout generation 10 padding=i8
+Initialization nested layout generation 11 padding=i64
+Initialization nested layout generation 12 padding=i8
+Initialization nested layout generation 13 padding=i64
+Initialization nested layout generation 14 padding=i8
+Initialization nested layout generation 15 padding=i64
+80 aggregate layout generations retired through normal/O2 JIT
+Initialization: parameters/defaults, recursive values, order, copies, lifecycle diagnostics, visibility, tooling, failure and reload passed
+Frontend passed: initialization
+frontend: passed
+<end of output>
+Test time =   8.83 sec
+----------------------------------------------------------
+Test Passed.
+"frontend" end time: Nov 08 18:47 Pacific Standard Time
+"frontend" time elapsed: 00:00:08
+----------------------------------------------------------
+
+333/368 Testing: modules
+333/368 Test: modules
+Command: "C:/Users/a/VoidS6-Storage-Release/void_tests.exe" "modules" "C:/Users/a/VoidS6-Storage-Release/module fixtures with spaces"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"modules" start time: Nov 08 18:47 Pacific Standard Time
+Output:
+----------------------------------------------------------
+Case-only siblings cannot be created on this filesystem; exact-case rejection still tested
+Host cannot create symlinks: A required privilege is not held by the client.
+Project constants, forwards, visibility, cycles, imports and restart checks passed
+Project-local library identities, cycles, ownership, overlays, native JIT and invalidation passed
+Multi-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed
+modules: passed
+<end of output>
+Test time =   2.35 sec
+----------------------------------------------------------
+Test Passed.
+"modules" end time: Nov 08 18:47 Pacific Standard Time
+"modules" time elapsed: 00:00:02
+----------------------------------------------------------
+
+330/368 Testing: numeric_enum_process
+330/368 Test: numeric_enum_process
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/numeric/enums.py" "C:/Users/a/VoidS6-Storage-Release/voidc.exe" "C:/Users/a/VoidS6-Storage-Release/numeric-enum-process.json"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"numeric_enum_process" start time: Nov 08 18:47 Pacific Standard Time
+Output:
+----------------------------------------------------------
+S6 542 boundary pairs, 39 invalid sources and 60 executed processes
+<end of output>
+Test time =  13.63 sec
+----------------------------------------------------------
+Test Passed.
+"numeric_enum_process" end time: Nov 08 18:47 Pacific Standard Time
+"numeric_enum_process" time elapsed: 00:00:13
+----------------------------------------------------------
+
+368/368 Testing: numeric_cli
+368/368 Test: numeric_cli
+Command: "C:/gcc/bin/cmake.exe" "-DLINKER=" "-DCOMPILER=C:/Users/a/VoidS6-Storage-Release/voidc.exe" "-DCLANG=C:/Users/a/Documents/ChatGPT/Void TEMP/Void-native/.toolchains/native-schannel/sdk/clang+llvm-23.1.4-x86_64-pc-windows-msvc/bin/clang.exe" "-DWINDOWS=1" "-DROOT=C:/Users/a/VoidCI42377496702-Native" "-DOUTPUT=C:/Users/a/VoidS6-Storage-Release/numeric native programs" "-DEXE_SUFFIX=.exe" "-P" "C:/Users/a/VoidCI42377496702-Native/tests/integration/numeric.cmake"
+Directory: C:/Users/a/VoidS6-Storage-Release
+"numeric_cli" start time: Nov 08 18:47 Pacific Standard Time
+Output:
+----------------------------------------------------------
+-- Numeric source constants, JIT and native AOT passed in both optimization modes
+<end of output>
+Test time =  55.57 sec
+----------------------------------------------------------
+Test Passed.
+"numeric_cli" end time: Nov 08 18:48 Pacific Standard Time
+"numeric_cli" time elapsed: 00:00:55
+----------------------------------------------------------
+
+End testing: Nov 08 18:48 Pacific Standard Time

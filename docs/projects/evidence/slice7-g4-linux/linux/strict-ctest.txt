@@ -1,0 +1,109 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-strict
+      Start  12: project_application
+      Start  13: project_application_process
+ 1/52 Test  #12: project_application ................   Passed   42.99 sec
+      Start 392: numeric_enum_process
+ 2/52 Test  #13: project_application_process ........   Passed   43.83 sec
+      Start 431: numeric_cli
+ 3/52 Test #392: numeric_enum_process ...............   Passed   24.68 sec
+      Start  11: project_creation_process
+ 4/52 Test  #11: project_creation_process ...........   Passed   15.40 sec
+      Start  14: project_discovery_cli
+ 5/52 Test #431: numeric_cli ........................   Passed   43.96 sec
+      Start 282: stage6_cache_processes
+ 6/52 Test #282: stage6_cache_processes .............   Passed   10.41 sec
+      Start 281: stage6_integrated
+ 7/52 Test  #14: project_discovery_cli ..............   Passed   18.33 sec
+      Start   8: project_selection
+ 8/52 Test #281: stage6_integrated ..................   Passed    7.91 sec
+      Start 280: native_source
+ 9/52 Test   #8: project_selection ..................   Passed    8.48 sec
+      Start 394: frontend
+10/52 Test #280: native_source ......................   Passed    5.58 sec
+      Start  15: project_profiles
+11/52 Test  #15: project_profiles ...................   Passed    4.54 sec
+      Start   6: project_manifest_legacy
+12/52 Test   #6: project_manifest_legacy ............   Passed    5.70 sec
+      Start  98: fixed_arrays_source
+13/52 Test #394: frontend ...........................   Passed   12.39 sec
+      Start 390: numeric
+14/52 Test  #98: fixed_arrays_source ................   Passed    3.50 sec
+      Start  16: project_protocol
+15/52 Test  #16: project_protocol ...................   Passed    2.23 sec
+      Start   9: project_sessions
+16/52 Test #390: numeric ............................   Passed    6.53 sec
+      Start 273: ffi_g3_jit_ir
+17/52 Test   #9: project_sessions ...................   Passed    1.83 sec
+      Start  17: project_nested_cli
+18/52 Test #273: ffi_g3_jit_ir ......................   Passed    2.25 sec
+      Start 270: ffi_g2_jit_ir
+19/52 Test  #17: project_nested_cli .................   Passed    1.61 sec
+      Start 265: ffi_g1_primitive_jit_ir
+20/52 Test #265: ffi_g1_primitive_jit_ir ............   Passed    1.27 sec
+      Start 382: reload
+21/52 Test #270: ffi_g2_jit_ir ......................   Passed    1.61 sec
+      Start 395: modules
+22/52 Test #382: reload .............................   Passed    0.97 sec
+      Start 269: ffi_g1_primitive_aot_missing
+23/52 Test #269: ffi_g1_primitive_aot_missing .......   Passed    0.89 sec
+      Start 391: numeric_enum_ir
+24/52 Test #395: modules ............................   Passed    1.71 sec
+      Start  56: stage10_fields
+25/52 Test  #56: stage10_fields .....................   Passed    0.82 sec
+      Start 389: analysis
+26/52 Test #391: numeric_enum_ir ....................   Passed    1.07 sec
+      Start  10: project_creation
+27/52 Test  #10: project_creation ...................   Passed    0.35 sec
+      Start   5: project_manifest_no_authority
+28/52 Test   #5: project_manifest_no_authority ......   Passed    0.32 sec
+      Start 387: sessions
+29/52 Test #387: sessions ...........................   Passed    0.26 sec
+      Start   2: project_manifest
+30/52 Test #389: analysis ...........................   Passed    1.25 sec
+      Start 393: numeric_enum_lsp
+31/52 Test   #2: project_manifest ...................   Passed    0.21 sec
+      Start 332: async_ir
+32/52 Test #393: numeric_enum_lsp ...................   Passed    0.14 sec
+      Start 383: gc
+33/52 Test #383: gc .................................   Passed    0.14 sec
+      Start 271: ffi_g2_aot_normal
+34/52 Test #332: async_ir ...........................   Passed    0.30 sec
+      Start 272: ffi_g2_aot_optimized
+35/52 Test #271: ffi_g2_aot_normal ..................   Passed    0.14 sec
+      Start 275: ffi_g3_aot_optimized
+36/52 Test #272: ffi_g2_aot_optimized ...............   Passed    0.14 sec
+      Start 274: ffi_g3_aot_normal
+37/52 Test #275: ffi_g3_aot_optimized ...............   Passed    0.14 sec
+      Start 284: native_aot_main_optimized
+38/52 Test #274: ffi_g3_aot_normal ..................   Passed    0.14 sec
+      Start 283: native_aot_main_normal
+39/52 Test #284: native_aot_main_optimized ..........   Passed    0.07 sec
+      Start 285: native_aot_terminated_nul_normal
+40/52 Test #283: native_aot_main_normal .............   Passed    0.07 sec
+      Start 289: native_aot_duplicate_normal
+41/52 Test #285: native_aot_terminated_nul_normal ...   Passed    0.06 sec
+      Start 288: native_aot_closed_optimized
+42/52 Test #289: native_aot_duplicate_normal ........   Passed    0.06 sec
+      Start 268: ffi_g1_primitive_aot_mismatch
+43/52 Test #288: native_aot_closed_optimized ........   Passed    0.06 sec
+      Start 266: ffi_g1_primitive_aot_normal
+44/52 Test #268: ffi_g1_primitive_aot_mismatch ......   Passed    0.06 sec
+      Start 267: ffi_g1_primitive_aot_optimized
+45/52 Test #266: ffi_g1_primitive_aot_normal ........   Passed    0.06 sec
+      Start   7: project_manifest_provenance
+46/52 Test #267: ffi_g1_primitive_aot_optimized .....   Passed    0.06 sec
+      Start   1: project_manifest_header
+47/52 Test   #7: project_manifest_provenance ........   Passed    0.04 sec
+      Start 276: ffi_g4_jit_ir
+48/52 Test   #1: project_manifest_header ............   Passed    0.02 sec
+      Start 277: ffi_g4_aot_normal
+49/52 Test #277: ffi_g4_aot_normal ..................   Passed    0.36 sec
+      Start 278: ffi_g4_aot_optimized
+50/52 Test #278: ffi_g4_aot_optimized ...............   Passed    0.34 sec
+      Start 279: ffi_g4_aot_startup
+51/52 Test #279: ffi_g4_aot_startup .................   Passed    0.21 sec
+52/52 Test #276: ffi_g4_jit_ir ......................   Passed    4.25 sec
+
+100% tests passed, 0 tests failed out of 52
+
+Total Test time (real) = 141.57 sec

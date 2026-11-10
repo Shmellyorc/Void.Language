@@ -1,0 +1,35 @@
+[  0%] Built target void_zone_objects
+[  6%] Built target void_format_objects
+[ 13%] Built target void_native_fixture
+[ 80%] Built target libcurl_static
+[ 80%] Building CXX object CMakeFiles/void_core.dir/src/frontend/project.cpp.o
+[ 93%] Built target void_runtime
+[ 93%] Building CXX object CMakeFiles/void_core.dir/src/frontend/source.cpp.o
+[ 93%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[ 93%] Building CXX object CMakeFiles/void_core.dir/src/frontend/tooling.cpp.o
+[ 93%] Built target void_native_inventory
+In file included from /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:6621:
+/home/shmellyorc/Documents/Void.Language/src/frontend/project_selection.inc:197:45: error: no matching member function for call to 'update'
+  197 |     auto field=[&](std::string_view s){hash.update(std::to_string(s.size())+":");hash.update(s);};
+      |                                        ~~~~~^~~~~~
+/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/include/llvm/Support/SHA256.h:42:17: note: candidate function not viable: no known conversion from 'basic_string<char, std::char_traits<char>, std::allocator<char>>' to 'ArrayRef<uint8_t>' (aka 'ArrayRef<unsigned char>') for 1st argument
+   42 |   LLVM_ABI void update(ArrayRef<uint8_t> Data);
+      |                 ^      ~~~~~~~~~~~~~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/include/llvm/Support/SHA256.h:45:17: note: candidate function not viable: no known conversion from 'basic_string<char, std::char_traits<char>, std::allocator<char>>' to 'StringRef' for 1st argument
+   45 |   LLVM_ABI void update(StringRef Str);
+      |                 ^      ~~~~~~~~~~~~~
+In file included from /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:6621:
+/home/shmellyorc/Documents/Void.Language/src/frontend/project_selection.inc:197:87: error: no matching member function for call to 'update'
+  197 |     auto field=[&](std::string_view s){hash.update(std::to_string(s.size())+":");hash.update(s);};
+      |                                                                                  ~~~~~^~~~~~
+/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/include/llvm/Support/SHA256.h:42:17: note: candidate function not viable: no known conversion from 'std::string_view' (aka 'basic_string_view<char>') to 'ArrayRef<uint8_t>' (aka 'ArrayRef<unsigned char>') for 1st argument
+   42 |   LLVM_ABI void update(ArrayRef<uint8_t> Data);
+      |                 ^      ~~~~~~~~~~~~~~~~~~~~~~
+/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/include/llvm/Support/SHA256.h:45:17: note: candidate function not viable: no known conversion from 'std::string_view' (aka 'basic_string_view<char>') to 'StringRef' for 1st argument
+   45 |   LLVM_ABI void update(StringRef Str);
+      |                 ^      ~~~~~~~~~~~~~
+2 errors generated.
+gmake[3]: *** [CMakeFiles/void_core.dir/build.make:107: CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o] Error 1
+gmake[2]: *** [CMakeFiles/Makefile2:2078: CMakeFiles/void_core.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:2406: CMakeFiles/voidc.dir/rule] Error 2
+gmake: *** [Makefile:388: voidc] Error 2

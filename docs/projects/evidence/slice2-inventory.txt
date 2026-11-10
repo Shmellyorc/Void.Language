@@ -1,0 +1,169 @@
+HEAD 2f667ea338127b8f91c3136804377ef3fa5218d6
+Index empty. Expanded working-tree inventory; report/receipt do not hash themselves.
+{"modified": 25, "total": 163, "untracked": 138}
+{"S1 amended by S2": 11, "S1 preserved": 72, "S2 baseline modification": 2, "S2 new": 78}
+
+STATUS | LAYER | EXACT PATH
+ M | S1 amended by S2 | CMakeLists.txt
+ M | S1 preserved | cmake/InstallLicenses.cmake
+ M | S1 amended by S2 | docs/CLI.md
+ M | S1 amended by S2 | docs/DECISIONS.md
+ M | S1 amended by S2 | docs/DIAGNOSTICS.md
+ M | S1 preserved | docs/EDITOR_INTEGRATION.md
+ M | S1 preserved | docs/LANGUAGE_BIBLE.md
+ M | S1 preserved | docs/LANGUAGE_SERVER.md
+ M | S1 preserved | docs/LOCAL_LIBRARIES.md
+ M | S1 amended by S2 | docs/MODULE_SYSTEM.md
+ M | S1 preserved | docs/NATIVE_LIBRARIES.md
+ M | S1 amended by S2 | docs/PROJECT_ARCHITECTURE_ROADMAP.md
+ M | S1 amended by S2 | docs/README.md
+ M | S1 preserved | docs/RUNTIME_GLOBALS.md
+ M | S1 amended by S2 | docs/SOURCE_COMPILER.md
+ M | S1 preserved | docs/STAGE8_DISCOVERY.md
+ M | S1 preserved | docs/STAGE9_APPLICATION_WORKFLOW.md
+ M | S1 preserved | docs/os/API.md
+ M | S1 preserved | docs/release/NOTICE_INVENTORY.json
+ M | S1 preserved | docs/release/REDISTRIBUTION_NOTICES.md
+ M | S1 amended by S2 | include/void/diagnostic.hpp
+ M | S2 baseline modification | include/void/frontend.hpp
+ M | S1 preserved | include/void/path.hpp
+ M | S1 amended by S2 | src/frontend/compiler.cpp
+ M | S2 baseline modification | src/main.cpp
+?? | S1 preserved | docs/projects/SLICE1.md
+?? | S1 preserved | docs/projects/SLICE1_CLOSEOUT.md
+?? | S2 new | docs/projects/SLICE2.md
+?? | S1 preserved | docs/projects/evidence/closeout/header-target-first-build.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/linux-debug.xml
+?? | S1 preserved | docs/projects/evidence/closeout/linux-install.xml
+?? | S1 preserved | docs/projects/evidence/closeout/linux-release.xml
+?? | S1 preserved | docs/projects/evidence/closeout/linux-strict.xml
+?? | S1 preserved | docs/projects/evidence/closeout/notice-corrected.json
+?? | S1 preserved | docs/projects/evidence/closeout/notice-failure.json
+?? | S1 preserved | docs/projects/evidence/closeout/original-debug-failure.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/original-debug-failure.xml
+?? | S1 preserved | docs/projects/evidence/closeout/original-strict-failure.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/original-strict-failure.xml
+?? | S1 preserved | docs/projects/evidence/closeout/upstream-verification.json
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-header-build.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-header.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-host-verified.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-http-verified.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-manifest-compile.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-manifest-link.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-manifest.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-debug-project-compile.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-first-transfer-failure.json
+?? | S1 preserved | docs/projects/evidence/closeout/windows-focused.cmd
+?? | S1 preserved | docs/projects/evidence/closeout/windows-focused.json
+?? | S1 preserved | docs/projects/evidence/closeout/windows-focused.py
+?? | S1 preserved | docs/projects/evidence/closeout/windows-missing-host-archives-Release-configure.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-missing-host-archives-native-results.json
+?? | S1 preserved | docs/projects/evidence/closeout/windows-missing-http-archives-Release-configure.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-missing-http-archives-native-results.json
+?? | S1 preserved | docs/projects/evidence/closeout/windows-missing-reviewed-patches-Release-configure.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-missing-reviewed-patches-native-results.json
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-header-build.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-header.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-host-verified.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-http-verified.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-manifest-compile.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-manifest-link.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-manifest.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-release-project-compile.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-sdk-layout-Release-configure.log.txt
+?? | S1 preserved | docs/projects/evidence/closeout/windows-sdk-layout-native-results.json
+?? | S1 preserved | docs/projects/evidence/slice1-baseline-source.patch
+?? | S1 preserved | docs/projects/evidence/slice1-closeout-inventory.txt
+?? | S1 preserved | docs/projects/evidence/slice1-closeout-source.patch
+?? | S1 preserved | docs/projects/evidence/slice1-closeout.json
+?? | S1 preserved | docs/projects/evidence/slice1-local.json
+?? | S1 preserved | docs/projects/evidence/slice1-malformed-header.toml
+?? | S2 new | docs/projects/evidence/slice2-baseline-source.patch
+?? | S2 new | docs/projects/evidence/slice2-inventory.txt
+?? | S2 new | docs/projects/evidence/slice2-local.json
+?? | S2 new | docs/projects/evidence/slice2-source.patch
+?? | S2 new | docs/projects/evidence/slice2/D-E-byte-bound-original.json
+?? | S2 new | docs/projects/evidence/slice2/cli-install.xml
+?? | S2 new | docs/projects/evidence/slice2/first-build-failure.log.txt
+?? | S2 new | docs/projects/evidence/slice2/first-corrected-tests.xml
+?? | S2 new | docs/projects/evidence/slice2/first-smoke.json
+?? | S2 new | docs/projects/evidence/slice2/first-tests.xml
+?? | S2 new | docs/projects/evidence/slice2/import-depth-original.json
+?? | S2 new | docs/projects/evidence/slice2/import-depth-pre-fix.cpp.txt
+?? | S2 new | docs/projects/evidence/slice2/incorrect-target-build.log.txt
+?? | S2 new | docs/projects/evidence/slice2/installed.json
+?? | S2 new | docs/projects/evidence/slice2/linux-debug-nested-processes.json
+?? | S2 new | docs/projects/evidence/slice2/linux-debug-nested.xml
+?? | S2 new | docs/projects/evidence/slice2/linux-debug-processes.json
+?? | S2 new | docs/projects/evidence/slice2/linux-debug.xml
+?? | S2 new | docs/projects/evidence/slice2/linux-release-nested-processes.json
+?? | S2 new | docs/projects/evidence/slice2/linux-release-nested.xml
+?? | S2 new | docs/projects/evidence/slice2/linux-release-processes.json
+?? | S2 new | docs/projects/evidence/slice2/linux-release.xml
+?? | S2 new | docs/projects/evidence/slice2/linux-strict-nested-processes.json
+?? | S2 new | docs/projects/evidence/slice2/linux-strict-nested.xml
+?? | S2 new | docs/projects/evidence/slice2/linux-strict-processes.json
+?? | S2 new | docs/projects/evidence/slice2/linux-strict.xml
+?? | S2 new | docs/projects/evidence/slice2/low-stack.json
+?? | S2 new | docs/projects/evidence/slice2/pre-final-debug.xml
+?? | S2 new | docs/projects/evidence/slice2/pre-final-release.xml
+?? | S2 new | docs/projects/evidence/slice2/pre-final-strict.xml
+?? | S2 new | docs/projects/evidence/slice2/root-alias-original.json
+?? | S2 new | docs/projects/evidence/slice2/root-alias-pre-fix.inc.txt
+?? | S2 new | docs/projects/evidence/slice2/second-tests.xml
+?? | S2 new | docs/projects/evidence/slice2/source-hardlink-original.json
+?? | S2 new | docs/projects/evidence/slice2/source-hardlink-pre-correction.inc.txt
+?? | S2 new | docs/projects/evidence/slice2/third-tests.xml
+?? | S2 new | docs/projects/evidence/slice2/virtual-root-original.json
+?? | S2 new | docs/projects/evidence/slice2/virtual-root-pre-fix.inc.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-Debug-nested.json
+?? | S2 new | docs/projects/evidence/slice2/windows-Debug-nested.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-Release-nested.json
+?? | S2 new | docs/projects/evidence/slice2/windows-Release-nested.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-cli-link.rsp
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-compiler-compile.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-host-verified.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-http-verified.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-legacy.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-project-cli.json
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-project-cli.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-project-compile.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-selection-link.rsp
+?? | S2 new | docs/projects/evidence/slice2/windows-debug-selection.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-native.cmd
+?? | S2 new | docs/projects/evidence/slice2/windows-native.json
+?? | S2 new | docs/projects/evidence/slice2/windows-native.py
+?? | S2 new | docs/projects/evidence/slice2/windows-nested-native-results.json
+?? | S2 new | docs/projects/evidence/slice2/windows-nested-native.cmd
+?? | S2 new | docs/projects/evidence/slice2/windows-nested-native.py
+?? | S2 new | docs/projects/evidence/slice2/windows-original-failure.json
+?? | S2 new | docs/projects/evidence/slice2/windows-original-failure.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-original-oracle.py
+?? | S2 new | docs/projects/evidence/slice2/windows-original-processes.json
+?? | S2 new | docs/projects/evidence/slice2/windows-release-cli-link.rsp
+?? | S2 new | docs/projects/evidence/slice2/windows-release-compiler-compile.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-release-host-verified.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-release-http-verified.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-release-legacy.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-release-project-cli.json
+?? | S2 new | docs/projects/evidence/slice2/windows-release-project-cli.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-release-project-compile.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-release-selection-link.rsp
+?? | S2 new | docs/projects/evidence/slice2/windows-release-selection.log.txt
+?? | S2 new | docs/projects/evidence/slice2/windows-source-hashes.json
+?? | S1 preserved | include/void/project.hpp
+?? | S1 preserved | src/frontend/project.cpp
+?? | S2 new | src/frontend/project_selection.inc
+?? | S1 preserved | tests/project/authority.py
+?? | S2 new | tests/project/discovery.py
+?? | S1 preserved | tests/project/header.cpp
+?? | S1 amended by S2 | tests/project/legacy.py
+?? | S1 preserved | tests/project/manifest.cpp
+?? | S2 new | tests/project/nested.py
+?? | S1 preserved | tests/project/provenance.py
+?? | S2 new | tests/project/selection.cpp
+?? | S1 preserved | third_party/tomlplusplus/LICENSE
+?? | S1 preserved | third_party/tomlplusplus/README.md
+?? | S1 preserved | third_party/tomlplusplus/toml.hpp
+?? | S1 preserved | third_party/tomlplusplus/upstream.json
+?? | S1 preserved | third_party/tomlplusplus/void-bounds-and-locations.patch

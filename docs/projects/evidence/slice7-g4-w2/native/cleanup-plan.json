@@ -1,0 +1,39 @@
+{
+  "acl_binary": "49a016017d7b6d24eb1cfd7d4c290c57ff62b9d51fcb7ad44423adfe6003f481",
+  "acl_fixture": "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33",
+  "acl_source": "02db3cea40db04b98b52325209c2faf6bd286792a55fbc1ccbe0fec7786583b4",
+  "duplicates": {
+    "acl-run.cmd": "6c9e8083ce11439d5285523865c69f85fbda9e62ac7a660303ba023aa362440d",
+    "acl-run.py": "c042333b072a489cda0da7c50ea35f1c52c3d0065ac532e7e5cc14816d495eaf",
+    "build.cmd": "e9bf2ba4105f136f676563371b82e973830f4c7eb26eceebfa235a0433ff43e8",
+    "native-run.py": "3041329ddb51050218e80d295ed5d6b4c436ac05c3d604e098b1e15b9ffacc78",
+    "space.cmd": "f2a0b6d23a578e10336696a3df8a8fbef24fc268e64d23b4a89d80c4cc6525f0"
+  },
+  "main_artifacts": {
+    "acl/void_w2_gate.dll": "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33",
+    "approved/void_w2_gate.dll": "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33",
+    "calibrate122/void_w2_gate.dll": "d3b56fd114946e6e421d2b8778a02c4623413cf146c1c4680aa9422cf41bb2d3",
+    "collision/void_w2_gate.dll": "7f81cf565422f6ec915592c83c692441922357e6e80e467ed223329aa2b22ce5",
+    "embedded/probe-embedded.exe": "7492062fc62f1530898fa57e330fef2a77b32c9e70a740d6ac0022d1e10f7587",
+    "embedded/void_w2_gate.dll": "d3b56fd114946e6e421d2b8778a02c4623413cf146c1c4680aa9422cf41bb2d3",
+    "external/probe-external.exe": "736539f014bd6d34a950ee5587f799a67b5b9c560b2d18394c437b5f84e7f5b0",
+    "external/probe-external.exe.manifest": "49caef4ad13493702cda8da006e0787c0a2089553d5119fbfedb522d1c7109bc",
+    "external/void_w2_gate.dll": "d3b56fd114946e6e421d2b8778a02c4623413cf146c1c4680aa9422cf41bb2d3",
+    "forwarder/void_w2_gate.dll": "18c7676a6a7c338b126e9147a06fae89c05a1dad213098a877479339f0c309b2",
+    "hardlink/second.dll": "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33",
+    "hardlink/void_w2_gate.dll": "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33",
+    "override/redirect.manifest": "49caef4ad13493702cda8da006e0787c0a2089553d5119fbfedb522d1c7109bc",
+    "override/void_w2_gate.dll": "d3b56fd114946e6e421d2b8778a02c4623413cf146c1c4680aa9422cf41bb2d3",
+    "pin-replacement/void_w2_gate.dll": "f2ed0b3705b6b76eee27171a96738d7fe93396819be5b57f36307cd9cb811913",
+    "pin/void_w2_gate.dll": "845f9a6524d64e6584ec2fba37de1b63b7d77a84efc85970ffbb4e3224f71d33",
+    "probe.exe": "dfb439cbd27d185315d02b4e12481a6851a03d272b0910d687e4786b74d9070d",
+    "redirect.manifest": "49caef4ad13493702cda8da006e0787c0a2089553d5119fbfedb522d1c7109bc",
+    "sentinel121/void_w2_gate.dll": "f2ed0b3705b6b76eee27171a96738d7fe93396819be5b57f36307cd9cb811913",
+    "sentinel122/void_w2_gate.dll": "d3b56fd114946e6e421d2b8778a02c4623413cf146c1c4680aa9422cf41bb2d3",
+    "separate/probe.exe": "dfb439cbd27d185315d02b4e12481a6851a03d272b0910d687e4786b74d9070d",
+    "separate/void_w2_gate.dll": "d3b56fd114946e6e421d2b8778a02c4623413cf146c1c4680aa9422cf41bb2d3",
+    "swap-guarded/void_w2_gate.dll": "d3b56fd114946e6e421d2b8778a02c4623413cf146c1c4680aa9422cf41bb2d3",
+    "swap-open/void_w2_gate.dll": "f2ed0b3705b6b76eee27171a96738d7fe93396819be5b57f36307cd9cb811913"
+  },
+  "main_source": "22d233d555dd3ca2f025a8b56ba74e9a5de1e89fa2b4433f769f20233cb3fdc4"
+}

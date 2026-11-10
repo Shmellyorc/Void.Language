@@ -1,0 +1,1476 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -107,6 +107,7 @@
+ add_library(void_native_fixture STATIC src/native/fixture.c src/native/sink.c)
+ target_link_libraries(void_native_fixture PRIVATE void_options)
+ add_library(void_runtime STATIC src/runtime/application.cpp src/runtime/os.cpp src/runtime/os_abi.cpp src/runtime/random.cpp src/runtime/filesystem_abi.cpp src/runtime/filesystem.cpp src/runtime/native_resource.cpp src/runtime/native_binding.cpp src/runtime/temporal_abi.cpp src/runtime/conversion.cpp src/runtime/text_case.cpp src/runtime/buffer.cpp src/runtime/list.cpp src/runtime/array.cpp src/runtime/dictionary.cpp src/runtime/fixed_abi.cpp src/runtime/gc_schema.cpp src/runtime/heap.cpp src/runtime/coordination.cpp src/runtime/console.cpp src/runtime/console_abi.cpp src/runtime/callback.cpp src/runtime/abi.cpp src/runtime/reload.cpp src/runtime/native.cpp src/runtime/async.cpp)
++target_sources(void_runtime PRIVATE src/runtime/c_span.cpp)
+ target_sources(void_runtime PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects> $<TARGET_OBJECTS:void_application_objects>)
+ target_link_libraries(void_runtime PUBLIC void_options Threads::Threads void_native_fixture ${CMAKE_DL_LIBS})
+ include(cmake/CurlProvider.cmake)
+@@ -1304,6 +1305,7 @@
+   add_test(NAME stage10_operator_integration COMMAND void_operator_integration "${PROJECT_SOURCE_DIR}")
+   set_tests_properties(stage10_operator_integration PROPERTIES TIMEOUT 180)
+   include(tests/ffi/primitives.cmake)
++  include(tests/ffi/records.cmake)
+   add_executable(void_native_tests tests/native/tests.cpp tests/native/integrated.cpp tests/native/probe.cpp $<TARGET_OBJECTS:void_native_test_fixture> tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
+   target_link_libraries(void_native_tests PRIVATE void_llvm void_cache_identity)
+   add_test(NAME native_source COMMAND void_native_tests "${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/native fixtures")
+--- a/include/void/c_primitive.hpp
++++ b/include/void/c_primitive.hpp
+@@ -14,15 +14,52 @@
+                                      const std::uint64_t*, std::uint32_t, std::uint64_t*);
+ }
+ inline constexpr std::string_view c_primitive_transport = "vd_c_primitive_dispatch_v1";
++inline constexpr std::string_view c_record_transport = "vd_c_primitive_dispatch_v2";
++inline constexpr std::string_view c_span_bridge = "vd_c_span_dispatch_v2";
++inline constexpr unsigned c_span_limit = 65536;
++
++struct CSpanRequest {
++    void** root;
++    std::uint64_t limit;
++    std::uint32_t argument, direction; // 1 input, 2 output, 3 input/output
++    std::uint32_t offset_argument, length_argument;
++};
++extern "C" std::uint32_t vd_c_span_dispatch_v2(CPrimitiveThunk*, const char*, std::uint32_t,
++    std::uint32_t, const std::uint64_t*, std::uint32_t, std::uint64_t*,
++    const CSpanRequest*, std::uint32_t) noexcept;
++
++inline bool reserved_c_transport(std::string_view symbol) {
++    return symbol.starts_with(c_primitive_transport) || symbol.starts_with(c_record_transport) ||
++        symbol.starts_with(c_span_bridge);
++}
+ inline constexpr std::uint32_t c_primitive_probe = UINT32_MAX;
+ inline constexpr unsigned c_primitive_max_arguments = 16;
+ 
+ class CPrimitiveAdmission final {
+ public:
++    struct Shape {
++        ir::Type scalar = ir::Type::none;
++        unsigned record = 0; // 1-based index, zero for primitives
++        unsigned extent = 0; // inline C array of scalars only
++        unsigned direction = 0; // C byte span only
++        unsigned offset_argument = 0, length_argument = 0, limit = 0;
++    };
++    struct Field {
++        std::string name, c_name;
++        Shape shape;
++        unsigned offset;
++    };
++    struct Record {
++        std::string name, c_name;
++        unsigned size, alignment;
++        std::vector<Field> fields;
++    };
+     struct Binding {
+         std::string name, export_name;
+         std::vector<ir::Type> parameters;
+         ir::Type result;
++        std::vector<Shape> abi_parameters;
++        Shape abi_result;
+     };
+     using Owner = std::shared_ptr<const CPrimitiveAdmission>;
+     CPrimitiveAdmission(const CPrimitiveAdmission&) = delete;
+@@ -37,12 +74,23 @@
+     const std::string& module() const { return module_; }
+     const std::vector<Binding>& bindings() const { return bindings_; }
+     CPrimitiveThunk* thunk() const { return thunk_; }
++    unsigned revision() const { return revision_; }
++    std::string_view transport() const { return revision_ == 1 ? c_primitive_transport : c_record_transport; }
++    const Record& record(unsigned index) const { return records_.at(index - 1); }
++    const std::vector<Record>& records() const { return records_; }
++    bool inline_array(ir::Type) const;
++    bool matches(const Shape&, ir::Type) const;
++    bool signature(const Binding&, const std::vector<ir::Type>&, ir::Type) const;
++    static unsigned scalar_bytes(ir::Type);
+     std::string call_identity(const Binding& binding) const { return provider_ + "::" + binding.export_name; }
+     std::string source() const;
+ private:
+     CPrimitiveAdmission() = default;
+     std::string descriptor_, provider_, target_, module_;
++    unsigned revision_ = 1;
+     std::vector<Binding> bindings_;
++    std::vector<Record> records_;
++    std::string source_type(const Shape&) const;
+     CPrimitiveThunk* thunk_ = nullptr;
+ };
+ }
+--- a/include/void/ir.hpp
++++ b/include/void/ir.hpp
+@@ -186,7 +186,7 @@
+     Type operator_owner = Type::none;
+     std::string operator_glyph = {};
+ };
+-bool numeric_enum_cleanup_return(const Function&,unsigned block);
++bool checked_storage_cleanup_return(const Function&, unsigned block, const CPrimitiveAdmission* = nullptr);
+ bool operator_arity(std::string_view glyph,std::size_t arity);
+ std::string operator_identity(Type owner,std::string_view glyph,const std::vector<Type>& operands);
+ void validate_operator_declaration(const Function&);
+--- a/include/void/runtime.hpp
++++ b/include/void/runtime.hpp
+@@ -146,6 +146,8 @@
+     void list_write(RegisteredRootWord,ScalarEncoding,std::uint64_t index,std::uint64_t bits,std::optional<std::uint64_t> version={});
+     void list_push(RegisteredRootWord,ScalarEncoding,std::uint64_t bits);
+     // Transactional byte overwrite/append using the existing list backing allocator.
++    std::uint64_t c_span_bytes(RegisteredRootWord, std::uint64_t offset, std::span<std::uint8_t>,
++                               bool read, std::optional<std::uint64_t> commit_version = {});
+     void list_write_bytes(RegisteredRootWord destination, RegisteredRootWord input,
+                           std::uint64_t position);
+     std::uint64_t list_remove(RegisteredRootWord,ScalarEncoding,std::uint64_t index);
+--- a/src/backend/llvm/backend.cpp
++++ b/src/backend/llvm/backend.cpp
+@@ -124,11 +124,20 @@
+         throw std::invalid_argument("C primitive descriptor does not match the native LLVM target");
+ }
+ static llvm::CallInst* call_c_primitive(llvm::IRBuilder<>& b, llvm::Module& module, const CPrimitiveAdmission& admission,
+-                                      std::uint32_t ordinal, llvm::Value* words, std::uint32_t count, llvm::Value* result) {
+-    auto transport = module.getOrInsertFunction(c_primitive_transport, b.getInt32Ty(), b.getPtrTy(),
++                                      std::uint32_t ordinal, llvm::Value* words, std::uint32_t count, llvm::Value* result,
++                                      llvm::Value* spans = nullptr, unsigned span_count = 0) {
++    auto transport = module.getOrInsertFunction(admission.transport(), b.getInt32Ty(), b.getPtrTy(),
+         b.getInt32Ty(), b.getInt32Ty(), b.getPtrTy(), b.getInt32Ty(), b.getPtrTy());
+     const auto& descriptor = admission.descriptor();
+-    return b.CreateCall(transport, {b.CreateGlobalString(descriptor), b.getInt32(descriptor.size()),
++    auto* bytes = b.CreateGlobalString(descriptor);
++    if (spans) {
++        auto bridge = module.getOrInsertFunction(c_span_bridge, b.getInt32Ty(), b.getPtrTy(),
++            b.getPtrTy(), b.getInt32Ty(), b.getInt32Ty(), b.getPtrTy(), b.getInt32Ty(),
++            b.getPtrTy(), b.getPtrTy(), b.getInt32Ty());
++        return b.CreateCall(bridge, {transport.getCallee(), bytes, b.getInt32(descriptor.size()),
++            b.getInt32(ordinal), words, b.getInt32(count), result, spans, b.getInt32(span_count)});
++    }
++    return b.CreateCall(transport, {bytes, b.getInt32(descriptor.size()),
+         b.getInt32(ordinal), words, b.getInt32(count), result});
+ }
+ void write_object(llvm::Module& module, llvm::TargetMachine& machine, const std::filesystem::path& output) {
+@@ -885,7 +894,7 @@
+             }
+             std::vector<llvm::Value*> values;
+             std::vector<ir::Type> value_types;
+-            const bool defer_return_load=ir::numeric_enum_cleanup_return(f,n);
++            const bool defer_return_load=ir::checked_storage_cleanup_return(f,n,input.c_primitives.get());
+             auto check_cleanup_return=[&] {
+                 if(async)b.CreateCall(module->getOrInsertFunction("vd_async_finish",b.getVoidTy(),b.getPtrTy()),{failure});
+                 auto* failed=llvm::BasicBlock::Create(context,"cleanup_failed",fn);auto* ready=llvm::BasicBlock::Create(context,"cleanup_complete",fn);b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),failed,ready);b.SetInsertPoint(failed);return_failure();b.SetInsertPoint(ready);
+@@ -1315,31 +1324,143 @@
+                 case Op::extract: v = b.CreateExtractValue(values[instruction.a],{static_cast<unsigned>(instruction.immediate)}); break;
+                 case Op::insert: v = b.CreateInsertValue(values[instruction.a],values[instruction.b],{static_cast<unsigned>(instruction.immediate)}); break;
+                 case Op::c_primitive_call: {
++                    using Shape = CPrimitiveAdmission::Shape;
++                    const auto& admission = *input.c_primitives;
++                    const auto ordinal = static_cast<std::uint32_t>(instruction.immediate);
++                    const auto& binding = admission.bindings().at(ordinal);
+                     const auto count = static_cast<std::uint32_t>(instruction.arguments.size());
+                     auto* absent = llvm::ConstantPointerNull::get(b.getPtrTy());
+-                    llvm::Value* words = absent;
+-                    if (count) {
+-                        words = b.CreateAlloca(b.getInt64Ty(), b.getInt32(count));
+-                        for (unsigned n = 0; n < count; ++n) {
+-                            const auto argument = instruction.arguments[n];
+-                            auto* slot = b.CreateInBoundsGEP(b.getInt64Ty(), words, b.getInt32(n));
+-                            b.CreateStore(bits(values[argument], operand_type(argument)), slot);
++                    auto scratch = [&](unsigned bytes) {
++                        auto* buffer = b.CreateAlloca(b.getInt64Ty(), b.getInt32((bytes + 7) / 8));
++                        b.CreateMemSet(buffer, b.getInt8(0), bytes, llvm::Align(8));
++                        return buffer;
++                    };
++                    auto read_bits = [&](llvm::Value* raw, ir::Type scalar) -> llvm::Value* {
++                        const unsigned width = scalar == ir::Type::boolean ? 1 : numeric::width(scalar);
++                        if (scalar == ir::Type::boolean)
++                            fail_if(b.CreateICmpUGT(raw, llvm::ConstantInt::get(raw->getType(), 1)),
++                                "noncanonical C Boolean field");
++                        auto* narrowed = b.CreateZExtOrTrunc(raw, b.getIntNTy(width));
++                        return numeric::floating(scalar) ? b.CreateBitCast(narrowed, type(scalar)) : narrowed;
++                    };
++                    std::function<void(const Shape&,ir::Type,llvm::Value*,llvm::Value*,bool)> transfer;
++                    transfer = [&](const Shape& shape, ir::Type source_type, llvm::Value* value,
++                                   llvm::Value* native, bool into_c) {
++                        if (shape.record) {
++                            const auto& record = admission.record(shape.record);
++                            for (unsigned i = 0; i < record.fields.size(); ++i) {
++                                const auto& field = record.fields[i];
++                                transfer(field.shape, ir::field_type(source_type, i),
++                                    b.CreateStructGEP(type(source_type), value, i),
++                                    b.CreateInBoundsGEP(b.getInt8Ty(), native, b.getInt32(field.offset)), into_c);
++                            }
++                            return;
+                         }
++                        const unsigned bytes = CPrimitiveAdmission::scalar_bytes(shape.scalar);
++                        auto* raw_type = b.getIntNTy(bytes * 8);
++                        if (!shape.extent) {
++                            if (into_c) {
++                                auto* word = bits(b.CreateLoad(type(shape.scalar), value), shape.scalar);
++                                b.CreateAlignedStore(b.CreateZExtOrTrunc(word, raw_type), native, llvm::Align(bytes));
++                            } else {
++                                auto* word = b.CreateAlignedLoad(raw_type, native, llvm::Align(bytes));
++                                b.CreateStore(read_bits(word, shape.scalar), value);
++                            }
++                            return;
++                        }
++                        const auto encoding = b.getInt32(scalar_encoding(shape.scalar));
++                        const auto extent = b.getInt64(shape.extent);
++                        if (!into_c) {
++                            b.CreateCall(module->getOrInsertFunction("vd_array_default", b.getVoidTy(),
++                                b.getPtrTy(), b.getInt32Ty(), b.getInt64Ty(), b.getInt64Ty(), b.getPtrTy()),
++                                {value, encoding, extent, b.getInt64(0), failure});
++                            selected_failure();
++                        }
++                        for (unsigned i = 0; i < shape.extent; ++i) {
++                            auto* position = b.CreateInBoundsGEP(b.getInt8Ty(), native, b.getInt32(i * bytes));
++                            if (into_c) {
++                                auto* word = b.CreateCall(module->getOrInsertFunction("vd_array_read", b.getInt64Ty(),
++                                    b.getPtrTy(), b.getInt64Ty(), b.getInt32Ty(), b.getInt64Ty(), b.getPtrTy()),
++                                    {value, b.getInt64(i), encoding, extent, failure});
++                                selected_failure();
++                                b.CreateAlignedStore(b.CreateZExtOrTrunc(word, raw_type), position, llvm::Align(bytes));
++                            } else {
++                                auto* raw = b.CreateAlignedLoad(raw_type, position, llvm::Align(bytes));
++                                auto* word = bits(read_bits(raw, shape.scalar), shape.scalar);
++                                b.CreateCall(module->getOrInsertFunction("vd_array_write", b.getVoidTy(),
++                                    b.getPtrTy(), b.getInt64Ty(), b.getInt64Ty(), b.getInt32Ty(), b.getInt64Ty(), b.getPtrTy()),
++                                    {value, b.getInt64(i), word, encoding, extent, failure});
++                                selected_failure();
++                            }
++                        }
++                    };
++                    llvm::Value* words = count ? static_cast<llvm::Value*>(scratch(count * 8)) : absent;
++                    unsigned span_count = 0;
++                    llvm::Value* spans = admission.revision() == 2 ? absent : nullptr;
++                    llvm::StructType* span_type = nullptr;
++                    for (unsigned a = 0; a < count; ++a) {
++                        const auto argument = instruction.arguments[a];
++                        const auto& shape = binding.abi_parameters[a];
++                        if (shape.direction) {
++                            if (!span_type) {
++                                span_type = llvm::StructType::get(b.getPtrTy(), b.getInt64Ty(), b.getInt32Ty(),
++                                    b.getInt32Ty(), b.getInt32Ty(), b.getInt32Ty());
++                                const auto* geometry = layout.getStructLayout(span_type);
++                                if (geometry->getSizeInBytes() != sizeof(CSpanRequest) ||
++                                    geometry->getElementOffset(1) != offsetof(CSpanRequest, limit) ||
++                                    geometry->getElementOffset(2) != offsetof(CSpanRequest, argument) ||
++                                    geometry->getElementOffset(3) != offsetof(CSpanRequest, direction) ||
++                                    geometry->getElementOffset(4) != offsetof(CSpanRequest, offset_argument) ||
++                                    geometry->getElementOffset(5) != offsetof(CSpanRequest, length_argument))
++                                    throw std::invalid_argument("C span request ABI mismatch");
++                                spans = b.CreateAlloca(span_type, b.getInt32(2));
++                            }
++                            auto* row = b.CreateInBoundsGEP(span_type, spans, b.getInt32(span_count++));
++                            llvm::Value* fields[] = {value_roots[n].at(argument), b.getInt64(shape.limit),
++                                b.getInt32(a), b.getInt32(shape.direction),
++                                b.getInt32(shape.offset_argument), b.getInt32(shape.length_argument)};
++                            for (unsigned i = 0; i < 6; ++i)
++                                b.CreateStore(fields[i], b.CreateStructGEP(span_type, row, i));
++                            continue;
++                        }
++                        llvm::Value* word;
++                        if (shape.record) {
++                            auto* storage = value_roots[n].at(argument);
++                            if (!storage) {
++                                storage = b.CreateAlloca(type(operand_type(argument)));
++                                b.CreateStore(values[argument], storage);
++                            }
++                            auto* native = scratch(admission.record(shape.record).size);
++                            transfer(shape, operand_type(argument), storage, native, true);
++                            word = b.CreatePtrToInt(native, b.getInt64Ty());
++                        } else word = bits(values[argument], operand_type(argument));
++                        b.CreateStore(word, b.CreateInBoundsGEP(b.getInt64Ty(), words, b.getInt32(a)));
+                     }
+                     const auto result_type = instruction.type;
+-                    llvm::Value* output = result_type == ir::Type::none ? static_cast<llvm::Value*>(absent) : b.CreateAlloca(b.getInt64Ty());
+-                    auto* status = call_c_primitive(b, *module, *input.c_primitives,
+-                        static_cast<std::uint32_t>(instruction.immediate), words, count, output);
++                    const auto& result_shape = binding.abi_result;
++                    llvm::Value* output = absent;
++                    if (result_type != ir::Type::none)
++                        output = scratch(result_shape.record ? admission.record(result_shape.record).size : 8);
++                    auto* status = call_c_primitive(b, *module, admission, ordinal, words, count, output, spans, span_count);
++                    if (span_count) {
++                        fail_if(b.CreateICmpEQ(status, b.getInt32(3)), "C byte span outside admitted extent");
++                        fail_if(b.CreateICmpEQ(status, b.getInt32(4)), "overlapping C byte spans");
++                        fail_if(b.CreateICmpEQ(status, b.getInt32(5)), "C byte span returned an oversized written prefix");
++                    }
+                     fail_if(b.CreateIsNotNull(status), "C primitive transport rejected " + instruction.callee);
+                     if (result_type == ir::Type::none) {
+                         v = llvm::UndefValue::get(b.getInt8Ty());
++                    } else if (result_shape.record) {
++                        auto* storage = value_roots[n].at(values.size());
++                        if (!storage) storage = b.CreateAlloca(type(result_type));
++                        transfer(result_shape, result_type, storage, output, false);
++                        v = b.CreateLoad(type(result_type), storage);
+                     } else {
+                         auto* raw = b.CreateLoad(b.getInt64Ty(), output);
+                         const unsigned width = result_type == ir::Type::boolean ? 1 : numeric::width(result_type);
+                         if (width < 64)
+                             fail_if(b.CreateIsNotNull(b.CreateLShr(raw, width)), "noncanonical C primitive result");
+-                        v = b.CreateZExtOrTrunc(raw, b.getIntNTy(width));
+-                        if (numeric::floating(result_type)) v = b.CreateBitCast(v, type(result_type));
++                        v = read_bits(raw, result_type);
+                     }
+                     break;
+                 }
+@@ -2000,8 +2121,11 @@
+         generation->tracker=dylib.createResourceTracker();
+         if (primitives) {
+             llvm::orc::SymbolMap symbols;
+-            symbols[jit->mangleAndIntern(c_primitive_transport)] = llvm::orc::ExecutorSymbolDef(
++            symbols[jit->mangleAndIntern(primitives->transport())] = llvm::orc::ExecutorSymbolDef(
+                 llvm::orc::ExecutorAddr::fromPtr(primitives->thunk()), llvm::JITSymbolFlags::Exported);
++            if (primitives->revision() == 2)
++                symbols[jit->mangleAndIntern(c_span_bridge)] = llvm::orc::ExecutorSymbolDef(
++                    llvm::orc::ExecutorAddr::fromPtr(vd_c_span_dispatch_v2), llvm::JITSymbolFlags::Exported);
+             check(dylib.define(llvm::orc::absoluteSymbols(symbols), generation->tracker));
+         }
+         if(object)check(jit->addObjectFile(generation->tracker,std::move(object)));
+@@ -2092,7 +2216,7 @@
+ Jit::~Jit() = default;
+ void Jit::bind_address(std::string name, std::uintptr_t entry) {
+     if (!entry) throw std::invalid_argument("null native import");
+-    if (name.starts_with(c_primitive_transport))
++    if (reserved_c_transport(name))
+         throw std::invalid_argument("C primitive transport requires per-generation admission");
+     impl_->custom_bindings=true;
+     llvm::orc::SymbolMap symbols;
+--- a/src/frontend/compiler.cpp
++++ b/src/frontend/compiler.cpp
+@@ -4222,7 +4222,8 @@
+         auto value=element();ir::Instruction initialize{ir::Op::array_initialize,emit({ir::Op::load,owner},token),emit({ir::Op::load,index},token)};initialize.arguments={value};emit(initialize,token);
+         emit({ir::Op::store,index,emit({ir::Op::add,emit({ir::Op::load,index},token),constant(Type::u64,{1,{}},token)},token)},token);jump(test);current=done;
+         auto value_array=emit({ir::Op::load,owner},token);
+-        return ir::contains_numeric_enum(t) ? emit({ir::Op::array_finish,value_array},token) : value_array;
++        return ir::contains_numeric_enum(t) || (module.c_primitives && module.c_primitives->inline_array(t)) ?
++            emit({ir::Op::array_finish,value_array},token) : value_array;
+     }
+     unsigned constant(Type t, const ir::ConstantValue& value, const Token& token) {
+         if(console::endpoint_type(t)){ir::Instruction endpoint{ir::Op::console_endpoint};endpoint.type=t;endpoint.immediate=value.fields.at(0).bits;return emit(endpoint,token);}
+@@ -6247,21 +6248,22 @@
+                 wrapper.source_name = f.token.text;
+                 wrapper.module_identity = id;
+                 wrapper.source = unit->source.location(f.token.offset);
+-                wrapper.parameters = binding.parameters;
+-                wrapper.result = binding.result;
++                wrapper.parameters.clear();
++                for (const auto& parameter : f.parameters) wrapper.parameters.push_back(parameter.type);
++                wrapper.result = f.result;
+                 ir::Block body;
+                 ir::Instruction call{ir::Op::c_primitive_call};
+                 call.callee = module.c_primitives->call_identity(binding);
+                 call.immediate = *f.c_primitive;
+-                call.type = binding.result;
++                call.type = wrapper.result;
+                 call.source = wrapper.source;
+-                for (unsigned argument = 0; argument < binding.parameters.size(); ++argument) {
++                for (unsigned argument = 0; argument < wrapper.parameters.size(); ++argument) {
+                     body.instructions.push_back({ir::Op::argument, argument});
+                     call.arguments.push_back(argument);
+                 }
+                 body.instructions.push_back(std::move(call));
+-                body.end = {binding.result == Type::none ? ir::Terminator::Kind::return_void :
+-                    ir::Terminator::Kind::return_value, static_cast<unsigned>(binding.parameters.size())};
++                body.end = {wrapper.result == Type::none ? ir::Terminator::Kind::return_void :
++                    ir::Terminator::Kind::return_value, static_cast<unsigned>(wrapper.parameters.size())};
+                 wrapper.blocks.push_back(std::move(body));
+                 module.functions.push_back(std::move(wrapper));
+                 continue;
+--- a/src/ir/c_primitive.cpp
++++ b/src/ir/c_primitive.cpp
+@@ -1,6 +1,7 @@
+ #include "void/c_primitive.hpp"
+ #include <algorithm>
+ #include <array>
++#include <charconv>
+ #include <initializer_list>
+ #include <set>
+ #include <span>
+@@ -96,7 +97,10 @@
+     auto admitted = std::shared_ptr<CPrimitiveAdmission>(new CPrimitiveAdmission);
+     admitted->descriptor_ = descriptor;
+     DescriptorReader reader(admitted->descriptor_);
+-    reader.exact({"void-c-primitive", "1", "1"});
++    const auto revision = reader.take();
++    if (revision == std::vector<std::string_view>{"void-c-primitive", "2", "2"}) admitted->revision_ = 2;
++    else if (revision != std::vector<std::string_view>{"void-c-primitive", "1", "1"})
++        reject(reader.line, "unsupported descriptor, ABI revision or effects");
+     auto provider = reader.value("provider");
+     if (!package(provider)) reject(reader.line, "invalid provider identity");
+     admitted->provider_ = provider;
+@@ -118,18 +122,123 @@
+     reader.exact({"effects", "direct-sync", "nonblocking", "no-callbacks"});
+     reader.exact({"call", "c-default"});
+     reader.exact({"aliases", "c_int:i32", llp64 ? "c_long:i32" : "c_long:i64", "c_size:u64", "c_bool:bool"});
+-    std::set<std::string_view> names, exports;
++    auto number = [&](std::string_view value, unsigned limit) {
++        unsigned result = 0;
++        const auto [end, error] = std::from_chars(value.data(), value.data() + value.size(), result);
++        if (error != std::errc{} || end != value.data() + value.size() ||
++            (value.size() > 1 && value.front() == '0') || result > limit)
++            reject(reader.line, "invalid bounded canonical decimal field");
++        return result;
++    };
++    auto parts = [](std::string_view token) {
++        std::vector<std::string_view> result;
++        while (true) {
++            const auto colon = token.find(':');
++            result.push_back(token.substr(0, colon));
++            if (colon == token.npos) return result;
++            token.remove_prefix(colon + 1);
++        }
++    };
++    auto shape = [&](std::string_view token, bool field, bool result) {
++        Shape type;
++        if (admitted->revision_ == 2) {
++            const auto p = parts(token);
++            if (p.size() == 2 && p[0] == "record") {
++                for (unsigned n = 0; n < admitted->records_.size(); ++n)
++                    if (admitted->records_[n].name == p[1]) { type.record = n + 1; return type; }
++                reject(reader.line, "record must name an earlier verified declaration");
++            }
++            if (field && p.size() == 4 && p[0] == "array") {
++                type.scalar = primitive(p[1], llp64, false, reader.line);
++                type.extent = number(p[2], 32);
++                const auto stride = number(p[3], 8);
++                if (!type.extent || stride != scalar_bytes(type.scalar))
++                    reject(reader.line, "invalid inline array extent or stride");
++                return type;
++            }
++            if (!field && !result && p.size() == 4) {
++                if (p[0] == "in") type.direction = 1;
++                if (p[0] == "out") type.direction = 2;
++                if (p[0] == "inout") type.direction = 3;
++                if (type.direction) {
++                    type.offset_argument = number(p[1], c_primitive_max_arguments - 1);
++                    type.length_argument = number(p[2], c_primitive_max_arguments - 1);
++                    type.limit = number(p[3], c_span_limit);
++                    if (!type.limit || type.offset_argument == type.length_argument)
++                        reject(reader.line, "invalid byte span offset/length contract");
++                    return type;
++                }
++            }
++        }
++        type.scalar = primitive(token, llp64, result, reader.line);
++        return type;
++    };
++    std::set<std::string_view> names, exports, c_records;
+     while (!reader.done()) {
+         const auto fields = reader.take();
++        if (admitted->revision_ == 2 && !fields.empty() && fields[0] == "record") {
++            if (fields.size() != 6 || !admitted->bindings_.empty() || admitted->records_.size() == 16 ||
++                !identifier(fields[1]) || !identifier(fields[2], true) ||
++                !names.insert(fields[1]).second || !c_records.insert(fields[2]).second)
++                reject(reader.line, "invalid record declaration or identity");
++            Record record{std::string(fields[1]), std::string(fields[2]), number(fields[3], 256),
++                number(fields[4], 8), {}};
++            const auto field_count = number(fields[5], 24);
++            if (!field_count) reject(reader.line, "empty C records are unsupported");
++            std::set<std::string_view> members, c_members;
++            unsigned end = 0, alignment = 1;
++            for (unsigned index = 0; index < field_count; ++index) {
++                const auto f = reader.take();
++                if (f.size() != 5 || f[0] != "field" || !identifier(f[1]) || !identifier(f[2], true) ||
++                    !members.insert(f[1]).second || !c_members.insert(f[2]).second)
++                    reject(reader.line, "invalid or duplicate C record field");
++                auto type = shape(f[3], true, false);
++                const auto field_align = type.record ? admitted->record(type.record).alignment : scalar_bytes(type.scalar);
++                const auto bytes = type.record ? admitted->record(type.record).size :
++                    field_align * std::max(type.extent, 1u);
++                const auto natural = (end + field_align - 1) / field_align * field_align;
++                const auto offset = number(f[4], 255);
++                if (offset != natural || bytes > 256 - offset)
++                    reject(reader.line, "C record field offset or padding disagrees with natural layout");
++                alignment = std::max(alignment, field_align);
++                end = offset + bytes;
++                record.fields.push_back({std::string(f[1]), std::string(f[2]), type, offset});
++            }
++            if (record.alignment != alignment || record.size != (end + alignment - 1) / alignment * alignment)
++                reject(reader.line, "C record size, alignment or tail padding disagrees with natural layout");
++            admitted->records_.push_back(std::move(record));
++            continue;
++        }
+         if (fields.size() < 4 || fields.size() > 4 + c_primitive_max_arguments || fields[0] != "bind" ||
+             admitted->bindings_.size() == binding_limit)
+             reject(reader.line, "expected a bounded primitive binding record");
+         if (!identifier(fields[1]) || !identifier(fields[2], true) ||
+             !names.insert(fields[1]).second || !exports.insert(fields[2]).second)
+             reject(reader.line, "invalid or duplicate binding name or export");
+-        Binding binding{std::string(fields[1]), std::string(fields[2]), {}, primitive(fields[3], llp64, true, reader.line)};
+-        for (auto parameter : std::span(fields).subspan(4))
+-            binding.parameters.push_back(primitive(parameter, llp64, false, reader.line));
++        Binding binding;
++        binding.name = fields[1];
++        binding.export_name = fields[2];
++        binding.abi_result = shape(fields[3], false, true);
++        binding.result = binding.abi_result.scalar;
++        for (auto parameter : std::span(fields).subspan(4)) {
++            auto type = shape(parameter, false, false);
++            binding.parameters.push_back(type.scalar);
++            binding.abi_parameters.push_back(type);
++        }
++        unsigned spans = 0, writable = 0;
++        std::set<unsigned> controls;
++        bool records = binding.abi_result.record != 0;
++        for (const auto& parameter : binding.abi_parameters) {
++            records |= parameter.record != 0;
++            if (!parameter.direction) continue;
++            ++spans;
++            writable += parameter.direction != 1;
++            for (auto index : {parameter.offset_argument, parameter.length_argument})
++                if (index >= binding.abi_parameters.size() || fields[4 + index] != "c_size" || !controls.insert(index).second)
++                    reject(reader.line, "byte span offsets and lengths require exact c_size operands");
++        }
++        if (spans && (spans > 2 || writable > 1 || records || binding.result != Type::i64))
++            reject(reader.line, "unsupported span count, overlap profile, record or result contract");
+         admitted->bindings_.push_back(std::move(binding));
+     }
+     if (admitted->bindings_.empty()) reject(reader.line, "expected at least one binding");
+@@ -141,19 +250,72 @@
+     return admitted;
+ }
+ 
++unsigned CPrimitiveAdmission::scalar_bytes(Type type) {
++    switch (type.kind) {
++    case Type::i8: case Type::u8: case Type::boolean: return 1;
++    case Type::i16: case Type::u16: return 2;
++    case Type::i32: case Type::u32: case Type::f32: return 4;
++    case Type::i64: case Type::u64: case Type::f64: return 8;
++    default: throw std::logic_error("invalid C scalar size");
++    }
++}
++bool CPrimitiveAdmission::inline_array(Type type) const {
++    for (const auto& record : records_)
++        for (const auto& field : record.fields)
++            if (field.shape.extent && matches(field.shape, type)) return true;
++    return false;
++}
++bool CPrimitiveAdmission::matches(const Shape& shape, Type type) const {
++    if (type.nullable || type.construction) return false;
++    if (shape.direction)
++        return type.kind == Type::growable_array && type.definition && type.definition->element &&
++            !type.definition->extent && ir::array_element(type) == Type::u8 &&
++            (shape.direction == 1 || ir::readonly_paths(type).empty());
++    if (shape.extent)
++        return type.kind == Type::fixed_array && type.definition && type.definition->element &&
++            type.definition->extent == shape.extent && ir::array_element(type) == shape.scalar;
++    if (!shape.record) return type == shape.scalar;
++    const auto& expected = record(shape.record);
++    if (type.kind != Type::aggregate || !type.definition) return false;
++    const auto& d = *type.definition;
++    if (d.identity != module_ + "::" + expected.name || d.module_identity != module_ ||
++        d.name != expected.name || !d.base.expired() || d.managed || d.interface_type ||
++        d.callable || d.element || d.option_type || d.result_type || !d.cases.empty() ||
++        d.fields.size() != expected.fields.size()) return false;
++    for (unsigned n = 0; n < d.fields.size(); ++n)
++        if (d.fields[n].name != expected.fields[n].name ||
++            !matches(expected.fields[n].shape, ir::field_type(type, n))) return false;
++    return true;
++}
++bool CPrimitiveAdmission::signature(const Binding& binding, const std::vector<Type>& args, Type result) const {
++    if (args.size() != binding.abi_parameters.size() || !matches(binding.abi_result, result)) return false;
++    for (unsigned n = 0; n < args.size(); ++n)
++        if (!matches(binding.abi_parameters[n], args[n])) return false;
++    return true;
++}
++std::string CPrimitiveAdmission::source_type(const Shape& shape) const {
++    if (shape.direction) return "[u8]";
++    if (shape.record) return record(shape.record).name;
++    if (shape.extent) return "[" + std::string(void_spelling(shape.scalar)) + ", " + std::to_string(shape.extent) + "]";
++    return std::string(void_spelling(shape.scalar));
++}
+ std::string CPrimitiveAdmission::source() const {
+     std::string text = "# Host-admitted C primitive declarations for " + provider_ + "\n";
++    for (const auto& record : records_) {
++        text += "value struct " + record.name + ":\n";
++        for (const auto& field : record.fields) text += "    " + field.name + ": " + source_type(field.shape) + "\n";
++    }
+     for (const auto& binding : bindings_) {
+         text += "func " + binding.name + "(";
+-        for (std::size_t index = 0; index < binding.parameters.size(); ++index) {
++        for (std::size_t index = 0; index < binding.abi_parameters.size(); ++index) {
+             if (index) text += ", ";
+-            text += "arg" + std::to_string(index) + ": ";
+-            text += void_spelling(binding.parameters[index]);
++            if (binding.abi_parameters[index].direction == 1) text += "const ";
++            text += "arg" + std::to_string(index) + ": " + source_type(binding.abi_parameters[index]);
+         }
+         text += ")";
+-        if (binding.result != Type::none) {
++        if (binding.abi_result.record || binding.result != Type::none) {
+             text += " -> ";
+-            text += void_spelling(binding.result);
++            text += source_type(binding.abi_result);
+         }
+         text += ":\n    pass\n";
+     }
+--- a/src/ir/module.cpp
++++ b/src/ir/module.cpp
+@@ -487,7 +487,7 @@
+     for (const auto& symbol : m.imports) if (symbol.starts_with("vd_global")) throw std::invalid_argument("VOID IR: global bridge requires validated typed global operations");
+     if(std::find(m.imports.begin(),m.imports.end(),"vd_value_array_complete")!=m.imports.end())
+         throw std::invalid_argument("VOID IR: array completion requires validated typed array operations");
+-    for (const auto& symbol : m.imports) if (symbol.starts_with(c_primitive_transport))
++    for (const auto& symbol : m.imports) if (reserved_c_transport(symbol))
+         throw std::invalid_argument("VOID IR: C primitive transport requires host admission and typed operations");
+     if (results) results->clear();
+     InstructionTypes qualified_types;
+@@ -910,7 +910,7 @@
+             }
+         }
+         std::vector<std::vector<Type>> body_types;
+-        const auto enum_array_homes=numeric_enum_array_homes(f);
++        const auto enum_array_homes=checked_array_homes(f, primitive);
+         for (const auto& b : f.blocks) {
+             std::vector<Type> types;
+             std::vector<bool> pure_templates;
+@@ -918,15 +918,16 @@
+             for(const auto& instruction:b.instructions)if(instruction.op==Op::function_reference && functions.contains(instruction.callee) && functions.at(instruction.callee)->asynchronous)fail("async function value requires an async callable contract");
+             auto pending_enum_array=[&](unsigned id) {
+                 const auto& producer=b.instructions[id];
+-                return numeric_enum_array_allocation(producer) || (producer.op==Op::load && enum_array_homes.contains(producer.a));
++                return checked_array_allocation(producer, primitive) || (producer.op==Op::load && enum_array_homes.contains(producer.a));
+             };
+             auto operand = [&](unsigned id) {
+                 if (id >= types.size() || types[id] == Type::none) fail("invalid operand in " + f.name);
+                 if(group_values[id] && (!validating || (validating->op!=Op::async_group_join && !(validating->op==Op::store && group_slots.contains(validating->a)))))fail("async group token escapes lifecycle operations");
+                 if(pending_enum_array(id) && (!validating || id!=validating->a ||
+                    (validating->op!=Op::array_initialize && validating->op!=Op::array_finish &&
+-                    !(validating->op==Op::array_capture && numeric_enum_array_allocation(b.instructions[id])))))
+-                    fail("incomplete numeric enum array escapes private construction");
++                    !(validating->op==Op::array_capture && checked_array_allocation(b.instructions[id], primitive)))))
++                    fail(contains_numeric_enum(types[id]) ? "incomplete numeric enum array escapes private construction" :
++                         "incomplete C inline array escapes private construction");
+                 return types[id];
+             };
+             auto expect = [&](unsigned id, Type t) { if (!assignable(operand(id),t)) fail("mistyped operand in " + f.name+": expected "+type_name(t)+", received "+type_name(operand(id))+" at value "+std::to_string(id)); };
+@@ -1042,17 +1043,17 @@
+                         i.immediate < 0 || static_cast<std::size_t>(i.immediate) >= primitive->bindings().size())
+                         fail("C primitive call outside the admitted binding module");
+                     const auto& binding = primitive->bindings()[static_cast<std::size_t>(i.immediate)];
+-                    const auto count = binding.parameters.size();
+-                    const auto terminator = binding.result == Type::none ? Terminator::Kind::return_void : Terminator::Kind::return_value;
++                    const auto count = binding.abi_parameters.size();
++                    const auto terminator = i.type == Type::none ? Terminator::Kind::return_void : Terminator::Kind::return_value;
+                     if (i.callee != primitive->call_identity(binding) || f.source_name != binding.name ||
+-                        i.type != binding.result || f.result != binding.result || f.parameters != binding.parameters ||
++                        i.type != f.result || !primitive->signature(binding, f.parameters, f.result) ||
+                         i.arguments.size() != count || b.instructions.size() != count + 1 ||
+                         b.end.kind != terminator || (terminator == Terminator::Kind::return_value && b.end.value != count) ||
+                         i.receiver || i.a || i.b || i.initialization || i.array_repeat || !i.operator_glyph.empty() || i.os_location_adapter)
+                         fail("invalid C primitive descriptor or exact call signature");
+                     for (unsigned n = 0; n < count; ++n)
+                         if (i.arguments[n] != n || b.instructions[n].op != Op::argument || b.instructions[n].a != n ||
+-                            operand(n) != binding.parameters[n])
++                            !primitive->matches(binding.abi_parameters[n], operand(n)))
+                             fail("invalid C primitive argument type or placement");
+                     result = i.type;
+                     break;
+@@ -1133,12 +1134,12 @@
+                 case Op::array_allocate:
+                     valid_type(i.type);
+                     if(i.type.kind!=Type::fixed_array || !i.arguments.empty() || i.receiver || i.immediate || !i.callee.empty() ||
+-                       (numeric_enum_array_allocation(i) && !m.coordinated))fail("invalid array construction storage");
++                       (checked_array_allocation(i, primitive) && !m.coordinated))fail("invalid array construction storage");
+                     result=i.type;break;
+                 case Op::array_initialize: {
+                     auto array=operand(i.a);
+                     if(array.kind!=Type::fixed_array || operand(i.b)!=Type::u64 || i.arguments.size()!=1 || i.receiver || i.immediate || !i.callee.empty() ||
+-                       (contains_numeric_enum(array) && !pending_enum_array(i.a)))fail("invalid array element initialization");
++                       (checked_array_shape(array, primitive) && !pending_enum_array(i.a)))fail("invalid array element initialization");
+                     expect(i.arguments[0],array_element(array));result=Type::none;break;
+                 }
+                 case Op::array_finish:
+@@ -1148,7 +1149,7 @@
+                     result=operand(i.a);break;
+                 case Op::array_capture:
+                     if(i.immediate<0 || static_cast<std::size_t>(i.immediate)>=f.locals.size() || !array_type(operand(i.a)) || operand(i.a)!=f.locals[i.immediate] || i.b || i.receiver || !i.arguments.empty() || !i.callee.empty())fail("invalid array iteration capture");
+-                    if(enum_array_homes.contains(i.immediate) && !numeric_enum_array_allocation(b.instructions[i.a]))
++                    if(enum_array_homes.contains(i.immediate) && !checked_array_allocation(b.instructions[i.a], primitive))
+                         fail("ordinary array captured into private numeric enum array storage");
+                     result=Type::none;break;
+                 case Op::list_check:
+@@ -1600,7 +1601,7 @@
+         }
+ #include "local_cleanup.inc"
+         validate_construction(f,m,body_types);
+-        validate_numeric_enum_slots(f);
++        validate_numeric_enum_slots(f, primitive && primitive->revision() == 2 ? primitive : nullptr);
+         validate_fixed_ownership(f,m,body_types);
+     }
+     for (const auto& global : m.globals) {
+--- a/src/ir/numeric_enum_storage.inc
++++ b/src/ir/numeric_enum_storage.inc
+@@ -16,32 +16,46 @@
+     return false;
+ }
+ 
+-bool numeric_enum_array_allocation(const Instruction& i) {
+-    return i.op==Op::array_allocate && i.type.kind==Type::fixed_array && contains_numeric_enum(i.type);
++bool checked_array_shape(Type type, const CPrimitiveAdmission* native) {
++    return contains_numeric_enum(type) || (native && native->inline_array(type));
++}
++bool checked_array_allocation(const Instruction& i, const CPrimitiveAdmission* native) {
++    return i.op == Op::array_allocate && i.type.kind == Type::fixed_array && checked_array_shape(i.type, native);
+ }
+ 
+-std::set<unsigned> numeric_enum_array_homes(const Function& f) {
++std::set<unsigned> checked_array_homes(const Function& f, const CPrimitiveAdmission* native) {
+     std::set<unsigned> homes;
+     for(const auto& block:f.blocks)for(unsigned n=0;n<block.instructions.size();++n) {
+         const auto& i=block.instructions[n];
+         if(i.op==Op::array_capture && i.a<n && i.immediate>=0 &&
+-           static_cast<std::size_t>(i.immediate)<f.locals.size() && numeric_enum_array_allocation(block.instructions[i.a]))
++           static_cast<std::size_t>(i.immediate)<f.locals.size() && checked_array_allocation(block.instructions[i.a], native))
+             homes.insert(static_cast<unsigned>(i.immediate));
+     }
+     return homes;
+ }
+ 
+-bool numeric_enum_cleanup_return(const Function& f,unsigned id) {
++bool checked_storage_slot(Type type, const CPrimitiveAdmission* native) {
++    if (contains_numeric_enum(type)) return true;
++    if (!native || native->revision() != 2) return false;
++    // Check scalar inputs too. A forged aggregate construction must not be
++    // able to wrap an uninitialized scalar in otherwise valid record storage.
++    return numeric::integer(type) || numeric::floating(type) || type == Type::boolean ||
++        type.kind == Type::aggregate || type.kind == Type::fixed_array ||
++        type.kind == Type::growable_array;
++}
++
++bool checked_storage_cleanup_return(const Function& f, unsigned id, const CPrimitiveAdmission* native) {
+     if(!f.cleanup_entry || id<*f.cleanup_entry)return false;
+     const auto& block=f.blocks[id];
+     return block.end.kind==Terminator::Kind::return_value && !block.instructions.empty() &&
+            block.end.value==block.instructions.size()-1 && block.instructions.back().op==Op::load &&
+-           contains_numeric_enum(f.locals.at(block.instructions.back().a));
++           checked_storage_slot(f.locals.at(block.instructions.back().a), native);
+ }
+ 
+-void validate_numeric_enum_slots(const Function& f) {
++void validate_numeric_enum_slots(const Function& f, const CPrimitiveAdmission* native) {
+     std::set<unsigned> tracked,entry;
+-    for(unsigned n=0;n<f.locals.size();++n)if(contains_numeric_enum(f.locals[n]))tracked.insert(n);
++    for(unsigned n=0;n<f.locals.size();++n)
++        if(checked_storage_slot(f.locals[n], native)) tracked.insert(n);
+     if(tracked.empty())return;
+     if(f.receiver && tracked.contains(0))entry.insert(0);
+ 
+@@ -58,10 +72,11 @@
+             const auto& block=f.blocks[id];
+             auto require=[&](unsigned slot) {
+                 if(tracked.contains(slot) && !state.contains(slot))
+-                    throw std::invalid_argument("VOID IR: read of uninitialized numeric enum storage in "+f.name);
++                    throw std::invalid_argument(std::string("VOID IR: read of uninitialized ") +
++                        (contains_numeric_enum(f.locals[slot]) ? "numeric enum" : "C binding carrier") + " storage in " + f.name);
+             };
+             for(const auto& i:block.instructions) {
+-                if(i.op==Op::load && !(unwinding && &i==&block.instructions.back() && numeric_enum_cleanup_return(f,id)))require(i.a);
++                if(i.op==Op::load && !(unwinding && &i==&block.instructions.back() && checked_storage_cleanup_return(f,id,native)))require(i.a);
+                 if(i.receiver)require(i.receiver->slot);
+                 if(i.op==Op::store && tracked.contains(i.a))state.insert(i.a);
+                 if(i.op==Op::array_capture && tracked.contains(i.immediate))state.insert(static_cast<unsigned>(i.immediate));
+--- a/src/ir/reference_capabilities.inc
++++ b/src/ir/reference_capabilities.inc
+@@ -233,6 +233,18 @@
+                         else if(i.op==Op::list_remove)value=field_facts(owner,values[i.a],array_element_path);
+                         break;
+                     }
++                    case Op::c_primitive_call: {
++                        const auto& binding = module.c_primitives->bindings().at(static_cast<unsigned>(i.immediate));
++                        for (unsigned n = 0; n < binding.abi_parameters.size(); ++n) {
++                            if (binding.abi_parameters[n].direction <= 1) continue;
++                            for (const auto& [path, fact] : values[i.arguments[n]]) {
++                                effect(summary.mutations, fact);
++                                if (fact.readonly) fail("C byte span writes through readonly reference");
++                            }
++                        }
++                        value = reference_facts(type);
++                        break;
++                    }
+                     case Op::native_call:
+                         for(auto argument:i.arguments){retain(values[argument]);for(const auto& [path,fact]:values[argument])effect(summary.mutations,fact);}value=reference_facts(type);break;
+                     case Op::gc_release:
+--- a/src/runtime/array.cpp
++++ b/src/runtime/array.cpp
+@@ -167,6 +167,29 @@
+     if(h.version!=version || h.backing!=old || h.count!=count)throw ListModified("List structurally modified during resize");
+     h.backing=next;h.capacity=grown;h.count=count+1;h.version=version+1;
+ }
++std::uint64_t Runtime::c_span_bytes(RegisteredRootWord root, std::uint64_t offset,
++                                    std::span<std::uint8_t> bytes, bool read,
++                                    std::optional<std::uint64_t> commit_version) {
++    require_managed();
++    const auto schema = fixed_scalar_schema(ScalarEncoding::u8);
++    poll();
++    std::lock_guard lock(mutex_);
++    auto& list = list_header(root, schema);
++    if (offset > list.count || bytes.size() > list.count - offset)
++        throw std::out_of_range("C byte span outside live list extent");
++    if (commit_version && *commit_version != list.version)
++        throw ListModified("C byte span destination changed during call");
++    if (bytes.empty() || (!read && !commit_version)) return list.version;
++    auto& state = heap_.buffer_state(list.backing);
++    auto* native_address = static_cast<std::uint8_t*>(list.backing) + state.layout->element_offset(offset);
++    if (commit_version) {
++        if (state.readers) throw BufferBusy("C byte span destination is leased");
++        std::memcpy(native_address, bytes.data(), bytes.size());
++    } else {
++        std::memcpy(bytes.data(), native_address, bytes.size());
++    }
++    return list.version;
++}
+ void Runtime::list_write_bytes(RegisteredRootWord destination, RegisteredRootWord input,
+                                std::uint64_t position) {
+     require_managed();
+--- /dev/null
++++ b/src/runtime/c_span.cpp
+@@ -0,0 +1,69 @@
++#include "void/c_primitive.hpp"
++#include "void/runtime.hpp"
++#include <algorithm>
++#include <array>
++#include <bit>
++#include <stdexcept>
++
++extern "C" std::uint32_t vd::vd_c_span_dispatch_v2(CPrimitiveThunk* thunk, const char* descriptor,
++    std::uint32_t descriptor_size, std::uint32_t ordinal, const std::uint64_t* words,
++    std::uint32_t count, std::uint64_t* result, const CSpanRequest* spans, std::uint32_t span_count) noexcept {
++    if (!thunk || !descriptor || count > c_primitive_max_arguments || (count && !words) ||
++        span_count > 2 || (span_count && (!spans || !result))) return 2;
++    try {
++        auto& runtime = Runtime::current();
++        std::array<std::uint64_t, c_primitive_max_arguments> arguments{};
++        if (count) std::copy_n(words, count, arguments.begin());
++        std::array<std::vector<std::uint64_t>, 2> storage;
++        std::array<std::span<std::uint8_t>, 2> buffers;
++        std::array<std::uint64_t, 2> versions{}, offsets{}, lengths{};
++        std::array<bool, c_primitive_max_arguments> occupied{};
++        unsigned writable = span_count;
++        for (unsigned n = 0; n < span_count; ++n) {
++            const auto& span = spans[n];
++            if (!span.root || !span.direction || span.direction > 3) return 2;
++            for (auto index : {span.argument, span.offset_argument, span.length_argument}) {
++                if (index >= count || occupied[index]) return 2;
++                occupied[index] = true;
++            }
++            offsets[n] = words[span.offset_argument];
++            lengths[n] = words[span.length_argument];
++            if (!span.limit || span.limit > c_span_limit || lengths[n] > span.limit ||
++                offsets[n] > UINT64_MAX - lengths[n]) return 3;
++            if (span.direction != 1) {
++                if (writable != span_count) return 2;
++                writable = n;
++            }
++            // Capture only into independent zero-initialized native words.
++            auto root = runtime.root_word(span.root);
++            storage[n].resize(static_cast<std::size_t>((lengths[n] + 7) / 8));
++            buffers[n] = {reinterpret_cast<std::uint8_t*>(storage[n].data()), static_cast<std::size_t>(lengths[n])};
++            versions[n] = runtime.c_span_bytes(root, offsets[n], buffers[n], span.direction != 2);
++            arguments[span.argument] = lengths[n] ? reinterpret_cast<std::uintptr_t>(buffers[n].data()) : 0;
++        }
++        if (span_count == 2) {
++            const auto& a = spans[0];
++            const auto& b = spans[1];
++            if (*a.root == *b.root && lengths[0] && lengths[1] &&
++                offsets[0] < offsets[1] + lengths[1] && offsets[1] < offsets[0] + lengths[0])
++                return 4;
++        }
++        std::uint32_t status;
++        {
++            Runtime::Native native(runtime);
++            status = thunk(descriptor, descriptor_size, ordinal, count ? arguments.data() : nullptr, count, result);
++        }
++        if (status || writable == span_count) return status;
++        const auto written = std::bit_cast<std::int64_t>(*result);
++        if (written < 0) return 0;
++        const auto& span = spans[writable];
++        if (static_cast<std::uint64_t>(written) > lengths[writable]) return 5;
++        runtime.c_span_bytes(runtime.root_word(span.root), offsets[writable],
++            buffers[writable].first(static_cast<std::size_t>(written)), false, versions[writable]);
++        return 0;
++    } catch (const std::out_of_range&) {
++        return 3;
++    } catch (const std::exception&) {
++        return 6;
++    }
++}
+--- /dev/null
++++ b/tests/ffi/g2_descriptor.h.in
+@@ -0,0 +1,6 @@
++#ifndef VOID_TEST_G2_DESCRIPTOR_H
++#define VOID_TEST_G2_DESCRIPTOR_H
++#define G2_FIXTURE_IDENTITY "@G2_FIXTURE_SHA@"
++static const char g2_descriptor[] =
++"@G2_DESCRIPTOR_STRING@";
++#endif
+--- /dev/null
++++ b/tests/ffi/records.cmake
+@@ -0,0 +1,45 @@
++if(NOT TARGET void_g1_thunk)
++  return()
++endif()
++
++set(g2_src "${PROJECT_SOURCE_DIR}/tests/ffi")
++set(g2_bin "${CMAKE_CURRENT_BINARY_DIR}/ffi-g2")
++set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
++  "${g2_src}/records_thunk.c" "${g2_src}/records_fixture.c")
++file(SHA256 "${g2_src}/records_thunk.c" G2_THUNK_SHA)
++file(SHA256 "${g2_src}/records_fixture.c" G2_FIXTURE_SHA)
++configure_file("${g2_src}/records.descriptor.in" "${g2_bin}/records.descriptor" @ONLY NEWLINE_STYLE LF)
++file(READ "${g2_bin}/records.descriptor" G2_DESCRIPTOR_STRING)
++string(REPLACE "\n" "\\n\"\n\"" G2_DESCRIPTOR_STRING "${G2_DESCRIPTOR_STRING}")
++configure_file("${g2_src}/g2_descriptor.h.in" "${g2_bin}/g2_descriptor.h" @ONLY NEWLINE_STYLE LF)
++
++add_library(void_g2_fixture OBJECT "${g2_src}/records_fixture.c")
++add_library(void_g2_thunk OBJECT "${g2_src}/records_thunk.c")
++foreach(target IN ITEMS void_g2_fixture void_g2_thunk)
++  set_target_properties("${target}" PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED YES
++    C_EXTENSIONS NO C_VISIBILITY_PRESET hidden INTERPROCEDURAL_OPTIMIZATION OFF)
++  target_link_libraries("${target}" PRIVATE void_options)
++endforeach()
++target_compile_definitions(void_g2_fixture PRIVATE G2_FIXTURE_IDENTITY="${G2_FIXTURE_SHA}")
++target_include_directories(void_g2_thunk PRIVATE "${g2_bin}")
++if(WIN32)
++  target_compile_definitions(void_g2_thunk PRIVATE G2_LLP64=1)
++endif()
++
++add_executable(void_g2_tests "${g2_src}/records.cpp"
++  $<TARGET_OBJECTS:void_g2_thunk> $<TARGET_OBJECTS:void_g2_fixture>)
++target_link_libraries(void_g2_tests PRIVATE void_llvm)
++add_test(NAME ffi_g2_jit_ir COMMAND void_g2_tests "${g2_bin}/records.descriptor" "${g2_src}/records.void")
++set_tests_properties(ffi_g2_jit_ir PROPERTIES TIMEOUT 180)
++foreach(mode IN ITEMS normal optimized)
++  set(g2_object "${g2_bin}/application-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
++  add_custom_command(OUTPUT "${g2_object}"
++    COMMAND void_g2_tests "${g2_bin}/records.descriptor" "${g2_src}/records.void" "${g2_object}" "${mode}"
++    DEPENDS void_g2_tests "${g2_bin}/records.descriptor" "${g2_src}/records.void" VERBATIM)
++  set_source_files_properties("${g2_object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
++  add_executable("void_g2_aot_${mode}" "${PROJECT_SOURCE_DIR}/tests/async/aot.cpp"
++    "${g2_object}" $<TARGET_OBJECTS:void_g2_thunk> $<TARGET_OBJECTS:void_g2_fixture>)
++  target_link_libraries("void_g2_aot_${mode}" PRIVATE void_runtime)
++  add_test(NAME "ffi_g2_aot_${mode}" COMMAND "${Python3_EXECUTABLE}"
++    "${g2_src}/records_process.py" "$<TARGET_FILE:void_g2_aot_${mode}>")
++endforeach()
+--- /dev/null
++++ b/tests/ffi/records.cpp
+@@ -0,0 +1,237 @@
++#include "void/backend.hpp"
++#include "void/c_primitive.hpp"
++#include "void/frontend.hpp"
++#include "void/runtime.hpp"
++#include <algorithm>
++#include <array>
++#include <atomic>
++#include <fstream>
++#include <iostream>
++#include <iterator>
++#include <semaphore>
++#include <stdexcept>
++#include <thread>
++
++extern "C" vd::CPrimitiveThunk vd_c_primitive_dispatch_v2;
++
++namespace {
++using namespace vd;
++using namespace vd::ir;
++
++void require(bool okay, std::string_view message) {
++    if (!okay) throw std::runtime_error(std::string(message));
++}
++template<class Test>
++void reject(std::string_view label, std::string_view expected, Test&& test) {
++    try { test(); }
++    catch (const std::exception& failure) {
++        require(std::string_view(failure.what()).find(expected) != std::string_view::npos,
++            std::string(label) + " received " + failure.what());
++        std::cout << label << ": " << failure.what() << '\n';
++        return;
++    }
++    throw std::runtime_error(std::string(label) + " accepted");
++}
++std::string read(const char* path) {
++    std::ifstream input(path, std::ios::binary);
++    require(input.is_open(), "cannot read descriptor");
++    return {std::istreambuf_iterator<char>(input), {}};
++}
++void bad_descriptors(const std::string& descriptor) {
++    auto changed = [&](std::string_view from, std::string_view to, std::string_view expected) {
++        auto copy = descriptor;
++        auto position = copy.find(from);
++        require(position != copy.npos, "descriptor marker missing");
++        copy.replace(position, from.size(), to);
++        reject(to, expected, [&] { (void)CPrimitiveAdmission::admit(copy, vd_c_primitive_dispatch_v2); });
++    };
++    changed("2 2", "2 1", "unsupported descriptor");
++    changed("sample G2Sample 16 8 2", "sample G2Sample 16 4 2", "alignment");
++    changed("packet G2Packet 32 8 4", "packet G2Packet 31 8 4", "size");
++    changed("reading f64 8", "reading f64 4", "offset");
++    changed("reading f64 8", "reading ptr 8", "unsupported");
++    changed("reading f64 8", "reading u64 8", "provider rejected");
++    changed("tag tag i32", "tag tag u32", "provider rejected");
++    changed("array:u16:3:2", "array:u16:3:1", "stride");
++    changed("array:u16:3:2", "array:u16:0:2", "extent");
++    changed("array:u16:3:2", "array:u16:03:2", "canonical");
++    changed("datum datum record:sample", "datum datum record:packet", "earlier");
++    changed("c-default", "fastcall", "unsupported");
++    changed("nonblocking no-callbacks", "retains-pointer no-callbacks", "unsupported");
++    changed("out:1:2:64", "out:1:2:65537", "bounded");
++    changed("out:1:2:64", "out:1:1:64", "offset/length");
++    changed("out:1:2:64 c_size", "out:1:2:64 u64", "exact c_size");
++    changed("in:1:2:64 c_size c_size out:4:5:64", "out:1:2:64 c_size c_size out:4:5:64", "span count");
++    changed("bind fill g2_fill i64", "bind fill g2_fill i32", "result contract");
++    changed("out:1:2:64", "inout:1:2:64", "provider rejected");
++}
++
++Function& function(Module& module, std::string_view suffix) {
++    auto found = std::find_if(module.functions.begin(), module.functions.end(), [&](const auto& f) {
++        return f.name.ends_with(suffix);
++    });
++    require(found != module.functions.end(), "typed fixture function missing");
++    return *found;
++}
++void bad_ir(Module good) {
++    good.analysis.reset();
++    validate(good);
++    auto test = [&](std::string_view name, std::string_view expected, auto mutate) {
++        auto m = good;
++        mutate(m);
++        reject(name, expected, [&] { validate(m); });
++    };
++    test("absent host seal", "outside the admitted", [](auto& m) { m.c_primitives.reset(); });
++    test("wrong provider", "exact call signature", [](auto& m) {
++        function(m, "::packet_mix").blocks[0].instructions.back().callee = "org.other::g2_packet";
++    });
++    test("wrong ordinal", "exact call signature", [](auto& m) {
++        function(m, "::packet_mix").blocks[0].instructions.back().immediate = 1;
++    });
++    test("record identity", "VOID IR:", [](auto& m) {
++        function(m, "::packet_mix").parameters[1] = function(m, "::color").parameters[0];
++    });
++    test("span count and slot swap", "argument type or placement", [](auto& m) {
++        function(m, "::fill").blocks[0].instructions.back().arguments[2] = 0;
++    });
++    test("readonly output", "VOID IR:", [](auto& m) {
++        auto& parameter = function(m, "::fill").parameters[0];
++        parameter = readonly_view(parameter);
++    });
++    test("foreign raw ABI use", "requires host admission", [](auto& m) {
++        m.imports.emplace_back(c_span_bridge);
++    });
++    test("unauthorized direct import", "requires the admitted direct import", [](auto& m) {
++        m.source_imports[m.root_identity].clear();
++    });
++    test("worker", "require synchronous execution", [](auto& m) {
++        function(m, "::entry").worker = true;
++    });
++    test("raw pointer construction flag", "exact call signature", [](auto& m) {
++        function(m, "::sum").blocks[0].instructions.back().initialization = true;
++    });
++    auto uninitialized = [&](std::string_view label, Type type) {
++        test(label, "uninitialized C binding carrier", [&](auto& m) {
++            auto& f = function(m, "::entry");
++            const auto slot = static_cast<unsigned>(f.locals.size());
++            f.locals.push_back(type);
++            f.blocks.front().instructions.push_back({Op::load, slot});
++        });
++    };
++    uninitialized("uninitialized record", function(good, "::packet_mix").parameters[1]);
++    uninitialized("uninitialized byte list", function(good, "::fill").parameters[0]);
++    uninitialized("uninitialized scalar field", Type::i32);
++    test("incomplete inline array escapes", "incomplete C inline array", [](auto& m) {
++        auto& f = function(m, "::entry");
++        auto& block = f.blocks.front().instructions;
++        const auto slot = static_cast<unsigned>(f.locals.size());
++        const auto t = field_type(function(m, "::packet_mix").parameters[1], 1);
++        f.locals.push_back(t);
++        const auto pending = static_cast<unsigned>(block.size());
++        Instruction allocate{Op::array_allocate};
++        allocate.type = t;
++        block.push_back(allocate);
++        block.push_back({Op::store, slot, pending});
++    });
++}
++
++std::binary_semaphore entered(0), collected(0);
++std::atomic<bool> executing = false;
++void* managed_object = nullptr;
++extern "C" std::uint32_t held_scratch(const char*, std::uint32_t, std::uint32_t,
++                                     const std::uint64_t* words, std::uint32_t, std::uint64_t* result) {
++    executing = true;
++    entered.release();
++    collected.acquire();
++    auto* bytes = reinterpret_cast<std::uint8_t*>(static_cast<std::uintptr_t>(words[0]));
++    if (!bytes || bytes == managed_object || words[2] != 2 || bytes[0] != 0 || bytes[1] != 0) return 2;
++    bytes[0] = 88;
++    *result = 1;
++    return 0;
++}
++void runtime_pressure(const std::string& descriptor) {
++    Runtime runtime(1);
++    Runtime::Attachment attach(runtime);
++    Runtime::Managed managed(runtime);
++    void* list = nullptr;
++    constexpr std::size_t zero = 0;
++    Runtime::Slot slot{&list, sizeof(list), &zero, 1};
++    Runtime::Frame roots(runtime, &slot, 1);
++    runtime.list_into(&list, ScalarEncoding::u8, 2);
++    runtime.list_write(runtime.root_word(&list), ScalarEncoding::u8, 0, 9);
++    runtime.list_write(runtime.root_word(&list), ScalarEncoding::u8, 1, 8);
++    managed_object = list;
++    const auto before = runtime.snapshot().completed_epoch;
++    std::thread collector([&] {
++        entered.acquire();
++        if (executing) {
++            Runtime::Attachment other(runtime);
++            Runtime::Managed held(runtime);
++            (void)runtime.collect();
++        }
++        collected.release();
++    });
++    CSpanRequest span{&list, 64, 0, 2, 1, 2};
++    std::array<std::uint64_t, 4> words{0, 0, 2, 254};
++    std::uint64_t result = 0;
++    auto call = [&](CPrimitiveThunk* target) {
++        return vd_c_span_dispatch_v2(target, descriptor.data(), static_cast<std::uint32_t>(descriptor.size()),
++            4, words.data(), static_cast<std::uint32_t>(words.size()), &result, &span, 1);
++    };
++    const auto status = call(held_scratch);
++    if (!executing) entered.release();
++    collector.join();
++    require(status == 0 && result == 1 && runtime.snapshot().completed_epoch > before, "GC did not complete during NativeSafe scratch lifetime");
++    auto read_at = [&](unsigned i) { return runtime.list_read(runtime.root_word(&list), ScalarEncoding::u8, i); };
++    require(read_at(0) == 88 && read_at(1) == 8, "partial copyback crossed initialized prefix");
++    require(call(vd_c_primitive_dispatch_v2) == 5 && read_at(0) == 88 && read_at(1) == 8,
++        "oversized provider result altered destination");
++    words[3] = 255;
++    require(call(vd_c_primitive_dispatch_v2) == 0 && read_at(0) == 88 && read_at(1) == 8,
++        "negative provider result altered destination");
++    words[2] = 65;
++    require(call(vd_c_primitive_dispatch_v2) == 3, "capacity cap ignored");
++    words[2] = 2;
++    span.length_argument = span.offset_argument;
++    require(call(vd_c_primitive_dispatch_v2) == 2, "conflicting buffer control slots admitted");
++    span.length_argument = 2;
++    span.root = &managed_object;
++    require(call(vd_c_primitive_dispatch_v2) != 0, "unregistered buffer word admitted");
++    std::cout << "NativeSafe collection, zeroed output scratch, partial commit, oversized and negative rollback passed\n";
++}
++}
++
++int main(int argc, char** argv) try {
++    require(argc == 3 || argc == 5, "expected descriptor and source, optionally AOT output and mode");
++    const auto descriptor = read(argv[1]);
++    auto admission = CPrimitiveAdmission::admit(descriptor, vd_c_primitive_dispatch_v2);
++    auto result = analyze_project(argv[2], admission);
++    if (!result.succeeded()) throw CompilationError(result.diagnostics);
++    auto program = result.program;
++    if (argc == 5) {
++        emit_object(program->lower(Emission::entry), argv[3], std::string_view(argv[4]) == "optimized", true);
++        return 0;
++    }
++    require(!analyze_project(argv[2]).succeeded(), "bare source acquired G2 admission");
++    bad_descriptors(descriptor);
++    bad_ir(program->lower());
++    runtime_pressure(descriptor);
++    for (bool optimize : {false, true}) {
++        Jit jit;
++        auto code = jit.compile(*program, optimize);
++        const auto status = code->invoke(7);
++        require(status == 103, "record/span source result " + std::to_string(status));
++        const auto failed = [&](int value, std::string_view diagnostic) {
++            reject(std::to_string(value), diagnostic, [&] { (void)code->invoke(value); });
++        };
++        failed(-1, "outside admitted extent");
++        failed(-2, "overlapping C byte spans");
++        failed(-3, "oversized written prefix");
++        failed(-4, "outside admitted extent");
++        std::cout << "G2 JIT " << (optimize ? "O2" : "normal") << " returned 103\n";
++    }
++    return 0;
++} catch (const std::exception& failure) {
++    std::cerr << failure.what() << '\n';
++    return 1;
++}
+--- /dev/null
++++ b/tests/ffi/records.descriptor.in
+@@ -0,0 +1,29 @@
++void-c-primitive 2 2
++provider org.voidlang.g2-fixture
++target @G1_TRIPLE@ @G1_PROFILE@
++source /native_records.void
++thunk @G2_THUNK_SHA@
++fixture @G2_FIXTURE_SHA@
++effects direct-sync nonblocking no-callbacks
++call c-default
++aliases c_int:i32 c_long:@G1_LONG@ c_size:u64 c_bool:bool
++record rgba G2Color 4 1 4
++field r r u8 0
++field g g u8 1
++field b b u8 2
++field a a u8 3
++record sample G2Sample 16 8 2
++field tag tag i32 0
++field reading reading f64 8
++record packet G2Packet 32 8 4
++field color color record:rgba 0
++field channels channels array:u16:3:2 4
++field mode mode u8 10
++field datum datum record:sample 16
++bind color g2_color record:rgba record:rgba
++bind calibrate g2_calibrate record:sample record:sample f32
++bind packet_mix g2_packet record:packet record:sample record:packet u32
++bind sum g2_sum i64 in:1:2:64 c_size c_size
++bind fill g2_fill i64 out:1:2:64 c_size c_size u8
++bind adjust g2_adjust i64 inout:1:2:64 c_size c_size
++bind move_bytes g2_move i64 in:1:2:64 c_size c_size out:4:5:64 c_size c_size
+--- /dev/null
++++ b/tests/ffi/records.void
+@@ -0,0 +1,45 @@
++use "/native_records.void" as ffi
++
++func entry(value: i32) -> i32:
++    var bytes: [u8] = [10, 20, 30, 40]
++    if value == -1:
++        return ffi.fill(bytes, 0, 5, 8) as i32
++    if value == -2:
++        return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32
++    if value == -3:
++        return ffi.fill(bytes, 0, 4, 254) as i32
++    if value == -4:
++        return ffi.fill(bytes, 18446744073709551615 as u64, 1, 8) as i32
++    var original = ffi.rgba(r = 4, g = 5, b = 7, a = 255)
++    var color = ffi.color(original)
++    if color.r != 7 or color.b != 4 or color.g != 5 or color.a != 255 or original.r != 4:
++        return 1
++    var baseline = ffi.sample(tag = -9, reading = 3.25)
++    var sample = ffi.calibrate(baseline, 2.0 as f32)
++    if sample.tag != -16 or sample.reading != 6.5:
++        return 2
++    var channels: [u16, 3] = [100, 200, 60000]
++    var payload = ffi.packet(color = original, channels = channels, mode = 17, datum = sample)
++    var returned = ffi.packet_mix(baseline, payload, 8)
++    if returned.color.r != 7 or returned.channels[0] != 60008 or returned.channels[1] != 200 or returned.channels[2] != 100:
++        return 3
++    if returned.mode != 25 or returned.datum.tag != -25 or returned.datum.reading != 9.75 or payload.channels[0] != 100:
++        return 4
++    if ffi.sum(bytes, 1, 2) != 50 or ffi.sum(bytes, 4, 0) != 0 or ffi.fill(bytes, 4, 0, 1) != 0:
++        return 5
++    if ffi.fill(bytes, 1, 2, 255) != -7 or bytes[1] != 20 or bytes[2] != 30:
++        return 6
++    if ffi.fill(bytes, 1, 2, 253) != 1 or bytes[1] != 42 or bytes[2] != 30:
++        return 7
++    if ffi.fill(bytes, 1, 2, 5) != 2 or bytes[0] != 10 or bytes[1] != 5 or bytes[2] != 6 or bytes[3] != 40:
++        return 8
++    if ffi.adjust(bytes, 1, 2) != 2 or bytes[1] != 80 or bytes[2] != 83:
++        return 9
++    if ffi.move_bytes(bytes, 0, 2, bytes, 2, 2) != 2 or bytes[2] != 10 or bytes[3] != 80:
++        return 10
++    var maximum: [u8] = []
++    for i in 0..<64:
++        maximum.push(0)
++    if ffi.fill(maximum, 0, 64, 1) != 64 or ffi.sum(maximum, 0, 64) != 2080 or maximum[63] != 64:
++        return 11
++    return value + 96
+--- /dev/null
++++ b/tests/ffi/records_fixture.c
+@@ -0,0 +1,68 @@
++#include <stddef.h>
++#include <stdint.h>
++
++typedef struct G2Color { uint8_t r, g, b, a; } G2Color;
++typedef struct G2Sample { int32_t tag; double reading; } G2Sample;
++typedef struct G2Packet {
++    G2Color color;
++    uint16_t channels[3];
++    uint8_t mode;
++    G2Sample datum;
++} G2Packet;
++
++_Static_assert(sizeof(G2Color) == 4 && _Alignof(G2Color) == 1, "small aggregate ABI");
++_Static_assert(sizeof(G2Sample) == 16 && _Alignof(G2Sample) == 8 && offsetof(G2Sample, reading) == 8, "mixed ABI");
++_Static_assert(sizeof(G2Packet) == 32 && _Alignof(G2Packet) == 8 && offsetof(G2Packet, datum) == 16 &&
++    offsetof(G2Packet, channels[2]) == 8, "nested and inline stride ABI");
++
++const char* g2_fixture_identity(void) { return G2_FIXTURE_IDENTITY; }
++G2Color g2_color(G2Color input) {
++    return (G2Color){input.b, input.g, input.r, input.a};
++}
++static int32_t clamped_tag(int64_t value) {
++    if (value < INT32_MIN) return INT32_MIN;
++    if (value > INT32_MAX) return INT32_MAX;
++    return (int32_t)value;
++}
++G2Sample g2_calibrate(G2Sample input, float factor) {
++    return (G2Sample){clamped_tag((int64_t)input.tag - 7), input.reading * factor};
++}
++G2Packet g2_packet(G2Sample base, G2Packet value, uint32_t delta) {
++    G2Packet output = {0};
++    output.color = g2_color(value.color);
++    output.channels[0] = (uint16_t)(value.channels[2] + delta);
++    output.channels[1] = value.channels[1];
++    output.channels[2] = value.channels[0];
++    output.mode = (uint8_t)(value.mode + delta);
++    output.datum.tag = clamped_tag((int64_t)base.tag + value.datum.tag);
++    output.datum.reading = base.reading + value.datum.reading;
++    return output;
++}
++static int checked_address(const uint8_t* data, size_t count) {
++    return count ? data != NULL && (uintptr_t)data % 8 == 0 : data == NULL;
++}
++int64_t g2_sum(const uint8_t* input, size_t count) {
++    if (!checked_address(input, count)) return -8;
++    int64_t sum = 0;
++    for (size_t i = 0; i < count; ++i) sum += input[i];
++    return sum;
++}
++int64_t g2_fill(uint8_t* output, size_t count, uint8_t seed) {
++    if (!checked_address(output, count)) return -8;
++    if (count == 0) return 0;
++    if (seed == 255) { output[0] = 99; return -7; }
++    if (seed == 254) { output[0] = 99; return (int64_t)count + 1; }
++    if (seed == 253) { output[0] = 42; return 1; }
++    for (size_t i = 0; i < count; ++i) output[i] = (uint8_t)(seed + i);
++    return (int64_t)count;
++}
++int64_t g2_adjust(uint8_t* value, size_t count) {
++    if (!checked_address(value, count)) return -8;
++    for (size_t i = 0; i < count; ++i) value[i] ^= 0x55;
++    return (int64_t)count;
++}
++int64_t g2_move(const uint8_t* input, size_t count, uint8_t* output, size_t capacity) {
++    if (!checked_address(input, count) || !checked_address(output, capacity) || count > capacity) return -8;
++    for (size_t i = 0; i < count; ++i) output[i] = input[i];
++    return (int64_t)count;
++}
+--- /dev/null
++++ b/tests/ffi/records_process.py
+@@ -0,0 +1,12 @@
++import subprocess
++import sys
++
++for value, expected in [(7, "103"), (-1, "outside admitted extent"),
++                        (-2, "overlapping C byte spans"),
++                        (-3, "oversized written prefix"), (-4, "outside admitted extent")]:
++    result = subprocess.run([sys.argv[1], str(value)], text=True, capture_output=True, timeout=45)
++    print(value, result.returncode, (result.stdout + result.stderr).strip())
++    if value > 0:
++        assert result.returncode == 0 and result.stdout.strip() == expected, result
++    else:
++        assert result.returncode == 1 and expected in result.stdout + result.stderr, result
+--- /dev/null
++++ b/tests/ffi/records_thunk.c
+@@ -0,0 +1,118 @@
++#include <float.h>
++#include <limits.h>
++#include <stddef.h>
++#include <stdint.h>
++#include <string.h>
++#include "g2_descriptor.h"
++
++#if !defined(__clang__) || __clang_major__ != 23 || __clang_minor__ != 1 || __clang_patchlevel__ != 4
++#error Gate 2 needs the matching pinned Clang
++#endif
++#if defined(G2_LLP64)
++#if !defined(_M_X64) || !defined(_WIN32) || !defined(_MSC_VER)
++#error Expected x64 MSVC ABI
++#endif
++_Static_assert(sizeof(long) == 4, "LLP64");
++#else
++#if !defined(__linux__) || !defined(__x86_64__) || !defined(__GLIBC__)
++#error Expected Linux x64 GNU ABI
++#endif
++_Static_assert(sizeof(long) == 8, "LP64");
++#endif
++#if __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
++#error Expected little-endian
++#endif
++_Static_assert(CHAR_BIT == 8 && sizeof(void*) == 8 && SIZE_MAX == UINT64_MAX && sizeof(int) == 4, "x64 C widths");
++_Static_assert(sizeof(float) == 4 && sizeof(double) == 8 && FLT_RADIX == 2 &&
++    FLT_MANT_DIG == 24 && DBL_MANT_DIG == 53 && FLT_MAX_EXP == 128 && DBL_MAX_EXP == 1024, "float/double");
++
++typedef struct G2Color { uint8_t r, g, b, a; } G2Color;
++typedef struct G2Sample { int32_t tag; double reading; } G2Sample;
++typedef struct G2Packet {
++    G2Color color;
++    uint16_t channels[3];
++    uint8_t mode;
++    G2Sample datum;
++} G2Packet;
++
++#define FIELD(record, field, type, offset) \
++    _Static_assert(offsetof(record, field) == offset && _Generic(((record*)0)->field, type:1, default:0), #record "." #field)
++_Static_assert(sizeof(G2Color) == 4 && _Alignof(G2Color) == 1, "color layout");
++FIELD(G2Color, r, uint8_t, 0);
++FIELD(G2Color, g, uint8_t, 1);
++FIELD(G2Color, b, uint8_t, 2);
++FIELD(G2Color, a, uint8_t, 3);
++_Static_assert(sizeof(G2Sample) == 16 && _Alignof(G2Sample) == 8, "sample layout");
++FIELD(G2Sample, tag, int32_t, 0);
++FIELD(G2Sample, reading, double, 8);
++_Static_assert(sizeof(G2Packet) == 32 && _Alignof(G2Packet) == 8, "packet layout");
++FIELD(G2Packet, color, G2Color, 0);
++FIELD(G2Packet, mode, uint8_t, 10);
++FIELD(G2Packet, datum, G2Sample, 16);
++_Static_assert(offsetof(G2Packet, channels) == 4 && sizeof(((G2Packet*)0)->channels) == 6 &&
++    offsetof(G2Packet, channels[1]) == 6 && offsetof(G2Packet, channels[2]) == 8 &&
++    _Generic(((G2Packet*)0)->channels[0], uint16_t:1, default:0), "packet array extent, stride and type");
++#undef FIELD
++
++extern const char* g2_fixture_identity(void);
++extern G2Color g2_color(G2Color);
++extern G2Sample g2_calibrate(G2Sample, float);
++extern G2Packet g2_packet(G2Sample, G2Packet, uint32_t);
++extern int64_t g2_sum(const uint8_t*, size_t);
++extern int64_t g2_fill(uint8_t*, size_t, uint8_t);
++extern int64_t g2_adjust(uint8_t*, size_t);
++extern int64_t g2_move(const uint8_t*, size_t, uint8_t*, size_t);
++
++static const void* record_at(uint64_t word, size_t alignment) {
++    return word && word % alignment == 0 ? (const void*)(uintptr_t)word : NULL;
++}
++uint32_t vd_c_primitive_dispatch_v2(const char* descriptor, uint32_t size, uint32_t ordinal,
++    const uint64_t* words, uint32_t count, uint64_t* out) {
++    if (!descriptor || size != sizeof(g2_descriptor) - 1 || memcmp(descriptor, g2_descriptor, size) ||
++        strcmp(g2_fixture_identity(), G2_FIXTURE_IDENTITY)) return 1;
++    if (ordinal == UINT32_MAX) return words || count || out ? 2 : 0;
++    static const uint8_t counts[] = {1,2,3,3,4,3,6};
++    if (ordinal >= sizeof counts || count != counts[ordinal] || !words || !out || (uintptr_t)out % 8) return 2;
++    switch (ordinal) {
++    case 0: {
++        G2Color input;
++        const void* address = record_at(words[0], _Alignof(G2Color));
++        if (!address) return 2;
++        memcpy(&input, address, sizeof input);
++        const G2Color result = g2_color(input);
++        memcpy(out, &result, sizeof result);
++        break;
++    }
++    case 1: {
++        G2Sample input;
++        const void* address = record_at(words[0], _Alignof(G2Sample));
++        if (!address) return 2;
++        memcpy(&input, address, sizeof input);
++        const uint32_t bits = (uint32_t)words[1];
++        float factor;
++        memcpy(&factor, &bits, sizeof factor);
++        const G2Sample result = g2_calibrate(input, factor);
++        memcpy(out, &result, sizeof result);
++        break;
++    }
++    case 2: {
++        G2Sample base;
++        G2Packet packet;
++        const void* first = record_at(words[0], _Alignof(G2Sample));
++        const void* second = record_at(words[1], _Alignof(G2Packet));
++        if (!first || !second) return 2;
++        memcpy(&base, first, sizeof base);
++        memcpy(&packet, second, sizeof packet);
++        const G2Packet result = g2_packet(base, packet, (uint32_t)words[2]);
++        memcpy(out, &result, sizeof result);
++        break;
++    }
++    case 3: *out = (uint64_t)g2_sum((const uint8_t*)(uintptr_t)words[0], words[2]); break;
++    case 4: *out = (uint64_t)g2_fill((uint8_t*)(uintptr_t)words[0], words[2], (uint8_t)words[3]); break;
++    case 5: *out = (uint64_t)g2_adjust((uint8_t*)(uintptr_t)words[0], words[2]); break;
++    case 6: *out = (uint64_t)g2_move((const uint8_t*)(uintptr_t)words[0], words[2],
++                                   (uint8_t*)(uintptr_t)words[3], words[5]); break;
++    default: return 2;
++    }
++    return 0;
++}

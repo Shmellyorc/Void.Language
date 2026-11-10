@@ -1,0 +1,398 @@
+Start testing: Nov 09 14:42 MST
+----------------------------------------------------------
+392/456 Testing: async_syntax_aot_values_normal
+392/456 Test: async_syntax_aot_values_normal
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/voidc" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/void_async_syntax_values_normal" "/home/shmellyorc/Documents/Void.Language/tests/async/syntax/values.void" "130" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/void_async_tests" "normal" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/async-syntax-values-normal.o"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug
+"async_syntax_aot_values_normal" start time: Nov 09 14:42 MST
+Output:
+----------------------------------------------------------
+await syntax: independent source check and linked AOT passed; actual 1 MiB stack=True
+<end of output>
+Test time =   0.76 sec
+----------------------------------------------------------
+Test Passed.
+"async_syntax_aot_values_normal" end time: Nov 09 14:42 MST
+"async_syntax_aot_values_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+271/456 Testing: lsp_collections_stdlib
+271/456 Test: lsp_collections_stdlib
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/collections_stdlib/lsp.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug
+"lsp_collections_stdlib" start time: Nov 09 14:42 MST
+Output:
+----------------------------------------------------------
+Collections LSP: 40 checks passed
+<end of output>
+Test time =   1.12 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_collections_stdlib" end time: Nov 09 14:42 MST
+"lsp_collections_stdlib" time elapsed: 00:00:01
+----------------------------------------------------------
+
+393/456 Testing: async_syntax_aot_values_optimized
+393/456 Test: async_syntax_aot_values_optimized
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/voidc" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/void_async_syntax_values_optimized" "/home/shmellyorc/Documents/Void.Language/tests/async/syntax/values.void" "130" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/void_async_tests" "optimized" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/async-syntax-values-optimized.o"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug
+"async_syntax_aot_values_optimized" start time: Nov 09 14:42 MST
+Output:
+----------------------------------------------------------
+await syntax: independent source check and linked AOT passed; actual 1 MiB stack=True
+<end of output>
+Test time =   0.86 sec
+----------------------------------------------------------
+Test Passed.
+"async_syntax_aot_values_optimized" end time: Nov 09 14:42 MST
+"async_syntax_aot_values_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+394/456 Testing: async_syntax_aot_errors_normal
+394/456 Test: async_syntax_aot_errors_normal
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/voidc" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/void_async_syntax_errors_normal" "/home/shmellyorc/Documents/Void.Language/tests/async/syntax/errors.void" "7" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/void_async_tests" "normal" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/async-syntax-errors-normal.o"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug
+"async_syntax_aot_errors_normal" start time: Nov 09 14:42 MST
+Output:
+----------------------------------------------------------
+await syntax: independent source check and linked AOT passed; actual 1 MiB stack=True
+<end of output>
+Test time =   0.55 sec
+----------------------------------------------------------
+Test Passed.
+"async_syntax_aot_errors_normal" end time: Nov 09 14:42 MST
+"async_syntax_aot_errors_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+396/456 Testing: async_syntax_aot_cancelled_normal
+396/456 Test: async_syntax_aot_cancelled_normal
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/voidc" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/void_async_syntax_cancelled_normal" "/home/shmellyorc/Documents/Void.Language/tests/async/syntax/cancelled.void" "failure:Async task cancelled" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/void_async_tests" "normal" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/async-syntax-cancelled-normal.o"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug
+"async_syntax_aot_cancelled_normal" start time: Nov 09 14:42 MST
+Output:
+----------------------------------------------------------
+await syntax: independent source check and linked AOT passed; actual 1 MiB stack=True
+<end of output>
+Test time =   0.27 sec
+----------------------------------------------------------
+Test Passed.
+"async_syntax_aot_cancelled_normal" end time: Nov 09 14:42 MST
+"async_syntax_aot_cancelled_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+395/456 Testing: async_syntax_aot_errors_optimized
+395/456 Test: async_syntax_aot_errors_optimized
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/voidc" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/void_async_syntax_errors_optimized" "/home/shmellyorc/Documents/Void.Language/tests/async/syntax/errors.void" "7" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/void_async_tests" "optimized" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/async-syntax-errors-optimized.o"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug
+"async_syntax_aot_errors_optimized" start time: Nov 09 14:42 MST
+Output:
+----------------------------------------------------------
+await syntax: independent source check and linked AOT passed; actual 1 MiB stack=True
+<end of output>
+Test time =   0.58 sec
+----------------------------------------------------------
+Test Passed.
+"async_syntax_aot_errors_optimized" end time: Nov 09 14:42 MST
+"async_syntax_aot_errors_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+397/456 Testing: async_syntax_aot_cancelled_optimized
+397/456 Test: async_syntax_aot_cancelled_optimized
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/voidc" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/void_async_syntax_cancelled_optimized" "/home/shmellyorc/Documents/Void.Language/tests/async/syntax/cancelled.void" "failure:Async task cancelled" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/void_async_tests" "optimized" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/async-syntax-cancelled-optimized.o"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug
+"async_syntax_aot_cancelled_optimized" start time: Nov 09 14:42 MST
+Output:
+----------------------------------------------------------
+await syntax: independent source check and linked AOT passed; actual 1 MiB stack=True
+<end of output>
+Test time =   0.33 sec
+----------------------------------------------------------
+Test Passed.
+"async_syntax_aot_cancelled_optimized" end time: Nov 09 14:42 MST
+"async_syntax_aot_cancelled_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+398/456 Testing: async_syntax_aot_failure_normal
+398/456 Test: async_syntax_aot_failure_normal
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/voidc" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/void_async_syntax_failure_normal" "/home/shmellyorc/Documents/Void.Language/tests/async/syntax/failure.void" "failure:Division by zero" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/void_async_tests" "normal" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/async-syntax-failure-normal.o"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug
+"async_syntax_aot_failure_normal" start time: Nov 09 14:42 MST
+Output:
+----------------------------------------------------------
+await syntax: independent source check and linked AOT passed; actual 1 MiB stack=True
+<end of output>
+Test time =   0.28 sec
+----------------------------------------------------------
+Test Passed.
+"async_syntax_aot_failure_normal" end time: Nov 09 14:42 MST
+"async_syntax_aot_failure_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+399/456 Testing: async_syntax_aot_failure_optimized
+399/456 Test: async_syntax_aot_failure_optimized
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/voidc" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/void_async_syntax_failure_optimized" "/home/shmellyorc/Documents/Void.Language/tests/async/syntax/failure.void" "failure:Division by zero" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/void_async_tests" "optimized" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/async-syntax-failure-optimized.o"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug
+"async_syntax_aot_failure_optimized" start time: Nov 09 14:42 MST
+Output:
+----------------------------------------------------------
+await syntax: independent source check and linked AOT passed; actual 1 MiB stack=True
+<end of output>
+Test time =   0.31 sec
+----------------------------------------------------------
+Test Passed.
+"async_syntax_aot_failure_optimized" end time: Nov 09 14:42 MST
+"async_syntax_aot_failure_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+400/456 Testing: async_syntax_aot_spawn_normal
+400/456 Test: async_syntax_aot_spawn_normal
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/voidc" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/void_async_syntax_spawn_normal" "/home/shmellyorc/Documents/Void.Language/tests/async/syntax/spawn.void" "9" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/void_async_tests" "normal" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/async-syntax-spawn-normal.o"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug
+"async_syntax_aot_spawn_normal" start time: Nov 09 14:42 MST
+Output:
+----------------------------------------------------------
+await syntax: independent source check and linked AOT passed; actual 1 MiB stack=True
+<end of output>
+Test time =   0.18 sec
+----------------------------------------------------------
+Test Passed.
+"async_syntax_aot_spawn_normal" end time: Nov 09 14:42 MST
+"async_syntax_aot_spawn_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+401/456 Testing: async_syntax_aot_spawn_optimized
+401/456 Test: async_syntax_aot_spawn_optimized
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/voidc" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/void_async_syntax_spawn_optimized" "/home/shmellyorc/Documents/Void.Language/tests/async/syntax/spawn.void" "9" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/void_async_tests" "optimized" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/async-syntax-spawn-optimized.o"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug
+"async_syntax_aot_spawn_optimized" start time: Nov 09 14:42 MST
+Output:
+----------------------------------------------------------
+await syntax: independent source check and linked AOT passed; actual 1 MiB stack=True
+<end of output>
+Test time =   0.20 sec
+----------------------------------------------------------
+Test Passed.
+"async_syntax_aot_spawn_optimized" end time: Nov 09 14:42 MST
+"async_syntax_aot_spawn_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+429/456 Testing: stage10_fields_aot
+429/456 Test: stage10_fields_aot
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/fields.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_native_fixture.a" "OFF"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug
+"stage10_fields_aot" start time: Nov 09 14:42 MST
+Output:
+----------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/fields.py", line 68, in <module>
+    run([clang, *flags, obj, runtime, fixture, "-o", exe])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/fields.py", line 23, in run
+    assert p.returncode == 0, (args, p.returncode, p.stdout, p.stderr)
+           ^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '-pthread', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-debug.JnbvmC/VOID Stage10 fields 5b6tkipr/normal.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_native_fixture.a', '-o', PosixPath('/tmp/void-s7-integrated-debug.JnbvmC/VOID Stage10 fields 5b6tkipr/normal.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp:569 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:569)\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp:207 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:207)\n>>>               c_dynamic.cpp.o:(vd::(anonymous namespace)::approved_bytes[abi:cxx11](int, vd::DynamicClosure::Image const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp:208 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:208)\n>>>               c_dynamic.cpp.o:(vd::(anonymous namespace)::approved_bytes[abi:cxx11](int, vd::DynamicClosure::Image const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+<end of output>
+Test time =   0.41 sec
+----------------------------------------------------------
+Test Failed.
+"stage10_fields_aot" end time: Nov 09 14:42 MST
+"stage10_fields_aot" time elapsed: 00:00:00
+----------------------------------------------------------
+
+428/456 Testing: ergonomics_sprint6
+428/456 Test: ergonomics_sprint6
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint6.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_native_fixture.a" "OFF"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug
+"ergonomics_sprint6" start time: Nov 09 14:42 MST
+Output:
+----------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint6.py", line 24, in <module>
+    run([compiler,'emit',source,'-o',obj,*switches]);run([clang,*flags,obj,runtime,fixture,'-pthread','-o',exe])
+                                                     ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint6.py", line 12, in run
+    assert p.returncode==status,(args,p.returncode,p.stdout,p.stderr)
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-debug.JnbvmC/VOID sprint6 gfr8zo91/normal.o'), PosixPath('/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a'), PosixPath('/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_native_fixture.a'), '-pthread', '-o', PosixPath('/tmp/void-s7-integrated-debug.JnbvmC/VOID sprint6 gfr8zo91/normal.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp:569 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:569)\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp:207 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:207)\n>>>               c_dynamic.cpp.o:(vd::(anonymous namespace)::approved_bytes[abi:cxx11](int, vd::DynamicClosure::Image const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp:208 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:208)\n>>>               c_dynamic.cpp.o:(vd::(anonymous namespace)::approved_bytes[abi:cxx11](int, vd::DynamicClosure::Image const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+<end of output>
+Test time =   0.99 sec
+----------------------------------------------------------
+Test Failed.
+"ergonomics_sprint6" end time: Nov 09 14:42 MST
+"ergonomics_sprint6" time elapsed: 00:00:00
+----------------------------------------------------------
+
+433/456 Testing: stage11_globals_aot
+433/456 Test: stage11_globals_aot
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage11/globals.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_native_fixture.a" "OFF"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug
+"stage11_globals_aot" start time: Nov 09 14:42 MST
+Output:
+----------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage11/globals.py", line 53, in <module>
+    execute("selected.void", {
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^
+        "selected.void": 'use "./game.void" as game\nvar score = 0\nfunc main():\n    game.reward_player()\n    print(score)\n    print(game.enemies_defeated)\n',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "game.void": 'var enemies_defeated = 0\nfunc reward_player():\n    score += 10\n    enemies_defeated += 1\n',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    }, b"10\n1\n")
+    ^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage11/globals.py", line 49, in execute
+    run([clang, obj, runtime, fixture, *flags, "-o", exe])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage11/globals.py", line 25, in run
+    assert result.returncode == expected, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', PosixPath('/tmp/void-s7-integrated-debug.JnbvmC/VOID globals 77k08y_0/program.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_native_fixture.a', '--driver-mode=g++', '-pthread', '-ldl', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', '-o', PosixPath('/tmp/void-s7-integrated-debug.JnbvmC/VOID globals 77k08y_0/program')], 1, b'', b'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp:569 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:569)\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp:207 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:207)\n>>>               c_dynamic.cpp.o:(vd::(anonymous namespace)::approved_bytes[abi:cxx11](int, vd::DynamicClosure::Image const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp:208 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:208)\n>>>               c_dynamic.cpp.o:(vd::(anonymous namespace)::approved_bytes[abi:cxx11](int, vd::DynamicClosure::Image const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+<end of output>
+Test time =   0.39 sec
+----------------------------------------------------------
+Test Failed.
+"stage11_globals_aot" end time: Nov 09 14:42 MST
+"stage11_globals_aot" time elapsed: 00:00:00
+----------------------------------------------------------
+
+431/456 Testing: stage10_temporal_aot
+431/456 Test: stage10_temporal_aot
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/temporal.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_native_fixture.a" "OFF"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug
+"stage10_temporal_aot" start time: Nov 09 14:42 MST
+Output:
+----------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/temporal.py", line 30, in <module>
+    execute([clang,*flags,obj,runtime,fixture,"-o",exe])
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/temporal.py", line 16, in execute
+    assert (result.returncode == 0) == success, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '-pthread', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-debug.JnbvmC/VOID Stage10 time qoajduj1/normal.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_native_fixture.a', '-o', PosixPath('/tmp/void-s7-integrated-debug.JnbvmC/VOID Stage10 time qoajduj1/normal.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp:569 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:569)\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp:207 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:207)\n>>>               c_dynamic.cpp.o:(vd::(anonymous namespace)::approved_bytes[abi:cxx11](int, vd::DynamicClosure::Image const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp:208 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:208)\n>>>               c_dynamic.cpp.o:(vd::(anonymous namespace)::approved_bytes[abi:cxx11](int, vd::DynamicClosure::Image const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+<end of output>
+Test time =   5.95 sec
+----------------------------------------------------------
+Test Failed.
+"stage10_temporal_aot" end time: Nov 09 14:42 MST
+"stage10_temporal_aot" time elapsed: 00:00:05
+----------------------------------------------------------
+
+435/456 Testing: stage10_operators_aot
+435/456 Test: stage10_operators_aot
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/operators.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_native_fixture.a" "OFF" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/void_operator_integration"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug
+"stage10_operators_aot" start time: Nov 09 14:42 MST
+Output:
+----------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/operators.py", line 49, in <module>
+    run([clang, *flags, obj, runtime, fixture, "-o", exe])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/operators.py", line 31, in run
+    assert p.returncode == status, (args, p.returncode, p.stdout, p.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '-pthread', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-debug.JnbvmC/VOID Stage10 operators 1cvvs3gv/normal.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_native_fixture.a', '-o', PosixPath('/tmp/void-s7-integrated-debug.JnbvmC/VOID Stage10 operators 1cvvs3gv/normal.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp:569 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:569)\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp:207 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:207)\n>>>               c_dynamic.cpp.o:(vd::(anonymous namespace)::approved_bytes[abi:cxx11](int, vd::DynamicClosure::Image const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp:208 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:208)\n>>>               c_dynamic.cpp.o:(vd::(anonymous namespace)::approved_bytes[abi:cxx11](int, vd::DynamicClosure::Image const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+<end of output>
+Test time =   0.90 sec
+----------------------------------------------------------
+Test Failed.
+"stage10_operators_aot" end time: Nov 09 14:42 MST
+"stage10_operators_aot" time elapsed: 00:00:00
+----------------------------------------------------------
+
+436/456 Testing: stage10_conversion_aot
+436/456 Test: stage10_conversion_aot
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/conversion.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_native_fixture.a" "OFF"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug
+"stage10_conversion_aot" start time: Nov 09 14:42 MST
+Output:
+----------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/conversion.py", line 59, in <module>
+    run([clang, *flags, obj, runtime, fixture, "-o", exe])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/conversion.py", line 23, in run
+    assert p.returncode == 0, (args, p.returncode, p.stdout, p.stderr)
+           ^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '-pthread', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-debug.JnbvmC/VOID Stage10 display 9jzoy6dg/normal.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_native_fixture.a', '-o', PosixPath('/tmp/void-s7-integrated-debug.JnbvmC/VOID Stage10 display 9jzoy6dg/normal.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp:569 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:569)\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp:207 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:207)\n>>>               c_dynamic.cpp.o:(vd::(anonymous namespace)::approved_bytes[abi:cxx11](int, vd::DynamicClosure::Image const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp:208 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:208)\n>>>               c_dynamic.cpp.o:(vd::(anonymous namespace)::approved_bytes[abi:cxx11](int, vd::DynamicClosure::Image const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+<end of output>
+Test time =   0.60 sec
+----------------------------------------------------------
+Test Failed.
+"stage10_conversion_aot" end time: Nov 09 14:42 MST
+"stage10_conversion_aot" time elapsed: 00:00:00
+----------------------------------------------------------
+
+445/456 Testing: application_native_sprint4
+445/456 Test: application_native_sprint4
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint4.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/voidc" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/void_sprint4_tests" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_native_fixture.a" "OFF"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug
+"application_native_sprint4" start time: Nov 09 14:42 MST
+Output:
+----------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint4.py", line 39, in <module>
+    link(obj,exe);run([exe],status,'');run([exe,'7'],status,'')
+    ~~~~^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint4.py", line 20, in link
+    def link(obj,exe): run([clang,*flags,obj,runtime,fixture,'-pthread','-o',exe])
+                       ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint4.py", line 12, in run
+    assert result.returncode==status,(args,result.returncode,result.stdout,result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-debug.JnbvmC/VOID Sprint 4 x9o8iazi/app0-normal.obj'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_native_fixture.a', '-pthread', '-o', PosixPath('/tmp/void-s7-integrated-debug.JnbvmC/VOID Sprint 4 x9o8iazi/app0-normal.exe')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp:569 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:569)\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp:207 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:207)\n>>>               c_dynamic.cpp.o:(vd::(anonymous namespace)::approved_bytes[abi:cxx11](int, vd::DynamicClosure::Image const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp:208 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:208)\n>>>               c_dynamic.cpp.o:(vd::(anonymous namespace)::approved_bytes[abi:cxx11](int, vd::DynamicClosure::Image const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+<end of output>
+Test time =   0.33 sec
+----------------------------------------------------------
+Test Failed.
+"application_native_sprint4" end time: Nov 09 14:42 MST
+"application_native_sprint4" time elapsed: 00:00:00
+----------------------------------------------------------
+
+446/456 Testing: text_collections_sprint3
+446/456 Test: text_collections_sprint3
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint3.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_native_fixture.a" "OFF"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug
+"text_collections_sprint3" start time: Nov 09 14:42 MST
+Output:
+----------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint3.py", line 179, in <module>
+    run([compiler,'emit',path,'-o',obj,*flags]);run([clang,*link_flags,obj,runtime,fixture,'-o',exe]);assert run([exe,'0']).stdout.strip()=='1'
+                                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint3.py", line 12, in run
+    assert result.returncode==(0 if ok else 1),(args,result.returncode,result.stdout,result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-debug.JnbvmC/VOID sprint3 7g6st5zm/text0.o'), PosixPath('/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a'), PosixPath('/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_native_fixture.a'), '-o', PosixPath('/tmp/void-s7-integrated-debug.JnbvmC/VOID sprint3 7g6st5zm/text0.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp:569 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:569)\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp:207 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:207)\n>>>               c_dynamic.cpp.o:(vd::(anonymous namespace)::approved_bytes[abi:cxx11](int, vd::DynamicClosure::Image const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp:208 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:208)\n>>>               c_dynamic.cpp.o:(vd::(anonymous namespace)::approved_bytes[abi:cxx11](int, vd::DynamicClosure::Image const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+<end of output>
+Test time =   0.80 sec
+----------------------------------------------------------
+Test Failed.
+"text_collections_sprint3" end time: Nov 09 14:42 MST
+"text_collections_sprint3" time elapsed: 00:00:00
+----------------------------------------------------------
+
+434/456 Testing: stage10_console_aot
+434/456 Test: stage10_console_aot
+Command: "/usr/bin/python3" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/console.py" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/voidc" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang" "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_native_fixture.a" "OFF"
+Directory: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug
+"stage10_console_aot" start time: Nov 09 14:42 MST
+Output:
+----------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/console.py", line 109, in <module>
+    run([clang, *flags, obj, runtime, fixture, "-o", executable])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/console.py", line 36, in run
+    assert p.returncode == status, (args, p.returncode, p.stdout, p.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '-pthread', '-ldl', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', PosixPath('/tmp/void-s7-integrated-debug.JnbvmC/VOID console source mbbkxk_g/operator_console_systems-normal.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_native_fixture.a', '-o', PosixPath('/tmp/void-s7-integrated-debug.JnbvmC/VOID console source mbbkxk_g/operator_console_systems-normal.bin')], 1, b'', b'ld.lld: error: undefined symbol: sodium_init\n>>> referenced by c_dynamic.cpp:569 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:569)\n>>>               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr<vd::DynamicClosure const>, std::filesystem::__cxx11::path const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n>>> referenced by c_dynamic.cpp:207 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:207)\n>>>               c_dynamic.cpp.o:(vd::(anonymous namespace)::approved_bytes[abi:cxx11](int, vd::DynamicClosure::Image const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n>>> referenced by c_dynamic.cpp:208 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:208)\n>>>               c_dynamic.cpp.o:(vd::(anonymous namespace)::approved_bytes[abi:cxx11](int, vd::DynamicClosure::Image const&)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-debug/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+<end of output>
+Test time =  22.35 sec
+----------------------------------------------------------
+Test Failed.
+"stage10_console_aot" end time: Nov 09 14:42 MST
+"stage10_console_aot" time elapsed: 00:00:22
+----------------------------------------------------------
+
+End testing: Nov 09 14:42 MST

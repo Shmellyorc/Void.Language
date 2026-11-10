@@ -1,0 +1,24 @@
+{
+  "profile": "strict",
+  "registered_tests": 433,
+  "unchanged_registration_properties": true,
+  "recipe_changes": [
+    "application_native_sprint4",
+    "ergonomics_sprint6",
+    "stage10_console_aot",
+    "stage10_conversion_aot",
+    "stage10_fields_aot",
+    "stage10_operators_aot",
+    "stage10_temporal_aot",
+    "stage11_globals_aot",
+    "text_collections_sprint3"
+  ],
+  "host_archives": [
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/strict/lib/libarchive.a",
+    "/home/shmellyorc/Documents/Void.Language/.toolchains/host/prefix/strict/lib/libsodium.a"
+  ],
+  "source_mirror": "/home/shmellyorc/Documents/Void.Language/build/slice7-final-link-repair/test-source-strict",
+  "attested_source_control": "host_capabilities_dependencies",
+  "exact_aot_source_paths": "async_syntax_aot_*",
+  "standard_library_uri_control": "lsp_collections_stdlib"
+}

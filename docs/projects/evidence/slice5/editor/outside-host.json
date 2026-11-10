@@ -1,0 +1,9 @@
+{
+  "mode": "outside",
+  "editor": "1.141.0",
+  "platform": "linux",
+  "events": [
+    "an active document outside the workspace suppresses the automatic offer"
+  ],
+  "status": "PASS"
+}

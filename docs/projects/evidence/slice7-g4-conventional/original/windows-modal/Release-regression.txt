@@ -1,0 +1,892 @@
+Test project C:/Users/a/VoidS7-G4Conventional/Release-attested
+      Start  17: cli_contract
+      Start 345: ffi_g4_conventional
+ 1/17 Test  #17: cli_contract .....................   Passed    8.58 sec
+      Start 338: analysis
+ 2/17 Test #338: analysis .........................   Passed    3.81 sec
+      Start 227: ffi_g3_jit_ir
+ 3/17 Test #227: ffi_g3_jit_ir ....................   Passed    1.39 sec
+      Start 331: reload
+ 4/17 Test #331: reload ...........................   Passed    0.77 sec
+      Start 219: ffi_g1_primitive_jit_ir
+ 5/17 Test #219: ffi_g1_primitive_jit_ir ..........   Passed    0.68 sec
+      Start 223: ffi_g1_primitive_aot_missing
+ 6/17 Test #223: ffi_g1_primitive_aot_missing .....   Passed    0.76 sec
+      Start 224: ffi_g2_jit_ir
+ 7/17 Test #224: ffi_g2_jit_ir ....................   Passed    0.65 sec
+      Start 226: ffi_g2_aot_optimized
+ 8/17 Test #226: ffi_g2_aot_optimized .............   Passed    0.39 sec
+      Start 225: ffi_g2_aot_normal
+ 9/17 Test #225: ffi_g2_aot_normal ................   Passed    0.55 sec
+      Start 228: ffi_g3_aot_normal
+10/17 Test #228: ffi_g3_aot_normal ................   Passed    0.40 sec
+      Start 229: ffi_g3_aot_optimized
+11/17 Test #229: ffi_g3_aot_optimized .............   Passed    0.35 sec
+      Start 332: gc
+12/17 Test #332: gc ...............................   Passed    0.06 sec
+      Start 220: ffi_g1_primitive_aot_normal
+13/17 Test #220: ffi_g1_primitive_aot_normal ......   Passed    0.26 sec
+      Start 221: ffi_g1_primitive_aot_optimized
+14/17 Test #221: ffi_g1_primitive_aot_optimized ...   Passed    0.22 sec
+      Start 222: ffi_g1_primitive_aot_mismatch
+15/17 Test #222: ffi_g1_primitive_aot_mismatch ....   Passed    0.23 sec
+      Start   2: project_manifest
+16/17 Test   #2: project_manifest .................   Passed    0.14 sec
+17/17 Test #345: ffi_g4_conventional ..............***Failed  199.66 sec
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:/gcc/bin/cmake.exe', '--install', 'C:/Users/a/VoidS7-G4Conventional/Release-attested', '--prefix', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\installed compiler', '--config', 'Release', '--component', 'compiler']
+exit=0 -- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/VOID-MIT-LICENSE.txt
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/LICENSING_SCOPE.md
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/REDISTRIBUTION.txt
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/NOTICE_INVENTORY.json
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/llvm-23.1.4
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/llvm-23.1.4/BLAKE3-LICENSE.txt
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/llvm-23.1.4/ConvertUTF-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/llvm-23.1.4/LICENSE.TXT
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/llvm-23.1.4/Support-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/llvm-23.1.4/xxhash-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/zstd-1.5.7
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/zstd-1.5.7/EMBEDDED-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/zstd-1.5.7/LICENSE
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/tomlplusplus/LICENSE
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/tomlplusplus/upstream.json
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/tomlplusplus/void-bounds-and-locations.patch
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/tomlplusplus/corresponding-source/toml.hpp
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/tomlplusplus/corresponding-source/README.md
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/zlib-1.3.2/LICENSE
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/libarchive
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/libarchive/COPYING
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/libarchive/SOURCE-NOTICES.json
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/libsodium
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/libsodium/LICENSE
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/libsodium/SOURCE-NOTICES.json
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/patches
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/patches/libsodium-1.0.22
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/patches/libsodium-1.0.22/asan-alignment.patch
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/patches/libsodium-1.0.22/PROVENANCE.json
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/host-versions.json
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/setup_host_deps.py
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/setup_host_deps_native.py
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/host-sodium.targets
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/verify_host_deps.py
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/corresponding-source/repro/tools/setup_host_deps.py
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/corresponding-source/repro/tools/setup_host_deps_native.py
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/corresponding-source/repro/tools/verify_host_deps.py
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/corresponding-source/repro/tools/verify_http_dependencies.py
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/corresponding-source/repro/tools/ci/llvm_sdk.py
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/corresponding-source/repro/cmake/host-sodium.targets
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/corresponding-source/repro/third_party/host-versions.json
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/corresponding-source/repro/third_party/http-versions.json
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/corresponding-source/repro/third_party/host-patches
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22/asan-alignment.patch
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22/PROVENANCE.json
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/libxml2-2.15.4
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/libxml2-2.15.4/Copyright
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/libxml2-2.15.4/FILE-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/UNICODE-LICENSE.txt
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/archive.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/channel.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/collections.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/console.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/convert.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/crypto.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/encoding
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/encoding/ascii.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/encoding/base64.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/encoding/binary.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/encoding/hex.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/error.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/io
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/io/memory.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/io.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/json.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/log.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/math.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/net
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/net/http.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/os.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/path.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/process.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/random.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/system_error.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/text.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/time.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/stdlib/url.void
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/LICENSE-Boost
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/LICENSE.txt
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/NOTICE
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/LICENSE
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/stage10-versions.json
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/bin/voidc.exe
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/lib/void/void_runtime.lib
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/lib/void/void_native_fixture.lib
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/lib/void/libcurl.lib
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/lib/void/archive.lib
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/lib/void/libsodium.lib
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/lib/void/psl.lib
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/lib/void/nghttp2.lib
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/lib/void/cares.lib
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/lib/void/zs.lib
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/aws-lc-5.12.0
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/aws-lc-5.12.0/LICENSE
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/aws-lc-5.12.0/NOTICE
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/aws-lc-5.12.0/UPSTREAM.json
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/c-ares-1.34.9
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/c-ares-1.34.9/LICENSE.md
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/libidn2-2.3.8
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/libidn2-2.3.8/COPYING
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/libidn2-2.3.8/COPYING.LESSERv3
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/libidn2-2.3.8/COPYING.unicode
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/libidn2-2.3.8/COPYINGv2
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/libidn2-2.3.8/README
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/libpsl-0.21.5
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/libpsl-0.21.5/COPYING
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/libpsl-0.21.5/LICENSE
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/libpsl-0.21.5/LICENSE.chromium
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/libpsl-0.21.5/README
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/libunistring-1.5
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/libunistring-1.5/COPYING
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/libunistring-1.5/COPYING.LIB
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/libunistring-1.5/README
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/nghttp2-1.70.0
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/nghttp2-1.70.0/COPYING
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/nghttp2-1.70.0/README
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/openssl-3.5.9
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/openssl-3.5.9/LICENSE.txt
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/zlib-1.3.2
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/zlib-1.3.2/LICENSE
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/zlib-1.3.2/README
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/COPYING
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/NOTICE
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/VOID-PROVENANCE.json
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/http-versions.json
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/publicsuffix
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/publicsuffix/LICENSE
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/publicsuffix/public_suffix_list.dat
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/publicsuffix/UPSTREAM.json
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/corresponding-source/setup_http_deps.py
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/corresponding-source/setup_http_deps_native.py
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/corresponding-source/http_archive.py
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/http/VOID-HTTP-DEPENDENCIES.json
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/bin/void-native.txt
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/bin/void-native-resources.txt
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/VOID-HOST-DEPENDENCIES.json
+-- Up-to-date: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/corresponding-source
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/corresponding-source/libarchive-3.8.11.tar.xz
+-- Installing: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\installed compiler/share/void/licenses/host/corresponding-source/libsodium-1.0.22.tar.gz
+
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\installed compiler\\bin\\voidc.exe', 'new', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪', '--source', 'src/main.void', '--project-id', 'org.test.native-application', '--app-id', 'org.test.native-app']
+exit=0 Manifest: C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/void.project.toml
+Project ID: org.test.native-application
+Application ID: org.test.native-app
+Next: from the displayed manifest directory, run voidc check --project .
+Created project manifest.
+Automatic application selection requires one eligible main(). Use --entry for a deliberate override.
+
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\installed compiler\\bin\\voidc.exe', 'check', '--project', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪']
+exit=0 Source checked successfully
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪', '--', 'ignored']
+exit=2 Invalid invocation: This project declares native code. Pass --allow-native to authorize its execution.
+Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]
+Try 'voidc run --help' for examples.
+
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪', '--allow-native', '--', 'ignored']
+exit=1 C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C dynamic library: missing or unreadable library C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/native/void_g4_conventional_provider.dll
+
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\installed compiler\\bin\\voidc.exe', 'native-bind', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪\\native\\provider.descriptor', 'conventional_fixture.h', '-o', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\independent C sources\\adapter.c']
+exit=0 
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\independent C sources argv=['C:/Users/a/Documents/ChatGPT/Void TEMP/Void-native/.toolchains/native-schannel/sdk/clang+llvm-23.1.4-x86_64-pc-windows-msvc/bin/clang.exe', '--driver-mode=g++', '-std=c++17', '-Wl,/implib:C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\independent C sources\\void_g4_conventional_dependency.lib', '-fuse-ld=lld', '-shared', '-O2', '-Wall', '-Wextra', '-Werror', '--target=x86_64-pc-windows-msvc', '-fms-runtime-lib=static', '-D_CRT_SECURE_NO_WARNINGS', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\independent C sources\\conventional_dependency.cpp', '-o', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪\\native\\void_g4_conventional_dependency.dll']
+exit=0 
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\independent C sources argv=['C:/Users/a/Documents/ChatGPT/Void TEMP/Void-native/.toolchains/native-schannel/sdk/clang+llvm-23.1.4-x86_64-pc-windows-msvc/bin/clang.exe', '-std=c11', '-Wl,/implib:C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\independent C sources\\void_g4_conventional_provider.lib', '-fuse-ld=lld', '-shared', '-O2', '-Wall', '-Wextra', '-Werror', '--target=x86_64-pc-windows-msvc', '-fms-runtime-lib=static', '-D_CRT_SECURE_NO_WARNINGS', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\independent C sources\\conventional_fixture.c', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\independent C sources\\void_g4_conventional_dependency.lib', '-o', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪\\native\\void_g4_conventional_provider.dll']
+exit=0 
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\independent C sources argv=['C:/Users/a/Documents/ChatGPT/Void TEMP/Void-native/.toolchains/native-schannel/sdk/clang+llvm-23.1.4-x86_64-pc-windows-msvc/bin/clang.exe', '-std=c11', '-Wl,/implib:C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\independent C sources\\void_g4_conventional_adapter.lib', '-fuse-ld=lld', '-shared', '-O2', '-Wall', '-Wextra', '-Werror', '--target=x86_64-pc-windows-msvc', '-fms-runtime-lib=static', '-D_CRT_SECURE_NO_WARNINGS', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\independent C sources\\conventional_rejection.c', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\independent C sources\\void_g4_conventional_provider.lib', '-o', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪\\native\\void_g4_conventional_adapter.dll']
+exit=0 
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\installed compiler\\bin\\voidc.exe', 'check', '--project', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪']
+exit=0 Source checked successfully
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\installed compiler\\bin\\voidc.exe', 'build', '--project', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪', '-o', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\unauthorized.exe']
+exit=2 Invalid invocation: This project declares native code. Pass --allow-native to authorize its execution.
+Usage: voidc build [file-or-directory] [-o executable] [--no-opt]
+Try 'voidc build --help' for examples.
+
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\independent C sources argv=['C:/Users/a/Documents/ChatGPT/Void TEMP/Void-native/.toolchains/native-schannel/sdk/clang+llvm-23.1.4-x86_64-pc-windows-msvc/bin/clang.exe', '-std=c11', '-Wl,/implib:C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\independent C sources\\void_g4_conventional_adapter.lib', '-fuse-ld=lld', '-shared', '-O2', '-Wall', '-Wextra', '-Werror', '--target=x86_64-pc-windows-msvc', '-fms-runtime-lib=static', '-D_CRT_SECURE_NO_WARNINGS', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\independent C sources\\adapter.c', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\independent C sources\\void_g4_conventional_provider.lib', '-o', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\void_g4_conventional_adapter.dll']
+exit=0 
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\installed compiler\\bin\\voidc.exe', 'native-bind', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\mismatched adapter\\provider.descriptor', 'conventional_fixture.h', '-o', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\mismatched adapter\\adapter.c']
+exit=0 
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\independent C sources argv=['C:/Users/a/Documents/ChatGPT/Void TEMP/Void-native/.toolchains/native-schannel/sdk/clang+llvm-23.1.4-x86_64-pc-windows-msvc/bin/clang.exe', '-std=c11', '-Wl,/implib:C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\independent C sources\\void_g4_conventional_adapter.lib', '-fuse-ld=lld', '-shared', '-O2', '-Wall', '-Wextra', '-Werror', '--target=x86_64-pc-windows-msvc', '-fms-runtime-lib=static', '-D_CRT_SECURE_NO_WARNINGS', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\mismatched adapter\\adapter.c', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\independent C sources\\void_g4_conventional_provider.lib', '-o', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\mismatched adapter\\void_g4_conventional_adapter.dll']
+exit=0 
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\independent C sources argv=['C:/Users/a/Documents/ChatGPT/Void TEMP/Void-native/.toolchains/native-schannel/sdk/clang+llvm-23.1.4-x86_64-pc-windows-msvc/bin/clang.exe', '-std=c11', '-fsyntax-only', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\wrong signature\\adapter.c']
+exit=1 C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\wrong signature\adapter.c:15:16: error: static assertion failed: C signature g4_conventional_scale
+   15 | _Static_assert(_Generic(&g4_conventional_scale, double (*)(double, float): 1, default: 0), "C signature g4_conventional_scale");
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪', '--allow-native', '--', 'payload 雪']
+exit=0 VOID native application payload 雪
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+pristine: initializers=['dependency initialized'], released=['-2', '23']
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪', '--allow-native', '--no-cache', '--no-opt', '--', 'payload 雪']
+exit=0 VOID native application payload 雪
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+normal: initializers=['dependency initialized'], released=['-2', '23']
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪', '--allow-native', '--no-cache', '--no-opt', '--', 'reject']
+exit=1 C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/conventional_ffi.void:23:6: runtime error: C resource operation rejected org.voidlang.g4-conventional::g4_conventional_acquire
+In function /conventional_ffi.void::acquire
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/src/main.void:12:32: source call
+            var rejected = ffi.acquire(-3)
+                               ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+normal: initializers=['dependency initialized'], released=['31']
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪', '--allow-native', '--no-cache', '--no-opt', '--', 'closed']
+exit=1 C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/conventional_ffi.void:25:6: runtime error: C resource is closed, null or invalid
+In function /conventional_ffi.void::borrow
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/src/main.void:17:24: source call
+            return ffi.borrow(owner)
+                       ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+normal: initializers=['dependency initialized'], released=['42']
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪', '--allow-native', '--no-cache', '--no-opt', '--', 'capacity']
+exit=1 C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/conventional_ffi.void:17:6: runtime error: C byte span outside admitted extent
+In function /conventional_ffi.void::sum
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/src/main.void:20:24: source call
+            return ffi.sum(too_short, 0, 2) as i32
+                       ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+normal: initializers=['dependency initialized'], released=[]
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\installed compiler\\bin\\voidc.exe', 'build', '--project', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪', '--allow-native', '--no-opt', '-o', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\normal\\application.exe']
+exit=0 Built native executable: C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/normal/application.exe
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\installed compiler\\bin\\voidc.exe', 'build', '--project', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪', '--allow-native', '--no-opt', '-o', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\normal\\application.exe']
+exit=0 Built native executable: C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/normal/application.exe
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\llvm-readobj.exe', '--coff-imports', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\normal\\application.exe']
+exit=0 
+File: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\normal\application.exe
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+Import {
+  Name: ADVAPI32.dll
+  ImportLookupTableRVA: 0x197038
+  ImportAddressTableRVA: 0x197598
+  Symbol: AddAccessAllowedAceEx (17)
+  Symbol: ConvertStringSidToSidW (131)
+  Symbol: CreateWellKnownSid (147)
+  Symbol: EqualSid (282)
+  Symbol: GetAce (311)
+  Symbol: GetLengthSid (331)
+  Symbol: GetSecurityDescriptorControl (348)
+  Symbol: GetSecurityDescriptorDacl (349)
+  Symbol: GetSecurityDescriptorOwner (352)
+  Symbol: GetSecurityInfo (355)
+  Symbol: GetTokenInformation (368)
+  Symbol: InitializeAcl (398)
+  Symbol: InitializeSecurityDescriptor (399)
+  Symbol: IsValidAcl (411)
+  Symbol: IsValidSecurityDescriptor (413)
+  Symbol: IsWellKnownSid (415)
+  Symbol: OpenProcessToken (536)
+  Symbol: SetSecurityDescriptorControl (746)
+  Symbol: SetSecurityDescriptorDacl (747)
+  Symbol: SetSecurityDescriptorOwner (749)
+  Symbol: SystemFunction036 (806)
+}
+Import {
+  Name: KERNEL32.dll
+  ImportLookupTableRVA: 0x1970E8
+  ImportAddressTableRVA: 0x197648
+  Symbol: AcquireSRWLockExclusive (0)
+  Symbol: AreFileApisANSI (35)
+  Symbol: CancelIo (115)
+  Symbol: CancelIoEx (116)
+  Symbol: CancelSynchronousIo (117)
+  Symbol: CloseHandle (137)
+  Symbol: CompareStringOrdinal (157)
+  Symbol: CompareStringW (158)
+  Symbol: CreateDirectoryW (189)
+  Symbol: CreateEventW (194)
+  Symbol: CreateFile2 (197)
+  Symbol: CreateFileW (206)
+  Symbol: CreateProcessW (232)
+  Symbol: CreateSymbolicLinkW (243)
+  Symbol: CreateThread (245)
+  Symbol: DecodePointer (269)
+  Symbol: DeleteCriticalSection (276)
+  Symbol: DeleteFileW (281)
+  Symbol: DeleteProcThreadAttributeList (282)
+  Symbol: DeviceIoControl (292)
+  Symbol: DuplicateHandle (306)
+  Symbol: EncodePointer (308)
+  Symbol: EnterCriticalSection (312)
+  Symbol: EnumSystemLocalesW (348)
+  Symbol: ExitProcess (359)
+  Symbol: FillConsoleOutputAttribute (372)
+  Symbol: FillConsoleOutputCharacterW (374)
+  Symbol: FindClose (382)
+  Symbol: FindFirstFileExW (388)
+  Symbol: FindFirstFileW (393)
+  Symbol: FindNextFileW (405)
+  Symbol: FlushFileBuffers (424)
+  Symbol: FormatMessageA (431)
+  Symbol: FreeEnvironmentStringsW (435)
+  Symbol: FreeLibrary (436)
+  Symbol: GetACP (443)
+  Symbol: GetCPInfo (458)
+  Symbol: GetCommandLineA (479)
+  Symbol: GetCommandLineW (480)
+  Symbol: GetConsoleCursorInfo (505)
+  Symbol: GetConsoleMode (517)
+  Symbol: GetConsoleOutputCP (521)
+  Symbol: GetConsoleScreenBufferInfo (523)
+  Symbol: GetCurrentDirectoryW (538)
+  Symbol: GetCurrentProcess (544)
+  Symbol: GetCurrentProcessId (545)
+  Symbol: GetCurrentThreadId (549)
+  Symbol: GetDiskFreeSpaceW (563)
+  Symbol: GetDriveTypeW (569)
+  Symbol: GetEnvironmentStringsW (577)
+  Symbol: GetExitCodeProcess (582)
+  Symbol: GetExitCodeThread (583)
+  Symbol: GetFileAttributesExW (588)
+  Symbol: GetFileAttributesW (591)
+  Symbol: GetFileInformationByHandle (593)
+  Symbol: GetFileInformationByHandleEx (594)
+  Symbol: GetFileSizeEx (598)
+  Symbol: GetFileType (600)
+  Symbol: GetFinalPathNameByHandleW (602)
+  Symbol: GetFullPathNameW (611)
+  Symbol: GetLastError (618)
+  Symbol: GetLocaleInfoEx (621)
+  Symbol: GetLocaleInfoW (622)
+  Symbol: GetModuleFileNameW (637)
+  Symbol: GetModuleHandleExW (640)
+  Symbol: GetModuleHandleW (641)
+  Symbol: GetNumberOfConsoleInputEvents (671)
+  Symbol: GetOEMCP (673)
+  Symbol: GetOverlappedResult (674)
+  Symbol: GetProcAddress (696)
+  Symbol: GetProcessHeap (702)
+  Symbol: GetStartupInfoW (730)
+  Symbol: GetStdHandle (732)
+  Symbol: GetStringTypeW (737)
+  Symbol: GetSystemInfo (749)
+  Symbol: GetSystemTimeAsFileTime (755)
+  Symbol: GetTickCount64 (786)
+  Symbol: GetTimeZoneInformation (792)
+  Symbol: GetUserDefaultLCID (798)
+  Symbol: GetVolumePathNameW (814)
+  Symbol: HeapAlloc (849)
+  Symbol: HeapFree (853)
+  Symbol: HeapReAlloc (856)
+  Symbol: HeapSize (858)
+  Symbol: InitializeCriticalSection (874)
+  Symbol: InitializeCriticalSectionAndSpinCount (875)
+  Symbol: InitializeCriticalSectionEx (876)
+  Symbol: InitializeProcThreadAttributeList (878)
+  Symbol: InitializeSListHead (879)
+  Symbol: IsDebuggerPresent (901)
+  Symbol: IsProcessorFeaturePresent (908)
+  Symbol: IsValidCodePage (914)
+  Symbol: IsValidLocale (916)
+  Symbol: LCMapStringEx (951)
+  Symbol: LCMapStringW (952)
+  Symbol: LeaveCriticalSection (964)
+  Symbol: LoadLibraryExW (970)
+  Symbol: LocalFree (982)
+  Symbol: LockFileEx (993)
+  Symbol: MoveFileExW (1007)
+  Symbol: MultiByteToWideChar (1014)
+  Symbol: PeekConsoleInputW (1062)
+  Symbol: QueryPerformanceCounter (1106)
+  Symbol: QueryPerformanceFrequency (1107)
+  Symbol: RaiseException (1129)
+  Symbol: ReadConsoleInputW (1137)
+  Symbol: ReadConsoleW (1143)
+  Symbol: ReadFile (1146)
+  Symbol: ReleaseSRWLockExclusive (1209)
+  Symbol: RemoveDirectoryW (1216)
+  Symbol: ResetEvent (1229)
+  Symbol: RtlCaptureContext (1238)
+  Symbol: RtlLookupFunctionEntry (1245)
+  Symbol: RtlPcToFileHeader (1247)
+  Symbol: RtlUnwind (1250)
+  Symbol: RtlUnwindEx (1251)
+  Symbol: RtlVirtualUnwind (1252)
+  Symbol: SetConsoleCursorInfo (1276)
+  Symbol: SetConsoleCursorPosition (1278)
+  Symbol: SetConsoleMode (1290)
+  Symbol: SetConsoleTextAttribute (1299)
+  Symbol: SetConsoleTitleW (1301)
+  Symbol: SetEndOfFile (1313)
+  Symbol: SetEnvironmentVariableW (1317)
+  Symbol: SetEvent (1319)
+  Symbol: SetFilePointerEx (1332)
+  Symbol: SetFileTime (1335)
+  Symbol: SetLastError (1346)
+  Symbol: SetStdHandle (1372)
+  Symbol: SetUnhandledExceptionFilter (1408)
+  Symbol: Sleep (1424)
+  Symbol: SleepConditionVariableSRW (1426)
+  Symbol: TerminateProcess (1439)
+  Symbol: TlsAlloc (1457)
+  Symbol: TlsFree (1458)
+  Symbol: TlsGetValue (1459)
+  Symbol: TlsSetValue (1460)
+  Symbol: TryAcquireSRWLockExclusive (1464)
+  Symbol: UnhandledExceptionFilter (1473)
+  Symbol: UpdateProcThreadAttribute (1486)
+  Symbol: VirtualAlloc (1498)
+  Symbol: VirtualFree (1501)
+  Symbol: WaitForMultipleObjects (1513)
+  Symbol: WaitForSingleObject (1515)
+  Symbol: WaitForSingleObjectEx (1516)
+  Symbol: WakeAllConditionVariable (1523)
+  Symbol: WideCharToMultiByte (1554)
+  Symbol: WriteConsoleW (1573)
+  Symbol: WriteFile (1574)
+}
+
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪', '--allow-native', '--no-cache', '--', 'payload 雪']
+exit=0 VOID native application payload 雪
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+optimized: initializers=['dependency initialized'], released=['-2', '23']
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪', '--allow-native', '--no-cache', '--', 'reject']
+exit=1 C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/conventional_ffi.void:23:6: runtime error: C resource operation rejected org.voidlang.g4-conventional::g4_conventional_acquire
+In function /conventional_ffi.void::acquire
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/src/main.void:12:32: source call
+            var rejected = ffi.acquire(-3)
+                               ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+optimized: initializers=['dependency initialized'], released=['31']
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪', '--allow-native', '--no-cache', '--', 'closed']
+exit=1 C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/conventional_ffi.void:25:6: runtime error: C resource is closed, null or invalid
+In function /conventional_ffi.void::borrow
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/src/main.void:17:24: source call
+            return ffi.borrow(owner)
+                       ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+optimized: initializers=['dependency initialized'], released=['42']
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪', '--allow-native', '--no-cache', '--', 'capacity']
+exit=1 C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/conventional_ffi.void:17:6: runtime error: C byte span outside admitted extent
+In function /conventional_ffi.void::sum
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/src/main.void:20:24: source call
+            return ffi.sum(too_short, 0, 2) as i32
+                       ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+optimized: initializers=['dependency initialized'], released=[]
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\installed compiler\\bin\\voidc.exe', 'build', '--project', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪', '--allow-native', '-o', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\optimized\\application.exe']
+exit=0 Built native executable: C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/optimized/application.exe
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\llvm-readobj.exe', '--coff-imports', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\optimized\\application.exe']
+exit=0 
+File: C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\optimized\application.exe
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+Import {
+  Name: ADVAPI32.dll
+  ImportLookupTableRVA: 0x185558
+  ImportAddressTableRVA: 0x185A70
+  Symbol: AddAccessAllowedAceEx (17)
+  Symbol: ConvertStringSidToSidW (131)
+  Symbol: CreateWellKnownSid (147)
+  Symbol: EqualSid (282)
+  Symbol: GetAce (311)
+  Symbol: GetLengthSid (331)
+  Symbol: GetSecurityDescriptorControl (348)
+  Symbol: GetSecurityDescriptorDacl (349)
+  Symbol: GetSecurityDescriptorOwner (352)
+  Symbol: GetSecurityInfo (355)
+  Symbol: GetTokenInformation (368)
+  Symbol: InitializeAcl (398)
+  Symbol: InitializeSecurityDescriptor (399)
+  Symbol: IsValidAcl (411)
+  Symbol: IsValidSecurityDescriptor (413)
+  Symbol: IsWellKnownSid (415)
+  Symbol: OpenProcessToken (536)
+  Symbol: SetSecurityDescriptorControl (746)
+  Symbol: SetSecurityDescriptorDacl (747)
+  Symbol: SetSecurityDescriptorOwner (749)
+  Symbol: SystemFunction036 (806)
+}
+Import {
+  Name: KERNEL32.dll
+  ImportLookupTableRVA: 0x185608
+  ImportAddressTableRVA: 0x185B20
+  Symbol: AcquireSRWLockExclusive (0)
+  Symbol: AreFileApisANSI (35)
+  Symbol: CancelIoEx (116)
+  Symbol: CancelSynchronousIo (117)
+  Symbol: CloseHandle (137)
+  Symbol: CompareStringOrdinal (157)
+  Symbol: CompareStringW (158)
+  Symbol: CreateDirectoryW (189)
+  Symbol: CreateEventW (194)
+  Symbol: CreateFileW (206)
+  Symbol: CreateProcessW (232)
+  Symbol: CreateSymbolicLinkW (243)
+  Symbol: CreateThread (245)
+  Symbol: DecodePointer (269)
+  Symbol: DeleteCriticalSection (276)
+  Symbol: DeleteFileW (281)
+  Symbol: DeleteProcThreadAttributeList (282)
+  Symbol: DeviceIoControl (292)
+  Symbol: DuplicateHandle (306)
+  Symbol: EncodePointer (308)
+  Symbol: EnterCriticalSection (312)
+  Symbol: EnumSystemLocalesW (348)
+  Symbol: ExitProcess (359)
+  Symbol: FillConsoleOutputAttribute (372)
+  Symbol: FillConsoleOutputCharacterW (374)
+  Symbol: FindClose (382)
+  Symbol: FindFirstFileExW (388)
+  Symbol: FindFirstFileW (393)
+  Symbol: FindNextFileW (405)
+  Symbol: FlushFileBuffers (424)
+  Symbol: FormatMessageA (431)
+  Symbol: FreeEnvironmentStringsW (435)
+  Symbol: FreeLibrary (436)
+  Symbol: GetACP (443)
+  Symbol: GetCPInfo (458)
+  Symbol: GetCommandLineA (479)
+  Symbol: GetCommandLineW (480)
+  Symbol: GetConsoleCursorInfo (505)
+  Symbol: GetConsoleMode (517)
+  Symbol: GetConsoleOutputCP (521)
+  Symbol: GetConsoleScreenBufferInfo (523)
+  Symbol: GetCurrentDirectoryW (538)
+  Symbol: GetCurrentProcess (544)
+  Symbol: GetCurrentProcessId (545)
+  Symbol: GetCurrentThreadId (549)
+  Symbol: GetEnvironmentStringsW (577)
+  Symbol: GetExitCodeProcess (582)
+  Symbol: GetExitCodeThread (583)
+  Symbol: GetFileAttributesExW (588)
+  Symbol: GetFileAttributesW (591)
+  Symbol: GetFileInformationByHandle (593)
+  Symbol: GetFileInformationByHandleEx (594)
+  Symbol: GetFileSizeEx (598)
+  Symbol: GetFileType (600)
+  Symbol: GetFinalPathNameByHandleW (602)
+  Symbol: GetFullPathNameW (611)
+  Symbol: GetLastError (618)
+  Symbol: GetLocaleInfoEx (621)
+  Symbol: GetLocaleInfoW (622)
+  Symbol: GetModuleFileNameW (637)
+  Symbol: GetModuleHandleExW (640)
+  Symbol: GetModuleHandleW (641)
+  Symbol: GetNumberOfConsoleInputEvents (671)
+  Symbol: GetOEMCP (673)
+  Symbol: GetOverlappedResult (674)
+  Symbol: GetProcAddress (696)
+  Symbol: GetProcessHeap (702)
+  Symbol: GetStartupInfoW (730)
+  Symbol: GetStdHandle (732)
+  Symbol: GetStringTypeW (737)
+  Symbol: GetSystemInfo (749)
+  Symbol: GetSystemTimeAsFileTime (755)
+  Symbol: GetTickCount64 (786)
+  Symbol: GetTimeZoneInformation (792)
+  Symbol: GetUserDefaultLCID (798)
+  Symbol: HeapAlloc (849)
+  Symbol: HeapFree (853)
+  Symbol: HeapReAlloc (856)
+  Symbol: HeapSize (858)
+  Symbol: InitializeCriticalSection (874)
+  Symbol: InitializeCriticalSectionAndSpinCount (875)
+  Symbol: InitializeCriticalSectionEx (876)
+  Symbol: InitializeProcThreadAttributeList (878)
+  Symbol: InitializeSListHead (879)
+  Symbol: IsDebuggerPresent (901)
+  Symbol: IsProcessorFeaturePresent (908)
+  Symbol: IsValidCodePage (914)
+  Symbol: IsValidLocale (916)
+  Symbol: LCMapStringEx (951)
+  Symbol: LCMapStringW (952)
+  Symbol: LeaveCriticalSection (964)
+  Symbol: LoadLibraryExW (970)
+  Symbol: LocalFree (982)
+  Symbol: LockFileEx (993)
+  Symbol: MoveFileExW (1007)
+  Symbol: MultiByteToWideChar (1014)
+  Symbol: PeekConsoleInputW (1062)
+  Symbol: QueryPerformanceCounter (1106)
+  Symbol: QueryPerformanceFrequency (1107)
+  Symbol: RaiseException (1129)
+  Symbol: ReadConsoleInputW (1137)
+  Symbol: ReadConsoleW (1143)
+  Symbol: ReadFile (1146)
+  Symbol: ReleaseSRWLockExclusive (1209)
+  Symbol: RemoveDirectoryW (1216)
+  Symbol: RtlCaptureContext (1238)
+  Symbol: RtlLookupFunctionEntry (1245)
+  Symbol: RtlPcToFileHeader (1247)
+  Symbol: RtlUnwind (1250)
+  Symbol: RtlUnwindEx (1251)
+  Symbol: RtlVirtualUnwind (1252)
+  Symbol: SetConsoleCursorInfo (1276)
+  Symbol: SetConsoleCursorPosition (1278)
+  Symbol: SetConsoleMode (1290)
+  Symbol: SetConsoleTextAttribute (1299)
+  Symbol: SetConsoleTitleW (1301)
+  Symbol: SetEndOfFile (1313)
+  Symbol: SetEnvironmentVariableW (1317)
+  Symbol: SetEvent (1319)
+  Symbol: SetFilePointerEx (1332)
+  Symbol: SetLastError (1346)
+  Symbol: SetStdHandle (1372)
+  Symbol: SetUnhandledExceptionFilter (1408)
+  Symbol: Sleep (1424)
+  Symbol: SleepConditionVariableSRW (1426)
+  Symbol: TerminateProcess (1439)
+  Symbol: TlsAlloc (1457)
+  Symbol: TlsFree (1458)
+  Symbol: TlsGetValue (1459)
+  Symbol: TlsSetValue (1460)
+  Symbol: TryAcquireSRWLockExclusive (1464)
+  Symbol: UnhandledExceptionFilter (1473)
+  Symbol: UpdateProcThreadAttribute (1486)
+  Symbol: WaitForMultipleObjects (1513)
+  Symbol: WaitForSingleObject (1515)
+  Symbol: WaitForSingleObjectEx (1516)
+  Symbol: WakeAllConditionVariable (1523)
+  Symbol: WideCharToMultiByte (1554)
+  Symbol: WriteConsoleW (1573)
+  Symbol: WriteFile (1574)
+}
+
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\sources outside checkout 雪', '--allow-native', '--', 'payload 雪']
+exit=1 C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C dynamic export: C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/native/void_g4_conventional_provider.dll does not provide g4_conventional_missing
+
+missing export: initializers=['dependency initialized'], released=[]
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\relocated normal 雪\\application.exe', 'payload 雪']
+exit=0 VOID native application payload 雪
+
+normal: initializers=['dependency initialized'], released=['-2', '23']
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\relocated normal 雪\\application.exe', 'reject']
+exit=1 C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/conventional_ffi.void:23:6: runtime error: C resource operation rejected org.voidlang.g4-conventional::g4_conventional_acquire
+In function /conventional_ffi.void::acquire
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/src/main.void:12:32: source call
+            var rejected = ffi.acquire(-3)
+                               ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+normal: initializers=['dependency initialized'], released=['31']
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\relocated normal 雪\\application.exe', 'closed']
+exit=1 C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/conventional_ffi.void:25:6: runtime error: C resource is closed, null or invalid
+In function /conventional_ffi.void::borrow
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/src/main.void:17:24: source call
+            return ffi.borrow(owner)
+                       ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+normal: initializers=['dependency initialized'], released=['42']
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\relocated normal 雪\\application.exe', 'capacity']
+exit=1 C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/conventional_ffi.void:17:6: runtime error: C byte span outside admitted extent
+In function /conventional_ffi.void::sum
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/src/main.void:20:24: source call
+            return ffi.sum(too_short, 0, 2) as i32
+                       ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+normal: initializers=['dependency initialized'], released=[]
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\relocated normal 雪\\application.exe', 'payload 雪']
+exit=1 C dynamic library: missing or unreadable library C:/Users/a/VoidS7-G4Conventional/Release-artifacts/VOID G4 9xlr7et4/relocated normal 雪/native/void_g4_conventional_provider.dll
+
+normal: initializers=[], released=[]
+cwd=C:\Users\a\VoidS7-G4Conventional\Release-artifacts\VOID G4 9xlr7et4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\relocated normal 雪\\application.exe', 'payload 雪']
+Traceback (most recent call last):
+  File "C:\Users\a\VoidCI42377496702-Native\tests\ffi\conventional_process.py", line 235, in <module>
+    verify(Path(name))
+    ~~~~~~^^^^^^^^^^^^
+  File "C:\Users\a\VoidCI42377496702-Native\tests\ffi\conventional_process.py", line 204, in verify
+    invoke([program, 'payload \u96ea'], mode, 1, 'C dynamic load', initialized=False)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidCI42377496702-Native\tests\ffi\conventional_process.py", line 145, in invoke
+    run(args, cwd, status, contains)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidCI42377496702-Native\tests\ffi\conventional_process.py", line 27, in run
+    proc = subprocess.run(argv, cwd=cwd, env=environment, capture_output=True, timeout=180)
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\subprocess.py", line 557, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\subprocess.py", line 1221, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\subprocess.py", line 1664, in _communicate
+    raise TimeoutExpired(self.args, orig_timeout)
+subprocess.TimeoutExpired: Command '['C:\\Users\\a\\VoidS7-G4Conventional\\Release-artifacts\\VOID G4 9xlr7et4\\relocated normal \u96ea\\application.exe', 'payload \u96ea']' timed out after 180 seconds
+
+
+94% tests passed, 1 tests failed out of 17
+
+Total Test time (real) = 199.77 sec
+
+The following tests FAILED:
+	345 - ffi_g4_conventional (Failed)
+Errors while running CTest

@@ -1,0 +1,9 @@
+{
+  "mode": "untrusted",
+  "editor": "1.141.0",
+  "platform": "linux",
+  "events": [
+    "untrusted workspace stays syntax-only with zero child launches or writes"
+  ],
+  "status": "PASS"
+}

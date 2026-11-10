@@ -1,0 +1,14 @@
+[
+  {
+    "directory": "C:/Users/a/VoidS7-G3Final-Release",
+    "command": "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe  /nologo -DG2_FIXTURE_IDENTITY=\\\"889eda7481b9615a96f9468b0ee504cff8e6523beb364b14c2daeeef9d23cb3e\\\" -D_ITERATOR_DEBUG_LEVEL=0 -IC:\\Users\\a\\VoidCI42377496702-Native\\include /DWIN32 /D_WINDOWS /O2 /Ob2 /DNDEBUG /std:c11 -MT /W4 /permissive- /EHsc /FoCMakeFiles\\void_g2_fixture.dir\\tests\\ffi\\records_fixture.c.obj /FdCMakeFiles\\void_g2_fixture.dir\\ -c -- C:\\Users\\a\\VoidCI42377496702-Native\\tests\\ffi\\records_fixture.c",
+    "file": "C:/Users/a/VoidCI42377496702-Native/tests/ffi/records_fixture.c",
+    "output": "C:/Users/a/VoidS7-G3Final-Release/CMakeFiles/void_g2_fixture.dir/tests/ffi/records_fixture.c.obj"
+  },
+  {
+    "directory": "C:/Users/a/VoidS7-G3Final-Release",
+    "command": "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe  /nologo -DG2_LLP64=1 -D_ITERATOR_DEBUG_LEVEL=0 -IC:\\Users\\a\\VoidS7-G3Final-Release\\ffi-g2 -IC:\\Users\\a\\VoidCI42377496702-Native\\include /DWIN32 /D_WINDOWS /O2 /Ob2 /DNDEBUG /std:c11 -MT /W4 /permissive- /EHsc /FoCMakeFiles\\void_g2_thunk.dir\\tests\\ffi\\records_thunk.c.obj /FdCMakeFiles\\void_g2_thunk.dir\\ -c -- C:\\Users\\a\\VoidCI42377496702-Native\\tests\\ffi\\records_thunk.c",
+    "file": "C:/Users/a/VoidCI42377496702-Native/tests/ffi/records_thunk.c",
+    "output": "C:/Users/a/VoidS7-G3Final-Release/CMakeFiles/void_g2_thunk.dir/tests/ffi/records_thunk.c.obj"
+  }
+]

@@ -1,0 +1,7 @@
+{
+  "events": [
+    "normal editor closes while the prompt remains offered",
+    "same physical root and persisted workspace storage suppress the next qualifying event"
+  ],
+  "status": "PASS"
+}

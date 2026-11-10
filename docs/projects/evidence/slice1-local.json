@@ -1,0 +1,654 @@
+{
+  "date": "2026-11-08",
+  "baseline": "2f667ea338127b8f91c3136804377ef3fa5218d6",
+  "working_tree": "uncommitted; preexisting fifteen-document Phase 1 work preserved",
+  "scope": "Slice 1 schema-only compiler API; no CLI/discovery/Runtime integration",
+  "host": {
+    "system": "Linux",
+    "machine": "x86_64",
+    "os_release": [
+      "PRETTY_NAME=\"PikaOS 4\"",
+      "NAME=\"PikaOS\"",
+      "VERSION_ID=\"4\"",
+      "VERSION=\"4\"",
+      "VERSION_CODENAME=nest"
+    ],
+    "clang": [
+      "clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)",
+      "Target: x86_64-unknown-linux-gnu"
+    ]
+  },
+  "fatal_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+  },
+  "source_inputs_sha256": {
+    "CMakeLists.txt": "86cf2c51f0cf8795f675a7bd2670396be6257bf462e1e6a738737fb0b1b1f9dd",
+    "cmake/InstallLicenses.cmake": "0bcff2b4a650c9464773c87e681d7d0dff50fe039f3510d4ef708a0d1ec3caa2",
+    "include/void/project.hpp": "b7e57ee7ab26330ade1eb538e880d2bbbcd9c604b4b25b01c4ee1c256dbe5d84",
+    "include/void/diagnostic.hpp": "d04d4a22f310d98ca84a365a8729fbe1036d397ccf5656c847c46cb68267dfab",
+    "include/void/path.hpp": "8d8e8cd9cb33f22c3481eb609cad0108ec6791d15eba6540bf8c555f13251b04",
+    "src/frontend/project.cpp": "b69965d50db29d90af030378bee57288d9ac7cd1928c6244bc3febcc9a3f1f42",
+    "src/frontend/compiler.cpp": "06a35d0a760da06e489920fe3ef56369cddad0385a2d1c2eaa4c56cee9b6ae24",
+    "tests/project/manifest.cpp": "8cf566f9e2ecc2964b6c5c2dcf6ca0d84398454e8c0202f8552659a1a61af43f",
+    "tests/project/legacy.py": "fc438093b7f7557c53452a383615eef537b24a62b7e3f3d77f97b7b292d1a60a",
+    "tests/project/authority.py": "83db8358c3182671fc2c10d65636ed88953fcf1219ed9b31fcca67667a516345",
+    "tests/project/provenance.py": "5ae8694013a61450297b31b7926ba7ec45f339873cdcd8397053605f33dfe7c6",
+    "third_party/tomlplusplus/toml.hpp": "7cd54af1a3497465eb26507f8d8a2ccfe661fccc27dac7a5121b885bee88d5e7",
+    "third_party/tomlplusplus/LICENSE": "529bc3900a9571e49db285b0df432397e70b881cc3bf48de6667ae74ff4b06d8",
+    "third_party/tomlplusplus/upstream.json": "98e2bf14bd9c8765aae02725a494affa31585ecb352e494d88f5eaccb806adfc",
+    "third_party/tomlplusplus/void-bounds-and-locations.patch": "d131e7ff7daa6373904406403b8f23def1b0dc02127de8230c1a09cdace3330f",
+    "third_party/tomlplusplus/README.md": "a975f5d05f6d02669920eaafc5ee508079e364fd2fdd8153d9d020d0beb6fd26"
+  },
+  "unchanged_protected_inputs_sha256": {
+    "README.md": "f21e6822e36bfcde1c3631bde88171c5eb8c529620c3d6b270795e146ecba2bb",
+    "src/main.cpp": "2067a7672eef5eeeeb7b3b4de41429e6074a9f86252927001bc448be193704ae",
+    "src/frontend/source.cpp": "8c9093cbe42f49083eafd35e88a58a6d94bad2073ec1cb8877d5a5bd45374874",
+    "src/runtime/application.cpp": "8bb9491be9c3e649080bf1016521141a90fee541eb6802df12a63ad2e0edd699",
+    "src/runtime/abi.cpp": "5ec5010ea22b086e97c37f57f2ff6ad35b296001727006271683a339dbc84f48",
+    "stdlib/os.void": "a05158eb5978aea445715c3c6cc173ec84b7c97a3335a1332a80aa58c7726d20",
+    "src/lsp/main.cpp": "e725f9a854a930a367390bcd5597227ee4eca6f969e8907a9f4eb6bf6a0158c2",
+    "editors/vscode/src/extension.ts": "de6883acf9d958bc31ef7435b06fe00ddb063de6151ff759fe1eb825ab88fed5",
+    "editors/vscode/src/config.ts": "518f8e85c85af88e8cab20bac188d4d99f5357669d90e41806d5de583dfef08b",
+    ".github/workflows/ci-link-experiment.yml": "8b62b4363215a9cb52e004e1869146f1f64842895c8597ec6e702d2ee1fd6189"
+  },
+  "final_profiles": [
+    {
+      "profile": "release",
+      "tests_passed": 24,
+      "test_cases": [
+        {
+          "name": "project_manifest",
+          "status": "passed",
+          "seconds": 0.032981,
+          "summary": "project_manifest: 3442 checks passed"
+        },
+        {
+          "name": "project_manifest_no_authority",
+          "status": "passed",
+          "seconds": 0.135364,
+          "summary": "project_manifest: 3443 checks passed under syscall denial\nproject_manifest_no_authority: four live SIGSYS controls passed"
+        },
+        {
+          "name": "project_manifest_legacy",
+          "status": "passed",
+          "seconds": 0.397282,
+          "summary": "project_manifest_legacy: 15 checks passed"
+        },
+        {
+          "name": "project_manifest_provenance",
+          "status": "passed",
+          "seconds": 0.0615545,
+          "summary": "project_manifest_provenance: 3 file hashes and exact pinned upstream reconstruction passed"
+        },
+        {
+          "name": "cli_contract",
+          "status": "passed",
+          "seconds": 2.8567,
+          "summary": ""
+        },
+        {
+          "name": "cli_install_resources",
+          "status": "passed",
+          "seconds": 0.12289,
+          "summary": ""
+        },
+        {
+          "name": "application_workflow_stage9",
+          "status": "passed",
+          "seconds": 6.49447,
+          "summary": ""
+        },
+        {
+          "name": "debug_cache_processes",
+          "status": "passed",
+          "seconds": 2.57488,
+          "summary": ""
+        },
+        {
+          "name": "automatic_cache_processes",
+          "status": "passed",
+          "seconds": 0.724447,
+          "summary": ""
+        },
+        {
+          "name": "os_errors",
+          "status": "passed",
+          "seconds": 5.18071,
+          "summary": ""
+        },
+        {
+          "name": "os_frontend",
+          "status": "passed",
+          "seconds": 6.50752,
+          "summary": ""
+        },
+        {
+          "name": "lsp_os",
+          "status": "passed",
+          "seconds": 1.48024,
+          "summary": ""
+        },
+        {
+          "name": "lsp_stage7",
+          "status": "passed",
+          "seconds": 0.189206,
+          "summary": ""
+        },
+        {
+          "name": "sessions",
+          "status": "passed",
+          "seconds": 0.061342,
+          "summary": ""
+        },
+        {
+          "name": "tooling",
+          "status": "passed",
+          "seconds": 0.213238,
+          "summary": ""
+        },
+        {
+          "name": "analysis",
+          "status": "passed",
+          "seconds": 0.504423,
+          "summary": ""
+        },
+        {
+          "name": "numeric",
+          "status": "passed",
+          "seconds": 2.2211,
+          "summary": ""
+        },
+        {
+          "name": "frontend",
+          "status": "passed",
+          "seconds": 4.71078,
+          "summary": ""
+        },
+        {
+          "name": "modules",
+          "status": "passed",
+          "seconds": 0.845787,
+          "summary": ""
+        },
+        {
+          "name": "local_libraries",
+          "status": "passed",
+          "seconds": 0.371001,
+          "summary": ""
+        },
+        {
+          "name": "source_cli",
+          "status": "passed",
+          "seconds": 3.47283,
+          "summary": ""
+        },
+        {
+          "name": "modules_cli",
+          "status": "passed",
+          "seconds": 14.211,
+          "summary": ""
+        },
+        {
+          "name": "analysis_cli",
+          "status": "passed",
+          "seconds": 0.515937,
+          "summary": ""
+        },
+        {
+          "name": "numeric_cli",
+          "status": "passed",
+          "seconds": 17.9876,
+          "summary": ""
+        }
+      ],
+      "xml": "build/llvm23-release/project-slice1-final.xml",
+      "xml_sha256": "f2fb9076ffcee4405bc390445d375474a66ca248f3b8b0f3a2a8d7835485849b",
+      "log": "build/project-slice1-release-final-tests.log",
+      "log_sha256": "4c896420c9c1931f9f4c27112912e63489a8bc6855fd3cc1c8c3f8f4e470134f",
+      "binaries": {
+        "void_project_manifest": "1ff575de629a34f2b82ede6a1e8df0b0ee14e0d294dde8963ba3a204bb853038",
+        "void_tests": "c490a5a54c473cfd65dcf66902117399315d4c0fa6105aefa29984fba8627aea",
+        "voidc": "fe49588471b2426d04408c20b68b41e9e3af8e1ae3e73a0c91b71e0623e65cc3",
+        "voidls": "e1fdbf46f3b6d01dcb9fa6a1cde05c75735320cb5e572b892f959fc9b3ecee7d"
+      }
+    },
+    {
+      "profile": "debug",
+      "tests_passed": 24,
+      "test_cases": [
+        {
+          "name": "project_manifest",
+          "status": "passed",
+          "seconds": 0.28803,
+          "summary": "project_manifest: 3442 checks passed"
+        },
+        {
+          "name": "project_manifest_no_authority",
+          "status": "passed",
+          "seconds": 0.436858,
+          "summary": "project_manifest: 3443 checks passed under syscall denial\nproject_manifest_no_authority: four live SIGSYS controls passed"
+        },
+        {
+          "name": "project_manifest_legacy",
+          "status": "passed",
+          "seconds": 0.768548,
+          "summary": "project_manifest_legacy: 15 checks passed"
+        },
+        {
+          "name": "project_manifest_provenance",
+          "status": "passed",
+          "seconds": 0.0422787,
+          "summary": "project_manifest_provenance: 3 file hashes and exact pinned upstream reconstruction passed"
+        },
+        {
+          "name": "cli_contract",
+          "status": "passed",
+          "seconds": 7.49044,
+          "summary": ""
+        },
+        {
+          "name": "cli_install_resources",
+          "status": "passed",
+          "seconds": 0.0937071,
+          "summary": ""
+        },
+        {
+          "name": "application_workflow_stage9",
+          "status": "passed",
+          "seconds": 13.7373,
+          "summary": ""
+        },
+        {
+          "name": "debug_cache_processes",
+          "status": "passed",
+          "seconds": 17.9655,
+          "summary": ""
+        },
+        {
+          "name": "automatic_cache_processes",
+          "status": "passed",
+          "seconds": 0.636015,
+          "summary": ""
+        },
+        {
+          "name": "os_errors",
+          "status": "passed",
+          "seconds": 21.7346,
+          "summary": ""
+        },
+        {
+          "name": "os_frontend",
+          "status": "passed",
+          "seconds": 46.0937,
+          "summary": ""
+        },
+        {
+          "name": "lsp_os",
+          "status": "passed",
+          "seconds": 9.2248,
+          "summary": ""
+        },
+        {
+          "name": "lsp_stage7",
+          "status": "passed",
+          "seconds": 0.32371,
+          "summary": ""
+        },
+        {
+          "name": "sessions",
+          "status": "passed",
+          "seconds": 0.223459,
+          "summary": ""
+        },
+        {
+          "name": "tooling",
+          "status": "passed",
+          "seconds": 0.462764,
+          "summary": ""
+        },
+        {
+          "name": "analysis",
+          "status": "passed",
+          "seconds": 0.786471,
+          "summary": ""
+        },
+        {
+          "name": "numeric",
+          "status": "passed",
+          "seconds": 5.33042,
+          "summary": ""
+        },
+        {
+          "name": "frontend",
+          "status": "passed",
+          "seconds": 9.66295,
+          "summary": ""
+        },
+        {
+          "name": "modules",
+          "status": "passed",
+          "seconds": 1.05162,
+          "summary": ""
+        },
+        {
+          "name": "local_libraries",
+          "status": "passed",
+          "seconds": 0.459559,
+          "summary": ""
+        },
+        {
+          "name": "source_cli",
+          "status": "passed",
+          "seconds": 3.83741,
+          "summary": ""
+        },
+        {
+          "name": "modules_cli",
+          "status": "passed",
+          "seconds": 46.6616,
+          "summary": ""
+        },
+        {
+          "name": "analysis_cli",
+          "status": "passed",
+          "seconds": 0.515142,
+          "summary": ""
+        },
+        {
+          "name": "numeric_cli",
+          "status": "passed",
+          "seconds": 29.0812,
+          "summary": ""
+        }
+      ],
+      "xml": "build/llvm23-debug/project-slice1-final.xml",
+      "xml_sha256": "aec1e48b82c899698be0c3e930d9e7d64e2f794f0afd70870b03ce054785f8bc",
+      "log": "build/project-slice1-debug-final-tests.log",
+      "log_sha256": "3cc54a93f58fa6e75ff66c387b1ff20f2f39f242dd1236789ac65d447708235d",
+      "binaries": {
+        "void_project_manifest": "a13a55ec287bc3abb4aa27b27f48ebeac818d98f33b8466214536d608438d36d",
+        "void_tests": "a2c4e0b206410695a75eed30c137bdee6eb69d6b06d87130cd2d90ede6bfda56",
+        "voidc": "c5af55b63ce364bfbcedc5ace57b49d8a874623cd2f020897dd86f619f04b865",
+        "voidls": "2dbfab185ea209a68507b9bbaff00171813277365d9ce02d76ffc2dcf2bca952"
+      }
+    },
+    {
+      "profile": "strict",
+      "tests_passed": 24,
+      "test_cases": [
+        {
+          "name": "project_manifest",
+          "status": "passed",
+          "seconds": 0.150986,
+          "summary": "project_manifest: 3442 checks passed"
+        },
+        {
+          "name": "project_manifest_no_authority",
+          "status": "passed",
+          "seconds": 0.257254,
+          "summary": "project_manifest: 3443 checks passed under syscall denial\nproject_manifest_no_authority: four live SIGSYS controls passed"
+        },
+        {
+          "name": "project_manifest_legacy",
+          "status": "passed",
+          "seconds": 1.57089,
+          "summary": "project_manifest_legacy: 15 checks passed"
+        },
+        {
+          "name": "project_manifest_provenance",
+          "status": "passed",
+          "seconds": 0.0379827,
+          "summary": "project_manifest_provenance: 3 file hashes and exact pinned upstream reconstruction passed"
+        },
+        {
+          "name": "cli_contract",
+          "status": "passed",
+          "seconds": 11.7254,
+          "summary": ""
+        },
+        {
+          "name": "cli_install_resources",
+          "status": "passed",
+          "seconds": 0.0889424,
+          "summary": ""
+        },
+        {
+          "name": "application_workflow_stage9",
+          "status": "passed",
+          "seconds": 31.5244,
+          "summary": ""
+        },
+        {
+          "name": "debug_cache_processes",
+          "status": "passed",
+          "seconds": 8.97426,
+          "summary": ""
+        },
+        {
+          "name": "automatic_cache_processes",
+          "status": "passed",
+          "seconds": 1.47398,
+          "summary": ""
+        },
+        {
+          "name": "os_errors",
+          "status": "passed",
+          "seconds": 21.6206,
+          "summary": ""
+        },
+        {
+          "name": "os_frontend",
+          "status": "passed",
+          "seconds": 40.3225,
+          "summary": ""
+        },
+        {
+          "name": "lsp_os",
+          "status": "passed",
+          "seconds": 6.67296,
+          "summary": ""
+        },
+        {
+          "name": "lsp_stage7",
+          "status": "passed",
+          "seconds": 0.493168,
+          "summary": ""
+        },
+        {
+          "name": "sessions",
+          "status": "passed",
+          "seconds": 0.284489,
+          "summary": ""
+        },
+        {
+          "name": "tooling",
+          "status": "passed",
+          "seconds": 0.687596,
+          "summary": ""
+        },
+        {
+          "name": "analysis",
+          "status": "passed",
+          "seconds": 1.12758,
+          "summary": ""
+        },
+        {
+          "name": "numeric",
+          "status": "passed",
+          "seconds": 6.60996,
+          "summary": ""
+        },
+        {
+          "name": "frontend",
+          "status": "passed",
+          "seconds": 11.7088,
+          "summary": ""
+        },
+        {
+          "name": "modules",
+          "status": "passed",
+          "seconds": 1.56811,
+          "summary": ""
+        },
+        {
+          "name": "local_libraries",
+          "status": "passed",
+          "seconds": 1.04402,
+          "summary": ""
+        },
+        {
+          "name": "source_cli",
+          "status": "passed",
+          "seconds": 14.8236,
+          "summary": ""
+        },
+        {
+          "name": "modules_cli",
+          "status": "passed",
+          "seconds": 58.5919,
+          "summary": ""
+        },
+        {
+          "name": "analysis_cli",
+          "status": "passed",
+          "seconds": 1.14935,
+          "summary": ""
+        },
+        {
+          "name": "numeric_cli",
+          "status": "passed",
+          "seconds": 48.7229,
+          "summary": ""
+        }
+      ],
+      "xml": "build/llvm23-strict/project-slice1-final.xml",
+      "xml_sha256": "df66d8eee8e8e4a0327a478b5765d18e07bbd0621da7569497ca0a6820ff0b2c",
+      "log": "build/project-slice1-strict-final-tests.log",
+      "log_sha256": "02d156cbfba0c499c34639150e473009f9117c23f4d2962172986361ad8663f2",
+      "binaries": {
+        "void_project_manifest": "83f653bdac838cf7f539cdf1a92ab99c356d6a10f76c0a76759ac69e5a16195d",
+        "void_tests": "fba753b96086c4a7109df62052c2a1dff9358fd492280412094bdba02696a327",
+        "voidc": "8ec3d6de618ec82ad8b861e2216129f0310e95729a06e157b612935a78e91aa8",
+        "voidls": "8017cdd61ddc84ee7b5628801d41d5e4ebf3215467559abe920ac14780324fec"
+      }
+    }
+  ],
+  "final_selected_ctest_outcomes": {
+    "passed": 72,
+    "failed": 0,
+    "entire_repository_suite": false
+  },
+  "release_install": {
+    "xml": "build/llvm23-release/project-slice1-install-final.xml",
+    "xml_sha256": "85f6d1944333c7930b1019a8dd8064e85a832d3856cdc708e4a0359a85fb020f",
+    "passed": 1,
+    "failed": 0
+  },
+  "extra_checks": {
+    "small_stack": [
+      {
+        "profile": "release",
+        "stack_bytes": 1048576,
+        "exit_code": 0,
+        "stdout": "project_manifest: 3442 checks passed",
+        "log": "build/project-slice1-release-small-stack.log"
+      },
+      {
+        "profile": "debug",
+        "stack_bytes": 1048576,
+        "exit_code": 0,
+        "stdout": "project_manifest: 3442 checks passed",
+        "log": "build/project-slice1-debug-small-stack.log"
+      },
+      {
+        "profile": "strict",
+        "stack_bytes": 1048576,
+        "exit_code": 0,
+        "stdout": "project_manifest: 3442 checks passed",
+        "log": "build/project-slice1-strict-small-stack.log"
+      }
+    ],
+    "notice_installs": [
+      {
+        "component": "compiler",
+        "exit_code": 0,
+        "license_provenance_patch": "exact-match",
+        "log": "build/project-slice1-install-compiler.log"
+      },
+      {
+        "component": "tooling",
+        "exit_code": 0,
+        "license_provenance_patch": "exact-match",
+        "log": "build/project-slice1-install-tooling.log"
+      }
+    ]
+  },
+  "retained_pre_repair_failures": [
+    {
+      "profile": "debug",
+      "passed": 22,
+      "failed": 2,
+      "failures": [
+        {
+          "name": "project_manifest",
+          "output": "void_project_manifest: /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15487: bool toml::impl::parser::parse_key(): Assertion `is_bare_key_character(*cp) || is_string_delimiter(*cp)' failed.\n"
+        },
+        {
+          "name": "project_manifest_no_authority",
+          "output": "void_project_manifest: /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15487: bool toml::impl::parser::parse_key(): Assertion `is_bare_key_character(*cp) || is_string_delimiter(*cp)' failed.\n"
+        }
+      ],
+      "xml": "build/project-slice1-debug-first-tests.xml",
+      "xml_sha256": "8f8f19a589b642752f0a5aeddef2985238f3a4967374ac660b10848c5f6b8cf8",
+      "log": "build/project-slice1-debug-tests.log",
+      "log_sha256": "874bf705d693a32ca640500cd5c95e322aa1a34ce447ee8a9902497c9f3e247e"
+    },
+    {
+      "profile": "strict",
+      "passed": 22,
+      "failed": 2,
+      "failures": [
+        {
+          "name": "project_manifest",
+          "output": "/home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15487:4: runtime error: assumption is violated during execution\n    #0 0x5644a765aacb in toml::v3::impl::impl_noex::parser::parse_key() /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15487:4\n    #1 0x5644a764fb35 in toml::v3::impl::impl_noex::parser::parse_table_header() /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15609:5\n    #2 0x5644a764c862 in toml::v3::impl::impl_noex::parser::parse_document() /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15916:22\n    #3 0x5644a764b997 in toml::v3::impl::impl_noex::parser::parser(toml::v3::impl::utf8_reader_interface&&) /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:16001:6\n    #4 0x5644a762f3c6 in toml::v3::impl::do_parse(toml::v3::impl::utf8_reader_interface&&) /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:16212:10\n    #5 0x5644a762f3c6 in toml::v3::noex::parse(std::basic_string_view<char, std::char_traits<char>>, std::basic_string_view<char, std::char_traits<char>>) /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:16279:10\n    #6 0x5644a762f3c6 in vd::project::ManifestParser::parse() /home/shmellyorc/Documents/Void.Language/src/frontend/project.cpp:304:23\n    #7 0x5644a762db5c in vd::project::parse_manifest(vd::SourceFile const&) /home/shmellyorc/Documents/Void.Language/src/frontend/project.cpp:366:86\n    #8 0x5644a76267d2 in (anonymous namespace)::parse(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>) /home/shmellyorc/Documents/Void.Language/tests/project/manifest.cpp:62:12\n    #9 0x5644a76126cb in (anonymous namespace)::mutations() /home/shmellyorc/Documents/Void.Language/tests/project/manifest.cpp:232:27\n    #10 0x5644a76126cb in main /home/shmellyorc/Documents/Void.Language/tests/project/manifest.cpp:293:89\n    #11 0x7f2c1ca2a3fd  (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a3fd) (BuildId: a6ece0eae08c71f58eaefb817ae72b57782127d3)\n    #12 0x7f2c1ca2a51a in __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a51a) (BuildId: a6ece0eae08c71f58eaefb817ae72b57782127d3)\n    #13 0x5644a75193f4 in _start (/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_project_manifest+0x4a63f4)\n\nSUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15487:4 \n"
+        },
+        {
+          "name": "project_manifest_no_authority",
+          "output": "/home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15487:4: runtime error: assumption is violated during execution\n"
+        }
+      ],
+      "xml": "build/project-slice1-strict-first-tests.xml",
+      "xml_sha256": "7b862217c3970a7de9ab0fc29c55b8d0363b244771b59b3c43f272db4ff38b89",
+      "log": "build/project-slice1-strict-tests.log",
+      "log_sha256": "a4887e8a7c7c3bc8ccefe2820613cc00fbceb37e427b9645eda7ed39ac6beba4"
+    }
+  ],
+  "reproducer": {
+    "path": "docs/projects/evidence/slice1-malformed-header.toml",
+    "sha256": "7904b2e1a98cfa5dbd6d3aa82ad6b605a00bbe4e3c1ddb58dd787d6620d7405e",
+    "gdb_log": "build/project-slice1-debug-crash.log",
+    "gdb_log_sha256": "1d1185f77011c1c6a75814edc338a317a00861bca6e3bdf81b3e4f1dc1bec6a9",
+    "cause": "Invalid table-header key starter reached an upstream assertion/optimizer assumption. Runtime validation now precedes it; assertions and fatal sanitizers retained."
+  },
+  "early_build_iterations": [
+    "Target initially requested before CMake reconfiguration (exit 2).",
+    "Private vendor previous-definition field initially inserted into wrong class; corrected before qualification.",
+    "Diagnostic vector resize required an unavailable default constructor; replaced with erasure.",
+    "Test string used deduced const char pointer; corrected to owning string.",
+    "a.CON/file.void was incorrectly expected invalid by a test; existing first-dot device-stem policy correctly accepts it."
+  ],
+  "remaining_unqualified": [
+    "Native Windows",
+    "Native macOS",
+    "Hosted seven-job CI",
+    "Actual new editor UI"
+  ],
+  "commands": {
+    "build": "cmake --build build/llvm23-<profile> --target void_project_manifest void_tests voidc voidls -j2",
+    "ctest_regex": "^(project_manifest.*|cli_contract|cli_install_resources|frontend|modules|numeric|analysis|tooling|sessions|source_cli|modules_cli|analysis_cli|numeric_cli|local_libraries|application_workflow_stage9|debug_cache_processes|automatic_cache_processes|os_frontend|lsp_os|os_errors|lsp_stage7)$",
+    "ctest": "ctest --test-dir build/llvm23-<profile> --output-on-failure --output-junit project-slice1-final.xml -j2 -R <ctest_regex>",
+    "small_stack": "each manifest fixture run with RLIMIT_STACK soft/hard 1048576; fatal sanitizer environment retained",
+    "notice_install": "cmake --install build/llvm23-release --config Release --component <compiler|tooling> --prefix <fresh-temporary-prefix>"
+  }
+}

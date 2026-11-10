@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="20"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="73"
+	timestamp="2026-11-08T19:45:02"
+	>
+	<testcase name="project_discovery_cli" classname="project_discovery_cli" time="18.8036" status="run">
+		<properties/>
+		<system-out>project_discovery_cli: 88 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_nested_cli" classname="project_nested_cli" time="1.54843" status="run">
+		<properties/>
+		<system-out>project_nested_cli: 11 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_fields" classname="stage10_fields" time="0.947859" status="run">
+		<properties/>
+		<system-out>54 field policy checks passed
+</system-out>
+	</testcase>
+	<testcase name="fixed_arrays_source" classname="fixed_arrays_source" time="3.69784" status="run">
+		<properties/>
+		<system-out>source array normal: 158 failing allocation budgets, recovery and cleanup passed
+source array O2: 158 failing allocation budgets, recovery and cleanup passed
+Numeric fixed arrays: source execution, roots, publication and failure recovery passed
+</system-out>
+	</testcase>
+	<testcase name="fixed_arrays_cli" classname="fixed_arrays_cli" time="10.3463" status="run">
+		<properties/>
+		<system-out>-- Real numeric fixed-array programs passed JIT and linked AOT, normal/O2
+</system-out>
+	</testcase>
+	<testcase name="async_ir" classname="async_ir" time="0.298565" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="reload" classname="reload" time="1.03961" status="run">
+		<properties/>
+		<system-out>reload: passed
+</system-out>
+	</testcase>
+	<testcase name="gc" classname="gc" time="0.155593" status="run">
+		<properties/>
+		<system-out>gc: passed
+</system-out>
+	</testcase>
+	<testcase name="native" classname="native" time="0.0878334" status="run">
+		<properties/>
+		<system-out>JIT session error: Symbols not found: [ missing_native ]
+native: passed
+</system-out>
+	</testcase>
+	<testcase name="sessions" classname="sessions" time="0.309305" status="run">
+		<properties/>
+		<system-out>sessions: passed
+</system-out>
+	</testcase>
+	<testcase name="analysis" classname="analysis" time="1.1709" status="run">
+		<properties/>
+		<system-out>normal: body edit 53 -&gt; 61, const edit rejected, old lease 53; concurrent calls 361714
+O2: body edit 53 -&gt; 61, const edit rejected, old lease 53; concurrent calls 530980
+analysis: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric" classname="numeric" time="7.72913" status="run">
+		<properties/>
+		<system-out>210 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed
+numeric: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric_enum_ir" classname="numeric_enum_ir" time="1.06075" status="run">
+		<properties/>
+		<system-out>enum: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+enum initialized: accepted
+field: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+field initialized: accepted
+array: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+array initialized: accepted
+field-array: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+field-array initialized: accepted
+array-field: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+array-field initialized: accepted
+nested: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+nested initialized: accepted
+managed: rejected (VOID IR: non-nullable reference storage read before initialization in /enum-storage.void::probe)
+managed initialized: accepted
+zero-backed holder: rejected (VOID IR: nominal source objects require complete construction)...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="numeric_enum_process" classname="numeric_enum_process" time="26.354" status="run">
+		<properties/>
+		<system-out>S6 542 boundary pairs, 39 invalid sources and 62 executed processes
+</system-out>
+	</testcase>
+	<testcase name="numeric_enum_lsp" classname="numeric_enum_lsp" time="0.21497" status="run">
+		<properties/>
+		<system-out>S6 LSP passed 15 recorded requests and overlay revisions
+</system-out>
+	</testcase>
+	<testcase name="frontend" classname="frontend" time="14.5992" status="run">
+		<properties/>
+		<system-out>Frontend begin: diagnostics
+50+ source diagnostic cases and UTF-8/ABI checks passed
+Frontend passed: diagnostics
+Frontend begin: programs
+Real .void files and independent programs executed through normal/O2 JIT
+Frontend passed: programs
+Frontend begin: numeric values
+1216 constant/normal/O2 numeric matrix comparisons passed
+Readonly/compile-time constants, numeric boundaries, concurrent failures, bounded traces and restart checks passed
+Frontend passed: numeric values
+Frontend begin: diagnostic recovery/resource limits
+Frontend resource case: combined expression/constant depth
+Structured diagnostics: independent files, recovery, bounded cascades, snapshots and failed reload verified
+Frontend passed: diagnostic recovery/resource limits
+Frontend begin: value structs
+Frontend resource case: bounded expanded value layouts
+Value struct source: nested/mixed layouts, copies, normal/O2 JIT, diagnostics, tooling and reload passed
+Frontend passed: value structs
+Frontend begin: receiver methods
+Frontend resource case: b...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="modules" classname="modules" time="1.8281" status="run">
+		<properties/>
+		<system-out>Project constants, forwards, visibility, cycles, imports and restart checks passed
+Project-local library identities, cycles, ownership, overlays, native JIT and invalidation passed
+Multi-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed
+modules: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric_sprint2" classname="numeric_sprint2" time="6.19545" status="run">
+		<properties/>
+		<system-out>Sprint 2: 71 argument/numeric/diagnostic normal/O2 JIT and linked AOT checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_fields_aot" classname="stage10_fields_aot" time="1.27008" status="run">
+		<properties/>
+		<system-out>16 field JIT/AOT checks passed
+</system-out>
+	</testcase>
+	<testcase name="numeric_cli" classname="numeric_cli" time="48.5003" status="run">
+		<properties/>
+		<system-out>-- Numeric source constants, JIT and native AOT passed in both optimization modes
+</system-out>
+	</testcase>
+</testsuite>

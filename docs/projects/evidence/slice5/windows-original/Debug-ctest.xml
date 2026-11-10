@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Win32-ninja"
+	tests="14"
+	failures="2"
+	disabled="0"
+	skipped="0"
+	hostname="DESKTOP-N4VH0F7"
+	time="150"
+	timestamp="2026-11-08T17:19:32"
+	>
+	<testcase name="project_manifest_header" classname="project_manifest_header" time="0.182392" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="project_manifest" classname="project_manifest" time="0.441207" status="run">
+		<properties/>
+		<system-out>project_manifest: 8788 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_legacy" classname="project_manifest_legacy" time="10.0584" status="run">
+		<properties/>
+		<system-out>project_manifest_legacy: 18 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_selection" classname="project_selection" time="46.8964" status="run">
+		<properties/>
+		<system-out>UNQUALIFIED: native symlink privilege A required privilege is not held by the client.
+project_selection: 353 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_sessions" classname="project_sessions" time="0.813608" status="run">
+		<properties/>
+		<system-out>project_sessions: 166 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_creation" classname="project_creation" time="0.238725" status="run">
+		<properties/>
+		<system-out>creation: entropy, reviewed directory, external collision, rollback ownership, staged content passed
+</system-out>
+	</testcase>
+	<testcase name="project_creation_process" classname="project_creation_process" time="1.11416" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "C:\Users\a\VoidCI42377496702-Native\tests\project\creation.py", line 81, in &lt;module&gt;
+    run("new", app_root, "--source", "tools/launcher.void", "--name", 'Orbit "Pilot" \\',
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "--version", "1.2.3-beta.4+qual")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidCI42377496702-Native\tests\project\creation.py", line 44, in run
+    return invoke(compiler, *args, status=status, cwd=cwd)
+  File "C:\Users\a\VoidCI42377496702-Native\tests\project\creation.py", line 29, in invoke
+    assert result.returncode == status, record
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'argv': ['C:\\Users\\a\\VoidS5-Final-Debug\\voidc.exe', 'new', 'C:\\Users\\a\\VoidS5-tmp-Debug\\VOID S5 creation n51sqtff\\arbitrary', '--source', 'tools/launcher.void', '--name', 'Orbit "Pilot" \\', '--version', '1.2.3-beta.4+qual'], 'cwd': 'C:\\Users\\a\\VoidS5-tmp-Debug\\VOID S5 creation n51sqtff', 'status': 1, 'stdout': 'Manifest: C:/Users/a/VoidS5-tmp-Debug/VOID S5 creation n51sqtff/arbitrary/void.project.toml\r\nProject ID: local.pf20b2af1a5f45a987071a2572ec67a60\r\nApplication ID: local.aebe55fc4ece083dcb8f7a0497df0fb43\r\nNext: voidc check --project "C:/Users/a/VoidS5-tmp-Debug/VOID S5 creation n51sqtff/arbitrary"\r\n', 'stderr': 'Cannot publish project exclusively (Windows error 5).\r\n'}
+</system-out>
+	</testcase>
+	<testcase name="project_application" classname="project_application" time="107.137" status="run">
+		<properties/>
+		<system-out>Application cache: unavailable/unavailable
+project_application: 63 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_application_process" classname="project_application_process" time="87.8676" status="run">
+		<properties/>
+		<system-out>project_application_process: 61 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_discovery_cli" classname="project_discovery_cli" time="21.9113" status="run">
+		<properties/>
+		<system-out>UNQUALIFIED: native persistent disk cache; project selection rejection is still exercised
+project_discovery_cli: 88 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_profiles" classname="project_profiles" time="4.38003" status="run">
+		<properties/>
+		<system-out>UNQUALIFIED: native persistent disk cache warm hit
+project_profiles: 43 process checks passed; compute instruction counts O0=8, O2=2, release --no-opt=8
+</system-out>
+	</testcase>
+	<testcase name="project_protocol" classname="project_protocol" time="2.87247" status="run">
+		<properties/>
+		<system-out>project_protocol: 169 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_nested_cli" classname="project_nested_cli" time="2.12067" status="run">
+		<properties/>
+		<system-out>project_nested_cli: 11 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="cli_install" classname="cli_install" time="7.45383" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>VOID Language Compiler v0.1.0 (development)
+LLVM 23.1.4
+Target: x86_64-pc-windows-msvc
+Build identity: f8cba66ab433f04b1d476c009d9676705f212128cd43104c4a34b44fcf6c8039
+PASS: installed stdlib check, optimized/Debug run, native build/run, resource hashes and LSP handshake
+Traceback (most recent call last):
+  File "C:\Users\a\VoidCI42377496702-Native\tests\cli\install.py", line 42, in &lt;module&gt;
+    run([compiler, 'new', generated, '--source', 'nested/launcher.void'])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidCI42377496702-Native\tests\cli\install.py", line 20, in run
+    assert result.returncode == status, (argv, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ([WindowsPath('C:/Users/a/VoidS5-tmp-Debug/VOID CLI installation [NON-UTF-8-BYTE-0xE9] lad3pt67/after move \u96ea/bin/voidc.exe'), 'new', WindowsPath('C:/Users/a/VoidS5-tmp-Debug/VOID CLI installation [NON-UTF-8-BYTE-0xE9] lad3pt67/created outside checkout'), '--source', 'nested/launcher.void'], 1, b'Manifest: C:/Users/a/VoidS5-tmp-Debug/VOID CLI installation \xc3\xa9 lad3pt67/created outside checkout/void.project.toml\r\nProject ID: local.p63436ecc8e591915d985a29335033297\r\nApplication ID: local.ab9d9fcd790a69cfcbeaf8b71c2af65c9\r\nNext: voidc check --project "C:/Users/a/VoidS5-tmp-Debug/VOID CLI installation \xc3\xa9 lad3pt67/created outside checkout"\r\n', b'Cannot publish project exclusively (Windows error 5).\r\n')
+</system-out>
+	</testcase>
+</testsuite>

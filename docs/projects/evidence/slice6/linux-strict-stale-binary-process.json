@@ -1,0 +1,81 @@
+{
+  "boundary_cases": 542,
+  "records": [
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+        "run",
+        "/tmp/VOID S6 numeric enum rl6t03ck/matrix.void",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+        "build",
+        "/tmp/VOID S6 numeric enum rl6t03ck/matrix.void",
+        "-o",
+        "/tmp/VOID S6 numeric enum rl6t03ck/matrix-normal",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID S6 numeric enum rl6t03ck/matrix-normal\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/VOID S6 numeric enum rl6t03ck/matrix-normal"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+        "run",
+        "/tmp/VOID S6 numeric enum rl6t03ck/matrix.void",
+        "--no-cache"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+        "build",
+        "/tmp/VOID S6 numeric enum rl6t03ck/matrix.void",
+        "-o",
+        "/tmp/VOID S6 numeric enum rl6t03ck/matrix-o2"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID S6 numeric enum rl6t03ck/matrix-o2\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/VOID S6 numeric enum rl6t03ck/matrix-o2"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+        "run",
+        "/tmp/VOID S6 numeric enum rl6t03ck/integration.void",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID S6 numeric enum rl6t03ck/integration.void:18:13: error: Field 'state' must be initialized before it is read.\n    code: VOID1106\n\n 18 |     if self.state == modes.mode.loud:\n    |             ^^^^^\n    Module: /integration.void\n    Hint: Construction views cannot become ordinary references before successful initialization and commit.\n\n/tmp/VOID S6 numeric enum rl6t03ck/modes.void:14:13: error: Field 'cached' must be initialized before it is read.\n    code: VOID1106\n\n 14 |     if self.cached is Some(mode.loud):\n    |             ^^^^^^\n    Module: /modes.void\n    Hint: Construction views cannot become ordinary references before successful initialization and commit.\n\n"
+    }
+  ]
+}

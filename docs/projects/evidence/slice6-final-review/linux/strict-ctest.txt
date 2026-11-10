@@ -1,0 +1,45 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-strict
+      Start 377: numeric_enum_process
+      Start  14: project_discovery_cli
+ 1/20 Test  #14: project_discovery_cli ............   Passed   18.80 sec
+      Start 416: numeric_cli
+ 2/20 Test #377: numeric_enum_process .............   Passed   26.35 sec
+      Start 112: fixed_arrays_cli
+ 3/20 Test #112: fixed_arrays_cli .................   Passed   10.35 sec
+      Start 381: numeric_sprint2
+ 4/20 Test #381: numeric_sprint2 ..................   Passed    6.20 sec
+      Start 379: frontend
+ 5/20 Test #379: frontend .........................   Passed   14.60 sec
+      Start  98: fixed_arrays_source
+ 6/20 Test  #98: fixed_arrays_source ..............   Passed    3.70 sec
+      Start 375: numeric
+ 7/20 Test #416: numeric_cli ......................   Passed   48.50 sec
+      Start  17: project_nested_cli
+ 8/20 Test  #17: project_nested_cli ...............   Passed    1.55 sec
+      Start 389: stage10_fields_aot
+ 9/20 Test #375: numeric ..........................   Passed    7.73 sec
+      Start 367: reload
+10/20 Test #367: reload ...........................   Passed    1.04 sec
+      Start 376: numeric_enum_ir
+11/20 Test #389: stage10_fields_aot ...............   Passed    1.27 sec
+      Start  56: stage10_fields
+12/20 Test #376: numeric_enum_ir ..................   Passed    1.06 sec
+      Start 380: modules
+13/20 Test  #56: stage10_fields ...................   Passed    0.95 sec
+      Start 374: analysis
+14/20 Test #374: analysis .........................   Passed    1.17 sec
+      Start 372: sessions
+15/20 Test #372: sessions .........................   Passed    0.31 sec
+      Start 378: numeric_enum_lsp
+16/20 Test #378: numeric_enum_lsp .................   Passed    0.21 sec
+      Start 368: gc
+17/20 Test #380: modules ..........................   Passed    1.83 sec
+      Start 317: async_ir
+18/20 Test #368: gc ...............................   Passed    0.16 sec
+      Start 369: native
+19/20 Test #369: native ...........................   Passed    0.09 sec
+20/20 Test #317: async_ir .........................   Passed    0.30 sec
+
+100% tests passed, 0 tests failed out of 20
+
+Total Test time (real) =  73.35 sec

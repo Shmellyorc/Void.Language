@@ -72,6 +72,9 @@ struct ProjectCapture {
         if(!parsed.succeeded())throw CompilationError(std::move(parsed.diagnostics));
         manifest=std::move(parsed.manifest);
         anchor=manifest->source();from.source=anchor;
+        if (!manifest->dependencies().empty())
+            project_failure(anchor, Code::project_reserved, "Dependency compilation is not supported in this compiler.",
+                "Use voidc resolve --project <directory> to verify the local dependency graph.");
         if (!manifest->native().empty()) {
 #ifdef _WIN32
             constexpr auto platform = "windows";

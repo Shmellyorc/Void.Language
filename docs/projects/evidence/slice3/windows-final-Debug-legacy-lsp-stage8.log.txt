@@ -1,0 +1,7 @@
+Debug cache: unavailable
+Debug cache: unavailable
+Windows drive discovery fixture: {"original": "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID discovery \u00e9\ud83d\ude00 # % l5en0kep", "canonical": "C:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID discovery \u00e9\ud83d\ude00 # % l5en0kep", "expanded_lower": "c:\\Users\\a\\VoidSlice3-Corrected-20261108\\native-private-temp\\VOID discovery \u00e9\ud83d\ude00 # % l5en0kep"}
+Windows unrelated mapped-drive rejection passed
+Windows short/long workspace ancestor checks passed
+Windows upper/lower drive workspace and active checks passed
+Stage 8 compiler-backed LSP discovery/docs/readonly checks passed

@@ -1,0 +1,2 @@
+UNQUALIFIED: native symlink privilege A required privilege is not held by the client.
+project_selection: 309 checks passed

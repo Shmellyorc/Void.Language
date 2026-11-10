@@ -1,0 +1,81 @@
+{
+  "boundary_cases": 574,
+  "records": [
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID S6 numeric enum _dyaav1b/matrix.void",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "build",
+        "/tmp/VOID S6 numeric enum _dyaav1b/matrix.void",
+        "-o",
+        "/tmp/VOID S6 numeric enum _dyaav1b/matrix-normal",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID S6 numeric enum _dyaav1b/matrix-normal\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/VOID S6 numeric enum _dyaav1b/matrix-normal"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID S6 numeric enum _dyaav1b/matrix.void",
+        "--no-cache"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "build",
+        "/tmp/VOID S6 numeric enum _dyaav1b/matrix.void",
+        "-o",
+        "/tmp/VOID S6 numeric enum _dyaav1b/matrix-o2"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID S6 numeric enum _dyaav1b/matrix-o2\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/VOID S6 numeric enum _dyaav1b/matrix-o2"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID S6 numeric enum _dyaav1b/integration.void",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID S6 numeric enum _dyaav1b/integration.void:37:13: error: Cannot infer generic parameter 't'; supply explicit type arguments.\n    code: VOID2001\n\n 37 |     if not (identity(next(255) as? modes.mode) is Some(var loud)) or not (next(-1) as? modes.mode is None):\n    |             ^^^^^^^^\n    Module: /integration.void\n\n/tmp/VOID S6 numeric enum _dyaav1b/integration.void:37:51: error: Unknown struct type in pattern.\n    code: VOID1103\n\n 37 |     if not (identity(next(255) as? modes.mode) is Some(var loud)) or not (next(-1) as? modes.mode is None):\n    |                                                   ^^^^\n    Module: /integration.void\n\n/tmp/VOID S6 numeric enum _dyaav1b/integration.void:39:28: error: Unknown identifier 'loud'.\n    code: VOID2002\n\n 39 |     if evaluations != 2 or loud != modes.mode.loud:\n    |                            ^^^^\n    Module: /integration.void\n    Hint: Declare it with var before use.\n\n/tmp/VOID S6 numeric enum _dyaav1b/integration.void:42:42: error: Unknown identifier 'loud'.\n    code: VOID2002\n\n 42 |     if shadow.value != 21 or modes.score(loud) != 19:\n    |                                          ^^^^\n    Module: /integration.void\n    Hint: Declare it with var before use.\n\n/tmp/VOID S6 numeric enum _dyaav1b/integration.void:44:34: error: Unknown identifier 'loud'.\n    code: VOID2002\n\n 44 |     var data = record(previous = loud)\n    |                                  ^^^^\n    Module: /integration.void\n    Hint: Declare it with var before use.\n\n"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+/tmp/tmp.SQN0tAdqq3/game.void:2:23: error: Incorrect argument count: missing required argument 'app_id'.
+    code: VOID2004
+
+ 2 | var location = system.data_dir()
+   |                       ^^^^^^^^
+    Module: /game.void
+    Hint: Supply an explicit constructed value or every required argument.
+
+/tmp/tmp.SQN0tAdqq3/game.void:4:20: error: Unknown struct type in pattern.
+    code: VOID1103
+
+ 4 |     if location is Ok(var path):
+   |                    ^^
+    Module: /game.void
+
+/tmp/tmp.SQN0tAdqq3/game.void:5:15: error: Unknown identifier 'path'.
+    code: VOID2002
+
+ 5 |         print(path)
+   |               ^^^^
+    Module: /game.void
+    Hint: Declare it with var before use.
+

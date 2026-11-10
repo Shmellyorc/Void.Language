@@ -1,0 +1,4 @@
+CMAKE_BUILD_TYPE:STRING=Debug
+LLVM_DIR:UNINITIALIZED=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+VOID_LLVM_RESEARCH:BOOL=ON
+VOID_SANITIZERS:BOOL=OFF

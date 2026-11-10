@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "C:\Users\a\VoidS7-Raylib-Compatibility\compat-software.py", line 37, in <module>
+    run('build',[sdk/'clang.exe','--target=x86_64-pc-windows-msvc','-fuse-ld=lld','-fms-runtime-lib=static',
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '-std=c11','-O2','-shared','-D_CRT_SECURE_NO_WARNINGS','-DBUILD_LIBTYPE_SHARED',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '-DPLATFORM_DESKTOP_WIN32','-DGRAPHICS_API_OPENGL_SOFTWARE',*sources,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '-lgdi32','-lwinmm','-lshcore','-luser32','-lshell32','-Wl,/implib:'+str(implib),'-o',dll])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidS7-Raylib-Compatibility\compat-software.py", line 29, in run
+    completed.check_returncode()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\subprocess.py", line 509, in check_returncode
+    raise CalledProcessError(self.returncode, self.args, self.stdout,
+                             self.stderr)
+subprocess.CalledProcessError: Command '['C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\clang.exe', '--target=x86_64-pc-windows-msvc', '-fuse-ld=lld', '-fms-runtime-lib=static', '-std=c11', '-O2', '-shared', '-D_CRT_SECURE_NO_WARNINGS', '-DBUILD_LIBTYPE_SHARED', '-DPLATFORM_DESKTOP_WIN32', '-DGRAPHICS_API_OPENGL_SOFTWARE', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src\\rcore.c', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src\\rshapes.c', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src\\rtextures.c', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src\\rtext.c', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src\\rmodels.c', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\raylib-6.0\\src\\raudio.c', '-lgdi32', '-lwinmm', '-lshcore', '-luser32', '-lshell32', '-Wl,/implib:C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software\\raylib.lib', '-o', 'C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-win32-software\\raylib.dll']' returned non-zero exit status 1.

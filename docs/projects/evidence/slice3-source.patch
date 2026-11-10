@@ -1,0 +1,2135 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -350,10 +350,23 @@
+   target_link_libraries(void_project_selection PRIVATE void_core)
+   add_test(NAME project_selection COMMAND void_project_selection)
+   set_tests_properties(project_selection PROPERTIES TIMEOUT 300)
++  add_executable(void_project_sessions tests/project/sessions.cpp)
++  target_link_libraries(void_project_sessions PRIVATE void_llvm void_runtime)
++  add_test(NAME project_sessions COMMAND void_project_sessions)
++  set_tests_properties(project_sessions PROPERTIES TIMEOUT 180)
+   add_test(NAME project_discovery_cli COMMAND "${Python3_EXECUTABLE}"
+     "${PROJECT_SOURCE_DIR}/tests/project/discovery.py" "$<TARGET_FILE:voidc>"
+     "${CMAKE_CURRENT_BINARY_DIR}/project-discovery-evidence.json")
+   set_tests_properties(project_discovery_cli PROPERTIES TIMEOUT 300)
++  add_test(NAME project_profiles COMMAND "${Python3_EXECUTABLE}"
++    "${PROJECT_SOURCE_DIR}/tests/project/profiles.py" "$<TARGET_FILE:voidc>"
++    "${LLVM_TOOLS_BINARY_DIR}/llvm-objdump${CMAKE_EXECUTABLE_SUFFIX}"
++    "${CMAKE_CURRENT_BINARY_DIR}/project-profiles-evidence.json")
++  set_tests_properties(project_profiles PROPERTIES TIMEOUT 240)
++  add_test(NAME project_protocol COMMAND "${Python3_EXECUTABLE}"
++    "${PROJECT_SOURCE_DIR}/tests/project/protocol.py" "$<TARGET_FILE:voidls>"
++    "${CMAKE_CURRENT_BINARY_DIR}/project-protocol-evidence.json")
++  set_tests_properties(project_protocol PROPERTIES TIMEOUT 180)
+   add_test(NAME project_nested_cli COMMAND "${Python3_EXECUTABLE}"
+     "${PROJECT_SOURCE_DIR}/tests/project/nested.py" "$<TARGET_FILE:voidc>"
+     "${CMAKE_CURRENT_BINARY_DIR}/project-nested-evidence.json")
+diff --git a/docs/CLI.md b/docs/CLI.md
+--- a/docs/CLI.md
++++ b/docs/CLI.md
+@@ -1,4 +1,31 @@
+ # voidc command reference
++
++## Manifest project profiles (Slice 3)
++
++`--profile debug|release` is project-only on check/run/build/emit. An explicit
++source file keeps legacy semantics and rejects this option with usage status 2.
++Default project selection is release; manifest settings apply, then `--no-opt`.
++`--cache` may replace an implicit release default with debug, but cannot override
++an explicitly selected release profile. It requires effective debug optimization
++`none`; a custom debug/O2 setting therefore conflicts unless explicit `--no-opt`
++disables it. `--no-cache` remains run-only and changes persistence, not optimization.
++Conflicts, duplicate profile options and unknown profile names are usage errors.
++
++Only the selected profile's unsupported `debug_info="line"` or `"full"` emits the
++owned structured warning **VOID5012**, including on project check. `none` is quiet.
++The requested value remains in the immutable manifest. Profile-controlled debug
++information modes are not implemented: existing backend source/type/location
++metadata behavior is retained, so `none` does not newly strip those records and a
++line/full request does not establish that its requested symbols were generated.
++Standalone commands receive no new warning or behavior change. This limitation
++and warning policy were explicitly approved for S3; actual mode-specific emission
++remains a separate review milestone.
++
++The conservative project selection digest plus effective profile settings belongs
++to build/cache provenance. It is distinct from semantic project context and the
++future Runtime application identity. Every project invocation still revalidates
++selection before cache use. See [Slice 3 qualification](projects/SLICE3.md).
++
+ 
+ Slice 1's compiler-library manifest parser is now used by Slice 2's compiler-owned
+ project selection. [Slice 1 evidence](projects/SLICE1_CLOSEOUT.md) remains historical;
+@@ -28,13 +55,13 @@
+ bypasses automatic seed scanning; invalid overrides never fall back. Bare explicit
+ files never acquire project context from an adjacent manifest. A library `--entry`
+ is a usage conflict. Paths cannot cross child project boundaries. API callers can
+-supply frozen named source and TOML overlays separately; editor protocol integration
+-remains Slice 3. No editor resolver or UI is introduced here.
++supply frozen named source and TOML overlays separately; Slice 3 integrates those
++inputs into ToolingSession/voidls and VS Code without an editor-side resolver.
+ 
+-`--profile debug|release`, creation and resolver/package commands remain future
+-syntax from the [Phase 1 ownership contract](PROJECT_ARCHITECTURE_ROADMAP.md#phase-1-ownership-and-data-flow).
+-Slice 2 retains O2 default, `--no-opt` and existing cache flags; parsed profile fields
+-are metadata, not yet an applied CLI profile. Proposed examples only:
++`--profile debug|release` is implemented in Slice 3 with the precedence and warning
++contract above. The [Phase 1 ownership contract](PROJECT_ARCHITECTURE_ROADMAP.md#phase-1-ownership-and-data-flow)
++retains future creation and resolver/package workflows. The build example is supported;
++init/new examples remain proposed only:
+ 
+ ```text
+ voidc build --project . --entry src/launcher.void --profile debug
+@@ -50,9 +77,9 @@
+ ## Future project commands, 8 November 2026
+ 
+ The [project roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) proposes `voidc init` and
+-`voidc new`, profile selection and eventual resolve/package workflows. Those
+-forms remain future commands/options; manifest-aware check/run/build/emit and the
+-selectors above are locally implemented in Slice 2. The approved entry direction requires no filename convention or mandatory
++`voidc new` and eventual resolve/package workflows. Those forms remain future
++commands; manifest-aware check/run/build/emit and selectors are implemented in S2,
++with project profiles added in S3. The approved entry direction requires no filename convention or mandatory
+ entry field: one valid main is selected by compiler analysis; ambiguity diagnoses.
+ The command forms below remain compatible; `main.void` directory discovery
+ applies when no manifest is selected. Explicit source paths and standalone/top-level/legacy
+diff --git a/docs/DIAGNOSTICS.md b/docs/DIAGNOSTICS.md
+--- a/docs/DIAGNOSTICS.md
++++ b/docs/DIAGNOSTICS.md
+@@ -408,3 +408,8 @@
+ Specializations do not revalidate documentation. Warnings retain declaring-module
+ ownership across imports and overlays, and cannot poison a reparsed generic header.
+ [Local evidence and limitations](DOCUMENTATION_HOVER_IMPLEMENTATION.md).
++
++Slice 3 assigns **VOID5012** to an owned warning for a selected project profile
++requesting unsupported profile-controlled `debug_info="line"` or `"full"`. It does
++not reject the schema or change existing emitter behavior; `none` is quiet. Explicit
++settings span their exact TOML value; schema defaults use an EOF insertion span.
+diff --git a/docs/EDITOR_INTEGRATION.md b/docs/EDITOR_INTEGRATION.md
+--- a/docs/EDITOR_INTEGRATION.md
++++ b/docs/EDITOR_INTEGRATION.md
+@@ -1,12 +1,42 @@
+ # VOID editor integration (Phase 11)
++
++## Manifest project recognition and sessions (Slice 3)
++
++The VS Code adapter uses compiler/voidls schema-2 preflight and project protocol 1.
++Literal `void.project.root` pins a manifest root; with `void.project.entry` it
++selects an in-root override. An entry setting alone retains the legacy entry-parent
++mode. With neither, compiler-owned nearest-manifest discovery precedes the existing
++legacy main.void/standalone behavior. TypeScript does not scan main declarations,
++parse TOML or implement a second source resolver. Error-bearing and library projects
++can open without an application entry. Exact TOML documents participate in dirty
++buffer synchronization and diagnostics through the existing client.
++
++Configured/bundled/PATH server resolution, native executable validation, single-folder/
++filesystem-workspace limits and workspace trust checks remain. New automatic/manifest
++preflight requires a matching project-capable server; unsupported old servers fail
++visibly without legacy downgrade. Explicit legacy entry mode can still use the old
++endpoint. No project process or operation starts in an untrusted workspace.
++
++Project state notifications update the selected-entry/status display. Query and edit
++results are guarded by client ownership and a project-wide epoch, in addition to
++existing document-version checks. Configuration restart intent survives coalesced
++readiness requests. A root switch creates a fresh client; stale callbacks from the
++previous project cannot update current state. Source/TOML/structural events invalidate
++selection, including wrong-case boundaries; actual admission stays in the compiler.
++The Select Project Entry command in project mode retains its pinned root. No init/new,
++first-file offers, automatic manifest writing or creation UI is delivered here.
++
++Actual Linux VS Code host qualification and native/platform limits are recorded in
++[Slice 3](projects/SLICE3.md); protocol handshakes alone are not editor qualification.
++
+ 
+ The [Phase 1 creation state machine](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-first-file-creation-and-terminal-workflows)
+ now freezes proposed first-event detection, concurrent-event coalescing, persisted
+-`offered`/accept/decline/dismiss suppression and explicit reset/retry behavior. Proposed
+-`void.project.root` selects manifest context; entry-only legacy configuration keeps
++`offered`/accept/decline/dismiss suppression and explicit reset/retry behavior.
++Creation remains unimplemented. Slice 3 now delivers `void.project.root` manifest context; entry-only legacy configuration keeps
+ its old root semantics. No manifest/main parser is added to the adapter. Error-bearing
+ project sessions and dirty manifest overlays belong to the shared compiler/voidls
+-contract. These workflows remain unimplemented; Phase 1 implementation is HOLD.
++contract and are delivered in S3. The first-file creation workflow remains deferred.
+ 
+ ## Approved project workflow roadmap, 8 November 2026
+ 
+@@ -23,7 +53,7 @@
+ explicit retry after decline/dismissal. Manifest/source-set edits must use shared
+ selection revisions and preserve dirty overlays. Baseline `void.project.entry`,
+ `voidls --discover`, exact `main.void` selection and existing session behavior below
+-remain delivered behavior until the compiler/protocol replacement is implemented.
++remain delivered legacy behavior alongside the additive S3 project protocol.
+ 
+ **Stage 8 Sprint 1 (20 October 2026):** [STAGE8_DISCOVERY.md](STAGE8_DISCOVERY.md)
+ supersedes the historical import/discovery exclusions below. It specifies separate
+diff --git a/docs/LANGUAGE_SERVER.md b/docs/LANGUAGE_SERVER.md
+--- a/docs/LANGUAGE_SERVER.md
++++ b/docs/LANGUAGE_SERVER.md
+@@ -1,4 +1,55 @@
+ # Minimal VOID language server (Phase 10)
++
++## Manifest project protocol (Slice 3)
++
++Legacy `--discover WORKSPACE ACTIVE ENTRY`, its three-field JSON, `--entry FILE`
++and `voidToolingProtocol: 1` remain available. The additive capability is
++`experimental.voidProjectProtocol: 1`. New automatic/project adapters require it;
++they never downgrade a selected manifest project to an entry-parent session.
++
++`voidls --discover-project WORKSPACE ACTIVE ROOT ENTRY` accepts four literal
++operands, with empty strings for absent values. With an explicit root it pins
++exactly that manifest; an entry override is portable and manifest-relative. With
++only an entry it uses legacy discovery. With neither it uses the compiler's shared
++admitted ancestor walk within the selected workspace, nearest manifest first,
++then the unchanged legacy helper only when no manifest is present. Explicit root
++plus an active source across/outside its boundary diagnoses. No creation query or
++project-writing workflow is implemented.
++
++The schema-2 JSON includes mode/root, canonical entry or null, standalone flag,
++manifest and requested root, application/library kind or null, status, decimal-string
++selectionRevision, snapshotKey, D/E counts and bounded diagnostic summary. Project
++errors such as missing main or malformed TOML return a successful error-bearing
++summary. Bad invocation/launch/path discovery failures remain process errors.
++Summary output is limited to 64 KiB; at most eight messages of 256 UTF-8 bytes are
++previewed. Detailed ranges and related locations belong to the session. Preflight
++revision "0" is an observation, not a session acceptance token or a stability promise.
++
++`voidls --project DIR [--entry PATH]` starts a pinned project session even with
++missing main or invalid TOML. The ordinary full-text didOpen/didChange/didClose
++methods accept exact `void.project.toml` documents in a separate overlay namespace.
++Manifest diagnostics use captured bytes and the existing UTF-16 conversion. Invalid
++policy never drives source traversal. Source deletion/tombstones never fall back
++to stale disk bytes. Library navigation uses validated declarationless-root metadata;
++there is no library application entry or executable IR.
++
++Project sessions support standard didCreateFiles/didRenameFiles/didDeleteFiles
++notifications and watched-file invalidation. Dirty rename bytes are retained even
++when a deletion watch arrives first. Closing a document returns explicitly to disk;
++newer full-text edits can repair a tombstoned document. Broad project watches also
++invalidate on directory and wrong-case manifest events, leaving admission to the
++compiler. Nested manifest edits change boundaries without switching the root.
++
++`void/projectState` requests return the current schema-2 summary; notifications of
++that name accompany accepted project revisions. Project diagnostics carry a
++`voidProjectRevision` decimal string, plus normal document versions when negotiated.
++`void/reselectProject` with `{entry: string|null}` deliberately reselects inside the
++same pinned root; root changes require a new server/session. Metadata/policy/entry
++changes preview diagnostics and mark reselection required. No operation publishes
++code. Historical successful indexes are never returned as current after failure.
++Existing 8 MiB framing, JSON/output limits, cancellation and legacy error semantics
++remain. See [S3 evidence and limits](projects/SLICE3.md).
++
+ 
+ The [Phase 1 ownership/protocol proposal](PROJECT_ARCHITECTURE_ROADMAP.md#phase-1-ownership-and-data-flow)
+ uses a separate schema-2 `--discover-project` summary and `--project` session, with
+diff --git a/docs/PROJECT_ARCHITECTURE_ROADMAP.md b/docs/PROJECT_ARCHITECTURE_ROADMAP.md
+--- a/docs/PROJECT_ARCHITECTURE_ROADMAP.md
++++ b/docs/PROJECT_ARCHITECTURE_ROADMAP.md
+@@ -1,4 +1,33 @@
+ # First-class VOID projects and native application roadmap
++
++## Current Slice 3 implementation, 8 November 2026
++
++Golden Wrench accepts the preserved [S2 final closeout](projects/SLICE2_FINAL_CLOSEOUT.md).
++Boss authorizes project ToolingSession/voidls/editor integration and project-only CLI
++profiles at the unchanged baseline. [S3 report/evidence](projects/SLICE3.md) records
++the implementation and final local qualification; stop for independent S3 review
++before S4. Historical S1/S2 status paragraphs below retain their dated scope.
++
++S3 keeps compiler-owned selection and immutable D/E observations, error-bearing and
++library metadata sessions, separate TOML overlays, owned revision acceptance, new
++schema-2 preflight and `voidProjectProtocol: 1`, guarded VS Code project recognition,
++and effective optimization/cache profiles. It separates raw selection/build provenance
++from normalized semantic source context; source hashes do not become permanent Runtime
++application identity. No Runtime application metadata or OS convenience adapters are
++implemented.
++
++Boss explicitly approved structured warning VOID5012 for the selected unsupported
++line/full debug-information mode, retaining requested metadata, actual optimization
++and existing backend behavior; none is quiet. The baseline already emits source/type/
++location debug records, but does not implement selectable none/line/full modes. S3
++does not claim those modes or strip baseline records. Actual mode-specific emission
++remains a separate review milestone. Standalone behavior remains unchanged.
++
++Hosted CI stays on strict hold until the complete project/general-C-FFI/dynamic-default
++raylib milestone and single integrated seven-job gate. S4, creation UI/init/new, numeric
++enums, general C FFI, dependency resolution and raylib remain unimplemented. All future
++roadmap sections and optional, separately qualified static-linkage goals remain intact.
++
+ 
+ ## Current Slice 2 implementation, 8 November 2026
+ 
+diff --git a/docs/TOOLING_SESSIONS.md b/docs/TOOLING_SESSIONS.md
+--- a/docs/TOOLING_SESSIONS.md
++++ b/docs/TOOLING_SESSIONS.md
+@@ -1,4 +1,47 @@
+ # Document revisions and tooling sessions (Phase 9)
++
++## Manifest-selected sessions (Slice 3)
++
++The existing `ToolingSession(ProjectSession{root, optional_entry})` adds pinned
++manifest mode. The entry-path constructor retains legacy behavior. Snapshots own
++canonical root identity, the original admission request, source/TOML overlays,
++document revisions and a session-owned identity token. `select/analyze/accept`
++remain separate; a delayed result from another revision or session cannot publish.
++A numeric revision or SHA-256 digest is not the acceptance identity.
++
++`SessionAnalysis::project()` contains the compiler's ProjectAnalysisResult and
++owned ProjectState observations: manifest, nullable entry, D/E source snapshots,
++inventory completeness, validation status and snapshot key. Errors retain useful
++observations and source-spanned diagnostics, with no executable program or stale
++semantic index. Malformed TOML has no traversed source policy. Manifest documents
++have their own exact `/.../void.project.toml` namespace; open/replace/unavailable/
++close and their monotonic revision rules also apply to it. `refresh()` invalidates
++physical observations; `reselect(entry)` is an explicit same-root transition.
++Changing the root requires a new session. Root admission always rechecks the original
++request, so canonical identity cannot erase an alias or wrong-case failure.
++
++A successful library has a semantic index but no `result().program` or application
++entry. `SessionAnalysis::succeeded()` includes checked libraries. Its retained
++`semantic_analysis()` is explicitly non-executable; lowering rejects before IR.
++It owns the same compiler validation's declarationless scope and source graph,
++without a synthetic importable root module. Failed selection has neither view.
++
++Selection/build provenance (raw manifest, source bytes, boundaries and inventory)
++is separate from normalized semantic project context (root, project/application/
++package metadata, entry, source policy and profile declarations). The source contract
++uses the latter, not the full discovery digest. Completed project comparisons feed
++only old/new semantic-module IDs to the existing source invalidator: TOML and
++validated D-only edits are not unresolved source imports. Body and comment-only
++changes can therefore remain compatible; semantic metadata, entry, source-policy
++or declaration/global-contract changes require reselection/restart as appropriate.
++`requires_reselection()` reports the pinned context boundary. Existing JIT publication
++still rechecks session freshness and native compatibility; no Runtime application
++identity or new publication authority is added. Legacy reload is unchanged.
++
++Snapshots freeze in-memory overlays, not the filesystem. All physical admission,
++source discovery, error ownership and recapture checks remain compiler-owned.
++See [Slice 3 report](projects/SLICE3.md) for actual reload, protocol and host evidence.
++
+ 
+ **Stage 8 Sprint 1 (20 October 2026):** [STAGE8_DISCOVERY.md](STAGE8_DISCOVERY.md)
+ supersedes the historical import/discovery exclusions below. It specifies separate
+diff --git a/editors/vscode/README.md b/editors/vscode/README.md
+--- a/editors/vscode/README.md
++++ b/editors/vscode/README.md
+@@ -1,13 +1,33 @@
+ # VOID Language for VS Code and VSCodium
++
++## Manifest projects
++
++Set `void.project.root` to a literal absolute or workspace-relative manifest root.
++An optional `void.project.entry` then selects a source inside that root. An entry
++setting without a root keeps the legacy entry-parent session. With neither, the
++matching voidls performs nearest-manifest discovery within the workspace, then
++legacy discovery only if no manifest was selected. No TypeScript source scan is used.
++
++Manifest/error-bearing and library sessions use `voidProjectProtocol: 1` and schema-2
++preflight. Missing main and malformed TOML produce diagnostics without preventing
++project opening. Dirty source/TOML buffers, file events and root switches retain
++revision/client guards. An older project-incapable server produces a visible error;
++there is no silent legacy downgrade. Explicit legacy-entry mode remains available.
++
++Trust, filesystem/single-folder restrictions, configured/bundled/PATH servers and
++standalone editing remain. Project creation prompts and init/new are not implemented.
++See the repository's `docs/projects/SLICE3.md` for execution evidence and limitations.
++
+ 
+ Compiler-owned completion, hover, signature help, diagnostics, navigation, source
+ symbols, guarded rename and conservative formatting through one native `voidls`.
+ Requires a trusted local filesystem workspace and VS Code API 1.141.0+. VSCodium
+-execution is a separate verification target. One selected entry graph per window.
++execution is a separate verification target. One pinned project/session per window.
+ 
+ Run **VOID: Select Project Entry** or set `void.project.entry` for an explicit
+-entry. Empty asks the shared compiler to select nearest `main.void` within the
+-workspace, otherwise a labelled standalone active-file session. Selection stays
++entry. With no root or entry setting, shared project preflight first selects the
++nearest manifest within the workspace; without a manifest it retains nearest
++`main.void` and labelled standalone fallback. Selection stays
+ fixed until deliberate restart/reselection. The status bar identifies entry and server.
+ `void.server.path` overrides discovery; empty checks a bundled native server,
+ then PATH. No shell expansion, runtime download or repository build occurs.
+diff --git a/editors/vscode/package.json b/editors/vscode/package.json
+--- a/editors/vscode/package.json
++++ b/editors/vscode/package.json
+@@ -17,7 +17,9 @@
+   ],
+   "main": "./dist/extension.js",
+   "activationEvents": [
+-    "onLanguage:void"
++    "onLanguage:void",
++    "onLanguage:toml",
++    "workspaceContains:void.project.toml"
+   ],
+   "capabilities": {
+     "untrustedWorkspaces": {
+@@ -77,7 +79,7 @@
+           "type": "string",
+           "default": "",
+           "scope": "window",
+-          "description": "Project entry .void file. Absolute or workspace-relative. Its parent is the project root. Empty asks voidls for the nearest main.void within the workspace, with a labelled standalone active-file fallback. Selection stays fixed until deliberate restart/reselection."
++          "description": "Literal entry source, absolute or workspace-relative. With project.root: an in-root manifest entry override. Alone: legacy entry-parent mode. Empty uses compiler-owned project preflight with legacy main.void/standalone fallback only when no manifest is selected."
+         },
+         "void.trace.server": {
+           "type": "string",
+@@ -89,6 +91,12 @@
+           "default": "off",
+           "scope": "window",
+           "description": "Optional LSP trace in the VOID output channel. Verbose logs can include source text."
++        },
++        "void.project.root": {
++          "type": "string",
++          "default": "",
++          "scope": "window",
++          "description": "Literal manifest root, absolute or workspace-relative. Pins project mode even for malformed TOML or no main. With project.entry, that entry must stay inside this root. Empty uses compiler-owned nearest-manifest discovery unless a legacy entry is configured."
+         }
+       }
+     },
+diff --git a/editors/vscode/src/config.ts b/editors/vscode/src/config.ts
+--- a/editors/vscode/src/config.ts
++++ b/editors/vscode/src/config.ts
+@@ -3,8 +3,8 @@
+ import {promisify} from 'node:util';
+ import {promises as fs, constants} from 'node:fs';
+ 
+-export interface Settings { server: string; entry: string; trace: 'off'|'messages'|'verbose'; }
+-export interface Project { server: string; entry: string; root: string; trace: Settings['trace']; singleFile: boolean; }
++export interface Settings { server: string; entry: string; root?: string; trace: 'off'|'messages'|'verbose'; }
++export interface Project { server: string; entry: string | null; root: string; manifestMode: boolean; requestedRoot?: string; entryOverride?: string; trace: Settings['trace']; singleFile: boolean; }
+ 
+ // Explicit paths are literal. Discovery searches only the installed PATH.
+ export function resolveSetting(value: string, workspace?: string, paths: path.PlatformPath = path): string {
+@@ -42,9 +42,27 @@
+         await fs.access(server, constants.X_OK).catch(() => { throw new Error(`voidls is not executable: ${server}. Check its execute permissions.`); });
+     }
+     const override = settings.entry ? resolveSetting(settings.entry, workspace) : '';
+-    const {stdout} = await promisify(execFile)(server, ['--discover', workspace ?? '', active ?? '', override], {encoding: 'utf8', maxBuffer: 65536, timeout: 10000});
+-    const selected = JSON.parse(stdout) as {entry: string; root: string; standalone: boolean};
++    const selectedRoot = settings.root ? resolveSetting(settings.root, workspace) : '';
++    let entryOverride: string | undefined;
++    if (selectedRoot && override) {
++        if (!inside(selectedRoot, override)) throw new Error('Project entry is outside the selected manifest root.');
++        entryOverride = path.relative(selectedRoot, override).split(path.sep).join('/');
++    }
++    // Explicit legacy entry settings keep the old endpoint/server behavior.
++    // Automatic/manifest selection requires the new compiler-owned preflight.
++    const legacy = !selectedRoot && !!override;
++    const args = legacy ? ['--discover', workspace ?? '', active ?? '', override] :
++        ['--discover-project', workspace ?? '', active ?? '', selectedRoot, entryOverride ?? ''];
++    let stdout: string;
++    try { ({stdout} = await promisify(execFile)(server, args, {encoding: 'utf8', maxBuffer: 65536, timeout: 10000})); }
++    catch (error) { throw new Error(`VOID project preflight failed. Automatic/manifest selection requires a matching voidProjectProtocol 1 server; no legacy downgrade was attempted. ${String(error)}`); }
++    const selected = JSON.parse(stdout) as {schema?: number; mode?: string; requestedRoot?: string; entry: string|null; root: string; standalone: boolean; status?: string};
+     const {entry, root} = selected;
+-    if (typeof entry !== 'string' || typeof root !== 'string' || typeof selected.standalone !== 'boolean' || !path.isAbsolute(entry) || !path.isAbsolute(root)) throw new Error('Invalid voidls project discovery response');
+-    return {server, entry, root, trace: settings.trace, singleFile: selected.standalone};
++    const manifestMode = !legacy && selected.schema === 2 && selected.mode === 'project';
++    if ((!legacy && (selected.schema !== 2 || !['project','legacy'].includes(selected.mode ?? ''))) ||
++        typeof root !== 'string' || !path.isAbsolute(root) || typeof selected.standalone !== 'boolean' ||
++        (entry !== null && (typeof entry !== 'string' || !path.isAbsolute(entry))) || (!manifestMode && entry === null) ||
++        (manifestMode && (typeof selected.requestedRoot !== 'string' || !path.isAbsolute(selected.requestedRoot))))
++        throw new Error('Invalid voidls project discovery response');
++    return {server, entry, root, manifestMode, requestedRoot: selected.requestedRoot, entryOverride, trace: settings.trace, singleFile: selected.standalone};
+ }
+diff --git a/editors/vscode/src/extension.ts b/editors/vscode/src/extension.ts
+--- a/editors/vscode/src/extension.ts
++++ b/editors/vscode/src/extension.ts
+@@ -10,6 +10,10 @@
+     private watcher?: vscode.FileSystemWatcher;
+     private serial: Promise<void> = Promise.resolve();
+     private disposed = false;
++    private epoch = 0;
++    private requestSerial = 0;
++    private restartRequested = false;
++    private projectRevision = 0n;
+     private warned = new Set<string>();
+     private fallback?: string;
+     constructor(private readonly output: vscode.LogOutputChannel, private readonly bundled: string, private readonly statusBar: vscode.StatusBarItem) {}
+@@ -17,50 +21,65 @@
+     async selectEntry(): Promise<void> {
+         if (!vscode.workspace.isTrusted) return;
+         const files = await vscode.window.showOpenDialog({canSelectMany: false, filters: {VOID: ['void']}, title: 'Select VOID project entry'});
+-        if (files?.[0]) await vscode.workspace.getConfiguration('void').update('project.entry', files[0].fsPath, vscode.ConfigurationTarget.Workspace);
++        if (files?.[0]) {
++            if (this.project?.manifestMode) {
++                if (!inside(this.project.root, files[0].fsPath)) { this.report('VOID: Select an entry inside the pinned project root.'); return; }
++                await vscode.workspace.getConfiguration('void').update('project.root', this.project.root, vscode.ConfigurationTarget.Workspace);
++            }
++            await vscode.workspace.getConfiguration('void').update('project.entry', files[0].fsPath, vscode.ConfigurationTarget.Workspace);
++        }
+     }
+     private report(message: string, repeat = false): void {
+         this.output.appendLine(message);
+         if (repeat || !this.warned.has(message)) { this.warned.add(message); void vscode.window.showErrorMessage(message + ' See Output → VOID.'); }
+     }
+     private documents(): vscode.TextDocument[] {
+-        return vscode.workspace.textDocuments.filter(d => d.languageId === 'void' && d.uri.scheme === 'file');
++        return vscode.workspace.textDocuments.filter(d => (d.languageId === 'void' || basename(d.uri.fsPath) === 'void.project.toml') && d.uri.scheme === 'file');
+     }
+     refresh(restart = false): Promise<void> {
+-        this.serial = this.serial.then(() => this.update(restart)).catch(e => this.report(`VOID: ${String(e)}`));
++        this.restartRequested ||= restart;
++        const serial = ++this.requestSerial; ++this.epoch;
++        this.serial = this.serial.then(async () => {
++            if (serial !== this.requestSerial) return;
++            await this.update(this.restartRequested, serial);
++            if (serial === this.requestSerial) this.restartRequested = false;
++        }).catch(e => this.report(`VOID: ${String(e)}`));
+         return this.serial;
+     }
+     private async stop(): Promise<void> {
++        ++this.epoch; this.projectRevision = 0n;
+         this.watcher?.dispose(); this.watcher = undefined;
+         const client = this.client; this.client = undefined; this.project = undefined;
+         if (client) { await client.stop(5000); await client.dispose(); }
+         this.statusBar.text = "VOID: stopped";
+     }
+-    private async update(restart: boolean): Promise<void> {
+-        if (this.disposed) return;
++    private async update(restart: boolean, serial: number): Promise<void> {
++        if (this.disposed || serial !== this.requestSerial) return;
+         if (!vscode.workspace.isTrusted) { await this.stop(); this.report('VOID native analysis requires a trusted workspace. Syntax highlighting remains available.'); return; }
+         const folders = vscode.workspace.workspaceFolders ?? [];
+         if (folders.some(f => f.uri.scheme !== 'file')) { await this.stop(); this.report('VOID requires a filesystem workspace on the extension host.'); return; }
+         const config = vscode.workspace.getConfiguration('void');
+-        const settings: Settings = {server: config.get('server.path', ''), entry: config.get('project.entry', ''), trace: config.get('trace.server', 'off')};
++        const settings: Settings = {server: config.get('server.path', ''), entry: config.get('project.entry', ''), root: config.get('project.root', ''), trace: config.get('trace.server', 'off')};
+         const docs = this.documents();
+         const active = vscode.window.activeTextEditor?.document;
+         if (restart) this.fallback = undefined;
+-        if (!settings.entry && !this.fallback) this.fallback = active?.languageId === 'void' && active.uri.scheme === 'file' ? active.uri.fsPath : docs[0]?.uri.fsPath;
+-        if (!docs.length && !this.client && !restart) return;
++        if (!settings.entry && !this.fallback) this.fallback = active && (active.languageId === 'void' || basename(active.uri.fsPath) === 'void.project.toml') && active.uri.scheme === 'file' ? active.uri.fsPath : docs[0]?.uri.fsPath;
++        if (!docs.length && !this.client && !restart && !settings.root) return;
+         let project: Project;
+         try { project = !restart && this.project ? this.project : await resolveProject(settings, folders.map(f => f.uri.fsPath), this.fallback, this.bundled); }
+         catch (e) { await this.stop(); this.report(`VOID: ${e instanceof Error ? e.message : String(e)}`); return; }
+-        for (const doc of docs) if (!inside(project.root, doc.uri.fsPath) || (project.singleFile && doc.uri.fsPath !== vscode.Uri.file(project.entry).fsPath)) {
++        for (const doc of docs) if (!inside(project.root, doc.uri.fsPath) || (project.singleFile && doc.uri.fsPath !== vscode.Uri.file(project.entry!).fsPath)) {
+             this.report('VOID: This document is outside the selected project or single-file entry. Configure void.project.entry for a multi-file project; use a separate window for unrelated projects.');
+         }
+-        if (!restart && this.client && this.project?.server === project.server && this.project.entry === project.entry && this.project.trace === project.trace) return;
++        if (!restart && this.client && this.project?.server === project.server && this.project.entry === project.entry && this.project.root === project.root && this.project.manifestMode === project.manifestMode && this.project.trace === project.trace) return;
++        if (serial !== this.requestSerial) return;
+         await this.stop();
+-        if (this.disposed) return;
+-        this.output.appendLine(`Starting ${project.server} --entry ${project.entry}`);
++        if (this.disposed || serial !== this.requestSerial || !vscode.workspace.isTrusted) return;
++        const args = project.manifestMode ? ['--project', project.requestedRoot ?? project.root, ...(project.entryOverride ? ['--entry', project.entryOverride] : [])] : ['--entry', project.entry!];
++        this.output.appendLine(`Starting ${project.server} ${JSON.stringify(args)}`);
+         const selector = {language: 'void', scheme: 'file', pattern: {baseUri: vscode.Uri.file(project.root).toString(),
+-            pattern: project.singleFile ? basename(project.entry).replace(/[*?()[\]{}!+@,]/g, c => '[' + c + ']') : '**/*.void'}};
+-        const serverOptions: ServerOptions = {command: project.server, args: ['--entry', project.entry],
++            pattern: project.singleFile ? basename(project.entry!).replace(/[*?()[\]{}!+@,]/g, c => '[' + c + ']') : '**/*.void'}};
++        const serverOptions: ServerOptions = {command: project.server, args,
+             options: {cwd: project.root, shell: false}};
+         let initialized = false;
+         let failureReported = false;
+@@ -72,14 +91,39 @@
+             // Deduplicate error/close callbacks for this session, not later crashes.
+             this.report('VOID language server terminated unexpectedly. Use VOID: Restart Language Server after checking the log.', true);
+         };
+-        this.watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(project.root, '**/*.void'));
++        this.watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(project.root, project.manifestMode ? '**/*' : '**/*.void'));
+         const clientOptions: LanguageClientOptions = {
+-            documentSelector: [selector],
++            documentSelector: [selector, ...(project.manifestMode ? [{scheme: 'file', pattern: {baseUri: vscode.Uri.file(project.root).toString(), pattern: '**/void.project.toml'}}] : [])],
+             synchronize: {fileEvents: this.watcher},
+-            middleware: {provideRenameEdits: async (document, position, newName, token, next) => {
++            middleware: {provideDefinition: async (document, position, token, next) => {
++                const epoch = this.epoch; const result = await next(document, position, token);
++                return !token.isCancellationRequested && this.client === client && epoch === this.epoch ? result : null;
++            }, provideHover: async (document, position, token, next) => {
++                const epoch = this.epoch; const result = await next(document, position, token);
++                return !token.isCancellationRequested && this.client === client && epoch === this.epoch ? result : null;
++            }, provideCompletionItem: async (document, position, context, token, next) => {
++                const epoch = this.epoch; const result = await next(document, position, context, token);
++                return !token.isCancellationRequested && this.client === client && epoch === this.epoch ? result : null;
++            }, provideReferences: async (document, position, context, token, next) => {
++                const epoch = this.epoch; const result = await next(document, position, context, token);
++                return !token.isCancellationRequested && this.client === client && epoch === this.epoch ? result : null;
++            }, provideSignatureHelp: async (document, position, context, token, next) => {
++                const epoch = this.epoch; const result = await next(document, position, context, token);
++                return !token.isCancellationRequested && this.client === client && epoch === this.epoch ? result : null;
++            }, provideDocumentSymbols: async (document, token, next) => {
++                const epoch = this.epoch; const result = await next(document, token);
++                return !token.isCancellationRequested && this.client === client && epoch === this.epoch ? result : null;
++            }, provideWorkspaceSymbols: async (query, token, next) => {
++                const epoch = this.epoch; const result = await next(query, token);
++                return !token.isCancellationRequested && this.client === client && epoch === this.epoch ? result : null;
++            }, prepareRename: async (document, position, token, next) => {
++                const epoch = this.epoch; const result = await next(document, position, token);
++                return !token.isCancellationRequested && this.client === client && epoch === this.epoch ? result : null;
++            }, provideRenameEdits: async (document, position, newName, token, next) => {
++                const epoch = this.epoch;
+                 const before = new Map(vscode.workspace.textDocuments.map(d => [d.uri.toString(), {document:d, version:d.version}]));
+                 const result = await next(document, position, newName, token);
+-                if (!result || token.isCancellationRequested) return null;
++                if (!result || token.isCancellationRequested || this.client !== client || epoch !== this.epoch) return null;
+                 for (const [uri] of result.entries()) {
+                     const previous = before.get(uri.toString());
+                     const current = vscode.workspace.textDocuments.find(d => d.uri.toString() === uri.toString());
+@@ -87,9 +131,9 @@
+                 }
+                 return result;
+             }, provideDocumentFormattingEdits: async (document, options, token, next) => {
+-                const version = document.version;
++                const version = document.version; const epoch = this.epoch;
+                 const result = await next(document, options, token);
+-                return !token.isCancellationRequested && !document.isClosed && document.version === version ? result : [];
++                return !token.isCancellationRequested && !document.isClosed && document.version === version && epoch === this.epoch && this.client === client ? result : [];
+             }},
+             outputChannel: this.output, traceOutputChannel: this.output,
+             revealOutputChannelOn: RevealOutputChannelOn.Never, // Never steal focus; explicit errors include the channel location.
+@@ -105,18 +149,30 @@
+         };
+         const client = new LanguageClient('void', 'VOID', serverOptions, clientOptions);
+         this.client = client; this.project = project;
++        const changed = () => { ++this.epoch; };
++        this.watcher.onDidCreate(changed); this.watcher.onDidChange(changed); this.watcher.onDidDelete(changed);
++        if (project.manifestMode) client.onNotification('void/projectState', (state: {schema?: number; mode?: string; root?: string; selectionRevision?: string; entry?: string|null; status?: string; kind?: string}) => {
++            if (this.client !== client || state.schema !== 2 || state.mode !== 'project' || state.root !== project.root || !/^[0-9]{1,20}$/.test(state.selectionRevision ?? '')) return;
++            const revision = BigInt(state.selectionRevision!); if (revision <= this.projectRevision) return;
++            this.projectRevision = revision;
++            if (state.entry !== null && typeof state.entry !== 'string') return;
++            project.entry = state.entry;
++            this.statusBar.text = 'VOID: ' + (state.status === 'error' ? 'project errors' : state.status === 'reselection-required' ? 'reselect required' : state.kind === 'library' ? 'library' : state.entry ? basename(state.entry) : 'project (no entry)');
++        });
+         try { await client.start();
+-            const capabilities = client.initializeResult?.capabilities as {experimental?: {voidToolingProtocol?: number}};
++            const capabilities = client.initializeResult?.capabilities as {experimental?: {voidToolingProtocol?: number; voidProjectProtocol?: number}};
+             if (capabilities?.experimental?.voidToolingProtocol !== 1) throw new Error('Incompatible voidls. Install the matching server or configure its executable in void.server.path.');
++            if (project.manifestMode && capabilities?.experimental?.voidProjectProtocol !== 1) throw new Error('Incompatible voidls: selected manifest projects require voidProjectProtocol 1. No legacy downgrade is allowed.');
+             initialized = true;
+-            this.statusBar.text = 'VOID: ' + (project.singleFile ? 'standalone ' : '') + basename(project.entry);
+-            this.statusBar.tooltip = project.server + '\n' + project.entry;
++            this.statusBar.text = 'VOID: ' + (project.singleFile ? 'standalone ' : '') + (project.entry ? basename(project.entry) : 'project (no entry)');
++            this.statusBar.tooltip = project.server + '\n' + project.root + '\n' + (project.entry ?? 'No executable entry');
+             this.statusBar.show(); await client.setTrace(project.trace === 'verbose' ? Trace.Verbose : project.trace === 'messages' ? Trace.Messages : Trace.Off); }
+         catch (e) { this.report(`VOID language server failed to start: ${String(e)}`); await this.stop(); }
+     }
+     async dispose(): Promise<void> { this.disposed = true; await this.serial; await this.stop(); }
++    changed(): void { ++this.epoch; }
+     status(): {state: string; entry?: string} {
+-        return {state: this.client?.state === State.Running ? 'running' : 'stopped', entry: this.project?.entry};
++        return {state: this.client?.state === State.Running ? 'running' : 'stopped', entry: this.project?.entry ?? undefined};
+     }
+ }
+ export function activate(context: vscode.ExtensionContext): {ready: () => Promise<void>; status: () => {state: string; entry?: string}; deactivate: () => Promise<void>} {
+@@ -128,8 +184,9 @@
+         vscode.commands.registerCommand('void.selectEntry', () => current.selectEntry()),
+         vscode.commands.registerCommand('void.refreshProject', () => current.refreshProject()),
+         vscode.commands.registerCommand('void.restartLanguageServer', () => current.refresh(true)),
+-        vscode.workspace.onDidOpenTextDocument(d => { if (d.languageId === 'void') void current.refresh(); }),
+-        vscode.window.onDidChangeActiveTextEditor(e => { if (e?.document.languageId === 'void') void current.refresh(); }),
++        vscode.workspace.onDidOpenTextDocument(d => { if (d.languageId === 'void' || basename(d.uri.fsPath) === 'void.project.toml') void current.refresh(); }),
++        vscode.window.onDidChangeActiveTextEditor(e => { if (e && (e.document.languageId === 'void' || basename(e.document.uri.fsPath) === 'void.project.toml')) void current.refresh(); }),
++        vscode.workspace.onDidChangeTextDocument(e => { if (e.document.languageId === 'void' || basename(e.document.uri.fsPath) === 'void.project.toml') current.changed(); }),
+         vscode.workspace.onDidChangeConfiguration(e => { if (e.affectsConfiguration('void')) void current.refresh(true); }),
+         vscode.workspace.onDidChangeWorkspaceFolders(() => { void current.refresh(true); }),
+         vscode.workspace.onDidGrantWorkspaceTrust(() => { void current.refresh(true); }));
+diff --git a/editors/vscode/src/test/config.test.ts b/editors/vscode/src/test/config.test.ts
+--- a/editors/vscode/src/test/config.test.ts
++++ b/editors/vscode/src/test/config.test.ts
+@@ -70,7 +70,7 @@
+         const settings = {server, entry: 'main.void', trace: 'off' as const};
+         const project = await resolveProject(settings, [directory]);
+         assert.equal(path.normalize(project.root), path.normalize(await fs.realpath(directory)));
+-        assert.equal(path.normalize(project.entry), path.normalize(path.join(project.root, 'main.void')));
++        assert.equal(path.normalize(project.entry!), path.normalize(path.join(project.root, 'main.void')));
+         assert(!project.singleFile);
+         if(process.platform==='win32') {
+             // The original explicit-entry check bypasses ancestor discovery.
+@@ -79,7 +79,7 @@
+                 for(const a of [directory[0].toUpperCase(),directory[0].toLowerCase()]) {
+                     const automatic=await resolveProject({...settings,entry:''},[w+directory.slice(1)],path.join(a+directory.slice(1),'main.void'));
+                     assert.equal(path.normalize(automatic.root),path.normalize(await fs.realpath(directory)));
+-                    assert.equal(path.normalize(automatic.entry),path.normalize(await fs.realpath(path.join(directory,'main.void'))));
++                    assert.equal(path.normalize(automatic.entry!),path.normalize(await fs.realpath(path.join(directory,'main.void'))));
+                     assert(!automatic.singleFile);
+                 }
+         }
+@@ -87,7 +87,7 @@
+         const fallback = await resolveProject({...settings, entry: ''}, [directory], path.join(directory, 'single.void'));
+         assert(fallback.singleFile);
+         assert.equal(path.normalize(fallback.root), path.normalize(await fs.realpath(directory)));
+-        assert.equal(path.normalize(fallback.entry), path.normalize(path.join(await fs.realpath(directory), 'single.void')));
++        assert.equal(path.normalize(fallback.entry!), path.normalize(path.join(await fs.realpath(directory), 'single.void')));
+         await assert.rejects(resolveProject(settings, [directory, directory]), /one project/);
+         await assert.rejects(resolveProject({...settings, entry: ''}, [directory]), /main.void/);
+         await assert.rejects(resolveProject({...settings, server: directory}, [directory]), /regular executable/);
+@@ -161,3 +161,31 @@
+     assert(!literals.some((r:RegExp) => r.test('nullify')));
+     assert(!indent.test('structure node:'));
+ });
++
++
++test('manifest projects preserve nullable entries and reject unsupported older servers', async () => {
++    const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'VOID manifest config 雪 '));
++    const server = process.env.VOIDLS_TEST_SERVER!;
++    const manifest = "schema=1\n[project]\nid='org.test.sources'\nname='Sources'\nversion='1.0.0'\nkind='application'\n[application]\nid='org.test.app'\n";
++    try {
++        await fs.writeFile(path.join(directory, 'void.project.toml'), manifest);
++        const settings = {server,entry:'',trace:'off' as const};
++        let selected = await resolveProject(settings,[directory]);
++        assert(selected.manifestMode && selected.entry === null && !selected.singleFile);
++        await fs.writeFile(path.join(directory,'game.void'),'func main() -> i32:\n    return 23\n');
++        selected = await resolveProject(settings,[directory],path.join(directory,'game.void'));
++        assert(selected.manifestMode && selected.entry === path.join(directory,'game.void'));
++        const explicit = await resolveProject({...settings,root:directory,entry:'game.void'},[directory]);
++        assert(explicit.manifestMode && explicit.entryOverride === 'game.void' && explicit.root === selected.root);
++        const legacy = await resolveProject({...settings,entry:'game.void'},[directory]);
++        assert(!legacy.manifestMode && legacy.entry === path.join(directory,'game.void'));
++        await fs.writeFile(path.join(directory, 'void.project.toml'),'[=roject]');
++        selected = await resolveProject({...settings,root:directory},[directory]);
++        assert(selected.manifestMode && selected.entry === null);
++        if (process.env.VOIDLS_OLD_SERVER_TEST) {
++            await assert.rejects(resolveProject({...settings,server:process.env.VOIDLS_OLD_SERVER_TEST},[directory]), /requires a matching voidProjectProtocol 1 server/);
++            const retained = await resolveProject({...settings,server:process.env.VOIDLS_OLD_SERVER_TEST,entry:'game.void'},[directory]);
++            assert(!retained.manifestMode && retained.entry === path.join(directory,'game.void'));
++        }
++    } finally { await fs.rm(directory,{recursive:true,force:true}); }
++});
+diff --git a/editors/vscode/src/test/projectHost.ts b/editors/vscode/src/test/projectHost.ts
+new file mode 100644
+--- /dev/null
++++ b/editors/vscode/src/test/projectHost.ts
+@@ -0,0 +1,31 @@
++import * as vscode from 'vscode';
++import assert from 'node:assert/strict';
++import * as path from 'node:path';
++import {promises as fs} from 'node:fs';
++const events: string[]=[];
++async function until<T>(read:()=>T|PromiseLike<T>,valid:(value:T)=>boolean,label:string):Promise<T>{const end=Date.now()+25000;while(Date.now()<end){const value=await read();if(valid(value)){events.push(label);return value;}await new Promise(resolve=>setTimeout(resolve,75));}throw new Error('Timed out: '+label);}
++function code(d:vscode.Diagnostic):unknown{return typeof d.code==='object'?d.code.value:d.code;}
++async function replace(document:vscode.TextDocument,text:string){const edit=new vscode.WorkspaceEdit();edit.replace(document.uri,new vscode.Range(document.positionAt(0),document.positionAt(document.getText().length)),text);assert(await vscode.workspace.applyEdit(edit));}
++export async function run():Promise<void>{
++ let passed=false;const root=process.env.VOID_TEST_ROOT!;const manifest=process.env.VOID_S3_MANIFEST!;const output=process.env.VOID_S3_HOST_EVIDENCE;let api:{ready():Promise<void>;status():{state:string;entry?:string};deactivate():Promise<void>}|undefined;
++ try {
++  assert(vscode.workspace.isTrusted);const toml=vscode.Uri.file(path.join(root,'void.project.toml'));let document=await vscode.workspace.openTextDocument(toml);await vscode.window.showTextDocument(document);
++  const extension=vscode.extensions.getExtension('void-language.void-language');assert(extension);api=await extension.activate();await api!.ready();
++  await until(()=>vscode.languages.getDiagnostics(toml),ds=>ds.some(d=>code(d)==='VOID5010'),'no-main project session opens with manifest diagnostics');assert.equal(api!.status().state,'running');assert.equal(api!.status().entry,undefined);
++  const game=vscode.Uri.file(path.join(root,'src/game.void'));const main='use "./helper.void" as h\nfunc main() -> i32:\n    return h.value()\n';await vscode.workspace.fs.writeFile(game,Buffer.from(main));let source=await vscode.workspace.openTextDocument(game);await vscode.window.showTextDocument(source);
++  await until(()=>api!.status().entry,p=>p===game.fsPath,'file creation selects any-name main');await until(()=>vscode.languages.getDiagnostics(toml),ds=>!ds.some(d=>code(d)==='VOID5010'),'missing-main diagnostic clears');
++  const point=new vscode.Position(2,14);await until(()=>vscode.commands.executeCommand<vscode.Location[]>('vscode.executeDefinitionProvider',game,point),locations=>!!locations?.some(l=>l.uri.fsPath===path.join(root,'src/helper.void')),'real editor project navigation');
++  await until(()=>vscode.commands.executeCommand<vscode.DocumentSymbol[]>('vscode.executeDocumentSymbolProvider',game),symbols=>!!symbols?.some(symbol=>symbol.name==='main'),'real editor project symbols');
++  await replace(document,'schema=1\n# é😀\n[=roject]\n');const errors=await until(()=>vscode.languages.getDiagnostics(toml),ds=>ds.some(d=>code(d)==='VOID5001'),'dirty TOML diagnostic publication');const error=errors.find(d=>code(d)==='VOID5001')!;assert.deepEqual(error.range,new vscode.Range(2,1,2,1));
++  await until(()=>vscode.commands.executeCommand<vscode.Location[]>('vscode.executeDefinitionProvider',game,point),locations=>!locations?.length,'failed manifest hides historical semantic results');
++  await replace(document,manifest);await until(()=>vscode.languages.getDiagnostics(toml),ds=>!ds.some(d=>d.severity===vscode.DiagnosticSeverity.Error),'malformed manifest repair');
++  const partial=main.replace('h.value()','h.');await replace(source,partial);await until(()=>vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider',game,new vscode.Position(2,13)),list=>!!list?.items.some(item=>(typeof item.label==='string'?item.label:item.label.label)==='value'),'shared compiler project recovery completion');await replace(source,main);await source.save();await document.save();
++  const renamed=vscode.Uri.file(path.join(root,'src/program.void'));const rename=new vscode.WorkspaceEdit();rename.renameFile(game,renamed);assert(await vscode.workspace.applyEdit(rename));await until(()=>api!.status().entry,p=>p===renamed.fsPath,'editor rename updates entry without rebasing root');source=await vscode.workspace.openTextDocument(renamed);await vscode.window.showTextDocument(source);await vscode.commands.executeCommand('void.restartLanguageServer');await api!.ready();
++  const second=vscode.Uri.file(path.join(root,'src/second.void'));await vscode.workspace.fs.writeFile(second,Buffer.from('func main() -> i32:\n    return 4\n'));const extra=await vscode.workspace.openTextDocument(second);await vscode.window.showTextDocument(extra);await until(()=>vscode.languages.getDiagnostics(toml),ds=>ds.some(d=>code(d)==='VOID5010'),'second main invalidates project selection');
++  const remove=new vscode.WorkspaceEdit();remove.deleteFile(second);assert(await vscode.workspace.applyEdit(remove));await until(()=>api!.status().entry,p=>p===renamed.fsPath,'editor deletion restores unique entry');
++  // Switch to a deliberately selected nested project in the same trusted window.
++  const child=path.join(root,'child');await fs.mkdir(path.join(child,'src'),{recursive:true});await fs.writeFile(path.join(child,'void.project.toml'),manifest.replaceAll('org.test','org.child'));const childEntry=vscode.Uri.file(path.join(child,'src/launcher.void'));await fs.writeFile(childEntry.fsPath,'func main() -> i32:\n    return 9\n');const childDocument=await vscode.workspace.openTextDocument(childEntry);await vscode.window.showTextDocument(childDocument);await vscode.workspace.getConfiguration('void').update('project.root',child,vscode.ConfigurationTarget.Workspace);await api!.ready();await until(()=>api!.status().entry,p=>p===childEntry.fsPath,'deliberate project switch uses a fresh pinned session');
++  const old=await vscode.commands.executeCommand<vscode.Location[]>('vscode.executeDefinitionProvider',renamed,point);assert(!old?.length,'old project queries must not reuse a previous session index');const oldSymbols=await vscode.commands.executeCommand<vscode.SymbolInformation[]>('vscode.executeWorkspaceSymbolProvider','value');assert(!oldSymbols?.some(symbol=>symbol.location.uri.fsPath===path.join(root,'src/helper.void')),'old project symbols must not survive a switch');events.push('old project semantic results unavailable after switch');
++  passed=true;console.log('project_editor_host: '+events.length+' checks passed');
++ } finally {await api?.deactivate();if(output)await fs.writeFile(output,JSON.stringify({events,status:passed?'PASS':'INCOMPLETE',platform:process.platform,editor:vscode.version},null,2)+'\n');}
++}
+diff --git a/editors/vscode/src/test/runProjectHost.ts b/editors/vscode/src/test/runProjectHost.ts
+new file mode 100644
+--- /dev/null
++++ b/editors/vscode/src/test/runProjectHost.ts
+@@ -0,0 +1,22 @@
++import {runTests} from '@vscode/test-electron';
++import {promises as fs} from 'node:fs';
++import * as path from 'node:path';
++import * as os from 'node:os';
++async function main(): Promise<void> {
++    if (!process.env.VOIDLS_PATH || !process.env.VSCODE_EXECUTABLE_PATH) throw new Error('Set VOIDLS_PATH and VSCODE_EXECUTABLE_PATH to the matching built server and existing qualified editor.');
++    const temp = await fs.mkdtemp(path.join(os.tmpdir(), 'VOID S3 editor 雪 '));
++    try {
++        const root = path.join(temp,'project');await fs.mkdir(path.join(root,'src'),{recursive:true});await fs.mkdir(path.join(root,'.vscode'));
++        const manifest = "schema=1\n[project]\nid='org.test.sources'\nname='Sources'\nversion='1.0.0'\nkind='application'\n[application]\nid='org.test.app'\n[sources]\nroots=['src']\n";
++        await fs.writeFile(path.join(root,'void.project.toml'),manifest);
++        await fs.writeFile(path.join(root,'src/helper.void'),'public func value() -> i32:\n    return 23\n');
++        await fs.writeFile(path.join(root,'.vscode/settings.json'),JSON.stringify({'void.server.path':await fs.realpath(process.env.VOIDLS_PATH),'void.project.root':'.','void.project.entry':'','void.trace.server':'verbose'}));
++        const profile=path.join(temp,'profile');await fs.mkdir(path.join(profile,'User'),{recursive:true});
++        await fs.writeFile(path.join(profile,'User/settings.json'),JSON.stringify({'security.workspace.trust.startupPrompt':'never','workbench.startupEditor':'none','telemetry.telemetryLevel':'off','update.mode':'none','extensions.autoCheckUpdates':false,'files.enableTrash':false}));
++        await runTests({vscodeExecutablePath:process.env.VSCODE_EXECUTABLE_PATH,extensionDevelopmentPath:path.resolve(__dirname,'../..'),extensionTestsPath:path.resolve(__dirname,'projectHost.js'),extensionTestsEnv:{VOID_TEST_ROOT:root,VOID_S3_MANIFEST:manifest,VOID_S3_HOST_EVIDENCE:process.env.VOID_S3_HOST_EVIDENCE ?? ''},launchArgs:[root,'--user-data-dir='+profile,'--extensions-dir='+path.join(temp,'extensions'),'--disable-extensions','--disable-updates','--disable-gpu','--skip-welcome','--skip-release-notes']});
++    } catch(error) {
++        if (process.env.VOID_S3_PROFILE_EVIDENCE) await fs.cp(temp,process.env.VOID_S3_PROFILE_EVIDENCE,{recursive:true});
++        throw error;
++    } finally {await fs.rm(temp,{recursive:true,force:true});}
++}
++main().catch(error=>{console.error(error);process.exitCode=1;});
+diff --git a/include/void/diagnostic.hpp b/include/void/diagnostic.hpp
+--- a/include/void/diagnostic.hpp
++++ b/include/void/diagnostic.hpp
+@@ -21,7 +21,8 @@
+     project_syntax = 5001, project_schema = 5002, project_field = 5003,
+     project_identity = 5004, project_version = 5005, project_path = 5006,
+     project_duplicate = 5007, project_reserved = 5008,
+-    project_boundary = 5009, project_entry = 5010, project_changed = 5011, limit = 9001
++    project_boundary = 5009, project_entry = 5010, project_changed = 5011,
++    project_debug_info = 5012, limit = 9001
+ };
+ struct SourceSpan {
+     std::shared_ptr<const SourceFile> source;
+diff --git a/include/void/frontend.hpp b/include/void/frontend.hpp
+--- a/include/void/frontend.hpp
++++ b/include/void/frontend.hpp
+@@ -74,7 +74,7 @@
+ class ValidatedAnalysis : public std::enable_shared_from_this<ValidatedAnalysis> {
+     friend struct AnalysisAccess;
+     std::string entry_, entry_symbol_, contract_, constants_;
+-    bool application_=false;
++    bool application_=false, executable_=true;
+     std::vector<Diagnostic> warnings_;
+     std::vector<AnalyzedModule> modules_;
+     std::vector<AnalyzedDeclaration> declarations_;
+@@ -90,6 +90,7 @@
+     const std::string& entry_identity() const { return entry_; }
+     const std::string& entry_symbol() const { return entry_symbol_; }
+     bool application() const { return application_; }
++    bool executable() const { return executable_; } // Libraries expose metadata only.
+     const auto& modules() const { return modules_; }
+     const auto& declarations() const { return declarations_; }
+     const auto& references() const { return references_; }
+@@ -121,31 +122,50 @@
+ // Manifest-selected mode is separate from the legacy entry-parent adapter above.
+ // TOML overlays have their own canonical root-relative namespace.
+ using ManifestOverrides = std::map<std::string, std::optional<SourceFile>>;
++void require_manifest_identity(const std::string&);
++// Owned observations, including failed selections. Never executable authority.
++struct ProjectState {
++    std::filesystem::path root;
++    std::shared_ptr<const project::Manifest> manifest;
++    std::optional<std::filesystem::path> entry;
++    std::map<std::string,SourceFile> discovery, execution;
++    std::string snapshot_key;
++    bool discovery_complete=false, validated=false;
++};
+ class ProjectAnalysis {
+     friend struct ProjectAnalysisAccess;
+     std::filesystem::path root_;
+     std::optional<std::filesystem::path> entry_;
+     std::shared_ptr<const project::Manifest> manifest_;
+-    std::shared_ptr<const ValidatedAnalysis> program_;
++    std::shared_ptr<const ValidatedAnalysis> program_, semantic_;
+     std::map<std::string, SourceFile> discovery_, execution_;
+-    std::string selection_key_;
++    std::string selection_key_, context_key_;
+     ProjectAnalysis() = default;
+ public:
+     const auto& root() const { return root_; }
+     const auto& entry() const { return entry_; }
+     const auto& manifest() const { return manifest_; }
+     const auto& program() const { return program_; } // Absent for a checked library.
++    const auto& semantic_analysis() const { return semantic_; } // Library lowering rejects.
+     const auto& discovery_sources() const { return discovery_; }
+     const auto& execution_sources() const { return execution_; }
+     const auto& selection_key() const { return selection_key_; }
++    const auto& context_key() const { return context_key_; } // Excludes source/trivia bytes.
+ };
+ struct ProjectAnalysisResult {
+     std::shared_ptr<const ProjectAnalysis> project;
+     std::vector<Diagnostic> diagnostics;
+     // Validated metadata may accompany failed selection; it grants no entry/IR.
+     std::shared_ptr<const project::Manifest> manifest;
++    std::shared_ptr<const ProjectState> state;
+     bool succeeded() const { return bool(project); }
+ };
++std::vector<Diagnostic> check_project_documents(const std::filesystem::path&,const SourceOverrides&,const ManifestOverrides&,const std::vector<std::string>&);
++struct ProjectPreflight {
++    std::filesystem::path root;std::optional<std::filesystem::path> entry;
++    bool manifest_mode=false,standalone=false;ProjectAnalysisResult analysis;
++};
++ProjectPreflight discover_project_context(const std::filesystem::path& workspace,const std::filesystem::path& active,const std::filesystem::path& root,const std::filesystem::path& entry);
+ // Also recognizes malformed/wrong-case manifest presence so callers fail closed.
+ bool project_manifest_present(const std::filesystem::path& root);
+ ProjectAnalysisResult analyze_manifest_project(const std::filesystem::path& root,
+@@ -165,6 +185,7 @@
+ EditorAssistance editor_assistance(const std::filesystem::path&, const SourceOverrides&,
+     const std::string& module, std::size_t cursor);
+ bool valid_editor_identifier(const std::string&);
++EditorAssistance project_editor_assistance(const std::filesystem::path&,const std::optional<std::string>&,const SourceOverrides&,const ManifestOverrides&,const std::string&,std::size_t);
+ std::optional<std::string> format_source(const SourceFile&);
+ // One source pipeline shared by checking, JIT and AOT. Errors contain rendered
+ // source diagnostics and are raised before invoking any backend.
+diff --git a/include/void/project.hpp b/include/void/project.hpp
+--- a/include/void/project.hpp
++++ b/include/void/project.hpp
+@@ -77,4 +77,14 @@
+ // Pure, bounded, owning parse of an already UTF-8-validated SourceFile snapshot.
+ // Does not open paths, discover entries, query the environment or execute code.
+ ParseResult parse_manifest(const SourceFile&);
++enum class ProfileName { debug, release };
++struct EffectiveProfile {
++    ProfileName name=ProfileName::release;
++    bool optimize=true;
++    DebugInfo debug_info=DebugInfo::none; // Requested setting, never a claim of emitted symbols.
++    std::vector<Diagnostic> diagnostics;
++    std::string cache_key;
++};
++// Usage conflicts throw invalid_argument. Only the selected profile can warn.
++EffectiveProfile resolve_profile(const Manifest&,std::optional<ProfileName>,bool no_opt,bool cache);
+ }
+diff --git a/include/void/tooling.hpp b/include/void/tooling.hpp
+--- a/include/void/tooling.hpp
++++ b/include/void/tooling.hpp
+@@ -98,12 +98,18 @@
+     std::shared_ptr<const Identity> identity_;
+     std::filesystem::path entry_;
+     SourceOverrides overrides_;
++    std::optional<std::filesystem::path> project_root_, project_request_;
++    std::optional<std::string> entry_override_;
++    ManifestOverrides manifests_;
+     std::map<std::string, DocumentRevision> documents_;
+     std::uint64_t revision_ = 0;
+ public:
+     std::uint64_t revision() const { return revision_; }
+     const auto& documents() const { return documents_; }
+     const auto& overrides() const { return overrides_; }
++    const auto& project_root() const { return project_root_; }
++    const auto& entry_override() const { return entry_override_; }
++    const auto& manifests() const { return manifests_; }
+     bool same_revision(const ProjectSnapshot& other) const { return identity_ && identity_ == other.identity_; }
+ };
+ class SessionAnalysis {
+@@ -111,11 +117,17 @@
+     ProjectSnapshot snapshot_;
+     AnalysisResult result_;
+     std::shared_ptr<const ToolingIndex> index_;
++    std::optional<ProjectAnalysisResult> project_;
++    std::shared_ptr<const ValidatedAnalysis> semantic_;
+ public:
+     const ProjectSnapshot& snapshot() const { return snapshot_; }
+     const AnalysisResult& result() const { return result_; }
+     const auto& index() const { return index_; } // Explicit historical access.
++    const auto& project() const { return project_; }
++    const auto& semantic_analysis() const { return semantic_; }
++    bool succeeded() const {return project_?project_->succeeded():result_.succeeded();}
+ };
++struct ProjectSession {std::filesystem::path root; std::optional<std::string> entry = {};};
+ // Single-threaded orchestration. Selecting, running and accepting are separate so
+ // a future scheduler can deliver results out of order without publishing stale data.
+ class ToolingSession {
+@@ -123,9 +135,13 @@
+     std::vector<std::string> changed_;
+     std::shared_ptr<const SessionAnalysis> latest_, last_success_;
+     InvalidationPlan accepted_plan_;
++    std::string selected_context_;
+     void change(const std::string&, DocumentRevision, std::optional<SourceFile>, bool close);
++    bool manifest_document(const std::string&) const;
++    bool overridden(const std::string&) const;
+ public:
+     explicit ToolingSession(std::filesystem::path entry);
++    explicit ToolingSession(ProjectSession);
+     ToolingSession(const ToolingSession&) = delete;
+     ToolingSession& operator=(const ToolingSession&) = delete;
+     void open(const std::string&, DocumentRevision, std::string text);
+@@ -134,6 +150,8 @@
+     void close(const std::string&, DocumentRevision);
+     // Explicit disk refresh invalidates freshness even if bytes have not changed.
+     void refresh();
++    void reselect(std::optional<std::string> entry = {});
++    bool requires_reselection() const;
+     ProjectSnapshot select() const { return current_; }
+     static std::shared_ptr<const SessionAnalysis> analyze(ProjectSnapshot);
+     bool accept(std::shared_ptr<const SessionAnalysis>);
+diff --git a/src/frontend/compiler.cpp b/src/frontend/compiler.cpp
+--- a/src/frontend/compiler.cpp
++++ b/src/frontend/compiler.cpp
+@@ -6132,13 +6132,14 @@
+ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path&, const SourceOverrides& = {}, bool verify_disk = false,const NativeProject* = nullptr,EditorProbe* = nullptr);
+ // This factory is the only way to construct a successful result.
+ struct AnalysisAccess {
+-    static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry,std::vector<Diagnostic> warnings={},const std::string& selection_key={}) {
++    static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry,std::vector<Diagnostic> warnings={},const std::string& context_key={},std::shared_ptr<Unit> library_scope={}) {
+         auto result = std::shared_ptr<ValidatedAnalysis>(new ValidatedAnalysis);result->warnings_=std::move(warnings);
+         result->entry_ = entry;
+-        const auto& selected=*units.at(entry);
++        const auto& selected=library_scope?*library_scope:*units.at(entry);
++        result->executable_=!library_scope;
+         const auto* app=application_entry(selected);
+         result->application_=app!=nullptr || (!selected.globals.empty() && !selected.declarations.contains("entry") && !selected.declarations.contains("main"));
+-        result->entry_symbol_=entry+(result->application_?"::$app_adapter":"::entry");
++        result->entry_symbol_=library_scope?std::string{}:entry+(result->application_?"::$app_adapter":"::entry");
+         // Builtin declaration snapshots provide stable canonical hover/reference
+         // identity, but never masquerade as filesystem navigation/edit targets.
+         for(auto type:{Type::i8,Type::u8,Type::i16,Type::u16,Type::i32,Type::u32,Type::i64,Type::u64,Type::f32,Type::f64})for(const auto& api:numeric::members()) {
+@@ -6152,11 +6153,12 @@
+         }
+         for(const auto& [id,u]:units)for(const auto& [symbol,record]:u->builtins)if(std::none_of(result->editor_declarations_.begin(),result->editor_declarations_.end(),[&](const auto& d){return d.identity==symbol;}))result->editor_declarations_.push_back(record);
+         result->contract_="18:numeric-prelude-v1:20:text-collections-v1:unicode-case-16-v1:display-v1:console-v2:terminal-v2:application-args-v2:host-primitives-v1:"+result->entry_symbol_;
+-        if(!selection_key.empty())result->contract_+="|project-selection-v1:"+selection_key;
++        if(!context_key.empty())result->contract_+="|project-context-v1:"+context_key;
+         for(const auto& [id,u]:units)for(const auto& f:u->functions)if(!f.native_symbol.empty())result->contract_+=":"+id+":"+f.native_symbol;
+ 
+         result->contract_+=std::string(formatting::abi_version)+"|"+std::string(temporal::abi_version);
+         auto graph = std::make_shared<const std::map<std::string, std::unique_ptr<Unit>>>(std::move(units));
++        auto& context=library_scope?*library_scope:*graph->at(entry);
+         auto field = [](std::string& out, const std::string& value) { out += std::to_string(value.size()) + ":" + value; };
+         std::map<std::string,std::string> source_identities;
+         for(const auto& [id,u]:*graph) {
+@@ -6325,7 +6327,7 @@
+                 }
+                 else if(e.kind==Expr::Kind::conversion && e.op=="interface") {
+                     reference(owner,e.type.definition->identity,e,*unit,true);
+-                    for(const auto& binding:graph->at(entry)->member_catalog->interface_bindings) if(binding.key==e.target)
++                    for(const auto& binding:context.member_catalog->interface_bindings) if(binding.key==e.target)
+                         for(const auto& [requirement,route]:binding.methods) {reference(owner,requirement,e,*unit,true);reference(owner,route.second,e,*unit,true);}
+                 } else if (!e.target.empty() && e.target!="$interpolation" && e.target!="$hole" && !e.target.starts_with("$array.") && !e.target.starts_with("$dict.")) reference(owner,e.target,e,*unit,implicit || e.implicit);
+                 else if (e.kind == Expr::Kind::name && locals.contains(e.slot)) reference(owner,locals.at(e.slot),e,*unit,implicit || e.implicit,locals.at(e.slot).find("::const::")!=std::string::npos && locals.at(e.slot).substr(0,locals.at(e.slot).find("::const::"))==owner.substr(0,owner.find("::const::")));
+@@ -6353,7 +6355,7 @@
+                 field(result->contract_,"array-extent");field(result->contract_,ir::type_name(array.resolved));
+             }
+             for (const auto& [token,raw] : unit->type_uses) {
+-                auto t = resolve_type(raw,*unit,*graph->at(entry),*graph,token);
++                auto t = resolve_type(raw,*unit,context,*graph,token);
+                 // Attribute annotation dependencies to their enclosing declaration,
+                 // keeping invalidation edges between owned declaration identities.
+                 std::string owner = id; std::size_t nearest = 0;
+@@ -6503,7 +6505,7 @@
+                 body(f.body);
+             }
+         }
+-        for(const auto& binding:graph->at(entry)->member_catalog->interface_bindings) {
++        for(const auto& binding:context.member_catalog->interface_bindings) {
+             field(result->contract_,"interface-binding");field(result->contract_,binding.key);
+             for(const auto& [requirement,route]:binding.methods) {
+                 const auto& owner=*graph->at(binding.interface.definition->module_identity);
+@@ -6523,7 +6525,10 @@
+             if(alternatives.size()>1){r.signature="Selected specializations:";for(const auto& label:alternatives)r.signature+="\n\n"+label;}
+         }
+         field(result->contract_,result->constants_);
+-        result->lower_ = [graph,entry] { return lower_graph(*graph,entry); };
++        result->lower_ = [graph,entry,library_scope] {
++            if(library_scope)throw std::invalid_argument("Library analysis has no executable entry or supported IR build operation.");
++            return lower_graph(*graph,entry);
++        };
+         return result;
+     }
+ };
+@@ -6630,7 +6635,7 @@
+ #include "project_selection.inc"
+ // Import recovery reads metadata only. Full imports still pass SourceGraph::load.
+ std::optional<EditorAssistance> import_assistance(const std::filesystem::path& entry,const SourceOverrides& overrides,
+-    const std::string& module,const SourceFile& source,std::size_t cursor) {
++    const std::string& module,const SourceFile& source,std::size_t cursor,ProjectCapture* project=nullptr) {
+     const auto& text=source.text();
+     auto line=cursor?text.find_last_of("\r\n",cursor-1):std::string::npos;line=line==std::string::npos?0:line+1;
+     auto start=line;if(!start && text.starts_with("\xef\xbb\xbf"))start=3;
+@@ -6652,7 +6657,8 @@
+         for(char c:prefix)if(!(letter(c)||digit(c)||c=='/'))return out;
+         if(prefix.starts_with('/') || prefix.find("//")!=std::string::npos)return out;
+     }
+-    Unit anchor(source,module);Diagnostics diagnostics;SourceGraph graph(std::filesystem::canonical(entry.parent_path()),diagnostics,overrides);
++    Unit anchor(source,module);Diagnostics diagnostics;SourceGraph legacy(std::filesystem::canonical(project?project->root:entry.parent_path()),diagnostics,overrides);
++    auto& graph=project?project->graph:legacy;
+     auto token=[&](std::string name){return Token{quoted?TokenKind::path:TokenKind::name,std::move(name),start};};
+     if(!quoted && directory.empty() && std::string_view("lib/").starts_with(leaf)) {
+         try {(void)graph.resolve(anchor,token("lib/_void_discovery_"),true);out.candidates.push_back({"lib/","project-local libraries",19,"lib/"});}catch(const CompilationError&){}
+@@ -6695,15 +6701,15 @@
+     return !name.empty() && letter(name[0]) && !reserved.contains(name) &&
+         std::all_of(name.begin(),name.end(),[](char c){return letter(c)||digit(c);});
+ }
+-EditorAssistance editor_assistance(const std::filesystem::path& entry,const SourceOverrides& overrides,const std::string& module,std::size_t cursor) {
++EditorAssistance editor_assistance_impl(const std::filesystem::path& entry,const SourceOverrides& overrides,const std::string& module,std::size_t cursor,ProjectCapture* project=nullptr,const std::optional<std::string>& project_entry={}) {
+     require_module_identity(module);
+     EditorAssistance empty;
+     auto selected=overrides.find(module);
+     if(selected!=overrides.end() && !selected->second)return empty;
+-    SourceFile source=selected!=overrides.end() && selected->second ? *selected->second : read_source(entry.parent_path()/utf8_path(module).relative_path());
++    SourceFile source=project?project->recapture_source(module):selected!=overrides.end() && selected->second ? *selected->second : read_source(entry.parent_path()/utf8_path(module).relative_path());
+     const auto& text=source.text();
+     if(cursor>text.size() || text.find("_void_editor_cursor_")!=std::string::npos) return empty;
+-    if(auto imports=import_assistance(entry,overrides,module,source,cursor))return *imports;
++    if(auto imports=import_assistance(entry,overrides,module,source,cursor,project))return *imports;
+     Diagnostics diagnostics;auto tokens=lex(source,diagnostics);
+     if(diagnostics.failed()) return empty;
+     std::size_t begin=cursor,end=cursor;
+@@ -6759,13 +6765,24 @@
+     }
+     auto frozen=overrides;frozen.insert_or_assign(module,SourceFile(source.path(),std::move(repaired)));
+     EditorProbe probe{module,begin,{},operator_context,{},{},0};probe.result.begin=begin;probe.result.end=end;
+-    try {(void)validated_project(entry,frozen,true,nullptr,&probe);if(operator_context)return probe.result;}
++    try {
++        if(project)(void)analyze_manifest_project_impl(project->root,project_entry,frozen,project->manifest_overlays,&probe);
++        else (void)validated_project(entry,frozen,true,nullptr,&probe);
++        if(operator_context)return probe.result;
++    }
+     catch(const EditorProbeFound&) {
+         const auto prefix=operator_context?std::string{}:text.substr(begin,cursor-begin);
+         std::erase_if(probe.result.candidates,[&](const auto& c){return !c.name.starts_with(prefix);});
+         return probe.result;
+     } catch(const CompilationError&) {}
+     return empty;
++}
++EditorAssistance editor_assistance(const std::filesystem::path& entry,const SourceOverrides& sources,const std::string& module,std::size_t cursor) {
++    return editor_assistance_impl(entry,sources,module,cursor);
++}
++EditorAssistance project_editor_assistance(const std::filesystem::path& root,const std::optional<std::string>& entry,const SourceOverrides& sources,const ManifestOverrides& manifests,const std::string& module,std::size_t cursor) {
++    try {ProjectCapture capture(root,sources,manifests);return editor_assistance_impl(root,sources,module,cursor,&capture,entry);}
++    catch(const CompilationError&){return {};}
+ }
+ std::optional<std::string> format_source(const SourceFile& source) {
+     // Parse with the ordinary compiler before proposing edits. This is local
+diff --git a/src/frontend/project.cpp b/src/frontend/project.cpp
+--- a/src/frontend/project.cpp
++++ b/src/frontend/project.cpp
+@@ -364,4 +364,24 @@
+     }
+ };
+ ParseResult parse_manifest(const SourceFile& source) { return ManifestParser(source).parse(); }
+-}
++EffectiveProfile resolve_profile(const Manifest& manifest,std::optional<ProfileName> requested,bool no_opt,bool cache) {
++    auto name=requested.value_or(cache?ProfileName::debug:ProfileName::release);
++    const auto& profile=name==ProfileName::debug?manifest.debug():manifest.release();
++    bool optimize=profile.optimization==Optimization::O2 && !no_opt;
++    if(cache && (name!=ProfileName::debug || optimize))throw std::invalid_argument("--cache requires the debug profile with effective optimization='none'; it cannot override an explicit release profile or O2 setting.");
++    EffectiveProfile result{name,optimize,profile.debug_info,{},"project-profile-v1:"};
++    const std::string label=name==ProfileName::debug?"debug":"release";
++    result.cache_key+=label+":"+(optimize?"O2":"none")+":"+std::to_string(static_cast<int>(profile.debug_info));
++    if(profile.debug_info!=DebugInfo::none) {
++        Diagnostic warning(DiagnosticCode::project_debug_info);warning.severity=Severity::warning;
++        warning.description="Project profile '"+label+"' requests debug_info='"+(profile.debug_info==DebugInfo::line?"line":"full")+"'; profile-controlled debug-information emission is not implemented.";
++        auto field=manifest.fields().find("build."+label+".debug_info");
++        warning.primary=field!=manifest.fields().end()?field->second.value:SourceSpan{std::make_shared<const SourceFile>(manifest.source()),"/void.project.toml",manifest.source().text().size(),manifest.source().text().size()};
++        warning.primary.module_identity="/void.project.toml";
++        warning.hint="The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.";
++        result.diagnostics.push_back(std::move(warning));
++    }
++    return result;
++}
++
++}
+diff --git a/src/frontend/project_selection.inc b/src/frontend/project_selection.inc
+--- a/src/frontend/project_selection.inc
++++ b/src/frontend/project_selection.inc
+@@ -231,35 +231,80 @@
+     for(const auto& [id,names]:capture.listings){field(id);for(const auto& name:names)field(name);field("end-directory");}
+     constexpr char hex[]="0123456789abcdef";std::string result;for(auto byte:hash.final()){result+=hex[byte>>4];result+=hex[byte&15];}return result;
+ }
++std::string project_context_key(const ProjectCapture& capture,const std::string& entry) {
++    // Semantic context is independent of source/build provenance and TOML trivia.
++    std::string result="project-context-v1";
++    auto field=[&](const std::string& value){result+=std::to_string(value.size())+":"+value;};
++    auto identity=[&](const project::Identity& value){field(value.id);field(value.name);field(value.version.text());};
++    const auto& m=*capture.manifest;
++    field(path_utf8(capture.root));identity(m.project());field(std::to_string(static_cast<int>(m.kind())));
++    if(m.application())identity(*m.application());if(m.package())identity(*m.package());
++    field(entry);field(std::to_string(m.sources().roots.size()));for(const auto& root:m.sources().roots)field(root);
++    field(std::to_string(m.sources().exclude.size()));for(const auto& excluded:m.sources().exclude)field(excluded);
++    for(const auto& profile:{m.debug(),m.release()}){field(std::to_string(static_cast<int>(profile.optimization)));field(std::to_string(static_cast<int>(profile.debug_info)));}
++    return result;
++}
+ }
+ struct ProjectAnalysisAccess {
+-    static std::shared_ptr<const ProjectAnalysis> build(ProjectCapture& capture,const std::set<std::string>& seeds,const std::string& entry,bool automatic) {
++    static std::shared_ptr<const ProjectAnalysis> build(ProjectCapture& capture,const std::set<std::string>& seeds,const std::string& entry,bool automatic,std::shared_ptr<Unit> library_scope) {
+         auto result=std::shared_ptr<ProjectAnalysis>(new ProjectAnalysis);
+         result->root_=capture.root;result->manifest_=capture.manifest;
+         for(const auto& id:seeds)result->discovery_.emplace(id,capture.sources.at(id));
+         for(const auto& [id,unit]:capture.graph.units)result->execution_.emplace(id,unit->source);
+         result->selection_key_=project_snapshot_key(capture,entry,automatic);
++        result->context_key_=project_context_key(capture,entry);
+         if(!entry.empty()) {
+             result->entry_=capture.root/utf8_path(entry).relative_path();
+-            result->program_=AnalysisAccess::build(std::move(capture.graph.units),entry,capture.diagnostics.warnings(),result->selection_key_);
++            result->program_=AnalysisAccess::build(std::move(capture.graph.units),entry,capture.diagnostics.warnings(),result->context_key_);
++            result->semantic_=result->program_;
++        } else {
++            result->semantic_=AnalysisAccess::build(std::move(capture.graph.units),entry,capture.diagnostics.warnings(),result->context_key_,std::move(library_scope));
+         }
+         return result;
+     }
+ };
++void require_manifest_identity(const std::string& id) {
++    if(id.empty() || id.front()!='/' || path_utf8(utf8_path(id).filename())!="void.project.toml")throw std::invalid_argument("Expected exact root-relative void.project.toml identity.");
++    for(const auto& part:utf8_path(id).relative_path())if(part=="." || part==".." || !portable_path_component(path_utf8(part)))throw std::invalid_argument("Invalid manifest overlay identity.");
++    if(path_utf8(utf8_path(id).lexically_normal())!=id)throw std::invalid_argument("Manifest overlay identity is not canonical.");
++}
+ bool project_manifest_present(const std::filesystem::path& root) {
+     for(const auto& item:std::filesystem::directory_iterator(root))if(folded(path_utf8(item.path().filename()))=="void.project.toml")return true;
+     return false;
+ }
+-ProjectAnalysisResult analyze_manifest_project(const std::filesystem::path& root,const std::optional<std::string>& entry_override,const SourceOverrides& sources,const ManifestOverrides& manifests) {
++ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path& root,const std::optional<std::string>& entry_override,const SourceOverrides& sources,const ManifestOverrides& manifests,EditorProbe* editor) {
+     ProjectAnalysisResult result;
++    std::unique_ptr<ProjectCapture> owned;
++    std::set<std::string> seeds;std::string entry;bool automatic=false,complete=false;
++    auto retain=[&] {
++        auto state=std::make_shared<ProjectState>();std::error_code ec;state->root=owned?owned->root:std::filesystem::canonical(root,ec);if(ec){ec.clear();state->root=std::filesystem::absolute(root,ec);}if(ec)state->root=root;
++        state->manifest=result.manifest;state->discovery_complete=complete;state->validated=result.succeeded();
++        if(owned) {
++            for(const auto& id:seeds)if(auto source=owned->sources.find(id);source!=owned->sources.end())state->discovery.emplace(id,source->second);
++            for(const auto& [id,unit]:owned->graph.units)state->execution.emplace(id,unit->source);
++            if(!entry.empty())state->entry=owned->root/utf8_path(entry).relative_path();
++            state->snapshot_key=project_snapshot_key(*owned,entry,automatic);
++        }
++        if(result.project){state->discovery=result.project->discovery_sources();state->execution=result.project->execution_sources();state->snapshot_key=result.project->selection_key();}
++        auto bind=[&](SourceSpan& span){
++            if(!span.module_identity.empty())return;
++            auto relative=span.source?utf8_path(span.source->path()).lexically_relative(state->root):std::filesystem::path{};
++            auto id="/"+path_utf8(relative);
++            if(!relative.empty())try{if(id.ends_with("/void.project.toml"))require_manifest_identity(id);else require_module_identity(id);span.module_identity=id;return;}catch(const std::invalid_argument&){}
++            span.module_identity="/void.project.toml";
++        };
++        for(auto& d:result.diagnostics){bind(d.primary);for(auto& related:d.related)bind(related.span);}
++        result.state=std::move(state);
++    };
+     try {
+-        ProjectCapture capture(root,sources,manifests);result.manifest=capture.manifest;
++        owned=std::make_unique<ProjectCapture>(root,sources,manifests);auto& capture=*owned;result.manifest=capture.manifest;capture.diagnostics.editor=editor;
+         const bool library=capture.manifest->kind()==project::Kind::library;
+         if(library && entry_override)project_failure(capture.anchor,Code::project_entry,"A library project cannot select an application entry.");
+         auto explicit_entry=entry_override?entry_override:capture.manifest->entry();
+-        bool automatic=!explicit_entry;std::set<std::string> seeds;std::string entry;
++        automatic=!explicit_entry;
+         if(automatic) {
+             seeds=capture.inventory();
++            complete=true;
+             for(const auto& id:seeds)capture.graph.parse(capture.from,{TokenKind::path,id,0});
+             capture.diagnostics.finish();
+             if(!library) {
+@@ -293,7 +338,8 @@
+         if(library)for(const auto& id:seeds)capture.graph.load(capture.from,{TokenKind::path,id,0});
+         else capture.graph.load(capture.from,{TokenKind::path,entry,0});
+         capture.diagnostics.finish();
+-        if(library) {Unit scope(capture.manifest->source(),"");validate_graph(capture.graph.units,"",capture.diagnostics,&scope);}
++        std::shared_ptr<Unit> library_scope;
++        if(library) {library_scope=std::make_shared<Unit>(capture.manifest->source(),"");validate_graph(capture.graph.units,"",capture.diagnostics,library_scope.get());}
+         else validate_graph(capture.graph.units,entry,capture.diagnostics);
+         // Recapture membership, boundary observations, spelling/aliases and bytes.
+         // No second source parse, no OS-transaction claim, and no stale success.
+@@ -308,8 +354,63 @@
+             auto found=fresh.sources.find(id);
+             fresh.changed(found==fresh.sources.end() || found->second.text()!=source.text());
+         }
+-        result.project=ProjectAnalysisAccess::build(capture,seeds,entry,automatic);result.diagnostics=capture.diagnostics.warnings();return result;
+-    } catch(const CompilationError& failure) {result.diagnostics=failure.diagnostics();return result;}
+-      catch(const std::filesystem::filesystem_error& failure) {Diagnostic d{Code::project_boundary};d.primary={std::make_shared<const SourceFile>(path_utf8(root),""),{},0,0};d.description=failure.what();d.hint="Check the selected project root, permissions and exact path spelling.";result.diagnostics.push_back(std::move(d));return result;}
+-      catch(const std::invalid_argument& failure) {Diagnostic d{Code::project_path};d.primary={std::make_shared<const SourceFile>(path_utf8(root),""),{},0,0};d.description=failure.what();d.hint="Use exact canonical root-relative source identities and a manifest-relative .void entry.";result.diagnostics.push_back(std::move(d));return result;}
+-}
++        result.project=ProjectAnalysisAccess::build(capture,seeds,entry,automatic,std::move(library_scope));result.diagnostics=capture.diagnostics.warnings();retain();return result;
++    } catch(const CompilationError& failure) {result.diagnostics=failure.diagnostics();retain();return result;}
++      catch(const std::filesystem::filesystem_error& failure) {Diagnostic d{Code::project_boundary};d.primary={std::make_shared<const SourceFile>(path_utf8(root),""),{},0,0};d.description=failure.what();d.hint="Check the selected project root, permissions and exact path spelling.";result.diagnostics.push_back(std::move(d));retain();return result;}
++      catch(const std::invalid_argument& failure) {Diagnostic d{Code::project_path};d.primary={std::make_shared<const SourceFile>(path_utf8(root),""),{},0,0};d.description=failure.what();d.hint="Use exact canonical root-relative source identities and a manifest-relative .void entry.";result.diagnostics.push_back(std::move(d));retain();return result;}
++}
++
++ProjectAnalysisResult analyze_manifest_project(const std::filesystem::path& root,const std::optional<std::string>& entry,const SourceOverrides& sources,const ManifestOverrides& manifests) {
++    return analyze_manifest_project_impl(root,entry,sources,manifests,nullptr);
++}
++
++std::vector<Diagnostic> check_project_documents(const std::filesystem::path& root,const SourceOverrides& sources,const ManifestOverrides& manifests,const std::vector<std::string>& documents) {
++    std::vector<Diagnostic> records;
++    try {
++        ProjectCapture capture(root,sources,manifests);
++        for(const auto& id:documents) {
++            try{require_module_identity(id);capture.graph.resolve(capture.from,{TokenKind::path,id,0});}
++            catch(const CompilationError& failure) {
++                for(auto diagnostic:failure.diagnostics()) {
++                    auto overlay=sources.find(id);auto source=overlay!=sources.end() && overlay->second?*overlay->second:SourceFile(path_utf8(capture.root/utf8_path(id).relative_path()),"");
++                    diagnostic.primary={std::make_shared<const SourceFile>(std::move(source)),id,0,0};records.push_back(std::move(diagnostic));
++                    if(records.size()==project::manifest_diagnostic_limit)return records;
++                }
++            }
++        }
++    }catch(const CompilationError& failure){records=failure.diagnostics();for(auto& d:records)if(d.primary.module_identity.empty())d.primary.module_identity="/void.project.toml";}
++    catch(const std::filesystem::filesystem_error& failure){Diagnostic d(Code::project_boundary);d.primary={std::make_shared<const SourceFile>(path_utf8(root/"void.project.toml"),""),"/void.project.toml",0,0};d.description=failure.what();records.push_back(std::move(d));}
++    return records;
++}
++std::vector<std::filesystem::path> project_ancestor_directories(const std::filesystem::path&,const std::filesystem::path&);
++ProjectPreflight discover_project_context(const std::filesystem::path& workspace,const std::filesystem::path& active,const std::filesystem::path& selected_root,const std::filesystem::path& selected_entry) {
++    ProjectPreflight result;auto root=selected_root;
++    if(root.empty() && selected_entry.empty() && !workspace.empty())
++        for(const auto& directory:project_ancestor_directories(workspace,active))if(project_manifest_present(directory)){root=directory;break;}
++    if(root.empty()) {
++        auto legacy=discover_project(workspace,active,selected_entry);
++        result.root=legacy.root;result.entry=legacy.entry;result.standalone=legacy.standalone;return result;
++    }
++    std::optional<std::string> entry;
++    if(!selected_entry.empty())entry=path_utf8(selected_entry);
++    result.manifest_mode=true;result.analysis=analyze_manifest_project(root,entry);
++    result.root=result.analysis.state->root;
++    if(result.analysis.manifest && !active.empty()) {
++        auto relative=std::filesystem::absolute(active).lexically_relative(result.root);auto id="/"+path_utf8(relative);
++        try {
++            if(id.ends_with("/void.project.toml"))require_manifest_identity(id);
++            else {
++                require_module_identity(id);SourceOverrides overlay{{id,SourceFile(path_utf8(active),"")}};
++                ManifestOverrides manifest{{"/void.project.toml",result.analysis.manifest->source()}};
++                auto failures=check_project_documents(root,overlay,manifest,{id});
++                if(!failures.empty())throw CompilationError(std::move(failures));
++            }
++        }catch(const std::invalid_argument& failure) {
++            Diagnostic diagnostic(Code::project_boundary);diagnostic.primary={std::make_shared<const SourceFile>(path_utf8(result.root/"void.project.toml"),""),"/void.project.toml",0,0};
++            diagnostic.description="Active document is outside the pinned project boundary: "+std::string(failure.what());result.analysis.diagnostics.push_back(std::move(diagnostic));result.analysis.project.reset();
++            auto state=std::make_shared<ProjectState>(*result.analysis.state);state->validated=false;result.analysis.state=std::move(state);
++        }
++    }
++    if(result.analysis.project)result.entry=result.analysis.project->entry();
++    return result;
++}
+diff --git a/src/frontend/source.cpp b/src/frontend/source.cpp
+--- a/src/frontend/source.cpp
++++ b/src/frontend/source.cpp
+@@ -148,28 +148,8 @@
+     std::lock_guard lock(standard_sources_mutex);
+     return installed_standard_sources.empty()?utf8_path(VOID_STDLIB_ROOT):installed_standard_sources;
+ }
+-ProjectSelection discover_project(const std::filesystem::path& workspace,
+-    const std::filesystem::path& active,const std::filesystem::path& explicit_entry) {
++std::vector<std::filesystem::path> project_ancestor_directories(const std::filesystem::path& workspace,const std::filesystem::path& active) {
+     namespace fs=std::filesystem;
+-    auto file=[](fs::path path,bool missing) {
+-        path=fs::absolute(path).lexically_normal();
+-        auto parent=fs::canonical(path.parent_path());
+-        auto name=path.filename();
+-        if(path.extension()!=".void")throw std::invalid_argument("Project entry must name an exact .void file");
+-        for(const auto& child:fs::directory_iterator(parent)) {
+-            auto a=path_utf8(child.path().filename()), b=path_utf8(name);
+-            auto fold=[](std::string x){for(auto& c:x)if(c>='A'&&c<='Z')c+='a'-'A';return x;};
+-            if(fold(a)==fold(b) && a!=b)throw std::invalid_argument("Project entry case mismatch/collision");
+-        }
+-        auto result=parent/name;auto status=fs::symlink_status(result);
+-        if(fs::is_symlink(status) || (fs::exists(status) && !fs::is_regular_file(status)) || (!missing && !fs::is_regular_file(status)))throw std::invalid_argument("Project entry must be a regular file without aliases");
+-        return result;
+-    };
+-    if(!explicit_entry.empty()) {auto entry=file(explicit_entry,false);return {entry,entry.parent_path(),false};}
+-    if(workspace.empty()) {
+-        if(active.empty())throw std::invalid_argument("Select a workspace or active .void file");
+-        auto entry=file(active,true);return {entry,entry.parent_path(),true};
+-    }
+     auto boundary=fs::canonical(workspace);
+     auto start=active.empty()?boundary:fs::absolute(active).lexically_normal().parent_path();
+     auto relative=start.lexically_relative(boundary);
+@@ -221,7 +201,33 @@
+     for(const auto& part:relative)if(part!=".") {checked/=part;if(fs::is_symlink(fs::symlink_status(checked)) || fs::canonical(checked)!=checked)throw std::invalid_argument("Project selection contains an alias");}
+     // Search using the same spelling as boundary, so termination is lexical too.
+     start=checked;
+-    for(auto directory=start;;directory=directory.parent_path()) {
++    std::vector<fs::path> result;
++    for(auto directory=start;;directory=directory.parent_path()){result.push_back(directory);if(directory==boundary)break;}
++    return result;
++}
++ProjectSelection discover_project(const std::filesystem::path& workspace,
++    const std::filesystem::path& active,const std::filesystem::path& explicit_entry) {
++    namespace fs=std::filesystem;
++    auto file=[](fs::path path,bool missing) {
++        path=fs::absolute(path).lexically_normal();
++        auto parent=fs::canonical(path.parent_path());
++        auto name=path.filename();
++        if(path.extension()!=".void")throw std::invalid_argument("Project entry must name an exact .void file");
++        for(const auto& child:fs::directory_iterator(parent)) {
++            auto a=path_utf8(child.path().filename()), b=path_utf8(name);
++            auto fold=[](std::string x){for(auto& c:x)if(c>='A'&&c<='Z')c+='a'-'A';return x;};
++            if(fold(a)==fold(b) && a!=b)throw std::invalid_argument("Project entry case mismatch/collision");
++        }
++        auto result=parent/name;auto status=fs::symlink_status(result);
++        if(fs::is_symlink(status) || (fs::exists(status) && !fs::is_regular_file(status)) || (!missing && !fs::is_regular_file(status)))throw std::invalid_argument("Project entry must be a regular file without aliases");
++        return result;
++    };
++    if(!explicit_entry.empty()) {auto entry=file(explicit_entry,false);return {entry,entry.parent_path(),false};}
++    if(workspace.empty()) {
++        if(active.empty())throw std::invalid_argument("Select a workspace or active .void file");
++        auto entry=file(active,true);return {entry,entry.parent_path(),true};
++    }
++    for(const auto& directory:project_ancestor_directories(workspace,active)) {
+         auto candidate=directory/"main.void";
+         // Validate case collisions even when exact main.void is absent.
+         for(const auto& child:fs::directory_iterator(directory)) {
+@@ -229,7 +235,6 @@
+             if(folded=="main.void" && name!="main.void")throw std::invalid_argument("main.void must use exact case without case siblings");
+         }
+         if(fs::exists(fs::symlink_status(candidate))) {auto entry=file(candidate,false);return {entry,directory,false};}
+-        if(directory==boundary)break;
+     }
+     if(active.empty())throw std::invalid_argument("No main.void in selected workspace");
+     auto entry=file(active,true);return {entry,entry.parent_path(),true};
+diff --git a/src/frontend/tooling.cpp b/src/frontend/tooling.cpp
+--- a/src/frontend/tooling.cpp
++++ b/src/frontend/tooling.cpp
+@@ -200,52 +200,99 @@
+     current_.entry_ = std::filesystem::absolute(entry);
+     refresh();
+ }
++ToolingSession::ToolingSession(ProjectSession project) {
++    // Pins location only. The compiler owns physical/policy admission, including
++    // diagnostics for malformed/no-entry projects; no source discovery here.
++    current_.project_request_=std::filesystem::absolute(project.root);
++    current_.project_root_=std::filesystem::canonical(project.root);
++    current_.entry_override_=std::move(project.entry);refresh();
++}
++bool ToolingSession::manifest_document(const std::string& id) const {
++    return current_.project_root_ && id.ends_with("/void.project.toml");
++}
++bool ToolingSession::overridden(const std::string& id) const {
++    return manifest_document(id)?current_.manifests_.contains(id):current_.overrides_.contains(id);
++}
++void ToolingSession::reselect(std::optional<std::string> entry) {
++    if(!current_.project_root_)throw std::invalid_argument("Project reselection requires manifest mode.");
++    refresh();current_.entry_override_=std::move(entry);selected_context_.clear();
++}
++bool ToolingSession::requires_reselection() const {
++    if(!current_.project_root_)return false;
++    auto current=current_analysis();
++    if(!current || !current->project() || !current->project()->project)return true;
++    return !selected_context_.empty() && selected_context_!=current->project()->project->context_key();
++}
+ void ToolingSession::refresh() {
+     if (current_.revision_ == UINT64_MAX) throw std::overflow_error("Project revision exhausted");
+-    if (last_success_) for (const auto& m : last_success_->result().program->modules())
++    if (last_success_) for (const auto& m : last_success_->semantic_analysis()->modules())
+         if (std::find(changed_.begin(),changed_.end(),m.identity) == changed_.end()) changed_.push_back(m.identity);
+     current_.identity_ = std::make_shared<const ProjectSnapshot::Identity>();
+     ++current_.revision_;
+ }
+ void ToolingSession::change(const std::string& id, DocumentRevision revision, std::optional<SourceFile> source, bool closing) {
+-    require_module_identity(id);
++    if(manifest_document(id))require_manifest_identity(id);else require_module_identity(id);
+     auto previous = current_.documents_.find(id);
+     if (!revision || (previous != current_.documents_.end() && revision <= previous->second))
+         throw std::invalid_argument("Document revision must strictly increase, including close/delete/reopen");
+     if (current_.revision_ == UINT64_MAX) throw std::overflow_error("Project revision exhausted");
+     current_.documents_[id] = revision;
+-    if (closing) current_.overrides_.erase(id);
+-    else current_.overrides_.insert_or_assign(id, std::move(source));
++    auto& overrides=manifest_document(id)?current_.manifests_:current_.overrides_;
++    if (closing) overrides.erase(id);
++    else overrides.insert_or_assign(id, std::move(source));
+     if (std::find(changed_.begin(),changed_.end(),id) == changed_.end()) changed_.push_back(id);
+     current_.identity_ = std::make_shared<const ProjectSnapshot::Identity>();
+     ++current_.revision_;
+ }
+ void ToolingSession::open(const std::string& id, DocumentRevision revision, std::string text) {
+-    if (current_.overrides_.contains(id)) throw std::invalid_argument("Document already open or unavailable; replace or close it first");
++    if (overridden(id)) throw std::invalid_argument("Document already open or unavailable; replace or close it first");
+     change(id, revision, SourceFile(id,std::move(text)), false);
+ }
+ void ToolingSession::replace(const std::string& id, DocumentRevision revision, std::string text) {
+-    if (!current_.overrides_.contains(id)) throw std::invalid_argument("Document must be open or unavailable before replacement");
++    if (!overridden(id)) throw std::invalid_argument("Document must be open or unavailable before replacement");
+     change(id, revision, SourceFile(id,std::move(text)), false);
+ }
+ void ToolingSession::unavailable(const std::string& id, DocumentRevision revision) { change(id,revision,{},false); }
+ void ToolingSession::close(const std::string& id, DocumentRevision revision) {
+-    if (!current_.overrides_.contains(id)) throw std::invalid_argument("No override to close");
++    if (!overridden(id)) throw std::invalid_argument("No override to close");
+     change(id,revision,{},true);
+ }
+ std::shared_ptr<const SessionAnalysis> ToolingSession::analyze(ProjectSnapshot snapshot) {
+     if (!snapshot.identity_) throw std::invalid_argument("Select a project snapshot before analysis");
+     auto result = std::make_shared<SessionAnalysis>();
+     result->snapshot_ = std::move(snapshot);
+-    result->result_ = analyze_project(result->snapshot_.entry_,result->snapshot_.overrides_);
+-    if (result->result_.succeeded()) result->index_ = std::make_shared<ToolingIndex>(result->result_.program);
++    if(result->snapshot_.project_root_) {
++        result->project_=analyze_manifest_project(*result->snapshot_.project_request_,result->snapshot_.entry_override_,result->snapshot_.overrides_,result->snapshot_.manifests_);
++        if(result->project_->manifest) {
++            std::vector<std::string> documents;for(const auto& [id,source]:result->snapshot_.overrides_)if(source)documents.push_back(id);
++            auto manifests=result->snapshot_.manifests_;manifests.insert_or_assign("/void.project.toml",result->project_->manifest->source());
++            auto failures=check_project_documents(*result->snapshot_.project_request_,result->snapshot_.overrides_,manifests,documents);
++            if(!failures.empty()) {
++                result->project_->diagnostics.insert(result->project_->diagnostics.end(),failures.begin(),failures.end());result->project_->project.reset();
++                auto state=std::make_shared<ProjectState>(*result->project_->state);state->validated=false;result->project_->state=std::move(state);
++            }
++        }
++        result->result_.diagnostics=result->project_->diagnostics;
++        if(auto project=result->project_->project){result->result_.program=project->program();result->semantic_=project->semantic_analysis();}
++    } else {result->result_=analyze_project(result->snapshot_.entry_,result->snapshot_.overrides_);result->semantic_=result->result_.program;}
++    if (result->semantic_) result->index_ = std::make_shared<ToolingIndex>(result->semantic_);
+     return result;
+ }
+ bool ToolingSession::accept(std::shared_ptr<const SessionAnalysis> result) {
+     if (!result || !is_current(*result) || (latest_ && latest_->snapshot().same_revision(result->snapshot()))) return false;
+-    accepted_plan_ = last_success_ ? plan_invalidation(*last_success_->result().program, changed_, result->result().program.get()) : InvalidationPlan{};
++    auto hints=changed_;
++    if(current_.project_root_ && last_success_ && result->semantic_analysis()) {
++        // A completed compiler selection has resolved D, TOML and membership.
++        // Feed the source invalidator only its old/new semantic graph domain.
++        auto present=[&](const std::string& id){for(const auto* analysis:{last_success_->semantic_analysis().get(),result->semantic_analysis().get()})for(const auto& module:analysis->modules())if(module.identity==id)return true;return false;};
++        std::erase_if(hints,[&](const auto& id){return !present(id);});
++    }
++    accepted_plan_ = last_success_ ? plan_invalidation(*last_success_->semantic_analysis(), hints, result->semantic_analysis().get()) : InvalidationPlan{};
+     latest_ = std::move(result);
+-    if (latest_->result().succeeded()) { last_success_ = latest_; changed_.clear(); }
++    if (latest_->succeeded()) {
++        if(latest_->project() && selected_context_.empty())selected_context_=latest_->project()->project->context_key();
++        last_success_ = latest_; changed_.clear();
++    }
+     return true;
+ }
+ std::shared_ptr<const SessionAnalysis> ToolingSession::current_analysis() const {
+@@ -258,6 +305,6 @@
+     auto fresh = current_analysis();
+     if (fresh) return accepted_plan_;
+     if (!last_success_) return {};
+-    return plan_invalidation(*last_success_->result().program, changed_);
+-}
+-}
++    return plan_invalidation(*last_success_->semantic_analysis(), changed_);
++}
++}
+diff --git a/src/lsp/main.cpp b/src/lsp/main.cpp
+--- a/src/lsp/main.cpp
++++ b/src/lsp/main.cpp
+@@ -173,11 +173,29 @@
+ #endif
+     return path==source;
+ }
++j::Object project_summary(const fs::path& root,const vd::ProjectAnalysisResult& result,std::uint64_t revision,bool reselect) {
++    j::Array errors;
++    for(const auto& d:result.diagnostics) {
++        if(errors.size()==8)break;
++        auto count=std::min<std::size_t>(d.description.size(),256);
++        while(count<d.description.size() && count && (static_cast<unsigned char>(d.description[count])&0xc0)==0x80)--count;
++        errors.push_back(j::Object{{"code",vd::diagnostic_code(d.code)},{"message",d.description.substr(0,count)}});
++    }
++    auto state=result.state;
++    return j::Object{{"schema",2},{"mode","project"},{"root",vd::path_utf8(root)},{"manifest",vd::path_utf8(root/"void.project.toml")},
++        {"kind",result.manifest?j::Value(result.manifest->kind()==vd::project::Kind::application?"application":"library"):j::Value(nullptr)},
++        {"entry",result.project && result.project->entry()?j::Value(vd::path_utf8(*result.project->entry())):j::Value(nullptr)},
++        {"standalone",false},{"selectionRevision",std::to_string(revision)},{"snapshotKey",state?state->snapshot_key:std::string{}},
++        {"status",!result.succeeded()?"error":reselect?"reselection-required":"ready"},{"requiresReselection",reselect},
++        {"discoveryCount",static_cast<std::int64_t>(state?state->discovery.size():0)},{"executionCount",static_cast<std::int64_t>(state?state->execution.size():0)},
++        {"diagnosticCount",static_cast<std::int64_t>(result.diagnostics.size())},{"diagnostics",std::move(errors)}};
++}
+ class Server {
+     enum class State { initial, waiting, ready, shutdown } state=State::initial;
+-    struct Document { std::int64_t version; std::string uri; };
+-    fs::path root, selected_root, entry_path;
++    struct Document { std::int64_t version; std::string uri; std::optional<vd::SourceFile> source; };
++    fs::path root, selected_root, entry_path, requested_root;
+     vd::ToolingSession session;
++    bool manifest_mode;
+     std::map<std::string,Document> open;
+     std::map<std::string,std::string> published;
+     bool hierarchical_symbols=false;
+@@ -187,8 +205,8 @@
+     bool related_information=false, diagnostic_versions=false, rename_edits=false, signature_plaintext=false;
+     std::string identity(const std::string& uri) const {
+         auto path=vd::lsp::uri_path(uri);
+-        if(auto current=session.current_analysis();current && current->result().program)
+-            for(const auto& m:current->result().program->modules())if(m.identity.starts_with("/@stdlib/") && known_source_path(path,vd::utf8_path(m.source.path())))return m.identity;
++        if(auto current=session.current_analysis();current && current->semantic_analysis())
++            for(const auto& m:current->semantic_analysis()->modules())if(m.identity.starts_with("/@stdlib/") && known_source_path(path,vd::utf8_path(m.source.path())))return m.identity;
+ #ifdef _WIN32
+         // Drive-letter spelling is URI/OS notation, not a VFS component.
+         auto raw=path.generic_u8string();
+@@ -202,14 +220,15 @@
+         auto relative=path.lexically_relative(root);
+         if(relative.empty() || relative.native().starts_with(fs::path("..").native())) relative=path.lexically_relative(selected_root);
+         auto utf8=relative.generic_u8string(); std::string key="/"+std::string(utf8.begin(),utf8.end());
+-        vd::require_module_identity(key); // Includes escape/canonical/case spelling policies.
++        if(manifest_mode && key.ends_with("/void.project.toml"))vd::require_manifest_identity(key);
++        else vd::require_module_identity(key); // Includes escape/canonical/case spelling policies.
+         return key;
+     }
+     std::string uri(const std::string& id) const {
+         // Filesystem canonicalization owns compiler identity, not client URI spelling.
+         // Versioned edits must address the exact document opened by the client.
+         if(id.starts_with("/@stdlib/")) {
+-            if(auto current=session.current_analysis();current && current->result().program)for(const auto& m:current->result().program->modules())if(m.identity==id)return vd::lsp::file_uri(vd::utf8_path(m.source.path()));
++            if(auto current=session.current_analysis();current && current->semantic_analysis())for(const auto& m:current->semantic_analysis()->modules())if(m.identity==id)return vd::lsp::file_uri(vd::utf8_path(m.source.path()));
+             return vd::lsp::file_uri(vd::standard_library_root()/vd::utf8_path(id.substr(9)));
+         }
+         if(auto document=open.find(id);document!=open.end())return document->second.uri;
+@@ -231,7 +250,9 @@
+         std::map<std::string,j::Array> groups;
+         for(const auto& [id,doc]:open) { (void)doc; groups[id]; }
+         for(const auto& [id,previous_uri]:published) { (void)previous_uri; groups[id]; } // Clear removed/repaired graph nodes.
+-        if(result->result().program) for(const auto& module:result->result().program->modules()) groups[module.identity];
++        if(result->project() && result->project()->project && result->project()->project->entry())entry_path=*result->project()->project->entry();
++        else if(manifest_mode)entry_path.clear();
++        if(result->semantic_analysis()) for(const auto& module:result->semantic_analysis()->modules()) groups[module.identity];
+         for(const auto& d:result->result().diagnostics) {
+             auto id=d.primary.module_identity;
+             if(id.empty()) throw std::logic_error("Project diagnostic has no VFS owner");
+@@ -253,12 +274,25 @@
+         published.clear();
+         for(auto& [id,diagnostics]:groups) {
+             j::Object params{{"uri",uri(id)},{"diagnostics",std::move(diagnostics)}};
++            if(manifest_mode)params["voidProjectRevision"]=std::to_string(result->snapshot().revision());
+             if(auto doc=open.find(id); doc!=open.end() && diagnostic_versions) params["version"]=doc->second.version;
+             // Retain only nonempty diagnostics: old empty/unreachable nodes need
+             // no unbounded clearing history. Open and reachable nodes seed each run.
+             if(!params.getArray("diagnostics")->empty()) published.emplace(id,uri(id));
+             send(j::Object{{"jsonrpc","2.0"},{"method","textDocument/publishDiagnostics"},{"params",std::move(params)}});
+         }
++        if(manifest_mode)send(j::Object{{"jsonrpc","2.0"},{"method","void/projectState"},{"params",summary()}});
++    }
++    j::Object summary() const {
++        auto current=session.current_analysis();
++        if(!manifest_mode || !current || !current->project())throw std::invalid_argument("No current manifest project summary");
++        return project_summary(root,*current->project(),current->snapshot().revision(),session.requires_reselection());
++    }
++    vd::AnalysisResult check_overlays(const vd::SourceOverrides& sources) const {
++        auto snapshot=session.select();
++        if(!manifest_mode)return vd::analyze_project(entry_path,sources);
++        auto checked=vd::analyze_manifest_project(requested_root,snapshot.entry_override(),sources,snapshot.manifests());
++        return {checked.project?checked.project->semantic_analysis():nullptr,std::move(checked.diagnostics)};
+     }
+     j::Value query(const std::string& method,const j::Object& params) const {
+         auto id=identity(string(object(params.get("textDocument")),"uri"));
+@@ -273,7 +307,7 @@
+         auto current=session.current_analysis(); auto index=session.current_index();
+         if(!current || !index) return empty();
+         const vd::SourceFile* source=nullptr;
+-        for(const auto& m:current->result().program->modules()) if(m.identity==id) source=&m.source;
++        for(const auto& m:current->semantic_analysis()->modules()) if(m.identity==id) source=&m.source;
+         if(!source) return empty();
+         auto offset=Positions(*source).offset(p);
+         if(!offset) throw std::invalid_argument("Position is outside the document or inside a surrogate pair");
+@@ -328,6 +362,11 @@
+         for(const auto& m:program.modules())if(m.identity==id)return &m.source;return nullptr;
+     }
+     bool disk_current(const vd::ValidatedAnalysis& program) const {
++        if(manifest_mode) {
++            auto current=session.current_analysis();auto snapshot=session.select();
++            auto checked=vd::analyze_manifest_project(requested_root,snapshot.entry_override(),snapshot.overrides(),snapshot.manifests());
++            if(!checked.project || !current || !current->project() || !current->project()->project || checked.project->selection_key()!=current->project()->project->selection_key())return false;
++        }
+         for(const auto& m:program.modules())if(!open.contains(m.identity)) {
+             try {if(vd::read_source(vd::utf8_path(m.source.path())).text()!=m.source.text())return false;}
+             catch(const std::exception&){return false;}
+@@ -361,24 +400,25 @@
+             return result;
+         }
+         auto module=identity(string(object(params.get("textDocument")),"uri"));
++        if(manifest_mode && module.ends_with("/void.project.toml"))return method=="textDocument/completion" || method=="textDocument/formatting"?j::Value(j::Array{}):j::Value(nullptr);
+         const vd::SourceFile* source=nullptr;
+         auto snapshot=session.select();
+         if(auto found=snapshot.overrides().find(module);found!=snapshot.overrides().end() && found->second)source=&*found->second;
+-        if(!source && current && current->result().program)source=source_in(*current->result().program,module);
++        if(!source && current && current->semantic_analysis())source=source_in(*current->semantic_analysis(),module);
+         if(method=="textDocument/formatting") {
+             if(module.starts_with("/@stdlib/"))return j::Array{};
+             const auto& options=object(params.get("options"));
+             if(!options.getBoolean("insertSpaces").value_or(false) || integer(options.get("tabSize"),1)!=4)throw std::invalid_argument("VOID formatting requires four spaces");
+-            j::Array result;if(!source || !index || !source_in(*current->result().program,module) || !disk_current(*current->result().program))return result;
++            j::Array result;if(!source || !index || !source_in(*current->semantic_analysis(),module) || !disk_current(*current->semantic_analysis()))return result;
+             auto formatted=vd::format_source(*source);if(!formatted || *formatted==source->text())return result;
+             // The same compiler checks both lexical structure and the entire
+             // proposed graph before returning a conservative whole-file edit.
+-            auto overlays=snapshot.overrides();for(const auto& m:current->result().program->modules())if(!m.identity.starts_with("/@stdlib/"))overlays.insert_or_assign(m.identity,m.source);
++            auto overlays=snapshot.overrides();for(const auto& m:current->semantic_analysis()->modules())if(!m.identity.starts_with("/@stdlib/"))overlays.insert_or_assign(m.identity,m.source);
+             overlays.insert_or_assign(module,vd::SourceFile(source->path(),*formatted));
+-            auto checked=vd::analyze_project(entry_path,overlays);
+-            if(!checked.program || checked.program->compatibility_contract()!=current->result().program->compatibility_contract())return result;
++            auto checked=check_overlays(overlays);
++            if(!checked.program || checked.program->compatibility_contract()!=current->semantic_analysis()->compatibility_contract())return result;
+             auto again=vd::format_source(vd::SourceFile(source->path(),*formatted));
+-            if(!again || *again!=*formatted || !session.is_current(*current) || !disk_current(*current->result().program))return result;
++            if(!again || *again!=*formatted || !session.is_current(*current) || !disk_current(*current->semantic_analysis()))return result;
+             result.push_back(j::Object{{"range",range({std::make_shared<const vd::SourceFile>(*source),module,0,source->text().size()})},{"newText",*formatted}});
+             return result;
+         }
+@@ -388,10 +428,10 @@
+         auto offset=Positions(*source).offset(p);if(!offset)throw std::invalid_argument("Invalid UTF-16 position");
+         if(method=="textDocument/completion" || method=="textDocument/signatureHelp") {
+             auto overlays=snapshot.overrides();
+-            if(current && current->result().program)for(const auto& m:current->result().program->modules())if(!m.identity.starts_with("/@stdlib/"))overlays.insert_or_assign(m.identity,m.source);
++            if(current && current->semantic_analysis())for(const auto& m:current->semantic_analysis()->modules())if(!m.identity.starts_with("/@stdlib/"))overlays.insert_or_assign(m.identity,m.source);
+             overlays.insert_or_assign(module,*source); // Position conversion and probe share exact bytes.
+             if(module.starts_with("/@stdlib/"))return method=="textDocument/completion"?j::Value(j::Array{}):j::Value(nullptr);
+-            auto assistance=vd::editor_assistance(entry_path,overlays,module,*offset);
++            auto assistance=manifest_mode?vd::project_editor_assistance(requested_root,snapshot.entry_override(),overlays,snapshot.manifests(),module,*offset):vd::editor_assistance(entry_path,overlays,module,*offset);
+             if(method=="textDocument/signatureHelp") {
+                 if(assistance.signature.empty() || assistance.active_parameter>=assistance.parameter_documentation.size() || assistance.parameter_documentation[assistance.active_parameter].empty())return nullptr;
+                 j::Array parameters;for(std::size_t n=0;n<assistance.parameters.size();++n) {
+@@ -424,7 +464,7 @@
+         if(definitions.size()!=1)throw std::invalid_argument("Rename cannot choose between concrete specialization targets");
+         if(module.starts_with("/@stdlib/") || definition->module.starts_with("/@stdlib/"))throw std::invalid_argument("Installed standard sources are read-only");
+         if(!rename_edits || !definition->rename_safe)throw std::invalid_argument("Rename requires version-safe documentChanges and a supported ordinary function, global, constant or uncaptured local binding");
+-        if(!disk_current(*current->result().program))throw std::invalid_argument("Disk sources changed; refresh before rename");
++        if(!disk_current(*current->semantic_analysis()))throw std::invalid_argument("Disk sources changed; refresh before rename");
+         if(method=="textDocument/prepareRename")return j::Object{{"range",range(selected_span)},{"placeholder",name_of(*definition)}};
+         auto replacement=string(params,"newName");if(!vd::valid_editor_identifier(replacement) || replacement=="entry" || replacement=="init" || replacement=="deinit" || replacement=="call")throw std::invalid_argument("Expected a non-reserved VOID identifier");
+         std::map<std::string,std::vector<vd::SourceSpan>> edits;
+@@ -440,12 +480,12 @@
+             if(auto found=edits.find(module);found!=edits.end())for(const auto& span:found->second)if(span.end<=offset)delta+=static_cast<std::ptrdiff_t>(replacement.size())-static_cast<std::ptrdiff_t>(span.end-span.begin);
+             return static_cast<std::size_t>(static_cast<std::ptrdiff_t>(offset)+delta);
+         };
+-        vd::SourceOverrides overlays;for(const auto& m:current->result().program->modules()) {
++        auto overlays=session.select().overrides();for(const auto& m:current->semantic_analysis()->modules()) {
+             if(m.identity.starts_with("/@stdlib/"))continue; // Installed sources are reread and checked, never editable overlays.
+             auto text=m.source.text();if(auto found=edits.find(m.identity);found!=edits.end())for(auto it=found->second.rbegin();it!=found->second.rend();++it)text.replace(it->begin,it->end-it->begin,replacement);
+-            overlays.emplace(m.identity,vd::SourceFile(m.source.path(),std::move(text)));
+-        }
+-        auto checked=vd::analyze_project(entry_path,overlays);if(!checked.program)throw std::invalid_argument("Rename fails compiler validation");
++            overlays.insert_or_assign(m.identity,vd::SourceFile(m.source.path(),std::move(text)));
++        }
++        auto checked=check_overlays(overlays);if(!checked.program)throw std::invalid_argument("Rename fails compiler validation");
+         vd::ToolingIndex fresh(checked.program);
+         // Compare every declaration and written binding at its transformed source
+         // position: valid compilation alone cannot detect legal rebinding.
+@@ -467,7 +507,7 @@
+         std::error_code root_error;
+         auto current_root=fs::canonical(selected_root,root_error);
+         if(root_error || current_root!=root)throw std::invalid_argument("Rename project root changed; restart the server");
+-        if(!session.is_current(*current) || !disk_current(*current->result().program))throw std::invalid_argument("Rename snapshot changed");
++        if(!session.is_current(*current) || !disk_current(*current->semantic_analysis()))throw std::invalid_argument("Rename snapshot changed");
+         j::Array changes;for(const auto& [id,spans]:edits){j::Array replacements;for(const auto& span:spans)replacements.push_back(j::Object{{"range",range(span)},{"newText",replacement}});
+             j::Value version=nullptr;if(auto doc=open.find(id);doc!=open.end())version=doc->second.version;
+             changes.push_back(j::Object{{"textDocument",j::Object{{"uri",uri(id)},{"version",std::move(version)}}},{"edits",std::move(replacements)}});
+@@ -487,21 +527,26 @@
+             std::string text;
+             if(method=="textDocument/didOpen") {
+                 if(found!=open.end()) throw std::invalid_argument("Document is already open");
+-                if(string(document,"languageId")!="void") throw std::invalid_argument("Expected VOID languageId 'void'");
++                if(!(manifest_mode && id.ends_with("/void.project.toml")) && string(document,"languageId")!="void") throw std::invalid_argument("Expected VOID languageId 'void'");
+                 if(open.size()>=4096) throw std::invalid_argument("Too many open documents");
+-                text=string(document,"text"); session.open(id,next(id),std::move(text)); open.emplace(id,Document{version,string(document,"uri")});
++                text=string(document,"text");
++                auto selected=session.select();const auto& overrides=manifest_mode && id.ends_with("/void.project.toml")?selected.manifests():selected.overrides();
++                if(manifest_mode && overrides.contains(id))session.replace(id,next(id),std::move(text));else session.open(id,next(id),std::move(text));
++                open.emplace(id,Document{version,string(document,"uri"), (manifest_mode && id.ends_with("/void.project.toml")?session.select().manifests():session.select().overrides()).at(id)});
+             } else {
+                 if(found==open.end()) throw std::invalid_argument("Document is not open");
+                 if(version<=found->second.version) throw std::invalid_argument("Stale or duplicate document version");
+                 auto changes=params.getArray("contentChanges");
+                 if(!changes) throw std::invalid_argument("Expected contentChanges array");
+-                text=session.select().overrides().at(id)->text();
++                auto selected=session.select();const auto& overrides=manifest_mode && id.ends_with("/void.project.toml")?selected.manifests():selected.overrides();
++                text=overrides.at(id)?overrides.at(id)->text():std::string{};
+                 for(const auto& event:*changes) {
+                     const auto& change=object(&event);
+                     if(change.get("range") || change.get("rangeLength")) throw std::invalid_argument("Incremental document changes are unsupported");
+                     text=string(change,"text");
+                 }
+                 session.replace(id,next(id),std::move(text)); found->second.version=version;
++                found->second.source=(manifest_mode && id.ends_with("/void.project.toml")?session.select().manifests():session.select().overrides()).at(id);
+             }
+         }
+         dirty=true;
+@@ -524,8 +569,9 @@
+         return ::kill(static_cast<pid_t>(process_id),0)==0 || errno!=ESRCH;
+ #endif
+     }
+-    explicit Server(const fs::path& entry) : root(fs::canonical(fs::absolute(entry).parent_path())),
+-        selected_root(fs::absolute(entry).parent_path().lexically_normal()),entry_path(root/entry.filename()),session(entry_path) { (void)vd::lsp::file_uri(root/entry.filename()); }
++    explicit Server(const fs::path& entry,bool project=false,const std::optional<std::string>& override={}) : root(fs::canonical(project?entry:fs::absolute(entry).parent_path())),
++        selected_root(project?root:fs::absolute(entry).parent_path().lexically_normal()),entry_path(project?fs::path{}:root/entry.filename()),requested_root(project?fs::absolute(entry):fs::absolute(entry).parent_path()),
++        session(project?vd::ToolingSession(vd::ProjectSession{entry,override}):vd::ToolingSession(entry_path)),manifest_mode(project) {}
+     std::optional<int> dispatch(j::Value message) {
+         auto o=message.getAsObject();
+         if(!o) { error(nullptr,-32600,"Invalid JSON-RPC request"); return {}; }
+@@ -579,7 +625,7 @@
+                         {"definitionProvider",true},{"referencesProvider",true},{"hoverProvider",true},{"completionProvider",j::Object{{"triggerCharacters",j::Array{"."," ","\"","/",":"}}}},
+                         {"signatureHelpProvider",j::Object{{"triggerCharacters",j::Array{"(",","}}}},{"documentSymbolProvider",true},{"workspaceSymbolProvider",true},
+                         {"documentFormattingProvider",true},{"renameProvider",rename_edits ? j::Value(j::Object{{"prepareProvider",true}}):j::Value(false)},
+-                        {"experimental",j::Object{{"voidToolingProtocol",1},{"refreshProject",true}}}}},{"serverInfo",j::Object{{"name","VOID"},{"version","0.2.0"}}}}}});
++                        {"workspace",manifest_mode?j::Value(j::Object{{"fileOperations",j::Object{{"didCreate",j::Object{{"filters",j::Array{j::Object{{"scheme","file"},{"pattern",j::Object{{"glob","**/*"}}}}}}}},{"didRename",j::Object{{"filters",j::Array{j::Object{{"scheme","file"},{"pattern",j::Object{{"glob","**/*"}}}}}}}},{"didDelete",j::Object{{"filters",j::Array{j::Object{{"scheme","file"},{"pattern",j::Object{{"glob","**/*"}}}}}}}}}}}):j::Value(j::Object{})},{"experimental",j::Object{{"voidToolingProtocol",1},{"voidProjectProtocol",1},{"refreshProject",true}}}}},{"serverInfo",j::Object{{"name","VOID"},{"version","0.2.0"}}}}}});
+                 return {};
+             }
+             if(name=="initialized") {
+@@ -605,6 +651,16 @@
+                 if(!id){fail(-32600,"Editor query requires a request");return {};}
+                 auto result=editor_query(name,object(o->get("params")));
+                 send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",std::move(result)}});return {};
++            }
++            if(name=="void/projectState" || name=="void/reselectProject") {
++                if(!manifest_mode){fail(-32601,"Manifest project mode is not selected");return {};}
++                if(!id){fail(-32600,"Project control requires a request");return {};}
++                if(name=="void/reselectProject") {
++                    const auto& params=object(o->get("params"));std::optional<std::string> entry;
++                    if(auto value=params.get("entry");value && !value->getAsNull())entry=string(params,"entry");
++                    session.reselect(entry);analyze();
++                }
++                send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",summary()}});return {};
+             }
+             if(name=="void/refreshProject") {
+                 session.refresh();analyze();if(id)send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",nullptr}});return {};
+@@ -616,10 +672,45 @@
+                 if(!open.contains(module))throw std::invalid_argument("Saved document is not open");
+                 session.refresh();dirty=true;return {};
+             }
++            if(manifest_mode && (name=="workspace/didCreateFiles" || name=="workspace/didDeleteFiles" || name=="workspace/didRenameFiles")) {
++                if(id){fail(-32600,"File operations require notifications");return {};}
++                const auto files=object(o->get("params")).getArray("files");if(!files || files->size()>4096)throw std::invalid_argument("Expected bounded file operations");
++                for(const auto& file:*files) {
++                    const auto& event=object(&file);std::string old;
++                    try{old=identity(string(event,name=="workspace/didRenameFiles"?"oldUri":"uri"));}catch(const std::invalid_argument&){continue;}
++                    if(old.starts_with("/@stdlib/"))continue;
++                    if(name=="workspace/didCreateFiles") {
++                        auto selected=session.select();const auto& overrides=old.ends_with("/void.project.toml")?selected.manifests():selected.overrides();
++                        if(auto found=overrides.find(old);found!=overrides.end() && !found->second && !open.contains(old))session.close(old,next(old));
++                    } else {
++                        auto snapshot=session.select();const auto& overrides=old.ends_with("/void.project.toml")?snapshot.manifests():snapshot.overrides();
++                        std::optional<vd::SourceFile> source;
++                        if(auto found=overrides.find(old);found!=overrides.end())source=found->second;
++                        if(!source)if(auto document=open.find(old);document!=open.end())source=document->second.source;
++                        std::string next_id;
++                        if(name=="workspace/didRenameFiles")try{next_id=identity(string(event,"newUri"));}catch(const std::invalid_argument&){}
++                        if(!next_id.empty() && next_id!=old && source) {
++                            auto selected=session.select();const auto& next_overrides=next_id.ends_with("/void.project.toml")?selected.manifests():selected.overrides();
++                            if(next_overrides.contains(next_id) || open.contains(next_id))throw std::invalid_argument("Rename would replace an editor override");
++                            auto revision=next(next_id); // Prove both counters before mutation.
++                            auto removed=next(old);session.open(next_id,revision,source->text());session.unavailable(old,removed);
++                        } else if(next_id!=old)session.unavailable(old,next(old));
++                    }
++                }
++                session.refresh();dirty=true;return {};
++            }
+             if(name=="workspace/didChangeWatchedFiles") {
+                 if(id){fail(-32600,"Watch changes require a notification");return {};}
+                 auto changes=object(o->get("params")).getArray("changes");if(!changes)throw std::invalid_argument("Expected watched changes");
+-                bool refresh=false;for(const auto& change:*changes)try{const auto& event=object(&change);(void)identity(string(event,"uri"));auto type=integer(event.get("type"),1);if(type>3)throw std::invalid_argument("Invalid watch type");refresh=true;}catch(const std::invalid_argument&){}
++                bool refresh=false;for(const auto& change:*changes)try{const auto& event=object(&change);auto event_uri=string(event,"uri");(void)vd::lsp::uri_path(event_uri);auto type=integer(event.get("type"),1);if(type>3)throw std::invalid_argument("Invalid watch type");
++                    if(manifest_mode) {
++                        refresh=true; // Unknown/wrong-case boundary names still invalidate selection.
++                        auto module=identity(event_uri);
++                        if(type==3)session.unavailable(module,next(module));
++                        if(type==1) {auto selected=session.select();const auto& overrides=module.ends_with("/void.project.toml")?selected.manifests():selected.overrides();if(auto found=overrides.find(module);found!=overrides.end() && !found->second && !open.contains(module))session.close(module,next(module));}
++                    }
++                    else (void)identity(event_uri);
++                    refresh=true;}catch(const std::invalid_argument&){}
+                 if(refresh){session.refresh();dirty=true;}return {};
+             }
+             if(name=="$/cancelRequest") {
+@@ -644,14 +735,22 @@
+     j::Value result=j::Object{{"entry",vd::path_utf8(selected.entry)},{"root",vd::path_utf8(selected.root)},{"standalone",selected.standalone}};
+     llvm::outs()<<result<<"\n";return 0;
+ }
+-int run(const fs::path& entry) {
++int project_preflight(const fs::path& workspace,const fs::path& active,const fs::path& root,const fs::path& entry) {
++    auto selected=vd::discover_project_context(workspace,active,root,entry);
++    j::Object summary=selected.manifest_mode?project_summary(selected.root,selected.analysis,0,false):j::Object{{"schema",2},{"mode","legacy"},{"root",vd::path_utf8(selected.root)},{"entry",vd::path_utf8(*selected.entry)},{"standalone",selected.standalone},{"status","ready"}};
++    if(selected.manifest_mode)summary["requestedRoot"]=vd::path_utf8(root.empty()?selected.root:fs::absolute(root));
++    std::string text;llvm::raw_string_ostream stream(text);stream<<j::Value(std::move(summary));stream.flush();
++    if(text.size()+1>65536)throw std::invalid_argument("Project discovery summary exceeds the 64 KiB protocol limit");
++    llvm::outs()<<text<<"\n";return 0;
++}
++int run(const fs::path& entry,bool project=false,const std::optional<std::string>& override={}) {
+ #ifdef _WIN32
+     if(_setmode(_fileno(stdin),_O_BINARY)==-1 || _setmode(_fileno(stdout),_O_BINARY)==-1) throw std::runtime_error("Cannot set binary protocol streams");
+ #endif
+ #ifdef SIGPIPE
+     std::signal(SIGPIPE,SIG_IGN);
+ #endif
+-    Server server(entry);
++    Server server(entry,project,override);
+     input.alive=[&]{return server.parent_alive();};
+     unsigned batch=0;auto started=std::chrono::steady_clock::now();
+     for(;;) {
+@@ -696,6 +795,8 @@
+ int wmain(int argc,wchar_t** argv) {
+     try {
+         auto executable=vd::path_utf8(fs::path(argv[0]));vd::configure_standard_library_root(vd::utf8_path(llvm::sys::fs::getMainExecutable(executable.c_str(),reinterpret_cast<void*>(&wmain))));
++        if(argc==6 && std::wstring_view(argv[1])==L"--discover-project")return project_preflight(fs::path(argv[2]),fs::path(argv[3]),fs::path(argv[4]),fs::path(argv[5]));
++        if((argc==3 || (argc==5 && std::wstring_view(argv[3])==L"--entry")) && std::wstring_view(argv[1])==L"--project")return run(fs::path(argv[2]),true,argc==5?std::optional(vd::path_utf8(fs::path(argv[4]))):std::nullopt);
+         if(argc==5 && std::wstring_view(argv[1])==L"--discover")return preflight(fs::path(argv[2]),fs::path(argv[3]),fs::path(argv[4]));
+         if(argc!=3 || std::wstring_view(argv[1])!=L"--entry") throw std::invalid_argument("Usage: voidls --entry <project entry.void>");
+         return run(fs::path(argv[2]));
+@@ -703,6 +804,8 @@
+ int main(int argc,char** argv) {
+     try {
+         vd::configure_standard_library_root(vd::utf8_path(llvm::sys::fs::getMainExecutable(argv[0],reinterpret_cast<void*>(&vd::configure_standard_library_root))));
++        if(argc==6 && std::string_view(argv[1])=="--discover-project")return project_preflight(vd::utf8_path(argv[2]),vd::utf8_path(argv[3]),vd::utf8_path(argv[4]),vd::utf8_path(argv[5]));
++        if((argc==3 || (argc==5 && std::string_view(argv[3])=="--entry")) && std::string_view(argv[1])=="--project")return run(vd::utf8_path(argv[2]),true,argc==5?std::optional(std::string(argv[4])):std::nullopt);
+         if(argc==5 && std::string_view(argv[1])=="--discover")return preflight(vd::utf8_path(argv[2]),vd::utf8_path(argv[3]),vd::utf8_path(argv[4]));
+         if(argc!=3 || std::string_view(argv[1])!="--entry") throw std::invalid_argument("Usage: voidls --entry <project entry.void>");
+         return run(vd::utf8_path(argv[2]));
+diff --git a/src/main.cpp b/src/main.cpp
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -38,6 +38,8 @@
+           "  --no-cache  Disable disk caching (run only).\n"
+           "  --project DIR  Select exactly DIR/void.project.toml.\n"
+           "  --entry PATH   Override its entry with a manifest-relative source.\n"
++          "  --profile debug|release  Select project optimization/cache settings.\n"
++          "                           line/full debug_info warns; profile-controlled emission is not implemented.\n"
+           "  -o PATH     Set output path (build/emit only; required by emit).\n"
+           "  --          End options before a source path.\n";
+     }
+@@ -138,6 +140,8 @@
+         std::vector<std::string> operands;std::optional<std::filesystem::path> output;
+         std::optional<std::filesystem::path> project_root;
+         std::optional<std::string> project_entry;
++        std::optional<vd::project::ProfileName> profile;
++        std::string profile_key;
+         for(int i=2;i<argc;++i) {
+             const std::string arg=argv[i];
+             if(arg=="--" && command=="run" && (!operands.empty() || project_root)) {
+@@ -155,6 +159,13 @@
+             else if(arg=="--project") {
+                 if(project_root || ++i==argc || !*argv[i] || argv[i][0]=='-')throw UsageError("Expected one directory after --project.");
+                 project_root=vd::utf8_path(argv[i]);
++            }
++            else if(arg=="--profile") {
++                if(profile || ++i==argc)throw UsageError("Expected one debug|release value after --profile.");
++                const std::string value=argv[i];
++                if(value=="debug")profile=vd::project::ProfileName::debug;
++                else if(value=="release")profile=vd::project::ProfileName::release;
++                else throw UsageError("--profile requires exactly debug or release.");
+             }
+             else if(arg=="--entry") {
+                 if(project_entry || ++i==argc || !*argv[i] || argv[i][0]=='-')throw UsageError("Expected one manifest-relative source after --entry.");
+@@ -179,6 +190,7 @@
+         auto value=operands.size()==2?input(operands[1].c_str()):0;
+         auto path=project_root?*project_root:operands.empty()?std::filesystem::current_path():vd::utf8_path(operands[0]);
+         const bool project_mode=project_root || (std::filesystem::is_directory(path) && vd::project_manifest_present(path));
++        if(profile && !project_mode)throw UsageError("--profile requires a manifest-selected project context.");
+         if(project_entry && !project_mode)throw UsageError("--entry requires a manifest-selected project context.");
+         std::shared_ptr<const vd::ProjectAnalysis> project;
+         std::filesystem::path selected;
+@@ -186,6 +198,13 @@
+         if(project_mode) {
+             auto result=vd::analyze_manifest_project(path,project_entry);
+             if(result.manifest && result.manifest->kind()==vd::project::Kind::library && project_entry)throw UsageError("--entry cannot select an application entry in a library project.");
++            if(result.manifest) {
++                vd::project::EffectiveProfile selected_profile;
++                try{selected_profile=vd::project::resolve_profile(*result.manifest,profile,no_opt,cache);}
++                catch(const std::invalid_argument& error){throw UsageError(error.what());}
++                optimize=selected_profile.optimize;profile_key=selected_profile.cache_key;
++                for(const auto& warning:selected_profile.diagnostics)std::cerr<<vd::render_diagnostic(warning)<<'\n';
++            }
+             if(!result.succeeded())throw vd::CompilationError(std::move(result.diagnostics));
+             project=std::move(result.project);
+             if(project->manifest()->kind()==vd::project::Kind::library) {
+@@ -208,7 +227,7 @@
+         vd::require_source_entry(*analysis.program);
+         if(command=="run") {
+             std::unique_ptr<vd::Jit> jit;
+-            if(!no_cache)jit=std::make_unique<vd::Jit>(vd::DebugCache{project?project->root():std::filesystem::canonical(selected.parent_path().empty()?std::filesystem::path("."):selected.parent_path()),std::string(vd::compiler_build_identity())+(project?":project-selection-v1:"+project->selection_key():"")},vd::ir::Emission::entry);
++            if(!no_cache)jit=std::make_unique<vd::Jit>(vd::DebugCache{project?project->root():std::filesystem::canonical(selected.parent_path().empty()?std::filesystem::path("."):selected.parent_path()),std::string(vd::compiler_build_identity())+(project?":project-selection-v1:"+project->selection_key()+":"+profile_key:"")},vd::ir::Emission::entry);
+             else jit=std::make_unique<vd::Jit>(vd::DebugCache{},vd::ir::Emission::entry);
+             auto code=jit->compile(*analysis.program,optimize);
+             if(auto runtime=code->runtime_owner())
+diff --git a/tests/project/profiles.py b/tests/project/profiles.py
+new file mode 100644
+--- /dev/null
++++ b/tests/project/profiles.py
+@@ -0,0 +1,57 @@
++"""Actual CLI optimization, selected warnings, cache conflicts and independent AOT."""
++from pathlib import Path
++import json,subprocess,sys,tempfile,os,re
++compiler=Path(sys.argv[1]).resolve();objdump=Path(sys.argv[2]).resolve();evidence=Path(sys.argv[3]) if len(sys.argv)>3 else None
++rows=[];checks=0
++manifest="schema=1\n[project]\nid='org.test.sources'\nname='Sources'\nversion='1.0.0'\nkind='application'\n[application]\nid='org.test.app'\n[sources]\nroots=['src']\n"
++source='public func compute(x: i32) -> i32:\n    var y = x + 0\n    y = y * 1\n    return y\nfunc main() -> i32:\n    return compute(23)\n'
++def run(args,status=0,warning=None):
++ global checks
++ p=subprocess.run(list(map(str,args)),capture_output=True,timeout=120);rows.append({'argv':list(map(str,args)),'status':p.returncode,'stdout':p.stdout.decode('utf-8','replace'),'stderr':p.stderr.decode('utf-8','replace')});assert p.returncode==status,rows[-1]
++ if warning is not None:
++  assert p.stderr.count(b'VOID5012')==int(bool(warning)),rows[-1]
++  if warning:assert b'warning:' in p.stderr and b"debug_info='"+warning.encode()+b"'" in p.stderr and b'profile-controlled' in p.stderr,rows[-1]
++ checks+=1;return p
++try:
++ with tempfile.TemporaryDirectory(prefix='VOID profile execution 雪 ') as directory:
++  root=Path(directory);(root/'src').mkdir();toml=root/'void.project.toml';toml.write_bytes(manifest.encode());(root/'src/game.void').write_bytes(source.encode())
++  for flags,warning in [([], 'line'),(['--profile','release'],'line'),(['--profile','debug'],'full'),(['--no-opt'],'line')]:
++   run([compiler,'check','--project',root,*flags],warning=warning)
++   run([compiler,'run','--project',root,'--no-cache',*flags],23,warning=warning)
++  for flags in [['--profile'],['--profile','Debug'],['--profile','other'],['--profile','debug','--profile','release'],['--profile','release','--cache'],['--profile','release','--cache','--no-opt'],['--profile','debug','--cache','--no-cache']]:run([compiler,'run','--project',root,*flags],2)
++  for command in ['run','check','build','emit']:
++   flags=['-o',root/'unused.o'] if command=='emit' else []
++   run([compiler,command,root/'src/game.void','--profile','debug',*flags],2)
++  # Emit and inspect the actual compute function. Register allocation may simplify
++  # arithmetic even at O0; its retained stack traffic still distinguishes O2.
++  def instructions(label,flags,warning):
++   path=root/(label+'.o');run([compiler,'emit','--project',root,*flags,'-o',path],warning=warning)
++   dump=run([objdump,'-d','--no-show-raw-insn',path]).stdout.decode();symbol='__vd_'+b'/src/game.void::compute'.hex()+'__void'
++   match=re.search(r'<'+symbol+r'>:\n(.*?)(?:\n\n|\Z)',dump,re.S);assert match,dump
++   body=[]
++   for line in match[1].splitlines():
++    if re.match(r'\s*[0-9a-f]+:',line):
++     body.append(line.split(':',1)[1].strip())
++     if re.match(r'ret\w*\b',body[-1]):break
++   assert body and re.match(r'ret\w*\b',body[-1]),body
++   return len(body)
++  debug=instructions('debug',['--profile','debug'],'full');release=instructions('release',['--profile','release'],'line');noopt=instructions('release-noopt',['--profile','release','--no-opt'],'line');assert debug>release and noopt==debug,(debug,release,noopt)
++  for profile,warning in [('debug','full'),('release','line')]:
++   exe=root/(profile+('.exe' if os.name=='nt' else ''));run([compiler,'build','--project',root,'--profile',profile,'-o',exe],warning=warning);run([exe],23,warning='')
++  # The cache creates excluded infrastructure after source capture; bootstrap it
++  # before measuring a stable inventory's explicit cold/warm pair.
++  run([compiler,'run','--project',root,'--profile','debug'],23,warning='full')
++  cold=run([compiler,'run','--project',root,'--profile','debug','--cache'],23,warning='full');warm=run([compiler,'run','--project',root,'--profile','debug','--cache'],23,warning='full')
++  if b'Debug cache: unavailable' not in cold.stderr:assert b'Debug cache: miss' in cold.stderr and b'Debug cache: hit' in warm.stderr,(cold.stderr,warm.stderr)
++  else:print('UNQUALIFIED: native persistent disk cache warm hit')
++  run([compiler,'run','--project',root,'--cache'],23,warning='full')
++  overrides="[build.debug]\noptimization='O2'\ndebug_info='none'\n[build.release]\noptimization='none'\ndebug_info='full'\n";toml.write_bytes((manifest+overrides).encode())
++  optimized_debug=instructions('custom-debug',['--profile','debug'],'');plain_release=instructions('custom-release',['--profile','release'],'full');assert optimized_debug==release and plain_release==debug,(optimized_debug,plain_release)
++  run([compiler,'run','--project',root,'--profile','debug','--cache'],2,warning='');run([compiler,'run','--project',root,'--profile','debug','--cache','--no-opt'],23,warning='')
++  # An unselected unsupported setting is quiet; only the selected setting warns.
++  toml.write_bytes((manifest+"[build.debug]\ndebug_info='full'\n[build.release]\ndebug_info='none'\n").encode());run([compiler,'check','--project',root],warning='');run([compiler,'check','--project',root,'--profile','debug'],warning='full')
++  # Legacy standalone emission/run stays on the established option grammar.
++  run([compiler,'run',root/'src/game.void','--no-cache'],23,warning='');run([compiler,'run',root/'src/game.void','--cache'],23,warning='')
++ print(f'project_profiles: {checks} process checks passed; compute instruction counts O0={debug}, O2={release}, release --no-opt={noopt}')
++finally:
++ if evidence:evidence.write_text(json.dumps({'checks':checks,'commands':rows},indent=2)+'\n')
+diff --git a/tests/project/protocol.py b/tests/project/protocol.py
+new file mode 100644
+--- /dev/null
++++ b/tests/project/protocol.py
+@@ -0,0 +1,67 @@
++"""S3 real-pipe project preflight, overlays, diagnostics, navigation and file events."""
++from pathlib import Path
++import sys,json,tempfile,subprocess
++sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'tools'))
++from lsp_client import Client,frame
++server=Path(sys.argv[1]).resolve();evidence=Path(sys.argv[2]) if len(sys.argv)>2 else None
++rows=[];checks=0
++manifest="schema=1\n[project]\nid='org.test.sources'\nname='Sources'\nversion='1.0.0'\nkind='application'\n[application]\nid='org.test.app'\n[sources]\nroots=['src']\n"
++main='use "./helper.void" as h\nfunc main() -> i32:\n    return h.value()\n'
++def check(v,message):
++ global checks
++ checks+=1
++ assert v,message
++def preflight(workspace,active='',root='',entry=''):
++ args=[server,'--discover-project',workspace,active,root,entry];p=subprocess.run(list(map(str,args)),capture_output=True,timeout=30);rows.append({'argv':list(map(str,args)),'status':p.returncode,'stdout':p.stdout.decode(),'stderr':p.stderr.decode()});check(p.returncode==0,p.stderr);check(len(p.stdout)<=65536,'summary bounded');return json.loads(p.stdout)
++def query(c,method,params=None):
++ response,notes=c.request(method,params or {});rows.append({'method':method,'params':params,'response':response,'diagnostics':notes});check('error' not in response,response);return response['result'],notes
++def state(c):return query(c,'void/projectState')[0]
++def opened(c,path,text,version=1,language='void'):
++ c.notify('textDocument/didOpen',{'textDocument':{'uri':path.as_uri(),'languageId':language,'version':version,'text':text}});return c.sync()
++def change(c,path,text,version):
++ c.notify('textDocument/didChange',{'textDocument':{'uri':path.as_uri(),'version':version},'contentChanges':[{'text':text}]});return c.sync()
++def close(c,path):c.notify('textDocument/didClose',{'textDocument':{'uri':path.as_uri()}});return c.sync()
++def codes(notes):return [d['code'] for n in notes for d in n['diagnostics']]
++def definition(c,path,text,word):
++ at=text.index(word);prefix=text[:at];return query(c,'textDocument/definition',{'textDocument':{'uri':path.as_uri()},'position':{'line':prefix.count('\n'),'character':len(prefix.rsplit('\n',1)[-1].encode('utf-16-le'))//2}})[0]
++try:
++ with tempfile.TemporaryDirectory(prefix='VOID S3 protocol é😀 ') as temporary:
++  root=Path(temporary);(root/'src').mkdir();toml=root/'void.project.toml';toml.write_bytes(manifest.encode());(root/'src/helper.void').write_bytes(b'public func value() -> i32:\n    return 23\n');game=root/'src/game.void';other=root/'src/other.void'
++  relative=root/'bare.void';relative.write_bytes(b'func entry(x: i32) -> i32:\n    return x\n')
++  with Client(server,Path('bare.void'),cwd=root) as legacy:
++   check(not any(n['diagnostics'] for n in legacy.initialize()),'legacy relative --entry initializes beside a manifest');location=query(legacy,'textDocument/definition',{'textDocument':{'uri':relative.as_uri()},'position':{'line':0,'character':6}})[0];check(location['uri']==relative.as_uri(),'legacy relative entry navigation');legacy.shutdown()
++  initial=preflight(root);check(initial['mode']=='project' and initial['kind']=='application' and initial['entry'] is None and initial['status']=='error','no-main preflight is a successful error-bearing summary')
++  with Client(server,root,project=True) as c:
++   caps=query(c,'initialize',{'capabilities':{'textDocument':{'publishDiagnostics':{'relatedInformation':True,'versionSupport':True}},'workspace':{'workspaceEdit':{'documentChanges':True,'failureHandling':'textOnlyTransactional'}}}})[0]['capabilities'];check(caps['experimental']['voidProjectProtocol']==1 and caps['experimental']['voidToolingProtocol']==1,'separate protocol capabilities');c.notify('initialized',{});check('VOID5010' in codes(c.sync()),'initial no-main diagnostic')
++   opened(c,game,main);ready=state(c);check(ready['entry']==game.as_posix() and ready['status']=='ready','virtual source entry');check(definition(c,game,main,'value()')['uri']==(root/'src/helper.void').as_uri(),'project-root import navigation')
++   hover=query(c,'textDocument/hover',{'textDocument':{'uri':game.as_uri()},'position':{'line':2,'character':14}})[0];check('value()' in hover['contents']['value'],'project semantic hover')
++   change(c,game,main.replace('return h.value()','return   h.value()'),2);formatted=query(c,'textDocument/formatting',{'textDocument':{'uri':game.as_uri()},'options':{'tabSize':4,'insertSpaces':True}})[0];check(len(formatted)==1 and formatted[0]['newText']==main,'project formatting uses pinned root validation');change(c,game,main,3)
++   renamed_symbol=query(c,'textDocument/rename',{'textDocument':{'uri':game.as_uri()},'position':{'line':2,'character':14},'newName':'renamed_helper'})[0];check(len(renamed_symbol['documentChanges'])==2,'project symbol rename validates the full compiler graph')
++   notes=opened(c,toml,'schema=1\n# é😀\n[=roject]\n',1,'toml');bad=state(c);check(bad['status']=='error' and bad['entry'] is None,'dirty malformed TOML cannot retain entry');d=next(d for n in notes for d in n['diagnostics'] if d['code']=='VOID5001');check(d['range']=={'start':{'line':2,'character':1},'end':{'line':2,'character':1}},'manifest UTF-16 range');check(definition(c,game,main,'value()') is None,'no stale successful navigation')
++   change(c,toml,manifest,2);check(state(c)['status']=='ready','manifest repair');check(definition(c,game,main,'value()') is not None,'navigation recovers')
++   inline="schema=1\nproject={id='org.test.sources',name='é😀',version='bad',kind='application'}\napplication={id='org.test.app'}\n";notes=change(c,toml,inline,3);d=next(d for n in notes for d in n['diagnostics'] if d['code']=='VOID5005');column=len(inline.splitlines()[1].split("'bad'")[0].encode('utf-16-le'))//2;check(d['range']=={'start':{'line':1,'character':column},'end':{'line':1,'character':column+5}},'same-line astral manifest UTF-16 range');change(c,toml,manifest,4)
++   ambiguous=opened(c,other,'func main() -> i32:\n    return 4\n');check('VOID5010' in codes(ambiguous) and state(c)['entry'] is None,'second dirty main invalidates entry')
++   c.notify('workspace/didDeleteFiles',{'files':[{'uri':other.as_uri()}]});c.sync();check(state(c)['entry']==game.as_posix(),'deleted dirty main tombstoned');close(c,other)
++   # A watch deletion can arrive before rename. The dirty bytes are retained by
++   # the open document, but never used as a deleted source entry.
++   c.notify('workspace/didChangeWatchedFiles',{'changes':[{'uri':game.as_uri(),'type':3}]});c.sync();check(state(c)['entry'] is None,'watch deletion hides open source')
++   renamed=root/'src/renamed.void';c.notify('workspace/didRenameFiles',{'files':[{'oldUri':game.as_uri(),'newUri':renamed.as_uri()}]});c.sync();check(state(c)['entry']==renamed.as_posix(),'rename transfers owned dirty bytes');close(c,game);opened(c,renamed,main)
++   check(state(c)['requiresReselection'],'entry rename requires deliberate reselection');selected=query(c,'void/reselectProject',{})[0];check(not selected['requiresReselection'],'explicit reselection')
++   versions=[int(v['selectionRevision']) for v in c.project_states];check(versions==sorted(set(versions)),'published revisions strictly increase')
++   previous=state(c)['selectionRevision'];change(c,toml,'[=roject]',1);check(state(c)['selectionRevision']==previous,'stale TOML version rejected')
++   child=root/'src/child';child.mkdir();opened(c,child/'void.project.toml','invalid child boundary',1,'toml');notes=opened(c,child/'helper.void','func value():\n    pass\n');check('VOID5009' in codes(notes) and state(c)['status']=='error','dirty nested project denies source overlay');close(c,child/'helper.void');close(c,child/'void.project.toml');check(state(c)['status']=='ready','closing boundary overlays repairs session')
++   wrong=child/'void.Project.toml';wrong.write_bytes(b'invalid boundary case');c.notify('workspace/didChangeWatchedFiles',{'changes':[{'uri':wrong.as_uri(),'type':1}]});notes=c.sync();check('VOID5009' in codes(notes) and state(c)['status']=='error','wrong-case manifest watcher invalidates through compiler admission');wrong.unlink();c.notify('workspace/didChangeWatchedFiles',{'changes':[{'uri':wrong.as_uri(),'type':3}]});c.sync();check(state(c)['status']=='ready','boundary removal restores selection')
++   c.notify('workspace/didDeleteFiles',{'files':[{'uri':toml.as_uri()}]});c.sync();check(state(c)['status']=='error','selected manifest deletion never downgrades');change(c,toml,manifest,5);check(state(c)['status']=='ready','whole text edit repairs a tombstoned open manifest without dereference')
++   # Queries queued after edits observe the latest revision; no older success
++   # may overtake a malformed manifest and publish navigation.
++   c.write(frame({'jsonrpc':'2.0','method':'textDocument/didChange','params':{'textDocument':{'uri':toml.as_uri(),'version':6},'contentChanges':[{'text':'[=roject]'}]}})+frame({'jsonrpc':'2.0','method':'void/projectState','id':'latest','params':{}}));response,notes=c.response('latest');check(response['result']['status']=='error' and 'VOID5001' in codes(notes),'queued edits precede current result')
++   c.shutdown()
++  # Disk creation/rename/deletion and nearest project selection use the compiler.
++  game.write_bytes(main.encode());check(preflight(root)['entry']==game.as_posix(),'disk parity');child=root/'src/child';(child/'void.project.toml').write_bytes(manifest.replace("roots=['src']","roots=['.']").encode());(child/'launcher.void').write_bytes(b'func main() -> i32:\n    return 2\n');check(preflight(root,child/'launcher.void')['root']==child.as_posix(),'nearest manifest before legacy main');pinned=preflight(root,child/'launcher.void',root);check(pinned['status']=='error' and pinned['entry'] is None,'explicit root never follows child active document')
++  legacy=root/'bare.void';legacy.write_bytes(b'func entry(x: i32) -> i32:\n    return x\n');check(preflight(root,game,'',legacy)['mode']=='legacy','entry-only setting preserves legacy mode')
++  library=manifest.replace("kind='application'","kind='library'").replace("[application]\nid='org.test.app'","[package]\nid='org.test.lib'\nname='library'");toml.write_bytes(library.encode())
++  with Client(server,root,project=True) as c:
++   c.initialize();info=state(c);check(info['kind']=='library' and info['entry'] is None and info['status']=='ready','library session no fabricated entry');check(definition(c,game,main,'value()') is not None,'library semantic navigation');c.shutdown()
++ print(f'project_protocol: {checks} checks passed')
++finally:
++ if evidence:evidence.write_text(json.dumps({'checks':checks,'commands_and_requests':rows},indent=2)+'\n')
+diff --git a/tests/project/sessions.cpp b/tests/project/sessions.cpp
+new file mode 100644
+--- /dev/null
++++ b/tests/project/sessions.cpp
+@@ -0,0 +1,73 @@
++#include "void/tooling.hpp"
++#include "void/backend.hpp"
++#include "void/path.hpp"
++#include <chrono>
++#include <fstream>
++#include <iostream>
++#include <stdexcept>
++namespace {
++namespace fs=std::filesystem;
++std::size_t checks=0;
++void check(bool value,const std::string& message){++checks;if(!value)throw std::runtime_error(message);}
++const std::string manifest="schema=1\n[project]\nid='org.test.sources'\nname='Sources'\nversion='1.0.0'\nkind='application'\n[application]\nid='org.test.app'\n[sources]\nroots=['src']\n";
++const std::string source="func main() -> i32:\n    return 23\n";
++struct Fixture {
++ fs::path root=fs::temp_directory_path()/vd::utf8_path("VOID S3 sessions 雪 "+std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
++ Fixture(){fs::create_directories(root/"src");write("void.project.toml",manifest);}
++ ~Fixture(){std::error_code ec;fs::remove_all(root,ec);}
++ void write(const std::string& id,const std::string& text){auto path=root/vd::utf8_path(id);fs::create_directories(path.parent_path());std::ofstream out(path,std::ios::binary);out<<text;check(bool(out),"fixture write");}
++};
++auto analyze(vd::ToolingSession& session,bool success){auto result=vd::ToolingSession::analyze(session.select());check(session.accept(result),"fresh result accepted");check(result->succeeded()==success,"expected session status");check(bool(session.current_index())==success,"no stale semantic index");if(!success)check(!result->result().program && !result->semantic_analysis(),"failed selection cannot return executable/semantic analysis");return result;}
++void sessions(){
++ Fixture f;vd::ToolingSession s(vd::ProjectSession{f.root});
++ auto empty=analyze(s,false);check(empty->project()->manifest && empty->project()->state->discovery_complete && !empty->project()->state->entry,"no-main error-bearing state");
++ s.open("/src/game.void",1,source);auto first=analyze(s,true);check(first->project()->project->entry()==f.root/"src/game.void","dirty new source selected");
++ auto retained=s.select();s.open("/src/second.void",1,source);auto ambiguous=analyze(s,false);check(ambiguous->project()->state->discovery.size()==2,"ambiguous D retained");
++ check(!s.accept(vd::ToolingSession::analyze(retained)),"delayed earlier success rejected");check(s.current_analysis()==ambiguous && s.last_success()==first,"failed current versus explicit historical success");
++ s.unavailable("/src/second.void",2);auto single=analyze(s,true);check(single->project()->project->entry()==first->project()->project->entry(),"tombstone changes inventory");
++ s.open("/void.project.toml",1,"# é😀\r\n[=roject]\r\n");auto malformed=analyze(s,false);auto diagnostic=malformed->result().diagnostics.at(0);check(diagnostic.primary.module_identity=="/void.project.toml","manifest has separate canonical owner");check(!malformed->project()->manifest && malformed->project()->state->discovery.empty(),"invalid TOML traverses no source policy");
++ s.replace("/void.project.toml",2,manifest);analyze(s,true);check(diagnostic.primary.source->text().find("[=roject]")!=std::string::npos,"diagnostic owns removed dirty manifest bytes");
++ auto selected=s.select();s.refresh();check(!s.accept(vd::ToolingSession::analyze(selected)),"disk invalidation rejects delayed selection");analyze(s,true);
++ vd::ToolingSession other(vd::ProjectSession{f.root});check(!other.accept(vd::ToolingSession::analyze(s.select())),"cross-session token rejection");
++ s.open("/src/child/void.project.toml",1,"malformed boundary");s.open("/src/child/new.void",1,"func helper():\n    pass\n");analyze(s,false);
++ s.unavailable("/src/child/void.project.toml",2);analyze(s,true);s.close("/src/child/new.void",2);s.close("/src/child/void.project.toml",3);analyze(s,true);
++ s.unavailable("/void.project.toml",3);analyze(s,false);s.close("/void.project.toml",4);analyze(s,true);
++ // A root change is a different session; explicit reselection never rebases dirty paths.
++ s.reselect("src/game.void");check(analyze(s,true)->project()->state->discovery.empty(),"explicit reselection skips D");check(!s.requires_reselection(),"deliberate selection accepted");
++ s.reselect("src/missing.void");analyze(s,false);check(s.requires_reselection(),"invalid explicit entry never falls back");
++ s.reselect();analyze(s,true);s.unavailable("/src/game.void",2);analyze(s,false);s.close("/src/game.void",3);analyze(s,false);
++ check(first->index()->declaration("/src/game.void::main").has_value(),"historical metadata outlives all revisions");
++}
++void libraries(){
++ Fixture f;auto policy=manifest;policy.replace(policy.find("kind='application'"),18,"kind='library'");policy.replace(policy.find("[application]"),std::string("[application]\nid='org.test.app'").size(),"[package]\nid='org.test.library'\nname='geometry'");f.write("void.project.toml",policy);
++ vd::ToolingSession s(vd::ProjectSession{f.root});auto empty=analyze(s,true);check(!empty->result().program && !empty->project()->project->entry() && !empty->semantic_analysis()->executable(),"library has metadata without executable entry");
++ bool rejected=false;try{(void)empty->semantic_analysis()->lower();}catch(const std::invalid_argument&){rejected=true;}check(rejected,"library metadata cannot lower IR");
++ s.open("/src/a.void",1,"public func value() -> i32:\n    return 7\n");s.open("/src/b.void",1,"use \"./a.void\" as a\nfunc main() -> i32:\n    return a.value()\n");auto indexed=analyze(s,true);check(indexed->index()->definition_at("/src/b.void",std::string("use \"./a.void\" as a\nfunc main() -> i32:\n    return a.").size())->module=="/src/a.void","library import navigation uses declarationless root");
++ s.replace("/src/b.void",2,"func read() -> i32:\n    return hidden\n");analyze(s,false);
++}
++void reload(){
++ for(bool optimize:{false,true}) {
++  Fixture f;const std::string body="var state = 0\nfunc main() -> i32:\n    state += 1\n    return state + ";f.write("src/game.void",body+"10\n");vd::ToolingSession s(vd::ProjectSession{f.root});auto before=analyze(s,true);
++  vd::Jit jit;vd::ReloadSlot slot(jit.compile(*before->result().program,optimize));check(slot.invoke(0)==11,"original application generation");
++  s.open("/src/game.void",1,body+"20\n");auto after=analyze(s,true);check(before->project()->project->selection_key()!=after->project()->project->selection_key(),"body changes selection/build provenance");check(before->project()->project->context_key()==after->project()->project->context_key(),"body retains semantic project context");check(s.invalidation().source_compatibility==vd::SourceCompatibility::exact_match && !s.requires_reselection(),"body remains source-compatible");check(jit.replace(slot,s,*after,optimize) && slot.invoke(0)==22,"actual body reload preserves global cells");
++  s.open("/void.project.toml",1,manifest+"# comment-only revision\n");auto trivia=analyze(s,true);check(s.invalidation().source_compatibility==vd::SourceCompatibility::exact_match && !s.requires_reselection(),"manifest trivia is provenance, not semantic metadata");check(jit.replace(slot,s,*trivia,optimize),"comment-only context compatible");
++  auto metadata=manifest;metadata.replace(metadata.find("name='Sources'"),14,"name='Changed'");s.replace("/void.project.toml",2,metadata);auto changed=analyze(s,true);check(s.requires_reselection() && s.invalidation().source_compatibility==vd::SourceCompatibility::restart_required,"semantic metadata requires reselection/restart");check(!jit.replace(slot,s,*changed,optimize),"old Runtime rejects changed project source context");
++  s.replace("/src/game.void",2,body+"30\n");check(!jit.replace(slot,s,*after,optimize),"stale project generation cannot publish");analyze(s,true);
++ }
++}
++void profiles(){
++ auto parsed=vd::project::parse_manifest(vd::SourceFile("manifest",manifest));check(parsed.succeeded(),"profile schema");auto m=parsed.manifest;
++ auto release=vd::project::resolve_profile(*m,{},false,false),debug=vd::project::resolve_profile(*m,vd::project::ProfileName::debug,false,false);
++ check(release.optimize && !debug.optimize && release.diagnostics.size()==1 && debug.diagnostics.size()==1,"schema-default profiles and selected warnings");
++ check(release.diagnostics[0].primary.begin==manifest.size() && release.diagnostics[0].primary.end==manifest.size(),"default-profile warning uses owned EOF insertion span");
++ check(release.debug_info==vd::project::DebugInfo::line && debug.debug_info==vd::project::DebugInfo::full,"requested modes retained");
++ check(release.diagnostics[0].severity==vd::Severity::warning && release.diagnostics[0].code==vd::DiagnosticCode::project_debug_info,"structured profile warning");
++ check(!vd::project::resolve_profile(*m,{},true,false).optimize,"explicit no-opt wins");check(vd::project::resolve_profile(*m,{},false,true).name==vd::project::ProfileName::debug,"implicit release yields to cache debug selection");
++ bool rejected=false;try{(void)vd::project::resolve_profile(*m,vd::project::ProfileName::release,true,true);}catch(const std::invalid_argument&){rejected=true;}check(rejected,"explicit release cache conflict survives no-opt");
++ auto override=vd::project::parse_manifest(vd::SourceFile("dirty",manifest+"[build.debug]\noptimization='O2'\ndebug_info='none'\n[build.release]\noptimization='none'\ndebug_info='full'\n"));check(override.succeeded(),"profile overrides");
++ auto selected=vd::project::resolve_profile(*override.manifest,vd::project::ProfileName::debug,false,false);check(selected.optimize && selected.diagnostics.empty(),"none quiet; unselected unsupported setting quiet");
++ auto warning=vd::project::resolve_profile(*override.manifest,vd::project::ProfileName::release,false,false).diagnostics.at(0);check(warning.primary.source->text().substr(warning.primary.begin,warning.primary.end-warning.primary.begin)=="'full'","explicit profile warning retains exact value range");
++ rejected=false;try{(void)vd::project::resolve_profile(*override.manifest,{},false,true);}catch(const std::invalid_argument&){rejected=true;}check(rejected,"custom O2 debug conflicts with cache");check(!vd::project::resolve_profile(*override.manifest,{},true,true).optimize,"explicit no-opt resolves effective debug optimization");
++}
++}
++int main(){try{sessions();libraries();reload();profiles();std::cout<<"project_sessions: "<<checks<<" checks passed\n";return 0;}catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}}
+diff --git a/tools/lsp_client.py b/tools/lsp_client.py
+--- a/tools/lsp_client.py
++++ b/tools/lsp_client.py
+@@ -15,10 +15,14 @@
+ 
+ 
+ class Client:
+-    def __init__(self, executable, entry, *, preexec_fn=None):
+-        self.process = subprocess.Popen([str(executable), "--entry", str(entry)],
++    def __init__(self, executable, entry, *, preexec_fn=None, project=False, entry_override=None, cwd=None):
++        self.project = project
++        self.project_states = []
++        argv = [str(executable), "--project" if project else "--entry", str(entry)]
++        if entry_override is not None: argv += ["--entry", entry_override]
++        self.process = subprocess.Popen(argv,
+                                         stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+-                                        preexec_fn=preexec_fn)
++                                        preexec_fn=preexec_fn, cwd=cwd)
+         self.messages = queue.Queue()
+         self.logs = bytearray()
+         self.serial = 0
+@@ -98,6 +102,9 @@
+                 assert message["id"] == request_id and type(message["id"]) is type(request_id), message
+                 assert ("result" in message) != ("error" in message), message
+                 return message, notifications
++            if self.project and message.get("method") == "void/projectState":
++                self.project_states.append(message["params"])
++                continue
+             assert message.get("method") == "textDocument/publishDiagnostics", message
+             notifications.append(message["params"])
+ 

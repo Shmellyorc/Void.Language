@@ -1,0 +1,4 @@
+held file=C:\Users\a\VoidS7-G4W2-replay\swap-guarded\void_w2_gate.dll id=c60478b6:00090000000bcbb3 sha256=d2777f220e42ad4bf4590cd23c4507d3054d8f55e38e88af31fb1e157dc2039e
+approved no-entry image replaced after dropping the held identity
+held file=C:\Users\a\VoidS7-G4W2-replay\swap-guarded\void_w2_gate.dll id=c60478b6:00090000000bcbb4 sha256=86c0d704bbb414e599deb1a064a6e0e0fc00ba04c0d470cf2b04bbb0b9768db2
+denied before executable load: image digest

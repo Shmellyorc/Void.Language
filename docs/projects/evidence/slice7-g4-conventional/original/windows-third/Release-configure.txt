@@ -1,0 +1,52 @@
+-- Could NOT find zstd (missing: zstd_LIBRARY zstd_INCLUDE_DIR) 
+-- VOID LLVM: 23.1.4 at C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\lib\cmake\llvm
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- curl 8.23.0: 1586 files verified; four private corrections
+
+-- HTTP dependency prefix verified: Release; 30 files
+
+-- Using CMake version 4.4.3
+-- curl version=[8.23.0]
+-- CMake platform flags: WIN32 CLANG-CL MSVC-1944
+-- Performing Test HAVE_WIN32_WINNT
+-- Performing Test HAVE_WIN32_WINNT - Success
+-- Found _WIN32_WINNT=0x0a00
+-- Picky compiler options: -Werror-implicit-function-declaration -W4 -Wextra -clang:-Wall -Wpedantic -Wbad-function-cast -Wconversion -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-long-long -Wno-multichar -Wpointer-arith -Wshadow -Wsign-compare -Wundef -Wunused -Wwrite-strings -Waddress -Wattributes -Wcast-align -Wcast-qual -Wdeclaration-after-statement -Wdiv-by-zero -Wempty-body -Wendif-labels -Wfloat-equal -Wformat-security -Wignored-qualifiers -Wmissing-field-initializers -Wmissing-noreturn -Wno-padded -Wno-sign-conversion -Wno-switch-default -Wno-switch-enum -Wno-system-headers -Wold-style-definition -Wredundant-decls -Wstrict-prototypes -Wtype-limits -Wunreachable-code -Wunused-parameter -Wvla -Wconditional-uninitialized -Wno-used-but-marked-unused -Wshift-sign-overflow -Wshorten-64-to-32 -Wformat=2 -Wno-covered-switch-default -Wno-disabled-macro-expansion -Wno-format-non-iso -Wenum-conversion -Wmissing-variable-declarations -Wno-documentation-unknown-command -Wsometimes-uninitialized -Wdouble-promotion -Wheader-guard -Wpragmas -Wunused-const-variable -Wcomma -Wno-nonportable-system-include-path -Wassign-enum -Wextra-semi-stmt -Wimplicit-fallthrough -Wxor-used-as-pow -Wcast-function-type -Wreserved-identifier -Wno-reserved-macro-identifier -Wno-unsafe-buffer-usage -Wcast-function-type-strict -Wformat-signedness -Warray-compare -Wc++-hidden-decl -Wimplicit-int-enum-cast -Wjump-misses-init -Wno-implicit-void-ptr-cast -Wtentative-definition-compat -Wno-c++-keyword -Wno-language-extension-token
+-- Found Cares: C:/Users/a/VoidCI42377496702-Native/.toolchains/http/prefix/windows-schannel-x86_64/Release/include (found version "1.34.9")
+-- Could NOT find Perl (missing: PERL_EXECUTABLE) 
+-- Found NGHTTP2: C:/Users/a/VoidCI42377496702-Native/.toolchains/http/prefix/windows-schannel-x86_64/Release/include (found version "1.70.0")
+-- Found Libpsl: C:/Users/a/VoidCI42377496702-Native/.toolchains/http/prefix/windows-schannel-x86_64/Release/include (found version "0.21.5")
+-- Check size of time_t
+-- Check size of time_t - done
+-- Protocols: http https
+-- Features: AsynchDNS HTTP2 HTTPS-proxy IDN IPv6 Largefile PSL SSL SSPI threadsafe Unicode
+-- Enabled SSL backends: Schannel
+CMake Error at cmake/HostDependencies.cmake:34 (message):
+  Pinned host providers invalid: Traceback (most recent call last):
+
+    File "C:\Users\a\VoidS7-G4Conventional\source\tools\verify_host_deps.py", line 128, in <module>
+      record=verify_prefix(args.prefix,args.profile,args.platform,args.architecture)
+    File "C:\Users\a\VoidS7-G4Conventional\source\tools\verify_host_deps.py", line 97, in verify_prefix
+      if receipt.get('toolchain')!=toolchain():raise ValueError('provider compiler/SDK/tool identity mismatch')
+                                   ~~~~~~~~~^^
+    File "C:\Users\a\VoidS7-G4Conventional\source\tools\verify_host_deps.py", line 70, in toolchain
+      if json.loads((sdk/'void-sdk-identity.json').read_text())!=llvm_sdk.archive_identity():raise ValueError('host provider SDK identity mismatch')
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+    File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 787, in read_text
+      with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 771, in open
+      return io.open(self, mode, buffering, encoding, errors, newline)
+             ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  FileNotFoundError: [Errno 2] No such file or directory:
+  'C:\\Users\\a\\VoidS7-G4Conventional\\source\\.toolchains\\llvm-23.1.4\\void-sdk-identity.json'
+
+
+
+  Run python3 tools/setup_host_deps.py --profile Release on the native host
+Call Stack (most recent call first):
+  CMakeLists.txt:116 (include)
+
+
+-- Configuring incomplete, errors occurred!

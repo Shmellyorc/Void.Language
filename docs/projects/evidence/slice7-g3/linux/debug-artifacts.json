@@ -1,0 +1,154 @@
+{
+  "profile": "debug",
+  "host": "x86_64",
+  "c_compile_commands": [
+    {
+      "directory": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+      "command": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang -DG3_FIXTURE_IDENTITY=\\\"bfd1c699c7d4b144c02e79f46246f381628072b66e22511eeda1d4b055e4a6a6\\\" -I/home/shmellyorc/Documents/Void.Language/include -g -std=c11 -fvisibility=hidden -Wall -Wextra -Wpedantic -o CMakeFiles/void_g3_fixture.dir/tests/ffi/resources_fixture.c.o -c /home/shmellyorc/Documents/Void.Language/tests/ffi/resources_fixture.c",
+      "file": "/home/shmellyorc/Documents/Void.Language/tests/ffi/resources_fixture.c",
+      "output": "CMakeFiles/void_g3_fixture.dir/tests/ffi/resources_fixture.c.o"
+    },
+    {
+      "directory": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+      "command": "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang  -I/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g3 -I/home/shmellyorc/Documents/Void.Language/include -g -std=c11 -fvisibility=hidden -Wall -Wextra -Wpedantic -o CMakeFiles/void_g3_thunk.dir/tests/ffi/resources_thunk.c.o -c /home/shmellyorc/Documents/Void.Language/tests/ffi/resources_thunk.c",
+      "file": "/home/shmellyorc/Documents/Void.Language/tests/ffi/resources_thunk.c",
+      "output": "CMakeFiles/void_g3_thunk.dir/tests/ffi/resources_thunk.c.o"
+    }
+  ],
+  "artifacts": {
+    "void_g3_tests": "c6f9b4f5caf973a751d9326f915bbc19688879da79eb1689c0158368102c49b1",
+    "void_g3_aot_normal": "b7f16a479aa96a1a39172262bdf6d747ec794b2bbfbefcbd04abff0f4a61b478",
+    "void_g3_aot_optimized": "db786e63c3b177a9386b9bc88d14fbcbec80b72532711763078ba4405216635b",
+    "voidc": "f5442bc05b307c17f13834d68d5b1c703f91f7a54e6ba9ca786ccd51760c43f4",
+    "ffi-g3/application-normal.o": "9521361d981c0cb860ac05bba79160c2c5723cf8029254327ead104b49e432df",
+    "ffi-g3/application-optimized.o": "2f42889e210bcfe0a75fb874167bfbd16e2d56e22d79c01a156e06521e89d228",
+    "ffi-g3/resources.descriptor": "e6cc893203769c7e8e5f62d20a787d3c6b1d464d21d7c240c9443481e6b4f834",
+    "CMakeFiles/void_g3_fixture.dir/tests/ffi/resources_fixture.c.o": "154e2a4d61e9cf42b9311d8e2d06d2d4bfac16db975625c7c452f1a8d7d48263",
+    "CMakeFiles/void_g3_thunk.dir/tests/ffi/resources_thunk.c.o": "f1af2d948abe98acf1fbd172bcdb4ee0ceb0fc09ed7abb5359b1bc6f535c70f0"
+  },
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "abort_on_error=1:halt_on_error=1:detect_leaks=1",
+    "UBSAN_OPTIONS": "abort_on_error=1:halt_on_error=1:print_stacktrace=1"
+  },
+  "processes": [
+    {
+      "case": "direct-jit-typed-ir-ownership",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g3_tests",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g3/resources.descriptor",
+        "/home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g3/evidence-replay"
+      ],
+      "status": 0,
+      "stdout": "3 2: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects\ninteger null: C primitive descriptor line 10: unsupported or contradictory native resource contract\npointer minus-one: C primitive descriptor line 10: unsupported or contradictory native resource contract\nshutdown-owner: C primitive descriptor line 10: unsupported or contradictory native resource contract\nretry-on-error: C primitive descriptor line 10: unsupported or contradictory native resource contract\ncreate missing owner: C primitive descriptor line 14: invalid native borrow or terminal release signature\nbind close_box g3_close i32 mut:box: C primitive descriptor line 15: missing exact native acquire or release contract\ni64 close:box: C primitive descriptor line 14: invalid native borrow or terminal release signature\ni32 close:box i32: C primitive descriptor line 14: invalid native borrow or terminal release signature\ni32 borrow:other i32: C primitive descriptor line 12: resource operation requires an earlier admitted identity\ni32 borrow:box mut:box: C primitive descriptor line 12: invalid native borrow or terminal release signature\nowner:box borrow:box i32: C primitive descriptor line 12: invalid native ownership transfer or mixed ABI\nvectorcall: C primitive descriptor line 8: unsupported descriptor, ABI revision or effects\nretains-owner no-callbacks: C primitive descriptor line 7: unsupported descriptor, ABI revision or effects\norg.voidlang.other: C primitive provider rejected the exact descriptor or fixture identity\nabsent admission: VOID IR: invalid native resource identity\nwrong provider: VOID IR: invalid C primitive descriptor or exact call signature\nwrong release ordinal: VOID IR: invalid C primitive descriptor or exact call signature\nforged ownership movement: VOID IR: invalid C primitive descriptor or exact call signature\nforged convention operand: VOID IR: invalid C primitive descriptor or exact call signature\nscope bypass: VOID IR: C primitive binding requires the admitted direct import\nraw bridge escape: VOID IR: C primitive transport requires host admission and typed operations\nworker resource access: VOID IR: C primitive graphs require synchronous execution\nborrow as escaping callable: VOID IR: C primitive binding is direct-call only\nwrapper control flow bypass: VOID IR: invalid admitted C primitive wrapper\nfabricated second owning wrapper: VOID IR: forged native resource\ninteger-to-resource cast: VOID IR: invalid conversion\nuninitialized handle: VOID IR: read of uninitialized C binding carrier storage in /resources.void::entry\neager global acquisition: VOID IR: C primitive operation during global startup\nduplicate native owner, foreign provider/Runtime and stale alias rejected\nborrow vs wrong-thread close and shutdown passed\ncreation-publication race passed\nterminal provider error reported on shutdown after release\ndirect typed IR stale alias: <host binding /native_resources.void>:6:6: runtime error: C resource is closed, null or invalid\nIn function /native_resources.void::read\nCalled from /resources.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:5:6: source call\n\nclosed alias: <host binding /native_resources.void>:6:6: runtime error: C resource is closed, null or invalid\nIn function /native_resources.void::read\nCalled from /resources.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:29:20: source call\n        return ffi.read(alias, 0)\n                   ^\n\ndouble close: <host binding /native_resources.void>:10:6: runtime error: C resource is closed, null or invalid\nIn function /native_resources.void::close_box\nCalled from /resources.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:31:20: source call\n        return ffi.close_box(alias)\n                   ^\n\nnull acquisition: /home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:14:40: runtime error: Null managed reference in checked conversion\n        return ffi.read(ffi.create(-1) as ffi.box, 0)\n                                       ^\nIn function /resources.void::entry\n\ncompatible body reload retained the owner and generation; changed thunk rejected\nG3 JIT normal returned 104\nclosed alias: <host binding /native_resources.void>:6:6: runtime error: C resource is closed, null or invalid\nIn function /native_resources.void::read\nCalled from /resources.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:29:20: source call\n        return ffi.read(alias, 0)\n                   ^\n\ndouble close: <host binding /native_resources.void>:10:6: runtime error: C resource is closed, null or invalid\nIn function /native_resources.void::close_box\nCalled from /resources.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:31:20: source call\n        return ffi.close_box(alias)\n                   ^\n\nnull acquisition: /home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:14:40: runtime error: Null managed reference in checked conversion\n        return ffi.read(ffi.create(-1) as ffi.box, 0)\n                                       ^\nIn function /resources.void::entry\n\ncompatible body reload retained the owner and generation; changed thunk rejected\nG3 JIT O2 returned 104\n",
+      "stderr": ""
+    },
+    {
+      "case": "independently-linked-aot-normal",
+      "argv": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/ffi/resources_process.py",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g3_aot_normal"
+      ],
+      "status": 0,
+      "stdout": "7 0 104\n-1 1 <host binding /native_resources.void>:6:6: runtime error: C resource is closed, null or invalid\nIn function /native_resources.void::read\nCalled from /resources.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:29:20: source call\n        return ffi.read(alias, 0)\n                   ^\n-2 1 <host binding /native_resources.void>:10:6: runtime error: C resource is closed, null or invalid\nIn function /native_resources.void::close_box\nCalled from /resources.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:31:20: source call\n        return ffi.close_box(alias)\n                   ^\n-3 1 /home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:14:40: runtime error: Null managed reference in checked conversion\n        return ffi.read(ffi.create(-1) as ffi.box, 0)\n                                       ^\nIn function /resources.void::entry\n-4 0 22\n",
+      "stderr": ""
+    },
+    {
+      "case": "independently-linked-aot-optimized",
+      "argv": [
+        "/usr/bin/python3",
+        "/home/shmellyorc/Documents/Void.Language/tests/ffi/resources_process.py",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g3_aot_optimized"
+      ],
+      "status": 0,
+      "stdout": "7 0 104\n-1 1 <host binding /native_resources.void>:6:6: runtime error: C resource is closed, null or invalid\nIn function /native_resources.void::read\nCalled from /resources.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:29:20: source call\n        return ffi.read(alias, 0)\n                   ^\n-2 1 <host binding /native_resources.void>:10:6: runtime error: C resource is closed, null or invalid\nIn function /native_resources.void::close_box\nCalled from /resources.void::entry\n/home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:31:20: source call\n        return ffi.close_box(alias)\n                   ^\n-3 1 /home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:14:40: runtime error: Null managed reference in checked conversion\n        return ffi.read(ffi.create(-1) as ffi.box, 0)\n                                       ^\nIn function /resources.void::entry\n-4 0 22\n",
+      "stderr": ""
+    },
+    {
+      "case": "startup-source-denial",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g3_tests",
+        "--emit",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g3/resources.descriptor",
+        "/home/shmellyorc/Documents/Void.Language/build/slice7-g3/source-probes/startup.void",
+        "/home/shmellyorc/Documents/Void.Language/build/slice7-g3/source-probes/debug-startup.o",
+        "normal"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "<host binding /native_resources.void>:4:6: error: C primitive calls require a completed application startup.\n    code: VOID1106\n\n 4 | func create(arg0: i32) -> box?:\n   |      ^^^^^^\n\n"
+    },
+    {
+      "case": "forged-source-denial",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_g3_tests",
+        "--emit",
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g3/resources.descriptor",
+        "/home/shmellyorc/Documents/Void.Language/build/slice7-g3/source-probes/forged.void",
+        "/home/shmellyorc/Documents/Void.Language/build/slice7-g3/source-probes/debug-forged.o",
+        "normal"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "/home/shmellyorc/Documents/Void.Language/build/slice7-g3/source-probes/forged.void:3:20: error: Native resources are nonforgeable; use the checked binding factory.\n    code: VOID1103\n\n 3 |     var fake = ffi.box()\n   |                    ^^^\n    Module: /forged.void\n\n"
+    }
+  ],
+  "clang_abi_probe": [
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-DG3_FIXTURE_IDENTITY=\"bfd1c699c7d4b144c02e79f46246f381628072b66e22511eeda1d4b055e4a6a6\"",
+        "-I/home/shmellyorc/Documents/Void.Language/include",
+        "-g",
+        "-std=c11",
+        "-fvisibility=hidden",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-o",
+        "-",
+        "-S",
+        "-emit-llvm",
+        "/home/shmellyorc/Documents/Void.Language/tests/ffi/resources_fixture.c"
+      ],
+      "C_IR_signatures": [
+        "target triple = \"x86_64-unknown-linux-gnu\"",
+        "define hidden ptr @g3_fixture_identity() #0 !dbg !33 {",
+        "define hidden ptr @g3_create(i32 noundef %0) #0 !dbg !39 {",
+        "define hidden i32 @g3_read(ptr noundef %0, i32 noundef %1) #0 !dbg !75 {",
+        "define hidden i32 @g3_add(ptr noundef %0, i32 noundef %1) #0 !dbg !88 {",
+        "define hidden i32 @g3_close(ptr noundef %0) #0 !dbg !119 {",
+        "define hidden i32 @g3_live() #0 !dbg !135 {",
+        "define hidden i32 @g3_releases() #0 !dbg !140 {"
+      ]
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang",
+        "-I/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/ffi-g3",
+        "-I/home/shmellyorc/Documents/Void.Language/include",
+        "-g",
+        "-std=c11",
+        "-fvisibility=hidden",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-o",
+        "-",
+        "-S",
+        "-emit-llvm",
+        "/home/shmellyorc/Documents/Void.Language/tests/ffi/resources_thunk.c"
+      ],
+      "C_IR_signatures": [
+        "target triple = \"x86_64-unknown-linux-gnu\"",
+        "declare ptr @g3_fixture_identity() #2",
+        "declare ptr @g3_create(i32 noundef) #2",
+        "declare i32 @g3_read(ptr noundef, i32 noundef) #2",
+        "declare i32 @g3_add(ptr noundef, i32 noundef) #2",
+        "declare i32 @g3_close(ptr noundef) #2",
+        "declare i32 @g3_live() #2"
+      ]
+    }
+  ]
+}

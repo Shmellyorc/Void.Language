@@ -1,0 +1,22 @@
+void-c-primitive 3 3
+provider org.voidlang.g5
+target x86_64-unknown-linux-gnu sysv-x64
+source /callback_checked.void
+thunk 8a8c471ee5e41ae426fc471a168b97748e190c8e28d34c2203ddb5c44feee724
+fixture 1944bee84ebe025f958f12e94cfa8c36097c1a53ab121756fd8f8ef667ed2dec
+effects direct-sync blocking checked-callbacks
+call c-default
+aliases c_int:i32 c_long:i64 c_size:u64 c_bool:bool
+resource registration G5Registration pointer null register unregister owner-calls shutdown-any consume-always
+callback integer context-first i32 i32
+callback floating context-first f64 f64 f32
+callback notification context-first void i32
+bind twice g5_twice i32 i32 scoped:integer
+bind mix g5_mix f64 f64 f32 scoped:floating
+bind notify g5_notify void i32 scoped:notification
+bind register g5_register owner:registration retained:integer
+bind fire g5_fire i32 borrow:registration i32 i32
+bind queue g5_queue i32 mut:registration i32
+bind wait g5_wait i32
+bind unregister g5_unregister i32 close:registration
+bind late g5_late i32

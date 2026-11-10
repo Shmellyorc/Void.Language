@@ -1,0 +1,14 @@
+In file included from C:\Users\a\VoidSlice1Closeout-20261108-r2\src\frontend\project.cpp:14:
+C:\Users\a\VoidSlice1Closeout-20261108-r2\third_party\tomlplusplus\toml.hpp(3573,19): warning: identifier '_tpath' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 3573 |                 path operator"" _tpath(const char* str, size_t len)
+      |                      ~~~~~~~~~~~^~~~~~
+      |                      operator""_tpath
+C:\Users\a\VoidSlice1Closeout-20261108-r2\third_party\tomlplusplus\toml.hpp(9605,27): warning: identifier '_toml' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 9605 |                 parse_result operator"" _toml(const char* str, size_t len)
+      |                              ~~~~~~~~~~~^~~~~
+      |                              operator""_toml
+C:\Users\a\VoidSlice1Closeout-20261108-r2\third_party\tomlplusplus\toml.hpp(9614,27): warning: identifier '_toml' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 9614 |                 parse_result operator"" _toml(const char8_t* str, size_t len)
+      |                              ~~~~~~~~~~~^~~~~
+      |                              operator""_toml
+3 warnings generated.

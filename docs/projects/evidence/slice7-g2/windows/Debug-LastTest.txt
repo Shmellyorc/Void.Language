@@ -1,0 +1,1069 @@
+Start testing: Nov 08 20:25 Pacific Standard Time
+----------------------------------------------------------
+1/376 Testing: project_manifest_header
+1/376 Test: project_manifest_header
+Command: "C:/Users/a/VoidS7-G2-Debug/void_project_header.exe"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"project_manifest_header" start time: Nov 08 20:25 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.25 sec
+----------------------------------------------------------
+Test Passed.
+"project_manifest_header" end time: Nov 08 20:25 Pacific Standard Time
+"project_manifest_header" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/376 Testing: project_manifest
+2/376 Test: project_manifest
+Command: "C:/Users/a/VoidS7-G2-Debug/void_project_manifest.exe"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"project_manifest" start time: Nov 08 20:25 Pacific Standard Time
+Output:
+----------------------------------------------------------
+project_manifest: 8788 checks passed
+<end of output>
+Test time =   0.64 sec
+----------------------------------------------------------
+Test Passed.
+"project_manifest" end time: Nov 08 20:25 Pacific Standard Time
+"project_manifest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/376 Testing: project_manifest_provenance
+6/376 Test: project_manifest_provenance
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/project/provenance.py" "C:/Users/a/VoidCI42377496702-Native"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"project_manifest_provenance" start time: Nov 08 20:25 Pacific Standard Time
+Output:
+----------------------------------------------------------
+project_manifest_provenance: 3 file hashes and exact pinned upstream reconstruction passed
+<end of output>
+Test time =   0.29 sec
+----------------------------------------------------------
+Test Passed.
+"project_manifest_provenance" end time: Nov 08 20:25 Pacific Standard Time
+"project_manifest_provenance" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/376 Testing: project_manifest_legacy
+5/376 Test: project_manifest_legacy
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/project/legacy.py" "C:/Users/a/VoidS7-G2-Debug/voidc.exe"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"project_manifest_legacy" start time: Nov 08 20:25 Pacific Standard Time
+Output:
+----------------------------------------------------------
+project_manifest_legacy: 18 checks passed
+<end of output>
+Test time =  12.22 sec
+----------------------------------------------------------
+Test Passed.
+"project_manifest_legacy" end time: Nov 08 20:26 Pacific Standard Time
+"project_manifest_legacy" time elapsed: 00:00:12
+----------------------------------------------------------
+
+8/376 Testing: project_sessions
+8/376 Test: project_sessions
+Command: "C:/Users/a/VoidS7-G2-Debug/void_project_sessions.exe"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"project_sessions" start time: Nov 08 20:26 Pacific Standard Time
+Output:
+----------------------------------------------------------
+project_sessions: 166 checks passed
+<end of output>
+Test time =   0.85 sec
+----------------------------------------------------------
+Test Passed.
+"project_sessions" end time: Nov 08 20:26 Pacific Standard Time
+"project_sessions" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/376 Testing: project_creation
+9/376 Test: project_creation
+Command: "C:/Users/a/VoidS7-G2-Debug/void_project_creation.exe"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"project_creation" start time: Nov 08 20:26 Pacific Standard Time
+Output:
+----------------------------------------------------------
+creation: entropy, reviewed directory, external collision, rollback ownership, staged content passed
+<end of output>
+Test time =   0.27 sec
+----------------------------------------------------------
+Test Passed.
+"project_creation" end time: Nov 08 20:26 Pacific Standard Time
+"project_creation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/376 Testing: project_creation_process
+10/376 Test: project_creation_process
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/project/creation.py" "C:/Users/a/VoidS7-G2-Debug/voidc.exe" "C:/Users/a/VoidS7-G2-Debug/voidls.exe" "C:/Users/a/VoidS7-G2-Debug/project-creation-evidence.json"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"project_creation_process" start time: Nov 08 20:26 Pacific Standard Time
+Output:
+----------------------------------------------------------
+S5 creation process: 62 invocations passed
+<end of output>
+Test time =  31.02 sec
+----------------------------------------------------------
+Test Passed.
+"project_creation_process" end time: Nov 08 20:26 Pacific Standard Time
+"project_creation_process" time elapsed: 00:00:31
+----------------------------------------------------------
+
+7/376 Testing: project_selection
+7/376 Test: project_selection
+Command: "C:/Users/a/VoidS7-G2-Debug/void_project_selection.exe"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"project_selection" start time: Nov 08 20:25 Pacific Standard Time
+Output:
+----------------------------------------------------------
+UNQUALIFIED: native symlink privilege A required privilege is not held by the client.
+project_selection: 353 checks passed
+<end of output>
+Test time =  55.29 sec
+----------------------------------------------------------
+Test Passed.
+"project_selection" end time: Nov 08 20:26 Pacific Standard Time
+"project_selection" time elapsed: 00:00:55
+----------------------------------------------------------
+
+12/376 Testing: project_application_process
+12/376 Test: project_application_process
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/project/application.py" "C:/Users/a/VoidS7-G2-Debug/voidc.exe" "C:/Users/a/VoidS7-G2-Debug/project-application-evidence.json"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"project_application_process" start time: Nov 08 20:26 Pacific Standard Time
+Output:
+----------------------------------------------------------
+project_application_process: 61 checks passed
+<end of output>
+Test time =  95.15 sec
+----------------------------------------------------------
+Test Passed.
+"project_application_process" end time: Nov 08 20:28 Pacific Standard Time
+"project_application_process" time elapsed: 00:01:35
+----------------------------------------------------------
+
+11/376 Testing: project_application
+11/376 Test: project_application
+Command: "C:/Users/a/VoidS7-G2-Debug/void_project_application.exe"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"project_application" start time: Nov 08 20:26 Pacific Standard Time
+Output:
+----------------------------------------------------------
+Application cache: unavailable/unavailable
+project_application: 63 checks passed
+<end of output>
+Test time = 113.74 sec
+----------------------------------------------------------
+Test Passed.
+"project_application" end time: Nov 08 20:28 Pacific Standard Time
+"project_application" time elapsed: 00:01:53
+----------------------------------------------------------
+
+14/376 Testing: project_profiles
+14/376 Test: project_profiles
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/project/profiles.py" "C:/Users/a/VoidS7-G2-Debug/voidc.exe" "C:/Users/a/Documents/ChatGPT/Void TEMP/Void-native/.toolchains/native-schannel/sdk/clang+llvm-23.1.4-x86_64-pc-windows-msvc/bin/llvm-objdump.exe" "C:/Users/a/VoidS7-G2-Debug/project-profiles-evidence.json"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"project_profiles" start time: Nov 08 20:28 Pacific Standard Time
+Output:
+----------------------------------------------------------
+UNQUALIFIED: native persistent disk cache warm hit
+project_profiles: 43 process checks passed; compute instruction counts O0=8, O2=2, release --no-opt=8
+<end of output>
+Test time =   5.77 sec
+----------------------------------------------------------
+Test Passed.
+"project_profiles" end time: Nov 08 20:28 Pacific Standard Time
+"project_profiles" time elapsed: 00:00:05
+----------------------------------------------------------
+
+15/376 Testing: project_protocol
+15/376 Test: project_protocol
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/project/protocol.py" "C:/Users/a/VoidS7-G2-Debug/voidls.exe" "C:/Users/a/VoidS7-G2-Debug/project-protocol-evidence.json"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"project_protocol" start time: Nov 08 20:28 Pacific Standard Time
+Output:
+----------------------------------------------------------
+project_protocol: 169 checks passed
+<end of output>
+Test time =   3.34 sec
+----------------------------------------------------------
+Test Passed.
+"project_protocol" end time: Nov 08 20:28 Pacific Standard Time
+"project_protocol" time elapsed: 00:00:03
+----------------------------------------------------------
+
+16/376 Testing: project_nested_cli
+16/376 Test: project_nested_cli
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/project/nested.py" "C:/Users/a/VoidS7-G2-Debug/voidc.exe" "C:/Users/a/VoidS7-G2-Debug/project-nested-evidence.json"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"project_nested_cli" start time: Nov 08 20:28 Pacific Standard Time
+Output:
+----------------------------------------------------------
+project_nested_cli: 11 process checks passed
+<end of output>
+Test time =   2.56 sec
+----------------------------------------------------------
+Test Passed.
+"project_nested_cli" end time: Nov 08 20:28 Pacific Standard Time
+"project_nested_cli" time elapsed: 00:00:02
+----------------------------------------------------------
+
+55/376 Testing: stage10_fields
+55/376 Test: stage10_fields
+Command: "C:/Users/a/VoidS7-G2-Debug/void_stage10_fields.exe"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"stage10_fields" start time: Nov 08 20:28 Pacific Standard Time
+Output:
+----------------------------------------------------------
+54 field policy checks passed
+<end of output>
+Test time =   0.76 sec
+----------------------------------------------------------
+Test Passed.
+"stage10_fields" end time: Nov 08 20:28 Pacific Standard Time
+"stage10_fields" time elapsed: 00:00:00
+----------------------------------------------------------
+
+72/376 Testing: fixed_arrays_source
+72/376 Test: fixed_arrays_source
+Command: "C:/Users/a/VoidS7-G2-Debug/void_fixed_arrays_tests.exe" "C:/Users/a/VoidCI42377496702-Native"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"fixed_arrays_source" start time: Nov 08 20:28 Pacific Standard Time
+Output:
+----------------------------------------------------------
+source array normal: 158 failing allocation budgets, recovery and cleanup passed
+source array O2: 158 failing allocation budgets, recovery and cleanup passed
+Numeric fixed arrays: source execution, roots, publication and failure recovery passed
+<end of output>
+Test time =   6.47 sec
+----------------------------------------------------------
+Test Passed.
+"fixed_arrays_source" end time: Nov 08 20:28 Pacific Standard Time
+"fixed_arrays_source" time elapsed: 00:00:06
+----------------------------------------------------------
+
+13/376 Testing: project_discovery_cli
+13/376 Test: project_discovery_cli
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/project/discovery.py" "C:/Users/a/VoidS7-G2-Debug/voidc.exe" "C:/Users/a/VoidS7-G2-Debug/project-discovery-evidence.json"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"project_discovery_cli" start time: Nov 08 20:28 Pacific Standard Time
+Output:
+----------------------------------------------------------
+UNQUALIFIED: native persistent disk cache; project selection rejection is still exercised
+project_discovery_cli: 88 process checks passed
+<end of output>
+Test time =  27.35 sec
+----------------------------------------------------------
+Test Passed.
+"project_discovery_cli" end time: Nov 08 20:28 Pacific Standard Time
+"project_discovery_cli" time elapsed: 00:00:27
+----------------------------------------------------------
+
+219/376 Testing: ffi_g1_primitive_jit_ir
+219/376 Test: ffi_g1_primitive_jit_ir
+Command: "C:/Users/a/VoidS7-G2-Debug/void_g1_tests.exe" "C:/Users/a/VoidS7-G2-Debug/ffi-g1/primitives.descriptor" "C:/Users/a/VoidS7-G2-Debug/ffi-g1/primitives.void" "C:/Users/a/VoidS7-G2-Debug/ffi-g1/tests"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"ffi_g1_primitive_jit_ir" start time: Nov 08 20:28 Pacific Standard Time
+Output:
+----------------------------------------------------------
+void-c-primitive 2 1: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+void-c-primitive 1 2: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+call vectorcall: C primitive descriptor line 8: unsupported descriptor, ABI revision or effects
+effects direct-sync blocking no-callbacks: C primitive descriptor line 7: unsupported descriptor, ABI revision or effects
+c_size:i64: C primitive descriptor line 9: unsupported descriptor, ABI revision or effects
+c_bool:u8: C primitive descriptor line 9: unsupported descriptor, ABI revision or effects
+bind signed8 g1_signed8 i8 ptr: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 record: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 void: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 u8: C primitive provider rejected the exact descriptor or fixture identity
+bind signed8 g1_missing i8 i8: C primitive provider rejected the exact descriptor or fixture identity
+bind signed16 g1_signed8 i8 i8: C primitive descriptor line 11: invalid or duplicate binding name or export
+bind signed8 g1_signed16 i8 i8: C primitive descriptor line 11: invalid or duplicate binding name or export
+extra signed8 g1_signed8 i8 i8: C primitive descriptor line 10: expected a bounded primitive binding record
+provider org.voidlang.forged: C primitive provider rejected the exact descriptor or fixture identity
+source /other.void: C primitive provider rejected the exact descriptor or fixture identity
+source /../other.void: C primitive descriptor line 4: expected a canonical single-file VFS identity
+target aarch64-: C primitive descriptor line 3: unsupported target/profile combination
+artifact identity: C primitive provider rejected the exact descriptor or fixture identity
+descriptor bounds: C primitive descriptor line 1: descriptor size outside 1..16384 bytes
+unavailable fixture: C primitive provider transport is unavailable
+missing independent admission: VOID IR: C primitive call outside the admitted binding module
+wrong provider: VOID IR: invalid C primitive descriptor or exact call signature
+wrong export: VOID IR: invalid C primitive descriptor or exact call signature
+wrong ordinal: VOID IR: invalid C primitive descriptor or exact call signature
+negative ordinal: VOID IR: C primitive call outside the admitted binding module
+missing operand: VOID IR: invalid C primitive descriptor or exact call signature
+extra operand: VOID IR: invalid C primitive descriptor or exact call signature
+argument signedness: VOID IR: invalid C primitive descriptor or exact call signature
+argument width: VOID IR: invalid C primitive descriptor or exact call signature
+return signedness: VOID IR: invalid C primitive descriptor or exact call signature
+return count: VOID IR: invalid C primitive descriptor or exact call signature
+aggregate result: VOID IR: invalid C primitive descriptor or exact call signature
+pointer-like result: VOID IR: invalid C primitive descriptor or exact call signature
+nondefault ABI operand: VOID IR: invalid C primitive descriptor or exact call signature
+receiver: VOID IR: invalid C primitive descriptor or exact call signature
+unadmitted scope: VOID IR: C primitive binding requires the admitted direct import
+unadmitted body: VOID IR: C primitive call outside the admitted binding module
+plain import bypass: VOID IR: C primitive transport requires host admission and typed operations
+first class binding: VOID IR: C primitive binding is direct-call only
+async activation: VOID IR: C primitive graphs require synchronous execution
+runtime-free bypass: VOID IR: invalid C primitive module admission
+ORC untrusted symbol bypass: C primitive transport requires per-generation admission
+JIT normal returned 73; direct C oracle agreed; long=32 bits
+JIT O2 returned 73; direct C oracle agreed; long=32 bits
+<end of output>
+Test time =   1.72 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g1_primitive_jit_ir" end time: Nov 08 20:28 Pacific Standard Time
+"ffi_g1_primitive_jit_ir" time elapsed: 00:00:01
+----------------------------------------------------------
+
+220/376 Testing: ffi_g1_primitive_aot_normal
+220/376 Test: ffi_g1_primitive_aot_normal
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/async/aot.py" "C:/Users/a/VoidS7-G2-Debug/void_g1_aot_normal.exe" "73"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"ffi_g1_primitive_aot_normal" start time: Nov 08 20:28 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.41 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g1_primitive_aot_normal" end time: Nov 08 20:28 Pacific Standard Time
+"ffi_g1_primitive_aot_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+221/376 Testing: ffi_g1_primitive_aot_optimized
+221/376 Test: ffi_g1_primitive_aot_optimized
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/async/aot.py" "C:/Users/a/VoidS7-G2-Debug/void_g1_aot_optimized.exe" "73"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"ffi_g1_primitive_aot_optimized" start time: Nov 08 20:28 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.32 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g1_primitive_aot_optimized" end time: Nov 08 20:28 Pacific Standard Time
+"ffi_g1_primitive_aot_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+222/376 Testing: ffi_g1_primitive_aot_mismatch
+222/376 Test: ffi_g1_primitive_aot_mismatch
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/async/aot.py" "C:/Users/a/VoidS7-G2-Debug/void_g1_aot_mismatch.exe" "failure:C primitive provider rejected the exact descriptor or fixture identity"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"ffi_g1_primitive_aot_mismatch" start time: Nov 08 20:28 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.27 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g1_primitive_aot_mismatch" end time: Nov 08 20:28 Pacific Standard Time
+"ffi_g1_primitive_aot_mismatch" time elapsed: 00:00:00
+----------------------------------------------------------
+
+223/376 Testing: ffi_g1_primitive_aot_missing
+223/376 Test: ffi_g1_primitive_aot_missing
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/ffi/missing.py" "C:/gcc/bin/cmake.exe" "C:/Users/a/VoidS7-G2-Debug" "Debug"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"ffi_g1_primitive_aot_missing" start time: Nov 08 20:28 Pacific Standard Time
+Output:
+----------------------------------------------------------
+[0/2] Re-checking globbed directories...
+[1/3] Building CXX object CMakeFiles\void_g1_aot_missing.dir\tests\async\aot.cpp.obj
+[2/3] Linking CXX executable void_g1_aot_missing.exe
+FAILED: [code=4294967295] void_g1_aot_missing.exe 
+C:\Windows\system32\cmd.exe /C "cd . && C:\gcc\bin\cmake.exe -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\void_g1_aot_missing.dir --rc="C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\rc.exe" --mt=C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\llvm-mt.exe --manifests  -- C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\lld-link.exe /nologo ffi-g1\application-optimized.obj CMakeFiles\void_g1_aot_missing.dir\tests\async\aot.cpp.obj  /out:void_g1_aot_missing.exe /implib:void_g1_aot_missing.lib /pdb:void_g1_aot_missing.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console  void_runtime.lib  void_native_fixture.lib  curl\lib\libcurl.lib  C:\Users\a\VoidCI42377496702-Native\.toolchains\http\prefix\windows-schannel-x86_64\Debug\lib\cares.lib  C:\Users\a\VoidCI42377496702-Native\.toolchains\http\prefix\windows-schannel-x86_64\Debug\lib\nghttp2.lib  C:\Users\a\VoidCI42377496702-Native\.toolchains\http\prefix\windows-schannel-x86_64\Debug\lib\psl.lib  normaliz.lib  crypt32.lib  secur32.lib  ws2_32.lib  normaliz.lib  crypt32.lib  secur32.lib  ws2_32.lib  iphlpapi.lib  C:\Users\a\VoidCI42377496702-Native\.toolchains\http\prefix\windows-schannel-x86_64\Debug\lib\zsd.lib  advapi32.lib  C:\Users\a\VoidCI42377496702-Native\.toolchains\host\prefix\windows-x86_64\Debug\lib\archive.lib  C:\Users\a\VoidCI42377496702-Native\.toolchains\host\prefix\windows-x86_64\Debug\lib\libsodium.lib  shell32.lib  ole32.lib  uuid.lib  bcrypt.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+LINK Pass 1: command "C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\lld-link.exe /nologo ffi-g1\application-optimized.obj CMakeFiles\void_g1_aot_missing.dir\tests\async\aot.cpp.obj /out:void_g1_aot_missing.exe /implib:void_g1_aot_missing.lib /pdb:void_g1_aot_missing.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console void_runtime.lib void_native_fixture.lib curl\lib\libcurl.lib C:\Users\a\VoidCI42377496702-Native\.toolchains\http\prefix\windows-schannel-x86_64\Debug\lib\cares.lib C:\Users\a\VoidCI42377496702-Native\.toolchains\http\prefix\windows-schannel-x86_64\Debug\lib\nghttp2.lib C:\Users\a\VoidCI42377496702-Native\.toolchains\http\prefix\windows-schannel-x86_64\Debug\lib\psl.lib normaliz.lib crypt32.lib secur32.lib ws2_32.lib normaliz.lib crypt32.lib secur32.lib ws2_32.lib iphlpapi.lib C:\Users\a\VoidCI42377496702-Native\.toolchains\http\prefix\windows-schannel-x86_64\Debug\lib\zsd.lib advapi32.lib C:\Users\a\VoidCI42377496702-Native\.toolchains\host\prefix\windows-x86_64\Debug\lib\archive.lib C:\Users\a\VoidCI42377496702-Native\.toolchains\host\prefix\windows-x86_64\Debug\lib\libsodium.lib shell32.lib ole32.lib uuid.lib bcrypt.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\void_g1_aot_missing.dir/intermediate.manifest CMakeFiles\void_g1_aot_missing.dir/manifest.res" failed (exit code 1) with the following output:
+lld-link: error: undefined symbol: vd_c_primitive_dispatch_v1
+
+>>> referenced by ffi-g1\application-optimized.obj:(__vd_2f6e61746976655f7072696d6974697665732e766f69643a3a7369676e656438__void)
+
+>>> referenced by ffi-g1\application-optimized.obj:(__vd_2f6e61746976655f7072696d6974697665732e766f69643a3a7369676e65643136__void)
+
+>>> referenced by ffi-g1\application-optimized.obj:(__vd_2f6e61746976655f7072696d6974697665732e766f69643a3a7369676e65643332__void)
+
+>>> referenced 16 more times
+
+ninja: build stopped: subcommand failed.
+<end of output>
+Test time =   1.09 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g1_primitive_aot_missing" end time: Nov 08 20:28 Pacific Standard Time
+"ffi_g1_primitive_aot_missing" time elapsed: 00:00:01
+----------------------------------------------------------
+
+225/376 Testing: ffi_g2_aot_normal
+225/376 Test: ffi_g2_aot_normal
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/ffi/records_process.py" "C:/Users/a/VoidS7-G2-Debug/void_g2_aot_normal.exe"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"ffi_g2_aot_normal" start time: Nov 08 20:28 Pacific Standard Time
+Output:
+----------------------------------------------------------
+7 0 103
+-1 1 <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:6:20: source call
+        return ffi.fill(bytes, 0, 5, 8) as i32
+                   ^
+-2 1 <host binding /native_records.void>:27:6: runtime error: overlapping C byte spans
+In function /native_records.void::move_bytes
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:8:20: source call
+        return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32
+                   ^
+-3 1 <host binding /native_records.void>:23:6: runtime error: C byte span returned an oversized written prefix
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:10:20: source call
+        return ffi.fill(bytes, 0, 4, 254) as i32
+                   ^
+-4 1 <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:12:20: source call
+        return ffi.fill(bytes, 18446744073709551615 as u64, 1, 8) as i32
+                   ^
+<end of output>
+Test time =   0.95 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g2_aot_normal" end time: Nov 08 20:28 Pacific Standard Time
+"ffi_g2_aot_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+224/376 Testing: ffi_g2_jit_ir
+224/376 Test: ffi_g2_jit_ir
+Command: "C:/Users/a/VoidS7-G2-Debug/void_g2_tests.exe" "C:/Users/a/VoidS7-G2-Debug/ffi-g2/records.descriptor" "C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"ffi_g2_jit_ir" start time: Nov 08 20:28 Pacific Standard Time
+Output:
+----------------------------------------------------------
+2 1: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+sample G2Sample 16 4 2: C primitive descriptor line 17: C record size, alignment or tail padding disagrees with natural layout
+packet G2Packet 31 8 4: C primitive descriptor line 22: C record size, alignment or tail padding disagrees with natural layout
+reading f64 4: C primitive descriptor line 17: C record field offset or padding disagrees with natural layout
+reading ptr 8: C primitive descriptor line 17: unsupported C primitive type
+reading u64 8: C primitive provider rejected the exact descriptor or fixture identity
+tag tag u32: C primitive provider rejected the exact descriptor or fixture identity
+array:u16:3:1: C primitive descriptor line 20: invalid inline array extent or stride
+array:u16:0:2: C primitive descriptor line 20: invalid inline array extent or stride
+array:u16:03:2: C primitive descriptor line 20: invalid bounded canonical decimal field
+datum datum record:packet: C primitive descriptor line 22: record must name an earlier verified declaration
+fastcall: C primitive descriptor line 8: unsupported descriptor, ABI revision or effects
+retains-pointer no-callbacks: C primitive descriptor line 7: unsupported descriptor, ABI revision or effects
+out:1:2:65537: C primitive descriptor line 27: invalid bounded canonical decimal field
+out:1:1:64: C primitive descriptor line 27: invalid byte span offset/length contract
+out:1:2:64 u64: C primitive descriptor line 27: byte span offsets and lengths require exact c_size operands
+out:1:2:64 c_size c_size out:4:5:64: C primitive descriptor line 29: unsupported span count, overlap profile, record or result contract
+bind fill g2_fill i32: C primitive descriptor line 27: unsupported span count, overlap profile, record or result contract
+inout:1:2:64: C primitive provider rejected the exact descriptor or fixture identity
+absent host seal: VOID IR: C primitive call outside the admitted binding module
+wrong provider: VOID IR: invalid C primitive descriptor or exact call signature
+wrong ordinal: VOID IR: invalid C primitive descriptor or exact call signature
+record identity: VOID IR: invalid C primitive descriptor or exact call signature
+span count and slot swap: VOID IR: invalid C primitive argument type or placement
+readonly output: VOID IR: invalid C primitive descriptor or exact call signature
+foreign raw ABI use: VOID IR: C primitive transport requires host admission and typed operations
+unauthorized direct import: VOID IR: C primitive binding requires the admitted direct import
+worker: VOID IR: C primitive graphs require synchronous execution
+raw pointer construction flag: VOID IR: invalid C primitive descriptor or exact call signature
+uninitialized record: VOID IR: read of uninitialized C binding carrier storage in /records.void::entry
+uninitialized byte list: VOID IR: read of uninitialized C binding carrier storage in /records.void::entry
+uninitialized scalar field: VOID IR: read of uninitialized C binding carrier storage in /records.void::entry
+incomplete inline array escapes: VOID IR: incomplete C inline array escapes private construction
+NativeSafe collection, zeroed output scratch, partial commit, oversized and negative rollback passed
+-1: <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:6:20: source call
+        return ffi.fill(bytes, 0, 5, 8) as i32
+                   ^
+
+-2: <host binding /native_records.void>:27:6: runtime error: overlapping C byte spans
+In function /native_records.void::move_bytes
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:8:20: source call
+        return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32
+                   ^
+
+-3: <host binding /native_records.void>:23:6: runtime error: C byte span returned an oversized written prefix
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:10:20: source call
+        return ffi.fill(bytes, 0, 4, 254) as i32
+                   ^
+
+-4: <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:12:20: source call
+        return ffi.fill(bytes, 18446744073709551615 as u64, 1, 8) as i32
+                   ^
+
+G2 JIT normal returned 103
+-1: <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:6:20: source call
+        return ffi.fill(bytes, 0, 5, 8) as i32
+                   ^
+
+-2: <host binding /native_records.void>:27:6: runtime error: overlapping C byte spans
+In function /native_records.void::move_bytes
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:8:20: source call
+        return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32
+                   ^
+
+-3: <host binding /native_records.void>:23:6: runtime error: C byte span returned an oversized written prefix
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:10:20: source call
+        return ffi.fill(bytes, 0, 4, 254) as i32
+                   ^
+
+-4: <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:12:20: source call
+        return ffi.fill(bytes, 18446744073709551615 as u64, 1, 8) as i32
+                   ^
+
+G2 JIT O2 returned 103
+<end of output>
+Test time =   2.12 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g2_jit_ir" end time: Nov 08 20:28 Pacific Standard Time
+"ffi_g2_jit_ir" time elapsed: 00:00:02
+----------------------------------------------------------
+
+226/376 Testing: ffi_g2_aot_optimized
+226/376 Test: ffi_g2_aot_optimized
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/ffi/records_process.py" "C:/Users/a/VoidS7-G2-Debug/void_g2_aot_optimized.exe"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"ffi_g2_aot_optimized" start time: Nov 08 20:28 Pacific Standard Time
+Output:
+----------------------------------------------------------
+7 0 103
+-1 1 <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:6:20: source call
+        return ffi.fill(bytes, 0, 5, 8) as i32
+                   ^
+-2 1 <host binding /native_records.void>:27:6: runtime error: overlapping C byte spans
+In function /native_records.void::move_bytes
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:8:20: source call
+        return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32
+                   ^
+-3 1 <host binding /native_records.void>:23:6: runtime error: C byte span returned an oversized written prefix
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:10:20: source call
+        return ffi.fill(bytes, 0, 4, 254) as i32
+                   ^
+-4 1 <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:12:20: source call
+        return ffi.fill(bytes, 18446744073709551615 as u64, 1, 8) as i32
+                   ^
+<end of output>
+Test time =   0.99 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g2_aot_optimized" end time: Nov 08 20:28 Pacific Standard Time
+"ffi_g2_aot_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+227/376 Testing: native_source
+227/376 Test: native_source
+Command: "C:/Users/a/VoidS7-G2-Debug/void_native_tests.exe" "C:/Users/a/VoidCI42377496702-Native" "C:/Users/a/VoidS7-G2-Debug/native fixtures"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"native_source" start time: Nov 08 20:28 Pacific Standard Time
+Output:
+----------------------------------------------------------
+native source passed
+<end of output>
+Test time =  11.17 sec
+----------------------------------------------------------
+Test Passed.
+"native_source" end time: Nov 08 20:29 Pacific Standard Time
+"native_source" time elapsed: 00:00:11
+----------------------------------------------------------
+
+228/376 Testing: stage6_integrated
+228/376 Test: stage6_integrated
+Command: "C:/Users/a/VoidS7-G2-Debug/void_native_tests.exe" "--integrated" "C:/Users/a/VoidCI42377496702-Native" "C:/Users/a/VoidS7-G2-Debug/stage6 integrated fixtures"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"stage6_integrated" start time: Nov 08 20:28 Pacific Standard Time
+Output:
+----------------------------------------------------------
+combined cached old root=0; old roots at barrier=14; retired generations=1; post-drain objects=0
+combined cached old root=0; old roots at barrier=14; retired generations=1; post-drain objects=0
+<end of output>
+Test time =  18.02 sec
+----------------------------------------------------------
+Test Passed.
+"stage6_integrated" end time: Nov 08 20:29 Pacific Standard Time
+"stage6_integrated" time elapsed: 00:00:18
+----------------------------------------------------------
+
+230/376 Testing: native_aot_main_normal
+230/376 Test: native_aot_main_normal
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/async/aot.py" "C:/Users/a/VoidS7-G2-Debug/void_native_aot_main_normal.exe" "19"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"native_aot_main_normal" start time: Nov 08 20:29 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.57 sec
+----------------------------------------------------------
+Test Passed.
+"native_aot_main_normal" end time: Nov 08 20:29 Pacific Standard Time
+"native_aot_main_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+229/376 Testing: stage6_cache_processes
+229/376 Test: stage6_cache_processes
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/native/processes.py" "C:/Users/a/VoidS7-G2-Debug/void_native_tests.exe" "C:/Users/a/VoidCI42377496702-Native"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"stage6_cache_processes" start time: Nov 08 20:29 Pacific Standard Time
+Output:
+----------------------------------------------------------
+Integrated fresh-process cold/hit/corrupt fallback (or safe bypass): passed
+Integrated fresh-process cold/hit/corrupt fallback (or safe bypass): passed
+<end of output>
+Test time =   8.56 sec
+----------------------------------------------------------
+Test Passed.
+"stage6_cache_processes" end time: Nov 08 20:29 Pacific Standard Time
+"stage6_cache_processes" time elapsed: 00:00:08
+----------------------------------------------------------
+
+231/376 Testing: native_aot_main_optimized
+231/376 Test: native_aot_main_optimized
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/async/aot.py" "C:/Users/a/VoidS7-G2-Debug/void_native_aot_main_optimized.exe" "19"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"native_aot_main_optimized" start time: Nov 08 20:29 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.55 sec
+----------------------------------------------------------
+Test Passed.
+"native_aot_main_optimized" end time: Nov 08 20:29 Pacific Standard Time
+"native_aot_main_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+232/376 Testing: native_aot_terminated_nul_normal
+232/376 Test: native_aot_terminated_nul_normal
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/async/aot.py" "C:/Users/a/VoidS7-G2-Debug/void_native_aot_terminated_nul_normal.exe" "failure:native text cannot contain NUL"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"native_aot_terminated_nul_normal" start time: Nov 08 20:29 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.49 sec
+----------------------------------------------------------
+Test Passed.
+"native_aot_terminated_nul_normal" end time: Nov 08 20:29 Pacific Standard Time
+"native_aot_terminated_nul_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+235/376 Testing: native_aot_closed_optimized
+235/376 Test: native_aot_closed_optimized
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/async/aot.py" "C:/Users/a/VoidS7-G2-Debug/void_native_aot_closed_optimized.exe" "failure:Native resource is closed or invalid"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"native_aot_closed_optimized" start time: Nov 08 20:29 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.52 sec
+----------------------------------------------------------
+Test Passed.
+"native_aot_closed_optimized" end time: Nov 08 20:29 Pacific Standard Time
+"native_aot_closed_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+236/376 Testing: native_aot_duplicate_normal
+236/376 Test: native_aot_duplicate_normal
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/async/aot.py" "C:/Users/a/VoidS7-G2-Debug/void_native_aot_duplicate_normal.exe" "failure:Native resource is closed or invalid"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"native_aot_duplicate_normal" start time: Nov 08 20:29 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.59 sec
+----------------------------------------------------------
+Test Passed.
+"native_aot_duplicate_normal" end time: Nov 08 20:29 Pacific Standard Time
+"native_aot_duplicate_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+278/376 Testing: async_ir
+278/376 Test: async_ir
+Command: "C:/Users/a/VoidS7-G2-Debug/void_async_tests.exe" "--ir"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"async_ir" start time: Nov 08 20:29 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.34 sec
+----------------------------------------------------------
+Test Passed.
+"async_ir" end time: Nov 08 20:29 Pacific Standard Time
+"async_ir" time elapsed: 00:00:00
+----------------------------------------------------------
+
+329/376 Testing: gc
+329/376 Test: gc
+Command: "C:/Users/a/VoidS7-G2-Debug/void_tests.exe" "gc"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"gc" start time: Nov 08 20:29 Pacific Standard Time
+Output:
+----------------------------------------------------------
+gc: passed
+<end of output>
+Test time =   0.33 sec
+----------------------------------------------------------
+Test Passed.
+"gc" end time: Nov 08 20:29 Pacific Standard Time
+"gc" time elapsed: 00:00:00
+----------------------------------------------------------
+
+328/376 Testing: reload
+328/376 Test: reload
+Command: "C:/Users/a/VoidS7-G2-Debug/void_tests.exe" "reload"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"reload" start time: Nov 08 20:29 Pacific Standard Time
+Output:
+----------------------------------------------------------
+reload: passed
+<end of output>
+Test time =   1.62 sec
+----------------------------------------------------------
+Test Passed.
+"reload" end time: Nov 08 20:29 Pacific Standard Time
+"reload" time elapsed: 00:00:01
+----------------------------------------------------------
+
+333/376 Testing: sessions
+333/376 Test: sessions
+Command: "C:/Users/a/VoidS7-G2-Debug/void_tests.exe" "sessions" "C:/Users/a/VoidS7-G2-Debug/session fixtures"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"sessions" start time: Nov 08 20:29 Pacific Standard Time
+Output:
+----------------------------------------------------------
+sessions: passed
+<end of output>
+Test time =   1.43 sec
+----------------------------------------------------------
+Test Passed.
+"sessions" end time: Nov 08 20:29 Pacific Standard Time
+"sessions" time elapsed: 00:00:01
+----------------------------------------------------------
+
+335/376 Testing: analysis
+335/376 Test: analysis
+Command: "C:/Users/a/VoidS7-G2-Debug/void_tests.exe" "analysis" "C:/Users/a/VoidS7-G2-Debug/analysis fixtures"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"analysis" start time: Nov 08 20:29 Pacific Standard Time
+Output:
+----------------------------------------------------------
+normal: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 420382
+O2: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 749608
+analysis: passed
+<end of output>
+Test time =   5.48 sec
+----------------------------------------------------------
+Test Passed.
+"analysis" end time: Nov 08 20:29 Pacific Standard Time
+"analysis" time elapsed: 00:00:05
+----------------------------------------------------------
+
+337/376 Testing: numeric_enum_ir
+337/376 Test: numeric_enum_ir
+Command: "C:/Users/a/VoidS7-G2-Debug/void_numeric_enum_ir.exe"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"numeric_enum_ir" start time: Nov 08 20:29 Pacific Standard Time
+Output:
+----------------------------------------------------------
+enum: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+enum initialized: accepted
+field: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+field initialized: accepted
+array: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+array initialized: accepted
+field-array: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+field-array initialized: accepted
+array-field: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+array-field initialized: accepted
+nested: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+nested initialized: accepted
+managed: rejected (VOID IR: non-nullable reference storage read before initialization in /enum-storage.void::probe)
+managed initialized: accepted
+zero-backed holder: rejected (VOID IR: nominal source objects require complete construction)
+zero-backed legacy_scalar: rejected (VOID IR: numeric enum fields require complete managed construction)
+zero-backed legacy_array: rejected (VOID IR: numeric enum fields require complete managed construction)
+managed missing field: rejected (VOID IR: invalid complete managed construction)
+managed partial buffer: rejected (VOID IR: incomplete numeric enum array escapes private construction)
+read allocated array before initialization: rejected (VOID IR: incomplete numeric enum array escapes private construction)
+partial buffer through private home: rejected (VOID IR: incomplete numeric enum array escapes private construction)
+partial buffer through ordinary store: rejected (VOID IR: incomplete numeric enum array escapes private construction)
+forged completion of ordinary value: rejected (VOID IR: invalid numeric enum array completion)
+complete private buffer published and projected: accepted
+private home absent on one predecessor: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+legacy array initialization of a finished value: rejected (VOID IR: invalid array element initialization)
+early completion: rejected at the live-prefix guard in normal and O2 JIT
+incomplete managed initializer: rejected (VOID IR: uninitialized construction field at call/exit/commit in /enum-storage.void::holder::method::init)
+complete managed initializer: accepted
+join missing true write: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+join missing false write: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+join with both writes: accepted
+unwind before explicit write: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+cleanup terminal return load: accepted
+unset option: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+constructed None: accepted
+unchecked inactive payload: rejected (VOID IR: sum payload requires checked access)
+storage audit: 24 negative, 12 positive, 0 mismatches
+numeric enum IR rejection, normal/O2 GC and reload passed
+<end of output>
+Test time =   1.30 sec
+----------------------------------------------------------
+Test Passed.
+"numeric_enum_ir" end time: Nov 08 20:29 Pacific Standard Time
+"numeric_enum_ir" time elapsed: 00:00:01
+----------------------------------------------------------
+
+336/376 Testing: numeric
+336/376 Test: numeric
+Command: "C:/Users/a/VoidS7-G2-Debug/void_tests.exe" "numeric" "C:/Users/a/VoidCI42377496702-Native"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"numeric" start time: Nov 08 20:29 Pacific Standard Time
+Output:
+----------------------------------------------------------
+210 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed
+numeric: passed
+<end of output>
+Test time =  11.01 sec
+----------------------------------------------------------
+Test Passed.
+"numeric" end time: Nov 08 20:29 Pacific Standard Time
+"numeric" time elapsed: 00:00:11
+----------------------------------------------------------
+
+339/376 Testing: numeric_enum_lsp
+339/376 Test: numeric_enum_lsp
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/numeric/enums_lsp.py" "C:/Users/a/VoidS7-G2-Debug/voidls.exe" "C:/Users/a/VoidS7-G2-Debug/numeric-enum-lsp.json"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"numeric_enum_lsp" start time: Nov 08 20:29 Pacific Standard Time
+Output:
+----------------------------------------------------------
+S6 LSP passed 15 recorded requests and overlay revisions
+<end of output>
+Test time =   0.88 sec
+----------------------------------------------------------
+Test Passed.
+"numeric_enum_lsp" end time: Nov 08 20:29 Pacific Standard Time
+"numeric_enum_lsp" time elapsed: 00:00:00
+----------------------------------------------------------
+
+340/376 Testing: frontend
+340/376 Test: frontend
+Command: "C:/Users/a/VoidS7-G2-Debug/void_tests.exe" "frontend" "C:/Users/a/VoidCI42377496702-Native"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"frontend" start time: Nov 08 20:29 Pacific Standard Time
+Output:
+----------------------------------------------------------
+Frontend begin: diagnostics
+50+ source diagnostic cases and UTF-8/ABI checks passed
+Frontend passed: diagnostics
+Frontend begin: programs
+Real .void files and independent programs executed through normal/O2 JIT
+Frontend passed: programs
+Frontend begin: numeric values
+1216 constant/normal/O2 numeric matrix comparisons passed
+Readonly/compile-time constants, numeric boundaries, concurrent failures, bounded traces and restart checks passed
+Frontend passed: numeric values
+Frontend begin: diagnostic recovery/resource limits
+Frontend resource case: combined expression/constant depth
+Structured diagnostics: independent files, recovery, bounded cascades, snapshots and failed reload verified
+Frontend passed: diagnostic recovery/resource limits
+Frontend begin: value structs
+Frontend resource case: bounded expanded value layouts
+Value struct source: nested/mixed layouts, copies, normal/O2 JIT, diagnostics, tooling and reload passed
+Frontend passed: value structs
+Frontend begin: receiver methods
+Frontend resource case: bounded receiver-chain semantics
+Receiver methods: actual storage, copies, imports, source order, effects, cycles, diagnostics, tooling and reload passed
+Frontend passed: receiver methods
+Frontend begin: initialization
+Initialization project main optimized=0
+Initialization project main optimized=1
+Initialization project order optimized=0
+Initialization project order optimized=1
+Initialization project required optimized=0
+Initialization project required optimized=1
+Initialization project numeric optimized=0
+Initialization project numeric optimized=1
+Initialization project failure optimized=0
+Initialization project failure optimized=1
+Initialization project copies optimized=0
+Initialization project copies optimized=1
+Initialization begin: layout retirement
+Initialization layout generation 0 fields=1
+Initialization layout generation 1 fields=8
+Initialization layout generation 2 fields=15
+Initialization layout generation 3 fields=5
+Initialization layout generation 4 fields=12
+Initialization layout generation 5 fields=2
+Initialization layout generation 6 fields=9
+Initialization layout generation 7 fields=16
+Initialization layout generation 8 fields=6
+Initialization layout generation 9 fields=13
+Initialization layout generation 10 fields=3
+Initialization layout generation 11 fields=10
+Initialization layout generation 12 fields=17
+Initialization layout generation 13 fields=7
+Initialization layout generation 14 fields=14
+Initialization layout generation 15 fields=4
+Initialization layout generation 16 fields=11
+Initialization layout generation 17 fields=1
+Initialization layout generation 18 fields=8
+Initialization layout generation 19 fields=15
+Initialization layout generation 20 fields=5
+Initialization layout generation 21 fields=12
+Initialization layout generation 22 fields=2
+Initialization layout generation 23 fields=9
+Initialization layout generation 24 fields=16
+Initialization layout generation 25 fields=6
+Initialization layout generation 26 fields=13
+Initialization layout generation 27 fields=3
+Initialization layout generation 28 fields=10
+Initialization layout generation 29 fields=17
+Initialization layout generation 30 fields=7
+Initialization layout generation 31 fields=14
+Initialization layout generation 32 fields=4
+Initialization layout generation 33 fields=11
+Initialization layout generation 34 fields=1
+Initialization layout generation 35 fields=8
+Initialization layout generation 36 fields=15
+Initialization layout generation 37 fields=5
+Initialization layout generation 38 fields=12
+Initialization layout generation 39 fields=2
+Initialization layout generation 40 fields=9
+Initialization layout generation 41 fields=16
+Initialization layout generation 42 fields=6
+Initialization layout generation 43 fields=13
+Initialization layout generation 44 fields=3
+Initialization layout generation 45 fields=10
+Initialization layout generation 46 fields=17
+Initialization layout generation 47 fields=7
+Initialization layout generation 48 fields=14
+Initialization layout generation 49 fields=4
+Initialization layout generation 50 fields=11
+Initialization layout generation 51 fields=1
+Initialization layout generation 52 fields=8
+Initialization layout generation 53 fields=15
+Initialization layout generation 54 fields=5
+Initialization layout generation 55 fields=12
+Initialization layout generation 56 fields=2
+Initialization layout generation 57 fields=9
+Initialization layout generation 58 fields=16
+Initialization layout generation 59 fields=6
+Initialization layout generation 60 fields=13
+Initialization layout generation 61 fields=3
+Initialization layout generation 62 fields=10
+Initialization layout generation 63 fields=17
+Initialization nested layout generation 0 padding=i8
+Initialization nested layout generation 1 padding=i64
+Initialization nested layout generation 2 padding=i8
+Initialization nested layout generation 3 padding=i64
+Initialization nested layout generation 4 padding=i8
+Initialization nested layout generation 5 padding=i64
+Initialization nested layout generation 6 padding=i8
+Initialization nested layout generation 7 padding=i64
+Initialization nested layout generation 8 padding=i8
+Initialization nested layout generation 9 padding=i64
+Initialization nested layout generation 10 padding=i8
+Initialization nested layout generation 11 padding=i64
+Initialization nested layout generation 12 padding=i8
+Initialization nested layout generation 13 padding=i64
+Initialization nested layout generation 14 padding=i8
+Initialization nested layout generation 15 padding=i64
+80 aggregate layout generations retired through normal/O2 JIT
+Initialization: parameters/defaults, recursive values, order, copies, lifecycle diagnostics, visibility, tooling, failure and reload passed
+Frontend passed: initialization
+frontend: passed
+<end of output>
+Test time =  18.68 sec
+----------------------------------------------------------
+Test Passed.
+"frontend" end time: Nov 08 20:29 Pacific Standard Time
+"frontend" time elapsed: 00:00:18
+----------------------------------------------------------
+
+341/376 Testing: modules
+341/376 Test: modules
+Command: "C:/Users/a/VoidS7-G2-Debug/void_tests.exe" "modules" "C:/Users/a/VoidS7-G2-Debug/module fixtures with spaces"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"modules" start time: Nov 08 20:29 Pacific Standard Time
+Output:
+----------------------------------------------------------
+Case-only siblings cannot be created on this filesystem; exact-case rejection still tested
+Host cannot create symlinks: A required privilege is not held by the client.
+Project constants, forwards, visibility, cycles, imports and restart checks passed
+Project-local library identities, cycles, ownership, overlays, native JIT and invalidation passed
+Multi-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed
+modules: passed
+<end of output>
+Test time =   2.72 sec
+----------------------------------------------------------
+Test Passed.
+"modules" end time: Nov 08 20:29 Pacific Standard Time
+"modules" time elapsed: 00:00:02
+----------------------------------------------------------
+
+338/376 Testing: numeric_enum_process
+338/376 Test: numeric_enum_process
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/numeric/enums.py" "C:/Users/a/VoidS7-G2-Debug/voidc.exe" "C:/Users/a/VoidS7-G2-Debug/numeric-enum-process.json"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"numeric_enum_process" start time: Nov 08 20:29 Pacific Standard Time
+Output:
+----------------------------------------------------------
+S6 542 boundary pairs, 39 invalid sources and 60 executed processes
+<end of output>
+Test time =  33.61 sec
+----------------------------------------------------------
+Test Passed.
+"numeric_enum_process" end time: Nov 08 20:29 Pacific Standard Time
+"numeric_enum_process" time elapsed: 00:00:33
+----------------------------------------------------------
+
+376/376 Testing: numeric_cli
+376/376 Test: numeric_cli
+Command: "C:/gcc/bin/cmake.exe" "-DLINKER=" "-DCOMPILER=C:/Users/a/VoidS7-G2-Debug/voidc.exe" "-DCLANG=C:/Users/a/Documents/ChatGPT/Void TEMP/Void-native/.toolchains/native-schannel/sdk/clang+llvm-23.1.4-x86_64-pc-windows-msvc/bin/clang.exe" "-DWINDOWS=1" "-DROOT=C:/Users/a/VoidCI42377496702-Native" "-DOUTPUT=C:/Users/a/VoidS7-G2-Debug/numeric native programs" "-DEXE_SUFFIX=.exe" "-P" "C:/Users/a/VoidCI42377496702-Native/tests/integration/numeric.cmake"
+Directory: C:/Users/a/VoidS7-G2-Debug
+"numeric_cli" start time: Nov 08 20:29 Pacific Standard Time
+Output:
+----------------------------------------------------------
+-- Numeric source constants, JIT and native AOT passed in both optimization modes
+<end of output>
+Test time =  91.95 sec
+----------------------------------------------------------
+Test Passed.
+"numeric_cli" end time: Nov 08 20:31 Pacific Standard Time
+"numeric_cli" time elapsed: 00:01:31
+----------------------------------------------------------
+
+End testing: Nov 08 20:31 Pacific Standard Time

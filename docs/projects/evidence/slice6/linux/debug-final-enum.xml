@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="2"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="15"
+	timestamp="2026-11-08T19:15:41"
+	>
+	<testcase name="numeric_enum_ir" classname="numeric_enum_ir" time="0.716219" status="run">
+		<properties/>
+		<system-out>numeric enum IR rejection, normal/O2 GC and reload passed
+</system-out>
+	</testcase>
+	<testcase name="numeric_enum_process" classname="numeric_enum_process" time="15.1593" status="run">
+		<properties/>
+		<system-out>S6 542 boundary pairs, 39 invalid sources and 56 executed processes
+</system-out>
+	</testcase>
+</testsuite>

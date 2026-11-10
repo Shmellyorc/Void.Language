@@ -1,0 +1,11 @@
+{
+  "head": "2f667ea338127b8f91c3136804377ef3fa5218d6",
+  "starting_raw_index_sha256": "87dc67b5787209439dfd4248860d1955bdd441b92995c8be4d94510130b37586",
+  "final_raw_index_sha256": "d0600fb53e9e64eb38c414e3a6e0d3cf76ec73c1730b18c089c0ceb28d513845",
+  "raw_index_mtime": "2026-11-08T16:22:12.251171",
+  "staged_paths": 0,
+  "index_entries_exactly_match_head": true,
+  "entries_compared": 68996,
+  "index_entry_tuple_sha256": "e71052bb113dae80387499b8c88019073387b04cb369089e2ab7064b154918ff",
+  "note": "Raw index metadata checksum differs; no staged content, modes or blob IDs differ. The index was not restored or rewritten to force a raw hash match."
+}

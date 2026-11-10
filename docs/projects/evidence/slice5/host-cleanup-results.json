@@ -1,0 +1,46 @@
+{
+  "removed": [
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice5/vm-before.png",
+      "sha256": "269b7ec66a8cf31342361b99be6062cc160272c73b56b60d58512b7a817aa58c"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice5/vm-native-command.png",
+      "sha256": "2fc13cfc4d47390f261190c85e47b3e60110a5d5a3617cab176e330d55e5f465"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice5/vm-final-run-before.png",
+      "sha256": "e04b2390ba5bbd05a703aa8b389aab86642a4c08c972af4f2048aca04f3ee38d"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice5/vm-final-command.png",
+      "sha256": "d63a69bfe0c1e60671c2683d8e8a277ab9648e09c505471af0ccb0b38118a988"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice5/vm-fixture-command.png",
+      "sha256": "597f77c84cd0c54946038a11e79ca3955344c7368086a7013f3799dc7120456b"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice5/vm-cleanup-command.png",
+      "sha256": "bf2d3069a7bb36f6453e97043ec16f888da94a3f652a69003e67415e1a303dd9"
+    },
+    {
+      "path": "/home/shmellyorc/VM/project-slice5/fixture/__pycache__/rerun.cpython-314.pyc",
+      "sha256": "3949b461c5fcc44b323dab0761ee9c0b5c0064eb6cab08d91b5c81bd32ff51bc"
+    },
+    {
+      "path": "/home/shmellyorc/VM/project-slice5/fixture/__pycache__"
+    }
+  ],
+  "retained": [
+    "/home/shmellyorc/Documents/Void.Language/build/slice5",
+    "/home/shmellyorc/Documents/Void.Language/build/slice5-start",
+    "/home/shmellyorc/Documents/Void.Language/docs/projects/evidence/slice5",
+    "/home/shmellyorc/Documents/Void.Language/docs/projects/evidence/slice5-source.patch",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug",
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict",
+    "/home/shmellyorc/VM/project-slice5"
+  ],
+  "test_fixture_cleanup": "CTest subprocesses and VS Code exited; their owned temporary workspaces self-cleaned."
+}

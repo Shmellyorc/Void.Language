@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+    "--discover-project",
+    "/tmp/VOID preflight open only 8kh0ruaf",
+    "/tmp/VOID preflight open only 8kh0ruaf/readable.void",
+    "/tmp/VOID preflight open only 8kh0ruaf",
+    "main.void"
+  ],
+  "active_file_bytes": 67108865,
+  "exit": 0,
+  "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":0,\"entry\":\"/tmp/VOID preflight open only 8kh0ruaf/main.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight open only 8kh0ruaf/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight open only 8kh0ruaf\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight open only 8kh0ruaf\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"a55affbff8af582efa42e52de8b55573da5fe74f3c386344e5bdf936548173fb\",\"standalone\":false,\"status\":\"ready\"}\n",
+  "stderr": ""
+}

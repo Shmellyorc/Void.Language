@@ -1,0 +1,31 @@
+[0/2] Re-checking globbed directories...
+[1/113] Building CXX object CMakeFiles\void_application_objects.dir\src\application_metadata.cpp.obj
+[2/113] Building CXX object CMakeFiles\void_application_objects.dir\src\project_identity.cpp.obj
+[3/113] Building CXX object CMakeFiles\void_core.dir\src\frontend\source.cpp.obj
+[4/113] Building CXX object CMakeFiles\void_core.dir\src\frontend\project.cpp.obj
+[5/113] Building CXX object CMakeFiles\void_core.dir\src\frontend\tooling.cpp.obj
+[6/113] Building CXX object CMakeFiles\void_core.dir\src\numeric.cpp.obj
+[7/113] Building CXX object CMakeFiles\void_core.dir\src\frontend\compiler.cpp.obj
+FAILED: [code=1] CMakeFiles/void_core.dir/src/frontend/compiler.cpp.obj 
+C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\clang-cl.exe  /nologo -TP -DVOID_STDLIB_ROOT=\"C:/Users/a/VoidCI42377496702-Native/stdlib\" -D_ITERATOR_DEBUG_LEVEL=0 -IC:\Users\a\VoidCI42377496702-Native\include -imsvcC:\Users\a\VoidCI42377496702-Native\third_party\tomlplusplus -imsvc"C:\Users\a\Documents\ChatGPT\Void TEMP\Void-native\.toolchains\native-schannel\sdk\clang+llvm-23.1.4-x86_64-pc-windows-msvc\include" -imsvcC:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4-deps\include /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MT -D_CRT_SECURE_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_NONSTDC_NO_WARNINGS -D_SCL_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_WARNINGS -DUNICODE -D_UNICODE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS /GR- /W4 /permissive- /EHsc -clang:-MD -clang:-MTCMakeFiles\void_core.dir\src\frontend\compiler.cpp.obj -clang:-MFCMakeFiles\void_core.dir\src\frontend\compiler.cpp.obj.d /FoCMakeFiles\void_core.dir\src\frontend\compiler.cpp.obj /FdCMakeFiles\void_core.dir\void_core.pdb -c -- C:\Users\a\VoidCI42377496702-Native\src\frontend\compiler.cpp
+C:\Users\a\VoidCI42377496702-Native\src\frontend\compiler.cpp(6529,54): error: expected unqualified-id
+ 6529 |                 const auto& owner=*graph->at(binding.interface.definition->module_identity);
+      |                                                      ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.19041.0\\um\combaseapi.h(169,19): note: expanded from macro 'interface'
+  169 | #define interface __STRUCT__
+      |                   ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.19041.0\\um\combaseapi.h(168,20): note: expanded from macro '__STRUCT__'
+  168 | #define __STRUCT__ struct
+      |                    ^
+C:\Users\a\VoidCI42377496702-Native\src\frontend\compiler.cpp(6530,73): error: expected unqualified-id
+ 6530 |                 Expr use(Expr::Kind::name,Token{TokenKind::name,binding.interface.definition->name,binding.interface.definition->source_offset});
+      |                                                                         ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.19041.0\\um\combaseapi.h(169,19): note: expanded from macro 'interface'
+  169 | #define interface __STRUCT__
+      |                   ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.19041.0\\um\combaseapi.h(168,20): note: expanded from macro '__STRUCT__'
+  168 | #define __STRUCT__ struct
+      |                    ^
+2 errors generated.
+[8/113] Building CXX object CMakeFiles\void_core.dir\src\ir\module.cpp.obj
+ninja: build stopped: subcommand failed.

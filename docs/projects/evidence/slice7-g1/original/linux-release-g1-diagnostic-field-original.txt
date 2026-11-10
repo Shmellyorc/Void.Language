@@ -1,0 +1,36 @@
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Building C object CMakeFiles/void_g1_fixture.dir/tests/ffi/primitives_fixture.c.o
+[  0%] Built target void_g1_fixture
+[  0%] Building C object CMakeFiles/void_g1_thunk.dir/tests/ffi/primitives_thunk.c.o
+[ 83%] Built target libcurl_static
+[ 83%] Built target void_g1_thunk
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/voidc_objects.dir/src/native_build.cpp.o
+[100%] Building CXX object CMakeFiles/voidc_objects.dir/src/main.cpp.o
+[100%] Building CXX object CMakeFiles/voidc_objects.dir/examples/proof.cpp.o
+/home/shmellyorc/Documents/Void.Language/examples/proof.cpp:7:46: warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+    7 |         {Terminator::Kind::return_value, 2}}}};
+      |                                              ^
+/home/shmellyorc/Documents/Void.Language/examples/proof.cpp:13:6: warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+   13 |     }};
+      |      ^
+2 warnings generated.
+[100%] Built target voidc_objects
+[100%] Generating cache-identity-Release.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Release.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Building CXX object CMakeFiles/void_g1_tests.dir/tests/ffi/primitives.cpp.o
+/home/shmellyorc/Documents/Void.Language/tests/ffi/primitives.cpp:52:102: error: no member named 'message' in 'vd::Diagnostic'
+   52 |             diagnostic.primary.source->location(diagnostic.primary.begin).line << ": " << diagnostic.message << '\n';
+      |                                                                                           ~~~~~~~~~~ ^
+1 error generated.
+gmake[3]: *** [CMakeFiles/void_g1_tests.dir/build.make:79: CMakeFiles/void_g1_tests.dir/tests/ffi/primitives.cpp.o] Error 1
+gmake[2]: *** [CMakeFiles/Makefile2:18919: CMakeFiles/void_g1_tests.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:18926: CMakeFiles/void_g1_tests.dir/rule] Error 2
+gmake: *** [Makefile:6537: void_g1_tests] Error 2

@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "removed_files": {
+    "/home/shmellyorc/VM/project-slice7-g4-linux/read-space.cmd": "5ec2a3de8559f5cd2a8760b213f67cde7b0018f344980474f8ab00a13740b83d",
+    "/home/shmellyorc/VM/project-slice7-g4-linux/read-space.py": "2d484af4075b9b577ebfee11ce824ee907ab0ebe262a66601591a0fc7289518d",
+    "/home/shmellyorc/VM/project-slice7-g4-linux/storage-before.json": "7d5f3217b2441c1cd5ca6619e6aafa08bece30ff66e2c171f4e65bed9ffbfd96",
+    "/home/shmellyorc/VM/project-slice7-g4-linux/storage-after.json": "ff52f8698f71f0e0b6701b42d0bafa2f1694415859c273e5ef9731126712764d"
+  },
+  "removed_directory": "/home/shmellyorc/VM/project-slice7-g4-linux"
+}

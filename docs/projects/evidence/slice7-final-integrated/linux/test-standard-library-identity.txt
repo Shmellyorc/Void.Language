@@ -1,0 +1,2 @@
+On retry, lsp_collections_stdlib is given the actual source-compiled standard-library root via its existing VOID_TEST_STDLIB test setting.
+[('lsp_collections_stdlib', [{'name': 'ENVIRONMENT', 'value': ['VOID_TEST_STDLIB=/home/shmellyorc/Documents/Void.Language/stdlib']}, {'name': 'TIMEOUT', 'value': 300.0}, {'name': 'WORKING_DIRECTORY', 'value': '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-release'}])]

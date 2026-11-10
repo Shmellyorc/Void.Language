@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Win32-ninja"
+	tests="22"
+	failures="1"
+	disabled="0"
+	skipped="0"
+	hostname="DESKTOP-N4VH0F7"
+	time="332"
+	timestamp="2026-11-08T16:29:06"
+	>
+	<testcase name="project_manifest" classname="project_manifest" time="0.520008" status="run">
+		<properties/>
+		<system-out>project_manifest: 8788 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_legacy" classname="project_manifest_legacy" time="16.7476" status="run">
+		<properties/>
+		<system-out>project_manifest_legacy: 18 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_selection" classname="project_selection" time="49.5718" status="run">
+		<properties/>
+		<system-out>UNQUALIFIED: native symlink privilege A required privilege is not held by the client.
+project_selection: 353 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_sessions" classname="project_sessions" time="0.834651" status="run">
+		<properties/>
+		<system-out>project_sessions: 166 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_application" classname="project_application" time="112.738" status="run">
+		<properties/>
+		<system-out>Application cache: unavailable/unavailable
+project_application: 63 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_application_process" classname="project_application_process" time="7.84991" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "C:\Users\a\VoidCI42377496702-Native\tests\project\application.py", line 170, in &lt;module&gt;
+    success(output, locations)
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidCI42377496702-Native\tests\project\application.py", line 151, in success
+    check(lines[:-1] == paths, lines)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidCI42377496702-Native\tests\project\application.py", line 24, in check
+    assert condition, detail
+           ^^^^^^^^^
+AssertionError: ['eager-data|C:/Users/a/AppData/Local/org.test.context-game', 'eager-config|C:/Users/a/AppData/Roaming/org.test.context-game', 'eager-cache|C:/Users/a/AppData/Local/org.test.context-game/cache', 'eager-state|C:/Users/a/AppData/Local/org.test.context-game/state', 'body-data|C:/Users/a/AppData/Local/org.test.context-game', 'body-config|C:/Users/a/AppData/Roaming/org.test.context-game', 'body-cache|C:/Users/a/AppData/Local/org.test.context-game/cache', 'body-state|C:/Users/a/AppData/Local/org.test.context-game/state', 'function-value|C:/Users/a/AppData/Local/org.test.context-game', 'named-explicit|C:/Users/a/AppData/Roaming/org.test.context-game', 'invalid-explicit|2|os.data_dir|0|0|0|os.data_dir: OS query input or application argument snapshot is invalid; native code 0|false']
+</system-out>
+	</testcase>
+	<testcase name="project_discovery_cli" classname="project_discovery_cli" time="27.5829" status="run">
+		<properties/>
+		<system-out>UNQUALIFIED: native persistent disk cache; project selection rejection is still exercised
+project_discovery_cli: 88 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_profiles" classname="project_profiles" time="5.37795" status="run">
+		<properties/>
+		<system-out>UNQUALIFIED: native persistent disk cache warm hit
+project_profiles: 43 process checks passed; compute instruction counts O0=8, O2=2, release --no-opt=8
+</system-out>
+	</testcase>
+	<testcase name="project_protocol" classname="project_protocol" time="4.38522" status="run">
+		<properties/>
+		<system-out>project_protocol: 169 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_nested_cli" classname="project_nested_cli" time="2.75374" status="run">
+		<properties/>
+		<system-out>project_nested_cli: 11 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_protocol" classname="lsp_protocol" time="6.45091" status="run">
+		<properties/>
+		<system-out>editor: CRLF/UTF16, cross-file symbols, overlays, versions, invalid/repair, graph changes and cycles passed
+transport: fragmented/coalesced frames, IDs, malformed messages, bounded framing, lifecycle and EOF passed
+value structs: real LSP type/constructor/field navigation, references, readonly diagnostics and revision recovery passed
+receiver methods: imported native LSP navigation, references, effect changes and revision recovery passed
+initialization: imported initializer navigation/references, exact argument diagnostics and unsaved recovery passed
+managed structs: cyclic types, imported fields/methods, readonly aliases and unsaved recovery passed
+managed initialization: imported constructor, private helper navigation, required-field diagnostics and unsaved repair passed
+reference values: imported nested reference navigation, precise readonly diagnostics and unsaved recovery passed
+composition: imported promoted navigation, ambiguity and unsaved repair passed
+inheritance: original owners, static virtual/sup...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage8" classname="lsp_stage8" time="8.82002" status="run">
+		<properties/>
+		<system-out>Debug cache: unavailable
+Debug cache: unavailable
+Windows drive discovery fixture: {"original": "C:\\Users\\a\\VoidS4-tmp-Debug\\VOID discovery \u00e9\ud83d\ude00 # % 7o5kxckt", "canonical": "C:\\Users\\a\\VoidS4-tmp-Debug\\VOID discovery \u00e9\ud83d\ude00 # % 7o5kxckt", "expanded_lower": "c:\\Users\\a\\VoidS4-tmp-Debug\\VOID discovery \u00e9\ud83d\ude00 # % 7o5kxckt"}
+Windows unrelated mapped-drive rejection passed
+Windows short/long workspace ancestor checks passed
+Windows upper/lower drive workspace and active checks passed
+Stage 8 compiler-backed LSP discovery/docs/readonly checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_host" classname="os_host" time="98.0303" status="run">
+		<properties/>
+		<system-out>OS native/ABI/GC/IR/globals/reload/cache: 127 checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_errors" classname="os_errors" time="57.1052" status="run">
+		<properties/>
+		<system-out>OS errors: 8 process checks, 9 valid/61 invalid IDs x four getters; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="os_frontend" classname="os_frontend" time="114.101" status="run">
+		<properties/>
+		<system-out>OS frontend: 75 processes passed; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="lsp_os" classname="lsp_os" time="16.521" status="run">
+		<properties/>
+		<system-out>OS LSP: 44 checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_owner" classname="os_owner" time="65.939" status="run">
+		<properties/>
+		<system-out>OS owner async JIT/O2/AOT: 8 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage11_globals" classname="stage11_globals" time="2.26102" status="run">
+		<properties/>
+		<system-out>107 global checks passed
+</system-out>
+	</testcase>
+	<testcase name="native_source" classname="native_source" time="9.70522" status="run">
+		<properties/>
+		<system-out>native source passed
+</system-out>
+	</testcase>
+	<testcase name="stage6_integrated" classname="stage6_integrated" time="14.8432" status="run">
+		<properties/>
+		<system-out>combined cached old root=0; old roots at barrier=14; retired generations=1; post-drain objects=0
+combined cached old root=0; old roots at barrier=14; retired generations=1; post-drain objects=0
+</system-out>
+	</testcase>
+	<testcase name="sessions" classname="sessions" time="0.720917" status="run">
+		<properties/>
+		<system-out>sessions: passed
+</system-out>
+	</testcase>
+	<testcase name="stage11_globals_aot" classname="stage11_globals_aot" time="25.2193" status="run">
+		<properties/>
+		<system-out>156 real-program global commands passed
+</system-out>
+	</testcase>
+</testsuite>

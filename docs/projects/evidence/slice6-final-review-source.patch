@@ -1,0 +1,662 @@
+diff --git a/include/void/ir.hpp b/include/void/ir.hpp
+index 66a3b62..564f376 100644
+--- a/include/void/ir.hpp
++++ b/include/void/ir.hpp
+@@ -115,6 +115,7 @@ std::string type_name(Type type);
+ std::string option_identity(Type payload);
+ std::string numeric_enum_layout(Type type);
+ bool numeric_enum_member(Type type,std::uint64_t bits);
++bool contains_numeric_enum(Type);
+ inline constexpr unsigned array_element_path=~0u;
+ bool array_type(Type);
+ bool collection_type(Type);
+@@ -137,7 +138,7 @@ enum class Op { math, random_xor, random_seed, global_cell, bitcast, native_call
+     remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate, aggregate, extract, insert,
+     stage_begin, gc_construct, gc_allocate, gc_read, gc_write, gc_collect, gc_poll, gc_alive,
+     upcast, virtual_call, base_init, stage_prefix, interface_pack, interface_prepare, interface_call, string_literal, string_concat, string_equal, string_count, string_index, string_encode, string_decode, text_case, scalar_display, scalar_format, format_unwrap, format_layout, scalar_parse, result_unwrap, memory_write, temporal_result, temporal_native, string_join, collection_enter, collection_leave, collection_append, collection_finish, os_query, host_native, url_native, http_native, http_async, http_control, console_endpoint, console_native, console_print, filesystem_native, filesystem_async, filesystem_control,
+-    fixed_array, array_get, array_set, fixed_snapshot, fixed_select, fixed_commit, array_count, list_push, list_remove, list_index, list_version, list_commit, list_check, array_capture, array_allocate, array_initialize, list_insert, list_clear, array_slice, dict_new, dict_get, dict_set, dict_contains, dict_remove, dict_clear, dict_count, dict_version, dict_check, dict_entry, text_translate, string_join_encode, local_cleanup, filesystem_write, try_convert };
++    fixed_array, array_get, array_set, fixed_snapshot, fixed_select, fixed_commit, array_count, list_push, list_remove, list_index, list_version, list_commit, list_check, array_capture, array_allocate, array_initialize, list_insert, list_clear, array_slice, dict_new, dict_get, dict_set, dict_contains, dict_remove, dict_clear, dict_count, dict_version, dict_check, dict_entry, text_translate, string_join_encode, local_cleanup, filesystem_write, try_convert, array_finish };
+ // A validated local aggregate storage path; never a source-visible reference.
+ struct Place { std::uint32_t slot = 0; std::vector<unsigned> fields; };
+ struct Instruction {
+@@ -185,6 +186,7 @@ struct Function {
+     Type operator_owner = Type::none;
+     std::string operator_glyph = {};
+ };
++bool numeric_enum_cleanup_return(const Function&,unsigned block);
+ bool operator_arity(std::string_view glyph,std::size_t arity);
+ std::string operator_identity(Type owner,std::string_view glyph,const std::vector<Type>& operands);
+ void validate_operator_declaration(const Function&);
+diff --git a/include/void/runtime_abi.hpp b/include/void/runtime_abi.hpp
+index 3ffc0de..fec131f 100644
+--- a/include/void/runtime_abi.hpp
++++ b/include/void/runtime_abi.hpp
+@@ -112,6 +112,7 @@ unsigned vd_dict_remove(void**,const vd::NativeDictionary*,const void*,vd::Runti
+ void vd_dict_clear(void**,const vd::NativeDictionary*,vd::RuntimeFailure*) noexcept;
+ void vd_value_array_new(void**,const vd::NativeArrayElement*,std::uint64_t,unsigned,vd::RuntimeFailure*) noexcept;
+ std::uint64_t vd_value_array_count(void**,const vd::NativeArrayElement*,vd::RuntimeFailure*) noexcept;
++void vd_value_array_complete(void**,const vd::NativeArrayElement*,std::uint64_t,vd::RuntimeFailure*) noexcept;
+ std::uint64_t vd_value_array_version(void**,const vd::NativeArrayElement*,vd::RuntimeFailure*) noexcept;
+ void vd_value_array_read(void*,void**,const vd::NativeArrayElement*,std::uint64_t,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
+ void vd_value_array_write(void**,const vd::NativeArrayElement*,std::uint64_t,unsigned,std::uint64_t,const void*,std::uint64_t,unsigned,unsigned,vd::RuntimeFailure*) noexcept;
+diff --git a/src/backend/llvm/backend.cpp b/src/backend/llvm/backend.cpp
+index d780e57..fe3e543 100644
+--- a/src/backend/llvm/backend.cpp
++++ b/src/backend/llvm/backend.cpp
+@@ -868,9 +868,15 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
+             }
+             std::vector<llvm::Value*> values;
+             std::vector<ir::Type> value_types;
++            const bool defer_return_load=ir::numeric_enum_cleanup_return(f,n);
++            auto check_cleanup_return=[&] {
++                if(async)b.CreateCall(module->getOrInsertFunction("vd_async_finish",b.getVoidTy(),b.getPtrTy()),{failure});
++                auto* failed=llvm::BasicBlock::Create(context,"cleanup_failed",fn);auto* ready=llvm::BasicBlock::Create(context,"cleanup_complete",fn);b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),failed,ready);b.SetInsertPoint(failed);return_failure();b.SetInsertPoint(ready);
++            };
+             for (const auto& instruction : f.blocks[n].instructions) {
+                 const auto& loc = instruction.source.path.empty() ? f.source : instruction.source;
+                 b.SetCurrentDebugLocation(llvm::DILocation::get(context, loc.line, loc.column, subprogram));
++                if(defer_return_load && &instruction==&f.blocks[n].instructions.back())check_cleanup_return();
+                 llvm::Value* v = nullptr;
+                 using ir::Op;
+                 auto trace_failure = [&] {
+@@ -1033,6 +1039,12 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
+                 case Op::array_initialize: {
+                     auto t=operand_type(instruction.a);native_write(t,value_roots[n].at(instruction.a),values[instruction.b],native_arg(ir::array_element(t),instruction.arguments[0],true),true);break;
+                 }
++                case Op::array_finish: {
++                    auto t=operand_type(instruction.a);
++                    b.CreateCall(module->getOrInsertFunction("vd_value_array_complete",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getPtrTy()),
++                        {value_roots[n].at(instruction.a),element_record(ir::array_element(t)),b.getInt64(*t.definition->extent),failure});
++                    selected_failure();v=values[instruction.a];break;
++                }
+                 case Op::array_capture: v=b.CreateStore(values[instruction.a],slots.at(instruction.immediate));break;
+                 case Op::list_check: {
+                     auto t=operand_type(instruction.a);
+@@ -1805,10 +1817,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
+                 values.push_back(v);
+             }
+             const auto& end = f.blocks[n].end;
+-            if(f.cleanup_entry && n>=*f.cleanup_entry && (end.kind==ir::Terminator::Kind::return_value || end.kind==ir::Terminator::Kind::return_void)){
+-                if(async)b.CreateCall(module->getOrInsertFunction("vd_async_finish",b.getVoidTy(),b.getPtrTy()),{failure});
+-                auto* failed=llvm::BasicBlock::Create(context,"cleanup_failed",fn);auto* ready=llvm::BasicBlock::Create(context,"cleanup_complete",fn);b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),failed,ready);b.SetInsertPoint(failed);return_failure();b.SetInsertPoint(ready);
+-            }
++            if(!defer_return_load && f.cleanup_entry && n>=*f.cleanup_entry &&
++               (end.kind==ir::Terminator::Kind::return_value || end.kind==ir::Terminator::Kind::return_void))check_cleanup_return();
+             switch (end.kind) {
+             case ir::Terminator::Kind::return_value: {
+                 auto* value=values[end.value];
+@@ -2010,7 +2020,7 @@ Jit::Jit(DebugCache cache,ir::Emission emission) : impl_(std::make_shared<Impl>(
+     bind("vd_array_read",vd_array_read);bind("vd_array_write",vd_array_write);
+     bind("vd_dict_new",vd_dict_new);bind("vd_dict_count",vd_dict_count);bind("vd_dict_read",vd_dict_read);bind("vd_dict_entry",vd_dict_entry);bind("vd_dict_write",vd_dict_write);bind("vd_dict_remove",vd_dict_remove);bind("vd_dict_clear",vd_dict_clear);
+     bind("vd_value_array_insert",vd_value_array_insert);bind("vd_value_array_clear",vd_value_array_clear);bind("vd_value_array_slice",vd_value_array_slice);
+-    bind("vd_value_array_new",vd_value_array_new);bind("vd_value_array_count",vd_value_array_count);bind("vd_value_array_version",vd_value_array_version);bind("vd_value_array_read",vd_value_array_read);bind("vd_value_array_write",vd_value_array_write);bind("vd_value_array_push",vd_value_array_push);bind("vd_value_array_remove",vd_value_array_remove);bind("vd_value_array_copy",vd_value_array_copy);
++    bind("vd_value_array_new",vd_value_array_new);bind("vd_value_array_count",vd_value_array_count);bind("vd_value_array_complete",vd_value_array_complete);bind("vd_value_array_version",vd_value_array_version);bind("vd_value_array_read",vd_value_array_read);bind("vd_value_array_write",vd_value_array_write);bind("vd_value_array_push",vd_value_array_push);bind("vd_value_array_remove",vd_value_array_remove);bind("vd_value_array_copy",vd_value_array_copy);
+     bind("vd_list_new",vd_list_new);bind("vd_list_count",vd_list_count);bind("vd_list_version",vd_list_version);
+     bind("vd_convert_parse", vd_convert_parse);
+     bind("vd_list_write_bytes", vd_list_write_bytes);
+diff --git a/src/frontend/compiler.cpp b/src/frontend/compiler.cpp
+index 5aade76..a930ba2 100644
+--- a/src/frontend/compiler.cpp
++++ b/src/frontend/compiler.cpp
+@@ -4216,7 +4216,9 @@ class Lowering {
+         auto test=block(),body=block(),done=block();jump(test);current=test;
+         terminate({ir::Terminator::Kind::branch,emit({ir::Op::less,emit({ir::Op::load,index},token),constant(Type::u64,{count,{}},token)},token),body,done});current=body;
+         auto value=element();ir::Instruction initialize{ir::Op::array_initialize,emit({ir::Op::load,owner},token),emit({ir::Op::load,index},token)};initialize.arguments={value};emit(initialize,token);
+-        emit({ir::Op::store,index,emit({ir::Op::add,emit({ir::Op::load,index},token),constant(Type::u64,{1,{}},token)},token)},token);jump(test);current=done;return emit({ir::Op::load,owner},token);
++        emit({ir::Op::store,index,emit({ir::Op::add,emit({ir::Op::load,index},token),constant(Type::u64,{1,{}},token)},token)},token);jump(test);current=done;
++        auto value_array=emit({ir::Op::load,owner},token);
++        return ir::contains_numeric_enum(t) ? emit({ir::Op::array_finish,value_array},token) : value_array;
+     }
+     unsigned constant(Type t, const ir::ConstantValue& value, const Token& token) {
+         if(console::endpoint_type(t)){ir::Instruction endpoint{ir::Op::console_endpoint};endpoint.type=t;endpoint.immediate=value.fields.at(0).bits;return emit(endpoint,token);}
+diff --git a/src/ir/module.cpp b/src/ir/module.cpp
+index 3d16531..489a58e 100644
+--- a/src/ir/module.cpp
++++ b/src/ir/module.cpp
+@@ -484,6 +484,8 @@ std::vector<VirtualTarget> virtual_targets(const Module& module,const Function&
+ void validate(const Module& m, InstructionTypes* results,std::map<std::string,ReferenceEffects>* verified_effects) {
+     for(const auto& symbol:m.imports)if(symbol.starts_with("vd_native_fixture_call"))throw std::invalid_argument("VOID IR: native bridge requires its verified typed descriptor");
+     for (const auto& symbol : m.imports) if (symbol.starts_with("vd_global")) throw std::invalid_argument("VOID IR: global bridge requires validated typed global operations");
++    if(std::find(m.imports.begin(),m.imports.end(),"vd_value_array_complete")!=m.imports.end())
++        throw std::invalid_argument("VOID IR: array completion requires validated typed array operations");
+     if (results) results->clear();
+     InstructionTypes qualified_types;
+     auto fail = [](const std::string& text) { throw std::invalid_argument("VOID IR: " + text); };
+@@ -894,14 +896,23 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+             }
+         }
+         std::vector<std::vector<Type>> body_types;
++        const auto enum_array_homes=numeric_enum_array_homes(f);
+         for (const auto& b : f.blocks) {
+             std::vector<Type> types;
+             std::vector<bool> pure_templates;
+             std::vector<bool> group_values;const Instruction* validating=nullptr;
+             for(const auto& instruction:b.instructions)if(instruction.op==Op::function_reference && functions.contains(instruction.callee) && functions.at(instruction.callee)->asynchronous)fail("async function value requires an async callable contract");
++            auto pending_enum_array=[&](unsigned id) {
++                const auto& producer=b.instructions[id];
++                return numeric_enum_array_allocation(producer) || (producer.op==Op::load && enum_array_homes.contains(producer.a));
++            };
+             auto operand = [&](unsigned id) {
+                 if (id >= types.size() || types[id] == Type::none) fail("invalid operand in " + f.name);
+                 if(group_values[id] && (!validating || (validating->op!=Op::async_group_join && !(validating->op==Op::store && group_slots.contains(validating->a)))))fail("async group token escapes lifecycle operations");
++                if(pending_enum_array(id) && (!validating || id!=validating->a ||
++                   (validating->op!=Op::array_initialize && validating->op!=Op::array_finish &&
++                    !(validating->op==Op::array_capture && numeric_enum_array_allocation(b.instructions[id])))))
++                    fail("incomplete numeric enum array escapes private construction");
+                 return types[id];
+             };
+             auto expect = [&](unsigned id, Type t) { if (!assignable(operand(id),t)) fail("mistyped operand in " + f.name+": expected "+type_name(t)+", received "+type_name(operand(id))+" at value "+std::to_string(id)); };
+@@ -911,6 +922,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+             };
+             for (const auto& i : b.instructions) {
+                 validating=&i;
++                if(i.receiver && enum_array_homes.contains(i.receiver->slot))fail("incomplete numeric enum array used as a receiver");
+                 Type result = Type::i32;
+                 if(!i.operator_glyph.empty() && i.op!=Op::call)fail("operator proof on non-call instruction");
+                 auto location = os::location_adapter(i.callee,false);
+@@ -1080,11 +1092,25 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+                     for(auto argument:i.arguments) expect(argument,array_element(i.type));
+                     result=i.type;break;
+                 case Op::array_allocate:
+-                    valid_type(i.type);if(i.type.kind!=Type::fixed_array || !i.arguments.empty() || i.receiver || i.immediate || !i.callee.empty())fail("invalid array construction storage");result=i.type;break;
+-                case Op::array_initialize:
+-                    if(operand(i.a).kind!=Type::fixed_array || operand(i.b)!=Type::u64 || i.arguments.size()!=1 || i.receiver || i.immediate || !i.callee.empty())fail("invalid array element initialization");expect(i.arguments[0],array_element(operand(i.a)));result=Type::none;break;
++                    valid_type(i.type);
++                    if(i.type.kind!=Type::fixed_array || !i.arguments.empty() || i.receiver || i.immediate || !i.callee.empty() ||
++                       (numeric_enum_array_allocation(i) && !m.coordinated))fail("invalid array construction storage");
++                    result=i.type;break;
++                case Op::array_initialize: {
++                    auto array=operand(i.a);
++                    if(array.kind!=Type::fixed_array || operand(i.b)!=Type::u64 || i.arguments.size()!=1 || i.receiver || i.immediate || !i.callee.empty() ||
++                       (contains_numeric_enum(array) && !pending_enum_array(i.a)))fail("invalid array element initialization");
++                    expect(i.arguments[0],array_element(array));result=Type::none;break;
++                }
++                case Op::array_finish:
++                    if(!m.coordinated || operand(i.a).kind!=Type::fixed_array || !pending_enum_array(i.a) ||
++                       i.b || i.immediate || i.receiver || i.initialization || !i.arguments.empty() || !i.callee.empty())
++                        fail("invalid numeric enum array completion");
++                    result=operand(i.a);break;
+                 case Op::array_capture:
+                     if(i.immediate<0 || static_cast<std::size_t>(i.immediate)>=f.locals.size() || !array_type(operand(i.a)) || operand(i.a)!=f.locals[i.immediate] || i.b || i.receiver || !i.arguments.empty() || !i.callee.empty())fail("invalid array iteration capture");
++                    if(enum_array_homes.contains(i.immediate) && !numeric_enum_array_allocation(b.instructions[i.a]))
++                        fail("ordinary array captured into private numeric enum array storage");
+                     result=Type::none;break;
+                 case Op::list_check:
+                     if(operand(i.a).kind!=Type::growable_array || operand(i.b)!=Type::u64 || i.receiver || !i.arguments.empty() || i.immediate || !i.callee.empty())fail("invalid iterator version check");
+@@ -1455,6 +1481,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
+                 }
+                 case Op::load: result = slot(i.a); break;
+                 case Op::store:
++                    if(enum_array_homes.contains(i.a))fail("store to private numeric enum array storage");
+                     if (f.receiver && f.parameters[0].kind==Type::aggregate && !f.receiver_mutates && i.a == 0) fail("non-mutating method writes receiver");
+                     expect(i.b, slot(i.a)); result = Type::none; break;
+                 case Op::async_call: case Op::call: case Op::virtual_call: {
+diff --git a/src/ir/numeric_enum_storage.inc b/src/ir/numeric_enum_storage.inc
+index 9a073df..9ac90b5 100644
+--- a/src/ir/numeric_enum_storage.inc
++++ b/src/ir/numeric_enum_storage.inc
+@@ -1,49 +1,81 @@
+-// Only inline fields can expose an uninitialized scalar discriminant. Heap and
+-// collection references use their existing construction and publication checks.
++// Aggregate fields and fixed-array elements carry value storage. Managed and
++// growable handles have separate initialization/publication contracts.
+ bool contains_numeric_enum(Type root) {
+-    if(root.kind!=Type::aggregate)return root.kind==Type::numeric_enum;
++    if(root.kind!=Type::aggregate && root.kind!=Type::fixed_array)return root.kind==Type::numeric_enum;
+     std::vector<Type> pending{root};
+     std::set<const ValueType*> seen;
+     for(std::size_t n=0;n<pending.size();++n) {
+         const auto type=pending[n];
+         if(type.kind==Type::numeric_enum)return true;
+-        if(type.kind==Type::aggregate && type.definition && seen.insert(type.definition.get()).second)
++        if(!type.definition || !seen.insert(type.definition.get()).second)continue;
++        if(type.kind==Type::aggregate)
+             for(const auto& field:type.definition->fields)pending.emplace_back(field.type);
++        else if(type.kind==Type::fixed_array && type.definition->element)
++            pending.emplace_back(*type.definition->element);
+     }
+     return false;
+ }
+ 
++bool numeric_enum_array_allocation(const Instruction& i) {
++    return i.op==Op::array_allocate && i.type.kind==Type::fixed_array && contains_numeric_enum(i.type);
++}
++
++std::set<unsigned> numeric_enum_array_homes(const Function& f) {
++    std::set<unsigned> homes;
++    for(const auto& block:f.blocks)for(unsigned n=0;n<block.instructions.size();++n) {
++        const auto& i=block.instructions[n];
++        if(i.op==Op::array_capture && i.a<n && i.immediate>=0 &&
++           static_cast<std::size_t>(i.immediate)<f.locals.size() && numeric_enum_array_allocation(block.instructions[i.a]))
++            homes.insert(static_cast<unsigned>(i.immediate));
++    }
++    return homes;
++}
++
++bool numeric_enum_cleanup_return(const Function& f,unsigned id) {
++    if(!f.cleanup_entry || id<*f.cleanup_entry)return false;
++    const auto& block=f.blocks[id];
++    return block.end.kind==Terminator::Kind::return_value && !block.instructions.empty() &&
++           block.end.value==block.instructions.size()-1 && block.instructions.back().op==Op::load &&
++           contains_numeric_enum(f.locals.at(block.instructions.back().a));
++}
++
+ void validate_numeric_enum_slots(const Function& f) {
+-    std::set<unsigned> tracked;
++    std::set<unsigned> tracked,entry;
+     for(unsigned n=0;n<f.locals.size();++n)if(contains_numeric_enum(f.locals[n]))tracked.insert(n);
+     if(tracked.empty())return;
++    if(f.receiver && tracked.contains(0))entry.insert(0);
+ 
+-    // Follow explicit control-flow edges, intersecting definitely initialized
+-    // slots at joins. An aggregate receiver is bound by the incoming ABI.
+-    std::vector<std::optional<std::set<unsigned>>> inputs(f.blocks.size());
+-    inputs.front().emplace();
+-    if(f.receiver && tracked.contains(0))inputs.front()->insert(0);
+-    std::vector<unsigned> work{0};
+-    while(!work.empty()) {
+-        const auto id=work.back();work.pop_back();
+-        auto state=*inputs[id];
+-        const auto& block=f.blocks[id];
+-        auto require=[&](unsigned slot) {
+-            if(tracked.contains(slot) && !state.contains(slot))
+-                throw std::invalid_argument("VOID IR: read of uninitialized numeric enum storage in "+f.name);
+-        };
+-        for(const auto& i:block.instructions) {
+-            if(i.op==Op::load)require(i.a);
+-            if(i.receiver)require(i.receiver->slot);
+-            if(i.op==Op::store && tracked.contains(i.a))state.insert(i.a);
++    // Intersect definitely initialized slots at explicit joins. A failure can
++    // also enter cleanup before any body write. Its terminal return load is
++    // emitted only on success and still needs a proof on the normal CFG.
++    auto verify=[&](unsigned start,bool unwinding) {
++        std::vector<std::optional<std::set<unsigned>>> inputs(f.blocks.size());
++        inputs[start]=entry;
++        std::vector<unsigned> work{start};
++        while(!work.empty()) {
++            const auto id=work.back();work.pop_back();
++            auto state=*inputs[id];
++            const auto& block=f.blocks[id];
++            auto require=[&](unsigned slot) {
++                if(tracked.contains(slot) && !state.contains(slot))
++                    throw std::invalid_argument("VOID IR: read of uninitialized numeric enum storage in "+f.name);
++            };
++            for(const auto& i:block.instructions) {
++                if(i.op==Op::load && !(unwinding && &i==&block.instructions.back() && numeric_enum_cleanup_return(f,id)))require(i.a);
++                if(i.receiver)require(i.receiver->slot);
++                if(i.op==Op::store && tracked.contains(i.a))state.insert(i.a);
++                if(i.op==Op::array_capture && tracked.contains(i.immediate))state.insert(static_cast<unsigned>(i.immediate));
++            }
++            auto edge=[&](unsigned target) {
++                auto& known=inputs[target];
++                if(!known){known=state;work.push_back(target);return;}
++                const auto removed=std::erase_if(*known,[&](unsigned slot){return !state.contains(slot);});
++                if(removed)work.push_back(target);
++            };
++            if(block.end.kind==Terminator::Kind::jump || block.end.kind==Terminator::Kind::branch)edge(block.end.yes);
++            if(block.end.kind==Terminator::Kind::branch)edge(block.end.no);
+         }
+-        auto edge=[&](unsigned target) {
+-            auto& known=inputs[target];
+-            if(!known){known=state;work.push_back(target);return;}
+-            const auto removed=std::erase_if(*known,[&](unsigned slot){return !state.contains(slot);});
+-            if(removed)work.push_back(target);
+-        };
+-        if(block.end.kind==Terminator::Kind::jump || block.end.kind==Terminator::Kind::branch)edge(block.end.yes);
+-        if(block.end.kind==Terminator::Kind::branch)edge(block.end.no);
+-    }
++    };
++    verify(0,false);
++    if(f.cleanup_entry && *f.cleanup_entry)verify(*f.cleanup_entry,true);
+ }
+diff --git a/src/ir/reference_capabilities.inc b/src/ir/reference_capabilities.inc
+index a476da3..76e557d 100644
+--- a/src/ir/reference_capabilities.inc
++++ b/src/ir/reference_capabilities.inc
+@@ -152,6 +152,8 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
+                         break;
+                     case Op::array_initialize:
+                         check(values[i.arguments[0]],array_element(types[function][block][i.a]),true);break;
++                    case Op::array_finish:
++                        value=values[i.a];break;
+                     case Op::array_get:
+                         value=field_facts(types[function][block][i.a],values[i.a],array_element_path);break;
+                     case Op::dict_new: {
+diff --git a/src/runtime/fixed_abi.cpp b/src/runtime/fixed_abi.cpp
+index 427041f..0e7f169 100644
+--- a/src/runtime/fixed_abi.cpp
++++ b/src/runtime/fixed_abi.cpp
+@@ -148,6 +148,9 @@ unsigned vd_dict_remove(void** source,const vd::NativeDictionary* d,const void*
+ void vd_dict_clear(void** source,const vd::NativeDictionary* d,vd::RuntimeFailure* f) noexcept {checked(f,[&]{if(!d)throw std::invalid_argument("missing dictionary metadata");auto& r=vd::Runtime::current();r.dictionary_clear(r.root_word(source),*d);});}
+ void vd_value_array_new(void** out,const vd::NativeArrayElement* e,std::uint64_t count,unsigned list,vd::RuntimeFailure* f) noexcept {native_array(e,count,f,[&](auto& r,const auto& l){r.array_new(out,l,list!=0);});}
+ std::uint64_t vd_value_array_count(void** source,const vd::NativeArrayElement* e,vd::RuntimeFailure* f) noexcept {std::uint64_t result=0;native_array(e,0,f,[&](auto& r,const auto& l){result=r.array_count(r.root_word(source),l,true);});return result;}
++void vd_value_array_complete(void** source,const vd::NativeArrayElement* e,std::uint64_t extent,vd::RuntimeFailure* f) noexcept {
++    native_array(e,extent,f,[&](auto& r,const auto& layout){(void)r.array_count(r.root_word(source),layout,false);});
++}
+ std::uint64_t vd_value_array_version(void** source,const vd::NativeArrayElement* e,vd::RuntimeFailure* f) noexcept {std::uint64_t result=0;native_array(e,0,f,[&](auto& r,const auto& l){result=r.array_version(r.root_word(source),l);});return result;}
+ void vd_value_array_read(void* out,void** source,const vd::NativeArrayElement* e,std::uint64_t extent,unsigned list,std::uint64_t index,vd::RuntimeFailure* f) noexcept {native_array(e,extent,f,[&](auto& r,const auto& l){r.array_read(out,r.root_word(source),l,list!=0,index);});}
+ void vd_value_array_write(void** source,const vd::NativeArrayElement* e,std::uint64_t extent,unsigned list,std::uint64_t index,const void* value,std::uint64_t version,unsigned selected,unsigned initialize,vd::RuntimeFailure* f) noexcept {native_array(e,extent,f,[&](auto& r,const auto& l){r.array_write(r.root_word(source),l,list!=0,index,value,initialize!=0,selected?std::optional(version):std::nullopt);});}
+diff --git a/tests/numeric/enum_storage.inc b/tests/numeric/enum_storage.inc
+new file mode 100644
+index 0000000..eeb0f0a
+--- /dev/null
++++ b/tests/numeric/enum_storage.inc
+@@ -0,0 +1,236 @@
++// Hand-built typed IR exercises the validator without source analysis.
++struct StorageAudit {
++    Module module;
++    Type enumeration, field, array, field_array, array_field, nested, object, option;
++    std::vector<Type> owned;
++    unsigned mismatches=0;
++    unsigned controls=0;
++    unsigned malformed=0;
++
++    StorageAudit() {
++        module.identity=module.root_identity="/enum-storage.void";
++        module.source_imports[module.identity];
++        module.coordinated=true;
++        auto d=descriptor("mode");
++        d->enum_backing=Type::u8;
++        d->numeric_members={{"ready",7}}; // Zero is never a valid member.
++        enumeration=Type::nominal(d);
++        field=record("field",enumeration);
++        array=fixed(enumeration);
++        field_array=record("field_array",array);
++        array_field=fixed(field);
++        nested=fixed(record("middle",fixed(array_field)));
++        object=record("holder",nested,true);
++        auto sum=std::make_shared<ValueType>();
++        sum->name=sum->identity=option_identity(enumeration);
++        sum->option_type=true;
++        sum->cases={{"None",1,0},{"Some",1,1}};
++        sum->fields={{"$tag",Type::i32,sum->identity},{"$some",enumeration,sum->identity}};
++        option=Type(sum);
++        module.nominal_types={enumeration,field,field_array,object,option};
++        Function entry;
++        entry.name=module.entry_symbol=module.identity+"::entry";
++        entry.source_name="entry";
++        entry.module_identity=module.identity;
++        entry.blocks={{{integer(Type::i32,0)},returns(0)}};
++        module.functions.push_back(std::move(entry));
++    }
++    std::shared_ptr<ValueType> descriptor(std::string name) {
++        auto d=std::make_shared<ValueType>();
++        d->name=std::move(name);d->module_identity=module.identity;d->identity=module.identity+"::"+d->name;
++        return d;
++    }
++    Type fixed(Type child) {
++        auto d=std::make_shared<ValueType>();
++        d->element=child;d->extent=1;d->name=d->identity=array_identity(child,d->extent);
++        return owned.emplace_back(d,Type::fixed_array);
++    }
++    Type record(const char* name,Type member,bool managed=false) {
++        auto d=descriptor(name);d->managed=managed;d->fields={{"item",member,d->identity}};
++        owned.push_back(Type::nominal(d));
++        return owned.back();
++    }
++    static Instruction integer(Type t,std::int64_t bits) {
++        Instruction i{Op::constant};i.type=t;i.immediate=bits;return i;
++    }
++    static Instruction make(Op op,Type t,std::vector<unsigned> args={}) {
++        Instruction i{op};i.type=t;i.arguments=std::move(args);return i;
++    }
++    static Terminator returns(unsigned id) {return {Terminator::Kind::return_value,id};}
++    static Terminator jumps(unsigned block) {return {Terminator::Kind::jump,0,block};}
++    static unsigned append(std::vector<Instruction>& code,Instruction i) {
++        code.push_back(std::move(i));return static_cast<unsigned>(code.size()-1);
++    }
++    unsigned complete(std::vector<Instruction>& code,Type t) {
++        if(t.kind==Type::numeric_enum)return append(code,integer(t,7));
++        if(t==option)return append(code,make(Op::sum,t));
++        if(t.kind==Type::fixed_array)return append(code,make(Op::fixed_array,t,{complete(code,array_element(t))}));
++        auto child=complete(code,field_type(t,0));
++        return append(code,make(t.kind==Type::managed_ref?Op::gc_construct:Op::aggregate,t,{child}));
++    }
++    unsigned project(std::vector<Instruction>& code,Type t,unsigned value) {
++        while(t.kind!=Type::numeric_enum) {
++            if(t.kind==Type::fixed_array) {
++                auto index=append(code,integer(Type::u64,0));
++                value=append(code,{Op::array_get,value,index});t=array_element(t);
++            } else {
++                value=append(code,{t.kind==Type::managed_ref?Op::gc_read:Op::extract,value});
++                t=field_type(t,0);
++            }
++        }
++        return value;
++    }
++    void run(std::string_view label,Type result,std::vector<Type> locals,std::vector<Block> blocks,std::string_view rejection={},std::optional<unsigned> cleanup={}) {
++        auto candidate=module;
++        Function f;
++        f.source_name="probe";f.module_identity=module.identity;f.name=module.identity+"::probe";
++        f.parameters.clear();f.cleanup_entry=cleanup;f.result=result;f.locals=std::move(locals);f.blocks=std::move(blocks);
++        candidate.functions.push_back(std::move(f));
++        try {
++            validate(candidate);
++            std::cout<<label<<": accepted\n";
++            if(!rejection.empty())++mismatches;
++        } catch(const std::invalid_argument& failure) {
++            std::cout<<label<<": rejected ("<<failure.what()<<")\n";
++            if(rejection.empty() || std::string_view(failure.what()).find(rejection)==std::string_view::npos)++mismatches;
++        }
++        if(rejection.empty())++controls;else ++malformed;
++    }
++    void slots() {
++        const std::pair<std::string_view,Type> cases[]={{"enum",enumeration},{"field",field},{"array",array},
++            {"field-array",field_array},{"array-field",array_field},{"nested",nested},{"managed",object}};
++        for(auto [name,type]:cases) {
++            std::vector<Instruction> bad{{Op::load,0}};
++            auto selected=project(bad,type,0);
++            run(name,enumeration,{type},{{std::move(bad),returns(selected)}},
++                type.kind==Type::managed_ref?"non-nullable reference storage":"uninitialized numeric enum storage");
++            std::vector<Instruction> good;
++            auto initial=complete(good,type);
++            append(good,{Op::store,0,initial});
++            auto value=append(good,{Op::load,0});
++            selected=project(good,type,value);
++            run(std::string(name)+" initialized",enumeration,{type},{{std::move(good),returns(selected)}});
++        }
++    }
++    void publication() {
++        for(Type type:{object,record("legacy_scalar",enumeration,true),record("legacy_array",array,true)}) {
++            auto expected=type==object?"nominal source objects require complete construction":"numeric enum fields require complete managed construction";
++            run("zero-backed "+type.definition->name,type,{},{{{make(Op::gc_allocate,type)},returns(0)}},expected);
++        }
++        run("managed missing field",object,{},{{{make(Op::gc_construct,object)},returns(0)}},"invalid complete managed construction");
++        run("managed partial buffer",object,{},{{{make(Op::array_allocate,nested),make(Op::gc_construct,object,{0})},returns(1)}},
++            "incomplete numeric enum array");
++        run("read allocated array before initialization",enumeration,{},
++            {{{make(Op::array_allocate,array),integer(Type::u64,0),{Op::array_get,0,1}},returns(2)}},"incomplete numeric enum array");
++    }
++    void staged_buffers() {
++        Instruction capture{Op::array_capture,0};
++        run("partial buffer through private home",object,{nested},
++            {{{make(Op::array_allocate,nested),capture,{Op::load,0},make(Op::gc_construct,object,{2})},returns(3)}},
++            "incomplete numeric enum array");
++        run("partial buffer through ordinary store",array,{array},
++            {{{make(Op::array_allocate,array),{Op::store,0,0},{Op::load,0}},returns(2)}},
++            "incomplete numeric enum array");
++        run("forged completion of ordinary value",array,{},
++            {{{integer(enumeration,7),make(Op::fixed_array,array,{0}),{Op::array_finish,1}},returns(2)}},
++            "invalid numeric enum array completion");
++        std::vector<Instruction> code{make(Op::array_allocate,nested),capture,integer(Type::u64,0)};
++        auto child=complete(code,array_element(nested));
++        auto staged=append(code,{Op::load,0});
++        auto initialize=make(Op::array_initialize,Type::none,{child});
++        initialize.a=staged;initialize.b=2;
++        append(code,initialize);
++        auto finished=append(code,{Op::array_finish,staged});
++        auto holder=append(code,make(Op::gc_construct,object,{finished}));
++        auto selected=project(code,object,holder);
++        run("complete private buffer published and projected",enumeration,{nested},{{code,returns(selected)}});
++        run("private home absent on one predecessor",nested,{nested},
++            {{{integer(Type::boolean,0)},{Terminator::Kind::branch,0,1,2}},
++             {{make(Op::array_allocate,nested),capture},jumps(2)},
++             {{{Op::load,0},{Op::array_finish,0}},returns(1)}},"uninitialized numeric enum storage");
++        run("legacy array initialization of a finished value",array,{},
++            {{{integer(enumeration,7),make(Op::fixed_array,array,{0}),integer(Type::u64,0),
++               [] {Instruction i{Op::array_initialize,1,2};i.arguments={0};return i;}()},returns(1)}},
++            "invalid array element initialization");
++
++        // The completion operation is a checked boundary. A forged attempt
++        // can reach it, but the live-prefix check must fail before the value
++        // can be published or used, in either optimization mode.
++        auto early=module;
++        early.functions[0].blocks={{{make(Op::array_allocate,array),{Op::array_finish,0},integer(Type::i32,7)},returns(2)}};
++        auto complete_buffer=module;
++        Instruction write{Op::array_initialize,0,1};
++        write.arguments={2};
++        complete_buffer.functions[0].blocks={{{make(Op::array_allocate,array),integer(Type::u64,0),
++            integer(enumeration,7),write,{Op::array_finish,0},integer(Type::i32,7)},returns(5)}};
++        for(bool optimize:{false,true}) {
++            auto ready=vd::Jit{}.compile(complete_buffer,complete_buffer.entry_symbol,optimize,{},std::make_shared<vd::Runtime>());
++            check(ready->invoke(0)==7,"complete buffer failed the Runtime completion guard");
++            auto entry=vd::Jit{}.compile(early,early.entry_symbol,optimize,{},std::make_shared<vd::Runtime>());
++            try {(void)entry->invoke(0);}
++            catch(const std::runtime_error& failure) {
++                check(std::string_view(failure.what()).find("Invalid fixed value contract")!=std::string_view::npos,failure.what());
++                continue;
++            }
++            throw std::runtime_error("Incomplete array passed the Runtime completion guard");
++        }
++        std::cout<<"early completion: rejected at the live-prefix guard in normal and O2 JIT\n";
++    }
++    void managed_staging() {
++        Type view=object;
++        view.construction=true;
++        Function init;
++        init.source_name="holder::method::init";
++        init.name=module.identity+"::"+init.source_name;
++        init.module_identity=module.identity;
++        init.method_name="init";
++        init.receiver=init.receiver_mutates=init.initializer=true;
++        init.parameters=init.locals={view};
++        init.result=Type::none;
++        init.construction_origins={{0,0}};
++        init.blocks={{{},{Terminator::Kind::return_void}}};
++        module.functions.push_back(init);
++        run("incomplete managed initializer",Type::i32,{},{{{integer(Type::i32,0)},returns(0)}},
++            "uninitialized construction field at call/exit/commit");
++        std::vector<Instruction> body{{Op::load,0}};
++        const auto value=complete(body,nested);
++        append(body,{Op::gc_write,0,value});
++        module.functions.back().blocks={{std::move(body),{Terminator::Kind::return_void}}};
++        run("complete managed initializer",Type::i32,{},{{{integer(Type::i32,0)},returns(0)}});
++        module.functions.pop_back();
++    }
++    void joins() {
++        std::vector<Instruction> assigned;
++        auto value=complete(assigned,nested);
++        append(assigned,{Op::store,0,value});
++        std::vector<Instruction> use{{Op::load,0}};
++        auto selected=project(use,nested,0);
++        const Block branch{{integer(Type::boolean,1)},{Terminator::Kind::branch,0,1,2}};
++        const Block set{assigned,jumps(3)}, skip{{},jumps(3)}, join{use,returns(selected)};
++        run("join missing true write",enumeration,{nested},{branch,skip,set,join},"uninitialized numeric enum storage");
++        run("join missing false write",enumeration,{nested},{branch,set,skip,join},"uninitialized numeric enum storage");
++        run("join with both writes",enumeration,{nested},{branch,set,set,join});
++        run("unwind before explicit write",enumeration,{nested},{{assigned,jumps(1)},join},
++            "uninitialized numeric enum storage",1);
++        run("cleanup terminal return load",nested,{nested},
++            {{assigned,jumps(1)},{{{Op::load,0}},returns(0)}},{},1);
++    }
++    void sums() {
++        run("unset option",option,{option},{{{{Op::load,0}},returns(0)}},"uninitialized numeric enum storage");
++        run("constructed None",option,{option},
++            {{{make(Op::sum,option),{Op::store,0,0},{Op::load,0}},returns(2)}});
++        Instruction payload{Op::extract,0};payload.immediate=1;
++        run("unchecked inactive payload",enumeration,{},{{{make(Op::sum,option),payload},returns(1)}},"sum payload requires checked access");
++    }
++};
++void storage_audit() {
++    StorageAudit audit;
++    audit.slots();
++    audit.publication();
++    audit.staged_buffers();
++    audit.managed_staging();
++    audit.joins();
++    audit.sums();
++    std::cout<<"storage audit: "<<audit.malformed<<" negative, "<<audit.controls<<" positive, "<<audit.mismatches<<" mismatches\n";
++    check(audit.mismatches==0,"typed-IR storage audit failed");
++}
+diff --git a/tests/numeric/enums.py b/tests/numeric/enums.py
+index 5ef406e..e9db511 100644
+--- a/tests/numeric/enums.py
++++ b/tests/numeric/enums.py
+@@ -162,6 +162,48 @@ public func score_cast<t>(value: option<t>) -> i32:
+     return 0
+ """
+ 
++storage = """enum mode(u8):
++    ready = 7
++    done = 255
++
++var initializations: i32 = 0
++var cleanups: i32 = 0
++
++value struct stamp:
++    state: mode = mode.ready
++
++func (self stamp) init():
++    if self.state == mode.ready:
++        initializations += 1
++    self.state = mode.done
++
++struct holder:
++    rows: [[stamp, 2], 3]
++    absent: option<mode>
++
++func count_cleanup():
++    cleanups += 1
++
++func select_mode() -> mode:
++    defer count_cleanup()
++    return mode.done
++
++func main() -> i32:
++    var rows: [[stamp, 2], 3]
++    var saved = holder(rows = rows, absent = None)
++    var count: i32 = 0
++    for row in saved.rows:
++        for cell in row:
++            if cell.state != mode.done:
++                return 1
++            count += 1
++    if count != 6 or initializations != 6 or not (saved.absent is None):
++        return 2
++    if select_mode() != mode.done or cleanups != 1:
++        return 3
++    return 0
++"""
++
+ try:
+     with tempfile.TemporaryDirectory(prefix="VOID S6 numeric enum ") as temporary:
+         root = Path(temporary).resolve()
+@@ -176,7 +218,7 @@ try:
+         boundary += "\nfunc main() -> i32:\n" + "".join(
+             f"    if boundary_{n}() != 0:\n        return {20+n}\n" for n in range(len(chunks))) + "    return 0\n"
+         (root / "modes.void").write_text(modes, encoding="utf-8")
+-        for name, source in [("matrix", boundary), ("integration", interaction)]:
++        for name, source in [("matrix", boundary), ("integration", interaction), ("storage", storage)]:
+             file = root / (name + ".void")
+             file.write_text(source, encoding="utf-8")
+             for optimization in (["--no-opt"], []):
+diff --git a/tests/numeric/enums_ir.cpp b/tests/numeric/enums_ir.cpp
+index fc5bcd8..17745e4 100644
+--- a/tests/numeric/enums_ir.cpp
++++ b/tests/numeric/enums_ir.cpp
+@@ -100,6 +100,7 @@ void malformed() {
+     bad.nominal_types.emplace_back(forged);
+     rejects(bad,"invalid canonical option identity");
+ }
++#include "enum_storage.inc"
+ void literal_source_types() {
+     const auto module=analysis(R"(func probe():
+     var i32_min = -2147483648 as? i64
+@@ -150,6 +151,7 @@ void reload_and_gc() {
+ int main() {
+     try {
+         malformed();
++        storage_audit();
+         literal_source_types();
+         reload_and_gc();
+         std::cout<<"numeric enum IR rejection, normal/O2 GC and reload passed\n";

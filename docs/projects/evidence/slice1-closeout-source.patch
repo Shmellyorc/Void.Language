@@ -1,0 +1,485 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -323,6 +323,10 @@
+ add_custom_target(voidup ALL DEPENDS "${voidup_application}")
+ include(CTest)
+ if(BUILD_TESTING)
++  add_executable(void_project_header tests/project/header.cpp)
++  target_link_libraries(void_project_header PRIVATE void_options)
++  set_target_properties(void_project_header PROPERTIES DISABLE_PRECOMPILE_HEADERS ON UNITY_BUILD OFF)
++  add_test(NAME project_manifest_header COMMAND void_project_header)
+   add_executable(void_project_manifest tests/project/manifest.cpp)
+   target_link_libraries(void_project_manifest PRIVATE void_core)
+   add_test(NAME project_manifest COMMAND void_project_manifest)
+diff --git a/cmake/InstallLicenses.cmake b/cmake/InstallLicenses.cmake
+--- a/cmake/InstallLicenses.cmake
++++ b/cmake/InstallLicenses.cmake
+@@ -17,6 +17,9 @@
+     "${root}/third_party/tomlplusplus/upstream.json"
+     "${root}/third_party/tomlplusplus/void-bounds-and-locations.patch"
+     DESTINATION share/void/licenses/tomlplusplus COMPONENT ${component})
++  install(FILES "${root}/third_party/tomlplusplus/toml.hpp"
++    "${root}/third_party/tomlplusplus/README.md"
++    DESTINATION share/void/licenses/tomlplusplus/corresponding-source COMPONENT ${component})
+   # LLVM may use zlib independently of the compiler's HTTP dependency closure.
+   install(FILES "${root}/third_party/http-licenses/zlib-1.3.2/LICENSE"
+     DESTINATION share/void/licenses/zlib-1.3.2 COMPONENT ${component})
+diff --git a/docs/DECISIONS.md b/docs/DECISIONS.md
+--- a/docs/DECISIONS.md
++++ b/docs/DECISIONS.md
+@@ -1,4 +1,24 @@
+ # Architectural decisions
++
++## 8 November 2026 — continuous local project roadmap; integrated hosted gate
++
++Boss authorizes local engineering through projects, application metadata,
++creation, numeric enums, general C FFI, dependency resolution, raylib and editor
++support, with Golden Wrench's independent review at each architectural boundary.
++Resolve material open decisions before dependent implementation. Slice 1's
++[closeout](projects/SLICE1_CLOSEOUT.md) preserves the original implementation and
++failure evidence; later slices remain unimplemented at that handoff.
++
++No hosted CI until the full project/raylib milestone is ready. The single final
++seven-job acceptance gate requires a real dynamically linked raylib VOID app via
++general C FFI, exercised ABI/window/render/input/shutdown and lifetime/error paths,
++normal/O2 JIT and independent AOT where supported, manifest/app metadata, VS Code
++recognition/run, and installed execution without the checkout. Optional static
++linkage is separately qualified by mode. Local Release/Debug/fatal sanitizer and
++available native Windows results retain exact inventories and platform limits.
++Boss retains Git, hosted dispatch and publication authority. The
++[central roadmap](PROJECT_ARCHITECTURE_ROADMAP.md#continuing-local-authorization-and-final-hosted-gate-8-november-2026)
++records the gate and supersedes older per-phase hosted/HOLD wording within scope.
+ 
+ ## 28 October 2026 — complete LLVM 23.1.4 migration authorized
+ 
+diff --git a/docs/PROJECT_ARCHITECTURE_ROADMAP.md b/docs/PROJECT_ARCHITECTURE_ROADMAP.md
+--- a/docs/PROJECT_ARCHITECTURE_ROADMAP.md
++++ b/docs/PROJECT_ARCHITECTURE_ROADMAP.md
+@@ -1,4 +1,38 @@
+ # First-class VOID projects and native application roadmap
++
++## Continuing local authorization and final hosted gate, 8 November 2026
++
++Boss authorizes continued local engineering through the approved roadmap, with
++Golden Wrench's independent review at each architectural boundary. Slice 1 closes
++at that boundary; [the closeout record](projects/SLICE1_CLOSEOUT.md) separates its
++new evidence from the original [implementation record](projects/SLICE1.md).
++Later slices remain unimplemented. Material unresolved schema, ABI, resolver or
++language decisions require Boss/Golden Wrench resolution before dependent work.
++Existing compiler, Runtime, VFS and editor ownership and language compatibility
++remain the implementation constraints.
++
++**No hosted CI is authorized before the complete project/raylib milestone.**
++The final seven-job matrix below is one integrated acceptance gate, after all
++approved features and a real VOID application are ready. It is not a per-slice
++hosted gate. Local Release, Debug and fatal sanitizer tests, available native
++Windows tests, negative security/ownership tests and exact source/evidence
++inventories accompany each slice. Missing native execution remains UNQUALIFIED.
++Boss retains staging, commits, pushes, hosted dispatch and publication authority.
++
++Before requesting that final hosted gate, demonstrate the application calling
++raylib through general C FFI with dynamic native linkage on supported platforms;
++ABI-compatible structs, functions and constants; actual window creation,
++rendering, input and shutdown; normal/O2 JIT and independent AOT where supported;
++correct exercised callback/native-resource lifetimes; missing/wrong-library
++rejection; manifest/application metadata integration; VS Code recognition and run
++workflows; and installed application execution without the source checkout.
++Static linkage remains optional and explicitly qualified by execution mode, or
++identified as unsupported; it cannot substitute for dynamic linkage.
++
++This authorization supersedes earlier HOLD/no-continuation language only within
++the approved roadmap and review boundaries. It changes no dependency pin,
++sanitizer, ACL, native admission, package verification or CI workflow. No binary
++publication is authorized.
+ 
+ ## Current Slice 1 implementation, 8 November 2026
+ 
+@@ -22,7 +56,7 @@
+ provider receipts, native linkage and outputs are unchanged. S2–S6, init/new, prompts,
+ enums, FFI/raylib and dependency resolution remain deferred and unimplemented.
+ Older HOLD/design-only statements below describe the original architecture
+-assignment; Slice 1 authorization supersedes them only for this bounded foundation.
++assignment; the continuing local authorization above now governs engineering.
+ 
+ 8 November 2026. Documentation and architecture planning only, prepared by
+ Keyboard Clanker for Golden Wrench's independent review. Inspected baseline:
+@@ -1012,7 +1046,8 @@
+ 
+ ## Recommended implementation order and acceptance gates
+ 
+-These are minimal **future implementation slices**, not permission to start them.
++These are minimal implementation slices under the continuing local authorization
++and independent review boundaries above.
+ Keep Phase 1 application-project work separate from later native/package features.
+ 
+ | Slice | Deliverable and dependency | Acceptance gate |
+@@ -1022,7 +1057,7 @@
+ | S3 | CLI and ToolingSession/voidls project inputs/protocol | S2; P26–P28, P40–P41, disk/overlay parity, error-bearing sessions, legacy protocol unchanged and stale-result rejection. |
+ | S4 | IR metadata, JIT/AOT/bootstrap Runtime admission and four closed OS adapters | S1–S3; P29–P35, exact unchanged explicit-ID behavior, normal/O2 JIT and independent AOT, GC/cache/reload, no-source installed execution. |
+ | S5 | Exclusive init/new and VS Code first-file workflow | S1/S3, completed S4 for end-to-end app identity; P36–P40 including actual editor accept/decline/dismiss/concurrency and standalone recovery. |
+-| S6 | Integrated project qualification and canonical user documentation | S1–S5; all applicable P01–P42 plus unchanged full suites and seven native jobs, fatal sanitizers, honest platform evidence. Stop for independent review/Boss-controlled integration. |
++| S6 | Integrated project qualification and canonical user documentation | S1–S5; all applicable P01–P42, relevant local suites, fatal sanitizers and honest native evidence. Stop for independent review. Hosted jobs wait for the full project/raylib gate above. |
+ 
+ S1 parsing helpers may be prepared independently of Runtime work only after scope
+ approval. Do not mask a missing library-analysis path, OS adapter or native platform
+@@ -1036,7 +1071,9 @@
+ platform packaging, onboarding and public distribution. Retain verified native
+ artifacts/ABI probes, callback-generation/library lifetime, real window lifecycle,
+ missing/wrong-library diagnostics and installed no-checkout native acceptance as
+-those later gates. None is implemented or authorized in Phase 1.
++those later gates. None is implemented in Phase 1; later local engineering follows
++the continuing authorization, unresolved-decision checks and independent review
++boundaries above.
+ 
+ ## Unresolved design questions for independent review
+ 
+diff --git a/docs/release/NOTICE_INVENTORY.json b/docs/release/NOTICE_INVENTORY.json
+--- a/docs/release/NOTICE_INVENTORY.json
++++ b/docs/release/NOTICE_INVENTORY.json
+@@ -389,7 +389,7 @@
+       ],
+       "platform": "all",
+       "license": "component index and unresolved obligations",
+-      "sha256": "63a9a55a90f6021abd0e8948f16a5481a1e0ce8486fedd043a3ac3b014f1d39c",
++      "sha256": "a20d087b2ebd7e9f88786c256ad53c6ac62b18c4468734b2d81325a83a044fa1",
+       "sources": []
+     },
+     {
+@@ -471,6 +471,76 @@
+         }
+       ],
+       "qualification": "Pinned-source notices installed on Linux, Windows and macOS; Windows/macOS native provider qualification remains pending."
++    },
++    {
++      "repository_path": "third_party/tomlplusplus/LICENSE",
++      "installed_path": "share/void/licenses/tomlplusplus/LICENSE",
++      "components": [
++        "compiler",
++        "tooling"
++      ],
++      "platform": "all",
++      "license": "MIT",
++      "sha256": "529bc3900a9571e49db285b0df432397e70b881cc3bf48de6667ae74ff4b06d8",
++      "provenance": "third_party/tomlplusplus/upstream.json",
++      "sources": [
++        {
++          "url": "https://raw.githubusercontent.com/marzer/tomlplusplus/30172438cee64926dc41fdd9c11fb3ba5b2ba9de/LICENSE",
++          "source_sha256": "529bc3900a9571e49db285b0df432397e70b881cc3bf48de6667ae74ff4b06d8",
++          "byte_start": 0,
++          "byte_end_exclusive": 1094,
++          "text_sha256": "529bc3900a9571e49db285b0df432397e70b881cc3bf48de6667ae74ff4b06d8",
++          "extraction": "whole-file"
++        }
++      ]
++    },
++    {
++      "repository_path": "third_party/tomlplusplus/upstream.json",
++      "installed_path": "share/void/licenses/tomlplusplus/upstream.json",
++      "components": [
++        "compiler",
++        "tooling"
++      ],
++      "platform": "all",
++      "license": "MIT",
++      "sha256": "98e2bf14bd9c8765aae02725a494affa31585ecb352e494d88f5eaccb806adfc",
++      "provenance": "third_party/tomlplusplus/upstream.json"
++    },
++    {
++      "repository_path": "third_party/tomlplusplus/void-bounds-and-locations.patch",
++      "installed_path": "share/void/licenses/tomlplusplus/void-bounds-and-locations.patch",
++      "components": [
++        "compiler",
++        "tooling"
++      ],
++      "platform": "all",
++      "license": "MIT",
++      "sha256": "d131e7ff7daa6373904406403b8f23def1b0dc02127de8230c1a09cdace3330f",
++      "provenance": "third_party/tomlplusplus/upstream.json"
++    },
++    {
++      "repository_path": "third_party/tomlplusplus/toml.hpp",
++      "installed_path": "share/void/licenses/tomlplusplus/corresponding-source/toml.hpp",
++      "components": [
++        "compiler",
++        "tooling"
++      ],
++      "platform": "all",
++      "license": "MIT",
++      "sha256": "7cd54af1a3497465eb26507f8d8a2ccfe661fccc27dac7a5121b885bee88d5e7",
++      "provenance": "third_party/tomlplusplus/upstream.json"
++    },
++    {
++      "repository_path": "third_party/tomlplusplus/README.md",
++      "installed_path": "share/void/licenses/tomlplusplus/corresponding-source/README.md",
++      "components": [
++        "compiler",
++        "tooling"
++      ],
++      "platform": "all",
++      "license": "MIT",
++      "sha256": "794360d588216c468ce40627042ff4ce0238fb8d72616688f04892f861765c7c",
++      "provenance": "third_party/tomlplusplus/upstream.json"
+     }
+   ],
+   "retained_entries": [
+diff --git a/docs/release/REDISTRIBUTION_NOTICES.md b/docs/release/REDISTRIBUTION_NOTICES.md
+--- a/docs/release/REDISTRIBUTION_NOTICES.md
++++ b/docs/release/REDISTRIBUTION_NOTICES.md
+@@ -19,6 +19,7 @@
+ | IANA tzdata 2026e | `LICENSE` preserves its public-domain declaration and listed code-file exceptions; `stage10-versions.json` pins the common sources |
+ | Unicode 16.0 runtime data | `UNICODE-LICENSE.txt`; Unicode data copyright © 1991–2024 Unicode, Inc. The installed license text carries its upstream 1991–2026 notice. Full mappings derive from Python Unicode tables and properties from Perl UCD inputs. Python is distributed under the PSF license: https://docs.python.org/3/license.html . Input/output hashes remain in repository `docs/text-encoding/evidence/unicode.json`; additional PSF/Perl-derived material obligations remain under provenance review. |
+ | Compiler curl 8.23.0 | `http/COPYING`, `http/NOTICE`, `http/VOID-PROVENANCE.json`, `http/http-versions.json`; preserve corrections and original curl terms |
++| Compiler/tooling project parser toml++ 3.4.0 | `tomlplusplus/LICENSE` (MIT), `upstream.json` and the complete private `void-bounds-and-locations.patch`; `corresponding-source/toml.hpp` and `README.md` preserve the exact patched source and reconstruction instructions. This does not add a parser or native dependency to generated applications. |
+ | Compiler nghttp2 1.70.0, c-ares 1.34.9, zlib 1.3.2 | Existing license files under their respective `http/` versioned subdirectories (MIT, MIT, Zlib) |
+ | Compiler libpsl 0.21.5 | `http/libpsl-0.21.5/` main MIT texts **and** `LICENSE.chromium` for BSD-licensed Chromium lookup code |
+ | Compiler PSL data | `http/publicsuffix/LICENSE` (MPL-2.0), `public_suffix_list.dat` (covered source) and `UPSTREAM.json`, pinned revision `8437e5262f13305f94087abe699b4fe2be1d1de8`. Recipients can find the covered source in this directory; preserve it and these notices when distributing the covered data/code. |
+diff --git a/include/void/project.hpp b/include/void/project.hpp
+--- a/include/void/project.hpp
++++ b/include/void/project.hpp
+@@ -2,9 +2,13 @@
+ #include "void/diagnostic.hpp"
+ #include <array>
+ #include <compare>
++#include <cstddef>
+ #include <map>
++#include <memory>
+ #include <optional>
++#include <string>
+ #include <string_view>
++#include <vector>
+ 
+ namespace vd::project {
+ inline constexpr std::size_t manifest_byte_limit = 256 * 1024;
+diff --git a/tests/project/header.cpp b/tests/project/header.cpp
+new file mode 100644
+--- /dev/null
++++ b/tests/project/header.cpp
+@@ -0,0 +1,23 @@
++#include "void/project.hpp"
++
++// Deliberately no other includes, PCH, unity build or void_core dependency.
++// Public declarations and inline operations must be usable by a fresh consumer.
++int main() {
++    static_assert(vd::project::manifest_byte_limit == 256 * 1024);
++    vd::project::Identity identity;
++    vd::project::Sources sources;
++    vd::project::ParseResult result;
++    vd::project::Field field{};
++    std::array<vd::project::Profile, 1> profiles{{
++        {vd::project::Optimization::O2, vd::project::DebugInfo::line}
++    }};
++    std::map<std::string, vd::project::Field> fields;
++    fields.emplace("source", field);
++    std::shared_ptr<const vd::project::Manifest> manifest;
++    std::optional<vd::project::SemanticVersion> version{identity.version};
++    std::string_view version_text = version->text();
++    std::vector<std::string> names{identity.name};
++    const std::size_t size = names.size() + fields.size() + profiles.size();
++    return size == 3 && version_text == "0.0.0" && sources.roots.size() == 1 &&
++        !manifest && !result.succeeded() ? 0 : 1;
++}
+diff --git a/tests/project/manifest.cpp b/tests/project/manifest.cpp
+--- a/tests/project/manifest.cpp
++++ b/tests/project/manifest.cpp
+@@ -228,6 +228,154 @@
+     try { (void)parse(std::string("schema = 1\n# ") + char(0xff)); check(false, "invalid UTF-8 accepted"); }
+     catch (const vd::CompilationError& e) { check(e.diagnostics()[0].code == Code::utf8, "UTF-8 shared diagnostic"); }
+ }
++void closeout_malformed_keys() {
++    // Header/key grammar probes are independent of VOID's schema. Some mutations
++    // are legal TOML; they still must be deterministic and never crash/assume.
++    const std::vector<std::string> malformed = {
++        "[=roject]", "[[=roject]]", "[.project]", "[[.project]]", "[project..name]",
++        "[[project..name]]", "[project.]", "[[project.]]", "[project.=]", "[[project.=]]",
++        "[project] extra", "[[project]", "[ [project]]", "[[[project]]]", "[",
++        "[[", "[project", "[project.", "[[project.", "[\"unterminated]",
++        "[['unterminated]]", "[\"bad\\q\"]", "a. = 1", "a..b = 1",
++        "a = { = 1 }", "a = { [ = 1 }", "a = { a..b = 1 }", "a = { a. = 1 }",
++        "[🎮]", "[\xef\xbb\xbfproject]"
++    };
++    for (const auto& text : malformed) {
++        bad(text, Code::project_syntax);
++        bad("\xef\xbb\xbf# 🎮\r\n" + text, Code::project_syntax);
++    }
++    for (unsigned value = 0; value < 128; ++value) {
++        for (const auto& framing : std::vector<std::pair<std::string, std::string>>{
++                {"[", "project]"}, {"[[", "project]]"}, {"[project.", "]"},
++                {"a = { ", "key = 1 }"}}) {
++            auto input = framing.first + char(value) + framing.second;
++            auto a = parse(input), b = parse(input);
++            check(!a.succeeded() && !b.succeeded(), "incomplete schema from key probe");
++            check(a.diagnostics.size() == b.diagnostics.size(), "key-probe diagnostic count");
++            for (std::size_t i = 0; i < a.diagnostics.size(); ++i) {
++                const auto& d = a.diagnostics[i];
++                check(d.primary.begin <= d.primary.end && d.primary.end <= input.size(), "key-probe range");
++                check(vd::render_diagnostic(d) == vd::render_diagnostic(b.diagnostics[i]), "key-probe determinism");
++            }
++        }
++    }
++}
++void closeout_ranges_and_ownership() {
++    auto exact = [](const vd::Diagnostic& d, std::size_t begin, std::size_t end) {
++        check(d.primary.begin == begin && d.primary.end == end, "exact primary half-open range");
++    };
++    auto header = bad("[=roject]", Code::project_syntax);
++    exact(header.diagnostics.at(0), 1, 1);
++    auto prefixed = bad("\xef\xbb\xbf# 🎮\r\n[=roject]", Code::project_syntax);
++    exact(prefixed.diagnostics.at(0), 12, 12);
++    auto position = prefixed.diagnostics[0].primary.source->location(12);
++    check(position.line == 2 && position.column == 2, "BOM/CRLF/astral malformed-header position");
++    auto duplicate = bad("schema = 1\nschema = 1\n", Code::project_duplicate);
++    exact(duplicate.diagnostics[0], 11, 11);
++    auto related = duplicate.diagnostics[0].related.at(0).span;
++    check(related.begin == 0 && related.end == 6, "exact first duplicate key range");
++    auto bom_duplicate = bad("\xef\xbb\xbfschema = 1\r\nschema = 1\r\n", Code::project_duplicate);
++    exact(bom_duplicate.diagnostics[0], 15, 15);
++    check(bom_duplicate.diagnostics[0].related.at(0).span.begin == 3 &&
++        bom_duplicate.diagnostics[0].related.at(0).span.end == 9, "BOM first-key range");
++    auto unknown = bad(replace(application, "schema = 1\n", "schema=1\nbogus=7\n"), Code::project_field);
++    check(unknown.diagnostics.size() == 1, "isolated unknown field");
++    exact(unknown.diagnostics[0], 9, 14);
++    const std::string inline_input = "schema=1\nproject={id='org.a',name='🎮',version='bad',kind='application'}\napplication={id='org.app'}\n";
++    auto version = bad(inline_input, Code::project_version);
++    auto start = inline_input.find("'bad'");
++    exact(version.diagnostics.at(0), start, start + 5);
++    auto missing = bad("schema=1\n[project]\n", Code::project_field);
++    check(missing.diagnostics.size() == 4, "required project fields");
++    for (const auto& d : missing.diagnostics) exact(d, 19, 19);
++    auto quoted = good(replace(application, "version = \"1.2.3-beta.1+build.7\"", "\"ver\\u0073ion\" = \"1.2.3-beta.1+build.7\""));
++    const auto& field = quoted->fields().at("project.version");
++    check(quoted->source().text().substr(field.key.begin, field.key.end-field.key.begin) == "\"ver\\u0073ion\"", "escaped quoted key exact raw span");
++    check(quoted->source().text().substr(field.value.begin, field.value.end-field.value.begin) == "\"1.2.3-beta.1+build.7\"", "quoted value exact raw span");
++    auto multiline = good(replace(application, "name = \"Orbit\"", "name = \"\"\"\nOrbit\"\"\""));
++    const auto& name_span = multiline->fields().at("project.name").value;
++    check(name_span.source->text().substr(name_span.begin, name_span.end-name_span.begin) == "\"\"\"\nOrbit\"\"\"", "multiline exact half-open span");
++
++    std::string original;
++    std::shared_ptr<const Manifest> owned;
++    {
++        std::string bytes = application + "name = '" + std::string(80, 'n') + "'\nversion = '123456789012345678901234567890.2.3-rc.100+build.9'\n[sources]\nroots = ['" + std::string(70, 's') + "']\n";
++        original = bytes;
++        vd::SourceFile source("ephemeral/void.project.toml", bytes);
++        auto parsed = parse_manifest(source);
++        check(parsed.succeeded(), "owned manifest fixture");
++        owned = parsed.manifest;
++        bytes.assign(bytes.size(), '!');
++        source = vd::SourceFile("replacement", "changed");
++        parsed = {};
++    }
++    std::vector<std::string> churn(200, std::string(original.size(), '?'));
++    check(owned->project().id == "org.example.orbit.sources" && owned->application()->name == std::string(80, 'n'), "owned identities after input destruction");
++    check(owned->application()->version.core()[0] == "123456789012345678901234567890" &&
++        owned->application()->version.prerelease() == std::vector<std::string>{"rc", "100"} &&
++        owned->application()->version.build() == std::vector<std::string>{"build", "9"}, "owned version parts after TOML tree destruction");
++    check(owned->sources().roots == std::vector<std::string>{std::string(70, 's')} && owned->source().text() == original, "owned roots and source after input replacement");
++    auto copied_field = owned->fields().at("application.name");
++    std::weak_ptr<const vd::SourceFile> weak = copied_field.value.source;
++    owned.reset();
++    check(!weak.expired() && copied_field.value.source->text() == original, "field independently retains snapshot after manifest destruction");
++    vd::Diagnostic copied_error{Code::project_field};
++    {
++        auto temporary = parse(replace(application, "version = \"1.2.3-beta.1+build.7\"", "version = 'bad'"));
++        check(!temporary.succeeded(), "owned diagnostic fixture");
++        copied_error = temporary.diagnostics.at(0);
++    }
++    check(copied_error.code == Code::project_version && !vd::render_diagnostic(copied_error).empty(), "diagnostic survives result and source destruction");
++    std::string semver_input = "123456789012345678901234567890.2.3-rc.100+build.9";
++    auto semver = parse_version(semver_input);
++    semver_input.assign(semver_input.size(), '!');
++    check(semver && semver->text() == "123456789012345678901234567890.2.3-rc.100+build.9" && semver->build()[1] == "9", "standalone SemVer owns its input");
++}
++void closeout_bounds_and_precedence() {
++    const auto prefix = application + "# 🎮\n";
++    good(prefix + std::string(manifest_byte_limit-prefix.size(), ' '));
++    auto oversized = bad(prefix + std::string(manifest_byte_limit+1-prefix.size(), ' '), Code::limit);
++    check(oversized.diagnostics.size() == 1 && oversized.diagnostics[0].primary.begin == manifest_byte_limit+1 &&
++        oversized.diagnostics[0].primary.end == manifest_byte_limit+1, "oversize EOF diagnostic and no TOML work");
++    for (std::size_t count : {32u, 33u, 256u, 257u}) {
++        bool roots = count < 100;
++        std::string paths = application + "[sources]\n" + (roots ? "roots" : "exclude") + " = [";
++        for (std::size_t i = 0; i < count; ++i) paths += (i ? "," : "") + std::string("'source") + std::to_string(i) + "'";
++        paths += "]\n";
++        if (count == 32 || count == 256) good(paths); else bad(paths, Code::limit);
++    }
++    for (std::size_t count : {128u, 129u}) {
++        auto bytes = application;
++        for (std::size_t i = 0; i < count; ++i) bytes += "unknown" + std::to_string(i) + "=0\n";
++        auto parsed = bad(bytes, count == 128 ? Code::project_field : Code::limit);
++        check(parsed.diagnostics.size() == count, "diagnostic cap edge");
++        check((parsed.diagnostics.back().code == Code::limit) == (count > 128), "overflow notice only beyond cap");
++    }
++    check(parse_version("0.0.0-" + std::string(249, 'a')).has_value() &&
++        !parse_version("0.0.0-" + std::string(250, 'a')), "prerelease byte-cap edge");
++    check(parse_version("0.0.0+" + std::string(249, '0')).has_value() &&
++        !parse_version("0.0.0+" + std::string(250, '0')), "build byte-cap edge, leading zero allowed");
++    std::string emoji;
++    for (unsigned i = 0; i < 128; ++i) emoji += "🎮";
++    good(replace(application, "name = \"Orbit\"", "name = " + quote(emoji)));
++    bad(replace(application, "name = \"Orbit\"", "name = " + quote(emoji + "🎮")), Code::project_identity);
++    const std::vector<std::string> ordered = {"1.0.0-0", "1.0.0-1", "1.0.0-9999999999999999999999999",
++        "1.0.0--", "1.0.0-A", "1.0.0-Z", "1.0.0-a", "1.0.0-a.0", "1.0.0-a.1", "1.0.0-a.A",
++        "1.0.0-a.a", "1.0.0-alpha", "1.0.0-alpha.1", "1.0.0-alpha.beta", "1.0.0-beta", "1.0.0-beta.2",
++        "1.0.0-beta.11", "1.0.0-rc.1", "1.0.0", "2.0.0", "999999999999999999999999999999999999.0.0"};
++    std::vector<SemanticVersion> parsed;
++    for (const auto& value : ordered) { auto v = parse_version(value); check(v.has_value(), "precedence fixture valid"); parsed.push_back(*v); }
++    for (std::size_t i = 0; i < parsed.size(); ++i) for (std::size_t j = 0; j < parsed.size(); ++j) {
++        check(parsed[i].compare_precedence(parsed[j]) == (i <=> j), "independent precedence order");
++        check((parsed[i].compare_precedence(parsed[j]) < 0) == (parsed[j].compare_precedence(parsed[i]) > 0), "precedence antisymmetry");
++    }
++    for (std::size_t i = 0; i+2 < parsed.size(); ++i)
++        check(parsed[i].compare_precedence(parsed[i+1]) < 0 && parsed[i+1].compare_precedence(parsed[i+2]) < 0 &&
++            parsed[i].compare_precedence(parsed[i+2]) < 0, "precedence transitivity");
++    auto plain = parse_version("1.0.0-rc.2"), one = parse_version("1.0.0-rc.2+001"), two = parse_version("1.0.0-rc.2+ABC");
++    check(plain->compare_precedence(*one) == 0 && one->compare_precedence(*two) == 0 &&
++        !(*plain == *one) && !(*one == *two), "build metadata equivalence versus exact identity");
++}
+ void mutations() {
+     // Deterministic edits to independent TOML text exercise poison/range handling.
+     // Success is allowed; a failed result must never contain validated metadata.
+@@ -341,7 +489,7 @@
+ #else
+         check(!sandbox, "syscall sandbox is Linux-only");
+ #endif
+-        versions(); identities(); schema(); syntax_and_spans(); limits_and_authority(); mutations();
++        versions(); identities(); schema(); syntax_and_spans(); limits_and_authority(); mutations(); closeout_malformed_keys(); closeout_ranges_and_ownership(); closeout_bounds_and_precedence();
+         std::cout << "project_manifest: " << checks << " checks passed" << (sandbox ? " under syscall denial" : "") << '\n';
+         if (sandbox) {
+             std::cout.flush();
+diff --git a/tests/project/provenance.py b/tests/project/provenance.py
+--- a/tests/project/provenance.py
++++ b/tests/project/provenance.py
+@@ -5,14 +5,18 @@
+ import re
+ import sys
+ 
+-root = Path(sys.argv[1]) / "third_party" / "tomlplusplus"
++installed = sys.argv[1] == "--installed"
++root = Path(sys.argv[2]) if installed else Path(sys.argv[1]) / "third_party" / "tomlplusplus"
++source = root / "corresponding-source" if installed else root
+ receipt = json.loads((root / "upstream.json").read_text())
+ assert receipt["commit"] == "30172438cee64926dc41fdd9c11fb3ba5b2ba9de"
+ assert receipt["tag"] == "v3.4.0"
+ for name, field in (("toml.hpp", "header_sha256"), ("LICENSE", "license_sha256"),
+                     ("void-bounds-and-locations.patch", "patch_sha256")):
+-    assert hashlib.sha256((root / name).read_bytes()).hexdigest() == receipt[field], name
+-current = (root / "toml.hpp").read_text().splitlines(keepends=True)
++    base = source if name == "toml.hpp" else root
++    assert hashlib.sha256((base / name).read_bytes()).hexdigest() == receipt[field], name
++assert "TOML parser" in (source / "README.md").read_text()
++current = (source / "toml.hpp").read_text().splitlines(keepends=True)
+ patch = (root / "void-bounds-and-locations.patch").read_text().splitlines(keepends=True)
+ original = []
+ cursor = 0
+diff --git a/third_party/tomlplusplus/README.md b/third_party/tomlplusplus/README.md
+--- a/third_party/tomlplusplus/README.md
++++ b/third_party/tomlplusplus/README.md
+@@ -23,4 +23,7 @@
+ to reconstruct the exact upstream bytes, without network access. This establishes
+ source consistency, not publisher authentication. Both installed compiler/tooling
+ components retain the MIT license, provenance and patch in
+-`share/void/licenses/tomlplusplus`.
++`share/void/licenses/tomlplusplus`, and the exact patched header and this record
++in its `corresponding-source` directory. Run the same verifier with
++`--installed <prefix>/share/void/licenses/tomlplusplus` to check an installed copy
++and reconstruct the pinned upstream source from that copy without a checkout.

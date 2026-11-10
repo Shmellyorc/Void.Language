@@ -1,0 +1,5 @@
++ set -x
++ /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc check /home/shmellyorc/Documents/Void.Language/build/slice6/managed-default.void
+Source checked successfully
++ /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc run --no-opt /home/shmellyorc/Documents/Void.Language/build/slice6/managed-default.void
++ /home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc run /home/shmellyorc/Documents/Void.Language/build/slice6/managed-default.void

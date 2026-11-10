@@ -1,0 +1,80 @@
+3 2: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+integer null: C primitive descriptor line 10: unsupported or contradictory native resource contract
+pointer minus-one: C primitive descriptor line 10: unsupported or contradictory native resource contract
+shutdown-owner: C primitive descriptor line 10: unsupported or contradictory native resource contract
+retry-on-error: C primitive descriptor line 10: unsupported or contradictory native resource contract
+create missing owner: C primitive descriptor line 14: invalid native borrow or terminal release signature
+bind close_box g3_close i32 mut:box: C primitive descriptor line 15: missing exact native acquire or release contract
+i64 close:box: C primitive descriptor line 14: invalid native borrow or terminal release signature
+i32 close:box i32: C primitive descriptor line 14: invalid native borrow or terminal release signature
+i32 borrow:other i32: C primitive descriptor line 12: resource operation requires an earlier admitted identity
+i32 borrow:box mut:box: C primitive descriptor line 12: invalid native borrow or terminal release signature
+owner:box borrow:box i32: C primitive descriptor line 12: invalid native ownership transfer or mixed ABI
+vectorcall: C primitive descriptor line 8: unsupported descriptor, ABI revision or effects
+retains-owner no-callbacks: C primitive descriptor line 7: unsupported descriptor, ABI revision or effects
+org.voidlang.other: C primitive provider rejected the exact descriptor or fixture identity
+absent admission: VOID IR: invalid native resource identity
+wrong provider: VOID IR: invalid C primitive descriptor or exact call signature
+wrong release ordinal: VOID IR: invalid C primitive descriptor or exact call signature
+forged ownership movement: VOID IR: invalid C primitive descriptor or exact call signature
+forged convention operand: VOID IR: invalid C primitive descriptor or exact call signature
+scope bypass: VOID IR: C primitive binding requires the admitted direct import
+raw bridge escape: VOID IR: C primitive transport requires host admission and typed operations
+worker resource access: VOID IR: C primitive graphs require synchronous execution
+borrow as escaping callable: VOID IR: C primitive binding is direct-call only
+wrapper control flow bypass: VOID IR: invalid admitted C primitive wrapper
+fabricated second owning wrapper: VOID IR: forged native resource
+integer-to-resource cast: VOID IR: invalid conversion
+uninitialized handle: VOID IR: read of uninitialized C binding carrier storage in /resources.void::entry
+eager global acquisition: VOID IR: C primitive operation during global startup
+duplicate native owner, foreign provider/Runtime and stale alias rejected
+borrow vs wrong-thread close and shutdown passed
+creation-publication race passed
+terminal provider error reported on shutdown after release
+direct typed IR stale alias: <host binding /native_resources.void>:6:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::read
+Called from /resources.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:5:6: source call
+
+closed alias: <host binding /native_resources.void>:6:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::read
+Called from /resources.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:29:20: source call
+        return ffi.read(alias, 0)
+                   ^
+
+double close: <host binding /native_resources.void>:10:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::close_box
+Called from /resources.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:31:20: source call
+        return ffi.close_box(alias)
+                   ^
+
+null acquisition: C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:14:40: runtime error: Null managed reference in checked conversion
+        return ffi.read(ffi.create(-1) as ffi.box, 0)
+                                       ^
+In function /resources.void::entry
+
+compatible body reload retained the owner and generation; changed thunk rejected
+G3 JIT normal returned 104
+closed alias: <host binding /native_resources.void>:6:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::read
+Called from /resources.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:29:20: source call
+        return ffi.read(alias, 0)
+                   ^
+
+double close: <host binding /native_resources.void>:10:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::close_box
+Called from /resources.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:31:20: source call
+        return ffi.close_box(alias)
+                   ^
+
+null acquisition: C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:14:40: runtime error: Null managed reference in checked conversion
+        return ffi.read(ffi.create(-1) as ffi.box, 0)
+                                       ^
+In function /resources.void::entry
+
+compatible body reload retained the owner and generation; changed thunk rejected
+G3 JIT O2 returned 104

@@ -1,0 +1,23 @@
+{
+  "removed": [
+    {
+      "path": "/tmp/tmp.SQN0tAdqq3",
+      "regular_file_count": 3,
+      "bytes": 2417797,
+      "active_files_observed": false,
+      "exploratory_executable_sha256": "bed70d47f9f0621ba3f357fc5d2eda216909c4782717ef60d99fba950e96253b"
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice4/s3-stdlib",
+      "regular_file_count": 26,
+      "bytes": 494945,
+      "active_files_observed": false
+    },
+    {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/slice4/library-repro",
+      "regular_file_count": 2,
+      "bytes": 208,
+      "active_files_observed": false
+    }
+  ]
+}

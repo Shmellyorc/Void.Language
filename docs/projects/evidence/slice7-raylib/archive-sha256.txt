@@ -1,0 +1,3 @@
+b64ba618a19e7da9e9c0e09bb398ecfd477a77d2d7231901bafc8739d27c08d2  raylib-6.0_linux_amd64.tar.gz
+c93c7dc74576e00e3ee57fa2bd5fd109fbfc5aca87e12046dd7ec2c2268b3f78  raylib-6.0_win64_msvc16.zip
+2b3ee1e2120c7a0796b33062c7e9a694dd8a8caa56a96319ac8c8ecf54a90d0b  raylib-6.0-source.tar.gz

@@ -1,0 +1,120 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-strict
+      Start 179: os_stack
+      Start 178: os_execution
+ 1/36 Test #178: os_execution .....................   Passed  119.32 sec
+      Start 190: os_frontend_stack
+ 2/36 Test #179: os_stack .........................   Passed  123.31 sec
+      Start 182: os_host
+ 3/36 Test #182: os_host ..........................   Passed   42.03 sec
+      Start 187: os_owner
+ 4/36 Test #190: os_frontend_stack ................   Passed   61.99 sec
+      Start 191: os_host_stack
+ 5/36 Test #187: os_owner .........................   Passed   42.01 sec
+      Start 186: os_cache
+ 6/36 Test #191: os_host_stack ....................   Passed   42.57 sec
+      Start 180: os_edges
+ 7/36 Test #186: os_cache .........................   Passed   21.06 sec
+      Start 181: os_edges_stack
+ 8/36 Test #180: os_edges .........................   Passed   23.63 sec
+      Start 188: os_examples
+ 9/36 Test #181: os_edges_stack ...................   Passed   22.77 sec
+      Start  12: project_discovery_cli
+10/36 Test #188: os_examples ......................   Passed   19.43 sec
+      Start 264: stage6_integrated
+11/36 Test  #12: project_discovery_cli ............   Passed   20.49 sec
+      Start 263: native_source
+12/36 Test #264: stage6_integrated ................   Passed   10.17 sec
+      Start  13: project_profiles
+13/36 Test #263: native_source ....................   Passed    6.87 sec
+      Start   8: project_selection
+14/36 Test  #13: project_profiles .................   Passed    4.80 sec
+      Start 184: os_frontend
+15/36 Test   #8: project_selection ................   Passed   10.18 sec
+      Start  80: gc_buffers
+16/36 Test  #80: gc_buffers .......................   Passed    4.45 sec
+      Start 183: os_errors
+17/36 Test #183: os_errors ........................   Passed   26.71 sec
+      Start   9: project_sessions
+18/36 Test   #9: project_sessions .................   Passed    2.02 sec
+      Start 388: stage11_globals_aot
+19/36 Test #388: stage11_globals_aot ..............   Passed   13.87 sec
+      Start  14: project_protocol
+20/36 Test  #14: project_protocol .................   Passed    2.40 sec
+      Start  15: project_nested_cli
+21/36 Test  #15: project_nested_cli ...............   Passed    2.12 sec
+      Start 155: lsp_stage8
+22/36 Test #155: lsp_stage8 .......................   Passed    2.64 sec
+      Start 153: lsp_protocol
+23/36 Test #153: lsp_protocol .....................   Passed    1.54 sec
+      Start 185: lsp_os
+24/36 Test #184: os_frontend ......................   Passed   68.08 sec
+      Start   6: project_manifest_legacy
+25/36 Test #185: lsp_os ...........................   Passed    8.38 sec
+      Start 234: stage11_globals
+26/36 Test #234: stage11_globals ..................   Passed    2.60 sec
+      Start 387: stage11_globals_stack
+27/36 Test   #6: project_manifest_legacy ..........   Passed    6.87 sec
+      Start  81: gc_schemas
+28/36 Test #387: stage11_globals_stack ............   Passed    1.55 sec
+      Start 370: sessions
+29/36 Test  #81: gc_schemas .......................   Passed    0.33 sec
+      Start   5: project_manifest_no_authority
+30/36 Test #370: sessions .........................   Passed    0.50 sec
+      Start   2: project_manifest
+31/36 Test   #5: project_manifest_no_authority ....   Passed    0.33 sec
+      Start   7: project_manifest_provenance
+32/36 Test   #7: project_manifest_provenance ......   Passed    0.04 sec
+      Start   1: project_manifest_header
+33/36 Test   #1: project_manifest_header ..........   Passed    0.02 sec
+      Start  10: project_application
+34/36 Test   #2: project_manifest .................   Passed    0.22 sec
+      Start  11: project_application_process
+35/36 Test  #10: project_application ..............***Failed    1.23 sec
+=================================================================
+==620857==ERROR: AddressSanitizer: alloc-dealloc-mismatch (operator new vs free) on 0x7b9c40bedfa0
+    #0 0x55eb82828276 in free /home/runner/work/llvm-project/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:51:3
+    #1 0x55eb83d439c6 in void std::__detail::__return_temporary_buffer<vd::(anonymous namespace)::Structure*>(vd::(anonymous namespace)::Structure**, unsigned long) /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_tempbuf.h:118:2
+    #2 0x55eb83d439c6 in std::_Temporary_buffer<__gnu_cxx::__normal_iterator<vd::(anonymous namespace)::Structure**, std::vector<vd::(anonymous namespace)::Structure*, std::allocator<vd::(anonymous namespace)::Structure*>>>, vd::(anonymous namespace)::Structure*>::_Impl::~_Impl() /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_tempbuf.h:215:4
+    #3 0x55eb83d439c6 in std::_Temporary_buffer<__gnu_cxx::__normal_iterator<vd::(anonymous namespace)::Structure**, std::vector<vd::(anonymous namespace)::Structure*, std::allocator<vd::(anonymous namespace)::Structure*>>>, vd::(anonymous namespace)::Structure*>::~_Temporary_buffer() /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_tempbuf.h:249:79
+    #4 0x55eb83d439c6 in void std::__stable_sort<__gnu_cxx::__normal_iterator<vd::(anonymous namespace)::Structure**, std::vector<vd::(anonymous namespace)::Structure*, std::allocator<vd::(anonymous namespace)::Structure*>>>, vd::(anonymous namespace)::validate_inheritance(std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>>>>&, vd::(anonymous namespace)::Unit&, vd::(anonymous namespace)::Diagnostics&)::$_1>(__gnu_cxx::__normal_iterator<vd::(anonymous namespace)::Structure**, std::vector<vd::(anonymous namespace)::Structure*, std::allocator<vd::(anonymous namespace)::Structure*>>>, __gnu_cxx::__normal_iterator<vd::(anonymous namespace)::Structure**, std::vector<vd::(anonymous namespace)::Structure*, std::allocator<vd::(anonymous namespace)::Structure*>>>, vd::(anonymous namespace)::validate_inheritance(std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>>>>&, vd::(anonymous namespace)::Unit&, vd::(anonymous namespace)::Diagnostics&)::$_1) /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_algo.h:5012:5
+    #5 0x55eb83d439c6 in void std::stable_sort<__gnu_cxx::__normal_iterator<vd::(anonymous namespace)::Structure**, std::vector<vd::(anonymous namespace)::Structure*, std::allocator<vd::(anonymous namespace)::Structure*>>>, vd::(anonymous namespace)::validate_inheritance(std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>>>>&, vd::(anonymous namespace)::Unit&, vd::(anonymous namespace)::Diagnostics&)::$_1>(__gnu_cxx::__normal_iterator<vd::(anonymous namespace)::Structure**, std::vector<vd::(anonymous namespace)::Structure*, std::allocator<vd::(anonymous namespace)::Structure*>>>, __gnu_cxx::__normal_iterator<vd::(anonymous namespace)::Structure**, std::vector<vd::(anonymous namespace)::Structure*, std::allocator<vd::(anonymous namespace)::Structure*>>>, vd::(anonymous namespace)::validate_inheritance(std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>>>>&, vd::(anonymous namespace)::Unit&, vd::(anonymous namespace)::Diagnostics&)::$_1) /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_algo.h:5079:7
+    #6 0x55eb83d439c6 in vd::(anonymous namespace)::validate_inheritance(std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>>>>&, vd::(anonymous namespace)::Unit&, vd::(anonymous namespace)::Diagnostics&) /home/shmellyorc/Documents/Void.Language/src/frontend/inheritance.inc:21:5
+    #7 0x55eb83c5bb22 in vd::(anonymous namespace)::validate_graph(std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>>>>&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const&, vd::(anonymous namespace)::Diagnostics&, vd::(anonymous namespace)::Unit*) /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:5915:5
+    #8 0x55eb83cb45c0 in vd::analyze_manifest_project_impl(std::filesystem::__cxx11::path const&, std::optional<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>> const&, std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::optional<vd::SourceFile>, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const, std::optional<vd::SourceFile>>>> const&, std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::optional<vd::SourceFile>, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const, std::optional<vd::SourceFile>>>> const&, vd::(anonymous namespace)::EditorProbe*) /home/shmellyorc/Documents/Void.Language/src/frontend/project_selection.inc:346:14
+    #9 0x55eb81761768 in (anonymous namespace)::Fixture::analysis() const /home/shmellyorc/Documents/Void.Language/tests/project/application.cpp:123:21
+    #10 0x55eb817597dd in (anonymous namespace)::generation(bool) /home/shmellyorc/Documents/Void.Language/tests/project/application.cpp:145:25
+    #11 0x55eb817569d6 in main /home/shmellyorc/Documents/Void.Language/tests/project/application.cpp:238:41
+    #12 0x7f1c41a2a3fd  (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a3fd) (BuildId: a6ece0eae08c71f58eaefb817ae72b57782127d3)
+    #13 0x7f1c41a2a51a in __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a51a) (BuildId: a6ece0eae08c71f58eaefb817ae72b57782127d3)
+    #14 0x55eb8277aa24 in _start (/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_project_application+0x2ccca24)
+
+0x7b9c40bedfa0 is located 0 bytes inside of 96-byte region [0x7b9c40bedfa0,0x7b9c40bee000)
+allocated by thread T0 here:
+    #0 0x55eb81a5b85d in operator new(unsigned long, std::nothrow_t const&) /home/runner/work/llvm-project/llvm-project/compiler-rt/lib/asan/asan_new_delete.cpp:114:3
+    #1 0x55eb83d43858 in vd::(anonymous namespace)::Structure** std::__detail::__get_temporary_buffer<vd::(anonymous namespace)::Structure*>(long) /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_tempbuf.h:94:16
+    #2 0x55eb83d43858 in std::pair<vd::(anonymous namespace)::Structure**, long> std::get_temporary_buffer<vd::(anonymous namespace)::Structure*>(long) /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_tempbuf.h:152:21
+    #3 0x55eb83d43858 in std::_Temporary_buffer<__gnu_cxx::__normal_iterator<vd::(anonymous namespace)::Structure**, std::vector<vd::(anonymous namespace)::Structure*, std::allocator<vd::(anonymous namespace)::Structure*>>>, vd::(anonymous namespace)::Structure*>::_Impl::_Impl(long) /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_tempbuf.h:208:6
+    #4 0x55eb83d43858 in std::_Temporary_buffer<__gnu_cxx::__normal_iterator<vd::(anonymous namespace)::Structure**, std::vector<vd::(anonymous namespace)::Structure*, std::allocator<vd::(anonymous namespace)::Structure*>>>, vd::(anonymous namespace)::Structure*>::_Temporary_buffer(__gnu_cxx::__normal_iterator<vd::(anonymous namespace)::Structure**, std::vector<vd::(anonymous namespace)::Structure*, std::allocator<vd::(anonymous namespace)::Structure*>>>, long) /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_tempbuf.h:323:40
+    #5 0x55eb83d43858 in void std::__stable_sort<__gnu_cxx::__normal_iterator<vd::(anonymous namespace)::Structure**, std::vector<vd::(anonymous namespace)::Structure*, std::allocator<vd::(anonymous namespace)::Structure*>>>, vd::(anonymous namespace)::validate_inheritance(std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>>>>&, vd::(anonymous namespace)::Unit&, vd::(anonymous namespace)::Diagnostics&)::$_1>(__gnu_cxx::__normal_iterator<vd::(anonymous namespace)::Structure**, std::vector<vd::(anonymous namespace)::Structure*, std::allocator<vd::(anonymous namespace)::Structure*>>>, __gnu_cxx::__normal_iterator<vd::(anonymous namespace)::Structure**, std::vector<vd::(anonymous namespace)::Structure*, std::allocator<vd::(anonymous namespace)::Structure*>>>, vd::(anonymous namespace)::validate_inheritance(std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>>>>&, vd::(anonymous namespace)::Unit&, vd::(anonymous namespace)::Diagnostics&)::$_1) /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_algo.h:4998:15
+    #6 0x55eb83d43858 in void std::stable_sort<__gnu_cxx::__normal_iterator<vd::(anonymous namespace)::Structure**, std::vector<vd::(anonymous namespace)::Structure*, std::allocator<vd::(anonymous namespace)::Structure*>>>, vd::(anonymous namespace)::validate_inheritance(std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>>>>&, vd::(anonymous namespace)::Unit&, vd::(anonymous namespace)::Diagnostics&)::$_1>(__gnu_cxx::__normal_iterator<vd::(anonymous namespace)::Structure**, std::vector<vd::(anonymous namespace)::Structure*, std::allocator<vd::(anonymous namespace)::Structure*>>>, __gnu_cxx::__normal_iterator<vd::(anonymous namespace)::Structure**, std::vector<vd::(anonymous namespace)::Structure*, std::allocator<vd::(anonymous namespace)::Structure*>>>, vd::(anonymous namespace)::validate_inheritance(std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>>>>&, vd::(anonymous namespace)::Unit&, vd::(anonymous namespace)::Diagnostics&)::$_1) /usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/bits/stl_algo.h:5079:7
+    #7 0x55eb83d43858 in vd::(anonymous namespace)::validate_inheritance(std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>>>>&, vd::(anonymous namespace)::Unit&, vd::(anonymous namespace)::Diagnostics&) /home/shmellyorc/Documents/Void.Language/src/frontend/inheritance.inc:21:5
+    #8 0x55eb83c5bb22 in vd::(anonymous namespace)::validate_graph(std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>>>>&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const&, vd::(anonymous namespace)::Diagnostics&, vd::(anonymous namespace)::Unit*) /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:5915:5
+    #9 0x55eb83cb45c0 in vd::analyze_manifest_project_impl(std::filesystem::__cxx11::path const&, std::optional<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>> const&, std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::optional<vd::SourceFile>, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const, std::optional<vd::SourceFile>>>> const&, std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::optional<vd::SourceFile>, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const, std::optional<vd::SourceFile>>>> const&, vd::(anonymous namespace)::EditorProbe*) /home/shmellyorc/Documents/Void.Language/src/frontend/project_selection.inc:346:14
+    #10 0x55eb81761768 in (anonymous namespace)::Fixture::analysis() const /home/shmellyorc/Documents/Void.Language/tests/project/application.cpp:123:21
+    #11 0x55eb817597dd in (anonymous namespace)::generation(bool) /home/shmellyorc/Documents/Void.Language/tests/project/application.cpp:145:25
+    #12 0x55eb817569d6 in main /home/shmellyorc/Documents/Void.Language/tests/project/application.cpp:238:41
+    #13 0x7f1c41a2a3fd  (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a3fd) (BuildId: a6ece0eae08c71f58eaefb817ae72b57782127d3)
+
+SUMMARY: AddressSanitizer: alloc-dealloc-mismatch /home/shmellyorc/Documents/Void.Language/src/frontend/inheritance.inc:21:5 in vd::(anonymous namespace)::validate_inheritance(std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const, std::unique_ptr<vd::(anonymous namespace)::Unit, std::default_delete<vd::(anonymous namespace)::Unit>>>>>&, vd::(anonymous namespace)::Unit&, vd::(anonymous namespace)::Diagnostics&)
+==620857==HINT: if you don't care about these errors you may set ASAN_OPTIONS=alloc_dealloc_mismatch=0
+==620857==ABORTING
+
+36/36 Test  #11: project_application_process ......   Passed   51.23 sec
+
+97% tests passed, 1 tests failed out of 36
+
+Total Test time (real) = 408.95 sec
+
+The following tests FAILED:
+	 10 - project_application (Failed)
+Errors while running CTest

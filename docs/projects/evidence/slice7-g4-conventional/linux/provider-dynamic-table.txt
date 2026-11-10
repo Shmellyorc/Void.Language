@@ -1,0 +1,36 @@
+
+File: /home/shmellyorc/Documents/Void.Language/build/slice7-g4-conventional/release-final-artifacts/VOID G4 q1jjks6g/relocated optimized 雪/native/libvoid_g4_conventional_provider.so
+Format: elf64-x86-64
+Arch: x86_64
+AddressSize: 64bit
+LoadName: libvoid_g4_conventional_provider.so
+DynamicSection [ (27 entries)
+  Tag                Type         Name/Value
+  0x000000000000001D RUNPATH      Library runpath: [$ORIGIN]
+  0x0000000000000001 NEEDED       Shared library: [libvoid_g4_conventional_dependency.so]
+  0x0000000000000001 NEEDED       Shared library: [libc.so.6]
+  0x000000000000000E SONAME       Library soname: [libvoid_g4_conventional_provider.so]
+  0x0000000000000007 RELA         0x7B0
+  0x0000000000000008 RELASZ       168 (bytes)
+  0x0000000000000009 RELAENT      24 (bytes)
+  0x000000006FFFFFF9 RELACOUNT    3
+  0x0000000000000017 JMPREL       0x858
+  0x0000000000000002 PLTRELSZ     192 (bytes)
+  0x0000000000000003 PLTGOT       0x42B8
+  0x0000000000000014 PLTREL       RELA
+  0x0000000000000006 SYMTAB       0x238
+  0x000000000000000B SYMENT       24 (bytes)
+  0x0000000000000005 STRTAB       0x574
+  0x000000000000000A STRSZ        568 (bytes)
+  0x000000006FFFFEF5 GNU_HASH     0x500
+  0x0000000000000019 INIT_ARRAY   0x30D8
+  0x000000000000001B INIT_ARRAYSZ 8 (bytes)
+  0x000000000000001A FINI_ARRAY   0x30D0
+  0x000000000000001C FINI_ARRAYSZ 8 (bytes)
+  0x000000000000000C INIT         0x2010
+  0x000000000000000D FINI         0x202C
+  0x000000006FFFFFF0 VERSYM       0x4A8
+  0x000000006FFFFFFE VERNEED      0x4DC
+  0x000000006FFFFFFF VERNEEDNUM   1
+  0x0000000000000000 NULL         0x0
+]

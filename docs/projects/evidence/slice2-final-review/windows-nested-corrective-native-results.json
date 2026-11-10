@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "script_sha256": "647dad971b57dc880a04c710f4a200fc036dd65477f9ef83dc23e2d86f8fc0f3",
+  "commands": [
+    {
+      "argv": [
+        "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+        "\\\\vboxsvr\\VM\\project-slice2-final-review\\nested.py",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Release\\voidc-slice2-final-review.exe",
+        "\\\\vboxsvr\\VM\\project-slice2-final-review\\Release-nested.json"
+      ],
+      "returncode": 0,
+      "binary_sha256": "00031ca6d5e2586fa2df57dc1535bf663f408b8e556a7aecd7d5b020f2e6d0e8"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+        "\\\\vboxsvr\\VM\\project-slice2-final-review\\nested.py",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\build\\Debug\\voidc-slice2-final-review.exe",
+        "\\\\vboxsvr\\VM\\project-slice2-final-review\\Debug-nested.json"
+      ],
+      "returncode": 0,
+      "binary_sha256": "d3ec065c88e5013387177930a1d78b93ecf18e1328fb44e1e2642e8a49c9d964"
+    }
+  ],
+  "original_missing_script_failure": "Preserved in native-results.json and Debug-nested.log"
+}

@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="36"
+	failures="1"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="80"
+	timestamp="2026-11-08T17:08:05"
+	>
+	<testcase name="project_manifest_header" classname="project_manifest_header" time="0.00358051" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="project_manifest" classname="project_manifest" time="0.048289" status="run">
+		<properties/>
+		<system-out>project_manifest: 8787 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_no_authority" classname="project_manifest_no_authority" time="0.0938963" status="run">
+		<properties/>
+		<system-out>project_manifest: 8788 checks passed under syscall denial
+project_manifest_no_authority: four live SIGSYS controls passed
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_legacy" classname="project_manifest_legacy" time="0.322648" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/project/legacy.py", line 52, in &lt;module&gt;
+    result = run(["check", no_id], 1, root)
+  File "/home/shmellyorc/Documents/Void.Language/tests/project/legacy.py", line 17, in run
+    assert result.returncode == expected, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['check', PosixPath('/tmp/void manifest legacy 6g683e1o/missing_context.void')], 0, b'Source checked successfully\n', b'')
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_provenance" classname="project_manifest_provenance" time="0.0391946" status="run">
+		<properties/>
+		<system-out>project_manifest_provenance: 3 file hashes and exact pinned upstream reconstruction passed
+</system-out>
+	</testcase>
+	<testcase name="project_selection" classname="project_selection" time="2.71119" status="run">
+		<properties/>
+		<system-out>project_selection: 476 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_sessions" classname="project_sessions" time="0.454739" status="run">
+		<properties/>
+		<system-out>project_sessions: 166 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_application" classname="project_application" time="6.8199" status="run">
+		<properties/>
+		<system-out>Application cache: miss/hit
+project_application: 54 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_application_process" classname="project_application_process" time="10.3234" status="run">
+		<properties/>
+		<system-out>project_application_process: 61 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_discovery_cli" classname="project_discovery_cli" time="3.8921" status="run">
+		<properties/>
+		<system-out>project_discovery_cli: 88 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_profiles" classname="project_profiles" time="0.960051" status="run">
+		<properties/>
+		<system-out>project_profiles: 43 process checks passed; compute instruction counts O0=6, O2=2, release --no-opt=6
+</system-out>
+	</testcase>
+	<testcase name="project_protocol" classname="project_protocol" time="0.536145" status="run">
+		<properties/>
+		<system-out>project_protocol: 169 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_nested_cli" classname="project_nested_cli" time="0.374739" status="run">
+		<properties/>
+		<system-out>project_nested_cli: 11 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="gc_buffers" classname="gc_buffers" time="0.8908" status="run">
+		<properties/>
+		<system-out>reference sweep before owner teardown: baseline=1 ordinal=-1 sites=11 failed=0 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=1 ordinal=-1 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=0 sites=0 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=0 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=1 sites=1 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=1 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=2 sites=2 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=2 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=3 sites=3 failed=1 released_source=0 native_cou...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="gc_schemas" classname="gc_schemas" time="0.0456837" status="run">
+		<properties/>
+		<system-out>schema admission requested bytes: one=1886, million=1917; cursor next allocations=0
+schema admission allocation-site rollback/retry: 40 sites
+compact GC schemas/shared cursor checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_protocol" classname="lsp_protocol" time="0.390635" status="run">
+		<properties/>
+		<system-out>editor: CRLF/UTF16, cross-file symbols, overlays, versions, invalid/repair, graph changes and cycles passed
+transport: fragmented/coalesced frames, IDs, malformed messages, bounded framing, lifecycle and EOF passed
+value structs: real LSP type/constructor/field navigation, references, readonly diagnostics and revision recovery passed
+receiver methods: imported native LSP navigation, references, effect changes and revision recovery passed
+initialization: imported initializer navigation/references, exact argument diagnostics and unsaved recovery passed
+managed structs: cyclic types, imported fields/methods, readonly aliases and unsaved recovery passed
+managed initialization: imported constructor, private helper navigation, required-field diagnostics and unsaved repair passed
+reference values: imported nested reference navigation, precise readonly diagnostics and unsaved recovery passed
+composition: imported promoted navigation, ambiguity and unsaved repair passed
+inheritance: original owners, static virtual/sup...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage8" classname="lsp_stage8" time="0.58658" status="run">
+		<properties/>
+		<system-out>Debug cache: hit
+Debug cache: hit
+SKIP: Windows 8.3 coverage requires Windows
+POSIX workspace ancestor alias and descendant rejection checks passed
+Stage 8 compiler-backed LSP discovery/docs/readonly checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_execution" classname="os_execution" time="26.3991" status="run">
+		<properties/>
+		<system-out>OS location/identity: 92 process checks passed; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="os_stack" classname="os_stack" time="26.0468" status="run">
+		<properties/>
+		<system-out>OS location/identity: 92 process checks passed; hard_stack_1MiB=True
+</system-out>
+	</testcase>
+	<testcase name="os_edges" classname="os_edges" time="4.08563" status="run">
+		<properties/>
+		<system-out>OS deleted image/long env/cwd: 10 process checks passed; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="os_edges_stack" classname="os_edges_stack" time="4.37025" status="run">
+		<properties/>
+		<system-out>OS deleted image/long env/cwd: 10 process checks passed; hard_stack_1MiB=True
+</system-out>
+	</testcase>
+	<testcase name="os_host" classname="os_host" time="5.9891" status="run">
+		<properties/>
+		<system-out>OS native/ABI/GC/IR/globals/reload/cache: 127 checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_errors" classname="os_errors" time="5.00513" status="run">
+		<properties/>
+		<system-out>OS errors: 8 process checks, 9 valid/61 invalid IDs x four getters; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="os_frontend" classname="os_frontend" time="8.14928" status="run">
+		<properties/>
+		<system-out>OS frontend: 75 processes passed; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="lsp_os" classname="lsp_os" time="1.42426" status="run">
+		<properties/>
+		<system-out>OS LSP: 44 checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_cache" classname="os_cache" time="3.57662" status="run">
+		<properties/>
+		<system-out>OS cache/fresh and simultaneously live process identity: 10 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_owner" classname="os_owner" time="13.8329" status="run">
+		<properties/>
+		<system-out>OS owner async JIT/O2/AOT: 8 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_examples" classname="os_examples" time="3.89532" status="run">
+		<properties/>
+		<system-out>OS examples: 9 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_frontend_stack" classname="os_frontend_stack" time="8.39466" status="run">
+		<properties/>
+		<system-out>OS frontend: 75 processes passed; hard_stack_1MiB=True
+</system-out>
+	</testcase>
+	<testcase name="os_host_stack" classname="os_host_stack" time="5.72623" status="run">
+		<properties/>
+		<system-out>OS native/ABI/GC/IR/globals/reload/cache: 127 checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage11_globals" classname="stage11_globals" time="0.894436" status="run">
+		<properties/>
+		<system-out>107 global checks passed
+</system-out>
+	</testcase>
+	<testcase name="native_source" classname="native_source" time="2.81739" status="run">
+		<properties/>
+		<system-out>native source passed
+</system-out>
+	</testcase>
+	<testcase name="stage6_integrated" classname="stage6_integrated" time="3.58529" status="run">
+		<properties/>
+		<system-out>combined cached old root=1; old roots at barrier=14; retired generations=1; post-drain objects=0
+combined cached old root=1; old roots at barrier=14; retired generations=1; post-drain objects=0
+</system-out>
+	</testcase>
+	<testcase name="sessions" classname="sessions" time="0.163204" status="run">
+		<properties/>
+		<system-out>sessions: passed
+</system-out>
+	</testcase>
+	<testcase name="stage11_globals_stack" classname="stage11_globals_stack" time="0.389903" status="run">
+		<properties/>
+		<system-out>1 MiB inferred-global guard and explicit-type chain passed
+</system-out>
+	</testcase>
+	<testcase name="stage11_globals_aot" classname="stage11_globals_aot" time="4.06317" status="run">
+		<properties/>
+		<system-out>157 real-program global commands passed
+</system-out>
+	</testcase>
+</testsuite>

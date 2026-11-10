@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="24"
+	failures="2"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="102"
+	timestamp="2026-11-08T12:01:00"
+	>
+	<testcase name="project_manifest" classname="project_manifest" time="0.233817" status="fail">
+		<failure message="Subprocess aborted"/>
+		<properties/>
+		<system-out>void_project_manifest: /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15487: bool toml::impl::parser::parse_key(): Assertion `is_bare_key_character(*cp) || is_string_delimiter(*cp)' failed.
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_no_authority" classname="project_manifest_no_authority" time="0.234542" status="fail">
+		<failure message="Subprocess aborted"/>
+		<properties/>
+		<system-out>void_project_manifest: /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus/toml.hpp:15487: bool toml::impl::parser::parse_key(): Assertion `is_bare_key_character(*cp) || is_string_delimiter(*cp)' failed.
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_legacy" classname="project_manifest_legacy" time="0.748502" status="run">
+		<properties/>
+		<system-out>project_manifest_legacy: 15 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_provenance" classname="project_manifest_provenance" time="0.039655" status="run">
+		<properties/>
+		<system-out>project_manifest_provenance: 3 file hashes and exact pinned upstream reconstruction passed
+</system-out>
+	</testcase>
+	<testcase name="cli_contract" classname="cli_contract" time="7.46165" status="run">
+		<properties/>
+		<system-out>76 CLI process checks passed on linux; native output and collision preservation passed
+</system-out>
+	</testcase>
+	<testcase name="cli_install_resources" classname="cli_install_resources" time="0.0878527" status="run">
+		<properties/>
+		<system-out>......s
+----------------------------------------------------------------------
+Ran 7 tests in 0.006s
+
+OK (skipped=1)
+</system-out>
+	</testcase>
+	<testcase name="application_workflow_stage9" classname="application_workflow_stage9" time="13.5377" status="run">
+		<properties/>
+		<system-out>Stage 9 real workflow checks passed: 111
+</system-out>
+	</testcase>
+	<testcase name="debug_cache_processes" classname="debug_cache_processes" time="17.4179" status="run">
+		<properties/>
+		<system-out>Fresh processes, corruption, concurrent publication, imports, diagnostics and large arrays passed
+</system-out>
+	</testcase>
+	<testcase name="automatic_cache_processes" classname="automatic_cache_processes" time="0.62817" status="run">
+		<properties/>
+		<system-out>Automatic O2/no-IR-O2 caching, bypass, fresh globals and diagnostics passed
+</system-out>
+	</testcase>
+	<testcase name="os_errors" classname="os_errors" time="20.6728" status="run">
+		<properties/>
+		<system-out>OS errors: 8 process checks, 9 valid/61 invalid IDs x four getters; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="os_frontend" classname="os_frontend" time="43.0251" status="run">
+		<properties/>
+		<system-out>OS frontend: 62 processes passed; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="lsp_os" classname="lsp_os" time="8.50158" status="run">
+		<properties/>
+		<system-out>OS LSP: 44 checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage7" classname="lsp_stage7" time="0.321156" status="run">
+		<properties/>
+		<system-out>Stage 7: completion/recovery, signatures, hover, bindings, symbols, guarded rename, formatting, refresh, batching, cancellation passed
+</system-out>
+	</testcase>
+	<testcase name="sessions" classname="sessions" time="0.232388" status="run">
+		<properties/>
+		<system-out>sessions: passed
+</system-out>
+	</testcase>
+	<testcase name="tooling" classname="tooling" time="0.457612" status="run">
+		<properties/>
+		<system-out>queries: aliased/direct definitions, 2 callers, root/local constants, byte spans and retained snapshots
+plan: /leaf.void -&gt; /middle.void::wrapper -&gt; /main.void::entry; validated 53 -&gt; 61, const restart required
+tooling: passed
+</system-out>
+	</testcase>
+	<testcase name="analysis" classname="analysis" time="0.812071" status="run">
+		<properties/>
+		<system-out>normal: body edit 53 -&gt; 61, const edit rejected, old lease 53; concurrent calls 241043
+O2: body edit 53 -&gt; 61, const edit rejected, old lease 53; concurrent calls 260784
+analysis: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric" classname="numeric" time="5.23385" status="run">
+		<properties/>
+		<system-out>210 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed
+numeric: passed
+</system-out>
+	</testcase>
+	<testcase name="frontend" classname="frontend" time="9.65779" status="run">
+		<properties/>
+		<system-out>Frontend begin: diagnostics
+50+ source diagnostic cases and UTF-8/ABI checks passed
+Frontend passed: diagnostics
+Frontend begin: programs
+Real .void files and independent programs executed through normal/O2 JIT
+Frontend passed: programs
+Frontend begin: numeric values
+1216 constant/normal/O2 numeric matrix comparisons passed
+Readonly/compile-time constants, numeric boundaries, concurrent failures, bounded traces and restart checks passed
+Frontend passed: numeric values
+Frontend begin: diagnostic recovery/resource limits
+Frontend resource case: combined expression/constant depth
+Structured diagnostics: independent files, recovery, bounded cascades, snapshots and failed reload verified
+Frontend passed: diagnostic recovery/resource limits
+Frontend begin: value structs
+Frontend resource case: bounded expanded value layouts
+Value struct source: nested/mixed layouts, copies, normal/O2 JIT, diagnostics, tooling and reload passed
+Frontend passed: value structs
+Frontend begin: receiver methods
+Frontend resource case: b...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="modules" classname="modules" time="1.07797" status="run">
+		<properties/>
+		<system-out>Project constants, forwards, visibility, cycles, imports and restart checks passed
+Project-local library identities, cycles, ownership, overlays, native JIT and invalidation passed
+Multi-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed
+modules: passed
+</system-out>
+	</testcase>
+	<testcase name="local_libraries" classname="local_libraries" time="0.464361" status="run">
+		<properties/>
+		<system-out>Local libraries: 16 compiler/JIT/AOT/cache/application checks and same-server LSP completion/overlay/refresh checks passed
+</system-out>
+	</testcase>
+	<testcase name="source_cli" classname="source_cli" time="3.74917" status="run">
+		<properties/>
+		<system-out>Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/source programs with spaces/architecture-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/source programs with spaces/architecture-optimized.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/source programs with spaces/loops-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/source programs with spaces/loops-optimized.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/source programs with spaces/functions-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/source programs with spaces/functions-optimized.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/source ...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="modules_cli" classname="modules_cli" time="42.3279" status="run">
+		<properties/>
+		<system-out>Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/module native programs with spaces/acceptance-normal.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/module native programs with spaces/acceptance-optimized.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/module native programs with spaces/nested-normal.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/module native programs with spaces/nested-optimized.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/module native programs with spaces/cyclic-normal.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/module native programs with spaces/cyclic-optimized.o
+Sourc...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="analysis_cli" classname="analysis_cli" time="0.573416" status="run">
+		<properties/>
+		<system-out>Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/analysis native programs/analysis-53-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/analysis native programs/analysis-53-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/analysis native programs/analysis-61-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/analysis native programs/analysis-61-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/analysis native programs/analysis-62-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug/analysis native programs/analysis-62-optimized.o
+</system-out>
+	</testcase>
+	<testcase name="numeric_cli" classname="numeric_cli" time="26.9126" status="run">
+		<properties/>
+		<system-out>-- Numeric source constants, JIT and native AOT passed in both optimization modes
+</system-out>
+	</testcase>
+</testsuite>

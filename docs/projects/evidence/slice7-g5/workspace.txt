@@ -1,0 +1,6 @@
+Windows source overlays restored or removed 229 initial and 229 final paths after hash verification. Reused 227 byte-matched input timestamps during the second build.
+Linux transient compositor test keyboard was destroyed and no matching virtual input device remains. Native binding preparation removed its temporary staging directories. The Windows audit verified empty native link scratch in the qualified gallery runs.
+The three original raylib archive hashes still match the integration receipts. Retained compiler build directories, qualified C and VOID packages, generated bindings, source packets and first failures. Windows binaries were built and executed from local C: storage. The VM retained its existing settings and toolchain.
+Windows opening compiler packet SHA-256 07bc13e2bf9b10055ae79d3304245806fd4b1b5a24b1df865e08b48e1842f943
+Windows final compiler packet SHA-256 ff1b774b59a555274cac85d0fa32504a5bd33a3252ca1e03c5d5389700ecfe63
+Windows gallery packet SHA-256 2c805368375382616d4eb0bfa737baaf1c70a5cd697c8b6cb5670510efc9b0b9

@@ -1,0 +1,1 @@
+Sprint 2 numeric completion/hover/signatures/readonly and named-label navigation passed

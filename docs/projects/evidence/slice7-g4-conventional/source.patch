@@ -1,0 +1,1538 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1639,6 +1639,12 @@
+   execute_process(COMMAND "${VOID_CLANG}" --version OUTPUT_VARIABLE VOID_CLANG_VERSION RESULT_VARIABLE VOID_CLANG_STATUS)
+   if(NOT VOID_CLANG_STATUS EQUAL 0 OR NOT VOID_CLANG_VERSION MATCHES "clang version 23\\.1\\.4([^0-9]|$)")
+     message(FATAL_ERROR "AOT tests require matching clang 23.1.4; set VOID_CLANG")
++  endif()
++  if((WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux") AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(AMD64|amd64|x86_64)$")
++    add_test(NAME ffi_g4_conventional COMMAND "${Python3_EXECUTABLE}"
++      "${PROJECT_SOURCE_DIR}/tests/ffi/conventional_process.py"
++      "${CMAKE_COMMAND}" "${CMAKE_CURRENT_BINARY_DIR}" "$<CONFIG>" "${VOID_CLANG}" "${VOID_SANITIZERS}")
++    set_tests_properties(ffi_g4_conventional PROPERTIES TIMEOUT 480)
+   endif()
+   add_test(NAME numeric_sprint2 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/numeric/sprint2.py"
+     "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}")
+diff --git a/include/void/c_dynamic.hpp b/include/void/c_dynamic.hpp
+--- a/include/void/c_dynamic.hpp
++++ b/include/void/c_dynamic.hpp
+@@ -27,10 +27,16 @@
+     const std::string& descriptor() const { return descriptor_; }
+     const std::vector<Image>& images() const { return images_; }
+     const std::vector<Export>& exports() const { return exports_; }
++    bool conventional() const { return !library_.empty(); }
++    const std::string& library() const { return library_; }
++    const std::string& adapter() const { return adapter_; }
++    const std::string& dispatch() const { return dispatch_; }
++    const std::string& target() const { return target_; }
+     static constexpr std::string_view transport = "vd_c_primitive_dispatch_v3";
+ private:
+     DynamicClosure() = default;
+     std::string bytes_, provider_, thunk_, descriptor_;
++    std::string library_, adapter_, dispatch_, target_;
+     std::vector<Image> images_;
+     std::vector<Export> exports_;
+ };
+diff --git a/include/void/c_primitive.hpp b/include/void/c_primitive.hpp
+--- a/include/void/c_primitive.hpp
++++ b/include/void/c_primitive.hpp
+@@ -54,6 +54,7 @@
+ public:
+     struct Shape {
+         ir::Type scalar = ir::Type::none;
++        enum class Alias { none, c_int, c_long, c_size, c_bool } alias = Alias::none;
+         unsigned record = 0; // 1-based index, zero for primitives
+         unsigned extent = 0; // inline C array of scalars only
+         unsigned direction = 0; // C byte span only
+@@ -90,6 +91,9 @@
+     // exact descriptor and independently compiled fixture.
+     static Owner admit(std::string_view descriptor, CPrimitiveThunk* linked_thunk);
+     static Owner admit_dynamic(std::string_view closure, std::filesystem::path host_root);
++    static Owner admit_conventional(std::string_view descriptor, std::filesystem::path host_root,
++                                    std::string_view library, std::string_view adapter);
++    static std::string generate_adapter(std::string_view descriptor, std::string_view header);
+     const std::string& descriptor() const { return descriptor_; }
+     const std::string& provider() const { return provider_; }
+     const std::string& target() const { return target_; }
+@@ -117,7 +121,7 @@
+     std::string source() const;
+ private:
+     CPrimitiveAdmission() = default;
+-    static std::shared_ptr<CPrimitiveAdmission> parse(std::string_view);
++    static std::shared_ptr<CPrimitiveAdmission> parse(std::string_view, bool conventional = false);
+     std::string descriptor_, provider_, target_, module_;
+     unsigned revision_ = 1;
+     std::vector<Binding> bindings_;
+diff --git a/include/void/frontend.hpp b/include/void/frontend.hpp
+--- a/include/void/frontend.hpp
++++ b/include/void/frontend.hpp
+@@ -175,7 +175,7 @@
+ bool project_manifest_present(const std::filesystem::path& root);
+ ProjectAnalysisResult analyze_manifest_project(const std::filesystem::path& root,
+     const std::optional<std::string>& entry_override = {},
+-    const SourceOverrides& sources = {}, const ManifestOverrides& manifests = {});
++    const SourceOverrides& sources = {}, const ManifestOverrides& manifests = {}, bool authorize_native = false);
+ struct EditorCandidate { std::string name, detail; int kind = 6; std::string insert_text = {}, documentation = {}; };
+ struct EditorAssistance {
+     std::vector<EditorCandidate> candidates;
+diff --git a/include/void/project.hpp b/include/void/project.hpp
+--- a/include/void/project.hpp
++++ b/include/void/project.hpp
+@@ -43,6 +43,7 @@
+     std::vector<std::string> exclude = {"tests", "examples", "vendor", "node_modules", "dist"};
+ };
+ struct Field { SourceSpan key, value; };
++struct NativeLibrary { std::string descriptor, library, adapter; };
+ 
+ // Schema-validated metadata only. This is not filesystem admission, a selected
+ // source graph, a Runtime identity, an install receipt or native authority.
+@@ -52,6 +53,7 @@
+     Kind kind_ = Kind::application;
+     std::optional<Identity> application_, package_;
+     std::optional<std::string> entry_;
++    std::map<std::string, NativeLibrary> native_;
+     Sources sources_;
+     Profile debug_ = {Optimization::none, DebugInfo::full};
+     Profile release_ = {Optimization::O2, DebugInfo::line};
+@@ -65,6 +67,7 @@
+     const auto& application() const { return application_; }
+     const auto& package() const { return package_; }
+     const auto& entry() const { return entry_; }
++    const auto& native() const { return native_; }
+     const Sources& sources() const { return sources_; }
+     const Profile& debug() const { return debug_; }
+     const Profile& release() const { return release_; }
+diff --git a/src/dynamic_closure.cpp b/src/dynamic_closure.cpp
+--- a/src/dynamic_closure.cpp
++++ b/src/dynamic_closure.cpp
+@@ -1,5 +1,6 @@
+ #include "void/c_dynamic.hpp"
+ #include "void/project.hpp"
++#include "void/path.hpp"
+ 
+ #include <algorithm>
+ #include <set>
+@@ -24,6 +25,13 @@
+     auto letter = [](char c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'; };
+     return !token.empty() && token.size() <= 128 && letter(token.front()) &&
+         std::all_of(token.begin(), token.end(), [&](char c) { return letter(c) || (c >= '0' && c <= '9'); });
++}
++bool library_name(std::string_view name, bool windows) {
++    return !name.empty() && name.size() <= 128 && portable_path_component(name) &&
++        name.front() != '.' && std::all_of(name.begin(), name.end(), [](char c) {
++            return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
++                (c >= '0' && c <= '9') || c == '-' || c == '_' || c == '.';
++        }) && (windows ? name.ends_with(".dll") : name.find(".so") != name.npos);
+ }
+ std::vector<std::string_view> words(std::string_view line) {
+     std::vector<std::string_view> result;
+@@ -52,21 +60,38 @@
+         bytes.remove_prefix(end + 1);
+         return line;
+     };
+-    if (next() != "void-native-closure 1") bad("unsupported revision");
++    const auto header = next();
++    const bool conventional = header == "void-native-conventional 1";
++    if (!conventional && header != "void-native-closure 1") bad("unsupported revision");
+     auto provider = words(next());
+     if (provider.size() != 2 || provider[0] != "provider" || !project::valid_identity(provider[1]))
+         bad("invalid provider");
+     plan->provider_ = provider[1];
+-    if (next() != "target x86_64-unknown-linux-gnu sysv-x64" || next() != "system none" ||
++    const auto target = next();
++    const bool windows = conventional && target == "target x86_64-pc-windows-msvc msvc-x64";
++    if (!windows && target != "target x86_64-unknown-linux-gnu sysv-x64")
++        bad("unsupported target ABI");
++    plan->target_ = windows ? "x86_64-pc-windows-msvc" : "x86_64-unknown-linux-gnu";
++    if (next() != (conventional ? "system os" : "system none") ||
+         next() != "layout executable-sibling-native") bad("unsupported target, system ABI or relocation policy");
+     auto thunk = words(next());
+-    if (thunk.size() != 3 || thunk[0] != "thunk" || !digest(thunk[1]) || thunk[2] != transport)
++    if (thunk.size() != 3 || thunk[0] != "thunk" || !digest(thunk[1]) ||
++        (thunk[2] != transport && (!conventional ||
++            (thunk[2] != "vd_c_primitive_dispatch_v1" && thunk[2] != "vd_c_primitive_dispatch_v2"))))
+         bad("invalid target thunk identity");
+     plan->thunk_ = thunk[1];
++    plan->dispatch_ = thunk[2];
++    if (conventional) {
++        const auto row = words(next());
++        if (row.size() != 3 || row[0] != "libraries" || !library_name(row[1], windows) || !library_name(row[2], windows))
++            bad("expected provider and adapter filenames");
++        plan->library_ = row[1];
++        plan->adapter_ = row[2];
++    }
+     std::set<std::string_view> images, exports;
+     for (auto line = next(); line != "descriptor"; line = next()) {
+         auto row = words(line);
+-        if (row[0] == "image") {
++        if (!conventional && row[0] == "image") {
+             if (row.size() < 3 || !plan->exports_.empty() || plan->images_.size() == 8 ||
+                 !component(row[1]) || images.contains(row[1]) || !digest(row[2]))
+                 bad("invalid or duplicate image");
+@@ -79,27 +104,32 @@
+             images.insert(row[1]);
+             plan->images_.push_back(std::move(image));
+         } else if (row[0] == "export") {
+-            if (row.size() != 3 || plan->exports_.size() == 128 || !images.contains(row[1]) ||
++            if (row.size() != 3 || plan->exports_.size() == 128 ||
++                (conventional ? row[1] != plan->library_ : !images.contains(row[1])) ||
+                 !symbol(row[2]) || !exports.insert(row[2]).second)
+                 bad("invalid or conflicting required export");
+             plan->exports_.push_back({std::string(row[1]), std::string(row[2])});
+         } else bad("unknown row");
+     }
+-    if (plan->images_.empty() || bytes.size() > 16384 || !bytes.starts_with("void-c-primitive 3 3\n"))
+-        bad("missing closure or exact revision 3 descriptor");
+-    const auto& main = plan->images_.back().name;
+-    if (std::none_of(plan->exports_.begin(), plan->exports_.end(), [&](const auto& e) {
+-        return e.image == main && e.symbol == transport;
+-    })) bad("missing main-image transport");
+-    std::set<std::string_view> reachable{main};
+-    for (auto it = plan->images_.rbegin(); it != plan->images_.rend(); ++it)
+-        if (reachable.contains(it->name)) reachable.insert(it->needed.begin(), it->needed.end());
+-    if (reachable.size() != images.size()) bad("unreachable image");
++    if (conventional) {
++        if (plan->exports_.empty()) bad("missing provider exports");
++    } else {
++        if (plan->images_.empty())
++            bad("missing closure or exact revision 3 descriptor");
++        const auto& main = plan->images_.back().name;
++        if (std::none_of(plan->exports_.begin(), plan->exports_.end(), [&](const auto& e) {
++            return e.image == main && e.symbol == transport;
++        })) bad("missing main-image transport");
++        std::set<std::string_view> reachable{main};
++        for (auto it = plan->images_.rbegin(); it != plan->images_.rend(); ++it)
++            if (reachable.contains(it->name)) reachable.insert(it->needed.begin(), it->needed.end());
++        if (reachable.size() != images.size()) bad("unreachable image");
++    }
+     const auto descriptor = bytes;
+-    const auto prefix = "void-c-primitive 3 3\nprovider " + plan->provider_ +
+-        "\ntarget x86_64-unknown-linux-gnu sysv-x64\n";
+-    if (!bytes.starts_with(prefix)) bad("exact descriptor provider or target mismatch");
+-    bytes.remove_prefix(prefix.size());
++    const auto revision = plan->dispatch_.back();
++    const auto expected = std::string("void-c-primitive ") + revision + " " + revision;
++    if (bytes.size() > 16384 || next() != expected || next() != "provider " + plan->provider_ || next() != target)
++        bad("exact descriptor provider or target mismatch");
+     if (!next().starts_with("source ") || next() != "thunk " + plan->thunk_)
+         bad("exact descriptor thunk mismatch");
+     plan->descriptor_ = descriptor;
+diff --git a/src/frontend/compiler.cpp b/src/frontend/compiler.cpp
+--- a/src/frontend/compiler.cpp
++++ b/src/frontend/compiler.cpp
+@@ -5308,6 +5308,10 @@
+             }
+         }
+     }
++    void generated_primitives(CPrimitiveAdmission::Owner admission) {
++        virtual_children[""][folded(admission->module().substr(1))].insert(admission->module().substr(1));
++        primitives = std::move(admission);
++    }
+     std::pair<std::string,std::filesystem::path> resolve(const Unit& from, const Token& path, bool directory=false) {
+         const bool local=path.kind!=TokenKind::path && path.text.starts_with("lib/");
+         if((path.kind==TokenKind::path || local) && standard_module(from.identity))error(from.source,path,Code::import_path,"Standard modules cannot import project VFS sources.","Use an unquoted standard-library module path outside lib/.");
+@@ -5328,6 +5332,7 @@
+         auto id=standard ? "/@stdlib"+relative : relative;
+         if(directory) {relative=path_utf8(utf8_path(relative).parent_path());id=standard ? "/@stdlib"+relative : relative;}
+         auto overlay = overrides.find(id);
++        const bool generated = !directory && primitives && id == primitives->module();
+         // All parse/load/recapture readers resolve first, including cached units.
+         // Overrides are frozen for the synchronous analysis: a tombstone can
+         // never reach their optional dereferences or fall back to disk bytes.
+@@ -5364,7 +5369,7 @@
+             if (prefix != relative && !standard && overrides.contains(prefix))
+                 error(from.source, path, Code::import_path, "An overridden source cannot also be a virtual directory: '" + prefix + "'.");
+             auto status = std::filesystem::symlink_status(physical, ec);
+-            if (ec == std::errc::no_such_file_or_directory && (overlay != overrides.end() || (directory && !standard && virtual_directories.contains(id)))) ec.clear();
++            if (ec == std::errc::no_such_file_or_directory && (generated || overlay != overrides.end() || (directory && !standard && virtual_directories.contains(id)))) ec.clear();
+             if (ec) error(from.source, path, Code::import_read, "Cannot inspect imported path '" + id + "'.");
+             if (prefix == relative && primitives && id == primitives->module() && std::filesystem::exists(status))
+                 error(from.source,path,Code::import_path,"Host-admitted C binding module collides with a project source.");
+@@ -5377,7 +5382,7 @@
+         }
+         if (directory) {
+             if(!std::filesystem::is_directory(physical,ec) && ec!=std::errc::no_such_file_or_directory)error(from.source,path,Code::import_read,"Import directory is unavailable.");
+-        } else if (overlay == overrides.end()) {
++        } else if (!generated && overlay == overrides.end()) {
+             if (!std::filesystem::is_regular_file(physical, ec) || ec)
+                 error(from.source, path, Code::import_read, "Imported path is not a regular .void source file.");
+         }
+@@ -6194,10 +6199,13 @@
+     }
+     for (auto& [id,f] : functions) for (const auto& p : f->parameters)
+         f->initialization_contract += std::to_string(p.token.text.size()) + ":" + p.token.text + std::to_string(p.default_syntax.size()) + ":" + p.default_syntax;
+-    if (std::any_of(units.begin(), units.end(), [](const auto& unit) { return bool(unit.second->c_primitives); }))
++    if (const auto provider = std::find_if(units.begin(), units.end(),
++            [](const auto& unit) { return bool(unit.second->c_primitives); }); provider != units.end()) {
++        const auto& dynamic = provider->second->c_primitives->dynamic();
+         for (const auto& [id, unit] : units) for (const auto& f : unit->functions)
+-            if (f.asynchronous)
++            if (f.asynchronous && !(dynamic && dynamic->conventional() && standard_module(id)))
+                 error(unit->source, f.token, Code::unsupported_type, "C primitive provider graphs require synchronous execution.");
++    }
+     // Recovered trees and AST-only poisoned types can never enter capability analysis or IR.
+     diagnostics.finish();
+     analyze_capabilities(units,diagnostics);
+@@ -6327,6 +6335,11 @@
+     for(const auto& f:module.functions) { trace_string(f.result); for(auto t:f.parameters) trace_string(t); for(auto t:f.locals) trace_string(t); }
+     for(auto t:module.nominal_types) if(t.definition) trace_string(Type(t.definition));
+     numeric::append_prelude(module);
++    // A conventional application can import a standard module that also offers
++    // async APIs. Only its entry closure is executable, and IR validation still
++    // rejects async or worker code reachable from that closure.
++    if (module.c_primitives && module.c_primitives->dynamic() && module.c_primitives->dynamic()->conventional())
++        ir::retain_entry(module);
+     ir::validate(module); return module;
+ }
+ 
+@@ -6335,7 +6348,7 @@
+ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path&, const SourceOverrides& = {}, bool verify_disk = false,const NativeProject* = nullptr,EditorProbe* = nullptr,CPrimitiveAdmission::Owner = {});
+ // This factory is the only way to construct a successful result.
+ struct AnalysisAccess {
+-    static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry,std::vector<Diagnostic> warnings={},const std::string& context_key={},std::shared_ptr<Unit> library_scope={},ApplicationMetadata::Owner metadata={}) {
++    static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry,std::vector<Diagnostic> warnings={},const std::string& context_key={},std::shared_ptr<Unit> library_scope={},ApplicationMetadata::Owner metadata={},bool native_authorized=true) {
+         auto result = std::shared_ptr<ValidatedAnalysis>(new ValidatedAnalysis);result->warnings_=std::move(warnings);
+         result->entry_ = entry;
+         result->application_metadata_ = std::move(metadata);
+@@ -6744,8 +6757,9 @@
+             if(alternatives.size()>1){r.signature="Selected specializations:";for(const auto& label:alternatives)r.signature+="\n\n"+label;}
+         }
+         field(result->contract_,result->constants_);
+-        result->lower_ = [graph,entry,library_scope] {
++        result->lower_ = [graph,entry,library_scope,native_authorized] {
+             if(library_scope)throw std::invalid_argument("Library analysis has no executable entry or supported IR build operation.");
++            if(!native_authorized)throw std::invalid_argument("Native project execution requires explicit host authorization.");
+             return lower_graph(*graph,entry);
+         };
+         return result;
+@@ -6999,7 +7013,7 @@
+     auto frozen=overrides;frozen.insert_or_assign(module,SourceFile(source.path(),std::move(repaired)));
+     EditorProbe probe{module,begin,{},operator_context,{},{},0};probe.result.begin=begin;probe.result.end=end;
+     try {
+-        if(project)(void)analyze_manifest_project_impl(project->root,project_entry,frozen,project->manifest_overlays,&probe);
++        if(project)(void)analyze_manifest_project_impl(project->root,project_entry,frozen,project->manifest_overlays,&probe,false);
+         else (void)validated_project(entry,frozen,true,nullptr,&probe);
+         if(operator_context)return probe.result;
+     }
+diff --git a/src/frontend/project.cpp b/src/frontend/project.cpp
+--- a/src/frontend/project.cpp
++++ b/src/frontend/project.cpp
+@@ -261,8 +261,30 @@
+             profile(*build, "debug", manifest_->debug_);
+             profile(*build, "release", manifest_->release_);
+         }
+-        for (auto key : {"dependencies", "native"}) if (auto* reserved = table(root, key); reserved && !reserved->empty())
+-            fail(Code::project_reserved, span(reserved->source()), "Nonempty project dependencies/native declarations are reserved.", "Schema 1 does not resolve, install, link or load project dependencies; remove the declarations.");
++        if (auto* reserved = table(root, "dependencies"); reserved && !reserved->empty())
++            fail(Code::project_reserved, span(reserved->source()), "Project dependency resolution is reserved.", "Remove the declarations.");
++        if (auto* native = table(root, "native")) for (const auto& [key, value] : *native) {
++            const auto platform = key.str();
++            if ((platform != "linux" && platform != "windows") || manifest_->kind_ != Kind::application) {
++                fail(Code::project_reserved, span(value.source()), "Native declarations require an application and a linux or windows table.",
++                    "Declare a local C provider under [native.linux] or [native.windows].");
++                continue;
++            }
++            if (auto* settings = table(*native, platform)) {
++                fields(*settings, "native." + std::string(platform), {"descriptor", "library", "adapter"});
++                NativeLibrary declaration;
++                for (auto [name, output] : {std::pair{"descriptor", &declaration.descriptor},
++                                           {"library", &declaration.library}, {"adapter", &declaration.adapter}}) {
++                    if (auto filename = text(*settings, name, true)) {
++                        if (!relative_path(*filename, false) || filename->find('/') != filename->npos)
++                            fail(Code::project_path, span(settings->get(name)->source()), "Expected a filename in the project native directory.",
++                                "Use one portable filename relative to native/.");
++                        *output = std::move(*filename);
++                    }
++                }
++                manifest_->native_.emplace(platform, std::move(declaration));
++            }
++        }
+         return finish();
+     }
+ };
+diff --git a/src/frontend/project_selection.inc b/src/frontend/project_selection.inc
+--- a/src/frontend/project_selection.inc
++++ b/src/frontend/project_selection.inc
+@@ -25,6 +25,7 @@
+     const ProjectCapture* original;
+     SourceFile anchor;
+     std::shared_ptr<const project::Manifest> manifest;
++    CPrimitiveAdmission::Owner native;
+     project::Sources creation_policy;
+     std::map<std::string,SourceFile> sources;
+     std::map<std::string,std::vector<std::string>> listings;
+@@ -71,6 +72,31 @@
+         if(!parsed.succeeded())throw CompilationError(std::move(parsed.diagnostics));
+         manifest=std::move(parsed.manifest);
+         anchor=manifest->source();from.source=anchor;
++        if (!manifest->native().empty()) {
++#ifdef _WIN32
++            constexpr auto platform = "windows";
++            constexpr auto target = "x86_64-pc-windows-msvc";
++#else
++            constexpr auto platform = "linux";
++            constexpr auto target = "x86_64-unknown-linux-gnu";
++#endif
++            const auto selected = manifest->native().find(platform);
++            if (selected == manifest->native().end())
++                project_failure(anchor, Code::project_reserved, "No native provider declared for this host.");
++            const auto& declaration = selected->second;
++            const auto directory = root / "native";
++            const auto path = directory / utf8_path(declaration.descriptor);
++            if (!project_fs::is_regular_file(path))
++                project_failure(anchor, Code::project_path, "Missing native descriptor: " + path_utf8(path));
++            auto descriptor = read_bounded(path, 16384);
++            native = CPrimitiveAdmission::admit_conventional(descriptor.text(), directory, declaration.library, declaration.adapter);
++            if (native->target() != target)
++                project_failure(anchor, Code::project_reserved, "Native descriptor target does not match this host.");
++            if (overlays.contains(native->module()))
++                project_failure(anchor, Code::project_boundary, "Generated C binding module cannot be overridden.");
++            changed(original && (!original->native || native->dynamic_contract() != original->native->dynamic_contract()));
++            graph.generated_primitives(native);
++        }
+         for(const auto& name:manifest->sources().roots) {
+             if(name!=".") {
+                 graph.resolve(from,{TokenKind::path,"/"+name+"/.void",0},true);
+@@ -181,11 +207,13 @@
+         if(discovery && sources.size()>=project_file_limit)project_failure(anchor,Code::limit,"Project discovery source-file limit exceeded.");
+         auto o=overlays.find(id);
+         if(discovery && o!=overlays.end() && o->second->text().size()>project_source_limit-bytes)project_failure(anchor,Code::limit,"Project discovery aggregate source-byte limit exceeded.");
+-        auto source=o!=overlays.end()?SourceFile(path_utf8(path),o->second->text()):discovery?read_bounded(path,project_source_limit-bytes):read_source(path);
++        auto source=native && id==native->module()?SourceFile(path_utf8(path),native->source()):
++            o!=overlays.end()?SourceFile(path_utf8(path),o->second->text()):discovery?read_bounded(path,project_source_limit-bytes):read_source(path);
+         if(original)if(auto old=original->sources.find(id);old!=original->sources.end())changed(source.text()!=old->second.text());
+         if(discovery)bytes+=source.text().size();sources.emplace(id,source);return source;
+     }
+     bool excluded(const std::string& id) const {
++        if(native && (id=="/native" || id.starts_with("/native/")))return true;
+         auto relative=id.substr(1);
+         for(const auto& part:utf8_path(relative))if(auto s=folded(path_utf8(part));s==".git" || s==".void" || s=="build" || s=="libs")return true;
+         const auto& policy=manifest?manifest->sources():creation_policy;
+@@ -238,6 +266,7 @@
+     llvm::SHA256 hash;
+     auto field=[&](std::string_view s){auto length=std::to_string(s.size())+":";hash.update(llvm::StringRef(length));hash.update(llvm::StringRef(s.data(),s.size()));};
+     field("void-project-selection-v1");field(path_utf8(capture.root));field(capture.manifest->source().text());field(entry);field(automatic?"automatic":"explicit");
++    if(capture.native)field(capture.native->dynamic()->bytes());
+     for(const auto& [id,source]:capture.sources){field(id);field(source.text());}
+     for(const auto& [id,present]:capture.boundaries){field(id);field(present?"present":"absent");}
+     for(const auto& [id,names]:capture.listings){field(id);for(const auto& name:names)field(name);field("end-directory");}
+@@ -258,7 +287,7 @@
+ }
+ }
+ struct ProjectAnalysisAccess {
+-    static std::shared_ptr<const ProjectAnalysis> build(ProjectCapture& capture,const std::set<std::string>& seeds,const std::string& entry,bool automatic,std::shared_ptr<Unit> library_scope) {
++    static std::shared_ptr<const ProjectAnalysis> build(ProjectCapture& capture,const std::set<std::string>& seeds,const std::string& entry,bool automatic,std::shared_ptr<Unit> library_scope,bool authorize_native) {
+         auto result=std::shared_ptr<ProjectAnalysis>(new ProjectAnalysis);
+         result->root_=capture.root;result->manifest_=capture.manifest;
+         for(const auto& id:seeds)result->discovery_.emplace(id,capture.sources.at(id));
+@@ -270,7 +299,7 @@
+             const auto& project = capture.manifest->project();
+             const auto& app = *capture.manifest->application();
+             auto metadata = ApplicationMetadata::make({project.id, project.name, project.version.text(), app.id, app.name, app.version.text()});
+-            result->program_=AnalysisAccess::build(std::move(capture.graph.units),entry,capture.diagnostics.warnings(),result->context_key_,{},std::move(metadata));
++            result->program_=AnalysisAccess::build(std::move(capture.graph.units),entry,capture.diagnostics.warnings(),result->context_key_,{},std::move(metadata),!capture.native || authorize_native);
+             result->semantic_=result->program_;
+         } else {
+             result->semantic_=AnalysisAccess::build(std::move(capture.graph.units),entry,capture.diagnostics.warnings(),result->context_key_,std::move(library_scope));
+@@ -287,7 +316,7 @@
+     for(const auto& item:std::filesystem::directory_iterator(root))if(folded(path_utf8(item.path().filename()))=="void.project.toml")return true;
+     return false;
+ }
+-ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path& root,const std::optional<std::string>& entry_override,const SourceOverrides& sources,const ManifestOverrides& manifests,EditorProbe* editor) {
++ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path& root,const std::optional<std::string>& entry_override,const SourceOverrides& sources,const ManifestOverrides& manifests,EditorProbe* editor,bool authorize_native) {
+     ProjectAnalysisResult result;
+     std::unique_ptr<ProjectCapture> owned;
+     std::set<std::string> seeds;std::string entry;bool automatic=false,complete=false;
+@@ -369,14 +398,14 @@
+             auto found=fresh.sources.find(id);
+             fresh.changed(found==fresh.sources.end() || found->second.text()!=source.text());
+         }
+-        result.project=ProjectAnalysisAccess::build(capture,seeds,entry,automatic,std::move(library_scope));result.diagnostics=capture.diagnostics.warnings();retain();return result;
++        result.project=ProjectAnalysisAccess::build(capture,seeds,entry,automatic,std::move(library_scope),authorize_native);result.diagnostics=capture.diagnostics.warnings();retain();return result;
+     } catch(const CompilationError& failure) {result.diagnostics=failure.diagnostics();retain();return result;}
+       catch(const std::filesystem::filesystem_error& failure) {Diagnostic d{Code::project_boundary};d.primary={std::make_shared<const SourceFile>(path_utf8(root),""),{},0,0};d.description=failure.what();d.hint="Check the selected project root, permissions and exact path spelling.";result.diagnostics.push_back(std::move(d));retain();return result;}
+       catch(const std::invalid_argument& failure) {Diagnostic d{Code::project_path};d.primary={std::make_shared<const SourceFile>(path_utf8(root),""),{},0,0};d.description=failure.what();d.hint="Use exact canonical root-relative source identities and a manifest-relative .void entry.";result.diagnostics.push_back(std::move(d));retain();return result;}
+ }
+ 
+-ProjectAnalysisResult analyze_manifest_project(const std::filesystem::path& root,const std::optional<std::string>& entry,const SourceOverrides& sources,const ManifestOverrides& manifests) {
+-    return analyze_manifest_project_impl(root,entry,sources,manifests,nullptr);
++ProjectAnalysisResult analyze_manifest_project(const std::filesystem::path& root,const std::optional<std::string>& entry,const SourceOverrides& sources,const ManifestOverrides& manifests,bool authorize_native) {
++    return analyze_manifest_project_impl(root,entry,sources,manifests,nullptr,authorize_native);
+ }
+ 
+ static std::vector<Diagnostic> check_project_documents_impl(const std::filesystem::path& root,const SourceOverrides& sources,const ManifestOverrides& manifests,const std::vector<std::string>& documents,bool read_physical) {
+diff --git a/src/ir/c_primitive.cpp b/src/ir/c_primitive.cpp
+--- a/src/ir/c_primitive.cpp
++++ b/src/ir/c_primitive.cpp
+@@ -1,10 +1,12 @@
+ #include "void/c_primitive.hpp"
++#include "void/path.hpp"
+ #include <algorithm>
+ #include <array>
+ #include <charconv>
+ #include <initializer_list>
+ #include <set>
+ #include <span>
++#include <sstream>
+ #include <stdexcept>
+ #include <utility>
+ 
+@@ -92,7 +94,7 @@
+ }
+ }
+ 
+-std::shared_ptr<CPrimitiveAdmission> CPrimitiveAdmission::parse(std::string_view descriptor) {
++std::shared_ptr<CPrimitiveAdmission> CPrimitiveAdmission::parse(std::string_view descriptor, bool conventional) {
+     if (descriptor.empty() || descriptor.size() > descriptor_limit) reject(1, "descriptor size outside 1..16384 bytes");
+     auto admitted = std::shared_ptr<CPrimitiveAdmission>(new CPrimitiveAdmission);
+     admitted->descriptor_ = descriptor;
+@@ -121,7 +123,11 @@
+     admitted->thunk_identity_ = reader.value("thunk");
+     if (!digest(admitted->thunk_identity_)) reject(reader.line, "invalid thunk SHA-256 identity");
+     if (!digest(reader.value("fixture"))) reject(reader.line, "invalid fixture SHA-256 identity");
+-    reader.exact({"effects", "direct-sync", "nonblocking", "no-callbacks"});
++    const auto effects = reader.take();
++    const std::initializer_list<std::string_view> nonblocking = {"effects", "direct-sync", "nonblocking", "no-callbacks"};
++    const std::initializer_list<std::string_view> blocking = {"effects", "direct-sync", "blocking", "no-callbacks"};
++    if (!std::ranges::equal(effects, nonblocking) && !(conventional && std::ranges::equal(effects, blocking)))
++        reject(reader.line, "unsupported descriptor, ABI revision or effects");
+     reader.exact({"call", "c-default"});
+     reader.exact({"aliases", "c_int:i32", llp64 ? "c_long:i32" : "c_long:i64", "c_size:u64", "c_bool:bool"});
+     auto number = [&](std::string_view value, unsigned limit) {
+@@ -143,6 +149,13 @@
+     };
+     auto shape = [&](std::string_view token, bool field, bool result) {
+         Shape type;
++        auto scalar = [&](std::string_view spelling) {
++            type.scalar = primitive(spelling, llp64, result, reader.line);
++            if (spelling == "c_int") type.alias = Shape::Alias::c_int;
++            if (spelling == "c_long") type.alias = Shape::Alias::c_long;
++            if (spelling == "c_size") type.alias = Shape::Alias::c_size;
++            if (spelling == "c_bool") type.alias = Shape::Alias::c_bool;
++        };
+         if (admitted->revision_ >= 2) {
+             const auto p = parts(token);
+             if (admitted->revision_ == 3 && !field && p.size() == 2) {
+@@ -162,7 +175,7 @@
+                 reject(reader.line, "record must name an earlier verified declaration");
+             }
+             if (field && p.size() == 4 && p[0] == "array") {
+-                type.scalar = primitive(p[1], llp64, false, reader.line);
++                scalar(p[1]);
+                 type.extent = number(p[2], 32);
+                 const auto stride = number(p[3], 8);
+                 if (!type.extent || stride != scalar_bytes(type.scalar))
+@@ -183,7 +196,7 @@
+                 }
+             }
+         }
+-        type.scalar = primitive(token, llp64, result, reader.line);
++        scalar(token);
+         return type;
+     };
+     std::set<std::string_view> names, exports, c_records;
+@@ -312,22 +325,162 @@
+ 
+ CPrimitiveAdmission::Owner CPrimitiveAdmission::admit_dynamic(std::string_view closure, std::filesystem::path root) {
+     auto plan = DynamicClosure::parse(closure);
+-    auto admitted = parse(plan->descriptor());
+-    if (admitted->target() != "x86_64-unknown-linux-gnu" || admitted->revision() != 3 ||
++    auto admitted = parse(plan->descriptor(), plan->conventional());
++    if (admitted->target() != plan->target() || admitted->transport() != plan->dispatch() ||
+         admitted->provider() != plan->provider() || admitted->thunk_identity_ != plan->thunk_identity() ||
+         !root.is_absolute() || root != root.lexically_normal())
+         throw std::invalid_argument("C dynamic closure does not match the exact descriptor or host root");
+     for (const auto& binding : admitted->bindings())
+         if (std::none_of(plan->exports().begin(), plan->exports().end(), [&](const auto& e) {
+-            return e.image == plan->images().back().name && e.symbol == binding.export_name;
+-        })) throw std::invalid_argument("C dynamic closure is missing an owned descriptor export");
++            return (plan->conventional() || e.image == plan->images().back().name) && e.symbol == binding.export_name;
++        })) throw std::invalid_argument(plan->conventional() ?
++            "C dynamic closure is missing a required descriptor export: " + binding.export_name :
++            "C dynamic closure is missing an owned descriptor export");
+     admitted->dynamic_ = std::move(plan);
+     admitted->dynamic_root_ = std::move(root);
+     return admitted;
+ }
+ 
++CPrimitiveAdmission::Owner CPrimitiveAdmission::admit_conventional(std::string_view descriptor,
++    std::filesystem::path root, std::string_view library, std::string_view adapter) {
++    const auto admitted = parse(descriptor, true);
++    std::string plan = "void-native-conventional 1\nprovider " + admitted->provider_ +
++        "\ntarget " + admitted->target_ +
++        (admitted->target_ == "x86_64-pc-windows-msvc" ? " msvc-x64" : " sysv-x64") +
++        "\nsystem os\nlayout executable-sibling-native\nthunk " + admitted->thunk_identity_ + ' ';
++    plan += admitted->transport();
++    plan += "\nlibraries ";
++    plan += library;
++    plan += ' ';
++    plan += adapter;
++    plan += '\n';
++    for (const auto& binding : admitted->bindings_) {
++        plan += "export ";
++        plan += library;
++        plan += ' ' + binding.export_name + '\n';
++    }
++    plan += "descriptor\n";
++    plan += descriptor;
++    return admit_dynamic(plan, std::move(root));
++}
++
++std::string CPrimitiveAdmission::generate_adapter(std::string_view descriptor, std::string_view header) {
++    const auto admitted = parse(descriptor, true);
++    if (header.empty() || std::any_of(header.begin(), header.end(), [](char c) {
++        return c < ' ' || c > '~' || c == '"' || c == '\\';
++    })) throw std::invalid_argument("C adapter requires an include filename with forward slashes");
++
++    using Shape = CPrimitiveAdmission::Shape;
++    auto c_type = [&](const Shape& shape) -> std::string {
++        if (shape.record) return admitted->record(shape.record).c_name;
++        if (shape.resource)
++            return (shape.role == CResourceRole::borrow ? "const " : "") +
++                admitted->resource(shape.resource).c_name + "*";
++        if (shape.direction) return shape.direction == 1 ? "const uint8_t*" : "uint8_t*";
++        switch (shape.alias) {
++            case Shape::Alias::c_int: return "int";
++            case Shape::Alias::c_long: return "long";
++            case Shape::Alias::c_size: return "size_t";
++            case Shape::Alias::c_bool: return "_Bool";
++            case Shape::Alias::none: break;
++        }
++        switch (shape.scalar.kind) {
++            case Type::none: return "void";
++            case Type::f32: return "float";
++            case Type::f64: return "double";
++            default:
++                const auto name = void_spelling(shape.scalar);
++                return (name.front() == 'u' ? "uint" : "int") + std::string(name.substr(1)) + "_t";
++        }
++    };
++    auto word_type = [](const Shape& shape) {
++        return "uint" + std::to_string(8 * scalar_bytes(shape.scalar)) + "_t";
++    };
++    std::ostringstream out;
++    out << "/* Generated by voidc native-bind. Compile as C11 with the provider header. */\n"
++           "#include <stdint.h>\n#include <stddef.h>\n#include <limits.h>\n#include <string.h>\n"
++           "#include \"" << header << "\"\n";
++    const bool windows = admitted->target_ == "x86_64-pc-windows-msvc";
++    out << (windows ? "#if !defined(_WIN32) || !defined(_M_X64)\n" : "#if !defined(__linux__) || !defined(__x86_64__)\n")
++        << "#error Wrong C adapter target\n#endif\n"
++        << "_Static_assert(CHAR_BIT == 8 && sizeof(void*) == 8 && sizeof(int) == 4 && sizeof(long) == "
++        << (windows ? 4 : 8) << " && sizeof(size_t) == 8 && sizeof(float) == 4 && sizeof(double) == 8, \"C ABI widths\");\n";
++    for (const auto& record : admitted->records_) {
++        out << "_Static_assert(sizeof(" << record.c_name << ") == " << record.size
++            << " && _Alignof(" << record.c_name << ") == " << record.alignment
++            << ", \"C layout " << record.c_name << "\");\n";
++        for (const auto& field : record.fields) {
++            out << "_Static_assert(offsetof(" << record.c_name << ", " << field.c_name << ") == " << field.offset
++                << " && _Generic(&((" << record.c_name << "*)0)->" << field.c_name << ", " << c_type(field.shape);
++            if (field.shape.extent) out << " (*)[" << field.shape.extent << ']';
++            else out << '*';
++            out << ": 1, default: 0), \"C field " << record.c_name << '.' << field.c_name << "\");\n";
++        }
++    }
++    for (const auto& binding : admitted->bindings_) {
++        out << "_Static_assert(_Generic(&" << binding.export_name << ", " << c_type(binding.abi_result) << " (*)(";
++        if (binding.abi_parameters.empty()) out << "void";
++        for (std::size_t i = 0; i < binding.abi_parameters.size(); ++i) {
++            if (i) out << ", ";
++            out << c_type(binding.abi_parameters[i]);
++        }
++        out << "): 1, default: 0), \"C signature " << binding.export_name << "\");\n";
++    }
++    out << "static const char vd_descriptor[] =\n    \"";
++    for (const auto c : descriptor) {
++        if (c == '\n') out << "\\n\"\n    \"";
++        else {
++            if (c == '"' || c == '\\' || c == '?') out << '\\';
++            out << c;
++        }
++    }
++    out << "\";\n" << (windows ? "__declspec(dllexport)" : "__attribute__((visibility(\"default\")))")
++        << "\nuint32_t " << admitted->transport() << "(const char* descriptor, uint32_t size, uint32_t ordinal,\n"
++           "    const uint64_t* words, uint32_t count, uint64_t* result) {\n"
++           "    if (!descriptor || size != sizeof(vd_descriptor) - 1 || memcmp(descriptor, vd_descriptor, size)) return 1;\n"
++           "    if (ordinal == UINT32_MAX) return words || count || result ? 1 : 0;\n"
++           "    if (count && !words) return 2;\n"
++           "    switch (ordinal) {\n";
++    for (std::size_t ordinal = 0; ordinal < admitted->bindings_.size(); ++ordinal) {
++        const auto& binding = admitted->bindings_[ordinal];
++        const auto& result = binding.abi_result;
++        const bool returns = result.scalar != Type::none || result.record || result.resource;
++        out << "    case " << ordinal << ": {\n        if (count != " << binding.abi_parameters.size()
++            << (returns ? " || !result" : " || result") << ") return 2;\n";
++        for (std::size_t i = 0; i < binding.abi_parameters.size(); ++i) {
++            const auto& shape = binding.abi_parameters[i];
++            const auto word = "words[" + std::to_string(i) + "]";
++            const auto argument = "arg" + std::to_string(i);
++            const auto type = c_type(shape);
++            if (shape.record || shape.resource) out << "        if (!" << word << ") return 2;\n";
++            out << "        " << type << ' ' << argument;
++            if (shape.resource || shape.direction) out << " = (" << type << ")(uintptr_t)" << word << ";\n";
++            else if (shape.scalar == Type::boolean) out << " = " << word << " != 0;\n";
++            else {
++                out << ";\n";
++                if (shape.record) out << "        memcpy(&" << argument << ", (const void*)(uintptr_t)" << word << ", sizeof " << argument << ");\n";
++                else out << "        " << word_type(shape) << " bits" << i << " = (" << word_type(shape) << ")" << word
++                         << ";\n        memcpy(&" << argument << ", &bits" << i << ", sizeof " << argument << ");\n";
++            }
++        }
++        out << "        ";
++        if (returns) out << c_type(result) << " value = ";
++        out << binding.export_name << '(';
++        for (std::size_t i = 0; i < binding.abi_parameters.size(); ++i) out << (i ? ", arg" : "arg") << i;
++        out << ");\n";
++        if (result.record) out << "        memcpy(result, &value, sizeof value);\n";
++        else if (result.resource) out << "        *result = (uintptr_t)value;\n";
++        else if (result.scalar == Type::boolean) out << "        *result = value;\n";
++        else if (returns) out << "        " << word_type(result)
++            << " bits;\n        memcpy(&bits, &value, sizeof bits);\n        *result = bits;\n";
++        out << "        return 0;\n    }\n";
++    }
++    out << "    default: return 2;\n    }\n}\n";
++    return out.str();
++}
++
+ std::string CPrimitiveAdmission::dynamic_contract() const {
+-    return dynamic_ ? dynamic_->bytes() + '\0' + dynamic_root_.generic_string() : std::string{};
++    return dynamic_ ? dynamic_->bytes() + '\0' + path_utf8(dynamic_root_) : std::string{};
+ }
+ 
+ unsigned CPrimitiveAdmission::scalar_bytes(Type type) {
+diff --git a/src/main.cpp b/src/main.cpp
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -1,4 +1,5 @@
+ #include "void/backend.hpp"
++#include "void/c_primitive.hpp"
+ #include "void/frontend.hpp"
+ #include "void/path.hpp"
+ #include "void/native_build.hpp"
+@@ -6,8 +7,10 @@
+ #include "void/runtime.hpp"
+ #include <llvm/Support/FileSystem.h>
+ #include <llvm/Config/llvm-config.h>
++#include <llvm/Support/raw_ostream.h>
+ #include <cerrno>
+ #include <cstdlib>
++#include <fstream>
+ #include <iostream>
+ #include <limits>
+ #include <set>
+@@ -15,7 +18,7 @@
+ namespace {
+ struct UsageError : std::invalid_argument {using std::invalid_argument::invalid_argument;};
+ bool known_command(const std::string& command) {
+-    return command=="check" || command=="run" || command=="build" || command=="emit" || command=="init" || command=="new";
++    return command=="check" || command=="run" || command=="build" || command=="emit" || command=="init" || command=="new" || command=="native-bind";
+ }
+ void usage(std::ostream& out, const std::string& command={}) {
+     if(command.empty() || command=="check")out<<"Usage: voidc check <file-or-directory> [--no-opt]\n";
+@@ -24,6 +27,7 @@
+     if(command.empty() || command=="emit")out<<"Usage: voidc emit <file-or-directory> -o <object> [--no-opt]\n";
+     if(command.empty() || command=="init")out<<"Usage: voidc init [DIR] [project options]\n";
+     if(command.empty() || command=="new")out<<"Usage: voidc new PATH [project options] [--source PATH]\n";
++    if(command.empty() || command=="native-bind")out<<"Usage: voidc native-bind <descriptor> <C-header> -o <adapter.c>\n";
+ }
+ void help(const std::string& command={}) {
+     std::cout<<"VOID Language Compiler v"<<VOID_COMPILER_VERSION<<" (development)\nLLVM "<<LLVM_VERSION_STRING<<"\n\n";
+@@ -36,6 +40,7 @@
+           "  emit    Write a native object for manual linking.\n"
+           "  init    Add a project manifest to an existing directory.\n"
+           "  new     Create a project and starter source in a new directory.\n"
++          "  native-bind  Generate a checked C11 adapter for a native library.\n"
+           "\nOptions:\n"
+           "  -h, --help  Show help; use <command> --help for examples.\n"
+           "  --version   Show compiler, LLVM, target and build identity.\n"
+@@ -43,6 +48,7 @@
+           "  --cache     Select Debug code and report cache status (run only).\n"
+           "  --no-cache  Disable disk caching (run only).\n"
+           "  --project DIR  Select exactly DIR/void.project.toml.\n"
++          "  --allow-native  Authorize this project's declared native provider for run/build/emit.\n"
+           "  --entry PATH   Override its entry with a manifest-relative source.\n"
+           "  --profile debug|release  Select project optimization/cache settings.\n"
+           "                           line/full debug_info warns; profile-controlled emission is not implemented.\n"
+@@ -142,6 +148,36 @@
+     if(app)std::cout<<"Automatic application selection requires one eligible main(). Use --entry for a deliberate override.\n";
+     return 0;
+ }
++void generate_native_binding(int argc, char** argv) {
++    if (argc != 6 || std::string_view(argv[4]) != "-o")
++        throw UsageError("Expected native-bind <descriptor> <C-header> -o <adapter.c>.");
++    const auto descriptor = vd::utf8_path(argv[2]);
++    const auto output = vd::utf8_path(argv[5]);
++    if (output.extension() != ".c")
++        throw UsageError("Expected a new .c output path.");
++    if (!std::filesystem::is_regular_file(descriptor))
++        throw std::runtime_error("Missing native descriptor: " + vd::path_utf8(descriptor));
++    std::ifstream source(descriptor, std::ios::binary);
++    std::string bytes(16385, '\0');
++    source.read(bytes.data(), static_cast<std::streamsize>(bytes.size()));
++    if (source.bad() || !source.eof() || source.gcount() == 0)
++        throw std::runtime_error("Cannot read native descriptor (expected 1..16384 bytes).");
++    bytes.resize(static_cast<std::size_t>(source.gcount()));
++    const auto generated = vd::CPrimitiveAdmission::generate_adapter(bytes, argv[3]);
++    int fd;
++    const auto name = vd::path_utf8(output);
++    if (auto error = llvm::sys::fs::openFileForWrite(name, fd, llvm::sys::fs::CD_CreateNew))
++        throw std::runtime_error("Cannot create C adapter " + name + ": " + error.message());
++    llvm::raw_fd_ostream file(fd, true);
++    file << generated;
++    file.close();
++    if (file.has_error()) {
++        file.clear_error();
++        std::error_code ignored;
++        std::filesystem::remove(output, ignored);
++        throw std::runtime_error("Cannot write C adapter: " + name);
++    }
++}
+ }
+ static int run_cli(int argc, char** argv) {
+     std::string command;
+@@ -175,7 +211,7 @@
+         }
+         if(argc>=2 && std::string(argv[1])=="help") {
+             if(argc==2) {help();return 0;}
+-            if(argc!=3 || !known_command(argv[2]))throw UsageError("Expected help [check|run|build|emit|init|new].");
++            if(argc!=3 || !known_command(argv[2]))throw UsageError("Expected help [check|run|build|emit|init|new|native-bind].");
+             help(argv[2]);return 0;
+         }
+         vd::configure_standard_library_root(vd::utf8_path(llvm::sys::fs::getMainExecutable(argv[0],reinterpret_cast<void*>(&run_cli))));
+@@ -193,7 +229,9 @@
+         if(!known_command(command))
+             throw UsageError("Unknown command: "+command);
+         if(argc==3 && (std::string(argv[2])=="--help" || std::string(argv[2])=="-h")) {help(command);return 0;}
++        if(command=="native-bind") {generate_native_binding(argc,argv);return 0;}
+         bool optimize=true,cache=false,no_cache=false,no_opt=false;
++        bool allow_native=false;
+         bool positional_only=false;
+         bool forwarded=false;
+         std::vector<std::string> application_arguments;
+@@ -216,6 +254,7 @@
+             else if(arg=="--no-opt") {if(no_opt)throw UsageError("Duplicate --no-opt.");no_opt=true;optimize=false;}
+             else if(arg=="--cache") {if(cache)throw UsageError("Duplicate --cache.");cache=true;optimize=false;}
+             else if(arg=="--no-cache") {if(no_cache)throw UsageError("Duplicate --no-cache.");no_cache=true;}
++            else if(arg=="--allow-native") {if(allow_native)throw UsageError("Duplicate --allow-native.");allow_native=true;}
+             else if(arg=="--project") {
+                 if(project_root || ++i==argc || !*argv[i] || argv[i][0]=='-')throw UsageError("Expected one directory after --project.");
+                 project_root=vd::utf8_path(argv[i]);
+@@ -250,13 +289,17 @@
+         auto value=operands.size()==2?input(operands[1].c_str()):0;
+         auto path=project_root?*project_root:operands.empty()?std::filesystem::current_path():vd::utf8_path(operands[0]);
+         const bool project_mode=project_root || (std::filesystem::is_directory(path) && vd::project_manifest_present(path));
++        if(allow_native && (!project_mode || command=="check"))
++            throw UsageError("--allow-native requires a manifest-selected run, build or emit.");
+         if(profile && !project_mode)throw UsageError("--profile requires a manifest-selected project context.");
+         if(project_entry && !project_mode)throw UsageError("--entry requires a manifest-selected project context.");
+         std::shared_ptr<const vd::ProjectAnalysis> project;
+         std::filesystem::path selected;
+         vd::AnalysisResult analysis;
+         if(project_mode) {
+-            auto result=vd::analyze_manifest_project(path,project_entry);
++            auto result=vd::analyze_manifest_project(path,project_entry,{},{},allow_native);
++            if(result.manifest && !result.manifest->native().empty() && command!="check" && !allow_native)
++                throw UsageError("This project declares native code. Pass --allow-native to authorize its execution.");
+             if(result.manifest && result.manifest->kind()==vd::project::Kind::library && project_entry)throw UsageError("--entry cannot select an application entry in a library project.");
+             if(result.manifest) {
+                 vd::project::EffectiveProfile selected_profile;
+diff --git a/src/native_build.cpp b/src/native_build.cpp
+--- a/src/native_build.cpp
++++ b/src/native_build.cpp
+@@ -1,6 +1,7 @@
+ #include "void/native_build.hpp"
+ #include "void/backend.hpp"
+ #include "void/cache.hpp"
++#include "void/c_primitive.hpp"
+ #include "void/path.hpp"
+ #include <llvm/Support/FileSystem.h>
+ #include <llvm/Support/Path.h>
+@@ -62,7 +63,7 @@
+     // Check before directory creation, so a failed collision never touches input.
+     for(const auto& module:analysis.modules()) {
+         auto source=utf8_path(module.source.path());
+-        if(path==source || (fs::exists(path) && fs::equivalent(path,source)))
++        if(path==source || (fs::exists(path) && fs::exists(source) && fs::equivalent(path,source)))
+             throw std::runtime_error("Unsafe source/output collision: "+path_utf8(path));
+     }
+     fs::create_directories(path.parent_path());
+@@ -217,7 +218,7 @@
+     output_path(analysis,output);publish(object,output);
+ }
+ void build_executable(const ValidatedAnalysis& analysis,const fs::path& requested,bool optimize,const char* argv0,std::string_view profile) {
+-    if (analysis.c_primitive_admission())
++    if (analysis.c_primitive_admission() && !analysis.c_primitive_admission()->dynamic())
+         throw std::invalid_argument("Host-admitted C primitives require an explicitly linked AOT fixture");
+     auto config=[&] {
+         try {return resources(argv0);}
+diff --git a/src/runtime/abi.cpp b/src/runtime/abi.cpp
+--- a/src/runtime/abi.cpp
++++ b/src/runtime/abi.cpp
+@@ -169,7 +169,12 @@
+         if (!closure || !closure_size) throw std::invalid_argument("C dynamic authority: missing embedded closure");
+         auto application = metadata ? vd::ApplicationMetadata::decode({metadata,metadata_size}) : vd::ApplicationMetadata::Owner{};
+         auto binding = vd::load_dynamic(vd::DynamicClosure::parse({closure,closure_size}), vd::installed_dynamic_root());
+-        return runtime_entry(entry,value,failure,records,count,witnesses,witness_count,argc,argv,false,
++#ifdef _WIN32
++        constexpr bool wide = true; // Dynamic applications use the generated wmain.
++#else
++        constexpr bool wide = false;
++#endif
++        return runtime_entry(entry,value,failure,records,count,witnesses,witness_count,argc,argv,wide,
+                              std::move(application),std::move(binding));
+     } catch (const std::exception& error) {
+         failure->message = error.what();
+diff --git a/src/runtime/c_dynamic.cpp b/src/runtime/c_dynamic.cpp
+--- a/src/runtime/c_dynamic.cpp
++++ b/src/runtime/c_dynamic.cpp
+@@ -1,12 +1,20 @@
+ #include "void/c_primitive.hpp"
++#include "void/path.hpp"
+ #include "void/runtime.hpp"
+ 
+ #include <algorithm>
+ #include <atomic>
+ #include <stdexcept>
+ 
++#ifdef _WIN32
++#define NOMINMAX
++#include <windows.h>
++#elif defined(__linux__)
++#include <dlfcn.h>
++#include <unistd.h>
++#endif
++
+ #if defined(__linux__) && defined(__GLIBC__) && defined(__x86_64__)
+-#include <dlfcn.h>
+ #include <elf.h>
+ #include <fcntl.h>
+ #include <link.h>
+@@ -17,7 +25,6 @@
+ #include <sys/stat.h>
+ #include <sys/sysmacros.h>
+ #include <sys/vfs.h>
+-#include <unistd.h>
+ 
+ #include <cerrno>
+ #include <cstring>
+@@ -33,6 +40,63 @@
+ [[noreturn]] void denied(std::string_view stage, std::string_view reason) {
+     throw std::runtime_error("C dynamic " + std::string(stage) + ": " + std::string(reason));
+ }
++
++#if defined(_WIN32) || defined(__linux__)
++class OsModule {
++#ifdef _WIN32
++    HMODULE handle_;
++#else
++    void* handle_;
++#endif
++public:
++    explicit OsModule(const std::filesystem::path& path) {
++        if (!std::filesystem::is_regular_file(path))
++            denied("library", "missing or unreadable library " + path_utf8(path));
++#ifdef _WIN32
++        // Scope filesystem search to the DLL's directory and System32.
++        // The ordinary loader still applies its loaded-module and redirection rules.
++        // Return loader failures to VOID instead of opening a modal error dialog.
++        DWORD previous_mode;
++        if (!SetThreadErrorMode(GetThreadErrorMode() | SEM_FAILCRITICALERRORS, &previous_mode))
++            denied("load", "cannot set thread error mode (Windows error " + std::to_string(GetLastError()) + ')');
++        handle_ = LoadLibraryExW(path.c_str(), nullptr,
++            LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_SYSTEM32);
++        const auto code = GetLastError();
++        SetThreadErrorMode(previous_mode, nullptr);
++        if (!handle_) {
++            denied("load", path_utf8(path) + " (Windows error " + std::to_string(code) +
++                "; check architecture, dependencies and initialization)");
++        }
++#else
++        handle_ = dlopen(path.c_str(), RTLD_NOW | RTLD_LOCAL);
++        if (!handle_) {
++            const auto* message = dlerror();
++            denied("load", path_utf8(path) + ": " + (message ? message : "dlopen failed"));
++        }
++#endif
++    }
++    OsModule(const OsModule&) = delete;
++    OsModule& operator=(const OsModule&) = delete;
++    ~OsModule() {
++#ifdef _WIN32
++        FreeLibrary(handle_);
++#else
++        dlclose(handle_);
++#endif
++    }
++    CPrimitiveThunk* find(const std::filesystem::path& path, const std::string& symbol) const {
++#ifdef _WIN32
++        auto address = GetProcAddress(handle_, symbol.c_str());
++#else
++        dlerror();
++        auto address = dlsym(handle_, symbol.c_str());
++        if (dlerror()) address = nullptr;
++#endif
++        if (!address) denied("export", path_utf8(path) + " does not provide " + symbol);
++        return reinterpret_cast<CPrimitiveThunk*>(address);
++    }
++};
++#endif
+ 
+ #if defined(__linux__) && defined(__GLIBC__) && defined(__x86_64__)
+ constexpr std::uint64_t page = 4096;
+@@ -449,6 +513,10 @@
+     std::filesystem::path root;
+     CPrimitiveThunk* thunk = nullptr;
+     mutable std::atomic<bool> claimed{false};
++#if defined(_WIN32) || defined(__linux__)
++    // Destroy the adapter first, while its provider still has a reference.
++    std::unique_ptr<OsModule> provider, adapter;
++#endif
+ #if defined(__linux__) && defined(__GLIBC__) && defined(__x86_64__)
+     std::vector<Mapped> modules;
+     ~DynamicBinding() { while (!modules.empty()) modules.pop_back(); }
+@@ -460,10 +528,43 @@
+ }
+ 
+ std::shared_ptr<const DynamicBinding> load_dynamic(DynamicClosure::Owner plan, const std::filesystem::path& root) {
+-#if defined(__linux__) && defined(__GLIBC__) && defined(__x86_64__)
+     if (!plan) denied("authority", "missing host closure");
+     if (auto* runtime = Runtime::attached(); runtime && runtime->is_managed())
+         denied("authority", "loader admission requires NativeSafe state");
++    if (plan->conventional()) {
++#if (defined(_WIN32) && (defined(_M_X64) || defined(__x86_64__))) || \
++    (defined(__linux__) && defined(__GLIBC__) && defined(__x86_64__))
++#ifdef _WIN32
++        constexpr auto target = "x86_64-pc-windows-msvc";
++#else
++        constexpr auto target = "x86_64-unknown-linux-gnu";
++#endif
++        if (plan->target() != target) denied("target", "conventional descriptor does not match this host");
++        if (!root.is_absolute() || root != root.lexically_normal())
++            denied("path", "conventional loading requires an absolute native directory");
++        const auto library = root / utf8_path(plan->library());
++        const auto adapter = root / utf8_path(plan->adapter());
++        auto result = std::make_shared<DynamicBinding>();
++        result->plan = std::move(plan);
++        result->root = root;
++        result->provider = std::make_unique<OsModule>(library);
++        for (const auto& item : result->plan->exports()) result->provider->find(library, item.symbol);
++        auto* transport = result->provider.get();
++        if (adapter != library) {
++            result->adapter = std::make_unique<OsModule>(adapter);
++            transport = result->adapter.get();
++        }
++        result->thunk = transport->find(adapter, result->plan->dispatch());
++        const auto& descriptor = result->plan->descriptor();
++        if (result->thunk(descriptor.data(), static_cast<std::uint32_t>(descriptor.size()),
++                          c_primitive_probe, nullptr, 0, nullptr))
++            denied("transport", "adapter rejected the exact descriptor or thunk identity: " + path_utf8(adapter));
++        return result;
++#else
++        denied("target", "conventional loading requires Windows x64 or Linux x86-64 GNU");
++#endif
++    }
++#if defined(__linux__) && defined(__GLIBC__) && defined(__x86_64__)
+     launch_policy();
+     if (sodium_init() < 0) denied("digest", "SHA-256 provider initialization failed");
+     auto directory = root_directory(root);
+@@ -536,7 +637,13 @@
+ }
+ 
+ std::filesystem::path installed_dynamic_root() {
+-#if defined(__linux__) && defined(__GLIBC__) && defined(__x86_64__)
++#ifdef _WIN32
++    std::wstring path(32768, L'\0');
++    const auto count = GetModuleFileNameW(nullptr, path.data(), static_cast<DWORD>(path.size()));
++    if (!count || count >= path.size()) denied("path", "executable location is unavailable");
++    path.resize(count);
++    return std::filesystem::path(path).parent_path() / "native";
++#elif defined(__linux__) && defined(__GLIBC__) && defined(__x86_64__)
+     char path[4097];
+     auto count = readlink("/proc/self/exe", path, sizeof path);
+     if (count <= 0 || count >= static_cast<ssize_t>(sizeof path))
+diff --git a/tests/ffi/conventional.descriptor.in b/tests/ffi/conventional.descriptor.in
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/conventional.descriptor.in
+@@ -0,0 +1,26 @@
++void-c-primitive 3 3
++provider org.voidlang.g4-conventional
++target @TARGET@
++source /conventional_ffi.void
++thunk @THUNK@
++fixture @FIXTURE@
++effects direct-sync blocking no-callbacks
++call c-default
++aliases c_int:i32 c_long:@LONG@ c_size:u64 c_bool:bool
++resource box ConventionalBox pointer null acquire close_box owner-calls shutdown-any consume-always
++record sample ConventionalSample 16 8 2
++field tag tag i32 0
++field value value f64 8
++bind add g4_conventional_add c_int c_int c_int
++bind scale g4_conventional_scale f64 f64 f32
++bind wide g4_conventional_long c_long c_long
++bind flip g4_conventional_flip c_bool c_bool
++bind transform g4_conventional_sample record:sample record:sample
++bind sum g4_conventional_sum i64 in:1:2:64 c_size c_size
++bind fill g4_conventional_fill i64 out:1:2:64 c_size c_size u8
++bind shift g4_conventional_shift i64 inout:1:2:64 c_size c_size
++bind acquire g4_conventional_acquire owner:box i32
++bind borrow g4_conventional_borrow i32 borrow:box
++bind close_box g4_conventional_close i32 close:box
++bind ping g4_conventional_ping void
++bind pings g4_conventional_pings i32
+diff --git a/tests/ffi/conventional.void.in b/tests/ffi/conventional.void.in
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/conventional.void.in
+@@ -0,0 +1,48 @@
++use os as host
++use "/conventional_ffi.void" as ffi
++
++var saved: ffi.box? = null
++
++func main() -> i32:
++    if host.args() is Ok(var args):
++        if args.count != 1:
++            return 10
++        if args[0] == "reject":
++            saved = ffi.acquire(31)
++            var rejected = ffi.acquire(-3)
++            return 11
++        if args[0] == "closed":
++            var owner = ffi.acquire(42) as ffi.box
++            ffi.close_box(owner)
++            return ffi.borrow(owner)
++        if args[0] == "capacity":
++            var too_short: [u8] = [1]
++            return ffi.sum(too_short, 0, 2) as i32
++        if ffi.add(30, 5) != 42 or ffi.scale(3.25, 2.0 as f32) != 6.5:
++            return 12
++        if ffi.wide(@LONG_ARG@) != @LONG_RESULT@ or ffi.flip(true) or not ffi.flip(false):
++            return 13
++        var sample = ffi.transform(ffi.sample(tag = -9, value = 3.25))
++        if sample.tag != -2 or sample.value != 6.5:
++            return 14
++        var bytes: [u8] = [10, 20, 30, 40]
++        if ffi.sum(bytes, 1, 2) != 50:
++            return 15
++        if ffi.fill(bytes, 1, 2, 255) != -7 or bytes[1] != 20 or bytes[2] != 30:
++            return 16
++        if ffi.fill(bytes, 1, 2, 5) != 2 or ffi.shift(bytes, 1, 2) != 2:
++            return 17
++        if bytes[0] != 10 or bytes[1] != 7 or bytes[2] != 8 or bytes[3] != 40:
++            return 18
++        if ffi.acquire(-1) != null:
++            return 19
++        var owner = ffi.acquire(-2) as ffi.box
++        if ffi.borrow(owner) != -2 or ffi.close_box(owner) != 17:
++            return 20
++        saved = ffi.acquire(23)
++        ffi.ping()
++        if ffi.pings() != 1 or ffi.borrow(saved as ffi.box) != 23:
++            return 21
++        print("VOID native application", args[0])
++        return 0
++    return 22
+diff --git a/tests/ffi/conventional_dependency.cpp b/tests/ffi/conventional_dependency.cpp
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/conventional_dependency.cpp
+@@ -0,0 +1,23 @@
++#include <cstdio>
++#include <chrono>
++#include <thread>
++
++#ifdef _WIN32
++#define G4_DEP __declspec(dllexport)
++#else
++#define G4_DEP __attribute__((visibility("default")))
++#endif
++
++static int bias;
++struct Startup {
++    Startup() {
++        if (auto* log = std::fopen("native-init.log", "a")) {
++            std::fputs("dependency initialized\n", log);
++            std::fclose(log);
++            bias = 7;
++        }
++    }
++};
++static Startup startup;
++extern "C" G4_DEP int g4_conventional_bias() { return bias; }
++extern "C" G4_DEP void g4_conventional_delay() { std::this_thread::sleep_for(std::chrono::milliseconds(2)); }
+diff --git a/tests/ffi/conventional_fixture.c b/tests/ffi/conventional_fixture.c
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/conventional_fixture.c
+@@ -0,0 +1,69 @@
++#define G4_PROVIDER
++#include "conventional_fixture.h"
++
++#include <stdio.h>
++#include <stdlib.h>
++
++#ifdef _WIN32
++__declspec(dllimport)
++#endif
++int g4_conventional_bias(void);
++#ifdef _WIN32
++__declspec(dllimport)
++#endif
++void g4_conventional_delay(void);
++
++struct ConventionalBox { int32_t value; };
++static ConventionalBox* last;
++static int32_t pings;
++
++int g4_conventional_add(int x, int y) { return x + y + g4_conventional_bias(); }
++double g4_conventional_scale(double x, float y) { return x * y; }
++long g4_conventional_long(long x) { return x + g4_conventional_bias(); }
++bool g4_conventional_flip(bool x) { return !x; }
++ConventionalSample g4_conventional_sample(ConventionalSample s) {
++    return (ConventionalSample){s.tag + g4_conventional_bias(), s.value * 2};
++}
++int64_t g4_conventional_sum(const uint8_t* data, size_t offset, size_t length) {
++    (void)offset;
++    int64_t total = 0;
++    for (size_t i = 0; i < length; ++i) total += data[i];
++    return total;
++}
++int64_t g4_conventional_fill(uint8_t* data, size_t offset, size_t length, uint8_t start) {
++    (void)offset;
++    for (size_t i = 0; i < length; ++i) data[i] = (uint8_t)(start + i);
++    return start == 255 ? -7 : (int64_t)length;
++}
++int64_t g4_conventional_shift(uint8_t* data, size_t offset, size_t length) {
++    (void)offset;
++    for (size_t i = 0; i < length; ++i) data[i] += 2;
++    return (int64_t)length;
++}
++ConventionalBox* g4_conventional_acquire(int32_t value) {
++    if (value == -1) return NULL;
++    ConventionalBox* box = malloc(sizeof *box);
++    if (box) {
++        box->value = value;
++        last = box;
++    }
++    return box;
++}
++int32_t g4_conventional_borrow(const ConventionalBox* box) { return box->value; }
++int32_t g4_conventional_close(ConventionalBox* box) {
++    int32_t status = box->value == -2 ? 17 : 0;
++    FILE* log = fopen("native-release.log", "a");
++    if (log) {
++        fprintf(log, "%d\n", (int)box->value);
++        fclose(log);
++    }
++    if (last == box) last = NULL;
++    free(box);
++    return status;
++}
++void g4_conventional_ping(void) {
++    g4_conventional_delay();
++    ++pings;
++}
++int32_t g4_conventional_pings(void) { return pings; }
++ConventionalBox* g4_conventional_last(void) { return last; }
+diff --git a/tests/ffi/conventional_fixture.h b/tests/ffi/conventional_fixture.h
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/conventional_fixture.h
+@@ -0,0 +1,31 @@
++#pragma once
++#include <stdbool.h>
++#include <stddef.h>
++#include <stdint.h>
++
++#ifdef _WIN32
++#  ifdef G4_PROVIDER
++#    define G4_API __declspec(dllexport)
++#  else
++#    define G4_API __declspec(dllimport)
++#  endif
++#else
++#  define G4_API __attribute__((visibility("default")))
++#endif
++
++typedef struct ConventionalBox ConventionalBox;
++typedef struct { int32_t tag; double value; } ConventionalSample;
++G4_API int g4_conventional_add(int, int);
++G4_API double g4_conventional_scale(double, float);
++G4_API long g4_conventional_long(long);
++G4_API bool g4_conventional_flip(bool);
++G4_API ConventionalSample g4_conventional_sample(ConventionalSample);
++G4_API int64_t g4_conventional_sum(const uint8_t*, size_t, size_t);
++G4_API int64_t g4_conventional_fill(uint8_t*, size_t, size_t, uint8_t);
++G4_API int64_t g4_conventional_shift(uint8_t*, size_t, size_t);
++G4_API ConventionalBox* g4_conventional_acquire(int32_t);
++G4_API int32_t g4_conventional_borrow(const ConventionalBox*);
++G4_API int32_t g4_conventional_close(ConventionalBox*);
++G4_API void g4_conventional_ping(void);
++G4_API int32_t g4_conventional_pings(void);
++G4_API ConventionalBox* g4_conventional_last(void);
+diff --git a/tests/ffi/conventional_process.py b/tests/ffi/conventional_process.py
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/conventional_process.py
+@@ -0,0 +1,235 @@
++"""Exercise installed project tooling and independently compiled OS-loaded libraries."""
++from contextlib import nullcontext
++from hashlib import sha256
++from pathlib import Path
++import os
++import shutil
++import subprocess
++import sys
++import tempfile
++
++sys.stdout.reconfigure(encoding='utf-8')
++cmake, build, config, clang = sys.argv[1:5]
++sanitized = sys.argv[5] == 'ON'
++sources = Path(__file__).resolve().parent
++windows = os.name == 'nt'
++exe = '.exe' if windows else ''
++environment = dict(os.environ)
++environment.pop('VOID_STDLIB_ROOT', None)
++if sanitized:
++    environment.update(ASAN_OPTIONS='halt_on_error=1:abort_on_error=1:detect_leaks=1',
++                       UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1')
++
++
++def run(args, cwd, status=0, contains=None):
++    argv = list(map(str, args))
++    print(f'cwd={cwd} argv={argv}', flush=True)
++    proc = subprocess.run(argv, cwd=cwd, env=environment, capture_output=True, timeout=180)
++    output = (proc.stdout + proc.stderr).decode('utf-8', errors='replace')
++    print(f'exit={proc.returncode} {output}', flush=True)
++    if status is None:
++        assert proc.returncode != 0, (args, output)
++    else:
++        assert proc.returncode == status, (args, proc.returncode, output)
++    if contains:
++        assert contains in output, (contains, output)
++    assert 'AddressSanitizer' not in output and 'UndefinedBehaviorSanitizer' not in output
++    return output
++
++
++def write(path, text):
++    path.write_bytes(text.encode('utf-8'))
++
++
++def digest(path):
++    return sha256(path.read_bytes()).hexdigest()
++
++
++def verify(root):
++    cwd = root / 'unrelated cwd'
++    cwd.mkdir()
++    prefix = root / 'installed compiler'
++    run([cmake, '--install', build, '--prefix', prefix, '--config', config, '--component', 'compiler'], cwd)
++    compiler = prefix / 'bin' / ('voidc' + exe)
++    project = root / 'sources outside checkout 雪'
++    run([compiler, 'new', project, '--source', 'src/main.void', '--project-id', 'org.test.native-application',
++         '--app-id', 'org.test.native-app'], cwd)
++    native = project / 'native'
++    native.mkdir()
++    stem, suffix = ('', '.dll') if windows else ('lib', '.so')
++    dependency, library, adapter = [native / (stem + 'void_g4_conventional_' + part + suffix)
++                                    for part in ('dependency', 'provider', 'adapter')]
++    descriptor = native / 'provider.descriptor'
++    target = 'x86_64-pc-windows-msvc msvc-x64' if windows else 'x86_64-unknown-linux-gnu sysv-x64'
++    long_type = 'i32' if windows else 'i64'
++    values = {'TARGET': target, 'LONG': long_type, 'THUNK': digest(sources / 'conventional_rejection.c'),
++              'FIXTURE': digest(sources / 'conventional_fixture.c')}
++    contract = (sources / 'conventional.descriptor.in').read_text(encoding='utf-8')
++    for key, value in values.items():
++        contract = contract.replace(f'@{key}@', value)
++    write(descriptor, contract)
++    with (project / 'void.project.toml').open('a', encoding='utf-8') as manifest:
++        platform = 'windows' if windows else 'linux'
++        manifest.write(f'\n[native.{platform}]\ndescriptor = "{descriptor.name}"\n'
++                       f'library = "{library.name}"\nadapter = "{adapter.name}"\n')
++    long_arg, long_result = ('-200', '-193') if windows else ('4000000000 as i64', '4000000007 as i64')
++    source = (sources / 'conventional.void.in').read_text(encoding='utf-8')
++    write(project / 'src/main.void', source.replace('@LONG_ARG@', long_arg).replace('@LONG_RESULT@', long_result))
++
++    selector = ['--project', project]
++    marker = cwd / 'native-init.log'
++    released = cwd / 'native-release.log'
++    run([compiler, 'check', *selector], cwd)
++    run([compiler, 'run', *selector, '--', 'ignored'], cwd, 2, 'Pass --allow-native')
++    assert not marker.exists()
++    run([compiler, 'run', *selector, '--allow-native', '--', 'ignored'], cwd, 1, 'C dynamic library')
++
++    build_c = root / 'independent C sources'
++    build_c.mkdir()
++    for name in ('conventional_fixture.h', 'conventional_fixture.c',
++                 'conventional_dependency.cpp', 'conventional_rejection.c'):
++        shutil.copy2(sources / name, build_c / name)
++    generated = build_c / 'adapter.c'
++    run([compiler, 'native-bind', descriptor, 'conventional_fixture.h', '-o', generated], cwd)
++    # Compile from independent C/C++ inputs using normal CRT and DLL/DSO imports.
++    flags = ['-fuse-ld=lld', '-shared', '-O2', '-Wall', '-Wextra', '-Werror']
++    if windows:
++        flags += ['--target=x86_64-pc-windows-msvc', '-fms-runtime-lib=static', '-D_CRT_SECURE_NO_WARNINGS']
++    else:
++        flags += ['-fPIC', '-fvisibility=hidden', '-Wl,-rpath,$ORIGIN']
++        if sanitized:
++            flags += ['-fsanitize=address,undefined', '-fno-sanitize-recover=all']
++    def link(output, input_file, *imports, cxx=False, status=0, contains=None):
++        options = ['--driver-mode=g++', '-std=c++17'] if cxx else ['-std=c11']
++        if windows:
++            options += ['-Wl,/implib:' + str(build_c / (output.stem + '.lib'))]
++            imports = tuple(build_c / (item.stem + '.lib') for item in imports)
++        else:
++            options += ['-Wl,-soname,' + output.name]
++        return run([clang, *options, *flags, input_file, *imports, '-o', output], build_c, status, contains)
++
++    link(dependency, build_c / 'conventional_dependency.cpp', cxx=True)
++    link(library, build_c / 'conventional_fixture.c', dependency)
++    link(adapter, build_c / 'conventional_rejection.c', library)
++    run([compiler, 'check', *selector], cwd)
++    assert not marker.exists()
++    denied_output = root / ('unauthorized' + exe)
++    run([compiler, 'build', *selector, '-o', denied_output], cwd, 2, 'Pass --allow-native')
++    assert not marker.exists() and not denied_output.exists()
++    # Compile the unchanged generated adapter as well as the fault-injection wrapper.
++    pristine = root / adapter.name
++    link(pristine, generated, library)
++
++    mismatch_dir = root / 'mismatched adapter'
++    mismatch_dir.mkdir()
++    bad_contract = mismatch_dir / descriptor.name
++    write(bad_contract, contract.replace(values['FIXTURE'], 'f' * 64))
++    mismatch_source = mismatch_dir / 'adapter.c'
++    run([compiler, 'native-bind', bad_contract, 'conventional_fixture.h', '-o', mismatch_source], cwd)
++    shutil.copy2(build_c / 'conventional_fixture.h', mismatch_dir / 'conventional_fixture.h')
++    mismatch = mismatch_dir / adapter.name
++    link(mismatch, mismatch_source, library)
++
++    wrong_signature = root / 'wrong signature'
++    wrong_signature.mkdir()
++    wrong_header = (build_c / 'conventional_fixture.h').read_text().replace(
++        'g4_conventional_scale(double, float)', 'g4_conventional_scale(double, double)')
++    write(wrong_signature / 'conventional_fixture.h', wrong_header)
++    shutil.copy2(generated, wrong_signature / generated.name)
++    run([clang, '-std=c11', '-fsyntax-only', wrong_signature / generated.name], build_c, None,
++        'C signature g4_conventional_scale')
++
++    def invoke(args, case, status=0, contains=None, releases=(), initialized=True):
++        marker.unlink(missing_ok=True)
++        released.unlink(missing_ok=True)
++        run(args, cwd, status, contains)
++        assert marker.exists() == initialized
++        init_log = marker.read_text().splitlines() if initialized else []
++        release_log = released.read_text().splitlines() if released.exists() else []
++        assert init_log == (['dependency initialized'] if initialized else [])
++        assert release_log == list(releases), case
++        print(f'{case}: initializers={init_log}, released={release_log}', flush=True)
++
++    message = 'VOID native application payload 雪'
++    shutil.copy2(adapter, build_c / 'adapter-with-rejection.bin')
++    shutil.copy2(pristine, adapter)
++    invoke([compiler, 'run', *selector, '--allow-native', '--', 'payload 雪'], 'pristine', contains=message,
++           releases=('-2', '23'))
++    shutil.copy2(build_c / 'adapter-with-rejection.bin', adapter)
++    installed = {}
++    for mode, options in (('normal', ['--no-opt']), ('optimized', [])):
++        jit = [compiler, 'run', *selector, '--allow-native', '--no-cache', *options, '--']
++        invoke([*jit, 'payload 雪'], mode, contains=message, releases=('-2', '23'))
++        invoke([*jit, 'reject'], mode, 1, 'C resource operation rejected', ('31',))
++        invoke([*jit, 'closed'], mode, 1, 'closed, null or invalid', ('42',))
++        invoke([*jit, 'capacity'], mode, 1, 'C byte span outside admitted extent')
++        output = root / mode / ('application' + exe)
++        marker.unlink()
++        run([compiler, 'build', *selector, '--allow-native', *options, '-o', output], cwd)
++        assert not marker.exists()
++        if mode == 'normal':
++            run([compiler, 'build', *selector, '--allow-native', *options, '-o', output], cwd)
++            assert not marker.exists()
++        image_tool = Path(clang).with_name('llvm-readobj' + exe)
++        imports = run([image_tool, '--coff-imports' if windows else '--dynamic-table', output], cwd)
++        assert 'void_g4_conventional_' not in imports
++        package = root / ('relocated ' + mode + ' 雪')
++        output.parent.rename(package)
++        packaged_native = package / 'native'
++        packaged_native.mkdir()
++        for image in (dependency, library, adapter):
++            shutil.copy2(image, packaged_native / image.name)
++        installed[mode] = package / output.name
++
++    missing_export = 'g4_conventional_missing'
++    write(descriptor, contract.replace('g4_conventional_scale', missing_export))
++    invoke([compiler, 'run', *selector, '--allow-native', '--', 'payload 雪'], 'missing export',
++           1, 'does not provide ' + missing_export)
++    write(descriptor, contract)
++    project.rename(root / 'archived project inputs')
++    prefix.rename(root / 'archived compiler install')
++    assert not project.exists() and not compiler.exists()
++    environment['VOID_STDLIB_ROOT'] = str(root / 'absent stdlib')
++    for mode, program in installed.items():
++        invoke([program, 'payload 雪'], mode, contains=message, releases=('-2', '23'))
++        invoke([program, 'reject'], mode, 1, 'C resource operation rejected', ('31',))
++        invoke([program, 'closed'], mode, 1, 'closed, null or invalid', ('42',))
++        invoke([program, 'capacity'], mode, 1, 'C byte span outside admitted extent')
++        package = program.parent / 'native'
++        binary = package / library.name
++        hidden = binary.with_suffix('.saved')
++        binary.rename(hidden)
++        invoke([program, 'payload 雪'], mode, 1, 'C dynamic library', initialized=False)
++        binary.write_bytes(b'invalid library image\n')
++        invoke([program, 'payload 雪'], mode, 1, 'C dynamic load', initialized=False)
++        binary.unlink()
++        hidden.rename(binary)
++        imported = package / dependency.name
++        hidden = imported.with_suffix('.saved')
++        imported.rename(hidden)
++        # A candidate in the unrelated CWD must not satisfy a missing bundled dependency.
++        shutil.copy2(hidden, cwd / imported.name)
++        invoke([program, 'payload 雪'], mode, 1, 'C dynamic load', initialized=False)
++        (cwd / imported.name).unlink()
++        hidden.rename(imported)
++        transport = package / adapter.name
++        hidden = transport.with_suffix('.saved')
++        transport.rename(hidden)
++        shutil.copy2(mismatch, transport)
++        invoke([program, 'payload 雪'], mode, 1, 'adapter rejected the exact descriptor')
++        transport.unlink()
++        hidden.rename(transport)
++        invoke([program, 'payload 雪'], mode, contains=message, releases=('-2', '23'))
++        for path in [program, *package.iterdir()]:
++            print(f'{digest(path)}  {path}')
++    print('PASS: conventional C FFI through installed compiler and relocated normal/O2 executables', flush=True)
++
++
++retained = os.environ.get('VOID_G4_EVIDENCE_ROOT')
++if retained:
++    Path(retained).mkdir(parents=True, exist_ok=True)
++    work = nullcontext(tempfile.mkdtemp(prefix='VOID G4 ', dir=retained))
++else:
++    work = tempfile.TemporaryDirectory(prefix='VOID G4 ')
++with work as name:
++    verify(Path(name))
+diff --git a/tests/ffi/conventional_rejection.c b/tests/ffi/conventional_rejection.c
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/conventional_rejection.c
+@@ -0,0 +1,19 @@
++/* Test-only fault injection around the generated, signature-checked adapter. */
++#define vd_c_primitive_dispatch_v3 conventional_generated_dispatch
++#include "adapter.c"
++#undef vd_c_primitive_dispatch_v3
++
++#ifdef _WIN32
++__declspec(dllexport)
++#else
++__attribute__((visibility("default")))
++#endif
++uint32_t vd_c_primitive_dispatch_v3(const char* descriptor, uint32_t size, uint32_t ordinal,
++    const uint64_t* words, uint32_t count, uint64_t* result) {
++    if (ordinal == 8 && count == 1 && words[0] == UINT32_MAX - 2 && result) {
++        // A rejected acquisition may leave a non-owning scratch value.
++        *result = (uintptr_t)g4_conventional_last();
++        return 2;
++    }
++    return conventional_generated_dispatch(descriptor, size, ordinal, words, count, result);
++}

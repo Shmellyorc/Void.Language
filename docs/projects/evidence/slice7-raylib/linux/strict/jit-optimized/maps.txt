@@ -1,0 +1,48 @@
+563f7155c000-563f7323c000 r--p 00000000 08:03 1747081910                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/compiler install/bin/voidc
+563f7323c000-563f77472000 r-xp 01cdf000 08:03 1747081910                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/compiler install/bin/voidc
+563f77472000-563f7751c000 r--p 05f14000 08:03 1747081910                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/compiler install/bin/voidc
+563f7751c000-563f77bfc000 rw-p 05fbd000 08:03 1747081910                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/compiler install/bin/voidc
+7b419fb08000-7b419fb13000 r--p 00000000 08:03 1881557610                 /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
+7b419fb13000-7b419fb5c000 r-xp 0000b000 08:03 1881557610                 /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
+7b419fb5c000-7b419fb6e000 r--p 00054000 08:03 1881557610                 /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
+7b419fb6e000-7b419fb72000 r--p 00065000 08:03 1881557610                 /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
+7b419fb72000-7b419fb73000 rw-p 00069000 08:03 1881557610                 /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
+7b419fb74000-7b419fbb5000 r--p 00000000 08:03 1879086046                 /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0
+7b419fbb5000-7b419fbf4000 r-xp 00041000 08:03 1879086046                 /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0
+7b419fbf4000-7b419fc07000 r--p 00080000 08:03 1879086046                 /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0
+7b419fc07000-7b419fc23000 r--p 00093000 08:03 1879086046                 /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0
+7b419fc23000-7b419fc24000 rw-p 000af000 08:03 1879086046                 /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0
+7b419fc2c000-7b419fc2f000 r--p 00000000 08:03 1879086040                 /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0
+7b419fc2f000-7b419fc4a000 r-xp 00003000 08:03 1879086040                 /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0
+7b419fc4a000-7b419fc4d000 r--p 0001e000 08:03 1879086040                 /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0
+7b419fc4d000-7b419fc4e000 r--p 00021000 08:03 1879086040                 /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0
+7b419fc4e000-7b419fc4f000 rw-p 00022000 08:03 1879086040                 /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0
+7b419fec3000-7b419fec4000 r--p 00000000 08:03 1879092113                 /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0
+7b419fec4000-7b419fec5000 r-xp 00001000 08:03 1879092113                 /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0
+7b419fec5000-7b419fec6000 r--p 00002000 08:03 1879092113                 /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0
+7b419fec6000-7b419fec7000 r--p 00002000 08:03 1879092113                 /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0
+7b419fec7000-7b419fec8000 rw-p 00003000 08:03 1879092113                 /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0
+7b41a0169000-7b41a0185000 r--p 00000000 08:03 1879092117                 /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+7b41a0185000-7b41a023b000 r-xp 0001c000 08:03 1879092117                 /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+7b41a023b000-7b41a02cf000 r--p 000d2000 08:03 1879092117                 /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+7b41a02cf000-7b41a02d1000 r--p 00165000 08:03 1879092117                 /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+7b41a02d1000-7b41a02d6000 rw-p 00167000 08:03 1879092117                 /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+7b41a02d6000-7b41a0306000 r--p 00000000 08:03 1214556415                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/gallery project/native/libraylib.so.600
+7b41a0306000-7b41a0414000 r-xp 00030000 08:03 1214556415                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/gallery project/native/libraylib.so.600
+7b41a0414000-7b41a0492000 r--p 0013e000 08:03 1214556415                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/gallery project/native/libraylib.so.600
+7b41a0492000-7b41a0496000 r--p 001bb000 08:03 1214556415                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/gallery project/native/libraylib.so.600
+7b41a0496000-7b41a049a000 rw-p 001bf000 08:03 1214556415                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/gallery project/native/libraylib.so.600
+7f41a2f00000-7f41a2f04000 r--p 00000000 08:03 1214573878                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/gallery project/native/libvoid_raylib.so
+7f41a2f04000-7f41a2f07000 r-xp 00003000 08:03 1214573878                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/gallery project/native/libvoid_raylib.so
+7f41a2f07000-7f41a2f08000 r--p 00005000 08:03 1214573878                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/gallery project/native/libvoid_raylib.so
+7f41a2f08000-7f41a2f0a000 rw-p 00005000 08:03 1214573878                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/gallery project/native/libvoid_raylib.so
+7f41a3600000-7f41a3726000 r--p 00000000 08:03 2018425994                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/compiler install/lib/void/libunistring.so.5.2.2
+7f41a3726000-7f41a39d2000 r-xp 00126000 08:03 2018425994                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/compiler install/lib/void/libunistring.so.5.2.2
+7f41a39d2000-7f41a3bff000 r--p 003d2000 08:03 2018425994                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/compiler install/lib/void/libunistring.so.5.2.2
+7f41a3bff000-7f41a3c05000 r--p 005fe000 08:03 2018425994                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/compiler install/lib/void/libunistring.so.5.2.2
+7f41a3c05000-7f41a3cb9000 rw-p 00604000 08:03 2018425994                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/compiler install/lib/void/libunistring.so.5.2.2
+7f41a4278000-7f41a428a000 r--p 00000000 08:03 2018425995                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/compiler install/lib/void/libidn2.so.0.4.0
+7f41a428a000-7f41a42b3000 r-xp 00012000 08:03 2018425995                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/compiler install/lib/void/libidn2.so.0.4.0
+7f41a42b3000-7f41a42e7000 r--p 0003b000 08:03 2018425995                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/compiler install/lib/void/libidn2.so.0.4.0
+7f41a42e7000-7f41a42e8000 r--p 0006e000 08:03 2018425995                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/compiler install/lib/void/libidn2.so.0.4.0
+7f41a42e8000-7f41a42f4000 rw-p 0006f000 08:03 2018425995                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/strict-driver-lsan-excluded/compiler install/lib/void/libidn2.so.0.4.0

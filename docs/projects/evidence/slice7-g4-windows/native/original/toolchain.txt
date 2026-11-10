@@ -1,0 +1,5 @@
+clang version 23.1.4 (https://github.com/llvm/llvm-project 7a941dfb2877a0b8cf30323fefa85ad019e0b0f5)
+Target: x86_64-pc-windows-msvc
+Thread model: posix
+InstalledDir: C:\Users\a\Documents\ChatGPT\Void TEMP\Void-native\.toolchains\native-schannel\sdk\clang+llvm-23.1.4-x86_64-pc-windows-msvc\bin
+Build config: +alloc:rpmalloc

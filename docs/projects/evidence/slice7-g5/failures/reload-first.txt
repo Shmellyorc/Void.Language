@@ -1,0 +1,6 @@
+<host binding /callback_checked.void>:1:1: error: Declaration shadows project-root global 'registration'.
+    code: VOID2005
+
+ 1 | # Host-admitted C primitive declarations for org.voidlang.g5
+   | ^^^^^^^^^^^^
+

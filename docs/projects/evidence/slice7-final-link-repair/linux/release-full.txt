@@ -1,0 +1,4 @@
+Summary reconstructed from the original release-full.xml and release-full-LastTest.txt.
+The launcher was edited during execution and overwrote the console transcript after CTest completed.
+launcher-output-first retains the separate wrapper error and exit status.
+443/443 CTest cases passed, 0 failed, 0 skipped. Wall time 1704 seconds.

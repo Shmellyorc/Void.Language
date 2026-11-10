@@ -1,0 +1,1429 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1645,6 +1645,13 @@
+       "${PROJECT_SOURCE_DIR}/tests/ffi/conventional_process.py"
+       "${CMAKE_COMMAND}" "${CMAKE_CURRENT_BINARY_DIR}" "$<CONFIG>" "${VOID_CLANG}" "${VOID_SANITIZERS}")
+     set_tests_properties(ffi_g4_conventional PROPERTIES TIMEOUT 480)
++    add_executable(void_g5_reload tests/ffi/callback_reload.cpp)
++    target_link_libraries(void_g5_reload PRIVATE void_llvm void_runtime)
++    add_test(NAME ffi_g5_callbacks COMMAND "${Python3_EXECUTABLE}"
++      "${PROJECT_SOURCE_DIR}/tests/ffi/callback_process.py" "$<TARGET_FILE:voidc>" "${VOID_CLANG}"
++      "${VOID_SANITIZERS}" "$<TARGET_FILE:void_g5_reload>"
++      "${CMAKE_COMMAND}" "${CMAKE_CURRENT_BINARY_DIR}" "$<CONFIG>")
++    set_tests_properties(ffi_g5_callbacks PROPERTIES TIMEOUT 480)
+   endif()
+   add_test(NAME numeric_sprint2 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/numeric/sprint2.py"
+     "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}")
+diff --git a/examples/raylib/native/raylib.descriptor.in b/examples/raylib/native/raylib.descriptor.in
+--- a/examples/raylib/native/raylib.descriptor.in
++++ b/examples/raylib/native/raylib.descriptor.in
+@@ -4,16 +4,18 @@
+ source /raylib_checked.void
+ thunk @THUNK@
+ fixture @FIXTURE@
+-effects direct-sync blocking no-callbacks
++effects direct-sync blocking checked-callbacks
+ call c-default
+ aliases c_int:i32 c_long:@LONG@ c_size:u64 c_bool:bool
+ resource window VoidRaylibWindow pointer null open close owner-calls shutdown-owner consume-always
++callback trace_event context-first void i32 u32 u32
+ record color Color 4 1 4
+ field r r u8 0
+ field g g u8 1
+ field b b u8 2
+ field a a u8 3
+ bind tint vd_raylib_tint record:color record:color f32
++bind trace vd_raylib_trace i32 scoped:trace_event
+ bind title vd_raylib_title i64 in:1:2:255 c_size c_size
+ bind open vd_raylib_open owner:window c_int c_int
+ bind should_close vd_raylib_should_close c_bool borrow:window
+diff --git a/examples/raylib/native/raylib_provider.c b/examples/raylib/native/raylib_provider.c
+--- a/examples/raylib/native/raylib_provider.c
++++ b/examples/raylib/native/raylib_provider.c
+@@ -21,6 +21,49 @@
+ static atomic_flag window_open = ATOMIC_FLAG_INIT;
+ // raylib stores the pointer in its global window state, even on failed init.
+ static char window_title[title_capacity];
++
++struct TraceCall {
++    VoidRaylibTrace callback;
++    void* context;
++    int delivered;
++};
++static _Thread_local struct TraceCall* trace_call;
++static atomic_flag trace_active = ATOMIC_FLAG_INIT;
++
++static void raylib_trace(int level, const char* format, va_list args) {
++    struct TraceCall* call = trace_call;
++    if (!call || call->delivered) return;
++    char message[128];
++    va_list copied;
++    va_copy(copied, args);
++    const int count = vsnprintf(message, sizeof message, format, copied);
++    va_end(copied);
++    if (count < 0 || (size_t)count >= sizeof message) {
++        call->delivered = -1;
++        return;
++    }
++    uint32_t digest = UINT32_C(2166136261);
++    for (int i = 0; i < count; ++i) {
++        digest ^= (unsigned char)message[i];
++        digest *= UINT32_C(16777619);
++    }
++    call->delivered = 1;
++    call->callback(call->context, level, (uint32_t)count, digest);
++}
++
++int vd_raylib_trace(VoidRaylibTrace callback, void* context) {
++    // Gallery startup owns all raylib calls and has no window/audio workers.
++    // raylib's global setter is used only within this synchronous scope.
++    if (atomic_flag_test_and_set(&trace_active)) return -1;
++    struct TraceCall call = {callback, context, 0};
++    trace_call = &call;
++    SetTraceLogCallback(raylib_trace);
++    TraceLog(LOG_WARNING, "VOID G5 trace %d %s", 7, "raylib");
++    SetTraceLogCallback(NULL);
++    trace_call = NULL;
++    atomic_flag_clear(&trace_active);
++    return call.delivered == 1 ? 0 : -1;
++}
+ 
+ Color vd_raylib_tint(Color color, float factor) {
+     return ColorBrightness(color, factor);
+diff --git a/examples/raylib/native/raylib_provider.h b/examples/raylib/native/raylib_provider.h
+--- a/examples/raylib/native/raylib_provider.h
++++ b/examples/raylib/native/raylib_provider.h
+@@ -12,6 +12,8 @@
+ #endif
+ 
+ typedef struct VoidRaylibWindow VoidRaylibWindow;
++typedef void (*VoidRaylibTrace)(void*, int32_t, uint32_t, uint32_t);
++VOID_RAYLIB_EXPORT int vd_raylib_trace(VoidRaylibTrace, void*);
+ VOID_RAYLIB_EXPORT Color vd_raylib_tint(Color, float);
+ VOID_RAYLIB_EXPORT int64_t vd_raylib_title(const uint8_t*, size_t, size_t);
+ VOID_RAYLIB_EXPORT VoidRaylibWindow* vd_raylib_open(int, int);
+diff --git a/examples/raylib/src/gallery.void b/examples/raylib/src/gallery.void
+--- a/examples/raylib/src/gallery.void
++++ b/examples/raylib/src/gallery.void
+@@ -1,8 +1,16 @@
+ use "/raylib_checked.void" as graphics
+ use os as host
+ 
++struct trace_capture:
++    matches: i32 = 0
++
++func (trace trace_capture) record(level: i32, length: u32, digest: u32):
++    if level == 4 and length == 22 as u32 and digest == 4125766144 as u32:
++        trace.matches += 1
++
+ func main() -> i32:
+     var implicit_close = false
++    var trace_only = false
+     var title = "VOID Raylib Gallery"
+     if host.args() is Ok(var options):
+         for option in options:
+@@ -10,11 +18,21 @@
+                 implicit_close = true
+             if option == "--reject-title":
+                 title = "VOID\0invalid"
++            if option == "--trace-only":
++                trace_only = true
+ 
+     var title_bytes = title.to_utf8()
+     if graphics.title(title_bytes, 0, title_bytes.count as u64) < 0:
+         print("Raylib title rejected")
+         return 2
++
++    var trace = trace_capture()
++    if graphics.trace(trace.record) != 0 or trace.matches != 1:
++        print("Raylib trace callback failed")
++        return 6
++    print("RAYLIB trace invoked VOID")
++    if trace_only:
++        return 0
+ 
+     var window = graphics.open(640, 360)
+     if window == null:
+diff --git a/include/void/c_primitive.hpp b/include/void/c_primitive.hpp
+--- a/include/void/c_primitive.hpp
++++ b/include/void/c_primitive.hpp
+@@ -21,6 +21,14 @@
+ inline constexpr std::string_view c_owner_resource_bridge = "vd_c_resource_dispatch_owner_v3";
+ inline constexpr std::string_view c_dynamic_resolve = "vd_c_dynamic_resolve_v1";
+ inline constexpr std::string_view c_dynamic_call = "vd_c_dynamic_call_v1";
++inline constexpr std::string_view c_callback_bridge = "vd_c_callback_dispatch_v1";
++struct RuntimeFailure;
++extern "C" {
++typedef void CCallbackEntry(std::uint64_t, void*, const std::uint64_t*, std::uint64_t*, RuntimeFailure*);
++}
++extern "C" std::uint32_t vd_c_callback_dispatch_v1(CPrimitiveThunk*, const char*, std::uint32_t,
++    std::uint32_t, std::uint64_t*, std::uint32_t, std::uint64_t*, void**, const char*, std::uint32_t,
++    std::uint32_t, std::uint64_t, void*, CCallbackEntry*, std::uint32_t, std::uint32_t, RuntimeFailure*) noexcept;
+ extern "C" CPrimitiveThunk* vd_c_dynamic_resolve_v1(const char*, std::uint32_t) noexcept;
+ enum class CResourceRole : std::uint32_t { none, acquire, borrow, mutate, close };
+ 
+@@ -47,7 +55,8 @@
+     return symbol.starts_with(c_primitive_transport) || symbol.starts_with(c_record_transport) ||
+         symbol.starts_with(c_span_bridge) || symbol.starts_with(c_resource_transport) ||
+         symbol.starts_with(c_resource_bridge) || symbol.starts_with(c_owner_resource_bridge) || symbol.starts_with(c_dynamic_resolve) ||
+-        symbol.starts_with(c_dynamic_call) || symbol.starts_with("vd_runtime_entry_dynamic_v1");
++        symbol.starts_with(c_dynamic_call) || symbol.starts_with(c_callback_bridge) ||
++        symbol.starts_with("vd_runtime_entry_dynamic_v1");
+ }
+ inline constexpr std::uint32_t c_primitive_probe = UINT32_MAX;
+ inline constexpr unsigned c_primitive_max_arguments = 16;
+@@ -62,7 +71,14 @@
+         unsigned direction = 0; // C byte span only
+         unsigned offset_argument = 0, length_argument = 0, limit = 0;
+         unsigned resource = 0; // 1-based resource identity
++        unsigned callback = 0; // 1-based callback signature
++        bool retained = false;
+         CResourceRole role = CResourceRole::none;
++    };
++    struct Callback {
++        std::string name;
++        Shape result;
++        std::vector<Shape> parameters;
+     };
+     struct Field {
+         std::string name, c_name;
+@@ -102,6 +118,7 @@
+     const std::string& target() const { return target_; }
+     const std::string& module() const { return module_; }
+     const std::vector<Binding>& bindings() const { return bindings_; }
++    const std::vector<Callback>& callbacks() const { return callbacks_; }
+     CPrimitiveThunk* thunk() const { return thunk_; }
+     const DynamicClosure::Owner& dynamic() const { return dynamic_; }
+     const std::filesystem::path& dynamic_root() const { return dynamic_root_; }
+@@ -128,6 +145,7 @@
+     std::string descriptor_, provider_, target_, module_;
+     unsigned revision_ = 1;
+     std::vector<Binding> bindings_;
++    std::vector<Callback> callbacks_;
+     std::vector<Record> records_;
+     std::vector<Resource> resources_;
+     std::string source_type(const Shape&) const;
+diff --git a/src/backend/llvm/backend.cpp b/src/backend/llvm/backend.cpp
+--- a/src/backend/llvm/backend.cpp
++++ b/src/backend/llvm/backend.cpp
+@@ -1339,6 +1339,81 @@
+                     auto* absent = llvm::ConstantPointerNull::get(b.getPtrTy());
+                     const auto* resource = binding.abi_result.resource ? &binding.abi_result :
+                         count && binding.abi_parameters[0].resource ? &binding.abi_parameters[0] : nullptr;
++                    if (count && binding.abi_parameters.back().callback) {
++                        const auto& signature = admission.callbacks().at(binding.abi_parameters.back().callback - 1);
++                        const auto callback_argument = instruction.arguments.back();
++                        const auto callback_type = operand_type(callback_argument);
++                        auto* callback = llvm::Function::Create(llvm::FunctionType::get(b.getVoidTy(),
++                            {b.getInt64Ty(), b.getPtrTy(), b.getPtrTy(), b.getPtrTy(), b.getPtrTy()}, false),
++                            llvm::GlobalValue::InternalLinkage, "c_callback_entry" + suffix, *module);
++                        llvm::IRBuilder<> entry(llvm::BasicBlock::Create(context, "entry", callback));
++                        auto* callable = entry.CreateInsertValue(llvm::UndefValue::get(type(callback_type)), callback->getArg(0), 0);
++                        callable = entry.CreateInsertValue(callable, callback->getArg(1), 1);
++                        std::vector<llvm::Value*> arguments{callable};
++                        for (unsigned a = 0; a < signature.parameters.size(); ++a) {
++                            const auto scalar = signature.parameters[a].scalar;
++                            auto* word = entry.CreateLoad(entry.getInt64Ty(),
++                                entry.CreateInBoundsGEP(entry.getInt64Ty(), callback->getArg(2), entry.getInt32(a)));
++                            auto* raw = entry.CreateZExtOrTrunc(word,
++                                entry.getIntNTy(scalar == ir::Type::boolean ? 1 : numeric::width(scalar)));
++                            arguments.push_back(numeric::floating(scalar) ? entry.CreateBitCast(raw, type(scalar)) : raw);
++                        }
++                        arguments.push_back(callback->getArg(4));
++                        llvm::Value* returned = entry.CreateCall(callable_dispatchers.at(ir::Type::key(callback_type)), arguments);
++                        const auto callback_result = signature.result.scalar;
++                        if (callback_result != ir::Type::none) {
++                            if (numeric::floating(callback_result))
++                                returned = entry.CreateBitCast(returned, entry.getIntNTy(numeric::width(callback_result)));
++                            entry.CreateStore(entry.CreateZExtOrTrunc(returned, entry.getInt64Ty()), callback->getArg(3));
++                        }
++                        entry.CreateRetVoid();
++                        auto* words = b.CreateAlloca(b.getInt64Ty(), b.getInt32(count));
++                        for (unsigned a = 0; a + 1 < count; ++a) {
++                            const auto arg = instruction.arguments[a];
++                            b.CreateStore(bits(values[arg], operand_type(arg)),
++                                b.CreateInBoundsGEP(b.getInt64Ty(), words, b.getInt32(a)));
++                        }
++                        b.CreateStore(b.getInt64(0), b.CreateInBoundsGEP(b.getInt64Ty(), words, b.getInt32(count - 1)));
++                        const auto result = instruction.type;
++                        llvm::Value* output = absent;
++                        if (!resource && result != ir::Type::none) {
++                            output = b.CreateAlloca(b.getInt64Ty());
++                            b.CreateStore(b.getInt64(0), output);
++                        }
++                        auto resolve = module->getOrInsertFunction(c_dynamic_resolve, b.getPtrTy(), b.getPtrTy(), b.getInt32Ty());
++                        const auto& plan = admission.dynamic()->bytes();
++                        auto* thunk = b.CreateCall(resolve, {b.CreateGlobalString(plan), b.getInt32(plan.size())});
++                        fail_if(b.CreateIsNull(thunk), "C dynamic Runtime binding is unavailable");
++                        auto bridge = module->getOrInsertFunction(c_callback_bridge, b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(),
++                            b.getInt32Ty(), b.getInt32Ty(), b.getPtrTy(), b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(),
++                            b.getPtrTy(), b.getInt32Ty(), b.getInt32Ty(), b.getInt64Ty(), b.getPtrTy(), b.getPtrTy(),
++                            b.getInt32Ty(), b.getInt32Ty(), b.getPtrTy());
++                        const auto& descriptor = admission.descriptor();
++                        const auto* owner = resource ? &admission.resource(resource->resource) : nullptr;
++                        auto* handle = owner ? value_roots[n].at(values.size()) : absent;
++                        llvm::Value* identity = absent;
++                        if (owner) identity = b.CreateGlobalString(admission.module() + "::" + owner->name);
++                        auto* target = values[callback_argument];
++                        auto* status = b.CreateCall(bridge, {thunk, b.CreateGlobalString(descriptor), b.getInt32(descriptor.size()),
++                            b.getInt32(ordinal), words, b.getInt32(count), output, handle, identity,
++                            b.getInt32(owner ? owner->release_ordinal : 0), b.getInt32(owner && owner->shutdown_owner),
++                            b.CreateExtractValue(target, 0), b.CreateExtractValue(target, 1), callback,
++                            b.getInt32(signature.parameters.size()), b.getInt32(callback_result != ir::Type::none), failure});
++                        selected_failure();
++                        fail_if(b.CreateICmpEQ(status, b.getInt32(3)), "C callback resource requires its owning thread");
++                        fail_if(b.CreateICmpEQ(status, b.getInt32(6)), "C callback provider returned a duplicate native owner");
++                        fail_if(b.CreateIsNotNull(status), "C callback transport rejected " + instruction.callee);
++                        if (owner) v = b.CreateLoad(b.getPtrTy(), handle);
++                        else if (result == ir::Type::none) v = llvm::UndefValue::get(b.getInt8Ty());
++                        else {
++                            auto* raw = b.CreateLoad(b.getInt64Ty(), output);
++                            const auto width = result == ir::Type::boolean ? 1 : numeric::width(result);
++                            if (width < 64) fail_if(b.CreateIsNotNull(b.CreateLShr(raw, width)), "noncanonical C callback result");
++                            v = b.CreateZExtOrTrunc(raw, b.getIntNTy(width));
++                            if (numeric::floating(result)) v = b.CreateBitCast(v, type(result));
++                        }
++                        break;
++                    }
+                     if (resource) {
+                         auto* words = b.CreateAlloca(b.getInt64Ty(), b.getInt32(count ? count : 1));
+                         const bool acquire = resource->role == CResourceRole::acquire;
+@@ -1375,6 +1450,8 @@
+                         fail_if(b.CreateICmpEQ(status, b.getInt32(2)), "C resource belongs to another provider or contract");
+                         fail_if(b.CreateICmpEQ(status, b.getInt32(3)), "C resource requires its owning thread");
+                         fail_if(b.CreateICmpEQ(status, b.getInt32(6)), "C provider returned a duplicate native owner");
++                        fail_if(b.CreateICmpEQ(status, b.getInt32(7)), "C callback cannot reenter its own registration");
++                        fail_if(b.CreateICmpEQ(status, b.getInt32(8)), "Retained C callback failed");
+                         fail_if(b.CreateIsNotNull(status), "C resource operation rejected " + instruction.callee);
+                         if (acquire) v = b.CreateLoad(b.getPtrTy(), handle);
+                         else if (result_type == ir::Type::none) v = llvm::UndefValue::get(b.getInt8Ty());
+@@ -2186,6 +2263,9 @@
+                     llvm::orc::ExecutorAddr::fromPtr(vd_c_dynamic_resolve_v1), llvm::JITSymbolFlags::Exported);
+                 symbols[jit->mangleAndIntern(c_dynamic_call)] = llvm::orc::ExecutorSymbolDef(
+                     llvm::orc::ExecutorAddr::fromPtr(vd_c_dynamic_call_v1), llvm::JITSymbolFlags::Exported);
++                if (!primitives->callbacks().empty())
++                    symbols[jit->mangleAndIntern(c_callback_bridge)] = llvm::orc::ExecutorSymbolDef(
++                        llvm::orc::ExecutorAddr::fromPtr(vd_c_callback_dispatch_v1), llvm::JITSymbolFlags::Exported);
+             } else {
+                 symbols[jit->mangleAndIntern(primitives->transport())] = llvm::orc::ExecutorSymbolDef(
+                     llvm::orc::ExecutorAddr::fromPtr(primitives->thunk()), llvm::JITSymbolFlags::Exported);
+diff --git a/src/frontend/compiler.cpp b/src/frontend/compiler.cpp
+--- a/src/frontend/compiler.cpp
++++ b/src/frontend/compiler.cpp
+@@ -349,6 +349,7 @@
+     std::vector<std::unique_ptr<Expr>> omitted;
+     std::string initializer, display_adapter;
+     std::vector<unsigned> field_indexes, argument_indexes;
++    std::optional<unsigned> c_callback_argument;
+     std::string literal_text;
+     std::optional<std::string> format_specification;
+     std::vector<std::unique_ptr<Expr>> parts;
+@@ -2026,6 +2027,13 @@
+             auto index=mapping[n-first];bound[index]=true;
+             auto actual = e.op=="$bound_numeric" && n==0 ? e.parts[n]->type : expression(*e.parts[n],target.parameters[index].type);
+             if((!target.native_symbol.empty() && native_binding(target.native_symbol).name=="register") && index==1 && e.parts[n]->kind!=Expr::Kind::function_reference)error(source,e.parts[n]->token,Code::unsupported_type,"Native callback registration requires a directly named function or a literal closure created in this generation.");
++            const auto expected = target.parameters[index].type;
++            if (target.c_primitive && expected.definition && expected.definition->callable && actual != error_type) {
++                if (e.parts[n]->kind != Expr::Kind::function_reference || n + 1 != e.parts.size())
++                    error(source,e.parts[n]->token,Code::unsupported_type,
++                        "A checked C callback must be supplied last as a directly named function, bound method or literal closure from this generation.");
++                e.c_callback_argument = index;
++            }
+             try { expect(actual,target.parameters[index].type,e.parts[n]->token); }
+             catch (const CompilationError& failure) { diagnostics.add(failure); invalid = true; }
+             invalid |= actual == error_type;
+@@ -4875,6 +4883,8 @@
+                 const auto& arg = e.parts[n];
+                 auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(expression_type(*arg));
+                 auto value = expression(*arg);if((!e.native_symbol.empty() && native_binding(e.native_symbol).name=="register") && (e.argument_indexes.empty()?n-first:e.argument_indexes[n-first])==1)native_callback=value;
++                if (e.c_callback_argument == (e.argument_indexes.empty() ? n-first : e.argument_indexes[n-first]))
++                    native_callback = value;
+                 if (expression_type(*arg).construction) {
+                     output.construction_origins[slot]=view_origin(value);
+                 }
+@@ -4890,6 +4900,7 @@
+             i.arguments.resize(slots.size());
+             for(unsigned n=0;n<slots.size();++n) i.arguments[e.argument_indexes.empty()?n:e.argument_indexes[n]]=emit({ir::Op::load,slots[n]},e.token);
+             if(!e.native_symbol.empty()){i.op=ir::Op::native_call;i.callee=e.native_symbol;i.type=e.type;if(native_callback)i.arguments[1]=*native_callback;}
++            if (e.c_callback_argument) i.arguments[*e.c_callback_argument] = *native_callback;
+             auto result=emit(i,e.token);
+             if(selected_receiver) {
+                 // Forward declarations need not have been lowered yet. The
+diff --git a/src/ir/c_primitive.cpp b/src/ir/c_primitive.cpp
+--- a/src/ir/c_primitive.cpp
++++ b/src/ir/c_primitive.cpp
+@@ -126,7 +126,9 @@
+     const auto effects = reader.take();
+     const std::initializer_list<std::string_view> nonblocking = {"effects", "direct-sync", "nonblocking", "no-callbacks"};
+     const std::initializer_list<std::string_view> blocking = {"effects", "direct-sync", "blocking", "no-callbacks"};
+-    if (!std::ranges::equal(effects, nonblocking) && !(conventional && std::ranges::equal(effects, blocking)))
++    const std::initializer_list<std::string_view> checked = {"effects", "direct-sync", "blocking", "checked-callbacks"};
++    const bool callbacks = conventional && admitted->revision_ >= 2 && std::ranges::equal(effects, checked);
++    if (!callbacks && !std::ranges::equal(effects, nonblocking) && !(conventional && std::ranges::equal(effects, blocking)))
+         reject(reader.line, "unsupported descriptor, ABI revision or effects");
+     reader.exact({"call", "c-default"});
+     reader.exact({"aliases", "c_int:i32", llp64 ? "c_long:i32" : "c_long:i64", "c_size:u64", "c_bool:bool"});
+@@ -158,6 +160,16 @@
+         };
+         if (admitted->revision_ >= 2) {
+             const auto p = parts(token);
++            if (callbacks && !field && !result && p.size() == 2 &&
++                (p[0] == "scoped" || p[0] == "retained")) {
++                for (unsigned n = 0; n < admitted->callbacks_.size(); ++n)
++                    if (admitted->callbacks_[n].name == p[1]) {
++                        type.callback = n + 1;
++                        type.retained = p[0] == "retained";
++                        return type;
++                    }
++                reject(reader.line, "callback parameter requires an earlier admitted signature");
++            }
+             if (admitted->revision_ == 3 && !field && p.size() == 2) {
+                 if (result && p[0] == "owner") type.role = CResourceRole::acquire;
+                 if (!result && p[0] == "borrow") type.role = CResourceRole::borrow;
+@@ -200,8 +212,25 @@
+         return type;
+     };
+     std::set<std::string_view> names, exports, c_records;
++    std::set<unsigned> used_callbacks;
+     while (!reader.done()) {
+         const auto fields = reader.take();
++        if (callbacks && fields[0] == "callback") {
++            if (fields.size() < 4 || fields.size() > 4 + c_primitive_max_arguments ||
++                !admitted->bindings_.empty() || admitted->callbacks_.size() == 16 ||
++                !identifier(fields[1]) || !names.insert(fields[1]).second || fields[2] != "context-first")
++                reject(reader.line, "expected a fixed C callback signature with context-first");
++            Callback callback{std::string(fields[1]), shape(fields[3], true, true), {}};
++            if (callback.result.record || callback.result.extent)
++                reject(reader.line, "callback result must be a scalar or void");
++            for (auto parameter : std::span(fields).subspan(4)) {
++                auto type = shape(parameter, true, false);
++                if (type.record || type.extent) reject(reader.line, "callback parameters must be scalars");
++                callback.parameters.push_back(type);
++            }
++            admitted->callbacks_.push_back(std::move(callback));
++            continue;
++        }
+         if (admitted->revision_ == 3 && fields[0] == "resource") {
+             if (fields.size() != 10 || !admitted->bindings_.empty() || !admitted->records_.empty() ||
+                 admitted->resources_.size() == 16 || !identifier(fields[1]) || !identifier(fields[2], true) ||
+@@ -291,8 +320,18 @@
+         if (resources > 1 || (resources && (records || spans)) ||
+             (binding.abi_result.resource && binding.name != admitted->resource(binding.abi_result.resource).acquire))
+             reject(reader.line, "invalid native ownership transfer or mixed ABI");
++        for (unsigned n = 0; n < binding.abi_parameters.size(); ++n) {
++            const auto& parameter = binding.abi_parameters[n];
++            if (!parameter.callback) continue;
++            if (n + 1 != binding.abi_parameters.size() || records || spans ||
++                (parameter.retained ? !binding.abi_result.resource : resources != 0))
++                reject(reader.line, "callback must be last, with scalar transport or retained resource acquisition");
++            used_callbacks.insert(parameter.callback);
++        }
+         admitted->bindings_.push_back(std::move(binding));
+     }
++    if (callbacks && (used_callbacks.empty() || used_callbacks.size() != admitted->callbacks_.size()))
++        reject(reader.line, "each checked callback declaration must be used by a binding");
+     if (admitted->bindings_.empty()) reject(reader.line, "expected at least one binding");
+     if (admitted->revision_ == 3 && admitted->resources_.empty())
+         reject(reader.line, "expected a resource contract in descriptor revision 3");
+@@ -406,6 +445,44 @@
+         << "#error Wrong C adapter target\n#endif\n"
+         << "_Static_assert(CHAR_BIT == 8 && sizeof(void*) == 8 && sizeof(int) == 4 && sizeof(long) == "
+         << (windows ? 4 : 8) << " && sizeof(size_t) == 8 && sizeof(float) == 4 && sizeof(double) == 8, \"C ABI widths\");\n";
++    if (!admitted->callbacks_.empty())
++        out << "struct vd_callback_context {\n"
++               "    uint32_t (*invoke)(void*, const uint64_t*, uint32_t, uint64_t*);\n"
++               "    void* owner;\n"
++               "};\n";
++    for (const auto& callback : admitted->callbacks_) {
++        const auto result = c_type(callback.result);
++        std::string parameters = "void*";
++        std::string arguments = "void* opaque";
++        for (unsigned i = 0; i < callback.parameters.size(); ++i) {
++            const auto parameter = c_type(callback.parameters[i]);
++            parameters += ", " + parameter;
++            arguments += ", " + parameter + " arg" + std::to_string(i);
++        }
++        out << "typedef " << result << " (*vd_cb_" << callback.name << ")(" << parameters << ");\n"
++            << "static " << result << " vd_enter_" << callback.name << '(' << arguments << ") {\n"
++            << "    struct vd_callback_context* context = opaque;\n";
++        if (!callback.parameters.empty())
++            out << "    uint64_t words[" << callback.parameters.size() << "];\n";
++        for (unsigned i = 0; i < callback.parameters.size(); ++i) {
++            const auto& parameter = callback.parameters[i];
++            if (parameter.scalar == Type::boolean) out << "    words[" << i << "] = arg" << i << ";\n";
++            else out << "    " << word_type(parameter) << " bits" << i << ";\n"
++                     << "    memcpy(&bits" << i << ", &arg" << i << ", sizeof bits" << i << ");\n"
++                     << "    words[" << i << "] = bits" << i << ";\n";
++        }
++        const bool returns = callback.result.scalar != Type::none;
++        if (returns) out << "    uint64_t value = 0;\n";
++        out << "    " << (returns ? "if (" : "(void)") << "context->invoke(opaque, "
++            << (callback.parameters.empty() ? "NULL" : "words") << ", " << callback.parameters.size()
++            << ", " << (returns ? "&value)) return 0;\n" : "NULL);\n");
++        if (callback.result.scalar == Type::boolean) out << "    return value != 0;\n";
++        else if (returns)
++            out << "    " << word_type(callback.result) << " bits = (" << word_type(callback.result) << ")value;\n"
++                << "    " << result << " decoded;\n"
++                << "    memcpy(&decoded, &bits, sizeof decoded);\n    return decoded;\n";
++        out << "}\n";
++    }
+     for (const auto& record : admitted->records_) {
+         out << "_Static_assert(sizeof(" << record.c_name << ") == " << record.size
+             << " && _Alignof(" << record.c_name << ") == " << record.alignment
+@@ -423,7 +500,9 @@
+         if (binding.abi_parameters.empty()) out << "void";
+         for (std::size_t i = 0; i < binding.abi_parameters.size(); ++i) {
+             if (i) out << ", ";
+-            out << c_type(binding.abi_parameters[i]);
++            const auto& parameter = binding.abi_parameters[i];
++            if (parameter.callback) out << "vd_cb_" << admitted->callbacks_[parameter.callback - 1].name << ", void*";
++            else out << c_type(parameter);
+         }
+         out << "): 1, default: 0), \"C signature " << binding.export_name << "\");\n";
+     }
+@@ -452,6 +531,11 @@
+             const auto& shape = binding.abi_parameters[i];
+             const auto word = "words[" + std::to_string(i) + "]";
+             const auto argument = "arg" + std::to_string(i);
++            if (shape.callback) {
++                out << "        if (!" << word << ") return 2;\n"
++                    << "        void* " << argument << " = (void*)(uintptr_t)" << word << ";\n";
++                continue;
++            }
+             const auto type = c_type(shape);
+             if (shape.record || shape.resource) out << "        if (!" << word << ") return 2;\n";
+             out << "        " << type << ' ' << argument;
+@@ -467,7 +551,12 @@
+         out << "        ";
+         if (returns) out << c_type(result) << " value = ";
+         out << binding.export_name << '(';
+-        for (std::size_t i = 0; i < binding.abi_parameters.size(); ++i) out << (i ? ", arg" : "arg") << i;
++        for (std::size_t i = 0; i < binding.abi_parameters.size(); ++i) {
++            if (i) out << ", ";
++            if (auto callback = binding.abi_parameters[i].callback)
++                out << "vd_enter_" << admitted->callbacks_[callback - 1].name << ", ";
++            out << "arg" << i;
++        }
+         out << ");\n";
+         if (result.record) out << "        memcpy(result, &value, sizeof value);\n";
+         else if (result.resource) out << "        *result = (uintptr_t)value;\n";
+@@ -515,6 +604,15 @@
+             type.nullable == (shape.role == CResourceRole::acquire) &&
+             ((shape.role != CResourceRole::mutate && shape.role != CResourceRole::close) || ir::readonly_paths(type).empty());
+     if (type.nullable || type.construction) return false;
++    if (shape.callback) {
++        const auto& signature = callbacks_.at(shape.callback - 1);
++        if (!type.definition || !type.definition->callable ||
++            type.definition->call_parameters.size() != signature.parameters.size() ||
++            Type(*type.definition->call_result) != signature.result.scalar) return false;
++        for (unsigned n = 0; n < signature.parameters.size(); ++n)
++            if (Type(type.definition->call_parameters[n]) != signature.parameters[n].scalar) return false;
++        return true;
++    }
+     if (shape.direction)
+         return type.kind == Type::growable_array && type.definition && type.definition->element &&
+             !type.definition->extent && ir::array_element(type) == Type::u8 &&
+@@ -542,6 +640,17 @@
+     return true;
+ }
+ std::string CPrimitiveAdmission::source_type(const Shape& shape) const {
++    if (shape.callback) {
++        const auto& callback = callbacks_.at(shape.callback - 1);
++        std::string text = "func(";
++        for (unsigned n = 0; n < callback.parameters.size(); ++n) {
++            if (n) text += ", ";
++            text += source_type(callback.parameters[n]);
++        }
++        text += ")";
++        if (callback.result.scalar != Type::none) text += " -> " + source_type(callback.result);
++        return text;
++    }
+     if (shape.resource)
+         return resource(shape.resource).name + (shape.role == CResourceRole::acquire ? "?" : "");
+     if (shape.direction) return "[u8]";
+diff --git a/src/ir/module.cpp b/src/ir/module.cpp
+--- a/src/ir/module.cpp
++++ b/src/ir/module.cpp
+@@ -1532,6 +1532,11 @@
+                         auto scope = m.source_imports.find(f.module_identity);
+                         if (i.op != Op::call || scope == m.source_imports.end() || !scope->second.contains(primitive->module()))
+                             fail("C primitive binding requires the admitted direct import");
++                        const auto& parameters = declaration->second->parameters;
++                        if (!parameters.empty() && parameters.back().definition && parameters.back().definition->callable &&
++                            (i.arguments.size() != parameters.size() || i.arguments.back() >= types.size() ||
++                             b.instructions[i.arguments.back()].op != Op::function_reference))
++                            fail("C callback lacks generation-local function provenance");
+                     }
+                     if(requirements.contains(i.callee)) fail("ordinary call cannot bypass interface receiver preparation");
+                     if(i.op==Op::virtual_call && (declaration==functions.end() || declaration->second->virtual_slot.empty() || i.initialization)) fail("invalid virtual call target");
+diff --git a/src/ir/reference_capabilities.inc b/src/ir/reference_capabilities.inc
+--- a/src/ir/reference_capabilities.inc
++++ b/src/ir/reference_capabilities.inc
+@@ -237,6 +237,10 @@
+                         const auto& binding = module.c_primitives->bindings().at(static_cast<unsigned>(i.immediate));
+                         for (unsigned n = 0; n < binding.abi_parameters.size(); ++n) {
+                             const auto& parameter = binding.abi_parameters[n];
++                            if (parameter.callback) {
++                                if (parameter.retained) retain(values[i.arguments[n]]);
++                                continue;
++                            }
+                             if (parameter.direction <= 1 && parameter.role != CResourceRole::mutate &&
+                                 parameter.role != CResourceRole::close) continue;
+                             for (const auto& [path, fact] : values[i.arguments[n]]) {
+diff --git a/src/runtime/c_resource.cpp b/src/runtime/c_resource.cpp
+--- a/src/runtime/c_resource.cpp
++++ b/src/runtime/c_resource.cpp
+@@ -1,4 +1,5 @@
+ #include "void/c_primitive.hpp"
++#include "void/callback.hpp"
+ #include "void/execution.hpp"
+ #include "void/native_resource.hpp"
+ #include <algorithm>
+@@ -10,6 +11,92 @@
+ namespace {
+ using namespace vd;
+ const char resource_kind = 0;
++
++// Passed only to the admitted adapter. C gets an ordinary C trampoline plus
++// this native context, with managed state and code ownership behind the bridge.
++struct CallbackContext {
++    std::uint32_t (*invoke)(void*, const std::uint64_t*, std::uint32_t, std::uint64_t*);
++    void* owner;
++};
++
++class CheckedCallback final : public CallbackProvider {
++    struct Active { const void* owner; Active* previous; };
++    static thread_local Active* active_;
++    Runtime& runtime_;
++    Runtime::Handle capture_;
++    const std::shared_ptr<void> generation_;
++    const std::uint64_t function_, thread_;
++    CCallbackEntry* const entry_;
++    const std::uint32_t count_;
++    const bool returns_;
++    CallbackContext context_{invoke, this};
++    const void* owner_ = nullptr; // Assigned before the context is published to C.
++    std::atomic<bool> sealed_{false};
++    std::mutex error_mutex_;
++    OwnedRuntimeFailure error_;
++    CallbackRegistration registration_;
++
++    static std::uint32_t invoke(void* opaque, const std::uint64_t* words,
++                                std::uint32_t count, std::uint64_t* result) noexcept {
++        auto& self = *static_cast<CheckedCallback*>(static_cast<CallbackContext*>(opaque)->owner);
++        if (self.sealed_) return 1;
++        if (count != self.count_ || (count && !words) || bool(result) != self.returns_ ||
++            (self.thread_ && self.thread_ != Runtime::current_thread_identity())) {
++            self.record({"C callback signature or thread rejected"});
++            return 1;
++        }
++        bool succeeded = false;
++        if (!self.registration_.run([&] {
++            Active invocation{self.owner_, active_};
++            active_ = &invocation;
++            struct Restore { Active* previous; ~Restore() { active_ = previous; } } restore{invocation.previous};
++            NativeCode::LeaseScope lease(self.generation_);
++            RuntimeFailure failure;
++            self.entry_(self.function_, self.capture_.get(), words, result, &failure);
++            if (failure.message) self.record(failure);
++            else succeeded = true;
++        })) self.record({"C callback Runtime admission rejected"});
++        return succeeded ? 0 : 1;
++    }
++
++    void record(const RuntimeFailure& failure) noexcept {
++        std::lock_guard lock(error_mutex_);
++        if (!error_.value().message) error_.assign(failure);
++        sealed_ = true;
++    }
++
++    // Scoped callers supply the barrier by returning. Retained callers supply
++    // it by completing their terminal release before closing this object.
++    void unregister_and_quiesce() noexcept override {}
++
++public:
++    CheckedCallback(Runtime& runtime, std::uint64_t function, void* capture, CCallbackEntry* entry,
++                    std::uint32_t count, bool returns, bool retained)
++        : runtime_(runtime), capture_(runtime, capture), generation_(NativeCode::active_lease()),
++          function_(function), thread_(retained ? 0 : Runtime::current_thread_identity()),
++          entry_(entry), count_(count), returns_(returns), registration_(runtime, *this) {}
++    ~CheckedCallback() override {
++        if (runtime_.is_managed()) {
++            Runtime::Native safe(runtime_);
++            registration_.close();
++        } else registration_.close();
++    }
++    void seal() noexcept { sealed_ = true; }
++    void set_owner(const void* owner) noexcept { owner_ = owner; }
++    static bool active(const void* owner) noexcept {
++        for (auto* invocation = active_; invocation; invocation = invocation->previous)
++            if (invocation->owner == owner) return true;
++        return false;
++    }
++    void* context() noexcept { return &context_; }
++    bool report(RuntimeFailure* failure) {
++        std::lock_guard lock(error_mutex_);
++        if (!error_.value().message) return false;
++        if (failure) retain_native_failure(error_.value(), failure);
++        return true;
++    }
++};
++thread_local CheckedCallback::Active* CheckedCallback::active_ = nullptr;
+ 
+ class Resource final : public NativeResource {
+     std::string descriptor_, identity_;
+@@ -20,6 +107,7 @@
+     std::mutex mutex_;
+     std::uint64_t native_ = 0;
+     std::atomic<std::uint64_t> exclusive_ = 0;
++    std::unique_ptr<CheckedCallback> callback_;
+ 
+     std::uint32_t dispatch(std::uint32_t ordinal, const std::uint64_t* args,
+                            std::uint32_t count, std::uint64_t* result) {
+@@ -65,17 +153,27 @@
+         exclusive_ = native_;
+         return native_ != 0;
+     }
++    void set_callback(std::unique_ptr<CheckedCallback> callback) {
++        callback->set_owner(this);
++        callback_ = std::move(callback);
++    }
++    bool report_callback(RuntimeFailure* failure) { return callback_ && callback_->report(failure); }
+     std::uint32_t borrow(std::uint32_t ordinal, const std::uint64_t* args,
+                          std::uint32_t count, std::uint64_t* result) {
++        if (CheckedCallback::active(this)) return 7;
+         std::lock_guard lock(mutex_);
+         if (!native_) return 1;
+         std::array<std::uint64_t, c_primitive_max_arguments> words{};
+         std::copy_n(args, count, words.begin());
+         words[0] = native_;
+-        return dispatch(ordinal, words.data(), count, result) ? 4 : 0;
+-    }
+-    std::error_code close() override {
++        if (dispatch(ordinal, words.data(), count, result)) return 4;
++        return report_callback(nullptr) ? 8 : 0;
++    }
++    std::error_code close() override { return close(nullptr); }
++    std::error_code close(RuntimeFailure* failure) {
++        if (CheckedCallback::active(this)) throw std::logic_error("C callback cannot close its own registration");
+         std::shared_ptr<void> retired;
++        std::unique_ptr<CheckedCallback> callback;
+         std::int32_t provider_status;
+         {
+             std::lock_guard lock(mutex_);
+@@ -85,6 +183,7 @@
+             // A conforming allocator can reuse the address as soon as C frees
+             // it. Close invalidates the ledger claim before that handoff.
+             exclusive_ = 0;
++            if (callback_) callback_->seal();
+             if (dispatch(release_, &native_, 1, &result)) {
+                 exclusive_ = native_;
+                 throw std::runtime_error("C terminal release transport rejected");
+@@ -92,13 +191,17 @@
+             native_ = 0; // Accepted release consumes even when its result reports failure.
+             provider_status = std::bit_cast<std::int32_t>(static_cast<std::uint32_t>(result));
+             retired = std::move(generation_);
+-        }
++            callback = std::move(callback_);
++        }
++        const bool fault = callback && callback->report(failure);
++        callback.reset();
+         wrapper.reset(nullptr);
+         // Retire the acquisition generation outside the resource and GC locks.
+         if (runtime.is_managed()) {
+             Runtime::Native native(runtime);
+             retired.reset();
+         } else retired.reset();
++        if (!provider_status && fault && !failure) return std::make_error_code(std::errc::operation_canceled);
+         return {provider_status, std::generic_category()};
+     }
+ };
+@@ -112,7 +215,8 @@
+ std::uint32_t dispatch_resource(CPrimitiveThunk* thunk, const char* descriptor,
+     std::uint32_t size, std::uint32_t ordinal, const std::uint64_t* words, std::uint32_t count,
+     std::uint64_t* result, void** handle, const char* identity, std::uint32_t release, CResourceRole role,
+-    bool shutdown_owner) noexcept {
++    bool shutdown_owner, std::unique_ptr<CheckedCallback> callback = {},
++    RuntimeFailure* failure = nullptr) noexcept {
+     if (!thunk || !descriptor || !size || size > 16384 || !identity || !handle ||
+         ordinal >= 64 || release >= 64 || count > c_primitive_max_arguments || (count && !words) ||
+         role < CResourceRole::acquire || role > CResourceRole::close ||
+@@ -137,12 +241,22 @@
+                 layout.descriptor = nominal;
+                 runtime.allocate_into(handle, layout);
+                 auto owner = std::make_shared<Resource>(runtime, *handle, contract, identity, thunk, release, shutdown_owner);
+-                if (!owner->acquire(ordinal, words, count)) *handle = nullptr;
+-                else if (!library->publish_exclusive(*handle, owner)) {
++                if (callback) owner->set_callback(std::move(callback));
++                const bool acquired = owner->acquire(ordinal, words, count);
++                if (acquired && !library->publish_exclusive(*handle, owner)) {
+                     owner->discard_duplicate();
+                     *handle = nullptr;
+                     return 6;
+                 }
++                if (owner->report_callback(failure)) {
++                    if (acquired) {
++                        (void)owner->close();
++                        library->erase(*handle, owner.get());
++                    }
++                    *handle = nullptr;
++                    return 8;
++                }
++                if (!acquired) *handle = nullptr;
+                 return 0;
+             } catch (...) {
+                 *handle = nullptr;
+@@ -161,6 +275,7 @@
+         catch (const std::runtime_error&) { return 3; }
+         if (role != CResourceRole::close)
+             return ordinal == release ? 5 : resource->borrow(ordinal, words, count, result);
++        if (CheckedCallback::active(resource.get())) return 7;
+         const auto error = resource->close();
+         library->erase(*handle, resource.get());
+         *result = static_cast<std::uint32_t>(error.value());
+@@ -182,3 +297,34 @@
+     std::uint64_t* result, void** handle, const char* identity, std::uint32_t release, CResourceRole role) noexcept {
+     return dispatch_resource(thunk, descriptor, size, ordinal, words, count, result, handle, identity, release, role, true);
+ }
++
++extern "C" std::uint32_t vd::vd_c_callback_dispatch_v1(CPrimitiveThunk* thunk, const char* descriptor,
++    std::uint32_t size, std::uint32_t ordinal, std::uint64_t* words, std::uint32_t count,
++    std::uint64_t* result, void** handle, const char* identity, std::uint32_t release, std::uint32_t shutdown_owner,
++    std::uint64_t function, void* capture, CCallbackEntry* entry, std::uint32_t arity, std::uint32_t returns,
++    RuntimeFailure* failure) noexcept {
++    if (!thunk || !descriptor || !size || size > 16384 || ordinal >= 64 ||
++        !words || !count || count > c_primitive_max_arguments || words[count - 1] ||
++        !function || !entry || arity > c_primitive_max_arguments || !failure ||
++        bool(handle) != bool(identity) || (handle && result) || shutdown_owner > 1 || returns > 1)
++        return 5;
++    try {
++        auto& runtime = Runtime::current();
++        if (shutdown_owner && !runtime.is_application_thread()) return 3;
++        NativeJob job(runtime);
++        auto callback = std::make_unique<CheckedCallback>(runtime, function, capture, entry, arity, returns, bool(handle));
++        words[count - 1] = reinterpret_cast<std::uintptr_t>(callback->context());
++        if (handle)
++            return dispatch_resource(thunk, descriptor, size, ordinal, words, count, nullptr, handle,
++                                     identity, release, CResourceRole::acquire, shutdown_owner,
++                                     std::move(callback), failure);
++        std::uint32_t status;
++        {
++            Runtime::Native safe(runtime);
++            status = thunk(descriptor, size, ordinal, words, count, result);
++        }
++        return callback->report(failure) ? 8 : status ? 4 : 0;
++    } catch (...) {
++        return 4;
++    }
++}
+diff --git a/tests/ffi/callback.descriptor.in b/tests/ffi/callback.descriptor.in
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/callback.descriptor.in
+@@ -0,0 +1,22 @@
++void-c-primitive 3 3
++provider org.voidlang.g5
++target @TARGET@
++source /callback_checked.void
++thunk @THUNK@
++fixture @FIXTURE@
++effects direct-sync blocking checked-callbacks
++call c-default
++aliases c_int:i32 c_long:@LONG@ c_size:u64 c_bool:bool
++resource registration G5Registration pointer null register unregister owner-calls shutdown-any consume-always
++callback integer context-first i32 i32
++callback floating context-first f64 f64 f32
++callback notification context-first void i32
++bind twice g5_twice i32 i32 scoped:integer
++bind mix g5_mix f64 f64 f32 scoped:floating
++bind notify g5_notify void i32 scoped:notification
++bind register g5_register owner:registration retained:integer
++bind fire g5_fire i32 borrow:registration i32 i32
++bind queue g5_queue i32 mut:registration i32
++bind wait g5_wait i32
++bind unregister g5_unregister i32 close:registration
++bind late g5_late i32
+diff --git a/tests/ffi/callback.void b/tests/ffi/callback.void
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/callback.void
+@@ -0,0 +1,79 @@
++use "/callback_checked.void" as g5
++use os as host
++
++struct state:
++    n: i32
++    label: string
++
++func (s state) step(value: i32) -> i32:
++    s.n += value
++    return s.n
++
++func (s state) notify(value: i32):
++    s.n += value
++
++func (s state) retained(value: i32) -> i32:
++    if value == 99:
++        var ignored = g5.wait()
++    if s.label != "capture survives":
++        return -100
++    return s.n + value
++
++func twice_value(value: i32) -> i32:
++    return value * 2
++
++func nested(value: i32) -> i32:
++    return g5.twice(value, twice_value)
++
++func fail_callback(value: i32) -> i32:
++    return 1 / (value - value)
++
++func mix_value(x: f64, y: f32) -> f64:
++    return x + (y as f64) * 2.0
++
++func create() -> g5.registration?:
++    var capture = state(n=41, label="capture survives")
++    return g5.register(capture.retained)
++
++func main() -> i32:
++    var mode = ""
++    if host.args() is Ok(var options):
++        for option in options:
++            mode = option
++
++    if mode == "failure":
++        var invalid = g5.twice(7, fail_callback)
++        return invalid
++    var local = state(n=4, label="scoped capture")
++    if g5.twice(-2, local.step) != 5:
++        return 2
++    g5.notify(8, local.notify)
++    if local.n != 20:
++        return 3
++    if g5.mix(1.5, 2.0 as f32, mix_value) != 14.5:
++        return 4
++    if g5.twice(1, nested) != 32:
++        return 5
++
++    var optional = create()
++    if optional == null:
++        return 6
++    var owner = optional as g5.registration
++    var i: i32 = 0
++    for i < 1024:
++        var pressure = state(n=i, label="GC pressure")
++        if pressure.n != i:
++            return 7
++        i += 1
++    if g5.fire(owner, 7, 0) != 48 or g5.fire(owner, 12, 1) != 53:
++        return 8
++    print("G5 integer, mixed floating point, void, reentry and retained foreign callbacks passed")
++    if mode == "implicit":
++        return g5.queue(owner, 1)
++    if g5.queue(owner, 2) != 0:
++        return 9
++    if g5.unregister(owner) != 0 or g5.late() != 0:
++        return 10
++    if mode == "retired":
++        return g5.fire(owner, 7, 0)
++    return 0
+diff --git a/tests/ffi/callback_fixture.c b/tests/ffi/callback_fixture.c
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/callback_fixture.c
+@@ -0,0 +1,139 @@
++#if !defined(_WIN32)
++#define _POSIX_C_SOURCE 200809L
++#endif
++#include "callback_fixture.h"
++#include <stdatomic.h>
++#include <stdio.h>
++#include <stdlib.h>
++#if defined(_WIN32)
++#include <windows.h>
++typedef HANDLE Thread;
++#define WORKER DWORD WINAPI
++static void yield_thread(void) { Sleep(1); }
++#else
++#include <pthread.h>
++#include <time.h>
++typedef pthread_t Thread;
++#define WORKER void*
++static void yield_thread(void) { nanosleep(&(const struct timespec){0, 1000000}, NULL); }
++#endif
++
++int32_t g5_twice(int32_t x, G5Int callback, void* context) {
++    int32_t first = callback(context, x);
++    return first + callback(context, x + 3);
++}
++double g5_mix(double x, float y, G5Float callback, void* context) {
++    double first = callback(context, x, y);
++    return first + callback(context, x * 2, y + 1);
++}
++void g5_notify(int32_t x, G5Notify callback, void* context) {
++    callback(context, x);
++    callback(context, x + 1);
++}
++
++struct G5Registration {
++    G5Int callback;
++    void* context;
++    Thread thread;
++    atomic_bool go;
++    atomic_bool ready;
++    int32_t input;
++    int32_t result;
++    int mode;
++};
++
++static atomic_bool occupied;
++static atomic_bool entered;
++static atomic_bool finish;
++
++G5Registration* g5_register(G5Int callback, void* context) {
++    if (atomic_exchange(&occupied, 1)) return NULL;
++    G5Registration* owner = calloc(1, sizeof *owner);
++    if (!owner) {
++        occupied = 0;
++        return NULL;
++    }
++    owner->callback = callback;
++    owner->context = context;
++    atomic_init(&owner->go, 0);
++    atomic_init(&owner->ready, 0);
++    return owner;
++}
++
++static WORKER worker(void* data) {
++    G5Registration* owner = data;
++    // Reserve the pair before unregister or Runtime admission.
++    G5Int callback = owner->callback;
++    void* context = owner->context;
++    owner->ready = 1;
++    while (!owner->go) yield_thread();
++    owner->result = callback(context, owner->input);
++    return 0;
++}
++
++static int start(G5Registration* owner) {
++#if defined(_WIN32)
++    owner->thread = CreateThread(NULL, 0, worker, owner, 0, NULL);
++    return owner->thread != NULL;
++#else
++    return pthread_create(&owner->thread, NULL, worker, owner) == 0;
++#endif
++}
++
++static void join(Thread thread) {
++#if defined(_WIN32)
++    if (WaitForSingleObject(thread, INFINITE) != WAIT_OBJECT_0) abort();
++    CloseHandle(thread);
++#else
++    if (pthread_join(thread, NULL)) abort();
++#endif
++}
++
++int32_t g5_fire(const G5Registration* owner, int32_t input, int32_t foreign) {
++    if (!foreign) return owner->callback(owner->context, input);
++    G5Registration dispatch = {.callback = owner->callback, .context = owner->context, .input = input};
++    atomic_init(&dispatch.ready, 0);
++    atomic_init(&dispatch.go, 1);
++    if (!start(&dispatch)) return -1000;
++    join(dispatch.thread);
++    return dispatch.result;
++}
++
++int32_t g5_queue(G5Registration* owner, int32_t mode) {
++    if (owner->mode || (mode != 1 && mode != 2)) return -1;
++    entered = 0;
++    finish = 0;
++    owner->mode = mode;
++    owner->input = mode == 2 ? 99 : 50;
++    owner->go = mode == 2;
++    if (!start(owner)) {
++        owner->mode = 0;
++        return -2;
++    }
++    while (!owner->ready || (mode == 2 && !entered)) yield_thread();
++    return 0;
++}
++
++int32_t g5_wait(void) {
++    entered = 1;
++    while (!finish) yield_thread();
++    return 0;
++}
++
++int32_t g5_unregister(G5Registration* owner) {
++    owner->callback = NULL;
++    owner->context = NULL;
++    occupied = 0;
++    if (owner->mode) {
++        owner->go = 1;
++        finish = 1;
++        join(owner->thread);
++        printf("G5 barrier mode=%d result=%d\n", owner->mode, owner->result);
++    }
++    puts("G5 native unregistered and drained");
++    fflush(stdout);
++    free(owner);
++    return 0;
++}
++
++int32_t g5_late(void) { return occupied ? -1 : 0; }
+diff --git a/tests/ffi/callback_fixture.h b/tests/ffi/callback_fixture.h
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/callback_fixture.h
+@@ -0,0 +1,27 @@
++#pragma once
++#include <stdint.h>
++
++#if defined(_WIN32)
++# if defined(G5_FIXTURE_BUILD)
++#  define G5_API __declspec(dllexport)
++# else
++#  define G5_API __declspec(dllimport)
++# endif
++#else
++# define G5_API __attribute__((visibility("default")))
++#endif
++
++typedef int32_t (*G5Int)(void*, int32_t);
++typedef double (*G5Float)(void*, double, float);
++typedef void (*G5Notify)(void*, int32_t);
++typedef struct G5Registration G5Registration;
++
++G5_API int32_t g5_twice(int32_t, G5Int, void*);
++G5_API double g5_mix(double, float, G5Float, void*);
++G5_API void g5_notify(int32_t, G5Notify, void*);
++G5_API G5Registration* g5_register(G5Int, void*);
++G5_API int32_t g5_fire(const G5Registration*, int32_t, int32_t);
++G5_API int32_t g5_queue(G5Registration*, int32_t);
++G5_API int32_t g5_wait(void);
++G5_API int32_t g5_unregister(G5Registration*);
++G5_API int32_t g5_late(void);
+diff --git a/tests/ffi/callback_process.py b/tests/ffi/callback_process.py
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/callback_process.py
+@@ -0,0 +1,157 @@
++"""Exercise G5 with a separate C provider and generated checked adapter."""
++from contextlib import nullcontext
++from hashlib import sha256
++from pathlib import Path
++import os
++import re
++import shutil
++import subprocess
++import sys
++import tempfile
++
++sys.stdout.reconfigure(encoding='utf-8')
++compiler, clang = map(Path, sys.argv[1:3])
++windows = os.name == 'nt'
++sanitized = sys.argv[3] == 'ON'
++sources = Path(__file__).resolve().parent
++environment = dict(os.environ)
++environment.pop('VOID_STDLIB_ROOT', None)
++if sanitized:
++    environment.update(ASAN_OPTIONS='halt_on_error=1:abort_on_error=1:detect_leaks=1',
++                       UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1')
++suffix = '.dll' if windows else '.so'
++exe = '.exe' if windows else ''
++
++
++def run(cwd, *args, status=0, expected=None, env=None):
++    command = list(map(str, args))
++    print('cwd=', cwd, 'argv=', command, flush=True)
++    completed = subprocess.run(command, cwd=cwd, env=env or environment, capture_output=True, timeout=90)
++    output = (completed.stdout + completed.stderr).decode('utf-8', errors='replace')
++    print(f'exit={completed.returncode}\n{output}', flush=True)
++    assert completed.returncode != 0 if status is None else completed.returncode == status, output
++    if expected:
++        assert expected in output, output
++    assert 'AddressSanitizer' not in output and 'UndefinedBehaviorSanitizer' not in output, output
++    return output
++
++
++def qualify(root):
++    global compiler
++    cwd = root / 'independent cwd'
++    cwd.mkdir()
++    prefix = root / 'compiler install'
++    if len(sys.argv) > 5:
++        cmake, build, config = sys.argv[5:8]
++        run(cwd, cmake, '--install', build, '--prefix', prefix, '--config', config, '--component', 'compiler')
++        compiler = prefix / 'bin' / ('voidc' + exe)
++    project = root / 'native callbacks project'
++    run(cwd, compiler, 'new', project, '--source', 'src/main.void', '--project-id', 'org.voidlang.callback-qual')
++    native = project / 'native'
++    native.mkdir()
++    provider = native / ('g5_fixture' + suffix)
++    adapter = native / ('g5_adapter' + suffix)
++    descriptor = native / 'callback.descriptor'
++    manifest = project / 'void.project.toml'
++    with manifest.open('a', encoding='utf-8') as stream:
++        stream.write(f'\n[native.{"windows" if windows else "linux"}]\ndescriptor = "{descriptor.name}"\n'
++                     f'library = "{provider.name}"\nadapter = "{adapter.name}"\n')
++    digest = lambda p: sha256(p.read_bytes()).hexdigest()
++    text = (sources / 'callback.descriptor.in').read_text()
++    for key, value in {
++        'TARGET': 'x86_64-pc-windows-msvc msvc-x64' if windows else 'x86_64-unknown-linux-gnu sysv-x64',
++        'LONG': 'i32' if windows else 'i64', 'THUNK': digest(sources / 'callback_fixture.h'),
++        'FIXTURE': digest(sources / 'callback_fixture.c'),
++    }.items():
++        text = text.replace(f'@{key}@', value)
++    descriptor.write_bytes(text.encode('ascii'))
++    source = project / 'src/main.void'
++    shutil.copyfile(sources / 'callback.void', source)
++    generated = root / 'callback_adapter.c'
++    run(cwd, compiler, 'native-bind', descriptor, 'callback_fixture.h', '-o', generated)
++    flags = ['-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-shared', '-fuse-ld=lld']
++    if windows:
++        flags += ['--target=x86_64-pc-windows-msvc', '-fms-runtime-lib=static']
++        import_library = root / 'g5_fixture.lib'
++        provider_flags = ['-Wl,/implib:' + str(import_library)]
++    else:
++        flags += ['-fPIC', '-fvisibility=hidden', '-pthread', '-Wl,-rpath,$ORIGIN']
++        if sanitized:
++            flags += ['-fsanitize=address,undefined', '-fno-sanitize-recover=all']
++        import_library = provider
++        provider_flags = ['-Wl,-soname,' + provider.name]
++    run(cwd, clang, *flags, *provider_flags, '-DG5_FIXTURE_BUILD', sources / 'callback_fixture.c', '-o', provider)
++    run(cwd, clang, *flags, '-I' + str(sources), generated, import_library, '-o', adapter)
++
++    bad_header = root / 'callback_fixture.h'
++    bad_header.write_text((sources / bad_header.name).read_text().replace(
++        '(*G5Float)(void*, double, float)', '(*G5Float)(void*, double, double)'))
++    run(cwd, clang, '-std=c11', '-fsyntax-only', generated, status=None, expected='C signature g5_mix')
++    bad_header.unlink()
++    bad_descriptor = root / 'unsupported.descriptor'
++    bad_descriptor.write_bytes(text.replace('context-first', 'no-context', 1).encode('ascii'))
++    run(cwd, compiler, 'native-bind', bad_descriptor, 'callback_fixture.h', '-o', root/'bad.c',
++        status=None, expected='context-first')
++    select = ['--project', project]
++    run(cwd, compiler, 'check', *select)
++    run(cwd, compiler, 'run', *select, status=2, expected='Pass --allow-native')
++
++    original = source.read_bytes()
++    source.write_bytes(original.replace(b'g5.twice(-2, local.step)', b'g5.twice(-2, mix_value)'))
++    run(cwd, compiler, 'check', *select, status=None, expected='Type mismatch')
++    source.write_bytes(original.replace(b'    if g5.twice(-2, local.step)', b'    var indirect = local.step\n    if g5.twice(-2, indirect)'))
++    run(cwd, compiler, 'check', *select, status=None, expected='from this generation')
++    source.write_bytes(original)
++
++    if len(sys.argv) > 4:
++        reload = root / 'reload.void'
++        shutil.copyfile(sources / 'callback_reload.void', reload)
++        run(cwd, sys.argv[4], reload, native, provider.name, adapter.name, descriptor,
++            expected='compatible/incompatible reload, retirement and self-drain passed')
++
++    def cases(command, env):
++        for mode in ('normal', 'implicit', 'retired', 'failure'):
++            argv = [*command, mode]
++            if mode == 'failure':
++                output = run(cwd, *argv, status=1, expected='Division by zero', env=env)
++                assert 'G5 native unregistered' not in output
++            else:
++                retired = mode == 'retired'
++                output = run(cwd, *argv, status=1 if retired else 0, expected='retained foreign callbacks passed', env=env)
++                assert output.count('G5 native unregistered and drained') == 1
++                barrier = 'G5 barrier mode=1 result=0' if mode == 'implicit' else 'G5 barrier mode=2 result=140'
++                assert barrier in output
++                if retired:
++                    assert 'closed, null or invalid' in output
++
++    packages = []
++    for name, options in (('normal', ['--no-opt']), ('optimized', [])):
++        cases([compiler, 'run', *select, '--allow-native', '--no-cache', *options, '--'], environment)
++        output = root / ('linked-' + name) / ('g5' + exe)
++        run(cwd, compiler, 'build', *select, '--allow-native', *options, '-o', output)
++        package = root / ('relocated ' + name + ' 雪')
++        output.parent.rename(package)
++        (package / 'native').mkdir()
++        for binary in (provider, adapter):
++            shutil.copy2(binary, package / 'native' / binary.name)
++        packages.append(package / output.name)
++    project.rename(root / 'retained original project')
++    if prefix.exists():
++        prefix.rename(root / 'retained compiler install')
++    runtime_path = str(Path(os.environ['SystemRoot']) / 'System32') if windows else '/usr/bin:/bin'
++    relocated_env = environment | {'PATH': runtime_path, 'VOID_STDLIB_ROOT': str(root / 'absent stdlib')}
++    for binary in packages:
++        cases([binary], relocated_env)
++    print('G5 passed all four compiled and relocated execution modes with independent C')
++    print('artifact identities', [(str(p), digest(p)) for p in (generated, *packages)])
++
++
++retained = os.environ.get('VOID_G5_EVIDENCE_ROOT')
++if retained:
++    root = Path(retained)
++    root.mkdir(parents=True, exist_ok=True)
++    scratch = nullcontext(tempfile.mkdtemp(prefix='g5-', dir=root))
++else:
++    scratch = tempfile.TemporaryDirectory(prefix='VOID G5 ')
++with scratch as directory:
++    qualify(Path(directory))
+diff --git a/tests/ffi/callback_reload.cpp b/tests/ffi/callback_reload.cpp
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/callback_reload.cpp
+@@ -0,0 +1,125 @@
++#include "void/backend.hpp"
++#include "void/c_primitive.hpp"
++#include "void/frontend.hpp"
++#include "void/runtime.hpp"
++
++#include <filesystem>
++#include <fstream>
++#include <iostream>
++#include <stdexcept>
++#include <string>
++
++namespace {
++using Path = std::filesystem::path;
++
++void require(bool condition, const char* message) {
++    if (!condition) throw std::runtime_error(message);
++}
++
++void write(const Path& path, const std::string& data) {
++    std::ofstream output(path, std::ios::binary);
++    output << data;
++    require(bool(output), "write callback reload fixture");
++}
++
++auto analyze(const Path& entry, const vd::CPrimitiveAdmission::Owner& contract) {
++    auto analysis = vd::analyze_project(entry, contract);
++    if (!analysis.succeeded()) throw vd::CompilationError(analysis.diagnostics);
++    return analysis.program;
++}
++
++void check_ir(const vd::ValidatedAnalysis& analysis) {
++    auto reject = [&](auto mutate, const std::string& diagnostic) {
++        auto module = analysis.lower();
++        mutate(module);
++        try { vd::ir::validate(module); }
++        catch (const std::invalid_argument& error) {
++            require(std::string(error.what()).find(diagnostic) != std::string::npos, error.what());
++            return;
++        }
++        throw std::runtime_error("forged C callback IR accepted");
++    };
++    reject([](auto& module) { module.imports.emplace_back(vd::c_callback_bridge); }, "requires host admission");
++    reject([](auto& module) {
++        for (auto& function : module.functions) for (auto& block : function.blocks)
++            for (auto& instruction : block.instructions)
++                if (instruction.op == vd::ir::Op::call &&
++                    instruction.callee.starts_with("/callback_checked.void::register")) {
++                    for (unsigned n = instruction.arguments.front() + 1; n < block.instructions.size(); ++n)
++                        if (&block.instructions[n] == &instruction) break;
++                        else if (block.instructions[n].op == vd::ir::Op::load) {
++                            instruction.arguments.front() = n;
++                            return;
++                        }
++                }
++        throw std::runtime_error("callback invocation missing a rooted reload control");
++    }, "generation-local");
++}
++
++void qualify(const Path& entry, const Path& native, const std::string& provider, const std::string& adapter,
++             const std::string& descriptor, const std::string& original, bool optimize) {
++    write(entry, original);
++    auto contract = vd::CPrimitiveAdmission::admit_conventional(descriptor, native, provider, adapter);
++    auto before = analyze(entry, contract);
++    check_ir(*before);
++    vd::Jit jit;
++    auto old = jit.compile(*before, optimize);
++    auto runtime = old->runtime_owner();
++    vd::ReloadSlot slot(old);
++    require(slot.invoke(0) == 1, "register original generation");
++
++    auto edited = original;
++    const std::string result = "return s.bias + value";
++    const auto position = edited.find(result);
++    require(position != std::string::npos, "fixture callback body");
++    edited.replace(position, result.size(), result + " + 100");
++    write(entry, edited);
++    auto replacement = analyze(entry, contract);
++    require(jit.replace(slot, *replacement, optimize), "compatible callback body reload rejected");
++    old.reset();
++    require(jit.live_generations() == 2, "registration lost its original ORC generation");
++    {
++        vd::Runtime::Attachment attachment(*runtime);
++        vd::Runtime::Managed managed(*runtime);
++        require(runtime->collect() == vd::Runtime::Collection::completed, "collect while retained");
++    }
++    require(slot.invoke(2) == 42, "old callback dispatched to the replacement body");
++    auto incompatible = descriptor;
++    const auto found = incompatible.find("callback integer context-first i32 i32");
++    require(found != std::string::npos, "fixture callback signature");
++    incompatible.replace(found, std::string("callback integer context-first i32 i32").size(),
++                         "callback integer context-first c_int c_int");
++    auto mismatched = vd::CPrimitiveAdmission::admit_conventional(incompatible, native, provider, adapter);
++    require(!jit.replace(slot, *analyze(entry, mismatched), optimize), "incompatible callback C contract reloaded");
++    require(slot.invoke(3) == 43, "incompatible candidate touched original registration");
++    require(slot.invoke(-1) == 0 && jit.live_generations() == 1, "unregister did not retire original ORC generation");
++    require(slot.invoke(0) == 1 && slot.invoke(2) == 142, "replacement registration did not use replacement body");
++    bool rejected = false;
++    try { (void)slot.invoke(-20); }
++    catch (const std::runtime_error& error) {
++        rejected = std::string(error.what()).find("Retained C callback failed") != std::string::npos;
++    }
++    require(rejected, "retained self-unregister was not rejected");
++    const auto failure = runtime->close();
++    require(failure.kind == vd::console::ErrorKind::io_failure &&
++            failure.os_code == static_cast<int>(std::errc::operation_canceled),
++            "retained failure was not reported after shutdown drain");
++    std::cout << "G5 ORC " << (optimize ? "O2" : "normal")
++              << " capture, compatible/incompatible reload, retirement and self-drain passed\n";
++}
++} // namespace
++
++int main(int argc, char** argv) {
++    try {
++        require(argc == 6, "expected entry, native root, provider, adapter and descriptor");
++        const Path entry = argv[1];
++        const auto descriptor = vd::read_source(argv[5]).text();
++        const auto source = vd::read_source(entry).text();
++        for (bool optimize : {false, true}) qualify(entry, argv[2], argv[3], argv[4], descriptor, source, optimize);
++        write(entry, source);
++        return 0;
++    } catch (const std::exception& error) {
++        std::cerr << error.what() << '\n';
++        return 1;
++    }
++}
+diff --git a/tests/ffi/callback_reload.void b/tests/ffi/callback_reload.void
+new file mode 100644
+--- /dev/null
++++ b/tests/ffi/callback_reload.void
+@@ -0,0 +1,26 @@
++use "/callback_checked.void" as g5
++
++var saved_registration: g5.registration? = null
++
++struct capture:
++    bias: i32
++
++func (s capture) receive(value: i32) -> i32:
++    if value == -20:
++        var owner = saved_registration as g5.registration
++        return g5.unregister(owner)
++    return s.bias + value
++
++func entry(value: i32) -> i32:
++    if value == 0:
++        var state = capture(bias=40)
++        saved_registration = g5.register(state.receive)
++        if saved_registration == null:
++            return -1
++        return 1
++    var owner = saved_registration as g5.registration
++    if value == -1:
++        var result = g5.unregister(owner)
++        saved_registration = null
++        return result
++    return g5.fire(owner, value, 0)

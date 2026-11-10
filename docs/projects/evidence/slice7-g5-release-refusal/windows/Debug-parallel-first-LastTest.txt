@@ -1,0 +1,2132 @@
+Start testing: Nov 09 11:42 Pacific Standard Time
+----------------------------------------------------------
+2/381 Testing: project_manifest
+2/381 Test: project_manifest
+Command: "C:/Users/a/VoidS7-G5-Compiler/Debug/void_project_manifest.exe"
+Directory: C:/Users/a/VoidS7-G5-Compiler/Debug
+"project_manifest" start time: Nov 09 11:42 Pacific Standard Time
+Output:
+----------------------------------------------------------
+project_manifest: 8788 checks passed
+<end of output>
+Test time =   0.39 sec
+----------------------------------------------------------
+Test Passed.
+"project_manifest" end time: Nov 09 11:42 Pacific Standard Time
+"project_manifest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+17/381 Testing: cli_contract
+17/381 Test: cli_contract
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/cli/contract.py" "C:/Users/a/VoidS7-G5-Compiler/Debug/voidc.exe"
+Directory: C:/Users/a/VoidS7-G5-Compiler/Debug
+"cli_contract" start time: Nov 09 11:42 Pacific Standard Time
+Output:
+----------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 701, in _rmtree_unsafe
+    os.unlink(fullname)
+    ~~~~~~~~~^^^^^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID CLI � # % if5dn1j9\\broken installation\\voidc.exe'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\a\VoidCI42377496702-Native\tests\cli\contract.py", line 75, in <module>
+    with tempfile.TemporaryDirectory(prefix='VOID CLI � # % ') as directory:
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 972, in __exit__
+    self.cleanup()
+    ~~~~~~~~~~~~^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 976, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 956, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 852, in rmtree
+    _rmtree_impl(path, dir_fd, onexc)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\shutil.py", line 705, in _rmtree_unsafe
+    onexc(os.unlink, fullname, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\AppData\Local\Programs\Python\Python314\Lib\tempfile.py", line 931, in onexc
+    _os.unlink(path)
+    ~~~~~~~~~~^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID CLI � # % if5dn1j9\\broken installation\\voidc.exe'
+<end of output>
+Test time =  15.61 sec
+----------------------------------------------------------
+Test Failed.
+"cli_contract" end time: Nov 09 11:43 Pacific Standard Time
+"cli_contract" time elapsed: 00:00:15
+----------------------------------------------------------
+
+121/381 Testing: runtime_callbacks
+121/381 Test: runtime_callbacks
+Command: "C:/Users/a/VoidS7-G5-Compiler/Debug/void_runtime_callbacks.exe"
+Directory: C:/Users/a/VoidS7-G5-Compiler/Debug
+"runtime_callbacks" start time: Nov 09 11:43 Pacific Standard Time
+Output:
+----------------------------------------------------------
+callback provider quiescence, shutdown, self-drain, generated native roots/reentry, exceptions and code leases passed
+<end of output>
+Test time =   0.77 sec
+----------------------------------------------------------
+Test Passed.
+"runtime_callbacks" end time: Nov 09 11:43 Pacific Standard Time
+"runtime_callbacks" time elapsed: 00:00:00
+----------------------------------------------------------
+
+219/381 Testing: ffi_g1_primitive_jit_ir
+219/381 Test: ffi_g1_primitive_jit_ir
+Command: "C:/Users/a/VoidS7-G5-Compiler/Debug/void_g1_tests.exe" "C:/Users/a/VoidS7-G5-Compiler/Debug/ffi-g1/primitives.descriptor" "C:/Users/a/VoidS7-G5-Compiler/Debug/ffi-g1/primitives.void" "C:/Users/a/VoidS7-G5-Compiler/Debug/ffi-g1/tests"
+Directory: C:/Users/a/VoidS7-G5-Compiler/Debug
+"ffi_g1_primitive_jit_ir" start time: Nov 09 11:43 Pacific Standard Time
+Output:
+----------------------------------------------------------
+void-c-primitive 2 1: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+void-c-primitive 1 2: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+call vectorcall: C primitive descriptor line 8: unsupported descriptor, ABI revision or effects
+effects direct-sync blocking no-callbacks: C primitive descriptor line 7: unsupported descriptor, ABI revision or effects
+c_size:i64: C primitive descriptor line 9: unsupported descriptor, ABI revision or effects
+c_bool:u8: C primitive descriptor line 9: unsupported descriptor, ABI revision or effects
+bind signed8 g1_signed8 i8 ptr: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 record: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 void: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 u8: C primitive provider rejected the exact descriptor or fixture identity
+bind signed8 g1_missing i8 i8: C primitive provider rejected the exact descriptor or fixture identity
+bind signed16 g1_signed8 i8 i8: C primitive descriptor line 11: invalid or duplicate binding name or export
+bind signed8 g1_signed16 i8 i8: C primitive descriptor line 11: invalid or duplicate binding name or export
+extra signed8 g1_signed8 i8 i8: C primitive descriptor line 10: expected a bounded primitive binding record
+provider org.voidlang.forged: C primitive provider rejected the exact descriptor or fixture identity
+source /other.void: C primitive provider rejected the exact descriptor or fixture identity
+source /../other.void: C primitive descriptor line 4: expected a canonical single-file VFS identity
+target aarch64-: C primitive descriptor line 3: unsupported target/profile combination
+artifact identity: C primitive provider rejected the exact descriptor or fixture identity
+descriptor bounds: C primitive descriptor line 1: descriptor size outside 1..16384 bytes
+unavailable fixture: C primitive provider transport is unavailable
+missing independent admission: VOID IR: C primitive call outside the admitted binding module
+wrong provider: VOID IR: invalid C primitive descriptor or exact call signature
+wrong export: VOID IR: invalid C primitive descriptor or exact call signature
+wrong ordinal: VOID IR: invalid C primitive descriptor or exact call signature
+negative ordinal: VOID IR: C primitive call outside the admitted binding module
+missing operand: VOID IR: invalid C primitive descriptor or exact call signature
+extra operand: VOID IR: invalid C primitive descriptor or exact call signature
+argument signedness: VOID IR: invalid C primitive descriptor or exact call signature
+argument width: VOID IR: invalid C primitive descriptor or exact call signature
+return signedness: VOID IR: invalid C primitive descriptor or exact call signature
+return count: VOID IR: invalid C primitive descriptor or exact call signature
+aggregate result: VOID IR: invalid C primitive descriptor or exact call signature
+pointer-like result: VOID IR: invalid C primitive descriptor or exact call signature
+nondefault ABI operand: VOID IR: invalid C primitive descriptor or exact call signature
+receiver: VOID IR: invalid C primitive descriptor or exact call signature
+unadmitted scope: VOID IR: C primitive binding requires the admitted direct import
+unadmitted body: VOID IR: C primitive call outside the admitted binding module
+plain import bypass: VOID IR: C primitive transport requires host admission and typed operations
+first class binding: VOID IR: C primitive binding is direct-call only
+async activation: VOID IR: C primitive graphs require synchronous execution
+runtime-free bypass: VOID IR: invalid C primitive module admission
+ORC untrusted symbol bypass: C primitive transport requires per-generation admission
+JIT normal returned 73; direct C oracle agreed; long=32 bits
+JIT O2 returned 73; direct C oracle agreed; long=32 bits
+<end of output>
+Test time =   0.99 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g1_primitive_jit_ir" end time: Nov 09 11:43 Pacific Standard Time
+"ffi_g1_primitive_jit_ir" time elapsed: 00:00:00
+----------------------------------------------------------
+
+220/381 Testing: ffi_g1_primitive_aot_normal
+220/381 Test: ffi_g1_primitive_aot_normal
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/async/aot.py" "C:/Users/a/VoidS7-G5-Compiler/Debug/void_g1_aot_normal.exe" "73"
+Directory: C:/Users/a/VoidS7-G5-Compiler/Debug
+"ffi_g1_primitive_aot_normal" start time: Nov 09 11:43 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.22 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g1_primitive_aot_normal" end time: Nov 09 11:43 Pacific Standard Time
+"ffi_g1_primitive_aot_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+221/381 Testing: ffi_g1_primitive_aot_optimized
+221/381 Test: ffi_g1_primitive_aot_optimized
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/async/aot.py" "C:/Users/a/VoidS7-G5-Compiler/Debug/void_g1_aot_optimized.exe" "73"
+Directory: C:/Users/a/VoidS7-G5-Compiler/Debug
+"ffi_g1_primitive_aot_optimized" start time: Nov 09 11:43 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.22 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g1_primitive_aot_optimized" end time: Nov 09 11:43 Pacific Standard Time
+"ffi_g1_primitive_aot_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+222/381 Testing: ffi_g1_primitive_aot_mismatch
+222/381 Test: ffi_g1_primitive_aot_mismatch
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/async/aot.py" "C:/Users/a/VoidS7-G5-Compiler/Debug/void_g1_aot_mismatch.exe" "failure:C primitive provider rejected the exact descriptor or fixture identity"
+Directory: C:/Users/a/VoidS7-G5-Compiler/Debug
+"ffi_g1_primitive_aot_mismatch" start time: Nov 09 11:43 Pacific Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.18 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g1_primitive_aot_mismatch" end time: Nov 09 11:43 Pacific Standard Time
+"ffi_g1_primitive_aot_mismatch" time elapsed: 00:00:00
+----------------------------------------------------------
+
+223/381 Testing: ffi_g1_primitive_aot_missing
+223/381 Test: ffi_g1_primitive_aot_missing
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/ffi/missing.py" "C:/gcc/bin/cmake.exe" "C:/Users/a/VoidS7-G5-Compiler/Debug" "Debug"
+Directory: C:/Users/a/VoidS7-G5-Compiler/Debug
+"ffi_g1_primitive_aot_missing" start time: Nov 09 11:43 Pacific Standard Time
+Output:
+----------------------------------------------------------
+[0/2] Re-checking globbed directories...
+[1/2] Linking CXX executable void_g1_aot_missing.exe
+FAILED: [code=4294967295] void_g1_aot_missing.exe 
+C:\Windows\system32\cmd.exe /C "cd . && C:\gcc\bin\cmake.exe -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\void_g1_aot_missing.dir --rc="C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\rc.exe" --mt=C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\llvm-mt.exe --manifests  -- C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\lld-link.exe /nologo ffi-g1\application-optimized.obj CMakeFiles\void_g1_aot_missing.dir\tests\async\aot.cpp.obj  /out:void_g1_aot_missing.exe /implib:void_g1_aot_missing.lib /pdb:void_g1_aot_missing.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console  void_runtime.lib  void_native_fixture.lib  curl\lib\libcurl.lib  C:\Users\a\VoidCI42377496702-Native\.toolchains\http\prefix\windows-schannel-x86_64\Debug\lib\cares.lib  C:\Users\a\VoidCI42377496702-Native\.toolchains\http\prefix\windows-schannel-x86_64\Debug\lib\nghttp2.lib  C:\Users\a\VoidCI42377496702-Native\.toolchains\http\prefix\windows-schannel-x86_64\Debug\lib\psl.lib  normaliz.lib  crypt32.lib  secur32.lib  ws2_32.lib  normaliz.lib  crypt32.lib  secur32.lib  ws2_32.lib  iphlpapi.lib  C:\Users\a\VoidCI42377496702-Native\.toolchains\http\prefix\windows-schannel-x86_64\Debug\lib\zsd.lib  advapi32.lib  C:\Users\a\VoidCI42377496702-Native\.toolchains\host\prefix\windows-x86_64\Debug\lib\archive.lib  C:\Users\a\VoidCI42377496702-Native\.toolchains\host\prefix\windows-x86_64\Debug\lib\libsodium.lib  shell32.lib  ole32.lib  uuid.lib  bcrypt.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+LINK Pass 1: command "C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\bin\lld-link.exe /nologo ffi-g1\application-optimized.obj CMakeFiles\void_g1_aot_missing.dir\tests\async\aot.cpp.obj /out:void_g1_aot_missing.exe /implib:void_g1_aot_missing.lib /pdb:void_g1_aot_missing.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console void_runtime.lib void_native_fixture.lib curl\lib\libcurl.lib C:\Users\a\VoidCI42377496702-Native\.toolchains\http\prefix\windows-schannel-x86_64\Debug\lib\cares.lib C:\Users\a\VoidCI42377496702-Native\.toolchains\http\prefix\windows-schannel-x86_64\Debug\lib\nghttp2.lib C:\Users\a\VoidCI42377496702-Native\.toolchains\http\prefix\windows-schannel-x86_64\Debug\lib\psl.lib normaliz.lib crypt32.lib secur32.lib ws2_32.lib normaliz.lib crypt32.lib secur32.lib ws2_32.lib iphlpapi.lib C:\Users\a\VoidCI42377496702-Native\.toolchains\http\prefix\windows-schannel-x86_64\Debug\lib\zsd.lib advapi32.lib C:\Users\a\VoidCI42377496702-Native\.toolchains\host\prefix\windows-x86_64\Debug\lib\archive.lib C:\Users\a\VoidCI42377496702-Native\.toolchains\host\prefix\windows-x86_64\Debug\lib\libsodium.lib shell32.lib ole32.lib uuid.lib bcrypt.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\void_g1_aot_missing.dir/intermediate.manifest CMakeFiles\void_g1_aot_missing.dir/manifest.res" failed (exit code 1) with the following output:
+lld-link: error: undefined symbol: vd_c_primitive_dispatch_v1
+
+>>> referenced by ffi-g1\application-optimized.obj:(__vd_2f6e61746976655f7072696d6974697665732e766f69643a3a7369676e656438__void)
+
+>>> referenced by ffi-g1\application-optimized.obj:(__vd_2f6e61746976655f7072696d6974697665732e766f69643a3a7369676e65643136__void)
+
+>>> referenced by ffi-g1\application-optimized.obj:(__vd_2f6e61746976655f7072696d6974697665732e766f69643a3a7369676e65643332__void)
+
+>>> referenced 16 more times
+
+ninja: build stopped: subcommand failed.
+<end of output>
+Test time =   0.56 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g1_primitive_aot_missing" end time: Nov 09 11:43 Pacific Standard Time
+"ffi_g1_primitive_aot_missing" time elapsed: 00:00:00
+----------------------------------------------------------
+
+224/381 Testing: ffi_g2_jit_ir
+224/381 Test: ffi_g2_jit_ir
+Command: "C:/Users/a/VoidS7-G5-Compiler/Debug/void_g2_tests.exe" "C:/Users/a/VoidS7-G5-Compiler/Debug/ffi-g2/records.descriptor" "C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void"
+Directory: C:/Users/a/VoidS7-G5-Compiler/Debug
+"ffi_g2_jit_ir" start time: Nov 09 11:43 Pacific Standard Time
+Output:
+----------------------------------------------------------
+2 1: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+sample G2Sample 16 4 2: C primitive descriptor line 17: C record size, alignment or tail padding disagrees with natural layout
+packet G2Packet 31 8 4: C primitive descriptor line 22: C record size, alignment or tail padding disagrees with natural layout
+reading f64 4: C primitive descriptor line 17: C record field offset or padding disagrees with natural layout
+reading ptr 8: C primitive descriptor line 17: unsupported C primitive type
+reading u64 8: C primitive provider rejected the exact descriptor or fixture identity
+tag tag u32: C primitive provider rejected the exact descriptor or fixture identity
+array:u16:3:1: C primitive descriptor line 20: invalid inline array extent or stride
+array:u16:0:2: C primitive descriptor line 20: invalid inline array extent or stride
+array:u16:03:2: C primitive descriptor line 20: invalid bounded canonical decimal field
+datum datum record:packet: C primitive descriptor line 22: record must name an earlier verified declaration
+fastcall: C primitive descriptor line 8: unsupported descriptor, ABI revision or effects
+retains-pointer no-callbacks: C primitive descriptor line 7: unsupported descriptor, ABI revision or effects
+out:1:2:65537: C primitive descriptor line 27: invalid bounded canonical decimal field
+out:1:1:64: C primitive descriptor line 27: invalid byte span offset/length contract
+out:1:2:64 u64: C primitive descriptor line 27: byte span offsets and lengths require exact c_size operands
+out:1:2:64 c_size c_size out:4:5:64: C primitive descriptor line 29: unsupported span count, overlap profile, record or result contract
+bind fill g2_fill i32: C primitive descriptor line 27: unsupported span count, overlap profile, record or result contract
+inout:1:2:64: C primitive provider rejected the exact descriptor or fixture identity
+absent host seal: VOID IR: C primitive call outside the admitted binding module
+wrong provider: VOID IR: invalid C primitive descriptor or exact call signature
+wrong ordinal: VOID IR: invalid C primitive descriptor or exact call signature
+record identity: VOID IR: invalid C primitive descriptor or exact call signature
+span count and slot swap: VOID IR: invalid C primitive argument type or placement
+readonly output: VOID IR: invalid C primitive descriptor or exact call signature
+foreign raw ABI use: VOID IR: C primitive transport requires host admission and typed operations
+unauthorized direct import: VOID IR: C primitive binding requires the admitted direct import
+worker: VOID IR: C primitive graphs require synchronous execution
+raw pointer construction flag: VOID IR: invalid C primitive descriptor or exact call signature
+uninitialized record: VOID IR: read of uninitialized C binding carrier storage in /records.void::entry
+uninitialized byte list: VOID IR: read of uninitialized C binding carrier storage in /records.void::entry
+uninitialized scalar field: VOID IR: read of uninitialized C binding carrier storage in /records.void::entry
+incomplete inline array escapes: VOID IR: incomplete C inline array escapes private construction
+NativeSafe collection, zeroed output scratch, partial commit, oversized and negative rollback passed
+-1: <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:6:20: source call
+        return ffi.fill(bytes, 0, 5, 8) as i32
+                   ^
+
+-2: <host binding /native_records.void>:27:6: runtime error: overlapping C byte spans
+In function /native_records.void::move_bytes
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:8:20: source call
+        return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32
+                   ^
+
+-3: <host binding /native_records.void>:23:6: runtime error: C byte span returned an oversized written prefix
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:10:20: source call
+        return ffi.fill(bytes, 0, 4, 254) as i32
+                   ^
+
+-4: <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:12:20: source call
+        return ffi.fill(bytes, 18446744073709551615 as u64, 1, 8) as i32
+                   ^
+
+G2 JIT normal returned 103
+-1: <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:6:20: source call
+        return ffi.fill(bytes, 0, 5, 8) as i32
+                   ^
+
+-2: <host binding /native_records.void>:27:6: runtime error: overlapping C byte spans
+In function /native_records.void::move_bytes
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:8:20: source call
+        return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32
+                   ^
+
+-3: <host binding /native_records.void>:23:6: runtime error: C byte span returned an oversized written prefix
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:10:20: source call
+        return ffi.fill(bytes, 0, 4, 254) as i32
+                   ^
+
+-4: <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:12:20: source call
+        return ffi.fill(bytes, 18446744073709551615 as u64, 1, 8) as i32
+                   ^
+
+G2 JIT O2 returned 103
+<end of output>
+Test time =   1.61 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g2_jit_ir" end time: Nov 09 11:43 Pacific Standard Time
+"ffi_g2_jit_ir" time elapsed: 00:00:01
+----------------------------------------------------------
+
+225/381 Testing: ffi_g2_aot_normal
+225/381 Test: ffi_g2_aot_normal
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/ffi/records_process.py" "C:/Users/a/VoidS7-G5-Compiler/Debug/void_g2_aot_normal.exe"
+Directory: C:/Users/a/VoidS7-G5-Compiler/Debug
+"ffi_g2_aot_normal" start time: Nov 09 11:43 Pacific Standard Time
+Output:
+----------------------------------------------------------
+7 0 103
+-1 1 <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:6:20: source call
+        return ffi.fill(bytes, 0, 5, 8) as i32
+                   ^
+-2 1 <host binding /native_records.void>:27:6: runtime error: overlapping C byte spans
+In function /native_records.void::move_bytes
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:8:20: source call
+        return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32
+                   ^
+-3 1 <host binding /native_records.void>:23:6: runtime error: C byte span returned an oversized written prefix
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:10:20: source call
+        return ffi.fill(bytes, 0, 4, 254) as i32
+                   ^
+-4 1 <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:12:20: source call
+        return ffi.fill(bytes, 18446744073709551615 as u64, 1, 8) as i32
+                   ^
+<end of output>
+Test time =   0.66 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g2_aot_normal" end time: Nov 09 11:43 Pacific Standard Time
+"ffi_g2_aot_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+226/381 Testing: ffi_g2_aot_optimized
+226/381 Test: ffi_g2_aot_optimized
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/ffi/records_process.py" "C:/Users/a/VoidS7-G5-Compiler/Debug/void_g2_aot_optimized.exe"
+Directory: C:/Users/a/VoidS7-G5-Compiler/Debug
+"ffi_g2_aot_optimized" start time: Nov 09 11:43 Pacific Standard Time
+Output:
+----------------------------------------------------------
+7 0 103
+-1 1 <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:6:20: source call
+        return ffi.fill(bytes, 0, 5, 8) as i32
+                   ^
+-2 1 <host binding /native_records.void>:27:6: runtime error: overlapping C byte spans
+In function /native_records.void::move_bytes
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:8:20: source call
+        return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32
+                   ^
+-3 1 <host binding /native_records.void>:23:6: runtime error: C byte span returned an oversized written prefix
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:10:20: source call
+        return ffi.fill(bytes, 0, 4, 254) as i32
+                   ^
+-4 1 <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:12:20: source call
+        return ffi.fill(bytes, 18446744073709551615 as u64, 1, 8) as i32
+                   ^
+<end of output>
+Test time =   0.67 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g2_aot_optimized" end time: Nov 09 11:43 Pacific Standard Time
+"ffi_g2_aot_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+227/381 Testing: ffi_g3_jit_ir
+227/381 Test: ffi_g3_jit_ir
+Command: "C:/Users/a/VoidS7-G5-Compiler/Debug/void_g3_tests.exe" "C:/Users/a/VoidS7-G5-Compiler/Debug/ffi-g3/resources.descriptor" "C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void" "C:/Users/a/VoidS7-G5-Compiler/Debug/ffi-g3/tests"
+Directory: C:/Users/a/VoidS7-G5-Compiler/Debug
+"ffi_g3_jit_ir" start time: Nov 09 11:43 Pacific Standard Time
+Output:
+----------------------------------------------------------
+3 2: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+integer null: C primitive descriptor line 10: unsupported or contradictory native resource contract
+pointer minus-one: C primitive descriptor line 10: unsupported or contradictory native resource contract
+shutdown-owner: C primitive descriptor line 10: unsupported or contradictory native resource contract
+retry-on-error: C primitive descriptor line 10: unsupported or contradictory native resource contract
+create missing owner: C primitive descriptor line 14: invalid native borrow or terminal release signature
+bind close_box g3_close i32 mut:box: C primitive descriptor line 15: missing exact native acquire or release contract
+i64 close:box: C primitive descriptor line 14: invalid native borrow or terminal release signature
+i32 close:box i32: C primitive descriptor line 14: invalid native borrow or terminal release signature
+i32 borrow:other i32: C primitive descriptor line 12: resource operation requires an earlier admitted identity
+i32 borrow:box mut:box: C primitive descriptor line 12: invalid native borrow or terminal release signature
+owner:box borrow:box i32: C primitive descriptor line 12: invalid native ownership transfer or mixed ABI
+vectorcall: C primitive descriptor line 8: unsupported descriptor, ABI revision or effects
+retains-owner no-callbacks: C primitive descriptor line 7: unsupported descriptor, ABI revision or effects
+org.voidlang.other: C primitive provider rejected the exact descriptor or fixture identity
+absent admission: VOID IR: invalid native resource identity
+wrong provider: VOID IR: invalid C primitive descriptor or exact call signature
+wrong release ordinal: VOID IR: invalid C primitive descriptor or exact call signature
+forged ownership movement: VOID IR: invalid C primitive descriptor or exact call signature
+forged convention operand: VOID IR: invalid C primitive descriptor or exact call signature
+scope bypass: VOID IR: C primitive binding requires the admitted direct import
+raw bridge escape: VOID IR: C primitive transport requires host admission and typed operations
+raw owner bridge escape: VOID IR: C primitive transport requires host admission and typed operations
+worker resource access: VOID IR: C primitive graphs require synchronous execution
+borrow as escaping callable: VOID IR: C primitive binding is direct-call only
+wrapper control flow bypass: VOID IR: invalid admitted C primitive wrapper
+fabricated second owning wrapper: VOID IR: forged native resource
+integer-to-resource cast: VOID IR: invalid conversion
+uninitialized handle: VOID IR: read of uninitialized C binding carrier storage in /resources.void::entry
+eager global acquisition: VOID IR: C primitive operation during global startup
+duplicate native owner, foreign provider/Runtime and stale alias rejected
+null and refused acquisition, refused release and retry preserved exact ownership
+foreign shutdown: Native shutdown requires the application owner thread
+borrow vs wrong-thread close and shutdown passed
+creation-publication race passed
+terminal provider error reported on shutdown after release
+direct typed IR stale alias: <host binding /native_resources.void>:6:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::read
+Called from /resources.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:5:6: source call
+
+closed alias: <host binding /native_resources.void>:6:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::read
+Called from /resources.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:29:20: source call
+        return ffi.read(alias, 0)
+                   ^
+
+double close: <host binding /native_resources.void>:10:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::close_box
+Called from /resources.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:31:20: source call
+        return ffi.close_box(alias)
+                   ^
+
+null acquisition: C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:14:40: runtime error: Null managed reference in checked conversion
+        return ffi.read(ffi.create(-1) as ffi.box, 0)
+                                       ^
+In function /resources.void::entry
+
+explicit close after reload retained the acquisition lease across the C release
+shutdown after reload retained the acquisition lease across the C release
+G3 JIT normal returned 104
+closed alias: <host binding /native_resources.void>:6:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::read
+Called from /resources.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:29:20: source call
+        return ffi.read(alias, 0)
+                   ^
+
+double close: <host binding /native_resources.void>:10:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::close_box
+Called from /resources.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:31:20: source call
+        return ffi.close_box(alias)
+                   ^
+
+null acquisition: C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:14:40: runtime error: Null managed reference in checked conversion
+        return ffi.read(ffi.create(-1) as ffi.box, 0)
+                                       ^
+In function /resources.void::entry
+
+explicit close after reload retained the acquisition lease across the C release
+shutdown after reload retained the acquisition lease across the C release
+G3 JIT O2 returned 104
+<end of output>
+Test time =   2.61 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g3_jit_ir" end time: Nov 09 11:43 Pacific Standard Time
+"ffi_g3_jit_ir" time elapsed: 00:00:02
+----------------------------------------------------------
+
+228/381 Testing: ffi_g3_aot_normal
+228/381 Test: ffi_g3_aot_normal
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources_process.py" "C:/Users/a/VoidS7-G5-Compiler/Debug/void_g3_aot_normal.exe"
+Directory: C:/Users/a/VoidS7-G5-Compiler/Debug
+"ffi_g3_aot_normal" start time: Nov 09 11:43 Pacific Standard Time
+Output:
+----------------------------------------------------------
+7 0 104
+-1 1 <host binding /native_resources.void>:6:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::read
+Called from /resources.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:29:20: source call
+        return ffi.read(alias, 0)
+                   ^
+-2 1 <host binding /native_resources.void>:10:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::close_box
+Called from /resources.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:31:20: source call
+        return ffi.close_box(alias)
+                   ^
+-3 1 C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:14:40: runtime error: Null managed reference in checked conversion
+        return ffi.read(ffi.create(-1) as ffi.box, 0)
+                                       ^
+In function /resources.void::entry
+-4 0 22
+<end of output>
+Test time =   0.38 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g3_aot_normal" end time: Nov 09 11:43 Pacific Standard Time
+"ffi_g3_aot_normal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+229/381 Testing: ffi_g3_aot_optimized
+229/381 Test: ffi_g3_aot_optimized
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources_process.py" "C:/Users/a/VoidS7-G5-Compiler/Debug/void_g3_aot_optimized.exe"
+Directory: C:/Users/a/VoidS7-G5-Compiler/Debug
+"ffi_g3_aot_optimized" start time: Nov 09 11:43 Pacific Standard Time
+Output:
+----------------------------------------------------------
+7 0 104
+-1 1 <host binding /native_resources.void>:6:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::read
+Called from /resources.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:29:20: source call
+        return ffi.read(alias, 0)
+                   ^
+-2 1 <host binding /native_resources.void>:10:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::close_box
+Called from /resources.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:31:20: source call
+        return ffi.close_box(alias)
+                   ^
+-3 1 C:/Users/a/VoidCI42377496702-Native/tests/ffi/resources.void:14:40: runtime error: Null managed reference in checked conversion
+        return ffi.read(ffi.create(-1) as ffi.box, 0)
+                                       ^
+In function /resources.void::entry
+-4 0 22
+<end of output>
+Test time =   0.37 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g3_aot_optimized" end time: Nov 09 11:43 Pacific Standard Time
+"ffi_g3_aot_optimized" time elapsed: 00:00:00
+----------------------------------------------------------
+
+331/381 Testing: reload
+331/381 Test: reload
+Command: "C:/Users/a/VoidS7-G5-Compiler/Debug/void_tests.exe" "reload"
+Directory: C:/Users/a/VoidS7-G5-Compiler/Debug
+"reload" start time: Nov 09 11:43 Pacific Standard Time
+Output:
+----------------------------------------------------------
+reload: passed
+<end of output>
+Test time =   3.62 sec
+----------------------------------------------------------
+Test Passed.
+"reload" end time: Nov 09 11:43 Pacific Standard Time
+"reload" time elapsed: 00:00:03
+----------------------------------------------------------
+
+332/381 Testing: gc
+332/381 Test: gc
+Command: "C:/Users/a/VoidS7-G5-Compiler/Debug/void_tests.exe" "gc"
+Directory: C:/Users/a/VoidS7-G5-Compiler/Debug
+"gc" start time: Nov 09 11:43 Pacific Standard Time
+Output:
+----------------------------------------------------------
+gc: passed
+<end of output>
+Test time =   0.13 sec
+----------------------------------------------------------
+Test Passed.
+"gc" end time: Nov 09 11:43 Pacific Standard Time
+"gc" time elapsed: 00:00:00
+----------------------------------------------------------
+
+338/381 Testing: analysis
+338/381 Test: analysis
+Command: "C:/Users/a/VoidS7-G5-Compiler/Debug/void_tests.exe" "analysis" "C:/Users/a/VoidS7-G5-Compiler/Debug/analysis fixtures"
+Directory: C:/Users/a/VoidS7-G5-Compiler/Debug
+"analysis" start time: Nov 09 11:43 Pacific Standard Time
+Output:
+----------------------------------------------------------
+normal: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 282111
+O2: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 324096
+analysis: passed
+<end of output>
+Test time =   2.45 sec
+----------------------------------------------------------
+Test Passed.
+"analysis" end time: Nov 09 11:43 Pacific Standard Time
+"analysis" time elapsed: 00:00:02
+----------------------------------------------------------
+
+345/381 Testing: ffi_g4_conventional
+345/381 Test: ffi_g4_conventional
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/ffi/conventional_process.py" "C:/gcc/bin/cmake.exe" "C:/Users/a/VoidS7-G5-Compiler/Debug" "Debug" "C:/Users/a/Documents/ChatGPT/Void TEMP/Void-native/.toolchains/native-schannel/sdk/clang+llvm-23.1.4-x86_64-pc-windows-msvc/bin/clang.exe" "OFF"
+Directory: C:/Users/a/VoidS7-G5-Compiler/Debug
+"ffi_g4_conventional" start time: Nov 09 11:43 Pacific Standard Time
+Output:
+----------------------------------------------------------
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:/gcc/bin/cmake.exe', '--install', 'C:/Users/a/VoidS7-G5-Compiler/Debug', '--prefix', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\installed compiler', '--config', 'Debug', '--component', 'compiler']
+exit=0 -- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/VOID-MIT-LICENSE.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/LICENSING_SCOPE.md
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/REDISTRIBUTION.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/NOTICE_INVENTORY.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/llvm-23.1.4
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/llvm-23.1.4/BLAKE3-LICENSE.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/llvm-23.1.4/ConvertUTF-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/llvm-23.1.4/LICENSE.TXT
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/llvm-23.1.4/Support-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/llvm-23.1.4/xxhash-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/zstd-1.5.7
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/zstd-1.5.7/EMBEDDED-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/zstd-1.5.7/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/tomlplusplus/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/tomlplusplus/upstream.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/tomlplusplus/void-bounds-and-locations.patch
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/tomlplusplus/corresponding-source/toml.hpp
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/tomlplusplus/corresponding-source/README.md
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/zlib-1.3.2/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/libarchive
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/libarchive/COPYING
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/libarchive/SOURCE-NOTICES.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/libsodium
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/libsodium/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/libsodium/SOURCE-NOTICES.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/patches
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/patches/libsodium-1.0.22
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/patches/libsodium-1.0.22/asan-alignment.patch
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/patches/libsodium-1.0.22/PROVENANCE.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/host-versions.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/setup_host_deps.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/setup_host_deps_native.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/host-sodium.targets
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/verify_host_deps.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/corresponding-source/repro/tools/setup_host_deps.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/corresponding-source/repro/tools/setup_host_deps_native.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/corresponding-source/repro/tools/verify_host_deps.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/corresponding-source/repro/tools/verify_http_dependencies.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/corresponding-source/repro/tools/ci/llvm_sdk.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/corresponding-source/repro/cmake/host-sodium.targets
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/corresponding-source/repro/third_party/host-versions.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/corresponding-source/repro/third_party/http-versions.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/corresponding-source/repro/third_party/host-patches
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22/asan-alignment.patch
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22/PROVENANCE.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/libxml2-2.15.4
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/libxml2-2.15.4/Copyright
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/libxml2-2.15.4/FILE-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/UNICODE-LICENSE.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/archive.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/channel.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/collections.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/console.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/convert.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/crypto.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/encoding
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/encoding/ascii.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/encoding/base64.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/encoding/binary.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/encoding/hex.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/error.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/io
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/io/memory.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/io.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/json.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/log.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/math.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/net
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/net/http.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/os.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/path.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/process.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/random.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/system_error.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/text.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/time.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/stdlib/url.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/LICENSE-Boost
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/LICENSE.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/NOTICE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/stage10-versions.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/bin/voidc.exe
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/lib/void/void_runtime.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/lib/void/void_native_fixture.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/lib/void/libcurl.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/lib/void/archive.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/lib/void/libsodium.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/lib/void/psl.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/lib/void/nghttp2.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/lib/void/cares.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/lib/void/zsd.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/aws-lc-5.12.0
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/aws-lc-5.12.0/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/aws-lc-5.12.0/NOTICE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/aws-lc-5.12.0/UPSTREAM.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/c-ares-1.34.9
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/c-ares-1.34.9/LICENSE.md
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/libidn2-2.3.8
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/libidn2-2.3.8/COPYING
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/libidn2-2.3.8/COPYING.LESSERv3
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/libidn2-2.3.8/COPYING.unicode
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/libidn2-2.3.8/COPYINGv2
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/libidn2-2.3.8/README
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/libpsl-0.21.5
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/libpsl-0.21.5/COPYING
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/libpsl-0.21.5/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/libpsl-0.21.5/LICENSE.chromium
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/libpsl-0.21.5/README
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/libunistring-1.5
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/libunistring-1.5/COPYING
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/libunistring-1.5/COPYING.LIB
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/libunistring-1.5/README
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/nghttp2-1.70.0
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/nghttp2-1.70.0/COPYING
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/nghttp2-1.70.0/README
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/openssl-3.5.9
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/openssl-3.5.9/LICENSE.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/zlib-1.3.2
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/zlib-1.3.2/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/zlib-1.3.2/README
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/COPYING
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/NOTICE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/VOID-PROVENANCE.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/http-versions.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/publicsuffix
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/publicsuffix/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/publicsuffix/public_suffix_list.dat
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/publicsuffix/UPSTREAM.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/corresponding-source/setup_http_deps.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/corresponding-source/setup_http_deps_native.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/corresponding-source/http_archive.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/http/VOID-HTTP-DEPENDENCIES.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/bin/void-native.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/bin/void-native-resources.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/VOID-HOST-DEPENDENCIES.json
+-- Up-to-date: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/corresponding-source
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/corresponding-source/libarchive-3.8.11.tar.xz
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\installed compiler/share/void/licenses/host/corresponding-source/libsodium-1.0.22.tar.gz
+
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\installed compiler\\bin\\voidc.exe', 'new', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪', '--source', 'src/main.void', '--project-id', 'org.test.native-application', '--app-id', 'org.test.native-app']
+exit=0 Manifest: C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/void.project.toml
+Project ID: org.test.native-application
+Application ID: org.test.native-app
+Next: from the displayed manifest directory, run voidc check --project .
+Created project manifest.
+Automatic application selection requires one eligible main(). Use --entry for a deliberate override.
+
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\installed compiler\\bin\\voidc.exe', 'check', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪']
+exit=0 Source checked successfully
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪', '--', 'ignored']
+exit=2 Invalid invocation: This project declares native code. Pass --allow-native to authorize its execution.
+Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]
+Try 'voidc run --help' for examples.
+
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪', '--allow-native', '--', 'ignored']
+exit=1 C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C dynamic library: missing or unreadable library C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/native/void_g4_conventional_provider.dll
+
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\installed compiler\\bin\\voidc.exe', 'native-bind', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪\\native\\provider.descriptor', 'conventional_fixture.h', '-o', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\independent C sources\\adapter.c']
+exit=0 
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\independent C sources argv=['C:/Users/a/Documents/ChatGPT/Void TEMP/Void-native/.toolchains/native-schannel/sdk/clang+llvm-23.1.4-x86_64-pc-windows-msvc/bin/clang.exe', '--driver-mode=g++', '-std=c++17', '-Wl,/implib:C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\independent C sources\\void_g4_conventional_dependency.lib', '-fuse-ld=lld', '-shared', '-O2', '-Wall', '-Wextra', '-Werror', '--target=x86_64-pc-windows-msvc', '-fms-runtime-lib=static', '-D_CRT_SECURE_NO_WARNINGS', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\independent C sources\\conventional_dependency.cpp', '-o', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪\\native\\void_g4_conventional_dependency.dll']
+exit=0 
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\independent C sources argv=['C:/Users/a/Documents/ChatGPT/Void TEMP/Void-native/.toolchains/native-schannel/sdk/clang+llvm-23.1.4-x86_64-pc-windows-msvc/bin/clang.exe', '-std=c11', '-Wl,/implib:C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\independent C sources\\void_g4_conventional_provider.lib', '-fuse-ld=lld', '-shared', '-O2', '-Wall', '-Wextra', '-Werror', '--target=x86_64-pc-windows-msvc', '-fms-runtime-lib=static', '-D_CRT_SECURE_NO_WARNINGS', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\independent C sources\\conventional_fixture.c', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\independent C sources\\void_g4_conventional_dependency.lib', '-o', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪\\native\\void_g4_conventional_provider.dll']
+exit=0 
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\independent C sources argv=['C:/Users/a/Documents/ChatGPT/Void TEMP/Void-native/.toolchains/native-schannel/sdk/clang+llvm-23.1.4-x86_64-pc-windows-msvc/bin/clang.exe', '-std=c11', '-Wl,/implib:C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\independent C sources\\void_g4_conventional_adapter.lib', '-fuse-ld=lld', '-shared', '-O2', '-Wall', '-Wextra', '-Werror', '--target=x86_64-pc-windows-msvc', '-fms-runtime-lib=static', '-D_CRT_SECURE_NO_WARNINGS', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\independent C sources\\conventional_rejection.c', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\independent C sources\\void_g4_conventional_provider.lib', '-o', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪\\native\\void_g4_conventional_adapter.dll']
+exit=0 
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\installed compiler\\bin\\voidc.exe', 'check', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪']
+exit=0 Source checked successfully
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\installed compiler\\bin\\voidc.exe', 'build', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪', '-o', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\unauthorized.exe']
+exit=2 Invalid invocation: This project declares native code. Pass --allow-native to authorize its execution.
+Usage: voidc build [file-or-directory] [-o executable] [--no-opt]
+Try 'voidc build --help' for examples.
+
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\independent C sources argv=['C:/Users/a/Documents/ChatGPT/Void TEMP/Void-native/.toolchains/native-schannel/sdk/clang+llvm-23.1.4-x86_64-pc-windows-msvc/bin/clang.exe', '-std=c11', '-Wl,/implib:C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\independent C sources\\void_g4_conventional_adapter.lib', '-fuse-ld=lld', '-shared', '-O2', '-Wall', '-Wextra', '-Werror', '--target=x86_64-pc-windows-msvc', '-fms-runtime-lib=static', '-D_CRT_SECURE_NO_WARNINGS', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\independent C sources\\adapter.c', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\independent C sources\\void_g4_conventional_provider.lib', '-o', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\void_g4_conventional_adapter.dll']
+exit=0 
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\installed compiler\\bin\\voidc.exe', 'native-bind', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\mismatched adapter\\provider.descriptor', 'conventional_fixture.h', '-o', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\mismatched adapter\\adapter.c']
+exit=0 
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\independent C sources argv=['C:/Users/a/Documents/ChatGPT/Void TEMP/Void-native/.toolchains/native-schannel/sdk/clang+llvm-23.1.4-x86_64-pc-windows-msvc/bin/clang.exe', '-std=c11', '-Wl,/implib:C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\independent C sources\\void_g4_conventional_adapter.lib', '-fuse-ld=lld', '-shared', '-O2', '-Wall', '-Wextra', '-Werror', '--target=x86_64-pc-windows-msvc', '-fms-runtime-lib=static', '-D_CRT_SECURE_NO_WARNINGS', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\mismatched adapter\\adapter.c', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\independent C sources\\void_g4_conventional_provider.lib', '-o', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\mismatched adapter\\void_g4_conventional_adapter.dll']
+exit=0 
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\independent C sources argv=['C:/Users/a/Documents/ChatGPT/Void TEMP/Void-native/.toolchains/native-schannel/sdk/clang+llvm-23.1.4-x86_64-pc-windows-msvc/bin/clang.exe', '-std=c11', '-fsyntax-only', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\wrong signature\\adapter.c']
+exit=1 C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\wrong signature\adapter.c:15:16: error: static assertion failed: C signature g4_conventional_scale
+   15 | _Static_assert(_Generic(&g4_conventional_scale, double (*)(double, float): 1, default: 0), "C signature g4_conventional_scale");
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪', '--allow-native', '--', 'payload 雪']
+exit=0 VOID native application payload 雪
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+pristine: initializers=['dependency initialized'], released=['-2', '23']
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪', '--allow-native', '--no-cache', '--no-opt', '--', 'payload 雪']
+exit=0 VOID native application payload 雪
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+normal: initializers=['dependency initialized'], released=['-2', '23']
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪', '--allow-native', '--no-cache', '--no-opt', '--', 'reject']
+exit=1 C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/conventional_ffi.void:23:6: runtime error: C resource operation rejected org.voidlang.g4-conventional::g4_conventional_acquire
+In function /conventional_ffi.void::acquire
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:12:32: source call
+            var rejected = ffi.acquire(-3)
+                               ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+normal: initializers=['dependency initialized'], released=['31']
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪', '--allow-native', '--no-cache', '--no-opt', '--', 'closed']
+exit=1 C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/conventional_ffi.void:25:6: runtime error: C resource is closed, null or invalid
+In function /conventional_ffi.void::borrow
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:17:24: source call
+            return ffi.borrow(owner)
+                       ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+normal: initializers=['dependency initialized'], released=['42']
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪', '--allow-native', '--no-cache', '--no-opt', '--', 'capacity']
+exit=1 C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/conventional_ffi.void:17:6: runtime error: C byte span outside admitted extent
+In function /conventional_ffi.void::sum
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:20:24: source call
+            return ffi.sum(too_short, 0, 2) as i32
+                       ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+normal: initializers=['dependency initialized'], released=[]
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\installed compiler\\bin\\voidc.exe', 'build', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪', '--allow-native', '--no-opt', '-o', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\normal\\application.exe']
+exit=0 Built native executable: C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/normal/application.exe
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\installed compiler\\bin\\voidc.exe', 'build', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪', '--allow-native', '--no-opt', '-o', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\normal\\application.exe']
+exit=0 Built native executable: C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/normal/application.exe
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\llvm-readobj.exe', '--coff-imports', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\normal\\application.exe']
+exit=0 
+File: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\normal\application.exe
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+Import {
+  Name: ADVAPI32.dll
+  ImportLookupTableRVA: 0x3CF770
+  ImportAddressTableRVA: 0x3CFD88
+  Symbol: AddAccessAllowedAceEx (17)
+  Symbol: ConvertStringSidToSidW (131)
+  Symbol: CreateWellKnownSid (147)
+  Symbol: EqualSid (282)
+  Symbol: GetAce (311)
+  Symbol: GetLengthSid (331)
+  Symbol: GetSecurityDescriptorControl (348)
+  Symbol: GetSecurityDescriptorDacl (349)
+  Symbol: GetSecurityDescriptorOwner (352)
+  Symbol: GetSecurityInfo (355)
+  Symbol: GetTokenInformation (368)
+  Symbol: InitializeAcl (398)
+  Symbol: InitializeSecurityDescriptor (399)
+  Symbol: IsValidAcl (411)
+  Symbol: IsValidSecurityDescriptor (413)
+  Symbol: IsWellKnownSid (415)
+  Symbol: OpenProcessToken (536)
+  Symbol: SetSecurityDescriptorControl (746)
+  Symbol: SetSecurityDescriptorDacl (747)
+  Symbol: SetSecurityDescriptorOwner (749)
+  Symbol: SystemFunction036 (806)
+}
+Import {
+  Name: bcrypt.dll
+  ImportLookupTableRVA: 0x3CF820
+  ImportAddressTableRVA: 0x3CFE38
+  Symbol: BCryptCloseAlgorithmProvider (2)
+  Symbol: BCryptGenRandom (29)
+  Symbol: BCryptOpenAlgorithmProvider (39)
+}
+Import {
+  Name: KERNEL32.dll
+  ImportLookupTableRVA: 0x3CF840
+  ImportAddressTableRVA: 0x3CFE58
+  Symbol: AcquireSRWLockExclusive (0)
+  Symbol: AreFileApisANSI (35)
+  Symbol: CancelIo (115)
+  Symbol: CancelIoEx (116)
+  Symbol: CancelSynchronousIo (117)
+  Symbol: CloseHandle (137)
+  Symbol: CompareStringOrdinal (157)
+  Symbol: CompareStringW (158)
+  Symbol: CreateDirectoryW (189)
+  Symbol: CreateEventW (194)
+  Symbol: CreateFile2 (197)
+  Symbol: CreateFileA (198)
+  Symbol: CreateFileW (206)
+  Symbol: CreateProcessW (232)
+  Symbol: CreateSymbolicLinkW (243)
+  Symbol: CreateThread (245)
+  Symbol: DebugBreak (266)
+  Symbol: DecodePointer (269)
+  Symbol: DeleteCriticalSection (276)
+  Symbol: DeleteFileW (281)
+  Symbol: DeleteProcThreadAttributeList (282)
+  Symbol: DeviceIoControl (292)
+  Symbol: DuplicateHandle (306)
+  Symbol: EncodePointer (308)
+  Symbol: EnterCriticalSection (312)
+  Symbol: EnumSystemLocalesW (348)
+  Symbol: ExitProcess (359)
+  Symbol: ExitThread (360)
+  Symbol: FillConsoleOutputAttribute (372)
+  Symbol: FillConsoleOutputCharacterW (374)
+  Symbol: FindClose (382)
+  Symbol: FindFirstFileA (386)
+  Symbol: FindFirstFileExW (388)
+  Symbol: FindFirstFileW (393)
+  Symbol: FindNextFileW (405)
+  Symbol: FlushFileBuffers (424)
+  Symbol: FormatMessageA (431)
+  Symbol: FreeEnvironmentStringsW (435)
+  Symbol: FreeLibrary (436)
+  Symbol: FreeLibraryAndExitThread (437)
+  Symbol: GetACP (443)
+  Symbol: GetCPInfo (458)
+  Symbol: GetCommandLineA (479)
+  Symbol: GetCommandLineW (480)
+  Symbol: GetConsoleCursorInfo (505)
+  Symbol: GetConsoleMode (517)
+  Symbol: GetConsoleOutputCP (521)
+  Symbol: GetConsoleScreenBufferInfo (523)
+  Symbol: GetCurrentDirectoryW (538)
+  Symbol: GetCurrentProcess (544)
+  Symbol: GetCurrentProcessId (545)
+  Symbol: GetCurrentThreadId (549)
+  Symbol: GetDateFormatW (555)
+  Symbol: GetDiskFreeSpaceW (563)
+  Symbol: GetDriveTypeW (569)
+  Symbol: GetDynamicTimeZoneInformation (572)
+  Symbol: GetEnvironmentStringsW (577)
+  Symbol: GetExitCodeProcess (582)
+  Symbol: GetExitCodeThread (583)
+  Symbol: GetFileAttributesA (586)
+  Symbol: GetFileAttributesExW (588)
+  Symbol: GetFileAttributesW (591)
+  Symbol: GetFileInformationByHandle (593)
+  Symbol: GetFileInformationByHandleEx (594)
+  Symbol: GetFileSizeEx (598)
+  Symbol: GetFileType (600)
+  Symbol: GetFinalPathNameByHandleW (602)
+  Symbol: GetFullPathNameW (611)
+  Symbol: GetHandleInformation (615)
+  Symbol: GetLastError (618)
+  Symbol: GetLocaleInfoEx (621)
+  Symbol: GetLocaleInfoW (622)
+  Symbol: GetModuleFileNameW (637)
+  Symbol: GetModuleHandleExW (640)
+  Symbol: GetModuleHandleW (641)
+  Symbol: GetNumberOfConsoleInputEvents (671)
+  Symbol: GetOEMCP (673)
+  Symbol: GetOverlappedResult (674)
+  Symbol: GetProcAddress (696)
+  Symbol: GetProcessHeap (702)
+  Symbol: GetStartupInfoW (730)
+  Symbol: GetStdHandle (732)
+  Symbol: GetStringTypeW (737)
+  Symbol: GetSystemInfo (749)
+  Symbol: GetSystemTimeAsFileTime (755)
+  Symbol: GetSystemTimePreciseAsFileTime (756)
+  Symbol: GetTempPathW (768)
+  Symbol: GetThreadErrorMode (771)
+  Symbol: GetTickCount64 (786)
+  Symbol: GetTimeFormatW (790)
+  Symbol: GetTimeZoneInformation (792)
+  Symbol: GetUserDefaultLCID (798)
+  Symbol: GetVolumePathNameW (814)
+  Symbol: HeapAlloc (849)
+  Symbol: HeapFree (853)
+  Symbol: HeapReAlloc (856)
+  Symbol: HeapSize (858)
+  Symbol: InitOnceBeginInitialize (867)
+  Symbol: InitOnceComplete (868)
+  Symbol: InitializeCriticalSection (874)
+  Symbol: InitializeCriticalSectionAndSpinCount (875)
+  Symbol: InitializeCriticalSectionEx (876)
+  Symbol: InitializeProcThreadAttributeList (878)
+  Symbol: InitializeSListHead (879)
+  Symbol: IsDebuggerPresent (901)
+  Symbol: IsProcessorFeaturePresent (908)
+  Symbol: IsValidCodePage (914)
+  Symbol: IsValidLocale (916)
+  Symbol: LCMapStringEx (951)
+  Symbol: LCMapStringW (952)
+  Symbol: LeaveCriticalSection (964)
+  Symbol: LoadLibraryExW (970)
+  Symbol: LocalFree (982)
+  Symbol: LockFileEx (993)
+  Symbol: MoveFileExW (1007)
+  Symbol: MultiByteToWideChar (1014)
+  Symbol: OutputDebugStringW (1054)
+  Symbol: PeekConsoleInputW (1062)
+  Symbol: PeekNamedPipe (1063)
+  Symbol: QueryPerformanceCounter (1106)
+  Symbol: QueryPerformanceFrequency (1107)
+  Symbol: RaiseException (1129)
+  Symbol: ReadConsoleInputW (1137)
+  Symbol: ReadConsoleW (1143)
+  Symbol: ReadFile (1146)
+  Symbol: ReleaseSRWLockExclusive (1209)
+  Symbol: RemoveDirectoryW (1216)
+  Symbol: ResetEvent (1229)
+  Symbol: RtlCaptureContext (1238)
+  Symbol: RtlLookupFunctionEntry (1245)
+  Symbol: RtlPcToFileHeader (1247)
+  Symbol: RtlUnwind (1250)
+  Symbol: RtlUnwindEx (1251)
+  Symbol: RtlVirtualUnwind (1252)
+  Symbol: SetConsoleCursorInfo (1276)
+  Symbol: SetConsoleCursorPosition (1278)
+  Symbol: SetConsoleMode (1290)
+  Symbol: SetConsoleTextAttribute (1299)
+  Symbol: SetConsoleTitleW (1301)
+  Symbol: SetEndOfFile (1313)
+  Symbol: SetEnvironmentVariableW (1317)
+  Symbol: SetEvent (1319)
+  Symbol: SetFilePointerEx (1332)
+  Symbol: SetFileTime (1335)
+  Symbol: SetLastError (1346)
+  Symbol: SetStdHandle (1372)
+  Symbol: SetThreadErrorMode (1384)
+  Symbol: SetUnhandledExceptionFilter (1408)
+  Symbol: Sleep (1424)
+  Symbol: SleepConditionVariableSRW (1426)
+  Symbol: TerminateProcess (1439)
+  Symbol: TlsAlloc (1457)
+  Symbol: TlsFree (1458)
+  Symbol: TlsGetValue (1459)
+  Symbol: TlsSetValue (1460)
+  Symbol: TryAcquireSRWLockExclusive (1464)
+  Symbol: UnhandledExceptionFilter (1473)
+  Symbol: UpdateProcThreadAttribute (1486)
+  Symbol: VirtualAlloc (1498)
+  Symbol: VirtualFree (1501)
+  Symbol: WaitForMultipleObjects (1513)
+  Symbol: WaitForSingleObject (1515)
+  Symbol: WaitForSingleObjectEx (1516)
+  Symbol: WakeAllConditionVariable (1523)
+  Symbol: WakeConditionVariable (1524)
+  Symbol: WideCharToMultiByte (1554)
+  Symbol: WriteConsoleW (1573)
+  Symbol: WriteFile (1574)
+}
+
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪', '--allow-native', '--no-cache', '--', 'payload 雪']
+exit=0 VOID native application payload 雪
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+optimized: initializers=['dependency initialized'], released=['-2', '23']
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪', '--allow-native', '--no-cache', '--', 'reject']
+exit=1 C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/conventional_ffi.void:23:6: runtime error: C resource operation rejected org.voidlang.g4-conventional::g4_conventional_acquire
+In function /conventional_ffi.void::acquire
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:12:32: source call
+            var rejected = ffi.acquire(-3)
+                               ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+optimized: initializers=['dependency initialized'], released=['31']
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪', '--allow-native', '--no-cache', '--', 'closed']
+exit=1 C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/conventional_ffi.void:25:6: runtime error: C resource is closed, null or invalid
+In function /conventional_ffi.void::borrow
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:17:24: source call
+            return ffi.borrow(owner)
+                       ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+optimized: initializers=['dependency initialized'], released=['42']
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪', '--allow-native', '--no-cache', '--', 'capacity']
+exit=1 C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/conventional_ffi.void:17:6: runtime error: C byte span outside admitted extent
+In function /conventional_ffi.void::sum
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:20:24: source call
+            return ffi.sum(too_short, 0, 2) as i32
+                       ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+optimized: initializers=['dependency initialized'], released=[]
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\installed compiler\\bin\\voidc.exe', 'build', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪', '--allow-native', '-o', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\optimized\\application.exe']
+exit=0 Built native executable: C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/optimized/application.exe
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\llvm-readobj.exe', '--coff-imports', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\optimized\\application.exe']
+exit=0 
+File: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\optimized\application.exe
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+Import {
+  Name: ADVAPI32.dll
+  ImportLookupTableRVA: 0x3B2200
+  ImportAddressTableRVA: 0x3B27D0
+  Symbol: AddAccessAllowedAceEx (17)
+  Symbol: ConvertStringSidToSidW (131)
+  Symbol: CreateWellKnownSid (147)
+  Symbol: EqualSid (282)
+  Symbol: GetAce (311)
+  Symbol: GetLengthSid (331)
+  Symbol: GetSecurityDescriptorControl (348)
+  Symbol: GetSecurityDescriptorDacl (349)
+  Symbol: GetSecurityDescriptorOwner (352)
+  Symbol: GetSecurityInfo (355)
+  Symbol: GetTokenInformation (368)
+  Symbol: InitializeAcl (398)
+  Symbol: InitializeSecurityDescriptor (399)
+  Symbol: IsValidAcl (411)
+  Symbol: IsValidSecurityDescriptor (413)
+  Symbol: IsWellKnownSid (415)
+  Symbol: OpenProcessToken (536)
+  Symbol: SetSecurityDescriptorControl (746)
+  Symbol: SetSecurityDescriptorDacl (747)
+  Symbol: SetSecurityDescriptorOwner (749)
+  Symbol: SystemFunction036 (806)
+}
+Import {
+  Name: bcrypt.dll
+  ImportLookupTableRVA: 0x3B22B0
+  ImportAddressTableRVA: 0x3B2880
+  Symbol: BCryptCloseAlgorithmProvider (2)
+  Symbol: BCryptGenRandom (29)
+  Symbol: BCryptOpenAlgorithmProvider (39)
+}
+Import {
+  Name: KERNEL32.dll
+  ImportLookupTableRVA: 0x3B22D0
+  ImportAddressTableRVA: 0x3B28A0
+  Symbol: AcquireSRWLockExclusive (0)
+  Symbol: AreFileApisANSI (35)
+  Symbol: CancelIoEx (116)
+  Symbol: CancelSynchronousIo (117)
+  Symbol: CloseHandle (137)
+  Symbol: CompareStringOrdinal (157)
+  Symbol: CompareStringW (158)
+  Symbol: CreateDirectoryW (189)
+  Symbol: CreateEventW (194)
+  Symbol: CreateFile2 (197)
+  Symbol: CreateFileA (198)
+  Symbol: CreateFileW (206)
+  Symbol: CreateProcessW (232)
+  Symbol: CreateSymbolicLinkW (243)
+  Symbol: CreateThread (245)
+  Symbol: DebugBreak (266)
+  Symbol: DecodePointer (269)
+  Symbol: DeleteCriticalSection (276)
+  Symbol: DeleteFileW (281)
+  Symbol: DeleteProcThreadAttributeList (282)
+  Symbol: DeviceIoControl (292)
+  Symbol: DuplicateHandle (306)
+  Symbol: EncodePointer (308)
+  Symbol: EnterCriticalSection (312)
+  Symbol: EnumSystemLocalesW (348)
+  Symbol: ExitProcess (359)
+  Symbol: ExitThread (360)
+  Symbol: FillConsoleOutputAttribute (372)
+  Symbol: FillConsoleOutputCharacterW (374)
+  Symbol: FindClose (382)
+  Symbol: FindFirstFileExW (388)
+  Symbol: FindFirstFileW (393)
+  Symbol: FindNextFileW (405)
+  Symbol: FlushFileBuffers (424)
+  Symbol: FormatMessageA (431)
+  Symbol: FreeEnvironmentStringsW (435)
+  Symbol: FreeLibrary (436)
+  Symbol: FreeLibraryAndExitThread (437)
+  Symbol: GetACP (443)
+  Symbol: GetCPInfo (458)
+  Symbol: GetCommandLineA (479)
+  Symbol: GetCommandLineW (480)
+  Symbol: GetConsoleCursorInfo (505)
+  Symbol: GetConsoleMode (517)
+  Symbol: GetConsoleOutputCP (521)
+  Symbol: GetConsoleScreenBufferInfo (523)
+  Symbol: GetCurrentDirectoryW (538)
+  Symbol: GetCurrentProcess (544)
+  Symbol: GetCurrentProcessId (545)
+  Symbol: GetCurrentThreadId (549)
+  Symbol: GetDateFormatW (555)
+  Symbol: GetDynamicTimeZoneInformation (572)
+  Symbol: GetEnvironmentStringsW (577)
+  Symbol: GetExitCodeProcess (582)
+  Symbol: GetExitCodeThread (583)
+  Symbol: GetFileAttributesA (586)
+  Symbol: GetFileAttributesExW (588)
+  Symbol: GetFileAttributesW (591)
+  Symbol: GetFileInformationByHandle (593)
+  Symbol: GetFileInformationByHandleEx (594)
+  Symbol: GetFileSizeEx (598)
+  Symbol: GetFileType (600)
+  Symbol: GetFinalPathNameByHandleW (602)
+  Symbol: GetFullPathNameW (611)
+  Symbol: GetHandleInformation (615)
+  Symbol: GetLastError (618)
+  Symbol: GetLocaleInfoEx (621)
+  Symbol: GetLocaleInfoW (622)
+  Symbol: GetModuleFileNameW (637)
+  Symbol: GetModuleHandleExW (640)
+  Symbol: GetModuleHandleW (641)
+  Symbol: GetNumberOfConsoleInputEvents (671)
+  Symbol: GetOEMCP (673)
+  Symbol: GetOverlappedResult (674)
+  Symbol: GetProcAddress (696)
+  Symbol: GetProcessHeap (702)
+  Symbol: GetStartupInfoW (730)
+  Symbol: GetStdHandle (732)
+  Symbol: GetStringTypeW (737)
+  Symbol: GetSystemInfo (749)
+  Symbol: GetSystemTimeAsFileTime (755)
+  Symbol: GetSystemTimePreciseAsFileTime (756)
+  Symbol: GetTempPathW (768)
+  Symbol: GetThreadErrorMode (771)
+  Symbol: GetTickCount64 (786)
+  Symbol: GetTimeFormatW (790)
+  Symbol: GetTimeZoneInformation (792)
+  Symbol: GetUserDefaultLCID (798)
+  Symbol: HeapAlloc (849)
+  Symbol: HeapFree (853)
+  Symbol: HeapReAlloc (856)
+  Symbol: HeapSize (858)
+  Symbol: InitOnceBeginInitialize (867)
+  Symbol: InitOnceComplete (868)
+  Symbol: InitializeCriticalSection (874)
+  Symbol: InitializeCriticalSectionAndSpinCount (875)
+  Symbol: InitializeCriticalSectionEx (876)
+  Symbol: InitializeProcThreadAttributeList (878)
+  Symbol: InitializeSListHead (879)
+  Symbol: IsDebuggerPresent (901)
+  Symbol: IsProcessorFeaturePresent (908)
+  Symbol: IsValidCodePage (914)
+  Symbol: IsValidLocale (916)
+  Symbol: LCMapStringEx (951)
+  Symbol: LCMapStringW (952)
+  Symbol: LeaveCriticalSection (964)
+  Symbol: LoadLibraryExW (970)
+  Symbol: LocalFree (982)
+  Symbol: LockFileEx (993)
+  Symbol: MoveFileExW (1007)
+  Symbol: MultiByteToWideChar (1014)
+  Symbol: OutputDebugStringW (1054)
+  Symbol: PeekConsoleInputW (1062)
+  Symbol: PeekNamedPipe (1063)
+  Symbol: QueryPerformanceCounter (1106)
+  Symbol: QueryPerformanceFrequency (1107)
+  Symbol: RaiseException (1129)
+  Symbol: ReadConsoleInputW (1137)
+  Symbol: ReadConsoleW (1143)
+  Symbol: ReadFile (1146)
+  Symbol: ReleaseSRWLockExclusive (1209)
+  Symbol: RemoveDirectoryW (1216)
+  Symbol: RtlCaptureContext (1238)
+  Symbol: RtlLookupFunctionEntry (1245)
+  Symbol: RtlPcToFileHeader (1247)
+  Symbol: RtlUnwind (1250)
+  Symbol: RtlUnwindEx (1251)
+  Symbol: RtlVirtualUnwind (1252)
+  Symbol: SetConsoleCursorInfo (1276)
+  Symbol: SetConsoleCursorPosition (1278)
+  Symbol: SetConsoleMode (1290)
+  Symbol: SetConsoleTextAttribute (1299)
+  Symbol: SetConsoleTitleW (1301)
+  Symbol: SetEndOfFile (1313)
+  Symbol: SetEnvironmentVariableW (1317)
+  Symbol: SetEvent (1319)
+  Symbol: SetFilePointerEx (1332)
+  Symbol: SetLastError (1346)
+  Symbol: SetStdHandle (1372)
+  Symbol: SetThreadErrorMode (1384)
+  Symbol: SetUnhandledExceptionFilter (1408)
+  Symbol: Sleep (1424)
+  Symbol: SleepConditionVariableSRW (1426)
+  Symbol: TerminateProcess (1439)
+  Symbol: TlsAlloc (1457)
+  Symbol: TlsFree (1458)
+  Symbol: TlsGetValue (1459)
+  Symbol: TlsSetValue (1460)
+  Symbol: TryAcquireSRWLockExclusive (1464)
+  Symbol: UnhandledExceptionFilter (1473)
+  Symbol: UpdateProcThreadAttribute (1486)
+  Symbol: WaitForMultipleObjects (1513)
+  Symbol: WaitForSingleObject (1515)
+  Symbol: WaitForSingleObjectEx (1516)
+  Symbol: WakeAllConditionVariable (1523)
+  Symbol: WakeConditionVariable (1524)
+  Symbol: WideCharToMultiByte (1554)
+  Symbol: WriteConsoleW (1573)
+  Symbol: WriteFile (1574)
+}
+
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\installed compiler\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\sources outside checkout 雪', '--allow-native', '--', 'payload 雪']
+exit=1 C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C dynamic export: C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/native/void_g4_conventional_provider.dll does not provide g4_conventional_missing
+
+missing export: initializers=['dependency initialized'], released=[]
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\relocated normal 雪\\application.exe', 'payload 雪']
+exit=0 VOID native application payload 雪
+
+normal: initializers=['dependency initialized'], released=['-2', '23']
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\relocated normal 雪\\application.exe', 'reject']
+exit=1 C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/conventional_ffi.void:23:6: runtime error: C resource operation rejected org.voidlang.g4-conventional::g4_conventional_acquire
+In function /conventional_ffi.void::acquire
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:12:32: source call
+            var rejected = ffi.acquire(-3)
+                               ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+normal: initializers=['dependency initialized'], released=['31']
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\relocated normal 雪\\application.exe', 'closed']
+exit=1 C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/conventional_ffi.void:25:6: runtime error: C resource is closed, null or invalid
+In function /conventional_ffi.void::borrow
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:17:24: source call
+            return ffi.borrow(owner)
+                       ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+normal: initializers=['dependency initialized'], released=['42']
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\relocated normal 雪\\application.exe', 'capacity']
+exit=1 C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/conventional_ffi.void:17:6: runtime error: C byte span outside admitted extent
+In function /conventional_ffi.void::sum
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:20:24: source call
+            return ffi.sum(too_short, 0, 2) as i32
+                       ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+normal: initializers=['dependency initialized'], released=[]
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\relocated normal 雪\\application.exe', 'payload 雪']
+exit=1 C dynamic library: missing or unreadable library C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/relocated normal 雪/native/void_g4_conventional_provider.dll
+
+normal: initializers=[], released=[]
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\relocated normal 雪\\application.exe', 'payload 雪']
+exit=1 C dynamic load: C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/relocated normal 雪/native/void_g4_conventional_provider.dll (Windows error 193; check architecture, dependencies and initialization)
+
+normal: initializers=[], released=[]
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\relocated normal 雪\\application.exe', 'payload 雪']
+exit=1 C dynamic load: C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/relocated normal 雪/native/void_g4_conventional_provider.dll (Windows error 126; check architecture, dependencies and initialization)
+
+normal: initializers=[], released=[]
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\relocated normal 雪\\application.exe', 'payload 雪']
+exit=1 C dynamic transport: adapter rejected the exact descriptor or thunk identity: C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/relocated normal 雪/native/void_g4_conventional_adapter.dll
+
+normal: initializers=['dependency initialized'], released=[]
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\relocated normal 雪\\application.exe', 'payload 雪']
+exit=0 VOID native application payload 雪
+
+normal: initializers=['dependency initialized'], released=['-2', '23']
+d2eb592ec220d4104faa5d6189b715a368a85ffb3cca2264fdc0d09da7161792  C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\relocated normal 雪\application.exe
+a497e8677fa6dde8d5fa02a01464960f843328745761e9abfc7f6010540f75a5  C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\relocated normal 雪\native\void_g4_conventional_adapter.dll
+f41c8f518c6ce962d326e036278fe0f484b1fdd82c052ab3bb1a5a2fd341c48d  C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\relocated normal 雪\native\void_g4_conventional_dependency.dll
+bf4416a93d353cfe0a3dd28350528cbbbd6b10d532a36172f135a5ab198d7e9f  C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\relocated normal 雪\native\void_g4_conventional_provider.dll
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\relocated optimized 雪\\application.exe', 'payload 雪']
+exit=0 VOID native application payload 雪
+
+optimized: initializers=['dependency initialized'], released=['-2', '23']
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\relocated optimized 雪\\application.exe', 'reject']
+exit=1 C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/conventional_ffi.void:23:6: runtime error: C resource operation rejected org.voidlang.g4-conventional::g4_conventional_acquire
+In function /conventional_ffi.void::acquire
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:12:32: source call
+            var rejected = ffi.acquire(-3)
+                               ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+optimized: initializers=['dependency initialized'], released=['31']
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\relocated optimized 雪\\application.exe', 'closed']
+exit=1 C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/conventional_ffi.void:25:6: runtime error: C resource is closed, null or invalid
+In function /conventional_ffi.void::borrow
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:17:24: source call
+            return ffi.borrow(owner)
+                       ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+optimized: initializers=['dependency initialized'], released=['42']
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\relocated optimized 雪\\application.exe', 'capacity']
+exit=1 C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/conventional_ffi.void:17:6: runtime error: C byte span outside admitted extent
+In function /conventional_ffi.void::sum
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:20:24: source call
+            return ffi.sum(too_short, 0, 2) as i32
+                       ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/sources outside checkout 雪/src/main.void:6:6: source call
+
+
+optimized: initializers=['dependency initialized'], released=[]
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\relocated optimized 雪\\application.exe', 'payload 雪']
+exit=1 C dynamic library: missing or unreadable library C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/relocated optimized 雪/native/void_g4_conventional_provider.dll
+
+optimized: initializers=[], released=[]
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\relocated optimized 雪\\application.exe', 'payload 雪']
+exit=1 C dynamic load: C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/relocated optimized 雪/native/void_g4_conventional_provider.dll (Windows error 193; check architecture, dependencies and initialization)
+
+optimized: initializers=[], released=[]
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\relocated optimized 雪\\application.exe', 'payload 雪']
+exit=1 C dynamic load: C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/relocated optimized 雪/native/void_g4_conventional_provider.dll (Windows error 126; check architecture, dependencies and initialization)
+
+optimized: initializers=[], released=[]
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\relocated optimized 雪\\application.exe', 'payload 雪']
+exit=1 C dynamic transport: adapter rejected the exact descriptor or thunk identity: C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G4 8iejgxa4/relocated optimized 雪/native/void_g4_conventional_adapter.dll
+
+optimized: initializers=['dependency initialized'], released=[]
+cwd=C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\unrelated cwd argv=['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G4 8iejgxa4\\relocated optimized 雪\\application.exe', 'payload 雪']
+exit=0 VOID native application payload 雪
+
+optimized: initializers=['dependency initialized'], released=['-2', '23']
+1b208e82829054fc8d18f690a1b7175bed322a8f382e9e049608a5baa01c4407  C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\relocated optimized 雪\application.exe
+a497e8677fa6dde8d5fa02a01464960f843328745761e9abfc7f6010540f75a5  C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\relocated optimized 雪\native\void_g4_conventional_adapter.dll
+f41c8f518c6ce962d326e036278fe0f484b1fdd82c052ab3bb1a5a2fd341c48d  C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\relocated optimized 雪\native\void_g4_conventional_dependency.dll
+bf4416a93d353cfe0a3dd28350528cbbbd6b10d532a36172f135a5ab198d7e9f  C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G4 8iejgxa4\relocated optimized 雪\native\void_g4_conventional_provider.dll
+PASS: conventional C FFI through installed compiler and relocated normal/O2 executables
+<end of output>
+Test time =  49.11 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g4_conventional" end time: Nov 09 11:44 Pacific Standard Time
+"ffi_g4_conventional" time elapsed: 00:00:49
+----------------------------------------------------------
+
+346/381 Testing: ffi_g5_callbacks
+346/381 Test: ffi_g5_callbacks
+Command: "C:/Users/a/AppData/Local/Programs/Python/Python314/python.exe" "C:/Users/a/VoidCI42377496702-Native/tests/ffi/callback_process.py" "C:/Users/a/VoidS7-G5-Compiler/Debug/voidc.exe" "C:/Users/a/Documents/ChatGPT/Void TEMP/Void-native/.toolchains/native-schannel/sdk/clang+llvm-23.1.4-x86_64-pc-windows-msvc/bin/clang.exe" "OFF" "C:/Users/a/VoidS7-G5-Compiler/Debug/void_g5_reload.exe" "C:/gcc/bin/cmake.exe" "C:/Users/a/VoidS7-G5-Compiler/Debug" "Debug"
+Directory: C:/Users/a/VoidS7-G5-Compiler/Debug
+"ffi_g5_callbacks" start time: Nov 09 11:44 Pacific Standard Time
+Output:
+----------------------------------------------------------
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:/gcc/bin/cmake.exe', '--install', 'C:/Users/a/VoidS7-G5-Compiler/Debug', '--prefix', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\compiler install', '--config', 'Debug', '--component', 'compiler']
+exit=0
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/VOID-MIT-LICENSE.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/LICENSING_SCOPE.md
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/REDISTRIBUTION.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/NOTICE_INVENTORY.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/llvm-23.1.4
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/llvm-23.1.4/BLAKE3-LICENSE.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/llvm-23.1.4/ConvertUTF-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/llvm-23.1.4/LICENSE.TXT
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/llvm-23.1.4/Support-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/llvm-23.1.4/xxhash-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/zstd-1.5.7
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/zstd-1.5.7/EMBEDDED-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/zstd-1.5.7/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/tomlplusplus/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/tomlplusplus/upstream.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/tomlplusplus/void-bounds-and-locations.patch
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/tomlplusplus/corresponding-source/toml.hpp
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/tomlplusplus/corresponding-source/README.md
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/zlib-1.3.2/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/libarchive
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/libarchive/COPYING
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/libarchive/SOURCE-NOTICES.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/libsodium
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/libsodium/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/libsodium/SOURCE-NOTICES.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/patches
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/patches/libsodium-1.0.22
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/patches/libsodium-1.0.22/asan-alignment.patch
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/patches/libsodium-1.0.22/PROVENANCE.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/host-versions.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/setup_host_deps.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/setup_host_deps_native.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/host-sodium.targets
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/verify_host_deps.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/corresponding-source/repro/tools/setup_host_deps.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/corresponding-source/repro/tools/setup_host_deps_native.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/corresponding-source/repro/tools/verify_host_deps.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/corresponding-source/repro/tools/verify_http_dependencies.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/corresponding-source/repro/tools/ci/llvm_sdk.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/corresponding-source/repro/cmake/host-sodium.targets
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-versions.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/http-versions.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22/asan-alignment.patch
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/corresponding-source/repro/third_party/host-patches/libsodium-1.0.22/PROVENANCE.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/libxml2-2.15.4
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/libxml2-2.15.4/Copyright
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/libxml2-2.15.4/FILE-NOTICES.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/UNICODE-LICENSE.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/archive.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/channel.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/collections.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/console.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/convert.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/crypto.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/encoding
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/encoding/ascii.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/encoding/base64.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/encoding/binary.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/encoding/hex.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/error.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/io
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/io/memory.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/io.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/json.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/log.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/math.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/net
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/net/http.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/os.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/path.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/process.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/random.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/system_error.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/text.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/time.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/stdlib/url.void
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/LICENSE-Boost
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/LICENSE.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/NOTICE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/stage10-versions.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/bin/voidc.exe
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/lib/void/void_runtime.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/lib/void/void_native_fixture.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/lib/void/libcurl.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/lib/void/archive.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/lib/void/libsodium.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/lib/void/psl.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/lib/void/nghttp2.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/lib/void/cares.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/lib/void/zsd.lib
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/aws-lc-5.12.0
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/aws-lc-5.12.0/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/aws-lc-5.12.0/NOTICE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/aws-lc-5.12.0/UPSTREAM.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/c-ares-1.34.9
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/c-ares-1.34.9/LICENSE.md
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/libidn2-2.3.8
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/libidn2-2.3.8/COPYING
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/libidn2-2.3.8/COPYING.LESSERv3
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/libidn2-2.3.8/COPYING.unicode
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/libidn2-2.3.8/COPYINGv2
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/libidn2-2.3.8/README
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/libpsl-0.21.5
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/libpsl-0.21.5/COPYING
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/libpsl-0.21.5/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/libpsl-0.21.5/LICENSE.chromium
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/libpsl-0.21.5/README
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/libunistring-1.5
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/libunistring-1.5/COPYING
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/libunistring-1.5/COPYING.LIB
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/libunistring-1.5/README
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/nghttp2-1.70.0
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/nghttp2-1.70.0/COPYING
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/nghttp2-1.70.0/README
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/openssl-3.5.9
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/openssl-3.5.9/LICENSE.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/zlib-1.3.2
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/zlib-1.3.2/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/zlib-1.3.2/README
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/COPYING
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/NOTICE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/VOID-PROVENANCE.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/http-versions.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/publicsuffix
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/publicsuffix/LICENSE
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/publicsuffix/public_suffix_list.dat
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/publicsuffix/UPSTREAM.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/corresponding-source/setup_http_deps.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/corresponding-source/setup_http_deps_native.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/corresponding-source/http_archive.py
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/http/VOID-HTTP-DEPENDENCIES.json
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/bin/void-native.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/bin/void-native-resources.txt
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/VOID-HOST-DEPENDENCIES.json
+-- Up-to-date: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/corresponding-source
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/corresponding-source/libarchive-3.8.11.tar.xz
+-- Installing: C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\compiler install/share/void/licenses/host/corresponding-source/libsodium-1.0.22.tar.gz
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\compiler install\\bin\\voidc.exe', 'new', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\native callbacks project', '--source', 'src/main.void', '--project-id', 'org.voidlang.callback-qual']
+exit=0
+Manifest: C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/void.project.toml
+Project ID: org.voidlang.callback-qual
+Application ID: local.ae2a867c4e85ac3124dbcf4fce8633eb0
+Next: from the displayed manifest directory, run voidc check --project .
+Created project manifest.
+Automatic application selection requires one eligible main(). Use --entry for a deliberate override.
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\compiler install\\bin\\voidc.exe', 'native-bind', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\native callbacks project\\native\\callback.descriptor', 'callback_fixture.h', '-o', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\callback_adapter.c']
+exit=0
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\clang.exe', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-shared', '-fuse-ld=lld', '--target=x86_64-pc-windows-msvc', '-fms-runtime-lib=static', '-Wl,/implib:C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\g5_fixture.lib', '-DG5_FIXTURE_BUILD', 'C:\\Users\\a\\VoidCI42377496702-Native\\tests\\ffi\\callback_fixture.c', '-o', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\native callbacks project\\native\\g5_fixture.dll']
+exit=0
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\clang.exe', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-shared', '-fuse-ld=lld', '--target=x86_64-pc-windows-msvc', '-fms-runtime-lib=static', '-IC:\\Users\\a\\VoidCI42377496702-Native\\tests\\ffi', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\callback_adapter.c', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\g5_fixture.lib', '-o', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\native callbacks project\\native\\g5_adapter.dll']
+exit=0
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\clang.exe', '-std=c11', '-fsyntax-only', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\callback_adapter.c']
+exit=1
+C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\callback_adapter.c:56:16: error: static assertion failed: C signature g5_mix
+   56 | _Static_assert(_Generic(&g5_mix, double (*)(double, float, vd_cb_floating, void*): 1, default: 0), "C signature g5_mix");
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\callback_adapter.c:118:43: error: incompatible function pointer types passing 'double (void *, double, float)' to parameter of type 'G5Float' (aka 'double (*)(void *, double, double)') [-Wincompatible-function-pointer-types]
+  118 |         double value = g5_mix(arg0, arg1, vd_enter_floating, arg2);
+      |                                           ^~~~~~~~~~~~~~~~~
+C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\callback_fixture.h:20:44: note: passing argument to parameter here
+   20 | G5_API double g5_mix(double, float, G5Float, void*);
+      |                                            ^
+2 errors generated.
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\compiler install\\bin\\voidc.exe', 'native-bind', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\unsupported.descriptor', 'callback_fixture.h', '-o', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\bad.c']
+exit=1
+C primitive descriptor line 11: expected a fixed C callback signature with context-first
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\compiler install\\bin\\voidc.exe', 'check', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\native callbacks project']
+exit=0
+Source checked successfully
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\native callbacks project']
+exit=2
+Invalid invocation: This project declares native code. Pass --allow-native to authorize its execution.
+Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]
+Try 'voidc run --help' for examples.
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\compiler install\\bin\\voidc.exe', 'check', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\native callbacks project']
+exit=1
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/src/main.void:48:21: error: Type mismatch: expected func(i32) -> i32, received func(f64, f32) -> f64.
+    code: VOID2001
+
+ 48 |     if g5.twice(-2, mix_value) != 5:
+    |                     ^^^^^^^^^
+    Module: /src/main.void
+    Expected: func(i32) -> i32
+    Received: func(f64, f32) -> f64
+
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\compiler install\\bin\\voidc.exe', 'check', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\native callbacks project']
+exit=1
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/src/main.void:49:21: error: A checked C callback must be supplied last as a directly named function, bound method or literal closure from this generation.
+    code: VOID1103
+
+ 49 |     if g5.twice(-2, indirect) != 5:
+    |                     ^^^^^^^^
+    Module: /src/main.void
+
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\bin\\clang.exe', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-shared', '-fuse-ld=lld', '--target=x86_64-pc-windows-msvc', '-fms-runtime-lib=static', '-IC:\\Users\\a\\VoidCI42377496702-Native\\tests\\ffi', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\callback_refusal_adapter.c', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\g5_fixture.lib', '-o', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\native callbacks project\\native\\g5_refusal_adapter.dll']
+exit=0
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:/Users/a/VoidS7-G5-Compiler/Debug/void_g5_reload.exe', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\reload.void', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\native callbacks project\\native', 'g5_fixture.dll', 'g5_refusal_adapter.dll', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\native callbacks project\\native\\callback.descriptor']
+exit=0
+G5 transport refused before native unregister
+G5 native unregistered and drained
+G5 transport refused before native unregister
+G5 native unregistered and drained
+G5 transport refused before native unregister
+G5 native unregistered and drained
+G5 transport refused before native unregister
+G5 native unregistered and drained
+G5 callback after refused release returned 44 (expected 44)
+G5 ORC normal capture, compatible/incompatible reload, refusal/retry, retirement and self-drain passed
+G5 callback after refused release returned 44 (expected 44)
+G5 ORC O2 capture, compatible/incompatible reload, refusal/retry, retirement and self-drain passed
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\native callbacks project', '--allow-native', '--no-cache', '--no-opt', '--', 'normal']
+exit=0
+G5 integer, mixed floating point, void, reentry and retained foreign callbacks passed
+G5 barrier mode=2 result=140
+G5 native unregistered and drained
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\native callbacks project', '--allow-native', '--no-cache', '--no-opt', '--', 'implicit']
+exit=0
+G5 integer, mixed floating point, void, reentry and retained foreign callbacks passed
+G5 barrier mode=1 result=0
+G5 native unregistered and drained
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\native callbacks project', '--allow-native', '--no-cache', '--no-opt', '--', 'retired']
+exit=1
+G5 integer, mixed floating point, void, reentry and retained foreign callbacks passed
+G5 barrier mode=2 result=140
+G5 native unregistered and drained
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/callback_checked.void:12:6: runtime error: C resource is closed, null or invalid
+In function /callback_checked.void::fire
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/src/main.void:78:19: source call
+        return g5.fire(owner, 7, 0)
+                  ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/src/main.void:38:6: source call
+
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\native callbacks project', '--allow-native', '--no-cache', '--no-opt', '--', 'failure']
+exit=1
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/src/main.void:29:14: runtime error: Division by zero
+    return 1 / (value - value)
+             ^
+In function /src/main.void::fail_callback
+Called from /callback_checked.void::twice
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/callback_checked.void:4:6: source call
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/src/main.void:45:26: source call
+        var invalid = g5.twice(7, fail_callback)
+                         ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/src/main.void:38:6: source call
+
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\compiler install\\bin\\voidc.exe', 'build', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\native callbacks project', '--allow-native', '--no-opt', '-o', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\linked-normal\\g5.exe']
+exit=0
+Built native executable: C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/linked-normal/g5.exe
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\native callbacks project', '--allow-native', '--no-cache', '--', 'normal']
+exit=0
+G5 integer, mixed floating point, void, reentry and retained foreign callbacks passed
+G5 barrier mode=2 result=140
+G5 native unregistered and drained
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\native callbacks project', '--allow-native', '--no-cache', '--', 'implicit']
+exit=0
+G5 integer, mixed floating point, void, reentry and retained foreign callbacks passed
+G5 barrier mode=1 result=0
+G5 native unregistered and drained
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\native callbacks project', '--allow-native', '--no-cache', '--', 'retired']
+exit=1
+G5 integer, mixed floating point, void, reentry and retained foreign callbacks passed
+G5 barrier mode=2 result=140
+G5 native unregistered and drained
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/callback_checked.void:12:6: runtime error: C resource is closed, null or invalid
+In function /callback_checked.void::fire
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/src/main.void:78:19: source call
+        return g5.fire(owner, 7, 0)
+                  ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/src/main.void:38:6: source call
+
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\compiler install\\bin\\voidc.exe', 'run', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\native callbacks project', '--allow-native', '--no-cache', '--', 'failure']
+exit=1
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/src/main.void:29:14: runtime error: Division by zero
+    return 1 / (value - value)
+             ^
+In function /src/main.void::fail_callback
+Called from /callback_checked.void::twice
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/callback_checked.void:4:6: source call
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/src/main.void:45:26: source call
+        var invalid = g5.twice(7, fail_callback)
+                         ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/src/main.void:38:6: source call
+
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\compiler install\\bin\\voidc.exe', 'build', '--project', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\native callbacks project', '--allow-native', '-o', 'C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\linked-optimized\\g5.exe']
+exit=0
+Built native executable: C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/linked-optimized/g5.exe
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/void.project.toml:19:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.
+    code: VOID5012
+
+ 19 | 
+    | ^
+    Module: /void.project.toml
+    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.
+
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\relocated normal 雪\\g5.exe', 'normal']
+exit=0
+G5 integer, mixed floating point, void, reentry and retained foreign callbacks passed
+G5 barrier mode=2 result=140
+G5 native unregistered and drained
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\relocated normal 雪\\g5.exe', 'implicit']
+exit=0
+G5 integer, mixed floating point, void, reentry and retained foreign callbacks passed
+G5 barrier mode=1 result=0
+G5 native unregistered and drained
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\relocated normal 雪\\g5.exe', 'retired']
+exit=1
+G5 integer, mixed floating point, void, reentry and retained foreign callbacks passed
+G5 barrier mode=2 result=140
+G5 native unregistered and drained
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/callback_checked.void:12:6: runtime error: C resource is closed, null or invalid
+In function /callback_checked.void::fire
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/src/main.void:78:19: source call
+        return g5.fire(owner, 7, 0)
+                  ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/src/main.void:38:6: source call
+
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\relocated normal 雪\\g5.exe', 'failure']
+exit=1
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/src/main.void:29:14: runtime error: Division by zero
+    return 1 / (value - value)
+             ^
+In function /src/main.void::fail_callback
+Called from /callback_checked.void::twice
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/callback_checked.void:4:6: source call
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/src/main.void:45:26: source call
+        var invalid = g5.twice(7, fail_callback)
+                         ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/src/main.void:38:6: source call
+
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\relocated optimized 雪\\g5.exe', 'normal']
+exit=0
+G5 integer, mixed floating point, void, reentry and retained foreign callbacks passed
+G5 barrier mode=2 result=140
+G5 native unregistered and drained
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\relocated optimized 雪\\g5.exe', 'implicit']
+exit=0
+G5 integer, mixed floating point, void, reentry and retained foreign callbacks passed
+G5 barrier mode=1 result=0
+G5 native unregistered and drained
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\relocated optimized 雪\\g5.exe', 'retired']
+exit=1
+G5 integer, mixed floating point, void, reentry and retained foreign callbacks passed
+G5 barrier mode=2 result=140
+G5 native unregistered and drained
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/callback_checked.void:12:6: runtime error: C resource is closed, null or invalid
+In function /callback_checked.void::fire
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/src/main.void:78:19: source call
+        return g5.fire(owner, 7, 0)
+                  ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/src/main.void:38:6: source call
+
+
+cwd= C:\Users\a\VoidS7-G5-Compiler\release-refusal-8qx4cjqk\Debug-tmp\VOID G5 t3041ha3\independent cwd argv= ['C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\relocated optimized 雪\\g5.exe', 'failure']
+exit=1
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/src/main.void:29:14: runtime error: Division by zero
+    return 1 / (value - value)
+             ^
+In function /src/main.void::fail_callback
+Called from /callback_checked.void::twice
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/callback_checked.void:4:6: source call
+Called from /src/main.void::main
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/src/main.void:45:26: source call
+        var invalid = g5.twice(7, fail_callback)
+                         ^
+Called from /src/main.void::$app_adapter
+C:/Users/a/VoidS7-G5-Compiler/release-refusal-8qx4cjqk/Debug-tmp/VOID G5 t3041ha3/native callbacks project/src/main.void:38:6: source call
+
+
+G5 passed all four compiled and relocated execution modes with independent C
+artifact identities [('C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\callback_adapter.c', '8677ef879d7624aa52463160a9e331dd34ff4150ce83df3324717080ee46017b'), ('C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\relocated normal 雪\\g5.exe', '429740b22c32394b641516d3c4ce417c8f5d13d3cec6641d359f3f3b7b936158'), ('C:\\Users\\a\\VoidS7-G5-Compiler\\release-refusal-8qx4cjqk\\Debug-tmp\\VOID G5 t3041ha3\\relocated optimized 雪\\g5.exe', '6dae291e8c7ae7b235ddd509bf39825d970cb3058553c37d5e516494d4157cb7')]
+<end of output>
+Test time =  35.81 sec
+----------------------------------------------------------
+Test Passed.
+"ffi_g5_callbacks" end time: Nov 09 11:44 Pacific Standard Time
+"ffi_g5_callbacks" time elapsed: 00:00:35
+----------------------------------------------------------
+
+End testing: Nov 09 11:44 Pacific Standard Time

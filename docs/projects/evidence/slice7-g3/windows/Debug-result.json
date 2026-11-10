@@ -1,0 +1,255 @@
+{
+  "status": "PASS",
+  "profile": "Debug",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "os_build": 19045,
+  "commands": [
+    {
+      "label": "configure",
+      "argv": [
+        "C:\\gcc\\bin\\cmake.exe",
+        "-S",
+        "C:\\Users\\a\\VoidCI42377496702-Native",
+        "-B",
+        "C:\\Users\\a\\VoidS7-G3-Debug",
+        "-G",
+        "Ninja",
+        "-DCMAKE_AR=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin/llvm-lib.exe",
+        "-DCMAKE_CXX_COMPILER=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin/clang-cl.exe",
+        "-DCMAKE_C_COMPILER=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin/clang-cl.exe",
+        "-DCMAKE_LINKER=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin/lld-link.exe",
+        "-DCMAKE_MAKE_PROGRAM=C:/gcc/bin/ninja.exe",
+        "-DCMAKE_MT=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4/bin/llvm-mt.exe",
+        "-DCMAKE_RC_COMPILER=C:/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0/x64/rc.exe",
+        "-DLLVM_DIR=C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\lib\\cmake\\llvm",
+        "-DZLIB_INCLUDE_DIR=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4-deps/include",
+        "-DZLIB_LIBRARY_RELEASE=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4-deps/lib/zlibstatic.lib",
+        "-Dzstd_DIR=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4-deps/lib/cmake/zstd",
+        "-DLibXml2_DIR=C:/Users/a/VoidCI42377496702-Native/.toolchains/llvm-23.1.4-deps/lib/cmake/libxml2",
+        "-DVOID_HOST_DEPS_ROOT=C:/Users/a/VoidCI42377496702-Native/.toolchains/host/prefix/windows-x86_64/Debug",
+        "-DVOID_HTTP_DEPS_ROOT=C:/Users/a/VoidCI42377496702-Native/cmake/../.toolchains/http/prefix/windows-schannel-x86_64/Debug",
+        "-DVOID_CLANG=C:/Users/a/Documents/ChatGPT/Void TEMP/Void-native/.toolchains/native-schannel/sdk/clang+llvm-23.1.4-x86_64-pc-windows-msvc/bin/clang.exe",
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DBUILD_TESTING=ON",
+        "-DVOID_SANITIZERS=OFF",
+        "-DVOID_LLVM_RESEARCH=OFF",
+        "-DPython3_EXECUTABLE=C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe"
+      ],
+      "returncode": 0,
+      "seconds": 41.46856690000004
+    },
+    {
+      "label": "build",
+      "argv": [
+        "C:\\gcc\\bin\\cmake.exe",
+        "--build",
+        "C:\\Users\\a\\VoidS7-G3-Debug",
+        "--parallel",
+        "2",
+        "--target",
+        "voidc",
+        "voidls",
+        "void_tests",
+        "void_numeric_enum_ir",
+        "void_native_inventory",
+        "void_project_application",
+        "void_project_sessions",
+        "void_project_selection",
+        "void_project_manifest",
+        "void_project_creation",
+        "void_fixed_arrays_tests",
+        "void_async_tests",
+        "void_stage10_fields",
+        "void_project_header",
+        "void_g1_tests",
+        "void_g1_aot_normal",
+        "void_g1_aot_optimized",
+        "void_g1_aot_mismatch",
+        "void_native_tests",
+        "void_g2_tests",
+        "void_g2_aot_normal",
+        "void_g2_aot_optimized",
+        "void_g3_tests",
+        "void_g3_aot_normal",
+        "void_g3_aot_optimized",
+        "void_native_aot_main_normal",
+        "void_native_aot_main_optimized",
+        "void_native_aot_terminated_nul_normal",
+        "void_native_aot_closed_optimized",
+        "void_native_aot_duplicate_normal"
+      ],
+      "returncode": 0,
+      "seconds": 364.24049789999935
+    },
+    {
+      "label": "ctest",
+      "argv": [
+        "C:\\gcc\\bin\\ctest.exe",
+        "--test-dir",
+        "C:\\Users\\a\\VoidS7-G3-Debug",
+        "--output-on-failure",
+        "-j",
+        "2",
+        "-R",
+        "^(ffi_g[123]_.*|native_source|native_aot_(main_(normal|optimized)|terminated_nul_normal|closed_optimized|duplicate_normal)|stage6_integrated|stage6_cache_processes|numeric|numeric_cli|numeric_enum_.*|fixed_arrays_source|async_ir|stage10_fields|frontend|modules|gc|reload|sessions|analysis|project_(manifest_header|manifest_no_authority|manifest_provenance|application|application_process|creation|creation_process|sessions|selection|profiles|protocol|manifest|manifest_legacy|discovery_cli|nested_cli))$",
+        "--output-junit",
+        "\\\\vboxsvr\\VM\\project-slice7-g3\\Debug-ctest.xml"
+      ],
+      "returncode": 0,
+      "seconds": 302.7760559999997
+    },
+    {
+      "label": "g1-direct",
+      "argv": [
+        "C:\\Users\\a\\VoidS7-G3-Debug\\void_g1_tests.exe",
+        "C:\\Users\\a\\VoidS7-G3-Debug\\ffi-g1\\primitives.descriptor",
+        "C:\\Users\\a\\VoidS7-G3-Debug\\ffi-g1\\primitives.void",
+        "C:\\Users\\a\\VoidS7-G3-Debug\\ffi-g1\\tests"
+      ],
+      "returncode": 0,
+      "seconds": 1.1254657999998017
+    },
+    {
+      "label": "g2-direct",
+      "argv": [
+        "C:\\Users\\a\\VoidS7-G3-Debug\\void_g2_tests.exe",
+        "C:\\Users\\a\\VoidS7-G3-Debug\\ffi-g2\\records.descriptor",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\tests\\ffi\\records.void"
+      ],
+      "returncode": 0,
+      "seconds": 1.7286733999999342
+    },
+    {
+      "label": "g2-aot-normal",
+      "argv": [
+        "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\tests\\ffi\\records_process.py",
+        "C:\\Users\\a\\VoidS7-G3-Debug\\void_g2_aot_normal.exe"
+      ],
+      "returncode": 0,
+      "seconds": 0.15546459999950457
+    },
+    {
+      "label": "g2-aot-optimized",
+      "argv": [
+        "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\tests\\ffi\\records_process.py",
+        "C:\\Users\\a\\VoidS7-G3-Debug\\void_g2_aot_optimized.exe"
+      ],
+      "returncode": 0,
+      "seconds": 0.16878670000005513
+    },
+    {
+      "label": "g3-direct",
+      "argv": [
+        "C:\\Users\\a\\VoidS7-G3-Debug\\void_g3_tests.exe",
+        "C:\\Users\\a\\VoidS7-G3-Debug\\ffi-g3\\resources.descriptor",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\tests\\ffi\\resources.void",
+        "C:\\Users\\a\\VoidS7-G3-Debug\\ffi-g3\\tests"
+      ],
+      "returncode": 0,
+      "seconds": 1.6747371000001294
+    },
+    {
+      "label": "g3-aot-normal",
+      "argv": [
+        "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\tests\\ffi\\resources_process.py",
+        "C:\\Users\\a\\VoidS7-G3-Debug\\void_g3_aot_normal.exe"
+      ],
+      "returncode": 0,
+      "seconds": 0.167190500000288
+    },
+    {
+      "label": "g3-aot-optimized",
+      "argv": [
+        "C:\\Users\\a\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\tests\\ffi\\resources_process.py",
+        "C:\\Users\\a\\VoidS7-G3-Debug\\void_g3_aot_optimized.exe"
+      ],
+      "returncode": 0,
+      "seconds": 0.153874800000267
+    },
+    {
+      "label": "g2-abi-fixture",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang.exe",
+        "-target",
+        "x86_64-pc-windows-msvc",
+        "-std=c11",
+        "-O0",
+        "-S",
+        "-emit-llvm",
+        "-DG2_FIXTURE_IDENTITY=\"889eda7481b9615a96f9468b0ee504cff8e6523beb364b14c2daeeef9d23cb3e\"",
+        "-IC:\\Users\\a\\VoidS7-G3-Debug\\ffi-g2",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\tests\\ffi\\records_fixture.c",
+        "-o",
+        "C:\\Users\\a\\VoidS7-G3-Debug\\ffi-g2\\records-fixture.ll"
+      ],
+      "returncode": 0,
+      "seconds": 0.3734298999997918
+    },
+    {
+      "label": "g2-abi-thunk",
+      "argv": [
+        "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang.exe",
+        "-target",
+        "x86_64-pc-windows-msvc",
+        "-std=c11",
+        "-O0",
+        "-S",
+        "-emit-llvm",
+        "-DG2_LLP64=1",
+        "-IC:\\Users\\a\\VoidS7-G3-Debug\\ffi-g2",
+        "C:\\Users\\a\\VoidCI42377496702-Native\\tests\\ffi\\records_thunk.c",
+        "-o",
+        "C:\\Users\\a\\VoidS7-G3-Debug\\ffi-g2\\records-thunk.ll"
+      ],
+      "returncode": 0,
+      "seconds": 0.13191679999999906
+    }
+  ],
+  "stage": "g2-abi-thunk",
+  "binaries": {
+    "voidc": "836b9407b4344d64363d55001c68a6f354a193c1bf9cb01a2152cfac264ba8f8",
+    "voidls": "fedfcf5876882fc9abf2471ff1b2e89cbf8566096fac263cfa245f81ab7ee545",
+    "void_tests": "a1d91f463b075160382e12dc8d79a4d4ea60ce0e089455a0c18b6b44387c20bd",
+    "void_numeric_enum_ir": "7830885952d180a448e7f3f180debe7b13a936e21f9fe6ffff3be23924da0603",
+    "void_project_application": "dffa8b92e6e083ce6f358a6838c935289ec168c270b451f3db4c1c761b0ff1db",
+    "void_project_sessions": "c3bfd28c33624b36565b83742326f0b6c693f3180a3347aefa516293d04bdbf1",
+    "void_project_creation": "bd02924c6b12df55e6ad9148e7a09c0812afd2fe26eeba4c8f6d27957aa90d5c"
+  },
+  "g1_artifacts": {
+    "ffi-g1/primitives.descriptor": "26bbdd8041cf04936068bb500ed0c0afb8310169f46dd194bbf4fc25bac6a929",
+    "ffi-g1/primitives.void": "f391b6911c1d3f7bacd1767543708cbd6523e86bbb06aa3e0a5a7d59c9b9bbf1",
+    "ffi-g1/application-normal.obj": "04ea3e9f5188eeaea3b7aef177d06331d96e688c6e739c0e70b1a32698c53b8f",
+    "ffi-g1/application-optimized.obj": "b46a65dccc2da4004c3cdc76d52e9883d6ea232bc71e0debbe6f14cf76e40775",
+    "void_g1_tests.exe": "614459fd51d3694b58705c644c5c44bf75a1193126e9b616525b0e121dff6567",
+    "void_g1_aot_normal.exe": "613640bab520530147309716e9a842c316e4eb7228fb391cc34eb5d5ff6bf1d5",
+    "void_g1_aot_optimized.exe": "fb483b9d5fc4da285f77bf3bce7675f1e551d9810e49ddf82fc4383d70e458fd",
+    "void_g1_aot_mismatch.exe": "a6dae4204b4e38482f1d156604ffa7582252532158208739e92c1cfacae3c048",
+    "CMakeFiles\\void_g1_thunk.dir\\tests\\ffi\\primitives_thunk.c.obj": "c3b467e638288ebaaf06f170fc04580ea13450acbb879fda809ab596888f6ecd",
+    "CMakeFiles\\void_g1_fixture.dir\\tests\\ffi\\primitives_fixture.c.obj": "cf4a6171cb61b55f33036261208c353eaf4447fb7482db217372bedd841eacfe",
+    "CMakeFiles\\void_g1_wrong_fixture.dir\\tests\\ffi\\primitives_fixture.c.obj": "00889f6c62fbbe4a8c2d5c4bb84e907d5a0721adb48f26f2f5d3d1817f8be500"
+  },
+  "g2_artifacts": {
+    "ffi-g2/records.descriptor": "f372b327a8dc66cc3e7926d9c19ff009fc217a6e53dae7883df8c3091c472d9f",
+    "ffi-g2/application-normal.obj": "aa68202c600716a61b7a709ce189064bb03bd1e74911d59cc740392dcd5802eb",
+    "ffi-g2/application-optimized.obj": "973932268eaf8db82065669b71a4aeb183efed7aa58894a10e88896f55c5f8c0",
+    "void_g2_tests.exe": "997085ec82de4c771c1a29a7068d80c216c51945993dc6605698f2e65d429af9",
+    "void_g2_aot_normal.exe": "77eb77c73b0164961d64d083237b8602da363942c51a49874935bb2f70a5b6f8",
+    "void_g2_aot_optimized.exe": "6be01a92b9d8492ba18c981fa849a7d4b010ceb3902397ca5d0576272a3dee73",
+    "CMakeFiles\\void_g2_thunk.dir\\tests\\ffi\\records_thunk.c.obj": "3ed67f022258a9887428566dc38f7e4e3d45a97d6ca980c6e0876317314e6156",
+    "CMakeFiles\\void_g2_fixture.dir\\tests\\ffi\\records_fixture.c.obj": "82bb3bd0110d8da49c68d732f1e3f11e4a6c8955bba65af711263f133c03c1d1"
+  },
+  "g3_artifacts": {
+    "ffi-g3/resources.descriptor": "cc8a56320efd768e4a9fe4918bffe0e1dc2d39fccc1ed60d83f5d2621e9306ea",
+    "ffi-g3/application-normal.obj": "8e64be0c09e97c723c5a0a25764ac77c16864e60592032fe1ee5a9a1d939525f",
+    "ffi-g3/application-optimized.obj": "47edda93021148326dc51543c44a1709dadaa2b5b1069387c929ddc20d107a6d",
+    "void_g3_tests.exe": "fab7220a3063fcb3db0323b1cfe191edf80b23c16e470cc0f4480cacb570ee66",
+    "void_g3_aot_normal.exe": "bcb92dd68b612b6ba346ae78324c9df2265b0c3cd645728de9b322931e42bc89",
+    "void_g3_aot_optimized.exe": "376ce33830951acb8fb650d4c9fd5522a3149b0749c25e7c4a530338cb15446d",
+    "CMakeFiles\\void_g3_thunk.dir\\tests\\ffi\\resources_thunk.c.obj": "97e97eeeb73804ca195f92fd3c4d8fd97d4a80bef42d1d11fb6ed4f69ca46c72",
+    "CMakeFiles\\void_g3_fixture.dir\\tests\\ffi\\resources_fixture.c.obj": "70aaed8a79363eeae46ab9cefa55fa1f44819a045288c06db4d40e51bf696036"
+  }
+}

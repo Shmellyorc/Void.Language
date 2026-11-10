@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="(empty)"
+	tests="9"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname=""
+	time="299"
+	timestamp="2026-11-09T13:35:24"
+	>
+	<testcase name="ergonomics_sprint6" classname="ergonomics_sprint6" time="3.26101" status="run">
+		<properties/>
+		<system-out>Sprint 6 process checks passed: 55
+</system-out>
+	</testcase>
+	<testcase name="stage10_fields_aot" classname="stage10_fields_aot" time="0.975684" status="run">
+		<properties/>
+		<system-out>16 field JIT/AOT checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_temporal_aot" classname="stage10_temporal_aot" time="9.34327" status="run">
+		<properties/>
+		<system-out>23 source temporal JIT/AOT and rejection checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage11_globals_aot" classname="stage11_globals_aot" time="9.21536" status="run">
+		<properties/>
+		<system-out>157 real-program global commands passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_console_aot" classname="stage10_console_aot" time="288.707" status="run">
+		<properties/>
+		<system-out>operator_console_systems: exact normal/O2 JIT and linked AOT verified
+console_operator_systems: exact normal/O2 JIT and linked AOT verified
+console_operator_failure: exact normal/O2 JIT and linked AOT verified
+console_operator_compound_failure: exact normal/O2 JIT and linked AOT verified
+console_operator_workload: exact normal/O2 JIT and linked AOT verified
+console_sum_display: exact normal/O2 JIT and linked AOT verified
+console_sum_failure: exact normal/O2 JIT and linked AOT verified
+console_collections: exact normal/O2 JIT and linked AOT verified
+console_collection_invalidated: exact normal/O2 JIT and linked AOT verified
+console_collection_failed_hook: exact normal/O2 JIT and linked AOT verified
+console_keys: exact normal/O2 JIT and linked AOT verified
+console_terminal: exact normal/O2 JIT and linked AOT verified
+console_exit: exact normal/O2 JIT and linked AOT verified
+console_zero: exact normal/O2 JIT and linked AOT verified
+console_cleanup_primary: exact normal/O2 JIT and linked AOT verified
+console_clea...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="stage10_operators_aot" classname="stage10_operators_aot" time="131.321" status="run">
+		<properties/>
+		<system-out>operator_systems: normal/O2 JIT and independently linked AOT verified
+operator_systems_async: normal/O2 JIT and independently linked AOT verified
+operator_native_systems: normal/O2 JIT and independently linked AOT verified
+operator_systems_workload: normal/O2 JIT and independently linked AOT verified
+operator_format_cache: normal/O2 JIT and independently linked AOT verified
+operator_keys: normal/O2 JIT and independently linked AOT verified
+operator_native_compound_invalidation: normal/O2 JIT and independently linked AOT verified
+operator_compound_capture: normal/O2 JIT and independently linked AOT verified
+operator_compound_conversions: normal/O2 JIT and independently linked AOT verified
+operator_compounds: normal/O2 JIT and independently linked AOT verified
+operator_native_compounds: normal/O2 JIT and independently linked AOT verified
+operator_native_compound_failure: normal/O2 JIT and independently linked AOT verified
+operator_compound_suspension: normal/O2 JIT and independently linked AOT verified
+operator...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="stage10_conversion_aot" classname="stage10_conversion_aot" time="0.998896" status="run">
+		<properties/>
+		<system-out>16 source display JIT/AOT checks passed
+</system-out>
+	</testcase>
+	<testcase name="application_native_sprint4" classname="application_native_sprint4" time="5.12955" status="run">
+		<properties/>
+		<system-out>Sprint 4 process checks passed: 163
+</system-out>
+	</testcase>
+	<testcase name="text_collections_sprint3" classname="text_collections_sprint3" time="22.7134" status="run">
+		<properties/>
+		<system-out>Sprint 3: 106 text/collection normal/O2 JIT, linked AOT and diagnostic process checks passed
+</system-out>
+	</testcase>
+</testsuite>

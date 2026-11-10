@@ -1,0 +1,45 @@
+void-c-primitive 2 1: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+void-c-primitive 1 2: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+call vectorcall: C primitive descriptor line 8: unsupported descriptor, ABI revision or effects
+effects direct-sync blocking no-callbacks: C primitive descriptor line 7: unsupported descriptor, ABI revision or effects
+c_size:i64: C primitive descriptor line 9: unsupported descriptor, ABI revision or effects
+c_bool:u8: C primitive descriptor line 9: unsupported descriptor, ABI revision or effects
+bind signed8 g1_signed8 i8 ptr: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 record: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 void: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 u8: C primitive provider rejected the exact descriptor or fixture identity
+bind signed8 g1_missing i8 i8: C primitive provider rejected the exact descriptor or fixture identity
+bind signed16 g1_signed8 i8 i8: C primitive descriptor line 11: invalid or duplicate binding name or export
+bind signed8 g1_signed16 i8 i8: C primitive descriptor line 11: invalid or duplicate binding name or export
+extra signed8 g1_signed8 i8 i8: C primitive descriptor line 10: expected a bounded primitive binding record
+provider org.voidlang.forged: C primitive provider rejected the exact descriptor or fixture identity
+source /other.void: C primitive provider rejected the exact descriptor or fixture identity
+source /../other.void: C primitive descriptor line 4: expected a canonical single-file VFS identity
+target aarch64-: C primitive descriptor line 3: unsupported target/profile combination
+artifact identity: C primitive provider rejected the exact descriptor or fixture identity
+descriptor bounds: C primitive descriptor line 1: descriptor size outside 1..16384 bytes
+unavailable fixture: C primitive provider transport is unavailable
+missing independent admission: VOID IR: C primitive call outside the admitted binding module
+wrong provider: VOID IR: invalid C primitive descriptor or exact call signature
+wrong export: VOID IR: invalid C primitive descriptor or exact call signature
+wrong ordinal: VOID IR: invalid C primitive descriptor or exact call signature
+negative ordinal: VOID IR: C primitive call outside the admitted binding module
+missing operand: VOID IR: invalid C primitive descriptor or exact call signature
+extra operand: VOID IR: invalid C primitive descriptor or exact call signature
+argument signedness: VOID IR: invalid C primitive descriptor or exact call signature
+argument width: VOID IR: invalid C primitive descriptor or exact call signature
+return signedness: VOID IR: invalid C primitive descriptor or exact call signature
+return count: VOID IR: invalid C primitive descriptor or exact call signature
+aggregate result: VOID IR: invalid C primitive descriptor or exact call signature
+pointer-like result: VOID IR: invalid C primitive descriptor or exact call signature
+nondefault ABI operand: VOID IR: invalid C primitive descriptor or exact call signature
+receiver: VOID IR: invalid C primitive descriptor or exact call signature
+unadmitted scope: VOID IR: C primitive binding requires the admitted direct import
+unadmitted body: VOID IR: C primitive call outside the admitted binding module
+plain import bypass: VOID IR: C primitive transport requires host admission and typed operations
+first class binding: VOID IR: C primitive binding is direct-call only
+async activation: VOID IR: C primitive graphs require synchronous execution
+runtime-free bypass: VOID IR: invalid C primitive module admission
+ORC untrusted symbol bypass: C primitive transport requires per-generation admission
+JIT normal returned 73; direct C oracle agreed; long=32 bits
+JIT O2 returned 73; direct C oracle agreed; long=32 bits

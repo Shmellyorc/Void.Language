@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "C:\Users\a\VoidS4-Allocator-Final\application.py", line 176, in <module>
+    run([compiler, "build", "--project", root, "--profile", profile, "-o", binary], cwd, env)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidS4-Allocator-Final\application.py", line 33, in run
+    check(result.returncode == status, records[-1])
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\a\VoidS4-Allocator-Final\application.py", line 24, in check
+    assert condition, detail
+           ^^^^^^^^^
+AssertionError: {'argv': ['C:\\Users\\a\\VoidS4-Final-Debug\\voidc.exe', 'build', '--project', 'C:\\Users\\a\\VoidS4-Allocator-Final\\Debug\\VOID S4 metadata \u96ea 7n3ia4ab\\checkout', '--profile', 'debug', '-o', 'C:\\Users\\a\\VoidS4-Allocator-Final\\Debug\\VOID S4 metadata \u96ea 7n3ia4ab\\output-debug.exe'], 'cwd': 'C:\\Users\\a\\VoidS4-Allocator-Final\\Debug\\VOID S4 metadata \u96ea 7n3ia4ab\\unrelated', 'status': 1, 'stdout': '', 'stderr': 'C:/Users/a/VoidS4-Allocator-Final/Debug/VOID S4 metadata \u96ea 7n3ia4ab/checkout/launcher.void:8:9: warning: Match may leave values unmatched.\n    code: VOID2021\n\n 8 |         match reason.kind:\n   |         ^^^^^\n    Module: /launcher.void\n\nCannot write native artifact copy (Windows error 112).\n'}

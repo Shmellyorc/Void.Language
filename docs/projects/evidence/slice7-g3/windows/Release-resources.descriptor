@@ -1,0 +1,15 @@
+void-c-primitive 3 3
+provider org.voidlang.g3-fixture
+target x86_64-pc-windows-msvc msvc-x64
+source /native_resources.void
+thunk b5515df106d3ec7917e19b1cec7a5fcd037ee2985cda4240b2b8f8aa6d31b5af
+fixture bfd1c699c7d4b144c02e79f46246f381628072b66e22511eeda1d4b055e4a6a6
+effects direct-sync nonblocking no-callbacks
+call c-default
+aliases c_int:i32 c_long:i32 c_size:u64 c_bool:bool
+resource box G3Box pointer null create close_box owner-calls shutdown-any consume-always
+bind create g3_create owner:box i32
+bind read g3_read i32 borrow:box i32
+bind add g3_add i32 mut:box i32
+bind close_box g3_close i32 close:box
+bind live g3_live i32

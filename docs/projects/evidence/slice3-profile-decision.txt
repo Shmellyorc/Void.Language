@@ -1,0 +1,12 @@
+Boss decision, Slice 3: approved Option 1 with strict qualification.
+Apply actual optimization and cache-profile behavior. Warn visibly and structurally
+only when the selected profile requests unsupported line/full debug information;
+none stays quiet. Preserve the requested value in validated metadata. Cover both
+schema defaults, authored overrides, warnings, actual optimization and cache conflicts.
+Standalone compilation and compiler checks remain unchanged. Actual mode-specific
+emission is deferred to its separate review milestone. No hosted CI, staging, commits or pushes.
+
+Source audit clarification: the unchanged baseline DIBuilder already emits
+source/type/location metadata. VOID5012 identifies unsupported profile-controlled
+emission. It does not claim the output lacks baseline debug records; none does not
+newly strip those records. No emitter implementation is included in S3.

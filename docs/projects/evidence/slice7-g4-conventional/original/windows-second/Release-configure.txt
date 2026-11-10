@@ -1,0 +1,18 @@
+-- Could NOT find zstd (missing: zstd_LIBRARY zstd_INCLUDE_DIR) 
+-- VOID LLVM: 23.1.4 at C:\Users\a\VoidCI42377496702-Native\.toolchains\llvm-23.1.4\lib\cmake\llvm
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- curl 8.23.0: 1586 files verified; four private corrections
+
+CMake Error at cmake/HttpNativeDependencies.cmake:45 (message):
+  HTTP corresponding source missing or digest mismatch: nghttp2-1.70.0.tar.gz
+
+
+
+  Run python3 tools/setup_http_deps.py --profile Release on the native host
+Call Stack (most recent call first):
+  cmake/HttpDependencies.cmake:85 (void_import_native_http_dependencies)
+  cmake/CurlProvider.cmake:59 (void_import_http_dependencies)
+  CMakeLists.txt:114 (void_add_curl_provider)
+
+
+-- Configuring incomplete, errors occurred!

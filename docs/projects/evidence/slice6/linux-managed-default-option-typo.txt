@@ -1,0 +1,7 @@
++ /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc check /home/shmellyorc/Documents/Void.Language/build/slice6/managed-default.void
+Source checked successfully
++ /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc run --no-opt /home/shmellyorc/Documents/Void.Language/build/slice6/managed-default.void
++ /home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc run -O2 /home/shmellyorc/Documents/Void.Language/build/slice6/managed-default.void
+Invalid invocation: Unknown option: -O2
+Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]
+Try 'voidc run --help' for examples.

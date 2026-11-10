@@ -1,0 +1,14 @@
+{
+  "mode": "trusted",
+  "editor": "1.141.0",
+  "platform": "linux",
+  "events": [
+    "activation and opening a pre-existing source do not offer",
+    "an unrelated pre-existing source suppresses a later-file offer",
+    "decline persists and prevents a repeat",
+    "dismissal persists and reset is deliberate",
+    "File\nEdit\nSelection\nView\nGo\nRun\nTerminal\n[Extension Development Host] trusted\nOpen in Agents\nSign In\n1\nExplorer\ntrusted\ngame.void\nhelper.void\nOutline\nTimeline\ngame\n.void\ngame.void\n1\n2\n3\nfunc main() -> i32:\n    return 27\nChat\nBuild with Agent\n\nAI responses may be inaccurate\n\nGenerate Agent Instructions to onboard AI onto your codebase.\n\ngame.void\nAgent\nModels\nLocal\nDefault permissions\n 0 \n 0\nVOID: standalone existing.void\nVOID\nLF\nUTF-8\nSpaces: 4\nLn 3, Col 1\nError: VOID project creation: Error: DialogService: refused to show dialog in tests. Contents: Review VOID project creation See Output → VOID.\nVOID: This document is outside the selected project or single-file entry. Configure void.project.entry for a multi-file project; use a separate window for unrelated projects. See Output → VOID.\nVOID: This document is outside the selected project or single-file entry. Configure void.project.entry for a multi-file project; use a separate window for unrelated projects. See Output → VOID."
+  ],
+  "failure": "Error: Timed out waiting for metadata review\n\tat until (/home/shmellyorc/Documents/Void.Language/editors/vscode/out/test/creationHost.js:55:11)\n\tat async Object.run (/home/shmellyorc/Documents/Void.Language/editors/vscode/out/test/creationHost.js:187:9)",
+  "status": "FAIL"
+}

@@ -1,0 +1,138 @@
+{
+  "scope": "Existing Linux Release baseline probes; no S6 feature qualification",
+  "compiler_sha256": "625f4d7c3d81c454ada9b8a4a2f6c1b75f1e8dfdbfb2686b7513b5e5ad4c3c8a",
+  "starting_head": "2f667ea338127b8f91c3136804377ef3fa5218d6",
+  "initial_fixture_run": {
+    "fixture": "/tmp/VOID S6 baseline audit deu7n42c",
+    "status": "probe harness assertion failed",
+    "expected_tagged_exit": 17,
+    "actual_tagged_exit": 1,
+    "diagnostic": "VOID1003 Unexpected character in source at 2:5 with uppercase Ready",
+    "recorded": "Initial terminal output and exact tagged control replay below"
+  },
+  "records": [
+    {
+      "probe": "tagged_control",
+      "source": "enum status:\n    ready\n    bad(code: i32)\n\nfunc main() -> i32:\n    var value = status.bad(17)\n    if value is status.bad(var code):\n        return code\n    return 1\n",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID S6 baseline audit y03l8asj/tagged_control.void",
+        "--no-opt",
+        "--no-cache"
+      ],
+      "exit": 17,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "probe": "result_control",
+      "source": "func main() -> i32:\n    var value: result<i32, string> = Ok(19)\n    if value is Ok(var code):\n        return code\n    return 1\n",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID S6 baseline audit y03l8asj/result_control.void",
+        "--no-opt",
+        "--no-cache"
+      ],
+      "exit": 19,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "probe": "as_control",
+      "source": "func main() -> i32:\n    var value: i16 = 20\n    return value as i32\n",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID S6 baseline audit y03l8asj/as_control.void",
+        "--no-opt",
+        "--no-cache"
+      ],
+      "exit": 20,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "probe": "numeric_enum_header",
+      "source": "enum state(u8):\n    ready = 1\n\nfunc main():\n    return\n",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "/tmp/VOID S6 baseline audit y03l8asj/numeric_enum_header.void",
+        "--no-opt"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID S6 baseline audit y03l8asj/numeric_enum_header.void:1:11: error: Expected ':', found '('.\n    code: VOID1101\n\n 1 | enum state(u8):\n   |           ^\n    Module: /numeric_enum_header.void\n\n"
+    },
+    {
+      "probe": "fallible_as",
+      "source": "func main():\n    var converted = 42 as? i8\n",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "/tmp/VOID S6 baseline audit y03l8asj/fallible_as.void",
+        "--no-opt"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID S6 baseline audit y03l8asj/fallible_as.void:2:26: error: The as? conversion is not supported.\n    code: VOID1003\n\n 2 |     var converted = 42 as? i8\n   |                          ^\n    Module: /fallible_as.void\n    Hint: Use a checked as conversion; fallible conversion syntax is deferred.\n\n"
+    },
+    {
+      "probe": "option_type",
+      "source": "func test(value: option<i32>):\n    return\n\nfunc main():\n    return\n",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "/tmp/VOID S6 baseline audit y03l8asj/option_type.void",
+        "--no-opt"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID S6 baseline audit y03l8asj/option_type.void:1:18: error: Type 'option' is not a generic struct.\n    code: VOID1103\n\n 1 | func test(value: option<i32>):\n   |                  ^^^^^^\n    Module: /option_type.void\n\n"
+    },
+    {
+      "probe": "option_constructor",
+      "source": "func main():\n    var value: option<i32> = Some(19)\n",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "/tmp/VOID S6 baseline audit y03l8asj/option_constructor.void",
+        "--no-opt"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID S6 baseline audit y03l8asj/option_constructor.void:2:30: error: Unexpected character in source.\n    code: VOID1003\n\n 2 |     var value: option<i32> = Some(19)\n   |                              ^\n    Module: /option_constructor.void\n    Hint: Use supported expressions and lowercase ASCII identifiers; Unicode identifiers and collection/indexing syntax are deferred.\n\n"
+    },
+    {
+      "probe": "fallback_operator",
+      "source": "func main() -> i32:\n    return 0 ?? 1\n",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "check",
+        "/tmp/VOID S6 baseline audit y03l8asj/fallback_operator.void",
+        "--no-opt"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID S6 baseline audit y03l8asj/fallback_operator.void:2:17: error: Expected end of statement, found '1'.\n    code: VOID1101\n\n 2 |     return 0 ?? 1\n   |                 ^\n    Module: /fallback_operator.void\n    Hint: Put each statement on its own line; postfix ++/-- cannot be used as values.\n\n"
+    },
+    {
+      "probe": "initial_uppercase_fixture_replay",
+      "source": "enum status:\n    Ready\n    Bad(code: i32)\n\nfunc main() -> i32:\n    var value = status.Bad(17)\n    if value is status.Bad(var code):\n        return code\n    return 1\n",
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID S6 baseline audit y03l8asj/initial_uppercase_fixture_replay.void",
+        "--no-opt",
+        "--no-cache"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID S6 baseline audit y03l8asj/initial_uppercase_fixture_replay.void:2:5: error: Unexpected character in source.\n    code: VOID1003\n\n 2 |     Ready\n   |     ^\n    Module: /initial_uppercase_fixture_replay.void\n    Hint: Use supported expressions and lowercase ASCII identifiers; Unicode identifiers and collection/indexing syntax are deferred.\n\n/tmp/VOID S6 baseline audit y03l8asj/initial_uppercase_fixture_replay.void:2:5: error: Expected a lowercase identifier.\n    code: VOID1102\n\n 2 |     Ready\n   |     ^\n    Module: /initial_uppercase_fixture_replay.void\n\n/tmp/VOID S6 baseline audit y03l8asj/initial_uppercase_fixture_replay.void:3:5: error: Unexpected character in source.\n    code: VOID1003\n\n 3 |     Bad(code: i32)\n   |     ^\n    Module: /initial_uppercase_fixture_replay.void\n    Hint: Use supported expressions and lowercase ASCII identifiers; Unicode identifiers and collection/indexing syntax are deferred.\n\n/tmp/VOID S6 baseline audit y03l8asj/initial_uppercase_fixture_replay.void:6:24: error: Unexpected character in source.\n    code: VOID1003\n\n 6 |     var value = status.Bad(17)\n   |                        ^\n    Module: /initial_uppercase_fixture_replay.void\n    Hint: Use supported expressions and lowercase ASCII identifiers; Unicode identifiers and collection/indexing syntax are deferred.\n\n/tmp/VOID S6 baseline audit y03l8asj/initial_uppercase_fixture_replay.void:7:24: error: Unexpected character in source.\n    code: VOID1003\n\n 7 |     if value is status.Bad(var code):\n   |                        ^\n    Module: /initial_uppercase_fixture_replay.void\n    Hint: Use supported expressions and lowercase ASCII identifiers; Unicode identifiers and collection/indexing syntax are deferred.\n\n/tmp/VOID S6 baseline audit y03l8asj/initial_uppercase_fixture_replay.void:8:9: error: Expected an expression, found '<indent>'.\n    code: VOID1101\n\n 8 |         return code\n   |         ^\n    Module: /initial_uppercase_fixture_replay.void\n\n"
+    }
+  ],
+  "temporary_fixture": "/tmp/VOID S6 baseline audit y03l8asj",
+  "fixture_removed": true
+}

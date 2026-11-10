@@ -1,0 +1,34 @@
+7f9e46ba8000-7f9e46bb3000 r--p 00000000 08:03 1881557610                 /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
+7f9e46bb3000-7f9e46bfc000 r-xp 0000b000 08:03 1881557610                 /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
+7f9e46bfc000-7f9e46c0e000 r--p 00054000 08:03 1881557610                 /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
+7f9e46c0e000-7f9e46c12000 r--p 00065000 08:03 1881557610                 /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
+7f9e46c12000-7f9e46c13000 rw-p 00069000 08:03 1881557610                 /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
+7f9e46c14000-7f9e46c55000 r--p 00000000 08:03 1879086046                 /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0
+7f9e46c55000-7f9e46c94000 r-xp 00041000 08:03 1879086046                 /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0
+7f9e46c94000-7f9e46ca7000 r--p 00080000 08:03 1879086046                 /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0
+7f9e46ca7000-7f9e46cc3000 r--p 00093000 08:03 1879086046                 /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0
+7f9e46cc3000-7f9e46cc4000 rw-p 000af000 08:03 1879086046                 /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0
+7f9e46ccc000-7f9e46ccf000 r--p 00000000 08:03 1879086040                 /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0
+7f9e46ccf000-7f9e46cea000 r-xp 00003000 08:03 1879086040                 /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0
+7f9e46cea000-7f9e46ced000 r--p 0001e000 08:03 1879086040                 /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0
+7f9e46ced000-7f9e46cee000 r--p 00021000 08:03 1879086040                 /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0
+7f9e46cee000-7f9e46cef000 rw-p 00022000 08:03 1879086040                 /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0
+7f9e46cff000-7f9e46d00000 r--p 00000000 08:03 1879092113                 /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0
+7f9e46d00000-7f9e46d01000 r-xp 00001000 08:03 1879092113                 /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0
+7f9e46d01000-7f9e46d02000 r--p 00002000 08:03 1879092113                 /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0
+7f9e46d02000-7f9e46d03000 r--p 00002000 08:03 1879092113                 /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0
+7f9e46d03000-7f9e46d04000 rw-p 00003000 08:03 1879092113                 /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0
+7f9e46e0c000-7f9e46e3c000 r--p 00000000 08:03 805799753                  /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-graphics/debug-qualified/gallery project/native/libraylib.so.600
+7f9e46e3c000-7f9e46f4a000 r-xp 00030000 08:03 805799753                  /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-graphics/debug-qualified/gallery project/native/libraylib.so.600
+7f9e46f4a000-7f9e46fc8000 r--p 0013e000 08:03 805799753                  /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-graphics/debug-qualified/gallery project/native/libraylib.so.600
+7f9e46fc8000-7f9e46fcc000 r--p 001bb000 08:03 805799753                  /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-graphics/debug-qualified/gallery project/native/libraylib.so.600
+7f9e46fcc000-7f9e46fd0000 rw-p 001bf000 08:03 805799753                  /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-graphics/debug-qualified/gallery project/native/libraylib.so.600
+7f9e4743e000-7f9e4745a000 r--p 00000000 08:03 1879092117                 /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+7f9e4745a000-7f9e47510000 r-xp 0001c000 08:03 1879092117                 /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+7f9e47510000-7f9e475a4000 r--p 000d2000 08:03 1879092117                 /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+7f9e475a4000-7f9e475a6000 r--p 00165000 08:03 1879092117                 /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+7f9e475a6000-7f9e475ab000 rw-p 00167000 08:03 1879092117                 /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+7f9e475ab000-7f9e475ad000 r--p 00000000 08:03 805799769                  /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-graphics/debug-qualified/gallery project/native/libvoid_raylib.so
+7f9e475ad000-7f9e475af000 r-xp 00001000 08:03 805799769                  /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-graphics/debug-qualified/gallery project/native/libvoid_raylib.so
+7f9e475af000-7f9e475b0000 r--p 00002000 08:03 805799769                  /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-graphics/debug-qualified/gallery project/native/libvoid_raylib.so
+7f9e475b0000-7f9e475b1000 rw-p 00002000 08:03 805799769                  /home/shmellyorc/Documents/Void.Language/build/slice7-g5/linux-graphics/debug-qualified/gallery project/native/libvoid_raylib.so

@@ -1,0 +1,48 @@
+55b8657ae000-55b8666c0000 r--p 00000000 08:03 1611678514                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/compiler install/bin/voidc
+55b8666c0000-55b869465000 r-xp 00f11000 08:03 1611678514                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/compiler install/bin/voidc
+55b869465000-55b869501000 r--p 03cb5000 08:03 1611678514                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/compiler install/bin/voidc
+55b869501000-55b869508000 rw-p 03d50000 08:03 1611678514                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/compiler install/bin/voidc
+7f2e1ecd4000-7f2e1ecdf000 r--p 00000000 08:03 1881557610                 /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
+7f2e1ecdf000-7f2e1ed28000 r-xp 0000b000 08:03 1881557610                 /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
+7f2e1ed28000-7f2e1ed3a000 r--p 00054000 08:03 1881557610                 /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
+7f2e1ed3a000-7f2e1ed3e000 r--p 00065000 08:03 1881557610                 /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
+7f2e1ed3e000-7f2e1ed3f000 rw-p 00069000 08:03 1881557610                 /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0
+7f2e1ed40000-7f2e1ed81000 r--p 00000000 08:03 1879086046                 /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0
+7f2e1ed81000-7f2e1edc0000 r-xp 00041000 08:03 1879086046                 /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0
+7f2e1edc0000-7f2e1edd3000 r--p 00080000 08:03 1879086046                 /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0
+7f2e1edd3000-7f2e1edef000 r--p 00093000 08:03 1879086046                 /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0
+7f2e1edef000-7f2e1edf0000 rw-p 000af000 08:03 1879086046                 /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0
+7f2e1edf8000-7f2e1edfb000 r--p 00000000 08:03 1879086040                 /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0
+7f2e1edfb000-7f2e1ee16000 r-xp 00003000 08:03 1879086040                 /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0
+7f2e1ee16000-7f2e1ee19000 r--p 0001e000 08:03 1879086040                 /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0
+7f2e1ee19000-7f2e1ee1a000 r--p 00021000 08:03 1879086040                 /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0
+7f2e1ee1a000-7f2e1ee1b000 rw-p 00022000 08:03 1879086040                 /usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0
+7f2e1ee2b000-7f2e1ee2c000 r--p 00000000 08:03 1879092113                 /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0
+7f2e1ee2c000-7f2e1ee2d000 r-xp 00001000 08:03 1879092113                 /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0
+7f2e1ee2d000-7f2e1ee2e000 r--p 00002000 08:03 1879092113                 /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0
+7f2e1ee2e000-7f2e1ee2f000 r--p 00002000 08:03 1879092113                 /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0
+7f2e1ee2f000-7f2e1ee30000 rw-p 00003000 08:03 1879092113                 /usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0
+7f2e1ee9f000-7f2e1eebb000 r--p 00000000 08:03 1879092117                 /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+7f2e1eebb000-7f2e1ef71000 r-xp 0001c000 08:03 1879092117                 /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+7f2e1ef71000-7f2e1f005000 r--p 000d2000 08:03 1879092117                 /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+7f2e1f005000-7f2e1f007000 r--p 00165000 08:03 1879092117                 /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+7f2e1f007000-7f2e1f00c000 rw-p 00167000 08:03 1879092117                 /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+7f2e1f00c000-7f2e1f03c000 r--p 00000000 08:03 1089549349                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/gallery project/native/libraylib.so.600
+7f2e1f03c000-7f2e1f14a000 r-xp 00030000 08:03 1089549349                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/gallery project/native/libraylib.so.600
+7f2e1f14a000-7f2e1f1c8000 r--p 0013e000 08:03 1089549349                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/gallery project/native/libraylib.so.600
+7f2e1f1c8000-7f2e1f1cc000 r--p 001bb000 08:03 1089549349                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/gallery project/native/libraylib.so.600
+7f2e1f1cc000-7f2e1f1d0000 rw-p 001bf000 08:03 1089549349                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/gallery project/native/libraylib.so.600
+7f2e1f618000-7f2e1f62b000 r--p 00000000 08:03 1884336304                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/compiler install/lib/void/libunistring.so.5.2.2
+7f2e1f62b000-7f2e1f661000 r-xp 00013000 08:03 1884336304                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/compiler install/lib/void/libunistring.so.5.2.2
+7f2e1f661000-7f2e1f7fa000 r--p 00049000 08:03 1884336304                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/compiler install/lib/void/libunistring.so.5.2.2
+7f2e1f7fa000-7f2e1f7fe000 r--p 001e1000 08:03 1884336304                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/compiler install/lib/void/libunistring.so.5.2.2
+7f2e1f7fe000-7f2e1f7ff000 rw-p 001e5000 08:03 1884336304                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/compiler install/lib/void/libunistring.so.5.2.2
+7f2e1fab0000-7f2e1fab2000 r--p 00000000 08:03 1089549352                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/gallery project/native/libvoid_raylib.so
+7f2e1fab2000-7f2e1fab3000 r-xp 00001000 08:03 1089549352                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/gallery project/native/libvoid_raylib.so
+7f2e1fab3000-7f2e1fab5000 r--p 00001000 08:03 1089549352                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/gallery project/native/libvoid_raylib.so
+7f2e1fab5000-7f2e1fab6000 rw-p 00002000 08:03 1089549352                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/gallery project/native/libvoid_raylib.so
+7f2e1fabf000-7f2e1fac1000 r--p 00000000 08:03 1884336305                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/compiler install/lib/void/libidn2.so.0.4.0
+7f2e1fac1000-7f2e1fac8000 r-xp 00002000 08:03 1884336305                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/compiler install/lib/void/libidn2.so.0.4.0
+7f2e1fac8000-7f2e1faef000 r--p 00009000 08:03 1884336305                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/compiler install/lib/void/libidn2.so.0.4.0
+7f2e1faef000-7f2e1faf0000 r--p 0002f000 08:03 1884336305                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/compiler install/lib/void/libidn2.so.0.4.0
+7f2e1faf0000-7f2e1faf1000 rw-p 00030000 08:03 1884336305                 /home/shmellyorc/Documents/Void.Language/build/slice7-raylib/linux/release-final/compiler install/lib/void/libidn2.so.0.4.0

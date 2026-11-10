@@ -1,0 +1,385 @@
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  7%] Built target void_core
+[ 78%] Built target libcurl_static
+[100%] Built target void_runtime
+[100%] Built target void_native_inventory
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target voidc
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Built target voidls
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_native_fixture
+[ 71%] Built target native_fixture
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_tests
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 66%] Built target libcurl_static
+[ 66%] Built target void_native_fixture
+[ 73%] Built target void_core
+[ 93%] Built target void_runtime
+[ 93%] Built target void_llvm
+[100%] Built target void_numeric_enum_ir
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 76%] Built target libcurl_static
+[ 76%] Built target void_application_objects
+[100%] Built target void_runtime
+[100%] Built target void_native_inventory
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_native_fixture
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_project_application
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 66%] Built target libcurl_static
+[ 66%] Built target void_native_fixture
+[ 73%] Built target void_core
+[ 93%] Built target void_runtime
+[ 93%] Built target void_llvm
+[100%] Built target void_project_sessions
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_project_selection
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_project_manifest
+Built target void_project_header
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_project_creation
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_zone_objects
+[ 71%] Built target void_native_fixture
+[ 71%] Built target void_managed_test_abi
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_fixed_arrays_tests
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 66%] Built target libcurl_static
+[ 66%] Built target void_native_fixture
+[ 66%] Built target void_managed_test_abi
+[ 73%] Built target void_core
+[ 93%] Built target void_runtime
+[ 93%] Built target void_llvm
+[ 93%] Built target voidc_objects
+[ 93%] Built target void_cache_identity
+[100%] Built target void_async_tests
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_zone_objects
+[ 71%] Built target void_native_fixture
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_stage10_fields
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_native_fixture
+[ 71%] Built target void_managed_test_abi
+[ 71%] Built target void_native_test_fixture
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target void_native_tests
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_native_fixture
+[ 71%] Built target void_g1_fixture
+[ 71%] Built target void_g1_thunk
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target void_g1_tests
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_application_objects
+[ 71%] Built target void_g1_fixture
+[ 71%] Built target void_g1_thunk
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target void_g1_tests
+[100%] Built target void_g1_aot_normal
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_application_objects
+[ 71%] Built target void_g1_fixture
+[ 71%] Built target void_g1_thunk
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target void_g1_tests
+[100%] Built target void_g1_aot_optimized
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 66%] Built target libcurl_static
+[ 66%] Built target void_application_objects
+[ 66%] Built target void_g1_wrong_fixture
+[ 66%] Built target void_g1_thunk
+[ 73%] Built target void_core
+[ 73%] Built target void_g1_fixture
+[ 93%] Built target void_runtime
+[ 93%] Built target void_llvm
+[ 93%] Built target voidc_objects
+[ 93%] Built target void_cache_identity
+[ 93%] Built target void_g1_tests
+[100%] Built target void_g1_aot_mismatch
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_native_fixture
+[ 71%] Built target void_g2_fixture
+[ 71%] Built target void_g2_thunk
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_g2_tests
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_application_objects
+[ 71%] Built target void_g2_fixture
+[ 71%] Built target void_g2_thunk
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_g2_tests
+[100%] Built target void_g2_aot_normal
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 66%] Built target libcurl_static
+[ 66%] Built target void_application_objects
+[ 66%] Built target void_g2_fixture
+[ 66%] Built target void_g2_thunk
+[ 73%] Built target void_core
+[ 93%] Built target void_runtime
+[ 93%] Built target void_llvm
+[ 93%] Built target void_g2_tests
+[100%] Built target void_g2_aot_optimized
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_native_fixture
+[ 71%] Built target void_g3_fixture
+[ 71%] Built target void_g3_thunk
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_g3_tests
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_application_objects
+[ 71%] Built target void_g3_fixture
+[ 71%] Built target void_g3_thunk
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_g3_tests
+[100%] Built target void_g3_aot_normal
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_application_objects
+[ 71%] Built target void_g3_fixture
+[ 71%] Built target void_g3_thunk
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_g3_tests
+[100%] Built target void_g3_aot_optimized
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_native_fixture
+[ 71%] Built target void_g4_competitor
+[ 71%] Built target void_g4_dep
+[ 71%] Built target void_g4_initializer
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_g4_main
+[100%] Built target void_g4_plan
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_g4_tests.dir/tests/ffi/dynamic.cpp.o
+[100%] Linking CXX executable void_g4_tests
+[100%] Built target void_g4_tests
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_application_objects
+[ 71%] Built target void_g4_dep
+[ 71%] Built target void_g4_competitor
+[ 71%] Built target void_g4_initializer
+[ 71%] Built target void_g4_main
+[ 92%] Built target void_runtime
+[100%] Built target void_core
+[100%] Built target void_g4_plan
+[100%] Built target void_llvm
+[100%] Built target void_g4_tests
+[100%] Generating ffi-g4/application-normal.o
+[100%] Linking CXX executable void_g4_aot_normal
+[100%] Built target void_g4_aot_normal
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_application_objects
+[ 71%] Built target void_g4_dep
+[ 71%] Built target void_g4_competitor
+[ 71%] Built target void_g4_initializer
+[ 71%] Built target void_g4_main
+[ 92%] Built target void_runtime
+[100%] Built target void_core
+[100%] Built target void_g4_plan
+[100%] Built target void_llvm
+[100%] Built target void_g4_tests
+[100%] Generating ffi-g4/application-optimized.o
+[100%] Linking CXX executable void_g4_aot_optimized
+[100%] Built target void_g4_aot_optimized
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 66%] Built target libcurl_static
+[ 66%] Built target void_application_objects
+[ 66%] Built target void_g4_dep
+[ 66%] Built target void_g4_competitor
+[ 66%] Built target void_g4_initializer
+[ 66%] Built target void_g4_main
+[ 86%] Built target void_runtime
+[ 93%] Built target void_core
+[ 93%] Built target void_g4_plan
+[ 93%] Built target void_llvm
+[ 93%] Built target void_g4_tests
+[100%] Generating ffi-g4/application-startup.o
+[100%] Linking CXX executable void_g4_aot_startup
+[100%] Built target void_g4_aot_startup
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_application_objects
+[ 71%] Built target void_managed_test_abi
+[ 71%] Built target void_native_test_fixture
+[ 92%] Built target void_runtime
+[100%] Built target void_core
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target void_native_tests
+[100%] Built target void_native_aot_main_normal
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_managed_test_abi
+[ 71%] Built target void_application_objects
+[ 71%] Built target void_native_test_fixture
+[ 92%] Built target void_runtime
+[100%] Built target void_core
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target void_native_tests
+[100%] Built target void_native_aot_main_optimized
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 66%] Built target libcurl_static
+[ 66%] Built target void_application_objects
+[ 66%] Built target void_managed_test_abi
+[ 66%] Built target void_native_test_fixture
+[ 86%] Built target void_core
+[ 93%] Built target void_runtime
+[ 93%] Built target void_llvm
+[ 93%] Built target voidc_objects
+[ 93%] Built target void_cache_identity
+[ 93%] Built target void_native_tests
+[100%] Built target void_native_aot_terminated_nul_normal
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_application_objects
+[ 71%] Built target void_managed_test_abi
+[ 71%] Built target void_native_test_fixture
+[ 92%] Built target void_runtime
+[100%] Built target void_core
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target void_native_tests
+[100%] Built target void_native_aot_closed_optimized
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 71%] Built target libcurl_static
+[ 71%] Built target void_application_objects
+[ 71%] Built target void_managed_test_abi
+[ 71%] Built target void_native_test_fixture
+[ 78%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target void_native_tests
+[100%] Built target void_native_aot_duplicate_normal

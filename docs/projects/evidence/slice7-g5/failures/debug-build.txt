@@ -1,0 +1,64 @@
+-- VOID LLVM: 23.1.4 at /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- Found Python3: /usr/bin/python3 (found suitable version "3.14.8", minimum required is "3.12") found components: Interpreter
+-- curl 8.23.0: 1586 files verified; four private corrections
+
+-- HTTP dependency prefix verified: Debug; 167 files
+
+-- Using CMake version 4.3.4
+-- curl version=[8.23.0]
+-- CMake platform flags: UNIX LLVM-CLANG
+-- Picky compiler options: -Werror-implicit-function-declaration -Wextra -Wall -Wpedantic -Wbad-function-cast -Wconversion -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-long-long -Wno-multichar -Wpointer-arith -Wshadow -Wsign-compare -Wundef -Wunused -Wwrite-strings -Waddress -Wattributes -Wcast-align -Wcast-qual -Wdeclaration-after-statement -Wdiv-by-zero -Wempty-body -Wendif-labels -Wfloat-equal -Wformat-security -Wignored-qualifiers -Wmissing-field-initializers -Wmissing-noreturn -Wno-padded -Wno-sign-conversion -Wno-switch-default -Wno-switch-enum -Wno-system-headers -Wold-style-definition -Wredundant-decls -Wstrict-prototypes -Wtype-limits -Wunreachable-code -Wunused-parameter -Wvla -Wconditional-uninitialized -Wno-used-but-marked-unused -Wshift-sign-overflow -Wshorten-64-to-32 -Wformat=2 -Wlanguage-extension-token -Wno-covered-switch-default -Wno-disabled-macro-expansion -Wformat-non-iso -Wenum-conversion -Wmissing-variable-declarations -Wno-documentation-unknown-command -Wsometimes-uninitialized -Wdouble-promotion -Wheader-guard -Wpragmas -Wunused-const-variable -Wcomma -Wassign-enum -Wextra-semi-stmt -Wimplicit-fallthrough -Wxor-used-as-pow -Wcast-function-type -Wreserved-identifier -Wno-reserved-macro-identifier -Wno-unsafe-buffer-usage -Wcast-function-type-strict -Wformat-signedness -Warray-compare -Wc++-hidden-decl -Wimplicit-int-enum-cast -Wjump-misses-init -Wno-implicit-void-ptr-cast -Wtentative-definition-compat -Wc++-keyword
+-- Found CA bundle: /etc/ssl/certs/ca-certificates.crt
+-- Found CA path: /etc/ssl/certs
+-- Protocols: http https
+-- Features: AsynchDNS HTTP2 HTTPS-proxy IDN IPv6 Largefile PSL SSL threadsafe
+-- Enabled SSL backends: AWS-LC
+-- Verified approved patched Linux host providers: Debug; build 2e0762f51dba9b8bd3b167f7f4a84f5ec9f7fc4e80a51a8fc3d12131f68ab66b
+
+-- Performing Test VOID_LLVM_ORC_RUNS
+-- Performing Test VOID_LLVM_ORC_RUNS - Success
+-- Found Python3: /usr/bin/python3 (found version "3.14.8") found components: Interpreter
+-- Configuring done (8.8s)
+-- Generating done (2.6s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[  0%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[ 71%] Built target libcurl_static
+[ 78%] Building CXX object CMakeFiles/void_core.dir/src/ir/module.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/ir/module.cpp:1042:63: warning: misleading indentation; statement is not part of the previous 'if' [-Wmisleading-indentation]
+ 1042 |                         fail("invalid deterministic release");result=Type::boolean;break;
+      |                                                               ^
+/home/shmellyorc/Documents/Void.Language/src/ir/module.cpp:1040:21: note: previous statement is here
+ 1040 |                     if(!f.receiver || f.method_name!="deinit" || operand(i.a).kind!=Type::managed_ref || operand(i.a).nullable ||
+      |                     ^
+1 warning generated.
+[ 78%] Building CXX object CMakeFiles/void_core.dir/src/ir/c_primitive.cpp.o
+[ 78%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_binding.cpp.o
+[ 78%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/coordination.cpp.o
+[ 78%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/callback.cpp.o
+[ 78%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/c_span.cpp.o
+[ 78%] Linking CXX static library libvoid_core.a
+[ 78%] Built target void_core
+[ 78%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/c_resource.cpp.o
+[ 78%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/c_dynamic.cpp.o
+[ 78%] Linking CXX static library libvoid_runtime.a
+[100%] Built target void_runtime
+[100%] Generating void-native-resources.txt, native-resources-install-Debug.txt
+[100%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+[100%] Built target void_native_inventory
+[100%] Linking CXX static library libvoid_llvm.a
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/voidc_objects.dir/src/main.cpp.o
+[100%] Building CXX object CMakeFiles/voidc_objects.dir/src/native_build.cpp.o
+[100%] Built target voidc_objects
+[100%] Generating cache-identity-Debug.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Debug.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+gmake: *** No rule to make target 'void_g5_reload'.  Stop.

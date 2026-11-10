@@ -1,0 +1,167 @@
+-- VOID LLVM: 23.1.4 at /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- Found Python3: /usr/bin/python3 (found suitable version "3.14.8", minimum required is "3.12") found components: Interpreter
+-- curl 8.23.0: 1586 files verified; four private corrections
+
+-- HTTP dependency prefix verified: Release; 167 files
+
+-- Using CMake version 4.3.4
+-- curl version=[8.23.0]
+-- CMake platform flags: UNIX LLVM-CLANG
+-- Picky compiler options: -Werror-implicit-function-declaration -Wextra -Wall -Wpedantic -Wbad-function-cast -Wconversion -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-long-long -Wno-multichar -Wpointer-arith -Wshadow -Wsign-compare -Wundef -Wunused -Wwrite-strings -Waddress -Wattributes -Wcast-align -Wcast-qual -Wdeclaration-after-statement -Wdiv-by-zero -Wempty-body -Wendif-labels -Wfloat-equal -Wformat-security -Wignored-qualifiers -Wmissing-field-initializers -Wmissing-noreturn -Wno-padded -Wno-sign-conversion -Wno-switch-default -Wno-switch-enum -Wno-system-headers -Wold-style-definition -Wredundant-decls -Wstrict-prototypes -Wtype-limits -Wunreachable-code -Wunused-parameter -Wvla -Wconditional-uninitialized -Wno-used-but-marked-unused -Wshift-sign-overflow -Wshorten-64-to-32 -Wformat=2 -Wlanguage-extension-token -Wno-covered-switch-default -Wno-disabled-macro-expansion -Wformat-non-iso -Wenum-conversion -Wmissing-variable-declarations -Wno-documentation-unknown-command -Wsometimes-uninitialized -Wdouble-promotion -Wheader-guard -Wpragmas -Wunused-const-variable -Wcomma -Wassign-enum -Wextra-semi-stmt -Wimplicit-fallthrough -Wxor-used-as-pow -Wcast-function-type -Wreserved-identifier -Wno-reserved-macro-identifier -Wno-unsafe-buffer-usage -Wcast-function-type-strict -Wformat-signedness -Warray-compare -Wc++-hidden-decl -Wimplicit-int-enum-cast -Wjump-misses-init -Wno-implicit-void-ptr-cast -Wtentative-definition-compat -Wc++-keyword
+-- Found CA bundle: /etc/ssl/certs/ca-certificates.crt
+-- Found CA path: /etc/ssl/certs
+-- Protocols: http https
+-- Features: AsynchDNS HTTP2 HTTPS-proxy IDN IPv6 Largefile PSL SSL threadsafe
+-- Enabled SSL backends: AWS-LC
+-- Verified approved patched Linux host providers: Release; build b245e19d2f7c84c034cea728352c5c1e59aa611c995fac6d515b33176daa68f1
+
+-- Performing Test VOID_LLVM_ORC_RUNS
+-- Performing Test VOID_LLVM_ORC_RUNS - Success
+-- Found Python3: /usr/bin/python3 (found version "3.14.8") found components: Interpreter
+-- Configuring done (7.4s)
+-- Generating done (2.2s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+[  0%] Building CXX object CMakeFiles/void_application_objects.dir/src/application_metadata.cpp.o
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Building CXX object CMakeFiles/void_application_objects.dir/src/project_identity.cpp.o
+[  0%] Built target void_native_fixture
+[ 66%] Built target libcurl_static
+[ 66%] Built target void_application_objects
+[ 66%] Building CXX object CMakeFiles/void_core.dir/src/frontend/project.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_core.dir/src/frontend/source.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/application.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/os.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_core.dir/src/frontend/tooling.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/os_abi.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/random.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_core.dir/src/numeric.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/filesystem_abi.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_resource.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_binding.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_core.dir/src/ir/module.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/temporal_abi.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/conversion.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_core.dir/src/ir/native_storage.cpp.o
+[ 66%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/text_case.cpp.o
+[ 73%] Building CXX object CMakeFiles/void_core.dir/src/ir/native_binding.cpp.o
+[ 73%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/buffer.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/list.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/array.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/dictionary.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/fixed_abi.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/coordination.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:669:137: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  669 |                 if(data.key && !request.keys && (!data.key->down || data.key->repeat!=1))return {-1,false,false,{ErrorKind::unsupported}};
+      |                                                                                                                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:672:69: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  672 |                 if(data.after)return {-1,false,false,data.after,true};
+      |                                                                     ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:675:41: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  675 |             if(queue.eof)return {-1,true};
+      |                                         ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:676:44: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  676 |             if(!fetch)return {-1,false,true};
+      |                                            ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:677:91: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  677 |             if(auto error=stopped(request,op.adapter());error)return {-1,false,false,error};
+      |                                                                                           ^
+/home/shmellyorc/Documents/Void.Language/src/runtime/console.cpp:690:137: warning: missing field 'key' initializer [-Wmissing-field-initializers]
+  690 |                 if(poll && !native.completed && native.error.kind==ErrorKind::would_block){queue.blocks.pop_back();return {-1,false,true};}
+      |                                                                                                                                         ^
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/console_abi.cpp.o
+6 warnings generated.
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/callback.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/abi.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/reload.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/async.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_abi.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_error.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_crypto.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_archive.cpp.o
+[ 80%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_directory.cpp.o
+[ 86%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_process.cpp.o
+[ 86%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_process_windows.cpp.o
+[ 86%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/host_directory_windows.cpp.o
+[ 86%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/url_abi.cpp.o
+[ 86%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http.cpp.o
+[ 86%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_bulk.cpp.o
+[ 86%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_resource.cpp.o
+[ 86%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_file.cpp.o
+[ 86%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/http_abi.cpp.o
+[ 86%] Building CXX object CMakeFiles/void_runtime.dir/src/runtime/native_work.cpp.o
+[ 86%] Linking CXX static library libvoid_runtime.a
+[ 86%] Built target void_runtime
+[ 86%] Generating void-native-resources.txt, native-resources-install-Release.txt
+[ 86%] Built target void_native_inventory
+[ 86%] Linking CXX static library libvoid_core.a
+[ 86%] Built target void_core
+[ 93%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+[ 93%] Linking CXX static library libvoid_llvm.a
+[ 93%] Built target void_llvm
+[ 93%] Building CXX object CMakeFiles/voidc_objects.dir/src/main.cpp.o
+[ 93%] Building CXX object CMakeFiles/voidc_objects.dir/src/native_build.cpp.o
+[ 93%] Building CXX object CMakeFiles/voidc_objects.dir/examples/proof.cpp.o
+/home/shmellyorc/Documents/Void.Language/examples/proof.cpp:7:46: warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+    7 |         {Terminator::Kind::return_value, 2}}}};
+      |                                              ^
+/home/shmellyorc/Documents/Void.Language/examples/proof.cpp:13:6: warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+   13 |     }};
+      |      ^
+2 warnings generated.
+/home/shmellyorc/Documents/Void.Language/src/native_build.cpp:172:112: warning: missing field 'verified_digests' initializer [-Wmissing-field-initializers]
+  172 |     Resources result{path(lines[1]),lines[2].empty()?fs::path{}:path(lines[2]),path(lines[3]),path(lines[4]),{}};
+      |                                                                                                                ^
+1 warning generated.
+[ 93%] Built target voidc_objects
+[ 93%] Generating cache-identity-Release.cpp
+[ 93%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Release.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+-- VOID LLVM: 23.1.4 at /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/lib/cmake/llvm
+-- VOID C++ RTTI: OFF (matches LLVM SDK across all targets)
+-- Found Python3: /usr/bin/python3 (found suitable version "3.14.8", minimum required is "3.12") found components: Interpreter
+-- curl 8.23.0: 1586 files verified; four private corrections
+
+-- HTTP dependency prefix verified: Release; 167 files
+
+-- Using CMake version 4.3.4
+-- curl version=[8.23.0]
+-- CMake platform flags: UNIX LLVM-CLANG
+-- Picky compiler options: -Werror-implicit-function-declaration -Wextra -Wall -Wpedantic -Wbad-function-cast -Wconversion -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-long-long -Wno-multichar -Wpointer-arith -Wshadow -Wsign-compare -Wundef -Wunused -Wwrite-strings -Waddress -Wattributes -Wcast-align -Wcast-qual -Wdeclaration-after-statement -Wdiv-by-zero -Wempty-body -Wendif-labels -Wfloat-equal -Wformat-security -Wignored-qualifiers -Wmissing-field-initializers -Wmissing-noreturn -Wno-padded -Wno-sign-conversion -Wno-switch-default -Wno-switch-enum -Wno-system-headers -Wold-style-definition -Wredundant-decls -Wstrict-prototypes -Wtype-limits -Wunreachable-code -Wunused-parameter -Wvla -Wconditional-uninitialized -Wno-used-but-marked-unused -Wshift-sign-overflow -Wshorten-64-to-32 -Wformat=2 -Wlanguage-extension-token -Wno-covered-switch-default -Wno-disabled-macro-expansion -Wformat-non-iso -Wenum-conversion -Wmissing-variable-declarations -Wno-documentation-unknown-command -Wsometimes-uninitialized -Wdouble-promotion -Wheader-guard -Wpragmas -Wunused-const-variable -Wcomma -Wassign-enum -Wextra-semi-stmt -Wimplicit-fallthrough -Wxor-used-as-pow -Wcast-function-type -Wreserved-identifier -Wno-reserved-macro-identifier -Wno-unsafe-buffer-usage -Wcast-function-type-strict -Wformat-signedness -Warray-compare -Wc++-hidden-decl -Wimplicit-int-enum-cast -Wjump-misses-init -Wno-implicit-void-ptr-cast -Wtentative-definition-compat -Wc++-keyword
+-- Found CA bundle: /etc/ssl/certs/ca-certificates.crt
+-- Found CA path: /etc/ssl/certs
+-- Protocols: http https
+-- Features: AsynchDNS HTTP2 HTTPS-proxy IDN IPv6 Largefile PSL SSL threadsafe
+-- Enabled SSL backends: AWS-LC
+-- Verified approved patched Linux host providers: Release; build b245e19d2f7c84c034cea728352c5c1e59aa611c995fac6d515b33176daa68f1
+
+-- Performing Test VOID_LLVM_ORC_RUNS
+-- Performing Test VOID_LLVM_ORC_RUNS - Success
+-- Found Python3: /usr/bin/python3 (found version "3.14.8") found components: Interpreter
+-- Configuring done (6.6s)
+-- Generating done (1.8s)
+-- Build files have been written to: /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  7%] Built target void_native_fixture
+[ 14%] Built target void_core
+[ 85%] Built target libcurl_static
+[100%] Built target void_runtime
+[107%] Built target void_llvm
+[107%] Building CXX object CMakeFiles/void_project_sessions.dir/tests/project/sessions.cpp.o
+[107%] Linking CXX executable void_project_sessions
+[107%] Built target void_project_sessions
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[  0%] Built target void_format_objects
+[ 50%] Built target void_core
+[ 50%] Building CXX object CMakeFiles/void_project_manifest.dir/tests/project/manifest.cpp.o
+[100%] Linking CXX executable void_project_manifest
+[100%] Built target void_project_manifest

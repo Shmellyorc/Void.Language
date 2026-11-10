@@ -1,0 +1,220 @@
+{
+  "pinned-child-source": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review _55gipnn",
+      "/tmp/VOID preflight review _55gipnn/parent/child/launcher.void",
+      "/tmp/VOID preflight review _55gipnn/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Source path crosses nested project boundary '/child'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review _55gipnn/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review _55gipnn/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review _55gipnn/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"8a2734fab2f409df3f218727f4cf8446a8ca0f921215da1975209be2bff70497\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "pinned-child-manifest": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review _55gipnn",
+      "/tmp/VOID preflight review _55gipnn/parent/child/void.project.toml",
+      "/tmp/VOID preflight review _55gipnn/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active manifest is outside the pinned project boundary: '/child/void.project.toml'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review _55gipnn/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review _55gipnn/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review _55gipnn/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"8a2734fab2f409df3f218727f4cf8446a8ca0f921215da1975209be2bff70497\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "pinned-outside": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review _55gipnn",
+      "/tmp/VOID preflight review _55gipnn/outside.void",
+      "/tmp/VOID preflight review _55gipnn/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active document is outside the pinned project boundary.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review _55gipnn/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review _55gipnn/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review _55gipnn/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"8a2734fab2f409df3f218727f4cf8446a8ca0f921215da1975209be2bff70497\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "invalid-source-identity": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review _55gipnn",
+      "/tmp/VOID preflight review _55gipnn/parent/notes.txt",
+      "/tmp/VOID preflight review _55gipnn/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3001\",\"message\":\"Import must name a .void source file.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review _55gipnn/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review _55gipnn/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review _55gipnn/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"8a2734fab2f409df3f218727f4cf8446a8ca0f921215da1975209be2bff70497\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "virtual-source": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review _55gipnn",
+      "/tmp/VOID preflight review _55gipnn/parent/new/draft.void",
+      "/tmp/VOID preflight review _55gipnn/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":0,\"entry\":\"/tmp/VOID preflight review _55gipnn/parent/main.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review _55gipnn/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review _55gipnn/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review _55gipnn/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"8a2734fab2f409df3f218727f4cf8446a8ca0f921215da1975209be2bff70497\",\"standalone\":false,\"status\":\"ready\"}\n",
+    "stderr": ""
+  },
+  "selected-manifest": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review _55gipnn",
+      "/tmp/VOID preflight review _55gipnn/parent/void.project.toml",
+      "/tmp/VOID preflight review _55gipnn/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":0,\"entry\":\"/tmp/VOID preflight review _55gipnn/parent/main.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review _55gipnn/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review _55gipnn/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review _55gipnn/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"8a2734fab2f409df3f218727f4cf8446a8ca0f921215da1975209be2bff70497\",\"standalone\":false,\"status\":\"ready\"}\n",
+    "stderr": ""
+  },
+  "nearest-child": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review _55gipnn",
+      "/tmp/VOID preflight review _55gipnn/parent/child/launcher.void",
+      "",
+      ""
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":1,\"entry\":\"/tmp/VOID preflight review _55gipnn/parent/child/launcher.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review _55gipnn/parent/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review _55gipnn/parent/child\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review _55gipnn/parent/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"fe3a4b500555d756c6b67c680097afb0a30c3f23e5a4b50f05138b7dddb676f8\",\"standalone\":false,\"status\":\"ready\"}\n",
+    "stderr": ""
+  },
+  "pinned-malformed-child-source": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review _55gipnn",
+      "/tmp/VOID preflight review _55gipnn/parent/child/launcher.void",
+      "/tmp/VOID preflight review _55gipnn/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Source path crosses nested project boundary '/child'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review _55gipnn/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review _55gipnn/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review _55gipnn/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"8a2734fab2f409df3f218727f4cf8446a8ca0f921215da1975209be2bff70497\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "pinned-malformed-child-manifest": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review _55gipnn",
+      "/tmp/VOID preflight review _55gipnn/parent/child/void.project.toml",
+      "/tmp/VOID preflight review _55gipnn/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active manifest is outside the pinned project boundary: '/child/void.project.toml'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review _55gipnn/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review _55gipnn/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review _55gipnn/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"8a2734fab2f409df3f218727f4cf8446a8ca0f921215da1975209be2bff70497\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "nearest-malformed-child": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review _55gipnn",
+      "/tmp/VOID preflight review _55gipnn/parent/child/launcher.void",
+      "",
+      ""
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5001\",\"message\":\"Invalid project TOML: Error while parsing table header: expected a bare or quoted key\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":0,\"kind\":null,\"manifest\":\"/tmp/VOID preflight review _55gipnn/parent/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review _55gipnn/parent/child\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review _55gipnn/parent/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "pinned-wrong-case-child-source": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review _55gipnn",
+      "/tmp/VOID preflight review _55gipnn/parent/child/launcher.void",
+      "/tmp/VOID preflight review _55gipnn/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Manifest must use exact case without case siblings in '/child'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review _55gipnn/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review _55gipnn/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review _55gipnn/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"8a2734fab2f409df3f218727f4cf8446a8ca0f921215da1975209be2bff70497\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "pinned-wrong-case-child-manifest": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review _55gipnn",
+      "/tmp/VOID preflight review _55gipnn/parent/child/void.Project.toml",
+      "/tmp/VOID preflight review _55gipnn/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3001\",\"message\":\"Import must name a .void source file.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review _55gipnn/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review _55gipnn/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review _55gipnn/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"8a2734fab2f409df3f218727f4cf8446a8ca0f921215da1975209be2bff70497\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "nearest-wrong-case-child": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review _55gipnn",
+      "/tmp/VOID preflight review _55gipnn/parent/child/launcher.void",
+      "",
+      ""
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Manifest must use exact case without case siblings in ''.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":0,\"kind\":null,\"manifest\":\"/tmp/VOID preflight review _55gipnn/parent/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review _55gipnn/parent/child\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review _55gipnn/parent/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "bad-invocation": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review _55gipnn"
+    ],
+    "exit": 2,
+    "stdout": "",
+    "stderr": "voidls: Usage: voidls --entry <project entry.void>\n"
+  },
+  "unpinned-invalid-discovery-path": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review _55gipnn",
+      "/tmp/outside.void",
+      "",
+      ""
+    ],
+    "exit": 2,
+    "stdout": "",
+    "stderr": "voidls: Active file is outside selected workspace\n"
+  },
+  "physical-alias": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review _55gipnn",
+      "/tmp/VOID preflight review _55gipnn/parent/alias.void",
+      "/tmp/VOID preflight review _55gipnn/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3001\",\"message\":\"Symbolic links are not supported in module paths.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review _55gipnn/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review _55gipnn/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review _55gipnn/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"13075494f9ffc3f4e179ebf04ecb3bcdcc71670753550b1249f19d9ddfe1484c\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  },
+  "physically-unreadable": {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+      "--discover-project",
+      "/tmp/VOID preflight review _55gipnn",
+      "/tmp/VOID preflight review _55gipnn/parent/unreadable.void",
+      "/tmp/VOID preflight review _55gipnn/parent",
+      "main.void"
+    ],
+    "exit": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3002\",\"message\":\"Cannot read admitted project source.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"/tmp/VOID preflight review _55gipnn/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID preflight review _55gipnn/parent\",\"requiresReselection\":false,\"root\":\"/tmp/VOID preflight review _55gipnn/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"249b105f727967cfee6dfd5b444a1b1d51d78bb24750dbc8a02a3faad6ca795a\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  }
+}

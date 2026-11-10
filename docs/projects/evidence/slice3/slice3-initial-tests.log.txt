@@ -1,0 +1,24 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start  9: project_sessions
+1/3 Test  #9: project_sessions .................***Failed    0.18 sec
+manifest trivia is provenance, not semantic metadata
+
+    Start 11: project_profiles
+2/3 Test #11: project_profiles .................***Failed    0.71 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/project/profiles.py", line 42, in <module>
+    if b'Debug cache: unavailable' not in cold.stderr:assert b'Debug cache: miss' in cold.stderr and b'Debug cache: hit' in warm.stderr,(cold.stderr,warm.stderr)
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (b"/tmp/VOID profile execution \xe9\x9b\xaa 6gl16z0j/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\nDebug cache: miss\n", b"/tmp/VOID profile execution \xe9\x9b\xaa 6gl16z0j/void.project.toml:11:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\nDebug cache: miss\n")
+
+    Start 12: project_protocol
+3/3 Test #12: project_protocol .................   Passed    0.25 sec
+
+33% tests passed, 2 tests failed out of 3
+
+Total Test time (real) =   1.15 sec
+
+The following tests FAILED:
+	  9 - project_sessions (Failed)
+	 11 - project_profiles (Failed)
+Errors while running CTest

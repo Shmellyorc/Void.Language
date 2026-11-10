@@ -1,0 +1,7 @@
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Building CXX object CMakeFiles/voidls.dir/src/lsp/main.cpp.o
+[100%] Linking CXX executable voidls
+[100%] Built target voidls

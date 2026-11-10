@@ -1,0 +1,1200 @@
+{
+  "checks": 169,
+  "commands_and_requests": [
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidS6-Storage-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20q_b9t0b5/bare.void"
+        },
+        "position": {
+          "line": 0,
+          "character": 6
+        }
+      },
+      "response": {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "range": {
+            "end": {
+              "character": 10,
+              "line": 0
+            },
+            "start": {
+              "character": 5,
+              "line": 0
+            }
+          },
+          "uri": "file:///C:/Users/a/VoidS6-Storage-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20q_b9t0b5/bare.void"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+        "",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5010\",\"message\":\"No eligible main() in application project.\"}],\"discoveryCount\":1,\"entry\":null,\"executionCount\":0,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"40a50d6b3e951d337daef37a5fce1da917f9fac20403fec6ea01bc1d30b0176c\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "method": "initialize",
+      "params": {
+        "capabilities": {
+          "textDocument": {
+            "publishDiagnostics": {
+              "relatedInformation": true,
+              "versionSupport": true
+            }
+          },
+          "workspace": {
+            "workspaceEdit": {
+              "documentChanges": true,
+              "failureHandling": "textOnlyTransactional"
+            }
+          }
+        }
+      },
+      "response": {
+        "id": 1,
+        "jsonrpc": "2.0",
+        "result": {
+          "capabilities": {
+            "completionProvider": {
+              "triggerCharacters": [
+                ".",
+                " ",
+                "\"",
+                "/",
+                ":"
+              ]
+            },
+            "definitionProvider": true,
+            "documentFormattingProvider": true,
+            "documentSymbolProvider": true,
+            "experimental": {
+              "refreshProject": true,
+              "voidProjectProtocol": 1,
+              "voidToolingProtocol": 1
+            },
+            "hoverProvider": true,
+            "positionEncoding": "utf-16",
+            "referencesProvider": true,
+            "renameProvider": {
+              "prepareProvider": true
+            },
+            "signatureHelpProvider": {
+              "triggerCharacters": [
+                "(",
+                ","
+              ]
+            },
+            "textDocumentSync": {
+              "change": 1,
+              "openClose": true,
+              "save": {
+                "includeText": false
+              }
+            },
+            "workspace": {
+              "fileOperations": {
+                "didCreate": {
+                  "filters": [
+                    {
+                      "pattern": {
+                        "glob": "**/*"
+                      },
+                      "scheme": "file"
+                    }
+                  ]
+                },
+                "didDelete": {
+                  "filters": [
+                    {
+                      "pattern": {
+                        "glob": "**/*"
+                      },
+                      "scheme": "file"
+                    }
+                  ]
+                },
+                "didRename": {
+                  "filters": [
+                    {
+                      "pattern": {
+                        "glob": "**/*"
+                      },
+                      "scheme": "file"
+                    }
+                  ]
+                }
+              }
+            },
+            "workspaceSymbolProvider": true
+          },
+          "serverInfo": {
+            "name": "VOID",
+            "version": "0.2.0"
+          }
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 4,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/src/game.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+          "schema": 2,
+          "selectionRevision": "2",
+          "snapshotKey": "690491e5076a700d8595c6f015ba9a95d101b3fd2af84f6f58531766b413d27e",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidS6-Storage-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20q_b9t0b5/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 13
+        }
+      },
+      "response": {
+        "id": 5,
+        "jsonrpc": "2.0",
+        "result": {
+          "range": {
+            "end": {
+              "character": 17,
+              "line": 0
+            },
+            "start": {
+              "character": 12,
+              "line": 0
+            }
+          },
+          "uri": "file:///C:/Users/a/VoidS6-Storage-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20q_b9t0b5/src/helper.void"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/hover",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidS6-Storage-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20q_b9t0b5/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 14
+        }
+      },
+      "response": {
+        "id": 6,
+        "jsonrpc": "2.0",
+        "result": {
+          "contents": {
+            "kind": "plaintext",
+            "value": "value() -> i32"
+          },
+          "range": {
+            "end": {
+              "character": 18,
+              "line": 2
+            },
+            "start": {
+              "character": 13,
+              "line": 2
+            }
+          }
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/formatting",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidS6-Storage-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20q_b9t0b5/src/game.void"
+        },
+        "options": {
+          "tabSize": 4,
+          "insertSpaces": true
+        }
+      },
+      "response": {
+        "id": 8,
+        "jsonrpc": "2.0",
+        "result": [
+          {
+            "newText": "use \"./helper.void\" as h\nfunc main() -> i32:\n    return h.value()\n",
+            "range": {
+              "end": {
+                "character": 0,
+                "line": 3
+              },
+              "start": {
+                "character": 0,
+                "line": 0
+              }
+            }
+          }
+        ]
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/rename",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidS6-Storage-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20q_b9t0b5/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 14
+        },
+        "newName": "renamed_helper"
+      },
+      "response": {
+        "id": 10,
+        "jsonrpc": "2.0",
+        "result": {
+          "documentChanges": [
+            {
+              "edits": [
+                {
+                  "newText": "renamed_helper",
+                  "range": {
+                    "end": {
+                      "character": 18,
+                      "line": 2
+                    },
+                    "start": {
+                      "character": 13,
+                      "line": 2
+                    }
+                  }
+                }
+              ],
+              "textDocument": {
+                "uri": "file:///C:/Users/a/VoidS6-Storage-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20q_b9t0b5/src/game.void",
+                "version": 3
+              }
+            },
+            {
+              "edits": [
+                {
+                  "newText": "renamed_helper",
+                  "range": {
+                    "end": {
+                      "character": 17,
+                      "line": 0
+                    },
+                    "start": {
+                      "character": 12,
+                      "line": 0
+                    }
+                  }
+                }
+              ],
+              "textDocument": {
+                "uri": "file:///C:/Users/a/VoidS6-Storage-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20q_b9t0b5/src/helper.void",
+                "version": null
+              }
+            }
+          ]
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 12,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5001",
+              "message": "Invalid project TOML: Error while parsing table header: expected a bare or quoted key"
+            }
+          ],
+          "discoveryCount": 0,
+          "entry": null,
+          "executionCount": 0,
+          "kind": null,
+          "manifest": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+          "schema": 2,
+          "selectionRevision": "5",
+          "snapshotKey": "",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidS6-Storage-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20q_b9t0b5/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 13
+        }
+      },
+      "response": {
+        "id": 13,
+        "jsonrpc": "2.0",
+        "result": null
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 15,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/src/game.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+          "schema": 2,
+          "selectionRevision": "6",
+          "snapshotKey": "690491e5076a700d8595c6f015ba9a95d101b3fd2af84f6f58531766b413d27e",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidS6-Storage-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20q_b9t0b5/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 13
+        }
+      },
+      "response": {
+        "id": 16,
+        "jsonrpc": "2.0",
+        "result": {
+          "range": {
+            "end": {
+              "character": 17,
+              "line": 0
+            },
+            "start": {
+              "character": 12,
+              "line": 0
+            }
+          },
+          "uri": "file:///C:/Users/a/VoidS6-Storage-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20q_b9t0b5/src/helper.void"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 20,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5010",
+              "message": "Ambiguous project entry: 2 eligible main() declarations."
+            }
+          ],
+          "discoveryCount": 3,
+          "entry": null,
+          "executionCount": 0,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+          "schema": 2,
+          "selectionRevision": "9",
+          "snapshotKey": "c227969f16433a00b3557fe1081c397c4433aa412883375a7f13ec92a737f700",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 22,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/src/game.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+          "schema": 2,
+          "selectionRevision": "11",
+          "snapshotKey": "25d6932121849817f5c896f4c11aacbdf75bec66b7a4ff2e33be0c05dccdf12a",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 25,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5010",
+              "message": "No eligible main() in application project."
+            }
+          ],
+          "discoveryCount": 1,
+          "entry": null,
+          "executionCount": 0,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+          "schema": 2,
+          "selectionRevision": "14",
+          "snapshotKey": "994784fe27dbd96b1be274c099fa137a3a5f8e906555d287fe2a0175877881a2",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 27,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+          "schema": 2,
+          "selectionRevision": "17",
+          "snapshotKey": "f046160f1eb32fad1f9dc69366833831d2bfbaea577540a8d83af42376b52ed5",
+          "standalone": false,
+          "status": "reselection-required"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 30,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+          "schema": 2,
+          "selectionRevision": "19",
+          "snapshotKey": "c1d2ef6ac1b084167179a1881be4108e4d22246297ab78b552fcd0b9682d28cb",
+          "standalone": false,
+          "status": "reselection-required"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/reselectProject",
+      "params": {},
+      "response": {
+        "id": 31,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+          "schema": 2,
+          "selectionRevision": "20",
+          "snapshotKey": "c1d2ef6ac1b084167179a1881be4108e4d22246297ab78b552fcd0b9682d28cb",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": [
+        {
+          "diagnostics": [],
+          "uri": "file:///C:/Users/a/VoidS6-Storage-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20q_b9t0b5/src/helper.void",
+          "voidProjectRevision": "20"
+        },
+        {
+          "diagnostics": [],
+          "uri": "file:///C:/Users/a/VoidS6-Storage-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20q_b9t0b5/src/renamed.void",
+          "version": 1,
+          "voidProjectRevision": "20"
+        },
+        {
+          "diagnostics": [],
+          "uri": "file:///C:/Users/a/VoidS6-Storage-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20q_b9t0b5/void.project.toml",
+          "version": 4,
+          "voidProjectRevision": "20"
+        }
+      ]
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 32,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+          "schema": 2,
+          "selectionRevision": "20",
+          "snapshotKey": "c1d2ef6ac1b084167179a1881be4108e4d22246297ab78b552fcd0b9682d28cb",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 34,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+          "schema": 2,
+          "selectionRevision": "20",
+          "snapshotKey": "c1d2ef6ac1b084167179a1881be4108e4d22246297ab78b552fcd0b9682d28cb",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 37,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5009",
+              "message": "Source path crosses nested project boundary '/src/child'."
+            }
+          ],
+          "discoveryCount": 2,
+          "entry": null,
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+          "schema": 2,
+          "selectionRevision": "22",
+          "snapshotKey": "81d6e8bc72ff69819b3fb8413e70218bb40205ec24b183d5af32765262afa867",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 40,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+          "schema": 2,
+          "selectionRevision": "24",
+          "snapshotKey": "34cfb5bfdce09f41178bd7605e49b174e3d2498c322a9b6f38c88df5d8bc1f29",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 42,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5009",
+              "message": "Manifest must use exact case without case siblings in '/src/child'."
+            }
+          ],
+          "discoveryCount": 0,
+          "entry": null,
+          "executionCount": 0,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+          "schema": 2,
+          "selectionRevision": "25",
+          "snapshotKey": "b3a7815d7c48dde697364931a026b40183f2e0d4c2076245a50fc9aab820d46e",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 44,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+          "schema": 2,
+          "selectionRevision": "26",
+          "snapshotKey": "34cfb5bfdce09f41178bd7605e49b174e3d2498c322a9b6f38c88df5d8bc1f29",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 46,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 1,
+          "diagnostics": [
+            {
+              "code": "VOID5009",
+              "message": "Selected project manifest is unavailable."
+            }
+          ],
+          "discoveryCount": 0,
+          "entry": null,
+          "executionCount": 0,
+          "kind": null,
+          "manifest": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/void.project.toml",
+          "mode": "project",
+          "requiresReselection": true,
+          "root": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+          "schema": 2,
+          "selectionRevision": "28",
+          "snapshotKey": "",
+          "standalone": false,
+          "status": "error"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 48,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/src/renamed.void",
+          "executionCount": 2,
+          "kind": "application",
+          "manifest": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+          "schema": 2,
+          "selectionRevision": "29",
+          "snapshotKey": "34cfb5bfdce09f41178bd7605e49b174e3d2498c322a9b6f38c88df5d8bc1f29",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+        "",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":2,\"entry\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/src/game.void\",\"executionCount\":2,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"c449a1dadf3934ec636e85e21285c2a72429509351e2d72ed5cb0d0cdfd6ead2\",\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\src\\child\\launcher.void",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":1,\"entry\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/src/child/launcher.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/src/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/src/child\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/src/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"0153eab3a02c02cbaf843ab533d370f34d2402c37a320efb83ecf08148864daa\",\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\src\\child\\launcher.void",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Source path crosses nested project boundary '/src/child'.\"}],\"discoveryCount\":2,\"entry\":null,\"executionCount\":2,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"962a9bd982eca442797c9bda31c3c73fcbbc13fab53aed7bb336947ef03b6258\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\src\\game.void",
+        "",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\bare.void"
+      ],
+      "status": 0,
+      "stdout": "{\"entry\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/bare.void\",\"mode\":\"legacy\",\"root\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\",\"schema\":2,\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "method": "void/projectState",
+      "params": null,
+      "response": {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "diagnosticCount": 0,
+          "diagnostics": [],
+          "discoveryCount": 2,
+          "entry": null,
+          "executionCount": 2,
+          "kind": "library",
+          "manifest": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/void.project.toml",
+          "mode": "project",
+          "requiresReselection": false,
+          "root": "C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5",
+          "schema": 2,
+          "selectionRevision": "1",
+          "snapshotKey": "690497f9f435c6392da2d2c52f77d84a05232c01b636f9a912bf5ea16f697c4f",
+          "standalone": false,
+          "status": "ready"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "file:///C:/Users/a/VoidS6-Storage-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20q_b9t0b5/src/game.void"
+        },
+        "position": {
+          "line": 2,
+          "character": 13
+        }
+      },
+      "response": {
+        "id": 3,
+        "jsonrpc": "2.0",
+        "result": {
+          "range": {
+            "end": {
+              "character": 17,
+              "line": 0
+            },
+            "start": {
+              "character": 12,
+              "line": 0
+            }
+          },
+          "uri": "file:///C:/Users/a/VoidS6-Storage-tmp-Release/VOID%20S3%20protocol%20%C3%A9%F0%9F%98%80%20q_b9t0b5/src/helper.void"
+        }
+      },
+      "diagnostics": []
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent\\child\\launcher.void",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Source path crosses nested project boundary '/child'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"06f511dda7706c495bdd675a3f3ea3e869899d9624341a10119716822f06d28d\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent\\child\\void.project.toml",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active manifest is outside the pinned project boundary: '/child/void.project.toml'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"06f511dda7706c495bdd675a3f3ea3e869899d9624341a10119716822f06d28d\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\outside.void",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active document is outside the pinned project boundary.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"06f511dda7706c495bdd675a3f3ea3e869899d9624341a10119716822f06d28d\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent\\notes.txt",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3001\",\"message\":\"Import must name a .void source file.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"06f511dda7706c495bdd675a3f3ea3e869899d9624341a10119716822f06d28d\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent\\@stdlib\\main.void",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5006\",\"message\":\"Document identity must be an exact canonical root-relative .void path\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"06f511dda7706c495bdd675a3f3ea3e869899d9624341a10119716822f06d28d\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent\\Main.void",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3001\",\"message\":\"Filesystem case collision for 'Main.void'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"06f511dda7706c495bdd675a3f3ea3e869899d9624341a10119716822f06d28d\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent\\void.project.toml",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":0,\"entry\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/main.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"06f511dda7706c495bdd675a3f3ea3e869899d9624341a10119716822f06d28d\",\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent\\virtual\\draft.void",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":0,\"entry\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/main.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"06f511dda7706c495bdd675a3f3ea3e869899d9624341a10119716822f06d28d\",\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent\\child\\launcher.void",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":0,\"diagnostics\":[],\"discoveryCount\":1,\"entry\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/child/launcher.void\",\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/child\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"8aa1c2ba69c014f5ab6ad9aa8c02b95030b2e9143e6a0893b91f412c9df1bd16\",\"standalone\":false,\"status\":\"ready\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent\\child\\launcher.void",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Source path crosses nested project boundary '/child'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"06f511dda7706c495bdd675a3f3ea3e869899d9624341a10119716822f06d28d\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent\\child\\void.project.toml",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Active manifest is outside the pinned project boundary: '/child/void.project.toml'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"06f511dda7706c495bdd675a3f3ea3e869899d9624341a10119716822f06d28d\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent\\child\\launcher.void",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5001\",\"message\":\"Invalid project TOML: Error while parsing table header: expected a bare or quoted key\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":0,\"kind\":null,\"manifest\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/child\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent\\child\\launcher.void",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Manifest must use exact case without case siblings in '/child'.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"06f511dda7706c495bdd675a3f3ea3e869899d9624341a10119716822f06d28d\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent\\child\\void.Project.toml",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3001\",\"message\":\"Import must name a .void source file.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"06f511dda7706c495bdd675a3f3ea3e869899d9624341a10119716822f06d28d\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent\\child\\launcher.void",
+        "",
+        ""
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5009\",\"message\":\"Manifest must use exact case without case siblings in ''.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":0,\"kind\":null,\"manifest\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/child/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/child\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/child\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight"
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "voidls: Usage: voidls --entry <project entry.void>\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\outside.void",
+        "",
+        ""
+      ],
+      "status": 2,
+      "stdout": "",
+      "stderr": "voidls: Active file is outside selected workspace\r\n"
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent\\junction\\outside.void",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3001\",\"message\":\"Module path contains a filesystem alias.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"101eafd635dcad5803ea3c64a7309c55eac32331148e6355fffeac52620c7ef7\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Users\\a\\VoidS6-Storage-Release\\voidls.exe",
+        "--discover-project",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent\\unreadable.void",
+        "C:\\Users\\a\\VoidS6-Storage-tmp-Release\\VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5\\preflight\\parent",
+        "main.void"
+      ],
+      "status": 0,
+      "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID3002\",\"message\":\"Cannot read admitted project source.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":1,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS6-Storage-tmp-Release/VOID S3 protocol \u00e9\ud83d\ude00 q_b9t0b5/preflight/parent\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"f4b20ccb75932b6bbf332c5a37454d8d110dfcf1c29baa71481bf141a47c15e2\",\"standalone\":false,\"status\":\"error\"}\n",
+      "stderr": ""
+    }
+  ]
+}

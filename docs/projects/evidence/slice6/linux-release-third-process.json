@@ -1,0 +1,81 @@
+{
+  "boundary_cases": 574,
+  "records": [
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID S6 numeric enum x1p2c9r7/matrix.void",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "build",
+        "/tmp/VOID S6 numeric enum x1p2c9r7/matrix.void",
+        "-o",
+        "/tmp/VOID S6 numeric enum x1p2c9r7/matrix-normal",
+        "--no-opt"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID S6 numeric enum x1p2c9r7/matrix-normal\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/VOID S6 numeric enum x1p2c9r7/matrix-normal"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID S6 numeric enum x1p2c9r7/matrix.void",
+        "--no-cache"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "build",
+        "/tmp/VOID S6 numeric enum x1p2c9r7/matrix.void",
+        "-o",
+        "/tmp/VOID S6 numeric enum x1p2c9r7/matrix-o2"
+      ],
+      "status": 0,
+      "stdout": "Built native executable: /tmp/VOID S6 numeric enum x1p2c9r7/matrix-o2\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/tmp/VOID S6 numeric enum x1p2c9r7/matrix-o2"
+      ],
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+        "run",
+        "/tmp/VOID S6 numeric enum x1p2c9r7/integration.void",
+        "--no-cache",
+        "--no-opt"
+      ],
+      "status": 1,
+      "stdout": "",
+      "stderr": "/tmp/VOID S6 numeric enum x1p2c9r7/modes.void:10:34: error: Type 'option' is not a generic struct.\n    code: VOID1103\n\n 10 | public func score_cast<t>(value: option<t>) -> i32:\n    |                                  ^^^^^^\n    Module: /modes.void\n\n"
+    }
+  ]
+}

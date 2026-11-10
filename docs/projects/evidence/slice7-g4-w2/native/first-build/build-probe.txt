@@ -1,0 +1,1 @@
+clang-cl: error: cannot specify '/Foprobe.obj' when compiling multiple source files

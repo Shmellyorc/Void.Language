@@ -1,0 +1,41 @@
+Test project C:/Users/a/VS7I2/Debug
+      Start  22: http_reload
+ 1/18 Test  #22: http_reload ......................   Passed  137.49 sec
+      Start  31: http_install
+ 2/18 Test  #31: http_install .....................   Passed  298.29 sec
+      Start  84: fixed_arrays_cli
+ 3/18 Test  #84: fixed_arrays_cli .................   Passed   23.69 sec
+      Start  85: growable_arrays_cli
+ 4/18 Test  #85: growable_arrays_cli ..............   Passed   38.74 sec
+      Start  86: arrays_cli
+ 5/18 Test  #86: arrays_cli .......................   Passed   54.12 sec
+      Start  87: generics_cli
+ 6/18 Test  #87: generics_cli .....................   Passed   22.84 sec
+      Start  88: collections_cli
+ 7/18 Test  #88: collections_cli ..................   Passed   76.40 sec
+      Start  89: dictionaries_cli
+ 8/18 Test  #89: dictionaries_cli .................   Passed   47.86 sec
+      Start  90: properties_cli
+ 9/18 Test  #90: properties_cli ...................   Passed   49.10 sec
+      Start  91: patterns_cli
+10/18 Test  #91: patterns_cli .....................   Passed   19.75 sec
+      Start  92: advanced_cli
+11/18 Test  #92: advanced_cli .....................   Passed   56.65 sec
+      Start  96: managed_cli
+12/18 Test  #96: managed_cli ......................   Passed    9.42 sec
+      Start 100: managed_initialization_cli
+13/18 Test #100: managed_initialization_cli .......   Passed   12.33 sec
+      Start 104: reference_values_cli
+14/18 Test #104: reference_values_cli .............   Passed   17.79 sec
+      Start 108: composition_cli
+15/18 Test #108: composition_cli ..................   Passed   10.04 sec
+      Start 112: inheritance_cli
+16/18 Test #112: inheritance_cli ..................   Passed   14.16 sec
+      Start 116: interfaces_cli
+17/18 Test #116: interfaces_cli ...................   Passed   10.91 sec
+      Start 120: strings_cli
+18/18 Test #120: strings_cli ......................   Passed    5.38 sec
+
+100% tests passed out of 18
+
+Total Test time (real) = 905.04 sec

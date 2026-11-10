@@ -1,0 +1,35 @@
+["C:\\gcc\\bin\\cmake.exe", "--build", "C:\\Users\\a\\VoidS7-Raylib-Compatibility\\build-gl11", "--parallel", "2", "--target", "raylib"]
+[1/28] Building C object raylib\CMakeFiles\raylib.dir\rcore.c.obj
+[2/28] Building C object raylib\CMakeFiles\raylib.dir\rmodels.c.obj
+[3/28] Building C object raylib\CMakeFiles\raylib.dir\rshapes.c.obj
+[4/28] Building C object raylib\CMakeFiles\raylib.dir\raudio.c.obj
+In file included from C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\src\raudio.c:214:
+C:\Users\a\VoidS7-Raylib-Compatibility\raylib-6.0\src\external/stb_vorbis.c(1404,75): warning: pointer comparison always evaluates to false [-Wtautological-compare]
+ 1404 |       if (f->stream_start + loc >= f->stream_end || f->stream_start + loc < f->stream_start) {
+      |                                                                           ^
+1 warning generated.
+[5/28] Building C object raylib\CMakeFiles\raylib.dir\rtext.c.obj
+[6/28] Building C object raylib\external\glfw\src\CMakeFiles\glfw.dir\context.c.obj
+[7/28] Building C object raylib\external\glfw\src\CMakeFiles\glfw.dir\init.c.obj
+[8/28] Building C object raylib\external\glfw\src\CMakeFiles\glfw.dir\input.c.obj
+[9/28] Building C object raylib\external\glfw\src\CMakeFiles\glfw.dir\monitor.c.obj
+[10/28] Building C object raylib\external\glfw\src\CMakeFiles\glfw.dir\platform.c.obj
+[11/28] Building C object raylib\external\glfw\src\CMakeFiles\glfw.dir\vulkan.c.obj
+[12/28] Building C object raylib\external\glfw\src\CMakeFiles\glfw.dir\window.c.obj
+[13/28] Building C object raylib\external\glfw\src\CMakeFiles\glfw.dir\egl_context.c.obj
+[14/28] Building C object raylib\external\glfw\src\CMakeFiles\glfw.dir\osmesa_context.c.obj
+[15/28] Building C object raylib\external\glfw\src\CMakeFiles\glfw.dir\null_init.c.obj
+[16/28] Building C object raylib\external\glfw\src\CMakeFiles\glfw.dir\null_monitor.c.obj
+[17/28] Building C object raylib\CMakeFiles\raylib.dir\rtextures.c.obj
+[18/28] Building C object raylib\external\glfw\src\CMakeFiles\glfw.dir\null_window.c.obj
+[19/28] Building C object raylib\external\glfw\src\CMakeFiles\glfw.dir\null_joystick.c.obj
+[20/28] Building C object raylib\external\glfw\src\CMakeFiles\glfw.dir\win32_module.c.obj
+[21/28] Building C object raylib\external\glfw\src\CMakeFiles\glfw.dir\win32_time.c.obj
+[22/28] Building C object raylib\external\glfw\src\CMakeFiles\glfw.dir\win32_thread.c.obj
+[23/28] Building C object raylib\external\glfw\src\CMakeFiles\glfw.dir\win32_init.c.obj
+[24/28] Building C object raylib\external\glfw\src\CMakeFiles\glfw.dir\win32_joystick.c.obj
+[25/28] Building C object raylib\external\glfw\src\CMakeFiles\glfw.dir\win32_monitor.c.obj
+[26/28] Building C object raylib\external\glfw\src\CMakeFiles\glfw.dir\win32_window.c.obj
+[27/28] Building C object raylib\external\glfw\src\CMakeFiles\glfw.dir\wgl_context.c.obj
+[28/28] Linking C shared library raylib\raylib.dll
+exit=0

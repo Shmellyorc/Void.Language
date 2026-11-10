@@ -1,0 +1,53 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+      Start  12: project_application
+      Start  13: project_application_process
+ 1/24 Test  #13: project_application_process ......   Passed   49.47 sec
+      Start   8: project_selection
+ 2/24 Test  #12: project_application ..............   Passed   60.98 sec
+      Start  11: project_creation_process
+ 3/24 Test  #11: project_creation_process .........   Passed   13.66 sec
+      Start  14: project_discovery_cli
+ 4/24 Test   #8: project_selection ................   Passed   37.28 sec
+      Start 404: numeric_sprint2
+ 5/24 Test  #14: project_discovery_cli ............   Passed   13.16 sec
+      Start  15: project_profiles
+ 6/24 Test #404: numeric_sprint2 ..................   Passed    3.02 sec
+      Start   6: project_manifest_legacy
+ 7/24 Test  #15: project_profiles .................   Passed    2.03 sec
+      Start 439: numeric_cli
+ 8/24 Test   #6: project_manifest_legacy ..........   Passed    5.97 sec
+      Start   9: project_sessions
+ 9/24 Test   #9: project_sessions .................   Passed    0.99 sec
+      Start  16: project_protocol
+10/24 Test  #16: project_protocol .................   Passed    1.23 sec
+      Start  17: project_nested_cli
+11/24 Test  #17: project_nested_cli ...............   Passed    0.74 sec
+      Start 402: frontend
+12/24 Test #402: frontend .........................   Passed   14.88 sec
+      Start   2: project_manifest
+13/24 Test   #2: project_manifest .................   Passed    1.03 sec
+      Start 390: reload
+14/24 Test #390: reload ...........................   Passed    0.62 sec
+      Start 398: numeric
+15/24 Test #439: numeric_cli ......................   Passed   31.97 sec
+      Start  10: project_creation
+16/24 Test  #10: project_creation .................   Passed    0.19 sec
+      Start 395: sessions
+17/24 Test #395: sessions .........................   Passed    0.23 sec
+      Start 391: gc
+18/24 Test #391: gc ...............................   Passed    0.11 sec
+      Start 403: modules
+19/24 Test #398: numeric ..........................   Passed    7.33 sec
+      Start 397: analysis
+20/24 Test #397: analysis .........................   Passed    1.03 sec
+      Start 399: numeric_enum_ir
+21/24 Test #403: modules ..........................   Passed    1.26 sec
+      Start 400: numeric_enum_process
+22/24 Test #399: numeric_enum_ir ..................   Passed    0.85 sec
+      Start 401: numeric_enum_lsp
+23/24 Test #401: numeric_enum_lsp .................   Passed    0.13 sec
+24/24 Test #400: numeric_enum_process .............   Passed   18.12 sec
+
+100% tests passed, 0 tests failed out of 24
+
+Total Test time (real) = 141.74 sec

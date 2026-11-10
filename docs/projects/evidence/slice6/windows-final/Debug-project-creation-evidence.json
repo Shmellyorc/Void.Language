@@ -1,0 +1,779 @@
+[
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "init"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\existing",
+    "status": 0,
+    "stdout": "Manifest: C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/existing/void.project.toml\r\nProject ID: local.p35447e51a5a762f5976a34cb7a3f1e5e\r\nApplication ID: local.ac43abb79b0850629b4c7a9dc41fc4e5e\r\nNext: from the displayed manifest directory, run voidc check --project .\r\nCreated project manifest.\r\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "run",
+      "--project",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\existing"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 19,
+    "stdout": "",
+    "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/existing/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "run",
+      "--project",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\existing",
+      "--no-opt"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 19,
+    "stdout": "",
+    "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/existing/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "init",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\existing"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Project manifest already exists, including a possible case sibling: C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/existing/void.project.toml\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "init",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\empty"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "Manifest: C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/empty/void.project.toml\r\nProject ID: local.p3b436fa871ae51ac06c14a53252c6013\r\nApplication ID: local.a7ba20cb190edfd46204a5ad159f59cea\r\nNext: from the displayed manifest directory, run voidc check --project .\r\nCreated project manifest.\r\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "check",
+      "--project",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\empty"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "",
+    "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/empty/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nC:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/empty/void.project.toml:1:1: error: No eligible main() in application project.\r\n    code: VOID5010\r\n\r\n 1 | schema = 1\r\n   | ^\r\n    Module: /void.project.toml\r\n    Hint: Add a valid main() in the admitted source roots or set project.entry/--entry for an explicit script or source.\r\n\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "init",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\many"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "Manifest: C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/many/void.project.toml\r\nProject ID: local.p5cdc0f76efa768e55afd5b5105235c7f\r\nApplication ID: local.af1fdaaccb9ae970060fb6ae6fbd1b4b2\r\nNext: from the displayed manifest directory, run voidc check --project .\r\nCreated project manifest.\r\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "check",
+      "--project",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\many"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "",
+    "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/many/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 11 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nC:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/many/void.project.toml:1:1: error: Ambiguous project entry: 2 eligible main() declarations.\r\n    code: VOID5010\r\n\r\n 1 | schema = 1\r\n   | ^\r\n    Module: /void.project.toml\r\n    Candidate /game.void at C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/many/game.void:1:6\r\n\r\n 1 | func main() -> i32:\r\n   |      ^^^^\r\n    Module: /game.void\r\n    Candidate /launcher.void at C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/many/launcher.void:1:6\r\n\r\n 1 | func main() -> i32:\r\n   |      ^^^^\r\n    Module: /launcher.void\r\n    Hint: Set project.entry/--entry or narrow sources.roots/exclude.\r\n\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "new",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\arbitrary",
+      "--source",
+      "tools/launcher.void",
+      "--name",
+      "Orbit \"Pilot\" \\",
+      "--version",
+      "1.2.3-beta.4+qual"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "Manifest: C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/arbitrary/void.project.toml\r\nProject ID: local.p4b5e44875998320b492c6b78252c0ae0\r\nApplication ID: local.aca091dbe98bd088f8a384290e2e7ad81\r\nNext: from the displayed manifest directory, run voidc check --project .\r\nCreated project manifest.\r\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "run",
+      "--project",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\arbitrary",
+      "--profile",
+      "release"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "",
+    "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/arbitrary/void.project.toml:14:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 14 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "run",
+      "--project",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\arbitrary",
+      "--profile",
+      "debug"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "",
+    "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/arbitrary/void.project.toml:14:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 14 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "build",
+      "--project",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\arbitrary",
+      "-o",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\generated.exe"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "Built native executable: C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/generated.exe\r\n",
+    "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/arbitrary/void.project.toml:14:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 14 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\generated.exe"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "run",
+      "--project",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\arbitrary",
+      "--profile",
+      "release"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 31,
+    "stdout": "",
+    "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/arbitrary/void.project.toml:14:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 14 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "run",
+      "--project",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\arbitrary",
+      "--profile",
+      "debug"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 31,
+    "stdout": "",
+    "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/arbitrary/void.project.toml:14:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 14 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "build",
+      "--project",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\arbitrary",
+      "-o",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\generated.exe"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "Built native executable: C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/generated.exe\r\n",
+    "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/arbitrary/void.project.toml:14:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 14 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\generated.exe"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 31,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "new",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\default-app",
+      "--project-id",
+      "org.test.project",
+      "--app-id",
+      "org.test.application"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "Manifest: C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/default-app/void.project.toml\r\nProject ID: org.test.project\r\nApplication ID: org.test.application\r\nNext: from the displayed manifest directory, run voidc check --project .\r\nCreated project manifest.\r\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "new",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\lib",
+      "--kind",
+      "library",
+      "--package-name",
+      "toolkit",
+      "--package-id",
+      "org.test.toolkit"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "Manifest: C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/lib/void.project.toml\r\nProject ID: local.p2847aa5e74bff0a791ac4af9628135e5\r\nPackage ID: org.test.toolkit\r\nNext: from the displayed manifest directory, run voidc check --project .\r\nCreated project manifest.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "check",
+      "--project",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\lib"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "Library project checked successfully\r\n",
+    "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/lib/void.project.toml:15:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 15 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "run",
+      "--project",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\lib"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "",
+    "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/lib/void.project.toml:15:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\r\n    code: VOID5012\r\n\r\n 15 | \r\n    | ^\r\n    Module: /void.project.toml\r\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\r\n\r\nLibrary project run/build/emit is unsupported; use check for source analysis.\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "new",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\toolkit",
+      "--kind",
+      "library"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "Manifest: C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/toolkit/void.project.toml\r\nProject ID: local.pfc34f9464d5d81a8e5d64c244864c561\r\nPackage ID: local.l4118944a73615f91a508bb3d6780cd22\r\nNext: from the displayed manifest directory, run voidc check --project .\r\nCreated project manifest.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "init",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\existing\\child"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "",
+    "stderr": "An enclosing project exists at C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/existing. Use --nested for a deliberate child project.\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "init",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\existing\\child",
+      "--nested"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "Manifest: C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/existing/child/void.project.toml\r\nProject ID: local.p0f06e5032631abaeb49146e1e1ced865\r\nApplication ID: local.a3bb11ef24aa0c38d86a3737af910111e\r\nNext: from the displayed manifest directory, run voidc check --project .\r\nCreated project manifest.\r\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "new",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\existing\\other"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "",
+    "stderr": "An enclosing project exists at C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/existing. Use --nested for a deliberate child project.\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "new",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\existing\\other",
+      "--nested"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "Manifest: C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/existing/other/void.project.toml\r\nProject ID: local.pf785667cabc7104e4c9e9f4be7df5a6b\r\nApplication ID: local.a67c7d2aa79fcf27757491897da32e2cb\r\nNext: from the displayed manifest directory, run voidc check --project .\r\nCreated project manifest.\r\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "new",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\existing\\Other",
+      "--nested"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Project destination already exists, including a possible case sibling: C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/existing/Other\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "init",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\case"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Project manifest already exists, including a possible case sibling: C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/case/void.project.toml\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "init",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\malformed"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Project manifest already exists, including a possible case sibling: C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/malformed/void.project.toml\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "new"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 2,
+    "stdout": "",
+    "stderr": "Invalid invocation: new requires a destination PATH.\r\nUsage: voidc new PATH [project options] [--source PATH]\r\nTry 'voidc new --help' for examples.\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "init",
+      "--source",
+      "game.void"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 2,
+    "stdout": "",
+    "stderr": "Invalid invocation: --source is only available with new.\r\nUsage: voidc init [DIR] [project options]\r\nTry 'voidc init --help' for examples.\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "init",
+      "--kind",
+      "other"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 2,
+    "stdout": "",
+    "stderr": "Invalid invocation: Expected --kind application or library.\r\nUsage: voidc init [DIR] [project options]\r\nTry 'voidc init --help' for examples.\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "init",
+      "--package-id",
+      "a"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 2,
+    "stdout": "",
+    "stderr": "Invalid invocation: Identity options must match the selected project kind.\r\nUsage: voidc init [DIR] [project options]\r\nTry 'voidc init --help' for examples.\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "init",
+      "--nested",
+      "--nested"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 2,
+    "stdout": "",
+    "stderr": "Invalid invocation: Duplicate creation option --nested.\r\nUsage: voidc init [DIR] [project options]\r\nTry 'voidc init --help' for examples.\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "init",
+      "--unknown"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 2,
+    "stdout": "",
+    "stderr": "Invalid invocation: Unknown creation option --unknown.\r\nUsage: voidc init [DIR] [project options]\r\nTry 'voidc init --help' for examples.\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "init",
+      "--name"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 2,
+    "stdout": "",
+    "stderr": "Invalid invocation: Missing value for --name.\r\nUsage: voidc init [DIR] [project options]\r\nTry 'voidc init --help' for examples.\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "new",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\invalid",
+      "--source",
+      "../escape.void"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "",
+    "stderr": "<document identity>:1:1: error: Import escapes the project root.\r\n    code: VOID3001\r\n\r\n 1 | \r\n   | ^\r\n    Hint: External imports require an explicit permission/identity contract and are not enabled in this phase.\r\n\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "new",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\invalid",
+      "--source",
+      "tests/game.void"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Starter path uses a default excluded discovery component.\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "new",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\invalid",
+      "--source",
+      "src/BUILD/app.void"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Starter path uses a reserved discovery component.\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "new",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\invalid",
+      "--source",
+      "game.txt"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "",
+    "stderr": "<document identity>:1:1: error: Import must name a .void source file.\r\n    code: VOID3001\r\n\r\n 1 | \r\n   | ^\r\n    Hint: Supply an exact-case filename, not a directory.\r\n\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "new",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\invalid",
+      "--source",
+      "src//game.void"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Document identity must be an exact canonical root-relative .void path\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "new",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\invalid",
+      "--source",
+      "Tests/game.void"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Starter path uses a default excluded discovery component.\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "new",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\invalid",
+      "--source",
+      "void.project.toml/game.void"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Starter path uses a reserved discovery component.\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "new",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\VOID.PROJECT.TOML"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "",
+    "stderr": "New project destination requires a valid directory basename.\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "new",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\invalid",
+      "--version",
+      "01.2.3"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "",
+    "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/invalid/void.project.toml:6:11: error: Invalid semantic version.\r\n    code: VOID5005\r\n\r\n 6 | version = \"01.2.3\"\r\n   |           ^^^^^^^^\r\n    Hint: Use major.minor.patch with optional -prerelease and +build identifiers; numeric core/prerelease identifiers cannot have leading zeroes. Limit: 255 ASCII bytes.\r\n\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "new",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\non-identifier",
+      "--kind",
+      "library"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "",
+    "stderr": "C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/non-identifier/void.project.toml:11:8: error: Invalid manifest name.\r\n    code: VOID5004\r\n\r\n 11 | name = \"non-identifier\"\r\n    |        ^^^^^^^^^^^^^^^^\r\n    Hint: Use a non-keyword lowercase compiler identifier for package.name.\r\n\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "new",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\absent-parent\\app"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Cannot pin native temporary directory (Windows error 2).\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "init",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\alias"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Native temporary path contains a reparse point.\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "new",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\alias\\attack",
+      "--nested"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Native temporary path contains a reparse point.\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "init",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\contested"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "Manifest: C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/contested/void.project.toml\r\nProject ID: local.p1997876170a5d7c3baadd446b569a241\r\nApplication ID: local.a953c58a9e76c775592dbde7c3026ce1e\r\nNext: from the displayed manifest directory, run voidc check --project .\r\nCreated project manifest.\r\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "init",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\contested"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "Manifest: C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/contested/void.project.toml\r\nProject ID: local.p3908dfc80319c3bc32e8907212592cab\r\nApplication ID: local.a5559c88d9e8ed0fca391d6fc93295d2b\r\nNext: from the displayed manifest directory, run voidc check --project .\r\n",
+    "stderr": "Project manifest already exists, including a possible case sibling: C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/contested/void.project.toml\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "new",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\contested-new"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "Manifest: C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/contested-new/void.project.toml\r\nProject ID: local.pc0247ebd8bf3fd9757ce409abbfa394e\r\nApplication ID: local.a2ee43b86672677814076a78e1222f584\r\nNext: from the displayed manifest directory, run voidc check --project .\r\nCreated project manifest.\r\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "new",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\contested-new"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 1,
+    "stdout": "Manifest: C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/contested-new/void.project.toml\r\nProject ID: local.p6257117e82eabef9f569d2441af3fc9f\r\nApplication ID: local.af7e4a5ea82f311b70ee45b9e957cf7c5\r\nNext: from the displayed manifest directory, run voidc check --project .\r\n",
+    "stderr": "Project destination already exists, including a possible case sibling: C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/contested-new\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidc.exe",
+      "init",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\editor\\child"
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "Manifest: C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/editor/child/void.project.toml\r\nProject ID: local.p74e5a1926b7de45166b8406ff8e60a3d\r\nApplication ID: local.a0f61c58a6fa901b804305f1964bf2984\r\nNext: from the displayed manifest directory, run voidc check --project .\r\nCreated project manifest.\r\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidls.exe",
+      "--discover-creation",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\editor",
+      ""
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "{\"creation\":{\"complete\":true,\"eligibleCount\":1,\"manifestPresent\":false,\"root\":\"C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/editor\",\"rootIdentity\":\"3322181814:1048576:504737\",\"sources\":[\"/game.void\"]},\"schema\":1}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidls.exe",
+      "--discover-creation",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\editor",
+      ""
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "{\"creation\":{\"complete\":false,\"eligibleCount\":17,\"manifestPresent\":false,\"root\":\"C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/editor\",\"rootIdentity\":\"3322181814:1048576:504737\",\"sources\":[]},\"schema\":1}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidls.exe",
+      "--plan-project",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\editor",
+      "application",
+      "",
+      ""
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "{\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/editor/void.project.toml\",\"name\":\"editor\",\"packageName\":\"\",\"projectId\":\"local.pbffa0935b6f8ae69d18ffd1bb529f00a\",\"roleId\":\"local.aa2e7c3b46534a0e08b487d6e2d0d1e55\",\"root\":\"C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/editor\",\"rootIdentity\":\"3322181814:1048576:504737\",\"schema\":1,\"version\":\"0.1.0\"}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidls.exe",
+      "--create-project",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\editor",
+      "3322181814:1048576:504737",
+      "application",
+      "editor",
+      "0.1.0",
+      "local.pbffa0935b6f8ae69d18ffd1bb529f00a",
+      "local.aa2e7c3b46534a0e08b487d6e2d0d1e55",
+      ""
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "{\"root\":\"C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/editor\",\"schema\":1,\"status\":\"created\"}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidls.exe",
+      "--create-project",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\editor",
+      "3322181814:1048576:504737",
+      "application",
+      "editor",
+      "0.1.0",
+      "local.pbffa0935b6f8ae69d18ffd1bb529f00a",
+      "local.aa2e7c3b46534a0e08b487d6e2d0d1e55",
+      ""
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "{\"root\":\"C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/editor\",\"schema\":1,\"status\":\"collision\"}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidls.exe",
+      "--plan-project",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\editor",
+      "application",
+      "",
+      ""
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "{\"root\":\"C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/editor\",\"rootIdentity\":\"3322181814:1048576:504737\",\"schema\":1,\"status\":\"collision\"}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidls.exe",
+      "--create-project",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\editor",
+      "3322181814:1048576:504737",
+      "application",
+      "editor",
+      "0.1.0",
+      "local.pbffa0935b6f8ae69d18ffd1bb529f00a",
+      "local.aa2e7c3b46534a0e08b487d6e2d0d1e55",
+      ""
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 2,
+    "stdout": "",
+    "stderr": "voidls: Project root changed after creation review.\r\n"
+  },
+  {
+    "argv": [
+      "C:\\Users\\a\\VoidS6-Final-Debug\\voidls.exe",
+      "--discover-project",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\empty",
+      "",
+      "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw\\empty",
+      ""
+    ],
+    "cwd": "C:\\Users\\a\\VoidS6-tmp-Debug\\VOID S5 creation oqrseucw",
+    "status": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5010\",\"message\":\"No eligible main() in application project.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":0,\"kind\":\"application\",\"manifest\":\"C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/empty/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/empty\",\"requiresReselection\":false,\"root\":\"C:/Users/a/VoidS6-tmp-Debug/VOID S5 creation oqrseucw/empty\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"01dc0d18820b5f05e2c8a645a5143c205b1e629640826106f314a482e9aec286\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  }
+]

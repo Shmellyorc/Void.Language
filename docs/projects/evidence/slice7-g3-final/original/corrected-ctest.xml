@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="1"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="0"
+	timestamp="2026-11-09T07:18:48"
+	>
+	<testcase name="ffi_g3_jit_ir" classname="ffi_g3_jit_ir" time="0.405396" status="run">
+		<properties/>
+		<system-out>3 2: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+integer null: C primitive descriptor line 10: unsupported or contradictory native resource contract
+pointer minus-one: C primitive descriptor line 10: unsupported or contradictory native resource contract
+shutdown-owner: C primitive descriptor line 10: unsupported or contradictory native resource contract
+retry-on-error: C primitive descriptor line 10: unsupported or contradictory native resource contract
+create missing owner: C primitive descriptor line 14: invalid native borrow or terminal release signature
+bind close_box g3_close i32 mut:box: C primitive descriptor line 15: missing exact native acquire or release contract
+i64 close:box: C primitive descriptor line 14: invalid native borrow or terminal release signature
+i32 close:box i32: C primitive descriptor line 14: invalid native borrow or terminal release signature
+i32 borrow:other i32: C primitive descriptor line 12: resource operation requires an earlier admitted ide...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+</testsuite>

@@ -1,0 +1,11 @@
+{
+  "status": "FAIL",
+  "editor": "1.141.0",
+  "checks": [
+    "imported definition",
+    "declared value in hover",
+    "dirty import invalidates and recovers",
+    "dirty completion retains signed backing value",
+    "UTF-16 conversion error"
+  ]
+}

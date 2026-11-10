@@ -1,0 +1,116 @@
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 66%] Built target libcurl_static
+[ 73%] Built target void_native_fixture
+[ 73%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[ 86%] Built target void_runtime
+[ 86%] Built target void_native_inventory
+[ 93%] Linking CXX static library libvoid_core.a
+[ 93%] Built target void_core
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Generating cache-identity-RelWithDebInfo.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-RelWithDebInfo.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Linking CXX executable voidls
+[100%] Built target voidls
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 66%] Built target libcurl_static
+[ 73%] Built target void_native_fixture
+[ 80%] Built target void_core
+[ 93%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_project_application.dir/tests/project/application.cpp.o
+[100%] Linking CXX executable void_project_application
+[100%] Built target void_project_application
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 66%] Built target libcurl_static
+[ 73%] Built target void_native_fixture
+[ 80%] Built target void_core
+[ 93%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_project_sessions
+[100%] Built target void_project_sessions
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Linking CXX executable void_project_selection
+[100%] Built target void_project_selection
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 50%] Built target void_core
+[100%] Linking CXX executable void_project_manifest
+[100%] Built target void_project_manifest
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 62%] Built target libcurl_static
+[ 68%] Built target void_native_fixture
+[ 68%] Built target native_fixture
+[ 75%] Built target void_core
+[ 87%] Built target void_runtime
+[ 93%] Built target void_llvm
+[ 93%] Linking CXX executable void_tests
+[100%] Built target void_tests
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 66%] Built target libcurl_static
+[ 73%] Built target void_native_fixture
+[ 80%] Built target void_core
+[ 93%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_managed_test_abi
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable void_globals
+[100%] Built target void_globals
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 66%] Built target libcurl_static
+[ 73%] Built target void_native_fixture
+[ 80%] Built target void_core
+[ 93%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target void_io_error_fixture
+[100%] Linking CXX executable void_io_runner
+[100%] Built target void_io_runner
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 66%] Built target libcurl_static
+[ 73%] Built target void_native_fixture
+[ 73%] Built target void_managed_test_abi
+[ 80%] Built target void_core
+[ 93%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_native_test_fixture
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable void_native_tests
+[100%] Built target void_native_tests
+[  7%] Built target void_native_fixture
+[  7%] Built target void_format_objects
+[  7%] Built target void_zone_objects
+[ 84%] Built target libcurl_static
+[ 84%] Built target void_application_objects
+[100%] Built target void_runtime
+[100%] Built target void_native_inventory

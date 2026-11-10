@@ -1,0 +1,92 @@
+2 1: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+sample G2Sample 16 4 2: C primitive descriptor line 17: C record size, alignment or tail padding disagrees with natural layout
+packet G2Packet 31 8 4: C primitive descriptor line 22: C record size, alignment or tail padding disagrees with natural layout
+reading f64 4: C primitive descriptor line 17: C record field offset or padding disagrees with natural layout
+reading ptr 8: C primitive descriptor line 17: unsupported C primitive type
+reading u64 8: C primitive provider rejected the exact descriptor or fixture identity
+tag tag u32: C primitive provider rejected the exact descriptor or fixture identity
+array:u16:3:1: C primitive descriptor line 20: invalid inline array extent or stride
+array:u16:0:2: C primitive descriptor line 20: invalid inline array extent or stride
+array:u16:03:2: C primitive descriptor line 20: invalid bounded canonical decimal field
+datum datum record:packet: C primitive descriptor line 22: record must name an earlier verified declaration
+fastcall: C primitive descriptor line 8: unsupported descriptor, ABI revision or effects
+retains-pointer no-callbacks: C primitive descriptor line 7: unsupported descriptor, ABI revision or effects
+out:1:2:65537: C primitive descriptor line 27: invalid bounded canonical decimal field
+out:1:1:64: C primitive descriptor line 27: invalid byte span offset/length contract
+out:1:2:64 u64: C primitive descriptor line 27: byte span offsets and lengths require exact c_size operands
+out:1:2:64 c_size c_size out:4:5:64: C primitive descriptor line 29: unsupported span count, overlap profile, record or result contract
+bind fill g2_fill i32: C primitive descriptor line 27: unsupported span count, overlap profile, record or result contract
+inout:1:2:64: C primitive provider rejected the exact descriptor or fixture identity
+absent host seal: VOID IR: C primitive call outside the admitted binding module
+wrong provider: VOID IR: invalid C primitive descriptor or exact call signature
+wrong ordinal: VOID IR: invalid C primitive descriptor or exact call signature
+record identity: VOID IR: invalid C primitive descriptor or exact call signature
+span count and slot swap: VOID IR: invalid C primitive argument type or placement
+readonly output: VOID IR: invalid C primitive descriptor or exact call signature
+foreign raw ABI use: VOID IR: C primitive transport requires host admission and typed operations
+unauthorized direct import: VOID IR: C primitive binding requires the admitted direct import
+worker: VOID IR: C primitive graphs require synchronous execution
+raw pointer construction flag: VOID IR: invalid C primitive descriptor or exact call signature
+uninitialized record: VOID IR: read of uninitialized C binding carrier storage in /records.void::entry
+uninitialized byte list: VOID IR: read of uninitialized C binding carrier storage in /records.void::entry
+uninitialized scalar field: VOID IR: read of uninitialized C binding carrier storage in /records.void::entry
+incomplete inline array escapes: VOID IR: incomplete C inline array escapes private construction
+NativeSafe collection, zeroed output scratch, partial commit, oversized and negative rollback passed
+-1: <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:6:20: source call
+        return ffi.fill(bytes, 0, 5, 8) as i32
+                   ^
+
+-2: <host binding /native_records.void>:27:6: runtime error: overlapping C byte spans
+In function /native_records.void::move_bytes
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:8:20: source call
+        return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32
+                   ^
+
+-3: <host binding /native_records.void>:23:6: runtime error: C byte span returned an oversized written prefix
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:10:20: source call
+        return ffi.fill(bytes, 0, 4, 254) as i32
+                   ^
+
+-4: <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:12:20: source call
+        return ffi.fill(bytes, 18446744073709551615 as u64, 1, 8) as i32
+                   ^
+
+G2 JIT normal returned 103
+-1: <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:6:20: source call
+        return ffi.fill(bytes, 0, 5, 8) as i32
+                   ^
+
+-2: <host binding /native_records.void>:27:6: runtime error: overlapping C byte spans
+In function /native_records.void::move_bytes
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:8:20: source call
+        return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32
+                   ^
+
+-3: <host binding /native_records.void>:23:6: runtime error: C byte span returned an oversized written prefix
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:10:20: source call
+        return ffi.fill(bytes, 0, 4, 254) as i32
+                   ^
+
+-4: <host binding /native_records.void>:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+C:/Users/a/VoidCI42377496702-Native/tests/ffi/records.void:12:20: source call
+        return ffi.fill(bytes, 18446744073709551615 as u64, 1, 8) as i32
+                   ^
+
+G2 JIT O2 returned 103

@@ -1,0 +1,801 @@
+[
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "init"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy/existing",
+    "status": 0,
+    "stdout": "Manifest: /tmp/VOID S5 creation htyu0xfy/existing/void.project.toml\nProject ID: local.p52f0d2f74b7f53fbe374123714fb289e\nApplication ID: local.a0dc813f5c9275821bc2868842eb970a9\nNext: from the displayed manifest directory, run voidc check --project .\nCreated project manifest.\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "run",
+      "--project",
+      "/tmp/VOID S5 creation htyu0xfy/existing"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 19,
+    "stdout": "",
+    "stderr": "/tmp/VOID S5 creation htyu0xfy/existing/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "run",
+      "--project",
+      "/tmp/VOID S5 creation htyu0xfy/existing",
+      "--no-opt"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 19,
+    "stdout": "",
+    "stderr": "/tmp/VOID S5 creation htyu0xfy/existing/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "init",
+      "/tmp/VOID S5 creation htyu0xfy/existing"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Project manifest already exists, including a possible case sibling: /tmp/VOID S5 creation htyu0xfy/existing/void.project.toml\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "init",
+      "/tmp/VOID S5 creation htyu0xfy/empty"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "Manifest: /tmp/VOID S5 creation htyu0xfy/empty/void.project.toml\nProject ID: local.pd77d4694ba368172f23e6d884b325e86\nApplication ID: local.aa415a43e4ff5ce963dc8616af3392e44\nNext: from the displayed manifest directory, run voidc check --project .\nCreated project manifest.\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "check",
+      "--project",
+      "/tmp/VOID S5 creation htyu0xfy/empty"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "",
+    "stderr": "/tmp/VOID S5 creation htyu0xfy/empty/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n/tmp/VOID S5 creation htyu0xfy/empty/void.project.toml:1:1: error: No eligible main() in application project.\n    code: VOID5010\n\n 1 | schema = 1\n   | ^\n    Module: /void.project.toml\n    Hint: Add a valid main() in the admitted source roots or set project.entry/--entry for an explicit script or source.\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "init",
+      "/tmp/VOID S5 creation htyu0xfy/many"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "Manifest: /tmp/VOID S5 creation htyu0xfy/many/void.project.toml\nProject ID: local.pf9ce5f3dc4533495af48e69c327cbad1\nApplication ID: local.af1d9b74af30a5512fd12f1cc5d3fc5be\nNext: from the displayed manifest directory, run voidc check --project .\nCreated project manifest.\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "check",
+      "--project",
+      "/tmp/VOID S5 creation htyu0xfy/many"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "",
+    "stderr": "/tmp/VOID S5 creation htyu0xfy/many/void.project.toml:11:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 11 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n/tmp/VOID S5 creation htyu0xfy/many/void.project.toml:1:1: error: Ambiguous project entry: 2 eligible main() declarations.\n    code: VOID5010\n\n 1 | schema = 1\n   | ^\n    Module: /void.project.toml\n    Candidate /game.void at /tmp/VOID S5 creation htyu0xfy/many/game.void:1:6\n\n 1 | func main() -> i32:\n   |      ^^^^\n    Module: /game.void\n    Candidate /launcher.void at /tmp/VOID S5 creation htyu0xfy/many/launcher.void:1:6\n\n 1 | func main() -> i32:\n   |      ^^^^\n    Module: /launcher.void\n    Hint: Set project.entry/--entry or narrow sources.roots/exclude.\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 creation htyu0xfy/arbitrary",
+      "--source",
+      "tools/launcher.void",
+      "--name",
+      "Orbit \"Pilot\" \\",
+      "--version",
+      "1.2.3-beta.4+qual"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "Manifest: /tmp/VOID S5 creation htyu0xfy/arbitrary/void.project.toml\nProject ID: local.p34b606d372b5ed9845d3168d2f92443b\nApplication ID: local.ad4033b048f40c03eb382ba53be99670e\nNext: from the displayed manifest directory, run voidc check --project .\nCreated project manifest.\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "run",
+      "--project",
+      "/tmp/VOID S5 creation htyu0xfy/arbitrary",
+      "--profile",
+      "release"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "",
+    "stderr": "/tmp/VOID S5 creation htyu0xfy/arbitrary/void.project.toml:14:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 14 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "run",
+      "--project",
+      "/tmp/VOID S5 creation htyu0xfy/arbitrary",
+      "--profile",
+      "debug"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "",
+    "stderr": "/tmp/VOID S5 creation htyu0xfy/arbitrary/void.project.toml:14:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 14 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "build",
+      "--project",
+      "/tmp/VOID S5 creation htyu0xfy/arbitrary",
+      "-o",
+      "/tmp/VOID S5 creation htyu0xfy/generated"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "Built native executable: /tmp/VOID S5 creation htyu0xfy/generated\n",
+    "stderr": "/tmp/VOID S5 creation htyu0xfy/arbitrary/void.project.toml:14:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 14 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+  },
+  {
+    "argv": [
+      "/tmp/VOID S5 creation htyu0xfy/generated"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "run",
+      "--project",
+      "/tmp/VOID S5 creation htyu0xfy/arbitrary",
+      "--profile",
+      "release"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 31,
+    "stdout": "",
+    "stderr": "/tmp/VOID S5 creation htyu0xfy/arbitrary/void.project.toml:14:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 14 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "run",
+      "--project",
+      "/tmp/VOID S5 creation htyu0xfy/arbitrary",
+      "--profile",
+      "debug"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 31,
+    "stdout": "",
+    "stderr": "/tmp/VOID S5 creation htyu0xfy/arbitrary/void.project.toml:14:1: warning: Project profile 'debug' requests debug_info='full'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 14 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "build",
+      "--project",
+      "/tmp/VOID S5 creation htyu0xfy/arbitrary",
+      "-o",
+      "/tmp/VOID S5 creation htyu0xfy/generated"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "Built native executable: /tmp/VOID S5 creation htyu0xfy/generated\n",
+    "stderr": "/tmp/VOID S5 creation htyu0xfy/arbitrary/void.project.toml:14:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 14 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+  },
+  {
+    "argv": [
+      "/tmp/VOID S5 creation htyu0xfy/generated"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 31,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 creation htyu0xfy/default-app",
+      "--project-id",
+      "org.test.project",
+      "--app-id",
+      "org.test.application"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "Manifest: /tmp/VOID S5 creation htyu0xfy/default-app/void.project.toml\nProject ID: org.test.project\nApplication ID: org.test.application\nNext: from the displayed manifest directory, run voidc check --project .\nCreated project manifest.\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 creation htyu0xfy/lib",
+      "--kind",
+      "library",
+      "--package-name",
+      "toolkit",
+      "--package-id",
+      "org.test.toolkit"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "Manifest: /tmp/VOID S5 creation htyu0xfy/lib/void.project.toml\nProject ID: local.p99f763ec2bb475956f50108e9c05c088\nPackage ID: org.test.toolkit\nNext: from the displayed manifest directory, run voidc check --project .\nCreated project manifest.\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "check",
+      "--project",
+      "/tmp/VOID S5 creation htyu0xfy/lib"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "Library project checked successfully\n",
+    "stderr": "/tmp/VOID S5 creation htyu0xfy/lib/void.project.toml:15:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 15 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "run",
+      "--project",
+      "/tmp/VOID S5 creation htyu0xfy/lib"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "",
+    "stderr": "/tmp/VOID S5 creation htyu0xfy/lib/void.project.toml:15:1: warning: Project profile 'release' requests debug_info='line'; profile-controlled debug-information emission is not implemented.\n    code: VOID5012\n\n 15 | \n    | ^\n    Module: /void.project.toml\n    Hint: The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.\n\nLibrary project run/build/emit is unsupported; use check for source analysis.\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 creation htyu0xfy/toolkit",
+      "--kind",
+      "library"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "Manifest: /tmp/VOID S5 creation htyu0xfy/toolkit/void.project.toml\nProject ID: local.p1e9e3baae99d02171e82fc46592fa915\nPackage ID: local.lf985e94713d284a08606a8d0bb2ef513\nNext: from the displayed manifest directory, run voidc check --project .\nCreated project manifest.\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "init",
+      "/tmp/VOID S5 creation htyu0xfy/existing/child"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "",
+    "stderr": "An enclosing project exists at /tmp/VOID S5 creation htyu0xfy/existing. Use --nested for a deliberate child project.\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "init",
+      "/tmp/VOID S5 creation htyu0xfy/existing/child",
+      "--nested"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "Manifest: /tmp/VOID S5 creation htyu0xfy/existing/child/void.project.toml\nProject ID: local.pa9bfef65ad56080dc74ecab3285a8785\nApplication ID: local.afa465144fa408fb11225a9e10f080959\nNext: from the displayed manifest directory, run voidc check --project .\nCreated project manifest.\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 creation htyu0xfy/existing/other"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "",
+    "stderr": "An enclosing project exists at /tmp/VOID S5 creation htyu0xfy/existing. Use --nested for a deliberate child project.\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 creation htyu0xfy/existing/other",
+      "--nested"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "Manifest: /tmp/VOID S5 creation htyu0xfy/existing/other/void.project.toml\nProject ID: local.p23a6f8685f44809b9a11b5de45b6b663\nApplication ID: local.ae1d37d63b3c2590a58dd85e2172782ab\nNext: from the displayed manifest directory, run voidc check --project .\nCreated project manifest.\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 creation htyu0xfy/existing/Other",
+      "--nested"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Project destination already exists, including a possible case sibling: /tmp/VOID S5 creation htyu0xfy/existing/Other\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "init",
+      "/tmp/VOID S5 creation htyu0xfy/case"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Project manifest already exists, including a possible case sibling: /tmp/VOID S5 creation htyu0xfy/case/void.project.toml\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "init",
+      "/tmp/VOID S5 creation htyu0xfy/malformed"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Project manifest already exists, including a possible case sibling: /tmp/VOID S5 creation htyu0xfy/malformed/void.project.toml\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 2,
+    "stdout": "",
+    "stderr": "Invalid invocation: new requires a destination PATH.\nUsage: voidc new PATH [project options] [--source PATH]\nTry 'voidc new --help' for examples.\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "init",
+      "--source",
+      "game.void"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 2,
+    "stdout": "",
+    "stderr": "Invalid invocation: --source is only available with new.\nUsage: voidc init [DIR] [project options]\nTry 'voidc init --help' for examples.\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "init",
+      "--kind",
+      "other"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 2,
+    "stdout": "",
+    "stderr": "Invalid invocation: Expected --kind application or library.\nUsage: voidc init [DIR] [project options]\nTry 'voidc init --help' for examples.\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "init",
+      "--package-id",
+      "a"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 2,
+    "stdout": "",
+    "stderr": "Invalid invocation: Identity options must match the selected project kind.\nUsage: voidc init [DIR] [project options]\nTry 'voidc init --help' for examples.\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "init",
+      "--nested",
+      "--nested"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 2,
+    "stdout": "",
+    "stderr": "Invalid invocation: Duplicate creation option --nested.\nUsage: voidc init [DIR] [project options]\nTry 'voidc init --help' for examples.\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "init",
+      "--unknown"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 2,
+    "stdout": "",
+    "stderr": "Invalid invocation: Unknown creation option --unknown.\nUsage: voidc init [DIR] [project options]\nTry 'voidc init --help' for examples.\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "init",
+      "--name"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 2,
+    "stdout": "",
+    "stderr": "Invalid invocation: Missing value for --name.\nUsage: voidc init [DIR] [project options]\nTry 'voidc init --help' for examples.\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 creation htyu0xfy/invalid",
+      "--source",
+      "../escape.void"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "",
+    "stderr": "<document identity>:1:1: error: Import escapes the project root.\n    code: VOID3001\n\n 1 | \n   | ^\n    Hint: External imports require an explicit permission/identity contract and are not enabled in this phase.\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 creation htyu0xfy/invalid",
+      "--source",
+      "tests/game.void"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Starter path uses a default excluded discovery component.\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 creation htyu0xfy/invalid",
+      "--source",
+      "src/BUILD/app.void"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Starter path uses a reserved discovery component.\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 creation htyu0xfy/invalid",
+      "--source",
+      "game.txt"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "",
+    "stderr": "<document identity>:1:1: error: Import must name a .void source file.\n    code: VOID3001\n\n 1 | \n   | ^\n    Hint: Supply an exact-case filename, not a directory.\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 creation htyu0xfy/invalid",
+      "--source",
+      "src//game.void"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Document identity must be an exact canonical root-relative .void path\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 creation htyu0xfy/invalid",
+      "--source",
+      "Tests/game.void"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Starter path uses a default excluded discovery component.\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 creation htyu0xfy/invalid",
+      "--source",
+      "void.project.toml/game.void"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Starter path uses a reserved discovery component.\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 creation htyu0xfy/VOID.PROJECT.TOML"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "",
+    "stderr": "New project destination requires a valid directory basename.\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 creation htyu0xfy/invalid",
+      "--version",
+      "01.2.3"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "",
+    "stderr": "/tmp/VOID S5 creation htyu0xfy/invalid/void.project.toml:6:11: error: Invalid semantic version.\n    code: VOID5005\n\n 6 | version = \"01.2.3\"\n   |           ^^^^^^^^\n    Hint: Use major.minor.patch with optional -prerelease and +build identifiers; numeric core/prerelease identifiers cannot have leading zeroes. Limit: 255 ASCII bytes.\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 creation htyu0xfy/non-identifier",
+      "--kind",
+      "library"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "",
+    "stderr": "/tmp/VOID S5 creation htyu0xfy/non-identifier/void.project.toml:11:8: error: Invalid manifest name.\n    code: VOID5004\n\n 11 | name = \"non-identifier\"\n    |        ^^^^^^^^^^^^^^^^\n    Hint: Use a non-keyword lowercase compiler identifier for package.name.\n\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 creation htyu0xfy/absent-parent/app"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Project creation path has wrong case or a case collision: /tmp/VOID S5 creation htyu0xfy/absent-parent\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "init",
+      "/tmp/VOID S5 creation htyu0xfy/alias"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Cannot pin project directory: Not a directory\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 creation htyu0xfy/alias/attack",
+      "--nested"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "",
+    "stderr": "Cannot pin project directory: Not a directory\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "init",
+      "/tmp/VOID S5 creation htyu0xfy/readonly"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "Manifest: /tmp/VOID S5 creation htyu0xfy/readonly/void.project.toml\nProject ID: local.pcfec7be6d9f739ab6a6e2aeb97521f35\nApplication ID: local.a5a064d5d2442134ec13b8a0add8de591\nNext: from the displayed manifest directory, run voidc check --project .\n",
+    "stderr": "Cannot create project staging directory: Permission denied\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 creation htyu0xfy/readonly/attempt"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "Manifest: /tmp/VOID S5 creation htyu0xfy/readonly/attempt/void.project.toml\nProject ID: local.p55b48a29a073155c585dc7f6664c5af7\nApplication ID: local.a0c4e15046c748141e90a456a7f2e15ff\nNext: from the displayed manifest directory, run voidc check --project .\n",
+    "stderr": "Cannot create project staging directory: Permission denied\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "init",
+      "/tmp/VOID S5 creation htyu0xfy/contested"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "Manifest: /tmp/VOID S5 creation htyu0xfy/contested/void.project.toml\nProject ID: local.p55a4e8f04ccfd01ebf478d1b511d38fd\nApplication ID: local.a5898ee9edc2ecc977478c9edf441b2f4\nNext: from the displayed manifest directory, run voidc check --project .\n",
+    "stderr": "Project manifest already exists, including a possible case sibling: /tmp/VOID S5 creation htyu0xfy/contested/void.project.toml\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "init",
+      "/tmp/VOID S5 creation htyu0xfy/contested"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "Manifest: /tmp/VOID S5 creation htyu0xfy/contested/void.project.toml\nProject ID: local.p159708b3810689789ffe5f7097774821\nApplication ID: local.a1562ee293af6bf34a74d22ac7829d6b3\nNext: from the displayed manifest directory, run voidc check --project .\nCreated project manifest.\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 creation htyu0xfy/contested-new"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 1,
+    "stdout": "Manifest: /tmp/VOID S5 creation htyu0xfy/contested-new/void.project.toml\nProject ID: local.p53e8ccbdd60e59310a4cb8a57c4c9f02\nApplication ID: local.a9a2cea4567375fca7fa67fb76264a9e3\nNext: from the displayed manifest directory, run voidc check --project .\n",
+    "stderr": "Project destination already exists, including a possible case sibling: /tmp/VOID S5 creation htyu0xfy/contested-new\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "new",
+      "/tmp/VOID S5 creation htyu0xfy/contested-new"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "Manifest: /tmp/VOID S5 creation htyu0xfy/contested-new/void.project.toml\nProject ID: local.p1a147e38345257aba8bce2bd97781c28\nApplication ID: local.a278bb3b33a0b3931f83ebc808f9d7887\nNext: from the displayed manifest directory, run voidc check --project .\nCreated project manifest.\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+      "init",
+      "/tmp/VOID S5 creation htyu0xfy/editor/child"
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "Manifest: /tmp/VOID S5 creation htyu0xfy/editor/child/void.project.toml\nProject ID: local.pd2672d19a0e03b140e54997ce4970e87\nApplication ID: local.af710e24f9c818e953380f67c2e409f99\nNext: from the displayed manifest directory, run voidc check --project .\nCreated project manifest.\nAutomatic application selection requires one eligible main(). Use --entry for a deliberate override.\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidls",
+      "--discover-creation",
+      "/tmp/VOID S5 creation htyu0xfy/editor",
+      ""
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "{\"creation\":{\"complete\":true,\"eligibleCount\":1,\"manifestPresent\":false,\"root\":\"/tmp/VOID S5 creation htyu0xfy/editor\",\"rootIdentity\":\"35:969774\",\"sources\":[\"/game.void\"]},\"schema\":1}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidls",
+      "--discover-creation",
+      "/tmp/VOID S5 creation htyu0xfy/editor",
+      ""
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "{\"creation\":{\"complete\":false,\"eligibleCount\":17,\"manifestPresent\":false,\"root\":\"/tmp/VOID S5 creation htyu0xfy/editor\",\"rootIdentity\":\"35:969774\",\"sources\":[]},\"schema\":1}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidls",
+      "--plan-project",
+      "/tmp/VOID S5 creation htyu0xfy/editor",
+      "application",
+      "",
+      ""
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "{\"kind\":\"application\",\"manifest\":\"/tmp/VOID S5 creation htyu0xfy/editor/void.project.toml\",\"name\":\"editor\",\"packageName\":\"\",\"projectId\":\"local.p2a20fa92af700dce0a3499169c749a73\",\"roleId\":\"local.a0262519556aafbe8a77288b18e18c2d4\",\"root\":\"/tmp/VOID S5 creation htyu0xfy/editor\",\"rootIdentity\":\"35:969774\",\"schema\":1,\"version\":\"0.1.0\"}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidls",
+      "--create-project",
+      "/tmp/VOID S5 creation htyu0xfy/editor",
+      "35:969774",
+      "application",
+      "editor",
+      "0.1.0",
+      "local.p2a20fa92af700dce0a3499169c749a73",
+      "local.a0262519556aafbe8a77288b18e18c2d4",
+      ""
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "{\"root\":\"/tmp/VOID S5 creation htyu0xfy/editor\",\"schema\":1,\"status\":\"created\"}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidls",
+      "--create-project",
+      "/tmp/VOID S5 creation htyu0xfy/editor",
+      "35:969774",
+      "application",
+      "editor",
+      "0.1.0",
+      "local.p2a20fa92af700dce0a3499169c749a73",
+      "local.a0262519556aafbe8a77288b18e18c2d4",
+      ""
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "{\"root\":\"/tmp/VOID S5 creation htyu0xfy/editor\",\"schema\":1,\"status\":\"collision\"}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidls",
+      "--plan-project",
+      "/tmp/VOID S5 creation htyu0xfy/editor",
+      "application",
+      "",
+      ""
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "{\"root\":\"/tmp/VOID S5 creation htyu0xfy/editor\",\"rootIdentity\":\"35:969774\",\"schema\":1,\"status\":\"collision\"}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidls",
+      "--create-project",
+      "/tmp/VOID S5 creation htyu0xfy/editor",
+      "35:969774",
+      "application",
+      "editor",
+      "0.1.0",
+      "local.p2a20fa92af700dce0a3499169c749a73",
+      "local.a0262519556aafbe8a77288b18e18c2d4",
+      ""
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 2,
+    "stdout": "",
+    "stderr": "voidls: Project root changed after creation review.\n"
+  },
+  {
+    "argv": [
+      "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidls",
+      "--discover-project",
+      "/tmp/VOID S5 creation htyu0xfy/empty",
+      "",
+      "/tmp/VOID S5 creation htyu0xfy/empty",
+      ""
+    ],
+    "cwd": "/tmp/VOID S5 creation htyu0xfy",
+    "status": 0,
+    "stdout": "{\"diagnosticCount\":1,\"diagnostics\":[{\"code\":\"VOID5010\",\"message\":\"No eligible main() in application project.\"}],\"discoveryCount\":0,\"entry\":null,\"executionCount\":0,\"kind\":\"application\",\"manifest\":\"/tmp/VOID S5 creation htyu0xfy/empty/void.project.toml\",\"mode\":\"project\",\"requestedRoot\":\"/tmp/VOID S5 creation htyu0xfy/empty\",\"requiresReselection\":false,\"root\":\"/tmp/VOID S5 creation htyu0xfy/empty\",\"schema\":2,\"selectionRevision\":\"0\",\"snapshotKey\":\"e1a3f10082b15b53a1f6e14910b8dcaf973fbb27fc336a2dd54b86e7e5c0b5fd\",\"standalone\":false,\"status\":\"error\"}\n",
+    "stderr": ""
+  }
+]

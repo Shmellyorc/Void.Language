@@ -1,0 +1,35 @@
+
+Dynamic section at offset 0x210288 contains 32 entries:
+  Tag        Type                         Name/Value
+ 0x000000000000001d (RUNPATH)            Library runpath: [/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/Release/lib]
+ 0x0000000000000001 (NEEDED)             Shared library: [libidn2.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libunistring.so.5]
+ 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+ 0x000000006ffffffb (FLAGS_1)            Flags: PIE
+ 0x0000000000000015 (DEBUG)              0x0
+ 0x0000000000000007 (RELA)               0x4588
+ 0x0000000000000008 (RELASZ)             10800 (bytes)
+ 0x0000000000000009 (RELAENT)            24 (bytes)
+ 0x000000006ffffff9 (RELACOUNT)          381
+ 0x0000000000000017 (JMPREL)             0x6fb8
+ 0x0000000000000002 (PLTRELSZ)           5304 (bytes)
+ 0x0000000000000003 (PLTGOT)             0x213d78
+ 0x0000000000000014 (PLTREL)             RELA
+ 0x0000000000000006 (SYMTAB)             0x320
+ 0x000000000000000b (SYMENT)             24 (bytes)
+ 0x0000000000000005 (STRTAB)             0x2284
+ 0x000000000000000a (STRSZ)              8962 (bytes)
+ 0x000000006ffffef5 (GNU_HASH)           0x21f0
+ 0x0000000000000019 (INIT_ARRAY)         0x211260
+ 0x000000000000001b (INIT_ARRAYSZ)       8 (bytes)
+ 0x000000000000001a (FINI_ARRAY)         0x211258
+ 0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)
+ 0x000000000000000c (INIT)               0x20f440
+ 0x000000000000000d (FINI)               0x20f45c
+ 0x000000006ffffff0 (VERSYM)             0x1d30
+ 0x000000006ffffffe (VERNEED)            0x1f5c
+ 0x000000006fffffff (VERNEEDNUM)         3
+ 0x0000000000000000 (NULL)               0x0

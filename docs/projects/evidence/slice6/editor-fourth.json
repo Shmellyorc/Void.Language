@@ -1,0 +1,7 @@
+{
+  "status": "FAIL",
+  "editor": "1.141.0",
+  "checks": [
+    "imported definition"
+  ]
+}

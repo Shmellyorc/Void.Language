@@ -1,0 +1,39 @@
+{
+  "exit": 0,
+  "frames": 50,
+  "input_frames": 23,
+  "pink": [
+    [
+      139.5,
+      124.5
+    ],
+    [
+      474.5,
+      234.5
+    ]
+  ],
+  "green": [
+    [
+      81.5,
+      228.5
+    ],
+    [
+      105.5,
+      228.5
+    ]
+  ],
+  "orange": [
+    [
+      310.5,
+      174.14
+    ],
+    [
+      415.5,
+      174.14
+    ]
+  ],
+  "native": {
+    "libvoid_raylib.so": "e4a2c85dabcbed06c9c749cbfed365145abb2d1017df01ba7f292db0b9cb14ff",
+    "libraylib.so.600": "1041653dd5c1cb8c67494fa398a296520d3ffec20cf1bf71b1eaa4b96ac61aee"
+  }
+}

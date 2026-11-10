@@ -1,0 +1,93 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start 283: ffi_g4_jit_ir
+    Start 284: ffi_g4_aot_normal
+1/4 Test #284: ffi_g4_aot_normal ................***Failed    0.49 sec
+normal ['7'] exit=0 104
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/dynamic_process.py", line 76, in <module>
+    qualify()
+    ~~~~~~~^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/dynamic_process.py", line 53, in qualify
+    invoke(['7'], 104)
+    ~~~~~~^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/dynamic_process.py", line 45, in invoke
+    assert process.returncode == returncode, (args, returncode, output)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['7'], 104, '104\n')
+
+    Start 285: ffi_g4_aot_optimized
+2/4 Test #283: ffi_g4_jit_ir ....................***Failed    0.53 sec
+bad closure revision: C dynamic closure: unsupported revision
+system library policy: C dynamic closure: unsupported target, system ABI or relocation policy
+foreign provider: C dynamic closure does not match the exact descriptor or host root
+aliased image: C dynamic closure: invalid or duplicate image
+missing descriptor export: C dynamic closure is missing an owned descriptor export
+wrong target thunk: C dynamic closure does not match the exact descriptor or host root
+direct bridge import: VOID IR: C primitive transport requires host admission and typed operations
+erased closure admission: VOID IR: C primitive admission differs from analyzed source
+forged dynamic ordinal: VOID IR: C primitive call outside the admitted binding module
+missing provider: C dynamic artifact: libvoid_g4_main.so is missing, aliased or outside file bounds
+modified dependency: C dynamic digest: libvoid_g4_dep.so
+symlink provider: C dynamic artifact: libvoid_g4_main.so is missing, aliased or outside file bounds
+hardlinked provider: C dynamic artifact: libvoid_g4_main.so is missing, aliased or outside file bounds
+missing required export: C dynamic symbol: missing exact owned export g4_missing
+wrong symbol owner: C dynamic symbol: missing exact owned export g4_bias
+unapproved ELF target: C dynamic ELF: unsupported target or header
+unsupported dynamic tag 15: C dynamic ELF: unsupported dynamic tag 15
+unsupported dynamic tag 1879047932: C dynamic ELF: unsupported dynamic tag 1879047932
+unsupported dynamic tag 12: C dynamic ELF: unsupported dynamic tag 12
+system DT_NEEDED: C dynamic dependency: unapproved DT_NEEDED in libvoid_g4_main.so
+ELF interpreter segment: C dynamic ELF: unsupported program header 3
+IFUNC resolver: C dynamic ELF: unsupported dynamic symbol (including weak, TLS and resolver symbols)
+IRELATIVE resolver: C dynamic ELF: unsupported relocation or target
+real initializer would exit 121 if mapped: C dynamic ELF: unsupported dynamic tag 1879048185
+cross-Runtime binding transfer: C dynamic authority: native binding is already owned by a Runtime
+stale dynamic alias: <host binding /native_dynamic.void>:15:6: runtime error: C resource is closed, null or invalid
+In function /native_dynamic.void::read
+Called from /dynamic.void::entry
+/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/jit-probes/dynamic.void:46:20: source call
+        return ffi.read(alias, 0)
+                   ^
+
+dynamic double close: <host binding /native_dynamic.void>:17:6: runtime error: C resource is closed, null or invalid
+In function /native_dynamic.void::close_box
+Called from /dynamic.void::entry
+/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/jit-probes/dynamic.void:48:20: source call
+        return ffi.close_box(alias)
+                   ^
+
+refused dynamic acquisition containing a live pointer: <host binding /native_dynamic.void>:13:6: runtime error: C resource operation rejected org.voidlang.g4-fixture::g4_create
+In function /native_dynamic.void::create
+Called from /dynamic.void::entry
+/home/shmellyorc/Documents/Void.Language/build/llvm23-release/ffi-g4/jit-probes/dynamic.void:16:28: source call
+        var rejected = ffi.create(-3)
+                           ^
+
+Runtime globals require their application owner thread
+
+    Start 286: ffi_g4_aot_startup
+3/4 Test #285: ffi_g4_aot_optimized .............***Failed    0.11 sec
+optimized ['7'] exit=0 104
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/dynamic_process.py", line 76, in <module>
+    qualify()
+    ~~~~~~~^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/dynamic_process.py", line 53, in qualify
+    invoke(['7'], 104)
+    ~~~~~~^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/ffi/dynamic_process.py", line 45, in invoke
+    assert process.returncode == returncode, (args, returncode, output)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['7'], 104, '104\n')
+
+4/4 Test #286: ffi_g4_aot_startup ...............   Passed    0.10 sec
+
+25% tests passed, 3 tests failed out of 4
+
+Total Test time (real) =   0.64 sec
+
+The following tests FAILED:
+	283 - ffi_g4_jit_ir (Failed)
+	284 - ffi_g4_aot_normal (Failed)
+	285 - ffi_g4_aot_optimized (Failed)
+Errors while running CTest

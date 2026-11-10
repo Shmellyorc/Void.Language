@@ -1,0 +1,3 @@
+use os
+func directory() -> result<string, os.error>:
+    return os.data_dir()

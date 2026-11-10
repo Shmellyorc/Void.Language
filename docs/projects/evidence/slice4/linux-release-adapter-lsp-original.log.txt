@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice4/os-location-lsp.py", line 77, in <module>
+    check(f'Direct {function}()' in str(shown.get('documentation')),shown)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice4/os-location-lsp.py", line 14, in check
+    assert yes,message
+           ^^^
+AssertionError: {'label': 'data_dir(app_id: string) -> result<string, /@stdlib/os.void::error>', 'parameters': [{'documentation': {'kind': 'plaintext', 'value': 'Portable 1-255 byte lowercase ASCII token; no empty dot pieces or Windows device stems.'}, 'label': 'app_id: string'}]}

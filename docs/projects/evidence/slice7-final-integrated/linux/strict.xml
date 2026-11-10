@@ -1,0 +1,3010 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="433"
+	failures="20"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="5511"
+	timestamp="2026-11-09T13:16:37"
+	>
+	<testcase name="project_manifest_header" classname="project_manifest_header" time="0.0226641" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="project_manifest" classname="project_manifest" time="0.342585" status="run">
+		<properties/>
+		<system-out>project_manifest: 8787 checks passed
+</system-out>
+	</testcase>
+	<testcase name="voidup_smoke" classname="voidup_smoke" time="2.0279" status="run">
+		<properties/>
+		<system-out>VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+VOIDUP native smoke passed; no signing keys, catalog or network used; installation qualification remains separate
+</system-out>
+	</testcase>
+	<testcase name="voidup_ci_integration" classname="voidup_ci_integration" time="0.282774" status="run">
+		<properties/>
+		<system-out>test_approved_host_patch_checkout_bytes (__main__.Integration.test_approved_host_patch_checkout_bytes) ... ok
+test_disk_preflight_checks_both_volumes (__main__.Integration.test_disk_preflight_checks_both_volumes) ... ok
+test_missing_disabled_and_private_tests_rejected (__main__.Integration.test_missing_disabled_and_private_tests_rejected) ... ok
+test_native_profile_layouts (__main__.Integration.test_native_profile_layouts) ... ok
+test_selected_workflow_order_and_no_credentials (__main__.Integration.test_selected_workflow_order_and_no_credentials) ... ok
+test_ambient_probe_override_fails_before_execution (__main__.Toolchain.test_ambient_probe_override_fails_before_execution) ... ok
+test_mismatched_headers_and_receipt_fail (__main__.Toolchain.test_mismatched_headers_and_receipt_fail) ... ok
+test_missing_components_fail (__main__.Toolchain.test_missing_components_fail) ... ok
+test_selector_is_resource_leaf (__main__.Toolchain.test_selector_is_resource_leaf) ... ok
+test_wrong_or_external_resource_fails (__main__....
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_no_authority" classname="project_manifest_no_authority" time="0.443907" status="run">
+		<properties/>
+		<system-out>project_manifest: 8788 checks passed under syscall denial
+project_manifest_no_authority: four live SIGSYS controls passed
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_legacy" classname="project_manifest_legacy" time="7.68236" status="run">
+		<properties/>
+		<system-out>project_manifest_legacy: 18 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_manifest_provenance" classname="project_manifest_provenance" time="0.0550675" status="run">
+		<properties/>
+		<system-out>project_manifest_provenance: 3 file hashes and exact pinned upstream reconstruction passed
+</system-out>
+	</testcase>
+	<testcase name="project_selection" classname="project_selection" time="10.1964" status="run">
+		<properties/>
+		<system-out>project_selection: 476 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_sessions" classname="project_sessions" time="0.631988" status="run">
+		<properties/>
+		<system-out>project_sessions: 166 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_creation" classname="project_creation" time="0.497646" status="run">
+		<properties/>
+		<system-out>creation: entropy, reviewed directory, external collision, rollback ownership, staged content passed
+</system-out>
+	</testcase>
+	<testcase name="project_creation_process" classname="project_creation_process" time="19.0615" status="run">
+		<properties/>
+		<system-out>S5 creation process: 64 invocations passed
+</system-out>
+	</testcase>
+	<testcase name="project_application" classname="project_application" time="66.6489" status="run">
+		<properties/>
+		<system-out>Application cache: miss/hit
+project_application: 63 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_application_process" classname="project_application_process" time="59.0924" status="run">
+		<properties/>
+		<system-out>project_application_process: 61 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_discovery_cli" classname="project_discovery_cli" time="21.2897" status="run">
+		<properties/>
+		<system-out>project_discovery_cli: 88 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_profiles" classname="project_profiles" time="4.86999" status="run">
+		<properties/>
+		<system-out>project_profiles: 43 process checks passed; compute instruction counts O0=6, O2=2, release --no-opt=6
+</system-out>
+	</testcase>
+	<testcase name="project_protocol" classname="project_protocol" time="1.07163" status="run">
+		<properties/>
+		<system-out>project_protocol: 169 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_nested_cli" classname="project_nested_cli" time="1.88232" status="run">
+		<properties/>
+		<system-out>project_nested_cli: 11 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="cli_contract" classname="cli_contract" time="15.8342" status="run">
+		<properties/>
+		<system-out>76 CLI process checks passed on linux; native output and collision preservation passed
+</system-out>
+	</testcase>
+	<testcase name="cli_install" classname="cli_install" time="8.59725" status="run">
+		<properties/>
+		<system-out>VOID Language Compiler v0.1.0 (development)
+LLVM 23.1.4
+Target: x86_64-unknown-linux-gnu
+Build identity: 03ecb2d2b2652bafee57d91eb0ce73b22a9502e17e6a325e5d17f00ddc3557c7
+PASS: installed stdlib check, optimized/Debug run, native build/run, resource hashes and LSP handshake
+PASS: 25 installed stdlib sources, relocated compiler/LSP, missing-module/Runtime controls, native output preservation
+</system-out>
+	</testcase>
+	<testcase name="cli_install_resources" classname="cli_install_resources" time="0.105464" status="run">
+		<properties/>
+		<system-out>......s
+----------------------------------------------------------------------
+Ran 7 tests in 0.006s
+
+OK (skipped=1)
+</system-out>
+	</testcase>
+	<testcase name="target_triple" classname="target_triple" time="0.026053" status="run">
+		<properties/>
+		<system-out>arm64-apple-macosx14.0
+</system-out>
+	</testcase>
+	<testcase name="http_native" classname="http_native" time="23.0967" status="run">
+		<properties/>
+		<system-out>{"http_latency":{"profile":"HTTP/1.1 plaintext","samples":64,"median_ms":41.9934,"p95_ms":43.0672,"process_cpu_seconds":0.076385}}
+{"http_latency":{"profile":"HTTP/1.1 verified TLS","samples":64,"median_ms":42.0186,"p95_ms":43.0285,"process_cpu_seconds":0.097904}}
+{"http_latency":{"profile":"HTTP/2 verified TLS","samples":64,"median_ms":1.23345,"p95_ms":1.76171,"process_cpu_seconds":0.050192}}
+{"h2_paused_sample":{"sample":0,"rss_kib":669812,"live_native_bytes":35644880,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":1,"rss_kib":669832,"live_native_bytes":35644880,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":2,"rss_kib":669832,"live_native_bytes":35644880,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":3,"rss_kib":669832,"live_native_bytes":35644880,"network_reserved":71375321,"decoded_queued":196608}}
+{"h2_paused_sample":{"sample":4,"rss_kib":669836,"live_native_bytes":35644880,"network_reserved":71...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="http_tls_memory" classname="http_tls_memory" time="1030.39" status="run">
+		<properties/>
+		<system-out>/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/net/http/tls_memory.py:74: DeprecationWarning: ssl.TLSVersion.TLSv1 is deprecated
+  context.minimum_version = ssl.TLSVersion.TLSv1
+/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/net/http/tls_memory.py:75: DeprecationWarning: ssl.TLSVersion.TLSv1_1 is deprecated
+  context.maximum_version = ssl.TLSVersion.TLSv1_1
+TLS provider corpus/flight/retained-memory checks passed
+</system-out>
+	</testcase>
+	<testcase name="http_reload" classname="http_reload" time="86.2415" status="run">
+		<properties/>
+		<system-out>Public HTTP held-request reload passed
+</system-out>
+	</testcase>
+	<testcase name="http_timeouts" classname="http_timeouts" time="8.98884" status="run">
+		<properties/>
+		<system-out>TLS/proxy phases, resumed producers, blocked writes and Digest header deadlines passed
+</system-out>
+	</testcase>
+	<testcase name="http_wire" classname="http_wire" time="1.71344" status="run">
+		<properties/>
+		<system-out>Independent malformed HTTP/1 framing, metadata, decoding, deadlines and redirect probes passed
+</system-out>
+	</testcase>
+	<testcase name="http_dns" classname="http_dns" time="8.28633" status="run">
+		<properties/>
+		<system-out>DNS retained live allocations: 261156; steady 303756..419305 bytes
+Native c-ares UDP/TCP, IPv4/IPv6, IDN, cache pressure, negative cache, cancellation and timeout passed
+</system-out>
+	</testcase>
+	<testcase name="url_native" classname="url_native" time="0.654181" status="run">
+		<properties/>
+		<system-out>URL/provider native checks passed: 8.23.0; AWS-LC/5.12.0; c-ares/1.34.9; libidn2/2.3.8
+</system-out>
+	</testcase>
+	<testcase name="http_examples" classname="http_examples" time="255.724" status="run">
+		<properties/>
+		<system-out>HTTP published examples: 19 checks passed
+</system-out>
+	</testcase>
+	<testcase name="http_ci_policy" classname="http_ci_policy" time="4.66651" status="run">
+		<properties/>
+		<system-out>test_corrupted_cache_rejected_without_replacement (__main__.AcquisitionTests.test_corrupted_cache_rejected_without_replacement) ... ok
+test_http_error_body_and_status_retained (__main__.AcquisitionTests.test_http_error_body_and_status_retained) ... ok
+test_network_failure_does_not_report_a_stale_partial_as_response (__main__.AcquisitionTests.test_network_failure_does_not_report_a_stale_partial_as_response) ... ok
+test_redirect_records_final_location_and_verifies_bytes (__main__.AcquisitionTests.test_redirect_records_final_location_and_verifies_bytes) ... ok
+test_successful_http_with_wrong_bytes_never_enters_cache (__main__.AcquisitionTests.test_successful_http_with_wrong_bytes_never_enters_cache) ... ok
+test_verified_bytes_promoted_and_cache_reverified (__main__.AcquisitionTests.test_verified_bytes_promoted_and_cache_reverified) ... ok
+test_every_reviewed_blob_survives_windows_checkout_filter (__main__.CheckoutTests.test_every_reviewed_blob_survives_windows_checkout_filter) ... ok
+test_each_missing_or_disable...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="http_curl_objects" classname="http_curl_objects" time="0.721213" status="run">
+		<properties/>
+		<system-out>test_static_and_object_library_compilation_policy (__main__.CurlObjectsTests.test_static_and_object_library_compilation_policy) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.638s
+
+OK
+Both curl layouts: static definitions, sanitizers and keylog ownership; six COFF import negative controls verified
+</system-out>
+	</testcase>
+	<testcase name="http_install" classname="http_install" time="189.404" status="run">
+		<properties/>
+		<system-out>Installed HTTP/URL/JSON: 18 relocated native/JIT/link checks passed
+</system-out>
+	</testcase>
+	<testcase name="http_bulk" classname="http_bulk" time="31.2913" status="run">
+		<properties/>
+		<system-out>Public bulk: download 67108864, upload 67108865, SHA-256 67c93935aeb247ac244e23db4c28a099130f1ecff693a3260f7436c1ad59e4bc
+</system-out>
+	</testcase>
+	<testcase name="http_ir" classname="http_ir" time="21.5772" status="run">
+		<properties/>
+		<system-out>43 HTTP IR module/type/arity/authority/worker/effect rejections passed
+</system-out>
+	</testcase>
+	<testcase name="http_source" classname="http_source" time="198.819" status="run">
+		<properties/>
+		<system-out>Public HTTP source: 15 analysis/JIT/native-link checks passed
+</system-out>
+	</testcase>
+	<testcase name="http_source_negative" classname="http_source_negative" time="7.2402" status="run">
+		<properties/>
+		<system-out>5 HTTP source authority/private/worker rejections passed
+</system-out>
+	</testcase>
+	<testcase name="http_source_faults" classname="http_source_faults" time="321.424" status="run">
+		<properties/>
+		<system-out>Public HTTP source: 2 analysis/JIT/native-link checks passed
+</system-out>
+	</testcase>
+	<testcase name="url_ir" classname="url_ir" time="1.1875" status="run">
+		<properties/>
+		<system-out>10 URL IR authority/type/arity/opcode rejections passed
+</system-out>
+	</testcase>
+	<testcase name="url_source" classname="url_source" time="14.5515" status="run">
+		<properties/>
+		<system-out>URL source check/JIT/O2/AOT: 7 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="url_lsp" classname="url_lsp" time="0.72351" status="run">
+		<properties/>
+		<system-out>URL LSP import/docs/definition/rename/completion checks passed
+</system-out>
+	</testcase>
+	<testcase name="http_lsp" classname="http_lsp" time="20.5398" status="run">
+		<properties/>
+		<system-out>HTTP LSP: module/member inventory, 25 documented methods, navigation and active parameter passed
+</system-out>
+	</testcase>
+	<testcase name="toolchain_stop_token" classname="toolchain_stop_token" time="0.0704141" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="stage10_operator_reload" classname="stage10_operator_reload" time="87.5895" status="run">
+		<properties/>
+		<system-out>250 operator/format compatibility/cache/reload checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_operator_keys" classname="stage10_operator_keys" time="1.00129" status="run">
+		<properties/>
+		<system-out>131 dictionary custom-equality checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_operator_resolution" classname="stage10_operator_resolution" time="4.50284" status="run">
+		<properties/>
+		<system-out>184 operator resolution/call checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_operator_declarations" classname="stage10_operator_declarations" time="2.8361" status="run">
+		<properties/>
+		<system-out>278 operator declaration/validation checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_source_formatting" classname="stage10_source_formatting" time="2.04616" status="run">
+		<properties/>
+		<system-out>321 source formatting/diagnostic checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_tooling" classname="stage10_tooling" time="1.40623" status="run">
+		<properties/>
+		<system-out>108 Stage 10 tooling metadata checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_display_reload" classname="stage10_display_reload" time="7.91692" status="run">
+		<properties/>
+		<system-out>280 display dependency/reload checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_temporal_ir" classname="stage10_temporal_ir" time="7.64748" status="run">
+		<properties/>
+		<system-out>8 temporal IR/worker checks passed
+</system-out>
+	</testcase>
+	<testcase name="format_temporal" classname="format_temporal" time="0.17954" status="run">
+		<properties/>
+		<system-out>1311 temporal core checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_hooks" classname="stage10_hooks" time="6.02282" status="run">
+		<properties/>
+		<system-out>77 nominal/custom display checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_interpolation" classname="stage10_interpolation" time="1.91377" status="run">
+		<properties/>
+		<system-out>57 interpolation checks passed
+</system-out>
+	</testcase>
+	<testcase name="decimal_float" classname="decimal_float" time="0.06216" status="run">
+		<properties/>
+		<system-out>Decimal float boundaries/oracle passed; comma locale tested
+</system-out>
+	</testcase>
+	<testcase name="stage10_conversion" classname="stage10_conversion" time="656.341" status="run">
+		<properties/>
+		<system-out>203 source conversion checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_fields" classname="stage10_fields" time="1.22184" status="run">
+		<properties/>
+		<system-out>54 field policy checks passed
+</system-out>
+	</testcase>
+	<testcase name="format_numeric" classname="format_numeric" time="0.288001" status="run">
+		<properties/>
+		<system-out>18663 numeric format checks passed
+</system-out>
+	</testcase>
+	<testcase name="format_zones" classname="format_zones" time="0.931346" status="run">
+		<properties/>
+		<system-out>2026e: 344 zones, 253 links, 1720 projections; embedded gap/overlap/history passed
+</system-out>
+	</testcase>
+	<testcase name="json_readonly" classname="json_readonly" time="26.7459" status="run">
+		<properties/>
+		<system-out>readonly RelWithDebInfo: 47/47 checks passed
+</system-out>
+	</testcase>
+	<testcase name="json_dynamic" classname="json_dynamic" time="38.066" status="run">
+		<properties/>
+		<system-out>grammar RelWithDebInfo: 100 vectors in 4 execution modes passed
+</system-out>
+	</testcase>
+	<testcase name="json_numbers" classname="json_numbers" time="49.494" status="run">
+		<properties/>
+		<system-out>numbers RelWithDebInfo: 125 vectors in 4 execution modes passed
+</system-out>
+	</testcase>
+	<testcase name="json_schema" classname="json_schema" time="75.1277" status="run">
+		<properties/>
+		<system-out>schema RelWithDebInfo: 14 error/order vectors in four modes and 21 admission/authority negatives passed
+</system-out>
+	</testcase>
+	<testcase name="json_bounds" classname="json_bounds" time="73.0749" status="run">
+		<properties/>
+		<system-out>bounds RelWithDebInfo: 56 vectors in 4 execution modes passed
+</system-out>
+	</testcase>
+	<testcase name="json_install" classname="json_install" time="75.4262" status="run">
+		<properties/>
+		<system-out>JSON relocated install: 7 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_adversarial" classname="json_adversarial" time="98.5658" status="run">
+		<properties/>
+		<system-out>JSON adversarial: 22 vectors in all four modes passed
+</system-out>
+	</testcase>
+	<testcase name="json_metering" classname="json_metering" time="62.8152" status="run">
+		<properties/>
+		<system-out>Frozen JSON budget/order oracle: four modes passed
+</system-out>
+	</testcase>
+	<testcase name="json_execution_validated" classname="json_execution_validated" time="41.2941" status="run">
+		<properties/>
+		<system-out>execution RelWithDebInfo: 6/6 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_execution_accessors" classname="json_execution_accessors" time="31.6041" status="run">
+		<properties/>
+		<system-out>execution RelWithDebInfo: 6/6 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_execution_dynamic_smoke" classname="json_execution_dynamic_smoke" time="32.037" status="run">
+		<properties/>
+		<system-out>execution RelWithDebInfo: 6/6 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_execution_typed_smoke" classname="json_execution_typed_smoke" time="66.7142" status="run">
+		<properties/>
+		<system-out>execution RelWithDebInfo: 6/6 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_execution_shapes" classname="json_execution_shapes" time="92.9487" status="run">
+		<properties/>
+		<system-out>execution RelWithDebInfo: 6/6 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_execution_ownership" classname="json_execution_ownership" time="41.8354" status="run">
+		<properties/>
+		<system-out>execution RelWithDebInfo: 6/6 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_execution_nested_inference" classname="json_execution_nested_inference" time="33.9334" status="run">
+		<properties/>
+		<system-out>execution RelWithDebInfo: 6/6 processes passed
+</system-out>
+	</testcase>
+	<testcase name="json_stress_fixed" classname="json_stress_fixed" time="140.677" status="run">
+		<properties/>
+		<system-out>JSON stack stress fixed: all four modes passed
+</system-out>
+	</testcase>
+	<testcase name="json_stress_wide" classname="json_stress_wide" time="78.5887" status="run">
+		<properties/>
+		<system-out>JSON stack stress wide: all four modes passed
+</system-out>
+	</testcase>
+	<testcase name="json_host" classname="json_host" time="271.013" status="run">
+		<properties/>
+		<system-out>JSON wide const GC O0: 131101178 root observations, 266 managed constructions, 119908 polls
+JSON forced GC O0: 11509238 root observations, 85 managed constructions, 11215 polls
+JSON allocation sweep O0: 2049 injected failures
+JSON wide const GC O2: 131101178 root observations, 266 managed constructions, 119908 polls
+JSON forced GC O2: 11509238 root observations, 85 managed constructions, 11215 polls
+JSON allocation sweep O2: 2049 injected failures
+JSON host: 12337 checks passed
+</system-out>
+	</testcase>
+	<testcase name="json_preservation" classname="json_preservation" time="1.43789" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/void-s7-integrated-strict.tk3gHC/VOID JSON preservation ia9n6o1i/incidents/incident-y_sl0pae
+CRASH EVIDENCE: /tmp/void-s7-integrated-strict.tk3gHC/VOID JSON preservation ia9n6o1i/incidents/incident-rsbv70_k
+CRASH EVIDENCE: /tmp/void-s7-integrated-strict.tk3gHC/VOID JSON preservation ia9n6o1i/incidents/incident-lxppqbjx
+JSON adapter: ordinary rejection and 3 reserved-status/timeout receipts verified
+</system-out>
+	</testcase>
+	<testcase name="json_lsp" classname="json_lsp" time="6.36513" status="run">
+		<properties/>
+		<system-out>JSON LSP: 43 checks passed
+</system-out>
+	</testcase>
+	<testcase name="application_workflow_stage9" classname="application_workflow_stage9" time="35.7982" status="run">
+		<properties/>
+		<system-out>Stage 9 real workflow checks passed: 111
+</system-out>
+	</testcase>
+	<testcase name="native_output_paths_ci88" classname="native_output_paths_ci88" time="7.32418" status="run">
+		<properties/>
+		<system-out>Windows 8.3/reparse checks require native Windows; portable checks execute here.
+CI #88 physical output checks passed: 16
+</system-out>
+	</testcase>
+	<testcase name="long_physical_paths_ci89" classname="long_physical_paths_ci89" time="7.1372" status="run">
+		<properties/>
+		<system-out>CI #89 long physical path checks passed: 33
+</system-out>
+	</testcase>
+	<testcase name="gc_buffers" classname="gc_buffers" time="4.3537" status="run">
+		<properties/>
+		<system-out>reference sweep before owner teardown: baseline=1 ordinal=-1 sites=11 failed=0 released_source=1 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=1 ordinal=-1 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=0 sites=0 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=0 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=1 sites=1 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=1 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=2 sites=2 failed=1 released_source=0 native_count=0 native_bytes=0 heap_objects=0
+reference sweep after owner teardown: baseline=0 ordinal=2 native_count=0 native_bytes=0
+reference sweep before owner teardown: baseline=0 ordinal=3 sites=3 failed=1 released_source=0 native_cou...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="gc_schemas" classname="gc_schemas" time="0.255334" status="run">
+		<properties/>
+		<system-out>schema admission requested bytes: one=1886, million=1917; cursor next allocations=0
+schema admission allocation-site rollback/retry: 40 sites
+compact GC schemas/shared cursor checks passed
+</system-out>
+	</testcase>
+	<testcase name="arrays_foundation" classname="arrays_foundation" time="0.349614" status="run">
+		<properties/>
+		<system-out>arrays_foundation: source_and_ir
+arrays_foundation: negatives
+arrays_foundation: compact_shapes
+arrays_foundation: indexes_and_budget
+arrays_foundation: owned_ir
+Scalar fixed-array analysis, owned IR and storage-contract checks passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_console" classname="runtime_console" time="0.075974" status="run">
+		<properties/>
+		<system-out>347 console foundation identity/lifecycle/GC checks passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_endpoints" classname="runtime_console_endpoints" time="0.173981" status="run">
+		<properties/>
+		<system-out>14 real POSIX endpoint identity/redirection/borrowing checks passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_transfers" classname="runtime_console_transfers" time="0.0553173" status="run">
+		<properties/>
+		<system-out>184 checked console transfer/deadline/cancellation checks passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_native_transfers" classname="runtime_console_native_transfers" time="0.935914" status="run">
+		<properties/>
+		<system-out>213 real POSIX binary/pipe/file/PTY/poll/deadline/cancel/GC/EINTR/SIGPIPE checks passed
+{"native_cases": [{"case": "host-write", "child_checks_before_report": 1, "cleanup_code": 0, "completed": 4, "descriptor_flags": {"descriptors": [{"after": [0, 32768], "after_errno": [0, 0], "before": [0, 32768], "before_errno": [0, 0], "fd": 0}, {"after": [0, 1], "after_errno": [0, 0], "before": [0, 1], "before_errno": [0, 0], "fd": 1}, {"after": [0, 1], "after_errno": [0, 0], "before": [0, 1], "before_errno": [0, 0], "fd": 2}], "equivalent": true}, "eof": false, "kind": 0, "native_progress": null, "os_code": 0}, {"case": "pipe", "child_checks_before_report": 517, "cleanup_code": 0, "completed": 1048590, "descriptor_flags": {"descriptors": [{"after": [0, 0], "after_errno": [0, 0], "before": [0, 0], "before_errno": [0, 0], "fd": 0}, {"after": [0, 1], "after_errno": [0, 0], "before": [0, 1], "before_errno": [0, 0], "fd": 1}, {"after": [0, 1], "after_errno": [0, 0], "before": [0, 1], "before_errno": [0, 0], "fd": 2}], "equiv...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_keyboard" classname="runtime_console_keyboard" time="0.045522" status="run">
+		<properties/>
+		<system-out>131 key/mode checks passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_terminal" classname="runtime_console_terminal" time="0.0438046" status="run">
+		<properties/>
+		<system-out>482 terminal ownership/presentation checks passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_native_keyboard" classname="runtime_console_native_keyboard" time="0.322544" status="run">
+		<properties/>
+		<system-out>92 native PTY key/mode checks passed
+99 native PTY key/mode integration checks passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_native_terminal" classname="runtime_console_native_terminal" time="0.822275" status="run">
+		<properties/>
+		<system-out>77 real POSIX terminal checks; 10 process cases
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_wide" classname="runtime_console_wide" time="0.155014" status="run">
+		<properties/>
+		<system-out>console wide checks: 271656
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_input" classname="runtime_console_input" time="0.0981822" status="run">
+		<properties/>
+		<system-out>2261 shared input/UTF8/line/progress/allocation checks passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_console_native_input" classname="runtime_console_native_input" time="0.531649" status="run">
+		<properties/>
+		<system-out>264 real POSIX shared input/UTF8/line/CR/mixed/timeout/GC checks passed
+{"native_cases": [{"case": "pipe", "child_checks_before_report": 17, "descriptor_flags": {"descriptors": [{"after": [0, 0], "after_errno": [0, 0], "before": [0, 0], "before_errno": [0, 0], "fd": 0}, {"after": [0, 1], "after_errno": [0, 0], "before": [0, 1], "before_errno": [0, 0], "fd": 1}, {"after": [0, 1], "after_errno": [0, 0], "before": [0, 1], "before_errno": [0, 0], "fd": 2}], "equivalent": true}}, {"case": "file", "child_checks_before_report": 17, "descriptor_flags": {"descriptors": [{"after": [0, 32768], "after_errno": [0, 0], "before": [0, 32768], "before_errno": [0, 0], "fd": 0}, {"after": [0, 1], "after_errno": [0, 0], "before": [0, 1], "before_errno": [0, 0], "fd": 1}, {"after": [0, 1], "after_errno": [0, 0], "before": [0, 1], "before_errno": [0, 0], "fd": 2}], "equivalent": true}}, {"case": "large-line", "child_checks_before_report": 7, "descriptor_flags": {"descriptors": [{"after": [0, 0], "after_errno": [0, 0], "before": [0...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="runtime_coordination" classname="runtime_coordination" time="2.09586" status="run">
+		<properties/>
+		<system-out>NativeSafe rendezvous baseline (1000, one frozen object): mean 1.08874 us, max 11.48 us
+runtime coordinator: states, nested roots, timeout, competing collectors, NativeSafe and stress passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_generated" classname="runtime_generated" time="1.65502" status="run">
+		<properties/>
+		<system-out>numeric loop normal: 2000003 polls, 100 collections, 7 parks
+numeric loop O2: 2000003 polls, 100 collections, 6 parks
+shared IR JIT roots: normal/O2, nested aggregates, temporaries, parameters, returns, loops, failure cleanup passed
+</system-out>
+	</testcase>
+	<testcase name="fixed_arrays_source" classname="fixed_arrays_source" time="3.86278" status="run">
+		<properties/>
+		<system-out>source array normal: 158 failing allocation budgets, recovery and cleanup passed
+source array O2: 158 failing allocation budgets, recovery and cleanup passed
+Numeric fixed arrays: source execution, roots, publication and failure recovery passed
+</system-out>
+	</testcase>
+	<testcase name="growable_arrays_source" classname="growable_arrays_source" time="5.36096" status="run">
+		<properties/>
+		<system-out>list transaction 0: 13 failing allocation budgets passed
+list transaction 1: 0 failing allocation budgets passed
+list transaction 2: 0 failing allocation budgets passed
+list transaction 3: 8 failing allocation budgets passed
+cold list construction: 46 failing allocation budgets passed
+growable source normal: 19 failing allocation budgets, recovery and cleanup passed
+growable source O2: 19 failing allocation budgets, recovery and cleanup passed
+Growable lists: source, aliases, roots, transactions and failures passed
+</system-out>
+	</testcase>
+	<testcase name="arrays_source" classname="arrays_source" time="10.2387" status="run">
+		<properties/>
+		<system-out>reference transaction 0: 17 failing budgets passed
+reference transaction 1: 2 failing budgets passed
+reference transaction 2: 1 failing budgets passed
+cold reference construction: 62 failing budgets passed
+failures source normal: 236 failing allocation budgets; cleanup/retry passed
+defaults source normal: 246 failing allocation budgets; cleanup/retry passed
+failures source O2: 236 failing allocation budgets; cleanup/retry passed
+defaults source O2: 246 failing allocation budgets; cleanup/retry passed
+Phase 23 arrays/ranges: source, GC, readonly, publication and failure checks passed
+</system-out>
+	</testcase>
+	<testcase name="generics_source" classname="generics_source" time="8.09773" status="run">
+		<properties/>
+		<system-out>failures normal: 325 allocation failures; roots/cleanup/retry passed
+initialization normal: 201 allocation failures; roots/cleanup/retry passed
+failures O2: 325 allocation failures; roots/cleanup/retry passed
+initialization O2: 201 allocation failures; roots/cleanup/retry passed
+Generic source, diagnostics, tooling, GC, failures and reload passed
+</system-out>
+	</testcase>
+	<testcase name="generics_hint_execution" classname="generics_hint_execution" time="24.1978" status="run">
+		<properties/>
+		<system-out>Shared hint contracts: 54 process checks on 1 MiB stacks passed
+</system-out>
+	</testcase>
+	<testcase name="generics_hint_lsp" classname="generics_hint_lsp" time="0.127703" status="run">
+		<properties/>
+		<system-out>Shared hints LSP: projected hover, navigation, diagnostics and repair passed on 1 MiB stack
+</system-out>
+	</testcase>
+	<testcase name="collections_source" classname="collections_source" time="26.4565" status="run">
+		<properties/>
+		<system-out>native operation 0: 17 allocation failures; rollback passed
+native operation 1: 2 allocation failures; rollback passed
+native operation 2: 31 allocation failures; rollback passed
+main normal: 163 allocation failures, roots/publication/cleanup/retry passed
+nested normal: 1746 allocation failures, roots/publication/cleanup/retry passed
+main O2: 163 allocation failures, roots/publication/cleanup/retry passed
+nested O2: 1746 allocation failures, roots/publication/cleanup/retry passed
+Collections: source/GC/rollback/readonly/iteration/reload passed
+</system-out>
+	</testcase>
+	<testcase name="dictionaries_source" classname="dictionaries_source" time="22.4662" status="run">
+		<properties/>
+		<system-out>native dictionary 0: 11 failures; rollback/version/collection passed
+native dictionary 1: 35 failures; rollback/version/collection passed
+native dictionary 2: 1 failures; rollback/version/collection passed
+native dictionary 3: 1 failures; rollback/version/collection passed
+native dictionary 4: 0 failures; rollback/version/collection passed
+native dictionary 5: 0 failures; rollback/version/collection passed
+native dictionary 6: 0 failures; rollback/version/collection passed
+main normal: 394 allocation failures; cleanup/retry passed
+transactions normal: 1419 allocation failures; cleanup/retry passed
+main O2: 394 allocation failures; cleanup/retry passed
+transactions O2: 1419 allocation failures; cleanup/retry passed
+Dictionaries: source/GC/order/readonly/rollback/reload passed
+</system-out>
+	</testcase>
+	<testcase name="properties_source" classname="properties_source" time="9.86667" status="run">
+		<properties/>
+		<system-out>normal property allocation failures: 154
+O2 property allocation failures: 154
+</system-out>
+	</testcase>
+	<testcase name="patterns_source" classname="patterns_source" time="11.0634" status="run">
+		<properties/>
+		<system-out>normal values allocation failures: 344
+normal large allocation failures: 206
+normal combined allocation failures: 98
+O2 values allocation failures: 344
+O2 large allocation failures: 206
+O2 combined allocation failures: 98
+</system-out>
+	</testcase>
+	<testcase name="debug_cache" classname="debug_cache" time="3.9236" status="run">
+		<properties/>
+		<system-out>cache generations, source/build invalidation, revisions, roots, failures and fallback passed
+</system-out>
+	</testcase>
+	<testcase name="debug_cache_processes" classname="debug_cache_processes" time="11.704" status="run">
+		<properties/>
+		<system-out>Fresh processes, corruption, concurrent publication, imports, diagnostics and large arrays passed
+</system-out>
+	</testcase>
+	<testcase name="automatic_cache_processes" classname="automatic_cache_processes" time="1.81589" status="run">
+		<properties/>
+		<system-out>Automatic O2/no-IR-O2 caching, bypass, fresh globals and diagnostics passed
+</system-out>
+	</testcase>
+	<testcase name="advanced_source" classname="advanced_source" time="12.2956" status="run">
+		<properties/>
+		<system-out>normal captures allocation failures: 197
+normal with allocation failures: 196
+normal events allocation failures: 304
+normal fixed_capture allocation failures: 116
+normal with semantic fault=resource-acquisition observed ordinal=2 passed
+normal with semantic fault=first-body-allocation observed ordinal=3 passed
+O2 captures allocation failures: 197
+O2 with allocation failures: 196
+O2 events allocation failures: 304
+O2 fixed_capture allocation failures: 116
+O2 with semantic fault=resource-acquisition observed ordinal=2 passed
+O2 with semantic fault=first-body-allocation observed ordinal=3 passed
+</system-out>
+	</testcase>
+	<testcase name="fixed_arrays_cli" classname="fixed_arrays_cli" time="9.63003" status="run">
+		<properties/>
+		<system-out>-- Real numeric fixed-array programs passed JIT and linked AOT, normal/O2
+</system-out>
+	</testcase>
+	<testcase name="growable_arrays_cli" classname="growable_arrays_cli" time="13.694" status="run">
+		<properties/>
+		<system-out>-- Growable numeric/bool lists passed normal/O2 source JIT and native AOT
+</system-out>
+	</testcase>
+	<testcase name="arrays_cli" classname="arrays_cli" time="15.9038" status="run">
+		<properties/>
+		<system-out>-- Phase 23 arrays/ranges passed normal/O2 source JIT and native AOT
+</system-out>
+	</testcase>
+	<testcase name="generics_cli" classname="generics_cli" time="8.05328" status="run">
+		<properties/>
+		<system-out>-- Generic programs passed normal/O2 JIT and linked AOT
+</system-out>
+	</testcase>
+	<testcase name="collections_cli" classname="collections_cli" time="22.0075" status="run">
+		<properties/>
+		<system-out>-- Collections: normal/O2 JIT and independently linked AOT passed
+</system-out>
+	</testcase>
+	<testcase name="dictionaries_cli" classname="dictionaries_cli" time="11.2601" status="run">
+		<properties/>
+		<system-out>-- Dictionaries: normal/O2 JIT and independently linked AOT passed
+</system-out>
+	</testcase>
+	<testcase name="properties_cli" classname="properties_cli" time="18.8985" status="run">
+		<properties/>
+		<system-out>-- Properties: 44 successful + 12 checked failures, normal/O2 JIT/independently linked AOT passed
+</system-out>
+	</testcase>
+	<testcase name="patterns_cli" classname="patterns_cli" time="7.06291" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="advanced_cli" classname="advanced_cli" time="22.1488" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="managed_source" classname="managed_source" time="3.51351" status="run">
+		<properties/>
+		<system-out>managed source: readonly, cyclic metadata, publication, GC, failure cleanup, source polls and reload passed
+</system-out>
+	</testcase>
+	<testcase name="managed_aot_normal" classname="managed_aot_normal" time="0.059842" status="run">
+		<properties/>
+		<system-out>parsed source AOT: roots, cyclic graphs, complete publication, automatic/forced GC and startup/failure recovery passed
+</system-out>
+	</testcase>
+	<testcase name="managed_aot_optimized" classname="managed_aot_optimized" time="0.058052" status="run">
+		<properties/>
+		<system-out>parsed source AOT: roots, cyclic graphs, complete publication, automatic/forced GC and startup/failure recovery passed
+</system-out>
+	</testcase>
+	<testcase name="managed_cli" classname="managed_cli" time="4.25615" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="managed_initialization_source" classname="managed_initialization_source" time="6.9416" status="run">
+		<properties/>
+		<system-out>managed initialization: staged views, readiness, helpers, roots, commit/failure/reload passed
+</system-out>
+	</testcase>
+	<testcase name="managed_initialization_aot_normal" classname="managed_initialization_aot_normal" time="0.0759167" status="run">
+		<properties/>
+		<system-out>native managed init: staged roots, commit, GC, failures and bootstrap passed
+</system-out>
+	</testcase>
+	<testcase name="managed_initialization_aot_optimized" classname="managed_initialization_aot_optimized" time="0.0659265" status="run">
+		<properties/>
+		<system-out>native managed init: staged roots, commit, GC, failures and bootstrap passed
+</system-out>
+	</testcase>
+	<testcase name="managed_initialization_cli" classname="managed_initialization_cli" time="6.27561" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="reference_values_source" classname="reference_values_source" time="4.49978" status="run">
+		<properties/>
+		<system-out>reference values: copies, capabilities, construction, sole aggregate roots, failure, tooling and reload passed
+</system-out>
+	</testcase>
+	<testcase name="reference_values_aot_normal" classname="reference_values_aot_normal" time="0.106181" status="run">
+		<properties/>
+		<system-out>native reference values: sole aggregate carriers, cycles, GC, failure and recovery passed
+</system-out>
+	</testcase>
+	<testcase name="reference_values_aot_optimized" classname="reference_values_aot_optimized" time="0.0889579" status="run">
+		<properties/>
+		<system-out>native reference values: sole aggregate carriers, cycles, GC, failure and recovery passed
+</system-out>
+	</testcase>
+	<testcase name="reference_values_cli" classname="reference_values_cli" time="9.38938" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="composition_source" classname="composition_source" time="3.23117" status="run">
+		<properties/>
+		<system-out>composition: lookup, storage, readonly, readiness, GC, tooling and reload passed
+</system-out>
+	</testcase>
+	<testcase name="composition_aot_normal" classname="composition_aot_normal" time="0.093054" status="run">
+		<properties/>
+		<system-out>native composition: sole aggregate carriers, cycles, GC, failure and recovery passed
+</system-out>
+	</testcase>
+	<testcase name="composition_aot_optimized" classname="composition_aot_optimized" time="0.0938464" status="run">
+		<properties/>
+		<system-out>native composition: sole aggregate carriers, cycles, GC, failure and recovery passed
+</system-out>
+	</testcase>
+	<testcase name="composition_cli" classname="composition_cli" time="5.05642" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="inheritance_source" classname="inheritance_source" time="4.58504" status="run">
+		<properties/>
+		<system-out>inheritance: source, exact contracts, prefix stages, virtual effects, IR, sole Base GC roots, reload and navigation passed
+</system-out>
+	</testcase>
+	<testcase name="inheritance_aot_normal" classname="inheritance_aot_normal" time="0.157708" status="run">
+		<properties/>
+		<system-out>native inheritance: full prefix, sole Base carriers, virtual dispatch, precise cycles and failure recovery passed
+</system-out>
+	</testcase>
+	<testcase name="inheritance_aot_optimized" classname="inheritance_aot_optimized" time="0.156261" status="run">
+		<properties/>
+		<system-out>native inheritance: full prefix, sole Base carriers, virtual dispatch, precise cycles and failure recovery passed
+</system-out>
+	</testcase>
+	<testcase name="inheritance_cli" classname="inheritance_cli" time="7.12764" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="interfaces_source" classname="interfaces_source" time="8.8108" status="run">
+		<properties/>
+		<system-out>interfaces: diagnostics begin
+interfaces: diagnostics passed
+interfaces: programs begin
+interfaces: programs passed
+interfaces: independent_ir begin
+interfaces: independent_ir passed
+interfaces: admission begin
+interfaces: admission passed
+interfaces: tooling_and_imports begin
+interfaces: tooling_and_imports passed
+interfaces: mode normal
+interfaces: roots begin
+interfaces: roots passed
+interfaces: handoffs begin
+interfaces: handoffs passed
+interfaces: selected begin
+interfaces: selected passed
+interfaces: retirement begin
+interfaces: retirement passed
+interfaces: parked begin
+interfaces: parked passed
+interfaces: timeout begin
+interfaces: timeout passed
+interfaces: active_reload begin
+interfaces: active_reload passed
+interfaces: mode O2
+interfaces: roots begin
+interfaces: roots passed
+interfaces: handoffs begin
+interfaces: handoffs passed
+interfaces: selected begin
+interfaces: selected passed
+interfaces: retirement begin
+interfaces: retirement passed
+interfaces: parked begin
+interfaces: parked passed
+interfa...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="interfaces_aot_normal" classname="interfaces_aot_normal" time="0.0857347" status="run">
+		<properties/>
+		<system-out>native interface tracing and dispatch passed
+</system-out>
+	</testcase>
+	<testcase name="interfaces_aot_optimized" classname="interfaces_aot_optimized" time="0.101536" status="run">
+		<properties/>
+		<system-out>native interface tracing and dispatch passed
+</system-out>
+	</testcase>
+	<testcase name="interfaces_cli" classname="interfaces_cli" time="6.08465" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="strings_source" classname="strings_source" time="5.28602" status="run">
+		<properties/>
+		<system-out>Sprint 3 native conversion 0: 26 failures; output/root preservation passed
+Sprint 3 native conversion 1: 11 failures; output/root preservation passed
+Sprint 3 traversal scalars=64 count128_us=65 last_index32_us=211
+Sprint 3 traversal scalars=1024 count128_us=933 last_index32_us=654
+Sprint 3 traversal scalars=4096 count128_us=3721 last_index32_us=2112
+Sprint 3 source normal: 69 allocation failures; roots/cleanup/retry/reload passed
+Sprint 3 source O2: 69 allocation failures; roots/cleanup/retry/reload passed
+UTF-8 string source, IR, roots, failures and reload passed
+</system-out>
+	</testcase>
+	<testcase name="strings_aot_normal" classname="strings_aot_normal" time="0.0956331" status="run">
+		<properties/>
+		<system-out>Runtime-only AOT strings, old-holder/new-code, roots and failures passed
+</system-out>
+	</testcase>
+	<testcase name="strings_aot_optimized" classname="strings_aot_optimized" time="0.0967561" status="run">
+		<properties/>
+		<system-out>Runtime-only AOT strings, old-holder/new-code, roots and failures passed
+</system-out>
+	</testcase>
+	<testcase name="strings_cli" classname="strings_cli" time="3.06869" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="runtime_callbacks" classname="runtime_callbacks" time="0.928996" status="run">
+		<properties/>
+		<system-out>callback provider quiescence, shutdown, self-drain, generated native roots/reentry, exceptions and code leases passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_failures" classname="runtime_failures" time="0.0360578" status="run">
+		<properties/>
+		<system-out>deterministic allocation failures: enumeration, partial marking, rollback and recovery passed (7)
+</system-out>
+	</testcase>
+	<testcase name="runtime_aot_normal" classname="runtime_aot_normal" time="0.115652" status="run">
+		<properties/>
+		<system-out>separately linked AOT precise roots and failure cleanup passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_aot_optimized" classname="runtime_aot_optimized" time="0.12185" status="run">
+		<properties/>
+		<system-out>separately linked AOT precise roots and failure cleanup passed
+</system-out>
+	</testcase>
+	<testcase name="runtime_invariants" classname="runtime_invariants" time="0.100953" status="run">
+		<properties/>
+		<system-out>corrupt roots and frame order cannot resume managed execution
+</system-out>
+	</testcase>
+	<testcase name="lsp_positions" classname="lsp_positions" time="0.0274096" status="run">
+		<properties/>
+		<system-out>UTF16 positions, owned snapshots and URI mapping passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_protocol" classname="lsp_protocol" time="1.59148" status="run">
+		<properties/>
+		<system-out>editor: CRLF/UTF16, cross-file symbols, overlays, versions, invalid/repair, graph changes and cycles passed
+transport: fragmented/coalesced frames, IDs, malformed messages, bounded framing, lifecycle and EOF passed
+value structs: real LSP type/constructor/field navigation, references, readonly diagnostics and revision recovery passed
+receiver methods: imported native LSP navigation, references, effect changes and revision recovery passed
+initialization: imported initializer navigation/references, exact argument diagnostics and unsaved recovery passed
+managed structs: cyclic types, imported fields/methods, readonly aliases and unsaved recovery passed
+managed initialization: imported constructor, private helper navigation, required-field diagnostics and unsaved repair passed
+reference values: imported nested reference navigation, precise readonly diagnostics and unsaved recovery passed
+composition: imported promoted navigation, ambiguity and unsaved repair passed
+inheritance: original owners, static virtual/sup...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage11_globals" classname="lsp_stage11_globals" time="0.234819" status="run">
+		<properties/>
+		<system-out>Global hover, completion, cross-file definition/references/rename, overlays and stale-version checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage8" classname="lsp_stage8" time="2.48813" status="run">
+		<properties/>
+		<system-out>Debug cache: hit
+Debug cache: hit
+SKIP: Windows 8.3 coverage requires Windows
+POSIX workspace ancestor alias and descendant rejection checks passed
+Stage 8 compiler-backed LSP discovery/docs/readonly checks passed
+</system-out>
+	</testcase>
+	<testcase name="documentation_execution" classname="documentation_execution" time="5.29412" status="run">
+		<properties/>
+		<system-out>Documentation execution: 18 processes passed (check, normal/O2 JIT, emit, linked build and native execution)
+</system-out>
+	</testcase>
+	<testcase name="lsp_documentation" classname="lsp_documentation" time="0.515084" status="run">
+		<properties/>
+		<system-out>Documentation: 196 assertions passed
+</system-out>
+	</testcase>
+	<testcase name="math_host" classname="math_host" time="2.85837" status="run">
+		<properties/>
+		<system-out>Math native cache: first=miss repeated=hit
+Math native cache: first=miss repeated=hit
+Math host: 28 checks passed
+</system-out>
+	</testcase>
+	<testcase name="math_ir" classname="math_ir" time="0.645897" status="run">
+		<properties/>
+		<system-out>799 independent scalar Math IR checks passed
+</system-out>
+	</testcase>
+	<testcase name="math_execution" classname="math_execution" time="46.6968" status="run">
+		<properties/>
+		<system-out>Math check: 1372 vectors, 59675 source bytes
+Math JIT O0
+Math linked AOT O0
+Math JIT O2
+Math linked AOT O2
+Math execution: 1372 vectors x four real modes; 7 processes passed; 1 MiB=False
+</system-out>
+	</testcase>
+	<testcase name="math_frontend" classname="math_frontend" time="34.7277" status="run">
+		<properties/>
+		<system-out>Math frontend: 356 processes passed; 1 MiB=False
+</system-out>
+	</testcase>
+	<testcase name="math_errors" classname="math_errors" time="29.6775" status="run">
+		<properties/>
+		<system-out>Math inherited checked failures: 11 cases x four modes; 66 processes passed
+</system-out>
+	</testcase>
+	<testcase name="math_worker" classname="math_worker" time="4.71032" status="run">
+		<properties/>
+		<system-out>Math worker: 8 preserved processes passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_math" classname="lsp_math" time="1.51912" status="run">
+		<properties/>
+		<system-out>Math LSP: 65 checks passed
+</system-out>
+	</testcase>
+	<testcase name="math_install" classname="math_install" time="4.21369" status="run">
+		<properties/>
+		<system-out>Math relocated install: 7 processes passed
+</system-out>
+	</testcase>
+	<testcase name="math_preservation" classname="math_preservation" time="1.37751" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/void-s7-integrated-strict.tk3gHC/VOID math synthetic preservation rn191z7a/synthetic-evidence/incident-ltynh8jt
+CRASH EVIDENCE: /tmp/void-s7-integrated-strict.tk3gHC/VOID math synthetic preservation rn191z7a/synthetic-evidence/incident-1t1lkuvo
+CRASH EVIDENCE: /tmp/void-s7-integrated-strict.tk3gHC/VOID math synthetic preservation rn191z7a/synthetic-evidence/incident-x1x2muew
+Math preservation: 3 synthetic reserved-87/timeout incidents, edited nested sources, compiler identity and original output verified and disposed
+</system-out>
+	</testcase>
+	<testcase name="math_stack" classname="math_stack" time="45.2445" status="run">
+		<properties/>
+		<system-out>Math check: 1372 vectors, 59675 source bytes
+Math JIT O0
+Math linked AOT O0
+Math JIT O2
+Math linked AOT O2
+Math execution: 1372 vectors x four real modes; 7 processes passed; 1 MiB=True
+</system-out>
+	</testcase>
+	<testcase name="math_frontend_stack" classname="math_frontend_stack" time="35.2225" status="run">
+		<properties/>
+		<system-out>Math frontend: 356 processes passed; 1 MiB=True
+</system-out>
+	</testcase>
+	<testcase name="host_capabilities_dependencies" classname="host_capabilities_dependencies" time="6.30498" status="run">
+		<properties/>
+		<system-out>Pinned host provider receipt: 9 admission/rejection checks passed
+Approved backport receipt: 18 admission/rejection checks passed
+</system-out>
+	</testcase>
+	<testcase name="host_capabilities_portable" classname="host_capabilities_portable" time="0.19876" status="run">
+		<properties/>
+		<system-out>Portable host providers: 70 checks passed
+</system-out>
+	</testcase>
+	<testcase name="host_capabilities_portable_source" classname="host_capabilities_portable_source" time="117.507" status="run">
+		<properties/>
+		<system-out>30 portable source invocations; normal/O2 JIT and independent AOT passed
+</system-out>
+	</testcase>
+	<testcase name="host_capabilities" classname="host_capabilities" time="197.413" status="run">
+		<properties/>
+		<system-out>54 processes; 28 ZIP cases per normal/O2 JIT/AOT; stack_1MiB=False; receipt=/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/host-capabilities-evidence/linux-strict.json
+</system-out>
+	</testcase>
+	<testcase name="host_capabilities_stack" classname="host_capabilities_stack" time="187.52" status="run">
+		<properties/>
+		<system-out>54 processes; 28 ZIP cases per normal/O2 JIT/AOT; stack_1MiB=True; receipt=/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/host-capabilities-evidence/linux-strict-stack.json
+</system-out>
+	</testcase>
+	<testcase name="host_capabilities_frontend" classname="host_capabilities_frontend" time="14.1068" status="run">
+		<properties/>
+		<system-out>23 frontend/authority checks; real 1 MiB stack
+</system-out>
+	</testcase>
+	<testcase name="host_capabilities_lsp" classname="host_capabilities_lsp" time="3.01087" status="run">
+		<properties/>
+		<system-out>31 new API declarations: compiler-owned hover and navigation passed
+</system-out>
+	</testcase>
+	<testcase name="host_capabilities_native" classname="host_capabilities_native" time="0.57706" status="run">
+		<properties/>
+		<system-out>Host boundary/GC/allocation/publication/process/ZIP/IR: 305 checks passed
+</system-out>
+	</testcase>
+	<testcase name="host_capabilities_install" classname="host_capabilities_install" time="42.8073" status="run">
+		<properties/>
+		<system-out>Installed and relocated native providers, notices and modules; normal/O2 JIT and isolated AOT passed on 1 MiB stacks
+</system-out>
+	</testcase>
+	<testcase name="os_execution" classname="os_execution" time="115.315" status="run">
+		<properties/>
+		<system-out>OS location/identity: 92 process checks passed; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="os_stack" classname="os_stack" time="114.192" status="run">
+		<properties/>
+		<system-out>OS location/identity: 92 process checks passed; hard_stack_1MiB=True
+</system-out>
+	</testcase>
+	<testcase name="os_edges" classname="os_edges" time="24.0436" status="run">
+		<properties/>
+		<system-out>OS deleted image/long env/cwd: 10 process checks passed; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="os_edges_stack" classname="os_edges_stack" time="23.6739" status="run">
+		<properties/>
+		<system-out>OS deleted image/long env/cwd: 10 process checks passed; hard_stack_1MiB=True
+</system-out>
+	</testcase>
+	<testcase name="os_host" classname="os_host" time="40.4706" status="run">
+		<properties/>
+		<system-out>OS native/ABI/GC/IR/globals/reload/cache: 127 checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_errors" classname="os_errors" time="25.9448" status="run">
+		<properties/>
+		<system-out>OS errors: 8 process checks, 9 valid/61 invalid IDs x four getters; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="os_frontend" classname="os_frontend" time="61.7257" status="run">
+		<properties/>
+		<system-out>OS frontend: 75 processes passed; hard_stack_1MiB=False
+</system-out>
+	</testcase>
+	<testcase name="lsp_os" classname="lsp_os" time="8.77346" status="run">
+		<properties/>
+		<system-out>OS LSP: 44 checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_cache" classname="os_cache" time="21.5958" status="run">
+		<properties/>
+		<system-out>OS cache/fresh and simultaneously live process identity: 10 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_owner" classname="os_owner" time="40.3096" status="run">
+		<properties/>
+		<system-out>OS owner async JIT/O2/AOT: 8 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_examples" classname="os_examples" time="21.1953" status="run">
+		<properties/>
+		<system-out>OS examples: 9 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_install" classname="os_install" time="34.1885" status="run">
+		<properties/>
+		<system-out>OS compiler/tooling install and independent AOT: 14 process checks passed
+</system-out>
+	</testcase>
+	<testcase name="os_frontend_stack" classname="os_frontend_stack" time="61.343" status="run">
+		<properties/>
+		<system-out>OS frontend: 75 processes passed; hard_stack_1MiB=True
+</system-out>
+	</testcase>
+	<testcase name="os_host_stack" classname="os_host_stack" time="41.7609" status="run">
+		<properties/>
+		<system-out>OS native/ABI/GC/IR/globals/reload/cache: 127 checks passed
+</system-out>
+	</testcase>
+	<testcase name="random_host" classname="random_host" time="62.7999" status="run">
+		<properties/>
+		<system-out>Swap fault sweep: operation=0 failures=112 successes=1
+Swap fault sweep: operation=1 failures=61 successes=1
+Swap fault sweep: operation=0 failures=112 successes=1
+Swap fault sweep: operation=1 failures=61 successes=1
+Benchmark O2: 20000 iterations (raw, typed, bounded, four-item shuffle), 0.885707 s, 22580.8 iterations/s
+Random host: 1333 checks passed
+</system-out>
+	</testcase>
+	<testcase name="random_execution" classname="random_execution" time="62.5883" status="run">
+		<properties/>
+		<system-out>Random execution: 792 vectors x 4 modes; 7 processes passed; 1 MiB=False
+</system-out>
+	</testcase>
+	<testcase name="random_frontend" classname="random_frontend" time="30.6528" status="run">
+		<properties/>
+		<system-out>Random frontend: 116 processes passed; 1 MiB=False
+</system-out>
+	</testcase>
+	<testcase name="lsp_random" classname="lsp_random" time="4.02029" status="run">
+		<properties/>
+		<system-out>Random LSP: 61 checks passed
+</system-out>
+	</testcase>
+	<testcase name="random_install" classname="random_install" time="12.1285" status="run">
+		<properties/>
+		<system-out>Random install/real OS entropy: 13 processes passed
+</system-out>
+	</testcase>
+	<testcase name="random_errors" classname="random_errors" time="27.8428" status="run">
+		<properties/>
+		<system-out>Random checked errors/defers: 24 processes passed
+</system-out>
+	</testcase>
+	<testcase name="random_preservation" classname="random_preservation" time="0.395279" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/void-s7-integrated-strict.tk3gHC/VOID random synthetic preservation 1e7mmp_m/evidence/incident-5as63w7w
+CRASH EVIDENCE: /tmp/void-s7-integrated-strict.tk3gHC/VOID random synthetic preservation 1e7mmp_m/evidence/incident-jsy059q6
+CRASH EVIDENCE: /tmp/void-s7-integrated-strict.tk3gHC/VOID random synthetic preservation 1e7mmp_m/evidence/incident-y10zi7ec
+Random preservation: 3 synthetic reserved-status/timeout incidents verified and disposed
+</system-out>
+	</testcase>
+	<testcase name="random_worker" classname="random_worker" time="11.6495" status="run">
+		<properties/>
+		<system-out>Random worker snapshot execution: 8 processes passed
+</system-out>
+	</testcase>
+	<testcase name="random_reference" classname="random_reference" time="0.0265535" status="run">
+		<properties/>
+		<system-out>Independent oracle: 24 published words, mixed 11-word sequence, 256 exhaustive residue domains and forced integer/float rejection passed
+</system-out>
+	</testcase>
+	<testcase name="random_stack" classname="random_stack" time="66.2078" status="run">
+		<properties/>
+		<system-out>Random execution: 792 vectors x 4 modes; 7 processes passed; 1 MiB=True
+</system-out>
+	</testcase>
+	<testcase name="random_frontend_stack" classname="random_frontend_stack" time="31.1678" status="run">
+		<properties/>
+		<system-out>Random frontend: 116 processes passed; 1 MiB=True
+</system-out>
+	</testcase>
+	<testcase name="binary_execution" classname="binary_execution" time="41.4728" status="run">
+		<properties/>
+		<system-out>Binary execution: 356 independent vectors; 19 processes passed (check, JIT/O2, linked AOT/O2, rejection checks)
+</system-out>
+	</testcase>
+	<testcase name="lsp_binary" classname="lsp_binary" time="0.371493" status="run">
+		<properties/>
+		<system-out>Binary LSP: 81 import, completion, navigation, hover and active-parameter checks passed
+</system-out>
+	</testcase>
+	<testcase name="binary_ownership" classname="binary_ownership" time="1.03588" status="run">
+		<properties/>
+		<system-out>normal: 62 allocation failure budgets, collection and retry passed
+O2: 62 allocation failure budgets, collection and retry passed
+Binary ownership: 801 checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_const_recovery" classname="lsp_const_recovery" time="4.5827" status="run">
+		<properties/>
+		<system-out>Const/global completion recovery: 472 assertions passed
+</system-out>
+	</testcase>
+	<testcase name="combined_ownership" classname="combined_ownership" time="13.8767" status="run">
+		<properties/>
+		<system-out>268 installed public declarations documented
+normal: 288 allocation failure budgets passed across all derived errors and unwrap
+O2: 288 allocation failure budgets passed across all derived errors and unwrap
+Combined ownership/documentation: 4111 checks passed
+</system-out>
+	</testcase>
+	<testcase name="combined_async_normal" classname="combined_async_normal" time="0.0674467" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="combined_async_optimized" classname="combined_async_optimized" time="0.0711121" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="combined_execution" classname="combined_execution" time="71.8394" status="run">
+		<properties/>
+		<system-out>Combined execution: 246 parsing assertions; 74 processes passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_combined" classname="lsp_combined" time="6.6098" status="run">
+		<properties/>
+		<system-out>Combined LSP: 97 documentation, completion, signature and navigation assertions passed
+</system-out>
+	</testcase>
+	<testcase name="memory_execution" classname="memory_execution" time="120.586" status="run">
+		<properties/>
+		<system-out>Memory execution: 268 numeric/IEEE vectors, 64 model transitions, semantic fixture, 14 rejection cases; 35 processes passed (check, JIT/O2, linked AOT/O2)
+</system-out>
+	</testcase>
+	<testcase name="lsp_memory" classname="lsp_memory" time="2.22393" status="run">
+		<properties/>
+		<system-out>Memory LSP: 156 completion, navigation, hover, constructor/method signature and documentation checks passed
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_text" classname="text_encoding_text" time="13.3283" status="run">
+		<properties/>
+		<system-out>PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc check /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/text.void 0.235s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc run /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/text.void --no-opt 2.722s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc run /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/text.void 3.246s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc build /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/text.void -o /tmp/void-s7-integrated-strict.tk3gHC/VOID text encoding execution biihgssx/text-aot/application --no-opt 2.964s
+PASS /tmp/void-s7-integrated-strict.tk3gHC/VOID text encod...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_hex" classname="text_encoding_hex" time="4.59843" status="run">
+		<properties/>
+		<system-out>PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc check /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/hex.void 0.111s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc run /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/hex.void --no-opt 0.618s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc run /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/hex.void 0.692s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc build /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/hex.void -o /tmp/void-s7-integrated-strict.tk3gHC/VOID text encoding execution udxl_dzj/hex-aot/application --no-opt 1.570s
+PASS /tmp/void-s7-integrated-strict.tk3gHC/VOID text encoding e...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_base64" classname="text_encoding_base64" time="7.72139" status="run">
+		<properties/>
+		<system-out>PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc check /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/base64.void 0.199s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc run /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/base64.void --no-opt 1.449s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc run /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/base64.void 1.491s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc build /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/base64.void -o /tmp/void-s7-integrated-strict.tk3gHC/VOID text encoding execution 5a27su2n/base64-aot/application --no-opt 2.165s
+PASS /tmp/void-s7-integrated-strict.tk3gHC/VOID ...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_ascii" classname="text_encoding_ascii" time="4.78925" status="run">
+		<properties/>
+		<system-out>PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc check /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/ascii.void 0.103s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc run /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/ascii.void --no-opt 0.754s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc run /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/ascii.void 0.740s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc build /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/ascii.void -o /tmp/void-s7-integrated-strict.tk3gHC/VOID text encoding execution o_sa16gw/ascii-aot/application --no-opt 1.424s
+PASS /tmp/void-s7-integrated-strict.tk3gHC/VOID text ...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_oracles" classname="text_encoding_oracles" time="290.922" status="run">
+		<properties/>
+		<system-out>PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc check /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/oracles.void 3.310s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc run /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/oracles.void --no-opt 76.323s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc run /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/oracles.void 82.143s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc build /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/oracles.void -o /tmp/void-s7-integrated-strict.tk3gHC/VOID text encoding execution qbjwascl/oracles-aot/application --no-opt 57.436s
+PASS /tmp/void-s7-integrated-strict.tk3g...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_interop" classname="text_encoding_interop" time="25.1095" status="run">
+		<properties/>
+		<system-out>PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc check /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/interop.void 1.404s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc run /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/interop.void --no-opt 5.761s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc run /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/interop.void 5.787s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc build /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/interop.void -o /tmp/void-s7-integrated-strict.tk3gHC/VOID text encoding execution 2pbbh26q/interop-aot/application --no-opt 5.876s
+PASS /tmp/void-s7-integrated-strict.tk3gHC/...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_large" classname="text_encoding_large" time="66.9846" status="run">
+		<properties/>
+		<system-out>PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc check /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/large.void 0.321s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc run /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/large.void --no-opt 17.253s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc run /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/large.void 15.708s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc build /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/large.void -o /tmp/void-s7-integrated-strict.tk3gHC/VOID text encoding execution naqwwlqd/large-aot/application --no-opt 2.582s
+PASS /tmp/void-s7-integrated-strict.tk3gHC/VOID tex...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_errors" classname="text_encoding_errors" time="11.5266" status="run">
+		<properties/>
+		<system-out>PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc check /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/errors.void 0.304s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc run /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/errors.void --no-opt 2.309s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc run /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/errors.void 2.826s
+PASS /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/voidc build /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/text_encoding/errors.void -o /tmp/void-s7-integrated-strict.tk3gHC/VOID text encoding execution ylex59gf/errors-aot/application --no-opt 2.970s
+PASS /tmp/void-s7-integrated-strict.tk3gHC/VOID ...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_crash_preservation" classname="text_encoding_crash_preservation" time="1.60893" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/void-s7-integrated-strict.tk3gHC/VOID crash preservation selftest jngs494_/evidence/incident-fbfzxzxt
+CRASH EVIDENCE: /tmp/void-s7-integrated-strict.tk3gHC/VOID crash preservation selftest jngs494_/evidence/incident-qjji18qv
+CRASH EVIDENCE: /tmp/void-s7-integrated-strict.tk3gHC/VOID crash preservation selftest jngs494_/evidence/incident-1bho4x59
+CRASH EVIDENCE: /tmp/void-s7-integrated-strict.tk3gHC/VOID crash preservation selftest jngs494_/evidence/incident-zl8ce8h9
+CRASH EVIDENCE: /tmp/void-s7-integrated-strict.tk3gHC/VOID crash preservation selftest jngs494_/evidence/incident-nkdyultu
+CRASH EVIDENCE: /tmp/void-s7-integrated-strict.tk3gHC/VOID crash preservation selftest jngs494_/evidence/incident-6p_c9q3u
+CRASH EVIDENCE: /tmp/void-s7-integrated-strict.tk3gHC/VOID crash preservation selftest jngs494_/evidence/incident-91xxez43
+CRASH EVIDENCE: /tmp/void-s7-integrated-strict.tk3gHC/VOID crash preservation selftest jngs494_/evidence/incident-qi7bp06y
+CRASH EVIDENCE: /tmp/void-s7-integrated-...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="lsp_text_encoding" classname="lsp_text_encoding" time="3.76773" status="run">
+		<properties/>
+		<system-out>54 persistent LSP documentation/completion/recovery checks passed
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_install" classname="text_encoding_install" time="17.4247" status="run">
+		<properties/>
+		<system-out>6 installed/relocated check/JIT/O2/linked AOT operations passed
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_depth" classname="text_encoding_depth" time="0.501472" status="run">
+		<properties/>
+		<system-out>1 MiB call depth 32: accepted
+1 MiB call depth 64: checked rejection
+1 MiB call depth 124: checked rejection
+1 MiB call depth 400: checked rejection
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_semantic_depth" classname="text_encoding_semantic_depth" time="2.14453" status="run">
+		<properties/>
+		<system-out>Deep receiver chains: bounded stack, nesting location and later error verified
+Numeric receiver chains: legal depth and recovering rejection fit the unchanged 1 MiB budget
+String index chains: legal depth and recovering rejection fit the unchanged 1 MiB budget
+Recursive type grammar: shallow acceptance, bounded stack, nesting diagnostic and later recovery verified
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_ir" classname="text_encoding_ir" time="2.0035" status="run">
+		<properties/>
+		<system-out>16 independent private Unicode IR rejections passed
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_inventory" classname="text_encoding_inventory" time="0.376666" status="run">
+		<properties/>
+		<system-out>Identity	Source	Signature	Parameters	Return	Tests
+/@stdlib/encoding/ascii.void::error_kind::variant::non_ascii	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:8	    non_ascii	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/ascii.void::error_kind::variant::limit_exceeded	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:11	    limit_exceeded	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/ascii.void::error_kind	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:6	enum error_kind:	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/ascii.void::error::field::kind	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:17	    kind: error_kind	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/ascii.void::error::field::offset	/home/shmellyorc/Documents/Void.Language/stdlib/encoding/ascii.void:20	    offset: i64	yes	n/a	oracles, focused, ownership, lsp
+/@stdlib/encoding/ascii.void::error	/home/shmellyorc/Document...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="text_encoding_ownership" classname="text_encoding_ownership" time="8.41342" status="run">
+		<properties/>
+		<system-out>8 translation ABI allocation failures preserved aliased output
+normal scenario 0: 27 failed budgets recovered
+normal scenario 1: 14 failed budgets recovered
+normal scenario 2: 14 failed budgets recovered
+normal scenario 3: 27 failed budgets recovered
+normal scenario 4: 114 failed budgets recovered
+normal scenario 5: 90 failed budgets recovered
+normal scenario 6: 124 failed budgets recovered
+normal scenario 7: 81 failed budgets recovered
+normal scenario 8: 44 failed budgets recovered
+normal scenario 9: 125 failed budgets recovered
+normal scenario 10: 38 failed budgets recovered
+normal scenario 11: 24 failed budgets recovered
+normal scenario 12: 31 failed budgets recovered
+normal scenario 13: 24 failed budgets recovered
+normal scenario 14: 13 failed budgets recovered
+normal scenario 15: 16 failed budgets recovered
+normal scenario 16: 35 failed budgets recovered
+normal scenario 17: 38 failed budgets recovered
+normal scenario 18: 31 failed budgets recovered
+normal scenario 19: 37 failed budgets recovered
+normal: ...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="memory_ownership" classname="memory_ownership" time="4.59621" status="run">
+		<properties/>
+		<system-out>normal scenario 0: 20 allocation failure budgets passed
+normal scenario 1: 51 allocation failure budgets passed
+normal scenario 2: 14 allocation failure budgets passed
+normal scenario 3: 17 allocation failure budgets passed
+normal scenario 4: 27 allocation failure budgets passed
+normal scenario 5: 25 allocation failure budgets passed
+normal scenario 6: 17 allocation failure budgets passed
+normal scenario 7: 4 allocation failure budgets passed
+normal scenario 8: 38 allocation failure budgets passed
+normal scenario 9: 14 allocation failure budgets passed
+normal scenario 10: 10 allocation failure budgets passed
+normal scenario 11: 28 allocation failure budgets passed
+normal scenario 12: 14 allocation failure budgets passed
+normal scenario 13: 14 allocation failure budgets passed
+normal: 293 failure budgets across 14 operations; atomic state and retry passed
+O2 scenario 0: 20 allocation failure budgets passed
+O2 scenario 1: 51 allocation failure budgets passed
+O2 scenario 2: 14 allocation failure budgets passed
+O...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage7" classname="lsp_stage7" time="0.529933" status="run">
+		<properties/>
+		<system-out>Stage 7: completion/recovery, signatures, hover, bindings, symbols, guarded rename, formatting, refresh, batching, cancellation passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_demo" classname="lsp_demo" time="0.128023" status="run">
+		<properties/>
+		<system-out>initialized: full synchronization, UTF-16, definition and references
+open: no diagnostics
+definition: worker.void:1:6
+references: declaration and one source call
+unsaved edit: VOID2002 at worker.void:2:12
+invalid revision: navigation returns null
+repair: old diagnostics cleared; fresh navigation restored
+shutdown and exit: clean protocol streams
+</system-out>
+	</testcase>
+	<testcase name="stage10_operator_compounds" classname="stage10_operator_compounds" time="6.60141" status="run">
+		<properties/>
+		<system-out>732 captured-place compound checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage11_globals" classname="stage11_globals" time="2.24934" status="run">
+		<properties/>
+		<system-out>107 global checks passed
+</system-out>
+	</testcase>
+	<testcase name="log_native" classname="log_native" time="581.442" status="run">
+		<properties/>
+		<system-out>native stack soft=1048576 hard=1048576
+startup optimize=0 close_before_shutdown=1 close_after_shutdown=1 passed
+reload optimize=0 pending_native_write preserved_global_file_identity passed
+transport optimize=0 partial_boundaries=18 native_closes=43 passed
+rotation optimize=0 native_identity_and_replacement_boundaries passed
+allocation optimize=0 acquisition_failures=72 post_effect_faults=1 passed
+cancel optimize=0 native_operation=14 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=14 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=15 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=15 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=18 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=18 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=30 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=30 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=24 completion...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="log_execution" classname="log_execution" time="290.243" status="run">
+		<properties/>
+		<system-out>Logging execution: 32 checks; hard stack=1048576
+</system-out>
+	</testcase>
+	<testcase name="log_frontend" classname="log_frontend" time="30.4368" status="run">
+		<properties/>
+		<system-out>Logging frontend: 16 visibility/readonly/worker/default/surface checks
+</system-out>
+	</testcase>
+	<testcase name="log_files" classname="log_files" time="91.5082" status="run">
+		<properties/>
+		<system-out>Logging filesystem: 244 native source/oracle checks; exact 0/1/3/32 retention, holes, preflight, adoption, count/path/bound reconfiguration
+</system-out>
+	</testcase>
+	<testcase name="log_oracles" classname="log_oracles" time="155.276" status="run">
+		<properties/>
+		<system-out>Logging independent byte/UTC oracles: 15 executions/emit/link checks; thresholds=30, all specified Unicode controls, 8 budgets, 9 invalid configurations, 8 fixed instants
+</system-out>
+	</testcase>
+	<testcase name="log_cache" classname="log_cache" time="58.5146" status="run">
+		<properties/>
+		<system-out>Logging cache: 6 miss/hit/bypass executions with fresh Runtime defaults
+</system-out>
+	</testcase>
+	<testcase name="log_install" classname="log_install" time="132.195" status="run">
+		<properties/>
+		<system-out>Logging installation: 15 relocated check/JIT/O2/build/independent-AOT/LSP checks
+</system-out>
+	</testcase>
+	<testcase name="log_console" classname="log_console" time="108.715" status="run">
+		<properties/>
+		<system-out>Logging actual console: 16 redirected/live-UTC/closed-peer/file-independence observations
+</system-out>
+	</testcase>
+	<testcase name="lsp_log" classname="lsp_log" time="17.2317" status="run">
+		<properties/>
+		<system-out>VOID_TEST_STACK {"inherited": [8388608, -1], "observed": [1048576, 1048576]}
+Logging LSP: 38 checks passed
+</system-out>
+	</testcase>
+	<testcase name="log_probe_normal" classname="log_probe_normal" time="2.15771" status="run">
+		<properties/>
+		<system-out>native stack soft=1048576 hard=1048576
+transport optimize=0 partial_boundaries=18 native_closes=43 passed
+rotation optimize=0 native_identity_and_replacement_boundaries passed
+allocation optimize=0 acquisition_failures=72 post_effect_faults=1 passed
+cancel optimize=0 native_operation=14 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=14 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=15 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=15 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=18 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=18 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=30 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=30 completion_race=1 closes=1 passed
+cancel optimize=0 native_operation=24 completion_race=0 closes=1 passed
+cancel optimize=0 native_operation=24 completion_race=1 closes=1 passed
+default replacement cancellation optimize=0 closes=1 p...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="log_probe_optimized" classname="log_probe_optimized" time="2.11982" status="run">
+		<properties/>
+		<system-out>native stack soft=1048576 hard=1048576
+transport optimize=1 partial_boundaries=18 native_closes=43 passed
+rotation optimize=1 native_identity_and_replacement_boundaries passed
+allocation optimize=1 acquisition_failures=72 post_effect_faults=1 passed
+cancel optimize=1 native_operation=14 completion_race=0 closes=1 passed
+cancel optimize=1 native_operation=14 completion_race=1 closes=1 passed
+cancel optimize=1 native_operation=15 completion_race=0 closes=1 passed
+cancel optimize=1 native_operation=15 completion_race=1 closes=1 passed
+cancel optimize=1 native_operation=18 completion_race=0 closes=1 passed
+cancel optimize=1 native_operation=18 completion_race=1 closes=1 passed
+cancel optimize=1 native_operation=30 completion_race=0 closes=1 passed
+cancel optimize=1 native_operation=30 completion_race=1 closes=1 passed
+cancel optimize=1 native_operation=24 completion_race=0 closes=1 passed
+cancel optimize=1 native_operation=24 completion_race=1 closes=1 passed
+default replacement cancellation optimize=1 closes=1 p...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_host" classname="collections_stdlib_host" time="106.321" status="run">
+		<properties/>
+		<system-out>operation=1 optimized=0 injected_allocation_failures=212
+operation=2 optimized=0 injected_allocation_failures=42
+operation=3 optimized=0 injected_allocation_failures=55
+operation=4 optimized=0 injected_allocation_failures=219
+operation=5 optimized=0 injected_allocation_failures=176
+operation=6 optimized=0 injected_allocation_failures=138
+operation=7 optimized=0 injected_allocation_failures=182
+operation=8 optimized=0 injected_allocation_failures=79
+map publication optimized=0 partial_effect_failures=42 passed
+collections cache/reload/captures/active leases optimized=0 passed
+operation=1 optimized=1 injected_allocation_failures=212
+operation=2 optimized=1 injected_allocation_failures=42
+operation=3 optimized=1 injected_allocation_failures=55
+operation=4 optimized=1 injected_allocation_failures=219
+operation=5 optimized=1 injected_allocation_failures=176
+operation=6 optimized=1 injected_allocation_failures=138
+operation=7 optimized=1 injected_allocation_failures=182
+operation=8 optimized=1 injected_allocation_f...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_execution" classname="collections_stdlib_execution" time="227.4" status="run">
+		<properties/>
+		<system-out>Collections: 56 JIT/emit/link/native checks; hard stack=default
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_failures" classname="collections_stdlib_failures" time="117.705" status="run">
+		<properties/>
+		<system-out>Collections expected invalidation and early-return execution passed in JIT/O2/linked AOT/O2
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_frontend" classname="collections_stdlib_frontend" time="10.9985" status="run">
+		<properties/>
+		<system-out>Collections: 39 source-located negative cases and ordinary same-name function passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_collections_stdlib" classname="lsp_collections_stdlib" time="0.899758" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>CRASH EVIDENCE: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/docs/collections/evidence/crashes/incident-o0ij6w_u
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/collections_stdlib/lsp.py", line 73, in &lt;module&gt;
+    check('error' not in response and 'main.void' in str(response.get('result')), response)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/collections_stdlib/lsp.py", line 18, in check
+    assert ok, detail
+           ^^
+AssertionError: {'error': {'code': -32602, 'message': '&lt;document identity&gt;:1:1: error: Import escapes the project root.\n    code: VOID3001\n\n 1 | \n   | ^\n    Hint: External imports require an explicit permission/identity contract and are not enabled in this phase.\n'}, 'id': 28, 'jsonrpc': '2.0'}
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_oracles" classname="collections_stdlib_oracles" time="32.1731" status="run">
+		<properties/>
+		<system-out>Collections independent oracles: 48 numeric distributions, 240 bounds and stable tagged duplicates; invalid comparators bounded
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_install" classname="collections_stdlib_install" time="15.6991" status="run">
+		<properties/>
+		<system-out>Collections installed/relocated check, JIT/O2, build, independent AOT and LSP passed
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_cache" classname="collections_stdlib_cache" time="3.60393" status="run">
+		<properties/>
+		<system-out>Collections automatic cache miss/hit/bypass and fresh captured-callback/equality state passed
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_operators" classname="collections_stdlib_operators" time="3.3864" status="run">
+		<properties/>
+		<system-out>184 operator resolution/call checks passed
+</system-out>
+	</testcase>
+	<testcase name="collections_stdlib_stack" classname="collections_stdlib_stack" time="221.311" status="run">
+		<properties/>
+		<system-out>Collections: 56 JIT/emit/link/native checks; hard stack=1048576
+</system-out>
+	</testcase>
+	<testcase name="channel_host" classname="channel_host" time="29.084" status="run">
+		<properties/>
+		<system-out>subscribe O0 once=0 path=0 failures=367 released_markers=353
+subscribe O0 once=0 path=1 failures=155 released_markers=136
+subscribe O0 once=0 path=2 failures=338 released_markers=309
+subscribe O0 once=0 path=3 failures=263 released_markers=244
+unsubscribe O0 once=0 survivor=0 before=7 after=2
+unsubscribe O0 once=0 survivor=1 before=9 after=1
+subscribe O0 once=1 path=0 failures=367 released_markers=353
+subscribe O0 once=1 path=1 failures=155 released_markers=136
+subscribe O0 once=1 path=2 failures=338 released_markers=309
+subscribe O0 once=1 path=3 failures=263 released_markers=244
+unsubscribe O0 once=1 survivor=0 before=7 after=2
+unsubscribe O0 once=1 survivor=1 before=9 after=1
+emit O0 no_delivery_failures=224 partial_failures=30
+subscribe O2 once=0 path=0 failures=367 released_markers=353
+subscribe O2 once=0 path=1 failures=155 released_markers=136
+subscribe O2 once=0 path=2 failures=338 released_markers=309
+subscribe O2 once=0 path=3 failures=263 released_markers=244
+unsubscribe O2 once=0 survivor=0 before...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="channel_frontend" classname="channel_frontend" time="7.66197" status="run">
+		<properties/>
+		<system-out>Channel frontend: 28 source-located rejections passed
+</system-out>
+	</testcase>
+	<testcase name="channel_execution" classname="channel_execution" time="109.906" status="run">
+		<properties/>
+		<system-out>Channel execution: 56 JIT/link/native/cache checks; hard stack=default
+</system-out>
+	</testcase>
+	<testcase name="lsp_channel" classname="lsp_channel" time="0.61539" status="run">
+		<properties/>
+		<system-out>Channel LSP: 55 checks passed
+</system-out>
+	</testcase>
+	<testcase name="channel_receiver" classname="channel_receiver" time="6.11079" status="run">
+		<properties/>
+		<system-out>Channel bound receivers: 7 check/JIT/build/native operations passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_console_source" classname="stage10_console_source" time="139.624" status="run">
+		<properties/>
+		<system-out>source console checks: 4342
+</system-out>
+	</testcase>
+	<testcase name="stage10_operator_integration" classname="stage10_operator_integration" time="50.2061" status="run">
+		<properties/>
+		<system-out>1163 operator GC/effect/failure integration checks passed
+</system-out>
+	</testcase>
+	<testcase name="ffi_g1_primitive_jit_ir" classname="ffi_g1_primitive_jit_ir" time="1.4145" status="run">
+		<properties/>
+		<system-out>void-c-primitive 2 1: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+void-c-primitive 1 2: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+call vectorcall: C primitive descriptor line 8: unsupported descriptor, ABI revision or effects
+effects direct-sync blocking no-callbacks: C primitive descriptor line 7: unsupported descriptor, ABI revision or effects
+c_size:i64: C primitive descriptor line 9: unsupported descriptor, ABI revision or effects
+c_bool:u8: C primitive descriptor line 9: unsupported descriptor, ABI revision or effects
+bind signed8 g1_signed8 i8 ptr: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 record: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 void: C primitive descriptor line 10: unsupported C primitive type
+bind signed8 g1_signed8 i8 u8: C primitive provider rejected the exact descriptor or fixture identity
+bind signed8 g1_missing i8 i8: C primi...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g1_primitive_aot_normal" classname="ffi_g1_primitive_aot_normal" time="0.0674893" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="ffi_g1_primitive_aot_optimized" classname="ffi_g1_primitive_aot_optimized" time="0.0623958" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="ffi_g1_primitive_aot_mismatch" classname="ffi_g1_primitive_aot_mismatch" time="0.0629988" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="ffi_g1_primitive_aot_missing" classname="ffi_g1_primitive_aot_missing" time="0.293638" status="run">
+		<properties/>
+		<system-out>[0/2] Re-checking globbed directories...
+[1/3] Building CXX object CMakeFiles/void_g1_aot_missing.dir/tests/async/aot.cpp.o
+[2/3] Linking CXX executable void_g1_aot_missing
+FAILED: [code=1] void_g1_aot_missing 
+: &amp;&amp; /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++ -O2 -g -DNDEBUG -Xlinker --exclude-libs -Xlinker libcurl.a:libssl.a:libcrypto.a:libcares.a:libnghttp2.a:libpsl.a:libz.a:libarchive.a:libsodium.a --ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld -fsanitize=address,undefined -Xlinker --dependency-file=CMakeFiles/void_g1_aot_missing.dir/link.d ffi-g1/application-optimized.o CMakeFiles/void_g1_aot_missing.dir/tests/async/aot.cpp.o -o void_g1_aot_missing  -Wl,-rpath,/home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib  libvoid_runtime.a  libvoid_native_fixture.a  curl/lib/libcurl.a  /home/shmellyorc/Documents/Void.Language/.toolchains/http/prefix/linux-aws-lc-5.12.0/strict/lib/libidn2.so  /home/shm...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g2_jit_ir" classname="ffi_g2_jit_ir" time="1.6625" status="run">
+		<properties/>
+		<system-out>2 1: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+sample G2Sample 16 4 2: C primitive descriptor line 17: C record size, alignment or tail padding disagrees with natural layout
+packet G2Packet 31 8 4: C primitive descriptor line 22: C record size, alignment or tail padding disagrees with natural layout
+reading f64 4: C primitive descriptor line 17: C record field offset or padding disagrees with natural layout
+reading ptr 8: C primitive descriptor line 17: unsupported C primitive type
+reading u64 8: C primitive provider rejected the exact descriptor or fixture identity
+tag tag u32: C primitive provider rejected the exact descriptor or fixture identity
+array:u16:3:1: C primitive descriptor line 20: invalid inline array extent or stride
+array:u16:0:2: C primitive descriptor line 20: invalid inline array extent or stride
+array:u16:03:2: C primitive descriptor line 20: invalid bounded canonical decimal field
+datum datum record:packet: C primitive descriptor line 22: record must n...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g2_aot_normal" classname="ffi_g2_aot_normal" time="0.155601" status="run">
+		<properties/>
+		<system-out>7 0 103
+-1 1 &lt;host binding /native_records.void&gt;:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:6:20: source call
+        return ffi.fill(bytes, 0, 5, 8) as i32
+                   ^
+-2 1 &lt;host binding /native_records.void&gt;:27:6: runtime error: overlapping C byte spans
+In function /native_records.void::move_bytes
+Called from /records.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:8:20: source call
+        return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32
+                   ^
+-3 1 &lt;host binding /native_records.void&gt;:23:6: runtime error: C byte span returned an oversized written prefix
+In function /native_records.void::fill
+Called from /records.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:10:20: source call
+        return ffi.fill(bytes, 0, 4, 254) as i32
+                   ^
+-4 1 &lt;host binding /native_re...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g2_aot_optimized" classname="ffi_g2_aot_optimized" time="0.152284" status="run">
+		<properties/>
+		<system-out>7 0 103
+-1 1 &lt;host binding /native_records.void&gt;:23:6: runtime error: C byte span outside admitted extent
+In function /native_records.void::fill
+Called from /records.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:6:20: source call
+        return ffi.fill(bytes, 0, 5, 8) as i32
+                   ^
+-2 1 &lt;host binding /native_records.void&gt;:27:6: runtime error: overlapping C byte spans
+In function /native_records.void::move_bytes
+Called from /records.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:8:20: source call
+        return ffi.move_bytes(bytes, 0, 2, bytes, 1, 2) as i32
+                   ^
+-3 1 &lt;host binding /native_records.void&gt;:23:6: runtime error: C byte span returned an oversized written prefix
+In function /native_records.void::fill
+Called from /records.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/ffi/records.void:10:20: source call
+        return ffi.fill(bytes, 0, 4, 254) as i32
+                   ^
+-4 1 &lt;host binding /native_re...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g3_jit_ir" classname="ffi_g3_jit_ir" time="2.53088" status="run">
+		<properties/>
+		<system-out>3 2: C primitive descriptor line 1: unsupported descriptor, ABI revision or effects
+integer null: C primitive descriptor line 10: unsupported or contradictory native resource contract
+pointer minus-one: C primitive descriptor line 10: unsupported or contradictory native resource contract
+shutdown-owner: C primitive descriptor line 10: unsupported or contradictory native resource contract
+retry-on-error: C primitive descriptor line 10: unsupported or contradictory native resource contract
+create missing owner: C primitive descriptor line 14: invalid native borrow or terminal release signature
+bind close_box g3_close i32 mut:box: C primitive descriptor line 15: missing exact native acquire or release contract
+i64 close:box: C primitive descriptor line 14: invalid native borrow or terminal release signature
+i32 close:box i32: C primitive descriptor line 14: invalid native borrow or terminal release signature
+i32 borrow:other i32: C primitive descriptor line 12: resource operation requires an earlier admitted ide...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g3_aot_normal" classname="ffi_g3_aot_normal" time="0.161593" status="run">
+		<properties/>
+		<system-out>7 0 104
+-1 1 &lt;host binding /native_resources.void&gt;:6:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::read
+Called from /resources.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:29:20: source call
+        return ffi.read(alias, 0)
+                   ^
+-2 1 &lt;host binding /native_resources.void&gt;:10:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::close_box
+Called from /resources.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:31:20: source call
+        return ffi.close_box(alias)
+                   ^
+-3 1 /home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:14:40: runtime error: Null managed reference in checked conversion
+        return ffi.read(ffi.create(-1) as ffi.box, 0)
+                                       ^
+In function /resources.void::entry
+-4 0 22
+</system-out>
+	</testcase>
+	<testcase name="ffi_g3_aot_optimized" classname="ffi_g3_aot_optimized" time="0.163131" status="run">
+		<properties/>
+		<system-out>7 0 104
+-1 1 &lt;host binding /native_resources.void&gt;:6:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::read
+Called from /resources.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:29:20: source call
+        return ffi.read(alias, 0)
+                   ^
+-2 1 &lt;host binding /native_resources.void&gt;:10:6: runtime error: C resource is closed, null or invalid
+In function /native_resources.void::close_box
+Called from /resources.void::entry
+/home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:31:20: source call
+        return ffi.close_box(alias)
+                   ^
+-3 1 /home/shmellyorc/Documents/Void.Language/tests/ffi/resources.void:14:40: runtime error: Null managed reference in checked conversion
+        return ffi.read(ffi.create(-1) as ffi.box, 0)
+                                       ^
+In function /resources.void::entry
+-4 0 22
+</system-out>
+	</testcase>
+	<testcase name="ffi_g4_jit_ir" classname="ffi_g4_jit_ir" time="5.92686" status="run">
+		<properties/>
+		<system-out>bad closure revision: C dynamic closure: unsupported revision
+system library policy: C dynamic closure: unsupported target, system ABI or relocation policy
+foreign provider: C dynamic closure: exact descriptor provider or target mismatch
+aliased image: C dynamic closure: invalid or duplicate image
+missing descriptor export: C dynamic closure is missing an owned descriptor export
+wrong target thunk: C dynamic closure: exact descriptor thunk mismatch
+direct bridge import: VOID IR: C primitive transport requires host admission and typed operations
+erased closure admission: VOID IR: C primitive admission differs from analyzed source
+forged dynamic ordinal: VOID IR: C primitive call outside the admitted binding module
+forged provider and symbol: VOID IR: invalid C primitive descriptor or exact call signature
+missing provider: C dynamic artifact: libvoid_g4_main.so is missing, aliased or outside file bounds
+modified dependency: C dynamic digest: libvoid_g4_dep.so
+symlink provider: C dynamic artifact: libvoid_g4_mai...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g4_aot_normal" classname="ffi_g4_aot_normal" time="0.792053" status="run">
+		<properties/>
+		<system-out>normal ['7'] exit=0 104
+normal ['-1'] exit=1 &lt;host binding /native_dynamic.void&gt;:15:6: runtime error: C resource is closed, null or invalid
+In function /native_dynamic.void::read
+Called from /dynamic.void::entry
+/tmp/void-s7-integrated-strict.tk3gHC/void-g4-source-z5g5tuo_/dynamic.void:46:20: source call
+        return ffi.read(alias, 0)
+                   ^
+normal ['-2'] exit=1 &lt;host binding /native_dynamic.void&gt;:17:6: runtime error: C resource is closed, null or invalid
+In function /native_dynamic.void::close_box
+Called from /dynamic.void::entry
+/tmp/void-s7-integrated-strict.tk3gHC/void-g4-source-z5g5tuo_/dynamic.void:48:20: source call
+        return ffi.close_box(alias)
+                   ^
+normal ['-3'] exit=1 &lt;host binding /native_dynamic.void&gt;:13:6: runtime error: C resource operation rejected org.voidlang.g4-fixture::g4_create
+In function /native_dynamic.void::create
+Called from /dynamic.void::entry
+/tmp/void-s7-integrated-strict.tk3gHC/void-g4-source-z5g5tuo_/dynamic.void:22:28: source call
+        ...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g4_aot_optimized" classname="ffi_g4_aot_optimized" time="0.382278" status="run">
+		<properties/>
+		<system-out>optimized ['7'] exit=0 104
+optimized ['-1'] exit=1 &lt;host binding /native_dynamic.void&gt;:15:6: runtime error: C resource is closed, null or invalid
+In function /native_dynamic.void::read
+Called from /dynamic.void::entry
+/tmp/void-s7-integrated-strict.tk3gHC/void-g4-source-14lddg2e/dynamic.void:46:20: source call
+        return ffi.read(alias, 0)
+                   ^
+optimized ['-2'] exit=1 &lt;host binding /native_dynamic.void&gt;:17:6: runtime error: C resource is closed, null or invalid
+In function /native_dynamic.void::close_box
+Called from /dynamic.void::entry
+/tmp/void-s7-integrated-strict.tk3gHC/void-g4-source-14lddg2e/dynamic.void:48:20: source call
+        return ffi.close_box(alias)
+                   ^
+optimized ['-3'] exit=1 &lt;host binding /native_dynamic.void&gt;:13:6: runtime error: C resource operation rejected org.voidlang.g4-fixture::g4_create
+In function /native_dynamic.void::create
+Called from /dynamic.void::entry
+/tmp/void-s7-integrated-strict.tk3gHC/void-g4-source-14lddg2e/dynamic.void:22:28: source c...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g4_aot_startup" classname="ffi_g4_aot_startup" time="0.284199" status="run">
+		<properties/>
+		<system-out>startup ['7'] exit=1 /tmp/void-s7-integrated-strict.tk3gHC/void-g4-source-1ic58_kn/dynamic_startup.void:5:15: runtime error: Division by zero
+    return 12 / zero
+              ^
+In function /dynamic_startup.void::eager
+Called from /dynamic_startup.void::$global$initialized
+/tmp/void-s7-integrated-strict.tk3gHC/void-g4-source-1ic58_kn/dynamic_startup.void:7:24: source call
+var initialized: i32 = eager()
+                       ^
+startup ['7'] exit=1 C dynamic digest: libvoid_g4_dep.so
+startup ['7'] exit=1 C dynamic artifact: libvoid_g4_dep.so is missing, aliased or outside file bounds
+startup ['7'] exit=1 C dynamic path: root is unavailable or aliased
+startup verified relocated dynamic AOT with its compile source removed
+</system-out>
+	</testcase>
+	<testcase name="native_source" classname="native_source" time="6.93421" status="run">
+		<properties/>
+		<system-out>native source passed
+</system-out>
+	</testcase>
+	<testcase name="stage6_integrated" classname="stage6_integrated" time="9.90534" status="run">
+		<properties/>
+		<system-out>combined cached old root=1; old roots at barrier=14; retired generations=1; post-drain objects=0
+combined cached old root=1; old roots at barrier=14; retired generations=1; post-drain objects=0
+</system-out>
+	</testcase>
+	<testcase name="stage6_cache_processes" classname="stage6_cache_processes" time="12.8679" status="run">
+		<properties/>
+		<system-out>Integrated fresh-process cold/hit/corrupt fallback (or safe bypass): passed
+Integrated fresh-process cold/hit/corrupt fallback (or safe bypass): passed
+</system-out>
+	</testcase>
+	<testcase name="native_aot_main_normal" classname="native_aot_main_normal" time="0.0623555" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_main_optimized" classname="native_aot_main_optimized" time="0.0638893" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_terminated_nul_normal" classname="native_aot_terminated_nul_normal" time="0.0690953" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_terminated_nul_optimized" classname="native_aot_terminated_nul_optimized" time="0.0683974" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_closed_normal" classname="native_aot_closed_normal" time="0.0705024" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_closed_optimized" classname="native_aot_closed_optimized" time="0.0736323" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_duplicate_normal" classname="native_aot_duplicate_normal" time="0.0682753" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_duplicate_optimized" classname="native_aot_duplicate_optimized" time="0.0685938" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_cleanup_failure_normal" classname="native_aot_cleanup_failure_normal" time="0.0689508" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_cleanup_failure_optimized" classname="native_aot_cleanup_failure_optimized" time="0.0733137" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_integrated_normal" classname="native_aot_integrated_normal" time="0.0690231" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_integrated_optimized" classname="native_aot_integrated_optimized" time="0.0879074" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_integrated_cancel_normal" classname="native_aot_integrated_cancel_normal" time="0.0896257" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_integrated_cancel_optimized" classname="native_aot_integrated_cancel_optimized" time="0.0857147" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_integrated_failure_normal" classname="native_aot_integrated_failure_normal" time="0.0731858" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="native_aot_integrated_failure_optimized" classname="native_aot_integrated_failure_optimized" time="0.0659233" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="io_ownership" classname="io_ownership" time="41.8646" status="run">
+		<properties/>
+		<system-out>174 I/O/path public declarations documented
+sync Debug: 198 checked allocation failures recovered
+sync O2: 198 checked allocation failures recovered
+174 I/O/path public declarations documented
+async Debug: 500 checked allocation failures recovered
+async O2: 500 checked allocation failures recovered
+5157 I/O ownership/documentation checks passed
+</system-out>
+	</testcase>
+	<testcase name="io_execution" classname="io_execution" time="62.1693" status="run">
+		<properties/>
+		<system-out>18 public source/file checks passed; 42 numeric vectors, both byte orders, JIT/O2/linked AOT; 1 MiB stack=False
+</system-out>
+	</testcase>
+	<testcase name="io_crash_preservation" classname="io_crash_preservation" time="0.292268" status="run">
+		<properties/>
+		<system-out>CRASH EVIDENCE: /tmp/void-s7-integrated-strict.tk3gHC/VOID disposable io preservation d55t_ow0/incidents/incident-f2ryxxv6
+CRASH EVIDENCE: /tmp/void-s7-integrated-strict.tk3gHC/VOID disposable io preservation d55t_ow0/incidents/incident-2m9pmtsp
+CRASH EVIDENCE: /tmp/void-s7-integrated-strict.tk3gHC/VOID disposable io preservation d55t_ow0/incidents/incident-vjtbzzhr
+IO preservation passed: compiler check, async runner and linked AOT abnormal exits; exact sources, companion, generator, command and streams verified; ordinary rejection excluded; all synthetic evidence disposed
+</system-out>
+	</testcase>
+	<testcase name="io_async_execution" classname="io_async_execution" time="61.2294" status="run">
+		<properties/>
+		<system-out>42 numeric vectors, both byte orders and filesystem APIs passed async JIT/O2
+</system-out>
+	</testcase>
+	<testcase name="io_wire_normal" classname="io_wire_normal" time="0.150803" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="io_wire_optimized" classname="io_wire_optimized" time="0.148803" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="lsp_io" classname="lsp_io" time="5.69554" status="run">
+		<properties/>
+		<system-out>41 io/path LSP documentation, completion and persistent recovery checks passed
+</system-out>
+	</testcase>
+	<testcase name="io_native_responsiveness" classname="io_native_responsiveness" time="16.0398" status="run">
+		<properties/>
+		<system-out>JIT: owner ran another ready activation while a real file read was held on the single bounded worker
+O2: owner ran another ready activation while a real file read was held on the single bounded worker
+</system-out>
+	</testcase>
+	<testcase name="io_native_close_failure" classname="io_native_close_failure" time="16.5596" status="run">
+		<properties/>
+		<system-out>JIT: recoverable close failure retained its diagnostic, retired once and released roots
+O2: recoverable close failure retained its diagnostic, retired once and released roots
+</system-out>
+	</testcase>
+	<testcase name="io_native_shutdown" classname="io_native_shutdown" time="16.7064" status="run">
+		<properties/>
+		<system-out>JIT: forgotten-file shutdown failure retained its diagnostic, retired once and released roots
+O2: forgotten-file shutdown failure retained its diagnostic, retired once and released roots
+</system-out>
+	</testcase>
+	<testcase name="io_native_opening_shutdown" classname="io_native_opening_shutdown" time="16.9125" status="run">
+		<properties/>
+		<system-out>JIT: Runtime shutdown drained an entered open and retired its acquisition once
+O2: Runtime shutdown drained an entered open and retired its acquisition once
+</system-out>
+	</testcase>
+	<testcase name="io_native_whole_shutdown" classname="io_native_whole_shutdown" time="16.4079" status="run">
+		<properties/>
+		<system-out>JIT: Runtime shutdown drained an entered open and retired its acquisition once
+O2: Runtime shutdown drained an entered open and retired its acquisition once
+</system-out>
+	</testcase>
+	<testcase name="io_native_pending_close" classname="io_native_pending_close" time="17.2896" status="run">
+		<properties/>
+		<system-out>JIT: owner ran another ready activation while a real file read was held on the single bounded worker
+O2: owner ran another ready activation while a real file read was held on the single bounded worker
+</system-out>
+	</testcase>
+	<testcase name="io_native_cancelled" classname="io_native_cancelled" time="17.1271" status="run">
+		<properties/>
+		<system-out>JIT: owner ran another ready activation while a real file read was held on the single bounded worker
+O2: owner ran another ready activation while a real file read was held on the single bounded worker
+</system-out>
+	</testcase>
+	<testcase name="io_probe_normal" classname="io_probe_normal" time="0.0506167" status="run">
+		<properties/>
+		<system-out>linked AOT: owner ran another ready activation while a real file read was held on the single bounded worker
+</system-out>
+	</testcase>
+	<testcase name="io_probe_optimized" classname="io_probe_optimized" time="0.0528536" status="run">
+		<properties/>
+		<system-out>linked AOT: owner ran another ready activation while a real file read was held on the single bounded worker
+</system-out>
+	</testcase>
+	<testcase name="io_async_source" classname="io_async_source" time="21.5648" status="run">
+		<properties/>
+		<system-out>Debug source execution passed
+O2 source execution passed
+</system-out>
+	</testcase>
+	<testcase name="io_errors_source" classname="io_errors_source" time="19.7493" status="run">
+		<properties/>
+		<system-out>Debug source execution passed
+O2 source execution passed
+</system-out>
+	</testcase>
+	<testcase name="io_errors_async" classname="io_errors_async" time="23.1649" status="run">
+		<properties/>
+		<system-out>Debug source execution passed
+O2 source execution passed
+</system-out>
+	</testcase>
+	<testcase name="io_examples_install" classname="io_examples_install" time="34.6349" status="run">
+		<properties/>
+		<system-out>11 example/install checks passed: Unicode config, game save/load, binary asset, memory/file wire interoperability, JIT/O2/linked AOT and relocated stdlib
+</system-out>
+	</testcase>
+	<testcase name="io_async_acquisition" classname="io_async_acquisition" time="0.473592" status="run">
+		<properties/>
+		<system-out>Debug source execution passed
+O2 source execution passed
+</system-out>
+	</testcase>
+	<testcase name="io_async_normal" classname="io_async_normal" time="0.101907" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="io_async_optimized" classname="io_async_optimized" time="0.105502" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="io_native_jobs" classname="io_native_jobs" time="0.043695" status="run">
+		<properties/>
+		<system-out>native jobs: result, blocked-owner progress, queued/pending cancellation, publication failure, acquisition rollback, nested cancellation drain and cleanup diagnostics passed (7 scenarios)
+</system-out>
+	</testcase>
+	<testcase name="native_workers" classname="native_workers" time="0.0418209" status="run">
+		<properties/>
+		<system-out>Runtime workers: native-only admission, three roots, same pool/thread, idle reconfiguration, busy rejection and shutdown passed
+</system-out>
+	</testcase>
+	<testcase name="async_external" classname="async_external" time="1.36914" status="run">
+		<properties/>
+		<system-out>128 MiB logical pulls: post-GC payload 1048640..1048640, persistent handles &lt;= 2; unreachable native records retire at quiescent GC checkpoints
+external native completion: ten lifecycle cases and pre-wait shutdown passed
+</system-out>
+	</testcase>
+	<testcase name="io_kernel" classname="io_kernel" time="0.104552" status="run">
+		<properties/>
+		<system-out>invalid native filename fixture: created=1 errno=0
+native filesystem kernel: paths, modes, cursor/read-ahead, EOF, lines, growth, metadata, filtered recursion, copy/move/delete, symlinks, budgets and 3 MiB streaming passed
+</system-out>
+	</testcase>
+	<testcase name="io_ir" classname="io_ir" time="4.29183" status="run">
+		<properties/>
+		<system-out>11 independent filesystem IR authority, arity, reply and opcode rejections passed
+</system-out>
+	</testcase>
+	<testcase name="io_cross_volume" classname="io_cross_volume" time="6.89857" status="run">
+		<properties/>
+		<system-out>Cross-device file and directory renames preserved both source entries in actual JIT/O2
+</system-out>
+	</testcase>
+	<testcase name="onboarding_examples" classname="onboarding_examples" time="1.76381" status="run">
+		<properties/>
+		<system-out>PASS: basics input 5 =&gt; 9 in both JIT modes
+PASS: types input 2 =&gt; 120 in both JIT modes
+PASS: functions input 3 =&gt; 36 in both JIT modes
+PASS: collections input 5 =&gt; 35 in both JIT modes
+PASS: memory input 2 =&gt; 19 in both JIT modes
+PASS: async input 2 =&gt; 27 in normal and optimized AOT modes
+PASS: 9 README/first-program/Wiki blocks match canonical examples; 12 execution cases
+</system-out>
+	</testcase>
+	<testcase name="async_source" classname="async_source" time="19.0939" status="run">
+		<properties/>
+		<system-out>async activations passed
+</system-out>
+	</testcase>
+	<testcase name="async_syntax_source" classname="async_syntax_source" time="8.05281" status="run">
+		<properties/>
+		<system-out>await error allocation sweep: 220 injected failures passed; O2=0
+await error allocation sweep: 220 injected failures passed; O2=1
+await syntax: 14 positive source/CFG checks, 12 rejected cases, 6 recovery checks, 20 JIT/GC executions passed; stack=default
+</system-out>
+	</testcase>
+	<testcase name="async_syntax_stack" classname="async_syntax_stack" time="8.20444" status="run">
+		<properties/>
+		<system-out>await error allocation sweep: 220 injected failures passed; O2=0
+await error allocation sweep: 220 injected failures passed; O2=1
+await syntax: 14 positive source/CFG checks, 12 rejected cases, 6 recovery checks, 20 JIT/GC executions passed; stack=1048576/1048576
+</system-out>
+	</testcase>
+	<testcase name="async_ir" classname="async_ir" time="0.129453" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_parallel" classname="async_parallel" time="3.08245" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_lifecycle" classname="async_lifecycle" time="5.57748" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_spawn_normal" classname="async_aot_spawn_normal" time="0.0683886" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_spawn_optimized" classname="async_aot_spawn_optimized" time="0.0702307" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_spawn_cancel_normal" classname="async_aot_spawn_cancel_normal" time="0.0682013" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_spawn_cancel_optimized" classname="async_aot_spawn_cancel_optimized" time="0.0761714" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_spawn_failure_normal" classname="async_aot_spawn_failure_normal" time="0.0758367" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_spawn_failure_optimized" classname="async_aot_spawn_failure_optimized" time="0.0727911" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_activation_normal" classname="async_aot_activation_normal" time="0.0651356" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_activation_optimized" classname="async_aot_activation_optimized" time="0.063457" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_managed_normal" classname="async_aot_managed_normal" time="0.062229" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_managed_optimized" classname="async_aot_managed_optimized" time="0.0678416" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_large_normal" classname="async_aot_large_normal" time="7.049" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_large_optimized" classname="async_aot_large_optimized" time="7.24296" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_closures_normal" classname="async_aot_closures_normal" time="0.0716856" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_closures_optimized" classname="async_aot_closures_optimized" time="0.0649975" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_loops_normal" classname="async_aot_loops_normal" time="0.0674021" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_loops_optimized" classname="async_aot_loops_optimized" time="0.066842" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_values_normal" classname="async_aot_values_normal" time="0.0663105" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_values_optimized" classname="async_aot_values_optimized" time="0.0631447" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_methods_normal" classname="async_aot_methods_normal" time="0.0627966" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_methods_optimized" classname="async_aot_methods_optimized" time="0.0621603" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_lifecycle_normal" classname="async_aot_lifecycle_normal" time="0.0628291" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_lifecycle_optimized" classname="async_aot_lifecycle_optimized" time="0.0653091" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_lifecycle_exits_normal" classname="async_aot_lifecycle_exits_normal" time="0.0672549" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_lifecycle_exits_optimized" classname="async_aot_lifecycle_exits_optimized" time="0.0663511" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_lifecycle_cancelled_normal" classname="async_aot_lifecycle_cancelled_normal" time="0.0663362" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_lifecycle_cancelled_optimized" classname="async_aot_lifecycle_cancelled_optimized" time="0.0675538" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_lifecycle_failures_normal" classname="async_aot_lifecycle_failures_normal" time="0.0654383" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_lifecycle_failures_optimized" classname="async_aot_lifecycle_failures_optimized" time="0.0676022" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_lifecycle_primary_normal" classname="async_aot_lifecycle_primary_normal" time="0.0652674" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_lifecycle_primary_optimized" classname="async_aot_lifecycle_primary_optimized" time="0.0811602" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_lifecycle_resources_normal" classname="async_aot_lifecycle_resources_normal" time="0.0766992" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_lifecycle_resources_optimized" classname="async_aot_lifecycle_resources_optimized" time="0.0652818" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_lifecycle_values_normal" classname="async_aot_lifecycle_values_normal" time="0.0695726" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_aot_lifecycle_values_optimized" classname="async_aot_lifecycle_values_optimized" time="0.0700212" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="async_syntax_aot_values_normal" classname="async_syntax_aot_values_normal" time="0.989514" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in &lt;module&gt;
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+</system-out>
+	</testcase>
+	<testcase name="async_syntax_aot_values_optimized" classname="async_syntax_aot_values_optimized" time="1.07857" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in &lt;module&gt;
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+</system-out>
+	</testcase>
+	<testcase name="async_syntax_aot_errors_normal" classname="async_syntax_aot_errors_normal" time="0.751564" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in &lt;module&gt;
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+</system-out>
+	</testcase>
+	<testcase name="async_syntax_aot_errors_optimized" classname="async_syntax_aot_errors_optimized" time="0.930018" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in &lt;module&gt;
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+</system-out>
+	</testcase>
+	<testcase name="async_syntax_aot_cancelled_normal" classname="async_syntax_aot_cancelled_normal" time="0.472843" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in &lt;module&gt;
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+</system-out>
+	</testcase>
+	<testcase name="async_syntax_aot_cancelled_optimized" classname="async_syntax_aot_cancelled_optimized" time="0.46626" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in &lt;module&gt;
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+</system-out>
+	</testcase>
+	<testcase name="async_syntax_aot_failure_normal" classname="async_syntax_aot_failure_normal" time="0.463757" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in &lt;module&gt;
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+</system-out>
+	</testcase>
+	<testcase name="async_syntax_aot_failure_optimized" classname="async_syntax_aot_failure_optimized" time="0.413412" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in &lt;module&gt;
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+</system-out>
+	</testcase>
+	<testcase name="async_syntax_aot_spawn_normal" classname="async_syntax_aot_spawn_normal" time="0.286439" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in &lt;module&gt;
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+</system-out>
+	</testcase>
+	<testcase name="async_syntax_aot_spawn_optimized" classname="async_syntax_aot_spawn_optimized" time="0.299062" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/async/syntax_aot.py", line 18, in &lt;module&gt;
+    assert emitted.read_bytes() == Path(sys.argv[7]).read_bytes(), 'limited-stack AOT object differs from linked object'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: limited-stack AOT object differs from linked object
+</system-out>
+	</testcase>
+	<testcase name="lsp_async_syntax" classname="lsp_async_syntax" time="0.232773" status="run">
+		<properties/>
+		<system-out>await syntax LSP: hover, definition, rename, signatures, formatting, completion, exact spans, recovery and repair passed; stack=1 MiB on Linux
+</system-out>
+	</testcase>
+	<testcase name="core" classname="core" time="0.243354" status="run">
+		<properties/>
+		<system-out>core: passed
+</system-out>
+	</testcase>
+	<testcase name="jit" classname="jit" time="0.223047" status="run">
+		<properties/>
+		<system-out>jit: passed
+</system-out>
+	</testcase>
+	<testcase name="reload" classname="reload" time="1.0973" status="run">
+		<properties/>
+		<system-out>reload: passed
+</system-out>
+	</testcase>
+	<testcase name="gc" classname="gc" time="0.186501" status="run">
+		<properties/>
+		<system-out>gc: passed
+</system-out>
+	</testcase>
+	<testcase name="native" classname="native" time="0.110698" status="run">
+		<properties/>
+		<system-out>JIT session error: Symbols not found: [ missing_native ]
+native: passed
+</system-out>
+	</testcase>
+	<testcase name="sessions_demo" classname="sessions_demo" time="0.1218" status="run">
+		<properties/>
+		<system-out>-- revision 1: /worker.void::calculate; references 1
+unsaved edit: previous analysis stale; full validation required
+fresh query: /worker.void::calculate; body exact match; affected dependencies: /main.void
+revision 3 diagnostics:
+/worker.void:2:12: error: Unknown identifier 'missing'.
+    code: VOID2002
+
+ 2 |     return missing
+   |            ^^^^^^^
+    Module: /worker.void
+    Hint: Declare it with var before use.
+
+repair: fresh successful analysis
+constant edit: restart required; no native publication
+
+</system-out>
+	</testcase>
+	<testcase name="tooling_demo" classname="tooling_demo" time="0.106293" status="run">
+		<properties/>
+		<system-out>-- /worker.void::calculate declared in /worker.void; references: 1
+edit plan: full validation required; fresh body source contract: exact match
+fresh constant source contract: restart required; no native generation modified
+
+</system-out>
+	</testcase>
+	<testcase name="sessions" classname="sessions" time="0.33285" status="run">
+		<properties/>
+		<system-out>sessions: passed
+</system-out>
+	</testcase>
+	<testcase name="tooling" classname="tooling" time="0.70301" status="run">
+		<properties/>
+		<system-out>queries: aliased/direct definitions, 2 callers, root/local constants, byte spans and retained snapshots
+plan: /leaf.void -&gt; /middle.void::wrapper -&gt; /main.void::entry; validated 53 -&gt; 61, const restart required
+tooling: passed
+</system-out>
+	</testcase>
+	<testcase name="analysis" classname="analysis" time="1.40334" status="run">
+		<properties/>
+		<system-out>normal: body edit 53 -&gt; 61, const edit rejected, old lease 53; concurrent calls 472894
+O2: body edit 53 -&gt; 61, const edit rejected, old lease 53; concurrent calls 480708
+analysis: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric" classname="numeric" time="7.24283" status="run">
+		<properties/>
+		<system-out>210 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed
+numeric: passed
+</system-out>
+	</testcase>
+	<testcase name="numeric_enum_ir" classname="numeric_enum_ir" time="0.99303" status="run">
+		<properties/>
+		<system-out>enum: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+enum initialized: accepted
+field: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+field initialized: accepted
+array: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+array initialized: accepted
+field-array: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+field-array initialized: accepted
+array-field: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+array-field initialized: accepted
+nested: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)
+nested initialized: accepted
+managed: rejected (VOID IR: non-nullable reference storage read before initialization in /enum-storage.void::probe)
+managed initialized: accepted
+zero-backed holder: rejected (VOID IR: nominal source objects require complete construction)...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="numeric_enum_process" classname="numeric_enum_process" time="27.0163" status="run">
+		<properties/>
+		<system-out>S6 542 boundary pairs, 39 invalid sources and 62 executed processes
+</system-out>
+	</testcase>
+	<testcase name="numeric_enum_lsp" classname="numeric_enum_lsp" time="0.144649" status="run">
+		<properties/>
+		<system-out>S6 LSP passed 15 recorded requests and overlay revisions
+</system-out>
+	</testcase>
+	<testcase name="frontend" classname="frontend" time="13.4985" status="run">
+		<properties/>
+		<system-out>Frontend begin: diagnostics
+50+ source diagnostic cases and UTF-8/ABI checks passed
+Frontend passed: diagnostics
+Frontend begin: programs
+Real .void files and independent programs executed through normal/O2 JIT
+Frontend passed: programs
+Frontend begin: numeric values
+1216 constant/normal/O2 numeric matrix comparisons passed
+Readonly/compile-time constants, numeric boundaries, concurrent failures, bounded traces and restart checks passed
+Frontend passed: numeric values
+Frontend begin: diagnostic recovery/resource limits
+Frontend resource case: combined expression/constant depth
+Structured diagnostics: independent files, recovery, bounded cascades, snapshots and failed reload verified
+Frontend passed: diagnostic recovery/resource limits
+Frontend begin: value structs
+Frontend resource case: bounded expanded value layouts
+Value struct source: nested/mixed layouts, copies, normal/O2 JIT, diagnostics, tooling and reload passed
+Frontend passed: value structs
+Frontend begin: receiver methods
+Frontend resource case: b...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="modules" classname="modules" time="1.90346" status="run">
+		<properties/>
+		<system-out>Project constants, forwards, visibility, cycles, imports and restart checks passed
+Project-local library identities, cycles, ownership, overlays, native JIT and invalidation passed
+Multi-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed
+modules: passed
+</system-out>
+	</testcase>
+	<testcase name="ffi_g4_conventional" classname="ffi_g4_conventional" time="33.6949" status="run">
+		<properties/>
+		<system-out>cwd=/tmp/void-s7-integrated-strict.tk3gHC/VOID G4 obzdj762/unrelated cwd argv=['/usr/bin/cmake', '--install', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict', '--prefix', '/tmp/void-s7-integrated-strict.tk3gHC/VOID G4 obzdj762/installed compiler', '--config', 'RelWithDebInfo', '--component', 'compiler']
+exit=0 -- Installing: /tmp/void-s7-integrated-strict.tk3gHC/VOID G4 obzdj762/installed compiler/share/void/licenses/VOID-MIT-LICENSE.txt
+-- Installing: /tmp/void-s7-integrated-strict.tk3gHC/VOID G4 obzdj762/installed compiler/share/void/licenses/LICENSING_SCOPE.md
+-- Installing: /tmp/void-s7-integrated-strict.tk3gHC/VOID G4 obzdj762/installed compiler/share/void/licenses/REDISTRIBUTION.txt
+-- Installing: /tmp/void-s7-integrated-strict.tk3gHC/VOID G4 obzdj762/installed compiler/share/void/licenses/NOTICE_INVENTORY.json
+-- Installing: /tmp/void-s7-integrated-strict.tk3gHC/VOID G4 obzdj762/installed compiler/share/void/licenses/llvm-23.1.4
+-- Installing: /tmp/void-s7-integrat...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g5_callbacks" classname="ffi_g5_callbacks" time="24.1319" status="run">
+		<properties/>
+		<system-out>cwd= /tmp/void-s7-integrated-strict.tk3gHC/VOID G5 kr0ral36/independent cwd argv= ['/usr/bin/cmake', '--install', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict', '--prefix', '/tmp/void-s7-integrated-strict.tk3gHC/VOID G5 kr0ral36/compiler install', '--config', 'RelWithDebInfo', '--component', 'compiler']
+exit=0
+-- Installing: /tmp/void-s7-integrated-strict.tk3gHC/VOID G5 kr0ral36/compiler install/share/void/licenses/VOID-MIT-LICENSE.txt
+-- Installing: /tmp/void-s7-integrated-strict.tk3gHC/VOID G5 kr0ral36/compiler install/share/void/licenses/LICENSING_SCOPE.md
+-- Installing: /tmp/void-s7-integrated-strict.tk3gHC/VOID G5 kr0ral36/compiler install/share/void/licenses/REDISTRIBUTION.txt
+-- Installing: /tmp/void-s7-integrated-strict.tk3gHC/VOID G5 kr0ral36/compiler install/share/void/licenses/NOTICE_INVENTORY.json
+-- Installing: /tmp/void-s7-integrated-strict.tk3gHC/VOID G5 kr0ral36/compiler install/share/void/licenses/llvm-23.1.4
+-- Installing: /tmp/void-s7-integrated-stric...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="numeric_sprint2" classname="numeric_sprint2" time="5.88702" status="run">
+		<properties/>
+		<system-out>Sprint 2: 71 argument/numeric/diagnostic normal/O2 JIT and linked AOT checks passed
+</system-out>
+	</testcase>
+	<testcase name="async_retention_sprint5" classname="async_retention_sprint5" time="38.5987" status="run">
+		<properties/>
+		<system-out>Sprint 5 retention: 16 successful process measurements; no suite-count multiplication
+</system-out>
+	</testcase>
+	<testcase name="async_retention_aot_growth_normal" classname="async_retention_aot_growth_normal" time="1.86611" status="run">
+		<properties/>
+		<system-out>Sprint 5 retention: 3 successful process measurements; no suite-count multiplication
+</system-out>
+	</testcase>
+	<testcase name="async_retention_aot_growth_optimized" classname="async_retention_aot_growth_optimized" time="2.04729" status="run">
+		<properties/>
+		<system-out>Sprint 5 retention: 3 successful process measurements; no suite-count multiplication
+</system-out>
+	</testcase>
+	<testcase name="async_retention_aot_workers_normal" classname="async_retention_aot_workers_normal" time="1.94745" status="run">
+		<properties/>
+		<system-out>Sprint 5 retention: 3 successful process measurements; no suite-count multiplication
+</system-out>
+	</testcase>
+	<testcase name="async_retention_aot_workers_optimized" classname="async_retention_aot_workers_optimized" time="1.94295" status="run">
+		<properties/>
+		<system-out>Sprint 5 retention: 3 successful process measurements; no suite-count multiplication
+</system-out>
+	</testcase>
+	<testcase name="ergonomics_sprint6_host" classname="ergonomics_sprint6_host" time="1.35341" status="run">
+		<properties/>
+		<system-out>Sprint 6 GC, checked failure, reload, async and native checks passed
+</system-out>
+	</testcase>
+	<testcase name="ergonomics_sprint6" classname="ergonomics_sprint6" time="1.34114" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint6.py", line 24, in &lt;module&gt;
+    run([compiler,'emit',source,'-o',obj,*switches]);run([clang,*flags,obj,runtime,fixture,'-pthread','-o',exe])
+                                                     ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint6.py", line 12, in run
+    assert p.returncode==status,(args,p.returncode,p.stdout,p.stderr)
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', '-fsanitize=address,undefined', PosixPath('/tmp/void-s7-integrated-strict.tk3gHC/VOID sprint6 oi_l506f/normal.o'), PosixPath('/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a'), PosixPath('/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_native_fixture.a'), '-pthread', '-o', PosixPath('/tmp/void-s7-integrated-strict.tk3gHC/VOID sprint6 oi_l506f/normal.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n&gt;&gt;&gt; referenced by c_dynamic.cpp:569 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:569)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n&gt;&gt;&gt; referenced by c_dynamic.cpp:207 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:207)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n&gt;&gt;&gt; referenced by c_dynamic.cpp:208 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:208)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+</system-out>
+	</testcase>
+	<testcase name="stage10_fields_aot" classname="stage10_fields_aot" time="0.627675" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/fields.py", line 68, in &lt;module&gt;
+    run([clang, *flags, obj, runtime, fixture, "-o", exe])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/fields.py", line 23, in run
+    assert p.returncode == 0, (args, p.returncode, p.stdout, p.stderr)
+           ^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '-pthread', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', '-fsanitize=address,undefined', PosixPath('/tmp/void-s7-integrated-strict.tk3gHC/VOID Stage10 fields g4u9_ymg/normal.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_native_fixture.a', '-o', PosixPath('/tmp/void-s7-integrated-strict.tk3gHC/VOID Stage10 fields g4u9_ymg/normal.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n&gt;&gt;&gt; referenced by c_dynamic.cpp:569 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:569)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n&gt;&gt;&gt; referenced by c_dynamic.cpp:207 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:207)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n&gt;&gt;&gt; referenced by c_dynamic.cpp:208 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:208)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+</system-out>
+	</testcase>
+	<testcase name="stage10_temporal_install" classname="stage10_temporal_install" time="17.2005" status="run">
+		<properties/>
+		<system-out>12 installed/relocated sources, LSP, notices and standalone zone checks passed
+</system-out>
+	</testcase>
+	<testcase name="stage10_temporal_aot" classname="stage10_temporal_aot" time="6.982" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/temporal.py", line 30, in &lt;module&gt;
+    execute([clang,*flags,obj,runtime,fixture,"-o",exe])
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/temporal.py", line 16, in execute
+    assert (result.returncode == 0) == success, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '-pthread', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', '-fsanitize=address,undefined', PosixPath('/tmp/void-s7-integrated-strict.tk3gHC/VOID Stage10 time 2hbqc9zo/normal.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_native_fixture.a', '-o', PosixPath('/tmp/void-s7-integrated-strict.tk3gHC/VOID Stage10 time 2hbqc9zo/normal.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n&gt;&gt;&gt; referenced by c_dynamic.cpp:569 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:569)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n&gt;&gt;&gt; referenced by c_dynamic.cpp:207 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:207)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n&gt;&gt;&gt; referenced by c_dynamic.cpp:208 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:208)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+</system-out>
+	</testcase>
+	<testcase name="stage11_globals_stack" classname="stage11_globals_stack" time="1.51618" status="run">
+		<properties/>
+		<system-out>1 MiB inferred-global guard and explicit-type chain passed
+</system-out>
+	</testcase>
+	<testcase name="stage11_globals_aot" classname="stage11_globals_aot" time="0.528324" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage11/globals.py", line 53, in &lt;module&gt;
+    execute("selected.void", {
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^
+        "selected.void": 'use "./game.void" as game\nvar score = 0\nfunc main():\n    game.reward_player()\n    print(score)\n    print(game.enemies_defeated)\n',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "game.void": 'var enemies_defeated = 0\nfunc reward_player():\n    score += 10\n    enemies_defeated += 1\n',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    }, b"10\n1\n")
+    ^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage11/globals.py", line 49, in execute
+    run([clang, obj, runtime, fixture, *flags, "-o", exe])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage11/globals.py", line 25, in run
+    assert result.returncode == expected, (args, result.returncode, result.stdout, result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', PosixPath('/tmp/void-s7-integrated-strict.tk3gHC/VOID globals 3israfw6/program.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_native_fixture.a', '--driver-mode=g++', '-pthread', '-ldl', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', '-fsanitize=address,undefined', '-o', PosixPath('/tmp/void-s7-integrated-strict.tk3gHC/VOID globals 3israfw6/program')], 1, b'', b'ld.lld: error: undefined symbol: sodium_init\n&gt;&gt;&gt; referenced by c_dynamic.cpp:569 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:569)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n&gt;&gt;&gt; referenced by c_dynamic.cpp:207 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:207)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n&gt;&gt;&gt; referenced by c_dynamic.cpp:208 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:208)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+</system-out>
+	</testcase>
+	<testcase name="stage10_console_aot" classname="stage10_console_aot" time="23.7961" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/console.py", line 109, in &lt;module&gt;
+    run([clang, *flags, obj, runtime, fixture, "-o", executable])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/console.py", line 36, in run
+    assert p.returncode == status, (args, p.returncode, p.stdout, p.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '-pthread', '-ldl', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', '-fsanitize=address,undefined', PosixPath('/tmp/void-s7-integrated-strict.tk3gHC/VOID console source niyiw0mq/operator_console_systems-normal.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_native_fixture.a', '-o', PosixPath('/tmp/void-s7-integrated-strict.tk3gHC/VOID console source niyiw0mq/operator_console_systems-normal.bin')], 1, b'', b'ld.lld: error: undefined symbol: sodium_init\n&gt;&gt;&gt; referenced by c_dynamic.cpp:569 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:569)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n&gt;&gt;&gt; referenced by c_dynamic.cpp:207 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:207)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n&gt;&gt;&gt; referenced by c_dynamic.cpp:208 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:208)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+</system-out>
+	</testcase>
+	<testcase name="stage10_operators_aot" classname="stage10_operators_aot" time="1.1918" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/operators.py", line 49, in &lt;module&gt;
+    run([clang, *flags, obj, runtime, fixture, "-o", exe])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/operators.py", line 31, in run
+    assert p.returncode == status, (args, p.returncode, p.stdout, p.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '-pthread', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', '-fsanitize=address,undefined', PosixPath('/tmp/void-s7-integrated-strict.tk3gHC/VOID Stage10 operators bws5o2ma/normal.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_native_fixture.a', '-o', PosixPath('/tmp/void-s7-integrated-strict.tk3gHC/VOID Stage10 operators bws5o2ma/normal.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n&gt;&gt;&gt; referenced by c_dynamic.cpp:569 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:569)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n&gt;&gt;&gt; referenced by c_dynamic.cpp:207 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:207)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n&gt;&gt;&gt; referenced by c_dynamic.cpp:208 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:208)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+</system-out>
+	</testcase>
+	<testcase name="stage10_conversion_aot" classname="stage10_conversion_aot" time="0.87605" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/conversion.py", line 59, in &lt;module&gt;
+    run([clang, *flags, obj, runtime, fixture, "-o", exe])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage10/conversion.py", line 23, in run
+    assert p.returncode == 0, (args, p.returncode, p.stdout, p.stderr)
+           ^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '-pthread', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', '-fsanitize=address,undefined', PosixPath('/tmp/void-s7-integrated-strict.tk3gHC/VOID Stage10 display 2t308nnj/normal.o'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_native_fixture.a', '-o', PosixPath('/tmp/void-s7-integrated-strict.tk3gHC/VOID Stage10 display 2t308nnj/normal.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n&gt;&gt;&gt; referenced by c_dynamic.cpp:569 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:569)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n&gt;&gt;&gt; referenced by c_dynamic.cpp:207 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:207)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n&gt;&gt;&gt; referenced by c_dynamic.cpp:208 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:208)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+</system-out>
+	</testcase>
+	<testcase name="lsp_sprint6" classname="lsp_sprint6" time="1.25726" status="run">
+		<properties/>
+		<system-out>Sprint 6 LSP navigation, UTF-16, hover, rename, completion, signature, diagnostics and formatting passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage10_fields" classname="lsp_stage10_fields" time="0.15051" status="run">
+		<properties/>
+		<system-out>Field LSP privacy, const hover/completion, dirty rejection and repair passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage10_display" classname="lsp_stage10_display" time="14.8523" status="run">
+		<properties/>
+		<system-out>Display LSP primitive/hook/temporal hover, completion, navigation, signature, original hole spans and dirty repair passed
+237 console/composite LSP checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage10_intelligence" classname="lsp_stage10_intelligence" time="0.6692" status="run">
+		<properties/>
+		<system-out>170 Stage 10 LSP intelligence checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_stage10_source_formatting" classname="lsp_stage10_source_formatting" time="1.30167" status="run">
+		<properties/>
+		<system-out>144 source formatting LSP/revision/diagnostic checks passed
+</system-out>
+	</testcase>
+	<testcase name="local_libraries" classname="local_libraries" time="1.20728" status="run">
+		<properties/>
+		<system-out>Local libraries: 16 compiler/JIT/AOT/cache/application checks and same-server LSP completion/overlay/refresh checks passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_sprint4" classname="lsp_sprint4" time="0.136762" status="run">
+		<properties/>
+		<system-out>Sprint 4 nonexecuting application analysis and native trust checks passed
+</system-out>
+	</testcase>
+	<testcase name="application_native_sprint4_host" classname="application_native_sprint4_host" time="1.67611" status="run">
+		<properties/>
+		<system-out>Sprint 4 host checks passed
+</system-out>
+	</testcase>
+	<testcase name="application_native_sprint4" classname="application_native_sprint4" time="0.455931" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint4.py", line 39, in &lt;module&gt;
+    link(obj,exe);run([exe],status,'');run([exe,'7'],status,'')
+    ~~~~^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint4.py", line 20, in link
+    def link(obj,exe): run([clang,*flags,obj,runtime,fixture,'-pthread','-o',exe])
+                       ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint4.py", line 12, in run
+    assert result.returncode==status,(args,result.returncode,result.stdout,result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', '-fsanitize=address,undefined', PosixPath('/tmp/void-s7-integrated-strict.tk3gHC/VOID Sprint 4 hjlc5th5/app0-normal.obj'), '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a', '/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_native_fixture.a', '-pthread', '-o', PosixPath('/tmp/void-s7-integrated-strict.tk3gHC/VOID Sprint 4 hjlc5th5/app0-normal.exe')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n&gt;&gt;&gt; referenced by c_dynamic.cpp:569 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:569)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n&gt;&gt;&gt; referenced by c_dynamic.cpp:207 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:207)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n&gt;&gt;&gt; referenced by c_dynamic.cpp:208 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:208)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+</system-out>
+	</testcase>
+	<testcase name="text_collections_sprint3" classname="text_collections_sprint3" time="1.03327" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint3.py", line 179, in &lt;module&gt;
+    run([compiler,'emit',path,'-o',obj,*flags]);run([clang,*link_flags,obj,runtime,fixture,'-o',exe]);assert run([exe,'0']).stdout.strip()=='1'
+                                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/src/tests/stage8/sprint3.py", line 12, in run
+    assert result.returncode==(0 if ok else 1),(args,result.returncode,result.stdout,result.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (['/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang', '--driver-mode=g++', '--ld-path=/home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/ld.lld', '-fsanitize=address,undefined', PosixPath('/tmp/void-s7-integrated-strict.tk3gHC/VOID sprint3 8evsq77d/text0.o'), PosixPath('/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a'), PosixPath('/home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_native_fixture.a'), '-o', PosixPath('/tmp/void-s7-integrated-strict.tk3gHC/VOID sprint3 8evsq77d/text0.bin')], 1, '', 'ld.lld: error: undefined symbol: sodium_init\n&gt;&gt;&gt; referenced by c_dynamic.cpp:569 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:569)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\n\nld.lld: error: undefined symbol: crypto_hash_sha256\n&gt;&gt;&gt; referenced by c_dynamic.cpp:207 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:207)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\n\nld.lld: error: undefined symbol: sodium_bin2hex\n&gt;&gt;&gt; referenced by c_dynamic.cpp:208 (/home/shmellyorc/Documents/Void.Language/src/runtime/c_dynamic.cpp:208)\n&gt;&gt;&gt;               c_dynamic.cpp.o:(vd::load_dynamic(std::shared_ptr&lt;vd::DynamicClosure const&gt;, std::filesystem::__cxx11::path const&amp;)) in archive /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/libvoid_runtime.a\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+</system-out>
+	</testcase>
+	<testcase name="lsp_sprint3" classname="lsp_sprint3" time="0.20107" status="run">
+		<properties/>
+		<system-out>Sprint 3 text/collection completion, hover, signatures, references and builtin protections passed
+</system-out>
+	</testcase>
+	<testcase name="lsp_sprint2" classname="lsp_sprint2" time="0.136787" status="run">
+		<properties/>
+		<system-out>Sprint 2 numeric completion/hover/signatures/readonly and named-label navigation passed
+</system-out>
+	</testcase>
+	<testcase name="aot" classname="aot" time="0.145182" status="run">
+		<properties/>
+		<system-out>Wrote native architecture proof object
+Verifying /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/aot proof/proof.o:	file format elf64-x86-64
+Verifying .debug_abbrev...
+Verifying .debug_info Unit Header Chain...
+Verifying .debug_types Unit Header Chain...
+Verifying non-dwo Units...
+Verifying unit: 1 / 1, "architecture.void"
+Verifying dwo Units...
+Verifying .debug_line...
+Verifying .debug_str_offsets...
+No errors.
+-- LLVM object linked, debug information verified, and three native paths executed
+</system-out>
+	</testcase>
+	<testcase name="source_cli" classname="source_cli" time="17.0723" status="run">
+		<properties/>
+		<system-out>Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/source programs with spaces/architecture-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/source programs with spaces/architecture-optimized.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/source programs with spaces/loops-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/source programs with spaces/loops-optimized.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/source programs with spaces/functions-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/source programs with spaces/f...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="value_structs_cli" classname="value_structs_cli" time="2.89744" status="run">
+		<properties/>
+		<system-out>Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/value struct programs with spaces/main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/value struct programs with spaces/main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/value struct programs with spaces/numeric-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/value struct programs with spaces/numeric-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/value struct programs with spaces/order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/value struct programs with spaces/order-optimized.o
+-- Value source normal/O2 JIT/AOT, target layou...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="receiver_methods_cli" classname="receiver_methods_cli" time="5.2032" status="run">
+		<properties/>
+		<system-out>Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/receiver method programs with spaces/main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/receiver method programs with spaces/main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/receiver method programs with spaces/order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/receiver method programs with spaces/order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/receiver method programs with spaces/recursive-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/receiver method programs with spaces/recursive-optimized.o
+Wrote native source objec...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="initialization_cli" classname="initialization_cli" time="6.06491" status="run">
+		<properties/>
+		<system-out>Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/initialization programs with spaces/main-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/initialization programs with spaces/main-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/initialization programs with spaces/order-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/initialization programs with spaces/order-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/initialization programs with spaces/required-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/initialization programs with spaces/required-optimized.o
+Wrote native source object: /home...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="modules_cli" classname="modules_cli" time="56.5504" status="run">
+		<properties/>
+		<system-out>Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/module native programs with spaces/acceptance-normal.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/module native programs with spaces/acceptance-optimized.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/module native programs with spaces/nested-normal.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/module native programs with spaces/nested-optimized.o
+Source checked successfully
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/module native programs with spaces/cyclic-normal.o
+Source checked successfully
+Wrote native source object:...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="analysis_cli" classname="analysis_cli" time="1.37673" status="run">
+		<properties/>
+		<system-out>Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/analysis native programs/analysis-53-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/analysis native programs/analysis-53-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/analysis native programs/analysis-61-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/analysis native programs/analysis-61-optimized.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/analysis native programs/analysis-62-normal.o
+Wrote native source object: /home/shmellyorc/Documents/Void.Language/build/slice7-final-integrated/linux-strict/analysis native programs/analysis-62-optimized.o
+</system-out>
+	</testcase>
+	<testcase name="numeric_cli" classname="numeric_cli" time="48.3006" status="run">
+		<properties/>
+		<system-out>-- Numeric source constants, JIT and native AOT passed in both optimization modes
+</system-out>
+	</testcase>
+</testsuite>

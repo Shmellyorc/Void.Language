@@ -1,0 +1,98 @@
+{
+  "CMakeLists.txt": {
+    "before": "2b016d7d872e8b22a6ed8520f6388ad0704d766795a37f6e6eea9427d66f9590",
+    "after": "8c8a2b0db4e1cd494ffc7719bc5f8f81c803486b6c5a127c78791de52dbd3110"
+  },
+  "docs/LANGUAGE_BIBLE.md": {
+    "before": "e77fd6641c60b3f8eb80c81db173b56e0e2e9b438c8b89f173d948f57d390160",
+    "after": "e3e90cc9ff01e42926a6b825472f5170f9a6ea1ca1bfd5738bf606580e36c63a"
+  },
+  "docs/NUMERIC_TYPES.md": {
+    "before": "4ac1bdc405119aa1c42cb972e8459dbb20c6ff5c5613e576214f750706a526ec",
+    "after": "9e58be735259b3b72aefc4aee165b7450dea342b9c75b3ba5ad16a19d40608ef"
+  },
+  "docs/PROJECT_ARCHITECTURE_ROADMAP.md": {
+    "before": "09f60b6496323537702906b83c631661217f45fd5ccb8b0e69af57ed3d6e8e3b",
+    "after": "b3d1f06bcb0c730ba26a5e29ac0ad413c704e3823f7ef9a04685bf10d7d3718b"
+  },
+  "editors/vscode/src/test/numericHost.ts": {
+    "before": null,
+    "after": "35c6116434f208130a5c9564db0f5519804daaa1be1f15cc42cbc32ec5abc3bf"
+  },
+  "editors/vscode/src/test/runNumericHost.ts": {
+    "before": null,
+    "after": "c0589fecf5fef272bc854cffe7245dd8b2d11f9798176a7b8fa93a6a7941f8c7"
+  },
+  "editors/vscode/syntaxes/void.tmLanguage.json": {
+    "before": "46061366843011f7059b42b208fa1d32b8bb26460cbac8fc2455bcc1bc0b5d51",
+    "after": "081ecf31d7de75bdfbdb911f58981c24d6b1db3c1bc0828ead13a4826e48ebcc"
+  },
+  "include/void/ir.hpp": {
+    "before": "b49140ef2c6e5ab4577f2d0c5f1de760ea19a993cb7b07b152d4bfe4c89fba95",
+    "after": "93368036c02ac249870828179818f10b33030628e56eb48585289e02bada100c"
+  },
+  "include/void/numeric.hpp": {
+    "before": "5397fb41d912e07f5ab983611a99920d2af806c515e3e4c9a06d708735576d3d",
+    "after": "1a076b4934dbc5f06f0f08258aa06581361fe9378f80fc69b2a49bd06cb27766"
+  },
+  "src/backend/llvm/backend.cpp": {
+    "before": "74a747468e249e1cfb2c9cd205ffb4448f950cc9d3df94789afe72223ecfc6c7",
+    "after": "74ed8147b22fd19e3f95546e472de5a2fc5e1a31df287662a673ad75800d3569"
+  },
+  "src/frontend/compiler.cpp": {
+    "before": "a590ec7a321e0bf6c6bd9a2015511ed3225eef6a038e6775ca12238bcf10776c",
+    "after": "d956d31c0a615871dd0a619528b3aedfe7a9857beddb87dc8d2f7586ab22319f"
+  },
+  "src/frontend/construction.inc": {
+    "before": "11dd4ab49feff3c1b428cb8cd5d957ba41d56351fb7154f3b62ae318392935d0",
+    "after": "ec7b4cdec002697349e616648427f83015e1c788f652e2f8d58da6345ba5eab7"
+  },
+  "src/frontend/generic_declarations.inc": {
+    "before": "38c18207bb3f60883165451e47e9db21ab5c42ad397dc919442c4fef58d78b12",
+    "after": "4761195beeb8794bbd2f37a23f5839b559bcf8d1fdbb2c53cc3d27f0b515e8fb"
+  },
+  "src/frontend/generic_inference.inc": {
+    "before": "cb209b877bf7b2005b1e0535195208e03ef586b84dbf3c35efcf2fe75e5f7652",
+    "after": "ee34fbea164048e6e4097f4ff12d38c087d6523aaae82d9673c622b1fe058bce"
+  },
+  "src/frontend/generics.inc": {
+    "before": "f2e58b54a6489c2932cf6f269e8681e261b7a78f47157f99444490f398dbc7f7",
+    "after": "22d1a99cbe45d08498334cc296e13ab03d7bc761e03c7e2aed8fa9dfbaacd99c"
+  },
+  "src/frontend/pattern_parser.inc": {
+    "before": "5b9a0af017b9702e82fbebc0bd0799c620174d23a7cf6296141f96d67c0f8951",
+    "after": "afca1dbb37f088759acada61007ab315b7e4508cc34711d4fb173b91a3de7b0a"
+  },
+  "src/frontend/pattern_semantics.inc": {
+    "before": "fda278c4fdcf77713473c262922075921d8c44365720d070b99189822c9c57b3",
+    "after": "15c89a74c0cc326cbeb05b6ad0092bdb91484f6abcb22b0f09eda8ce1909984f"
+  },
+  "src/ir/module.cpp": {
+    "before": "4360935b276a2912ddd7f4dbe17365e003af6a90778915a18215c06875f46da7",
+    "after": "64d20126b6b1c44ea9343359931776f73f1eaeaea43ee3531d5e3ea6a89a2286"
+  },
+  "src/ir/numeric_enum_storage.inc": {
+    "before": null,
+    "after": "7cf8cf64093e9a3bad87d68f1956cc2c5d18ffa0b6c713dea93197ca958ba652"
+  },
+  "src/numeric.cpp": {
+    "before": "2c687512907e74a345dd49e9f9417eb5edfeb2687454875717b400e2160041c6",
+    "after": "07ae952f13f9ff8eeb9a6e291366c85b720a1829415d247fccaafb9bb5b22d50"
+  },
+  "tests/numeric/enums.py": {
+    "before": null,
+    "after": "644d40700a852bc6a4ecb0d426e4e31375fa02e31020341e037617f22f2b788e"
+  },
+  "tests/numeric/enums_ir.cpp": {
+    "before": null,
+    "after": "9c09c773442bc8d151839d0d52d9971123241ba41a35273d88d697a4795821ba"
+  },
+  "tests/numeric/enums_lsp.py": {
+    "before": null,
+    "after": "5121b8a9fa57fe5685e5f23bff05c0e23334957e03170cb343f8534382893cdf"
+  },
+  "tests/numeric/tests.cpp": {
+    "before": "f726c186bb6f976059be03d08e052a3dc55ccabccfaf223e7e236b1aaabe86b9",
+    "after": "08aa4dd230230ee06d07fc46312964435b8571cb6bd522d2d8a9604a6ae61269"
+  }
+}

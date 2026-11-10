@@ -1,0 +1,11 @@
+Original direct strict command after the first strict build
+ASAN_OPTIONS=abort_on_error=1:halt_on_error=1:detect_leaks=1 UBSAN_OPTIONS=abort_on_error=1:halt_on_error=1:print_stacktrace=1 build/llvm23-strict/void_g1_tests build/llvm23-strict/ffi-g1/primitives.descriptor build/llvm23-strict/ffi-g1/primitives.void build/llvm23-strict/ffi-g1/evidence-replay
+G1 admitted an async graph
+Original exit status: 1
+2026-11-08 20:39:42.428820435 -0700 564417 src/frontend/compiler.cpp
+2026-11-08 20:42:14.808183547 -0700 48128608 build/llvm23-strict/CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+2026-11-08 20:46:32.960586134 -0700 197140984 build/llvm23-strict/void_g1_tests
+1c5f87693fa7a6a8dc0281843f7b0553c2e8f19647bfa8a3c284f14da1ae8313  src/frontend/compiler.cpp
+b3cb5ec67a9533ea7c1e44bb11767a17a94577ec12ef0c90b92573dab716ac19  build/llvm23-strict/CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+0cbea303a7f1040472e778f88c35f17284412a9904c4fddaac84182c196ee9f2  build/llvm23-strict/void_g1_tests
+build/slice7-g1/linux-strict-g1-build.log:18:[100%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o

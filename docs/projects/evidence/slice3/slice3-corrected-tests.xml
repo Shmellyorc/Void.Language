@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="3"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="1"
+	timestamp="2026-11-08T15:34:51"
+	>
+	<testcase name="project_sessions" classname="project_sessions" time="0.277699" status="run">
+		<properties/>
+		<system-out>project_sessions: 155 checks passed
+</system-out>
+	</testcase>
+	<testcase name="project_profiles" classname="project_profiles" time="0.97056" status="run">
+		<properties/>
+		<system-out>project_profiles: 43 process checks passed; compute instruction counts O0=6, O2=2, release --no-opt=6
+</system-out>
+	</testcase>
+	<testcase name="project_protocol" classname="project_protocol" time="0.258692" status="run">
+		<properties/>
+		<system-out>project_protocol: 60 checks passed
+</system-out>
+	</testcase>
+</testsuite>

@@ -1,0 +1,11 @@
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 83%] Built target libcurl_static
+[ 83%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_numeric_enum_ir.dir/tests/numeric/enums_ir.cpp.o
+[100%] Linking CXX executable void_numeric_enum_ir
+[100%] Built target void_numeric_enum_ir

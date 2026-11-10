@@ -1,0 +1,11 @@
+{
+  "mode": "offered-reopen",
+  "editor": "1.141.0",
+  "platform": "linux",
+  "events": [
+    "File\nEdit\nSelection\nView\nGo\nRun\n[Extension Development Host] offered\nExplorer\noffered\nsecond.void\nOutline\nTimeline\nShow All Commands\nCtrl\n+\nShift\n+\nP\nGo to File\nCtrl\n+\nP\nOpen Settings\nCtrl\n+\n,\n 0 \n 0\nVOID: stopped\nInfo: All installed extensions are temporarily disabled.\nReload and Enable Extensions\nAll installed extensions are temporarily disabled.\nSource: VOID Language\nCreate VOID project\nKeep standalone\nStart a VOID project for these first sources?",
+    "{\"status\":{\"state\":\"stopped\"},\"open\":[],\"diagnostics\":[]}"
+  ],
+  "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 0\n\n\tat Object.run (/home/shmellyorc/Documents/Void.Language/editors/vscode/out/test/creationHost.js:149:30)",
+  "status": "FAIL"
+}

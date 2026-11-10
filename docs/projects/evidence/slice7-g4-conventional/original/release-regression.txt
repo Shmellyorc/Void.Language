@@ -1,0 +1,49 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+      Start 276: ffi_g1_primitive_aot_missing
+      Start 283: ffi_g4_jit_ir
+      Start  18: cli_contract
+      Start 280: ffi_g3_jit_ir
+ 1/17 Test #283: ffi_g4_jit_ir ....................***Failed    0.18 sec
+bad closure revision: C dynamic closure: unsupported revision
+system library policy: C dynamic closure: unsupported target, system ABI or relocation policy
+foreign provider: C dynamic closure: exact descriptor provider or target mismatch
+aliased image: C dynamic closure: invalid or duplicate image
+missing descriptor export received C dynamic closure is missing a required descriptor export: g4_add
+
+      Start 277: ffi_g2_jit_ir
+ 2/17 Test #277: ffi_g2_jit_ir ....................   Passed    1.15 sec
+      Start 272: ffi_g1_primitive_jit_ir
+ 3/17 Test #280: ffi_g3_jit_ir ....................   Passed    1.84 sec
+      Start 284: ffi_g4_aot_normal
+ 4/17 Test #272: ffi_g1_primitive_jit_ir ..........   Passed    0.93 sec
+      Start 285: ffi_g4_aot_optimized
+ 5/17 Test #284: ffi_g4_aot_normal ................   Passed    1.08 sec
+      Start 286: ffi_g4_aot_startup
+ 6/17 Test #285: ffi_g4_aot_optimized .............   Passed    0.68 sec
+      Start 279: ffi_g2_aot_optimized
+ 7/17 Test #279: ffi_g2_aot_optimized .............   Passed    0.07 sec
+      Start 275: ffi_g1_primitive_aot_mismatch
+ 8/17 Test #275: ffi_g1_primitive_aot_mismatch ....   Passed    0.05 sec
+      Start 278: ffi_g2_aot_normal
+ 9/17 Test #286: ffi_g4_aot_startup ...............   Passed    0.16 sec
+      Start 274: ffi_g1_primitive_aot_optimized
+10/17 Test #278: ffi_g2_aot_normal ................   Passed    0.08 sec
+      Start 273: ffi_g1_primitive_aot_normal
+11/17 Test #274: ffi_g1_primitive_aot_optimized ...   Passed    0.05 sec
+      Start 282: ffi_g3_aot_optimized
+12/17 Test #273: ffi_g1_primitive_aot_normal ......   Passed    0.04 sec
+      Start 281: ffi_g3_aot_normal
+13/17 Test #282: ffi_g3_aot_optimized .............   Passed    0.07 sec
+      Start   2: project_manifest
+14/17 Test #281: ffi_g3_aot_normal ................   Passed    0.06 sec
+15/17 Test   #2: project_manifest .................   Passed    0.07 sec
+16/17 Test  #18: cli_contract .....................   Passed    3.97 sec
+17/17 Test #276: ffi_g1_primitive_aot_missing .....   Passed    8.31 sec
+
+94% tests passed, 1 tests failed out of 17
+
+Total Test time (real) =   8.33 sec
+
+The following tests FAILED:
+	283 - ffi_g4_jit_ir (Failed)
+Errors while running CTest

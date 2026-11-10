@@ -1,0 +1,9 @@
+{
+  "compile": {
+    "directory": "C:/Users/a/VoidS7-G1-Release",
+    "command": "C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\clang-cl.exe  /nologo -TP -DCURL_STATICLIB -DNOMINMAX -DWIN32_LEAN_AND_MEAN -D_ITERATOR_DEBUG_LEVEL=0 -D_WIN32_WINNT=0x0A00 -IC:\\Users\\a\\VoidCI42377496702-Native\\include -IC:\\Users\\a\\VoidCI42377496702-Native\\third_party\\curl\\include -IC:\\Users\\a\\VoidCI42377496702-Native\\tests\\integration -imsvc\"C:\\Users\\a\\Documents\\ChatGPT\\Void TEMP\\Void-native\\.toolchains\\native-schannel\\sdk\\clang+llvm-23.1.4-x86_64-pc-windows-msvc\\include\" -imsvcC:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\http\\prefix\\windows-schannel-x86_64\\Release\\include /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MT /GR- /W4 /permissive- /EHsc /FoCMakeFiles\\void_tests.dir\\tests\\analysis\\tests.cpp.obj /FdCMakeFiles\\void_tests.dir\\ -c -- C:\\Users\\a\\VoidCI42377496702-Native\\tests\\analysis\\tests.cpp",
+    "file": "C:/Users/a/VoidCI42377496702-Native/tests/analysis/tests.cpp",
+    "output": "C:/Users/a/VoidS7-G1-Release/CMakeFiles/void_tests.dir/tests/analysis/tests.cpp.obj"
+  },
+  "link": "C:\\Windows\\system32\\cmd.exe /C \"cd . && C:\\gcc\\bin\\cmake.exe -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\\void_tests.dir --rc=\"C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.19041.0\\x64\\rc.exe\" --mt=C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\llvm-mt.exe --manifests  -- C:\\Users\\a\\VoidCI42377496702-Native\\.toolchains\\llvm-23.1.4\\bin\\lld-link.exe /nologo @CMakeFiles\\void_tests.rsp  /out:void_tests.exe /implib:void_tests.lib /pdb:void_tests.pdb /version:0.0 /machine:x64 /INCREMENTAL:NO /subsystem:console && cd .\""
+}

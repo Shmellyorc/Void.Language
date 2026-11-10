@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-clang++"
+	tests="4"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="gamedev"
+	time="0"
+	timestamp="2026-11-09T08:10:07"
+	>
+	<testcase name="ffi_g4_jit_ir" classname="ffi_g4_jit_ir" time="0.810659" status="run">
+		<properties/>
+		<system-out>bad closure revision: C dynamic closure: unsupported revision
+system library policy: C dynamic closure: unsupported target, system ABI or relocation policy
+foreign provider: C dynamic closure: exact descriptor provider or target mismatch
+aliased image: C dynamic closure: invalid or duplicate image
+missing descriptor export: C dynamic closure is missing an owned descriptor export
+wrong target thunk: C dynamic closure: exact descriptor thunk mismatch
+direct bridge import: VOID IR: C primitive transport requires host admission and typed operations
+erased closure admission: VOID IR: C primitive admission differs from analyzed source
+forged dynamic ordinal: VOID IR: C primitive call outside the admitted binding module
+missing provider: C dynamic artifact: libvoid_g4_main.so is missing, aliased or outside file bounds
+modified dependency: C dynamic digest: libvoid_g4_dep.so
+symlink provider: C dynamic artifact: libvoid_g4_main.so is missing, aliased or outside file bounds
+hardlinked provider: C dynamic artifact: lib...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g4_aot_normal" classname="ffi_g4_aot_normal" time="0.187422" status="run">
+		<properties/>
+		<system-out>normal ['7'] exit=0 104
+normal ['-1'] exit=1 &lt;host binding /native_dynamic.void&gt;:15:6: runtime error: C resource is closed, null or invalid
+In function /native_dynamic.void::read
+Called from /dynamic.void::entry
+/tmp/void-g4-source-upcryt43/dynamic.void:46:20: source call
+        return ffi.read(alias, 0)
+                   ^
+normal ['-2'] exit=1 &lt;host binding /native_dynamic.void&gt;:17:6: runtime error: C resource is closed, null or invalid
+In function /native_dynamic.void::close_box
+Called from /dynamic.void::entry
+/tmp/void-g4-source-upcryt43/dynamic.void:48:20: source call
+        return ffi.close_box(alias)
+                   ^
+normal ['-3'] exit=1 &lt;host binding /native_dynamic.void&gt;:13:6: runtime error: C resource operation rejected org.voidlang.g4-fixture::g4_create
+In function /native_dynamic.void::create
+Called from /dynamic.void::entry
+/tmp/void-g4-source-upcryt43/dynamic.void:22:28: source call
+        var rejected = ffi.create(-3)
+                           ^
+normal ['-4'] exit=0 22
+normal ['7'] exi...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g4_aot_optimized" classname="ffi_g4_aot_optimized" time="0.110517" status="run">
+		<properties/>
+		<system-out>optimized ['7'] exit=0 104
+optimized ['-1'] exit=1 &lt;host binding /native_dynamic.void&gt;:15:6: runtime error: C resource is closed, null or invalid
+In function /native_dynamic.void::read
+Called from /dynamic.void::entry
+/tmp/void-g4-source-bxgpkcv4/dynamic.void:46:20: source call
+        return ffi.read(alias, 0)
+                   ^
+optimized ['-2'] exit=1 &lt;host binding /native_dynamic.void&gt;:17:6: runtime error: C resource is closed, null or invalid
+In function /native_dynamic.void::close_box
+Called from /dynamic.void::entry
+/tmp/void-g4-source-bxgpkcv4/dynamic.void:48:20: source call
+        return ffi.close_box(alias)
+                   ^
+optimized ['-3'] exit=1 &lt;host binding /native_dynamic.void&gt;:13:6: runtime error: C resource operation rejected org.voidlang.g4-fixture::g4_create
+In function /native_dynamic.void::create
+Called from /dynamic.void::entry
+/tmp/void-g4-source-bxgpkcv4/dynamic.void:22:28: source call
+        var rejected = ffi.create(-3)
+                           ^
+optimized ['-4'] exit=0 22
+o...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="ffi_g4_aot_startup" classname="ffi_g4_aot_startup" time="0.0970458" status="run">
+		<properties/>
+		<system-out>startup ['7'] exit=1 /tmp/void-g4-source-0aub74z2/dynamic_startup.void:5:15: runtime error: Division by zero
+    return 12 / zero
+              ^
+In function /dynamic_startup.void::eager
+Called from /dynamic_startup.void::$global$initialized
+/tmp/void-g4-source-0aub74z2/dynamic_startup.void:7:24: source call
+var initialized: i32 = eager()
+                       ^
+startup ['7'] exit=1 C dynamic digest: libvoid_g4_dep.so
+startup ['7'] exit=1 C dynamic artifact: libvoid_g4_dep.so is missing, aliased or outside file bounds
+startup ['7'] exit=1 C dynamic path: root is unavailable or aliased
+startup verified relocated dynamic AOT with its compile source removed
+</system-out>
+	</testcase>
+</testsuite>
