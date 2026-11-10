@@ -70,6 +70,23 @@ voidc build --project . --allow-native -o /path/to/other-package/gallery
 
 On Windows, use `python`, `voidc.exe`, and an output name of `gallery.exe`. Pass `--library C:\path\to\raylib.dll --import-library C:\path\to\matching\raylib.lib` for the qualified software build, with `raylib.h` and `LICENSE` from the same source tree. `prepare.py` runs public `voidc native-bind`, compiles the generated C and the shim into a shared provider, and stages the separate raylib shared library. For the strict Linux compiler add `--sanitize` to instrument the adapter. Native project execution and linking require `--allow-native`.
 
+To build the Windows software DLL, verify the raylib 6.0 source archive against the hash above. In an x64 MSVC developer shell, set `$raylibSource` to the extracted source root, `$clang` and `$readobj` to the pinned LLVM 23.1.4 tools, and `$out` to a fresh output directory.
+
+```powershell
+$modules = @('rcore', 'rshapes', 'rtextures', 'rtext', 'rmodels', 'raudio')
+$sources = $modules | ForEach-Object { Join-Path $raylibSource "src/$_.c" }
+$dll = Join-Path $out 'raylib.dll'
+$importLibrary = Join-Path $out 'raylib.lib'
+& $clang --target=x86_64-pc-windows-msvc -fuse-ld=lld -fms-runtime-lib=static `
+  -std=c11 -O2 -shared -D_CRT_SECURE_NO_WARNINGS -DBUILD_LIBTYPE_SHARED `
+  -DPLATFORM_DESKTOP_WIN32 -DGRAPHICS_API_OPENGL_SOFTWARE $sources `
+  -lopengl32 -lgdi32 -lwinmm -lshcore -luser32 -lshell32 "-Wl,/implib:$importLibrary" -o $dll
+if ($LASTEXITCODE -ne 0) { throw 'raylib build failed' }
+& $readobj --coff-imports $dll
+```
+
+Use that DLL and import library with `prepare.py`, the extracted `src/raylib.h`, and the upstream `LICENSE`. The historical native C control and WGL/Mesa failure records are in the [raylib diagnostics ZIP](VOID_ARCHIVE_AND_RETENTION_POLICY.md#verified-archives).
+
 For AOT distribution copy these files from the prepared project’s `native/` directory into a sibling `native/` directory beside the emitted executable.
 
 | Linux | Windows |

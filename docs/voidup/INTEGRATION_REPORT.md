@@ -344,9 +344,12 @@ literal [NUL list](evidence/ci-42446206797/commit-paths.nul) and
 
 Actual complete review diffs are [source.patch](evidence/ci-42446206797/source.patch)
 and [documentation.patch](evidence/ci-42446206797/documentation.patch).
-[Original hosted evidence](evidence/ci-42446206797/original-ci.tar.gz) and its
-[per-file restoration index](evidence/ci-42446206797/original-ci-index.json) retain
-all final logs, metadata and diagnostic ZIPs with verified original digests.
+The [per-file restoration index](evidence/ci-42446206797/original-ci-index.json)
+records the final hosted logs, metadata and diagnostic ZIPs with their original
+digests. The full original bundle is recoverable from commit
+`a642ce746a62a7646d06d42d9f87931813aaa812`. The
+[retention policy](../projects/VOID_ARCHIVE_AND_RETENTION_POLICY.md#restoring-historical-records)
+identifies the selected failure records and recovery procedure.
 [Local verification](evidence/ci-42446206797/local-verification.tar.gz) and its
 [index](evidence/ci-42446206797/local-verification-index.json) retain original
 failures, all source revisions, controls, builds, complete/repeated tests, SDK/ABI,
@@ -1457,10 +1460,11 @@ zero remaining failed names and zero remaining skipped names.
 
 The [source diff](evidence/ci-42377496702/source.patch) contains the following
 eleven source/build/test changes. The [documentation diff](evidence/ci-42377496702/documentation.patch)
-contains this report revision. The [original CI archive](evidence/ci-42377496702/original-ci.tar.gz)
-and [index](evidence/ci-42377496702/original-ci-index.json) preserve all seven job
-logs, twelve diagnostic ZIPs and metadata: 27 members, each read back and
-SHA-256 verified. The [local verification archive](evidence/ci-42377496702/local-verification.tar.gz)
+contains this report revision. The [original CI index](evidence/ci-42377496702/original-ci-index.json)
+records all seven job logs, twelve diagnostic ZIPs and metadata. All 27 members
+were read back and SHA-256 verified. Recover the original bundle from the
+audited commit using the [retention procedure](../projects/VOID_ARCHIVE_AND_RETENTION_POLICY.md#restoring-historical-records).
+The [local verification archive](evidence/ci-42377496702/local-verification.tar.gz)
 and [index](evidence/ci-42377496702/local-verification-index.json) preserve actual
 commands, original failures, native probes, receipts, XML results and reruns.
 
@@ -1902,9 +1906,10 @@ frozen installed execution verifies the updated Runtime checksum too.
 
 The [source diff](evidence/ci-42427327049/source.patch) and
 [documentation diff](evidence/ci-42427327049/documentation.patch) contain the actual
-reviewable changes. [Original hosted evidence](evidence/ci-42427327049/original-ci.tar.gz)
-([index](evidence/ci-42427327049/original-ci-index.json)) preserves the completed
-run. [Local native/Linux evidence](evidence/ci-42427327049/local-verification.tar.gz)
+reviewable changes. The [original hosted index](evidence/ci-42427327049/original-ci-index.json)
+records the completed run. The [retention procedure](../projects/VOID_ARCHIVE_AND_RETENTION_POLICY.md#restoring-historical-records)
+identifies the selected failure records and how to recover the original bundle.
+[Local native/Linux evidence](evidence/ci-42427327049/local-verification.tar.gz)
 ([index](evidence/ci-42427327049/local-verification-index.json)) preserves commands,
 source preimages, original local failures and corrected outcomes. Raw records
 also remain in `build/ci-42427327049/` and

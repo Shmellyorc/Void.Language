@@ -184,6 +184,12 @@ compiler/link receipts and executable hashes: [original](evidence/performance-re
 [framing](evidence/performance-repair/framing-final/hashes.json).
 The [summary JSON](evidence/performance-repair/summary.json) records every warm
 observation, first-stage invocation, median/range, CPU time and resource counts.
+The generated executable copies outside the frozen baseline are historical build
+outputs. For a new measurement, rebuild in a private output directory with the
+recorded source cohort and the maintained
+[build driver](../../tests/log/performance_build.py) and
+[measurement driver](../../tests/log/performance_run.py). The frozen baseline
+remains available for the exact historical comparison.
 
 **Performance gate: OPEN.** Small synchronous file logging is 17.415 ms versus
 2.973 ms direct I/O, about 5.86×. It misses both the single-digit and 2–3× initial

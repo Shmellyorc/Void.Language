@@ -30,6 +30,8 @@ holds in historical records do not govern current work.
 
 ## Engineering documentation
 
+- [Archive and retention policy](projects/VOID_ARCHIVE_AND_RETENTION_POLICY.md)
+  governs qualification outputs and cleanup for every milestone.
 - [Slice 2 project discovery and entry selection](projects/SLICE2.md): compiler-owned
   manifest/VFS admission, immutable D/E snapshots, any-name main, library checking,
   explicit overrides, actual execution tests and independent-review boundary.

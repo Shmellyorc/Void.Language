@@ -133,6 +133,39 @@ The final Debug run passed every case on its first attempt. The complete runs pr
 
 The proposed integration list now contains 198 paths. The repair amends the existing CMake file and closeout report and adds nine tracked test drivers to the proposed changes. The inventory verifies the bytes of every other accepted opening path and separates required review evidence from retained diagnostics. HEAD remains `2f667ea338127b8f91c3136804377ef3fa5218d6`, the index matches the opening snapshot, and the staged diff is empty. [Exact integration paths](evidence/slice7-final-link-repair/integration-paths.txt) · [Layered inventory](evidence/slice7-final-link-repair/inventory.txt) · [Required review evidence](evidence/slice7-final-link-repair/review-evidence-paths.txt) · [Git receipt](evidence/slice7-final-link-repair/git-state.txt)
 
-The qualified build trees, test source mirrors, relocated packages and diagnostic remnants are retained under `build/slice7-final-link-repair/`. The original build trees, source packet and qualification evidence remain in place. The workspace receipt verifies removal of the repair's temporary run directories and copy-on-write probe. [Cleanup and retention receipt](evidence/slice7-final-link-repair/workspace.txt)
+The workspace receipt describes the build trees, source packet, relocated packages and scratch cleanup at qualification time. The later storage review accepted removal of the obsolete Windows build and package copies under `VS7I2`. The Linux cleanup proposal lists the corresponding redundant build trees separately from active builds and source inputs. [Archive and retention policy](VOID_ARCHIVE_AND_RETENTION_POLICY.md)
 
-The integrated repair is ready for Golden Wrench review.
+### Reproduce from source
+
+Use a disposable checkout at `a642ce746a62a7646d06d42d9f87931813aaa812`, LLVM/Clang/LLD 23.1.4, CMake, Ninja, Python 3.12 or newer, and the matching attested host and HTTP prefixes. On Windows use the x64 MSVC tools and Windows SDK. Configure with `BUILD_TESTING=ON`. Use Release, Debug with `VOID_LLVM_RESEARCH=ON` on Linux, and RelWithDebInfo with `VOID_SANITIZERS=ON` for the Linux strict profile. [Configure and install](../SOURCE_COMPILER.md#building-the-compiler)
+
+Run the Linux suites on the native host with a private `TMPDIR`. For strict use `ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:detect_leaks=1` and `UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1`. Set `VOID_TEST_STDLIB` to the physical checkout's `stdlib` directory for the LSP identity checks. Build and test with the original timeouts.
+
+```sh
+export VOID_TEST_STDLIB="$PWD/stdlib"
+cmake --build "$build" --parallel 2
+ctest --test-dir "$build" --parallel 2 --output-on-failure
+ctest --test-dir "$build" --output-on-failure -R '^(ffi_g[1-5]_|runtime_callbacks$|cli_install)'
+```
+
+The Windows 10 build 19045 audit selected 150 of 381 registered tests per profile. From a native x64 developer shell with private `TEMP` and `TMP`, build all targets for the selected configuration, then use this historical selector. Each profile ran one CTest job at a time.
+
+```powershell
+$selection = @(
+  '^(project_.*|cli_.*|target_triple|application_workflow_stage9|native_output_paths_ci88|'
+  'long_physical_paths_ci89|toolchain_stop_token|core|jit|reload|gc|gc_.*|native|native_source|'
+  'native_aot_(main|integrated|cleanup_failure)_.*|runtime_.*|analysis|frontend|modules|'
+  'numeric.*|sessions.*|tooling.*|ffi_g[12345]_.*|aot|.*_cli|'
+  'fixed_arrays_source|growable_arrays_source|arrays_(source|foundation)|generics_.*|'
+  'collections_source|dictionaries_source|properties_source|patterns_source|advanced_source|'
+  'async_(ir|source|lifecycle|parallel|syntax_source|aot_resources_.*)|native_workers|io_native_jobs|'
+  'local_libraries|lsp_(positions|protocol|sprint[2346]|stage8|stage11_globals)|'
+  'documentation_execution|stage6_integrated|stage10_(fields.*|operator_reload|operator_resolution|'
+  'operator_integration|tooling|display_reload)|os_(frontend|errors)|binary_ownership|'
+  'http_(native|reload|source|source_negative|source_faults|ir|install)|url_(native|ir|source))$'
+) -join ''
+ctest --test-dir $build -C $config --show-only -R $selection
+ctest --test-dir $build -C $config --parallel 1 --output-on-failure -R $selection
+```
+
+Install the compiler and tooling components into a private prefix and use the installed `voidc` for the sample. The checked provider, native binding, JIT, AOT and relocation procedure uses the committed sample and the pinned vendor inputs. Historical receipt links above identify the original local audit records. Source replay uses the current build and test definitions. [Installed compiler and raylib replay](SLICE7_RAYLIB_INTEGRATION.md#build-and-run-the-sample) · [Selective historical archives](VOID_ARCHIVE_AND_RETENTION_POLICY.md#verified-archives)
