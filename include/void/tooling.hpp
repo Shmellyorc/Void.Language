@@ -98,12 +98,18 @@ class ProjectSnapshot {
     std::shared_ptr<const Identity> identity_;
     std::filesystem::path entry_;
     SourceOverrides overrides_;
+    std::optional<std::filesystem::path> project_root_, project_request_;
+    std::optional<std::string> entry_override_;
+    ManifestOverrides manifests_;
     std::map<std::string, DocumentRevision> documents_;
     std::uint64_t revision_ = 0;
 public:
     std::uint64_t revision() const { return revision_; }
     const auto& documents() const { return documents_; }
     const auto& overrides() const { return overrides_; }
+    const auto& project_root() const { return project_root_; }
+    const auto& entry_override() const { return entry_override_; }
+    const auto& manifests() const { return manifests_; }
     bool same_revision(const ProjectSnapshot& other) const { return identity_ && identity_ == other.identity_; }
 };
 class SessionAnalysis {
@@ -111,11 +117,17 @@ class SessionAnalysis {
     ProjectSnapshot snapshot_;
     AnalysisResult result_;
     std::shared_ptr<const ToolingIndex> index_;
+    std::optional<ProjectAnalysisResult> project_;
+    std::shared_ptr<const ValidatedAnalysis> semantic_;
 public:
     const ProjectSnapshot& snapshot() const { return snapshot_; }
     const AnalysisResult& result() const { return result_; }
     const auto& index() const { return index_; } // Explicit historical access.
+    const auto& project() const { return project_; }
+    const auto& semantic_analysis() const { return semantic_; }
+    bool succeeded() const {return project_?project_->succeeded():result_.succeeded();}
 };
+struct ProjectSession {std::filesystem::path root; std::optional<std::string> entry = {};};
 // Single-threaded orchestration. Selecting, running and accepting are separate so
 // a future scheduler can deliver results out of order without publishing stale data.
 class ToolingSession {
@@ -123,9 +135,13 @@ class ToolingSession {
     std::vector<std::string> changed_;
     std::shared_ptr<const SessionAnalysis> latest_, last_success_;
     InvalidationPlan accepted_plan_;
+    std::string selected_context_;
     void change(const std::string&, DocumentRevision, std::optional<SourceFile>, bool close);
+    bool manifest_document(const std::string&) const;
+    bool overridden(const std::string&) const;
 public:
     explicit ToolingSession(std::filesystem::path entry);
+    explicit ToolingSession(ProjectSession);
     ToolingSession(const ToolingSession&) = delete;
     ToolingSession& operator=(const ToolingSession&) = delete;
     void open(const std::string&, DocumentRevision, std::string text);
@@ -134,6 +150,8 @@ public:
     void close(const std::string&, DocumentRevision);
     // Explicit disk refresh invalidates freshness even if bytes have not changed.
     void refresh();
+    void reselect(std::optional<std::string> entry = {});
+    bool requires_reselection() const;
     ProjectSnapshot select() const { return current_; }
     static std::shared_ptr<const SessionAnalysis> analyze(ProjectSnapshot);
     bool accept(std::shared_ptr<const SessionAnalysis>);

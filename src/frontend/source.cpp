@@ -148,28 +148,8 @@ std::filesystem::path standard_library_root() {
     std::lock_guard lock(standard_sources_mutex);
     return installed_standard_sources.empty()?utf8_path(VOID_STDLIB_ROOT):installed_standard_sources;
 }
-ProjectSelection discover_project(const std::filesystem::path& workspace,
-    const std::filesystem::path& active,const std::filesystem::path& explicit_entry) {
+std::vector<std::filesystem::path> project_ancestor_directories(const std::filesystem::path& workspace,const std::filesystem::path& active) {
     namespace fs=std::filesystem;
-    auto file=[](fs::path path,bool missing) {
-        path=fs::absolute(path).lexically_normal();
-        auto parent=fs::canonical(path.parent_path());
-        auto name=path.filename();
-        if(path.extension()!=".void")throw std::invalid_argument("Project entry must name an exact .void file");
-        for(const auto& child:fs::directory_iterator(parent)) {
-            auto a=path_utf8(child.path().filename()), b=path_utf8(name);
-            auto fold=[](std::string x){for(auto& c:x)if(c>='A'&&c<='Z')c+='a'-'A';return x;};
-            if(fold(a)==fold(b) && a!=b)throw std::invalid_argument("Project entry case mismatch/collision");
-        }
-        auto result=parent/name;auto status=fs::symlink_status(result);
-        if(fs::is_symlink(status) || (fs::exists(status) && !fs::is_regular_file(status)) || (!missing && !fs::is_regular_file(status)))throw std::invalid_argument("Project entry must be a regular file without aliases");
-        return result;
-    };
-    if(!explicit_entry.empty()) {auto entry=file(explicit_entry,false);return {entry,entry.parent_path(),false};}
-    if(workspace.empty()) {
-        if(active.empty())throw std::invalid_argument("Select a workspace or active .void file");
-        auto entry=file(active,true);return {entry,entry.parent_path(),true};
-    }
     auto boundary=fs::canonical(workspace);
     auto start=active.empty()?boundary:fs::absolute(active).lexically_normal().parent_path();
     auto relative=start.lexically_relative(boundary);
@@ -221,7 +201,33 @@ ProjectSelection discover_project(const std::filesystem::path& workspace,
     for(const auto& part:relative)if(part!=".") {checked/=part;if(fs::is_symlink(fs::symlink_status(checked)) || fs::canonical(checked)!=checked)throw std::invalid_argument("Project selection contains an alias");}
     // Search using the same spelling as boundary, so termination is lexical too.
     start=checked;
-    for(auto directory=start;;directory=directory.parent_path()) {
+    std::vector<fs::path> result;
+    for(auto directory=start;;directory=directory.parent_path()){result.push_back(directory);if(directory==boundary)break;}
+    return result;
+}
+ProjectSelection discover_project(const std::filesystem::path& workspace,
+    const std::filesystem::path& active,const std::filesystem::path& explicit_entry) {
+    namespace fs=std::filesystem;
+    auto file=[](fs::path path,bool missing) {
+        path=fs::absolute(path).lexically_normal();
+        auto parent=fs::canonical(path.parent_path());
+        auto name=path.filename();
+        if(path.extension()!=".void")throw std::invalid_argument("Project entry must name an exact .void file");
+        for(const auto& child:fs::directory_iterator(parent)) {
+            auto a=path_utf8(child.path().filename()), b=path_utf8(name);
+            auto fold=[](std::string x){for(auto& c:x)if(c>='A'&&c<='Z')c+='a'-'A';return x;};
+            if(fold(a)==fold(b) && a!=b)throw std::invalid_argument("Project entry case mismatch/collision");
+        }
+        auto result=parent/name;auto status=fs::symlink_status(result);
+        if(fs::is_symlink(status) || (fs::exists(status) && !fs::is_regular_file(status)) || (!missing && !fs::is_regular_file(status)))throw std::invalid_argument("Project entry must be a regular file without aliases");
+        return result;
+    };
+    if(!explicit_entry.empty()) {auto entry=file(explicit_entry,false);return {entry,entry.parent_path(),false};}
+    if(workspace.empty()) {
+        if(active.empty())throw std::invalid_argument("Select a workspace or active .void file");
+        auto entry=file(active,true);return {entry,entry.parent_path(),true};
+    }
+    for(const auto& directory:project_ancestor_directories(workspace,active)) {
         auto candidate=directory/"main.void";
         // Validate case collisions even when exact main.void is absent.
         for(const auto& child:fs::directory_iterator(directory)) {
@@ -229,7 +235,6 @@ ProjectSelection discover_project(const std::filesystem::path& workspace,
             if(folded=="main.void" && name!="main.void")throw std::invalid_argument("main.void must use exact case without case siblings");
         }
         if(fs::exists(fs::symlink_status(candidate))) {auto entry=file(candidate,false);return {entry,directory,false};}
-        if(directory==boundary)break;
     }
     if(active.empty())throw std::invalid_argument("No main.void in selected workspace");
     auto entry=file(active,true);return {entry,entry.parent_path(),true};

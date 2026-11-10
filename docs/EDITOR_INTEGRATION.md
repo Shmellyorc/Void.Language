@@ -1,5 +1,63 @@
 # VOID editor integration (Phase 11)
 
+## First-file project creation (Slice 5)
+
+In a trusted single filesystem workspace using automatic project selection, a
+new named VOID source can trigger one **Create VOID project** / **Keep standalone**
+offer. The matching native server inventories eligible sources. An established tree
+suppresses the offer. Simultaneous fresh files qualify as a single batch when they
+account for the full nonempty inventory. Opening an existing file does not prompt.
+
+Accepting opens a separate review showing the destination, kind, version and IDs.
+Choose **Create Manifest** to approve publication. Workspace storage records the
+offer before displaying it and remembers acceptance, decline and dismissal for
+the physical root. **VOID: Reset Project Creation Prompt** clears that suppression.
+**VOID: Create Project** deliberately opens creation for an admitted existing
+workspace, including one with multiple files. A created manifest switches the
+editor to the compiler-owned session with current dirty buffers. Restricted
+workspaces keep syntax highlighting without launching creation tools. See
+[Slice 5](projects/SLICE5.md).
+
+The following sections retain the scope of their original implementation slices.
+
+## Manifest project recognition and sessions (Slice 3)
+
+The VS Code adapter uses compiler/voidls schema-2 preflight and project protocol 1.
+Literal `void.project.root` pins a manifest root; with `void.project.entry` it
+selects an in-root override. An entry setting alone retains the legacy entry-parent
+mode. With neither, compiler-owned nearest-manifest discovery precedes the existing
+legacy main.void/standalone behavior. TypeScript does not scan main declarations,
+parse TOML or implement a second source resolver. Error-bearing and library projects
+can open without an application entry. Exact TOML documents participate in dirty
+buffer synchronization and diagnostics through the existing client.
+
+Configured/bundled/PATH server resolution, native executable validation, single-folder/
+filesystem-workspace limits and workspace trust checks remain. New automatic/manifest
+preflight requires a matching project-capable server; unsupported old servers fail
+visibly without legacy downgrade. Explicit legacy entry mode can still use the old
+endpoint. No project process or operation starts in an untrusted workspace.
+
+Project state notifications update the selected-entry/status display. Query and edit
+results are guarded by client ownership and a project-wide epoch, in addition to
+existing document-version checks. Configuration restart intent survives coalesced
+readiness requests. A root switch creates a fresh client; stale callbacks from the
+previous project cannot update current state. Source/TOML/structural events invalidate
+selection, including wrong-case boundaries; actual admission stays in the compiler.
+The Select Project Entry command in project mode retains its pinned root. No init/new,
+first-file offers, automatic manifest writing or creation UI is delivered here.
+
+Actual Linux VS Code host qualification and native/platform limits are recorded in
+[Slice 3](projects/SLICE3.md); protocol handshakes alone are not editor qualification.
+
+
+The [Phase 1 creation state machine](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-first-file-creation-and-terminal-workflows)
+now freezes proposed first-event detection, concurrent-event coalescing, persisted
+`offered`/accept/decline/dismiss suppression and explicit reset/retry behavior.
+Creation remains unimplemented. Slice 3 now delivers `void.project.root` manifest context; entry-only legacy configuration keeps
+its old root semantics. No manifest/main parser is added to the adapter. Error-bearing
+project sessions and dirty manifest overlays belong to the shared compiler/voidls
+contract and are delivered in S3. The first-file creation workflow remains deferred.
+
 ## Approved project workflow roadmap, 8 November 2026
 
 The [coordinated project roadmap](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-ide-and-public-usability-milestones)
@@ -15,7 +73,7 @@ preserves standalone files, trusted-workspace restrictions, exclusive creation a
 explicit retry after decline/dismissal. Manifest/source-set edits must use shared
 selection revisions and preserve dirty overlays. Baseline `void.project.entry`,
 `voidls --discover`, exact `main.void` selection and existing session behavior below
-remain delivered behavior until the compiler/protocol replacement is implemented.
+remain delivered legacy behavior alongside the additive S3 project protocol.
 
 **Stage 8 Sprint 1 (20 October 2026):** [STAGE8_DISCOVERY.md](STAGE8_DISCOVERY.md)
 supersedes the historical import/discovery exclusions below. It specifies separate

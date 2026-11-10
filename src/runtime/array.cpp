@@ -167,6 +167,29 @@ void Runtime::array_insert(RegisteredRootWord source,const ElementSchemaRef& sch
     if(h.version!=version || h.backing!=old || h.count!=count)throw ListModified("List structurally modified during resize");
     h.backing=next;h.capacity=grown;h.count=count+1;h.version=version+1;
 }
+std::uint64_t Runtime::c_span_bytes(RegisteredRootWord root, std::uint64_t offset,
+                                    std::span<std::uint8_t> bytes, bool read,
+                                    std::optional<std::uint64_t> commit_version) {
+    require_managed();
+    const auto schema = fixed_scalar_schema(ScalarEncoding::u8);
+    poll();
+    std::lock_guard lock(mutex_);
+    auto& list = list_header(root, schema);
+    if (offset > list.count || bytes.size() > list.count - offset)
+        throw std::out_of_range("C byte span outside live list extent");
+    if (commit_version && *commit_version != list.version)
+        throw ListModified("C byte span destination changed during call");
+    if (bytes.empty() || (!read && !commit_version)) return list.version;
+    auto& state = heap_.buffer_state(list.backing);
+    auto* native_address = static_cast<std::uint8_t*>(list.backing) + state.layout->element_offset(offset);
+    if (commit_version) {
+        if (state.readers) throw BufferBusy("C byte span destination is leased");
+        std::memcpy(native_address, bytes.data(), bytes.size());
+    } else {
+        std::memcpy(bytes.data(), native_address, bytes.size());
+    }
+    return list.version;
+}
 void Runtime::list_write_bytes(RegisteredRootWord destination, RegisteredRootWord input,
                                std::uint64_t position) {
     require_managed();

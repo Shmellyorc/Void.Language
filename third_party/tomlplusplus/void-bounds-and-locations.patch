@@ -1,0 +1,92 @@
+--- a/toml.hpp
++++ b/toml.hpp
+@@ -9074,6 +9074,7 @@
+ 		std::string description_;
+ #endif
+ 		source_region source_;
++		source_region previous_definition_{}; // VOID: retain duplicate origin.
+ 
+ 	  public:
+ #if TOML_EXCEPTIONS
+@@ -9132,6 +9133,9 @@
+ 		{
+ 			return source_;
+ 		}
++
++		const source_region& previous_definition() const noexcept { return previous_definition_; }
++		void previous_definition(const source_region& value) noexcept { previous_definition_ = value; }
+ 
+ 		friend std::ostream& operator<<(std::ostream& lhs, const parse_error& rhs)
+ 		{
+@@ -13524,6 +13528,7 @@
+ 		bool recording = false, recording_whitespace = true;
+ 		std::string_view current_scope;
+ 		size_t nested_values = {};
++		source_region previous_definition{}; // VOID: first duplicate declaration.
+ #if !TOML_EXCEPTIONS
+ 		mutable optional<parse_error> err;
+ #endif
+@@ -13553,6 +13558,7 @@
+ 			builder.finish(pos, reader.source_path());
+ #else
+ 			err.emplace(builder.finish(pos, reader.source_path()));
++			err->previous_definition(previous_definition);
+ #endif
+ 		}
+ 
+@@ -15478,7 +15484,10 @@
+ 		{
+ 			return_if_error({});
+ 			assert_not_eof();
+-			TOML_ASSERT_ASSUME(is_bare_key_character(*cp) || is_string_delimiter(*cp));
++			// VOID: table headers can reach this function with an invalid key starter.
++			// Validate input before any optimizer assumption, in every build profile.
++			if TOML_UNLIKELY(!(is_bare_key_character(*cp) || is_string_delimiter(*cp)))
++				set_error_and_return_default("expected a bare or quoted key"sv);
+ 			push_parse_scope("key"sv);
+ 
+ 			key_buffer.clear();
+@@ -15527,6 +15536,9 @@
+ 				consume_leading_whitespace();
+ 
+ 				// store segment
++				// VOID: bound dotted/header paths before creating recursive table trees.
++				if (key_buffer.size() >= 8u)
++					set_error_and_return_default("exceeded VOID manifest key depth limit (8)"sv);
+ 				key_buffer.push_back(key_segment, key_begin, key_end);
+ 
+ 				// eof or no more key to come
+@@ -15657,6 +15669,7 @@
+ 					}
+ 					else
+ 					{
++						previous_definition = pit->first.source();
+ 						if (!is_arr && p.type() == node_type::table)
+ 							set_error_and_return_default("cannot redefine existing table '"sv,
+ 														 to_sv(recording_buffer),
+@@ -15729,6 +15742,7 @@
+ 				}
+ 
+ 				// if we get here it's a redefinition error.
++				previous_definition = it->first.source();
+ 				if (!is_arr && matching_node.type() == node_type::table)
+ 				{
+ 					set_error_at(header_begin_pos,
+@@ -15832,6 +15846,7 @@
+ 							|| !(impl::find(dotted_key_tables.begin(), dotted_key_tables.end(), p)
+ 								 || impl::find(implicit_tables.begin(), implicit_tables.end(), p)))
+ 						{
++							previous_definition = pit->first.source();
+ 							set_error_at(key_buffer.starts[i],
+ 										 "cannot redefine existing "sv,
+ 										 to_sv(pit->second.type()),
+@@ -15860,7 +15875,8 @@
+ 			auto it								= tbl->lower_bound(last_segment);
+ 			if (it != tbl->end() && it->first == last_segment)
+ 			{
+-				set_error("cannot redefine existing "sv,
++				previous_definition = it->first.source();
++				set_error_at(key_buffer.starts.back(), "cannot redefine existing "sv,
+ 						  to_sv(it->second.type()),
+ 						  " '"sv,
+ 						  to_sv(recording_buffer),

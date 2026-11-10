@@ -35,7 +35,7 @@ private:
     std::shared_ptr<Impl> impl_;
 };
 void emit_async_object(const ir::Module&, const std::filesystem::path&, bool optimize);
-void emit_object(const ir::Module&, const std::filesystem::path&, bool optimize, bool source_program = false);
+void emit_object(const ir::Module&, const std::filesystem::path&, bool optimize, bool source_program = false, std::string_view build_inputs = {});
 // Internal architectural harness supplies its own runtime entry guard/main.
 void emit_runtime_object(const ir::Module&, const std::filesystem::path&, bool optimize, const std::string& generation_suffix = {});
 }

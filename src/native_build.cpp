@@ -1,5 +1,7 @@
 #include "void/native_build.hpp"
 #include "void/backend.hpp"
+#include "void/cache.hpp"
+#include "void/c_primitive.hpp"
 #include "void/path.hpp"
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Path.h>
@@ -61,7 +63,7 @@ fs::path output_path(const ValidatedAnalysis& analysis,const fs::path& requested
     // Check before directory creation, so a failed collision never touches input.
     for(const auto& module:analysis.modules()) {
         auto source=utf8_path(module.source.path());
-        if(path==source || (fs::exists(path) && fs::equivalent(path,source)))
+        if(path==source || (fs::exists(path) && fs::exists(source) && fs::equivalent(path,source)))
             throw std::runtime_error("Unsafe source/output collision: "+path_utf8(path));
     }
     fs::create_directories(path.parent_path());
@@ -113,8 +115,9 @@ void publish(const fs::path& staged,const fs::path& output) {
 struct Resources {
     fs::path driver,linker,runtime,fixture;
     std::vector<std::string> flags;
+    std::string verified_digests;
 };
-void verify_resources(const fs::path& config, const Resources& resources) {
+void verify_resources(const fs::path& config, Resources& resources) {
     const auto inventory = config.parent_path()/"void-native-resources.txt";
     std::ifstream file(inventory);
     std::string line;
@@ -142,6 +145,7 @@ void verify_resources(const fs::path& config, const Resources& resources) {
         for(auto byte:digest.final()){actual+=hex[byte>>4];actual+=hex[byte&15];}
         if(actual!=line.substr(0,64))
             throw std::runtime_error("Native link resource checksum mismatch: "+path_utf8(path));
+        resources.verified_digests += actual;
         if(std::find(checked.begin(),checked.end(),path)!=checked.end())
             throw std::runtime_error("Duplicate native resource inventory entry");
         checked.push_back(path);
@@ -166,7 +170,7 @@ Resources resources(const char* argv0) {
     if(!file.eof() || lines.size()<5 || (lines[0]!="VOID native 23.1.4 v1" && lines[0]!="VOID native 23.1.4 v2"))
         throw std::runtime_error("Native toolchain resources missing or invalid: "+path_utf8(config));
     auto path=[&](const std::string& text){auto p=utf8_path(text);return p.is_absolute()?p:(config.parent_path()/p).lexically_normal();};
-    Resources result{path(lines[1]),lines[2].empty()?fs::path{}:path(lines[2]),path(lines[3]),path(lines[4]),{}};
+    Resources result{path(lines[1]),lines[2].empty()?fs::path{}:path(lines[2]),path(lines[3]),path(lines[4]),{},{}};
     for(const auto& p:{result.driver,result.runtime,result.fixture}) {
         if(!fs::is_regular_file(p))throw std::runtime_error("Native toolchain resource missing: "+path_utf8(p));
         exact_path(p);
@@ -207,13 +211,15 @@ void version(const fs::path& tool,const char* expected,const fs::path& capture) 
         throw std::runtime_error("Native toolchain requires matching LLVM/Clang/LLD 23.1.4: "+path_utf8(tool));
 }
 }
-void publish_object(const ValidatedAnalysis& analysis,const fs::path& requested,bool optimize) {
+void publish_object(const ValidatedAnalysis& analysis,const fs::path& requested,bool optimize,std::string_view profile) {
     auto output=output_path(analysis,requested);Staging stage(output);
     auto object=stage.directory/"program.o";
-    emit_object(analysis.lower(),object,optimize,true);
+    emit_object(analysis.lower(),object,optimize,true,std::string(compiler_build_identity())+":"+std::string(profile));
     output_path(analysis,output);publish(object,output);
 }
-void build_executable(const ValidatedAnalysis& analysis,const fs::path& requested,bool optimize,const char* argv0) {
+void build_executable(const ValidatedAnalysis& analysis,const fs::path& requested,bool optimize,const char* argv0,std::string_view profile) {
+    if (analysis.c_primitive_admission() && !analysis.c_primitive_admission()->dynamic())
+        throw std::invalid_argument("Host-admitted C primitives require an explicitly linked AOT fixture");
     auto config=[&] {
         try {return resources(argv0);}
         catch(const std::exception& error) {
@@ -238,7 +244,9 @@ void build_executable(const ValidatedAnalysis& analysis,const fs::path& requeste
     version(config.driver,"clang version 23.1.4",work/"version.txt");
     if(!config.linker.empty())version(config.linker,"LLD 23.1.4",work/"version.txt");
     const auto object=work/"program.o";
-    emit_object(analysis.lower(ir::Emission::entry),object,optimize,true);
+    std::string provenance=std::string(compiler_build_identity())+":"+std::to_string(profile.size())+":"+std::string(profile)+":"+config.verified_digests;
+    for(const auto& flag:config.flags)provenance+=std::to_string(flag.size())+":"+flag;
+    emit_object(analysis.lower(ir::Emission::entry),object,optimize,true,provenance);
     std::vector<std::string> args{path_utf8(config.driver),"--driver-mode=g++"};
     if(!config.linker.empty())args.push_back("--ld-path="+path_utf8(config.linker));
     // LLD interprets '%' in absolute output paths. The driver's child working

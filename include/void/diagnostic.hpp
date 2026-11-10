@@ -17,7 +17,12 @@ enum class DiagnosticCode {
     constant_call = 2011, constant_cycle = 2012, zero_divisor = 2013,
     integer_range = 2014, numeric_conversion = 2015, numeric_operator = 2016, numeric_representability = 2017, receiver = 2018, unknown_method = 2019, initializer_deferred = 2020, incomplete_match = 2021, documentation_missing_parameter = 2022, documentation_unknown_parameter = 2023, documentation_duplicate_parameter = 2024, import_path = 3001, import_read = 3002,
     visibility = 3003, ambiguous = 3004, alias_conflict = 3005, import_context = 3006,
-    entry = 4001, limit = 9001
+    entry = 4001,
+    project_syntax = 5001, project_schema = 5002, project_field = 5003,
+    project_identity = 5004, project_version = 5005, project_path = 5006,
+    project_duplicate = 5007, project_reserved = 5008,
+    project_boundary = 5009, project_entry = 5010, project_changed = 5011,
+    project_debug_info = 5012, limit = 9001
 };
 struct SourceSpan {
     std::shared_ptr<const SourceFile> source;

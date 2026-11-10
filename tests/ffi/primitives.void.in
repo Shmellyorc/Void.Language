@@ -1,0 +1,42 @@
+use "/native_primitives.void" as c
+
+func entry(value: i32) -> i32:
+    if c.signed8(-128 as i8) != -128 as i8 or c.signed8(127 as i8) != 127 as i8:
+        return 1
+    if c.signed16(-32768 as i16) != -32768 as i16 or c.signed16(32767 as i16) != 32767 as i16:
+        return 2
+    if c.signed32(-2147483648) != -2147483648 or c.signed32(2147483647) != 2147483647:
+        return 3
+    if c.signed64(-9223372036854775808 as i64) != -9223372036854775808 as i64 or c.signed64(9223372036854775807 as i64) != 9223372036854775807 as i64:
+        return 4
+    if c.unsigned8(0 as u8) != 0 as u8 or c.unsigned8(255 as u8) != 255 as u8:
+        return 5
+    if c.unsigned16(0 as u16) != 0 as u16 or c.unsigned16(65535 as u16) != 65535 as u16:
+        return 6
+    if c.unsigned32(0 as u32) != 0 as u32 or c.unsigned32(4294967295 as u32) != 4294967295 as u32:
+        return 7
+    if c.unsigned64(0 as u64) != 0 as u64 or c.unsigned64(18446744073709551615 as u64) != 18446744073709551615 as u64:
+        return 8
+    if c.cint(-2147483648) != -2147483648 or c.cint(2147483647) != 2147483647:
+        return 9
+    if c.clong(@G1_LONG_MIN@ as @G1_LONG@) != @G1_LONG_MIN@ as @G1_LONG@ or c.clong(@G1_LONG_MAX@ as @G1_LONG@) != @G1_LONG_MAX@ as @G1_LONG@:
+        return 10
+    if c.csize(0 as u64) != 0 as u64 or c.csize(18446744073709551615 as u64) != 18446744073709551615 as u64:
+        return 11
+    if c.invert(true) or not c.invert(false):
+        return 12
+    if c.single(1.25 as f32, -3.0 as f32) != -0.5 as f32:
+        return 13
+    if c.double_value(5.5 as f64, -1.5 as f64) != 2.5 as f64:
+        return 14
+    if not c.sign_zero(-0.0 as f32, 0.0 as f64) or c.sign_zero(0.0 as f32, -0.0 as f64):
+        return 15
+    if c.mixed(-111 as i8, 60001 as u16, -200000001, 1.25 as f32, 18446744073709551615 as u64, -2.5 as f64, -800000000000000001 as i64, 5.5 as f32, 4000000001 as u32, -7.75 as f64, 251 as u8, -30123 as i16, -0.5 as f32, 17.5 as f64) != 17293822569102704641 as u64:
+        return 16
+    if c.mixed(-110 as i8, 60001 as u16, -200000001, 1.25 as f32, 18446744073709551615 as u64, -2.5 as f64, -800000000000000001 as i64, 5.5 as f32, 4000000001 as u32, -7.75 as f64, 251 as u8, -30123 as i16, -0.5 as f32, 17.5 as f64) != 0 as u64:
+        return 17
+    var answer = c.sentinel()
+    if answer != 4000000007 as u32 or c.signed32(value) != value:
+        return 18
+    c.no_result(answer)
+    return value + 66

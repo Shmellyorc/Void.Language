@@ -96,14 +96,19 @@ target_include_directories(void_zone_objects PRIVATE third_party/date/include)
 target_compile_definitions(void_zone_objects PRIVATE
   USE_OS_TZDB=0 HAS_REMOTE_API=0 AUTO_DOWNLOAD=0 VOID_EMBEDDED_TZDB=1)
 target_link_libraries(void_zone_objects PRIVATE void_options)
-add_library(void_core src/frontend/source.cpp src/frontend/compiler.cpp src/frontend/tooling.cpp src/numeric.cpp src/ir/module.cpp src/ir/native_storage.cpp src/ir/native_binding.cpp)
-target_sources(void_core PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects>)
+add_library(void_application_objects OBJECT src/application_metadata.cpp src/project_identity.cpp src/dynamic_closure.cpp)
+target_link_libraries(void_application_objects PRIVATE void_options)
+add_library(void_core src/frontend/project.cpp src/frontend/project_creation.cpp src/frontend/source.cpp src/frontend/compiler.cpp src/frontend/tooling.cpp src/numeric.cpp src/ir/module.cpp src/ir/native_storage.cpp src/ir/native_binding.cpp)
+target_sources(void_core PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects> $<TARGET_OBJECTS:void_application_objects>)
+target_sources(void_core PRIVATE src/ir/c_primitive.cpp)
+target_include_directories(void_core SYSTEM PRIVATE third_party/tomlplusplus)
 target_compile_definitions(void_core PRIVATE VOID_STDLIB_ROOT="${VOID_STDLIB_ROOT}")
 target_link_libraries(void_core PUBLIC void_options Threads::Threads)
 add_library(void_native_fixture STATIC src/native/fixture.c src/native/sink.c)
 target_link_libraries(void_native_fixture PRIVATE void_options)
 add_library(void_runtime STATIC src/runtime/application.cpp src/runtime/os.cpp src/runtime/os_abi.cpp src/runtime/random.cpp src/runtime/filesystem_abi.cpp src/runtime/filesystem.cpp src/runtime/native_resource.cpp src/runtime/native_binding.cpp src/runtime/temporal_abi.cpp src/runtime/conversion.cpp src/runtime/text_case.cpp src/runtime/buffer.cpp src/runtime/list.cpp src/runtime/array.cpp src/runtime/dictionary.cpp src/runtime/fixed_abi.cpp src/runtime/gc_schema.cpp src/runtime/heap.cpp src/runtime/coordination.cpp src/runtime/console.cpp src/runtime/console_abi.cpp src/runtime/callback.cpp src/runtime/abi.cpp src/runtime/reload.cpp src/runtime/native.cpp src/runtime/async.cpp)
-target_sources(void_runtime PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects>)
+target_sources(void_runtime PRIVATE src/runtime/c_span.cpp src/runtime/c_resource.cpp src/runtime/c_dynamic.cpp)
+target_sources(void_runtime PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects> $<TARGET_OBJECTS:void_application_objects>)
 target_link_libraries(void_runtime PUBLIC void_options Threads::Threads void_native_fixture ${CMAKE_DL_LIBS})
 include(cmake/CurlProvider.cmake)
 void_add_curl_provider(HTTP)
@@ -224,6 +229,9 @@ target_include_directories(void_core SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
 target_compile_options(void_core PRIVATE ${VOID_LLVM_DEFINITIONS})
 llvm_map_components_to_libnames(VOID_NUMERIC_LIBS Support)
 target_link_libraries(void_core PRIVATE ${VOID_NUMERIC_LIBS})
+if(WIN32)
+  target_link_libraries(void_core PRIVATE advapi32)
+endif()
 target_link_libraries(void_llvm PUBLIC void_core void_runtime PRIVATE ${VOID_LLVM_LIBS})
 add_library(void_lsp src/lsp/positions.cpp)
 target_link_libraries(void_lsp PUBLIC void_core)
@@ -322,11 +330,71 @@ add_custom_command(OUTPUT "${voidup_application}"
 add_custom_target(voidup ALL DEPENDS "${voidup_application}")
 include(CTest)
 if(BUILD_TESTING)
+  add_executable(void_project_header tests/project/header.cpp)
+  target_link_libraries(void_project_header PRIVATE void_options)
+  set_target_properties(void_project_header PROPERTIES DISABLE_PRECOMPILE_HEADERS ON UNITY_BUILD OFF)
+  add_test(NAME project_manifest_header COMMAND void_project_header)
+  add_executable(void_project_manifest tests/project/manifest.cpp)
+  target_link_libraries(void_project_manifest PRIVATE void_core)
+  add_test(NAME project_manifest COMMAND void_project_manifest)
+  set_tests_properties(project_manifest PROPERTIES TIMEOUT 60)
   add_test(NAME voidup_smoke COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/voidup/smoke.py"
     "${voidup_application}" "${CMAKE_CURRENT_BINARY_DIR}/voidup-smoke-evidence")
   set_tests_properties(voidup_smoke PROPERTIES TIMEOUT 240)
   add_test(NAME voidup_ci_integration COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/voidup/ci_integration.py")
   find_package(Python3 3.12 REQUIRED COMPONENTS Interpreter)
+  if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    add_test(NAME project_manifest_no_authority COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/project/authority.py" "$<TARGET_FILE:void_project_manifest>")
+    set_tests_properties(project_manifest_no_authority PROPERTIES TIMEOUT 60)
+  endif()
+  add_test(NAME project_manifest_legacy COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/project/legacy.py" "$<TARGET_FILE:voidc>")
+  set_tests_properties(project_manifest_legacy PROPERTIES TIMEOUT 180)
+  add_test(NAME project_manifest_provenance COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/project/provenance.py" "${PROJECT_SOURCE_DIR}")
+  add_executable(void_project_selection tests/project/selection.cpp)
+  target_link_libraries(void_project_selection PRIVATE void_core)
+  add_test(NAME project_selection COMMAND void_project_selection)
+  set_tests_properties(project_selection PROPERTIES TIMEOUT 300)
+  add_executable(void_project_sessions tests/project/sessions.cpp)
+  target_link_libraries(void_project_sessions PRIVATE void_llvm void_runtime)
+  add_test(NAME project_sessions COMMAND void_project_sessions)
+  set_tests_properties(project_sessions PROPERTIES TIMEOUT 180)
+  add_executable(void_project_creation tests/project/creation.cpp)
+  target_link_libraries(void_project_creation PRIVATE void_core)
+  add_test(NAME project_creation COMMAND void_project_creation)
+  add_test(NAME project_creation_process COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/project/creation.py" "$<TARGET_FILE:voidc>" "$<TARGET_FILE:voidls>"
+    "${CMAKE_CURRENT_BINARY_DIR}/project-creation-evidence.json")
+  set_tests_properties(project_creation project_creation_process PROPERTIES TIMEOUT 300)
+  add_executable(void_project_application tests/project/application.cpp)
+  target_link_libraries(void_project_application PRIVATE void_llvm void_runtime)
+  add_test(NAME project_application COMMAND void_project_application)
+  set_tests_properties(project_application PROPERTIES TIMEOUT 180)
+  if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    add_test(NAME project_application_process COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/project/application.py" "$<TARGET_FILE:voidc>"
+      "${CMAKE_CURRENT_BINARY_DIR}/project-application-evidence.json")
+    set_tests_properties(project_application_process PROPERTIES TIMEOUT 300)
+  endif()
+  add_test(NAME project_discovery_cli COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/project/discovery.py" "$<TARGET_FILE:voidc>"
+    "${CMAKE_CURRENT_BINARY_DIR}/project-discovery-evidence.json")
+  set_tests_properties(project_discovery_cli PROPERTIES TIMEOUT 300)
+  add_test(NAME project_profiles COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/project/profiles.py" "$<TARGET_FILE:voidc>"
+    "${LLVM_TOOLS_BINARY_DIR}/llvm-objdump${CMAKE_EXECUTABLE_SUFFIX}"
+    "${CMAKE_CURRENT_BINARY_DIR}/project-profiles-evidence.json")
+  set_tests_properties(project_profiles PROPERTIES TIMEOUT 240)
+  add_test(NAME project_protocol COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/project/protocol.py" "$<TARGET_FILE:voidls>"
+    "${CMAKE_CURRENT_BINARY_DIR}/project-protocol-evidence.json")
+  set_tests_properties(project_protocol PROPERTIES TIMEOUT 180)
+  add_test(NAME project_nested_cli COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/project/nested.py" "$<TARGET_FILE:voidc>"
+    "${CMAKE_CURRENT_BINARY_DIR}/project-nested-evidence.json")
+  set_tests_properties(project_nested_cli PROPERTIES TIMEOUT 180)
   add_test(NAME cli_contract COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/cli/contract.py" "$<TARGET_FILE:voidc>")
   set_tests_properties(cli_contract PROPERTIES TIMEOUT 180)
   add_test(NAME cli_install COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/cli/install.py"
@@ -1236,6 +1304,10 @@ if(BUILD_TESTING)
   target_link_libraries(void_operator_integration PRIVATE void_llvm)
   add_test(NAME stage10_operator_integration COMMAND void_operator_integration "${PROJECT_SOURCE_DIR}")
   set_tests_properties(stage10_operator_integration PROPERTIES TIMEOUT 180)
+  include(tests/ffi/primitives.cmake)
+  include(tests/ffi/records.cmake)
+  include(tests/ffi/resources.cmake)
+  include(tests/ffi/dynamic.cmake)
   add_executable(void_native_tests tests/native/tests.cpp tests/native/integrated.cpp tests/native/probe.cpp $<TARGET_OBJECTS:void_native_test_fixture> tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
   target_link_libraries(void_native_tests PRIVATE void_llvm void_cache_identity)
   add_test(NAME native_source COMMAND void_native_tests "${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/native fixtures")
@@ -1548,6 +1620,16 @@ if(BUILD_TESTING)
   set_tests_properties(analysis PROPERTIES TIMEOUT 180)
   add_test(NAME numeric COMMAND void_tests numeric "${PROJECT_SOURCE_DIR}")
   set_tests_properties(numeric PROPERTIES TIMEOUT 120)
+  add_executable(void_numeric_enum_ir tests/numeric/enums_ir.cpp)
+  target_link_libraries(void_numeric_enum_ir PRIVATE void_llvm void_runtime)
+  add_test(NAME numeric_enum_ir COMMAND void_numeric_enum_ir)
+  add_test(NAME numeric_enum_process COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/numeric/enums.py" "$<TARGET_FILE:voidc>"
+    "${CMAKE_CURRENT_BINARY_DIR}/numeric-enum-process.json")
+  add_test(NAME numeric_enum_lsp COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/numeric/enums_lsp.py" "$<TARGET_FILE:voidls>"
+    "${CMAKE_CURRENT_BINARY_DIR}/numeric-enum-lsp.json")
+  set_tests_properties(numeric_enum_ir numeric_enum_process numeric_enum_lsp PROPERTIES TIMEOUT 480)
   add_test(NAME frontend COMMAND void_tests frontend "${PROJECT_SOURCE_DIR}")
   set_tests_properties(frontend PROPERTIES TIMEOUT 90)
   add_test(NAME modules COMMAND void_tests modules "${CMAKE_CURRENT_BINARY_DIR}/module fixtures with spaces")
@@ -1557,6 +1639,19 @@ if(BUILD_TESTING)
   execute_process(COMMAND "${VOID_CLANG}" --version OUTPUT_VARIABLE VOID_CLANG_VERSION RESULT_VARIABLE VOID_CLANG_STATUS)
   if(NOT VOID_CLANG_STATUS EQUAL 0 OR NOT VOID_CLANG_VERSION MATCHES "clang version 23\\.1\\.4([^0-9]|$)")
     message(FATAL_ERROR "AOT tests require matching clang 23.1.4; set VOID_CLANG")
+  endif()
+  if((WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux") AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(AMD64|amd64|x86_64)$")
+    add_test(NAME ffi_g4_conventional COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/ffi/conventional_process.py"
+      "${CMAKE_COMMAND}" "${CMAKE_CURRENT_BINARY_DIR}" "$<CONFIG>" "${VOID_CLANG}" "${VOID_SANITIZERS}")
+    set_tests_properties(ffi_g4_conventional PROPERTIES TIMEOUT 480)
+    add_executable(void_g5_reload tests/ffi/callback_reload.cpp)
+    target_link_libraries(void_g5_reload PRIVATE void_llvm void_runtime)
+    add_test(NAME ffi_g5_callbacks COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/ffi/callback_process.py" "$<TARGET_FILE:voidc>" "${VOID_CLANG}"
+      "${VOID_SANITIZERS}" "$<TARGET_FILE:void_g5_reload>"
+      "${CMAKE_COMMAND}" "${CMAKE_CURRENT_BINARY_DIR}" "$<CONFIG>")
+    set_tests_properties(ffi_g5_callbacks PROPERTIES TIMEOUT 480)
   endif()
   add_test(NAME numeric_sprint2 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/numeric/sprint2.py"
     "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}")
@@ -1608,30 +1703,39 @@ if(BUILD_TESTING)
   target_link_libraries(void_sprint6_tests PRIVATE void_llvm void_cache_identity)
   add_test(NAME ergonomics_sprint6_host COMMAND void_sprint6_tests "${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/sprint6 host fixtures")
   set_tests_properties(ergonomics_sprint6_host PROPERTIES TIMEOUT 180)
+  # The Linux recipes invoke Clang directly and need the Runtime's pinned host
+  # archives after the Runtime and fixture archives.
+  set(legacy_aot_host_libraries "")
+  if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    set(legacy_aot_host_libraries ${VOID_HOST_LINK_FILES})
+  endif()
   add_test(NAME ergonomics_sprint6 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage8/sprint6.py"
-    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}")
+    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}" ${legacy_aot_host_libraries})
   set_tests_properties(ergonomics_sprint6 PROPERTIES TIMEOUT 240)
   add_test(NAME stage10_fields_aot COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage10/fields.py"
-    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}")
+    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}" ${legacy_aot_host_libraries})
   add_test(NAME stage10_temporal_install COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage10/install_temporal.py"
     "${CMAKE_COMMAND}" "${CMAKE_CURRENT_BINARY_DIR}" "$<CONFIG>")
   set_tests_properties(stage10_temporal_install PROPERTIES TIMEOUT 300)
   add_test(NAME stage10_temporal_aot COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage10/temporal.py"
-    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}")
+    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}" ${legacy_aot_host_libraries})
   set_tests_properties(stage10_temporal_aot PROPERTIES TIMEOUT 240)
   if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_test(NAME stage11_globals_stack COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage11/stack.py" "$<TARGET_FILE:voidc>")
     set_tests_properties(stage11_globals_stack PROPERTIES TIMEOUT 180)
   endif()
-  add_test(NAME stage11_globals_aot COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage11/globals.py" $<TARGET_FILE:voidc> "${VOID_CLANG}" "${VOID_LINKER}" $<TARGET_FILE:void_runtime> $<TARGET_FILE:void_native_fixture> "${VOID_SANITIZERS}")
+  add_test(NAME stage11_globals_aot COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage11/globals.py"
+    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}" ${legacy_aot_host_libraries})
   set_tests_properties(stage11_globals_aot PROPERTIES TIMEOUT 900)
-  add_test(NAME stage10_console_aot COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage10/console.py" $<TARGET_FILE:voidc> "${VOID_CLANG}" "${VOID_LINKER}" $<TARGET_FILE:void_runtime> $<TARGET_FILE:void_native_fixture> "${VOID_SANITIZERS}")
+  add_test(NAME stage10_console_aot COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage10/console.py"
+    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}" ${legacy_aot_host_libraries})
   set_tests_properties(stage10_console_aot PROPERTIES TIMEOUT 2400)
-  add_test(NAME stage10_operators_aot COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage10/operators.py" $<TARGET_FILE:voidc> "${VOID_CLANG}" "${VOID_LINKER}" $<TARGET_FILE:void_runtime> $<TARGET_FILE:void_native_fixture> "${VOID_SANITIZERS}" $<TARGET_FILE:void_operator_integration>)
+  add_test(NAME stage10_operators_aot COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage10/operators.py"
+    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}" "$<TARGET_FILE:void_operator_integration>" ${legacy_aot_host_libraries})
   # Includes the combined temporal/field/hook fixtures and measured source workloads.
   set_tests_properties(stage10_operators_aot PROPERTIES TIMEOUT 600)
   add_test(NAME stage10_conversion_aot COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage10/conversion.py"
-    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}")
+    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}" ${legacy_aot_host_libraries})
   set_tests_properties(stage10_fields_aot stage10_conversion_aot PROPERTIES TIMEOUT 240)
   add_test(NAME lsp_sprint6 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage8/lsp_sprint6.py" "$<TARGET_FILE:voidls>")
   add_test(NAME lsp_stage10_fields COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage10/lsp_fields.py" "$<TARGET_FILE:voidls>")
@@ -1649,10 +1753,10 @@ if(BUILD_TESTING)
   add_test(NAME application_native_sprint4_host COMMAND void_sprint4_tests "${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/sprint4 host fixtures")
   set_tests_properties(application_native_sprint4_host PROPERTIES TIMEOUT 180)
   add_test(NAME application_native_sprint4 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage8/sprint4.py"
-    "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_sprint4_tests>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}")
+    "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_sprint4_tests>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}" ${legacy_aot_host_libraries})
   set_tests_properties(application_native_sprint4 PROPERTIES TIMEOUT 240)
   add_test(NAME text_collections_sprint3 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage8/sprint3.py"
-    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}")
+    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}" ${legacy_aot_host_libraries})
   set_tests_properties(text_collections_sprint3 PROPERTIES TIMEOUT 240)
   add_test(NAME lsp_sprint3 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage8/lsp_sprint3.py" "$<TARGET_FILE:voidls>")
   set_tests_properties(lsp_sprint3 PROPERTIES TIMEOUT 60)

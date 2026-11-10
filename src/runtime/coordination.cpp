@@ -379,6 +379,7 @@ console::Error Runtime::close() {
             throw std::logic_error("Runtime cannot drain native jobs from their owning executor");
         }
         if (console_context_) console_context_->check_drain();
+        if (native_library_) native_library_->require_shutdown_thread();
         closing_ = true;
         context = console_context_;
         changed_.notify_all();

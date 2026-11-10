@@ -1,0 +1,6 @@
+#ifndef VOID_TEST_G3_DESCRIPTOR_H
+#define VOID_TEST_G3_DESCRIPTOR_H
+#define G3_FIXTURE_IDENTITY "@G3_FIXTURE_SHA@"
+static const char g3_descriptor[] =
+"@G3_DESCRIPTOR_STRING@";
+#endif

@@ -34,7 +34,10 @@ extern "C" void vd_os_call(void* output, const vd::os::ReplyLayout* layout,
         // independently checked in typed IR; null is a valid empty env name here.
         if (os::operations[operation].text_argument) copied = runtime.string_bytes(input);
         os::Result result;
-        {
+        if (selected == os::Operation::application_id) {
+            if (auto metadata = runtime.application_metadata()) result.text = metadata->application_id();
+            else result.kind = os::ErrorKind::unavailable;
+        } else {
             Runtime::Native safe(runtime);
             result = os::query(selected, copied);
         }

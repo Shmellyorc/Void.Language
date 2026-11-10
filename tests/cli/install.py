@@ -15,8 +15,8 @@ environment = os.environ.copy()
 environment.pop('VOID_STDLIB_ROOT', None)
 
 
-def run(argv, status=0):
-    result = subprocess.run(list(map(str, argv)), capture_output=True, env=environment, timeout=180)
+def run(argv, status=0, *, cwd=None):
+    result = subprocess.run(list(map(str, argv)), capture_output=True, env=environment, timeout=180, cwd=cwd)
     assert result.returncode == status, (argv, result.returncode, result.stdout, result.stderr)
     return result
 
@@ -36,6 +36,16 @@ with tempfile.TemporaryDirectory(prefix='VOID CLI installation é ') as director
     compiler = prefix / 'bin' / ('voidc' + suffix)
     project = root / 'external project'
     project.mkdir()
+    run([compiler, 'init', project, '--project-id', 'org.test.installed', '--app-id', 'org.test.installed-app'], cwd=root)
+    assert {path.name for path in project.iterdir()} == {'void.project.toml'}
+    generated = root / 'created outside checkout'
+    run([compiler, 'new', generated, '--source', 'nested/launcher.void'], cwd=root)
+    run([compiler, 'run', '--project', generated, '--profile', 'release'], cwd=root)
+    run([compiler, 'run', '--project', generated, '--profile', 'debug'], cwd=root)
+    generated_output = root / ('installed-app' + suffix)
+    run([compiler, 'build', '--project', generated, '-o', generated_output], cwd=root)
+    generated.rename(root / 'hidden application sources')
+    run([generated_output], cwd=root)
     source = project / 'main.void'
     source.write_text(HELLO, encoding='utf-8')
     output = project / ('hello' + suffix)

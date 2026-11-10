@@ -15,10 +15,14 @@ def frame(message):
 
 
 class Client:
-    def __init__(self, executable, entry, *, preexec_fn=None):
-        self.process = subprocess.Popen([str(executable), "--entry", str(entry)],
+    def __init__(self, executable, entry, *, preexec_fn=None, project=False, entry_override=None, cwd=None):
+        self.project = project
+        self.project_states = []
+        argv = [str(executable), "--project" if project else "--entry", str(entry)]
+        if entry_override is not None: argv += ["--entry", entry_override]
+        self.process = subprocess.Popen(argv,
                                         stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                        preexec_fn=preexec_fn)
+                                        preexec_fn=preexec_fn, cwd=cwd)
         self.messages = queue.Queue()
         self.logs = bytearray()
         self.serial = 0
@@ -98,6 +102,9 @@ class Client:
                 assert message["id"] == request_id and type(message["id"]) is type(request_id), message
                 assert ("result" in message) != ("error" in message), message
                 return message, notifications
+            if self.project and message.get("method") == "void/projectState":
+                self.project_states.append(message["params"])
+                continue
             assert message.get("method") == "textDocument/publishDiagnostics", message
             notifications.append(message["params"])
 

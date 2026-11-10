@@ -119,6 +119,13 @@ for(auto& [id,u]:units) {
         if(found==owner->applications.end())return raw;
         if(found->resolved!=Type::none)return found->resolved;
         auto [declaration_owner,generic]=structure_lookup(*owner,root,units,found->name,found->token);
+        if(!generic && found->name=="option") {
+            if(found->arguments.size()!=1)error(owner->source,found->token,Code::argument_count,"option<T> requires exactly one payload type.");
+            auto payload=resolve_type(found->arguments.front(),*owner,root,units,site);
+            if(!numeric::integer(payload) && payload.kind!=Type::numeric_enum)
+                error(owner->source,found->token,Code::unsupported_type,"option<T> requires an integer or numeric enum payload.");
+            return found->resolved=owner->make_option(payload);
+        }
         if(!generic || generic->generics.empty())error(owner->source,found->token,Code::unsupported_type,"Type '"+found->name+"' is not a generic struct.");
         std::vector<Type> arguments;for(auto argument:found->arguments)arguments.push_back(resolve_type(argument,*owner,root,units,site));
         auto& concrete=owner->specialize_structure(*owner,*declaration_owner,*generic,arguments,site);

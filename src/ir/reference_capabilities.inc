@@ -152,6 +152,8 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                         break;
                     case Op::array_initialize:
                         check(values[i.arguments[0]],array_element(types[function][block][i.a]),true);break;
+                    case Op::array_finish:
+                        value=values[i.a];break;
                     case Op::array_get:
                         value=field_facts(types[function][block][i.a],values[i.a],array_element_path);break;
                     case Op::dict_new: {
@@ -229,6 +231,24 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                         if(auto found=values[i.a].find({});found!=values[i.a].end()) {effect(summary.mutations,found->second);if(found->second.readonly)fail("mutation through readonly list");}
                         if(i.op!=Op::list_remove && i.op!=Op::list_clear)check(values[i.op==Op::list_push?i.b:i.arguments[0]],array_element(owner),true);
                         else if(i.op==Op::list_remove)value=field_facts(owner,values[i.a],array_element_path);
+                        break;
+                    }
+                    case Op::c_primitive_call: {
+                        const auto& binding = module.c_primitives->bindings().at(static_cast<unsigned>(i.immediate));
+                        for (unsigned n = 0; n < binding.abi_parameters.size(); ++n) {
+                            const auto& parameter = binding.abi_parameters[n];
+                            if (parameter.callback) {
+                                if (parameter.retained) retain(values[i.arguments[n]]);
+                                continue;
+                            }
+                            if (parameter.direction <= 1 && parameter.role != CResourceRole::mutate &&
+                                parameter.role != CResourceRole::close) continue;
+                            for (const auto& [path, fact] : values[i.arguments[n]]) {
+                                effect(summary.mutations, fact);
+                                if (fact.readonly) fail("C binding mutates a readonly reference");
+                            }
+                        }
+                        value = reference_facts(type);
                         break;
                     }
                     case Op::native_call:

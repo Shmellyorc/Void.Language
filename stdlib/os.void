@@ -176,7 +176,8 @@ private func _directory(operation: string, app_id: string, reply: _reply, leaf: 
 
 ## Discover XDG data, Windows LocalAppData or macOS Application Support, with one validated application component.
 ## Returns a path only; creates nothing, resolves no links and promises no writability or permissions.
-## @param app_id Portable 1-255 byte lowercase ASCII token; no empty dot pieces or Windows device stems.
+## Direct data_dir() uses the consuming Runtime application ID and returns unavailable when absent.
+## @param app_id Portable 1-255 byte lowercase ASCII token; no empty dot pieces or Windows device stems. Direct data_dir() uses Runtime application identity and returns unavailable when absent.
 ## @return Ok with an owned absolute UTF-8 directory, or Err with operation os.data_dir and native diagnostics.
 func data_dir(app_id: string) -> result<string, error>:
     if not _valid_id(app_id):
@@ -187,7 +188,8 @@ func data_dir(app_id: string) -> result<string, error>:
 
 ## Discover XDG config, Windows RoamingAppData or macOS Application Support/id/config, with one validated application component.
 ## Returns a path only; creates nothing, resolves no links and promises no writability or permissions.
-## @param app_id Portable 1-255 byte lowercase ASCII token; no empty dot pieces or Windows device stems.
+## Direct config_dir() uses the consuming Runtime application ID and returns unavailable when absent.
+## @param app_id Portable 1-255 byte lowercase ASCII token; no empty dot pieces or Windows device stems. Direct config_dir() uses Runtime application identity and returns unavailable when absent.
 ## @return Ok with an owned absolute UTF-8 directory, or Err with operation os.config_dir and native diagnostics.
 func config_dir(app_id: string) -> result<string, error>:
     if not _valid_id(app_id):
@@ -200,7 +202,8 @@ func config_dir(app_id: string) -> result<string, error>:
 
 ## Discover XDG cache, Windows LocalAppData/id/cache or macOS Caches, with one validated application component.
 ## Returns a path only; creates nothing, resolves no links and promises no writability or permissions.
-## @param app_id Portable 1-255 byte lowercase ASCII token; no empty dot pieces or Windows device stems.
+## Direct cache_dir() uses the consuming Runtime application ID and returns unavailable when absent.
+## @param app_id Portable 1-255 byte lowercase ASCII token; no empty dot pieces or Windows device stems. Direct cache_dir() uses Runtime application identity and returns unavailable when absent.
 ## @return Ok with an owned absolute UTF-8 directory, or Err with operation os.cache_dir and native diagnostics.
 func cache_dir(app_id: string) -> result<string, error>:
     if not _valid_id(app_id):
@@ -214,7 +217,8 @@ func cache_dir(app_id: string) -> result<string, error>:
 ## Discover XDG state, Windows LocalAppData/id/state or macOS Application Support/id/state, with one validated application component.
 ## Returns a path only; creates nothing, resolves no links and promises no writability or permissions.
 ## Persistent operational history/restart data; no log rotation, retention or session IPC guarantees.
-## @param app_id Portable 1-255 byte lowercase ASCII token; no empty dot pieces or Windows device stems.
+## Direct state_dir() uses the consuming Runtime application ID and returns unavailable when absent.
+## @param app_id Portable 1-255 byte lowercase ASCII token; no empty dot pieces or Windows device stems. Direct state_dir() uses Runtime application identity and returns unavailable when absent.
 ## @return Ok with an owned absolute UTF-8 directory, or Err with operation os.state_dir and native diagnostics.
 func state_dir(app_id: string) -> result<string, error>:
     if not _valid_id(app_id):
@@ -223,6 +227,39 @@ func state_dir(app_id: string) -> result<string, error>:
     if platform() == "windows" or platform() == "macos":
         leaf = "state"
     return _directory("os.state_dir", app_id, _os_state_root(), leaf)
+
+
+private func _missing_application_identity(operation: string) -> error:
+    return error(message = "Application identity is unavailable.", path = "", code = 6,
+        operation = operation, kind = error_kind.unavailable, os_code = 0, native_domain = "")
+
+
+private func _app_data_dir() -> result<string, error>:
+    var identity = _os_application_id()
+    if identity.kind != 0:
+        return Err(_missing_application_identity("os.data_dir"))
+    return data_dir(identity.text)
+
+
+private func _app_config_dir() -> result<string, error>:
+    var identity = _os_application_id()
+    if identity.kind != 0:
+        return Err(_missing_application_identity("os.config_dir"))
+    return config_dir(identity.text)
+
+
+private func _app_cache_dir() -> result<string, error>:
+    var identity = _os_application_id()
+    if identity.kind != 0:
+        return Err(_missing_application_identity("os.cache_dir"))
+    return cache_dir(identity.text)
+
+
+private func _app_state_dir() -> result<string, error>:
+    var identity = _os_application_id()
+    if identity.kind != 0:
+        return Err(_missing_application_identity("os.state_dir"))
+    return state_dir(identity.text)
 
 
 ## Discover the current application home; Linux honors absolute HOME then real-user passwd fallback.

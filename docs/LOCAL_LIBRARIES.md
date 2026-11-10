@@ -1,5 +1,19 @@
 # Project-local VOID libraries
 
+Slice 1 now validates application/library metadata and rejects nonempty reserved
+native/dependency declarations through the explicit compiler-library parser only.
+[Engineering evidence](projects/SLICE1.md) records the qualification. Source-library
+analysis, project admission, resolution and native linking/loading remain deferred;
+current import/provider behavior is unchanged.
+
+The [Phase 1 source/identity contract](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-compiler-owned-entry-discovery)
+keeps `libs/` import-only for automatic application discovery; an imported library
+main does not become a candidate. A file independently included as an application
+seed remains eligible even if another seed imports it; exclusions/library placement
+make that role explicit. Library manifests initially support validation/metadata,
+not package artifacts or resolution. Schema 1 rejects nonempty reserved dependencies
+and native tables. These are proposals, with implementation HOLD.
+
 ## Later approved project/package direction, 8 November 2026
 
 The [coordinated roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) extends the future

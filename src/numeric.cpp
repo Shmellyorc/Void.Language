@@ -2,6 +2,7 @@
 #include "void/numeric.hpp"
 #include <llvm/ADT/APFloat.h>
 #include <llvm/ADT/APSInt.h>
+#include <llvm/ADT/SmallString.h>
 #include <llvm/Support/Error.h>
 #include <stdexcept>
 namespace vd::numeric {
@@ -77,16 +78,26 @@ std::uint64_t literal(std::string text, Type t, bool explicit_rounding) {
         throw std::invalid_argument("Integer literal is not exactly representable in " + std::string(ir::type_name(t)) + "; use as for explicit rounding");
     return bits(v);
 }
+std::optional<std::uint64_t> try_integer_convert(std::uint64_t v, Type from, Type to) {
+    if (!integer(from) || !integer(to)) throw std::invalid_argument("Integer conversion requires integer types");
+    llvm::APInt input(width(from),v);
+    const auto wide=signed_integer(from)?input.sext(128):input.zext(128);
+    if (!(signed_integer(to)?wide.isSignedIntN(width(to)):!wide.isNegative() && wide.isIntN(width(to)))) return {};
+    return wide.trunc(width(to)).getZExtValue();
+}
+std::string integer_text(std::uint64_t value, Type type) {
+    llvm::SmallString<24> text;
+    llvm::APInt(width(type),value).toString(text,10,signed_integer(type));
+    return std::string(text);
+}
 std::uint64_t convert(std::uint64_t v, Type from, Type to) {
     if (!number(from) || !number(to)) throw std::invalid_argument("Numeric as requires numeric source and destination types");
     if (from == to) return v;
     if (integer(from)) {
         llvm::APInt a(width(from), v);
         if (integer(to)) {
-            auto extended = signed_integer(from) ? a.sext(128) : a.zext(128);
-            if (!(signed_integer(to) ? extended.isSignedIntN(width(to)) : !extended.isNegative() && extended.isIntN(width(to))))
-                throw std::invalid_argument("Checked numeric conversion is out of range");
-            return extended.trunc(width(to)).getZExtValue();
+            if(auto converted=try_integer_convert(v,from,to))return *converted;
+            throw std::invalid_argument("Checked numeric conversion is out of range");
         }
         llvm::APFloat result(semantics(to)); result.convertFromAPInt(a, signed_integer(from), nearest); return bits(result);
     }

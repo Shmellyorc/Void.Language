@@ -1,0 +1,49 @@
+use "/native_dynamic.void" as ffi
+
+var saved: ffi.box? = null
+
+func entry(value: i32) -> i32:
+    if value == 90:
+        saved = ffi.create(31)
+        return ffi.read(saved as ffi.box, 0)
+    if value == 91:
+        return ffi.read(saved as ffi.box, 0) + 7
+    if value == 92:
+        return ffi.close_box(saved as ffi.box)
+    if value == 93:
+        return ffi.releases()
+    if value == 94:
+        var rejected = ffi.create(-3)
+        return ffi.live()
+    if value == 95:
+        return ffi.add(200, 0)
+    if value == -3:
+        saved = ffi.create(31)
+        var rejected = ffi.create(-3)
+        return ffi.live()
+    if value == -4:
+        var live = ffi.create(22) as ffi.box
+        return ffi.read(live, 0)
+    if ffi.add(value, -2) != value + 5:
+        return 1
+    var sample = ffi.calibrate(ffi.sample(tag = -9, reading = 3.25))
+    if sample.tag != -2 or sample.reading != 6.5:
+        return 2
+    var bytes: [u8] = [10, 20, 30, 40]
+    if ffi.fill(bytes, 1, 2, 255) != -7 or bytes[1] != 20 or bytes[2] != 30:
+        return 3
+    if ffi.fill(bytes, 1, 2, 5) != 2 or bytes[0] != 10 or bytes[1] != 5 or bytes[2] != 6 or bytes[3] != 40:
+        return 4
+    if ffi.create(-1) != null:
+        return 5
+    var owner = ffi.create(-2) as ffi.box
+    var alias = owner
+    if ffi.read(alias, 1) != -13 or ffi.read(owner, 0) != -2:
+        return 6
+    if ffi.close_box(owner) != 17 or ffi.live() != 0:
+        return 7
+    if value == -1:
+        return ffi.read(alias, 0)
+    if value == -2:
+        return ffi.close_box(alias)
+    return value + 97

@@ -55,6 +55,11 @@ std::vector<Type> infer_arguments(Unit& owner,const std::vector<GenericParameter
             auto application=std::find_if(owner.applications.begin(),owner.applications.end(),[&](const auto& a){return a.definition==pattern.definition;});
             if(application==owner.applications.end())return;
             auto [declaration_owner,generic]=structure_lookup(owner,root,units,application->name,application->token);(void)declaration_owner;
+            if(!generic && application->name=="option" && application->arguments.size()==1 &&
+               actual.definition && actual.definition->option_type) {
+                match(application->arguments.front(),ir::field_type(actual,1));
+                return;
+            }
             for(const auto& [id,u]:units)for(const auto& concrete:u->structures)if(concrete.definition==actual.definition && concrete.generic_origin==generic)
                 for(unsigned n=0;n<application->arguments.size() && n<concrete.type_arguments.size();++n)match(application->arguments[n],concrete.type_arguments[n]);
         }

@@ -1,0 +1,6 @@
+#ifndef VOID_TEST_G2_DESCRIPTOR_H
+#define VOID_TEST_G2_DESCRIPTOR_H
+#define G2_FIXTURE_IDENTITY "@G2_FIXTURE_SHA@"
+static const char g2_descriptor[] =
+"@G2_DESCRIPTOR_STRING@";
+#endif

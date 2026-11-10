@@ -1,5 +1,48 @@
 # Document revisions and tooling sessions (Phase 9)
 
+## Manifest-selected sessions (Slice 3)
+
+The existing `ToolingSession(ProjectSession{root, optional_entry})` adds pinned
+manifest mode. The entry-path constructor retains legacy behavior. Snapshots own
+canonical root identity, the original admission request, source/TOML overlays,
+document revisions and a session-owned identity token. `select/analyze/accept`
+remain separate; a delayed result from another revision or session cannot publish.
+A numeric revision or SHA-256 digest is not the acceptance identity.
+
+`SessionAnalysis::project()` contains the compiler's ProjectAnalysisResult and
+owned ProjectState observations: manifest, nullable entry, D/E source snapshots,
+inventory completeness, validation status and snapshot key. Errors retain useful
+observations and source-spanned diagnostics, with no executable program or stale
+semantic index. Malformed TOML has no traversed source policy. Manifest documents
+have their own exact `/.../void.project.toml` namespace; open/replace/unavailable/
+close and their monotonic revision rules also apply to it. `refresh()` invalidates
+physical observations; `reselect(entry)` is an explicit same-root transition.
+Changing the root requires a new session. Root admission always rechecks the original
+request, so canonical identity cannot erase an alias or wrong-case failure.
+
+A successful library has a semantic index but no `result().program` or application
+entry. `SessionAnalysis::succeeded()` includes checked libraries. Its retained
+`semantic_analysis()` is explicitly non-executable; lowering rejects before IR.
+It owns the same compiler validation's declarationless scope and source graph,
+without a synthetic importable root module. Failed selection has neither view.
+
+Selection/build provenance (raw manifest, source bytes, boundaries and inventory)
+is separate from normalized semantic project context (root, project/application/
+package metadata, entry, source policy and profile declarations). The source contract
+uses the latter, not the full discovery digest. Completed project comparisons feed
+only old/new semantic-module IDs to the existing source invalidator: TOML and
+validated D-only edits are not unresolved source imports. Body and comment-only
+changes can therefore remain compatible; semantic metadata, entry, source-policy
+or declaration/global-contract changes require reselection/restart as appropriate.
+`requires_reselection()` reports the pinned context boundary. Existing JIT publication
+still rechecks session freshness and native compatibility; no Runtime application
+identity or new publication authority is added. Legacy reload is unchanged.
+
+Snapshots freeze in-memory overlays, not the filesystem. All physical admission,
+source discovery, error ownership and recapture checks remain compiler-owned.
+See [Slice 3 report](projects/SLICE3.md) for actual reload, protocol and host evidence.
+
+
 **Stage 8 Sprint 1 (20 October 2026):** [STAGE8_DISCOVERY.md](STAGE8_DISCOVERY.md)
 supersedes the historical import/discovery exclusions below. It specifies separate
 standard/project source domains, importer-relative bare quoted imports, bounded

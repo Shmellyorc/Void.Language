@@ -1,5 +1,6 @@
 #include "void/lsp.hpp"
 #include "void/tooling.hpp"
+#include "void/project_creation.hpp"
 #include "void/numeric.hpp"
 #include <bit>
 #include <llvm/Support/JSON.h>
@@ -173,11 +174,29 @@ bool known_source_path(fs::path path,const fs::path& source) {
 #endif
     return path==source;
 }
+j::Object project_summary(const fs::path& root,const vd::ProjectAnalysisResult& result,std::uint64_t revision,bool reselect) {
+    j::Array errors;
+    for(const auto& d:result.diagnostics) {
+        if(errors.size()==8)break;
+        auto count=std::min<std::size_t>(d.description.size(),256);
+        while(count<d.description.size() && count && (static_cast<unsigned char>(d.description[count])&0xc0)==0x80)--count;
+        errors.push_back(j::Object{{"code",vd::diagnostic_code(d.code)},{"message",d.description.substr(0,count)}});
+    }
+    auto state=result.state;
+    return j::Object{{"schema",2},{"mode","project"},{"root",vd::path_utf8(root)},{"manifest",vd::path_utf8(root/"void.project.toml")},
+        {"kind",result.manifest?j::Value(result.manifest->kind()==vd::project::Kind::application?"application":"library"):j::Value(nullptr)},
+        {"entry",result.project && result.project->entry()?j::Value(vd::path_utf8(*result.project->entry())):j::Value(nullptr)},
+        {"standalone",false},{"selectionRevision",std::to_string(revision)},{"snapshotKey",state?state->snapshot_key:std::string{}},
+        {"status",!result.succeeded()?"error":reselect?"reselection-required":"ready"},{"requiresReselection",reselect},
+        {"discoveryCount",static_cast<std::int64_t>(state?state->discovery.size():0)},{"executionCount",static_cast<std::int64_t>(state?state->execution.size():0)},
+        {"diagnosticCount",static_cast<std::int64_t>(result.diagnostics.size())},{"diagnostics",std::move(errors)}};
+}
 class Server {
     enum class State { initial, waiting, ready, shutdown } state=State::initial;
-    struct Document { std::int64_t version; std::string uri; };
-    fs::path root, selected_root, entry_path;
+    struct Document { std::int64_t version; std::string uri; std::optional<vd::SourceFile> source; };
+    fs::path root, selected_root, entry_path, requested_root;
     vd::ToolingSession session;
+    bool manifest_mode;
     std::map<std::string,Document> open;
     std::map<std::string,std::string> published;
     bool hierarchical_symbols=false;
@@ -187,8 +206,8 @@ class Server {
     bool related_information=false, diagnostic_versions=false, rename_edits=false, signature_plaintext=false;
     std::string identity(const std::string& uri) const {
         auto path=vd::lsp::uri_path(uri);
-        if(auto current=session.current_analysis();current && current->result().program)
-            for(const auto& m:current->result().program->modules())if(m.identity.starts_with("/@stdlib/") && known_source_path(path,vd::utf8_path(m.source.path())))return m.identity;
+        if(auto current=session.current_analysis();current && current->semantic_analysis())
+            for(const auto& m:current->semantic_analysis()->modules())if(m.identity.starts_with("/@stdlib/") && known_source_path(path,vd::utf8_path(m.source.path())))return m.identity;
 #ifdef _WIN32
         // Drive-letter spelling is URI/OS notation, not a VFS component.
         auto raw=path.generic_u8string();
@@ -202,14 +221,15 @@ class Server {
         auto relative=path.lexically_relative(root);
         if(relative.empty() || relative.native().starts_with(fs::path("..").native())) relative=path.lexically_relative(selected_root);
         auto utf8=relative.generic_u8string(); std::string key="/"+std::string(utf8.begin(),utf8.end());
-        vd::require_module_identity(key); // Includes escape/canonical/case spelling policies.
+        if(manifest_mode && key.ends_with("/void.project.toml"))vd::require_manifest_identity(key);
+        else vd::require_module_identity(key); // Includes escape/canonical/case spelling policies.
         return key;
     }
     std::string uri(const std::string& id) const {
         // Filesystem canonicalization owns compiler identity, not client URI spelling.
         // Versioned edits must address the exact document opened by the client.
         if(id.starts_with("/@stdlib/")) {
-            if(auto current=session.current_analysis();current && current->result().program)for(const auto& m:current->result().program->modules())if(m.identity==id)return vd::lsp::file_uri(vd::utf8_path(m.source.path()));
+            if(auto current=session.current_analysis();current && current->semantic_analysis())for(const auto& m:current->semantic_analysis()->modules())if(m.identity==id)return vd::lsp::file_uri(vd::utf8_path(m.source.path()));
             return vd::lsp::file_uri(vd::standard_library_root()/vd::utf8_path(id.substr(9)));
         }
         if(auto document=open.find(id);document!=open.end())return document->second.uri;
@@ -231,7 +251,9 @@ class Server {
         std::map<std::string,j::Array> groups;
         for(const auto& [id,doc]:open) { (void)doc; groups[id]; }
         for(const auto& [id,previous_uri]:published) { (void)previous_uri; groups[id]; } // Clear removed/repaired graph nodes.
-        if(result->result().program) for(const auto& module:result->result().program->modules()) groups[module.identity];
+        if(result->project() && result->project()->project && result->project()->project->entry())entry_path=*result->project()->project->entry();
+        else if(manifest_mode)entry_path.clear();
+        if(result->semantic_analysis()) for(const auto& module:result->semantic_analysis()->modules()) groups[module.identity];
         for(const auto& d:result->result().diagnostics) {
             auto id=d.primary.module_identity;
             if(id.empty()) throw std::logic_error("Project diagnostic has no VFS owner");
@@ -253,12 +275,25 @@ class Server {
         published.clear();
         for(auto& [id,diagnostics]:groups) {
             j::Object params{{"uri",uri(id)},{"diagnostics",std::move(diagnostics)}};
+            if(manifest_mode)params["voidProjectRevision"]=std::to_string(result->snapshot().revision());
             if(auto doc=open.find(id); doc!=open.end() && diagnostic_versions) params["version"]=doc->second.version;
             // Retain only nonempty diagnostics: old empty/unreachable nodes need
             // no unbounded clearing history. Open and reachable nodes seed each run.
             if(!params.getArray("diagnostics")->empty()) published.emplace(id,uri(id));
             send(j::Object{{"jsonrpc","2.0"},{"method","textDocument/publishDiagnostics"},{"params",std::move(params)}});
         }
+        if(manifest_mode)send(j::Object{{"jsonrpc","2.0"},{"method","void/projectState"},{"params",summary()}});
+    }
+    j::Object summary() const {
+        auto current=session.current_analysis();
+        if(!manifest_mode || !current || !current->project())throw std::invalid_argument("No current manifest project summary");
+        return project_summary(root,*current->project(),current->snapshot().revision(),session.requires_reselection());
+    }
+    vd::AnalysisResult check_overlays(const vd::SourceOverrides& sources) const {
+        auto snapshot=session.select();
+        if(!manifest_mode)return vd::analyze_project(entry_path,sources);
+        auto checked=vd::analyze_manifest_project(requested_root,snapshot.entry_override(),sources,snapshot.manifests());
+        return {checked.project?checked.project->semantic_analysis():nullptr,std::move(checked.diagnostics)};
     }
     j::Value query(const std::string& method,const j::Object& params) const {
         auto id=identity(string(object(params.get("textDocument")),"uri"));
@@ -273,7 +308,7 @@ class Server {
         auto current=session.current_analysis(); auto index=session.current_index();
         if(!current || !index) return empty();
         const vd::SourceFile* source=nullptr;
-        for(const auto& m:current->result().program->modules()) if(m.identity==id) source=&m.source;
+        for(const auto& m:current->semantic_analysis()->modules()) if(m.identity==id) source=&m.source;
         if(!source) return empty();
         auto offset=Positions(*source).offset(p);
         if(!offset) throw std::invalid_argument("Position is outside the document or inside a surrogate pair");
@@ -328,6 +363,11 @@ class Server {
         for(const auto& m:program.modules())if(m.identity==id)return &m.source;return nullptr;
     }
     bool disk_current(const vd::ValidatedAnalysis& program) const {
+        if(manifest_mode) {
+            auto current=session.current_analysis();auto snapshot=session.select();
+            auto checked=vd::analyze_manifest_project(requested_root,snapshot.entry_override(),snapshot.overrides(),snapshot.manifests());
+            if(!checked.project || !current || !current->project() || !current->project()->project || checked.project->selection_key()!=current->project()->project->selection_key())return false;
+        }
         for(const auto& m:program.modules())if(!open.contains(m.identity)) {
             try {if(vd::read_source(vd::utf8_path(m.source.path())).text()!=m.source.text())return false;}
             catch(const std::exception&){return false;}
@@ -361,24 +401,25 @@ class Server {
             return result;
         }
         auto module=identity(string(object(params.get("textDocument")),"uri"));
+        if(manifest_mode && module.ends_with("/void.project.toml"))return method=="textDocument/completion" || method=="textDocument/formatting"?j::Value(j::Array{}):j::Value(nullptr);
         const vd::SourceFile* source=nullptr;
         auto snapshot=session.select();
         if(auto found=snapshot.overrides().find(module);found!=snapshot.overrides().end() && found->second)source=&*found->second;
-        if(!source && current && current->result().program)source=source_in(*current->result().program,module);
+        if(!source && current && current->semantic_analysis())source=source_in(*current->semantic_analysis(),module);
         if(method=="textDocument/formatting") {
             if(module.starts_with("/@stdlib/"))return j::Array{};
             const auto& options=object(params.get("options"));
             if(!options.getBoolean("insertSpaces").value_or(false) || integer(options.get("tabSize"),1)!=4)throw std::invalid_argument("VOID formatting requires four spaces");
-            j::Array result;if(!source || !index || !source_in(*current->result().program,module) || !disk_current(*current->result().program))return result;
+            j::Array result;if(!source || !index || !source_in(*current->semantic_analysis(),module) || !disk_current(*current->semantic_analysis()))return result;
             auto formatted=vd::format_source(*source);if(!formatted || *formatted==source->text())return result;
             // The same compiler checks both lexical structure and the entire
             // proposed graph before returning a conservative whole-file edit.
-            auto overlays=snapshot.overrides();for(const auto& m:current->result().program->modules())if(!m.identity.starts_with("/@stdlib/"))overlays.insert_or_assign(m.identity,m.source);
+            auto overlays=snapshot.overrides();for(const auto& m:current->semantic_analysis()->modules())if(!m.identity.starts_with("/@stdlib/"))overlays.insert_or_assign(m.identity,m.source);
             overlays.insert_or_assign(module,vd::SourceFile(source->path(),*formatted));
-            auto checked=vd::analyze_project(entry_path,overlays);
-            if(!checked.program || checked.program->compatibility_contract()!=current->result().program->compatibility_contract())return result;
+            auto checked=check_overlays(overlays);
+            if(!checked.program || checked.program->compatibility_contract()!=current->semantic_analysis()->compatibility_contract())return result;
             auto again=vd::format_source(vd::SourceFile(source->path(),*formatted));
-            if(!again || *again!=*formatted || !session.is_current(*current) || !disk_current(*current->result().program))return result;
+            if(!again || *again!=*formatted || !session.is_current(*current) || !disk_current(*current->semantic_analysis()))return result;
             result.push_back(j::Object{{"range",range({std::make_shared<const vd::SourceFile>(*source),module,0,source->text().size()})},{"newText",*formatted}});
             return result;
         }
@@ -388,10 +429,10 @@ class Server {
         auto offset=Positions(*source).offset(p);if(!offset)throw std::invalid_argument("Invalid UTF-16 position");
         if(method=="textDocument/completion" || method=="textDocument/signatureHelp") {
             auto overlays=snapshot.overrides();
-            if(current && current->result().program)for(const auto& m:current->result().program->modules())if(!m.identity.starts_with("/@stdlib/"))overlays.insert_or_assign(m.identity,m.source);
+            if(current && current->semantic_analysis())for(const auto& m:current->semantic_analysis()->modules())if(!m.identity.starts_with("/@stdlib/"))overlays.insert_or_assign(m.identity,m.source);
             overlays.insert_or_assign(module,*source); // Position conversion and probe share exact bytes.
             if(module.starts_with("/@stdlib/"))return method=="textDocument/completion"?j::Value(j::Array{}):j::Value(nullptr);
-            auto assistance=vd::editor_assistance(entry_path,overlays,module,*offset);
+            auto assistance=manifest_mode?vd::project_editor_assistance(requested_root,snapshot.entry_override(),overlays,snapshot.manifests(),module,*offset):vd::editor_assistance(entry_path,overlays,module,*offset);
             if(method=="textDocument/signatureHelp") {
                 if(assistance.signature.empty() || assistance.active_parameter>=assistance.parameter_documentation.size() || assistance.parameter_documentation[assistance.active_parameter].empty())return nullptr;
                 j::Array parameters;for(std::size_t n=0;n<assistance.parameters.size();++n) {
@@ -424,7 +465,7 @@ class Server {
         if(definitions.size()!=1)throw std::invalid_argument("Rename cannot choose between concrete specialization targets");
         if(module.starts_with("/@stdlib/") || definition->module.starts_with("/@stdlib/"))throw std::invalid_argument("Installed standard sources are read-only");
         if(!rename_edits || !definition->rename_safe)throw std::invalid_argument("Rename requires version-safe documentChanges and a supported ordinary function, global, constant or uncaptured local binding");
-        if(!disk_current(*current->result().program))throw std::invalid_argument("Disk sources changed; refresh before rename");
+        if(!disk_current(*current->semantic_analysis()))throw std::invalid_argument("Disk sources changed; refresh before rename");
         if(method=="textDocument/prepareRename")return j::Object{{"range",range(selected_span)},{"placeholder",name_of(*definition)}};
         auto replacement=string(params,"newName");if(!vd::valid_editor_identifier(replacement) || replacement=="entry" || replacement=="init" || replacement=="deinit" || replacement=="call")throw std::invalid_argument("Expected a non-reserved VOID identifier");
         std::map<std::string,std::vector<vd::SourceSpan>> edits;
@@ -440,12 +481,12 @@ class Server {
             if(auto found=edits.find(module);found!=edits.end())for(const auto& span:found->second)if(span.end<=offset)delta+=static_cast<std::ptrdiff_t>(replacement.size())-static_cast<std::ptrdiff_t>(span.end-span.begin);
             return static_cast<std::size_t>(static_cast<std::ptrdiff_t>(offset)+delta);
         };
-        vd::SourceOverrides overlays;for(const auto& m:current->result().program->modules()) {
+        auto overlays=session.select().overrides();for(const auto& m:current->semantic_analysis()->modules()) {
             if(m.identity.starts_with("/@stdlib/"))continue; // Installed sources are reread and checked, never editable overlays.
             auto text=m.source.text();if(auto found=edits.find(m.identity);found!=edits.end())for(auto it=found->second.rbegin();it!=found->second.rend();++it)text.replace(it->begin,it->end-it->begin,replacement);
-            overlays.emplace(m.identity,vd::SourceFile(m.source.path(),std::move(text)));
+            overlays.insert_or_assign(m.identity,vd::SourceFile(m.source.path(),std::move(text)));
         }
-        auto checked=vd::analyze_project(entry_path,overlays);if(!checked.program)throw std::invalid_argument("Rename fails compiler validation");
+        auto checked=check_overlays(overlays);if(!checked.program)throw std::invalid_argument("Rename fails compiler validation");
         vd::ToolingIndex fresh(checked.program);
         // Compare every declaration and written binding at its transformed source
         // position: valid compilation alone cannot detect legal rebinding.
@@ -467,7 +508,7 @@ class Server {
         std::error_code root_error;
         auto current_root=fs::canonical(selected_root,root_error);
         if(root_error || current_root!=root)throw std::invalid_argument("Rename project root changed; restart the server");
-        if(!session.is_current(*current) || !disk_current(*current->result().program))throw std::invalid_argument("Rename snapshot changed");
+        if(!session.is_current(*current) || !disk_current(*current->semantic_analysis()))throw std::invalid_argument("Rename snapshot changed");
         j::Array changes;for(const auto& [id,spans]:edits){j::Array replacements;for(const auto& span:spans)replacements.push_back(j::Object{{"range",range(span)},{"newText",replacement}});
             j::Value version=nullptr;if(auto doc=open.find(id);doc!=open.end())version=doc->second.version;
             changes.push_back(j::Object{{"textDocument",j::Object{{"uri",uri(id)},{"version",std::move(version)}}},{"edits",std::move(replacements)}});
@@ -487,21 +528,26 @@ class Server {
             std::string text;
             if(method=="textDocument/didOpen") {
                 if(found!=open.end()) throw std::invalid_argument("Document is already open");
-                if(string(document,"languageId")!="void") throw std::invalid_argument("Expected VOID languageId 'void'");
+                if(!(manifest_mode && id.ends_with("/void.project.toml")) && string(document,"languageId")!="void") throw std::invalid_argument("Expected VOID languageId 'void'");
                 if(open.size()>=4096) throw std::invalid_argument("Too many open documents");
-                text=string(document,"text"); session.open(id,next(id),std::move(text)); open.emplace(id,Document{version,string(document,"uri")});
+                text=string(document,"text");
+                auto selected=session.select();const auto& overrides=manifest_mode && id.ends_with("/void.project.toml")?selected.manifests():selected.overrides();
+                if(manifest_mode && overrides.contains(id))session.replace(id,next(id),std::move(text));else session.open(id,next(id),std::move(text));
+                open.emplace(id,Document{version,string(document,"uri"), (manifest_mode && id.ends_with("/void.project.toml")?session.select().manifests():session.select().overrides()).at(id)});
             } else {
                 if(found==open.end()) throw std::invalid_argument("Document is not open");
                 if(version<=found->second.version) throw std::invalid_argument("Stale or duplicate document version");
                 auto changes=params.getArray("contentChanges");
                 if(!changes) throw std::invalid_argument("Expected contentChanges array");
-                text=session.select().overrides().at(id)->text();
+                auto selected=session.select();const auto& overrides=manifest_mode && id.ends_with("/void.project.toml")?selected.manifests():selected.overrides();
+                text=overrides.at(id)?overrides.at(id)->text():std::string{};
                 for(const auto& event:*changes) {
                     const auto& change=object(&event);
                     if(change.get("range") || change.get("rangeLength")) throw std::invalid_argument("Incremental document changes are unsupported");
                     text=string(change,"text");
                 }
                 session.replace(id,next(id),std::move(text)); found->second.version=version;
+                found->second.source=(manifest_mode && id.ends_with("/void.project.toml")?session.select().manifests():session.select().overrides()).at(id);
             }
         }
         dirty=true;
@@ -524,8 +570,9 @@ public:
         return ::kill(static_cast<pid_t>(process_id),0)==0 || errno!=ESRCH;
 #endif
     }
-    explicit Server(const fs::path& entry) : root(fs::canonical(fs::absolute(entry).parent_path())),
-        selected_root(fs::absolute(entry).parent_path().lexically_normal()),entry_path(root/entry.filename()),session(entry_path) { (void)vd::lsp::file_uri(root/entry.filename()); }
+    explicit Server(const fs::path& entry,bool project=false,const std::optional<std::string>& override={}) : root(fs::canonical(project?entry:fs::absolute(entry).parent_path())),
+        selected_root(project?root:fs::absolute(entry).parent_path().lexically_normal()),entry_path(project?fs::path{}:root/entry.filename()),requested_root(project?fs::absolute(entry):fs::absolute(entry).parent_path()),
+        session(project?vd::ToolingSession(vd::ProjectSession{entry,override}):vd::ToolingSession(entry_path)),manifest_mode(project) {}
     std::optional<int> dispatch(j::Value message) {
         auto o=message.getAsObject();
         if(!o) { error(nullptr,-32600,"Invalid JSON-RPC request"); return {}; }
@@ -579,7 +626,7 @@ public:
                         {"definitionProvider",true},{"referencesProvider",true},{"hoverProvider",true},{"completionProvider",j::Object{{"triggerCharacters",j::Array{"."," ","\"","/",":"}}}},
                         {"signatureHelpProvider",j::Object{{"triggerCharacters",j::Array{"(",","}}}},{"documentSymbolProvider",true},{"workspaceSymbolProvider",true},
                         {"documentFormattingProvider",true},{"renameProvider",rename_edits ? j::Value(j::Object{{"prepareProvider",true}}):j::Value(false)},
-                        {"experimental",j::Object{{"voidToolingProtocol",1},{"refreshProject",true}}}}},{"serverInfo",j::Object{{"name","VOID"},{"version","0.2.0"}}}}}});
+                        {"workspace",manifest_mode?j::Value(j::Object{{"fileOperations",j::Object{{"didCreate",j::Object{{"filters",j::Array{j::Object{{"scheme","file"},{"pattern",j::Object{{"glob","**/*"}}}}}}}},{"didRename",j::Object{{"filters",j::Array{j::Object{{"scheme","file"},{"pattern",j::Object{{"glob","**/*"}}}}}}}},{"didDelete",j::Object{{"filters",j::Array{j::Object{{"scheme","file"},{"pattern",j::Object{{"glob","**/*"}}}}}}}}}}}):j::Value(j::Object{})},{"experimental",j::Object{{"voidToolingProtocol",1},{"voidProjectProtocol",1},{"refreshProject",true}}}}},{"serverInfo",j::Object{{"name","VOID"},{"version","0.2.0"}}}}}});
                 return {};
             }
             if(name=="initialized") {
@@ -606,6 +653,16 @@ public:
                 auto result=editor_query(name,object(o->get("params")));
                 send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",std::move(result)}});return {};
             }
+            if(name=="void/projectState" || name=="void/reselectProject") {
+                if(!manifest_mode){fail(-32601,"Manifest project mode is not selected");return {};}
+                if(!id){fail(-32600,"Project control requires a request");return {};}
+                if(name=="void/reselectProject") {
+                    const auto& params=object(o->get("params"));std::optional<std::string> entry;
+                    if(auto value=params.get("entry");value && !value->getAsNull())entry=string(params,"entry");
+                    session.reselect(entry);analyze();
+                }
+                send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",summary()}});return {};
+            }
             if(name=="void/refreshProject") {
                 session.refresh();analyze();if(id)send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",nullptr}});return {};
             }
@@ -616,10 +673,45 @@ public:
                 if(!open.contains(module))throw std::invalid_argument("Saved document is not open");
                 session.refresh();dirty=true;return {};
             }
+            if(manifest_mode && (name=="workspace/didCreateFiles" || name=="workspace/didDeleteFiles" || name=="workspace/didRenameFiles")) {
+                if(id){fail(-32600,"File operations require notifications");return {};}
+                const auto files=object(o->get("params")).getArray("files");if(!files || files->size()>4096)throw std::invalid_argument("Expected bounded file operations");
+                for(const auto& file:*files) {
+                    const auto& event=object(&file);std::string old;
+                    try{old=identity(string(event,name=="workspace/didRenameFiles"?"oldUri":"uri"));}catch(const std::invalid_argument&){continue;}
+                    if(old.starts_with("/@stdlib/"))continue;
+                    if(name=="workspace/didCreateFiles") {
+                        auto selected=session.select();const auto& overrides=old.ends_with("/void.project.toml")?selected.manifests():selected.overrides();
+                        if(auto found=overrides.find(old);found!=overrides.end() && !found->second && !open.contains(old))session.close(old,next(old));
+                    } else {
+                        auto snapshot=session.select();const auto& overrides=old.ends_with("/void.project.toml")?snapshot.manifests():snapshot.overrides();
+                        std::optional<vd::SourceFile> source;
+                        if(auto found=overrides.find(old);found!=overrides.end())source=found->second;
+                        if(!source)if(auto document=open.find(old);document!=open.end())source=document->second.source;
+                        std::string next_id;
+                        if(name=="workspace/didRenameFiles")try{next_id=identity(string(event,"newUri"));}catch(const std::invalid_argument&){}
+                        if(!next_id.empty() && next_id!=old && source) {
+                            auto selected=session.select();const auto& next_overrides=next_id.ends_with("/void.project.toml")?selected.manifests():selected.overrides();
+                            if(next_overrides.contains(next_id) || open.contains(next_id))throw std::invalid_argument("Rename would replace an editor override");
+                            auto revision=next(next_id); // Prove both counters before mutation.
+                            auto removed=next(old);session.open(next_id,revision,source->text());session.unavailable(old,removed);
+                        } else if(next_id!=old)session.unavailable(old,next(old));
+                    }
+                }
+                session.refresh();dirty=true;return {};
+            }
             if(name=="workspace/didChangeWatchedFiles") {
                 if(id){fail(-32600,"Watch changes require a notification");return {};}
                 auto changes=object(o->get("params")).getArray("changes");if(!changes)throw std::invalid_argument("Expected watched changes");
-                bool refresh=false;for(const auto& change:*changes)try{const auto& event=object(&change);(void)identity(string(event,"uri"));auto type=integer(event.get("type"),1);if(type>3)throw std::invalid_argument("Invalid watch type");refresh=true;}catch(const std::invalid_argument&){}
+                bool refresh=false;for(const auto& change:*changes)try{const auto& event=object(&change);auto event_uri=string(event,"uri");(void)vd::lsp::uri_path(event_uri);auto type=integer(event.get("type"),1);if(type>3)throw std::invalid_argument("Invalid watch type");
+                    if(manifest_mode) {
+                        refresh=true; // Unknown/wrong-case boundary names still invalidate selection.
+                        auto module=identity(event_uri);
+                        if(type==3)session.unavailable(module,next(module));
+                        if(type==1) {auto selected=session.select();const auto& overrides=module.ends_with("/void.project.toml")?selected.manifests():selected.overrides();if(auto found=overrides.find(module);found!=overrides.end() && !found->second && !open.contains(module))session.close(module,next(module));}
+                    }
+                    else (void)identity(event_uri);
+                    refresh=true;}catch(const std::invalid_argument&){}
                 if(refresh){session.refresh();dirty=true;}return {};
             }
             if(name=="$/cancelRequest") {
@@ -644,14 +736,78 @@ int preflight(const fs::path& workspace,const fs::path& active,const fs::path& e
     j::Value result=j::Object{{"entry",vd::path_utf8(selected.entry)},{"root",vd::path_utf8(selected.root)},{"standalone",selected.standalone}};
     llvm::outs()<<result<<"\n";return 0;
 }
-int run(const fs::path& entry) {
+int project_preflight(const fs::path& workspace,const fs::path& active,const fs::path& root,const fs::path& entry) {
+    auto selected=vd::discover_project_context(workspace,active,root,entry);
+    j::Object summary=selected.manifest_mode?project_summary(selected.root,selected.analysis,0,false):j::Object{{"schema",2},{"mode","legacy"},{"root",vd::path_utf8(selected.root)},{"entry",vd::path_utf8(*selected.entry)},{"standalone",selected.standalone},{"status","ready"}};
+    if(selected.manifest_mode)summary["requestedRoot"]=vd::path_utf8(root.empty()?selected.root:fs::absolute(root));
+    std::string text;llvm::raw_string_ostream stream(text);stream<<j::Value(std::move(summary));stream.flush();
+    if(text.size()+1>65536)throw std::invalid_argument("Project discovery summary exceeds the 64 KiB protocol limit");
+    llvm::outs()<<text<<"\n";return 0;
+}
+int creation_preflight(const fs::path& workspace,const fs::path& active) {
+    auto selected=vd::project::discover_creation(workspace,active);
+    j::Array sources;
+    for(const auto& id:selected.sources)sources.push_back(id);
+    llvm::outs()<<j::Value(j::Object{{"schema",1},{"creation",j::Object{
+        {"root",vd::path_utf8(selected.root.path)},{"rootIdentity",selected.root.identity},
+        {"manifestPresent",selected.manifest_present},{"complete",selected.complete},
+        {"eligibleCount",static_cast<std::int64_t>(selected.eligible_count)},{"sources",std::move(sources)}}}})<<"\n";
+    return 0;
+}
+vd::project::CreationOptions creation_options(std::string_view kind,const std::string& name,const std::string& package_name) {
+    vd::project::CreationOptions options;
+    if(kind!="application" && kind!="library")throw std::invalid_argument("Invalid creation kind.");
+    options.kind=kind=="library"?vd::project::Kind::library:vd::project::Kind::application;
+    if(!name.empty())options.name=name;
+    if(!package_name.empty())options.package_name=package_name;
+    return options;
+}
+int creation_plan(const fs::path& root,const std::string& kind,const std::string& name,const std::string& package_name) {
+    std::optional<vd::project::CreationPlan> preview;
+    try {
+        preview=vd::project::plan_creation(root,creation_options(kind,name,package_name));
+    } catch(const vd::project::CreationCollision&) {
+        auto selected=vd::project::inspect_creation_root(root);
+        llvm::outs()<<j::Value(j::Object{{"schema",1},{"root",vd::path_utf8(selected.path)},
+            {"rootIdentity",selected.identity},{"status","collision"}})<<"\n";
+        return 0;
+    }
+    const auto& plan=*preview;
+    const auto& metadata=plan.manifest->project();
+    const auto& role=kind=="library"?*plan.manifest->package():*plan.manifest->application();
+    llvm::outs()<<j::Value(j::Object{{"schema",1},{"root",vd::path_utf8(plan.root)},{"rootIdentity",plan.parent.identity},
+        {"manifest",vd::path_utf8(plan.root/"void.project.toml")},{"name",metadata.name},{"kind",kind},
+        {"version",metadata.version.text()},{"projectId",metadata.id},{"roleId",role.id},
+        {"packageName",kind=="library"?role.name:""}})<<"\n";
+    return 0;
+}
+int creation_write(const fs::path& root,const std::string& identity,const std::string& kind,const std::string& name,
+                   const std::string& version,const std::string& project_id,const std::string& role_id,const std::string& package_name) {
+    auto admit=[&] {
+        auto current=vd::project::inspect_creation_root(root);
+        if(current.path!=root || current.identity!=identity)throw std::invalid_argument("Project root changed after creation review.");
+    };
+    admit();
+    auto options=creation_options(kind,name,package_name);
+    options.name=name;options.version=version;options.project_id=project_id;
+    if(kind=="application")options.application_id=role_id;else options.package_id=role_id;
+    std::string status="created";
+    try {
+        auto plan=vd::project::plan_creation(root,options);
+        if(plan.parent.identity!=identity)throw std::invalid_argument("Project root changed after creation review.");
+        vd::project::publish_creation(plan);
+    } catch(const vd::project::CreationCollision&) {admit();status="collision";}
+    llvm::outs()<<j::Value(j::Object{{"schema",1},{"root",vd::path_utf8(root)},{"status",status}})<<"\n";
+    return 0;
+}
+int run(const fs::path& entry,bool project=false,const std::optional<std::string>& override={}) {
 #ifdef _WIN32
     if(_setmode(_fileno(stdin),_O_BINARY)==-1 || _setmode(_fileno(stdout),_O_BINARY)==-1) throw std::runtime_error("Cannot set binary protocol streams");
 #endif
 #ifdef SIGPIPE
     std::signal(SIGPIPE,SIG_IGN);
 #endif
-    Server server(entry);
+    Server server(entry,project,override);
     input.alive=[&]{return server.parent_alive();};
     unsigned batch=0;auto started=std::chrono::steady_clock::now();
     for(;;) {
@@ -696,6 +852,12 @@ int run(const fs::path& entry) {
 int wmain(int argc,wchar_t** argv) {
     try {
         auto executable=vd::path_utf8(fs::path(argv[0]));vd::configure_standard_library_root(vd::utf8_path(llvm::sys::fs::getMainExecutable(executable.c_str(),reinterpret_cast<void*>(&wmain))));
+        auto text=[&](int index){auto utf8=fs::path(argv[index]).u8string();return std::string(utf8.begin(),utf8.end());};
+        if(argc==4 && std::wstring_view(argv[1])==L"--discover-creation")return creation_preflight(fs::path(argv[2]),fs::path(argv[3]));
+        if(argc==6 && std::wstring_view(argv[1])==L"--plan-project")return creation_plan(fs::path(argv[2]),text(3),text(4),text(5));
+        if(argc==10 && std::wstring_view(argv[1])==L"--create-project")return creation_write(fs::path(argv[2]),text(3),text(4),text(5),text(6),text(7),text(8),text(9));
+        if(argc==6 && std::wstring_view(argv[1])==L"--discover-project")return project_preflight(fs::path(argv[2]),fs::path(argv[3]),fs::path(argv[4]),fs::path(argv[5]));
+        if((argc==3 || (argc==5 && std::wstring_view(argv[3])==L"--entry")) && std::wstring_view(argv[1])==L"--project")return run(fs::path(argv[2]),true,argc==5?std::optional(vd::path_utf8(fs::path(argv[4]))):std::nullopt);
         if(argc==5 && std::wstring_view(argv[1])==L"--discover")return preflight(fs::path(argv[2]),fs::path(argv[3]),fs::path(argv[4]));
         if(argc!=3 || std::wstring_view(argv[1])!=L"--entry") throw std::invalid_argument("Usage: voidls --entry <project entry.void>");
         return run(fs::path(argv[2]));
@@ -703,6 +865,11 @@ int wmain(int argc,wchar_t** argv) {
 int main(int argc,char** argv) {
     try {
         vd::configure_standard_library_root(vd::utf8_path(llvm::sys::fs::getMainExecutable(argv[0],reinterpret_cast<void*>(&vd::configure_standard_library_root))));
+        if(argc==4 && std::string_view(argv[1])=="--discover-creation")return creation_preflight(vd::utf8_path(argv[2]),vd::utf8_path(argv[3]));
+        if(argc==6 && std::string_view(argv[1])=="--plan-project")return creation_plan(vd::utf8_path(argv[2]),argv[3],argv[4],argv[5]);
+        if(argc==10 && std::string_view(argv[1])=="--create-project")return creation_write(vd::utf8_path(argv[2]),argv[3],argv[4],argv[5],argv[6],argv[7],argv[8],argv[9]);
+        if(argc==6 && std::string_view(argv[1])=="--discover-project")return project_preflight(vd::utf8_path(argv[2]),vd::utf8_path(argv[3]),vd::utf8_path(argv[4]),vd::utf8_path(argv[5]));
+        if((argc==3 || (argc==5 && std::string_view(argv[3])=="--entry")) && std::string_view(argv[1])=="--project")return run(vd::utf8_path(argv[2]),true,argc==5?std::optional(std::string(argv[4])):std::nullopt);
         if(argc==5 && std::string_view(argv[1])=="--discover")return preflight(vd::utf8_path(argv[2]),vd::utf8_path(argv[3]),vd::utf8_path(argv[4]));
         if(argc!=3 || std::string_view(argv[1])!="--entry") throw std::invalid_argument("Usage: voidls --entry <project entry.void>");
         return run(vd::utf8_path(argv[2]));

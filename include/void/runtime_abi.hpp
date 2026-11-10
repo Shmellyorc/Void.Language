@@ -93,6 +93,7 @@ const void* vd_gc_witness(const char*) noexcept;
 std::int64_t vd_gc_interface_binding(void*,const void*,const char* const*,std::size_t) noexcept;
 std::int32_t vd_runtime_entry_metadata(vd::NativeCode::CheckedEntry,std::int32_t,vd::RuntimeFailure*,const vd::RuntimeTypeRecord*,std::size_t,const vd::RuntimeWitnessRecord*,std::size_t) noexcept;
 std::int32_t vd_runtime_entry_application(vd::NativeCode::CheckedEntry,vd::RuntimeFailure*,const vd::RuntimeTypeRecord*,std::size_t,const vd::RuntimeWitnessRecord*,std::size_t,int,const void*,bool) noexcept;
+std::int32_t vd_runtime_entry_context_v1(vd::NativeCode::CheckedEntry,std::int32_t,vd::RuntimeFailure*,const vd::RuntimeTypeRecord*,std::size_t,const vd::RuntimeWitnessRecord*,std::size_t,int,const void*,bool,const char*,std::size_t) noexcept;
 std::int64_t vd_gc_dynamic_type(void*,const char* const*,std::size_t) noexcept;
 std::int32_t vd_runtime_entry(vd::NativeCode::CheckedEntry, std::int32_t, vd::RuntimeFailure*) noexcept;
 std::int32_t vd_runtime_entry_typed(vd::NativeCode::CheckedEntry,std::int32_t,vd::RuntimeFailure*,const vd::RuntimeTypeRecord*,std::size_t) noexcept;
@@ -111,6 +112,7 @@ unsigned vd_dict_remove(void**,const vd::NativeDictionary*,const void*,vd::Runti
 void vd_dict_clear(void**,const vd::NativeDictionary*,vd::RuntimeFailure*) noexcept;
 void vd_value_array_new(void**,const vd::NativeArrayElement*,std::uint64_t,unsigned,vd::RuntimeFailure*) noexcept;
 std::uint64_t vd_value_array_count(void**,const vd::NativeArrayElement*,vd::RuntimeFailure*) noexcept;
+void vd_value_array_complete(void**,const vd::NativeArrayElement*,std::uint64_t,vd::RuntimeFailure*) noexcept;
 std::uint64_t vd_value_array_version(void**,const vd::NativeArrayElement*,vd::RuntimeFailure*) noexcept;
 void vd_value_array_read(void*,void**,const vd::NativeArrayElement*,std::uint64_t,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
 void vd_value_array_write(void**,const vd::NativeArrayElement*,std::uint64_t,unsigned,std::uint64_t,const void*,std::uint64_t,unsigned,unsigned,vd::RuntimeFailure*) noexcept;

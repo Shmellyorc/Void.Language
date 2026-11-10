@@ -1,5 +1,13 @@
 # Stage 9 application workflow — 21 October 2026
 
+The [Phase 1 matrix](PROJECT_ARCHITECTURE_ROADMAP.md#phase-1-compatibility-and-migration-matrix)
+freezes proposed manifest-only discovery, explicit project-entry precedence,
+manifest-root VFS/output behavior and unchanged bare explicit-file semantics. The
+[later argument implementation](voidup/PHASE_B_REPORT.md) already supports literal
+application forwarding after an explicit selection and `--`; the original Stage 9
+no-application-operands wording below is historical for that extension. Phase 1
+preserves actual forwarding, legacy precedence and eager-global order. HOLD remains.
+
 ## Later approved project direction, 8 November 2026
 
 The [project architecture roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) records the

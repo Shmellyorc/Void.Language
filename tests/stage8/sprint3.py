@@ -2,6 +2,7 @@
 import os, pathlib, subprocess, sys, tempfile
 compiler=pathlib.Path(sys.argv[1]).resolve();clang=sys.argv[2];linker=sys.argv[3] if len(sys.argv)>3 else ''
 runtime=pathlib.Path(sys.argv[4]).resolve();fixture=pathlib.Path(sys.argv[5]).resolve();sanitizers=sys.argv[6]=='ON'
+host_libraries=sys.argv[7:]
 link_flags=['--driver-mode=g++',*(['--ld-path='+linker] if linker else []),*(['-fsanitize=address,undefined'] if sanitizers else [])]
 if os.name=='nt':link_flags += ['-fms-runtime-lib=static','-llegacy_stdio_definitions']
 checks=0
@@ -176,7 +177,7 @@ with tempfile.TemporaryDirectory(prefix='VOID sprint3 ') as temp:
         for flags in [[],['--no-opt']]:
             assert run([compiler,'run',path,'0',*flags]).stdout.strip()=='1'
             obj=root/(name+str(len(flags))+'.o');exe=root/(name+str(len(flags))+('.exe' if os.name=='nt' else '.bin'))
-            run([compiler,'emit',path,'-o',obj,*flags]);run([clang,*link_flags,obj,runtime,fixture,'-o',exe]);assert run([exe,'0']).stdout.strip()=='1'
+            run([compiler,'emit',path,'-o',obj,*flags]);run([clang,*link_flags,obj,runtime,fixture,*host_libraries,'-o',exe]);assert run([exe,'0']).stdout.strip()=='1'
     malformed=[[128],[192,175],[224,128,128],[237,160,128],[244,144,128,128],[245,128,128,128],[240,159,142],[194],[65,128],[255],[226,40,161]]
     path=root/'malformed.void'
     lines=['func entry(x: i32) -> i32:']
@@ -185,12 +186,12 @@ with tempfile.TemporaryDirectory(prefix='VOID sprint3 ') as temp:
     lines.append('    return 1');path.write_text('\n'.join(lines)+'\n',encoding='utf-8')
     for flags in [[],['--no-opt']]:
         assert run([compiler,'run',path,'0',*flags]).stdout.strip()=='1'
-        obj=root/('malformed'+str(len(flags))+'.o');exe=root/('malformed'+str(len(flags))+('.exe' if os.name=='nt' else '.bin'));run([compiler,'emit',path,'-o',obj,*flags]);run([clang,*link_flags,obj,runtime,fixture,'-o',exe]);assert run([exe,'0']).stdout.strip()=='1'
+        obj=root/('malformed'+str(len(flags))+'.o');exe=root/('malformed'+str(len(flags))+('.exe' if os.name=='nt' else '.bin'));run([compiler,'emit',path,'-o',obj,*flags]);run([clang,*link_flags,obj,runtime,fixture,*host_libraries,'-o',exe]);assert run([exe,'0']).stdout.strip()=='1'
     for expression in ['""[0]','"abc"[3]','"abc"[-4]','"abc"[i64.min_value]','"abc"[u64.max_value]']:
         path=root/'bounds.void';path.write_text('func entry(x: i32) -> i32:\n    var value = '+expression+'\n    return 1\n',encoding='utf-8');run([compiler,'check',path])
         for flags in [[],['--no-opt']]:
             assert 'String index' in run([compiler,'run',path,'0',*flags],False).stderr
-            obj=root/('bounds'+str(len(flags))+'.o');exe=root/('bounds'+str(len(flags))+('.exe' if os.name=='nt' else '.bin'));run([compiler,'emit',path,'-o',obj,*flags]);run([clang,*link_flags,obj,runtime,fixture,'-o',exe]);failure=run([exe,'0'],False);assert 'String index' in failure.stdout+failure.stderr
+            obj=root/('bounds'+str(len(flags))+'.o');exe=root/('bounds'+str(len(flags))+('.exe' if os.name=='nt' else '.bin'));run([compiler,'emit',path,'-o',obj,*flags]);run([clang,*link_flags,obj,runtime,fixture,*host_libraries,'-o',exe]);failure=run([exe,'0'],False);assert 'String index' in failure.stdout+failure.stderr
 
     invalid=['var s = "x"\n    s[0] = "a"','var s = "x"\n    s.length = 2','var v = "a"[true]','var v = "a"[0.5]','var bytes: [i32] = [1]\n    var v = string.from_utf8(bytes)','var v = [1].get(true)','var v = [1].get(0.5)','var a: [i32, 1] = [1]\n    a.pop()','const a = [1]\n    a.pop()','const a = [1]\n    var b = a\n    b.pop()','var d = {1: 2}\n    d.get(true)']
     for body in invalid:

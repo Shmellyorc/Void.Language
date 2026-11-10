@@ -24,6 +24,8 @@ bool supports(ir::Op, ir::Type);
 // LLVM support utilities are private implementation details, never IR types.
 std::uint64_t literal(std::string text, ir::Type, bool explicit_rounding = false);
 std::uint64_t convert(std::uint64_t, ir::Type from, ir::Type to);
+std::optional<std::uint64_t> try_integer_convert(std::uint64_t, ir::Type from, ir::Type to);
+std::string integer_text(std::uint64_t, ir::Type);
 std::uint64_t negate(std::uint64_t, ir::Type);
 std::uint64_t binary(ir::Op, std::uint64_t, std::uint64_t, ir::Type);
 }

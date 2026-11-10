@@ -189,7 +189,8 @@ Result checked_path(std::string text, bool executable) {
     Result result; result.text = std::move(text); return result;
 }
 Result query(Operation operation, std::string_view input) {
-    if (static_cast<unsigned>(operation) >= operations.size()) throw std::invalid_argument("Invalid OS operation");
+    if (static_cast<unsigned>(operation) >= operations.size() || operation == Operation::application_id)
+        throw std::invalid_argument("Invalid native OS operation");
     if (operation == Operation::environment) {
         if (input.empty() || input.find('\0') != std::string_view::npos || input.find('=') != std::string_view::npos) return fail(ErrorKind::invalid_argument);
         if (!valid_utf8(input)) return fail(ErrorKind::invalid_utf8);

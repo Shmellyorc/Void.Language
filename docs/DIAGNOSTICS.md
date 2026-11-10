@@ -1,5 +1,17 @@
 # Structured diagnostics and compiler recovery (Phase 5)
 
+## Slice 2 project admission and entry diagnostics, 8 November 2026
+
+The compiler-owned manifest project API/CLI adds VOID5009 for physical root/file
+admission and nested boundaries; VOID5010 for missing, ambiguous, wrong-signature
+or conflicting project entry selection; and VOID5011 for changed snapshots
+("Project changed during discovery; retry."). Ambiguity locations carry sorted
+canonical VFS identities and exact main-name spans. Source lexer/parser/import/
+semantic failures retain their existing codes; work/input limits remain VOID9001.
+Failed selection publishes no ProjectAnalysis or executable program. A valid
+Manifest may accompany an error result without granting entry or native authority.
+[Implementation and evidence](projects/SLICE2.md).
+
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
 Historical Phase 5 context: the user reports Phase 4 commit `d78b6b8`, Actions run #6, passed Linux, Windows
@@ -69,6 +81,23 @@ error severity; warnings alone do not invalidate a program or a specialization.
 The CLI prints warnings before check, run, emit and build. LSP publishes them with
 warning severity through the same owned source snapshots.
 
+## Slice 1 project manifest diagnostics, 8 November 2026
+
+The compiler-library [manifest parser](../include/void/project.hpp) uses these same
+owned SourceFile/SourceSpan/Diagnostic records. It does not wire TOML into current
+CLI or editor selection. TOML permits tabs, quoted/dotted keys and multiline strings;
+VOID source indentation restrictions above do not apply to TOML. Duplicate records
+retain the earlier definition as a related location. Errors sort by byte location,
+range, code, description and hint. Invalid documents never return a Manifest.
+
+The 256 KiB input cap, eight-level value/key limits, source-array limits and bounded
+128 errors plus one overflow notice use existing VOID9001. For this parser it means
+a resource limit prevents successful validation, extending the diagnostic-budget
+case in the historical table. Invalid raw UTF-8 is rejected by SourceFile using
+existing VOID1001 before TOML parsing. Physical boundary/entry admission, Runtime
+identity, LSP TOML publication and CLI project commands remain deferred. See the
+[Slice 1 engineering record](projects/SLICE1.md) for actual qualification/limits.
+
 ## Assigned codes
 
 Codes identify stable problem categories; wording and hints can improve without
@@ -118,6 +147,14 @@ are implemented.
 | VOID3005 | Conflicting import alias or alias/declaration collision |
 | VOID3006 | Imports used without a filesystem compilation context |
 | VOID4001 | Missing or incompatible CLI entry adapter |
+| VOID5001 | Malformed project TOML syntax |
+| VOID5002 | Missing, mistyped or unsupported project schema revision |
+| VOID5003 | Missing, unknown, mistyped, forbidden or invalid project field/profile |
+| VOID5004 | Invalid project/application/package identity or display/import name |
+| VOID5005 | Invalid semantic version |
+| VOID5006 | Invalid manifest-relative path or overlapping/reserved source roots |
+| VOID5007 | Duplicate TOML key/table or duplicate/case-conflicting source paths |
+| VOID5008 | Reserved nonempty project dependency/native declarations |
 | VOID9001 | Diagnostic budget exhausted; further analysis/diagnostics suppressed |
 
 ## Recovery and safety boundaries
@@ -371,3 +408,8 @@ unused generic functions, generic receiver methods and interface requirements.
 Specializations do not revalidate documentation. Warnings retain declaring-module
 ownership across imports and overlays, and cannot poison a reparsed generic header.
 [Local evidence and limitations](DOCUMENTATION_HOVER_IMPLEMENTATION.md).
+
+Slice 3 assigns **VOID5012** to an owned warning for a selected project profile
+requesting unsupported profile-controlled `debug_info="line"` or `"full"`. It does
+not reject the schema or change existing emitter behavior; `none` is quiet. Explicit
+settings span their exact TOML value; schema defaults use an EOF insertion span.

@@ -25,7 +25,7 @@
             bool generic=false;
             if(end<tokens.size() && tokens[end].text=="<"){unsigned count=0;auto close=end;for(;close<tokens.size();++close){if(tokens[close].text=="<")++count;else if(tokens[close].text==">" && !--count)break;else if(tokens[close].kind==TokenKind::newline || tokens[close].kind==TokenKind::end)break;}if(close<tokens.size() && tokens[close].text==">"){generic=true;end=close+1;}}
             bool value_tail=false;
-            if(end<tokens.size() && tokens[end].text=="("){unsigned count=0;auto close=end;for(;close<tokens.size();++close){if(tokens[close].text=="(")++count;else if(tokens[close].text==")" && !--count)break;}if(close+1<tokens.size())value_tail=precedence(tokens[close+1].text)>=4 || tokens[close+1].text=="as" || tokens[close+1].text==".." || tokens[close+1].text=="..<";}
+            if(end<tokens.size() && tokens[end].text=="("){unsigned count=0;auto close=end;for(;close<tokens.size();++close){if(tokens[close].text=="(")++count;else if(tokens[close].text==")" && !--count)break;}if(close+1<tokens.size())value_tail=precedence(tokens[close+1].text)>=4 || tokens[close+1].text=="as" || tokens[close+1].text=="as?" || tokens[close+1].text==".." || tokens[close+1].text=="..<";}
             if(end<tokens.size() && (tokens[end].text=="(" || generic) && !value_tail) {
                 result.kind=Pattern::Kind::constructor;result.variant_token=take();result.spelling=result.variant_token.text;
                 while(accept(".")){result.variant_token=name();result.spelling+="."+result.variant_token.text;}

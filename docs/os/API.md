@@ -8,23 +8,24 @@ including owner async activations and eager globals.
 Worker-reachable calls are rejected transitively. Import, source checking, editor
 analysis and object emission execute no native OS query.
 
-## Approved project-aware location direction, 8 November 2026
+## Project application locations
 
-The [project roadmap](../PROJECT_ARCHITECTURE_ROADMAP.md#proposed-metadata-delivery-and-os-locations)
-plans zero-argument `os.data_dir()`, `os.config_dir()`, `os.cache_dir()` and
-`os.state_dir()` using the consuming application's validated, immutable Runtime
-metadata. **Not implemented:** the four getters still require explicit IDs today.
-Keep their explicit-ID call forms, existing `result<string, error>`, validation,
-platform placement, errors, owned UTF-8 paths, owner-thread/GC rules and no-creation
-security contract. Project metadata authenticates no identity and grants no access.
+Direct calls to `os.data_dir()`, `os.config_dir()`, `os.cache_dir()` and
+`os.state_dir()` use the consuming Runtime's admitted application ID. Each returns
+`result<string, error>` and delegates to the corresponding explicit-ID function.
+Library code uses the same consuming Runtime. JIT image, resource and PID queries
+still describe the host process.
 
-Propose embedding metadata in installed AOT applications and passing it explicitly
-to JIT/embedding Runtime contexts before eager globals. No cwd/source-manifest or
-process-filename guessing; library identity must not replace host application ID.
-Recommend existing `unavailable` for missing app context, zero native code/domain,
-and existing `invalid_argument` for an invalid explicitly supplied ID. Exact facade
-binding and the missing-context rule remain proposed, pending review. This does
-not change existing image/resource/PID observations of the JIT host.
+Each public declaration and function value takes one string. The compiler accepts
+an omitted ID at a direct call to one of the four resolved standard declarations,
+including calls through an import alias. Use a closure to store the zero-argument
+form in a function value.
+
+Missing context returns `unavailable` (code 6) before native root discovery. The
+error identifies the public operation, carries empty path and native domain, has
+native code zero, and reads `Application identity is unavailable.` An explicit
+invalid ID still returns `invalid_argument`. Metadata conveys no access or ownership
+authority. [Project metadata and startup](../PROJECT_ARCHITECTURE_ROADMAP.md#proposed-metadata-delivery-and-os-locations).
 
 ## Implemented original queries
 

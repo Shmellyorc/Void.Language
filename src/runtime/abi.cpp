@@ -1,5 +1,6 @@
 #include "void/runtime_abi.hpp"
 #include "void/async.hpp"
+#include "void/c_dynamic.hpp"
 #include "void/format.hpp"
 #include "void/native_runtime.hpp"
 #include <new>
@@ -21,6 +22,7 @@ int Runtime::globals_begin(std::string_view contract, std::size_t count, Runtime
         if (global_state_ == 3) { failure = global_failure_.value(); return -1; }
         if (global_state_ == 2) return 0;
         if (global_state_ == 1) throw std::logic_error("Reentrant entry during global initialization");
+        application_context_set_ = application_started_ = true;
         global_contract_ = contract; global_admitted_ = true;
         global_owner_ = std::this_thread::get_id(); global_state_ = 1;
     }
@@ -115,10 +117,12 @@ VD_DISPLAY_ENCODING(u8);VD_DISPLAY_ENCODING(u16);VD_DISPLAY_ENCODING(u32);VD_DIS
 VD_DISPLAY_ENCODING(f32);VD_DISPLAY_ENCODING(f64);
 #undef VD_DISPLAY_ENCODING
 static_assert(static_cast<unsigned>(vd::ScalarEncoding::boolean)==10);
-std::int32_t runtime_entry(vd::NativeCode::CheckedEntry entry,std::int32_t value,vd::RuntimeFailure* failure,const vd::RuntimeTypeRecord* records,std::size_t count,const vd::RuntimeWitnessRecord* witnesses=nullptr,std::size_t witness_count=0,int argc=0,const void* argv=nullptr,bool wide=false) noexcept {
+std::int32_t runtime_entry(vd::NativeCode::CheckedEntry entry,std::int32_t value,vd::RuntimeFailure* failure,const vd::RuntimeTypeRecord* records,std::size_t count,const vd::RuntimeWitnessRecord* witnesses=nullptr,std::size_t witness_count=0,int argc=0,const void* argv=nullptr,bool wide=false,vd::ApplicationMetadata::Owner application={},std::shared_ptr<const vd::DynamicBinding> dynamic={}) noexcept {
     try {
         vd::Runtime runtime(256);
+        if (dynamic) runtime.bind_dynamic(std::move(dynamic));
         runtime.application_arguments(argc ? vd::capture_application_arguments(argc, argv, wide) : vd::checked_application_arguments({}));
+        runtime.start_application(std::move(application));
         vd::Runtime::Attachment attachment(runtime);
         if(count || witness_count) {vd_runtime_admit_metadata(&runtime,records,count,witnesses,witness_count,failure);if(failure->message) return 0;}
         auto checkpoint=runtime.console_checkpoint();vd::NativeCode::LeaseScope native_failures(vd::NativeCode::active_lease());std::int32_t result;
@@ -147,6 +151,36 @@ void construct(void** slot,std::size_t size,const std::size_t* offsets,std::size
 extern "C" {
 std::int32_t vd_runtime_entry_application(vd::NativeCode::CheckedEntry entry,vd::RuntimeFailure* failure,const vd::RuntimeTypeRecord* records,std::size_t count,const vd::RuntimeWitnessRecord* witnesses,std::size_t witness_count,int argc,const void* argv,bool wide) noexcept {
     return runtime_entry(entry,0,failure,records,count,witnesses,witness_count,argc,argv,wide);
+}
+std::int32_t vd_runtime_entry_context_v1(vd::NativeCode::CheckedEntry entry,std::int32_t value,vd::RuntimeFailure* failure,const vd::RuntimeTypeRecord* records,std::size_t count,const vd::RuntimeWitnessRecord* witnesses,std::size_t witness_count,int argc,const void* argv,bool wide,const char* bytes,std::size_t size) noexcept {
+    try {
+        if (!bytes || !size) throw std::invalid_argument("Missing application metadata.");
+        auto metadata = vd::ApplicationMetadata::decode(std::string_view(bytes,size));
+        return runtime_entry(entry,value,failure,records,count,witnesses,witness_count,argc,argv,wide,std::move(metadata));
+    } catch (const std::invalid_argument&) {failure->message="Invalid compiled application metadata.";}
+      catch (const std::bad_alloc&) {failure->message="Runtime startup allocation failed.";}
+    return 0;
+}
+std::int32_t vd_runtime_entry_dynamic_v1(vd::NativeCode::CheckedEntry entry, std::int32_t value,
+    vd::RuntimeFailure* failure, const vd::RuntimeTypeRecord* records, std::size_t count,
+    const vd::RuntimeWitnessRecord* witnesses, std::size_t witness_count, int argc, const void* argv,
+    const char* metadata, std::size_t metadata_size, const char* closure, std::size_t closure_size) noexcept {
+    try {
+        if (!closure || !closure_size) throw std::invalid_argument("C dynamic authority: missing embedded closure");
+        auto application = metadata ? vd::ApplicationMetadata::decode({metadata,metadata_size}) : vd::ApplicationMetadata::Owner{};
+        auto binding = vd::load_dynamic(vd::DynamicClosure::parse({closure,closure_size}), vd::installed_dynamic_root());
+#ifdef _WIN32
+        constexpr bool wide = true; // Dynamic applications use the generated wmain.
+#else
+        constexpr bool wide = false;
+#endif
+        return runtime_entry(entry,value,failure,records,count,witnesses,witness_count,argc,argv,wide,
+                             std::move(application),std::move(binding));
+    } catch (const std::exception& error) {
+        failure->message = error.what();
+        vd::export_native_failure(failure);
+    }
+    return 0;
 }
 void vd_display_enter(const char* hook,void* identity,vd::RuntimeFailure* failure) noexcept {
     try{vd::Runtime::current().display_enter(hook,identity);}

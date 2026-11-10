@@ -1,0 +1,24 @@
+void-c-primitive 3 3
+provider org.voidlang.raylib
+target @TARGET@
+source /raylib_checked.void
+thunk @THUNK@
+fixture @FIXTURE@
+effects direct-sync blocking checked-callbacks
+call c-default
+aliases c_int:i32 c_long:@LONG@ c_size:u64 c_bool:bool
+resource window VoidRaylibWindow pointer null open close owner-calls shutdown-owner consume-always
+callback trace_event context-first void i32 u32 u32
+record color Color 4 1 4
+field r r u8 0
+field g g u8 1
+field b b u8 2
+field a a u8 3
+bind tint vd_raylib_tint record:color record:color f32
+bind trace vd_raylib_trace i32 scoped:trace_event
+bind title vd_raylib_title i64 in:1:2:255 c_size c_size
+bind open vd_raylib_open owner:window c_int c_int
+bind should_close vd_raylib_should_close c_bool borrow:window
+bind direction vd_raylib_direction c_int borrow:window
+bind draw vd_raylib_draw c_int mut:window c_int c_int u8 u8 u8
+bind close vd_raylib_close i32 close:window

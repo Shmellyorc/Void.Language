@@ -1,0 +1,33 @@
+use "/callback_checked.void" as g5
+
+var saved_registration: g5.registration? = null
+var fault_probe: i32 = 0
+
+struct capture:
+    bias: i32
+
+func (s capture) receive(value: i32) -> i32:
+    if value == -20:
+        var owner = saved_registration as g5.registration
+        return g5.unregister(owner)
+    if value == -21:
+        fault_probe = 1
+    return s.bias + value
+
+func entry(value: i32) -> i32:
+    if value == 0:
+        var state = capture(bias=40)
+        saved_registration = g5.register(state.receive)
+        if saved_registration == null:
+            return -1
+        return 1
+    if value == -22:
+        return fault_probe
+    var owner = saved_registration as g5.registration
+    if value == -1:
+        var result = g5.unregister(owner)
+        saved_registration = null
+        return result
+    if value > 0:
+        return g5.fire(owner, value, 1)
+    return g5.fire(owner, value, 0)

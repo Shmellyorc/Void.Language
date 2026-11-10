@@ -1,5 +1,34 @@
 # Source compiler and engineering build guide
 
+Slice 1 supplies the compiler-library [manifest parser](../include/void/project.hpp).
+Slice 2 adds `analyze_manifest_project(root, entry_override, sources, manifests)`
+in [frontend.hpp](../include/void/frontend.hpp), returning an owning immutable
+ProjectAnalysis with separate discovery/execution source snapshots and a selection
+key. Applications retain the existing ValidatedAnalysis/IR/LLVM pipeline. Libraries
+have no executable program or entry: their source union is checked with an explicit
+declarationless root scope. [Engineering/evidence](projects/SLICE2.md).
+
+SourceGraph now separates its ordinary Parser pass from import expansion. D Units
+are retained and moved into E as needed, so unimported helpers are not semantically
+checked, emitted or initialized. The manifest fixes the physical VFS root; the
+selected entry fixes application declaration ownership. Disk membership, boundary
+observations and bytes are recaptured before successful acceptance. This detects
+changes and requests retry; it is not an OS filesystem transaction or sandbox.
+
+Legacy `analyze_project(entry)` and existing ToolingSession/voidls entry-only modes
+remain adapters with their original semantics. Slice 3 will integrate project
+sessions/protocol; Runtime metadata, zero-ID OS calls and creation remain later
+slices. No second source parser, editor resolver or LLVM path is introduced.
+
+The [Phase 1 ownership contract](PROJECT_ARCHITECTURE_ROADMAP.md#phase-1-ownership-and-data-flow)
+requires explicit project root, source inventory, selected declaration owner and
+metadata inputs. Legacy `analyze_project(entry)`/ToolingSession remain entry-only;
+they do not supply the new records. S2's separate project API implements root,
+inventory and declaration-owner selection while keeping those legacy adapters.
+Parser capture is separate from recursive imports, with one semantic/IR/LLVM path
+and no fabricated library application entry. Project sessions/protocol, metadata
+and later slices await their architectural review boundaries in the roadmap.
+
 ## Approved project/compiler roadmap, 8 November 2026
 
 The [project architecture roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) plans native
@@ -9,8 +38,9 @@ Never require `main.void` or a mandatory entry field in the replacement design;
 select one valid main or report ambiguity. Reuse the current frontend, typed IR
 validation, Runtime context, LLVM JIT/AOT, explicit native admission, resource
 inventories and staged artifact publication. Dynamic linking is the approved
-default; static remains optional. These are unimplemented future additions, not
-changes to current commands or a new compiler/backend. Baseline exact `main.void`
+default; static remains optional. S1/S2 deliver parsing/discovery locally; metadata,
+numeric enums and general C ABI remain future additions through this compiler.
+Legacy exact `main.void`
 automatic discovery and explicit-file compatibility still apply below.
 
 For onboarding, start with [source installation](install/README.md),

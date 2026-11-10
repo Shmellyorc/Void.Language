@@ -33,11 +33,11 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             const auto& fields=parameters.at(origin).definition->fields;
             for (unsigned field=0;field<fields.size();++field) {
                 Type t=fields[field].type;
-                const bool endpoint_default=f.initializer && origin==0 && console::endpoint_type(t) &&
+                const bool checked_default=f.initializer && origin==0 && checked_initializer_default(t) &&
                     std::any_of(f.initialization_defaults.begin(),f.initialization_defaults.end(),[&](const auto& value){return value->slot==field;});
                 // The existing initializer prelude writes these checked constant
                 // copies before the body; independent IR still proves the write.
-                if (!f.initializer || !ir::requires_initialization(t) || endpoint_default) initial.emplace(origin,field);
+                if (!f.initializer || !ir::requires_initialization(t) || checked_default) initial.emplace(origin,field);
             }
         }
         auto require_field=[&](unsigned origin,unsigned field,const Ready& ready,const Token& token) {

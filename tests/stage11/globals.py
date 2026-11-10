@@ -7,7 +7,7 @@ import shutil
 import sys
 import tempfile
 
-compiler, clang, linker, runtime, fixture, sanitizer = sys.argv[1:]
+compiler, clang, linker, runtime, fixture, sanitizer, *host_libraries = sys.argv[1:]
 flags = ["--driver-mode=g++", "-pthread"]
 if sys.platform.startswith("linux"):
     flags.append("-ldl")
@@ -46,7 +46,7 @@ with tempfile.TemporaryDirectory(prefix="VOID globals ") as directory:
             obj = root / "program.o"
             exe = root / ("program.exe" if os.name == "nt" else "program")
             run([compiler, "emit", path, "-o", obj, *switches])
-            run([clang, obj, runtime, fixture, *flags, "-o", exe])
+            run([clang, obj, runtime, fixture, *host_libraries, *flags, "-o", exe])
             result = run([exe], status)
             assert result.stdout == stdout and error in result.stderr, (name, "AOT", result)
 

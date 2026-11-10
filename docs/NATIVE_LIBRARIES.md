@@ -1,5 +1,18 @@
 # Trusted static native providers
 
+Slice 1 now validates application/library metadata and rejects nonempty reserved
+native/dependency declarations through the explicit compiler-library parser only.
+[Engineering evidence](projects/SLICE1.md) records the qualification. Source-library
+analysis, project admission, resolution and native linking/loading remain deferred;
+current import/provider behavior is unchanged.
+
+The [Phase 1 manifest freeze](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-manifest-and-identity-model)
+reserves `native`/`dependencies` but rejects nonempty declarations in schema 1.
+No new provider/linker admission is designed into initial project creation or
+analysis. Existing provider/resource receipts remain required; metadata cannot
+replace them. The dynamic-default C/raylib roadmap stays intact for later phases.
+Implementation remains HOLD.
+
 ## Approved general C interoperability direction, 8 November 2026
 
 The [project/native architecture roadmap](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-general-purpose-c-interoperability)

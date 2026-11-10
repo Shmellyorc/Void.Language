@@ -1,5 +1,7 @@
 #include "void/ir.hpp"
+#include "void/frontend.hpp"
 #include "void/native_binding.hpp"
+#include "void/c_primitive.hpp"
 #include "void/numeric.hpp"
 #include "void/math_ops.hpp"
 #include "void/temporal_ops.hpp"
@@ -156,6 +158,11 @@ CompactValueShape compact_value_shape(Type root) {
     };
     std::function<CompactValueShape(Type)> visit=[&](Type t)->CompactValueShape {
         if((t.nullable && !reference_value(t) && !(t.definition && t.definition->callable)) || t.construction || !t.preparation.empty()) throw std::invalid_argument("Unsupported array value shape");
+        if(t.kind==Type::numeric_enum) {
+            if(!t.definition || !t.definition->enum_backing || !numeric::integer(*t.definition->enum_backing))
+                throw std::invalid_argument("Invalid numeric enum array element");
+            return {0,numeric::width(*t.definition->enum_backing)/8u,1};
+        }
         if(numeric::number(t) || t==Type::boolean) return {0,t==Type::boolean ? 1u : numeric::width(t)/8u,1};
         if(reference_value(t) || t.kind==Type::string || (t.kind==Type::growable_array || t.kind==Type::dictionary))return {0,sizeof(void*),1};
         if((t.kind!=Type::fixed_array && t.kind!=Type::aggregate) || !t.definition || t.definition->managed || t.definition->interface_type)
@@ -221,7 +228,7 @@ bool async_boundary_safe(Type root) {
     while(!pending.empty()){auto t=pending.back();pending.pop_back();if(t.construction || t.kind==Type::prepared_receiver)return false;if(!t.definition || !seen.insert(t.definition.get()).second)continue;if(t.definition->callable || t.definition->native_resource)return false;if(t.definition->element)pending.push_back(*t.definition->element);for(const auto& field:t.definition->fields)pending.push_back(field.type);}
     return true;
 }
-bool requires_initialization(Type t){return !t.nullable && (console::endpoint_type(t) || reference_value(t) || (t.definition && (t.definition->callable || !t.definition->cases.empty())));}
+bool requires_initialization(Type t){return !t.nullable && (t.kind==Type::numeric_enum || console::endpoint_type(t) || reference_value(t) || (t.definition && (t.definition->callable || !t.definition->cases.empty())));}
 bool reference_value(Type t) { return t.kind==Type::managed_ref || t.kind==Type::interface_ref; }
 Type::Type(std::shared_ptr<const ValueType> d, Kind k) : kind(k) {
     if (!d) return;
@@ -248,12 +255,29 @@ Type::Type(std::shared_ptr<const ValueType> d, Kind k) : kind(k) {
     }
     definition = std::shared_ptr<const ValueType>(std::move(owner),d.get());
 }
+Type Type::nominal(std::shared_ptr<const ValueType> d) {
+    const auto kind=d->enum_backing?numeric_enum:d->interface_type?interface_ref:d->managed?managed_ref:aggregate;
+    return Type(std::move(d),kind);
+}
+std::string option_identity(Type payload) {return "$option:"+array_identity(payload,{});}
+bool numeric_enum_member(Type t,std::uint64_t bits) {
+    return t.kind==Type::numeric_enum && t.definition &&
+        std::any_of(t.definition->numeric_members.begin(),t.definition->numeric_members.end(),
+                    [&](const auto& member){return member.bits==bits;});
+}
+std::string numeric_enum_layout(Type t) {
+    if(t.kind!=Type::numeric_enum)return {};
+    std::string layout=type_name(*t.definition->enum_backing)+":";
+    for(const auto& member:t.definition->numeric_members)
+        layout+=std::to_string(member.name.size())+":"+member.name+"="+std::to_string(member.bits)+";";
+    return layout;
+}
 FieldType::FieldType(Type t) : kind(t.kind), nullable(t.nullable), readonly(t.readonly), readonly_references(t.readonly_references) {
     if (t.construction) throw std::invalid_argument("construction view cannot be a field type");
     if (t.definition) target = t.definition->self;
 }
 FieldType::operator Type() const {
-    if (kind != Type::aggregate && kind != Type::unresolved && kind != Type::managed_ref && kind != Type::interface_ref && kind!=Type::fixed_array && kind!=Type::growable_array && kind!=Type::dictionary) { Type t(kind); t.nullable=nullable; t.readonly=readonly;t.readonly_references=readonly_references; return t; }
+    if (kind != Type::aggregate && kind != Type::unresolved && kind != Type::managed_ref && kind != Type::interface_ref && kind!=Type::fixed_array && kind!=Type::growable_array && kind!=Type::dictionary && kind!=Type::numeric_enum) { Type t(kind); t.nullable=nullable; t.readonly=readonly;t.readonly_references=readonly_references; return t; }
     auto d = target.lock();
     if (!d) throw std::logic_error("nominal type edge outlived its definition table");
     Type t(std::move(d),kind); t.nullable=nullable; t.readonly=readonly;t.readonly_references=readonly_references; return t;
@@ -433,7 +457,7 @@ std::string type_name(Type t) {
     if(t.kind==Type::dictionary)return "{"+type_name(dictionary_key(t))+": "+type_name(dictionary_value(t))+"}";
     if(array_type(t)) return "["+type_name(array_element(t))+(t.definition->extent ? ", "+std::to_string(*t.definition->extent) : "")+"]";
     if (t.kind == Type::managed_ref && t.definition) return std::string(t.readonly ? "readonly " : "") + t.definition->identity + (t.nullable ? "?" : "");
-    switch (t.kind) { case Type::string: return "string"; case Type::aggregate: if (t.definition) return t.definition->identity.c_str(); break; case Type::unresolved: if (t.definition) return t.definition->name.c_str(); break; case Type::i8: return "i8"; case Type::i16: return "i16"; case Type::i64: return "i64"; case Type::u8: return "u8"; case Type::u16: return "u16"; case Type::u32: return "u32"; case Type::u64: return "u64"; case Type::f32: return "f32"; case Type::f64: return "f64"; case Type::i32: return "i32"; case Type::boolean: return "bool"; case Type::none: return "no result"; default: break; }
+    switch (t.kind) { case Type::string: return "string"; case Type::numeric_enum: case Type::aggregate: if (t.definition) return t.definition->identity.c_str(); break; case Type::unresolved: if (t.definition) return t.definition->name.c_str(); break; case Type::i8: return "i8"; case Type::i16: return "i16"; case Type::i64: return "i64"; case Type::u8: return "u8"; case Type::u16: return "u16"; case Type::u32: return "u32"; case Type::u64: return "u64"; case Type::f32: return "f32"; case Type::f64: return "f64"; case Type::i32: return "i32"; case Type::boolean: return "bool"; case Type::none: return "no result"; default: break; }
     throw std::invalid_argument("VOID IR: unknown type");
 }
 std::vector<VirtualTarget> virtual_targets(const Module& module,const Function& root) {
@@ -457,13 +481,29 @@ std::vector<VirtualTarget> virtual_targets(const Module& module,const Function& 
 #include "construction.inc"
 #include "reference_capabilities.inc"
 #include "fixed_ownership.inc"
+#include "numeric_enum_storage.inc"
 void validate(const Module& m, InstructionTypes* results,std::map<std::string,ReferenceEffects>* verified_effects) {
     for(const auto& symbol:m.imports)if(symbol.starts_with("vd_native_fixture_call"))throw std::invalid_argument("VOID IR: native bridge requires its verified typed descriptor");
     for (const auto& symbol : m.imports) if (symbol.starts_with("vd_global")) throw std::invalid_argument("VOID IR: global bridge requires validated typed global operations");
+    if(std::find(m.imports.begin(),m.imports.end(),"vd_value_array_complete")!=m.imports.end())
+        throw std::invalid_argument("VOID IR: array completion requires validated typed array operations");
+    for (const auto& symbol : m.imports) if (reserved_c_transport(symbol))
+        throw std::invalid_argument("VOID IR: C primitive transport requires host admission and typed operations");
     if (results) results->clear();
     InstructionTypes qualified_types;
     auto fail = [](const std::string& text) { throw std::invalid_argument("VOID IR: " + text); };
     if (m.identity.empty()) fail("missing module identity");
+    const auto* primitive = m.c_primitives.get();
+    if (primitive && (!m.coordinated || m.async_root || !m.native_library.empty() || !m.imports.empty() ||
+        m.root_identity == primitive->module() || !m.source_imports.contains(primitive->module())))
+        fail("invalid C primitive module admission");
+    if (m.application_metadata) (void)ApplicationMetadata::decode(m.application_metadata->bytes());
+    if (m.analysis) {
+        if (m.analysis->c_primitive_admission() != m.c_primitives) fail("C primitive admission differs from analyzed source");
+        const auto& expected = m.analysis->application_metadata();
+        if (expected != m.application_metadata && (!expected || !m.application_metadata || *expected != *m.application_metadata))
+            fail("application metadata differs from validated source analysis");
+    }
     if (!m.globals.empty() && (m.root_identity != m.identity || !m.source_imports.contains(m.root_identity))) fail("invalid global source scope graph");
     std::map<std::string, const Global*> globals;
     for (const auto& value : m.globals) {
@@ -510,6 +550,10 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         std::vector<Type> pending{root};
         for (std::size_t n=0;n<pending.size();++n) {
             auto t=pending[n];
+            if(t.definition && t.kind!=Type::numeric_enum && (t.definition->enum_backing || !t.definition->numeric_members.empty()))
+                fail("numeric enum used with a non-enum type");
+            if(t.definition && t.kind!=Type::aggregate && (t.definition->option_type || t.definition->identity.starts_with("$option:")))
+                fail("canonical option used with a non-sum type");
             if(t.kind==Type::dictionary) {
                 if(!m.coordinated || !t.definition || !t.definition->element || t.definition->extent || !t.definition->fields.empty() || t.nullable || t.construction || !t.preparation.empty())fail("invalid dictionary type");
                 auto entry=array_element(t);if(entry.kind!=Type::aggregate || entry.definition->fields.size()!=3 || field_type(entry,2)!=Type::u64 || !dictionary_key_supported(dictionary_key(t)) || dictionary_type(dictionary_key(t),dictionary_value(t))!=t)fail("invalid dictionary key/value shape");
@@ -548,6 +592,31 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 if(!added && found->second!=t.definition.get()) fail("duplicate nominal interface identity");
                 continue;
             }
+            if(t.kind==Type::numeric_enum) {
+                auto* d=t.definition.get();
+                if(!d || !d->enum_backing || !numeric::integer(*d->enum_backing) || d->numeric_members.empty() ||
+                   d->managed || d->interface_type || d->callable || d->result_type || d->option_type ||
+                   d->native_resource || !d->native_provider.empty() || d->custom_equality || d->task_result ||
+                   d->element || d->extent || !d->base.expired() || !d->fields.empty() || !d->cases.empty() ||
+                   d->call_result || !d->call_parameters.empty() || !t.preparation.empty() || !t.readonly_references.empty() ||
+                   d->name.empty() || d->identity.find('\0')!=std::string::npos || d->module_identity.empty() ||
+                   d->identity!=d->module_identity+"::"+d->name || !m.source_imports.contains(d->module_identity) ||
+                   (d->visibility!="public" && d->visibility!="private" && d->visibility!="internal"))
+                    fail("invalid numeric enum descriptor");
+                auto [previous,inserted]=definitions.emplace(d->identity,d);
+                if(!inserted && previous->second!=d)fail("conflicting numeric enum identity");
+                if(checked.insert(d).second) {
+                    std::set<std::string> names;std::set<std::uint64_t> values;
+                    const auto width=numeric::width(*d->enum_backing);
+                    for(const auto& member:d->numeric_members) {
+                        if(member.name.empty() || (member.name.front()>='0' && member.name.front()<='9') ||
+                           !std::all_of(member.name.begin(),member.name.end(),[](char c){return c=='_' || (c>='a' && c<='z') || (c>='0' && c<='9');}) ||
+                           !names.insert(member.name).second || !values.insert(member.bits).second ||
+                           (width<64 && member.bits>>width))fail("invalid or duplicate numeric enum discriminant");
+                    }
+                }
+                continue;
+            }
             if(t.definition && t.definition->interface_type) fail("interface used as an ordinary concrete nominal");
             if (t.kind!=Type::aggregate && t.kind!=Type::managed_ref) {
                 if (t.kind==Type::unresolved || t.kind==Type::invalid || t.kind==Type::null_value) fail("unresolved type");
@@ -558,7 +627,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             if(auto base=d->base.lock();base && base->native_resource)fail("native resource cannot be extended");
             if(console::endpoint_type(t) && (t.kind!=Type::aggregate || d->module_identity!=console::source_module || d->identity!=d->module_identity+"::"+d->name || d->managed || !d->base.expired() || !d->cases.empty() || d->interface_type || d->callable || d->native_resource || d->fields.size()!=1 || Type(d->fields[0].type)!=Type::i64 || d->fields[0].name!="_id" || !d->fields[0].readonly || d->fields[0].visibility!="internal"))fail("invalid console endpoint identity");
             if(console::session_type(t) && (!d->native_resource || d->native_provider!="void.console.v1" || t.kind!=Type::managed_ref || !d->managed || d->module_identity!=console::source_module || !d->base.expired() || d->callable || !d->cases.empty() || d->interface_type || d->fields.size()!=1 || Type(d->fields[0].type)!=Type::i64 || d->fields[0].readonly || d->fields[0].visibility!="internal" || d->fields[0].name!="_token"))fail("invalid terminal session identity");
-            if(d->native_resource && !console::session_type(t) && ((m.native_library!="void.fixture.v1" && m.native_library!="void.sink.v1") || t.kind!=Type::managed_ref || d->native_provider!=m.native_library || !d->managed || d->fields.size()!=1 || Type(d->fields[0].type)!=Type::u64 || d->callable || !d->base.expired() || !d->cases.empty() || d->interface_type))fail("invalid native resource identity");
+            if(d->native_resource && !console::session_type(t) && !(primitive && primitive->resource_type(t)) && ((m.native_library!="void.fixture.v1" && m.native_library!="void.sink.v1") || t.kind!=Type::managed_ref || d->native_provider!=m.native_library || !d->managed || d->fields.size()!=1 || Type(d->fields[0].type)!=Type::u64 || d->callable || !d->base.expired() || !d->cases.empty() || d->interface_type))fail("invalid native resource identity");
             if(d->task_result){
                 auto r=Type(*d->task_result);if(t.kind!=Type::managed_ref || !d->managed || d->callable || d->interface_type || !d->base.expired() || !d->cases.empty() || d->result_type || d->element || d->extent || d->fields.size()!=2 || Type(d->fields[0].type)!=Type::i32 || (Type(d->fields[1].type)!=(r==Type::none?Type::boolean:r) || capability_key(d->fields[1].type)!=capability_key(r==Type::none?Type::boolean:r)) || d->identity!="$task:"+std::to_string(r.kind)+":"+Type::key(r)+(r.nullable?"?":"")+":"+capability_key(r))fail("invalid task handle shape");
             }
@@ -566,6 +635,23 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 if(t.kind!=Type::aggregate || d->managed || d->interface_type || !d->cases.empty() || d->result_type || d->fields.size()!=2 || Type(d->fields[0].type)!=Type::u64 || Type(d->fields[1].type).kind!=Type::managed_ref || !d->fields[1].type.nullable || !d->call_result || !d->base.expired())fail("invalid function value shape");
                 pending.push_back(*d->call_result);for(const auto& parameter:d->call_parameters){if(Type(parameter)==Type::none)fail("no-result function parameter");pending.push_back(parameter);}
             }
+            if(d->option_type) {
+                if(t.kind!=Type::aggregate || d->managed || d->callable || d->result_type || d->native_resource ||
+                   d->task_result || d->call_result || !d->call_parameters.empty() || !d->module_identity.empty() ||
+                   d->cases.size()!=2 || d->cases[0].name!="None" || d->cases[0].count!=0 ||
+                   d->cases[1].name!="Some" || d->cases[1].count!=1 || d->fields.size()!=2 ||
+                   d->fields[0].name!="$tag" || d->fields[1].name!="$some")
+                    fail("invalid canonical option shape");
+                auto payload=Type(d->fields[1].type);
+                if((!numeric::integer(payload) && payload.kind!=Type::numeric_enum) ||
+                   payload.nullable || payload.readonly || !payload.readonly_references.empty() ||
+                   d->identity!=option_identity(payload) || d->name!=d->identity)
+                    fail("invalid canonical option identity");
+                for(const auto& field:d->fields)
+                    if(field.owner!=d->identity || field.visibility!="public" || field.using_field || field.event ||
+                       field.readonly || field.type.readonly || field.type.nullable || !field.type.readonly_references.empty())
+                        fail("invalid canonical option field");
+            } else if(d->identity.starts_with("$option:"))fail("forged canonical option identity");
             if(d->result_type && d->cases.empty())fail("result type has no variants");
             if(!d->cases.empty()) {
                 if(t.kind!=Type::aggregate || d->fields.empty() || Type(d->fields[0].type)!=Type::i32 || d->managed || d->interface_type || !d->base.expired())fail("invalid sum layout");
@@ -577,7 +663,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             if(!m.interface_requirements.empty() && d->visibility!="public" && d->visibility!="internal" && d->visibility!="private") fail("invalid concrete nominal visibility");
             const bool callable_environment=d->identity=="$void::$environment";
             if(callable_environment && (!d->managed || !d->fields.empty() || !d->base.expired() || !d->module_identity.empty() || d->name!="$environment" || d->visibility!="private"))fail("invalid shared callable environment base");
-            if(!m.interface_requirements.empty() && !callable_environment && !dictionary_entries.contains(d) && !d->result_type && !d->callable && !d->task_result && (d->identity!=d->module_identity+"::"+d->name || !m.source_imports.contains(d->module_identity))) fail("invalid concrete nominal ownership for interface binding");
+            if(!m.interface_requirements.empty() && !callable_environment && !dictionary_entries.contains(d) && !d->result_type && !d->option_type && !d->callable && !d->task_result && (d->identity!=d->module_identity+"::"+d->name || !m.source_imports.contains(d->module_identity))) fail("invalid concrete nominal ownership for interface binding");
             if (t.construction && !d->managed) fail("construction view requires a managed nominal");
             if (t.kind==Type::aggregate && d->managed) fail("managed nominal cannot be an inline value");
             auto [found,added]=definitions.emplace(d->identity,d);
@@ -620,7 +706,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
     };
     std::set<const ValueType*> catalog_definitions;
     for(auto t:m.nominal_types) {
-        if((t.kind!=Type::aggregate && t.kind!=Type::managed_ref && t.kind!=Type::interface_ref) || !t.definition || !catalog_definitions.insert(t.definition.get()).second) fail("invalid or duplicate nominal catalog entry");
+        if((t.kind!=Type::aggregate && t.kind!=Type::managed_ref && t.kind!=Type::interface_ref && t.kind!=Type::numeric_enum) || !t.definition || !catalog_definitions.insert(t.definition.get()).second) fail("invalid or duplicate nominal catalog entry");
         valid_type(t);
         if(t.kind==Type::managed_ref && !t.definition->managed) fail("nominal catalog requires a managed class");
         auto base=t.definition->base.lock();
@@ -655,6 +741,12 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         if(!found) fail("interface has no requirements");
     }
     for (const auto& f : m.functions) {
+        if (primitive && (f.asynchronous || f.worker)) fail("C primitive graphs require synchronous execution");
+        if (primitive && f.module_identity == primitive->module() &&
+            (f.receiver || f.initializer || f.closure || f.cleanup_entry || !f.locals.empty() ||
+             f.blocks.size() != 1 || f.blocks.front().instructions.empty() ||
+             f.blocks.front().instructions.back().op != Op::c_primitive_call || f.name == m.entry_symbol))
+            fail("invalid admitted C primitive wrapper");
         if(!m.interface_requirements.empty() && !m.source_imports.contains(f.module_identity)) fail("function has no source access scope");
         if(f.asynchronous){
             if(!m.coordinated || f.task.kind!=Type::managed_ref || f.task.nullable || f.task.construction || !f.task.definition || !f.task.definition->task_result || f.initializer || f.accessor || (f.receiver && f.method_name=="deinit") || !f.virtual_slot.empty() || f.closure || (f.receiver && (f.parameters.empty() || f.parameters[0].kind!=Type::managed_ref)))fail("invalid async declaration or task result");
@@ -818,14 +910,24 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             }
         }
         std::vector<std::vector<Type>> body_types;
+        const auto enum_array_homes=checked_array_homes(f, primitive);
         for (const auto& b : f.blocks) {
             std::vector<Type> types;
             std::vector<bool> pure_templates;
             std::vector<bool> group_values;const Instruction* validating=nullptr;
             for(const auto& instruction:b.instructions)if(instruction.op==Op::function_reference && functions.contains(instruction.callee) && functions.at(instruction.callee)->asynchronous)fail("async function value requires an async callable contract");
+            auto pending_enum_array=[&](unsigned id) {
+                const auto& producer=b.instructions[id];
+                return checked_array_allocation(producer, primitive) || (producer.op==Op::load && enum_array_homes.contains(producer.a));
+            };
             auto operand = [&](unsigned id) {
                 if (id >= types.size() || types[id] == Type::none) fail("invalid operand in " + f.name);
                 if(group_values[id] && (!validating || (validating->op!=Op::async_group_join && !(validating->op==Op::store && group_slots.contains(validating->a)))))fail("async group token escapes lifecycle operations");
+                if(pending_enum_array(id) && (!validating || id!=validating->a ||
+                   (validating->op!=Op::array_initialize && validating->op!=Op::array_finish &&
+                    !(validating->op==Op::array_capture && checked_array_allocation(b.instructions[id], primitive)))))
+                    fail(contains_numeric_enum(types[id]) ? "incomplete numeric enum array escapes private construction" :
+                         "incomplete C inline array escapes private construction");
                 return types[id];
             };
             auto expect = [&](unsigned id, Type t) { if (!assignable(operand(id),t)) fail("mistyped operand in " + f.name+": expected "+type_name(t)+", received "+type_name(operand(id))+" at value "+std::to_string(id)); };
@@ -835,8 +937,29 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             };
             for (const auto& i : b.instructions) {
                 validating=&i;
+                if(i.receiver && enum_array_homes.contains(i.receiver->slot))fail("incomplete numeric enum array used as a receiver");
                 Type result = Type::i32;
                 if(!i.operator_glyph.empty() && i.op!=Op::call)fail("operator proof on non-call instruction");
+                auto location = os::location_adapter(i.callee,false);
+                if (location || i.os_location_adapter) {
+                    if (!location || !i.os_location_adapter || !m.coordinated || i.op != Op::call ||
+                        i.receiver || i.a || i.b || i.immediate || i.initialization || !i.arguments.empty())
+                        fail("invalid OS location direct-call proof");
+                    auto adapter = functions.find(i.callee);
+                    auto facade = functions.find(std::string(os::source_prefix) + std::string(location->facade));
+                    auto scope = m.source_imports.find(f.module_identity);
+                    if (adapter == functions.end() || facade == functions.end() ||
+                        (f.module_identity != os::source_module && (scope == m.source_imports.end() || !scope->second.contains(std::string(os::source_module)))))
+                        fail("OS location adapter has no admitted source declaration");
+                    const auto& a = *adapter->second;
+                    const auto& p = *facade->second;
+                    if (a.module_identity != os::source_module || p.module_identity != os::source_module ||
+                        a.visibility != "private" || p.visibility != "public" || a.asynchronous || p.asynchronous ||
+                        a.receiver || p.receiver || !a.parameters.empty() || p.parameters != std::vector<Type>{Type::string} ||
+                        a.result != p.result || !a.result.definition || !a.result.definition->result_type ||
+                        field_type(a.result,1) != Type::string || Type::key(field_type(a.result,2)) != "/@stdlib/os.void::error")
+                        fail("invalid OS location adapter declaration");
+                }
                 if(i.array_repeat && i.op!=Op::fixed_array) fail("repeat template on non-array instruction");
                 switch (i.op) {
                 case Op::interface_pack: {
@@ -877,6 +1000,8 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     valid_type(i.type);
                     if(std::any_of(m.nominal_types.begin(),m.nominal_types.end(),[&](auto t){return t.kind==Type::managed_ref && Type::key(t)==Type::key(i.type);})) fail("nominal source objects require complete construction");
                     if (!m.coordinated || i.type.kind != Type::managed_ref || i.type.construction || i.type.definition->fields.empty()) fail("invalid managed allocation");
+                    for(const auto& field:i.type.definition->fields)
+                        if(contains_numeric_enum(field.type))fail("numeric enum fields require complete managed construction");
                     result = i.type; break;
                 case Op::gc_read: case Op::gc_write: {
                     if(operand(i.a).definition && operand(i.a).definition->task_result)fail("task payload access requires await");
@@ -912,7 +1037,29 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     break;
                 }
                 case Op::gc_release:
-                    if(!f.receiver || f.method_name!="deinit" || operand(i.a).kind!=Type::managed_ref || operand(i.a).nullable || operand(i.a).construction)fail("invalid deterministic release");result=Type::boolean;break;
+                    if(!f.receiver || f.method_name!="deinit" || operand(i.a).kind!=Type::managed_ref || operand(i.a).nullable ||
+                        operand(i.a).construction || (primitive && primitive->resource_type(operand(i.a))))
+                        fail("invalid deterministic release");result=Type::boolean;break;
+                case Op::c_primitive_call: {
+                    if (!primitive || f.module_identity != primitive->module() ||
+                        i.immediate < 0 || static_cast<std::size_t>(i.immediate) >= primitive->bindings().size())
+                        fail("C primitive call outside the admitted binding module");
+                    const auto& binding = primitive->bindings()[static_cast<std::size_t>(i.immediate)];
+                    const auto count = binding.abi_parameters.size();
+                    const auto terminator = i.type == Type::none ? Terminator::Kind::return_void : Terminator::Kind::return_value;
+                    if (i.callee != primitive->call_identity(binding) || f.source_name != binding.name ||
+                        i.type != f.result || !primitive->signature(binding, f.parameters, f.result) ||
+                        i.arguments.size() != count || b.instructions.size() != count + 1 ||
+                        b.end.kind != terminator || (terminator == Terminator::Kind::return_value && b.end.value != count) ||
+                        i.receiver || i.a || i.b || i.initialization || i.array_repeat || !i.operator_glyph.empty() || i.os_location_adapter)
+                        fail("invalid C primitive descriptor or exact call signature");
+                    for (unsigned n = 0; n < count; ++n)
+                        if (i.arguments[n] != n || b.instructions[n].op != Op::argument || b.instructions[n].a != n ||
+                            !primitive->matches(binding.abi_parameters[n], operand(n)))
+                            fail("invalid C primitive argument type or placement");
+                    result = i.type;
+                    break;
+                }
                 case Op::native_call: {
                     valid_type(i.type);
                     std::vector<Type> parameters;for(auto value:i.arguments)parameters.push_back(operand(value));
@@ -930,6 +1077,11 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     valid_type(i.type);if(!i.type.definition || !i.type.definition->callable || !i.type.nullable || i.receiver || !i.arguments.empty() || !i.callee.empty())fail("invalid null function value");result=i.type;break;
                 case Op::function_reference: {
                     valid_type(i.type);auto target=names.find(i.callee);
+                    if (primitive) {
+                        auto declaration = functions.find(i.callee);
+                        if (declaration != functions.end() && declaration->second->module_identity == primitive->module())
+                            fail("C primitive binding is direct-call only");
+                    }
                     if(!i.type.definition || !i.type.definition->callable || target==names.end() || target->second.receiver || target->second.initializer || target->second.parameters.size()!=i.type.definition->call_parameters.size()+(target->second.closure?1:0) || target->second.result!=Type(*i.type.definition->call_result) || i.receiver || i.arguments.size()!=(target->second.closure?1:0))fail("invalid function reference");
                     if(target->second.closure){expect(i.arguments[0],target->second.parameters[0]);auto environment=Type(i.type.definition->fields[1].type);environment.nullable=false;if(!subtype(operand(i.arguments[0]),environment))fail("function environment does not match callable storage");}
                     for(unsigned n=0;n<i.type.definition->call_parameters.size();++n)if(target->second.parameters[n+(target->second.closure?1:0)]!=Type(i.type.definition->call_parameters[n]) || capability_key(target->second.parameters[n+(target->second.closure?1:0)])!=capability_key(i.type.definition->call_parameters[n]))fail("function reference parameter authority mismatch");
@@ -982,11 +1134,25 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     for(auto argument:i.arguments) expect(argument,array_element(i.type));
                     result=i.type;break;
                 case Op::array_allocate:
-                    valid_type(i.type);if(i.type.kind!=Type::fixed_array || !i.arguments.empty() || i.receiver || i.immediate || !i.callee.empty())fail("invalid array construction storage");result=i.type;break;
-                case Op::array_initialize:
-                    if(operand(i.a).kind!=Type::fixed_array || operand(i.b)!=Type::u64 || i.arguments.size()!=1 || i.receiver || i.immediate || !i.callee.empty())fail("invalid array element initialization");expect(i.arguments[0],array_element(operand(i.a)));result=Type::none;break;
+                    valid_type(i.type);
+                    if(i.type.kind!=Type::fixed_array || !i.arguments.empty() || i.receiver || i.immediate || !i.callee.empty() ||
+                       (checked_array_allocation(i, primitive) && !m.coordinated))fail("invalid array construction storage");
+                    result=i.type;break;
+                case Op::array_initialize: {
+                    auto array=operand(i.a);
+                    if(array.kind!=Type::fixed_array || operand(i.b)!=Type::u64 || i.arguments.size()!=1 || i.receiver || i.immediate || !i.callee.empty() ||
+                       (checked_array_shape(array, primitive) && !pending_enum_array(i.a)))fail("invalid array element initialization");
+                    expect(i.arguments[0],array_element(array));result=Type::none;break;
+                }
+                case Op::array_finish:
+                    if(!m.coordinated || operand(i.a).kind!=Type::fixed_array || !pending_enum_array(i.a) ||
+                       i.b || i.immediate || i.receiver || i.initialization || !i.arguments.empty() || !i.callee.empty())
+                        fail("invalid numeric enum array completion");
+                    result=operand(i.a);break;
                 case Op::array_capture:
                     if(i.immediate<0 || static_cast<std::size_t>(i.immediate)>=f.locals.size() || !array_type(operand(i.a)) || operand(i.a)!=f.locals[i.immediate] || i.b || i.receiver || !i.arguments.empty() || !i.callee.empty())fail("invalid array iteration capture");
+                    if(enum_array_homes.contains(i.immediate) && !checked_array_allocation(b.instructions[i.a], primitive))
+                        fail("ordinary array captured into private numeric enum array storage");
                     result=Type::none;break;
                 case Op::list_check:
                     if(operand(i.a).kind!=Type::growable_array || operand(i.b)!=Type::u64 || i.receiver || !i.arguments.empty() || i.immediate || !i.callee.empty())fail("invalid iterator version check");
@@ -1263,7 +1429,10 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 case Op::constant:
                     if (array_type(i.type) || i.type.construction || i.type.kind == Type::aggregate || i.type.kind==Type::prepared_receiver || i.type == Type::none || (reference_value(i.type) && i.immediate != 0) || (i.type == Type::boolean && i.immediate != 0 && i.immediate != 1) || (i.type==Type::string && i.immediate!=0)) fail("invalid literal");
                     if (reference_value(i.type) && !i.type.nullable) fail("null literal requires a nullable reference type");
-                    valid_type(i.type); result = i.type; break;
+                    valid_type(i.type);
+                    if(i.type.kind==Type::numeric_enum && !numeric_enum_member(i.type,std::bit_cast<std::uint64_t>(i.immediate)))
+                        fail("undeclared numeric enum constant");
+                    result = i.type; break;
                 case Op::add: case Op::subtract: case Op::multiply: case Op::divide: case Op::remainder:
                     result = operand(i.a);
                     if (!numeric::supports(i.op,result)) fail("illegal numeric operation");
@@ -1272,7 +1441,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     if (!numeric::supports(i.op,operand(i.a))) fail("non-numeric ordering");
                     expect(i.b,operand(i.a)); result = Type::boolean; break;
                 case Op::equal: case Op::not_equal:
-                    if (!((operand(i.a).definition && operand(i.b).definition && operand(i.a).definition->callable && operand(i.b).definition->callable && Type::key(operand(i.a))==Type::key(operand(i.b))) || (reference_value(operand(i.a)) && !operand(i.a).construction && operand(i.b).kind==operand(i.a).kind && !operand(i.b).construction && Type::key(operand(i.a))==Type::key(operand(i.b))) || (numeric::supports(i.op,operand(i.a)) && operand(i.a)==operand(i.b)))) fail("comparison type mismatch");
+                    if (!((operand(i.a).definition && operand(i.b).definition && operand(i.a).definition->callable && operand(i.b).definition->callable && Type::key(operand(i.a))==Type::key(operand(i.b))) || (reference_value(operand(i.a)) && !operand(i.a).construction && operand(i.b).kind==operand(i.a).kind && !operand(i.b).construction && Type::key(operand(i.a))==Type::key(operand(i.b))) || ((numeric::supports(i.op,operand(i.a)) || operand(i.a).kind==Type::numeric_enum) && operand(i.a)==operand(i.b)))) fail("comparison type mismatch");
                     result = Type::boolean; break;
                 case Op::stage_prefix: {
                     auto from=operand(i.a),to=i.type;
@@ -1330,6 +1499,12 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     valid_type(i.type);
                     if(!numeric::number(operand(i.a)) || !numeric::number(i.type) || numeric::width(operand(i.a))!=numeric::width(i.type) || i.b || i.receiver || !i.arguments.empty() || !i.callee.empty())fail("invalid numeric bitcast");
                     result=i.type;break;
+                case Op::try_convert:
+                    valid_type(i.type);
+                    if(!numeric::integer(operand(i.a)) || !i.type.definition || !i.type.definition->option_type ||
+                       i.b || i.immediate || i.receiver || i.initialization || i.array_repeat ||
+                       !i.arguments.empty() || !i.callee.empty())fail("invalid fallible integer conversion");
+                    result=i.type;break;
                 case Op::convert:
                     valid_type(i.type);
                     if (!((operand(i.a).definition && i.type.definition && operand(i.a).definition->callable && i.type.definition->callable && Type::key(operand(i.a))==Type::key(i.type)) || (reference_value(operand(i.a)) && !operand(i.a).construction && i.type.kind==operand(i.a).kind && !i.type.construction && Type::key(operand(i.a))==Type::key(i.type) && !i.type.nullable) || (numeric::number(operand(i.a)) && numeric::number(i.type)))) fail("invalid conversion");
@@ -1348,10 +1523,21 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 }
                 case Op::load: result = slot(i.a); break;
                 case Op::store:
+                    if(enum_array_homes.contains(i.a))fail("store to private numeric enum array storage");
                     if (f.receiver && f.parameters[0].kind==Type::aggregate && !f.receiver_mutates && i.a == 0) fail("non-mutating method writes receiver");
                     expect(i.b, slot(i.a)); result = Type::none; break;
                 case Op::async_call: case Op::call: case Op::virtual_call: {
                     auto declaration=functions.find(i.callee);
+                    if (primitive && declaration != functions.end() && declaration->second->module_identity == primitive->module()) {
+                        auto scope = m.source_imports.find(f.module_identity);
+                        if (i.op != Op::call || scope == m.source_imports.end() || !scope->second.contains(primitive->module()))
+                            fail("C primitive binding requires the admitted direct import");
+                        const auto& parameters = declaration->second->parameters;
+                        if (!parameters.empty() && parameters.back().definition && parameters.back().definition->callable &&
+                            (i.arguments.size() != parameters.size() || i.arguments.back() >= types.size() ||
+                             b.instructions[i.arguments.back()].op != Op::function_reference))
+                            fail("C callback lacks generation-local function provenance");
+                    }
                     if(requirements.contains(i.callee)) fail("ordinary call cannot bypass interface receiver preparation");
                     if(i.op==Op::virtual_call && (declaration==functions.end() || declaration->second->virtual_slot.empty() || i.initialization)) fail("invalid virtual call target");
                     auto target = names.find(i.callee);
@@ -1422,6 +1608,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         }
 #include "local_cleanup.inc"
         validate_construction(f,m,body_types);
+        validate_numeric_enum_slots(f, primitive && primitive->revision() >= 2 ? primitive : nullptr);
         validate_fixed_ownership(f,m,body_types);
     }
     for (const auto& global : m.globals) {
@@ -1436,6 +1623,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 switch (instruction.op) {
                 case Op::http_async: case Op::filesystem_async: case Op::async_call: case Op::await: case Op::async_cancel: case Op::async_group_enter: case Op::async_group_join: case Op::async_drain:
                     fail("task operation during global startup"); break;
+                case Op::c_primitive_call: fail("C primitive operation during global startup"); break;
                 case Op::native_call:
                     if (native_binding(instruction.callee).name == "register") fail("native callback registration during global startup");
                     break;
@@ -1467,7 +1655,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         }
     }
     if(m.async_root){auto entry=functions.find(m.entry_symbol);if(entry!=functions.end() && entry->second->worker)fail("worker cannot be a root adapter");if(entry==functions.end() || !entry->second->asynchronous || entry->second->parameters!=std::vector<Type>{Type::i32} || entry->second->result!=Type::i32)fail("invalid explicit async root adapter signature");}
-    if(!m.interface_requirements.empty()) for(const auto& [key,definition]:definitions) if(!catalog_definitions.contains(definition) && !dictionary_entries.contains(definition) && !definition->result_type && !definition->callable) fail("incomplete nominal universe for structural interfaces");
+    if(!m.interface_requirements.empty()) for(const auto& [key,definition]:definitions) if(!catalog_definitions.contains(definition) && !dictionary_entries.contains(definition) && !definition->result_type && !definition->option_type && !definition->callable) fail("incomplete nominal universe for structural interfaces");
     std::map<std::string,ReferenceEffects> worker_effects;
     auto* inferred=verified_effects?verified_effects:&worker_effects;
     validate_reference_capabilities(m,qualified_types,inferred);
@@ -1507,7 +1695,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 case Op::http_control:case Op::http_native:case Op::http_async:case Op::url_native:fail("worker cannot perform URL operations");break;
                 case Op::filesystem_write:case Op::filesystem_control:case Op::filesystem_native:case Op::filesystem_async:case Op::console_print:case Op::console_native:fail("worker cannot perform console I/O");break;
                 case Op::temporal_native:if(temporal::operations.at(i.immediate).clock)fail("worker cannot read Runtime clocks");break;
-                case Op::native_call:case Op::async_call:case Op::async_cancel:case Op::async_cancel_children:case Op::async_group_enter:case Op::async_group_join:case Op::await:case Op::function_call:case Op::interface_call:case Op::virtual_call:fail("unsupported worker task/indirect effect");break;
+                case Op::c_primitive_call:case Op::native_call:case Op::async_call:case Op::async_cancel:case Op::async_cancel_children:case Op::async_group_enter:case Op::async_group_join:case Op::await:case Op::function_call:case Op::interface_call:case Op::virtual_call:fail("unsupported worker task/indirect effect");break;
                 case Op::local_cleanup:case Op::call:case Op::base_init:case Op::function_reference:{auto target=functions.find(i.callee);if(target==functions.end())fail("worker has unknown native effect");graph.push_back(target->second);break;}
                 default:break;
                 }

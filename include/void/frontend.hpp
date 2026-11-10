@@ -2,6 +2,7 @@
 #include "void/ir.hpp"
 #include "void/native_binding.hpp"
 #include "void/diagnostic.hpp"
+#include "void/project.hpp"
 #include <filesystem>
 #include <functional>
 #include <optional>
@@ -73,7 +74,9 @@ struct AnalyzedReference {
 class ValidatedAnalysis : public std::enable_shared_from_this<ValidatedAnalysis> {
     friend struct AnalysisAccess;
     std::string entry_, entry_symbol_, contract_, constants_;
-    bool application_=false;
+    bool application_=false, executable_=true;
+    std::shared_ptr<const CPrimitiveAdmission> c_primitives_;
+    ApplicationMetadata::Owner application_metadata_;
     std::vector<Diagnostic> warnings_;
     std::vector<AnalyzedModule> modules_;
     std::vector<AnalyzedDeclaration> declarations_;
@@ -89,6 +92,9 @@ public:
     const std::string& entry_identity() const { return entry_; }
     const std::string& entry_symbol() const { return entry_symbol_; }
     bool application() const { return application_; }
+    const ApplicationMetadata::Owner& application_metadata() const { return application_metadata_; }
+    const auto& c_primitive_admission() const { return c_primitives_; }
+    bool executable() const { return executable_; } // Libraries expose metadata only.
     const auto& modules() const { return modules_; }
     const auto& declarations() const { return declarations_; }
     const auto& references() const { return references_; }
@@ -116,7 +122,60 @@ ProjectSelection discover_project(const std::filesystem::path& workspace,
 void require_module_identity(const std::string& identity);
 AnalysisResult analyze_project(const std::filesystem::path& entry);
 AnalysisResult analyze_project(const std::filesystem::path& entry,const NativeProject&);
+AnalysisResult analyze_project(const std::filesystem::path& entry, std::shared_ptr<const CPrimitiveAdmission>);
 AnalysisResult analyze_project(const std::filesystem::path& entry, const SourceOverrides& overrides);
+// Manifest-selected mode is separate from the legacy entry-parent adapter above.
+// TOML overlays have their own canonical root-relative namespace.
+using ManifestOverrides = std::map<std::string, std::optional<SourceFile>>;
+void require_manifest_identity(const std::string&);
+// Owned observations, including failed selections. Never executable authority.
+struct ProjectState {
+    std::filesystem::path root;
+    std::shared_ptr<const project::Manifest> manifest;
+    std::optional<std::filesystem::path> entry;
+    std::map<std::string,SourceFile> discovery, execution;
+    std::string snapshot_key;
+    bool discovery_complete=false, validated=false;
+};
+class ProjectAnalysis {
+    friend struct ProjectAnalysisAccess;
+    std::filesystem::path root_;
+    std::optional<std::filesystem::path> entry_;
+    std::shared_ptr<const project::Manifest> manifest_;
+    std::shared_ptr<const ValidatedAnalysis> program_, semantic_;
+    std::map<std::string, SourceFile> discovery_, execution_;
+    std::string selection_key_, context_key_;
+    ProjectAnalysis() = default;
+public:
+    const auto& root() const { return root_; }
+    const auto& entry() const { return entry_; }
+    const auto& manifest() const { return manifest_; }
+    const auto& program() const { return program_; } // Absent for a checked library.
+    const auto& semantic_analysis() const { return semantic_; } // Library lowering rejects.
+    const auto& discovery_sources() const { return discovery_; }
+    const auto& execution_sources() const { return execution_; }
+    const auto& selection_key() const { return selection_key_; }
+    const auto& context_key() const { return context_key_; } // Excludes source/trivia bytes.
+};
+struct ProjectAnalysisResult {
+    std::shared_ptr<const ProjectAnalysis> project;
+    std::vector<Diagnostic> diagnostics;
+    // Validated metadata may accompany failed selection; it grants no entry/IR.
+    std::shared_ptr<const project::Manifest> manifest;
+    std::shared_ptr<const ProjectState> state;
+    bool succeeded() const { return bool(project); }
+};
+std::vector<Diagnostic> check_project_documents(const std::filesystem::path&,const SourceOverrides&,const ManifestOverrides&,const std::vector<std::string>&);
+struct ProjectPreflight {
+    std::filesystem::path root;std::optional<std::filesystem::path> entry;
+    bool manifest_mode=false,standalone=false;ProjectAnalysisResult analysis;
+};
+ProjectPreflight discover_project_context(const std::filesystem::path& workspace,const std::filesystem::path& active,const std::filesystem::path& root,const std::filesystem::path& entry);
+// Also recognizes malformed/wrong-case manifest presence so callers fail closed.
+bool project_manifest_present(const std::filesystem::path& root);
+ProjectAnalysisResult analyze_manifest_project(const std::filesystem::path& root,
+    const std::optional<std::string>& entry_override = {},
+    const SourceOverrides& sources = {}, const ManifestOverrides& manifests = {}, bool authorize_native = false);
 struct EditorCandidate { std::string name, detail; int kind = 6; std::string insert_text = {}, documentation = {}; };
 struct EditorAssistance {
     std::vector<EditorCandidate> candidates;
@@ -131,6 +190,7 @@ struct EditorAssistance {
 EditorAssistance editor_assistance(const std::filesystem::path&, const SourceOverrides&,
     const std::string& module, std::size_t cursor);
 bool valid_editor_identifier(const std::string&);
+EditorAssistance project_editor_assistance(const std::filesystem::path&,const std::optional<std::string>&,const SourceOverrides&,const ManifestOverrides&,const std::string&,std::size_t);
 std::optional<std::string> format_source(const SourceFile&);
 // One source pipeline shared by checking, JIT and AOT. Errors contain rendered
 // source diagnostics and are raised before invoking any backend.

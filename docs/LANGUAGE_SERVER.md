@@ -1,5 +1,76 @@
 # Minimal VOID language server (Phase 10)
 
+## Creation subprocesses (Slice 5)
+
+The VS Code adapter uses an additive schema-1 subprocess contract. It calls
+`--discover-creation WORKSPACE ACTIVE` (empty ACTIVE means no active selector)
+for a bounded inventory without source parsing, then `--plan-project` for the
+reviewed manifest path and identities. Only after approval does it send the
+reviewed options and physical root identity to `--create-project`. A same-root
+manifest collision is reported explicitly, so the editor can preserve the existing
+file and run normal project selection. The regular schema-2 preflight, project LSP
+sessions and legacy endpoints keep their existing contracts. See
+[Slice 5](projects/SLICE5.md).
+
+## Manifest project protocol (Slice 3)
+
+Legacy `--discover WORKSPACE ACTIVE ENTRY`, its three-field JSON, `--entry FILE`
+and `voidToolingProtocol: 1` remain available. The additive capability is
+`experimental.voidProjectProtocol: 1`. New automatic/project adapters require it;
+they never downgrade a selected manifest project to an entry-parent session.
+
+`voidls --discover-project WORKSPACE ACTIVE ROOT ENTRY` accepts four literal
+operands, with empty strings for absent values. With an explicit root it pins
+exactly that manifest; an entry override is portable and manifest-relative. With
+only an entry it uses legacy discovery. With neither it uses the compiler's shared
+admitted ancestor walk within the selected workspace, nearest manifest first,
+then the unchanged legacy helper only when no manifest is present. Explicit root
+plus an active source across/outside its boundary diagnoses. No creation query or
+project-writing workflow is implemented.
+
+The schema-2 JSON includes mode/root, canonical entry or null, standalone flag,
+manifest and requested root, application/library kind or null, status, decimal-string
+selectionRevision, snapshotKey, D/E counts and bounded diagnostic summary. Project
+errors such as missing main or malformed TOML return a successful error-bearing
+summary. Bad invocation/launch/path discovery failures remain process errors.
+Summary output is limited to 64 KiB; at most eight messages of 256 UTF-8 bytes are
+previewed. Detailed ranges and related locations belong to the session. Preflight
+revision "0" is an observation, not a session acceptance token or a stability promise.
+
+`voidls --project DIR [--entry PATH]` starts a pinned project session even with
+missing main or invalid TOML. The ordinary full-text didOpen/didChange/didClose
+methods accept exact `void.project.toml` documents in a separate overlay namespace.
+Manifest diagnostics use captured bytes and the existing UTF-16 conversion. Invalid
+policy never drives source traversal. Source deletion/tombstones never fall back
+to stale disk bytes. Library navigation uses validated declarationless-root metadata;
+there is no library application entry or executable IR.
+
+Project sessions support standard didCreateFiles/didRenameFiles/didDeleteFiles
+notifications and watched-file invalidation. Dirty rename bytes are retained even
+when a deletion watch arrives first. Closing a document returns explicitly to disk;
+newer full-text edits can repair a tombstoned document. Broad project watches also
+invalidate on directory and wrong-case manifest events, leaving admission to the
+compiler. Nested manifest edits change boundaries without switching the root.
+
+`void/projectState` requests return the current schema-2 summary; notifications of
+that name accompany accepted project revisions. Project diagnostics carry a
+`voidProjectRevision` decimal string, plus normal document versions when negotiated.
+`void/reselectProject` with `{entry: string|null}` deliberately reselects inside the
+same pinned root; root changes require a new server/session. Metadata/policy/entry
+changes preview diagnostics and mark reselection required. No operation publishes
+code. Historical successful indexes are never returned as current after failure.
+Existing 8 MiB framing, JSON/output limits, cancellation and legacy error semantics
+remain. See [S3 evidence and limits](projects/SLICE3.md).
+
+
+The [Phase 1 ownership/protocol proposal](PROJECT_ARCHITECTURE_ROADMAP.md#phase-1-ownership-and-data-flow)
+uses a separate schema-2 `--discover-project` summary and `--project` session, with
+additive `voidProjectProtocol: 1`. Existing `--discover`, `--entry` and
+`voidToolingProtocol: 1` remain the legacy contract. Manifest snapshots, inventory,
+nullable entry/library mode and errors must be represented explicitly; a missing
+main need not prevent an editing session. Failed discovery cannot provide usable
+ValidatedAnalysis/IR. No protocol/source change is implemented; HOLD remains.
+
 ## Approved project analysis roadmap, 8 November 2026
 
 The [project roadmap](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-ide-and-public-usability-milestones)

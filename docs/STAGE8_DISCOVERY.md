@@ -1,5 +1,12 @@
 # Stage 8 Sprint 1: project and module discovery
 
+The [Phase 1 compatibility matrix](PROJECT_ARCHITECTURE_ROADMAP.md#phase-1-compatibility-and-migration-matrix)
+limits new discovery to selected manifests. With no manifest, the exact algorithm
+below remains the proposed initial compatibility path; it is not silently replaced
+by a recursive scan. A new project preflight/session protocol carries root, kind,
+optional entry and revisions; the legacy endpoint remains unchanged. All are design
+recommendations awaiting review, with implementation HOLD.
+
 ## Later approved replacement, 8 November 2026
 
 The exact-case `main.void` algorithm below is an implemented historical milestone

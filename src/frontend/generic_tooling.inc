@@ -14,7 +14,7 @@ auto type_references=[&](const auto& uses,const std::map<std::string,std::string
         // Resolve source names only: do not instantiate or type-check an unused
         // body merely to publish navigation. Unknown body types remain deferred.
         try {
-            auto [target,declaration]=structure_lookup(*unit,*graph->at(entry),*graph,spelling,token);(void)target;
+            auto [target,declaration]=structure_lookup(*unit,context,*graph,spelling,token);(void)target;
             if(declaration)reference(owner,declaration->definition->identity,use,*unit);
         }catch(const CompilationError&){}
     }

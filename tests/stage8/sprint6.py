@@ -2,6 +2,7 @@
 import os,pathlib,subprocess,sys,tempfile
 compiler=pathlib.Path(sys.argv[1]).resolve(); clang=sys.argv[2];linker=sys.argv[3]
 runtime=pathlib.Path(sys.argv[4]).resolve();fixture=pathlib.Path(sys.argv[5]).resolve();sanitizers=sys.argv[6]=='ON'
+host_libraries=sys.argv[7:]
 flags=['--driver-mode=g++',*(['--ld-path='+linker] if linker else []),*(['-fsanitize=address,undefined'] if sanitizers else [])]
 if os.name=='nt': flags+=['-fms-runtime-lib=static','-llegacy_stdio_definitions']
 checks=0
@@ -21,7 +22,7 @@ with tempfile.TemporaryDirectory(prefix='VOID sprint6 ') as directory:
         for value,want in [(1,28),(2,18),(0,38),(-1,38)]:
             assert run([compiler,'run',source,value,*switches]).stdout.strip()==str(want)
         obj=root/('optimized.o' if opt else 'normal.o');exe=obj.with_suffix('.exe' if os.name=='nt' else '.bin')
-        run([compiler,'emit',source,'-o',obj,*switches]);run([clang,*flags,obj,runtime,fixture,'-pthread','-o',exe])
+        run([compiler,'emit',source,'-o',obj,*switches]);run([clang,*flags,obj,runtime,fixture,*host_libraries,'-pthread','-o',exe])
         for value,want in [(1,28),(2,18),(0,38),(-1,38)]:assert run([exe,value]).stdout.strip()==str(want)
     # Preserve physical line ending handling through call and indentation tokens.
     for newline in ['\r\n','\r']:

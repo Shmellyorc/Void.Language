@@ -10,10 +10,10 @@ with tempfile.TemporaryDirectory(prefix='VOID OS frontend ') as directory:
         source.write_text(text)
         r=h.run([compiler,'check',source],work,status=0 if valid else 1,small=small)
         if diagnostic:assert diagnostic.encode() in r.stderr,r.stderr
-    calls=['data_dir("com.game")','config_dir("com.game")','cache_dir("com.game")','state_dir("com.game")','home_dir()','temp_dir()','executable_path()','resource_dir()','env("HOME")','platform()','architecture()','process_id()','is_bundle()']
+    calls=['data_dir("com.game")','config_dir("com.game")','cache_dir("com.game")','state_dir("com.game")','data_dir()','config_dir()','cache_dir()','state_dir()','home_dir()','temp_dir()','executable_path()','resource_dir()','env("HOME")','platform()','architecture()','process_id()','is_bundle()']
     for call in calls:
         check('use os as system\nfunc main():\n    var answer = system.'+call+'\n')
-    for call in ('data_dir()','data_dir(1)','data_dir("a", "b")','env()','env(true)','home_dir(0)','process_id(0)','platform(0)','is_bundle(0)','_os_env("HOME")','_reply()','cwd()','runtime_dir()','session_dir()'):
+    for call in ('data_dir(1)','data_dir("a", "b")','env()','env(true)','home_dir(0)','process_id(0)','platform(0)','is_bundle(0)','_os_env("HOME")','_os_application_id()','_app_data_dir()','_reply()','cwd()','runtime_dir()','session_dir()'):
         check('use os\nfunc main():\n    var answer = os.'+call+'\n',False)
     for symbol in ('_os_env("HOME")','_os_process_id()'):
         check('func main():\n    var answer = '+symbol+'\n',False)

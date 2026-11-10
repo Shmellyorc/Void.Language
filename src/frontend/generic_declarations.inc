@@ -34,6 +34,12 @@ for(auto& [id,u]:units) {
         auto application=std::find_if(u->applications.begin(),u->applications.end(),[&](const auto& a){return a.definition==raw.definition;});
         if(application!=u->applications.end()) {
             auto [owner,declaration]=structure_lookup(*u,root,units,application->name,application->token);(void)owner;
+            if(!declaration && application->name=="option") {
+                if(raw.nullable)error(u->source,token,Code::unsupported_type,"Options cannot be nullable.");
+                if(application->arguments.size()!=1)error(u->source,application->token,Code::argument_count,"option<T> requires exactly one payload type.");
+                type(application->arguments.front(),application->token,names);
+                return;
+            }
             if(!declaration || declaration->generics.empty())error(u->source,application->token,Code::unsupported_type,"Type '"+application->name+"' is not a generic struct.");
             if(raw.nullable && !declaration->definition->managed)error(u->source,token,Code::unsupported_type,"Only managed references can be nullable.");
             if(application->arguments.size()!=declaration->generics.size())error(u->source,application->token,Code::argument_count,"Incorrect number of generic type arguments.");
@@ -51,7 +57,7 @@ for(auto& [id,u]:units) {
             Depth guard(diagnostics.semantic_depth(),u->source,s.token,128);
             std::string key=std::to_string(raw.kind)+":"+Type::key(raw)+(raw.nullable?"?":"");
             auto add=[&](const std::string& part){key+=":"+std::to_string(part.size())+":"+part;};
-            for(const auto& a:u->applications)if(a.definition==raw.definition){auto [module,owner]=structure_lookup(*u,root,units,a.name,a.token);(void)module;key=owner->definition->identity+(raw.nullable?"?":"");for(auto argument:a.arguments)add(operand_key(argument));return key;}
+            for(const auto& a:u->applications)if(a.definition==raw.definition){auto [module,owner]=structure_lookup(*u,root,units,a.name,a.token);(void)module;key=(owner?owner->definition->identity:"$option")+(raw.nullable?"?":"");for(auto argument:a.arguments)add(operand_key(argument));return key;}
             for(auto& a:u->arrays)if(a.definition==raw.definition){key=a.key?"dictionary":a.extent?"fixed":"list";if(a.key)add(operand_key(*a.key));else if(a.extent)add(std::to_string(*array_extent(*u,a)));add(operand_key(a.element));return key;}
             for(const auto& r:u->results)if(r.definition==raw.definition){key="result";add(operand_key(r.success));add(operand_key(r.failure));return key;}
             for(const auto& f:u->function_types)if(f.definition==raw.definition){key=raw.nullable?"func?":"func";for(auto p:f.parameters)add(operand_key(p));add(operand_key(f.result));return key;}

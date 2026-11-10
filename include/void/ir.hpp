@@ -1,11 +1,12 @@
 #pragma once
+#include "void/application_metadata.hpp"
 #include "void/source.hpp"
 #include <cstdint>
 #include <memory>
 #include <optional>
 #include <map>
 #include <set>
-namespace vd { class ValidatedAnalysis; }
+namespace vd { class CPrimitiveAdmission; class ValidatedAnalysis; }
 #include <string>
 #include <vector>
 namespace vd::ir {
@@ -17,7 +18,7 @@ struct TypeArena;
 using ReferencePath = std::vector<unsigned>;
 using ReferencePaths = std::set<ReferencePath>;
 struct Type {
-    enum Kind { i32, boolean, none, i8, i16, i64, u8, u16, u32, u64, f32, f64, aggregate, unresolved, invalid, managed_ref, null_value, interface_ref, prepared_receiver, string, fixed_array, growable_array, dictionary };
+    enum Kind { i32, boolean, none, i8, i16, i64, u8, u16, u32, u64, f32, f64, aggregate, unresolved, invalid, managed_ref, null_value, interface_ref, prepared_receiver, string, fixed_array, growable_array, dictionary, numeric_enum };
     Kind kind = i32;
     bool nullable = false, readonly = false;
     std::string preparation = {}; // Private prepared requirement identity; never user storage.
@@ -36,6 +37,7 @@ struct Type {
         return key(a) < key(b);
     }
     static std::string key(const Type&);
+    static Type nominal(std::shared_ptr<const ValueType>);
 };
 // Descriptor edges never own another descriptor/table. A Type obtained from an
 // edge reacquires the immutable table owner; public/query Types remain owning.
@@ -56,6 +58,7 @@ struct ValueField {
     std::size_t source_offset = 0;
 };
 struct SumCase { std::string name; unsigned begin=0, count=0; };
+struct NumericMember { std::string name; std::uint64_t bits; };
 struct ValueType {
     std::string identity, name;
     std::vector<ValueField> fields;
@@ -66,6 +69,9 @@ struct ValueType {
     bool interface_type = false;
     std::vector<SumCase> cases = {}; // Disjoint, zero-inactive payload fields; field zero is the tag.
     bool result_type = false;
+    bool option_type = false;
+    std::optional<Type::Kind> enum_backing;
+    std::vector<NumericMember> numeric_members;
     bool callable = false;
     std::string native_provider = {}; // Compiled catalog identity, independent of source module spelling.
     bool native_resource = false; // Binding-private managed identity; no source payload/constructor.
@@ -86,7 +92,7 @@ struct ValueType {
 struct TypeArena { std::vector<std::shared_ptr<const ValueType>> definitions; };
 inline std::string Type::key(const Type& t) { return t.definition ? t.definition->identity : std::string{}; }
 inline bool operator==(const Type& a, const Type& b) {
-    return (a.kind!=Type::prepared_receiver || a.preparation==b.preparation) && a.kind == b.kind && a.nullable == b.nullable && a.construction == b.construction && (a.kind != Type::aggregate && a.kind != Type::unresolved && a.kind != Type::managed_ref && a.kind != Type::interface_ref && a.kind != Type::prepared_receiver && a.kind != Type::fixed_array && a.kind != Type::growable_array && a.kind != Type::dictionary ? true :
+    return (a.kind!=Type::prepared_receiver || a.preparation==b.preparation) && a.kind == b.kind && a.nullable == b.nullable && a.construction == b.construction && (a.kind != Type::aggregate && a.kind != Type::unresolved && a.kind != Type::managed_ref && a.kind != Type::interface_ref && a.kind != Type::prepared_receiver && a.kind != Type::fixed_array && a.kind != Type::growable_array && a.kind != Type::dictionary && a.kind != Type::numeric_enum ? true :
         a.definition && b.definition && a.definition->identity == b.definition->identity);
 }
 struct ConstantValue { std::uint64_t bits = 0; std::vector<ConstantValue> fields; std::string text = {};
@@ -106,6 +112,10 @@ std::vector<unsigned> physical_field_path(Type owner, unsigned field);
 std::string capability_key(Type type);
 std::string reference_path_name(Type type,const ReferencePath& path);
 std::string type_name(Type type);
+std::string option_identity(Type payload);
+std::string numeric_enum_layout(Type type);
+bool numeric_enum_member(Type type,std::uint64_t bits);
+bool contains_numeric_enum(Type);
 inline constexpr unsigned array_element_path=~0u;
 bool array_type(Type);
 bool collection_type(Type);
@@ -128,7 +138,7 @@ enum class Op { math, random_xor, random_seed, global_cell, bitcast, native_call
     remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate, aggregate, extract, insert,
     stage_begin, gc_construct, gc_allocate, gc_read, gc_write, gc_collect, gc_poll, gc_alive,
     upcast, virtual_call, base_init, stage_prefix, interface_pack, interface_prepare, interface_call, string_literal, string_concat, string_equal, string_count, string_index, string_encode, string_decode, text_case, scalar_display, scalar_format, format_unwrap, format_layout, scalar_parse, result_unwrap, memory_write, temporal_result, temporal_native, string_join, collection_enter, collection_leave, collection_append, collection_finish, os_query, host_native, url_native, http_native, http_async, http_control, console_endpoint, console_native, console_print, filesystem_native, filesystem_async, filesystem_control,
-    fixed_array, array_get, array_set, fixed_snapshot, fixed_select, fixed_commit, array_count, list_push, list_remove, list_index, list_version, list_commit, list_check, array_capture, array_allocate, array_initialize, list_insert, list_clear, array_slice, dict_new, dict_get, dict_set, dict_contains, dict_remove, dict_clear, dict_count, dict_version, dict_check, dict_entry, text_translate, string_join_encode, local_cleanup, filesystem_write };
+    fixed_array, array_get, array_set, fixed_snapshot, fixed_select, fixed_commit, array_count, list_push, list_remove, list_index, list_version, list_commit, list_check, array_capture, array_allocate, array_initialize, list_insert, list_clear, array_slice, dict_new, dict_get, dict_set, dict_contains, dict_remove, dict_clear, dict_count, dict_version, dict_check, dict_entry, text_translate, string_join_encode, local_cleanup, filesystem_write, try_convert, array_finish, c_primitive_call };
 // A validated local aggregate storage path; never a source-visible reference.
 struct Place { std::uint32_t slot = 0; std::vector<unsigned> fields; };
 struct Instruction {
@@ -144,6 +154,7 @@ struct Instruction {
     std::string source_excerpt = {}; // Snapshot of the source line and caret.
     bool array_repeat = false; // fixed_array only: pure prototype value, copied extent times.
     std::string operator_glyph = {}; // Exact source operator call proof, using ordinary call ABI.
+    bool os_location_adapter = false; // Closed direct-call proof for standard OS location helpers.
 };
 struct Terminator {
     enum class Kind { return_value, branch, jump, return_void, unreachable } kind = Kind::return_value;
@@ -175,6 +186,7 @@ struct Function {
     Type operator_owner = Type::none;
     std::string operator_glyph = {};
 };
+bool checked_storage_cleanup_return(const Function&, unsigned block, const CPrimitiveAdmission* = nullptr);
 bool operator_arity(std::string_view glyph,std::size_t arity);
 std::string operator_identity(Type owner,std::string_view glyph,const std::vector<Type>& operands);
 void validate_operator_declaration(const Function&);
@@ -215,6 +227,8 @@ struct Module {
     struct GenericInstance { std::string declaration; std::vector<Type> arguments; };
     std::map<std::string,GenericDeclaration> generic_declarations = {};
     std::map<std::string,GenericInstance> generic_instances = {};
+    ApplicationMetadata::Owner application_metadata = {};
+    std::shared_ptr<const CPrimitiveAdmission> c_primitives = {};
 };
 std::string generic_identity(std::string_view,const std::vector<Type>&);
 std::string generic_instance_identity(const Module&,const Module::GenericInstance&,const Function* = nullptr);

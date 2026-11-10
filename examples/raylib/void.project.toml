@@ -1,0 +1,31 @@
+schema = 1
+
+[project]
+id = "org.voidlang.examples.raylib"
+name = "VOID raylib"
+version = "0.1.0"
+kind = "application"
+
+[application]
+id = "org.voidlang.examples.raylib-app"
+
+[sources]
+roots = ["src"]
+
+[build.debug]
+optimization = "none"
+debug_info = "none"
+
+[build.release]
+optimization = "O2"
+debug_info = "none"
+
+[native.linux]
+descriptor = "raylib-linux.descriptor"
+library = "libvoid_raylib.so"
+adapter = "libvoid_raylib.so"
+
+[native.windows]
+descriptor = "raylib-windows.descriptor"
+library = "void_raylib.dll"
+adapter = "void_raylib.dll"

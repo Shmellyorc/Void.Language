@@ -1,0 +1,79 @@
+use "/callback_checked.void" as g5
+use os as host
+
+struct state:
+    n: i32
+    label: string
+
+func (s state) step(value: i32) -> i32:
+    s.n += value
+    return s.n
+
+func (s state) notify(value: i32):
+    s.n += value
+
+func (s state) retained(value: i32) -> i32:
+    if value == 99:
+        var ignored = g5.wait()
+    if s.label != "capture survives":
+        return -100
+    return s.n + value
+
+func twice_value(value: i32) -> i32:
+    return value * 2
+
+func nested(value: i32) -> i32:
+    return g5.twice(value, twice_value)
+
+func fail_callback(value: i32) -> i32:
+    return 1 / (value - value)
+
+func mix_value(x: f64, y: f32) -> f64:
+    return x + (y as f64) * 2.0
+
+func create() -> g5.registration?:
+    var capture = state(n=41, label="capture survives")
+    return g5.register(capture.retained)
+
+func main() -> i32:
+    var mode = ""
+    if host.args() is Ok(var options):
+        for option in options:
+            mode = option
+
+    if mode == "failure":
+        var invalid = g5.twice(7, fail_callback)
+        return invalid
+    var local = state(n=4, label="scoped capture")
+    if g5.twice(-2, local.step) != 5:
+        return 2
+    g5.notify(8, local.notify)
+    if local.n != 20:
+        return 3
+    if g5.mix(1.5, 2.0 as f32, mix_value) != 14.5:
+        return 4
+    if g5.twice(1, nested) != 32:
+        return 5
+
+    var optional = create()
+    if optional == null:
+        return 6
+    var owner = optional as g5.registration
+    var i: i32 = 0
+    for i < 1024:
+        var pressure = state(n=i, label="GC pressure")
+        if pressure.n != i:
+            return 7
+        i += 1
+    if g5.fire(owner, 7, 0) != 48 or g5.fire(owner, 12, 1) != 53:
+        return 8
+    print("G5 integer, mixed floating point, void, reentry and retained foreign callbacks passed")
+    if mode == "implicit":
+        return g5.queue(owner, 1)
+    if g5.queue(owner, 2) != 0:
+        return 9
+    if g5.unregister(owner) != 0 or g5.late() != 0:
+        return 10
+    if mode == "retired":
+        return g5.fire(owner, 7, 0)
+    return 0

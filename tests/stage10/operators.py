@@ -7,7 +7,7 @@ import subprocess
 import sys
 import tempfile
 
-compiler, clang, linker, runtime, fixture, sanitizer, integration = sys.argv[1:]
+compiler, clang, linker, runtime, fixture, sanitizer, integration, *host_libraries = sys.argv[1:]
 flags = ["--driver-mode=g++", "-pthread"]
 if linker:
     flags.append("--ld-path=" + linker)
@@ -46,7 +46,7 @@ with tempfile.TemporaryDirectory(prefix="VOID Stage10 operators ") as directory:
         obj = root / ("optimized.o" if optimized else "normal.o")
         exe = obj.with_suffix(".exe" if os.name == "nt" else ".bin")
         run([compiler, "emit", source, "-o", obj, *switches])
-        run([clang, *flags, obj, runtime, fixture, "-o", exe])
+        run([clang, *flags, obj, runtime, fixture, *host_libraries, "-o", exe])
         for value in (0, 4, -3):
             assert run([exe, value]) == str(value)
     # Reuse the compiler-owned async/native admission harness for fixtures that
@@ -86,7 +86,7 @@ with tempfile.TemporaryDirectory(prefix="VOID Stage10 operators ") as directory:
             obj = root / (name + mode + ".o")
             exe = obj.with_suffix(".exe" if os.name == "nt" else ".bin")
             run([integration, "--emit", source, obj, mode, kind])
-            run([clang, *flags, obj, runtime, fixture, "-o", exe])
+            run([clang, *flags, obj, runtime, fixture, *host_libraries, "-o", exe])
             for value, expected in inputs:
                 diagnostics = () if expected is not None else ("Division by zero",)
                 if name == "operator_native_systems" and expected is None:

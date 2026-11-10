@@ -1,4 +1,5 @@
 #pragma once
+#include "void/application_metadata.hpp"
 #include <cstdint>
 #include <memory>
 #include <mutex>
@@ -34,10 +35,16 @@ struct Compatibility {
     std::shared_ptr<const ValidatedAnalysis> analysis = {};
     std::uintptr_t runtime_identity = 0;
     bool async_root = false;
+    ApplicationMetadata::Owner application_metadata = {};
+    std::string build_provenance = {}; // Generation-only, excluded from reload compatibility.
+    std::uintptr_t native_thunk_identity = 0; // In-process G3 ownership authority.
+    std::string native_dynamic_contract = {};
     bool operator==(const Compatibility& other) const {
         return function_id == other.function_id && signature == other.signature &&
             layout == other.layout && captures == other.captures && constants == other.constants &&
-            constant_contract == other.constant_contract && source_contract == other.source_contract && runtime_identity == other.runtime_identity && async_root == other.async_root;
+            constant_contract == other.constant_contract && source_contract == other.source_contract && runtime_identity == other.runtime_identity && async_root == other.async_root &&
+            native_thunk_identity == other.native_thunk_identity && native_dynamic_contract == other.native_dynamic_contract &&
+            (application_metadata == other.application_metadata || (application_metadata && other.application_metadata && *application_metadata == *other.application_metadata));
     }
 };
 class NativeCode {

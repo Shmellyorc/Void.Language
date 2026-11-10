@@ -27,6 +27,7 @@ class CallbackRegistration;
 // These are runtime embedding interfaces, not source-language thread features.
 struct NativeDictionary {const NativeArrayElement* entry;const NativeArrayElement* key;std::size_t value_offset,hash_offset;};
 class NativeLibrary;
+class DynamicBinding;
 class NativeWorkers;
 struct NativeWake;
 class Runtime {
@@ -54,6 +55,11 @@ public:
     static Runtime* attached() noexcept { return current_runtime_; }
     void application_arguments(ApplicationArguments);
     const ApplicationArguments& application_arguments() const { return application_arguments_; }
+    void admit_application(ApplicationMetadata::Owner); // Null explicitly admits absence.
+    void start_application(ApplicationMetadata::Owner expected = {}, bool commit = true);
+    static std::uint64_t current_thread_identity() noexcept;
+    bool is_application_thread() const;
+    ApplicationMetadata::Owner application_metadata() const;
     bool is_managed() const { return current_runtime_ == this && thread().state == State::managed; }
     // One explicitly admitted application owns these persistent precise roots.
     void admit_globals(std::string_view contract, bool replacement = false, bool commit = true);
@@ -143,6 +149,8 @@ public:
     void list_write(RegisteredRootWord,ScalarEncoding,std::uint64_t index,std::uint64_t bits,std::optional<std::uint64_t> version={});
     void list_push(RegisteredRootWord,ScalarEncoding,std::uint64_t bits);
     // Transactional byte overwrite/append using the existing list backing allocator.
+    std::uint64_t c_span_bytes(RegisteredRootWord, std::uint64_t offset, std::span<std::uint8_t>,
+                               bool read, std::optional<std::uint64_t> commit_version = {});
     void list_write_bytes(RegisteredRootWord destination, RegisteredRootWord input,
                           std::uint64_t position);
     std::uint64_t list_remove(RegisteredRootWord,ScalarEncoding,std::uint64_t index);
@@ -166,17 +174,23 @@ public:
     // acquisitions before retiring resources; it does not cancel source tasks.
     void begin_native_job();
     void end_native_job() noexcept;
+    std::shared_ptr<const DynamicBinding> dynamic_binding() const;
+    void bind_dynamic(std::shared_ptr<const DynamicBinding>);
     std::int64_t console_checkpoint() const;
     console::Error console_finish(std::int64_t checkpoint);
     console::Error close(); // Reject new attachments; existing participants must drain.
 private:
     ApplicationArguments application_arguments_;
     bool application_arguments_set_ = false;
+    ApplicationMetadata::Owner application_metadata_;
+    std::uint64_t application_thread_ = 0;
+    bool application_context_set_ = false, application_started_ = false;
     friend class CallbackRegistration;
     friend class NativeLibrary;
     friend class NativeWorkers;
     friend std::error_code native_shutdown(Runtime&);
     std::shared_ptr<NativeLibrary> native_library_;
+    std::shared_ptr<const DynamicBinding> native_dynamic_;
     std::shared_ptr<NativeWorkers> native_workers_;
     std::shared_ptr<console::Context> console_context_;
     unsigned async_worker_limit_ = 4;

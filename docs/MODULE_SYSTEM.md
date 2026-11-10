@@ -1,13 +1,30 @@
 # Module system and multi-file native compilation
 
+Slice 2 locally implements the manifest-selected D/E contract through the existing
+SourceGraph and Parser. A manifest fixes VFS `/`; the selected source still owns
+application root declarations. Libraries check with a declarationless root scope.
+Source hard-link identity collisions are checked across parsed D and loaded E,
+including overlaid host files; the existing single-identity source policy remains.
+Manifest files require exactly one native link. Physical source/execution graphs
+retain existing import/parser limits; the new 4,096-file/64 MiB discovery budget
+applies to D. [Engineering, tests and platform gaps](projects/SLICE2.md).
+
+The [Phase 1 discovery contract](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-compiler-owned-entry-discovery)
+now distinguishes the parsed discovery inventory D from selected entry import graph
+E: only E receives application semantic/startup treatment. Root declarations remain
+owned by the selected source module; the manifest fixes VFS `/`. Library-kind check
+uses no application root declaration privileges. Bare explicit-file roots remain
+unchanged. This refines the earlier all-seed validation suggestion. The new project
+API/CLI is locally implemented; S3 editor/session integration remains future work.
+
 ## Approved project direction, 8 November 2026
 
 The [project architecture roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) proposes
 manifest-root source sets, persistent project/package identity and compiler-owned
 entry discovery without a required filename or `entry` key. One valid main is
-selected; multiple application candidates diagnose ambiguity. This is not
-implemented: baseline automatic selection still uses exact `main.void`, while
-explicit files can have any valid name. A manifest root would be independent of
+selected; multiple application candidates diagnose ambiguity. Slice 2 implements
+that selection only with a manifest. Manifestless automatic selection still uses
+exact `main.void`, while explicit files can have any valid name. A manifest root is independent of
 the selected entry's directory; explicit standalone files keep existing behavior.
 Imported libraries gain neither entry eligibility nor native authority by import.
 The proposed broader application seed graph and external package domain must pass

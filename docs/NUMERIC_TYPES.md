@@ -1,19 +1,50 @@
 # Numeric types and contextual literals
 
-## Approved numeric-backed enum direction, 8 November 2026
+## Numeric-backed enums and fallible casts
 
-The [project roadmap](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-numeric-backed-enums-and-fallible-conversion)
-plans checked integer-to-numeric-enum conversion. A valid conversion must check
-both backing-type range and membership in the declared discriminants; invalid
-integers must never create invalid enum values. Existing payload-bearing tagged
-variants and internal tag ordinals do not become integer-backed C enums.
+```void
+enum mode(u8):
+    quiet = 3
+    loud = 255
 
-`(code as? error_kind) ?? error_kind.system_failure` is illustrative syntax only.
-The current parser rejects `as?` and has no `??` expression operator. Numeric enum
-declaration syntax, optional/result representation, fallback typing and grammar
-remain proposed design. Existing numeric `as`, RuntimeFailure, independent IR
-validation and shared normal/O2 LLVM JIT/AOT semantics remain unchanged. New enum
-conversion and its cross-mode/platform acceptance are not implemented or verified.
+func decode(raw: i32) -> option<mode>:
+    return raw as? mode
+
+func select_mode(raw: i32) -> mode:
+    match decode(raw):
+        Some(var value):
+            return value
+        None:
+            return mode.quiet
+```
+
+Numeric-backed enum declarations accept all eight fixed-width integer types.
+Each lowercase member must have an explicit decimal integer discriminant, with
+an optional leading sign. Values must fit the backing type. Member names and
+mathematical values must be unique, so `0` and `-0` denote the same discriminant.
+Matching and equality preserve nominal identity. Exhaustiveness follows the
+declared members even when their discriminants are sparse. Enum locals and array
+elements require initialized values. Tagged enums keep their existing semantics.
+
+`as?` shares the precedence and left-to-right association of `as`. The operand is
+evaluated once. An unsuffixed integer literal used directly as an operand selects
+the first type that fits from `i32`, `i64`, and `u64`. Operands beyond those types
+diagnose. For integer destinations, the mathematical range check decides the
+result before narrowing. For numeric-backed enums, a second check requires a
+declared discriminant. Constant evaluation follows the same rules as execution.
+
+The result is the canonical tagged sum `option<T>`, with `Some(value)` for success
+and `None` for failure. In expressions the constructors use the expected canonical
+option type. In patterns they use the subject type. Slice 6 supports fixed-width
+integer and numeric-backed enum payloads. Ordinary name lookup still resolves a
+user-declared `option` where visible. That declaration has its own nominal
+identity, and the compiler-generated type of an `as?` expression remains canonical.
+
+Existing `as` conversion and RuntimeFailure behavior remain in effect. Slice 6
+defers enum-to-integer extraction, enum arithmetic, automatic numbering, aliases,
+C ABI contracts, additional fallible conversion categories and `??`. The older
+nullable-cast proposal has been superseded for this conversion family.
+Local qualification is recorded in the [Slice 6 report](projects/SLICE6.md).
 
 ## Existing numeric contract
 
@@ -125,7 +156,8 @@ actual caller trace; no exception unwinds through generated code. Direct known
 invalid integer literal casts in evaluated function expressions diagnose early.
 Short-circuited constant branches are type-checked but do not execute conversions
 or arithmetic. Ordinary malformed/out-of-range literal construction still diagnoses.
-There is no `as?`, nullable stand-in, implicit Boolean conversion or wrapping cast.
+The fallible integer conversions above use `as?`. Implicit Boolean conversion
+and wrapping casts remain outside the numeric contract.
 
 ## Shared implementation and guards
 

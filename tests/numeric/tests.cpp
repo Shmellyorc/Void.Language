@@ -132,7 +132,7 @@ void numeric_tests(const std::filesystem::path& root) {
         {"var x = 1 as bool",C::numeric_conversion},
         {"var x = 300 as i8",C::numeric_conversion},
         {"var x = 1.0q",C::numeric_literal},
-        {"var x = 1.0 as? i32",C::character}
+        {"var x = 1.0 as? i32",C::numeric_conversion}
     };
     for (const auto& [body,code] : invalid) reject("func f():\n    " + body + "\n",code);
     reject("const bad: i32 = (0.0 / 0.0) as i32\n",C::numeric_conversion);

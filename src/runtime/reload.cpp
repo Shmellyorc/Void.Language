@@ -40,6 +40,7 @@ std::int32_t NativeCode::invoke(std::int32_t value) const {
     RuntimeFailure failure;
     std::int32_t result;
     if (runtime_) {
+        runtime_->start_application(compatibility_.application_metadata);
         Runtime::Attachment attachment(*runtime_);
         auto checkpoint=runtime_->console_checkpoint();
         {Runtime::Managed managed(*runtime_);result = checked_(value, &failure);}

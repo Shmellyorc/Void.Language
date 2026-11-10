@@ -33,6 +33,20 @@ void NativeLibrary::publish(void* key, std::shared_ptr<NativeResource> value) {
     }
 }
 
+bool NativeLibrary::publish_exclusive(void* key, const std::shared_ptr<NativeResource>& value) {
+    const auto identity = value->exclusive_native_identity();
+    if (!identity) throw std::invalid_argument("Missing exclusive native identity");
+    std::lock_guard admission(runtime_.mutex_);
+    std::lock_guard lock(mutex_);
+    for (const auto& [wrapper, existing] : resources_) {
+        (void)wrapper;
+        if (existing->exclusive_native_identity() == identity) return false;
+    }
+    if (runtime_.closing_) throw std::runtime_error("Native resource publication rejected during shutdown");
+    if (!resources_.emplace(key, value).second) throw std::runtime_error("Duplicate native identity");
+    return true;
+}
+
 std::shared_ptr<NativeLibrary> NativeLibrary::existing(Runtime& runtime) {
     std::lock_guard lock(runtime.mutex_);
     return runtime.native_library_;
@@ -79,11 +93,21 @@ void NativeLibrary::erase(void* key, const NativeResource* expected) {
     }
 }
 
+void NativeLibrary::check_shutdown_thread_locked() const {
+    for (const auto& entry : resources_) entry.second->require_shutdown_thread();
+}
+
+void NativeLibrary::require_shutdown_thread() {
+    std::lock_guard lock(mutex_);
+    check_shutdown_thread_locked();
+}
+
 std::error_code NativeLibrary::shutdown() {
     std::lock_guard drain(shutdown_mutex_);
     std::map<void*, std::shared_ptr<NativeResource>> retired;
     {
         std::lock_guard lock(mutex_);
+        check_shutdown_thread_locked();
         retired.swap(resources_);
     }
     std::exception_ptr failure;

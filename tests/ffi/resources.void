@@ -1,0 +1,35 @@
+use "/native_resources.void" as ffi
+
+var saved: ffi.box? = null
+
+func entry(value: i32) -> i32:
+    if value == 90:
+        saved = ffi.create(31)
+        return ffi.read(saved as ffi.box, 0)
+    if value == 91:
+        return ffi.read(saved as ffi.box, 0) + 7
+    if value == 92:
+        return ffi.close_box(saved as ffi.box)
+    if value == -3:
+        return ffi.read(ffi.create(-1) as ffi.box, 0)
+    if value == -4:
+        var live = ffi.create(22) as ffi.box
+        return ffi.read(live, 0)
+    if ffi.create(-1) != null or ffi.live() != 0:
+        return 1
+    var owned = ffi.create(11) as ffi.box
+    var alias = owned
+    if ffi.read(alias, 0) != 11 or ffi.add(owned, 4) != 15 or ffi.read(alias, 0) != 15:
+        return 2
+    if ffi.read(alias, 1) != -19 or ffi.read(alias, 0) != 15:
+        return 3
+    if ffi.close_box(owned) != 0:
+        return 4
+    if value == -1:
+        return ffi.read(alias, 0)
+    if value == -2:
+        return ffi.close_box(alias)
+    var terminal = ffi.create(-2) as ffi.box
+    if ffi.close_box(terminal) != 17 or ffi.live() != 0:
+        return 5
+    return value + 97

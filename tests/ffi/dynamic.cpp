@@ -1,0 +1,448 @@
+#include "void/backend.hpp"
+#include "void/c_primitive.hpp"
+#include "void/frontend.hpp"
+#include "void/native_resource.hpp"
+#include "void/runtime.hpp"
+
+#include <dlfcn.h>
+#include <elf.h>
+#include <fcntl.h>
+#include <link.h>
+#include <sodium.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+#include <array>
+#include <atomic>
+#include <chrono>
+#include <cstring>
+#include <fstream>
+#include <iostream>
+#include <iterator>
+#include <semaphore>
+#include <stdexcept>
+#include <thread>
+
+namespace {
+using namespace vd;
+using namespace vd::ir;
+namespace fs = std::filesystem;
+
+void require(bool condition, std::string_view message) {
+    if (!condition) throw std::runtime_error(std::string(message));
+}
+template<class Work>
+void rejects(std::string_view label, std::string_view expected, Work work) {
+    try { work(); }
+    catch (const std::exception& error) {
+        require(std::string_view(error.what()).find(expected) != std::string_view::npos,
+            std::string(label) + " received " + error.what());
+        std::cout << label << ": " << error.what() << '\n';
+        return;
+    }
+    throw std::runtime_error(std::string(label) + " unexpectedly accepted");
+}
+std::string read(const fs::path& path) {
+    std::ifstream input(path, std::ios::binary);
+    require(bool(input), "cannot read " + path.string());
+    return {std::istreambuf_iterator<char>(input), {}};
+}
+void write(const fs::path& path, std::string_view text) {
+    std::ofstream output(path, std::ios::binary);
+    output.write(text.data(), text.size());
+    require(bool(output), "cannot write " + path.string());
+}
+std::string change(std::string text, std::string_view from, std::string_view to) {
+    auto at = text.find(from);
+    require(at != text.npos, "missing fixture marker");
+    return text.replace(at, from.size(), to);
+}
+std::string digest(std::string_view bytes) {
+    unsigned char hash[crypto_hash_sha256_BYTES];
+    char text[sizeof hash * 2 + 1];
+    require(!crypto_hash_sha256(hash, reinterpret_cast<const unsigned char*>(bytes.data()), bytes.size()),
+            "fixture hash");
+    return sodium_bin2hex(text, sizeof text, hash, sizeof hash);
+}
+auto analyze(const fs::path& source, const CPrimitiveAdmission::Owner& admission) {
+    auto result = analyze_project(source, admission);
+    if (!result.succeeded()) throw CompilationError(result.diagnostics);
+    return result.program;
+}
+
+void offline_denials(const std::string& recipe, const fs::path& root, const ValidatedAnalysis& analysis) {
+    auto reject_plan = [&](std::string_view label, std::string_view from, std::string_view to, std::string_view expected) {
+        rejects(label, expected, [&] { (void)CPrimitiveAdmission::admit_dynamic(change(recipe, from, to), root); });
+    };
+    reject_plan("bad closure revision", "closure 1", "closure 2", "unsupported revision");
+    reject_plan("system library policy", "system none", "system ambient", "system ABI");
+    reject_plan("foreign provider", "provider org.voidlang.g4-fixture", "provider org.voidlang.wrong", "exact descriptor");
+    reject_plan("aliased image", "image libvoid_g4_dep.so", "image ../libvoid_g4_dep.so", "invalid or duplicate image");
+    reject_plan("missing descriptor export", "export libvoid_g4_main.so g4_add\n", "", "missing an owned descriptor export");
+    const auto thunk = analysis.c_primitive_admission()->dynamic()->thunk_identity();
+    auto wrong = thunk;
+    wrong.front() = wrong.front() == 'a' ? 'b' : 'a';
+    reject_plan("wrong target thunk", "thunk " + thunk, "thunk " + wrong, "exact descriptor");
+    auto good = analysis.lower();
+    {
+        auto forged = good;
+        forged.imports.push_back(std::string(c_dynamic_resolve));
+        rejects("direct bridge import", "requires host admission", [&] { validate(forged); });
+    }
+    {
+        auto forged = good;
+        forged.c_primitives.reset();
+        rejects("erased closure admission", "differs from analyzed source", [&] { validate(forged); });
+    }
+    {
+        auto forged = good;
+        forged.analysis.reset();
+        bool changed = false;
+        for (auto& function : forged.functions)
+            for (auto& block : function.blocks)
+                for (auto& instruction : block.instructions)
+                    if (instruction.op == Op::c_primitive_call) {
+                        instruction.immediate = 63;
+                        changed = true;
+                    }
+        require(changed, "expected dynamic IR call");
+        rejects("forged dynamic ordinal", "outside the admitted binding module", [&] { validate(forged); });
+    }
+    {
+        auto forged = good;
+        forged.analysis.reset();
+        for (auto& function : forged.functions)
+            for (auto& block : function.blocks)
+                for (auto& instruction : block.instructions)
+                    if (instruction.op == Op::c_primitive_call) instruction.callee = "other::g4_add";
+        rejects("forged provider and symbol", "exact call signature", [&] { validate(forged); });
+    }
+}
+
+template<class T>
+T at(const std::string& bytes, std::size_t offset) {
+    require(offset <= bytes.size() && sizeof(T) <= bytes.size() - offset, "test ELF read bounds");
+    T value;
+    std::memcpy(&value, bytes.data() + offset, sizeof value);
+    return value;
+}
+template<class T>
+void put(std::string& bytes, std::size_t offset, T value) {
+    require(offset <= bytes.size() && sizeof(T) <= bytes.size() - offset, "test ELF write bounds");
+    std::memcpy(bytes.data() + offset, &value, sizeof value);
+}
+struct EditableElf {
+    std::string bytes;
+    Elf64_Ehdr header;
+    std::vector<Elf64_Phdr> segments;
+    Elf64_Phdr dynamic{};
+    explicit EditableElf(std::string input) : bytes(std::move(input)), header(at<Elf64_Ehdr>(bytes,0)) {
+        for (unsigned n = 0; n < header.e_phnum; ++n) {
+            auto p = at<Elf64_Phdr>(bytes, header.e_phoff + n * sizeof(Elf64_Phdr));
+            segments.push_back(p);
+            if (p.p_type == PT_DYNAMIC) dynamic = p;
+        }
+    }
+    std::size_t tag(Elf64_Sxword wanted) const {
+        for (std::size_t pos = dynamic.p_offset; pos < dynamic.p_offset + dynamic.p_filesz; pos += sizeof(Elf64_Dyn))
+            if (at<Elf64_Dyn>(bytes, pos).d_tag == wanted) return pos;
+        throw std::runtime_error("missing test dynamic tag");
+    }
+    std::size_t offset(Elf64_Addr address) const {
+        for (const auto& p : segments)
+            if (p.p_type == PT_LOAD && address >= p.p_vaddr && address - p.p_vaddr < p.p_filesz)
+                return p.p_offset + address - p.p_vaddr;
+        throw std::runtime_error("missing test ELF address");
+    }
+    std::size_t table(Elf64_Sxword wanted) const {
+        return offset(at<Elf64_Dyn>(bytes, tag(wanted)).d_un.d_ptr);
+    }
+};
+void loader_denials(const std::string& recipe, const fs::path& root, const fs::path& sandbox,
+                    const fs::path& constructor, const fs::path& source) {
+    const auto plan = DynamicClosure::parse(recipe);
+    const auto& main = plan->images().back();
+    const auto& dep = plan->images().front();
+    const auto isolated = sandbox / "negative";
+    fs::create_directories(isolated);
+    const auto main_bytes = read(root / main.name), dep_bytes = read(root / dep.name);
+    auto setup = [&] {
+        write(isolated / main.name, main_bytes);
+        write(isolated / dep.name, dep_bytes);
+    };
+    auto reject_load = [&](std::string_view label, std::string_view expected, std::string_view bytes) {
+        auto admission = CPrimitiveAdmission::admit_dynamic(bytes, isolated);
+        auto program = analyze(source, admission);
+        auto module = program->lower();
+        auto runtime = std::make_shared<Runtime>();
+        Jit jit;
+        rejects(label, expected, [&] { (void)jit.compile(module, module.entry_symbol, false, {}, runtime); });
+        require(!runtime->dynamic_binding() && !jit.live_generations(), "failed admission published a binding");
+    };
+    setup();
+    fs::remove(isolated / main.name);
+    reject_load("missing provider", "C dynamic artifact", recipe);
+    setup();
+    write(isolated / dep.name, dep_bytes + 'x');
+    reject_load("modified dependency", "C dynamic digest", recipe);
+    setup();
+    fs::remove(isolated / main.name);
+    fs::create_symlink(root / main.name, isolated / main.name);
+    reject_load("symlink provider", "C dynamic artifact", recipe);
+    fs::remove(isolated / main.name);
+    fs::create_hard_link(root / main.name, isolated / main.name);
+    reject_load("hardlinked provider", "C dynamic artifact", recipe);
+    fs::remove(isolated / main.name);
+    setup();
+    const auto extra = "export " + main.name + " g4_missing\n";
+    reject_load("missing required export", "missing exact owned export",
+                change(recipe,"\ndescriptor\n","\n"+extra+"descriptor\n"));
+    reject_load("wrong symbol owner", "missing exact owned export",
+                change(recipe,"export "+dep.name+" g4_bias","export "+main.name+" g4_bias"));
+    auto conflict = change(dep_bytes, "g4_bias", std::string("g4_add\0",7));
+    write(isolated / dep.name, conflict);
+    reject_load("conflicting symbol across closure", "conflicting closure definition",
+                change(recipe,dep.sha256,digest(conflict)));
+    setup();
+
+    auto mutated = [&](std::string_view label, std::string_view expected, auto edit) {
+        EditableElf image(main_bytes);
+        edit(image);
+        write(isolated / main.name, image.bytes);
+        reject_load(label, expected, change(recipe, main.sha256, digest(image.bytes)));
+    };
+    mutated("unapproved ELF target", "unsupported target", [](auto& image) {
+        image.header.e_machine = EM_AARCH64;
+        put(image.bytes, 0, image.header);
+    });
+    for (auto forbidden : {DT_RPATH, DT_AUDIT, DT_INIT})
+        mutated("unsupported dynamic tag " + std::to_string(forbidden), "unsupported dynamic tag", [&](auto& image) {
+            auto pos = image.tag(DT_FLAGS);
+            auto entry = at<Elf64_Dyn>(image.bytes,pos);
+            entry.d_tag = forbidden;
+            put(image.bytes,pos,entry);
+        });
+    mutated("system DT_NEEDED", "unapproved DT_NEEDED", [](auto& image) {
+        auto needed = at<Elf64_Dyn>(image.bytes, image.tag(DT_NEEDED));
+        image.bytes.replace(image.table(DT_STRTAB) + needed.d_un.d_val, 10, "libc.so.6\0", 10);
+    });
+    for (auto unsupported : {PT_INTERP, PT_TLS})
+    mutated("ELF program header " + std::to_string(unsupported), "unsupported program header", [&](auto& image) {
+        for (std::size_t n = 0; n < image.segments.size(); ++n) {
+            auto p = image.segments[n];
+            if (p.p_type != PT_GNU_STACK) continue;
+            p.p_type = unsupported;
+            put(image.bytes, image.header.e_phoff + n * sizeof(Elf64_Phdr), p);
+            return;
+        }
+        throw std::runtime_error("missing test stack segment");
+    });
+    mutated("IFUNC resolver", "resolver symbols", [](auto& image) {
+        auto pos = image.table(DT_SYMTAB) + sizeof(Elf64_Sym);
+        auto symbol = at<Elf64_Sym>(image.bytes,pos);
+        symbol.st_info = ELF64_ST_INFO(STB_GLOBAL, STT_GNU_IFUNC);
+        put(image.bytes,pos,symbol);
+    });
+    mutated("IRELATIVE resolver", "unsupported relocation", [](auto& image) {
+        auto pos = image.table(DT_JMPREL);
+        auto relocation = at<Elf64_Rela>(image.bytes,pos);
+        relocation.r_info = ELF64_R_INFO(0, R_X86_64_IRELATIVE);
+        put(image.bytes,pos,relocation);
+    });
+    setup();
+    auto init = read(constructor);
+    write(isolated / dep.name, init);
+    reject_load("real initializer would exit 121 if mapped", "unsupported dynamic tag",
+                change(recipe, dep.sha256, digest(init)));
+}
+
+CPrimitiveThunk* observed_thunk(Runtime& runtime, const std::string& recipe) {
+    Runtime::Attachment attached(runtime);
+    Runtime::Managed managed(runtime);
+    return vd_c_dynamic_resolve_v1(recipe.data(),recipe.size());
+}
+std::uint64_t inspect(CPrimitiveThunk* thunk, const std::string& descriptor, unsigned ordinal,
+                      const std::uint64_t* words = nullptr, unsigned count = 0) {
+    std::uint64_t value = 0;
+    require(thunk(descriptor.data(), descriptor.size(), ordinal, words, count, &value) == 0,
+            "host fixture inspection transport");
+    return value;
+}
+bool mapped(CPrimitiveThunk* thunk) {
+    Dl_info image{};
+    return dladdr(reinterpret_cast<void*>(thunk), &image) != 0;
+}
+void observe_images(CPrimitiveThunk* thunk, const DynamicClosure& plan) {
+    Dl_info info{};
+    void* owner = nullptr;
+    require(dladdr1(reinterpret_cast<void*>(thunk), &info, &owner, RTLD_DL_LINKMAP) && owner,
+            "cannot inspect actual dynamic namespace");
+    auto* link = static_cast<link_map*>(owner);
+    while (link->l_prev) link = link->l_prev;
+    for (const auto& image : plan.images()) {
+        require(link && std::string_view(link->l_name).starts_with("/proc/self/fd/"),
+                "namespace did not map from a sealed descriptor");
+        int fd = open(link->l_name, O_RDONLY | O_CLOEXEC);
+        struct stat identity{};
+        const bool sealed = fd >= 0 && fstat(fd,&identity) == 0 &&
+            fcntl(fd,F_GET_SEALS) == (F_SEAL_WRITE | F_SEAL_SHRINK | F_SEAL_GROW | F_SEAL_SEAL);
+        if (fd >= 0) close(fd);
+        require(sealed && digest(read(link->l_name)) == image.sha256, "mapped closure hash or seals differ");
+        std::cout << "G4 mapped " << image.name << " inode " << identity.st_ino
+                  << " verified sealed SHA-256 " << image.sha256 << '\n';
+        link = link->l_next;
+    }
+    require(!link, "unexpected namespace member");
+}
+void drain_call(const std::shared_ptr<const NativeCode>& code, CPrimitiveThunk* thunk, const std::string& descriptor) {
+    auto& runtime = *code->runtime_owner();
+    std::atomic<bool> invoked{false}, closed{false};
+    const std::uint64_t query = 0, resume = 2;
+    bool entered = false, protected_call = false;
+    std::binary_semaphore begin_close(0);
+    std::thread closer([&] { begin_close.acquire(); closed = !runtime.close(); });
+    std::thread observer([&] {
+        for (unsigned attempt = 0; attempt < 5000 && !invoked; ++attempt) {
+            if (inspect(thunk,descriptor,8,&query,1) == 1) { entered = true; break; }
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+        begin_close.release();
+        bool closing = false;
+        for (unsigned attempt = 0; attempt < 5000; ++attempt) {
+            try { (void)NativeLibrary::get(runtime); }
+            catch (const std::runtime_error&) { closing = true; break; }
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+        protected_call = closing && !closed && !invoked && mapped(thunk) && inspect(thunk,descriptor,6) == 1;
+        inspect(thunk,descriptor,8,&resume,1);
+    });
+    int value = -1;
+    std::exception_ptr invocation_error;
+    try { value = code->invoke(95); }
+    catch (...) { invocation_error = std::current_exception(); }
+    invoked = true;
+    observer.join();
+    closer.join();
+    if (invocation_error) std::rethrow_exception(invocation_error);
+    require(entered && protected_call && closed && value == 200, "shutdown did not drain the live dynamic call");
+}
+
+void lifecycle(const std::string& recipe, const fs::path& source, const fs::path& bundle,
+               const fs::path& root, bool optimize) {
+    auto admission = CPrimitiveAdmission::admit_dynamic(recipe, root);
+    const auto probe = bundle / "dynamic.void";
+    const auto original = read(source);
+    write(probe, original);
+    CPrimitiveThunk* thunk = nullptr;
+    std::weak_ptr<const DynamicBinding> lease;
+    {
+        Jit jit;
+        auto program = analyze(probe, admission);
+        auto first = jit.compile(*program,optimize);
+        auto runtime = first->runtime_owner();
+        ReloadSlot slot(first);
+        thunk = observed_thunk(*runtime,recipe);
+        require(thunk && mapped(thunk), "dynamic binding absent");
+        observe_images(thunk,*admission->dynamic());
+        {
+            Runtime unrelated;
+            require(!observed_thunk(unrelated,recipe), "foreign Runtime can resolve another binding");
+            rejects("cross-Runtime binding transfer", "already owned", [&] {
+                unrelated.bind_dynamic(runtime->dynamic_binding());
+            });
+        }
+        lease = runtime->dynamic_binding();
+        require(slot.invoke(7) == 104, "primitive/record/span/resource execution");
+        rejects("stale dynamic alias", "closed, null or invalid", [&] { (void)slot.invoke(-1); });
+        rejects("dynamic double close", "closed, null or invalid", [&] { (void)slot.invoke(-2); });
+        require(slot.invoke(90) == 31, "live native owner");
+        const auto releases = slot.invoke(93);
+        rejects("refused dynamic acquisition containing a live pointer", "operation rejected", [&] { (void)slot.invoke(94); });
+        require(slot.invoke(91) == 38 && slot.invoke(93) == releases, "refusal released a foreign-owned pointer");
+
+        write(probe, change(original, " + 7", " + 8"));
+        auto updated = analyze(probe, admission);
+        auto incompatible = analyze(probe, CPrimitiveAdmission::admit_dynamic(recipe, bundle));
+        require(!jit.replace(slot,*incompatible,optimize) && slot.invoke(91) == 38, "wrong closure root replaced live authority");
+        auto changed_hash = admission->dynamic()->images().front().sha256;
+        changed_hash.front() = changed_hash.front() == 'a' ? 'b' : 'a';
+        auto changed_recipe = change(recipe,admission->dynamic()->images().front().sha256,changed_hash);
+        auto changed_admission = CPrimitiveAdmission::admit_dynamic(changed_recipe,root);
+        auto changed_closure = analyze(probe,changed_admission);
+        require(!jit.replace(slot,*changed_closure,optimize), "wrong digest replaced live authority");
+        const auto isolated_call = bundle / "binding_authority.void";
+        write(isolated_call,"use \"/native_dynamic.void\" as ffi\n\n"
+                            "func entry(value: i32) -> i32:\n    return ffi.add(value, 0)\n");
+        auto forged_runtime = analyze(isolated_call,changed_admission)->lower();
+        rejects("different closure in live Runtime", "incompatible with the Runtime binding", [&] {
+            (void)jit.compile(forged_runtime,forged_runtime.entry_symbol,optimize,{},runtime);
+        });
+        require(jit.replace(slot,*updated,optimize), "compatible reload failed");
+        first.reset();
+        require(jit.live_generations() == 2 && slot.invoke(91) == 39 &&
+                observed_thunk(*runtime,recipe) == thunk, "reload lost binding or acquisition lease");
+        require(slot.invoke(92) == 0 && slot.invoke(93) == releases + 1 &&
+                jit.live_generations() == 1, "terminal release did not retire acquisition generation");
+        require(slot.invoke(90) == 31, "live shutdown owner");
+        drain_call(slot.acquire(),thunk,admission->descriptor());
+        require(inspect(thunk,admission->descriptor(),6) == 0 &&
+                inspect(thunk,admission->descriptor(),7) == static_cast<unsigned>(releases + 2) &&
+                mapped(thunk), "shutdown did not release once while provider was still mapped");
+    }
+    require(lease.expired() && !mapped(thunk), "provider retained after Runtime and generation retirement");
+    std::cout << "G4 " << (optimize ? "O2" : "normal")
+              << " JIT returned 104; refusal, reload, live call, teardown and unmap passed\n";
+}
+
+void replacement(const std::string& recipe, const fs::path& source, const fs::path& root,
+                 const fs::path& sandbox, const fs::path& competitor) {
+    auto plan = DynamicClosure::parse(recipe);
+    const auto stage = sandbox / "replacement";
+    fs::create_directories(stage);
+    for (const auto& image : plan->images())
+        fs::copy_file(root/image.name, stage/image.name, fs::copy_options::overwrite_existing);
+    auto program = analyze(source, CPrimitiveAdmission::admit_dynamic(recipe, stage));
+    Jit jit;
+    auto code = jit.compile(*program, false);
+    const auto staged = stage/"replace.tmp";
+    fs::copy_file(competitor, staged, fs::copy_options::overwrite_existing);
+    fs::rename(staged, stage/plan->images().front().name);
+    require(code->invoke(7) == 104, "replacement changed a sealed mapping");
+    rejects("new Runtime after on-disk dependency replacement", "C dynamic digest", [&] {
+        (void)jit.compile(*program, false);
+    });
+}
+}
+
+int main(int argc, char** argv) try {
+    if (argc == 6 && std::string_view(argv[1]) == "--emit") {
+        const auto source = fs::absolute(argv[3]);
+        const auto absent = source.parent_path() / "not-installed";
+        require(!fs::exists(absent), "offline emission unexpectedly has a provider root");
+        auto admission = CPrimitiveAdmission::admit_dynamic(read(argv[2]), absent);
+        auto program = analyze(source,admission);
+        emit_object(program->lower(Emission::entry),argv[4],std::string_view(argv[5])=="optimized",true);
+        return 0;
+    }
+    require(argc == 7, "expected closure, source, bundle, scratch, competitor and initializer");
+    require(sodium_init() >= 0, "fixture SHA-256 initialization");
+    const auto recipe = read(argv[1]);
+    const auto root = fs::canonical(argv[3]);
+    const auto sandbox = fs::absolute(argv[4]);
+    fs::create_directories(sandbox);
+    const auto offline = CPrimitiveAdmission::admit_dynamic(recipe, sandbox/"absent");
+    auto program = analyze(argv[2],offline);
+    require(!analyze_project(argv[2]).succeeded(), "source granted dynamic loading authority");
+    offline_denials(recipe,root,*program);
+    loader_denials(recipe,root,sandbox,argv[6],argv[2]);
+    void* competitor = dlopen(argv[5],RTLD_NOW|RTLD_LOCAL);
+    require(competitor, "base namespace competitor missing");
+    lifecycle(recipe,argv[2],sandbox,root,false);
+    lifecycle(recipe,argv[2],sandbox,root,true);
+    replacement(recipe,argv[2],root,sandbox,argv[5]);
+    require(!dlclose(competitor), "competitor unload failed");
+    return 0;
+} catch (const std::exception& error) {
+    std::cerr << error.what() << '\n';
+    return 1;
+}

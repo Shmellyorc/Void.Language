@@ -30,9 +30,17 @@ holds in historical records do not govern current work.
 
 ## Engineering documentation
 
+- [Slice 2 project discovery and entry selection](projects/SLICE2.md): compiler-owned
+  manifest/VFS admission, immutable D/E snapshots, any-name main, library checking,
+  explicit overrides, actual execution tests and independent-review boundary.
+- [Slice 1 project manifest implementation](projects/SLICE1.md): schema-only
+  compiler API, validation/diagnostics, executed local qualification and explicit
+  deferred integration/platform limits.
 - [First-class projects and C interoperability roadmap](PROJECT_ARCHITECTURE_ROADMAP.md):
-  approved next direction, proposed manifest/discovery/enum/FFI design, baseline
-  audit and ordered acceptance gates. Planning only; no implementation claimed.
+  Phase 1 schema/identity/discovery/metadata/creation contract proposal, source
+  audit, compatibility matrix, 42 acceptance cases and six implementation slices.
+  Local Slice 2 implementation/review boundary; later enum/FFI/raylib/package
+  direction and the single final hosted acceptance gate are retained.
 - [Current status/strategy](DEVELOPMENT_STRATEGY.md), [Wrench instructions](WRENCH_CLANKER.md),
   [Research role](RESEARCH_CLANKER.md), [known issues](KNOWN_ISSUES.md).
 - VOIDUP: [Phase A](voidup/REPORT.md), [Phase B](voidup/PHASE_B_REPORT.md),

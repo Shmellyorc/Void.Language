@@ -1,5 +1,18 @@
 # VOID 2.0: Language Bible and Compiler Architecture
 
+**Current Slice 1:** Boss authorized the isolated project schema/identity/SemVer/
+diagnostic foundation; it is implemented in the compiler library. See
+[qualification and remaining limits](projects/SLICE1.md). No project-aware entry,
+Runtime/OS identity, CLI/editor or later language/native feature is delivered.
+The implementation HOLD below continues to apply to those later integrations.
+
+**Phase 1 proposal at `2f667ea3`, implementation HOLD:** the
+[initial project contract](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-manifest-and-identity-model)
+now specifies schema 1, identities, source policy, metadata and acceptance. New
+filename-independent discovery is manifest-selected; bare explicit files and
+manifestless directory discovery retain their implemented behavior. Detailed
+choices await Boss/Golden Wrench approval, not execution from this record.
+
 ## Approved project and C interoperability direction, 8 November 2026
 
 The [coordinated architecture roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) records
@@ -10,14 +23,13 @@ general typed C interoperability and IDE/package/release workflows. Dynamic link
 is the approved default; static linking is optional. Raylib is the first substantial
 integration target, not a special compiler subsystem.
 
-**Approved direction, not implemented:** never require a hardcoded entry filename
+**Project entry rule:** never require a hardcoded entry filename
 or an `entry` manifest key. Compiler-owned discovery must select exactly one valid
 main in the selected application source graph, in any valid source filename;
 multiple candidates diagnose ambiguity. Preserve explicit entries, standalone and
-top-level execution, and libraries without main. Baseline automatic `main.void`
-selection remains implemented until replaced. Proposed schema, `as?`/`??`, ABI and
-resolver details are labelled for review in the roadmap; metadata grants no authority.
-This is documentation only and grants no implementation or public release clearance.
+top-level execution, and libraries without main. Manifestless automatic discovery
+retains `main.void`. Integer and numeric-enum `as?` now follow the Slice 6 contract.
+The roadmap carries open ABI and resolver decisions. Metadata grants no authority.
 
 ## Active toolchain and migration history
 
@@ -298,7 +310,7 @@ func test():
 
 ## 6. Numeric types and literals [AGREED]
 
-**Implemented clarification (Phase 6):** All ten fixed-width integer/float types, contextual literals, wrapping integer arithmetic, defined division/remainder, IEEE floating behavior and explicit **checked numeric `as`** are specified and implemented in `NUMERIC_TYPES.md`. These are not still undecided. Invalid runtime casts report source-located failures; numeric `as?`, platform-sized aliases, alternative base/exponent/separator literals, hashing and other broader conversions remain future scope. Exact rules for those extensions are not inferred from examples here.
+**Implemented clarification:** Phase 6 implements all ten fixed-width integer/float types, contextual literals, wrapping integer arithmetic, defined division/remainder, IEEE floating behavior and checked numeric `as`. Invalid runtime casts report source-located failures. Project Slice 6 adds integer-to-integer and integer-to-numeric-enum `as?` returning canonical `option<T>`. See [Numeric types and contextual literals](NUMERIC_TYPES.md). Platform-sized aliases, alternative base/exponent/separator literals, hashing and broader conversions remain future scope.
 
 Exact-width types are available: `i8`, `i16`, `i32`, `i64`, unsigned counterparts, `f32`, `f64`, and `bool`. The precise list of platform-sized integer aliases remains open. Unannotated small integral literals normally infer `i32`; unannotated floating literals normally infer `f32`, reflecting the game-development focus.
 
@@ -1585,10 +1597,10 @@ Use proper error types, including enums with cases such as `not_found`, `permiss
 
 ## 30. Type casts, checks, and parsing [AGREED]
 
-**Implemented clarification:** Phase 6 defines the numeric `as` conversion matrix, floating truncation/rounding, invalid-value failures, range checking and optimization-independent behavior. Phase 16+ separately implements bounded checked managed reference conversions/upcasts in its approved nominal/interface source family. This section's older generic OPEN language applies to future `as?`, downcasts, foreign conversions and richer type patterns, not the existing checked numeric casts.
+**Implemented clarification:** Phase 6 defines the numeric `as` conversion matrix, floating truncation/rounding, invalid-value failures, range checking and optimization-independent behavior. Phase 16+ separately implements bounded checked managed reference conversions/upcasts in its approved nominal/interface source family. Project Slice 6 implements the integer and numeric-backed enum `as?` family in [Numeric types and contextual literals](NUMERIC_TYPES.md#numeric-backed-enums-and-fallible-casts). Other fallible conversions, downcasts, foreign conversions and richer type patterns remain open.
 
 - `value as type` is an explicit checked conversion; when allowed but invalid at runtime, report a VOID runtime error.
-- `value as? type` is a checked, nullable conversion; return `null` on failure.
+- `value as? type` checks an integer against the target integer range and, for a numeric-backed enum, its declared discriminants. The result is canonical `option<type>` containing `Some(value)` or `None`. This supersedes the older nullable-cast proposal for the implemented family.
 - `value is type` / `value is type(binding)` checks types and narrows them through the pattern system.
 - Parse strings using `parse<t>(text)`, returning a `result`, rather than magically casting strings to numbers.
 - Compatible numeric literals adapt to expected parameter/field types.
@@ -1599,9 +1611,8 @@ var number = 100
 var speed = number as f32
 var precise = speed as f64
 
-var unit: base_unit = enemy()
-if (unit as? player) is Ok(p):
-    print(p.name)
+if number as? i8 is Some(var small):
+    print(small)
 ```
 
 ```python
@@ -1616,7 +1627,7 @@ match parse<i32>(age):
 # var bad = age as i32  # Compile error: parsing is not casting
 ```
 
-Explicit floating-to-integer casts were proposed to truncate toward zero, rejecting out-of-range values, `NaN`, and infinity with either runtime error (`as`) or null (`as?`). Exact conversion tables, rounding rules, interface/reference upcasts, and impossible-cast diagnostics are **OPEN**. User-defined conversion operators are intentionally deferred.
+Floating-to-integer `as` truncates toward zero and reports a runtime error for out-of-range values, `NaN`, and infinity. The earlier floating-to-integer `as?` sketch was part of the nullable proposal. Fallible floating-point and reference conversions, along with user-defined conversion operators, remain deferred.
 
 ## 31. Generics and constraints [AGREED]
 
@@ -3144,7 +3155,7 @@ This section matters especially when an AI assistant inherits this file without 
 14. **Array API spelling:** [APPROVED PHASE 23 API: count/push/remove_at; source arrays still gated] Phase 23 A9 approves `.count`, `.push(value)` and `.remove_at(index)` for the first source-array slice; it does not approve an automatic `add` alias. `pop`, search/equality removal, slicing and other methods remain separate future API decisions. Approved names do not establish completed source-array implementation.
 15. **Iteration modification:** [APPROVED DIRECTION: invalidation at next iterator access] Structural mutation invalidates active growable-list iterators when they next access the iterator, in either direction; this is approved design, not completed source-list execution. The special reverse-current-element deletion exception remains deferred, not accepted or tested.
 16. **Pattern forms:** [IMPLEMENTED; HOSTED-LOCKED: Stage 4, CI #68] Shared is/match patterns with success-scoped explicit var captures, range/struct/list/rest/dictionary forms; see ADVANCED_LANGUAGE.md.
-17. **Numeric conversion policy:** [IMPLEMENTED CORE: Phase 6 numeric behavior; additional casts/hashing open] `NUMERIC_TYPES.md` implements contextual literal typing, wrapping integer overflow, signed/unsigned arithmetic rules, IEEE NaN/signed-zero comparisons and checked numeric `as` (including truncate-toward-zero float-to-int). `as?`, float hashing/total ordering, platform-sized aliases and additional conversions remain future design.
+17. **Numeric conversion policy:** [IMPLEMENTED CORE: Phase 6 numeric behavior and project Slice 6 fallible integer casts] `NUMERIC_TYPES.md` specifies contextual literals, wrapping integer overflow, signed/unsigned arithmetic, IEEE NaN/signed-zero comparisons and checked numeric `as`. Project Slice 6 adds canonical `option<T>` for integer-to-integer and integer-to-numeric-enum `as?`. Float hashing and total ordering, platform-sized aliases and additional conversions remain future design.
 18. **UTF-8 semantics:** [IMPLEMENTED CORE: Phase 22 UTF-8 foundation; future indexing/slicing open] S1-S8 approve the strict UTF-8 foundation with exact bytes,
     no normalization and embedded NUL. Section 8.1 approves future scalar indexing,
     scalar length, byte_length and nullable strings in principle, outside Phase 22.

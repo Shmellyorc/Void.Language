@@ -1,5 +1,6 @@
 #include "void/application.hpp"
 #include "void/runtime.hpp"
+#include <atomic>
 #include "void/utf8.hpp"
 #include <cstring>
 #include <stdexcept>
@@ -67,5 +68,38 @@ void Runtime::application_arguments(ApplicationArguments value) {
         throw std::logic_error("Application arguments require admission before globals");
     if (!value.error) value = checked_application_arguments(std::move(value.values));
     application_arguments_ = std::move(value); application_arguments_set_ = true;
+}
+void Runtime::admit_application(ApplicationMetadata::Owner value) {
+    std::lock_guard lock(mutex_);
+    if (application_started_ || closing_) throw std::logic_error("Late application context admission.");
+    if (application_context_set_) throw std::logic_error("Application context is already admitted.");
+    application_metadata_ = std::move(value);
+    application_context_set_ = true;
+}
+void Runtime::start_application(ApplicationMetadata::Owner expected, bool commit) {
+    std::lock_guard lock(mutex_);
+    if (closing_) throw std::logic_error("Runtime is closing.");
+    if (application_context_set_ && expected && (!application_metadata_ || *application_metadata_ != *expected))
+        throw std::invalid_argument("Compiled application context conflicts with the Runtime.");
+    if (commit) {
+        if (!application_context_set_) application_metadata_ = std::move(expected);
+        if (!application_started_) application_thread_ = current_thread_identity();
+        application_context_set_ = application_started_ = true;
+    }
+}
+std::uint64_t Runtime::current_thread_identity() noexcept {
+    // A thread ID can be recycled after the application owner exits.
+    static std::atomic<std::uint64_t> next{1};
+    thread_local const auto identity = next.fetch_add(1, std::memory_order_relaxed);
+    if (!identity) std::terminate();
+    return identity;
+}
+bool Runtime::is_application_thread() const {
+    std::lock_guard lock(mutex_);
+    return application_thread_ == current_thread_identity();
+}
+ApplicationMetadata::Owner Runtime::application_metadata() const {
+    std::lock_guard lock(mutex_);
+    return application_metadata_;
 }
 }

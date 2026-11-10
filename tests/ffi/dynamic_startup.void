@@ -1,0 +1,10 @@
+use "/native_dynamic.void" as ffi
+
+func eager() -> i32:
+    var zero: i32 = 0
+    return 12 / zero
+
+var initialized: i32 = eager()
+
+func entry(value: i32) -> i32:
+    return ffi.add(initialized, value)

@@ -29,11 +29,13 @@
 #include "void/runtime_abi.hpp"
 #include "void/async.hpp"
 #include "void/native_binding.hpp"
+#include "void/c_primitive.hpp"
 #include "void/native_runtime.hpp"
 #include "void/reference_capabilities.hpp"
 #include <cmath>
 #include <array>
 #include <llvm/ADT/SmallVector.h>
+#include <llvm/Config/llvm-config.h>
 #include <llvm/ExecutionEngine/Orc/LLJIT.h>
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
@@ -46,6 +48,7 @@
 #include <llvm/TargetParser/Host.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Target/TargetMachine.h>
+#include <llvm/Transforms/Utils/ModuleUtils.h>
 #include <atomic>
 #include <map>
 #include <mutex>
@@ -111,6 +114,38 @@ std::unique_ptr<llvm::TargetMachine> native_machine() {
         llvm::TargetOptions(), llvm::Reloc::PIC_));
     if (!machine) throw std::runtime_error("cannot create native target machine");
     return machine;
+}
+static void check_c_primitive_target(const ir::Module& input, const llvm::Triple& target) {
+    if (!input.c_primitives) return;
+    const bool windows = input.c_primitives->target() == "x86_64-pc-windows-msvc";
+    const bool matching = windows ? target.isOSWindows() && target.getEnvironment() == llvm::Triple::MSVC :
+        target.isOSLinux() && target.getEnvironment() == llvm::Triple::GNU;
+    if (target.getArch() != llvm::Triple::x86_64 || !matching)
+        throw std::invalid_argument("C primitive descriptor does not match the native LLVM target");
+}
+static llvm::CallInst* call_c_primitive(llvm::IRBuilder<>& b, llvm::Module& module, const CPrimitiveAdmission& admission,
+                                      std::uint32_t ordinal, llvm::Value* words, std::uint32_t count, llvm::Value* result,
+                                      llvm::Value* spans = nullptr, unsigned span_count = 0) {
+    if (const auto& plan = admission.dynamic()) {
+        auto bridge = module.getOrInsertFunction(c_dynamic_call, b.getInt32Ty(), b.getPtrTy(), b.getInt32Ty(),
+            b.getInt32Ty(), b.getPtrTy(), b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(), b.getInt32Ty());
+        return b.CreateCall(bridge, {b.CreateGlobalString(plan->bytes()), b.getInt32(plan->bytes().size()),
+            b.getInt32(ordinal), words, b.getInt32(count), result,
+            spans ? spans : llvm::ConstantPointerNull::get(b.getPtrTy()), b.getInt32(span_count)});
+    }
+    auto transport = module.getOrInsertFunction(admission.transport(), b.getInt32Ty(), b.getPtrTy(),
+        b.getInt32Ty(), b.getInt32Ty(), b.getPtrTy(), b.getInt32Ty(), b.getPtrTy());
+    const auto& descriptor = admission.descriptor();
+    auto* bytes = b.CreateGlobalString(descriptor);
+    if (spans) {
+        auto bridge = module.getOrInsertFunction(c_span_bridge, b.getInt32Ty(), b.getPtrTy(),
+            b.getPtrTy(), b.getInt32Ty(), b.getInt32Ty(), b.getPtrTy(), b.getInt32Ty(),
+            b.getPtrTy(), b.getPtrTy(), b.getInt32Ty());
+        return b.CreateCall(bridge, {transport.getCallee(), bytes, b.getInt32(descriptor.size()),
+            b.getInt32(ordinal), words, b.getInt32(count), result, spans, b.getInt32(span_count)});
+    }
+    return b.CreateCall(transport, {bytes, b.getInt32(descriptor.size()),
+        b.getInt32(ordinal), words, b.getInt32(count), result});
 }
 void write_object(llvm::Module& module, llvm::TargetMachine& machine, const std::filesystem::path& output) {
     std::error_code ec;
@@ -245,7 +280,30 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         if (t == ir::Type::none) return b.getVoidTy();
         if (t == ir::Type::f32) return b.getFloatTy();
         if (t == ir::Type::f64) return b.getDoubleTy();
+        if(t.kind==ir::Type::numeric_enum)t=*t.definition->enum_backing;
         return b.getIntNTy(numeric::width(t));
+    };
+    auto checked_integer=[&](llvm::Value* value,ir::Type from,ir::Type to) {
+        auto* wide_type=b.getIntNTy(128);
+        auto extend=[&](std::uint64_t bits) {
+            auto limit=llvm::APInt(numeric::width(to),bits);
+            return llvm::ConstantInt::get(context,numeric::signed_integer(to)?limit.sext(128):limit.zext(128));
+        };
+        auto* wide=numeric::signed_integer(from)?b.CreateSExt(value,wide_type):b.CreateZExt(value,wide_type);
+        auto* low=extend(numeric::limit(to,false));
+        auto* high=extend(numeric::limit(to,true));
+        auto* valid=b.CreateAnd(b.CreateICmpSGE(wide,low),b.CreateICmpSLE(wide,high));
+        return std::pair{wide,valid};
+    };
+    auto enum_membership=[&](ir::Type enumeration,llvm::Value* value,bool wide) {
+        auto backing=ir::Type(*enumeration.definition->enum_backing);
+        llvm::Value* valid=b.getFalse();
+        for(const auto& member:enumeration.definition->numeric_members) {
+            auto bits=llvm::APInt(numeric::width(backing),member.bits);
+            if(wide)bits=numeric::signed_integer(backing)?bits.sext(128):bits.zext(128);
+            valid=b.CreateOr(valid,b.CreateICmpEQ(value,llvm::ConstantInt::get(context,bits)));
+        }
+        return valid;
     };
     auto field_offset=[&](ir::Type owner,unsigned field) {
         std::uint64_t offset=0; auto* native=type(ir::Type(owner.definition));
@@ -287,7 +345,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         };
     auto element_key=[&](ir::Type t) {
         if(numeric::number(t) || t==ir::Type::boolean)return std::string("void.fixed.scalar.v1/")+std::to_string(scalar_encoding(t));
-        return std::string("void.array.element.v1/")+std::to_string(t.kind)+":"+ir::Type::key(t)+(t.nullable?"?":"");
+        auto key=std::string("void.array.element.v1/")+std::to_string(t.kind)+":"+ir::Type::key(t)+(t.nullable?"?":"");
+        if(t.kind==ir::Type::numeric_enum)key+="|"+ir::numeric_enum_layout(t);
+        return key;
     };
     auto list_key=[&](ir::Type element) {auto key=element_key(element);constexpr std::string_view scalar="void.fixed.scalar.v1/";return key.starts_with(scalar) ? "void.list.v1/"+key.substr(scalar.size()) : "void.list.v2/"+key;};
     auto* element_field_type=llvm::StructType::get(b.getPtrTy(),size_type,b.getInt64Ty(),b.getInt32Ty(),b.getInt32Ty());
@@ -300,7 +360,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         std::function<void(ir::Type,std::uint64_t,bool)> visit=[&](ir::Type t,std::uint64_t offset,bool inactive) {
             if(t.kind==ir::Type::aggregate) {for(unsigned n=0;n<t.definition->fields.size();++n)visit(ir::field_type(t,n),offset+field_offset(t,n),inactive || (!t.definition->cases.empty() && n!=0));return;}
             unsigned kind;std::string target;std::uint64_t extent=0;
-            if(numeric::number(t) || t==ir::Type::boolean)kind=scalar_encoding(t);
+            if(t.kind==ir::Type::numeric_enum)kind=scalar_encoding(*t.definition->enum_backing);
+            else if(numeric::number(t) || t==ir::Type::boolean)kind=scalar_encoding(t);
             else if(t.kind==ir::Type::managed_ref){kind=11;target=ir::Type::key(t);}
             else if(t.kind==ir::Type::string)kind=12;
             else if(t.kind==ir::Type::interface_ref){kind=13;target=ir::Type::key(t);}
@@ -460,6 +521,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
     for(const auto& [scope,imports]:input.source_imports) {access_contract+=encoded(scope);for(const auto& imported:imports) access_contract+=encoded(imported);}
     for(auto t:input.nominal_types) {
         access_contract+=encoded(ir::type_name(t))+encoded(std::to_string(t.kind))+encoded(t.definition->module_identity)+encoded(t.definition->visibility);auto base=t.definition->base.lock();access_contract+=encoded(base ? base->identity : "");
+        if(t.kind==ir::Type::numeric_enum)access_contract+=encoded(ir::numeric_enum_layout(t));
         for(const auto& variant:t.definition->cases)access_contract+=encoded(variant.name)+encoded(std::to_string(variant.begin))+encoded(std::to_string(variant.count));
         for(const auto& field:t.definition->fields) access_contract+=encoded(field.name)+encoded(field.owner)+encoded(ir::type_name(field.type))+(field.using_field ? "U;" : "F;");
     }
@@ -547,6 +609,11 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             auto* result = debug.createStructType(file,ir::type_name(t),file,0,offsets->getSizeInBits(),
                 layout.getABITypeAlign(native).value()*8,llvm::DINode::FlagZero,nullptr,debug.getOrCreateArray(members));
             debug_aggregates.emplace(t.definition->identity,result); return result;
+        }
+        if(t.kind==ir::Type::numeric_enum) {
+            auto backing=ir::Type(*t.definition->enum_backing);
+            return debug.createBasicType(ir::type_name(t),numeric::width(backing),
+                numeric::signed_integer(backing)?llvm::dwarf::DW_ATE_signed:llvm::dwarf::DW_ATE_unsigned);
         }
         return debug.createBasicType(ir::type_name(t),numeric::width(t), t == ir::Type::boolean ? llvm::dwarf::DW_ATE_boolean : numeric::floating(t) ? llvm::dwarf::DW_ATE_float : numeric::signed_integer(t) ? llvm::dwarf::DW_ATE_signed : llvm::dwarf::DW_ATE_unsigned);
     };
@@ -834,9 +901,15 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             }
             std::vector<llvm::Value*> values;
             std::vector<ir::Type> value_types;
+            const bool defer_return_load=ir::checked_storage_cleanup_return(f,n,input.c_primitives.get());
+            auto check_cleanup_return=[&] {
+                if(async)b.CreateCall(module->getOrInsertFunction("vd_async_finish",b.getVoidTy(),b.getPtrTy()),{failure});
+                auto* failed=llvm::BasicBlock::Create(context,"cleanup_failed",fn);auto* ready=llvm::BasicBlock::Create(context,"cleanup_complete",fn);b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),failed,ready);b.SetInsertPoint(failed);return_failure();b.SetInsertPoint(ready);
+            };
             for (const auto& instruction : f.blocks[n].instructions) {
                 const auto& loc = instruction.source.path.empty() ? f.source : instruction.source;
                 b.SetCurrentDebugLocation(llvm::DILocation::get(context, loc.line, loc.column, subprogram));
+                if(defer_return_load && &instruction==&f.blocks[n].instructions.back())check_cleanup_return();
                 llvm::Value* v = nullptr;
                 using ir::Op;
                 auto trace_failure = [&] {
@@ -998,6 +1071,12 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 }
                 case Op::array_initialize: {
                     auto t=operand_type(instruction.a);native_write(t,value_roots[n].at(instruction.a),values[instruction.b],native_arg(ir::array_element(t),instruction.arguments[0],true),true);break;
+                }
+                case Op::array_finish: {
+                    auto t=operand_type(instruction.a);
+                    b.CreateCall(module->getOrInsertFunction("vd_value_array_complete",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getPtrTy()),
+                        {value_roots[n].at(instruction.a),element_record(ir::array_element(t)),b.getInt64(*t.definition->extent),failure});
+                    selected_failure();v=values[instruction.a];break;
                 }
                 case Op::array_capture: v=b.CreateStore(values[instruction.a],slots.at(instruction.immediate));break;
                 case Op::list_check: {
@@ -1251,6 +1330,275 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     break;
                 case Op::extract: v = b.CreateExtractValue(values[instruction.a],{static_cast<unsigned>(instruction.immediate)}); break;
                 case Op::insert: v = b.CreateInsertValue(values[instruction.a],values[instruction.b],{static_cast<unsigned>(instruction.immediate)}); break;
+                case Op::c_primitive_call: {
+                    using Shape = CPrimitiveAdmission::Shape;
+                    const auto& admission = *input.c_primitives;
+                    const auto ordinal = static_cast<std::uint32_t>(instruction.immediate);
+                    const auto& binding = admission.bindings().at(ordinal);
+                    const auto count = static_cast<std::uint32_t>(instruction.arguments.size());
+                    auto* absent = llvm::ConstantPointerNull::get(b.getPtrTy());
+                    const auto* resource = binding.abi_result.resource ? &binding.abi_result :
+                        count && binding.abi_parameters[0].resource ? &binding.abi_parameters[0] : nullptr;
+                    if (count && binding.abi_parameters.back().callback) {
+                        const auto& signature = admission.callbacks().at(binding.abi_parameters.back().callback - 1);
+                        const auto callback_argument = instruction.arguments.back();
+                        const auto callback_type = operand_type(callback_argument);
+                        auto* callback = llvm::Function::Create(llvm::FunctionType::get(b.getVoidTy(),
+                            {b.getInt64Ty(), b.getPtrTy(), b.getPtrTy(), b.getPtrTy(), b.getPtrTy()}, false),
+                            llvm::GlobalValue::InternalLinkage, "c_callback_entry" + suffix, *module);
+                        llvm::IRBuilder<> entry(llvm::BasicBlock::Create(context, "entry", callback));
+                        auto* callable = entry.CreateInsertValue(llvm::UndefValue::get(type(callback_type)), callback->getArg(0), 0);
+                        callable = entry.CreateInsertValue(callable, callback->getArg(1), 1);
+                        std::vector<llvm::Value*> arguments{callable};
+                        for (unsigned a = 0; a < signature.parameters.size(); ++a) {
+                            const auto scalar = signature.parameters[a].scalar;
+                            auto* word = entry.CreateLoad(entry.getInt64Ty(),
+                                entry.CreateInBoundsGEP(entry.getInt64Ty(), callback->getArg(2), entry.getInt32(a)));
+                            auto* raw = entry.CreateZExtOrTrunc(word,
+                                entry.getIntNTy(scalar == ir::Type::boolean ? 1 : numeric::width(scalar)));
+                            arguments.push_back(numeric::floating(scalar) ? entry.CreateBitCast(raw, type(scalar)) : raw);
+                        }
+                        arguments.push_back(callback->getArg(4));
+                        llvm::Value* returned = entry.CreateCall(callable_dispatchers.at(ir::Type::key(callback_type)), arguments);
+                        const auto callback_result = signature.result.scalar;
+                        if (callback_result != ir::Type::none) {
+                            if (numeric::floating(callback_result))
+                                returned = entry.CreateBitCast(returned, entry.getIntNTy(numeric::width(callback_result)));
+                            entry.CreateStore(entry.CreateZExtOrTrunc(returned, entry.getInt64Ty()), callback->getArg(3));
+                        }
+                        entry.CreateRetVoid();
+                        auto* words = b.CreateAlloca(b.getInt64Ty(), b.getInt32(count));
+                        for (unsigned a = 0; a + 1 < count; ++a) {
+                            const auto arg = instruction.arguments[a];
+                            b.CreateStore(bits(values[arg], operand_type(arg)),
+                                b.CreateInBoundsGEP(b.getInt64Ty(), words, b.getInt32(a)));
+                        }
+                        b.CreateStore(b.getInt64(0), b.CreateInBoundsGEP(b.getInt64Ty(), words, b.getInt32(count - 1)));
+                        const auto result = instruction.type;
+                        llvm::Value* output = absent;
+                        if (!resource && result != ir::Type::none) {
+                            output = b.CreateAlloca(b.getInt64Ty());
+                            b.CreateStore(b.getInt64(0), output);
+                        }
+                        auto resolve = module->getOrInsertFunction(c_dynamic_resolve, b.getPtrTy(), b.getPtrTy(), b.getInt32Ty());
+                        const auto& plan = admission.dynamic()->bytes();
+                        auto* thunk = b.CreateCall(resolve, {b.CreateGlobalString(plan), b.getInt32(plan.size())});
+                        fail_if(b.CreateIsNull(thunk), "C dynamic Runtime binding is unavailable");
+                        auto bridge = module->getOrInsertFunction(c_callback_bridge, b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(),
+                            b.getInt32Ty(), b.getInt32Ty(), b.getPtrTy(), b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(),
+                            b.getPtrTy(), b.getInt32Ty(), b.getInt32Ty(), b.getInt64Ty(), b.getPtrTy(), b.getPtrTy(),
+                            b.getInt32Ty(), b.getInt32Ty(), b.getPtrTy());
+                        const auto& descriptor = admission.descriptor();
+                        const auto* owner = resource ? &admission.resource(resource->resource) : nullptr;
+                        auto* handle = owner ? value_roots[n].at(values.size()) : absent;
+                        llvm::Value* identity = absent;
+                        if (owner) identity = b.CreateGlobalString(admission.module() + "::" + owner->name);
+                        auto* target = values[callback_argument];
+                        auto* status = b.CreateCall(bridge, {thunk, b.CreateGlobalString(descriptor), b.getInt32(descriptor.size()),
+                            b.getInt32(ordinal), words, b.getInt32(count), output, handle, identity,
+                            b.getInt32(owner ? owner->release_ordinal : 0), b.getInt32(owner && owner->shutdown_owner),
+                            b.CreateExtractValue(target, 0), b.CreateExtractValue(target, 1), callback,
+                            b.getInt32(signature.parameters.size()), b.getInt32(callback_result != ir::Type::none), failure});
+                        selected_failure();
+                        fail_if(b.CreateICmpEQ(status, b.getInt32(3)), "C callback resource requires its owning thread");
+                        fail_if(b.CreateICmpEQ(status, b.getInt32(6)), "C callback provider returned a duplicate native owner");
+                        fail_if(b.CreateIsNotNull(status), "C callback transport rejected " + instruction.callee);
+                        if (owner) v = b.CreateLoad(b.getPtrTy(), handle);
+                        else if (result == ir::Type::none) v = llvm::UndefValue::get(b.getInt8Ty());
+                        else {
+                            auto* raw = b.CreateLoad(b.getInt64Ty(), output);
+                            const auto width = result == ir::Type::boolean ? 1 : numeric::width(result);
+                            if (width < 64) fail_if(b.CreateIsNotNull(b.CreateLShr(raw, width)), "noncanonical C callback result");
+                            v = b.CreateZExtOrTrunc(raw, b.getIntNTy(width));
+                            if (numeric::floating(result)) v = b.CreateBitCast(v, type(result));
+                        }
+                        break;
+                    }
+                    if (resource) {
+                        auto* words = b.CreateAlloca(b.getInt64Ty(), b.getInt32(count ? count : 1));
+                        const bool acquire = resource->role == CResourceRole::acquire;
+                        for (unsigned a = 0; a < count; ++a) {
+                            const auto argument = instruction.arguments[a];
+                            auto* word = !acquire && a == 0 ? b.getInt64(0) : bits(values[argument], operand_type(argument));
+                            b.CreateStore(word, b.CreateInBoundsGEP(b.getInt64Ty(), words, b.getInt32(a)));
+                        }
+                        const auto result_type = instruction.type;
+                        const auto& info = admission.resource(resource->resource);
+                        auto* handle = value_roots[n].at(acquire ? values.size() : instruction.arguments[0]);
+                        llvm::Value* scalar = acquire || result_type == ir::Type::none ?
+                            static_cast<llvm::Value*>(absent) : b.CreateAlloca(b.getInt64Ty());
+                        if (scalar != absent) b.CreateStore(b.getInt64(0), scalar);
+                        auto* bytes = b.CreateGlobalString(admission.descriptor());
+                        llvm::Value* transport;
+                        if (const auto& plan = admission.dynamic()) {
+                            auto resolve = module->getOrInsertFunction(c_dynamic_resolve, b.getPtrTy(), b.getPtrTy(), b.getInt32Ty());
+                            transport = b.CreateCall(resolve, {b.CreateGlobalString(plan->bytes()), b.getInt32(plan->bytes().size())});
+                            fail_if(b.CreateIsNull(transport), "C dynamic Runtime binding is unavailable");
+                        } else {
+                            transport = module->getOrInsertFunction(admission.transport(), b.getInt32Ty(), b.getPtrTy(),
+                                b.getInt32Ty(), b.getInt32Ty(), b.getPtrTy(), b.getInt32Ty(), b.getPtrTy()).getCallee();
+                        }
+                        auto bridge = module->getOrInsertFunction(info.shutdown_owner ? c_owner_resource_bridge : c_resource_bridge,
+                            b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(),
+                            b.getInt32Ty(), b.getInt32Ty(), b.getPtrTy(), b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(),
+                            b.getPtrTy(), b.getInt32Ty(), b.getInt32Ty());
+                        auto* status = b.CreateCall(bridge, {transport, bytes, b.getInt32(admission.descriptor().size()),
+                            b.getInt32(ordinal), words, b.getInt32(count), scalar, handle,
+                            b.CreateGlobalString(admission.module() + "::" + info.name), b.getInt32(info.release_ordinal),
+                            b.getInt32(static_cast<std::uint32_t>(resource->role))});
+                        fail_if(b.CreateICmpEQ(status, b.getInt32(1)), "C resource is closed, null or invalid");
+                        fail_if(b.CreateICmpEQ(status, b.getInt32(2)), "C resource belongs to another provider or contract");
+                        fail_if(b.CreateICmpEQ(status, b.getInt32(3)), "C resource requires its owning thread");
+                        fail_if(b.CreateICmpEQ(status, b.getInt32(6)), "C provider returned a duplicate native owner");
+                        fail_if(b.CreateICmpEQ(status, b.getInt32(7)), "C callback cannot reenter its own registration");
+                        fail_if(b.CreateICmpEQ(status, b.getInt32(8)), "Retained C callback failed");
+                        fail_if(b.CreateIsNotNull(status), "C resource operation rejected " + instruction.callee);
+                        if (acquire) v = b.CreateLoad(b.getPtrTy(), handle);
+                        else if (result_type == ir::Type::none) v = llvm::UndefValue::get(b.getInt8Ty());
+                        else {
+                            auto* raw = b.CreateLoad(b.getInt64Ty(), scalar);
+                            const unsigned width = result_type == ir::Type::boolean ? 1 : numeric::width(result_type);
+                            if (width < 64)
+                                fail_if(b.CreateIsNotNull(b.CreateLShr(raw, width)), "noncanonical C resource result");
+                            v = b.CreateZExtOrTrunc(raw, b.getIntNTy(width));
+                            if (numeric::floating(result_type)) v = b.CreateBitCast(v, type(result_type));
+                        }
+                        break;
+                    }
+                    auto scratch = [&](unsigned bytes) {
+                        auto* buffer = b.CreateAlloca(b.getInt64Ty(), b.getInt32((bytes + 7) / 8));
+                        b.CreateMemSet(buffer, b.getInt8(0), bytes, llvm::Align(8));
+                        return buffer;
+                    };
+                    auto read_bits = [&](llvm::Value* raw, ir::Type scalar) -> llvm::Value* {
+                        const unsigned width = scalar == ir::Type::boolean ? 1 : numeric::width(scalar);
+                        if (scalar == ir::Type::boolean)
+                            fail_if(b.CreateICmpUGT(raw, llvm::ConstantInt::get(raw->getType(), 1)),
+                                "noncanonical C Boolean field");
+                        auto* narrowed = b.CreateZExtOrTrunc(raw, b.getIntNTy(width));
+                        return numeric::floating(scalar) ? b.CreateBitCast(narrowed, type(scalar)) : narrowed;
+                    };
+                    std::function<void(const Shape&,ir::Type,llvm::Value*,llvm::Value*,bool)> transfer;
+                    transfer = [&](const Shape& shape, ir::Type source_type, llvm::Value* value,
+                                   llvm::Value* native, bool into_c) {
+                        if (shape.record) {
+                            const auto& record = admission.record(shape.record);
+                            for (unsigned i = 0; i < record.fields.size(); ++i) {
+                                const auto& field = record.fields[i];
+                                transfer(field.shape, ir::field_type(source_type, i),
+                                    b.CreateStructGEP(type(source_type), value, i),
+                                    b.CreateInBoundsGEP(b.getInt8Ty(), native, b.getInt32(field.offset)), into_c);
+                            }
+                            return;
+                        }
+                        const unsigned bytes = CPrimitiveAdmission::scalar_bytes(shape.scalar);
+                        auto* raw_type = b.getIntNTy(bytes * 8);
+                        if (!shape.extent) {
+                            if (into_c) {
+                                auto* word = bits(b.CreateLoad(type(shape.scalar), value), shape.scalar);
+                                b.CreateAlignedStore(b.CreateZExtOrTrunc(word, raw_type), native, llvm::Align(bytes));
+                            } else {
+                                auto* word = b.CreateAlignedLoad(raw_type, native, llvm::Align(bytes));
+                                b.CreateStore(read_bits(word, shape.scalar), value);
+                            }
+                            return;
+                        }
+                        const auto encoding = b.getInt32(scalar_encoding(shape.scalar));
+                        const auto extent = b.getInt64(shape.extent);
+                        if (!into_c) {
+                            b.CreateCall(module->getOrInsertFunction("vd_array_default", b.getVoidTy(),
+                                b.getPtrTy(), b.getInt32Ty(), b.getInt64Ty(), b.getInt64Ty(), b.getPtrTy()),
+                                {value, encoding, extent, b.getInt64(0), failure});
+                            selected_failure();
+                        }
+                        for (unsigned i = 0; i < shape.extent; ++i) {
+                            auto* position = b.CreateInBoundsGEP(b.getInt8Ty(), native, b.getInt32(i * bytes));
+                            if (into_c) {
+                                auto* word = b.CreateCall(module->getOrInsertFunction("vd_array_read", b.getInt64Ty(),
+                                    b.getPtrTy(), b.getInt64Ty(), b.getInt32Ty(), b.getInt64Ty(), b.getPtrTy()),
+                                    {value, b.getInt64(i), encoding, extent, failure});
+                                selected_failure();
+                                b.CreateAlignedStore(b.CreateZExtOrTrunc(word, raw_type), position, llvm::Align(bytes));
+                            } else {
+                                auto* raw = b.CreateAlignedLoad(raw_type, position, llvm::Align(bytes));
+                                auto* word = bits(read_bits(raw, shape.scalar), shape.scalar);
+                                b.CreateCall(module->getOrInsertFunction("vd_array_write", b.getVoidTy(),
+                                    b.getPtrTy(), b.getInt64Ty(), b.getInt64Ty(), b.getInt32Ty(), b.getInt64Ty(), b.getPtrTy()),
+                                    {value, b.getInt64(i), word, encoding, extent, failure});
+                                selected_failure();
+                            }
+                        }
+                    };
+                    llvm::Value* words = count ? static_cast<llvm::Value*>(scratch(count * 8)) : absent;
+                    unsigned span_count = 0;
+                    llvm::Value* spans = admission.revision() >= 2 ? absent : nullptr;
+                    llvm::StructType* span_type = nullptr;
+                    for (unsigned a = 0; a < count; ++a) {
+                        const auto argument = instruction.arguments[a];
+                        const auto& shape = binding.abi_parameters[a];
+                        if (shape.direction) {
+                            if (!span_type) {
+                                span_type = llvm::StructType::get(b.getPtrTy(), b.getInt64Ty(), b.getInt32Ty(),
+                                    b.getInt32Ty(), b.getInt32Ty(), b.getInt32Ty());
+                                const auto* geometry = layout.getStructLayout(span_type);
+                                if (geometry->getSizeInBytes() != sizeof(CSpanRequest) ||
+                                    geometry->getElementOffset(1) != offsetof(CSpanRequest, limit) ||
+                                    geometry->getElementOffset(2) != offsetof(CSpanRequest, argument) ||
+                                    geometry->getElementOffset(3) != offsetof(CSpanRequest, direction) ||
+                                    geometry->getElementOffset(4) != offsetof(CSpanRequest, offset_argument) ||
+                                    geometry->getElementOffset(5) != offsetof(CSpanRequest, length_argument))
+                                    throw std::invalid_argument("C span request ABI mismatch");
+                                spans = b.CreateAlloca(span_type, b.getInt32(2));
+                            }
+                            auto* row = b.CreateInBoundsGEP(span_type, spans, b.getInt32(span_count++));
+                            llvm::Value* fields[] = {value_roots[n].at(argument), b.getInt64(shape.limit),
+                                b.getInt32(a), b.getInt32(shape.direction),
+                                b.getInt32(shape.offset_argument), b.getInt32(shape.length_argument)};
+                            for (unsigned i = 0; i < 6; ++i)
+                                b.CreateStore(fields[i], b.CreateStructGEP(span_type, row, i));
+                            continue;
+                        }
+                        llvm::Value* word;
+                        if (shape.record) {
+                            auto* storage = value_roots[n].at(argument);
+                            if (!storage) {
+                                storage = b.CreateAlloca(type(operand_type(argument)));
+                                b.CreateStore(values[argument], storage);
+                            }
+                            auto* native = scratch(admission.record(shape.record).size);
+                            transfer(shape, operand_type(argument), storage, native, true);
+                            word = b.CreatePtrToInt(native, b.getInt64Ty());
+                        } else word = bits(values[argument], operand_type(argument));
+                        b.CreateStore(word, b.CreateInBoundsGEP(b.getInt64Ty(), words, b.getInt32(a)));
+                    }
+                    const auto result_type = instruction.type;
+                    const auto& result_shape = binding.abi_result;
+                    llvm::Value* output = absent;
+                    if (result_type != ir::Type::none)
+                        output = scratch(result_shape.record ? admission.record(result_shape.record).size : 8);
+                    auto* status = call_c_primitive(b, *module, admission, ordinal, words, count, output, spans, span_count);
+                    if (span_count) {
+                        fail_if(b.CreateICmpEQ(status, b.getInt32(3)), "C byte span outside admitted extent");
+                        fail_if(b.CreateICmpEQ(status, b.getInt32(4)), "overlapping C byte spans");
+                        fail_if(b.CreateICmpEQ(status, b.getInt32(5)), "C byte span returned an oversized written prefix");
+                    }
+                    fail_if(b.CreateIsNotNull(status), "C primitive transport rejected " + instruction.callee);
+                    if (result_type == ir::Type::none) {
+                        v = llvm::UndefValue::get(b.getInt8Ty());
+                    } else if (result_shape.record) {
+                        auto* storage = value_roots[n].at(values.size());
+                        if (!storage) storage = b.CreateAlloca(type(result_type));
+                        transfer(result_shape, result_type, storage, output, false);
+                        v = b.CreateLoad(type(result_type), storage);
+                    } else {
+                        auto* raw = b.CreateLoad(b.getInt64Ty(), output);
+                        const unsigned width = result_type == ir::Type::boolean ? 1 : numeric::width(result_type);
+                        if (width < 64)
+                            fail_if(b.CreateIsNotNull(b.CreateLShr(raw, width)), "noncanonical C primitive result");
+                        v = read_bits(raw, result_type);
+                    }
+                    break;
+                }
                 case Op::native_call: {
                     unsigned op=native_operation(instruction.callee);
                     llvm::Value* bits=b.getInt64(0);llvm::Value* object=llvm::ConstantPointerNull::get(b.getPtrTy());llvm::Value* text=object;llvm::Value* environment=object;llvm::Value* entry=object;llvm::Value* function=b.getInt64(0);
@@ -1594,6 +1942,31 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     v=b.CreateInsertValue(value,code,2); break;
                 }
                 case Op::bitcast: v=b.CreateBitCast(values[instruction.a],type(instruction.type));break;
+                case Op::try_convert: {
+                    const auto destination=ir::field_type(instruction.type,1);
+                    const bool enumeration=destination.kind==ir::Type::numeric_enum;
+                    const auto backing=enumeration?ir::Type(*destination.definition->enum_backing):destination;
+                    auto [wide,in_range]=checked_integer(values[instruction.a],operand_type(instruction.a),backing);
+                    auto* absent=b.GetInsertBlock();
+                    auto* present=llvm::BasicBlock::Create(context,"try_convert.some",fn);
+                    auto* done=llvm::BasicBlock::Create(context,"try_convert.done",fn);
+                    llvm::BasicBlock* membership=nullptr;
+                    if(enumeration) {
+                        membership=llvm::BasicBlock::Create(context,"try_convert.membership",fn);
+                        b.CreateCondBr(in_range,membership,done);b.SetInsertPoint(membership);
+                        b.CreateCondBr(enum_membership(destination,wide,true),present,done);
+                    } else b.CreateCondBr(in_range,present,done);
+                    b.SetInsertPoint(present);
+                    auto* empty=llvm::Constant::getNullValue(type(instruction.type));
+                    auto* tagged=b.CreateInsertValue(empty,b.getInt32(1),0);
+                    auto* some=b.CreateInsertValue(tagged,b.CreateTrunc(wide,type(backing)),1);
+                    b.CreateBr(done);b.SetInsertPoint(done);
+                    auto* option=b.CreatePHI(type(instruction.type),enumeration?3:2);
+                    option->addIncoming(empty,absent);
+                    if(membership)option->addIncoming(empty,membership);
+                    option->addIncoming(some,present);
+                    v=option;break;
+                }
                 case Op::convert: {
                     auto* a = values[instruction.a]; auto from = operand_type(instruction.a), to = instruction.type;
                     if(from.definition && from.definition->callable){if(!to.nullable)fail_if(b.CreateICmpEQ(b.CreateExtractValue(a,0),b.getInt64(0)),"Null function value in checked conversion");v=a;break;}
@@ -1604,10 +1977,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     }
                     if (from == to) { v = a; break; }
                     if (numeric::integer(from) && numeric::integer(to)) {
-                        auto* wide = numeric::signed_integer(from) ? b.CreateSExt(a,b.getIntNTy(128)) : b.CreateZExt(a,b.getIntNTy(128));
-                        auto low = numeric::signed_integer(to) ? llvm::APInt::getSignedMinValue(numeric::width(to)).sext(128) : llvm::APInt(128,0);
-                        auto high = numeric::signed_integer(to) ? llvm::APInt::getSignedMaxValue(numeric::width(to)).sext(128) : llvm::APInt::getMaxValue(numeric::width(to)).zext(128);
-                        fail_if(b.CreateOr(b.CreateICmpSLT(wide,llvm::ConstantInt::get(context,low)),b.CreateICmpSGT(wide,llvm::ConstantInt::get(context,high))),"Checked numeric conversion is out of range");
+                        auto [wide,valid]=checked_integer(a,from,to);
+                        fail_if(b.CreateNot(valid),"Checked numeric conversion is out of range");
                         v = b.CreateTrunc(wide,type(to));
                     } else if (numeric::integer(from)) {
                         v = numeric::signed_integer(from) ? b.CreateSIToFP(a,type(to)) : b.CreateUIToFP(a,type(to));
@@ -1740,16 +2111,16 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
 
                 }
                 auto result_type = instruction_types[n].at(values.size());
+                if(result_type.kind==ir::Type::numeric_enum && instruction.op!=Op::constant)
+                    fail_if(b.CreateNot(enum_membership(result_type,v,false)),"Invalid numeric enum discriminant in storage");
                 if(async && result_type!=ir::Type::none)b.CreateStore(v,frame_home(async->values[n][values.size()]));
                 else if (input.coordinated && value_roots[n].at(values.size())) b.CreateStore(v,value_roots[n][values.size()]);
                 value_types.push_back(result_type);
                 values.push_back(v);
             }
             const auto& end = f.blocks[n].end;
-            if(f.cleanup_entry && n>=*f.cleanup_entry && (end.kind==ir::Terminator::Kind::return_value || end.kind==ir::Terminator::Kind::return_void)){
-                if(async)b.CreateCall(module->getOrInsertFunction("vd_async_finish",b.getVoidTy(),b.getPtrTy()),{failure});
-                auto* failed=llvm::BasicBlock::Create(context,"cleanup_failed",fn);auto* ready=llvm::BasicBlock::Create(context,"cleanup_complete",fn);b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),failed,ready);b.SetInsertPoint(failed);return_failure();b.SetInsertPoint(ready);
-            }
+            if(!defer_return_load && f.cleanup_entry && n>=*f.cleanup_entry &&
+               (end.kind==ir::Terminator::Kind::return_value || end.kind==ir::Terminator::Kind::return_void))check_cleanup_return();
             switch (end.kind) {
             case ir::Terminator::Kind::return_value: {
                 auto* value=values[end.value];
@@ -1837,6 +2208,9 @@ struct Jit::Impl {
     struct Generation {
         std::shared_ptr<llvm::orc::LLJIT> jit;
         std::shared_ptr<std::atomic<std::size_t>> live;
+        ApplicationMetadata::Owner application_metadata;
+        std::string build_provenance;
+        std::shared_ptr<const DynamicBinding> dynamic;
         llvm::orc::ResourceTrackerSP tracker;
         llvm::orc::JITDylib* dylib=nullptr;
         ~Generation() {
@@ -1849,7 +2223,7 @@ struct Jit::Impl {
     };
     std::shared_ptr<const NativeCode> load(std::unique_ptr<llvm::Module> module,
         std::unique_ptr<llvm::LLVMContext> context, const std::string& symbol,
-        Compatibility contract, const std::shared_ptr<Impl>&, bool checked = false, std::shared_ptr<Runtime> runtime = {}, const std::string& suffix = {}, bool isolated = false, std::unique_ptr<llvm::MemoryBuffer> object = {}) {
+        Compatibility contract, const std::shared_ptr<Impl>&, bool checked = false, std::shared_ptr<Runtime> runtime = {}, const std::string& suffix = {}, bool isolated = false, std::unique_ptr<llvm::MemoryBuffer> object = {}, CPrimitiveAdmission::Owner primitives = {}, std::shared_ptr<const DynamicBinding> dynamic = {}) {
 #ifdef VOID_FUNCTION_SANITIZER_HASH
         // The host ABI is checked before reaching this boundary. Match the
         // compiler-generated plain/checked entry metadata without disabling UBSan.
@@ -1863,6 +2237,8 @@ struct Jit::Impl {
 #endif
         auto generation = std::make_shared<Generation>();
         generation->jit=jit;generation->live=live;++*live;
+        generation->application_metadata=contract.application_metadata;
+        generation->build_provenance=contract.build_provenance;
         auto* target=&jit->getMainJITDylib();
         // Source generations are self-contained. Trusted raw-IR clients retain
         // their existing cross-module exported-symbol linking contract.
@@ -1879,6 +2255,32 @@ struct Jit::Impl {
         }
         auto& dylib=*target;
         generation->tracker=dylib.createResourceTracker();
+        generation->dynamic = std::move(dynamic);
+        if (primitives) {
+            llvm::orc::SymbolMap symbols;
+            if (primitives->dynamic()) {
+                symbols[jit->mangleAndIntern(c_dynamic_resolve)] = llvm::orc::ExecutorSymbolDef(
+                    llvm::orc::ExecutorAddr::fromPtr(vd_c_dynamic_resolve_v1), llvm::JITSymbolFlags::Exported);
+                symbols[jit->mangleAndIntern(c_dynamic_call)] = llvm::orc::ExecutorSymbolDef(
+                    llvm::orc::ExecutorAddr::fromPtr(vd_c_dynamic_call_v1), llvm::JITSymbolFlags::Exported);
+                if (!primitives->callbacks().empty())
+                    symbols[jit->mangleAndIntern(c_callback_bridge)] = llvm::orc::ExecutorSymbolDef(
+                        llvm::orc::ExecutorAddr::fromPtr(vd_c_callback_dispatch_v1), llvm::JITSymbolFlags::Exported);
+            } else {
+                symbols[jit->mangleAndIntern(primitives->transport())] = llvm::orc::ExecutorSymbolDef(
+                    llvm::orc::ExecutorAddr::fromPtr(primitives->thunk()), llvm::JITSymbolFlags::Exported);
+            }
+            if (primitives->revision() >= 2)
+                symbols[jit->mangleAndIntern(c_span_bridge)] = llvm::orc::ExecutorSymbolDef(
+                    llvm::orc::ExecutorAddr::fromPtr(vd_c_span_dispatch_v2), llvm::JITSymbolFlags::Exported);
+            if (primitives->revision() == 3) {
+                symbols[jit->mangleAndIntern(c_resource_bridge)] = llvm::orc::ExecutorSymbolDef(
+                    llvm::orc::ExecutorAddr::fromPtr(vd_c_resource_dispatch_v3), llvm::JITSymbolFlags::Exported);
+                symbols[jit->mangleAndIntern(c_owner_resource_bridge)] = llvm::orc::ExecutorSymbolDef(
+                    llvm::orc::ExecutorAddr::fromPtr(vd_c_resource_dispatch_owner_v3), llvm::JITSymbolFlags::Exported);
+            }
+            check(dylib.define(llvm::orc::absoluteSymbols(symbols), generation->tracker));
+        }
         if(object)check(jit->addObjectFile(generation->tracker,std::move(object)));
         else check(jit->addIRModule(generation->tracker, llvm::orc::ThreadSafeModule(std::move(module), std::move(context))));
         auto address = unwrap(jit->lookup(dylib,symbol));
@@ -1947,7 +2349,7 @@ Jit::Jit(DebugCache cache,ir::Emission emission) : impl_(std::make_shared<Impl>(
     bind("vd_array_read",vd_array_read);bind("vd_array_write",vd_array_write);
     bind("vd_dict_new",vd_dict_new);bind("vd_dict_count",vd_dict_count);bind("vd_dict_read",vd_dict_read);bind("vd_dict_entry",vd_dict_entry);bind("vd_dict_write",vd_dict_write);bind("vd_dict_remove",vd_dict_remove);bind("vd_dict_clear",vd_dict_clear);
     bind("vd_value_array_insert",vd_value_array_insert);bind("vd_value_array_clear",vd_value_array_clear);bind("vd_value_array_slice",vd_value_array_slice);
-    bind("vd_value_array_new",vd_value_array_new);bind("vd_value_array_count",vd_value_array_count);bind("vd_value_array_version",vd_value_array_version);bind("vd_value_array_read",vd_value_array_read);bind("vd_value_array_write",vd_value_array_write);bind("vd_value_array_push",vd_value_array_push);bind("vd_value_array_remove",vd_value_array_remove);bind("vd_value_array_copy",vd_value_array_copy);
+    bind("vd_value_array_new",vd_value_array_new);bind("vd_value_array_count",vd_value_array_count);bind("vd_value_array_complete",vd_value_array_complete);bind("vd_value_array_version",vd_value_array_version);bind("vd_value_array_read",vd_value_array_read);bind("vd_value_array_write",vd_value_array_write);bind("vd_value_array_push",vd_value_array_push);bind("vd_value_array_remove",vd_value_array_remove);bind("vd_value_array_copy",vd_value_array_copy);
     bind("vd_list_new",vd_list_new);bind("vd_list_count",vd_list_count);bind("vd_list_version",vd_list_version);
     bind("vd_convert_parse", vd_convert_parse);
     bind("vd_list_write_bytes", vd_list_write_bytes);
@@ -1967,11 +2369,24 @@ Jit::Jit(DebugCache cache,ir::Emission emission) : impl_(std::make_shared<Impl>(
 Jit::~Jit() = default;
 void Jit::bind_address(std::string name, std::uintptr_t entry) {
     if (!entry) throw std::invalid_argument("null native import");
+    if (reserved_c_transport(name))
+        throw std::invalid_argument("C primitive transport requires per-generation admission");
     impl_->custom_bindings=true;
     llvm::orc::SymbolMap symbols;
     symbols[impl_->jit->mangleAndIntern(name)] = llvm::orc::ExecutorSymbolDef(
         llvm::orc::ExecutorAddr(entry), llvm::JITSymbolFlags::Exported);
     check(impl_->jit->getMainJITDylib().define(llvm::orc::absoluteSymbols(symbols)));
+}
+static std::string application_build_provenance(const ValidatedAnalysis* analysis, const ApplicationMetadata& metadata,
+                                                std::string_view target, bool optimize, std::string_view inputs) {
+    std::string recipe="VOID-application-build-v1";
+    auto field=[&](std::string_view value){llvm_backend::cache_field(recipe,value);};
+    field(LLVM_VERSION_STRING);field(target);field(optimize?"O2":"O0");field(inputs);field(metadata.bytes());
+    if(analysis) {
+        field(analysis->entry_identity());field(analysis->compatibility_contract());
+        for(const auto& source:analysis->modules()) {field(source.identity);field(source.source.text());}
+    }
+    return llvm_backend::digest(recipe);
 }
 std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const std::string& entry,
                                               bool optimize, Compatibility contract, std::shared_ptr<Runtime> runtime) {
@@ -1985,10 +2400,12 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
         return compile(coordinated,entry,optimize,std::move(contract),std::move(runtime));
     }
     if (input.coordinated && input.analysis && !runtime) {
-        if (!input.globals.empty()) runtime = std::make_shared<Runtime>(256);
+        if (input.application_metadata || !input.globals.empty() ||
+            (input.c_primitives && input.c_primitives->dynamic())) runtime = std::make_shared<Runtime>(256);
         else { if (!impl_->source_runtime) impl_->source_runtime=std::make_shared<Runtime>(256); runtime=impl_->source_runtime; }
     }
     std::map<std::string,ir::ReferenceEffects> checked_effects;ir::validate(input,nullptr,&checked_effects);
+    check_c_primitive_target(input, impl_->jit->getTargetTriple());
     if (input.coordinated != static_cast<bool>(runtime)) throw std::invalid_argument("coordinated IR requires an explicit runtime owner");
     const ir::Function* selected = nullptr;
     for (const auto& f : input.functions) if (f.name == entry) selected = &f;
@@ -1997,7 +2414,10 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
     if (!selected) for (const auto& f : input.functions)
         if (f.name == input.identity + "::" + entry && !f.module_identity.empty()) selected = &f;
     if (!selected) throw std::invalid_argument("entry function does not exist");
+    if (input.c_primitives && selected->module_identity == input.c_primitives->module())
+        throw std::invalid_argument("C primitive binding cannot be a host entry");
     if(selected->asynchronous!=input.async_root)throw std::invalid_argument("Async entry requires the explicit scheduler root adapter");
+    if (runtime) runtime->start_application(input.application_metadata,false);
     if (!input.globals.empty()) runtime->admit_globals(global_contract(input), impl_->replacing_globals, false);
     contract.async_root=input.async_root;
     if (selected->parameters != std::vector<ir::Type>{ir::Type::i32} || selected->result != ir::Type::i32)
@@ -2008,8 +2428,16 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
         throw std::invalid_argument("code identity or signature does not match IR");
     // Compiler records always override host-supplied source safety metadata.
     contract.analysis = input.analysis;
+    contract.application_metadata = input.application_metadata;
+    if (input.application_metadata)
+        contract.build_provenance = application_build_provenance(input.analysis.get(),*input.application_metadata,impl_->target_identity,optimize,impl_->cache.build_identity);
     contract.source_contract = input.analysis ? input.analysis->compatibility_contract() : std::string{};
+    if (input.c_primitives && !input.analysis)
+        contract.source_contract = input.c_primitives->descriptor();
     contract.runtime_identity = reinterpret_cast<std::uintptr_t>(runtime.get());
+    contract.native_thunk_identity = input.c_primitives && input.c_primitives->revision() == 3 ?
+        reinterpret_cast<std::uintptr_t>(input.c_primitives->thunk()) : 0;
+    contract.native_dynamic_contract = input.c_primitives ? input.c_primitives->dynamic_contract() : std::string{};
     if (input.coordinated && !input.analysis) {
         std::map<std::string,std::string> layouts;
         auto encoded = [](const std::string& text) { return std::to_string(text.size()) + ":" + text; };
@@ -2018,6 +2446,7 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
             auto base=t.definition->base.lock();
             std::string text = encoded(t.definition->identity) + "base:"+encoded(base ? base->identity : "")+"{";
             for (const auto& field : t.definition->fields) text += encoded(field.name) + ":"+encoded(field.owner)+":"+encoded(ir::type_name(field.type))+":"+encoded(ir::capability_key(field.type))+";";
+            if(t.kind==ir::Type::numeric_enum)text+=encoded(ir::numeric_enum_layout(t));
             for(const auto& variant:t.definition->cases)text+=encoded(variant.name)+":"+std::to_string(variant.begin)+":"+std::to_string(variant.count)+";";
             layouts.emplace(t.definition->identity,text + "}");
             for (const auto& field : t.definition->fields) record(field.type);
@@ -2056,7 +2485,17 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
     module->setDataLayout(impl_->jit->getDataLayout());
     module->setTargetTriple(impl_->jit->getTargetTriple());
     finish(*module, optimize);
-    auto result = impl_->load(std::move(module), std::move(context), native_symbol(*selected, suffix), std::move(contract), impl_, !selected->module_identity.empty() || input.coordinated, runtime,suffix,!selected->module_identity.empty());
+    std::shared_ptr<const DynamicBinding> dynamic;
+    if (input.c_primitives && input.c_primitives->dynamic()) {
+        const auto& plan = input.c_primitives->dynamic();
+        const auto& root = input.c_primitives->dynamic_root();
+        dynamic = runtime->dynamic_binding();
+        if (!dynamic) dynamic = load_dynamic(plan, root);
+        else if (!matches_dynamic(*dynamic, *plan, root))
+            throw std::invalid_argument("C dynamic closure is incompatible with the Runtime binding");
+    }
+    auto result = impl_->load(std::move(module), std::move(context), native_symbol(*selected, suffix), std::move(contract), impl_, !selected->module_identity.empty() || input.coordinated, runtime,suffix,!selected->module_identity.empty() || bool(input.c_primitives),{},input.c_primitives,dynamic);
+    if (dynamic) runtime->bind_dynamic(std::move(dynamic));
     if (!input.globals.empty()) runtime->admit_globals(global_contract(input), impl_->replacing_globals);
     return result;
 }
@@ -2070,6 +2509,10 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
     impl_->cache_status="disabled";
     auto cold=[&]{auto module=analysis.lower(impl_->emission);module.async_root=async_root;return compile(module,module.entry_symbol,optimize,contract,runtime);};
     if(!impl_->cache.project_root.empty() && impl_->cache.build_identity.empty()){impl_->cache_status="unavailable";return cold();}
+    if (analysis.c_primitive_admission()) {
+        if (!impl_->cache.project_root.empty()) impl_->cache_status = "unavailable";
+        return cold();
+    }
     if(impl_->custom_bindings || impl_->cache.project_root.empty())return cold();
     std::string identity;
     try {
@@ -2079,6 +2522,7 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
     field(optimize?"ir-O2":"no-ir-O2");
     field(impl_->emission==ir::Emission::entry?"entry-emission-v1":"all-exports");
     field(analysis.compatibility_contract());field(analysis.constant_contract());field(runtime ? "forced-runtime" : "automatic-runtime");
+    field(analysis.application_metadata()?std::string_view(analysis.application_metadata()->bytes()):std::string_view{});
     field(std::to_string(analysis.modules().size()));
     for(const auto& m:analysis.modules()) {field("module");field(m.identity);field(m.source.path());field(m.source.text());field(std::to_string(m.imports.size()));for(const auto& i:m.imports)field(i);}
     } catch(const std::bad_alloc&) {impl_->cache_status="unavailable";return cold();}
@@ -2092,9 +2536,10 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
             const bool globals = std::any_of(analysis.declarations().begin(), analysis.declarations().end(), [](const auto& d) { return d.kind == AnalyzedDeclaration::Kind::global_variable; });
             if (globals && !artifact->coordinated) throw std::runtime_error("global cache coordination mismatch");
             if (artifact->coordinated && !owner) {
-                if (globals) owner = std::make_shared<Runtime>(256);
+                if (analysis.application_metadata() || globals) owner = std::make_shared<Runtime>(256);
                 else { if (!impl_->source_runtime) impl_->source_runtime = std::make_shared<Runtime>(256); owner = impl_->source_runtime; }
             }
+            if (owner) owner->start_application(analysis.application_metadata(),false);
             if (globals) owner->admit_globals(global_contract(analysis), impl_->replacing_globals, false);
             if(bool(owner)!=artifact->coordinated)throw std::runtime_error("cache coordination mismatch");
             auto expected=analysis.entry_symbol();
@@ -2102,6 +2547,9 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
             if(contract.function_id!=expected || contract.signature!="c:i32(i32)")throw std::invalid_argument("code identity or signature does not match IR");
             contract.source_contract=analysis.compatibility_contract();contract.constant_contract=analysis.constant_contract();
             contract.analysis=analysis.shared_from_this();contract.runtime_identity=reinterpret_cast<std::uintptr_t>(owner.get());
+            contract.application_metadata=analysis.application_metadata();
+            if (contract.application_metadata)
+                contract.build_provenance=application_build_provenance(&analysis,*contract.application_metadata,impl_->target_identity,optimize,impl_->cache.build_identity);
             ir::Function entry;entry.name=expected;entry.module_identity=analysis.entry_identity();
             auto result=impl_->load({}, {},native_symbol(entry,"__cache"),contract,impl_,true,owner,"__cache",true,std::move(object));
             if (globals) owner->admit_globals(global_contract(analysis), impl_->replacing_globals);
@@ -2123,6 +2571,11 @@ std::shared_ptr<const NativeCode> Jit::replacement(const NativeCode& current,con
     if(contract.function_id.empty())contract.function_id=analysis.entry_symbol();
     contract.constant_contract=analysis.constant_contract();contract.source_contract=analysis.compatibility_contract();
     contract.analysis=analysis.shared_from_this();contract.runtime_identity=current.compatibility().runtime_identity;contract.async_root=current.compatibility().async_root;
+    contract.application_metadata=analysis.application_metadata();
+    const auto& native = analysis.c_primitive_admission();
+    contract.native_thunk_identity = native && native->revision() == 3 ?
+        reinterpret_cast<std::uintptr_t>(native->thunk()) : 0;
+    contract.native_dynamic_contract = native ? native->dynamic_contract() : std::string{};
     if(!(current.compatibility()==contract))return {};
     struct Replacement { bool& flag; explicit Replacement(bool& value) : flag(value) { flag = true; } ~Replacement() { flag = false; } } replacement(impl_->replacing_globals);
     return compile_analysis(analysis,optimize,std::move(contract),current.runtime_owner(),current.compatibility().async_root);
@@ -2177,7 +2630,7 @@ std::shared_ptr<const NativeCode> Jit::compile_root_probe(bool optimize) {
     return impl_->load(std::move(module), std::move(context), name, {"/proof::root_probe"}, impl_);
 }
 static void emit_impl(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program, bool runtime_object, const std::string& generation_suffix = {},
-                      bool storage_proof = false, const std::filesystem::path& proof_report = {}) {
+                      bool storage_proof = false, const std::filesystem::path& proof_report = {}, std::string_view build_inputs = {}) {
     if ((runtime_object && !input.coordinated) || (input.coordinated && !runtime_object && !source_program)) throw std::invalid_argument("coordinated AOT requires the runtime proof bootstrap");
     initialize();
     llvm::LLVMContext context;
@@ -2187,6 +2640,7 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
     for(const auto& f:input.functions)if(f.name==input.entry_symbol && f.asynchronous!=input.async_root)throw std::invalid_argument("Async AOT entry requires the explicit scheduler root adapter");
     if (!entry_valid) throw std::invalid_argument("AOT CLI adapter requires entry: i32(i32)");
     auto machine = native_machine();
+    check_c_primitive_target(input, machine->getTargetTriple());
     const auto triple = machine->getTargetTriple().str();
 #ifdef VOID_LLVM_RESEARCH
     llvm_backend::LoweringInventory inventory;
@@ -2204,6 +2658,14 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
                         );
     module->setTargetTriple(machine->getTargetTriple());
     module->setDataLayout(machine->createDataLayout());
+    llvm::GlobalVariable* application_record = nullptr;
+    if (input.application_metadata) {
+        llvm::IRBuilder<> constants(context);
+        application_record = constants.CreateGlobalString(input.application_metadata->bytes(),"vd.application.metadata.v1",0,module.get(),false);
+        auto provenance = application_build_provenance(input.analysis.get(),*input.application_metadata,triple,optimize,build_inputs);
+        auto* identity = constants.CreateGlobalString(provenance,"vd.application.provenance.v1",0,module.get());
+        llvm::appendToUsed(*module,{application_record,identity});
+    }
     if (!runtime_object) {
     const ir::Function* entry_function = nullptr;
     for (const auto& f : input.functions) if (f.name == input.entry_symbol) entry_function = &f;
@@ -2265,12 +2727,46 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
         arguments.push_back(failure);
     }
     llvm::CallInst* result;
+    const auto* dynamic = input.c_primitives ? input.c_primitives->dynamic().get() : nullptr;
+    if (input.c_primitives && !dynamic) {
+        auto* absent = llvm::ConstantPointerNull::get(b.getPtrTy());
+        auto* status = call_c_primitive(b, *module, *input.c_primitives, c_primitive_probe, absent, 0, absent);
+        auto* mismatch = llvm::BasicBlock::Create(context, "c_primitive_mismatch", main);
+        auto* admitted = llvm::BasicBlock::Create(context, "c_primitive_admitted", main);
+        b.CreateCondBr(b.CreateIsNotNull(status), mismatch, admitted);
+        b.SetInsertPoint(mismatch);
+        auto puts = module->getOrInsertFunction("puts", b.getInt32Ty(), b.getPtrTy());
+        b.CreateCall(puts, {b.CreateGlobalString("VOID: C primitive provider rejected the exact descriptor or fixture identity")});
+        b.CreateRet(b.getInt32(1));
+        b.SetInsertPoint(admitted);
+    }
     if (input.coordinated) {
         auto* catalog=module->getNamedGlobal("__vd_types"+(source_program ? std::string("__void") : std::string{}));
         auto* count=module->getNamedGlobal("__vd_type_count"+(source_program ? std::string("__void") : std::string{}));
         auto* size_type=b.getIntNTy(module->getDataLayout().getPointerSizeInBits());
         auto* witnesses=module->getNamedGlobal("__vd_witnesses"+(source_program ? std::string("__void") : std::string{}));auto* witness_count=module->getNamedGlobal("__vd_witness_count"+(source_program ? std::string("__void") : std::string{}));
-        if (source_program && input.application)
+        if (dynamic) {
+            const bool forward = source_program && input.application;
+            auto* absent = llvm::ConstantPointerNull::get(b.getPtrTy());
+            auto bootstrap = module->getOrInsertFunction("vd_runtime_entry_dynamic_v1", b.getInt32Ty(), b.getPtrTy(),
+                b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(), size_type, b.getPtrTy(), size_type,
+                b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(), size_type, b.getPtrTy(), size_type);
+            result = b.CreateCall(bootstrap, {entry,input_value,failure,catalog,b.CreateLoad(size_type,count),
+                witnesses,b.CreateLoad(size_type,witness_count),
+                forward ? static_cast<llvm::Value*>(main->getArg(0)) : b.getInt32(0),
+                forward ? static_cast<llvm::Value*>(main->getArg(1)) : absent,
+                application_record ? static_cast<llvm::Value*>(application_record) : absent,
+                llvm::ConstantInt::get(size_type, application_record ? input.application_metadata->bytes().size() : 0),
+                b.CreateGlobalString(dynamic->bytes()),llvm::ConstantInt::get(size_type,dynamic->bytes().size())});
+        } else if (application_record) {
+            const bool forward = source_program && input.application;
+            const bool wide = forward && llvm::Triple(module->getTargetTriple()).isOSWindows();
+            auto bootstrap=module->getOrInsertFunction("vd_runtime_entry_context_v1",b.getInt32Ty(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy(),size_type,b.getInt32Ty(),b.getPtrTy(),b.getInt1Ty(),b.getPtrTy(),size_type);
+            result=b.CreateCall(bootstrap,{entry,input_value,failure,catalog,b.CreateLoad(size_type,count),witnesses,b.CreateLoad(size_type,witness_count),
+                forward?static_cast<llvm::Value*>(main->getArg(0)):b.getInt32(0),
+                forward?static_cast<llvm::Value*>(main->getArg(1)):llvm::ConstantPointerNull::get(b.getPtrTy()),
+                b.getInt1(wide),application_record,llvm::ConstantInt::get(size_type,input.application_metadata->bytes().size())});
+        } else if (source_program && input.application)
             result=b.CreateCall(module->getOrInsertFunction("vd_runtime_entry_application",b.getInt32Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy(),size_type,b.getInt32Ty(),b.getPtrTy(),b.getInt1Ty()),{entry,failure,catalog,b.CreateLoad(size_type,count),witnesses,b.CreateLoad(size_type,witness_count),main->getArg(0),main->getArg(1),b.getInt1(llvm::Triple(module->getTargetTriple()).isOSWindows())});
         else result=b.CreateCall(module->getOrInsertFunction("vd_runtime_entry_metadata",b.getInt32Ty(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy(),size_type),{entry,input_value,failure,catalog,b.CreateLoad(size_type,count),witnesses,b.CreateLoad(size_type,witness_count)});
     }
@@ -2354,8 +2850,8 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
     write_object(*module,*machine,output);
 }
 void emit_async_object(const ir::Module& source,const std::filesystem::path& output,bool optimize){auto module=source;module.async_root=true;emit_object(module,output,optimize,true);}
-void emit_object(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program) {
-    emit_impl(input,output,optimize,source_program,false);
+void emit_object(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program, std::string_view build_inputs) {
+    emit_impl(input,output,optimize,source_program,false,{},false,{},build_inputs);
 }
 void emit_runtime_object(const ir::Module& input, const std::filesystem::path& output, bool optimize, const std::string& generation_suffix) {
     emit_impl(input,output,optimize,false,true,generation_suffix);

@@ -13,6 +13,13 @@ function(void_install_licenses component)
     DESTINATION share/void/licenses/llvm-23.1.4 COMPONENT ${component})
   install(DIRECTORY "${root}/third_party/llvm-dependency-licenses/zstd-1.5.7/"
     DESTINATION share/void/licenses/zstd-1.5.7 COMPONENT ${component})
+  install(FILES "${root}/third_party/tomlplusplus/LICENSE"
+    "${root}/third_party/tomlplusplus/upstream.json"
+    "${root}/third_party/tomlplusplus/void-bounds-and-locations.patch"
+    DESTINATION share/void/licenses/tomlplusplus COMPONENT ${component})
+  install(FILES "${root}/third_party/tomlplusplus/toml.hpp"
+    "${root}/third_party/tomlplusplus/README.md"
+    DESTINATION share/void/licenses/tomlplusplus/corresponding-source COMPONENT ${component})
   # LLVM may use zlib independently of the compiler's HTTP dependency closure.
   install(FILES "${root}/third_party/http-licenses/zlib-1.3.2/LICENSE"
     DESTINATION share/void/licenses/zlib-1.3.2 COMPONENT ${component})

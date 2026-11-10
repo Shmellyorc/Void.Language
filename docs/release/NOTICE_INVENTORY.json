@@ -389,7 +389,7 @@
       ],
       "platform": "all",
       "license": "component index and unresolved obligations",
-      "sha256": "63a9a55a90f6021abd0e8948f16a5481a1e0ce8486fedd043a3ac3b014f1d39c",
+      "sha256": "a20d087b2ebd7e9f88786c256ad53c6ac62b18c4468734b2d81325a83a044fa1",
       "sources": []
     },
     {
@@ -471,6 +471,76 @@
         }
       ],
       "qualification": "Pinned-source notices installed on Linux, Windows and macOS; Windows/macOS native provider qualification remains pending."
+    },
+    {
+      "repository_path": "third_party/tomlplusplus/LICENSE",
+      "installed_path": "share/void/licenses/tomlplusplus/LICENSE",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "platform": "all",
+      "license": "MIT",
+      "sha256": "529bc3900a9571e49db285b0df432397e70b881cc3bf48de6667ae74ff4b06d8",
+      "provenance": "third_party/tomlplusplus/upstream.json",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/marzer/tomlplusplus/30172438cee64926dc41fdd9c11fb3ba5b2ba9de/LICENSE",
+          "source_sha256": "529bc3900a9571e49db285b0df432397e70b881cc3bf48de6667ae74ff4b06d8",
+          "byte_start": 0,
+          "byte_end_exclusive": 1094,
+          "text_sha256": "529bc3900a9571e49db285b0df432397e70b881cc3bf48de6667ae74ff4b06d8",
+          "extraction": "whole-file"
+        }
+      ]
+    },
+    {
+      "repository_path": "third_party/tomlplusplus/upstream.json",
+      "installed_path": "share/void/licenses/tomlplusplus/upstream.json",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "platform": "all",
+      "license": "MIT",
+      "sha256": "98e2bf14bd9c8765aae02725a494affa31585ecb352e494d88f5eaccb806adfc",
+      "provenance": "third_party/tomlplusplus/upstream.json"
+    },
+    {
+      "repository_path": "third_party/tomlplusplus/void-bounds-and-locations.patch",
+      "installed_path": "share/void/licenses/tomlplusplus/void-bounds-and-locations.patch",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "platform": "all",
+      "license": "MIT",
+      "sha256": "d131e7ff7daa6373904406403b8f23def1b0dc02127de8230c1a09cdace3330f",
+      "provenance": "third_party/tomlplusplus/upstream.json"
+    },
+    {
+      "repository_path": "third_party/tomlplusplus/toml.hpp",
+      "installed_path": "share/void/licenses/tomlplusplus/corresponding-source/toml.hpp",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "platform": "all",
+      "license": "MIT",
+      "sha256": "7cd54af1a3497465eb26507f8d8a2ccfe661fccc27dac7a5121b885bee88d5e7",
+      "provenance": "third_party/tomlplusplus/upstream.json"
+    },
+    {
+      "repository_path": "third_party/tomlplusplus/README.md",
+      "installed_path": "share/void/licenses/tomlplusplus/corresponding-source/README.md",
+      "components": [
+        "compiler",
+        "tooling"
+      ],
+      "platform": "all",
+      "license": "MIT",
+      "sha256": "794360d588216c468ce40627042ff4ce0238fb8d72616688f04892f861765c7c",
+      "provenance": "third_party/tomlplusplus/upstream.json"
     }
   ],
   "retained_entries": [

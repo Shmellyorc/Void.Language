@@ -4,7 +4,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
-compiler, clang, linker, runtime, fixture, sanitizer = sys.argv[1:]
+compiler, clang, linker, runtime, fixture, sanitizer, *host_libraries = sys.argv[1:]
 flags = ["--driver-mode=g++", "-pthread"]
 if linker: flags.append("--ld-path=" + linker)
 if sanitizer == "ON": flags.append("-fsanitize=address,undefined")
@@ -27,7 +27,7 @@ with tempfile.TemporaryDirectory(prefix="VOID Stage10 time ") as directory:
         obj=root/("optimized.o" if optimized else "normal.o")
         exe=obj.with_suffix(".exe" if os.name=="nt" else ".bin")
         execute([compiler,"emit",source,"-o",obj,*options])
-        execute([clang,*flags,obj,runtime,fixture,"-o",exe])
+        execute([clang,*flags,obj,runtime,fixture,*host_libraries,"-o",exe])
         for value in (0,4,-3): assert execute([exe,value])[0]==str(value)
     for body in ('var value = date(2024, 1, 1)', 'var value: date', 'var value = "{make_date(2024, 1, 1):yyyy}"',
                  'if make_date(2024, 1, 1) is Ok(var value):\n        var invalid = "{value:HH}"',

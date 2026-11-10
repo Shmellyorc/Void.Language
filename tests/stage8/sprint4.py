@@ -2,6 +2,7 @@
 import os, pathlib, subprocess, sys, tempfile
 compiler, host, clang, linker, runtime, fixture = sys.argv[1:7]
 sanitizers=sys.argv[7]=='ON'
+host_libraries=sys.argv[8:]
 flags=['--driver-mode=g++', *(['--ld-path='+linker] if linker else []), *(['-fsanitize=address,undefined'] if sanitizers else [])]
 if os.name=='nt': flags+=['-fms-runtime-lib=static','-llegacy_stdio_definitions']
 checks=0
@@ -17,7 +18,7 @@ def run(args, status=0, output=None, diagnostic=None):
 with tempfile.TemporaryDirectory(prefix='VOID Sprint 4 ') as directory:
     root=pathlib.Path(directory);source=root/'main.void'
     def write(text): source.write_text(text,encoding='utf-8')
-    def link(obj,exe): run([clang,*flags,obj,runtime,fixture,'-pthread','-o',exe])
+    def link(obj,exe): run([clang,*flags,obj,runtime,fixture,*host_libraries,'-pthread','-o',exe])
     cases=[('var value = 10\nvalue += 5\nreturn value\n',15),
            ('var text = "A🎮\\0"\nif text.length == 3:\n    return 7\nreturn 2\n',7),
            ('var value = 10\n',0),('return\n',0),

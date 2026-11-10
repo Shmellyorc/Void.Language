@@ -1,5 +1,7 @@
 #include "void/frontend.hpp"
+#include "void/c_primitive.hpp"
 #include "void/path.hpp"
+#include "void/project_creation.hpp"
 #include "void/numeric.hpp"
 #include "void/math_ops.hpp"
 #include "void/temporal_ops.hpp"
@@ -26,6 +28,17 @@
 #include <stdexcept>
 #include <tuple>
 #include <type_traits>
+#include <llvm/Support/SHA256.h>
+#include <llvm/ADT/StringRef.h>
+#ifdef _WIN32
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
 // These handler boundaries keep unrelated temporaries out of recursive semantic
 // frames even in Release. The existing depth budget must fit a 1 MiB stack.
 #if defined(_MSC_VER)
@@ -244,13 +257,21 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::
             if (p == text.size() || text[p] != '"') error(source, {TokenKind::path, "", start}, Code::import_quote, "Unterminated import path.", "Close the path with a double quote on this line.");
             emit(TokenKind::path, text.substr(start + 1, p - start - 1), start); ++p; continue;
         }
-        if ((c=='O' && text.substr(p,2)=="Ok") || (c=='E' && text.substr(p,3)=="Err")) {
-            const auto width=c=='O'?2u:3u;
-            if(p+width<text.size() && (letter(text[p+width]) || digit(text[p+width])))error(source,{TokenKind::symbol,"",p},Code::identifier,"Only Ok and Err use uppercase spelling.");
-            p+=width;emit(TokenKind::name,text.substr(start,width),start);continue;
+        if(c=='O' || c=='E' || c=='S' || c=='N') {
+            const std::string_view names[]={"Ok","Err","Some","None"};
+            auto spelling=std::find_if(std::begin(names),std::end(names),[&](auto name){return std::string_view(text).substr(p).starts_with(name);});
+            if(spelling!=std::end(names)) {
+                const auto width=spelling->size();
+                if(p+width<text.size() && (letter(text[p+width]) || digit(text[p+width])))
+                    error(source,{TokenKind::symbol,"",p},Code::identifier,"Only Ok, Err, Some and None use uppercase spelling.");
+                p+=width;emit(TokenKind::name,std::string(*spelling),start);continue;
+            }
         }
         if (letter(c)) {
             while (p < text.size() && (letter(text[p]) || digit(text[p]))) ++p;
+            if(p-start==2 && text.compare(start,2,"as")==0 && p<end && text[p]=='?') {
+                ++p;emit(TokenKind::symbol,"as?",start);continue;
+            }
             emit(TokenKind::name, text.substr(start, p - start), start); continue;
         }
         if (digit(c)) {
@@ -328,6 +349,7 @@ struct Expr {
     std::vector<std::unique_ptr<Expr>> omitted;
     std::string initializer, display_adapter;
     std::vector<unsigned> field_indexes, argument_indexes;
+    std::optional<unsigned> c_callback_argument;
     std::string literal_text;
     std::optional<std::string> format_specification;
     std::vector<std::unique_ptr<Expr>> parts;
@@ -431,6 +453,7 @@ struct Function {
     std::vector<RelatedLocation> instantiation_context;
     unsigned specialization_depth=0;
     std::string native_symbol;
+    std::optional<unsigned> c_primitive;
     bool analyzed=false, prepared=false, defaults_prepared=false, initializer_prepared=false;
     std::map<std::set<unsigned>,ConstructionContext> construction_contexts;
     std::string construction_contract;
@@ -641,6 +664,7 @@ struct Import {
     bool explicit_alias = false;
 };
 struct Unit {
+    CPrimitiveAdmission::Owner c_primitives;
     EditorProbe* editor=nullptr;
     std::function<void(Type,Type,const SourceFile&,const Token&)> prepare_relationships;
     SourceFile source;
@@ -668,6 +692,7 @@ struct Unit {
     std::vector<Type> synthetic_types;
     std::map<std::string,AnalyzedDeclaration> builtins;
     std::function<Type(Type,Type)> make_result;
+    std::function<Type(Type)> make_option;
     std::function<Type(Type,const Token&)> resolve_callable;
     std::function<Type(const std::vector<Type>&,Type)> make_callable;
     std::function<Type(Type)> make_task;
@@ -785,7 +810,7 @@ class Parser {
         return take();
     }
     Token name() {
-        if (peek().kind != TokenKind::name || reserved.contains(peek().text))
+        if (peek().kind != TokenKind::name || reserved.contains(peek().text) || at("Some") || at("None"))
             error(source, peek(), Code::identifier, "Expected a lowercase identifier.");
         return take();
     }
@@ -1007,11 +1032,11 @@ class Parser {
     std::unique_ptr<Expr> expression(int minimum = 1) {
         Depth guard(depth, source, peek());
         auto left = unary();
-        while (precedence(peek().text) >= minimum || (at("as") && minimum <= 6)) {
-            if (at("as")) {
+        while (precedence(peek().text) >= minimum || ((at("as") || at("as?")) && minimum <= 6)) {
+            if (at("as") || at("as?")) {
                 if (++nodes > 512) error(source, peek(), Code::nesting, "Expression size limit exceeded.", "Split this expression into smaller local values.");
                 auto token = take();
-                if (at("?")) error(source,peek(),Code::character,"The as? conversion is not supported.","Use a checked as conversion; fallible conversion syntax is deferred.");
+                if (token.text=="as" && at("?")) error(source,peek(),Code::syntax,"Write the fallible conversion operator as? without an intervening space.");
                 auto e = std::make_unique<Expr>(Expr::Kind::conversion, token);
                 e->parts.push_back(std::move(left)); e->type = type(); left = std::move(e); continue;
             }
@@ -1170,14 +1195,38 @@ public:
             if(accept("enum")) {
                 Structure enumeration;enumeration.token=name();enumeration.visibility=f.visibility;
                 enumeration.definition=std::make_shared<ir::ValueType>();enumeration.definition->name=enumeration.token.text;
-                Statement tag(Statement::Kind::variable,enumeration.token);tag.name="$tag";tag.annotation=Type::i32;enumeration.fields.push_back(std::move(tag));
-                need(":");newline();need("<indent>");std::set<std::string> cases;
+                if(accept("(")) {
+                    auto backing=take();auto type=numeric::primitive(backing.text);
+                    if(!numeric::integer(type))error(source,backing,Code::unsupported_type,"A numeric enum requires a fixed-width integer backing.");
+                    enumeration.definition->enum_backing=type.kind;
+                    need(")");
+                } else {
+                    Statement tag(Statement::Kind::variable,enumeration.token);tag.name="$tag";tag.annotation=Type::i32;enumeration.fields.push_back(std::move(tag));
+                }
+                need(":");newline();need("<indent>");std::set<std::string> cases;std::map<std::uint64_t,Token> discriminants;
                 while(!at("<dedent>") && !at("<end of file>")) {
                     std::string visibility="public";
                     if(at("private") || at("internal") || at("public"))visibility=take().text;
-                    if(at("operator")){operator_declaration(enumeration,visibility);continue;}
+                    if(at("operator") && !enumeration.definition->enum_backing){operator_declaration(enumeration,visibility);continue;}
                     if(visibility!="public")error(source,peek(),Code::syntax,"Enum variant visibility modifiers are not supported.");
                     auto token=name();enumeration.case_tokens.push_back(token);if(!cases.insert(token.text).second)error(source,token,Code::duplicate,"Duplicate enum variant.");
+                    if(enumeration.definition->enum_backing) {
+                        if(!letter(token.text.front()))error(source,token,Code::identifier,"Numeric enum member names are lowercase.");
+                        need("=");
+                        auto value=peek();std::string spelling;
+                        if(at("+") || at("-"))spelling=take().text;
+                        auto digits=take();
+                        if(digits.kind!=TokenKind::number || !std::all_of(digits.text.begin(),digits.text.end(),digit))
+                            error(source,digits,Code::integer_range,"A numeric enum discriminant must be a decimal integer literal.");
+                        value.source_width=digits.offset+digits.text.size()-value.offset;
+                        std::uint64_t bits;
+                        try {bits=numeric::literal(spelling+digits.text,*enumeration.definition->enum_backing);}
+                        catch(const std::invalid_argument& failure){error(source,value,Code::integer_range,failure.what());}
+                        auto [previous,inserted]=discriminants.emplace(bits,value);
+                        if(!inserted)error(source,value,Code::duplicate,"Duplicate numeric enum discriminant.",{},
+                            {{span(source,previous->second),"Previously declared value."}});
+                        enumeration.definition->numeric_members.push_back({token.text,bits});newline();continue;
+                    }
                     ir::SumCase variant{token.text,static_cast<unsigned>(enumeration.fields.size()),0};
                     if(accept("(")) {if(!at(")"))do {
                         Statement field(Statement::Kind::variable,name());field.name="$"+token.text+"$"+field.token.text;need(":");field.annotation=type();enumeration.fields.push_back(std::move(field));++variant.count;
@@ -1407,10 +1456,13 @@ Type resolve_type(Type t, Unit& unit, Unit& root, const std::map<std::string,std
     if (!structure) error(unit.source,location,Code::unsupported_type,"Unsupported type '" + t.definition->name + "'.","Use a numeric type, bool, string or a visible value/managed struct.");
     if(!structure->generics.empty())error(unit.source,token,Code::unsupported_type,"Generic type '"+structure->token.text+"' requires concrete type arguments.");
     if (structure->layout_state == 3) throw Poison{};
-    Type result(structure->definition, structure->definition->interface_type ? Type::interface_ref : structure->definition->managed ? Type::managed_ref : Type::aggregate);
+    auto result=Type::nominal(structure->definition);
     result.nullable = t.nullable; result.readonly=t.readonly;
     if (result.nullable && !ir::reference_value(result)) error(unit.source,token,Code::unsupported_type,"Only managed references can be nullable in this phase.");
     return result;
+}
+bool checked_initializer_default(Type t) {
+    return t.kind==Type::numeric_enum || (t.definition && t.definition->option_type) || console::endpoint_type(t);
 }
 ir::ConstantValue constant_value(const SourceFile&, const Expr&);
 void check_dictionary_key(const SourceFile& source,const Token& use,Type key,const std::map<std::string,std::unique_ptr<Unit>>& units) {
@@ -1975,6 +2027,13 @@ class Semantics {
             auto index=mapping[n-first];bound[index]=true;
             auto actual = e.op=="$bound_numeric" && n==0 ? e.parts[n]->type : expression(*e.parts[n],target.parameters[index].type);
             if((!target.native_symbol.empty() && native_binding(target.native_symbol).name=="register") && index==1 && e.parts[n]->kind!=Expr::Kind::function_reference)error(source,e.parts[n]->token,Code::unsupported_type,"Native callback registration requires a directly named function or a literal closure created in this generation.");
+            const auto expected = target.parameters[index].type;
+            if (target.c_primitive && expected.definition && expected.definition->callable && actual != error_type) {
+                if (e.parts[n]->kind != Expr::Kind::function_reference || n + 1 != e.parts.size())
+                    error(source,e.parts[n]->token,Code::unsupported_type,
+                        "A checked C callback must be supplied last as a directly named function, bound method or literal closure from this generation.");
+                e.c_callback_argument = index;
+            }
             try { expect(actual,target.parameters[index].type,e.parts[n]->token); }
             catch (const CompilationError& failure) { diagnostics.add(failure); invalid = true; }
             invalid |= actual == error_type;
@@ -2006,8 +2065,11 @@ class Semantics {
                 const auto& field = *structure.effective_fields[n].second;
                 auto& field_owner=*structure.effective_fields[n].first;
                 if(field.expression){
-                    if(initializer_declaration && console::endpoint_type(*field.annotation)){
-                        auto value=std::make_unique<Expr>(Expr::Kind::literal,field.token);value->type=*field.annotation;value->aggregate_value=structure.defaults.fields.at(n);value->slot=n;e.omitted.push_back(std::move(value));
+                    if(initializer_declaration && checked_initializer_default(*field.annotation)){
+                        auto value=std::make_unique<Expr>(Expr::Kind::literal,field.token);
+                        value->type=*field.annotation;value->aggregate_value=structure.defaults.fields.at(n);
+                        value->value=value->aggregate_value.bits;value->slot=n;
+                        e.omitted.push_back(std::move(value));
                     }
                     continue;
                 }
@@ -2063,11 +2125,11 @@ class Semantics {
             const auto& field=*structure.effective_fields[n].second; auto& field_owner=*structure.effective_fields[n].first;
             Type t = *field.annotation;
             const bool complete_default = field.expression && t.definition &&
-                (t.definition->callable || !t.definition->cases.empty() || console::endpoint_type(t));
+                (t.kind==Type::numeric_enum || t.definition->callable || !t.definition->cases.empty() || console::endpoint_type(t));
             if (ir::requires_initialization(t) && !complete_default && std::find(e.field_indexes.begin(),e.field_indexes.end(),n)==e.field_indexes.end()) {
                 if(!ir::field_accessible(*root.member_catalog,Type(structure.definition,structure.definition->managed?Type::managed_ref:Type::aggregate),n,access.identity,lexical_owner()))
                     error(source,e.token,Code::visibility,"An inaccessible required field cannot be supplied by this caller: "+field.name+".","Provide an accessible owner initializer or factory.",{{span(field_owner.source,field.token),"Required field declared here."}});
-                error(source,e.token,Code::argument_count,"A non-nullable reference field requires an explicit value: " + field.name + ".",{},{{span(field_owner.source,field.token),"Required field declared here."}});
+                error(source,e.token,Code::argument_count,(t.kind==Type::numeric_enum?"A numeric enum field requires an explicit value: ":"A non-nullable reference field requires an explicit value: ") + field.name + ".",{},{{span(field_owner.source,field.token),"Required field declared here."}});
             }
         }
         if (!structure.initializer || !structure.definition->managed) construction_fields(e,owner,structure,runtime);
@@ -2230,7 +2292,7 @@ class Semantics {
     VOID_SEMANTIC_HANDLER std::optional<Type> field_anchor(Expr& e) {
         using K=Expr::Kind;
         if (auto [owner, declaration] = enum_declaration(e); declaration) {
-            return Type(declaration->definition);
+            return Type::nominal(declaration->definition);
         }
         if(primitive_base_selected(*e.parts[0]))return primitive_anchor(*e.parts[0]);
         const auto& operand = *e.parts[0];
@@ -2261,7 +2323,10 @@ class Semantics {
             if (e.literal_text.back() == 'd') return Type::f64;
             return {};
         }
-        if (e.kind == K::conversion) return e.type;
+        if (e.kind == K::conversion) {
+            if(e.token.text!="as?" || !e.type_arguments.empty())return e.type;
+            return fallible_anchor(e);
+        }
         if (e.kind == K::global) return e.type;
         if (e.kind==K::spawned || e.kind==K::propagate || e.kind==K::awaited)return projected_anchor(e);
         if (e.kind==K::choice)return choice_anchor(e);
@@ -2547,10 +2612,13 @@ class Semantics {
         case Expr::Kind::array_slice: return slice_expression(e);
         case Expr::Kind::literal: return literal_expression(e, expected);
         case Expr::Kind::global: return e.type;
-        case Expr::Kind::name: return name_expression(e);
+        case Expr::Kind::name:
+            if(e.token.text=="None" && e.qualifier.empty())return option_expression(e,expected);
+            return name_expression(e);
         case Expr::Kind::field: return field_expression(e, expected);
         case Expr::Kind::call:
             if(e.token.text=="Ok" || e.token.text=="Err")return result_expression(e,expected);
+            if((e.token.text=="Some" || e.token.text=="None") && e.qualifier.empty())return option_expression(e,expected);
             return call_expression(e);
         case Expr::Kind::method_call: return method_expression(e);
         case Expr::Kind::conversion: return conversion_expression(e);
@@ -2681,6 +2749,13 @@ class Semantics {
         e.source_target=target.symbol;
         return sum_expression(e,*expected,e.token.text=="Ok"?0:1,0);
     }
+    VOID_SEMANTIC_HANDLER Type option_expression(Expr& e,const std::optional<Type>& expected) {
+        if(!expected || !expected->definition || !expected->definition->option_type)
+            error(source,e.token,Code::type_mismatch,"Some and None require a contextual option<T> type.");
+        const bool some=e.token.text=="Some";
+        if(!some && e.kind!=Expr::Kind::name)error(source,e.token,Code::syntax,"Write None without parentheses.");
+        return sum_expression(e,*expected,some?1u:0u,0);
+    }
     std::pair<Unit*, Structure*> enum_declaration(Expr& e) {
         auto& base = *e.parts[0];
         std::string spelling;
@@ -2695,7 +2770,7 @@ class Semantics {
             return {};
         }
         auto selected = structure_lookup(unit, root, units, spelling, base.token);
-        if (!selected.second || selected.second->definition->cases.empty()) {
+        if (!selected.second || (selected.second->definition->cases.empty() && !selected.second->definition->enum_backing)) {
             return {};
         }
         return selected;
@@ -2705,6 +2780,23 @@ class Semantics {
         auto [owner, structure] = enum_declaration(e);
         if (!structure) {
             return {};
+        }
+        if(structure->definition->enum_backing) {
+            auto type=Type::nominal(structure->definition);
+            const auto& members=structure->definition->numeric_members;
+            if(editor_cursor(e)) {
+                if(!invalid_function && !unit.failed_import)for(unsigned n=0;n<members.size();++n) {
+                    const auto& member=members[n];
+                    auto detail=ir::type_name(type)+" = "+numeric::integer_text(member.bits,*structure->definition->enum_backing);
+                    diagnostics.editor->result.candidates.push_back({member.name,detail,20,{},source_documentation(owner->source,structure->case_tokens[n].offset).text(false)});
+                }
+                throw EditorProbeFound{};
+            }
+            auto found=std::find_if(members.begin(),members.end(),[&](const auto& member){return member.name==e.token.text;});
+            if(found==members.end())error(source,e.token,Code::unknown_identifier,"Unknown numeric enum member '"+e.token.text+"'.");
+            if(call)error(source,e.token,Code::not_callable,"Numeric enum members are values.");
+            e.kind=Expr::Kind::literal;e.parts.clear();e.value=found->bits;e.target=Type::key(type)+"::variant::"+found->name;
+            return e.type=type;
         }
         const auto& variants=structure->definition->cases;
         if(editor_cursor(e)) {
@@ -2835,6 +2927,7 @@ class Semantics {
                     if(e.type_arguments.empty())error(source,e.token,Code::unsupported_type,"A generic function value requires explicit concrete type arguments.");
                     std::vector<Type> arguments;for(auto type:e.type_arguments)arguments.push_back(resolve_type(type,unit,root,units,e.token));auto& owner=generic_owner(*function);function=&unit.specialize_function(unit,owner,const_cast<Function&>(*function),arguments,e.token,current?current->specialization_depth+1:0,Type::none);
                 }else if(!e.type_arguments.empty())error(source,e.token,Code::unsupported_type,"This function value is not generic.");
+                if(function->c_primitive)error(source,e.token,Code::unsupported_type,"C primitive bindings require a direct call.");
                 if(function->asynchronous)error(source,e.token,Code::unsupported_type,"Async function values require a reviewed async callable contract; call the function directly.");
                 std::vector<Type> parameters;for(const auto& parameter:function->parameters)parameters.push_back(parameter.type);
                 e.target=function->symbol;e.kind=Expr::Kind::function_reference;return e.type=unit.make_callable(parameters,function->result);
@@ -3277,7 +3370,7 @@ class Semantics {
         }
         auto [owner, structure] = structure_lookup(unit,root,units,e.qualifier.empty() ? e.token.text : e.qualifier + "." + e.token.text,e.qualifier.empty() ? e.token : e.qualifier_token);
         if (structure && !(e.qualifier.empty() && lookup(e.token.text))) {
-            if(!structure->definition->cases.empty())error(source,e.token,Code::not_callable,"Construct enum values with type.variant and its payload arguments.");
+            if(structure->definition->enum_backing || !structure->definition->cases.empty())error(source,e.token,Code::not_callable,"Construct enum values with type.variant and its payload arguments.");
             auto& concrete=concrete_structure(e,*owner,*structure);
             construction(e,*owner,concrete,current != nullptr,unit);
             return e.type;
@@ -3299,10 +3392,47 @@ class Semantics {
             catch (const CompilationError&) { check_arguments(); throw; }
             catch (const Poison&) { check_arguments(); throw; }
         }();
+        if (e.parts.empty() && e.type_arguments.empty()) if (const auto* location = os::location_adapter(target.symbol,true)) {
+            const auto& declarations = units.at(std::string(os::source_module))->declarations;
+            auto adapter = declarations.find(std::string(location->implementation));
+            if (adapter == declarations.end() || target.visibility != "public" || target.asynchronous ||
+                target.parameters.size() != 1 || target.parameters.front().type != Type::string ||
+                adapter->second->visibility != "private" || adapter->second->asynchronous ||
+                !adapter->second->parameters.empty() || adapter->second->result != target.result)
+                error(source,e.token,Code::invalid_value,"Invalid trusted OS application-location adapter.");
+            e.source_target = target.symbol;
+            e.target = adapter->second->symbol;
+            e.op = "$os.location";
+            return e.type = call_arguments(e,*adapter->second,0);
+        }
         e.target = target.symbol;
         return e.type = call_arguments(e,target,0);
     }
+    VOID_SEMANTIC_HANDLER std::optional<Type> fallible_anchor(const Expr& e) {
+        auto target=resolve_type(e.type,unit,root,units,e.token);
+        if(numeric::integer(target) || target.kind==Type::numeric_enum)return unit.make_option(target);
+        return {};
+    }
+    VOID_SEMANTIC_HANDLER Type fallible_conversion(Expr& e) {
+        if(!e.type_arguments.empty())return e.type;
+        auto destination=resolve_type(e.type,unit,root,units,e.token);
+        auto& operand=*e.parts[0];
+        Type from=Type::none;
+        if(operand.kind==Expr::Kind::literal && !operand.literal_text.empty() && !decimal(operand)) {
+            for(auto candidate:{Type::i32,Type::i64,Type::u64})try {
+                operand.value=numeric::literal(operand.literal_text,candidate);
+                operand.type=from=candidate;operand.literal_text.clear();break;
+            } catch(const std::invalid_argument&) {}
+            if(from==Type::none)error(source,operand.token,Code::integer_range,"Fallible conversion literal is outside the fixed-width integer domain.");
+        } else from=expression(operand);
+        if(from==error_type)return error_type;
+        if(!numeric::integer(from) || !(numeric::integer(destination) || destination.kind==Type::numeric_enum))
+            error(source,e.token,Code::numeric_conversion,"as? requires an integer operand and an integer or numeric enum destination.");
+        e.type_arguments.push_back(destination);
+        return e.type=unit.make_option(destination);
+    }
     VOID_SEMANTIC_HANDLER Type conversion_expression(Expr& e) {
+        if(e.token.text=="as?")return fallible_conversion(e);
         using K = Expr::Kind;
         Type target = e.type = resolve_type(e.type,unit,root,units,e.token);
         auto& operand = *e.parts[0];
@@ -3490,6 +3620,7 @@ class Semantics {
                 if(needs_array_recipe(t))s.expression=array_recipe(t,s.token,true,unit);
                 else {s.expression=std::make_unique<Expr>(Expr::Kind::literal,s.token);s.expression->type=t;s.expression->aggregate_value=array_default(t,s.token);}
             }
+            if(!s.expression && t.kind==Type::numeric_enum)error(source,s.token,Code::initializer,"Numeric enum values require an explicit initializer.");
             if(!s.expression && t.definition && !t.definition->cases.empty())error(source,s.token,Code::initializer,"Enum/result values require an explicit variant initializer.");
             if (!s.expression && t.kind == Type::aggregate) {
                 auto [owner,structure] = owned_structure(t);
@@ -3763,7 +3894,7 @@ public:
         auto [owner,structure] = owned_structure(f.receiver->type);
         if (f.receiver->type.kind==Type::aggregate) for (const auto& field:structure->fields) {
             auto type=*field.annotation;
-            const bool complete_default=field.expression && type.definition && (type.definition->callable || !type.definition->cases.empty() || console::endpoint_type(type));
+            const bool complete_default=field.expression && type.definition && (type.kind==Type::numeric_enum || type.definition->callable || !type.definition->cases.empty() || console::endpoint_type(type));
             if (ir::requires_initialization(type) && !complete_default)
                 error(source,f.token,Code::initializer,"Value init requires every field to be valid before its body; a non-nullable reference has no safe default.","Use named-field construction without init for a value with required reference fields.",{{span(owner->source,field.token),"Required reference field declared here."}});
         }
@@ -3775,7 +3906,7 @@ public:
         if(t.kind==Type::growable_array || t.kind==Type::dictionary)return false;
         if(t.kind==Type::fixed_array)return *t.definition->extent && needs_array_recipe(ir::array_element(t));
         if(t.kind!=Type::aggregate || t.definition->callable)return false;
-        if(t.definition->result_type)return false;
+        if(t.definition->result_type || t.definition->option_type)return false;
         auto [owner,structure]=owned_structure(t);if(structure->initializer)return true;
         for(const auto& field:t.definition->fields)if(needs_array_recipe(field.type))return true;
         return false;
@@ -3788,7 +3919,7 @@ public:
             e->kind=Expr::Kind::array_default;e->parts.push_back(array_recipe(ir::array_element(t),token,runtime,access));return e;
         }
         if(t.definition && t.definition->callable){if(!t.nullable)error(source,token,Code::initializer,"An array of functions requires complete values.");e->kind=Expr::Kind::function_null;return e;}
-        if(t.definition && !t.definition->cases.empty())error(source,token,Code::initializer,"Enum/result elements require explicit variants.");
+        if(t.kind==Type::numeric_enum || (t.definition && !t.definition->cases.empty()))error(source,token,Code::initializer,"Enum/result elements require explicit variants.");
         if(t.kind==Type::aggregate){auto [owner,structure]=owned_structure(t);construction(*e,*owner,*structure,runtime,access);}
         else if(ir::reference_value(t) && !t.nullable)error(source,token,Code::initializer,"A required array reference needs an explicit initializer.");
         return e;
@@ -3797,6 +3928,7 @@ public:
         ir::ConstantValue value;if(t.kind==Type::growable_array || t.kind==Type::dictionary)return value;value.repeat=*t.definition->extent;
         if(!*value.repeat) return value;
         auto element=ir::array_element(t);
+        if(element.kind==Type::numeric_enum)error(source,token,Code::initializer,"Numeric enum elements require explicit values.");
         if(console::endpoint_type(element))error(source,token,Code::initializer,"Console endpoint elements require explicit borrowed values.");
         if(ir::reference_value(element) && !element.nullable)error(source,token,Code::initializer,"A nonempty array of required references needs a complete literal.");
         if(ir::collection_type(element)) value.fields.push_back(array_default(element,token));
@@ -3862,7 +3994,7 @@ public:
                 } catch (const CompilationError& failure) { diagnostics.add(failure); }
                   catch (const Poison&) {}
             }
-            if(!f.native_symbol.empty())return;
+            if(!f.native_symbol.empty() || f.c_primitive)return;
             auto flow = sequence(f.body, false);
             if (f.result != Type::none && (flow & next_flow) && diagnostics.size() == before && !f.parse_failed && !invalid_function)
                 try { error(source, f.token, Code::missing_return, "Missing return path in '" + f.token.text + "'.", "Return a " + std::string(ir::type_name(f.result)) + " on every path that reaches the end."); }
@@ -4096,7 +4228,10 @@ class Lowering {
         auto test=block(),body=block(),done=block();jump(test);current=test;
         terminate({ir::Terminator::Kind::branch,emit({ir::Op::less,emit({ir::Op::load,index},token),constant(Type::u64,{count,{}},token)},token),body,done});current=body;
         auto value=element();ir::Instruction initialize{ir::Op::array_initialize,emit({ir::Op::load,owner},token),emit({ir::Op::load,index},token)};initialize.arguments={value};emit(initialize,token);
-        emit({ir::Op::store,index,emit({ir::Op::add,emit({ir::Op::load,index},token),constant(Type::u64,{1,{}},token)},token)},token);jump(test);current=done;return emit({ir::Op::load,owner},token);
+        emit({ir::Op::store,index,emit({ir::Op::add,emit({ir::Op::load,index},token),constant(Type::u64,{1,{}},token)},token)},token);jump(test);current=done;
+        auto value_array=emit({ir::Op::load,owner},token);
+        return ir::contains_numeric_enum(t) || (module.c_primitives && module.c_primitives->inline_array(t)) ?
+            emit({ir::Op::array_finish,value_array},token) : value_array;
     }
     unsigned constant(Type t, const ir::ConstantValue& value, const Token& token) {
         if(console::endpoint_type(t)){ir::Instruction endpoint{ir::Op::console_endpoint};endpoint.type=t;endpoint.immediate=value.fields.at(0).bits;return emit(endpoint,token);}
@@ -4748,6 +4883,8 @@ class Lowering {
                 const auto& arg = e.parts[n];
                 auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(expression_type(*arg));
                 auto value = expression(*arg);if((!e.native_symbol.empty() && native_binding(e.native_symbol).name=="register") && (e.argument_indexes.empty()?n-first:e.argument_indexes[n-first])==1)native_callback=value;
+                if (e.c_callback_argument == (e.argument_indexes.empty() ? n-first : e.argument_indexes[n-first]))
+                    native_callback = value;
                 if (expression_type(*arg).construction) {
                     output.construction_origins[slot]=view_origin(value);
                 }
@@ -4757,11 +4894,13 @@ class Lowering {
             if(selected_receiver && !e.parts[0]->property)emit({ir::Op::store,receiver->slot,selected_receiver->read()},e.token);
             ir::Instruction i{e.asynchronous_call || !parallel_target.empty() ? ir::Op::async_call : e.interface_call ? ir::Op::interface_call : !e.virtual_slot.empty() && !e.super_call ? ir::Op::virtual_call : ir::Op::call}; i.callee = parallel_target.empty()?e.target+(e.super_call && e.token.text=="deinit"?"::$body$"+Type::key(e.parts[0]->type):""):std::string(parallel_target); i.receiver = receiver;
             if(e.op=="$operator")i.operator_glyph=e.token.text=="!="?"==":e.token.text;
+            i.os_location_adapter = e.op == "$os.location";
             if (context) if (auto found=context->calls.find(&e);found!=context->calls.end())
                 i.callee=ir::construction_name(e.target,{found->second.begin(),found->second.end()});
             i.arguments.resize(slots.size());
             for(unsigned n=0;n<slots.size();++n) i.arguments[e.argument_indexes.empty()?n:e.argument_indexes[n]]=emit({ir::Op::load,slots[n]},e.token);
             if(!e.native_symbol.empty()){i.op=ir::Op::native_call;i.callee=e.native_symbol;i.type=e.type;if(native_callback)i.arguments[1]=*native_callback;}
+            if (e.c_callback_argument) i.arguments[*e.c_callback_argument] = *native_callback;
             auto result=emit(i,e.token);
             if(selected_receiver) {
                 // Forward declarations need not have been lowered yet. The
@@ -4772,7 +4911,9 @@ class Lowering {
             });
         });
         case K::conversion: return frontend_case([&]() -> unsigned {
-            auto value = expression(*e.parts[0]); if(e.op=="identity" && expression_type(e)==expression_type(*e.parts[0])) return value; ir::Instruction i{e.op=="interface" ? ir::Op::interface_pack : e.op=="upcast" ? (expression_type(e).construction ? ir::Op::stage_prefix : ir::Op::upcast) : ir::Op::convert,value}; i.type = expression_type(e);i.callee=e.target; return emit(i,e.token);
+            auto value = expression(*e.parts[0]);
+            if(e.token.text=="as?") {ir::Instruction i{ir::Op::try_convert,value};i.type=expression_type(e);return emit(i,e.token);}
+            if(e.op=="identity" && expression_type(e)==expression_type(*e.parts[0])) return value; ir::Instruction i{e.op=="interface" ? ir::Op::interface_pack : e.op=="upcast" ? (expression_type(e).construction ? ir::Op::stage_prefix : ir::Op::upcast) : ir::Op::convert,value}; i.type = expression_type(e);i.callee=e.target; return emit(i,e.token);
         });
         case K::unary: return frontend_case([&]() -> unsigned {
             auto value = expression(*e.parts[0]);
@@ -5061,7 +5202,7 @@ public:
                 Type t=f.receiver->type.definition->fields[field].type;
                 std::optional<unsigned> selected;
                 for(const auto& child:f.initialization_defaults) if(child->slot==field) selected=expression(*child);
-                if (ir::requires_initialization(t) && !(console::endpoint_type(t) && selected)) continue;
+                if (ir::requires_initialization(t) && !(checked_initializer_default(t) && selected)) continue;
                 auto value=selected ? *selected : constant(t,f.initialization_value.fields.at(field),f.token);
                 auto view=emit({ir::Op::load,0},f.token);
                 ir::Instruction write{ir::Op::gc_write,view,value}; write.immediate=field; emit(write,f.token);
@@ -5095,13 +5236,7 @@ bool identifier(const std::string& text) {
         std::all_of(text.begin(), text.end(), [](char c) { return letter(c) || digit(c); });
 }
 void portable_component(const SourceFile& source, const Token& at, const std::string& component) {
-    bool invalid = component.empty() || component.back() == ' ' || component.back() == '.';
-    for (unsigned char c : component)
-        invalid |= c < 32 || c >= 127 || std::string("<>:\"|?*\\").find(static_cast<char>(c)) != std::string::npos;
-    auto base = folded(component.substr(0, component.find('.')));
-    invalid |= base == "con" || base == "prn" || base == "aux" || base == "nul" ||
-        (base.size() == 4 && (base.starts_with("com") || base.starts_with("lpt")) && base[3] >= '1' && base[3] <= '9');
-    if (invalid) error(source, at, Code::import_path, "Non-portable module path component '" + component + "'.",
+    if (!portable_path_component(component)) error(source, at, Code::import_path, "Non-portable module path component '" + component + "'.",
         "Use printable ASCII filenames without Windows-reserved characters/names or trailing dots/spaces; Unicode module filenames are deferred.");
 }
 std::string normalize(const Unit& from, const Token& path) {
@@ -5152,6 +5287,7 @@ class SourceGraph {
     unsigned depth = 0;
     const SourceOverrides& overrides;
     const NativeProject* native=nullptr;
+    CPrimitiveAdmission::Owner primitives;
     std::optional<std::filesystem::path> standard_root;
     struct Directory {std::map<std::string,std::set<std::string>> names;std::error_code error;};
     std::map<std::filesystem::path,Directory> directories;
@@ -5166,7 +5302,13 @@ class SourceGraph {
     }
 public:
     std::map<std::string, std::unique_ptr<Unit>> units;
-    explicit SourceGraph(std::filesystem::path project_root, Diagnostics& d, const SourceOverrides& o,const NativeProject* bindings=nullptr) : root(std::move(project_root)), diagnostics(d), overrides(o),native(bindings) {
+    // Parsed discovery trees are not execution members until load follows them.
+    std::map<std::string, std::unique_ptr<Unit>> parsed;
+    std::function<void(const std::filesystem::path&,const std::string&,bool)> admit;
+    std::function<SourceFile(const std::filesystem::path&,const std::string&)> reader;
+    explicit SourceGraph(std::filesystem::path project_root, Diagnostics& d, const SourceOverrides& o,const NativeProject* bindings=nullptr,
+                         CPrimitiveAdmission::Owner c_primitives = {})
+        : root(std::move(project_root)), diagnostics(d), overrides(o), native(bindings), primitives(std::move(c_primitives)) {
         for(const auto& [key,value]:overrides) {
             std::string parent;
             for(std::size_t begin=1;begin<key.size();) {
@@ -5176,6 +5318,10 @@ public:
                 if(end==std::string::npos)break;parent=key.substr(0,end);begin=end+1;
             }
         }
+    }
+    void generated_primitives(CPrimitiveAdmission::Owner admission) {
+        virtual_children[""][folded(admission->module().substr(1))].insert(admission->module().substr(1));
+        primitives = std::move(admission);
     }
     std::pair<std::string,std::filesystem::path> resolve(const Unit& from, const Token& path, bool directory=false) {
         const bool local=path.kind!=TokenKind::path && path.text.starts_with("lib/");
@@ -5197,6 +5343,10 @@ public:
         auto id=standard ? "/@stdlib"+relative : relative;
         if(directory) {relative=path_utf8(utf8_path(relative).parent_path());id=standard ? "/@stdlib"+relative : relative;}
         auto overlay = overrides.find(id);
+        const bool generated = !directory && primitives && id == primitives->module();
+        // All parse/load/recapture readers resolve first, including cached units.
+        // Overrides are frozen for the synchronous analysis: a tombstone can
+        // never reach their optional dereferences or fall back to disk bytes.
         if (overlay != overrides.end() && !overlay->second)
             error(from.source, path, Code::import_read, "Source is explicitly unavailable: '" + id + "'.", "Restore the document or close its override to return to disk.");
         auto physical=root;
@@ -5230,17 +5380,20 @@ public:
             if (prefix != relative && !standard && overrides.contains(prefix))
                 error(from.source, path, Code::import_path, "An overridden source cannot also be a virtual directory: '" + prefix + "'.");
             auto status = std::filesystem::symlink_status(physical, ec);
-            if (ec == std::errc::no_such_file_or_directory && (overlay != overrides.end() || (directory && !standard && virtual_directories.contains(id)))) ec.clear();
+            if (ec == std::errc::no_such_file_or_directory && (generated || overlay != overrides.end() || (directory && !standard && virtual_directories.contains(id)))) ec.clear();
             if (ec) error(from.source, path, Code::import_read, "Cannot inspect imported path '" + id + "'.");
+            if (prefix == relative && primitives && id == primitives->module() && std::filesystem::exists(status))
+                error(from.source,path,Code::import_path,"Host-admitted C binding module collides with a project source.");
             if (std::filesystem::is_symlink(status)) error(from.source, path, Code::import_path, "Symbolic links are not supported in module paths.", "Import a regular project file; symlink identity and external permissions are deferred.");
             if (std::filesystem::exists(status)) {
                 auto resolved_part = std::filesystem::canonical(physical, ec);
                 if (ec || resolved_part != physical) error(from.source, path, Code::import_path, "Module path contains a filesystem alias.");
             }
+            if (!standard && admit) admit(physical,prefix,prefix==relative && !directory);
         }
         if (directory) {
             if(!std::filesystem::is_directory(physical,ec) && ec!=std::errc::no_such_file_or_directory)error(from.source,path,Code::import_read,"Import directory is unavailable.");
-        } else if (overlay == overrides.end()) {
+        } else if (!generated && overlay == overrides.end()) {
             if (!std::filesystem::is_regular_file(physical, ec) || ec)
                 error(from.source, path, Code::import_read, "Imported path is not a regular .void source file.");
         }
@@ -5249,7 +5402,7 @@ public:
         if (!directory && std::filesystem::exists(physical, ec)) {
             if (!std::filesystem::is_regular_file(physical, ec) || ec)
                 error(from.source, path, Code::import_path, "Module path names a non-file host object.");
-            for (const auto& [other_id, other] : units) {
+            for (const auto* store : {&units,&parsed}) for (const auto& [other_id, other] : *store) {
                 if(other_id==id)continue;
                 auto other_path = standard_module(other_id) ? *standard_root / utf8_path(other_id.substr(9)) : root / utf8_path(other_id).relative_path();
                 if (std::filesystem::equivalent(physical, other_path, ec) && !ec)
@@ -5259,39 +5412,62 @@ public:
         }
         return {id,physical};
     }
-    Unit& load(const Unit& from, const Token& path) {
+    Unit& parse(const Unit& from, const Token& path) {
         auto [id,physical]=resolve(from,path);
+        return parse_resolved(from,path,id,physical);
+    }
+    Unit& parse_resolved(const Unit& from,const Token& path,const std::string& id,const std::filesystem::path& physical) {
         if(auto found=units.find(id);found!=units.end())return *found->second;
-        Depth guard(depth,from.source,path);
+        if(auto found=parsed.find(id);found!=parsed.end())return *found->second;
         auto overlay=overrides.find(id);
-        // Publish before traversing imports: function-only declaration cycles are safe.
         std::unique_ptr<Unit> unit;
-        try { unit = std::make_unique<Unit>(overlay == overrides.end() ? read_source(physical) : *overlay->second, id); }
+        try { unit = std::make_unique<Unit>(reader ? reader(physical,id) : overlay == overrides.end() ? read_source(physical) : *overlay->second, id); }
         catch (const SourceReadError&) { error(from.source, path, Code::import_read, "Cannot read imported file '" + id + "'.", "Check source file permissions and storage availability."); }
         catch (const CompilationError& failure) {
             auto records = failure.diagnostics();
             for (auto& record : records) record.primary.module_identity = id;
             throw CompilationError(std::move(records));
         }
-        auto* result = unit.get(); units.emplace(id, std::move(unit));
+        auto* result = unit.get(); parsed.emplace(id, std::move(unit));
         diagnostics.bind(result->source, id);
         auto before = diagnostics.size();
         Parser(result->source, diagnostics).parse(*result);
         result->parse_failed |= diagnostics.size() != before;
         if(id==console::source_module)for(auto& structure:result->structures)if(structure.token.text=="terminal_session"){structure.definition->native_resource=true;structure.definition->native_provider="void.console.v1";}
+        if (primitives && id == primitives->module()) {
+            result->c_primitives = primitives;
+            for (auto& structure : result->structures)
+                for (const auto& resource : primitives->resources())
+                    if (structure.token.text == resource.name) {
+                        structure.definition->native_resource = true;
+                        structure.definition->native_provider = primitives->provider();
+                    }
+            const auto& bindings = primitives->bindings();
+            for (auto& f : result->functions)
+                for (unsigned index = 0; index < bindings.size(); ++index)
+                    if (f.token.text == bindings[index].name) f.c_primitive = index;
+        }
         if(native && id==native->module){for(auto& structure:result->structures){structure.definition->native_resource=true;structure.definition->native_provider=native->library;}for(auto& f:result->functions)for(const auto& b:native->bindings)if(f.token.text==b.name)f.native_symbol=b.symbol;}
-
-        for (auto& import : result->imports) {
+        return *result;
+    }
+    Unit& load(const Unit& from, const Token& path) {
+        auto [id,physical]=resolve(from,path);
+        if(auto found=units.find(id);found!=units.end())return *found->second;
+        Depth guard(depth,from.source,path);
+        auto& result=parse_resolved(from,path,id,physical);
+        // Publish before traversing imports: function-only declaration cycles are safe.
+        units.insert(parsed.extract(result.identity));
+        for (auto& import : result.imports) {
             try {
-                auto& target = load(*result, import.path);
+                auto& target = load(result, import.path);
                 import.target = target.identity;
             } catch (const CompilationError& failure) {
-                diagnostics.add(failure); result->failed_import = true;
+                diagnostics.add(failure); result.failed_import = true;
                 auto qualifier = import.explicit_alias ? import.alias.text : path_utf8(utf8_path(import.path.text).stem());
-                result->failed_qualifiers.insert(qualifier);
+                result.failed_qualifiers.insert(qualifier);
             }
         }
-        return *result;
+        return result;
     }
 };
 // Only typed, pure ASTs reach this evaluator. The shared software kernel
@@ -5372,6 +5548,16 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
     auto a = constant_value(source,*e.parts[0]).bits;
     try {
         if (e.kind == Expr::Kind::conversion) {
+            if(e.token.text=="as?") {
+                auto destination=ir::field_type(e.type,1);
+                auto backing=destination.kind==Type::numeric_enum?Type(*destination.definition->enum_backing):destination;
+                auto value=numeric::try_integer_convert(a,e.parts[0]->type,backing);
+                ir::ConstantValue result;result.fields.resize(2);
+                if(value && (destination.kind!=Type::numeric_enum || ir::numeric_enum_member(destination,*value))) {
+                    result.fields[0].bits=1;result.fields[1].bits=*value;
+                }
+                return result;
+            }
             if (ir::reference_value(e.type)) { if (!a && !e.type.nullable) throw std::invalid_argument("Cannot unwrap null in a compile-time expression"); return {a,{}}; }
             return {numeric::convert(a,e.parts[0]->type,e.type),{}};
         }
@@ -5380,7 +5566,7 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
         if (e.op == "or" && a) return {1,{}};
         auto b = constant_value(source,*e.parts[1]).bits;
         if (e.op == "and" || e.op == "or") return {b,{}};
-        if (ir::reference_value(e.parts[0]->type)) return {static_cast<std::uint64_t>(e.op=="==" ? a==b : a!=b),{}};
+        if (ir::reference_value(e.parts[0]->type) || e.parts[0]->type.kind==Type::numeric_enum) return {static_cast<std::uint64_t>(e.op=="==" ? a==b : a!=b),{}};
         return {numeric::binary(operation(e.op),a,b,e.parts[0]->type),{}};
     } catch (const CompilationError&) { throw; }
       catch (const std::invalid_argument& failure) {
@@ -5402,7 +5588,7 @@ ir::Module member_catalog(const std::map<std::string,std::unique_ptr<Unit>>& uni
     ir::Module m;m.root_identity=entry;
     for(const auto& [id,u]:units) {
         auto& imports=m.source_imports[id];for(const auto& i:u->imports) if(!i.target.empty()) imports.insert(i.target);
-        for(const auto& s:u->structures) m.nominal_types.emplace_back(s.definition,s.definition->interface_type ? Type::interface_ref : s.definition->managed ? Type::managed_ref : Type::aggregate);
+        for(const auto& s:u->structures) m.nominal_types.push_back(Type::nominal(s.definition));
         for(const auto& f:u->functions) if(!f.parse_failed) {
             auto header=member_header(*u,f);
             if(f.interface_requirement) m.interface_requirements.push_back(std::move(header));else m.functions.push_back(std::move(header));
@@ -5426,7 +5612,7 @@ void generic_provenance(ir::Module& module,const std::map<std::string,std::uniqu
             module.generic_instances.emplace(structure.definition->identity,ir::Module::GenericInstance{structure.generic_origin->definition->identity,structure.type_arguments});
     }
 }
-void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry, Diagnostics& diagnostics) {
+void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry, Diagnostics& diagnostics, Unit* library_scope=nullptr) {
     for(auto& [id,u]:units)if(u->application_body) {
         try {
             if(id!=entry)error(u->source,{TokenKind::name,"",0},Code::entry,"Imported modules cannot contain executable top-level statements.");
@@ -5455,7 +5641,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         }
     }
     }
-    auto& root = *units.at(entry);
+    auto& root = library_scope ? *library_scope : *units.at(entry);
     for(auto& [id,u]:units)for(auto& s:u->generic_structures) {
         s.definition->identity=id+"::"+s.token.text;s.definition->module_identity=id;s.definition->visibility=s.visibility;
         if(u->declarations.contains(s.token.text) || !u->structure_names.emplace(s.token.text,&s).second)
@@ -5702,6 +5888,20 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         return ir::with_field_type(ir::with_field_type(Type(canonical),1,success),2,failure);
     };
     for(auto& [id,u]:units)u->make_result=make_result;
+    std::map<std::string,Type> canonical_options;
+    auto make_option=[&](Type payload) {
+        payload.readonly=false;
+        const auto key=ir::option_identity(payload);
+        if(auto found=canonical_options.find(key);found!=canonical_options.end())return found->second;
+        auto d=std::make_shared<ir::ValueType>();
+        d->identity=d->name=key;d->display_name="option<"+ir::type_name(payload)+">";d->option_type=true;
+        d->cases={{"None",1,0},{"Some",1,1}};
+        d->fields={{"$tag",Type::i32,key},{"$some",payload,key}};
+        d->self=d;d->arena=arena;arena->definitions.push_back(d);
+        auto type=Type(d);canonical_options.emplace(key,type);root.synthetic_types.push_back(type);
+        return type;
+    };
+    for(auto& [id,u]:units)u->make_option=make_option;
 
     for(auto& [id,u]:units)u->resolve_result=[&,owner=u.get()](Type raw,const Token& token)->Type {
         auto found=std::find_if(owner->results.begin(),owner->results.end(),[&](const auto& syntax){return syntax.definition==raw.definition;});
@@ -5928,7 +6128,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     }
     diagnostics.finish();
     try {root.member_catalog->interface_bindings=ir::interface_universe(*root.member_catalog);}
-    catch(const std::length_error& failure) {error(root.source,root.structures.front().token,Code::limit,failure.what(),"Split unrelated providers into separately compiled projects.");}
+    catch(const std::length_error& failure) {error(root.source,root.structures.empty()?Token{TokenKind::end,"",0}:root.structures.front().token,Code::limit,failure.what(),"Split unrelated providers into separately compiled projects.");}
     std::map<std::string,Function*> functions;
     std::map<std::string,std::set<std::string>> dependencies;
     std::vector<std::string> pending;
@@ -5992,9 +6192,12 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         auto name = startup_pending.back(); startup_pending.pop_back();
         if (!functions.contains(name) || !startup.insert(name).second) continue;
         const auto& function = *functions.at(name);
-        if (function.asynchronous || (!function.native_symbol.empty() && native_binding(function.native_symbol).name == "register")) {
+        if (function.asynchronous || function.c_primitive ||
+            (!function.native_symbol.empty() && native_binding(function.native_symbol).name == "register")) {
             for (const auto& [id, owner] : units) if (owner->declarations.contains(function.token.text) && owner->declarations.at(function.token.text) == &function)
-                error(owner->source, function.token, Code::initializer, "Global initialization requires synchronous calls without native callback registration.");
+                error(owner->source, function.token, Code::initializer, function.c_primitive ?
+                    "C primitive calls require a completed application startup." :
+                    "Global initialization requires synchronous calls without native callback registration.");
         }
         for (const auto& target : dependencies[name]) startup_pending.push_back(target);
     }
@@ -6007,6 +6210,13 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     }
     for (auto& [id,f] : functions) for (const auto& p : f->parameters)
         f->initialization_contract += std::to_string(p.token.text.size()) + ":" + p.token.text + std::to_string(p.default_syntax.size()) + ":" + p.default_syntax;
+    if (const auto provider = std::find_if(units.begin(), units.end(),
+            [](const auto& unit) { return bool(unit.second->c_primitives); }); provider != units.end()) {
+        const auto& dynamic = provider->second->c_primitives->dynamic();
+        for (const auto& [id, unit] : units) for (const auto& f : unit->functions)
+            if (f.asynchronous && !(dynamic && dynamic->conventional() && standard_module(id)))
+                error(unit->source, f.token, Code::unsupported_type, "C primitive provider graphs require synchronous execution.");
+    }
     // Recovered trees and AST-only poisoned types can never enter capability analysis or IR.
     diagnostics.finish();
     analyze_capabilities(units,diagnostics);
@@ -6015,10 +6225,12 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     diagnostics.finish();
     (void)string_pool(units);
     for(auto& [id,u]:units)for(auto& f:u->functions)if(f.asynchronous){f.task=u->make_task(f.result);if(!ir::async_boundary_safe(f.result))error(u->source,f.token,Code::unsupported_type,"Callable-containing results cannot escape an async task in Delivery 1.");for(const auto& parameter:f.parameters)if(!ir::async_boundary_safe(parameter.type))error(u->source,parameter.token,Code::unsupported_type,"Callable-containing or borrowed arguments cannot cross an async task boundary in Delivery 1.");if(f.receiver && !ir::async_boundary_safe(f.receiver->type))error(u->source,f.token,Code::unsupported_type,"Callable-containing managed receivers cannot cross an async task boundary in Delivery 1.");if(f.initializer || f.accessor || (f.receiver && f.token.text=="deinit") || f.virtual_method || f.overriding || f.interface_requirement || (f.receiver && f.receiver->type.kind!=Type::managed_ref))error(u->source,f.token,Code::unsupported_type,"Async lifecycle methods, accessors, value receivers and virtual/interface methods require a reviewed contract.");}
-    for(auto& [id,u]:units) {u->resolve_global={};u->make_task={};u->make_cleanup={};u->make_capture_record={};u->make_callable={};u->resolve_callable={};u->resolve_result={};u->make_result={};u->resolve_array={};u->resolve_application={};u->specialize_function={};u->specialize_structure={};} // No closures into this validation frame escape.
+    for(auto& [id,u]:units) {u->resolve_global={};u->make_task={};u->make_cleanup={};u->make_capture_record={};u->make_callable={};u->resolve_callable={};u->resolve_result={};u->make_result={};u->make_option={};u->resolve_array={};u->resolve_application={};u->specialize_function={};u->specialize_structure={};} // No closures into this validation frame escape.
 }
 ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry) {
     ir::Module module;
+    for (const auto& [id, unit] : units) if (unit->c_primitives) module.c_primitives = unit->c_primitives;
+    if (module.c_primitives) module.coordinated = true;
     auto strings=string_pool(units);
     std::map<std::string, std::set<std::string>> reach;
     for (const auto& [id, unit] : units) {
@@ -6040,7 +6252,7 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
     }
     for(const auto& [id,unit]:units)for(auto type:unit->synthetic_types){module.nominal_types.push_back(type);if(type.kind==Type::managed_ref)module.coordinated=true;}
     for (const auto& [id,unit] : units) for (const auto& structure : unit->structures) {
-        module.nominal_types.emplace_back(structure.definition,structure.definition->interface_type ? Type::interface_ref : structure.definition->managed ? Type::managed_ref : Type::aggregate);
+        module.nominal_types.push_back(Type::nominal(structure.definition));
         if (structure.definition->managed || structure.definition->interface_type) module.coordinated=true;
     }
     std::set<std::string> results;
@@ -6054,6 +6266,33 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
         Lowering lowering(unit->source,module,strings);
         for (const auto& f : unit->functions) {
             if(elided_handlers.contains(f.symbol))continue;
+            if (f.c_primitive) {
+                const auto& binding = module.c_primitives->bindings().at(*f.c_primitive);
+                ir::Function wrapper;
+                wrapper.name = f.symbol;
+                wrapper.source_name = f.token.text;
+                wrapper.module_identity = id;
+                wrapper.source = unit->source.location(f.token.offset);
+                wrapper.parameters.clear();
+                for (const auto& parameter : f.parameters) wrapper.parameters.push_back(parameter.type);
+                wrapper.result = f.result;
+                ir::Block body;
+                ir::Instruction call{ir::Op::c_primitive_call};
+                call.callee = module.c_primitives->call_identity(binding);
+                call.immediate = *f.c_primitive;
+                call.type = wrapper.result;
+                call.source = wrapper.source;
+                for (unsigned argument = 0; argument < wrapper.parameters.size(); ++argument) {
+                    body.instructions.push_back({ir::Op::argument, argument});
+                    call.arguments.push_back(argument);
+                }
+                body.instructions.push_back(std::move(call));
+                body.end = {wrapper.result == Type::none ? ir::Terminator::Kind::return_void :
+                    ir::Terminator::Kind::return_value, static_cast<unsigned>(wrapper.parameters.size())};
+                wrapper.blocks.push_back(std::move(body));
+                module.functions.push_back(std::move(wrapper));
+                continue;
+            }
             if(!f.native_symbol.empty()){module.native_library=std::string(native_provider(f.native_symbol));module.coordinated=true;continue;}
             if(f.interface_requirement) {
                 ir::Function requirement;requirement.name=f.symbol;requirement.parameters={f.receiver->type};
@@ -6107,21 +6346,28 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
     for(const auto& f:module.functions) { trace_string(f.result); for(auto t:f.parameters) trace_string(t); for(auto t:f.locals) trace_string(t); }
     for(auto t:module.nominal_types) if(t.definition) trace_string(Type(t.definition));
     numeric::append_prelude(module);
+    // A conventional application can import a standard module that also offers
+    // async APIs. Only its entry closure is executable, and IR validation still
+    // rejects async or worker code reachable from that closure.
+    if (module.c_primitives && module.c_primitives->dynamic() && module.c_primitives->dynamic()->conventional())
+        ir::retain_entry(module);
     ir::validate(module); return module;
 }
 
 }
 std::shared_ptr<const ValidatedAnalysis> validated_source(const SourceFile&);
-std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path&, const SourceOverrides& = {}, bool verify_disk = false,const NativeProject* = nullptr,EditorProbe* = nullptr);
+std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path&, const SourceOverrides& = {}, bool verify_disk = false,const NativeProject* = nullptr,EditorProbe* = nullptr,CPrimitiveAdmission::Owner = {});
 // This factory is the only way to construct a successful result.
 struct AnalysisAccess {
-    static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry,std::vector<Diagnostic> warnings={}) {
+    static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry,std::vector<Diagnostic> warnings={},const std::string& context_key={},std::shared_ptr<Unit> library_scope={},ApplicationMetadata::Owner metadata={},bool native_authorized=true) {
         auto result = std::shared_ptr<ValidatedAnalysis>(new ValidatedAnalysis);result->warnings_=std::move(warnings);
         result->entry_ = entry;
-        const auto& selected=*units.at(entry);
+        result->application_metadata_ = std::move(metadata);
+        const auto& selected=library_scope?*library_scope:*units.at(entry);
+        result->executable_=!library_scope;
         const auto* app=application_entry(selected);
         result->application_=app!=nullptr || (!selected.globals.empty() && !selected.declarations.contains("entry") && !selected.declarations.contains("main"));
-        result->entry_symbol_=entry+(result->application_?"::$app_adapter":"::entry");
+        result->entry_symbol_=library_scope?std::string{}:entry+(result->application_?"::$app_adapter":"::entry");
         // Builtin declaration snapshots provide stable canonical hover/reference
         // identity, but never masquerade as filesystem navigation/edit targets.
         for(auto type:{Type::i8,Type::u8,Type::i16,Type::u16,Type::i32,Type::u32,Type::i64,Type::u64,Type::f32,Type::f64})for(const auto& api:numeric::members()) {
@@ -6135,10 +6381,17 @@ struct AnalysisAccess {
         }
         for(const auto& [id,u]:units)for(const auto& [symbol,record]:u->builtins)if(std::none_of(result->editor_declarations_.begin(),result->editor_declarations_.end(),[&](const auto& d){return d.identity==symbol;}))result->editor_declarations_.push_back(record);
         result->contract_="18:numeric-prelude-v1:20:text-collections-v1:unicode-case-16-v1:display-v1:console-v2:terminal-v2:application-args-v2:host-primitives-v1:"+result->entry_symbol_;
+        if(!context_key.empty())result->contract_+="|project-context-v1:"+context_key;
+        for (const auto& [id,u] : units) if (u->c_primitives) {
+            result->c_primitives_ = u->c_primitives;
+            const auto& bytes = u->c_primitives->descriptor();
+            result->contract_ += "|c-primitive:" + std::to_string(bytes.size()) + ":" + bytes;
+        }
         for(const auto& [id,u]:units)for(const auto& f:u->functions)if(!f.native_symbol.empty())result->contract_+=":"+id+":"+f.native_symbol;
 
         result->contract_+=std::string(formatting::abi_version)+"|"+std::string(temporal::abi_version);
         auto graph = std::make_shared<const std::map<std::string, std::unique_ptr<Unit>>>(std::move(units));
+        auto& context=library_scope?*library_scope:*graph->at(entry);
         auto field = [](std::string& out, const std::string& value) { out += std::to_string(value.size()) + ":" + value; };
         std::map<std::string,std::string> source_identities;
         for(const auto& [id,u]:*graph) {
@@ -6307,7 +6560,7 @@ struct AnalysisAccess {
                 }
                 else if(e.kind==Expr::Kind::conversion && e.op=="interface") {
                     reference(owner,e.type.definition->identity,e,*unit,true);
-                    for(const auto& binding:graph->at(entry)->member_catalog->interface_bindings) if(binding.key==e.target)
+                    for(const auto& binding:context.member_catalog->interface_bindings) if(binding.key==e.target)
                         for(const auto& [requirement,route]:binding.methods) {reference(owner,requirement,e,*unit,true);reference(owner,route.second,e,*unit,true);}
                 } else if (!e.target.empty() && e.target!="$interpolation" && e.target!="$hole" && !e.target.starts_with("$array.") && !e.target.starts_with("$dict.")) reference(owner,e.target,e,*unit,implicit || e.implicit);
                 else if (e.kind == Expr::Kind::name && locals.contains(e.slot)) reference(owner,locals.at(e.slot),e,*unit,implicit || e.implicit,locals.at(e.slot).find("::const::")!=std::string::npos && locals.at(e.slot).substr(0,locals.at(e.slot).find("::const::"))==owner.substr(0,owner.find("::const::")));
@@ -6335,7 +6588,7 @@ struct AnalysisAccess {
                 field(result->contract_,"array-extent");field(result->contract_,ir::type_name(array.resolved));
             }
             for (const auto& [token,raw] : unit->type_uses) {
-                auto t = resolve_type(raw,*unit,*graph->at(entry),*graph,token);
+                auto t = resolve_type(raw,*unit,context,*graph,token);
                 // Attribute annotation dependencies to their enclosing declaration,
                 // keeping invalidation edges between owned declaration identities.
                 std::string owner = id; std::size_t nearest = 0;
@@ -6363,7 +6616,8 @@ struct AnalysisAccess {
             }
             for (const auto& structure : unit->structures) {
                 auto key = structure.definition->identity;
-                std::string layout;
+                auto type=Type::nominal(structure.definition);
+                std::string layout=ir::numeric_enum_layout(type);
                 for(const auto& variant:structure.definition->cases){field(layout,"variant");field(layout,variant.name);field(layout,std::to_string(variant.begin));field(layout,std::to_string(variant.count));}
                 for (const auto& member : structure.fields) {
                     auto t = *member.annotation; auto identity = key + "::field::" + member.name;
@@ -6373,14 +6627,23 @@ struct AnalysisAccess {
                     record.using_field=member.using_field;record.readonly=member.readonly;record.editor_symbol_kind=member.event?24:8; declaration(std::move(record),true,structure.definition->cases.empty());
                     if (member.expression) expression(*member.expression,identity,{});
                 }
-                for(unsigned n=0;n<structure.case_tokens.size();++n){const auto& variant=structure.definition->cases[n];std::vector<Type> parameters;for(unsigned field=0;field<variant.count;++field)parameters.push_back(ir::field_type(Type(structure.definition),variant.begin+field));
+                for(unsigned n=0;n<structure.definition->numeric_members.size();++n){
+                    const auto& member=structure.definition->numeric_members[n];
+                    const auto value=numeric::integer_text(member.bits,*structure.definition->enum_backing);
+                    AnalyzedDeclaration record{AnalyzedDeclaration::Kind::module_constant,key+"::variant::"+member.name,id,structure.visibility,location(structure.case_tokens[n]),{},type,value,member.bits,key};
+                    record.editor_symbol_kind=22;
+                    record.signature=ir::type_name(type)+"."+member.name+" = "+value+" ("+ir::type_name(*structure.definition->enum_backing)+")";
+                    declaration(std::move(record));
+                }
+                for(unsigned n=0;n<structure.definition->cases.size();++n){const auto& variant=structure.definition->cases[n];std::vector<Type> parameters;for(unsigned field=0;field<variant.count;++field)parameters.push_back(ir::field_type(Type(structure.definition),variant.begin+field));
                     AnalyzedDeclaration record{variant.count?AnalyzedDeclaration::Kind::function:AnalyzedDeclaration::Kind::module_constant,key+"::variant::"+variant.name,id,structure.visibility,location(structure.case_tokens[n]),parameters,Type(structure.definition),std::to_string(n),variant.count?std::optional<std::uint64_t>{}:std::optional<std::uint64_t>{n},key};
                     for(unsigned i=0;i<variant.count;++i){const auto& member=structure.fields[variant.begin+i];record.written_parameters.push_back({member.token.text,parameters[i],location(member.token)});}
                     record.editor_symbol_kind=22;declaration(std::move(record));
                 }
-                AnalyzedDeclaration record{structure.definition->interface_type ? AnalyzedDeclaration::Kind::interface_type : structure.definition->managed ? AnalyzedDeclaration::Kind::managed_structure : AnalyzedDeclaration::Kind::value_structure,key,id,structure.visibility,location(structure.token),{},Type(structure.definition,structure.definition->interface_type ? Type::interface_ref : structure.definition->managed ? Type::managed_ref : Type::aggregate),layout,{},id};
+                AnalyzedDeclaration record{structure.definition->interface_type ? AnalyzedDeclaration::Kind::interface_type : structure.definition->managed ? AnalyzedDeclaration::Kind::managed_structure : AnalyzedDeclaration::Kind::value_structure,key,id,structure.visibility,location(structure.token),{},type,layout,{},id};
                 if(structure.source_end>structure.token.offset){auto r=location(structure.token);r.begin=unit->source.line_starts().at(unit->source.location(structure.token.offset).line-1);r.end=structure.source_end;record.extent=r;}
                 if(!structure.case_tokens.empty())record.editor_symbol_kind=10;
+                if(structure.definition->enum_backing)record.signature="enum "+structure.token.text+"("+ir::type_name(*structure.definition->enum_backing)+")";
                 if(auto base=structure.definition->base.lock()) record.base_identity=base->identity;
                 declaration(std::move(record));
             }
@@ -6485,7 +6748,7 @@ struct AnalysisAccess {
                 body(f.body);
             }
         }
-        for(const auto& binding:graph->at(entry)->member_catalog->interface_bindings) {
+        for(const auto& binding:context.member_catalog->interface_bindings) {
             field(result->contract_,"interface-binding");field(result->contract_,binding.key);
             for(const auto& [requirement,route]:binding.methods) {
                 const auto& owner=*graph->at(binding.interface.definition->module_identity);
@@ -6505,12 +6768,17 @@ struct AnalysisAccess {
             if(alternatives.size()>1){r.signature="Selected specializations:";for(const auto& label:alternatives)r.signature+="\n\n"+label;}
         }
         field(result->contract_,result->constants_);
-        result->lower_ = [graph,entry] { return lower_graph(*graph,entry); };
+        result->lower_ = [graph,entry,library_scope,native_authorized] {
+            if(library_scope)throw std::invalid_argument("Library analysis has no executable entry or supported IR build operation.");
+            if(!native_authorized)throw std::invalid_argument("Native project execution requires explicit host authorization.");
+            return lower_graph(*graph,entry);
+        };
         return result;
     }
 };
 ir::Module ValidatedAnalysis::lower(ir::Emission emission) const {
     auto module = lower_(); module.constant_contract = constants_; module.analysis = shared_from_this();
+    module.application_metadata = application_metadata_;
     // The complete graph has already passed checking and typed-IR validation.
     if(emission==ir::Emission::entry)ir::retain_entry(module);
     return module;
@@ -6524,6 +6792,19 @@ AnalysisResult analyze_project(const std::filesystem::path& entry,const NativePr
         overrides.emplace(bindings.module,SourceFile(path_utf8(root/utf8_path(bindings.module).relative_path()),native_project_source(bindings)));
         auto program=validated_project(entry,overrides,true,&bindings);return {program,program->warnings()};
     }catch(const CompilationError& e){return {nullptr,e.diagnostics()};}
+}
+AnalysisResult analyze_project(const std::filesystem::path& entry, CPrimitiveAdmission::Owner admission) {
+    if (!admission) throw std::invalid_argument("C primitive project requires explicit host admission");
+    if ("/" + path_utf8(entry.filename()) == admission->module())
+        throw std::invalid_argument("A C primitive declaration module cannot be the project entry");
+    SourceOverrides overrides;
+    overrides.emplace(admission->module(), SourceFile("<host binding " + admission->module() + ">", admission->source()));
+    try {
+        auto program = validated_project(entry, overrides, true, nullptr, nullptr, std::move(admission));
+        return {program, program->warnings()};
+    } catch (const CompilationError& failure) {
+        return {nullptr, failure.diagnostics()};
+    }
 }
 AnalysisResult analyze_project(const std::filesystem::path& entry) {
     try { auto program=validated_project(entry);return {program,program->warnings()}; }
@@ -6551,7 +6832,7 @@ std::shared_ptr<const ValidatedAnalysis> validated_source(const SourceFile& sour
     validate_graph(units, identity, diagnostics);
     return AnalysisAccess::build(std::move(units), identity,diagnostics.warnings());
 }
-std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path& entry, const SourceOverrides& overrides, bool verify_disk,const NativeProject* bindings,EditorProbe* editor) {
+std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path& entry, const SourceOverrides& overrides, bool verify_disk,const NativeProject* bindings,EditorProbe* editor,CPrimitiveAdmission::Owner primitives) {
     for (const auto& [id, source] : overrides) { (void)source; require_module_identity(id); }
     std::error_code ec;
     auto absolute = std::filesystem::absolute(entry, ec);
@@ -6561,7 +6842,7 @@ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem
     // A diagnostic anchor is needed even before the entry file can be opened.
     Unit anchor(SourceFile(path_utf8(absolute), ""), "/");
     Diagnostics diagnostics; diagnostics.editor=editor; diagnostics.bind(anchor.source, "/" + path_utf8(absolute.filename()));
-    SourceGraph graph(root, diagnostics, overrides,bindings);
+    SourceGraph graph(root, diagnostics, overrides,bindings,primitives);
     auto& first = [&]() -> Unit& {
         try { return graph.load(anchor, {TokenKind::path, "/" + path_utf8(absolute.filename()), 0}); }
         catch (const CompilationError& failure) { diagnostics.add(failure); diagnostics.finish(); throw; }
@@ -6569,7 +6850,7 @@ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem
     // A disk read is not an atomic filesystem transaction. Re-discover paths and
     // compare exact bytes before accepting this captured graph. Overlays are frozen.
     if (verify_disk) {
-        Diagnostics check; SourceGraph again(root, check, overrides,bindings);
+        Diagnostics check; SourceGraph again(root, check, overrides,bindings,primitives);
         again.load(anchor, {TokenKind::path, first.identity, 0});
         bool same = graph.units.size() == again.units.size();
         for (const auto& [id, unit] : graph.units) {
@@ -6609,9 +6890,10 @@ AnalysisResult analyze_project(const std::filesystem::path& entry, const SourceO
     try {auto program=validated_project(entry,overrides,true);return {program,program->warnings()};}
     catch (const CompilationError& failure) { return {{}, failure.diagnostics()}; }
 }
+#include "project_selection.inc"
 // Import recovery reads metadata only. Full imports still pass SourceGraph::load.
 std::optional<EditorAssistance> import_assistance(const std::filesystem::path& entry,const SourceOverrides& overrides,
-    const std::string& module,const SourceFile& source,std::size_t cursor) {
+    const std::string& module,const SourceFile& source,std::size_t cursor,ProjectCapture* project=nullptr) {
     const auto& text=source.text();
     auto line=cursor?text.find_last_of("\r\n",cursor-1):std::string::npos;line=line==std::string::npos?0:line+1;
     auto start=line;if(!start && text.starts_with("\xef\xbb\xbf"))start=3;
@@ -6633,7 +6915,8 @@ std::optional<EditorAssistance> import_assistance(const std::filesystem::path& e
         for(char c:prefix)if(!(letter(c)||digit(c)||c=='/'))return out;
         if(prefix.starts_with('/') || prefix.find("//")!=std::string::npos)return out;
     }
-    Unit anchor(source,module);Diagnostics diagnostics;SourceGraph graph(std::filesystem::canonical(entry.parent_path()),diagnostics,overrides);
+    Unit anchor(source,module);Diagnostics diagnostics;SourceGraph legacy(std::filesystem::canonical(project?project->root:entry.parent_path()),diagnostics,overrides);
+    auto& graph=project?project->graph:legacy;
     auto token=[&](std::string name){return Token{quoted?TokenKind::path:TokenKind::name,std::move(name),start};};
     if(!quoted && directory.empty() && std::string_view("lib/").starts_with(leaf)) {
         try {(void)graph.resolve(anchor,token("lib/_void_discovery_"),true);out.candidates.push_back({"lib/","project-local libraries",19,"lib/"});}catch(const CompilationError&){}
@@ -6676,15 +6959,15 @@ bool valid_editor_identifier(const std::string& name) {
     return !name.empty() && letter(name[0]) && !reserved.contains(name) &&
         std::all_of(name.begin(),name.end(),[](char c){return letter(c)||digit(c);});
 }
-EditorAssistance editor_assistance(const std::filesystem::path& entry,const SourceOverrides& overrides,const std::string& module,std::size_t cursor) {
+EditorAssistance editor_assistance_impl(const std::filesystem::path& entry,const SourceOverrides& overrides,const std::string& module,std::size_t cursor,ProjectCapture* project=nullptr,const std::optional<std::string>& project_entry={}) {
     require_module_identity(module);
     EditorAssistance empty;
     auto selected=overrides.find(module);
     if(selected!=overrides.end() && !selected->second)return empty;
-    SourceFile source=selected!=overrides.end() && selected->second ? *selected->second : read_source(entry.parent_path()/utf8_path(module).relative_path());
+    SourceFile source=project?project->recapture_source(module):selected!=overrides.end() && selected->second ? *selected->second : read_source(entry.parent_path()/utf8_path(module).relative_path());
     const auto& text=source.text();
     if(cursor>text.size() || text.find("_void_editor_cursor_")!=std::string::npos) return empty;
-    if(auto imports=import_assistance(entry,overrides,module,source,cursor))return *imports;
+    if(auto imports=import_assistance(entry,overrides,module,source,cursor,project))return *imports;
     Diagnostics diagnostics;auto tokens=lex(source,diagnostics);
     if(diagnostics.failed()) return empty;
     std::size_t begin=cursor,end=cursor;
@@ -6740,13 +7023,24 @@ EditorAssistance editor_assistance(const std::filesystem::path& entry,const Sour
     }
     auto frozen=overrides;frozen.insert_or_assign(module,SourceFile(source.path(),std::move(repaired)));
     EditorProbe probe{module,begin,{},operator_context,{},{},0};probe.result.begin=begin;probe.result.end=end;
-    try {(void)validated_project(entry,frozen,true,nullptr,&probe);if(operator_context)return probe.result;}
+    try {
+        if(project)(void)analyze_manifest_project_impl(project->root,project_entry,frozen,project->manifest_overlays,&probe,false);
+        else (void)validated_project(entry,frozen,true,nullptr,&probe);
+        if(operator_context)return probe.result;
+    }
     catch(const EditorProbeFound&) {
         const auto prefix=operator_context?std::string{}:text.substr(begin,cursor-begin);
         std::erase_if(probe.result.candidates,[&](const auto& c){return !c.name.starts_with(prefix);});
         return probe.result;
     } catch(const CompilationError&) {}
     return empty;
+}
+EditorAssistance editor_assistance(const std::filesystem::path& entry,const SourceOverrides& sources,const std::string& module,std::size_t cursor) {
+    return editor_assistance_impl(entry,sources,module,cursor);
+}
+EditorAssistance project_editor_assistance(const std::filesystem::path& root,const std::optional<std::string>& entry,const SourceOverrides& sources,const ManifestOverrides& manifests,const std::string& module,std::size_t cursor) {
+    try {ProjectCapture capture(root,sources,manifests);return editor_assistance_impl(root,sources,module,cursor,&capture,entry);}
+    catch(const CompilationError&){return {};}
 }
 std::optional<std::string> format_source(const SourceFile& source) {
     // Parse with the ordinary compiler before proposing edits. This is local

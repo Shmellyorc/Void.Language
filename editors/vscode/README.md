@@ -1,13 +1,33 @@
 # VOID Language for VS Code and VSCodium
 
+## Manifest projects
+
+Set `void.project.root` to a literal absolute or workspace-relative manifest root.
+An optional `void.project.entry` then selects a source inside that root. An entry
+setting without a root keeps the legacy entry-parent session. With neither, the
+matching voidls performs nearest-manifest discovery within the workspace, then
+legacy discovery only if no manifest was selected. No TypeScript source scan is used.
+
+Manifest/error-bearing and library sessions use `voidProjectProtocol: 1` and schema-2
+preflight. Missing main and malformed TOML produce diagnostics without preventing
+project opening. Dirty source/TOML buffers, file events and root switches retain
+revision/client guards. An older project-incapable server produces a visible error;
+there is no silent legacy downgrade. Explicit legacy-entry mode remains available.
+
+Trust, filesystem/single-folder restrictions, configured/bundled/PATH servers and
+standalone editing remain. Project creation prompts and init/new are not implemented.
+See the repository's `docs/projects/SLICE3.md` for execution evidence and limitations.
+
+
 Compiler-owned completion, hover, signature help, diagnostics, navigation, source
 symbols, guarded rename and conservative formatting through one native `voidls`.
 Requires a trusted local filesystem workspace and VS Code API 1.141.0+. VSCodium
-execution is a separate verification target. One selected entry graph per window.
+execution is a separate verification target. One pinned project/session per window.
 
 Run **VOID: Select Project Entry** or set `void.project.entry` for an explicit
-entry. Empty asks the shared compiler to select nearest `main.void` within the
-workspace, otherwise a labelled standalone active-file session. Selection stays
+entry. With no root or entry setting, shared project preflight first selects the
+nearest manifest within the workspace; without a manifest it retains nearest
+`main.void` and labelled standalone fallback. Selection stays
 fixed until deliberate restart/reselection. The status bar identifies entry and server.
 `void.server.path` overrides discovery; empty checks a bundled native server,
 then PATH. No shell expansion, runtime download or repository build occurs.

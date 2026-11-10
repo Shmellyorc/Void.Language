@@ -11,7 +11,7 @@ import queue
 import threading
 import time
 
-compiler, clang, linker, runtime, fixture, sanitizer = sys.argv[1:]
+compiler, clang, linker, runtime, fixture, sanitizer, *host_libraries = sys.argv[1:]
 compiler, runtime, fixture = map(lambda x: str(Path(x).resolve()), (compiler, runtime, fixture))
 fixtures = Path(__file__).resolve().parent
 checks = 0
@@ -106,7 +106,7 @@ with tempfile.TemporaryDirectory(prefix="VOID console source ") as directory:
             obj = root / (name + ("-O2.o" if optimized else "-normal.o"))
             executable = obj.with_suffix(".exe" if os.name == "nt" else ".bin")
             run([compiler, "emit", source, "-o", obj, *switches])
-            run([clang, *flags, obj, runtime, fixture, "-o", executable])
+            run([clang, *flags, obj, runtime, fixture, *host_libraries, "-o", executable])
             started = time.perf_counter()
             p = run([executable], stdin, status)
             assert p.stdout == stdout, (name, optimized, "AOT stdout", p.stdout, stdout)
@@ -148,7 +148,7 @@ with tempfile.TemporaryDirectory(prefix="VOID console source ") as directory:
         obj = root / ("prompt-O2.o" if optimized else "prompt-normal.o")
         executable = obj.with_suffix(".exe" if os.name == "nt" else ".bin")
         run([compiler, "emit", source, "-o", obj, *switches])
-        run([clang, *flags, obj, runtime, fixture, "-o", executable])
+        run([clang, *flags, obj, runtime, fixture, *host_libraries, "-o", executable])
         for label, args in [("JIT", [compiler, "run", source, *switches]), ("linked AOT", [executable])]:
             for case, payload, ending in [("unicode-CR-open", "Ada🎮\r".encode(), "Hello, Ada🎮\ndone\n".encode()), ("empty-line", b"\n", b"Hello, \ndone\n"), ("EOF", b"", b"EOF\ndone\n"), ("invalid-UTF8", b"\xff", b"input error invalid_encoding 1\ndone\n")]:
                 child = subprocess.Popen([str(a) for a in args], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=environment)
@@ -220,7 +220,7 @@ with tempfile.TemporaryDirectory(prefix="VOID console source ") as directory:
             obj = root / ("terminal-O2.o" if optimized else "terminal-normal.o")
             executable = obj.with_suffix(".bin")
             run([compiler, "emit", source, "-o", obj, *switches])
-            run([clang, *flags, obj, runtime, fixture, "-o", executable])
+            run([clang, *flags, obj, runtime, fixture, *host_libraries, "-o", executable])
             for label, args in [("JIT", [compiler, "run", source, *switches]), ("linked AOT", [executable])]:
                 master, slave = pty.openpty()
                 fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack("HHHH", 24, 80, 0, 0))
@@ -276,7 +276,7 @@ with tempfile.TemporaryDirectory(prefix="VOID console source ") as directory:
                 obj = root / ("keys-opt.o" if optimized else "keys.o")
                 executable = obj.with_suffix(".bin")
                 run([compiler, "emit", source, "-o", obj, *switches])
-                run([clang, *flags, obj, runtime, fixture, "-o", executable])
+                run([clang, *flags, obj, runtime, fixture, *host_libraries, "-o", executable])
                 for label, args in [("JIT", [compiler, "run", source, *switches]), ("linked AOT", [executable])]:
                     master, slave = pty.openpty()
                     mode = termios.tcgetattr(slave)
@@ -317,7 +317,7 @@ with tempfile.TemporaryDirectory(prefix="VOID console source ") as directory:
         source.write_text('use console\nfunc done():\n    print("broken-cleanup;", file = console.stderr, end = "")\nfunc again():\n    print("also broken")\nfunc main():\n    defer done()\n    defer again()\n    print("broken")\n', encoding="utf-8")
         obj, executable = root / "broken.o", root / "broken.bin"
         run([compiler, "emit", source, "-o", obj])
-        run([clang, *flags, obj, runtime, fixture, "-o", executable])
+        run([clang, *flags, obj, runtime, fixture, *host_libraries, "-o", executable])
         for label, args in [("JIT/O2", [compiler, "run", source]), ("linked AOT/O2", [executable])]:
             read_fd, write_fd = os.pipe()
             os.close(read_fd)
@@ -342,7 +342,7 @@ with tempfile.TemporaryDirectory(prefix="VOID console source ") as directory:
         for optimized in (False,True):
             switches=[] if optimized else ["--no-opt"]
             obj=root/("partial-O2.o" if optimized else "partial-normal.o");exe=obj.with_suffix(".bin")
-            run([compiler,"emit",source,"-o",obj,*switches]);run([clang,*flags,obj,runtime,fixture,"-o",exe])
+            run([compiler,"emit",source,"-o",obj,*switches]);run([clang,*flags,obj,runtime,fixture,*host_libraries,"-o",exe])
             for label,args in [("JIT",[compiler,"run",source,*switches]),("linked AOT",[exe])]:
                 read_fd,write_fd=os.pipe();capacity=fcntl.fcntl(read_fd,fcntl.F_GETPIPE_SZ)
                 child=subprocess.Popen([str(x) for x in args],stdin=subprocess.DEVNULL,stdout=write_fd,stderr=subprocess.PIPE,env=environment);os.close(write_fd)

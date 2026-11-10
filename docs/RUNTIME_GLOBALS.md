@@ -1,5 +1,17 @@
 # Runtime globals — Stage 11
 
+## Manifest project startup
+
+The [project contract](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-compiler-owned-entry-discovery)
+preserves selected-entry root visibility and initializes only its reachable import
+graph E. Parsing unrelated application seeds for discovery does not initialize or
+emit their globals. The manifest directory is a VFS boundary, not a source module.
+JIT and AOT admit the immutable application context before entering the checked
+startup wrapper. Runtime admission freezes either validated metadata or explicit
+absence. Eager globals can query the four application directories as soon as their
+initializers run. A compatible replacement retains the context and the initialized
+cells. Metadata or selected entry changes require restart. [Project startup contract](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-metadata-delivery-and-os-locations).
+
 **STAGE 11: OFFICIALLY LOCKED, October 25, 2026.** Golden Wrench reviewed and
 accepted the implementation; Boss authorized the lock at tested commit
 `e8633b246fe6139d39d830afd4cb249f7dab4d8e`.

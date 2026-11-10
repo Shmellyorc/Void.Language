@@ -23,17 +23,19 @@
         return false;
     }
     template<class Visit> bool warn_match(const Token& token,Type type,Visit patterns) {
-        bool complete=false,present=false,absent=false;std::set<unsigned> covered;std::set<std::uint64_t> booleans;
+        bool complete=false,present=false,absent=false;std::set<unsigned> covered;std::set<std::uint64_t> scalar_cases;
         patterns([&](const Pattern& p){
             complete|=irrefutable(p);
             present|=p.nullable && p.children.size()==1 && irrefutable(p.children[0]);
             absent|=p.kind==Pattern::Kind::value && p.values[0]->token.text=="null";
             if(p.kind==Pattern::Kind::constructor && type.definition && !type.definition->cases.empty() && std::all_of(p.children.begin(),p.children.end(),[&](const auto& child){return irrefutable(child);}))covered.insert(p.tag);
             if(p.kind==Pattern::Kind::value && p.values[0]->kind==Expr::Kind::sum && p.values[0]->parts.empty())covered.insert(p.values[0]->slot);
-            if(type==Type::boolean && p.kind==Pattern::Kind::value && p.values[0]->kind==Expr::Kind::literal)booleans.insert(p.values[0]->value);
+            if((type==Type::boolean || type.kind==Type::numeric_enum) && p.kind==Pattern::Kind::value &&
+               p.values[0]->kind==Expr::Kind::literal)scalar_cases.insert(p.values[0]->value);
         });
         if(type.definition && !type.definition->cases.empty())complete|=covered.size()==type.definition->cases.size();
-        if(type==Type::boolean)complete|=booleans.size()==2;
+        if(type==Type::boolean)complete|=scalar_cases.size()==2;
+        if(type.kind==Type::numeric_enum)complete|=scalar_cases.size()==type.definition->numeric_members.size();
         if(type.nullable)complete|=present && absent;
         if(!complete)diagnostics.warn(source,token,Code::incomplete_match,"Match may leave values unmatched.");return complete;
     }
@@ -90,7 +92,7 @@
             }
             if(type.definition && !type.definition->cases.empty()) {
                 const auto& cases=type.definition->cases;std::string variant=p.spelling;
-                if(!type.definition->result_type) {
+                if(!type.definition->result_type && !type.definition->option_type) {
                     const auto dot=variant.rfind('.');
                     if(dot==std::string::npos)error(source,p.token,Code::type_mismatch,"Enum patterns require type.variant spelling.");
                     auto [owner,structure]=structure_lookup(unit,root,units,variant.substr(0,dot),p.token);
@@ -98,10 +100,20 @@
                     variant=variant.substr(dot+1);
                 }
                 auto selected=std::find_if(cases.begin(),cases.end(),[&](const auto& c){return c.name==variant;});
+                if(type.definition->option_type && variant=="None")
+                    error(source,p.token,Code::syntax,"Write the None pattern without parentheses.");
                 if(selected==cases.end() || selected->count!=p.children.size())error(source,p.token,Code::type_mismatch,"Enum/result pattern payload does not match its variant.");
                 p.tag=static_cast<unsigned>(selected-cases.begin());
                 if(type.definition->result_type)(void)result_editor_target(type,p.tag,p.variant_token);
                 for(unsigned n=0;n<p.children.size();++n){if(!p.fields[n].text.empty())error(source,p.fields[n],Code::syntax,"Variant patterns use positional payloads.");p.indexes.push_back(selected->begin+n);check_pattern(p.children[n],ir::field_type(type,selected->begin+n));}return;
+            }
+            if(type.kind==Type::numeric_enum) {
+                auto [owner,structure]=structure_lookup(unit,root,units,p.spelling,p.token);
+                if(!structure || structure->definition!=type.definition || p.children.size()>1 ||
+                   (!p.children.empty() && !p.fields.front().text.empty()))
+                    error(source,p.token,Code::type_mismatch,"Numeric enum patterns require a member or an exact whole-value type.");
+                if(p.children.empty()){p.kind=K::wildcard;return;}
+                auto inner=std::move(p.children.front());p=std::move(inner);check_pattern(p,type);return;
             }
             auto resolved=p.annotated_type?resolve_type(p.narrowed,unit,root,units,p.token):Type(Type::none);
             if(p.annotated_type && (numeric::number(resolved) || resolved==Type::boolean || resolved==Type::string)){

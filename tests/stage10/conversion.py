@@ -5,7 +5,7 @@ import subprocess
 import sys
 import tempfile
 
-compiler, clang, linker, runtime, fixture, sanitizer = sys.argv[1:]
+compiler, clang, linker, runtime, fixture, sanitizer, *host_libraries = sys.argv[1:]
 flags = ["--driver-mode=g++", "-pthread"]
 if linker:
     flags.append("--ld-path=" + linker)
@@ -56,7 +56,7 @@ func entry(input: i32) -> i32:
         obj = root / ("optimized.o" if optimized else "normal.o")
         exe = obj.with_suffix(".exe" if os.name == "nt" else ".bin")
         run([compiler, "emit", source, "-o", obj, *switches])
-        run([clang, *flags, obj, runtime, fixture, "-o", exe])
+        run([clang, *flags, obj, runtime, fixture, *host_libraries, "-o", exe])
         for value in (0, 4, -3):
             assert run([exe, value]) == str(len(str(value)) + max(3, len(str(abs(value)))) + (1 if value < 0 else 0))
 print(f"{checks} source display JIT/AOT checks passed")

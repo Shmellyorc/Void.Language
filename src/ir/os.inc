@@ -3,6 +3,8 @@
                         i.a || i.b || i.immediate < 0 || static_cast<std::size_t>(i.immediate) >= os::operations.size() ||
                         i.receiver || !i.callee.empty() || !i.operator_glyph.empty() || i.initialization || i.array_repeat) fail("invalid private OS operation");
                     const auto& contract = os::operations.at(i.immediate);
+                    if (i.immediate == static_cast<unsigned>(os::Operation::application_id) && !os::location_adapter(f.name,false))
+                        fail("application ID query outside a standard OS location adapter");
                     if (i.arguments.size() != (contract.text_argument ? 1u : 0u)) fail("invalid OS arity");
                     if (contract.text_argument && operand(i.arguments[0]) != Type::string) fail("invalid OS input type");
                     if (i.immediate == static_cast<unsigned>(os::Operation::process_id)) {

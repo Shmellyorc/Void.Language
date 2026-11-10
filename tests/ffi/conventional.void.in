@@ -1,0 +1,48 @@
+use os as host
+use "/conventional_ffi.void" as ffi
+
+var saved: ffi.box? = null
+
+func main() -> i32:
+    if host.args() is Ok(var args):
+        if args.count != 1:
+            return 10
+        if args[0] == "reject":
+            saved = ffi.acquire(31)
+            var rejected = ffi.acquire(-3)
+            return 11
+        if args[0] == "closed":
+            var owner = ffi.acquire(42) as ffi.box
+            ffi.close_box(owner)
+            return ffi.borrow(owner)
+        if args[0] == "capacity":
+            var too_short: [u8] = [1]
+            return ffi.sum(too_short, 0, 2) as i32
+        if ffi.add(30, 5) != 42 or ffi.scale(3.25, 2.0 as f32) != 6.5:
+            return 12
+        if ffi.wide(@LONG_ARG@) != @LONG_RESULT@ or ffi.flip(true) or not ffi.flip(false):
+            return 13
+        var sample = ffi.transform(ffi.sample(tag = -9, value = 3.25))
+        if sample.tag != -2 or sample.value != 6.5:
+            return 14
+        var bytes: [u8] = [10, 20, 30, 40]
+        if ffi.sum(bytes, 1, 2) != 50:
+            return 15
+        if ffi.fill(bytes, 1, 2, 255) != -7 or bytes[1] != 20 or bytes[2] != 30:
+            return 16
+        if ffi.fill(bytes, 1, 2, 5) != 2 or ffi.shift(bytes, 1, 2) != 2:
+            return 17
+        if bytes[0] != 10 or bytes[1] != 7 or bytes[2] != 8 or bytes[3] != 40:
+            return 18
+        if ffi.acquire(-1) != null:
+            return 19
+        var owner = ffi.acquire(-2) as ffi.box
+        if ffi.borrow(owner) != -2 or ffi.close_box(owner) != 17:
+            return 20
+        saved = ffi.acquire(23)
+        ffi.ping()
+        if ffi.pings() != 1 or ffi.borrow(saved as ffi.box) != 23:
+            return 21
+        print("VOID native application", args[0])
+        return 0
+    return 22

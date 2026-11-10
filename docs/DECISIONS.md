@@ -1,5 +1,37 @@
 # Architectural decisions
 
+## 8 November 2026 — Slice 2 local project discovery authorized
+
+Golden Wrench accepts Slice 1 closeout for local continuation. Boss authorizes
+manifest-selected compiler discovery and entry selection, bounded VFS admission,
+immutable source/TOML overlays, D/E separation and declarationless-root library
+checking. The [Slice 2 record](projects/SLICE2.md) separates source changes, executed
+local/native results and qualification gaps. Bare explicit files and manifestless
+main.void selection keep their existing semantics. S3 sessions/protocol, Runtime
+metadata and later roadmap features remain beyond this review boundary. No hosted
+CI until the complete project/raylib milestone; Git/publication authority remains
+with Boss. The full dynamic-default raylib gate below is preserved.
+
+## 8 November 2026 — continuous local project roadmap; integrated hosted gate
+
+Boss authorizes local engineering through projects, application metadata,
+creation, numeric enums, general C FFI, dependency resolution, raylib and editor
+support, with Golden Wrench's independent review at each architectural boundary.
+Resolve material open decisions before dependent implementation. Slice 1's
+[closeout](projects/SLICE1_CLOSEOUT.md) preserves the original implementation and
+failure evidence; later slices remain unimplemented at that handoff.
+
+No hosted CI until the full project/raylib milestone is ready. The single final
+seven-job acceptance gate requires a real dynamically linked raylib VOID app via
+general C FFI, exercised ABI/window/render/input/shutdown and lifetime/error paths,
+normal/O2 JIT and independent AOT where supported, manifest/app metadata, VS Code
+recognition/run, and installed execution without the checkout. Optional static
+linkage is separately qualified by mode. Local Release/Debug/fatal sanitizer and
+available native Windows results retain exact inventories and platform limits.
+Boss retains Git, hosted dispatch and publication authority. The
+[central roadmap](PROJECT_ARCHITECTURE_ROADMAP.md#continuing-local-authorization-and-final-hosted-gate-8-november-2026)
+records the gate and supersedes older per-phase hosted/HOLD wording within scope.
+
 ## 28 October 2026 — complete LLVM 23.1.4 migration authorized
 
 Boss authorizes replacing the active LLVM/Clang/LLD 19.1.7 requirement with
@@ -1244,3 +1276,72 @@ results retain their original scope. Recommended order and measurable gates are
 in the [roadmap](PROJECT_ARCHITECTURE_ROADMAP.md#recommended-implementation-order-and-acceptance-gates).
 Stop after documentation for Golden Wrench's independent architecture review;
 Boss retains implementation, Git, hosted CI and public release control.
+
+
+## 8 November 2026 — Phase 1 project contract proposal for architecture review
+
+Verified baseline `2f667ea338127b8f91c3136804377ef3fa5218d6`, initially clean.
+**Documentation/design only; implementation HOLD.** The earlier approved product
+direction remains. The [central contract](PROJECT_ARCHITECTURE_ROADMAP.md) now
+freezes recommended initial rules for independent Boss/Golden Wrench approval;
+recording them is not approval of schema details or implementation authorization.
+
+- Schema integer 1 is distinct from SemVer. One application or library target;
+  independent project/app/package identity. Field ownership, defaults, validation,
+  bounded work, exact versions/paths and source-spanned diagnostics are specified.
+  Nonempty reserved native/dependencies data rejects; no future feature is ignored
+  into apparent support. Library mode initially provides source check/metadata.
+- Filename-independent main discovery applies only to manifest-selected context;
+  bare explicit files and manifestless main.void discovery stay compatible. Optional
+  explicit project entry bypasses candidate scanning without changing manifest VFS
+  root. Zero/multiple candidate behavior and legacy/main/script precedence are explicit.
+- Distinguish parsed discovery inventory D from selected execution import graph E.
+  Only E has application semantic/startup treatment; unimported globals do not run.
+  A library import never promotes a main; independently eligible application seeds
+  remain eligible even when imported. Nested project boundaries are isolated.
+- Embedded immutable AOT metadata and per-Runtime JIT context arrive before globals.
+  Proposed zero-ID OS calls use four closed direct-call adaptations; explicit-ID
+  functions and their function-value types remain. Missing context is existing
+  unavailable, never guessed identity or a new permission/authentication model.
+- Init/new generate separate persistent IDs, create exclusively and omit entry.
+  VS Code stores offered/accept/decline/dismiss suppression before prompting;
+  explicit reset/command permits retry. No first-file event installs or loads code.
+- New project preflight/capability is separate from legacy entry-only protocol;
+  source/manifest snapshots, cache/reload and error-bearing editor sessions share
+  compiler authority. Profile/output and migration behavior are specified.
+
+[Compatibility matrix](PROJECT_ARCHITECTURE_ROADMAP.md#phase-1-compatibility-and-migration-matrix),
+[42 concrete test cases/native gates](PROJECT_ARCHITECTURE_ROADMAP.md#phase-1-concrete-acceptance-matrix),
+[six implementation slices](PROJECT_ARCHITECTURE_ROADMAP.md#recommended-implementation-order-and-acceptance-gates)
+and [approval decisions](PROJECT_ARCHITECTURE_ROADMAP.md#unresolved-design-questions-for-independent-review)
+make the proposal reviewable. Preserve seven-job native qualification, fatal
+sanitizers, current receipts and all historical successes/failures. No new tests
+or CI acceptance are claimed. Enums/as?, general C FFI, dynamic-default/static-
+optional raylib, resolution/locks, VOIDUP, debugging and public packaging remain
+future milestones. Stop for independent architecture review before implementation.
+
+
+## 8 November 2026 — bounded project Slice 1 implementation authorized
+
+Boss authorized the schema-parsing/identity/SemVer/diagnostic foundation at baseline
+`2f667ea338127b8f91c3136804377ef3fa5218d6`, after checking the local Phase 1 proposal
+against current compiler, VFS, CLI, Runtime and editor sources. The existing fifteen
+uncommitted architecture-document changes are retained. No material contradiction
+blocks this isolated pure API; ordinary parser/dependency details are settled by
+source inspection and executed qualification, not by silently approving S2–S6.
+
+Slice 1 implements one schema-1 application/library metadata record, exact fields
+and defaults, portable identities/names/relative paths, overflow-safe SemVer
+precedence, duplicate/unknown/missing/type/kind/reserved errors and owned source
+spans. The private pinned MIT toml++ parser retains duplicate locations, bounds key
+and value nesting, and guards malformed key input before an optimizer assumption.
+Current compiler-native resource and provider receipts are untouched.
+
+Physical root/entry/manifest admission and cross-project ID collisions are later
+work: parsing supplied bytes grants no filesystem/native/install authority. Equal
+ID text across distinct roles is expressly allowed, while duplicate declarations
+reject. No manifest lookup, main discovery, Runtime/OS identity, CLI creation,
+editor prompt, enum, FFI/raylib or dependency resolution is implemented here.
+[Engineering record](projects/SLICE1.md) preserves the actual failed attempts,
+parser assertion/UBSan repair, final results and unqualified platforms. Boss alone
+controls staging, commits, pushes, hosted CI and publication.

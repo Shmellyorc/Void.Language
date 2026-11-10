@@ -70,7 +70,7 @@ test('validate executable and deterministic canonical project selection', async 
         const settings = {server, entry: 'main.void', trace: 'off' as const};
         const project = await resolveProject(settings, [directory]);
         assert.equal(path.normalize(project.root), path.normalize(await fs.realpath(directory)));
-        assert.equal(path.normalize(project.entry), path.normalize(path.join(project.root, 'main.void')));
+        assert.equal(path.normalize(project.entry!), path.normalize(path.join(project.root, 'main.void')));
         assert(!project.singleFile);
         if(process.platform==='win32') {
             // The original explicit-entry check bypasses ancestor discovery.
@@ -79,7 +79,7 @@ test('validate executable and deterministic canonical project selection', async 
                 for(const a of [directory[0].toUpperCase(),directory[0].toLowerCase()]) {
                     const automatic=await resolveProject({...settings,entry:''},[w+directory.slice(1)],path.join(a+directory.slice(1),'main.void'));
                     assert.equal(path.normalize(automatic.root),path.normalize(await fs.realpath(directory)));
-                    assert.equal(path.normalize(automatic.entry),path.normalize(await fs.realpath(path.join(directory,'main.void'))));
+                    assert.equal(path.normalize(automatic.entry!),path.normalize(await fs.realpath(path.join(directory,'main.void'))));
                     assert(!automatic.singleFile);
                 }
         }
@@ -87,7 +87,7 @@ test('validate executable and deterministic canonical project selection', async 
         const fallback = await resolveProject({...settings, entry: ''}, [directory], path.join(directory, 'single.void'));
         assert(fallback.singleFile);
         assert.equal(path.normalize(fallback.root), path.normalize(await fs.realpath(directory)));
-        assert.equal(path.normalize(fallback.entry), path.normalize(path.join(await fs.realpath(directory), 'single.void')));
+        assert.equal(path.normalize(fallback.entry!), path.normalize(path.join(await fs.realpath(directory), 'single.void')));
         await assert.rejects(resolveProject(settings, [directory, directory]), /one project/);
         await assert.rejects(resolveProject({...settings, entry: ''}, [directory]), /main.void/);
         await assert.rejects(resolveProject({...settings, server: directory}, [directory]), /regular executable/);
@@ -160,4 +160,32 @@ test('presentation covers approved keyword colors and space indentation', async 
     for (const word of ['true','false','null']) assert(literals.some((r:RegExp) => r.test(word)));
     assert(!literals.some((r:RegExp) => r.test('nullify')));
     assert(!indent.test('structure node:'));
+});
+
+
+test('manifest projects preserve nullable entries and reject unsupported older servers', async () => {
+    const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'VOID manifest config 雪 '));
+    const server = process.env.VOIDLS_TEST_SERVER!;
+    const manifest = "schema=1\n[project]\nid='org.test.sources'\nname='Sources'\nversion='1.0.0'\nkind='application'\n[application]\nid='org.test.app'\n";
+    try {
+        await fs.writeFile(path.join(directory, 'void.project.toml'), manifest);
+        const settings = {server,entry:'',trace:'off' as const};
+        let selected = await resolveProject(settings,[directory]);
+        assert(selected.manifestMode && selected.entry === null && !selected.singleFile);
+        await fs.writeFile(path.join(directory,'game.void'),'func main() -> i32:\n    return 23\n');
+        selected = await resolveProject(settings,[directory],path.join(directory,'game.void'));
+        assert(selected.manifestMode && selected.entry === path.join(directory,'game.void'));
+        const explicit = await resolveProject({...settings,root:directory,entry:'game.void'},[directory]);
+        assert(explicit.manifestMode && explicit.entryOverride === 'game.void' && explicit.root === selected.root);
+        const legacy = await resolveProject({...settings,entry:'game.void'},[directory]);
+        assert(!legacy.manifestMode && legacy.entry === path.join(directory,'game.void'));
+        await fs.writeFile(path.join(directory, 'void.project.toml'),'[=roject]');
+        selected = await resolveProject({...settings,root:directory},[directory]);
+        assert(selected.manifestMode && selected.entry === null);
+        if (process.env.VOIDLS_OLD_SERVER_TEST) {
+            await assert.rejects(resolveProject({...settings,server:process.env.VOIDLS_OLD_SERVER_TEST},[directory]), /requires a matching voidProjectProtocol 1 server/);
+            const retained = await resolveProject({...settings,server:process.env.VOIDLS_OLD_SERVER_TEST,entry:'game.void'},[directory]);
+            assert(!retained.manifestMode && retained.entry === path.join(directory,'game.void'));
+        }
+    } finally { await fs.rm(directory,{recursive:true,force:true}); }
 });

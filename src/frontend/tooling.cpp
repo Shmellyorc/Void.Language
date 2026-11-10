@@ -200,52 +200,99 @@ ToolingSession::ToolingSession(std::filesystem::path entry) {
     current_.entry_ = std::filesystem::absolute(entry);
     refresh();
 }
+ToolingSession::ToolingSession(ProjectSession project) {
+    // Pins location only. The compiler owns physical/policy admission, including
+    // diagnostics for malformed/no-entry projects; no source discovery here.
+    current_.project_request_=std::filesystem::absolute(project.root);
+    current_.project_root_=std::filesystem::canonical(project.root);
+    current_.entry_override_=std::move(project.entry);refresh();
+}
+bool ToolingSession::manifest_document(const std::string& id) const {
+    return current_.project_root_ && id.ends_with("/void.project.toml");
+}
+bool ToolingSession::overridden(const std::string& id) const {
+    return manifest_document(id)?current_.manifests_.contains(id):current_.overrides_.contains(id);
+}
+void ToolingSession::reselect(std::optional<std::string> entry) {
+    if(!current_.project_root_)throw std::invalid_argument("Project reselection requires manifest mode.");
+    refresh();current_.entry_override_=std::move(entry);selected_context_.clear();
+}
+bool ToolingSession::requires_reselection() const {
+    if(!current_.project_root_)return false;
+    auto current=current_analysis();
+    if(!current || !current->project() || !current->project()->project)return true;
+    return !selected_context_.empty() && selected_context_!=current->project()->project->context_key();
+}
 void ToolingSession::refresh() {
     if (current_.revision_ == UINT64_MAX) throw std::overflow_error("Project revision exhausted");
-    if (last_success_) for (const auto& m : last_success_->result().program->modules())
+    if (last_success_) for (const auto& m : last_success_->semantic_analysis()->modules())
         if (std::find(changed_.begin(),changed_.end(),m.identity) == changed_.end()) changed_.push_back(m.identity);
     current_.identity_ = std::make_shared<const ProjectSnapshot::Identity>();
     ++current_.revision_;
 }
 void ToolingSession::change(const std::string& id, DocumentRevision revision, std::optional<SourceFile> source, bool closing) {
-    require_module_identity(id);
+    if(manifest_document(id))require_manifest_identity(id);else require_module_identity(id);
     auto previous = current_.documents_.find(id);
     if (!revision || (previous != current_.documents_.end() && revision <= previous->second))
         throw std::invalid_argument("Document revision must strictly increase, including close/delete/reopen");
     if (current_.revision_ == UINT64_MAX) throw std::overflow_error("Project revision exhausted");
     current_.documents_[id] = revision;
-    if (closing) current_.overrides_.erase(id);
-    else current_.overrides_.insert_or_assign(id, std::move(source));
+    auto& overrides=manifest_document(id)?current_.manifests_:current_.overrides_;
+    if (closing) overrides.erase(id);
+    else overrides.insert_or_assign(id, std::move(source));
     if (std::find(changed_.begin(),changed_.end(),id) == changed_.end()) changed_.push_back(id);
     current_.identity_ = std::make_shared<const ProjectSnapshot::Identity>();
     ++current_.revision_;
 }
 void ToolingSession::open(const std::string& id, DocumentRevision revision, std::string text) {
-    if (current_.overrides_.contains(id)) throw std::invalid_argument("Document already open or unavailable; replace or close it first");
+    if (overridden(id)) throw std::invalid_argument("Document already open or unavailable; replace or close it first");
     change(id, revision, SourceFile(id,std::move(text)), false);
 }
 void ToolingSession::replace(const std::string& id, DocumentRevision revision, std::string text) {
-    if (!current_.overrides_.contains(id)) throw std::invalid_argument("Document must be open or unavailable before replacement");
+    if (!overridden(id)) throw std::invalid_argument("Document must be open or unavailable before replacement");
     change(id, revision, SourceFile(id,std::move(text)), false);
 }
 void ToolingSession::unavailable(const std::string& id, DocumentRevision revision) { change(id,revision,{},false); }
 void ToolingSession::close(const std::string& id, DocumentRevision revision) {
-    if (!current_.overrides_.contains(id)) throw std::invalid_argument("No override to close");
+    if (!overridden(id)) throw std::invalid_argument("No override to close");
     change(id,revision,{},true);
 }
 std::shared_ptr<const SessionAnalysis> ToolingSession::analyze(ProjectSnapshot snapshot) {
     if (!snapshot.identity_) throw std::invalid_argument("Select a project snapshot before analysis");
     auto result = std::make_shared<SessionAnalysis>();
     result->snapshot_ = std::move(snapshot);
-    result->result_ = analyze_project(result->snapshot_.entry_,result->snapshot_.overrides_);
-    if (result->result_.succeeded()) result->index_ = std::make_shared<ToolingIndex>(result->result_.program);
+    if(result->snapshot_.project_root_) {
+        result->project_=analyze_manifest_project(*result->snapshot_.project_request_,result->snapshot_.entry_override_,result->snapshot_.overrides_,result->snapshot_.manifests_);
+        if(result->project_->manifest) {
+            std::vector<std::string> documents;for(const auto& [id,source]:result->snapshot_.overrides_)if(source)documents.push_back(id);
+            auto manifests=result->snapshot_.manifests_;manifests.insert_or_assign("/void.project.toml",result->project_->manifest->source());
+            auto failures=check_project_documents(*result->snapshot_.project_request_,result->snapshot_.overrides_,manifests,documents);
+            if(!failures.empty()) {
+                result->project_->diagnostics.insert(result->project_->diagnostics.end(),failures.begin(),failures.end());result->project_->project.reset();
+                auto state=std::make_shared<ProjectState>(*result->project_->state);state->validated=false;result->project_->state=std::move(state);
+            }
+        }
+        result->result_.diagnostics=result->project_->diagnostics;
+        if(auto project=result->project_->project){result->result_.program=project->program();result->semantic_=project->semantic_analysis();}
+    } else {result->result_=analyze_project(result->snapshot_.entry_,result->snapshot_.overrides_);result->semantic_=result->result_.program;}
+    if (result->semantic_) result->index_ = std::make_shared<ToolingIndex>(result->semantic_);
     return result;
 }
 bool ToolingSession::accept(std::shared_ptr<const SessionAnalysis> result) {
     if (!result || !is_current(*result) || (latest_ && latest_->snapshot().same_revision(result->snapshot()))) return false;
-    accepted_plan_ = last_success_ ? plan_invalidation(*last_success_->result().program, changed_, result->result().program.get()) : InvalidationPlan{};
+    auto hints=changed_;
+    if(current_.project_root_ && last_success_ && result->semantic_analysis()) {
+        // A completed compiler selection has resolved D, TOML and membership.
+        // Feed the source invalidator only its old/new semantic graph domain.
+        auto present=[&](const std::string& id){for(const auto* analysis:{last_success_->semantic_analysis().get(),result->semantic_analysis().get()})for(const auto& module:analysis->modules())if(module.identity==id)return true;return false;};
+        std::erase_if(hints,[&](const auto& id){return !present(id);});
+    }
+    accepted_plan_ = last_success_ ? plan_invalidation(*last_success_->semantic_analysis(), hints, result->semantic_analysis().get()) : InvalidationPlan{};
     latest_ = std::move(result);
-    if (latest_->result().succeeded()) { last_success_ = latest_; changed_.clear(); }
+    if (latest_->succeeded()) {
+        if(latest_->project() && selected_context_.empty())selected_context_=latest_->project()->project->context_key();
+        last_success_ = latest_; changed_.clear();
+    }
     return true;
 }
 std::shared_ptr<const SessionAnalysis> ToolingSession::current_analysis() const {
@@ -258,6 +305,6 @@ InvalidationPlan ToolingSession::invalidation() const {
     auto fresh = current_analysis();
     if (fresh) return accepted_plan_;
     if (!last_success_) return {};
-    return plan_invalidation(*last_success_->result().program, changed_);
+    return plan_invalidation(*last_success_->semantic_analysis(), changed_);
 }
 }

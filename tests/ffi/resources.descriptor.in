@@ -1,0 +1,15 @@
+void-c-primitive 3 3
+provider org.voidlang.g3-fixture
+target @G1_TRIPLE@ @G1_PROFILE@
+source /native_resources.void
+thunk @G3_THUNK_SHA@
+fixture @G3_FIXTURE_SHA@
+effects direct-sync nonblocking no-callbacks
+call c-default
+aliases c_int:i32 c_long:@G1_LONG@ c_size:u64 c_bool:bool
+resource box G3Box pointer null create close_box owner-calls shutdown-any consume-always
+bind create g3_create owner:box i32
+bind read g3_read i32 borrow:box i32
+bind add g3_add i32 mut:box i32
+bind close_box g3_close i32 close:box
+bind live g3_live i32

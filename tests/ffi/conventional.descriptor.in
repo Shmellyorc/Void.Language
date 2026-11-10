@@ -1,0 +1,26 @@
+void-c-primitive 3 3
+provider org.voidlang.g4-conventional
+target @TARGET@
+source /conventional_ffi.void
+thunk @THUNK@
+fixture @FIXTURE@
+effects direct-sync blocking no-callbacks
+call c-default
+aliases c_int:i32 c_long:@LONG@ c_size:u64 c_bool:bool
+resource box ConventionalBox pointer null acquire close_box owner-calls shutdown-any consume-always
+record sample ConventionalSample 16 8 2
+field tag tag i32 0
+field value value f64 8
+bind add g4_conventional_add c_int c_int c_int
+bind scale g4_conventional_scale f64 f64 f32
+bind wide g4_conventional_long c_long c_long
+bind flip g4_conventional_flip c_bool c_bool
+bind transform g4_conventional_sample record:sample record:sample
+bind sum g4_conventional_sum i64 in:1:2:64 c_size c_size
+bind fill g4_conventional_fill i64 out:1:2:64 c_size c_size u8
+bind shift g4_conventional_shift i64 inout:1:2:64 c_size c_size
+bind acquire g4_conventional_acquire owner:box i32
+bind borrow g4_conventional_borrow i32 borrow:box
+bind close_box g4_conventional_close i32 close:box
+bind ping g4_conventional_ping void
+bind pings g4_conventional_pings i32

@@ -1,0 +1,66 @@
+use "/raylib_checked.void" as graphics
+use os as host
+
+struct trace_capture:
+    matches: i32 = 0
+
+func (trace trace_capture) record(level: i32, length: u32, digest: u32):
+    if level == 4 and length == 22 as u32 and digest == 4125766144 as u32:
+        trace.matches += 1
+
+func main() -> i32:
+    var implicit_close = false
+    var trace_only = false
+    var title = "VOID Raylib Gallery"
+    if host.args() is Ok(var options):
+        for option in options:
+            if option == "--implicit-close":
+                implicit_close = true
+            if option == "--reject-title":
+                title = "VOID\0invalid"
+            if option == "--trace-only":
+                trace_only = true
+
+    var title_bytes = title.to_utf8()
+    if graphics.title(title_bytes, 0, title_bytes.count as u64) < 0:
+        print("Raylib title rejected")
+        return 2
+
+    var trace = trace_capture()
+    if graphics.trace(trace.record) != 0 or trace.matches != 1:
+        print("Raylib trace callback failed")
+        return 6
+    print("RAYLIB trace invoked VOID")
+    if trace_only:
+        return 0
+
+    var window = graphics.open(640, 360)
+    if window == null:
+        print("Raylib window or texture initialization failed")
+        return 3
+    var owner = window as graphics.window
+    var background = graphics.tint(graphics.color(r = 21, g = 29, b = 49, a = 255), 0.08 as f32)
+    print("RAYLIB ready")
+
+    var frame: i32 = 0
+    var input_frames: i32 = 0
+    var x: i32 = 280
+    for not graphics.should_close(owner):
+        var step = graphics.direction(owner)
+        if step != 0:
+            if input_frames == 0:
+                print("RAYLIB keyboard input", step)
+            input_frames += 1
+            x += step * 5
+            if x < 25:
+                x = 25
+            if x > 550:
+                x = 550
+        if graphics.draw(owner, x, frame % 500, background.r, background.g, background.b) != 0:
+            return 4
+        frame += 1
+
+    if not implicit_close and graphics.close(owner) != 0:
+        return 5
+    print("RAYLIB frames", frame, "input frames", input_frames)
+    return 0
