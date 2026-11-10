@@ -1,6 +1,9 @@
 #include "project_git.hpp"
+#include "project_git_process.hpp"
 #include "void/path.hpp"
+#include "void/project_resolution.hpp"
 #include <llvm/Support/FileSystem.h>
+#include <llvm/Support/Process.h>
 #include <llvm/Support/Program.h>
 #include <llvm/Support/SHA1.h>
 #include <llvm/Support/SHA256.h>
@@ -93,7 +96,6 @@ void write_bytes(const fs::path& path, std::string_view data) {
 // Read only the selected object database. No source-repository config, refs,
 // alternates, worktree, hooks or transports participate.
 CreationRoot local_objects(const fs::path& root, const GitPin& pin) {
-    if (!pin.origin.starts_with("file:")) fail("HTTPS Git acquisition is unavailable in D3. Use an authorized file: repository.");
     auto repository = inspect_creation_root(root / utf8_path(pin.origin.substr(5))).path;
     const auto dot_git = repository / ".git";
     if (fs::exists(fs::symlink_status(dot_git))) repository = inspect_creation_root(dot_git).path;
@@ -113,22 +115,84 @@ CreationRoot local_objects(const fs::path& root, const GitPin& pin) {
 class GitObjects {
     fs::path work, objects;
     std::string git;
+    std::vector<std::string> isolated_settings;
     const std::chrono::steady_clock::time_point deadline = std::chrono::steady_clock::now() + std::chrono::seconds(60);
 public:
-    explicit GitObjects(fs::path directory) : objects(std::move(directory)), git(VOID_GIT_EXECUTABLE) {
+    explicit GitObjects(const fs::path& directory) : git(VOID_GIT_EXECUTABLE) {
         if (git.empty() || !utf8_path(git).is_absolute() || !fs::is_regular_file(utf8_path(git)))
             fail("No trusted Git executable is configured. Set VOID_GIT_EXECUTABLE at compiler configuration.");
         llvm::SmallString<256> path;
         if (auto error = llvm::sys::fs::createUniqueDirectory("void-git", path)) fail(error.message());
-        work = fs::canonical(utf8_path(path.str().str()));
+        work = utf8_path(path.str().str());
         try {
+            work = fs::canonical(work);
+            objects = directory.empty() ? work / "repo.git" / "objects" : directory;
             fs::create_directories(work / "repo.git" / "refs");
+            if (directory.empty()) fs::create_directory(objects);
             write_bytes(work / "repo.git" / "HEAD", "ref: refs/heads/void\n");
             write_bytes(work / "repo.git" / "config", "[core]\n\trepositoryformatversion = 0\n\tbare = true\n");
+            const auto unused = path_utf8(work / "no-config");
+            isolated_settings = {
+                "GIT_OBJECT_DIRECTORY=" + path_utf8(objects), "GIT_CONFIG_GLOBAL=" + unused,
+                "GIT_CONFIG_SYSTEM=" + unused, "GIT_CONFIG_NOSYSTEM=1", "GIT_NO_REPLACE_OBJECTS=1",
+                "GIT_NO_LAZY_FETCH=1", "GIT_PROTOCOL_FROM_USER=0", "LC_ALL=C"
+            };
         } catch (...) { std::error_code ignored; fs::remove_all(work, ignored); throw; }
     }
     ~GitObjects() { std::error_code ignored; fs::remove_all(work, ignored); }
     GitObjects(const GitObjects&) = delete;
+
+    void fetch(const GitPin& pin) const {
+        auto settings = isolated_settings;
+        const auto directory = path_utf8(work);
+        const std::array<std::string, 10> transport_settings{
+            "GIT_ALLOW_PROTOCOL=https", "GIT_TERMINAL_PROMPT=0", "GIT_ALLOC_LIMIT=134217728",
+            "HOME=" + directory, "USERPROFILE=" + directory, "XDG_CONFIG_HOME=" + directory,
+            "NETRC=" + path_utf8(work / "no-netrc"), "TMPDIR=" + directory,
+            "TEMP=" + directory, "TMP=" + directory
+        };
+        settings.insert(settings.end(), transport_settings.begin(), transport_settings.end());
+        // A caller may provide a local CA bundle. Git still verifies the server
+        // certificate and hostname. Other Git, curl and TLS settings are scrubbed.
+        if (const auto ca = llvm::sys::Process::GetEnv("GIT_SSL_CAINFO")) {
+            const auto bundle = utf8_path(*ca);
+            if (!bundle.is_absolute() || !fs::is_regular_file(bundle))
+                fail("GIT_SSL_CAINFO must name an absolute path to a local CA bundle.");
+            settings.push_back("GIT_SSL_CAINFO=" + *ca);
+        }
+        // Only the named remote may connect directly. Standalone HTTP
+        // helpers inherit a proxy URL that Git rejects before connecting.
+        const std::vector<std::string> args{
+            git, "--git-dir=" + path_utf8(work / "repo.git"),
+            "-c", "http.proxy=://", "-c", "remote.void-source.proxy=",
+            "-c", "remote.void-source.url=" + pin.origin,
+            "-c", "credential.helper=", "-c", "credential.interactive=false",
+            "-c", "http.sslVerify=true", "-c", "http.schannelUseSSLCAInfo=true",
+            "-c", "http.followRedirects=false", "-c", "http.emptyAuth=false",
+            "-c", "http.lowSpeedLimit=1", "-c", "http.lowSpeedTime=10",
+            "-c", "fetch.fsckObjects=true", "-c", "fetch.unpackLimit=1",
+            "fetch", "--quiet", "--depth=1", "--no-tags", "--no-recurse-submodules",
+            "--no-write-fetch-head", "--no-auto-gc", "--no-write-commit-graph", "--", "void-source", pin.revision
+        };
+        const int status = run_git_fetch(work, args, settings, std::min(deadline,
+            std::chrono::steady_clock::now() + std::chrono::seconds(30)));
+        if (status == 0) return;
+        std::string diagnostic(2048, '\0');
+        std::ifstream errors(work / "fetch-error", std::ios::binary);
+        errors.read(diagnostic.data(), static_cast<std::streamsize>(diagnostic.size()));
+        diagnostic.resize(static_cast<std::size_t>(errors.gcount()));
+        if (diagnostic.find("credential url cannot be parsed: ://") != diagnostic.npos)
+            fail("HTTPS Git refused a secondary HTTP download. Fetches may only use the declared remote.");
+        if (diagnostic.find("unadvertised object") != diagnostic.npos ||
+            diagnostic.find("not our ref") != diagnostic.npos ||
+            diagnostic.find("couldn't find remote ref") != diagnostic.npos)
+            fail("HTTPS Git remote did not supply the pinned commit. The commit may be unavailable or the "
+                 "server may refuse exact object-ID requests for unadvertised commits.");
+        for (char& c : diagnostic) if (c < ' ' || c > '~') c = ' ';
+        while (!diagnostic.empty() && diagnostic.back() == ' ') diagnostic.pop_back();
+        fail("HTTPS Git fetch failed (exit " + std::to_string(status) + ")." +
+             (diagnostic.empty() ? std::string{} : " " + diagnostic));
+    }
 
     Objects read(const Ids& ids, std::string_view type, std::size_t limit) const {
         if (ids.empty()) return {};
@@ -137,13 +201,8 @@ public:
         write_bytes(work / "input", request);
         const auto input = path_utf8(work / "input"), output = path_utf8(work / "output");
         const auto git_dir = "--git-dir=" + path_utf8(work / "repo.git");
-        const auto unused = path_utf8(work / "no-config");
-        const std::array<std::string, 9> settings{
-            "GIT_OBJECT_DIRECTORY=" + path_utf8(objects), "GIT_CONFIG_GLOBAL=" + unused,
-            "GIT_CONFIG_SYSTEM=" + unused, "GIT_CONFIG_NOSYSTEM=1", "GIT_NO_REPLACE_OBJECTS=1",
-            "GIT_NO_LAZY_FETCH=1", "GIT_PROTOCOL_FROM_USER=0", "GIT_ALLOW_PROTOCOL=", "LC_ALL=C"};
-        std::array<llvm::StringRef, settings.size()> env;
-        std::copy(settings.begin(), settings.end(), env.begin());
+        std::vector<llvm::StringRef> env(isolated_settings.begin(), isolated_settings.end());
+        env.emplace_back("GIT_ALLOW_PROTOCOL=");
         const std::array<std::optional<llvm::StringRef>, 3> redirects{input, output, llvm::StringRef("")};
         auto execute = [&](llvm::StringRef option) {
             write_bytes(work / "output", "");
@@ -286,8 +345,10 @@ fs::path git_snapshot_path(const fs::path& root, const GitPin& pin) {
 }
 
 GitSnapshot acquire_git_snapshot(const fs::path& root, const GitPin& pin) {
-    const auto objects = local_objects(root, pin);
-    GitObjects git(objects.path);
+    if (!valid_git_pin(pin)) fail("Invalid Git acquisition pin.");
+    const auto objects = pin.origin.starts_with("file:") ? std::optional(local_objects(root, pin)) : std::nullopt;
+    GitObjects git(objects ? objects->path : fs::path{});
+    if (!objects) git.fetch(pin);
     GitSnapshot result;
     auto commit = git.read({pin.revision}, "commit", manifest_byte_limit);
     add_proof(result.proof, pin.revision, "commit", commit.at(pin.revision));
@@ -312,7 +373,7 @@ GitSnapshot acquire_git_snapshot(const fs::path& root, const GitPin& pin) {
         bytes += data.size();
         result.files.emplace(path, data);
     }
-    if (inspect_creation_root(objects.path).identity != objects.identity)
+    if (objects && inspect_creation_root(objects->path).identity != objects->identity)
         fail("Local Git object directory changed during acquisition.");
     result.directories = entries.directories;
     finish(result, pin);

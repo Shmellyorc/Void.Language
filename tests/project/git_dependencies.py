@@ -148,7 +148,7 @@ def negative(base):
     selection(valid, subdir="src")
     cli(root, "deps", "fetch", status=1, message="Missing exact void.project.toml")
     write(root, manifest, policy("app", [edge("units", "https://example.invalid/units.git", valid)]))
-    cli(root, "deps", "fetch", status=1, message="HTTPS Git acquisition is unavailable")
+    cli(root, "resolve", status=1, message="Missing Git dependency snapshot")
     assert not (root / store).exists()
 
     for mode, oid in [("120000", blob), ("160000", valid)]:

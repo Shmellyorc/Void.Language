@@ -74,9 +74,17 @@ bool valid_git_pin(const GitPin& pin) {
     origin.remove_prefix(8);
     const auto slash = origin.find('/');
     if (slash == origin.npos || slash == 0 || slash + 1 == origin.size()) return false;
-    const auto host = origin.substr(0, slash);
+    auto host = origin.substr(0, slash);
+    if (const auto colon = host.find(':'); colon != host.npos) {
+        const auto port = host.substr(colon + 1);
+        // Use a canonical decimal port for each explicitly addressed endpoint.
+        if (port.empty() || port.size() > 5 || port.front() == '0' ||
+            port.find_first_not_of("0123456789") != port.npos ||
+            (port.size() == 5 && port > "65535")) return false;
+        host = host.substr(0, colon);
+    }
     const auto path = origin.substr(slash + 1);
-    return host.find_first_not_of("abcdefghijklmnopqrstuvwxyz0123456789.-") == host.npos &&
+    return !host.empty() && host.find_first_not_of("abcdefghijklmnopqrstuvwxyz0123456789.-") == host.npos &&
            path.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~/") == path.npos &&
            valid_git_subdir(path);
 }

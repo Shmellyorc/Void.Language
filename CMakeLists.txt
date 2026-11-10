@@ -105,7 +105,8 @@ find_program(VOID_GIT_EXECUTABLE NAMES git DOC "Trusted Git executable for expli
 if(NOT VOID_GIT_EXECUTABLE)
   set(VOID_GIT_EXECUTABLE "")
 endif()
-target_sources(void_core PRIVATE src/frontend/project_resolution.cpp src/frontend/project_git.cpp)
+target_sources(void_core PRIVATE src/frontend/project_resolution.cpp src/frontend/project_git.cpp
+  src/frontend/project_git_process.cpp)
 target_compile_definitions(void_core PRIVATE VOID_GIT_EXECUTABLE="${VOID_GIT_EXECUTABLE}")
 target_include_directories(void_core SYSTEM PRIVATE third_party/tomlplusplus)
 target_compile_definitions(void_core PRIVATE VOID_STDLIB_ROOT="${VOID_STDLIB_ROOT}")
@@ -363,6 +364,10 @@ if(BUILD_TESTING)
       "${PROJECT_SOURCE_DIR}/tests/project/git_dependencies.py"
       "$<TARGET_FILE:voidc>" "${VOID_GIT_EXECUTABLE}" "${CMAKE_C_COMPILER}")
     set_tests_properties(project_git_dependencies PROPERTIES TIMEOUT 300)
+    add_test(NAME project_git_https COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/project/git_https.py"
+      "$<TARGET_FILE:voidc>" "${VOID_GIT_EXECUTABLE}")
+    set_tests_properties(project_git_https PROPERTIES TIMEOUT 300)
   endif()
   void_add_output_test(voidup_smoke "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/voidup/smoke.py"
     "${voidup_application}" "@VOID_TEST_OUTPUT@/voidup-smoke-evidence")
