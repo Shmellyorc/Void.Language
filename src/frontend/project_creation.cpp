@@ -489,6 +489,88 @@ bool publish_dependency_lock(const CreationRoot& root,const std::optional<std::s
     }
 }
 
+void publish_git_snapshot(const CreationRoot& root, const std::string& key,
+                          const std::map<std::string, std::string_view>& files,
+                          const std::function<void(const fs::path&)>& verify) {
+    Parent parent(root.path);
+    if (parent.identity_key() != root.identity) throw std::runtime_error("Project root changed before Git snapshot publication.");
+    const auto work = root.path / ".void";
+    const auto store = work / git_store_name;
+    if (named(root.path, ".void")) named(root.path, ".void", true);
+#ifdef _WIN32
+    auto ensure_directory = [](const fs::path& path) {
+        if (!CreateDirectoryW(path.c_str(), nullptr) && GetLastError() != ERROR_ALREADY_EXISTS)
+            native_windows::fail("Cannot create Git snapshot store");
+    };
+    ensure_directory(work);
+    Parent workspace(work);
+    if (named(work, std::string(git_store_name))) named(work, std::string(git_store_name), true);
+    ensure_directory(store);
+#else
+    if (mkdirat(parent.handle.fd, ".void", 0700) && errno != EEXIST) system_failure("Cannot create Git snapshot workspace");
+    Parent workspace(work);
+    if (named(work, std::string(git_store_name))) named(work, std::string(git_store_name), true);
+    if (mkdirat(workspace.handle.fd, git_store_name.data(), 0700) && errno != EEXIST)
+        system_failure("Cannot create Git snapshot store");
+#endif
+    Parent destination(store);
+    const auto temporary = "acquire-" + random_hex();
+    const auto stage = store / temporary;
+#ifdef _WIN32
+    auto staged = make_directory(stage, true);
+#else
+    auto staged = make_directory(destination.handle.fd, temporary);
+#endif
+    bool published = false;
+    auto cleanup = [&] {
+        if (!owns(staged) || inspect_creation_root(store).identity != destination.identity_key())
+            throw std::runtime_error("Git snapshot staging ownership changed; retained " + path_utf8(stage) + ".");
+#ifdef _WIN32
+        CloseHandle(std::exchange(staged.handle.value, INVALID_HANDLE_VALUE));
+#endif
+        fs::remove_all(stage);
+    };
+    try {
+        for (const auto& [relative, bytes] : files) {
+            const bool directory_entry = relative.ends_with('/');
+            const auto path = stage / utf8_path(directory_entry ? relative.substr(0, relative.size() - 1) : relative);
+            Parent directory(path.parent_path());
+            if (directory_entry) {
+#ifdef _WIN32
+                (void)make_directory(path, false);
+#else
+                (void)make_directory(directory.handle.fd, path_utf8(path.filename()));
+#endif
+                continue;
+            }
+#ifdef _WIN32
+            auto file = make_file(path);
+#else
+            auto file = make_file(directory.handle.fd, path_utf8(path.filename()));
+#endif
+            write_file(file, bytes);
+        }
+        verify(stage);
+        if (inspect_creation_root(root.path).identity != root.identity ||
+            inspect_creation_root(store).identity != destination.identity_key() || !owns(staged))
+            throw std::runtime_error("Git snapshot store changed before publication.");
+        try {
+#ifdef _WIN32
+            publish_file(staged, store / key);
+#else
+            rename_exclusive(staged, destination.handle.fd, key);
+#endif
+            published = true;
+        } catch (const CreationCollision&) {
+            verify(store / key);
+        }
+    } catch (...) {
+        if (!published) cleanup();
+        throw;
+    }
+    if (!published) cleanup();
+}
+
 CreationPlan plan_creation(const fs::path& requested,const CreationOptions& options,CreationEntropy entropy) {
     auto root=absolute_target(requested);
     auto leaf=path_utf8(root.filename());

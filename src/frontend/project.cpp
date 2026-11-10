@@ -2,6 +2,7 @@
 #include "void/frontend.hpp"
 #include "void/path.hpp"
 #include "project_files.hpp"
+#include "void/project_resolution.hpp"
 #include <algorithm>
 #include <set>
 #include <tuple>
@@ -57,6 +58,27 @@ bool valid_dependency_path(std::string_view path) {
         path.remove_prefix(slash + 1);
     }
     return true;
+}
+
+bool valid_git_subdir(std::string_view path) {
+    return path.empty() || (relative_path(path, false) && valid_dependency_path(path));
+}
+
+bool valid_git_pin(const GitPin& pin) {
+    if (pin.revision.size() != 40 || pin.revision.find_first_not_of("0123456789abcdef") != pin.revision.npos)
+        return false;
+    std::string_view origin = pin.origin;
+    if (origin.starts_with("file:"))
+        return origin.size() > 5 && valid_git_subdir(origin.substr(5));
+    if (!origin.starts_with("https://") || origin.size() > 4096) return false;
+    origin.remove_prefix(8);
+    const auto slash = origin.find('/');
+    if (slash == origin.npos || slash == 0 || slash + 1 == origin.size()) return false;
+    const auto host = origin.substr(0, slash);
+    const auto path = origin.substr(slash + 1);
+    return host.find_first_not_of("abcdefghijklmnopqrstuvwxyz0123456789.-") == host.npos &&
+           path.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~/") == path.npos &&
+           valid_git_subdir(path);
 }
 
 bool VersionRequirement::accepts(const SemanticVersion& version) const {
@@ -146,7 +168,7 @@ LockShape dependency_lock_shape(std::string_view bytes) {
     const auto format = lock["format"].value_exact<std::int64_t>();
     const auto resolver = lock["resolver"].value_exact<std::int64_t>();
     if (!format || !resolver) return LockShape::malformed;
-    if (*format != 1 || *resolver != 1) return LockShape::unsupported;
+    if (*format != *resolver || (*format != 1 && *format != 2)) return LockShape::unsupported;
     auto id = [](const auto& node) {
         const auto value = node.template value_exact<std::string_view>();
         return value && valid_identity(*value);
@@ -168,23 +190,35 @@ LockShape dependency_lock_shape(std::string_view bytes) {
         !edges((*root)["dependencies"].as_table())) return LockShape::malformed;
     const auto kind = (*root)["kind"].value_exact<std::string_view>();
     if (!kind || (*kind != "application" && *kind != "library")) return LockShape::malformed;
-    if (!lock.contains("package")) return lock.size() == 3 ? LockShape::valid : LockShape::malformed;
+    if (!lock.contains("package")) return *format == 1 && lock.size() == 3 ? LockShape::valid : LockShape::malformed;
     const auto* packages = lock["package"].as_array();
     if (lock.size() != 4 || !packages || packages->empty() || packages->size() > dependency_package_limit)
         return LockShape::malformed;
     std::set<std::string_view> ids, paths;
+    std::set<std::tuple<std::string_view, std::string_view, std::string_view>> git_locations;
     for (const auto& item : *packages) {
         const auto* package = item.as_table();
-        if (!package || package->size() != 6 || !id((*package)["id"]) ||
+        if (!package || !id((*package)["id"]) ||
             !digest((*package)["manifest"]) || !digest((*package)["tree"]) ||
             !edges((*package)["dependencies"].as_table())) return LockShape::malformed;
         const auto version = (*package)["version"].value_exact<std::string_view>();
         const auto path = (*package)["path"].value_exact<std::string_view>();
-        if (!version || !parse_version(*version) || !path || !relative_path(*path, false) || !valid_dependency_path(*path))
-            return LockShape::malformed;
-        if (!ids.insert(*(*package)["id"].value_exact<std::string_view>()).second || !paths.insert(*path).second)
-            return LockShape::conflicting;
+        if (!version || !parse_version(*version)) return LockShape::malformed;
+        if (!ids.insert(*(*package)["id"].value_exact<std::string_view>()).second) return LockShape::conflicting;
+        if (path) {
+            if (package->size() != 6 || package->contains("git") || package->contains("rev") || package->contains("subdir") ||
+                !relative_path(*path, false) || !valid_dependency_path(*path)) return LockShape::malformed;
+            if (!paths.insert(*path).second) return LockShape::conflicting;
+        } else {
+            const auto origin = (*package)["git"].value_exact<std::string_view>();
+            const auto rev = (*package)["rev"].value_exact<std::string_view>();
+            const auto subdir = (*package)["subdir"].value_exact<std::string_view>();
+            if (*format != 2 || package->size() != 8 || !origin || !rev || !subdir || !valid_git_subdir(*subdir) ||
+                !valid_git_pin({std::string(*origin), std::string(*rev)})) return LockShape::malformed;
+            if (!git_locations.emplace(*origin, *rev, *subdir).second) return LockShape::conflicting;
+        }
     }
+    if (*format == 2 && git_locations.empty()) return LockShape::malformed;
     return LockShape::valid;
 }
 
@@ -286,9 +320,12 @@ class ManifestParser {
                 fail(Code::project_reserved, span(node.source()), "Dependency declarations require a local library table.", "Declare id, path and version under [dependencies." + alias + "].");
                 continue;
             }
-            fields(*settings, "dependencies." + alias, {"id", "path", "version"});
+            fields(*settings, "dependencies." + alias, {"id", "path", "git", "rev", "subdir", "version"});
             auto id = text(*settings, "id", true);
-            auto path = text(*settings, "path", true);
+            auto path = text(*settings, "path", false);
+            auto git = text(*settings, "git", false);
+            auto rev = text(*settings, "rev", bool(git));
+            auto subdir = text(*settings, "subdir", false);
             auto version = text(*settings, "version", true);
             auto requirement = version ? parse_version_requirement(*version) : std::nullopt;
             if (id && !valid_identity(*id))
@@ -297,8 +334,23 @@ class ManifestParser {
                 fail(Code::project_path, span(settings->get("path")->source()), "Invalid local dependency path.", "Use portable relative components outside reserved administrative directories.");
             if (version && !requirement)
                 fail(Code::project_version, span(settings->get("version")->source()), "Invalid dependency version constraint.", "Use = followed by an exact SemVer or comma-separated stable bounds.");
-            if (id && path && requirement)
-                manifest_->dependencies_.emplace(alias, Dependency{std::move(*id), std::move(*path), std::move(*requirement)});
+            if (settings->contains("path") == settings->contains("git") ||
+                (!git && (settings->contains("rev") || settings->contains("subdir"))))
+                fail(Code::project_field, span(node.source()), "Dependency must declare exactly one locator, path or git with rev.",
+                     "Keep path for a local library, or replace it with git and a full commit rev.");
+            if (subdir && (subdir->empty() || !valid_git_subdir(*subdir)))
+                fail(Code::project_path, span(settings->get("subdir")->source()), "Invalid Git dependency subdir.",
+                     "Use a portable repository-relative directory without parent traversal, or omit subdir for the repository root.");
+            std::optional<GitDependency> pinned;
+            if (git && rev) {
+                GitPin pin{std::move(*git), std::move(*rev)};
+                if (!valid_git_pin(pin))
+                    fail(Code::project_path, span(settings->get("git")->source()), "Invalid Git dependency origin or revision.",
+                         "Use file:<project-relative-repository> or a plain HTTPS origin and a full lowercase SHA-1 commit.");
+                else pinned = GitDependency{std::move(pin), subdir.value_or("")};
+            }
+            if (id && (path || pinned) && requirement)
+                manifest_->dependencies_.emplace(alias, Dependency{std::move(*id), path.value_or(""), std::move(*requirement), std::move(pinned)});
         }
     }
     void paths(const toml::table& source, std::string_view key, std::vector<std::string>& target, bool roots) {

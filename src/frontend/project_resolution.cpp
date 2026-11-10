@@ -1,5 +1,6 @@
 #include "void/project_resolution.hpp"
 #include "project_files.hpp"
+#include "project_git.hpp"
 #include "void/path.hpp"
 #include <llvm/ADT/StringRef.h>
 #include <llvm/Support/SHA256.h>
@@ -57,12 +58,14 @@ struct Trace {
     const std::string& alias;
     const Dependency& dependency;
     SourceSpan span(std::string_view field) const {
+        if (field == "path" && dependency.git) field = "git";
         return owner.fields().at("dependencies." + alias + "." + std::string(field)).value;
     }
 };
 
 struct Package {
     std::string path, version, manifest_digest, tree_digest;
+    std::optional<GitDependency> git;
     Edges edges;
     PackageSources sources;
     std::size_t height = 0;
@@ -78,6 +81,7 @@ class Resolver {
     const fs::path& root;
     const Manifest* effective_root;
     bool retain_sources;
+    const std::vector<GitPin>* fetch;
     using Directory = std::map<std::string, std::set<std::string>>;
     std::map<fs::path, Directory> directories;
     std::map<std::string, Package> packages;
@@ -85,6 +89,10 @@ class Resolver {
     std::set<std::string> active;
     std::vector<Trace> trace;
     std::size_t visited = 0, hashed_bytes = 0, edge_count = 0;
+    std::size_t snapshot_bytes = 0;
+    std::set<GitPin> authorized, pending;
+    std::map<GitPin, GitSnapshot> snapshots;
+    std::map<fs::path, const GitPin*> snapshot_roots;
 
     std::string chain() const {
         std::string result;
@@ -105,7 +113,55 @@ class Resolver {
         if (earlier) error.related.push_back({earlier->first_span, "First selection via " + earlier->first_chain});
         throw CompilationError({std::move(error)});
     }
+    const GitPin* owner(const fs::path& path) const {
+        if (snapshot_roots.empty()) return nullptr;
+        const auto relative = path.lexically_relative(root);
+        auto it = relative.begin();
+        if (it == relative.end() || *it != ".void" || ++it == relative.end() || *it != git_store_name)
+            return nullptr;
+        auto tree = root / ".void" / git_store_name;
+        for (unsigned i = 0; i < 3; ++i) {
+            if (++it == relative.end()) return nullptr;
+            tree /= *it;
+        }
+        const auto found = snapshot_roots.find(tree);
+        return found == snapshot_roots.end() ? nullptr : found->second;
+    }
+    static std::string relative_to(const fs::path& path, const fs::path& base) {
+        return path == base ? "" : path_utf8(path.lexically_relative(base));
+    }
+    std::string describe(const std::string& locator) const {
+        const auto path = root / utf8_path(locator);
+        if (const auto* pin = owner(path)) {
+            const auto subdir = relative_to(path, snapshots.at(*pin).tree);
+            return pin->origin + " at " + pin->revision + (subdir.empty() ? "" : " subdir " + subdir);
+        }
+        return locator.empty() ? "." : locator;
+    }
+    std::string input(const fs::path& path, std::size_t limit) const {
+        if (const auto* pin = owner(path)) {
+            const auto& snapshot = snapshots.at(*pin);
+            const auto& bytes = snapshot.files.at(relative_to(path, snapshot.tree));
+            if (bytes.size() > limit) fail(Code::limit, "Git dependency input byte limit exceeded.");
+            return bytes;
+        }
+        return read_project_input(path, limit);
+    }
+    bool is_directory(const fs::path& path) const {
+        if (const auto* pin = owner(path)) {
+            const auto& snapshot = snapshots.at(*pin);
+            return snapshot.directories.contains(relative_to(path, snapshot.tree));
+        }
+        return fs::is_directory(fs::symlink_status(path)) && !project_path_alias(path);
+    }
     void require_path(const fs::path& path, bool directory) const {
+        if (const auto* pin = owner(path)) {
+            const auto& snapshot = snapshots.at(*pin);
+            const auto relative = relative_to(path, snapshot.tree);
+            if (!(directory ? snapshot.directories.contains(relative) : snapshot.files.contains(relative)))
+                fail(Code::project_boundary, "Dependency path is outside the verified Git snapshot: " + relative);
+            return;
+        }
         const auto type = fs::symlink_status(path).type();
         const auto expected = directory ? fs::file_type::directory : fs::file_type::regular;
         if (type != expected || project_path_alias(path) || fs::canonical(path) != path)
@@ -115,10 +171,26 @@ class Resolver {
         if (auto found = directories.find(path); found != directories.end()) return found->second;
         require_path(path, true);
         Directory names;
-        for (const auto& child : fs::directory_iterator(path)) {
-            if (++visited > visit_limit) fail(Code::limit, "Dependency directory-entry work limit exceeded.");
-            auto leaf = path_utf8(child.path().filename());
-            names[fold_project_name(leaf)].insert(std::move(leaf));
+        auto add = [&](std::string leaf) {
+            auto& exact_names = names[fold_project_name(leaf)];
+            if (exact_names.insert(std::move(leaf)).second && ++visited > visit_limit)
+                fail(Code::limit, "Dependency directory-entry work limit exceeded.");
+        };
+        if (const auto* pin = owner(path)) {
+            const auto& snapshot = snapshots.at(*pin);
+            const auto relative = relative_to(path, snapshot.tree);
+            const auto prefix = relative.empty() ? "" : relative + "/";
+            auto child = [&](std::string_view name) {
+                if (name == prefix) return;
+                auto suffix = name.substr(prefix.size());
+                add(std::string(suffix.substr(0, suffix.find('/'))));
+            };
+            for (auto entry = snapshot.files.lower_bound(prefix); entry != snapshot.files.end() && entry->first.starts_with(prefix); ++entry)
+                child(entry->first);
+            for (auto entry = snapshot.directories.lower_bound(prefix); entry != snapshot.directories.end() && entry->starts_with(prefix); ++entry)
+                child(*entry);
+        } else for (const auto& child : fs::directory_iterator(path)) {
+            add(path_utf8(child.path().filename()));
         }
         return directories.emplace(path, std::move(names)).first->second;
     }
@@ -134,7 +206,7 @@ class Resolver {
         if (!exact(path, manifest_name)) return false;
         const auto manifest = path / manifest_name;
         require_path(manifest, false);
-        if (fs::hard_link_count(manifest) != 1)
+        if (!owner(path) && fs::hard_link_count(manifest) != 1)
             fail(Code::project_boundary, "Dependency manifest is a hard-link alias: " + path_utf8(manifest));
         return true;
     }
@@ -144,7 +216,7 @@ class Resolver {
         const auto path = locator.empty() ? root : root / utf8_path(locator);
         if (!boundary(path)) fail(Code::project_boundary, "Missing exact void.project.toml at " + path_utf8(path));
         const auto manifest = path / manifest_name;
-        auto result = parse_manifest(SourceFile(path_utf8(manifest), read_project_input(manifest, manifest_byte_limit)));
+        auto result = parse_manifest(SourceFile(path_utf8(manifest), input(manifest, manifest_byte_limit)));
         if (!result.succeeded()) {
             if (!trace.empty())
                 for (auto& diagnostic : result.diagnostics)
@@ -153,12 +225,11 @@ class Resolver {
         }
         return *manifests.emplace(locator, std::move(result.manifest)).first->second;
     }
-    std::string locate(const std::string& declaring, const std::string& requested) {
-        auto path = declaring.empty() ? root : root / utf8_path(declaring);
+    std::string locate(fs::path path, const fs::path& enclosure, const std::string& requested) {
         const auto relative = utf8_path(requested);
         for (auto component = relative.begin(); component != relative.end(); ++component) {
             if (*component == "..") {
-                if (path == root) fail(Code::project_boundary, "Dependency path escapes the selected project enclosure.");
+                if (path == enclosure) fail(Code::project_boundary, "Dependency path escapes the selected project enclosure.");
                 path = path.parent_path();
                 continue;
             }
@@ -170,9 +241,45 @@ class Resolver {
                 fail(Code::project_boundary, "Dependency path crosses nested project boundary: " + path_utf8(path));
         }
         if (path == root) return {};
-        const auto locator = path_utf8(path.lexically_relative(root));
-        if (!valid_dependency_path(locator)) fail(Code::limit, "Canonical dependency path exceeds its work limits.");
+        const auto locator = relative_to(path, root);
+        if (!valid_git_subdir(relative_to(path, enclosure))) fail(Code::limit, "Canonical dependency path exceeds its work limits.");
         return locator;
+    }
+
+    std::string locate(const std::string& declaring, const Dependency& requirement) {
+        if (!requirement.git) {
+            auto path = declaring.empty() ? root : root / utf8_path(declaring);
+            const auto* pin = owner(path);
+            return locate(path, pin ? snapshots.at(*pin).tree : root, requirement.path);
+        }
+        const auto& selection = *requirement.git;
+        auto found = snapshots.find(selection.pin);
+        if (found == snapshots.end()) {
+            try {
+                auto snapshot = read_git_snapshot(git_snapshot_path(root, selection.pin), selection.pin);
+                if (!snapshot) {
+                    if (!fetch) fail(Code::project_path, "Missing Git dependency snapshot for " + selection.pin.origin +
+                        " at " + selection.pin.revision + ". Run voidc deps fetch --project <directory>.");
+                    if (!authorized.contains(selection.pin))
+                        fail(Code::project_reserved, "Transitive Git pin requires explicit acquisition authorization: " +
+                            selection.pin.origin + " " + selection.pin.revision + ". Pass --allow-git <origin> <rev>.");
+                    snapshot = acquire_git_snapshot(root, selection.pin);
+                    pending.insert(selection.pin);
+                }
+                auto retained = snapshot->bytes + snapshot->proof.size();
+                for (const auto& [path, bytes] : snapshot->files) retained += path.size();
+                for (const auto& path : snapshot->directories) retained += path.size();
+                if (retained > total_bytes - snapshot_bytes)
+                    fail(Code::limit, "Git dependency snapshot byte limit exceeded.");
+                snapshot_bytes += retained;
+                found = snapshots.emplace(selection.pin, std::move(*snapshot)).first;
+                snapshot_roots.emplace(found->second.tree, &found->first);
+            } catch (const std::runtime_error& failure) {
+                fail(Code::project_path, "Git dependency " + selection.pin.origin + " at " + selection.pin.revision +
+                    ": " + failure.what());
+            }
+        }
+        return locate(found->second.tree, found->second.tree, selection.subdir);
     }
 
     // false denotes a regular file, true denotes an exact nested project boundary.
@@ -190,15 +297,15 @@ class Resolver {
             auto relative = prefix.empty() ? leaf : prefix + "/" + leaf;
             if (relative.size() > 4096) fail(Code::limit, "Dependency tree path byte limit exceeded.");
             const auto child = path / utf8_path(leaf);
-            const auto status = fs::symlink_status(child);
-            if (fs::is_directory(status) && !project_path_alias(child)) {
+            const auto directory = is_directory(child);
+            if (directory) {
                 if (!boundary(child)) {
                     inventory(base, relative, depth + 1, tree);
                     continue;
                 }
             } else require_path(child, false);
             if (tree.size() == file_limit) fail(Code::limit, "Dependency tree file and boundary limit exceeded.");
-            tree.emplace(std::move(relative), fs::is_directory(status));
+            tree.emplace(std::move(relative), directory);
         }
     }
     std::string tree_digest(const std::string& locator, const Manifest& manifest, PackageSources& sources) {
@@ -215,7 +322,7 @@ class Resolver {
             digest.field(is_boundary ? "boundary" : "file");
             digest.field(name);
             if (is_boundary) continue;
-            auto contents = read_project_input(path / utf8_path(name), std::min(package_bytes - bytes, total_bytes - hashed_bytes));
+            auto contents = input(path / utf8_path(name), std::min(package_bytes - bytes, total_bytes - hashed_bytes));
             if (name == manifest_name && contents != manifest.source().text())
                 fail(Code::project_changed, "Dependency manifest changed during resolution; retry.");
             bytes += contents.size();
@@ -234,7 +341,7 @@ class Resolver {
             trace.push_back({manifest, alias, requirement});
             if (++edge_count > dependency_edge_limit) fail(Code::limit, "Dependency graph edge limit exceeded.");
             if (depth == depth_limit) fail(Code::limit, "Dependency graph depth limit exceeded.");
-            const auto locator = locate(declaring, requirement.path);
+            const auto locator = locate(declaring, requirement);
             if (!locator.empty() && !manifests.contains(locator) &&
                 manifests.size() >= dependency_package_limit + (effective_root ? 0 : 1))
                 fail(Code::limit, "Dependency graph package limit exceeded.");
@@ -247,19 +354,22 @@ class Resolver {
             const auto prior = packages.find(package.id);
             const auto* earlier = prior == packages.end() ? nullptr : &prior->second;
             if (earlier && earlier->path != locator)
-                fail(Code::project_duplicate, "Dependency origin conflict for '" + package.id + "': '" + earlier->path +
-                    "' and '" + locator + "'.", "path", earlier);
+                fail(Code::project_duplicate, "Dependency origin conflict for '" + package.id + "': '" + describe(earlier->path) +
+                    "' and '" + describe(locator) + "'.", "path", earlier);
             if (!requirement.version.accepts(package.version))
                 fail(Code::project_version, "Dependency version conflict for '" + package.id + "': " + package.version.text() +
                     " does not satisfy " + requirement.version.text() + ".", "version", earlier);
             if (active.contains(locator))
-                fail(Code::project_boundary, "Dependency cycle closes at '" + (locator.empty() ? std::string(".") : locator) + "'.");
+                fail(Code::project_boundary, "Dependency cycle closes at '" + describe(locator) + "'.");
             if (!selected.package_entry())
                 fail(Code::project_entry, "Consumed library requires package.entry.");
             auto [position, fresh] = packages.try_emplace(package.id);
             auto& node = position->second;
             if (fresh) {
                 node.path = locator;
+                const auto physical = root / utf8_path(locator);
+                if (const auto* pin = owner(physical))
+                    node.git = GitDependency{*pin, relative_to(physical, snapshots.at(*pin).tree)};
                 node.version = package.version.text();
                 node.manifest_digest = sha256(selected.source().text());
                 node.tree_digest = tree_digest(locator, selected, node.sources);
@@ -278,8 +388,14 @@ class Resolver {
     }
 
 public:
-    explicit Resolver(const fs::path& selected_root, const Manifest* manifest = nullptr, bool keep = false)
-        : root(selected_root), effective_root(manifest), retain_sources(keep) {}
+    explicit Resolver(const fs::path& selected_root, const Manifest* manifest = nullptr, bool keep = false,
+                      const std::vector<GitPin>* authorized_pins = nullptr)
+        : root(selected_root), effective_root(manifest), retain_sources(keep), fetch(authorized_pins) {}
+
+    std::size_t publish(const CreationRoot& admitted) const {
+        for (const auto& pin : pending) publish_git_snapshot(admitted, pin, snapshots.at(pin));
+        return snapshots.size();
+    }
 
     auto take_packages() {
         std::map<std::string, LockedPackage, std::less<>> result;
@@ -293,21 +409,33 @@ public:
 
     Snapshot capture() {
         const auto& manifest = read_manifest("");
+        if (fetch) {
+            authorized.insert(fetch->begin(), fetch->end());
+            for (const auto& [alias, dependency] : manifest.dependencies())
+                if (dependency.git) authorized.insert(dependency.git->pin);
+        }
         Edges edges;
         active.insert("");
         resolve_edges(manifest, "", edges, 0);
         const std::string_view kind = manifest.kind() == Kind::application ? "application" : "library";
         Digest inputs;
-        inputs.field("void-dependency-inputs-v1");
+        const bool git_graph = !snapshots.empty();
+        inputs.field(git_graph ? "void-dependency-inputs-v2" : "void-dependency-inputs-v1");
         inputs.field(manifest.project().id);
         inputs.field(kind);
         for (const auto& [alias, dependency] : manifest.dependencies()) {
             inputs.field(alias);
             inputs.field(dependency.id);
-            inputs.field(packages.at(dependency.id).path);
+            const auto& package = packages.at(dependency.id);
+            if (git_graph) inputs.field(package.git ? "git" : "path");
+            if (package.git) {
+                inputs.field(package.git->pin.origin);
+                inputs.field(package.git->pin.revision);
+                inputs.field(package.git->subdir);
+            } else inputs.field(package.path);
             inputs.field(dependency.version.text());
         }
-        std::string lock = "format = 1\nresolver = 1\n\n[root]\n";
+        std::string lock = git_graph ? "format = 2\nresolver = 2\n\n[root]\n" : "format = 1\nresolver = 1\n\n[root]\n";
         string_field(lock, "id", manifest.project().id);
         string_field(lock, "kind", kind);
         string_field(lock, "inputs", inputs.finish());
@@ -316,7 +444,11 @@ public:
         for (const auto& [id, package] : packages) {
             lock += "\n[[package]]\n";
             string_field(lock, "id", id);
-            string_field(lock, "path", package.path);
+            if (package.git) {
+                string_field(lock, "git", package.git->pin.origin);
+                string_field(lock, "rev", package.git->pin.revision);
+                string_field(lock, "subdir", package.git->subdir);
+            } else string_field(lock, "path", package.path);
             string_field(lock, "version", package.version);
             string_field(lock, "manifest", package.manifest_digest);
             string_field(lock, "tree", package.tree_digest);
@@ -388,5 +520,18 @@ ResolveResult resolve_dependencies(const fs::path& requested, ResolveMode mode) 
     if (previous && mode != ResolveMode::refresh) stale_lock();
     if (!publish_dependency_lock(root, previous, captured.lock, recheck)) return ResolveResult::verified;
     return previous ? ResolveResult::refreshed : ResolveResult::created;
+}
+
+std::size_t fetch_dependencies(const fs::path& requested, const std::vector<GitPin>& allowed) {
+    if (allowed.size() > dependency_edge_limit ||
+        std::any_of(allowed.begin(), allowed.end(), [](const auto& pin) { return !valid_git_pin(pin); }))
+        throw std::invalid_argument("Invalid Git acquisition authorization.");
+    const auto root = inspect_creation_root(requested);
+    Resolver resolver(root.path, nullptr, false, &allowed);
+    const auto captured = resolver.capture();
+    if (inspect_creation_root(root.path).identity != root.identity ||
+        read_project_input(root.path / manifest_name, manifest_byte_limit) != captured.manifest)
+        throw std::runtime_error("Project root or manifest changed during Git acquisition; retry.");
+    return resolver.publish(root);
 }
 }

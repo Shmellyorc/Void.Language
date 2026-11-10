@@ -19,7 +19,7 @@
 namespace {
 struct UsageError : std::invalid_argument {using std::invalid_argument::invalid_argument;};
 bool known_command(const std::string& command) {
-    return command=="check" || command=="run" || command=="build" || command=="emit" || command=="init" || command=="new" || command=="resolve" || command=="native-bind";
+    return command=="check" || command=="run" || command=="build" || command=="emit" || command=="init" || command=="new" || command=="resolve" || command=="deps" || command=="native-bind";
 }
 void usage(std::ostream& out, const std::string& command={}) {
     if(command.empty() || command=="check")out<<"Usage: voidc check <file-or-directory> [--no-opt]\n";
@@ -29,6 +29,7 @@ void usage(std::ostream& out, const std::string& command={}) {
     if(command.empty() || command=="init")out<<"Usage: voidc init [DIR] [project options]\n";
     if(command.empty() || command=="new")out<<"Usage: voidc new PATH [project options] [--source PATH]\n";
     if(command.empty() || command=="resolve")out<<"Usage: voidc resolve --project DIR [--locked | --refresh]\n";
+    if(command.empty() || command=="deps")out<<"Usage: voidc deps fetch --project DIR [--allow-git ORIGIN REV]...\n";
     if(command.empty() || command=="native-bind")out<<"Usage: voidc native-bind <descriptor> <C-header> -o <adapter.c>\n";
 }
 void help(const std::string& command={}) {
@@ -42,7 +43,8 @@ void help(const std::string& command={}) {
           "  emit    Write a native object for manual linking.\n"
           "  init    Add a project manifest to an existing directory.\n"
           "  new     Create a project and starter source in a new directory.\n"
-          "  resolve Resolve local library dependencies and verify or write void.lock.\n"
+          "  resolve Resolve available library dependencies and verify or write void.lock.\n"
+          "  deps fetch   Explicitly acquire pinned Git source snapshots.\n"
           "  native-bind  Generate a checked C11 adapter for a native library.\n"
           "\nOptions:\n"
           "  -h, --help  Show help; use <command> --help for examples.\n"
@@ -131,6 +133,31 @@ int resolve_project(int argc,char** argv) {
     case ResolveResult::created: std::cout<<"Created void.lock.\n"; break;
     case ResolveResult::refreshed: std::cout<<"Refreshed void.lock.\n"; break;
     }
+    return 0;
+}
+int fetch_project(int argc, char** argv) {
+    using namespace vd::project;
+    if (argc < 3 || std::string_view(argv[2]) != "fetch") throw UsageError("Expected deps fetch.");
+    std::optional<std::filesystem::path> root;
+    std::vector<GitPin> allowed;
+    for (int i = 3; i < argc; ++i) {
+        const std::string_view option = argv[i];
+        if (option == "--project") {
+            if (root || ++i == argc || !*argv[i] || argv[i][0] == '-')
+                throw UsageError("Expected one directory after --project.");
+            root = vd::utf8_path(argv[i]);
+        } else if (option == "--allow-git") {
+            if (i + 2 >= argc || allowed.size() == dependency_edge_limit)
+                throw UsageError("Expected --allow-git ORIGIN REV.");
+            GitPin pin{argv[i + 1], argv[i + 2]};
+            i += 2;
+            if (!valid_git_pin(pin)) throw UsageError("Invalid --allow-git origin or revision.");
+            allowed.push_back(std::move(pin));
+        } else throw UsageError("Unknown deps fetch option: " + std::string(option));
+    }
+    if (!root) throw UsageError("deps fetch requires --project DIR.");
+    const auto count = fetch_dependencies(*root, allowed);
+    std::cout << "Verified Git source snapshots: " << count << '\n';
     return 0;
 }
 int create_project(const std::string& command,int argc,char** argv) {
@@ -241,7 +268,7 @@ static int run_cli(int argc, char** argv) {
         }
         if(argc>=2 && std::string(argv[1])=="help") {
             if(argc==2) {help();return 0;}
-            if(argc!=3 || !known_command(argv[2]))throw UsageError("Expected help [check|run|build|emit|init|new|resolve|native-bind].");
+            if(argc!=3 || !known_command(argv[2]))throw UsageError("Expected help [check|run|build|emit|init|new|resolve|deps|native-bind].");
             help(argv[2]);return 0;
         }
         vd::configure_standard_library_root(vd::utf8_path(llvm::sys::fs::getMainExecutable(argv[0],reinterpret_cast<void*>(&run_cli))));
@@ -260,6 +287,7 @@ static int run_cli(int argc, char** argv) {
             throw UsageError("Unknown command: "+command);
         if(argc==3 && (std::string(argv[2])=="--help" || std::string(argv[2])=="-h")) {help(command);return 0;}
         if(command=="resolve")return resolve_project(argc,argv);
+        if(command=="deps")return fetch_project(argc,argv);
         if(command=="native-bind") {generate_native_binding(argc,argv);return 0;}
         bool optimize=true,cache=false,no_cache=false,no_opt=false;
         bool allow_native=false;

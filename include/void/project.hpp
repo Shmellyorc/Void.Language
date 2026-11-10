@@ -41,7 +41,16 @@ struct VersionRequirement {
     std::string text() const;
 };
 std::optional<VersionRequirement> parse_version_requirement(std::string_view);
-struct Dependency { std::string id, path; VersionRequirement version; };
+struct GitPin {
+    std::string origin, revision;
+    auto operator<=>(const GitPin&) const = default;
+};
+struct GitDependency { GitPin pin; std::string subdir; };
+struct Dependency {
+    std::string id, path;
+    VersionRequirement version;
+    std::optional<GitDependency> git = {};
+};
 inline constexpr std::size_t dependency_edge_limit = 1024;
 
 enum class Kind { application, library };

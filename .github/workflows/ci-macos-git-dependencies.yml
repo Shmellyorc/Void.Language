@@ -1,0 +1,18 @@
+name: D3 Git source acquisition / macOS ARM64
+on:
+  workflow_dispatch:
+    inputs:
+      reviewed_sha:
+        description: Full commit SHA containing the reviewed D3 sources and this workflow
+        type: string
+        required: true
+permissions:
+  contents: read
+jobs:
+  qualify:
+    uses: ./.github/workflows/ci-macos-package-qualification.yml
+    with:
+      reviewed_sha: ${{ inputs.reviewed_sha }}
+      slice: d3
+      test_names: project_git_dependencies
+      build_targets: voidc

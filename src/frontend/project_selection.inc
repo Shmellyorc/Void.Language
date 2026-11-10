@@ -209,6 +209,8 @@ struct ProjectCapture {
         // loaded E, including overlaid host files. Retain its source-file policy.
     }
     void admit(const project_fs::path& path,const std::string& id,bool leaf) {
+        if(id=="/.void/git-deps" || id.starts_with("/.void/git-deps/"))
+            project_failure(anchor,Code::project_boundary,"Git dependency store is reserved for locked package imports.");
         if(project_native_alias(path))project_failure(anchor,Code::project_boundary,"Project source path contains an alias: '"+id+"'.");
         if(leaf) {std::error_code ec;if(project_fs::exists(path,ec))admit_file(path);}
         else if(boundary(id))project_failure(anchor,Code::project_boundary,"Source path crosses nested project boundary '"+id+"'.", "Select the child project explicitly; parent imports and entry overrides cannot cross it.");

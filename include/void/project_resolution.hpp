@@ -3,9 +3,11 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace vd::project {
 class Manifest;
+struct GitPin;
 using DependencyEdges = std::map<std::string, std::string, std::less<>>;
 using PackageSources = std::map<std::string, std::string, std::less<>>;
 struct LockedPackage {
@@ -34,4 +36,7 @@ enum class ResolveMode { create, refresh, locked };
 enum class ResolveResult { no_dependencies, verified, created, refreshed };
 // Resolve local source metadata and verify or publish the selected root's lock.
 ResolveResult resolve_dependencies(const std::filesystem::path&, ResolveMode);
+// Only this operation may consult the explicitly authorized Git repositories.
+std::size_t fetch_dependencies(const std::filesystem::path&, const std::vector<GitPin>&);
+bool valid_git_pin(const GitPin&);
 }
