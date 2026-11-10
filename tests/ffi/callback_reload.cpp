@@ -3,6 +3,7 @@
 #include "void/frontend.hpp"
 #include "void/runtime.hpp"
 
+#include <array>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -65,15 +66,16 @@ void check_ir(const vd::ValidatedAnalysis& analysis) {
     }, "generation-local");
 }
 
-void qualify(const Path& entry, const Path& native, const std::string& provider, const std::string& adapter,
-             const std::string& descriptor, const std::string& original, bool optimize) {
+template<class Analyze, class Incompatible>
+void qualify(const Path& entry, const std::string& original, bool optimize,
+             const Analyze& analyze_current, const Incompatible& analyze_incompatible) {
     write(entry, original);
-    auto contract = vd::CPrimitiveAdmission::admit_conventional(descriptor, native, provider, adapter);
-    auto before = analyze(entry, contract);
+    auto before = analyze_current();
     check_ir(*before);
     vd::Jit jit;
     auto old = jit.compile(*before, optimize);
     auto runtime = old->runtime_owner();
+    const auto* binding = runtime->dynamic_binding().get();
     vd::ReloadSlot slot(old);
     require(slot.invoke(0) == 1, "register original generation");
 
@@ -83,8 +85,10 @@ void qualify(const Path& entry, const Path& native, const std::string& provider,
     require(position != std::string::npos, "fixture callback body");
     edited.replace(position, result.size(), result + " + 100");
     write(entry, edited);
-    auto replacement = analyze(entry, contract);
+    auto replacement = analyze_current();
     require(jit.replace(slot, *replacement, optimize), "compatible callback body reload rejected");
+    require(slot.acquire()->runtime_owner() == runtime && runtime->dynamic_binding().get() == binding,
+            "compatible callback reload changed the Runtime or dynamic binding");
     old.reset();
     require(jit.live_generations() == 2, "registration lost its original ORC generation");
     {
@@ -93,13 +97,7 @@ void qualify(const Path& entry, const Path& native, const std::string& provider,
         require(runtime->collect() == vd::Runtime::Collection::completed, "collect while retained");
     }
     require(slot.invoke(2) == 42, "old callback dispatched to the replacement body");
-    auto incompatible = descriptor;
-    const auto found = incompatible.find("callback integer context-first i32 i32");
-    require(found != std::string::npos, "fixture callback signature");
-    incompatible.replace(found, std::string("callback integer context-first i32 i32").size(),
-                         "callback integer context-first c_int c_int");
-    auto mismatched = vd::CPrimitiveAdmission::admit_conventional(incompatible, native, provider, adapter);
-    require(!jit.replace(slot, *analyze(entry, mismatched), optimize), "incompatible callback C contract reloaded");
+    require(!jit.replace(slot, *analyze_incompatible(), optimize), "incompatible callback C contract reloaded");
     require(slot.invoke(3) == 43, "incompatible candidate touched original registration");
     expect_failure(slot, -1, "C resource operation rejected");
     require(jit.live_generations() == 2, "transport refusal retired the original ORC generation");
@@ -119,15 +117,60 @@ void qualify(const Path& entry, const Path& native, const std::string& provider,
     std::cout << "G5 ORC " << (optimize ? "O2" : "normal")
               << " capture, compatible/incompatible reload, refusal/retry, retirement and self-drain passed\n";
 }
+
+void qualify_managed(const Path& project, const Path& catalog, const Path& alternate) {
+    const std::string entry_name = "src/main.void";
+    const auto entry = project / entry_name;
+    const auto source = vd::read_source(entry).text();
+    auto current = [&] {
+        auto result = vd::analyze_manifest_project(project, entry_name, {}, {}, true);
+        if (!result.succeeded()) throw vd::CompilationError(result.diagnostics);
+        auto program = result.project->program();
+        const auto& admission = program->c_primitive_admission();
+        require(program->locked_dependencies() && admission &&
+                admission->dynamic_contract().starts_with("void-native-managed 1\n"),
+                "reload fixture did not use the locked managed provider");
+        return program;
+    };
+    // Use the same project, source and loaded libraries with a second approved
+    // payload identity. Change only the notice and the catalog/lock that bind it.
+    const std::array files{catalog / "LICENSE.txt", catalog / "void.native.toml", project / "void.lock"};
+    auto incompatible = [&] {
+        std::array<std::string, files.size()> originals;
+        for (std::size_t index = 0; index < files.size(); ++index) {
+            originals[index] = vd::read_source(files[index]).text();
+            write(files[index], vd::read_source(alternate / files[index].filename()).text());
+        }
+        auto replacement = current();
+        for (std::size_t index = 0; index < files.size(); ++index) write(files[index], originals[index]);
+        return replacement;
+    };
+    for (bool optimize : {false, true}) qualify(entry, source, optimize, current, incompatible);
+    write(entry, source);
+}
 } // namespace
 
 int main(int argc, char** argv) {
     try {
+        if (argc == 5 && std::string_view(argv[1]) == "--managed") {
+            qualify_managed(argv[2], argv[3], argv[4]);
+            return 0;
+        }
         require(argc == 6, "expected entry, native root, provider, adapter and descriptor");
         const Path entry = argv[1];
         const auto descriptor = vd::read_source(argv[5]).text();
         const auto source = vd::read_source(entry).text();
-        for (bool optimize : {false, true}) qualify(entry, argv[2], argv[3], argv[4], descriptor, source, optimize);
+        const auto contract = vd::CPrimitiveAdmission::admit_conventional(descriptor, argv[2], argv[3], argv[4]);
+        auto current = [&] { return analyze(entry, contract); };
+        auto incompatible = [&] {
+            auto text = descriptor;
+            const std::string signature = "callback integer context-first i32 i32";
+            const auto position = text.find(signature);
+            require(position != std::string::npos, "fixture callback signature");
+            text.replace(position, signature.size(), "callback integer context-first c_int c_int");
+            return analyze(entry, vd::CPrimitiveAdmission::admit_conventional(text, argv[2], argv[3], argv[4]));
+        };
+        for (bool optimize : {false, true}) qualify(entry, source, optimize, current, incompatible);
         write(entry, source);
         return 0;
     } catch (const std::exception& error) {

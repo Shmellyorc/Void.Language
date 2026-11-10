@@ -382,9 +382,11 @@ CPrimitiveAdmission::Owner CPrimitiveAdmission::admit_dynamic(std::string_view c
 }
 
 CPrimitiveAdmission::Owner CPrimitiveAdmission::admit_conventional(std::string_view descriptor,
-    std::filesystem::path root, std::string_view library, std::string_view adapter) {
+    std::filesystem::path root, std::string_view library, std::string_view adapter,
+    const std::vector<DynamicClosure::Payload>& payload) {
     const auto admitted = parse(descriptor, true);
-    std::string plan = "void-native-conventional 1\nprovider " + admitted->provider_ +
+    std::string plan = std::string(payload.empty() ? "void-native-conventional 1" : "void-native-managed 1") +
+        "\nprovider " + admitted->provider_ +
         "\ntarget " + admitted->target_ +
         (admitted->target_ == "x86_64-pc-windows-msvc" ? " msvc-x64" : " sysv-x64") +
         "\nsystem os\nlayout executable-sibling-native\nthunk " + admitted->thunk_identity_ + ' ';
@@ -394,6 +396,8 @@ CPrimitiveAdmission::Owner CPrimitiveAdmission::admit_conventional(std::string_v
     plan += ' ';
     plan += adapter;
     plan += '\n';
+    for (const auto& file : payload)
+        plan += "payload " + file.name + ' ' + file.sha256 + ' ' + std::to_string(file.size) + '\n';
     for (const auto& binding : admitted->bindings_) {
         plan += "export ";
         plan += library;

@@ -6,6 +6,8 @@ int main() {
     static_assert(vd::project::manifest_byte_limit == 256 * 1024);
     vd::project::Identity identity;
     vd::project::Sources sources;
+    vd::project::NativeRequirement requirement;
+    vd::project::NativeCatalog catalog;
     vd::project::ParseResult result;
     vd::project::Field field{};
     std::array<vd::project::Profile, 1> profiles{{
@@ -19,5 +21,6 @@ int main() {
     std::vector<std::string> names{identity.name};
     const std::size_t size = names.size() + fields.size() + profiles.size();
     return size == 3 && version_text == "0.0.0" && sources.roots.size() == 1 &&
+        requirement.abi == 0 && catalog.runtime.empty() && catalog.descriptor.size == 0 &&
         !manifest && !result.succeeded() ? 0 : 1;
 }

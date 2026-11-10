@@ -513,7 +513,20 @@ void publish_git_snapshot(const CreationRoot& root, const std::string& key,
     if (mkdirat(workspace.handle.fd, git_store_name.data(), 0700) && errno != EEXIST)
         system_failure("Cannot create Git snapshot store");
 #endif
+    publish_project_directory(inspect_creation_root(store), key, files, verify, [&] {
+        if (inspect_creation_root(root.path).identity != root.identity)
+            throw std::runtime_error("Git snapshot store changed before publication.");
+    });
+}
+
+void publish_project_directory(const CreationRoot& directory, const std::string& leaf,
+                               const std::map<std::string, std::string_view>& files,
+                               const std::function<void(const fs::path&)>& verify,
+                               const std::function<void()>& recheck) {
+    const auto& store = directory.path;
     Parent destination(store);
+    if (destination.identity_key() != directory.identity)
+        throw std::runtime_error("Staged directory parent changed before publication.");
     const auto temporary = "acquire-" + random_hex();
     const auto stage = store / temporary;
 #ifdef _WIN32
@@ -524,7 +537,7 @@ void publish_git_snapshot(const CreationRoot& root, const std::string& key,
     bool published = false;
     auto cleanup = [&] {
         if (!owns(staged) || inspect_creation_root(store).identity != destination.identity_key())
-            throw std::runtime_error("Git snapshot staging ownership changed; retained " + path_utf8(stage) + ".");
+            throw std::runtime_error("Staged directory ownership changed; retained " + path_utf8(stage) + ".");
 #ifdef _WIN32
         CloseHandle(std::exchange(staged.handle.value, INVALID_HANDLE_VALUE));
 #endif
@@ -551,18 +564,18 @@ void publish_git_snapshot(const CreationRoot& root, const std::string& key,
             write_file(file, bytes);
         }
         verify(stage);
-        if (inspect_creation_root(root.path).identity != root.identity ||
-            inspect_creation_root(store).identity != destination.identity_key() || !owns(staged))
-            throw std::runtime_error("Git snapshot store changed before publication.");
+        if (recheck) recheck();
+        if (inspect_creation_root(store).identity != destination.identity_key() || !owns(staged))
+            throw std::runtime_error("Staged directory parent changed before publication.");
         try {
 #ifdef _WIN32
-            publish_file(staged, store / key);
+            publish_file(staged, store / leaf);
 #else
-            rename_exclusive(staged, destination.handle.fd, key);
+            rename_exclusive(staged, destination.handle.fd, leaf);
 #endif
             published = true;
         } catch (const CreationCollision&) {
-            verify(store / key);
+            verify(store / leaf);
         }
     } catch (...) {
         if (!published) cleanup();

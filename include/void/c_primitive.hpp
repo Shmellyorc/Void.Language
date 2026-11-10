@@ -111,7 +111,8 @@ public:
     static Owner admit(std::string_view descriptor, CPrimitiveThunk* linked_thunk);
     static Owner admit_dynamic(std::string_view closure, std::filesystem::path host_root);
     static Owner admit_conventional(std::string_view descriptor, std::filesystem::path host_root,
-                                    std::string_view library, std::string_view adapter);
+                                    std::string_view library, std::string_view adapter,
+                                    const std::vector<DynamicClosure::Payload>& payload = {});
     static std::string generate_adapter(std::string_view descriptor, std::string_view header);
     const std::string& descriptor() const { return descriptor_; }
     const std::string& provider() const { return provider_; }

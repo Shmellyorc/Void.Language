@@ -1,13 +1,13 @@
 #pragma once
+#include "void/project.hpp"
 #include <filesystem>
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
 
+namespace vd { class CPrimitiveAdmission; }
 namespace vd::project {
-class Manifest;
-struct GitPin;
 using DependencyEdges = std::map<std::string, std::string, std::less<>>;
 using PackageSources = std::map<std::string, std::string, std::less<>>;
 struct LockedPackage {
@@ -19,6 +19,8 @@ class LockedDependencies {
     std::string identity_;
     DependencyEdges direct_;
     std::map<std::string, LockedPackage, std::less<>> packages_;
+    std::shared_ptr<const CPrimitiveAdmission> native_;
+    std::vector<NativeArtifact> native_link_inputs_;
     LockedDependencies() = default;
     friend std::shared_ptr<const LockedDependencies> verify_locked_dependencies(
         const std::filesystem::path&, const Manifest&, bool);
@@ -26,6 +28,8 @@ public:
     const auto& identity() const { return identity_; }
     const auto& direct() const { return direct_; }
     const auto& packages() const { return packages_; }
+    const auto& native() const { return native_; }
+    const auto& native_link_inputs() const { return native_link_inputs_; }
 };
 // Verify against the effective root manifest. Only the compiler's first capture
 // needs to retain the bytes. A recapture can verify the entire plan without them.

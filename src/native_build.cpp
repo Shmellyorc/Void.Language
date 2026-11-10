@@ -3,6 +3,9 @@
 #include "void/cache.hpp"
 #include "void/c_primitive.hpp"
 #include "void/path.hpp"
+#include "void/project_resolution.hpp"
+#include "frontend/project_files.hpp"
+#include "frontend/project_native.hpp"
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Path.h>
 #include <llvm/Support/Program.h>
@@ -17,6 +20,7 @@
 namespace vd {
 namespace {
 namespace fs = std::filesystem;
+constexpr auto managed_payload_directory = "native";
 // Physical paths, not VFS identities. Match each component before advancing;
 // never canonicalize the destination and erase descendant spelling/alias evidence.
 void exact_path(const fs::path& path) {
@@ -56,10 +60,18 @@ void exact_path(const fs::path& path) {
         current=std::move(next);
     }
 }
-fs::path output_path(const ValidatedAnalysis& analysis,const fs::path& requested) {
+fs::path output_path(const ValidatedAnalysis& analysis,const fs::path& requested,bool managed=false) {
     auto path=fs::absolute(requested).lexically_normal();
     if(path.extension()==".void")throw std::runtime_error("Unsafe source/output collision: output has a source extension: "+path_utf8(path));
     if(path.filename().empty())throw std::runtime_error("Output must name a file.");
+    if (managed) {
+        auto leaf = path_utf8(path.filename());
+#ifdef _WIN32
+        leaf.resize(leaf.find_last_not_of(" .") + 1);
+#endif
+        if (project::fold_project_name(leaf) == managed_payload_directory)
+            throw std::runtime_error("Managed native executable output conflicts with the reserved native payload directory: " + path_utf8(path));
+    }
     // Check before directory creation, so a failed collision never touches input.
     for(const auto& module:analysis.modules()) {
         auto source=utf8_path(module.source.path());
@@ -228,7 +240,11 @@ void build_executable(const ValidatedAnalysis& analysis,const fs::path& requeste
               "and the original LLVM/Clang/LLD 23.1.4 SDK together. See docs/install/README.md.");
         }
     }();
-    auto output=output_path(analysis,requested);Staging stage(output);
+    const auto& native = analysis.c_primitive_admission();
+    const auto managed = native && native->dynamic() && !native->dynamic()->payload().empty();
+    auto output=output_path(analysis,requested,managed);Staging stage(output);
+    const auto payload = managed ? project::read_managed_payload(*native) : std::map<std::string, std::string>{};
+    const auto destination = managed ? std::optional(project::inspect_creation_root(output.parent_path())) : std::nullopt;
 #ifdef _WIN32
     auto root=native_windows::temporary_root();exact_path(root);
     native_windows::Directory linking(root,true);
@@ -246,7 +262,6 @@ void build_executable(const ValidatedAnalysis& analysis,const fs::path& requeste
     const auto object=work/"program.o";
     std::string provenance=std::string(compiler_build_identity())+":"+std::to_string(profile.size())+":"+std::string(profile)+":"+config.verified_digests;
     for(const auto& flag:config.flags)provenance+=std::to_string(flag.size())+":"+flag;
-    emit_object(analysis.lower(ir::Emission::entry),object,optimize,true,provenance);
     std::vector<std::string> args{path_utf8(config.driver),"--driver-mode=g++"};
     if(!config.linker.empty())args.push_back("--ld-path="+path_utf8(config.linker));
     // LLD interprets '%' in absolute output paths. The driver's child working
@@ -258,17 +273,47 @@ void build_executable(const ValidatedAnalysis& analysis,const fs::path& requeste
     const auto& object_argument=object;
 #endif
     args.insert(args.end(),{"-working-directory",path_utf8(work),path_utf8(object_argument),path_utf8(config.runtime),path_utf8(config.fixture),"-o",path_utf8(executable.filename())});
+    const auto& locked = analysis.locked_dependencies();
+    if (managed && locked && !locked->native_link_inputs().empty()) {
+        const auto inputs = project::read_managed_link_inputs(*native, locked->native_link_inputs());
+        const fs::path input_directory = "catalog-link";
+        fs::create_directory(work / input_directory);
+        for (const auto& [name, bytes] : inputs) {
+            const auto relative = input_directory / utf8_path(name);
+            std::ofstream file(work / relative, std::ios::binary);
+            file.write(bytes.data(), static_cast<std::streamsize>(bytes.size()));
+            file.close();
+            if (!file) throw std::runtime_error("Cannot stage managed native link input: " + name);
+            args.insert(args.end(), {"-Xlinker", path_utf8(relative)});
+        }
+    }
     // Dependency archives follow the program/runtime objects that reference
     // them. Driver options in this list apply to the whole invocation.
     args.insert(args.end(),config.flags.begin(),config.flags.end());
 #if defined(__linux__)
     args.push_back("-ldl"); // Optional system terminfo binding in the Runtime archive.
 #endif
+    emit_object(analysis.lower(ir::Emission::entry),object,optimize,true,provenance);
     auto status=execute(args);
     if(status!=0)throw std::runtime_error("Native linker failed (status "+std::to_string(status)+
       "). Driver: "+path_utf8(config.driver)+"\nCheck the linker diagnostics above and host C/C++ development libraries. See docs/install/README.md.");
     if(!fs::is_regular_file(executable) || fs::file_size(executable)==0 || !llvm::sys::fs::can_execute(path_utf8(executable)))
         throw std::runtime_error("Native linker did not produce a usable executable.");
+    if (managed) {
+        std::map<std::string, std::string_view> files(payload.begin(), payload.end());
+        project::publish_project_directory(*destination, managed_payload_directory, files, [&](const fs::path& directory) {
+            if (project::inspect_creation_root(directory).path != directory)
+                throw std::runtime_error("Managed native output directory spelling changed.");
+            std::size_t count = 0;
+            for (const auto& entry : fs::directory_iterator(directory)) {
+                const auto file = payload.find(path_utf8(entry.path().filename()));
+                if (file == payload.end() || project::read_project_input(entry.path(), file->second.size()) != file->second)
+                    throw std::runtime_error("Managed native output has a different payload; select a fresh output directory.");
+                ++count;
+            }
+            if (count != payload.size()) throw std::runtime_error("Managed native output payload is incomplete.");
+        });
+    }
 #ifdef _WIN32
     // Check PE structure through LLVM, not merely child status or nonempty bytes.
     // Keep the original pinned, with writes/deletion denied, through transfer.

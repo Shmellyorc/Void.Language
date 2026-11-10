@@ -4,6 +4,8 @@
 
 #include <algorithm>
 #include <atomic>
+#include <fstream>
+#include <sodium.h>
 #include <stdexcept>
 
 #ifdef _WIN32
@@ -19,7 +21,6 @@
 #include <fcntl.h>
 #include <link.h>
 #include <linux/magic.h>
-#include <sodium.h>
 #include <sys/mman.h>
 #include <sys/auxv.h>
 #include <sys/stat.h>
@@ -42,6 +43,44 @@ namespace {
 }
 
 #if defined(_WIN32) || defined(__linux__)
+void verify_managed_payload(const DynamicClosure& plan, const std::filesystem::path& root) {
+    namespace fs = std::filesystem;
+    if (plan.payload().empty()) return;
+    if (sodium_init() < 0) denied("digest", "SHA-256 provider initialization failed");
+    if (!fs::is_directory(fs::symlink_status(root)) || fs::canonical(root) != root)
+        denied("path", "managed native payload directory is missing or aliased");
+    for (const auto& file : plan.payload()) {
+        const auto path = root / utf8_path(file.name);
+        if (!fs::is_regular_file(fs::symlink_status(path)) || fs::hard_link_count(path) != 1 ||
+            fs::canonical(path) != path || fs::file_size(path) != file.size)
+            denied("artifact", "managed native payload missing or changed: " + file.name);
+#ifdef _WIN32
+        const auto attributes = GetFileAttributesW(path.c_str());
+        if (attributes == INVALID_FILE_ATTRIBUTES || attributes & FILE_ATTRIBUTE_REPARSE_POINT)
+            denied("artifact", "managed native payload is an alias: " + file.name);
+#endif
+        std::ifstream input(path, std::ios::binary);
+        if (!input) denied("artifact", "cannot open managed native payload: " + file.name);
+        crypto_hash_sha256_state hash;
+        crypto_hash_sha256_init(&hash);
+        std::uint64_t remaining = file.size;
+        unsigned char buffer[16384];
+        while (remaining) {
+            const auto chunk = static_cast<std::streamsize>(std::min<std::uint64_t>(remaining, sizeof buffer));
+            input.read(reinterpret_cast<char*>(buffer), chunk);
+            if (input.gcount() != chunk) denied("artifact", "cannot read managed native payload: " + file.name);
+            crypto_hash_sha256_update(&hash, buffer, static_cast<unsigned long long>(chunk));
+            remaining -= static_cast<std::uint64_t>(chunk);
+        }
+        unsigned char digest[crypto_hash_sha256_BYTES];
+        char hex[2 * crypto_hash_sha256_BYTES + 1];
+        crypto_hash_sha256_final(&hash, digest);
+        sodium_bin2hex(hex, sizeof hex, digest, sizeof digest);
+        if (input.peek() != std::char_traits<char>::eof() || input.bad() || file.sha256 != hex)
+            denied("artifact", "managed native payload identity mismatch: " + file.name);
+    }
+}
+
 class OsModule {
 #ifdef _WIN32
     HMODULE handle_;
@@ -542,6 +581,7 @@ std::shared_ptr<const DynamicBinding> load_dynamic(DynamicClosure::Owner plan, c
         if (plan->target() != target) denied("target", "conventional descriptor does not match this host");
         if (!root.is_absolute() || root != root.lexically_normal())
             denied("path", "conventional loading requires an absolute native directory");
+        verify_managed_payload(*plan, root);
         const auto library = root / utf8_path(plan->library());
         const auto adapter = root / utf8_path(plan->adapter());
         auto result = std::make_shared<DynamicBinding>();

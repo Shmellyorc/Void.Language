@@ -3,6 +3,7 @@
 #include "void/path.hpp"
 
 #include <algorithm>
+#include <charconv>
 #include <set>
 #include <span>
 #include <stdexcept>
@@ -61,7 +62,8 @@ DynamicClosure::Owner DynamicClosure::parse(std::string_view bytes) {
         return line;
     };
     const auto header = next();
-    const bool conventional = header == "void-native-conventional 1";
+    const bool managed = header == "void-native-managed 1";
+    const bool conventional = managed || header == "void-native-conventional 1";
     if (!conventional && header != "void-native-closure 1") bad("unsupported revision");
     auto provider = words(next());
     if (provider.size() != 2 || provider[0] != "provider" || !project::valid_identity(provider[1]))
@@ -89,6 +91,8 @@ DynamicClosure::Owner DynamicClosure::parse(std::string_view bytes) {
         plan->adapter_ = row[2];
     }
     std::set<std::string_view> images, exports;
+    std::set<std::string> payload_names;
+    std::uint64_t payload_bytes = 0;
     for (auto line = next(); line != "descriptor"; line = next()) {
         auto row = words(line);
         if (!conventional && row[0] == "image") {
@@ -103,6 +107,20 @@ DynamicClosure::Owner DynamicClosure::parse(std::string_view bytes) {
             }
             images.insert(row[1]);
             plan->images_.push_back(std::move(image));
+        } else if (managed && row[0] == "payload") {
+            std::uint64_t size = 0;
+            if (row.size() != 4 || plan->payload_.size() == payload_count_limit || !plan->exports_.empty() ||
+                row[1].size() > 128 || !portable_path_component(row[1]) ||
+                row[1].front() == '.' || row[1].find('/') != row[1].npos || !digest(row[2]))
+                bad("invalid managed payload record");
+            auto name = std::string(row[1]);
+            for (char& c : name) if (c >= 'A' && c <= 'Z') c += 'a' - 'A';
+            const auto [end, error] = std::from_chars(row[3].data(), row[3].data() + row[3].size(), size);
+            if (error != std::errc{} || end != row[3].data() + row[3].size() || !size ||
+                size > payload_limit - payload_bytes || !payload_names.insert(name).second)
+                bad("invalid managed payload size or duplicate name");
+            payload_bytes += size;
+            plan->payload_.push_back({std::string(row[1]), std::string(row[2]), size});
         } else if (row[0] == "export") {
             if (row.size() != 3 || plan->exports_.size() == 128 ||
                 (conventional ? row[1] != plan->library_ : !images.contains(row[1])) ||
@@ -113,6 +131,11 @@ DynamicClosure::Owner DynamicClosure::parse(std::string_view bytes) {
     }
     if (conventional) {
         if (plan->exports_.empty()) bad("missing provider exports");
+        if (managed)
+            for (const auto* filename : {&plan->library_, &plan->adapter_})
+                if (std::none_of(plan->payload_.begin(), plan->payload_.end(),
+                                 [&](const auto& file) { return file.name == *filename; }))
+                    bad("managed payload omits provider or adapter");
     } else {
         if (plan->images_.empty())
             bad("missing closure or exact revision 3 descriptor");

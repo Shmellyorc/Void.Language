@@ -19,6 +19,32 @@ def run(*args):
     subprocess.run(command, check=True)
 
 
+def write_catalog(directory, descriptor, provider, dependency, notice, target, import_library):
+    directory.mkdir()
+    files = [descriptor, provider, dependency, notice]
+    if import_library is not None:
+        files.append(import_library)
+    for path in files:
+        shutil.copyfile(path, directory / path.name)
+
+    def identity(path):
+        copied = directory / path.name
+        return f'{copied.stat().st_size}:{digest(copied)}'
+
+    def entry(path):
+        return f'"{path.name}" = "{identity(path)}"\n'
+
+    plan = ('format = 1\n[native]\nid = "org.voidlang.raylib"\nversion = "6.0.0"\nabi = 3\n'
+            f'target = "{target.split()[0]}"\nrevision = "raylib-6.0-shim-v1"\n'
+            f'descriptor = "{descriptor.name}"\ndescriptor-identity = "{identity(descriptor)}"\n'
+            f'library = "{provider.name}"\nadapter = "{provider.name}"\n'
+            '\n[native.runtime]\n' + entry(provider) + entry(dependency) + '\n[native.link]\n')
+    if import_library is not None:
+        plan += entry(import_library)
+    plan += '\n[native.notices]\n' + entry(notice)
+    (directory / 'void.native.toml').write_text(plan, encoding='utf-8')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--voidc', default='voidc')
@@ -27,6 +53,7 @@ def main():
     parser.add_argument('--library', required=True, type=Path)
     parser.add_argument('--license', required=True, type=Path)
     parser.add_argument('--import-library', type=Path)
+    parser.add_argument('--managed-catalog', type=Path, help='write an approved local catalog to a new directory')
     parser.add_argument('--sanitize', action='store_true', help='instrument the shim when running a sanitized Linux Runtime')
     args = parser.parse_args()
 
@@ -38,6 +65,8 @@ def main():
             print(f'{digest(path)}  {path}', flush=True)
     if args.header.name != 'raylib.h':
         parser.error('--header must name raylib.h')
+    if args.managed_catalog is not None and args.managed_catalog.exists():
+        parser.error('--managed-catalog must name a new directory')
 
     native = Path(__file__).resolve().parent / 'native'
     platform = 'windows' if windows else 'linux'
@@ -71,9 +100,13 @@ def main():
                 flags += ['-fsanitize=address,undefined', '-fno-sanitize-recover=all']
             imports = stage / dependency
         run(args.clang, *flags, source, stage / generated, imports, '-o', stage / provider)
-        for name in (provider, dependency, descriptor, generated, 'RAYLIB-LICENSE.txt'):
-            (stage / name).replace(native / name)
-            print(f'{digest(native / name)}  {native / name}')
+        if args.managed_catalog is not None:
+            write_catalog(args.managed_catalog, stage / descriptor, stage / provider, stage / dependency,
+                          stage / 'RAYLIB-LICENSE.txt', target, args.import_library)
+        else:
+            for name in (provider, dependency, descriptor, generated, 'RAYLIB-LICENSE.txt'):
+                (stage / name).replace(native / name)
+                print(f'{digest(native / name)}  {native / name}')
 
 
 if __name__ == '__main__':

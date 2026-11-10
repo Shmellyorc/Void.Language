@@ -357,7 +357,8 @@ static int run_cli(int argc, char** argv) {
         vd::AnalysisResult analysis;
         if(project_mode) {
             auto result=vd::analyze_manifest_project(path,project_entry,{},{},allow_native);
-            if(result.manifest && !result.manifest->native().empty() && command!="check" && !allow_native)
+            if(result.manifest && (!result.manifest->native().empty() || result.manifest->native_requirement()) &&
+                command!="check" && !allow_native)
                 throw UsageError("This project declares native code. Pass --allow-native to authorize its execution.");
             if(result.manifest && result.manifest->kind()==vd::project::Kind::library && project_entry)throw UsageError("--entry cannot select an application entry in a library project.");
             if(result.manifest) {

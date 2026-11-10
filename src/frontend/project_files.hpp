@@ -21,6 +21,10 @@ bool publish_dependency_lock(const CreationRoot&, const std::optional<std::strin
 void publish_git_snapshot(const CreationRoot&, const std::string& key,
                           const std::map<std::string, std::string_view>& files,
                           const std::function<void(const std::filesystem::path&)>& verify);
+void publish_project_directory(const CreationRoot&, const std::string& leaf,
+                               const std::map<std::string, std::string_view>& files,
+                               const std::function<void(const std::filesystem::path&)>& verify,
+                               const std::function<void()>& recheck = {});
 
 enum class LockShape { valid, malformed, unsupported, conflicting };
 LockShape dependency_lock_shape(std::string_view);

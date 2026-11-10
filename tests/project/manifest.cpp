@@ -212,6 +212,106 @@ version = ">=1.4.0, <2.0.0"
     good(replace(application, "kind = \"application\"", "kind = \"application\"\nentry = \"a.CON/file.void\""));
     good(application + "[sources]\nroots = ['src', 'src2']\nexclude = ['absent', 'src/a']\n");
 }
+void managed_native_metadata() {
+    const std::string requirement = R"([native-requirements.graphics]
+id = "org.example.raylib"
+version = "=6.0.0+local"
+abi = 3
+)";
+    const auto manifest = good(application + requirement);
+    const auto& selected = manifest->native_requirement();
+    check(selected && selected->alias == "graphics" && selected->id == "org.example.raylib" &&
+        selected->version.text() == "6.0.0+local" && selected->abi == 3, "managed native requirement identity");
+    check(manifest->native().empty() && manifest->dependencies().empty() &&
+        selected->version != manifest->project().version, "managed provider has its own identity");
+    check(!good(application)->native_requirement(), "dependency-free manifest acquired a native requirement");
+    const std::string manual = R"([native.linux]
+descriptor = "native.descriptor"
+library = "libprovider.so"
+adapter = "libadapter.so"
+[native.windows]
+descriptor = "windows.descriptor"
+library = "provider.dll"
+adapter = "adapter.dll"
+)";
+    const auto manual_manifest = good(application + manual);
+    check(!manual_manifest->native_requirement() && manual_manifest->native().size() == 2 &&
+        manual_manifest->native().at("linux").library == "libprovider.so" &&
+        manual_manifest->native().at("windows").adapter == "adapter.dll", "manual native target metadata");
+    bad(library + requirement, Code::project_reserved);
+    bad(application + manual + requirement, Code::project_reserved);
+    bad(application + requirement + replace(requirement, ".graphics]", ".other]"), Code::project_reserved);
+    bad(application + replace(requirement, ".graphics]", ".func]"), Code::project_identity);
+    bad(application + replace(requirement, "org.example.raylib", "../provider"), Code::project_field);
+    for (const auto* version : {"6.0.0", ">=6.0.0", "=06.0.0", "=6.0.0, <7.0.0"})
+        bad(application + replace(requirement, "=6.0.0+local", version), Code::project_field);
+    for (const auto* abi : {"0", "4", "-1", "3.0", "'3'", "true"})
+        bad(application + replace(requirement, "abi = 3", "abi = " + std::string(abi)), Code::project_field);
+    bad(application + requirement + "command = 'never-execute'\n", Code::project_field);
+
+    const std::string hash(64, 'a');
+    const auto identity = [&](std::uint64_t size) { return quote(std::to_string(size) + ":" + hash); };
+    const std::string text = R"(format = 1
+[native]
+id = "org.example.raylib"
+version = "6.0.0+local"
+abi = 3
+target = "x86_64-unknown-linux-gnu"
+revision = "vendor-build-2"
+descriptor = "native.descriptor"
+library = "libprovider.so"
+adapter = "libadapter.so"
+)" + std::string("descriptor-identity = ") + identity(17) + "\n[native.runtime]\n" +
+        "\"libprovider.so\" = " + identity(101) + "\n\"libadapter.so\" = " + identity(102) +
+        "\n\"libvendor.so.1\" = " + identity(103) + "\n[native.link]\n\"libvendor.a\" = " + identity(31) +
+        "\n[native.notices]\n\"LICENSE.txt\" = " + identity(19) + "\n";
+    const auto catalog = parse_native_catalog(std::string(text));
+    check(catalog.id == selected->id && catalog.version == selected->version && catalog.abi == selected->abi &&
+        catalog.target == "x86_64-unknown-linux-gnu" && catalog.revision == "vendor-build-2", "catalog target identity");
+    check(catalog.descriptor.name == "native.descriptor" && catalog.descriptor.size == 17 &&
+        catalog.descriptor.sha256 == hash && catalog.library == "libprovider.so" &&
+        catalog.adapter == "libadapter.so", "owned descriptor and provider metadata");
+    check(catalog.runtime.size() == 3 && catalog.link.size() == 1 && catalog.notices.size() == 1 &&
+        catalog.runtime.back().name == "libvendor.so.1" && catalog.link.front().name == "libvendor.a" &&
+        catalog.notices.front().name == "LICENSE.txt", "catalog artifact roles");
+    auto windows = replace(text, "x86_64-unknown-linux-gnu", "x86_64-pc-windows-msvc");
+    windows = replace(replace(windows, "libprovider.so", "provider.dll"), "libprovider.so", "provider.dll");
+    windows = replace(replace(windows, "libadapter.so", "adapter.dll"), "libadapter.so", "adapter.dll");
+    windows = replace(replace(windows, "libvendor.so.1", "vendor.dll"), "libvendor.a", "vendor.lib");
+    const auto windows_catalog = parse_native_catalog(windows);
+    check(windows_catalog.target == "x86_64-pc-windows-msvc" && windows_catalog.library == "provider.dll" &&
+        windows_catalog.link.front().name == "vendor.lib", "Windows target-specific artifact names");
+
+    const auto reject = [&](const std::string& input) {
+        bool rejected = false;
+        try { (void)parse_native_catalog(input); }
+        catch (const std::runtime_error&) { rejected = true; }
+        check(rejected, "invalid managed catalog accepted");
+    };
+    reject(replace(text, "format = 1", "format = 2"));
+    reject(replace(text, "x86_64-unknown-linux-gnu", "aarch64-apple-darwin"));
+    reject(replace(text, "6.0.0+local", "=6.0.0"));
+    reject(replace(text, "abi = 3", "abi = 9"));
+    reject(replace(text, "native.descriptor", "../native.descriptor"));
+    reject(replace(text, "\"libprovider.so\" = ", "\"another.so\" = "));
+    reject(replace(text, "\"LICENSE.txt\" = ", "\"LIBVENDOR.SO.1\" = "));
+    reject(replace(text, "\"LICENSE.txt\" = " + identity(19), ""));
+    reject(replace(text, identity(17), identity(16385)));
+    reject(replace(text, identity(19), quote("019:" + hash)));
+    reject(replace(text, identity(19), quote("19:" + std::string(64, 'A'))));
+    reject(replace(text, identity(19), quote("18446744073709551616:" + hash)));
+    reject(replace(text, identity(19), identity(native_catalog_payload_limit)));
+    check(parse_native_catalog(text + std::string(native_catalog_byte_limit - text.size(), ' ')).id == catalog.id,
+        "catalog byte limit includes exact boundary");
+    reject(text + std::string(native_catalog_byte_limit + 1 - text.size(), ' '));
+    auto many = text;
+    constexpr std::size_t files = 6;
+    for (std::size_t i = files; i < native_catalog_file_limit; ++i)
+        many += "\"notice-" + std::to_string(i) + ".txt\" = " + identity(1) + "\n";
+    check(parse_native_catalog(many).notices.size() == 1 + native_catalog_file_limit - files,
+        "catalog file limit includes exact boundary");
+    reject(many + "\"overflow.txt\" = " + identity(1) + "\n");
+}
 void syntax_and_spans() {
     bad(application + "id = 'org.example.another'\n", Code::project_duplicate);
     bad(replace(application, "id = \"org.example.orbit.sources\"", "id = 'org.example.orbit.sources'\nid = 'org.example.other.sources'"), Code::project_duplicate);
@@ -509,7 +609,7 @@ int main(int argc, char** argv) {
 #else
         check(!sandbox, "syscall sandbox is Linux-only");
 #endif
-        versions(); identities(); schema(); syntax_and_spans(); limits_and_authority(); mutations(); closeout_malformed_keys(); closeout_ranges_and_ownership(); closeout_bounds_and_precedence();
+        versions(); identities(); schema(); managed_native_metadata(); syntax_and_spans(); limits_and_authority(); mutations(); closeout_malformed_keys(); closeout_ranges_and_ownership(); closeout_bounds_and_precedence();
         std::cout << "project_manifest: " << checks << " checks passed" << (sandbox ? " under syscall denial" : "") << '\n';
         if (sandbox) {
             std::cout.flush();

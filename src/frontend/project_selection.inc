@@ -74,7 +74,7 @@ struct ProjectCapture {
         if(!parsed.succeeded())throw CompilationError(std::move(parsed.diagnostics));
         manifest=std::move(parsed.manifest);
         anchor=manifest->source();from.source=anchor;
-        if (!manifest->dependencies().empty()) {
+        if (!manifest->dependencies().empty() || manifest->native_requirement()) {
             try {
                 dependencies = project::verify_locked_dependencies(root, *manifest, !original);
             } catch (const std::runtime_error& failure) {
@@ -82,6 +82,7 @@ struct ProjectCapture {
                     "Verify the package inputs with voidc resolve and refresh the lock explicitly after intentional changes.");
             }
             changed(original && (!original->dependencies || dependencies->identity() != original->dependencies->identity()));
+            native = dependencies->native();
             graph.dependencies = dependencies.get();
             for (const auto& [id, package] : dependencies->packages()) package_roots.insert("/" + package.locator);
         }
@@ -105,6 +106,8 @@ struct ProjectCapture {
             native = CPrimitiveAdmission::admit_conventional(descriptor.text(), directory, declaration.library, declaration.adapter);
             if (native->target() != target)
                 project_failure(anchor, Code::project_reserved, "Native descriptor target does not match this host.");
+        }
+        if (native) {
             if (overlays.contains(native->module()))
                 project_failure(anchor, Code::project_boundary, "Generated C binding module cannot be overridden.");
             changed(original && (!original->native || native->dynamic_contract() != original->native->dynamic_contract()));

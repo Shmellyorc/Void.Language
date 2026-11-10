@@ -3,6 +3,7 @@
 #include <array>
 #include <compare>
 #include <cstddef>
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <optional>
@@ -64,6 +65,29 @@ struct Sources {
 };
 struct Field { SourceSpan key, value; };
 struct NativeLibrary { std::string descriptor, library, adapter; };
+struct NativeRequirement {
+    std::string alias, id;
+    SemanticVersion version;
+    unsigned abi = 0;
+};
+
+inline constexpr std::size_t native_catalog_byte_limit = 32 * 1024;
+inline constexpr std::size_t native_catalog_file_limit = 24;
+inline constexpr std::uint64_t native_catalog_payload_limit = 128 * 1024 * 1024;
+struct NativeArtifact {
+    std::string name, sha256;
+    std::uint64_t size = 0;
+};
+struct NativeCatalog {
+    std::string id, target, revision, library, adapter;
+    SemanticVersion version;
+    unsigned abi = 0;
+    NativeArtifact descriptor;
+    std::vector<NativeArtifact> runtime, link, notices;
+};
+// Parse owned, bounded artifact claims. The result carries no approval or
+// authority to open any file. Invalid catalog bytes throw std::runtime_error.
+NativeCatalog parse_native_catalog(std::string_view bytes);
 
 // Schema-validated metadata only. This is not filesystem admission, a selected
 // source graph, a Runtime identity, an install receipt or native authority.
@@ -75,6 +99,7 @@ class Manifest {
     std::optional<std::string> entry_, package_entry_;
     std::map<std::string, Dependency> dependencies_;
     std::map<std::string, NativeLibrary> native_;
+    std::optional<NativeRequirement> native_requirement_;
     Sources sources_;
     Profile debug_ = {Optimization::none, DebugInfo::full};
     Profile release_ = {Optimization::O2, DebugInfo::line};
@@ -91,6 +116,7 @@ public:
     const auto& package_entry() const { return package_entry_; }
     const auto& dependencies() const { return dependencies_; }
     const auto& native() const { return native_; }
+    const auto& native_requirement() const { return native_requirement_; }
     const Sources& sources() const { return sources_; }
     const Profile& debug() const { return debug_; }
     const Profile& release() const { return release_; }

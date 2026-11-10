@@ -106,7 +106,7 @@ if(NOT VOID_GIT_EXECUTABLE)
   set(VOID_GIT_EXECUTABLE "")
 endif()
 target_sources(void_core PRIVATE src/frontend/project_resolution.cpp src/frontend/project_git.cpp
-  src/frontend/project_git_process.cpp)
+  src/frontend/project_git_process.cpp src/frontend/project_native.cpp)
 target_compile_definitions(void_core PRIVATE VOID_GIT_EXECUTABLE="${VOID_GIT_EXECUTABLE}")
 target_include_directories(void_core SYSTEM PRIVATE third_party/tomlplusplus)
 target_compile_definitions(void_core PRIVATE VOID_STDLIB_ROOT="${VOID_STDLIB_ROOT}")
@@ -234,8 +234,8 @@ if(NOT VOID_LLVM_ORC_RUNS)
 endif()
 target_include_directories(void_core SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
 target_compile_options(void_core PRIVATE ${VOID_LLVM_DEFINITIONS})
-llvm_map_components_to_libnames(VOID_NUMERIC_LIBS Support)
-target_link_libraries(void_core PRIVATE ${VOID_NUMERIC_LIBS})
+llvm_map_components_to_libnames(VOID_CORE_LLVM_LIBS Support Object)
+target_link_libraries(void_core PRIVATE ${VOID_CORE_LLVM_LIBS})
 if(WIN32)
   target_link_libraries(void_core PRIVATE advapi32)
 endif()
@@ -359,6 +359,24 @@ if(BUILD_TESTING)
     "${PROJECT_SOURCE_DIR}/tests/project/packages.py" "$<TARGET_FILE:voidc>"
     "$<TARGET_FILE:voidls>" "$<TARGET_FILE:void_project_packages_ir>")
   set_tests_properties(project_packages PROPERTIES TIMEOUT 300)
+  add_test(NAME project_managed_native COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/project/managed_native.py"
+    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_SANITIZERS}"
+    "$<$<PLATFORM_ID:Linux>:$<TARGET_FILE:voidls>>")
+  set_tests_properties(project_managed_native PROPERTIES TIMEOUT 300)
+  set(VOID_TEST_RAYLIB_ROOT "" CACHE PATH "Approved local raylib 6.0 Linux x86-64 release directory for opt-in tests")
+  if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$")
+    add_test(NAME project_managed_native_resolution COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/project/managed_native_resolution.py"
+      "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_GIT_EXECUTABLE}")
+    set_tests_properties(project_managed_native_resolution PROPERTIES TIMEOUT 120)
+    if(VOID_TEST_RAYLIB_ROOT)
+      add_test(NAME project_managed_raylib COMMAND "${Python3_EXECUTABLE}"
+        "${PROJECT_SOURCE_DIR}/tests/project/managed_raylib.py"
+        "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_TEST_RAYLIB_ROOT}" "${VOID_SANITIZERS}")
+      set_tests_properties(project_managed_raylib PROPERTIES TIMEOUT 600)
+    endif()
+  endif()
   if(VOID_GIT_EXECUTABLE)
     add_test(NAME project_git_dependencies COMMAND "${Python3_EXECUTABLE}"
       "${PROJECT_SOURCE_DIR}/tests/project/git_dependencies.py"
@@ -1662,6 +1680,13 @@ if(BUILD_TESTING)
       "${VOID_SANITIZERS}" "$<TARGET_FILE:void_g5_reload>"
       "${CMAKE_COMMAND}" "${CMAKE_CURRENT_BINARY_DIR}" "$<CONFIG>")
     set_tests_properties(ffi_g5_callbacks PROPERTIES TIMEOUT 480)
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+      add_test(NAME project_managed_native_callbacks COMMAND "${Python3_EXECUTABLE}"
+        "${PROJECT_SOURCE_DIR}/tests/ffi/callback_process.py" "$<TARGET_FILE:voidc>" "${VOID_CLANG}"
+        "${VOID_SANITIZERS}" "$<TARGET_FILE:void_g5_reload>"
+        "${CMAKE_COMMAND}" "${CMAKE_CURRENT_BINARY_DIR}" "$<CONFIG>" --managed)
+      set_tests_properties(project_managed_native_callbacks PROPERTIES TIMEOUT 480)
+    endif()
   endif()
   add_test(NAME numeric_sprint2 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/numeric/sprint2.py"
     "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}")

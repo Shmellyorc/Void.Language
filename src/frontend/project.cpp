@@ -4,6 +4,7 @@
 #include "project_files.hpp"
 #include "void/project_resolution.hpp"
 #include <algorithm>
+#include <charconv>
 #include <set>
 #include <tuple>
 
@@ -169,6 +170,82 @@ std::optional<VersionRequirement> parse_version_requirement(std::string_view inp
     return requirement;
 }
 
+namespace {
+constexpr std::string_view native_catalog_name = "void.native.toml";
+
+bool native_filename(std::string_view name) {
+    return name.size() <= 128 && portable_path_component(name) && name.front() != '.' &&
+        name.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._-") == name.npos &&
+        fold_project_name(name) != native_catalog_name;
+}
+
+std::optional<NativeCatalog> native_catalog(const toml::table& table) {
+    if (table.size() != 12) return {};
+    auto get = [&](const char* key) { return table[key].value_exact<std::string_view>().value_or(""); };
+    const auto id = get("id"), target = get("target"), revision = get("revision");
+    auto version = parse_version(get("version"));
+    const auto descriptor = get("descriptor"), library = get("library"), adapter = get("adapter");
+    const auto abi = table["abi"].value_exact<std::int64_t>().value_or(0);
+    if (!valid_identity(id) || !version || !valid_identity(revision) ||
+        (target != "x86_64-unknown-linux-gnu" && target != "x86_64-pc-windows-msvc") || abi < 1 || abi > 3 ||
+        !native_filename(descriptor) || !native_filename(library) || !native_filename(adapter)) return {};
+    std::set<std::string> names;
+    std::uint64_t bytes = 0;
+    auto file = [&](std::string_view name, std::string_view identity) -> std::optional<NativeArtifact> {
+        const auto colon = identity.find(':');
+        if (!native_filename(name) || colon == identity.npos || !colon || identity.front() == '0' ||
+            names.size() == native_catalog_file_limit || !names.insert(fold_project_name(name)).second)
+            return {};
+        std::uint64_t size = 0;
+        const auto [end, error] = std::from_chars(identity.data(), identity.data() + colon, size);
+        const auto hash = identity.substr(colon + 1);
+        if (error != std::errc{} || end != identity.data() + colon || !size ||
+            size > native_catalog_payload_limit - bytes || hash.size() != 64 ||
+            hash.find_first_not_of("0123456789abcdef") != hash.npos) return {};
+        bytes += size;
+        return NativeArtifact{std::string(name), std::string(hash), size};
+    };
+    auto descriptor_file = file(descriptor, get("descriptor-identity"));
+    if (!descriptor_file || descriptor_file->size > 16384) return {};
+    NativeCatalog plan{std::string(id), std::string(target), std::string(revision), std::string(library),
+        std::string(adapter), std::move(*version), static_cast<unsigned>(abi), std::move(*descriptor_file), {}, {}, {}};
+    auto rows = [&](const char* role, auto& output) {
+        const auto* entries = table[role].as_table();
+        if (!entries) return false;
+        for (const auto& [name, value] : *entries) {
+            auto claimed = file(name.str(), value.value_exact<std::string_view>().value_or(""));
+            if (!claimed) return false;
+            output.push_back(std::move(*claimed));
+        }
+        return true;
+    };
+    if (!rows("runtime", plan.runtime) || !rows("link", plan.link) || !rows("notices", plan.notices) ||
+        plan.notices.empty()) return {};
+    for (const auto name : {library, adapter})
+        if (std::none_of(plan.runtime.begin(), plan.runtime.end(), [&](const auto& image) { return image.name == name; }))
+            return {};
+    return plan;
+}
+}
+
+NativeCatalog parse_native_catalog(std::string_view bytes) {
+    if (bytes.size() > native_catalog_byte_limit)
+        throw std::runtime_error("Managed native artifact catalog exceeds its byte limit.");
+    auto parsed = toml::parse(bytes);
+    if (!parsed)
+        throw std::runtime_error("Invalid managed native artifact catalog TOML: " + std::string(parsed.error().description()));
+    if (parsed.table().size() == 2 && parsed.table()["format"].value_exact<std::int64_t>() == 1) {
+        if (const auto* provider = parsed.table()["native"].as_table()) {
+            if (!provider->contains("id"))
+                throw std::runtime_error("Managed native artifact catalog is missing its provider ID.");
+            if (!provider->contains("target"))
+                throw std::runtime_error("Managed native artifact catalog is missing its target.");
+            if (auto plan = native_catalog(*provider)) return std::move(*plan);
+        }
+    }
+    throw std::runtime_error("Invalid or ambiguous managed native artifact catalog.");
+}
+
 LockShape dependency_lock_shape(std::string_view bytes) {
     const auto parsed = toml::parse(bytes);
     if (!parsed) return LockShape::malformed;
@@ -176,7 +253,12 @@ LockShape dependency_lock_shape(std::string_view bytes) {
     const auto format = lock["format"].value_exact<std::int64_t>();
     const auto resolver = lock["resolver"].value_exact<std::int64_t>();
     if (!format || !resolver) return LockShape::malformed;
-    if (*format != *resolver || (*format != 1 && *format != 2)) return LockShape::unsupported;
+    if (*format != *resolver || (*format != 1 && *format != 2 && *format != 3)) return LockShape::unsupported;
+    const bool managed = *format == 3;
+    if (managed) {
+        const auto* provider = lock["native"].as_table();
+        if (!provider || !native_catalog(*provider)) return LockShape::malformed;
+    }
     auto id = [](const auto& node) {
         const auto value = node.template value_exact<std::string_view>();
         return value && valid_identity(*value);
@@ -198,9 +280,13 @@ LockShape dependency_lock_shape(std::string_view bytes) {
         !edges((*root)["dependencies"].as_table())) return LockShape::malformed;
     const auto kind = (*root)["kind"].value_exact<std::string_view>();
     if (!kind || (*kind != "application" && *kind != "library")) return LockShape::malformed;
-    if (!lock.contains("package")) return *format == 1 && lock.size() == 3 ? LockShape::valid : LockShape::malformed;
+    const auto base_size = managed ? 4u : 3u;
+    if (managed && *kind != "application") return LockShape::malformed;
+    if (!lock.contains("package"))
+        return *format != 2 && lock.size() == base_size && (!managed || (*root)["dependencies"].as_table()->empty()) ?
+            LockShape::valid : LockShape::malformed;
     const auto* packages = lock["package"].as_array();
-    if (lock.size() != 4 || !packages || packages->empty() || packages->size() > dependency_package_limit)
+    if (lock.size() != base_size + 1 || !packages || packages->empty() || packages->size() > dependency_package_limit)
         return LockShape::malformed;
     std::set<std::string_view> ids, paths;
     std::set<std::tuple<std::string_view, std::string_view, std::string_view>> git_locations;
@@ -221,7 +307,7 @@ LockShape dependency_lock_shape(std::string_view bytes) {
             const auto origin = (*package)["git"].value_exact<std::string_view>();
             const auto rev = (*package)["rev"].value_exact<std::string_view>();
             const auto subdir = (*package)["subdir"].value_exact<std::string_view>();
-            if (*format != 2 || package->size() != 8 || !origin || !rev || !subdir || !valid_git_subdir(*subdir) ||
+            if (*format == 1 || package->size() != 8 || !origin || !rev || !subdir || !valid_git_subdir(*subdir) ||
                 !valid_git_pin({std::string(*origin), std::string(*rev)})) return LockShape::malformed;
             if (!git_locations.emplace(*origin, *rev, *subdir).second) return LockShape::conflicting;
         }
@@ -462,7 +548,7 @@ public:
             return finish();
         }
         const auto& root = result.table();
-        fields(root, "", {"schema", "project", "application", "package", "sources", "build", "dependencies", "native"});
+        fields(root, "", {"schema", "project", "application", "package", "sources", "build", "dependencies", "native", "native-requirements"});
         const auto* schema = root.get("schema");
         if (!schema || !schema->is_integer() || schema->ref<std::int64_t>() != 1) {
             fail(Code::project_schema, schema ? span(schema->source()) : eof(), "Project schema must be integer 1.",
@@ -513,6 +599,31 @@ public:
             profile(*build, "release", manifest_->release_);
         }
         if (auto* declarations = table(root, "dependencies")) dependencies(*declarations);
+        if (auto* requirements = table(root, "native-requirements")) {
+            const auto where = span(requirements->source());
+            if (manifest_->kind_ != Kind::application || requirements->size() != 1 || root.contains("native")) {
+                fail(Code::project_reserved, where, "Select one managed native requirement in an application without a manual native provider.",
+                     "Use [native-requirements.<alias>] with id, exact version and abi.");
+            } else {
+                const auto entry = requirements->begin();
+                const auto& [key, value] = *entry;
+                const auto alias = key.str();
+                if (alias.size() > 128 || !valid_editor_identifier(std::string(alias)))
+                    fail(Code::project_identity, span(key.source()), "Invalid native requirement alias.", "Use a lowercase compiler identifier.");
+                if (auto* setting = table(*requirements, alias)) {
+                    fields(*setting, "native-requirements." + std::string(alias), {"id", "version", "abi"});
+                    const auto id = text(*setting, "id", true);
+                    const auto version = text(*setting, "version", true);
+                    const auto exact = version && version->starts_with('=') ?
+                        parse_version(std::string_view(*version).substr(1)) : std::nullopt;
+                    const auto abi = (*setting)["abi"].value_exact<std::int64_t>().value_or(0);
+                    if (!id || !valid_identity(*id) || !exact || abi < 1 || abi > 3)
+                        fail(Code::project_field, span(value.source()), "Invalid managed native id, exact version or ABI.",
+                             "Use a portable provider id, =SEMVER and integer ABI 1, 2 or 3.");
+                    else manifest_->native_requirement_ = NativeRequirement{std::string(alias), *id, *exact, static_cast<unsigned>(abi)};
+                }
+            }
+        }
         if (auto* native = table(root, "native")) for (const auto& [key, value] : *native) {
             const auto platform = key.str();
             if ((platform != "linux" && platform != "windows") || manifest_->kind_ != Kind::application) {

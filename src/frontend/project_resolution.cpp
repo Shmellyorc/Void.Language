@@ -1,6 +1,7 @@
 #include "void/project_resolution.hpp"
 #include "project_files.hpp"
 #include "project_git.hpp"
+#include "project_native.hpp"
 #include "void/path.hpp"
 #include <llvm/ADT/StringRef.h>
 #include <llvm/Support/SHA256.h>
@@ -51,6 +52,24 @@ std::string sha256(std::string_view bytes) {
 void string_field(std::string& text, std::string_view key, std::string_view value) {
     text.append(key).append(" = \"").append(value).append("\"\n");
 }
+
+void append_native_lock(std::string& lock, const NativeCatalog& plan) {
+    auto identity = [](const NativeArtifact& file) { return std::to_string(file.size) + ':' + file.sha256; };
+    lock += "\n[native]\n";
+    string_field(lock, "id", plan.id);
+    string_field(lock, "version", plan.version.text());
+    string_field(lock, "target", plan.target);
+    string_field(lock, "revision", plan.revision);
+    lock += "abi = " + std::to_string(plan.abi) + '\n';
+    string_field(lock, "descriptor", plan.descriptor.name);
+    string_field(lock, "descriptor-identity", identity(plan.descriptor));
+    string_field(lock, "library", plan.library);
+    string_field(lock, "adapter", plan.adapter);
+    for (const auto& [role, files] : {std::pair{"runtime", &plan.runtime}, {"link", &plan.link}, {"notices", &plan.notices}}) {
+        lock += "\n[native." + std::string(role) + "]\n";
+        for (const auto& file : *files) string_field(lock, '"' + file.name + '"', identity(file));
+    }
+}
 using Edges = DependencyEdges;
 
 struct Trace {
@@ -77,6 +96,15 @@ struct Snapshot {
     std::string manifest, lock;
 };
 
+[[noreturn]] void native_selection_failed(const Manifest& manifest, const NativeRequirement& requirement,
+                                           std::string_view reason) {
+    Diagnostic error(Code::project_path);
+    error.primary = manifest.fields().at("native-requirements." + requirement.alias + ".id").value;
+    error.description = reason;
+    error.hint = "Select the approved local catalog matching this requirement and host target.";
+    throw CompilationError({std::move(error)});
+}
+
 class Resolver {
     const fs::path& root;
     const Manifest* effective_root;
@@ -93,6 +121,7 @@ class Resolver {
     std::set<GitPin> authorized, pending;
     std::map<GitPin, GitSnapshot> snapshots;
     std::map<fs::path, const GitPin*> snapshot_roots;
+    std::optional<SelectedNative> native;
 
     std::string chain() const {
         std::string result;
@@ -409,6 +438,16 @@ public:
 
     Snapshot capture() {
         const auto& manifest = read_manifest("");
+        if (!fetch && manifest.native_requirement()) {
+            const auto& requirement = *manifest.native_requirement();
+            try {
+                native = select_managed_native(requirement);
+            } catch (const std::invalid_argument& error) {
+                native_selection_failed(manifest, requirement, error.what());
+            } catch (const std::runtime_error& error) {
+                native_selection_failed(manifest, requirement, error.what());
+            }
+        }
         if (fetch) {
             authorized.insert(fetch->begin(), fetch->end());
             for (const auto& [alias, dependency] : manifest.dependencies())
@@ -420,14 +459,15 @@ public:
         const std::string_view kind = manifest.kind() == Kind::application ? "application" : "library";
         Digest inputs;
         const bool git_graph = !snapshots.empty();
-        inputs.field(git_graph ? "void-dependency-inputs-v2" : "void-dependency-inputs-v1");
+        inputs.field(native ? "void-dependency-inputs-v3" :
+            git_graph ? "void-dependency-inputs-v2" : "void-dependency-inputs-v1");
         inputs.field(manifest.project().id);
         inputs.field(kind);
         for (const auto& [alias, dependency] : manifest.dependencies()) {
             inputs.field(alias);
             inputs.field(dependency.id);
             const auto& package = packages.at(dependency.id);
-            if (git_graph) inputs.field(package.git ? "git" : "path");
+            if (git_graph || native) inputs.field(package.git ? "git" : "path");
             if (package.git) {
                 inputs.field(package.git->pin.origin);
                 inputs.field(package.git->pin.revision);
@@ -435,7 +475,15 @@ public:
             } else inputs.field(package.path);
             inputs.field(dependency.version.text());
         }
-        std::string lock = git_graph ? "format = 2\nresolver = 2\n\n[root]\n" : "format = 1\nresolver = 1\n\n[root]\n";
+        if (native) {
+            const auto& required = *manifest.native_requirement();
+            inputs.field(required.alias);
+            inputs.field(required.id);
+            inputs.field(required.version.text());
+            inputs.field(std::to_string(required.abi));
+        }
+        std::string lock = native ? "format = 3\nresolver = 3\n\n[root]\n" :
+            git_graph ? "format = 2\nresolver = 2\n\n[root]\n" : "format = 1\nresolver = 1\n\n[root]\n";
         string_field(lock, "id", manifest.project().id);
         string_field(lock, "kind", kind);
         string_field(lock, "inputs", inputs.finish());
@@ -455,10 +503,15 @@ public:
             lock += "\n[package.dependencies]\n";
             for (const auto& [alias, target] : package.edges) string_field(lock, alias, target);
         }
+        if (native) append_native_lock(lock, native->artifacts);
         if (lock.size() > lock_byte_limit) fail(Code::limit, "Dependency lock byte limit exceeded.");
         return {manifest.source().text(), std::move(lock)};
     }
-    bool has_dependencies() { return !read_manifest("").dependencies().empty(); }
+    bool has_dependencies() {
+        const auto& manifest = read_manifest("");
+        return !manifest.dependencies().empty() || manifest.native_requirement().has_value();
+    }
+    std::optional<SelectedNative> take_native() { return std::move(native); }
 };
 
 void require_lock_shape(std::string_view bytes) {
@@ -479,7 +532,7 @@ void require_lock_shape(std::string_view bytes) {
 
 std::shared_ptr<const LockedDependencies> verify_locked_dependencies(
     const fs::path& requested, const Manifest& manifest, bool retain_sources) {
-    if (manifest.dependencies().empty()) return {};
+    if (manifest.dependencies().empty() && !manifest.native_requirement()) return {};
     const auto root = inspect_creation_root(requested);
     const auto previous = read_dependency_lock(root.path);
     if (!previous) missing_lock();
@@ -492,6 +545,10 @@ std::shared_ptr<const LockedDependencies> verify_locked_dependencies(
     plan->identity_ = sha256(*previous);
     for (const auto& [alias, dependency] : manifest.dependencies()) plan->direct_.emplace(alias, dependency.id);
     plan->packages_ = resolver.take_packages();
+    if (auto native = resolver.take_native()) {
+        plan->native_ = std::move(native->admission);
+        plan->native_link_inputs_ = std::move(native->artifacts.link);
+    }
     return plan;
 }
 

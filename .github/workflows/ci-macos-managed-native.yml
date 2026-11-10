@@ -1,0 +1,18 @@
+name: D4 managed native metadata / macOS ARM64
+on:
+  workflow_dispatch:
+    inputs:
+      reviewed_sha:
+        description: Full commit SHA containing the reviewed D4 sources and this workflow
+        type: string
+        required: true
+permissions:
+  contents: read
+jobs:
+  qualify:
+    uses: ./.github/workflows/ci-macos-package-qualification.yml
+    with:
+      reviewed_sha: ${{ inputs.reviewed_sha }}
+      slice: d4-managed-native
+      test_names: project_managed_native
+      build_targets: voidc
