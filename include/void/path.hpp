@@ -3,6 +3,20 @@
 #include <string>
 #include <string_view>
 namespace vd {
+inline constexpr std::string_view package_source_prefix = "/@pkg/";
+inline bool package_source(std::string_view identity) {
+    return identity == "/@pkg" || identity.starts_with(package_source_prefix);
+}
+inline std::string_view source_domain(std::string_view identity) {
+    if (identity.starts_with("/@stdlib/")) return "/@stdlib";
+    if (!identity.starts_with(package_source_prefix)) return {};
+    return identity.substr(0, identity.find('/', package_source_prefix.size()));
+}
+inline std::string_view package_relative_source(std::string_view identity) {
+    const auto slash = identity.find('/', package_source_prefix.size());
+    return slash == identity.npos ? std::string_view{} : identity.substr(slash + 1);
+}
+
 // Shared lexical VFS component policy. Physical path admission remains separate.
 inline bool portable_path_component(std::string_view component) {
     if (component.empty() || component.back() == ' ' || component.back() == '.') return false;

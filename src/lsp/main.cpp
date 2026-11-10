@@ -2,6 +2,7 @@
 #include "void/tooling.hpp"
 #include "void/project_creation.hpp"
 #include "void/numeric.hpp"
+#include "void/path.hpp"
 #include <bit>
 #include <llvm/Support/JSON.h>
 #include <llvm/Support/FileSystem.h>
@@ -28,6 +29,9 @@
 namespace {
 namespace j=llvm::json;
 namespace fs=std::filesystem;
+bool read_only_source(std::string_view id) {
+    return id.starts_with("/@stdlib/") || vd::package_source(id);
+}
 using vd::lsp::Positions;
 constexpr std::size_t max_body=8*1024*1024, max_header=8192;
 struct FramingError : std::runtime_error { using std::runtime_error::runtime_error; };
@@ -206,8 +210,16 @@ class Server {
     bool related_information=false, diagnostic_versions=false, rename_edits=false, signature_plaintext=false;
     std::string identity(const std::string& uri) const {
         auto path=vd::lsp::uri_path(uri);
-        if(auto current=session.current_analysis();current && current->semantic_analysis())
-            for(const auto& m:current->semantic_analysis()->modules())if(m.identity.starts_with("/@stdlib/") && known_source_path(path,vd::utf8_path(m.source.path())))return m.identity;
+        if(auto current=session.current_analysis();current) {
+            if(current->semantic_analysis())
+                for(const auto& m:current->semantic_analysis()->modules())if(read_only_source(m.identity) && known_source_path(path,vd::utf8_path(m.source.path())))return m.identity;
+            if(current->project() && current->project()->state)
+                for(const auto& [id,source]:current->project()->state->execution)
+                    if(vd::package_source(id) && known_source_path(path,vd::utf8_path(source.path())))return id;
+            for(const auto& d:current->result().diagnostics)
+                if(vd::package_source(d.primary.module_identity) && d.primary.source &&
+                   known_source_path(path,vd::utf8_path(d.primary.source->path())))return d.primary.module_identity;
+        }
 #ifdef _WIN32
         // Drive-letter spelling is URI/OS notation, not a VFS component.
         auto raw=path.generic_u8string();
@@ -228,15 +240,21 @@ class Server {
     std::string uri(const std::string& id) const {
         // Filesystem canonicalization owns compiler identity, not client URI spelling.
         // Versioned edits must address the exact document opened by the client.
-        if(id.starts_with("/@stdlib/")) {
+        if(read_only_source(id)) {
             if(auto current=session.current_analysis();current && current->semantic_analysis())for(const auto& m:current->semantic_analysis()->modules())if(m.identity==id)return vd::lsp::file_uri(vd::utf8_path(m.source.path()));
+            if(vd::package_source(id)) {
+                if(auto previous=published.find(id);previous!=published.end())return previous->second;
+                throw std::invalid_argument("Package source has no admitted URI");
+            }
             return vd::lsp::file_uri(vd::standard_library_root()/vd::utf8_path(id.substr(9)));
         }
         if(auto document=open.find(id);document!=open.end())return document->second.uri;
         return vd::lsp::file_uri(selected_root/vd::utf8_path(id).relative_path());
     }
     j::Object location(const vd::SourceSpan& span) const {
-        return j::Object{{"uri",uri(span.module_identity)},{"range",range(span)}};
+        auto target=vd::package_source(span.module_identity) && span.source
+            ? vd::lsp::file_uri(vd::utf8_path(span.source->path())) : uri(span.module_identity);
+        return j::Object{{"uri",std::move(target)},{"range",range(span)}};
     }
     vd::DocumentRevision next(const std::string& id) const {
         auto snapshot=session.select(); auto found=snapshot.documents().find(id);
@@ -249,6 +267,7 @@ class Server {
         auto result=vd::ToolingSession::analyze(session.select());
         if(!session.accept(result) || !session.is_current(*result)) return;
         std::map<std::string,j::Array> groups;
+        std::map<std::string,std::string> package_uris;
         for(const auto& [id,doc]:open) { (void)doc; groups[id]; }
         for(const auto& [id,previous_uri]:published) { (void)previous_uri; groups[id]; } // Clear removed/repaired graph nodes.
         if(result->project() && result->project()->project && result->project()->project->entry())entry_path=*result->project()->project->entry();
@@ -257,6 +276,8 @@ class Server {
         for(const auto& d:result->result().diagnostics) {
             auto id=d.primary.module_identity;
             if(id.empty()) throw std::logic_error("Project diagnostic has no VFS owner");
+            if(vd::package_source(id) && d.primary.source)
+                package_uris[id]=vd::lsp::file_uri(vd::utf8_path(d.primary.source->path()));
             auto message=d.description;
             if(!d.hint.empty()) message+="\nHint: "+d.hint;
             j::Object diagnostic{{"range",range(d.primary)},{"severity",d.severity==vd::Severity::error ? 1 : d.severity==vd::Severity::warning ? 2 : 3},
@@ -269,19 +290,25 @@ class Server {
             groups[id].push_back(std::move(diagnostic));
         }
         // Closing/reopening under another URI spelling must clear old diagnostics.
-        for(const auto& [id,previous_uri]:published)if(previous_uri!=uri(id))
+        auto target_uri=[&](const std::string& id) {
+            if(auto found=package_uris.find(id);found!=package_uris.end())return found->second;
+            return uri(id);
+        };
+        for(const auto& [id,previous_uri]:published)if(previous_uri!=target_uri(id))
             send(j::Object{{"jsonrpc","2.0"},{"method","textDocument/publishDiagnostics"},
                 {"params",j::Object{{"uri",previous_uri},{"diagnostics",j::Array{}}}}});
-        published.clear();
+        std::map<std::string,std::string> next_published;
         for(auto& [id,diagnostics]:groups) {
-            j::Object params{{"uri",uri(id)},{"diagnostics",std::move(diagnostics)}};
+            const auto target=target_uri(id);
+            j::Object params{{"uri",target},{"diagnostics",std::move(diagnostics)}};
             if(manifest_mode)params["voidProjectRevision"]=std::to_string(result->snapshot().revision());
             if(auto doc=open.find(id); doc!=open.end() && diagnostic_versions) params["version"]=doc->second.version;
             // Retain only nonempty diagnostics: old empty/unreachable nodes need
             // no unbounded clearing history. Open and reachable nodes seed each run.
-            if(!params.getArray("diagnostics")->empty()) published.emplace(id,uri(id));
+            if(!params.getArray("diagnostics")->empty()) next_published.emplace(id,target);
             send(j::Object{{"jsonrpc","2.0"},{"method","textDocument/publishDiagnostics"},{"params",std::move(params)}});
         }
+        published=std::move(next_published);
         if(manifest_mode)send(j::Object{{"jsonrpc","2.0"},{"method","void/projectState"},{"params",summary()}});
     }
     j::Object summary() const {
@@ -407,14 +434,14 @@ class Server {
         if(auto found=snapshot.overrides().find(module);found!=snapshot.overrides().end() && found->second)source=&*found->second;
         if(!source && current && current->semantic_analysis())source=source_in(*current->semantic_analysis(),module);
         if(method=="textDocument/formatting") {
-            if(module.starts_with("/@stdlib/"))return j::Array{};
+            if(read_only_source(module))return j::Array{};
             const auto& options=object(params.get("options"));
             if(!options.getBoolean("insertSpaces").value_or(false) || integer(options.get("tabSize"),1)!=4)throw std::invalid_argument("VOID formatting requires four spaces");
             j::Array result;if(!source || !index || !source_in(*current->semantic_analysis(),module) || !disk_current(*current->semantic_analysis()))return result;
             auto formatted=vd::format_source(*source);if(!formatted || *formatted==source->text())return result;
             // The same compiler checks both lexical structure and the entire
             // proposed graph before returning a conservative whole-file edit.
-            auto overlays=snapshot.overrides();for(const auto& m:current->semantic_analysis()->modules())if(!m.identity.starts_with("/@stdlib/"))overlays.insert_or_assign(m.identity,m.source);
+            auto overlays=snapshot.overrides();for(const auto& m:current->semantic_analysis()->modules())if(!read_only_source(m.identity))overlays.insert_or_assign(m.identity,m.source);
             overlays.insert_or_assign(module,vd::SourceFile(source->path(),*formatted));
             auto checked=check_overlays(overlays);
             if(!checked.program || checked.program->compatibility_contract()!=current->semantic_analysis()->compatibility_contract())return result;
@@ -429,9 +456,12 @@ class Server {
         auto offset=Positions(*source).offset(p);if(!offset)throw std::invalid_argument("Invalid UTF-16 position");
         if(method=="textDocument/completion" || method=="textDocument/signatureHelp") {
             auto overlays=snapshot.overrides();
-            if(current && current->semantic_analysis())for(const auto& m:current->semantic_analysis()->modules())if(!m.identity.starts_with("/@stdlib/"))overlays.insert_or_assign(m.identity,m.source);
-            overlays.insert_or_assign(module,*source); // Position conversion and probe share exact bytes.
             if(module.starts_with("/@stdlib/"))return method=="textDocument/completion"?j::Value(j::Array{}):j::Value(nullptr);
+            if(current && current->semantic_analysis())for(const auto& m:current->semantic_analysis()->modules())if(!read_only_source(m.identity))overlays.insert_or_assign(m.identity,m.source);
+            if(vd::package_source(module)) {
+                if(!current || !current->semantic_analysis() || !disk_current(*current->semantic_analysis()))
+                    return method=="textDocument/completion"?j::Value(j::Array{}):j::Value(nullptr);
+            } else overlays.insert_or_assign(module,*source); // Position conversion and probe share exact bytes.
             auto assistance=manifest_mode?vd::project_editor_assistance(requested_root,snapshot.entry_override(),overlays,snapshot.manifests(),module,*offset):vd::editor_assistance(entry_path,overlays,module,*offset);
             if(method=="textDocument/signatureHelp") {
                 if(assistance.signature.empty() || assistance.active_parameter>=assistance.parameter_documentation.size() || assistance.parameter_documentation[assistance.active_parameter].empty())return nullptr;
@@ -463,7 +493,7 @@ class Server {
             return j::Object{{"contents",j::Object{{"kind","plaintext"},{"value",std::move(text)}}},{"range",range(selected_span)}};
         }
         if(definitions.size()!=1)throw std::invalid_argument("Rename cannot choose between concrete specialization targets");
-        if(module.starts_with("/@stdlib/") || definition->module.starts_with("/@stdlib/"))throw std::invalid_argument("Installed standard sources are read-only");
+        if(read_only_source(module) || read_only_source(definition->module))throw std::invalid_argument("Installed standard and locked package sources are read-only");
         if(!rename_edits || !definition->rename_safe)throw std::invalid_argument("Rename requires version-safe documentChanges and a supported ordinary function, global, constant or uncaptured local binding");
         if(!disk_current(*current->semantic_analysis()))throw std::invalid_argument("Disk sources changed; refresh before rename");
         if(method=="textDocument/prepareRename")return j::Object{{"range",range(selected_span)},{"placeholder",name_of(*definition)}};
@@ -472,7 +502,7 @@ class Server {
         edits[definition->module].push_back(definition->source);
         for(const auto& r:index->references_to(definition->identity))edits[r.source.module_identity].push_back(r.source);
         for(auto& [id,spans]:edits){
-            if(id.starts_with("/@stdlib/"))throw std::invalid_argument("Rename would edit installed standard sources");std::sort(spans.begin(),spans.end(),[](const auto& a,const auto& b){return a.begin<b.begin;});
+            if(read_only_source(id))throw std::invalid_argument("Rename would edit a read-only source");std::sort(spans.begin(),spans.end(),[](const auto& a,const auto& b){return a.begin<b.begin;});
             spans.erase(std::unique(spans.begin(),spans.end(),[](const auto& a,const auto& b){return a.begin==b.begin && a.end==b.end;}),spans.end());
             std::size_t end=0;for(const auto& span:spans){if(span.begin<end || span.source->text().substr(span.begin,span.end-span.begin)!=name_of(*definition))throw std::invalid_argument("Uncertain or overlapping rename binding");end=span.end;}
         }
@@ -482,7 +512,7 @@ class Server {
             return static_cast<std::size_t>(static_cast<std::ptrdiff_t>(offset)+delta);
         };
         auto overlays=session.select().overrides();for(const auto& m:current->semantic_analysis()->modules()) {
-            if(m.identity.starts_with("/@stdlib/"))continue; // Installed sources are reread and checked, never editable overlays.
+            if(read_only_source(m.identity))continue;
             auto text=m.source.text();if(auto found=edits.find(m.identity);found!=edits.end())for(auto it=found->second.rbegin();it!=found->second.rend();++it)text.replace(it->begin,it->end-it->begin,replacement);
             overlays.insert_or_assign(m.identity,vd::SourceFile(m.source.path(),std::move(text)));
         }
@@ -518,7 +548,7 @@ class Server {
 
     void synchronize(const std::string& method,const j::Object& params) {
         const auto& document=object(params.get("textDocument")); auto id=identity(string(document,"uri"));
-        if(id.starts_with("/@stdlib/"))return; // Navigation never grants overlay authority.
+        if(read_only_source(id))return; // Navigation never grants overlay authority.
         auto found=open.find(id);
         if(method=="textDocument/didClose") {
             if(found==open.end()) throw std::invalid_argument("Document is not open");
@@ -669,7 +699,7 @@ public:
             if(name=="textDocument/didSave") {
                 if(id){fail(-32600,"Save requires a notification");return {};}
                 auto module=identity(string(object(object(o->get("params")).get("textDocument")),"uri"));
-                if(module.starts_with("/@stdlib/"))return {};
+                if(read_only_source(module))return {};
                 if(!open.contains(module))throw std::invalid_argument("Saved document is not open");
                 session.refresh();dirty=true;return {};
             }
@@ -679,7 +709,7 @@ public:
                 for(const auto& file:*files) {
                     const auto& event=object(&file);std::string old;
                     try{old=identity(string(event,name=="workspace/didRenameFiles"?"oldUri":"uri"));}catch(const std::invalid_argument&){continue;}
-                    if(old.starts_with("/@stdlib/"))continue;
+                    if(read_only_source(old))continue;
                     if(name=="workspace/didCreateFiles") {
                         auto selected=session.select();const auto& overrides=old.ends_with("/void.project.toml")?selected.manifests():selected.overrides();
                         if(auto found=overrides.find(old);found!=overrides.end() && !found->second && !open.contains(old))session.close(old,next(old));
@@ -690,7 +720,7 @@ public:
                         if(!source)if(auto document=open.find(old);document!=open.end())source=document->second.source;
                         std::string next_id;
                         if(name=="workspace/didRenameFiles")try{next_id=identity(string(event,"newUri"));}catch(const std::invalid_argument&){}
-                        if(!next_id.empty() && next_id!=old && source) {
+                        if(!next_id.empty() && !read_only_source(next_id) && next_id!=old && source) {
                             auto selected=session.select();const auto& next_overrides=next_id.ends_with("/void.project.toml")?selected.manifests():selected.overrides();
                             if(next_overrides.contains(next_id) || open.contains(next_id))throw std::invalid_argument("Rename would replace an editor override");
                             auto revision=next(next_id); // Prove both counters before mutation.
@@ -707,6 +737,7 @@ public:
                     if(manifest_mode) {
                         refresh=true; // Unknown/wrong-case boundary names still invalidate selection.
                         auto module=identity(event_uri);
+                        if(read_only_source(module))continue;
                         if(type==3)session.unavailable(module,next(module));
                         if(type==1) {auto selected=session.select();const auto& overrides=module.ends_with("/void.project.toml")?selected.manifests():selected.overrides();if(auto found=overrides.find(module);found!=overrides.end() && !found->second && !open.contains(module))session.close(module,next(module));}
                     }

@@ -347,6 +347,12 @@ if(BUILD_TESTING)
   add_test(NAME project_dependencies COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/project/dependencies.py" "$<TARGET_FILE:voidc>" "${CMAKE_C_COMPILER}")
   set_tests_properties(project_dependencies PROPERTIES TIMEOUT 300)
+  add_executable(void_project_packages_ir tests/project/packages_ir.cpp)
+  target_link_libraries(void_project_packages_ir PRIVATE void_llvm void_runtime)
+  add_test(NAME project_packages COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/project/packages.py" "$<TARGET_FILE:voidc>"
+    "$<TARGET_FILE:voidls>" "$<TARGET_FILE:void_project_packages_ir>")
+  set_tests_properties(project_packages PROPERTIES TIMEOUT 300)
   void_add_output_test(voidup_smoke "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/voidup/smoke.py"
     "${voidup_application}" "@VOID_TEST_OUTPUT@/voidup-smoke-evidence")
   set_tests_properties(voidup_smoke PROPERTIES TIMEOUT 240)

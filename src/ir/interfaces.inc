@@ -3,8 +3,8 @@
 bool method_accessible(const Module& m,const Function& f,std::string_view scope) {
     if(f.module_identity.empty()) return false;
     if(f.visibility=="private" && f.module_identity!=scope) return false;
-    if(f.visibility=="internal" && f.module_identity.starts_with("/@stdlib/")!=scope.starts_with("/@stdlib/"))return false;
-    if(f.module_identity==scope || (f.module_identity==m.root_identity && scope.starts_with("/@stdlib/")==m.root_identity.starts_with("/@stdlib/"))) return true;
+    if(f.visibility=="internal" && source_domain(f.module_identity)!=source_domain(scope))return false;
+    if(f.module_identity==scope || (f.module_identity==m.root_identity && source_domain(scope)==source_domain(m.root_identity))) return true;
     auto found=m.source_imports.find(std::string(scope));
     return found!=m.source_imports.end() && found->second.contains(f.module_identity);
 }
@@ -14,7 +14,7 @@ bool field_accessible(const Module& m,Type container,unsigned index,std::string_
     if(field.visibility=="internal") {
         const ValueType* owner=container.definition.get();
         for(const auto& t:m.nominal_types)if(t.definition && t.definition->identity==field.owner){owner=t.definition.get();break;}
-        return owner->module_identity.starts_with("/@stdlib/")==scope.starts_with("/@stdlib/");
+        return source_domain(owner->module_identity)==source_domain(scope);
     }
     return field.visibility=="public";
 }
@@ -87,8 +87,8 @@ static Module::Binding structural_conformance(const Module& m,Type view,Type int
     if(interface.kind!=Type::interface_ref || !interface.definition || !interface.definition->interface_type) fail("Invalid interface type");
     auto visible=[&](const ValueType& d) {
         if(d.visibility=="private" && d.module_identity!=scope) return false;
-        if(d.visibility=="internal" && d.module_identity.starts_with("/@stdlib/")!=scope.starts_with("/@stdlib/"))return false;
-        if(d.module_identity==scope || (d.module_identity==m.root_identity && scope.starts_with("/@stdlib/")==m.root_identity.starts_with("/@stdlib/"))) return true;
+        if(d.visibility=="internal" && source_domain(d.module_identity)!=source_domain(scope))return false;
+        if(d.module_identity==scope || (d.module_identity==m.root_identity && source_domain(scope)==source_domain(m.root_identity))) return true;
         auto imports=m.source_imports.find(std::string(scope));
         return imports!=m.source_imports.end() && imports->second.contains(d.module_identity);
     };
@@ -216,7 +216,7 @@ MemberSelection select_operator(const Module& m,std::string_view glyph,const std
         for(unsigned n=0;n<operands.size();++n){const auto t=operands[n];direct |= (t.kind==Type::aggregate || t.kind==Type::managed_ref) && Type::key(t)==Type::key(f.operator_owner);exact &= t==f.parameters[n];}
         if(!direct || !exact || !seen.insert(f.name).second)continue;
         const auto& owner=*f.operator_owner.definition;
-        const bool same_domain=scope.starts_with("/@stdlib/")==owner.module_identity.starts_with("/@stdlib/");
+        const bool same_domain=source_domain(scope)==source_domain(owner.module_identity);
         bool accessible=owner.visibility=="public" || (owner.visibility=="internal" && same_domain) || (owner.visibility=="private" && scope==owner.module_identity);
         Function visibility;visibility.module_identity=f.module_identity;visibility.visibility="public"; // Private operators use lexical owner, not file-method policy.
         accessible &= method_accessible(m,visibility,scope) && (f.visibility=="public" || (f.visibility=="internal" && same_domain) || (f.visibility=="private" && lexical_owner==Type::key(f.operator_owner)));

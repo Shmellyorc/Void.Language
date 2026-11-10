@@ -179,7 +179,7 @@ def test_diamond(base):
         assert outside.read_bytes() == refreshed
         (root / "void.lock").unlink()
         write(root, "void.lock", refreshed)
-    invoke(root, status=1, message="Dependency compilation is not supported", command="check")
+    invoke(root, command="check")
     subprocess.run([str(compiler), "check", str(root / "main.void")], check=True, capture_output=True, timeout=40)
     return root
 

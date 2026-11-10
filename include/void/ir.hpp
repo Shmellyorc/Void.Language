@@ -7,6 +7,7 @@
 #include <map>
 #include <set>
 namespace vd { class CPrimitiveAdmission; class ValidatedAnalysis; }
+namespace vd::project { class LockedDependencies; }
 #include <string>
 #include <vector>
 namespace vd::ir {
@@ -229,6 +230,7 @@ struct Module {
     std::map<std::string,GenericInstance> generic_instances = {};
     ApplicationMetadata::Owner application_metadata = {};
     std::shared_ptr<const CPrimitiveAdmission> c_primitives = {};
+    std::shared_ptr<const project::LockedDependencies> locked_dependencies = {};
 };
 std::string generic_identity(std::string_view,const std::vector<Type>&);
 std::string generic_instance_identity(const Module&,const Module::GenericInstance&,const Function* = nullptr);

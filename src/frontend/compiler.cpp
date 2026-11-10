@@ -2,6 +2,7 @@
 #include "void/c_primitive.hpp"
 #include "void/path.hpp"
 #include "void/project_creation.hpp"
+#include "void/project_resolution.hpp"
 #include "void/numeric.hpp"
 #include "void/math_ops.hpp"
 #include "void/temporal_ops.hpp"
@@ -654,7 +655,7 @@ void validate_documentation(const SourceFile& source,const Function& f,Diagnosti
         diagnostics.warn(source,p.token,Code::documentation_missing_parameter,"Missing documentation for parameter '"+p.token.text+"'.");
 }
 bool standard_module(std::string_view id) { return id.starts_with("/@stdlib/"); }
-bool same_library(std::string_view a, std::string_view b) { return standard_module(a)==standard_module(b); }
+bool same_library(std::string_view a, std::string_view b) { return source_domain(a)==source_domain(b); }
 bool source_visible(std::string_view visibility, std::string_view owner, std::string_view scope) {
     return owner==scope || (visibility!="private" && (visibility!="internal" || same_library(owner,scope)));
 }
@@ -663,6 +664,12 @@ struct Import {
     std::string target;
     bool explicit_alias = false;
 };
+std::string import_alias(const Import& import) {
+    if (import.explicit_alias) return import.alias.text;
+    if (import.path.kind != TokenKind::path && import.path.text.starts_with("pkg/"))
+        return import.path.text.substr(4);
+    return path_utf8(utf8_path(import.target.empty() ? import.path.text : import.target).stem());
+}
 struct Unit {
     CPrimitiveAdmission::Owner c_primitives;
     EditorProbe* editor=nullptr;
@@ -4418,7 +4425,14 @@ class Lowering {
     }
 #include "pattern_lowering.inc"
     VOID_SEMANTIC_HANDLER unsigned spawned(const Expr& e) {
-            auto& call=*e.parts[0];ir::Function wrapper;wrapper.name=call.target+"::$spawn."+std::to_string(module.functions.size());wrapper.module_identity=call.target.substr(0,call.target.find("::"));wrapper.source_name=wrapper.name.substr(wrapper.module_identity.size()+2);wrapper.source=source.location(e.token.offset);wrapper.visibility="private";wrapper.asynchronous=true;wrapper.worker=true;wrapper.task=e.type;wrapper.result=call.type;wrapper.parameters.clear();
+            auto& call=*e.parts[0];ir::Function wrapper;
+            const auto owner=output.name.substr(0,output.name.find("::"));
+            const auto target_owner=call.target.substr(0,call.target.find("::"));
+            const auto suffix="::$spawn."+std::to_string(module.functions.size());
+            const bool package_call=package_source(owner) || package_source(target_owner);
+            wrapper.module_identity=package_call ? owner : target_owner;
+            wrapper.name=(package_call ? output.name : call.target)+suffix;
+            wrapper.source_name=wrapper.name.substr(wrapper.module_identity.size()+2);wrapper.source=source.location(e.token.offset);wrapper.visibility="private";wrapper.asynchronous=true;wrapper.worker=true;wrapper.task=e.type;wrapper.result=call.type;wrapper.parameters.clear();
             ir::Block body;ir::Instruction invoke{ir::Op::call};invoke.callee=call.target;invoke.source=wrapper.source;
             wrapper.parameters.resize(call.parts.size());for(unsigned n=0;n<call.parts.size();++n){wrapper.parameters[call.argument_indexes.empty()?n:call.argument_indexes[n]]=call.parts[n]->type;invoke.arguments.push_back(n);body.instructions.push_back({ir::Op::argument,n});}
             unsigned value=body.instructions.size();body.instructions.push_back(invoke);
@@ -5306,6 +5320,7 @@ public:
     std::map<std::string, std::unique_ptr<Unit>> parsed;
     std::function<void(const std::filesystem::path&,const std::string&,bool)> admit;
     std::function<SourceFile(const std::filesystem::path&,const std::string&)> reader;
+    const project::LockedDependencies* dependencies = nullptr;
     explicit SourceGraph(std::filesystem::path project_root, Diagnostics& d, const SourceOverrides& o,const NativeProject* bindings=nullptr,
                          CPrimitiveAdmission::Owner c_primitives = {})
         : root(std::move(project_root)), diagnostics(d), overrides(o), native(bindings), primitives(std::move(c_primitives)) {
@@ -5323,11 +5338,51 @@ public:
         virtual_children[""][folded(admission->module().substr(1))].insert(admission->module().substr(1));
         primitives = std::move(admission);
     }
+    const project::LockedPackage* package(std::string_view identity) const {
+        if (!dependencies || !identity.starts_with(package_source_prefix)) return nullptr;
+        const auto found = dependencies->packages().find(source_domain(identity).substr(package_source_prefix.size()));
+        return found == dependencies->packages().end() ? nullptr : &found->second;
+    }
+    const project::DependencyEdges* direct_packages(std::string_view identity) const {
+        if (!dependencies || standard_module(identity)) return nullptr;
+        if (!package_source(identity)) return &dependencies->direct();
+        const auto* selected = package(identity);
+        return selected ? &selected->dependencies : nullptr;
+    }
+    SourceFile package_snapshot(const std::string& id) const {
+        const auto* selected = package(id);
+        if (selected) {
+            const auto relative = package_relative_source(id);
+            if (auto found = selected->sources.find(relative); found != selected->sources.end())
+                return SourceFile(path_utf8(root / utf8_path(selected->locator) / utf8_path(relative)), found->second);
+        }
+        throw std::invalid_argument("Source is outside the verified package snapshot.");
+    }
+    std::string package_identity(const std::filesystem::path& physical) const {
+        if (!dependencies) return {};
+        for (const auto& [id, selected] : dependencies->packages()) {
+            const auto relative = path_utf8(physical.lexically_relative(root / utf8_path(selected.locator)));
+            if (selected.sources.contains(relative)) return std::string(package_source_prefix) + id + "/" + relative;
+        }
+        return {};
+    }
     std::pair<std::string,std::filesystem::path> resolve(const Unit& from, const Token& path, bool directory=false) {
+        if (path.kind != TokenKind::path && path.text.starts_with("pkg/")) {
+            const auto alias = path.text.substr(4);
+            const auto* direct = direct_packages(from.identity);
+            if (directory || !identifier(alias) || !direct || !direct->contains(alias))
+                error(from.source, path, Code::import_path, "Undeclared direct package import '" + path.text + "'.",
+                    "Use pkg/<alias> for a direct dependency in the importing manifest.");
+            const auto& id = direct->at(alias);
+            const auto& selected = dependencies->packages().at(id);
+            return {std::string(package_source_prefix) + id + "/" + selected.entry,
+                root / utf8_path(selected.locator) / utf8_path(selected.entry)};
+        }
         const bool local=path.kind!=TokenKind::path && path.text.starts_with("lib/");
         if((path.kind==TokenKind::path || local) && standard_module(from.identity))error(from.source,path,Code::import_path,"Standard modules cannot import project VFS sources.","Use an unquoted standard-library module path outside lib/.");
         bool standard=path.kind!=TokenKind::path && !local;
-        Unit anchor(from.source,from.identity);
+        const auto* owner = package(from.identity);
+        Unit anchor(from.source,owner ? "/" + std::string(package_relative_source(from.identity)) : from.identity);
         Token requested=path;
         if(path.kind!=TokenKind::path) requested.text="/"+path.text+".void";
         if(local) {
@@ -5340,6 +5395,22 @@ public:
         }
         auto relative=normalize(anchor,requested);
         if(relative.starts_with("/@stdlib/"))error(from.source,path,Code::import_path,"Reserved standard-library source identity.");
+        if(package_source(relative))error(from.source,path,Code::import_path,"Reserved package source identity.","Import packages with pkg/<alias>.");
+        if (owner && !standard) {
+            if (directory) relative = path_utf8(utf8_path(relative).parent_path());
+            auto suffix = std::string_view(relative);
+            if (suffix.starts_with('/')) suffix.remove_prefix(1);
+            if (directory) {
+                const auto prefix = suffix.empty() ? std::string{} : std::string(suffix) + "/";
+                const auto child = owner->sources.lower_bound(prefix);
+                if (child == owner->sources.end() || !child->first.starts_with(prefix))
+                    error(from.source,path,Code::import_read,"Directory is outside the verified package sources.");
+            } else if (!owner->sources.contains(suffix))
+                error(from.source,path,Code::import_read,"Cannot find exact-case source '" + relative + "' in the verified package.",
+                    "Use a locked source within the owning package's boundary.");
+            return {std::string(source_domain(from.identity)) + relative,
+                root / utf8_path(owner->locator) / utf8_path(suffix)};
+        }
         auto id=standard ? "/@stdlib"+relative : relative;
         if(directory) {relative=path_utf8(utf8_path(relative).parent_path());id=standard ? "/@stdlib"+relative : relative;}
         auto overlay = overrides.find(id);
@@ -5404,7 +5475,8 @@ public:
                 error(from.source, path, Code::import_path, "Module path names a non-file host object.");
             for (const auto* store : {&units,&parsed}) for (const auto& [other_id, other] : *store) {
                 if(other_id==id)continue;
-                auto other_path = standard_module(other_id) ? *standard_root / utf8_path(other_id.substr(9)) : root / utf8_path(other_id).relative_path();
+                auto other_path = package_source(other_id) ? utf8_path(other->source.path()) :
+                    standard_module(other_id) ? *standard_root / utf8_path(other_id.substr(9)) : root / utf8_path(other_id).relative_path();
                 if (std::filesystem::equivalent(physical, other_path, ec) && !ec)
                     error(from.source, path, Code::import_path, "Hard-link aliases have conflicting module identities: '" + id + "' and '" + other_id + "'.", "Use one VFS filename for this physical source.");
                 ec.clear();
@@ -5421,7 +5493,8 @@ public:
         if(auto found=parsed.find(id);found!=parsed.end())return *found->second;
         auto overlay=overrides.find(id);
         std::unique_ptr<Unit> unit;
-        try { unit = std::make_unique<Unit>(reader ? reader(physical,id) : overlay == overrides.end() ? read_source(physical) : *overlay->second, id); }
+        try { unit = std::make_unique<Unit>(package_source(id) ? package_snapshot(id) :
+            reader ? reader(physical,id) : overlay == overrides.end() ? read_source(physical) : *overlay->second, id); }
         catch (const SourceReadError&) { error(from.source, path, Code::import_read, "Cannot read imported file '" + id + "'.", "Check source file permissions and storage availability."); }
         catch (const CompilationError& failure) {
             auto records = failure.diagnostics();
@@ -5463,7 +5536,7 @@ public:
                 import.target = target.identity;
             } catch (const CompilationError& failure) {
                 diagnostics.add(failure); result.failed_import = true;
-                auto qualifier = import.explicit_alias ? import.alias.text : path_utf8(utf8_path(import.path.text).stem());
+                auto qualifier = import_alias(import);
                 result.failed_qualifiers.insert(qualifier);
             }
         }
@@ -5700,7 +5773,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         for (const auto& import : unit->imports) {
             if (import.target.empty()) continue;
             if (units.at(import.target)->parse_failed) unit->failed_import = true;
-            auto alias = import.explicit_alias ? import.alias.text : path_utf8(utf8_path(import.target).stem());
+            auto alias = import_alias(import);
             try {
             if (!import.explicit_alias && !identifier(alias)) continue;
             if (unit->global_names.contains(alias) || (same_library(id,root.identity) && root.global_names.contains(alias) && root.global_names.at(alias)->visibility!="private") || unit->structure_names.contains(alias) || (same_library(id,root.identity) && root.structure_names.contains(alias) && root.structure_names.at(alias)->visibility != "private") || (import.explicit_alias && unit->declarations.contains(alias)) || unit->constant_names.contains(alias) || (same_library(id,root.identity) && root.constant_names.contains(alias) && !root.constant_names.at(alias)->file_private))
@@ -5713,7 +5786,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
                 std::vector<RelatedLocation> related;
                 for (const auto& previous : unit->imports) {
                     if (&previous == &import) break;
-                    auto previous_alias = previous.explicit_alias ? previous.alias.text : path_utf8(utf8_path(previous.target).stem());
+                    auto previous_alias = import_alias(previous);
                     if (previous_alias == alias && !previous.target.empty()) { related.push_back({span(unit->source, previous.alias), "Previously imported"}); break; }
                 }
                 error(unit->source, import.alias, Code::alias_conflict, "Conflicting import alias '" + alias + "'.", "Give these modules different aliases using as.", std::move(related));
@@ -6227,8 +6300,10 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     for(auto& [id,u]:units)for(auto& f:u->functions)if(f.asynchronous){f.task=u->make_task(f.result);if(!ir::async_boundary_safe(f.result))error(u->source,f.token,Code::unsupported_type,"Callable-containing results cannot escape an async task in Delivery 1.");for(const auto& parameter:f.parameters)if(!ir::async_boundary_safe(parameter.type))error(u->source,parameter.token,Code::unsupported_type,"Callable-containing or borrowed arguments cannot cross an async task boundary in Delivery 1.");if(f.receiver && !ir::async_boundary_safe(f.receiver->type))error(u->source,f.token,Code::unsupported_type,"Callable-containing managed receivers cannot cross an async task boundary in Delivery 1.");if(f.initializer || f.accessor || (f.receiver && f.token.text=="deinit") || f.virtual_method || f.overriding || f.interface_requirement || (f.receiver && f.receiver->type.kind!=Type::managed_ref))error(u->source,f.token,Code::unsupported_type,"Async lifecycle methods, accessors, value receivers and virtual/interface methods require a reviewed contract.");}
     for(auto& [id,u]:units) {u->resolve_global={};u->make_task={};u->make_cleanup={};u->make_capture_record={};u->make_callable={};u->resolve_callable={};u->resolve_result={};u->make_result={};u->make_option={};u->resolve_array={};u->resolve_application={};u->specialize_function={};u->specialize_structure={};} // No closures into this validation frame escape.
 }
-ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry) {
+ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry,
+                      std::shared_ptr<const project::LockedDependencies> dependencies) {
     ir::Module module;
+    module.locked_dependencies = std::move(dependencies);
     for (const auto& [id, unit] : units) if (unit->c_primitives) module.c_primitives = unit->c_primitives;
     if (module.c_primitives) module.coordinated = true;
     auto strings=string_pool(units);
@@ -6359,10 +6434,11 @@ std::shared_ptr<const ValidatedAnalysis> validated_source(const SourceFile&);
 std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path&, const SourceOverrides& = {}, bool verify_disk = false,const NativeProject* = nullptr,EditorProbe* = nullptr,CPrimitiveAdmission::Owner = {});
 // This factory is the only way to construct a successful result.
 struct AnalysisAccess {
-    static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry,std::vector<Diagnostic> warnings={},const std::string& context_key={},std::shared_ptr<Unit> library_scope={},ApplicationMetadata::Owner metadata={},bool native_authorized=true) {
+    static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry,std::vector<Diagnostic> warnings={},const std::string& context_key={},std::shared_ptr<Unit> library_scope={},ApplicationMetadata::Owner metadata={},bool native_authorized=true,std::shared_ptr<const project::LockedDependencies> dependencies={}) {
         auto result = std::shared_ptr<ValidatedAnalysis>(new ValidatedAnalysis);result->warnings_=std::move(warnings);
         result->entry_ = entry;
         result->application_metadata_ = std::move(metadata);
+        result->locked_dependencies_ = dependencies;
         const auto& selected=library_scope?*library_scope:*units.at(entry);
         result->executable_=!library_scope;
         const auto* app=application_entry(selected);
@@ -6768,10 +6844,10 @@ struct AnalysisAccess {
             if(alternatives.size()>1){r.signature="Selected specializations:";for(const auto& label:alternatives)r.signature+="\n\n"+label;}
         }
         field(result->contract_,result->constants_);
-        result->lower_ = [graph,entry,library_scope,native_authorized] {
+        result->lower_ = [graph,entry,library_scope,native_authorized,dependencies=std::move(dependencies)] {
             if(library_scope)throw std::invalid_argument("Library analysis has no executable entry or supported IR build operation.");
             if(!native_authorized)throw std::invalid_argument("Native project execution requires explicit host authorization.");
-            return lower_graph(*graph,entry);
+            return lower_graph(*graph,entry,dependencies);
         };
         return result;
     }
@@ -6883,7 +6959,7 @@ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem
 }
 void require_module_identity(const std::string& identity) {
     Unit anchor(SourceFile("<document identity>", ""), "/");
-    if (standard_module(identity) || identity.empty() || identity[0] != '/' || normalize(anchor, {TokenKind::path, identity, 0}) != identity)
+    if (standard_module(identity) || package_source(identity) || identity.empty() || identity[0] != '/' || normalize(anchor, {TokenKind::path, identity, 0}) != identity)
         throw std::invalid_argument("Document identity must be an exact canonical root-relative .void path");
 }
 AnalysisResult analyze_project(const std::filesystem::path& entry, const SourceOverrides& overrides) {
@@ -6918,6 +6994,16 @@ std::optional<EditorAssistance> import_assistance(const std::filesystem::path& e
     Unit anchor(source,module);Diagnostics diagnostics;SourceGraph legacy(std::filesystem::canonical(project?project->root:entry.parent_path()),diagnostics,overrides);
     auto& graph=project?project->graph:legacy;
     auto token=[&](std::string name){return Token{quoted?TokenKind::path:TokenKind::name,std::move(name),start};};
+    const auto* direct=graph.direct_packages(module);
+    if(!quoted && directory.starts_with("pkg/")) {
+        if(directory=="pkg/" && direct)for(const auto& [alias,id]:*direct)if(identifier(alias) && alias.starts_with(leaf)) {
+            if(out.candidates.size()>=256){out.incomplete=true;break;}
+            out.candidates.push_back({alias,id,17,alias});
+        }
+        return out;
+    }
+    if(!quoted && directory.empty() && direct && !direct->empty() && std::string_view("pkg/").starts_with(leaf))
+        out.candidates.push_back({"pkg/","locked packages",19,"pkg/"});
     if(!quoted && directory.empty() && std::string_view("lib/").starts_with(leaf)) {
         try {(void)graph.resolve(anchor,token("lib/_void_discovery_"),true);out.candidates.push_back({"lib/","project-local libraries",19,"lib/"});}catch(const CompilationError&){}
     }
@@ -6926,11 +7012,20 @@ std::optional<EditorAssistance> import_assistance(const std::filesystem::path& e
         auto [id,physical]=graph.resolve(anchor,token(dummy),true);
         if(id=="/")id.clear();
         std::set<std::string> children;
-        std::error_code ec;
-        for(std::filesystem::directory_iterator it(physical,ec),end;!ec && it!=end;it.increment(ec))children.insert(path_utf8(it->path().filename()));
-        if(ec && ec!=std::errc::no_such_file_or_directory)return out;
-        if(quoted || local)for(const auto& [key,value]:overrides)if(value && key.starts_with(id+"/")) {
-            auto child=key.substr(id.size()+1);children.insert(child.substr(0,child.find('/')));
+        if(const auto* owner=graph.package(id)) {
+            auto relative=std::string(package_relative_source(id));
+            if(!relative.empty())relative+="/";
+            for(auto child=owner->sources.lower_bound(relative);child!=owner->sources.end() && child->first.starts_with(relative);++child) {
+                const auto name=std::string_view(child->first).substr(relative.size());
+                children.emplace(name.substr(0,name.find('/')));
+            }
+        } else {
+            std::error_code ec;
+            for(std::filesystem::directory_iterator it(physical,ec),end;!ec && it!=end;it.increment(ec))children.insert(path_utf8(it->path().filename()));
+            if(ec && ec!=std::errc::no_such_file_or_directory)return out;
+            if(quoted || local)for(const auto& [key,value]:overrides)if(value && key.starts_with(id+"/")) {
+                auto child=key.substr(id.size()+1);children.insert(child.substr(0,child.find('/')));
+            }
         }
         for(const auto& child:children) {
             if(child=="@stdlib")continue;
@@ -6942,7 +7037,7 @@ std::optional<EditorAssistance> import_assistance(const std::filesystem::path& e
             try {(void)graph.resolve(anchor,token(directory+child+"/_void_discovery_"+(quoted?".void":"")),true);folder=true;}catch(const CompilationError&){}
             const bool local_root=local && directory=="lib/";
             if((local_root && folder) || (!local_root && child.ends_with(".void")))try {(void)graph.resolve(anchor,token(directory+(quoted || local_root?child:child.substr(0,child.size()-5))));file=true;}catch(const CompilationError&){}
-            if(!quoted && !local && directory.empty() && child=="lib")folder=false;
+            if(!quoted && !local && directory.empty() && (child=="lib" || child=="pkg"))folder=false;
             if(!quoted) {auto valid_segment=[](const std::string& name){return !name.empty() && letter(name[0]) && std::all_of(name.begin(),name.end(),[](char c){return letter(c)||digit(c);});};if(!valid_segment(file_name))file=false;if(!valid_segment(child))folder=false;}
             if(!folder && !file)continue;
             if(out.candidates.size()>=256){out.incomplete=true;break;}
@@ -6960,14 +7055,16 @@ bool valid_editor_identifier(const std::string& name) {
         std::all_of(name.begin(),name.end(),[](char c){return letter(c)||digit(c);});
 }
 EditorAssistance editor_assistance_impl(const std::filesystem::path& entry,const SourceOverrides& overrides,const std::string& module,std::size_t cursor,ProjectCapture* project=nullptr,const std::optional<std::string>& project_entry={}) {
-    require_module_identity(module);
+    const bool locked_source=project && package_source(module);
+    if(!locked_source)require_module_identity(module);
     EditorAssistance empty;
     auto selected=overrides.find(module);
     if(selected!=overrides.end() && !selected->second)return empty;
-    SourceFile source=project?project->recapture_source(module):selected!=overrides.end() && selected->second ? *selected->second : read_source(entry.parent_path()/utf8_path(module).relative_path());
+    SourceFile source=locked_source?project->graph.package_snapshot(module):project?project->recapture_source(module):selected!=overrides.end() && selected->second ? *selected->second : read_source(entry.parent_path()/utf8_path(module).relative_path());
     const auto& text=source.text();
     if(cursor>text.size() || text.find("_void_editor_cursor_")!=std::string::npos) return empty;
     if(auto imports=import_assistance(entry,overrides,module,source,cursor,project))return *imports;
+    if(locked_source)return empty;
     Diagnostics diagnostics;auto tokens=lex(source,diagnostics);
     if(diagnostics.failed()) return empty;
     std::size_t begin=cursor,end=cursor;

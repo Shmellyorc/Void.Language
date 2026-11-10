@@ -12,6 +12,8 @@
 #include "void/os.hpp"
 #include "void/host_ops.hpp"
 #include "void/reference_capabilities.hpp"
+#include "void/path.hpp"
+#include "void/project_resolution.hpp"
 #include <map>
 #include <algorithm>
 #include <set>
@@ -493,6 +495,44 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
     InstructionTypes qualified_types;
     auto fail = [](const std::string& text) { throw std::invalid_argument("VOID IR: " + text); };
     if (m.identity.empty()) fail("missing module identity");
+    if (package_source(m.identity) || package_source(m.root_identity) || package_source(m.entry_symbol))
+        fail("a package cannot own the program entry");
+    auto package = [&](std::string_view scope) -> const project::LockedPackage* {
+        if (!m.locked_dependencies || !scope.starts_with(package_source_prefix)) return nullptr;
+        const auto id = source_domain(scope).substr(package_source_prefix.size());
+        const auto found = m.locked_dependencies->packages().find(id);
+        return found == m.locked_dependencies->packages().end() ? nullptr : &found->second;
+    };
+    auto admitted_package_source = [&](const std::string& scope) {
+        const auto* selected = package(scope);
+        return selected && selected->sources.contains(package_relative_source(scope)) && m.source_imports.contains(scope);
+    };
+    for (const auto& [scope, imports] : m.source_imports) {
+        if (package_source(scope) && !admitted_package_source(scope)) fail("source is outside the verified package snapshot");
+        for (const auto& target : imports) {
+            if (!package_source(scope) && !package_source(target)) continue;
+            if (!package_source(target)) {
+                if (source_domain(target) != "/@stdlib" || !m.source_imports.contains(target))
+                    fail("package import escapes its source domain");
+                continue;
+            }
+            if (!admitted_package_source(target)) fail("import is outside the verified package snapshot");
+            if (source_domain(scope) == source_domain(target)) continue;
+            if (source_domain(scope) == "/@stdlib") fail("standard-library scope cannot import a package");
+            const auto* owner = package(scope);
+            const auto& direct = owner ? owner->dependencies : m.locked_dependencies->direct();
+            const auto id = source_domain(target).substr(package_source_prefix.size());
+            if (package_relative_source(target) != package(target)->entry ||
+                std::none_of(direct.begin(), direct.end(), [&](const auto& edge) { return edge.second == id; }))
+                fail("package import requires a verified direct edge to its entry");
+        }
+    }
+    auto package_call = [&](const Function& caller, const Function& callee) {
+        const auto& from = caller.module_identity;
+        const auto& to = callee.module_identity;
+        if (from == to || (!package_source(from) && !package_source(to))) return;
+        if (!method_accessible(m, callee, from)) fail("inaccessible package callable");
+    };
     const auto* primitive = m.c_primitives.get();
     if (primitive && (!m.coordinated || m.async_root || !m.native_library.empty() || !m.imports.empty() ||
         m.root_identity == primitive->module() || !m.source_imports.contains(primitive->module())))
@@ -500,6 +540,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
     if (m.application_metadata) (void)ApplicationMetadata::decode(m.application_metadata->bytes());
     if (m.analysis) {
         if (m.analysis->c_primitive_admission() != m.c_primitives) fail("C primitive admission differs from analyzed source");
+        if (m.analysis->locked_dependencies() != m.locked_dependencies) fail("package admission differs from analyzed source");
         const auto& expected = m.analysis->application_metadata();
         if (expected != m.application_metadata && (!expected || !m.application_metadata || *expected != *m.application_metadata))
             fail("application metadata differs from validated source analysis");
@@ -580,6 +621,10 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             if (t.construction && (t.kind!=Type::managed_ref || t.nullable)) fail("invalid construction view type");
             if (t.nullable && !reference_value(t) && !(t.definition && t.definition->callable)) fail("nullable non-reference type");
             if ((reference_value(t) || t.kind==Type::prepared_receiver || t.kind==Type::string) && !m.coordinated) fail("managed references require coordinated runtime");
+            if (t.definition && (package_source(t.definition->identity) || package_source(t.definition->module_identity)) &&
+                (!admitted_package_source(t.definition->module_identity) ||
+                 !t.definition->identity.starts_with(t.definition->module_identity + "::")))
+                fail("invalid package nominal ownership");
             if(t.kind==Type::interface_ref || t.kind==Type::prepared_receiver) {
                 if(!t.definition || !t.definition->interface_type || t.definition->managed || t.definition->identity.empty() || !t.definition->fields.empty() || !t.definition->base.expired()) fail("invalid interface definition");
                 if(t.definition->visibility!="public" && t.definition->visibility!="internal" && t.definition->visibility!="private") fail("invalid interface visibility");
@@ -741,6 +786,8 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         if(!found) fail("interface has no requirements");
     }
     for (const auto& f : m.functions) {
+        if ((package_source(f.name) || package_source(f.module_identity)) && !admitted_package_source(f.module_identity))
+            fail("function has no verified package source scope");
         if (primitive && (f.asynchronous || f.worker)) fail("C primitive graphs require synchronous execution");
         if (primitive && f.module_identity == primitive->module() &&
             (f.receiver || f.initializer || f.closure || f.cleanup_entry || !f.locals.empty() ||
@@ -1063,7 +1110,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 case Op::native_call: {
                     valid_type(i.type);
                     std::vector<Type> parameters;for(auto value:i.arguments)parameters.push_back(operand(value));
-                    if(!m.coordinated || m.native_library!=native_provider(i.callee) || i.receiver || !native_signature(i.callee,parameters,i.type))fail("invalid native ABI/call/publication");
+                    if(package_source(f.module_identity) || !m.coordinated || m.native_library!=native_provider(i.callee) || i.receiver || !native_signature(i.callee,parameters,i.type))fail("invalid native ABI/call/publication");
                     if(native_binding(i.callee).name=="register" && b.instructions[i.arguments[1]].op!=Op::function_reference)fail("native callback lacks generation-local provenance");
                     result=i.type;break;
                 }
@@ -1077,6 +1124,9 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     valid_type(i.type);if(!i.type.definition || !i.type.definition->callable || !i.type.nullable || i.receiver || !i.arguments.empty() || !i.callee.empty())fail("invalid null function value");result=i.type;break;
                 case Op::function_reference: {
                     valid_type(i.type);auto target=names.find(i.callee);
+                    if (auto declaration = functions.find(i.callee); declaration != functions.end())
+                        package_call(f, *declaration->second);
+                    else if (package_source(f.module_identity)) fail("inaccessible package callable");
                     if (primitive) {
                         auto declaration = functions.find(i.callee);
                         if (declaration != functions.end() && declaration->second->module_identity == primitive->module())
@@ -1466,6 +1516,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     } else {
                         auto found=functions.find(i.callee);
                         if(found==functions.end() || !found->second->initializer || Type::key(found->second->parameters[0])!=base->identity || i.arguments.size()+1!=found->second->parameters.size()) fail("invalid base initializer target");
+                        package_call(f, *found->second);
                         for(unsigned n=0;n<i.arguments.size();++n) expect(i.arguments[n],found->second->parameters[n+1]);
                     }
                     result=Type::none; break;
@@ -1517,8 +1568,9 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     if (found == globals.end()) fail("unknown global identity");
                     const auto& value = *found->second;
                     bool imported = m.source_imports.contains(f.module_identity) && m.source_imports.at(f.module_identity).contains(value.module_identity);
-                    bool root = value.module_identity == m.root_identity && value.module_identity.starts_with("/@stdlib/") == f.module_identity.starts_with("/@stdlib/");
-                    if (f.module_identity != value.module_identity && (value.visibility == "private" || (!imported && !root) || (value.visibility == "internal" && value.module_identity.starts_with("/@stdlib/") != f.module_identity.starts_with("/@stdlib/")))) fail("inaccessible global");
+                    const bool same_domain = source_domain(value.module_identity) == source_domain(f.module_identity);
+                    bool root = value.module_identity == m.root_identity && same_domain;
+                    if (f.module_identity != value.module_identity && (value.visibility == "private" || (!imported && !root) || (value.visibility == "internal" && !same_domain))) fail("inaccessible global");
                     result = value.cell; break;
                 }
                 case Op::load: result = slot(i.a); break;
@@ -1528,6 +1580,8 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     expect(i.b, slot(i.a)); result = Type::none; break;
                 case Op::async_call: case Op::call: case Op::virtual_call: {
                     auto declaration=functions.find(i.callee);
+                    if (declaration != functions.end()) package_call(f, *declaration->second);
+                    else if (package_source(f.module_identity)) fail("inaccessible package callable");
                     if (primitive && declaration != functions.end() && declaration->second->module_identity == primitive->module()) {
                         auto scope = m.source_imports.find(f.module_identity);
                         if (i.op != Op::call || scope == m.source_imports.end() || !scope->second.contains(primitive->module()))

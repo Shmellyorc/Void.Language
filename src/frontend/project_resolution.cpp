@@ -50,7 +50,7 @@ std::string sha256(std::string_view bytes) {
 void string_field(std::string& text, std::string_view key, std::string_view value) {
     text.append(key).append(" = \"").append(value).append("\"\n");
 }
-using Edges = std::map<std::string, std::string>;
+using Edges = DependencyEdges;
 
 struct Trace {
     const Manifest& owner;
@@ -64,6 +64,7 @@ struct Trace {
 struct Package {
     std::string path, version, manifest_digest, tree_digest;
     Edges edges;
+    PackageSources sources;
     std::size_t height = 0;
     std::string first_chain;
     SourceSpan first_span;
@@ -75,6 +76,8 @@ struct Snapshot {
 
 class Resolver {
     const fs::path& root;
+    const Manifest* effective_root;
+    bool retain_sources;
     using Directory = std::map<std::string, std::set<std::string>>;
     std::map<fs::path, Directory> directories;
     std::map<std::string, Package> packages;
@@ -136,6 +139,7 @@ class Resolver {
         return true;
     }
     const Manifest& read_manifest(const std::string& locator) {
+        if (locator.empty() && effective_root) return *effective_root;
         if (auto found = manifests.find(locator); found != manifests.end()) return *found->second;
         const auto path = locator.empty() ? root : root / utf8_path(locator);
         if (!boundary(path)) fail(Code::project_boundary, "Missing exact void.project.toml at " + path_utf8(path));
@@ -197,7 +201,7 @@ class Resolver {
             tree.emplace(std::move(relative), fs::is_directory(status));
         }
     }
-    std::string tree_digest(const std::string& locator, const Manifest& manifest) {
+    std::string tree_digest(const std::string& locator, const Manifest& manifest, PackageSources& sources) {
         const auto path = root / utf8_path(locator);
         Tree tree;
         inventory(path, "", 0, tree);
@@ -217,6 +221,7 @@ class Resolver {
             bytes += contents.size();
             hashed_bytes += contents.size();
             digest.field(contents);
+            if (retain_sources && name.ends_with(".void")) sources.emplace(name, std::move(contents));
         }
         if (!tree.contains(std::string(manifest_name)))
             fail(Code::project_changed, "Dependency manifest disappeared during resolution; retry.");
@@ -230,7 +235,8 @@ class Resolver {
             if (++edge_count > dependency_edge_limit) fail(Code::limit, "Dependency graph edge limit exceeded.");
             if (depth == depth_limit) fail(Code::limit, "Dependency graph depth limit exceeded.");
             const auto locator = locate(declaring, requirement.path);
-            if (!manifests.contains(locator) && manifests.size() > dependency_package_limit)
+            if (!locator.empty() && !manifests.contains(locator) &&
+                manifests.size() >= dependency_package_limit + (effective_root ? 0 : 1))
                 fail(Code::limit, "Dependency graph package limit exceeded.");
             const auto& selected = read_manifest(locator);
             if (!selected.package())
@@ -256,7 +262,7 @@ class Resolver {
                 node.path = locator;
                 node.version = package.version.text();
                 node.manifest_digest = sha256(selected.source().text());
-                node.tree_digest = tree_digest(locator, selected);
+                node.tree_digest = tree_digest(locator, selected, node.sources);
                 node.first_chain = chain();
                 node.first_span = trace.back().span("path");
                 active.insert(locator);
@@ -272,7 +278,18 @@ class Resolver {
     }
 
 public:
-    explicit Resolver(const fs::path& selected_root) : root(selected_root) {}
+    explicit Resolver(const fs::path& selected_root, const Manifest* manifest = nullptr, bool keep = false)
+        : root(selected_root), effective_root(manifest), retain_sources(keep) {}
+
+    auto take_packages() {
+        std::map<std::string, LockedPackage, std::less<>> result;
+        for (auto& [id, package] : packages) {
+            auto entry = *manifests.at(package.path)->package_entry();
+            result.emplace(id, LockedPackage{std::move(package.path), std::move(entry),
+                std::move(package.edges), std::move(package.sources)});
+        }
+        return result;
+    }
 
     Snapshot capture() {
         const auto& manifest = read_manifest("");
@@ -311,6 +328,39 @@ public:
     }
     bool has_dependencies() { return !read_manifest("").dependencies().empty(); }
 };
+
+void require_lock_shape(std::string_view bytes) {
+    switch (dependency_lock_shape(bytes)) {
+    case LockShape::unsupported: throw std::runtime_error("Unsupported void.lock format or resolver revision.");
+    case LockShape::malformed: throw std::runtime_error("Malformed void.lock. Review and move it aside before resolving.");
+    case LockShape::conflicting: throw std::runtime_error("Conflicting package IDs or paths in void.lock. Review and move it aside before resolving.");
+    case LockShape::valid: break;
+    }
+}
+[[noreturn]] void missing_lock() {
+    throw std::runtime_error("Missing void.lock. Run voidc resolve --project <directory>.");
+}
+[[noreturn]] void stale_lock() {
+    throw std::runtime_error("Stale or tampered void.lock. Review the inputs and run voidc resolve --project <directory> --refresh.");
+}
+}
+
+std::shared_ptr<const LockedDependencies> verify_locked_dependencies(
+    const fs::path& requested, const Manifest& manifest, bool retain_sources) {
+    if (manifest.dependencies().empty()) return {};
+    const auto root = inspect_creation_root(requested);
+    const auto previous = read_dependency_lock(root.path);
+    if (!previous) missing_lock();
+    require_lock_shape(*previous);
+    Resolver resolver(root.path, &manifest, retain_sources);
+    if (resolver.capture().lock != *previous) stale_lock();
+    if (inspect_creation_root(root.path).identity != root.identity || read_dependency_lock(root.path) != previous)
+        throw std::runtime_error("Project root or dependency lock changed during verification; retry.");
+    auto plan = std::shared_ptr<LockedDependencies>(new LockedDependencies);
+    plan->identity_ = sha256(*previous);
+    for (const auto& [alias, dependency] : manifest.dependencies()) plan->direct_.emplace(alias, dependency.id);
+    plan->packages_ = resolver.take_packages();
+    return plan;
 }
 
 ResolveResult resolve_dependencies(const fs::path& requested, ResolveMode mode) {
@@ -319,16 +369,8 @@ ResolveResult resolve_dependencies(const fs::path& requested, ResolveMode mode) 
     const bool dependencies = resolver.has_dependencies();
     const auto previous = read_dependency_lock(root.path);
     if (!previous && !dependencies) return ResolveResult::no_dependencies;
-    if (!previous && mode == ResolveMode::locked)
-        throw std::runtime_error("Missing void.lock. Run voidc resolve --project <directory>.");
-    if (previous) {
-        switch (dependency_lock_shape(*previous)) {
-        case LockShape::unsupported: throw std::runtime_error("Unsupported void.lock format or resolver revision.");
-        case LockShape::malformed: throw std::runtime_error("Malformed void.lock. Review and move it aside before resolving.");
-        case LockShape::conflicting: throw std::runtime_error("Conflicting package IDs or paths in void.lock. Review and move it aside before resolving.");
-        case LockShape::valid: break;
-        }
-    }
+    if (!previous && mode == ResolveMode::locked) missing_lock();
+    if (previous) require_lock_shape(*previous);
     const auto captured = resolver.capture();
     auto recheck = [&] {
         if (inspect_creation_root(root.path).identity != root.identity)
@@ -343,8 +385,7 @@ ResolveResult resolve_dependencies(const fs::path& requested, ResolveMode mode) 
             throw std::runtime_error("Dependency lock changed during verification; retry.");
         return ResolveResult::verified;
     }
-    if (previous && mode != ResolveMode::refresh)
-        throw std::runtime_error("Stale or tampered void.lock. Review the inputs and run voidc resolve --project <directory> --refresh.");
+    if (previous && mode != ResolveMode::refresh) stale_lock();
     if (!publish_dependency_lock(root, previous, captured.lock, recheck)) return ResolveResult::verified;
     return previous ? ResolveResult::refreshed : ResolveResult::created;
 }

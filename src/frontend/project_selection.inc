@@ -25,6 +25,8 @@ struct ProjectCapture {
     const ProjectCapture* original;
     SourceFile anchor;
     std::shared_ptr<const project::Manifest> manifest;
+    std::shared_ptr<const project::LockedDependencies> dependencies;
+    std::set<std::string> package_roots;
     CPrimitiveAdmission::Owner native;
     project::Sources creation_policy;
     std::map<std::string,SourceFile> sources;
@@ -51,7 +53,7 @@ struct ProjectCapture {
         }
         for(const auto& [id,value]:manifest_overlays) {
             (void)value;
-            if(id.empty() || id.front()!='/' || path_utf8(utf8_path(id).filename())!="void.project.toml")
+            if(id.empty() || id.front()!='/' || package_source(id) || path_utf8(utf8_path(id).filename())!="void.project.toml")
                 project_failure(anchor,Code::project_path,"Manifest overlay must name an exact root-relative void.project.toml.");
             for(const auto& component:utf8_path(id).relative_path())if(component=="." || component==".." || !portable_path_component(path_utf8(component)))
                 project_failure(anchor,Code::project_path,"Invalid manifest overlay identity.");
@@ -72,9 +74,17 @@ struct ProjectCapture {
         if(!parsed.succeeded())throw CompilationError(std::move(parsed.diagnostics));
         manifest=std::move(parsed.manifest);
         anchor=manifest->source();from.source=anchor;
-        if (!manifest->dependencies().empty())
-            project_failure(anchor, Code::project_reserved, "Dependency compilation is not supported in this compiler.",
-                "Use voidc resolve --project <directory> to verify the local dependency graph.");
+        if (!manifest->dependencies().empty()) {
+            try {
+                dependencies = project::verify_locked_dependencies(root, *manifest, !original);
+            } catch (const std::runtime_error& failure) {
+                project_failure(anchor, Code::project_changed, failure.what(),
+                    "Verify the package inputs with voidc resolve and refresh the lock explicitly after intentional changes.");
+            }
+            changed(original && (!original->dependencies || dependencies->identity() != original->dependencies->identity()));
+            graph.dependencies = dependencies.get();
+            for (const auto& [id, package] : dependencies->packages()) package_roots.insert("/" + package.locator);
+        }
         if (!manifest->native().empty()) {
 #ifdef _WIN32
             constexpr auto platform = "windows";
@@ -186,6 +196,7 @@ struct ProjectCapture {
         if(!matches.empty())admit_file(path,true);
         bool present=!matches.empty();
         if(auto o=manifest_overlays.find(id+"/void.project.toml");o!=manifest_overlays.end())present=bool(o->second);
+        present = present || package_roots.contains(id);
         if(original)if(auto old=original->boundaries.find(id);old!=original->boundaries.end())changed(present!=old->second);
         boundaries.emplace(id,present);return present;
     }
@@ -270,6 +281,7 @@ std::string project_snapshot_key(const ProjectCapture& capture,const std::string
     auto field=[&](std::string_view s){auto length=std::to_string(s.size())+":";hash.update(llvm::StringRef(length));hash.update(llvm::StringRef(s.data(),s.size()));};
     field("void-project-selection-v1");field(path_utf8(capture.root));field(capture.manifest->source().text());field(entry);field(automatic?"automatic":"explicit");
     if(capture.native)field(capture.native->dynamic()->bytes());
+    if(capture.dependencies){field("locked-dependency-plan-v1");field(capture.dependencies->identity());}
     for(const auto& [id,source]:capture.sources){field(id);field(source.text());}
     for(const auto& [id,present]:capture.boundaries){field(id);field(present?"present":"absent");}
     for(const auto& [id,names]:capture.listings){field(id);for(const auto& name:names)field(name);field("end-directory");}
@@ -286,6 +298,7 @@ std::string project_context_key(const ProjectCapture& capture,const std::string&
     field(entry);field(std::to_string(m.sources().roots.size()));for(const auto& root:m.sources().roots)field(root);
     field(std::to_string(m.sources().exclude.size()));for(const auto& excluded:m.sources().exclude)field(excluded);
     for(const auto& profile:{m.debug(),m.release()}){field(std::to_string(static_cast<int>(profile.optimization)));field(std::to_string(static_cast<int>(profile.debug_info)));}
+    if(capture.dependencies){field("locked-dependency-plan-v1");field(capture.dependencies->identity());}
     return result;
 }
 }
@@ -302,16 +315,16 @@ struct ProjectAnalysisAccess {
             const auto& project = capture.manifest->project();
             const auto& app = *capture.manifest->application();
             auto metadata = ApplicationMetadata::make({project.id, project.name, project.version.text(), app.id, app.name, app.version.text()});
-            result->program_=AnalysisAccess::build(std::move(capture.graph.units),entry,capture.diagnostics.warnings(),result->context_key_,{},std::move(metadata),!capture.native || authorize_native);
+            result->program_=AnalysisAccess::build(std::move(capture.graph.units),entry,capture.diagnostics.warnings(),result->context_key_,{},std::move(metadata),!capture.native || authorize_native,capture.dependencies);
             result->semantic_=result->program_;
         } else {
-            result->semantic_=AnalysisAccess::build(std::move(capture.graph.units),entry,capture.diagnostics.warnings(),result->context_key_,std::move(library_scope));
+            result->semantic_=AnalysisAccess::build(std::move(capture.graph.units),entry,capture.diagnostics.warnings(),result->context_key_,std::move(library_scope),{},true,capture.dependencies);
         }
         return result;
     }
 };
 void require_manifest_identity(const std::string& id) {
-    if(id.empty() || id.front()!='/' || path_utf8(utf8_path(id).filename())!="void.project.toml")throw std::invalid_argument("Expected exact root-relative void.project.toml identity.");
+    if(id.empty() || id.front()!='/' || package_source(id) || path_utf8(utf8_path(id).filename())!="void.project.toml")throw std::invalid_argument("Expected exact root-relative void.project.toml identity.");
     for(const auto& part:utf8_path(id).relative_path())if(part=="." || part==".." || !portable_path_component(path_utf8(part)))throw std::invalid_argument("Invalid manifest overlay identity.");
     if(path_utf8(utf8_path(id).lexically_normal())!=id)throw std::invalid_argument("Manifest overlay identity is not canonical.");
 }
@@ -335,6 +348,10 @@ ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path&
         if(result.project){state->discovery=result.project->discovery_sources();state->execution=result.project->execution_sources();state->snapshot_key=result.project->selection_key();}
         auto bind=[&](SourceSpan& span){
             if(!span.module_identity.empty())return;
+            if(owned && span.source) {
+                auto package_id=owned->graph.package_identity(utf8_path(span.source->path()));
+                if(!package_id.empty()){span.module_identity=std::move(package_id);return;}
+            }
             auto relative=span.source?utf8_path(span.source->path()).lexically_relative(state->root):std::filesystem::path{};
             auto id="/"+path_utf8(relative);
             if(!relative.empty())try{if(id.ends_with("/void.project.toml"))require_manifest_identity(id);else require_module_identity(id);span.module_identity=id;return;}catch(const std::invalid_argument&){}
@@ -395,7 +412,7 @@ ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path&
         // diagnostics; an exception alone is not evidence of a changed snapshot.
         ProjectCapture fresh(root,sources,manifests,&capture);
         fresh.changed(automatic && fresh.inventory()!=seeds);
-        for(const auto& [id,unit]:capture.graph.units)fresh.changed(fresh.recapture_source(id).text()!=unit->source.text());
+        for(const auto& [id,unit]:capture.graph.units)if(!package_source(id))fresh.changed(fresh.recapture_source(id).text()!=unit->source.text());
         fresh.changed(fresh.manifest->source().text()!=capture.manifest->source().text() || fresh.root!=capture.root || fresh.boundaries!=capture.boundaries || fresh.listings!=capture.listings || fresh.sources.size()!=capture.sources.size());
         for(const auto& [id,source]:capture.sources) {
             auto found=fresh.sources.find(id);
@@ -499,7 +516,9 @@ ProjectPreflight discover_project_context(const std::filesystem::path& workspace
                 if(id!="/void.project.toml")
                     project_failure(active_source,Code::project_boundary,"Active manifest is outside the pinned project boundary: '"+id+"'.");
             }
-            else {
+            else if (std::none_of(result.analysis.state->execution.begin(), result.analysis.state->execution.end(),
+                [&](const auto& source) { return package_source(source.first) &&
+                    utf8_path(source.second.path()) == result.root / relative; })) {
                 require_module_identity(id);
                 SourceOverrides overlay{{id,active_source}};
                 ManifestOverrides manifest{{"/void.project.toml",result.analysis.manifest->source()}};

@@ -76,6 +76,7 @@ class ValidatedAnalysis : public std::enable_shared_from_this<ValidatedAnalysis>
     std::string entry_, entry_symbol_, contract_, constants_;
     bool application_=false, executable_=true;
     std::shared_ptr<const CPrimitiveAdmission> c_primitives_;
+    std::shared_ptr<const project::LockedDependencies> locked_dependencies_;
     ApplicationMetadata::Owner application_metadata_;
     std::vector<Diagnostic> warnings_;
     std::vector<AnalyzedModule> modules_;
@@ -94,6 +95,7 @@ public:
     bool application() const { return application_; }
     const ApplicationMetadata::Owner& application_metadata() const { return application_metadata_; }
     const auto& c_primitive_admission() const { return c_primitives_; }
+    const auto& locked_dependencies() const { return locked_dependencies_; }
     bool executable() const { return executable_; } // Libraries expose metadata only.
     const auto& modules() const { return modules_; }
     const auto& declarations() const { return declarations_; }
@@ -155,7 +157,7 @@ public:
     const auto& discovery_sources() const { return discovery_; }
     const auto& execution_sources() const { return execution_; }
     const auto& selection_key() const { return selection_key_; }
-    const auto& context_key() const { return context_key_; } // Excludes source/trivia bytes.
+    const auto& context_key() const { return context_key_; } // Includes locked inputs, excludes root source and manifest trivia.
 };
 struct ProjectAnalysisResult {
     std::shared_ptr<const ProjectAnalysis> project;

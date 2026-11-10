@@ -1,0 +1,19 @@
+name: D2 locked package compilation / macOS ARM64
+on:
+  workflow_dispatch:
+    inputs:
+      reviewed_sha:
+        description: Full commit SHA containing the reviewed D2 sources and this workflow
+        type: string
+        required: true
+permissions:
+  contents: read
+jobs:
+  qualify:
+    uses: ./.github/workflows/ci-macos-package-qualification.yml
+    with:
+      reviewed_sha: ${{ inputs.reviewed_sha }}
+      slice: d2
+      test_names: project_packages
+      # The D2 process test queries the actual language server over stdio.
+      build_targets: voidc voidls void_project_packages_ir

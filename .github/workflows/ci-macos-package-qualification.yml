@@ -1,0 +1,195 @@
+name: Locked packages / macOS ARM64
+on:
+  workflow_call:
+    inputs:
+      reviewed_sha:
+        type: string
+        required: true
+      slice:
+        type: string
+        required: true
+      test_names:
+        type: string
+        required: true
+      build_targets:
+        type: string
+        required: true
+permissions:
+  contents: read
+jobs:
+  qualify:
+    name: macOS ARM64 / ${{ matrix.configuration }}
+    runs-on: macos-15
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+    defaults:
+      run:
+        shell: bash
+    env:
+      PACKAGE_CONFIGURATION: ${{ matrix.configuration }}
+      PACKAGE_REVIEWED_SHA: ${{ inputs.reviewed_sha }}
+      PACKAGE_SLICE: ${{ inputs.slice }}
+      PACKAGE_TESTS: ${{ inputs.test_names }}
+      PACKAGE_TARGETS: ${{ inputs.build_targets }}
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+      MACOSX_DEPLOYMENT_TARGET: '14.0'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Verify reviewed source and native runner, select Apple SDK
+        run: |
+          work="$(cd "$RUNNER_TEMP" && pwd -P)/void-$PACKAGE_SLICE"
+          mkdir -p "$work/logs" "$work/tmp"
+          printf 'PACKAGE_WORK=%s\nTMPDIR=%s/tmp\n' "$work" "$work" >> "$GITHUB_ENV"
+          {
+            printf 'Commit %s / ref %s / %s\n' "$GITHUB_SHA" "$GITHUB_REF" "$PACKAGE_CONFIGURATION"
+            if ! [[ "$PACKAGE_REVIEWED_SHA" =~ ^[0-9a-f]{40}$ &&
+                    "$PACKAGE_REVIEWED_SHA" = "$GITHUB_SHA" &&
+                    "$PACKAGE_REVIEWED_SHA" = "$(git rev-parse HEAD)" ]]; then
+              echo 'The selected ref and checkout must both match the full reviewed commit SHA.'
+              exit 1
+            fi
+            sw_vers
+            uname -a
+            df -h "$GITHUB_WORKSPACE" "$work"
+            sysctl -n hw.memsize
+            test "$GITHUB_EVENT_NAME" = workflow_dispatch
+            test "$RUNNER_ENVIRONMENT" = github-hosted
+            test "$RUNNER_ARCH" = ARM64
+            test "$(uname -m)" = arm64
+            if ! test -d "$DEVELOPER_DIR"; then
+              printf 'Required Xcode 26.3 installation is missing at %s\n' "$DEVELOPER_DIR" >&2
+              exit 1
+            fi
+            xcodebuild -version
+            xcrun --sdk macosx --show-sdk-path
+            xcrun --find ld
+            cmake --version
+            ninja --version
+          } 2>&1 | tee "$work/logs/runner-sdk.log"
+      - name: Bootstrap and verify LLVM Clang LLD 23.1.4
+        run: python -B tools/ci/llvm_sdk.py 2>&1 | tee "$PACKAGE_WORK/logs/llvm-bootstrap.log"
+      - name: Bootstrap pinned HTTP provider libraries
+        run: |
+          df -h "$GITHUB_WORKSPACE" "$TMPDIR"
+          python -B tools/setup_http_deps.py --profile "$PACKAGE_CONFIGURATION" --jobs 2 --macos-install-only \
+            2>&1 | tee "$PACKAGE_WORK/logs/http-bootstrap.log"
+      - name: Bootstrap host providers and verify both dependency closures
+        run: |
+          python -B tools/ci/voidup_bootstrap.py bootstrap --configuration "$PACKAGE_CONFIGURATION" \
+            --evidence "$PACKAGE_WORK/host" 2>&1 | tee "$PACKAGE_WORK/logs/host-bootstrap.log"
+      - name: Configure native compiler and register tests
+        run: |
+          df -h "$GITHUB_WORKSPACE" "$TMPDIR"
+          cmake -S . -B "$PACKAGE_WORK/build" -G Ninja \
+            -DCMAKE_BUILD_TYPE="$PACKAGE_CONFIGURATION" -DBUILD_TESTING=ON \
+            -DVOID_SANITIZERS=OFF -DVOID_LLVM_RESEARCH=OFF \
+            -DCMAKE_C_COMPILER="$CC" -DCMAKE_CXX_COMPILER="$CXX" \
+            -DLLVM_DIR="$LLVM_DIR" -DVOID_CLANG="$VOID_CLANG" -DVOID_LINKER="$VOID_LINKER" \
+            -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_SYSROOT="$SDKROOT" \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET="$MACOSX_DEPLOYMENT_TARGET" \
+            2>&1 | tee "$PACKAGE_WORK/logs/configure.log"
+      - name: Build the required compiler and test binaries
+        run: |
+          read -r -a targets <<< "$PACKAGE_TARGETS"
+          cmake --build "$PACKAGE_WORK/build" --parallel 2 \
+            --target "${targets[@]}" \
+            2>&1 | tee "$PACKAGE_WORK/logs/compiler-build.log"
+      - name: Smoke test native project check, JIT and AOT
+        env:
+          VOID_STDLIB_ROOT: ${{ github.workspace }}/stdlib
+        run: |
+          {
+            work=$(cd "$PACKAGE_WORK" && pwd -P)
+            compiler="$work/build/voidc"
+            "$compiler" --version
+            test "$(xcrun lipo -archs "$compiler")" = arm64
+            "$compiler" new "$work/smoke"
+            cat > "$work/smoke/src/app.void" <<'VOID'
+          use console
+
+          func main() -> i32:
+              print("VOID ARM64 smoke")
+              return 0
+          VOID
+            "$compiler" check --project "$work/smoke"
+            jit_output=$("$compiler" run --project "$work/smoke" --no-cache)
+            test "$jit_output" = 'VOID ARM64 smoke'
+            "$compiler" build --project "$work/smoke" -o "$work/smoke-native"
+            test "$(xcrun lipo -archs "$work/smoke-native")" = arm64
+            aot_output=$("$work/smoke-native")
+            test "$aot_output" = 'VOID ARM64 smoke'
+          } 2>&1 | tee "$PACKAGE_WORK/logs/native-smoke.log"
+      - name: Run the exact package CTest selection
+        run: |
+          selector="^($PACKAGE_TESTS)$"
+          ctest --test-dir "$PACKAGE_WORK/build" -R "$selector" --show-only=json-v1 > "$PACKAGE_WORK/selection.json"
+          python -B - "$PACKAGE_WORK/selection.json" <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          import sys
+
+          expected = sorted(os.environ["PACKAGE_TESTS"].split("|"))
+          tests = json.loads(Path(sys.argv[1]).read_text())["tests"]
+          selected = sorted(test["name"] for test in tests)
+          if selected != expected:
+              raise SystemExit(f"Expected {expected}, selected {selected}")
+          PY
+          ctest --test-dir "$PACKAGE_WORK/build" -R "$selector" --no-tests=error \
+            --verbose --output-on-failure 2>&1 | tee "$PACKAGE_WORK/logs/ctest.log"
+      - name: Collect bounded failure diagnostics
+        if: failure()
+        run: |
+          export PACKAGE_WORK="${PACKAGE_WORK:-$RUNNER_TEMP/void-$PACKAGE_SLICE}"
+          mkdir -p "$PACKAGE_WORK/failure"
+          { df -h "$GITHUB_WORKSPACE" "$PACKAGE_WORK"; sysctl -n hw.memsize; } \
+            > "$PACKAGE_WORK/failure/runner-resources.txt" 2>&1
+          python3 -B - <<'PY'
+          import os
+          from pathlib import Path
+
+          work = Path(os.environ["PACKAGE_WORK"])
+          profile = os.environ["PACKAGE_CONFIGURATION"]
+          logs = list((work / "logs").glob("*.log"))
+          logs += [work / path for path in (
+              "selection.json",
+              "build/Testing/Temporary/LastTest.log",
+              "build/CMakeFiles/CMakeConfigureLog.yaml",
+              "host/build-host-providers.log",
+              "host/verify-dependencies.log",
+          )]
+          roots = (
+              (Path("docs/net/http/evidence"), f"dependencies-macos-aws-lc-5.12.0-arm64-{profile}-*"),
+              (work / "host/provider-builds", f"dependencies-macos-arm64-{profile}-*"),
+          )
+          for parent, pattern in roots:
+              receipts = sorted(parent.glob(pattern))
+              if receipts:
+                  files = [path for path in receipts[-1].iterdir()
+                           if path.suffix in (".log", ".stdout", ".stderr", ".json")
+                           and path.is_file() and path.stat().st_size]
+                  logs.extend(sorted(files, key=lambda path: path.stat().st_mtime_ns)[-4:])
+          for number, path in enumerate(logs):
+              if path.is_file():
+                  with path.open("rb") as stream:
+                      stream.seek(max(0, path.stat().st_size - 32 * 1024))
+                      tail = stream.read()
+                  (work / "failure" / f"{number:02d}-{path.name}").write_bytes(tail)
+          PY
+      - name: Retain failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: macos-${{ inputs.slice }}-${{ matrix.configuration }}-failure-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/void-${{ inputs.slice }}/failure
+          if-no-files-found: warn
+          retention-days: 7
