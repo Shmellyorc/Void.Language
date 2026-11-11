@@ -4,6 +4,14 @@
 #include <iterator>
 #include <span>
 namespace vd {
+struct SemanticToken {
+    enum class Kind { namespace_, type, structure, interface_, enumeration, type_parameter,
+                      parameter, variable, property, enum_member, event, function, method, operator_, count };
+    enum Modifier : unsigned { declaration = 1, definition = 2, readonly = 4, static_ = 8, default_library = 16 };
+    std::size_t begin, end;
+    Kind kind;
+    unsigned modifiers;
+};
 // Owns the successful analysis. Query results are copies with owning source spans.
 class ToolingIndex {
     std::shared_ptr<const ValidatedAnalysis> analysis_;
@@ -68,6 +76,7 @@ public:
     std::optional<AnalyzedDeclaration> definition_at(const std::string& module, std::size_t byte_offset) const;
     std::vector<AnalyzedReference> references_to(const std::string& identity) const;
     std::vector<AnalyzedDeclaration> declarations_in(const std::string& module) const;
+    std::vector<SemanticToken> semantic_tokens(const std::string& module) const;
 };
 // Source contract only; never authorization to publish code or a host ABI verdict.
 enum class SourceCompatibility { unknown, exact_match, restart_required };

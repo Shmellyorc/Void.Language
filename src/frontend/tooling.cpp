@@ -80,6 +80,94 @@ std::vector<AnalyzedDeclaration> ToolingIndex::declarations_in(const std::string
     return result;
 }
 namespace {
+SemanticToken::Kind semantic_kind(const AnalyzedDeclaration& d) {
+    using D=AnalyzedDeclaration::Kind;
+    using K=SemanticToken::Kind;
+    // These editor kinds come from validated enum, accessor and event declarations.
+    switch(d.editor_symbol_kind) {
+    case 7: return K::property;
+    case 10: return K::enumeration;
+    case 22: return K::enum_member;
+    case 24: return K::event;
+    }
+    switch(d.kind) {
+    case D::import_alias: return K::namespace_;
+    case D::value_structure: case D::managed_structure: return d.builtin ? K::type : K::structure;
+    case D::interface_type: return K::interface_;
+    case D::type_parameter: return K::type_parameter;
+    case D::parameter: return K::parameter;
+    case D::value_field: case D::managed_field: return K::property;
+    case D::function: return K::function;
+    case D::receiver_method: case D::interface_requirement: case D::initializer: return K::method;
+    case D::operator_function: return K::operator_;
+    case D::global_variable: case D::module_constant: case D::local_constant: case D::local_variable: return K::variable;
+    }
+    throw std::logic_error("Unknown semantic declaration kind");
+}
+
+bool written_name(std::string_view text) {
+    return !text.empty() && (text.front()<'0' || text.front()>'9') &&
+        text.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")==std::string_view::npos;
+}
+}
+
+std::vector<SemanticToken> ToolingIndex::semantic_tokens(const std::string& module) const {
+    using D=AnalyzedDeclaration::Kind;
+    using K=SemanticToken::Kind;
+    struct Candidate { SemanticToken token; unsigned priority; bool conflict=false; };
+    std::map<std::pair<std::size_t,std::size_t>,Candidate> sites;
+    auto add=[&](const SourceSpan& site,const AnalyzedDeclaration& d,bool declares,std::string_view spelling={}) {
+        if(!site.source || site.begin>=site.end || site.end>site.source->text().size())return;
+        const auto text=std::string_view(site.source->text()).substr(site.begin,site.end-site.begin);
+        if(!declares && spelling!=text)return;
+        const auto kind=semantic_kind(d);
+        if(kind==K::operator_ ? text!=d.operator_glyph : !written_name(text))return;
+        unsigned modifiers=0;
+        if(declares) {
+            modifiers|=SemanticToken::declaration;
+            if(!d.declaration_only && d.kind!=D::interface_requirement && kind!=K::parameter && kind!=K::type_parameter && kind!=K::namespace_)
+                modifiers|=SemanticToken::definition;
+        }
+        if(d.readonly || d.kind==D::module_constant || d.kind==D::local_constant || kind==K::enum_member)
+            modifiers|=SemanticToken::readonly;
+        if(d.static_member || kind==K::enum_member)modifiers|=SemanticToken::static_;
+        if(d.builtin || d.module.starts_with("/@stdlib/"))modifiers|=SemanticToken::default_library;
+        // The written type takes precedence when construction also references its initializer.
+        // Authored declarations precede references and compiler-generated editor bindings.
+        const unsigned priority=declares ? (d.visibility!="local" ? 3 : 2) :
+            (d.kind==D::initializer ? 0 : 1);
+        Candidate candidate{{site.begin,site.end,kind,modifiers},priority};
+        auto [entry,inserted]=sites.try_emplace({site.begin,site.end},candidate);
+        if(inserted)return;
+        auto& current=entry->second;
+        if(priority>current.priority)current=candidate;
+        else if(priority==current.priority) {
+            current.conflict|=kind!=current.token.kind;
+            current.token.modifiers&=modifiers;
+        }
+    };
+    const auto records=declarations();
+    if(auto found=modules_.find(module);found!=modules_.end())
+        for(auto i:found->second)if(!records[i].builtin)add(records[i].source,records[i],true);
+    const auto uses=references();
+    if(auto found=positions_.find(module);found!=positions_.end())for(auto i:found->second) {
+        const auto& use=uses[i];
+        if(use.navigation_only)continue;
+        if(auto binding=declarations_.find(use.to);binding!=declarations_.end()) {
+            auto spelling=std::string_view(use.spelling);
+            if(auto separator=spelling.find("::");separator!=std::string_view::npos)spelling.remove_prefix(separator+2);
+            add(use.source,records[binding->second],false,spelling);
+        }
+    }
+    std::vector<SemanticToken> tokens;
+    for(const auto& [key,candidate]:sites) {
+        (void)key;
+        if(!candidate.conflict && (tokens.empty() || tokens.back().end<=candidate.token.begin))tokens.push_back(candidate.token);
+    }
+    return tokens;
+}
+
+namespace {
 using Keys=std::set<std::string>;
 using Edges=std::map<std::string,Keys>;
 // Iterative finite-graph traversal; every identity is enqueued at most once.

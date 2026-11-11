@@ -431,6 +431,7 @@ struct ConstructionContext {
     std::map<const Expr*,std::set<unsigned>> calls;
 };
 struct GenericParameter { Token token; std::optional<Type> constraint; };
+struct TypeUse { Token token; Type type; std::optional<Token> qualifier; };
 struct Function {
     struct Capture {unsigned outer_slot;Type cell;Token token;bool snapshot=false;};
     bool collection_adapter=false;
@@ -446,7 +447,7 @@ struct Function {
     std::map<unsigned,unsigned> capture_inputs;
     std::vector<GenericParameter> generics;
     std::vector<Token> syntax;
-    std::vector<std::pair<Token,Type>> type_uses;
+    std::vector<TypeUse> type_uses;
     std::map<std::string,Type> substitutions;
     std::map<std::string,std::string> substitution_sources;
     std::string generic_origin, concrete_name, concrete_method_name, display_name;
@@ -574,7 +575,7 @@ struct Structure {
     Token token;
     std::vector<GenericParameter> generics;
     std::vector<Token> syntax;
-    std::vector<std::pair<Token,Type>> type_uses;
+    std::vector<TypeUse> type_uses;
     std::vector<Type> type_arguments;
     Structure* generic_origin=nullptr;
     bool hierarchy_checked=false;
@@ -687,7 +688,7 @@ struct Unit {
     std::list<ResultSyntax> results;
     std::list<ArraySyntax> arrays;
     std::list<GenericApplication> applications;
-    std::vector<std::pair<Token,Type>> type_uses;
+    std::vector<TypeUse> type_uses;
     std::map<std::string,Function*> specialized_functions, display_adapters, json_adapters;
     std::map<std::string,Structure*> specialized_structures;
     std::map<std::string, Structure*> structure_names;
@@ -740,7 +741,7 @@ class Parser {
     bool instantiating=false,multiline_expression=false;
     Function* parsing_function=nullptr;
     struct FunctionScope {Function*& active;Function* saved;FunctionScope(Function*& slot,Function& next):active(slot),saved(slot){active=&next;}~FunctionScope(){active=saved;}};
-    std::vector<std::pair<Token,Type>> type_uses;
+    std::vector<TypeUse> type_uses;
     const Token& peek(std::size_t ahead = 0) const { return tokens[std::min(p + ahead, tokens.size() - 1)]; }
     void synchronize(std::size_t start, bool declaration) {
         // Reconstruct indentation at the failure and its safe boundary.
@@ -881,7 +882,7 @@ class Parser {
             {"u8",Type::u8},{"u16",Type::u16},{"u32",Type::u32},{"u64",Type::u64},
             {"f32",Type::f32},{"f64",Type::f64},{"bool",Type::boolean},{"string",Type::string}};
         auto found = types.find(peek().text);
-        if (found != types.end()) { take(); if (at("?")) error(source,take(),Code::unsupported_type,"Only managed references can be nullable in this phase."); return found->second; }
+        if (found != types.end()) { type_uses.push_back({take(),found->second,{}}); if (at("?")) error(source,take(),Code::unsupported_type,"Only managed references can be nullable in this phase."); return found->second; }
         if (peek().kind != TokenKind::name || reserved.contains(peek().text)) error(source,peek(),Code::unsupported_type,"Unsupported type '" + peek().text + "'.","Use a numeric type, bool, string or a visible value/managed struct.");
         auto token = name();
         std::string spelling = token.text;
@@ -895,7 +896,7 @@ class Parser {
         if(at("<")){applications.push_back({reference_token,spelling,d,type_arguments()});d->name=source.text().substr(token.offset,tokens[p-1].offset+1-token.offset);}
         Type result(d,Type::unresolved); result.nullable = accept("?");
         if(result.nullable && generic_names.contains(spelling))error(source,reference_token,Code::unsupported_type,"Nullable generic parameters are not implemented.");
-        type_uses.emplace_back(reference_token,result);
+        type_uses.push_back({reference_token,result,reference_token.offset==token.offset?std::optional<Token>{}:token});
         return result;
     }
     Type type() {
@@ -1785,7 +1786,9 @@ class Semantics {
     VOID_SEMANTIC_HANDLER Type text_property(Expr& e) {
         if(!current)error(source,e.token,Code::constant_call,"String inspection requires runtime evaluation.");
         e.target="$text."+e.token.text;Function property;property.token=e.token;property.result=Type::i64;property.symbol=e.target;
-        builtin_record(property,e.token.text=="length"?"Unicode scalar count (i64); no grapheme segmentation.":"UTF-8 byte count (i64), including embedded NUL.");unit.builtins.at(property.symbol).kind=AnalyzedDeclaration::Kind::module_constant;e.source_target=e.target;return e.type=Type::i64;
+        builtin_record(property,e.token.text=="length"?"Unicode scalar count (i64); no grapheme segmentation.":"UTF-8 byte count (i64), including embedded NUL.");
+        auto& record=unit.builtins.at(property.symbol);record.kind=AnalyzedDeclaration::Kind::module_constant;
+        record.editor_symbol_kind=7;record.readonly=true;e.source_target=e.target;return e.type=Type::i64;
     }
     VOID_SEMANTIC_HANDLER Type text_type_call(Expr& e) {return core_call(e,Type::string,true);}
     VOID_SEMANTIC_HANDLER std::optional<Type> text_anchor() {return Type::string;}
@@ -1817,7 +1820,9 @@ class Semantics {
         }
         target.symbol=e.target+"::"+ir::capability_key(receiver)+(argument?"::"+ir::capability_key(*argument):"");
         if(argument)target.parameters.push_back({Token{TokenKind::name,name,e.token.offset},*argument});
-        builtin_record(target,documentation);if(argument)unit.builtins.at(target.symbol).documentation.parameters.push_back({name,type_level?"The UTF-8 bytes to validate and copy.":receiver.kind==Type::dictionary?"The key to look up.":"The index to look up; negative indexes count from the end.",{}});e.source_target=target.symbol;
+        builtin_record(target,documentation);
+        auto& record=unit.builtins.at(target.symbol);record.kind=AnalyzedDeclaration::Kind::receiver_method;record.static_member=type_level;
+        if(argument)record.documentation.parameters.push_back({name,type_level?"The UTF-8 bytes to validate and copy.":receiver.kind==Type::dictionary?"The key to look up.":"The index to look up; negative indexes count from the end.",{}});e.source_target=target.symbol;
         if(type_level)e.parts.erase(e.parts.begin());
         const auto result=call_arguments(e,target,type_level?0:1);
         return e.type=result;
@@ -6450,10 +6455,16 @@ struct AnalysisAccess {
             const std::string name(api.name);auto text=std::make_shared<const SourceFile>("<numeric prelude>",name);
             SourceSpan site{text,"$numeric",0,name.size()};
             AnalyzedDeclaration record{api.callable?AnalyzedDeclaration::Kind::function:AnalyzedDeclaration::Kind::module_constant,numeric::symbol(type,api.name),"$numeric","public",site,{},type,{}};
-            record.builtin=true;record.documentation=numeric_documentation(api);
+            record.builtin=true;record.static_member=true;record.documentation=numeric_documentation(api);
             for(auto parameter:api.parameters){record.parameters.push_back(type);record.written_parameters.push_back({std::string(parameter),type,site});}
-            if(!api.callable)record.value=numeric::limit(type,api.name=="max_value");
+            if(!api.callable){record.value=numeric::limit(type,api.name=="max_value");record.editor_symbol_kind=7;record.readonly=true;}
             result->editor_declarations_.push_back(std::move(record));
+        }
+        auto primitive_identity=[](Type type){return "$core::type::"+ir::type_name(type);};
+        for(auto type:{Type::i8,Type::u8,Type::i16,Type::u16,Type::i32,Type::u32,Type::i64,Type::u64,Type::f32,Type::f64,Type::boolean,Type::string}) {
+            auto name=ir::type_name(type);auto text=std::make_shared<const SourceFile>("<core prelude>",name);
+            AnalyzedDeclaration record{AnalyzedDeclaration::Kind::value_structure,primitive_identity(type),"$core","public",{text,"$core",0,name.size()},{},type,{}};
+            record.builtin=true;result->editor_declarations_.push_back(std::move(record));
         }
         for(const auto& [id,u]:units)for(const auto& [symbol,record]:u->builtins)if(std::none_of(result->editor_declarations_.begin(),result->editor_declarations_.end(),[&](const auto& d){return d.identity==symbol;}))result->editor_declarations_.push_back(record);
         result->contract_="18:numeric-prelude-v1:20:text-collections-v1:unicode-case-16-v1:display-v1:console-v2:terminal-v2:application-args-v2:host-primitives-v1:"+result->entry_symbol_;
@@ -6541,7 +6552,7 @@ struct AnalysisAccess {
             if(e.kind==Expr::Kind::method_call && e.token.text=="format" && e.parts.size()==2 && e.parts[1]->type==Type::string)return format_specification_syntax(*e.parts[1]);
             return {};
         };
-        auto reference = [&](const std::string& from, const std::string& to, const Expr& e, const Unit& u, bool implicit = false, bool native_contract = true) {
+        auto reference = [&](const std::string& from, const std::string& to, const Expr& e, const Unit& u, bool implicit = false, bool native_contract = true, bool navigation_only = false) {
             implicit |= from.find("::$json$")!=std::string::npos;
             auto location = span(u.source,e.token); location.module_identity = u.identity;
             auto spelling = e.qualifier + "::" + e.token.text;
@@ -6557,7 +6568,7 @@ struct AnalysisAccess {
             const bool written=visible_references.emplace(origin,target,u.identity,location.begin,location.end,implicit).second;
             std::string exact;field(exact,origin);field(exact,target);field(exact,u.identity);field(exact,std::to_string(location.begin));field(exact,std::to_string(location.end));field(exact,binding);field(exact,implicit?"implicit":"written");
             if(exact_references.insert(exact).second)
-                (native_contract ? result->references_ : result->editor_references_).push_back({origin,target,spelling,std::move(location),implicit || !written,std::move(binding),std::move(presentation)});
+                (native_contract ? result->references_ : result->editor_references_).push_back({origin,target,spelling,std::move(location),implicit || !written,std::move(binding),std::move(presentation),navigation_only});
             if(native_contract) {field(result->contract_,"reference"); field(result->contract_,from); field(result->contract_,to);}
 
         };
@@ -6591,6 +6602,16 @@ struct AnalysisAccess {
             std::set<std::string> aliases;
             for(const auto& import:unit->imports)if(import.explicit_alias && aliases.insert(import.alias.text).second)
                 result->editor_declarations_.push_back({AnalyzedDeclaration::Kind::import_alias,id+"::import::"+import.alias.text,id,"private",location(import.alias),{},Type::none,{},{},id});
+            auto namespace_reference=[&](const std::string& owner,const Token& token,bool implicit=false) {
+                auto binding=unit->qualifiers.find(token.text);
+                if(binding==unit->qualifiers.end() || binding->second.size()!=1)return;
+                Expr use(Expr::Kind::name,token);
+                auto target=aliases.contains(token.text)?id+"::import::"+token.text:binding->second.front()->identity+"::$module";
+                reference(owner,target,use,*unit,implicit,false);
+            };
+            auto primitive_reference=[&](const std::string& owner,const Token& token,Type type) {
+                Expr use(Expr::Kind::name,token);reference(owner,primitive_identity(type),use,*unit,false,false);
+            };
 #include "generic_tooling.inc"
             std::function<void(const Expr&,const std::string&,const std::map<unsigned,std::string>&,bool)> visit_expression;
             auto visit_patterns = [&](const Pattern& pattern,const std::string& owner,const std::map<unsigned,std::string>& locals,bool implicit) {
@@ -6612,16 +6633,15 @@ struct AnalysisAccess {
             };
             auto expression = [&](const Expr& e, const std::string& owner, const std::map<unsigned,std::string>& locals) { visit_expression(e,owner,locals,owner.find("::$display$")!=std::string::npos); };
             visit_expression = [&](const Expr& e, const std::string& owner, const auto& locals, bool implicit) {
+                const bool implicit_site=implicit || e.implicit;
                 if(auto spec=format_specification(e)) {
                     field(result->contract_,"format-specification");field(result->contract_,owner);field(result->contract_,*spec);
                     reference(owner,"$display.specification",e,*unit,true);
                 }
-                if(!e.qualifier.empty() && aliases.contains(e.qualifier)) {
-                    Expr alias(Expr::Kind::name,e.qualifier_token);reference(owner,id+"::import::"+e.qualifier,alias,*unit,implicit,false);
-                }
+                if(!e.qualifier.empty())namespace_reference(owner,e.qualifier_token,implicit_site);
                 if(!e.source_target.empty()) {
-                    reference(owner,e.source_target,e,*unit,implicit,!e.source_target.starts_with("$result::"));if(!e.target.empty())reference(owner,e.target,e,*unit,true);
-                    if(!implicit && e.source_target.starts_with("$display.") && display_hooks.contains(e.target)) {
+                    reference(owner,e.source_target,e,*unit,implicit_site,!e.source_target.starts_with("$result::"));if(!e.target.empty())reference(owner,e.target,e,*unit,true);
+                    if(!implicit_site && e.source_target.starts_with("$display.") && display_hooks.contains(e.target)) {
                         std::set<std::string> names{e.token.text};
                         if(e.token.text=="format") {
                             names={"string","format"};
@@ -6631,15 +6651,16 @@ struct AnalysisAccess {
                             }
                         }
                         const auto& hooks=display_hooks.at(e.target);
-                        for(const auto& name:names)if(auto hook=hooks.find(name);hook!=hooks.end())reference(owner,hook->second,e,*unit,false,false);
+                        for(const auto& name:names)if(auto hook=hooks.find(name);hook!=hooks.end())
+                            reference(owner,hook->second,e,*unit,false,false,/*navigation_only=*/true);
                     }
                 }
                 else if(e.kind==Expr::Kind::conversion && e.op=="interface") {
                     reference(owner,e.type.definition->identity,e,*unit,true);
                     for(const auto& binding:context.member_catalog->interface_bindings) if(binding.key==e.target)
                         for(const auto& [requirement,route]:binding.methods) {reference(owner,requirement,e,*unit,true);reference(owner,route.second,e,*unit,true);}
-                } else if (!e.target.empty() && e.target!="$interpolation" && e.target!="$hole" && !e.target.starts_with("$array.") && !e.target.starts_with("$dict.")) reference(owner,e.target,e,*unit,implicit || e.implicit);
-                else if (e.kind == Expr::Kind::name && locals.contains(e.slot)) reference(owner,locals.at(e.slot),e,*unit,implicit || e.implicit,locals.at(e.slot).find("::const::")!=std::string::npos && locals.at(e.slot).substr(0,locals.at(e.slot).find("::const::"))==owner.substr(0,owner.find("::const::")));
+                } else if (!e.target.empty() && e.target!="$interpolation" && e.target!="$hole" && !e.target.starts_with("$array.") && !e.target.starts_with("$dict.")) reference(owner,e.target,e,*unit,implicit_site);
+                else if (e.kind == Expr::Kind::name && locals.contains(e.slot)) reference(owner,locals.at(e.slot),e,*unit,implicit_site,locals.at(e.slot).find("::const::")!=std::string::npos && locals.at(e.slot).substr(0,locals.at(e.slot).find("::const::"))==owner.substr(0,owner.find("::const::")));
                 if(!e.virtual_slot.empty() && !e.super_call) for(const auto& [id,target_unit]:*graph) for(const auto& target:target_unit->functions)
                     if(target.virtual_slot==e.virtual_slot) reference(owner,target.symbol,e,*unit,true);
                 if (!e.initializer.empty()) reference(owner,e.initializer,e,*unit,implicit);
@@ -6663,7 +6684,8 @@ struct AnalysisAccess {
                 expression(*array.extent,id,{});
                 field(result->contract_,"array-extent");field(result->contract_,ir::type_name(array.resolved));
             }
-            for (const auto& [token,raw] : unit->type_uses) {
+            for (const auto& [token,raw,qualifier] : unit->type_uses) {
+                if(raw.kind!=Type::unresolved){primitive_reference(id,token,raw);continue;}
                 auto t = resolve_type(raw,*unit,context,*graph,token);
                 // Attribute annotation dependencies to their enclosing declaration,
                 // keeping invalidation edges between owned declaration identities.
@@ -6677,6 +6699,7 @@ struct AnalysisAccess {
                     consider(structure.token,structure.definition->identity);
                     for (const auto& member : structure.fields) consider(member.token,structure.definition->identity + "::field::" + member.name);
                 }
+                if(qualifier)namespace_reference(owner,*qualifier);
                 Expr use(Expr::Kind::name,token); reference(owner,t.definition->identity,use,*unit);
             }
             for(const auto& syntax:unit->results) {
@@ -6740,7 +6763,11 @@ struct AnalysisAccess {
                 AnalyzedDeclaration method_record{!f.operator_glyph.empty() ? AnalyzedDeclaration::Kind::operator_function : f.interface_requirement ? AnalyzedDeclaration::Kind::interface_requirement : f.initializer ? AnalyzedDeclaration::Kind::initializer : f.receiver ? AnalyzedDeclaration::Kind::receiver_method : AnalyzedDeclaration::Kind::function,f.symbol,id,f.visibility,location(f.token),parameters,f.result,{}};
                 if (f.receiver) { method_record.owner = f.receiver->type.definition->identity; method_record.receiver = f.receiver->type; method_record.receiver_mutates = f.receiver_mutates; }
                 if(!f.operator_glyph.empty()){method_record.owner=Type::key(f.operator_owner);method_record.operator_glyph=f.operator_glyph;method_record.editor_symbol_kind=25;}
-                if(f.accessor)method_record.editor_symbol_kind=7;
+                if(f.accessor) {
+                    method_record.editor_symbol_kind=7;
+                    method_record.readonly=f.accessor==1 && std::none_of(unit->functions.begin(),unit->functions.end(),[&](const auto& other){return other.accessor==2 && other.token.offset==f.token.offset;});
+                }
+                method_record.declaration_only=!f.native_symbol.empty() || f.c_primitive;
                 method_record.rename_safe=f.operator_glyph.empty() && !f.receiver && !f.anonymous && f.generic_origin.empty() && f.generics.empty() && f.token.text!="entry" && f.token.text!="$application" && !f.global_initializer;
                 if(!f.operator_glyph.empty() || f.receiver || random_numeric_function(f))method_record.signature=editor_signature(f);
                 method_record.initialization_contract=f.initialization_contract;
@@ -6773,10 +6800,13 @@ struct AnalysisAccess {
                 std::map<unsigned,std::string> locals;
                 for(const auto& binding:f.editor_bindings) {
                     if(!f.generic_origin.empty() || f.display_adapter || f.json_adapter || (f.global_initializer && !valid_editor_identifier(binding.token.text)))continue;
-                    if(binding.readonly && std::none_of(f.parameters.begin(),f.parameters.end(),[&](const auto& p){return p.slot==binding.slot;})) continue;
+                    const bool parameter=(f.receiver && f.receiver->slot==binding.slot) ||
+                        std::any_of(f.parameters.begin(),f.parameters.end(),[&](const auto& p){return p.slot==binding.slot;});
+                    if(binding.readonly && !parameter) continue;
                     auto key=source_identity(f.symbol)+"::local::"+std::to_string(binding.slot);
-                    auto kind=std::any_of(f.parameters.begin(),f.parameters.end(),[&](const auto& p){return p.slot==binding.slot;}) ? AnalyzedDeclaration::Kind::parameter : AnalyzedDeclaration::Kind::local_variable;
+                    auto kind=parameter ? AnalyzedDeclaration::Kind::parameter : AnalyzedDeclaration::Kind::local_variable;
                     AnalyzedDeclaration record{kind,key,id,"local",location(binding.token),{},f.locals.at(binding.slot),{},{},source_identity(f.symbol)};
+                    record.readonly=binding.readonly;
                     record.rename_safe=!f.receiver && !f.anonymous && f.lambdas.empty() && f.captures.empty() && valid_editor_identifier(binding.token.text);
                     result->editor_declarations_.push_back(std::move(record));
                     locals.emplace(binding.slot,key);

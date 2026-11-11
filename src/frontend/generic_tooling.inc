@@ -4,7 +4,8 @@ auto parameter_records=[&](const auto& parameters,const std::string& owner) {
     for(const auto& p:parameters)declaration({AnalyzedDeclaration::Kind::type_parameter,owner+"::type::"+p.token.text,id,"private",location(p.token),{},Type::none,{},{},owner},false);
 };
 auto type_references=[&](const auto& uses,const std::map<std::string,std::string>& names,const std::string& owner) {
-    for(const auto& [token,type]:uses)if(type.kind==Type::unresolved) {
+    for(const auto& [token,type,qualifier]:uses) {
+        if(type.kind!=Type::unresolved){primitive_reference(owner,token,type);continue;}
         Expr use(Expr::Kind::name,token);
         if(auto parameter=names.find(type.definition->name);parameter!=names.end()) {
             reference(owner,parameter->second,use,*unit);continue;
@@ -15,7 +16,7 @@ auto type_references=[&](const auto& uses,const std::map<std::string,std::string
         // body merely to publish navigation. Unknown body types remain deferred.
         try {
             auto [target,declaration]=structure_lookup(*unit,context,*graph,spelling,token);(void)target;
-            if(declaration)reference(owner,declaration->definition->identity,use,*unit);
+            if(declaration){if(qualifier)namespace_reference(owner,*qualifier);reference(owner,declaration->definition->identity,use,*unit);}
         }catch(const CompilationError&){}
     }
 };

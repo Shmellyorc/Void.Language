@@ -63,6 +63,8 @@ struct AnalyzedDeclaration {
     bool readonly = false;
     std::string operator_glyph = {};
     std::string signature = {}; // Compiler-owned presentation; excluded from native contracts.
+    bool static_member = false; // Editor metadata for type-level members.
+    bool declaration_only = false; // Native declarations without a VOID body.
 };
 struct AnalyzedReference {
     std::string from, to, spelling;
@@ -70,6 +72,7 @@ struct AnalyzedReference {
     bool implicit = false; // Dependency edge without a written use site.
     std::string binding_contract = {}; // Exact native identities/specification, before editor normalization.
     std::string signature = {}; // Concrete selected callable, before source identity normalization.
+    bool navigation_only = false; // Related target, with no distinct authored token.
 };
 class ValidatedAnalysis : public std::enable_shared_from_this<ValidatedAnalysis> {
     friend struct AnalysisAccess;

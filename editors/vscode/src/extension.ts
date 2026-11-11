@@ -124,6 +124,12 @@ class ServerManager {
             }, provideDocumentSymbols: async (document, token, next) => {
                 const epoch = this.epoch; const result = await next(document, token);
                 return !token.isCancellationRequested && this.client === client && epoch === this.epoch ? result : null;
+            }, provideDocumentSemanticTokens: async (document, token, next) => {
+                const epoch = this.epoch;
+                const version = document.version;
+                const result = await next(document, token);
+                return !token.isCancellationRequested && !document.isClosed && document.version === version &&
+                    this.client === client && epoch === this.epoch ? result : null;
             }, provideWorkspaceSymbols: async (query, token, next) => {
                 const epoch = this.epoch; const result = await next(query, token);
                 return !token.isCancellationRequested && this.client === client && epoch === this.epoch ? result : null;

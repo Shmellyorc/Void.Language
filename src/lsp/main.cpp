@@ -4,6 +4,7 @@
 #include "void/numeric.hpp"
 #include "void/path.hpp"
 #include <bit>
+#include <array>
 #include <llvm/Support/JSON.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/raw_ostream.h>
@@ -33,6 +34,11 @@ bool read_only_source(std::string_view id) {
     return id.starts_with("/@stdlib/") || vd::package_source(id);
 }
 using vd::lsp::Positions;
+constexpr std::array semantic_types{"namespace", "type", "struct", "interface", "enum", "typeParameter",
+    "parameter", "variable", "property", "enumMember", "event", "function", "method", "operator"};
+constexpr std::array semantic_modifiers{"declaration", "definition", "readonly", "static", "defaultLibrary"};
+static_assert(semantic_types.size()==static_cast<std::size_t>(vd::SemanticToken::Kind::count));
+constexpr char semantic_refresh_id[]="void/semanticTokens/refresh";
 constexpr std::size_t max_body=8*1024*1024, max_header=8192;
 struct FramingError : std::runtime_error { using std::runtime_error::runtime_error; };
 // One bounded transport buffer and one analysis thread. Drain ordered mutations
@@ -208,6 +214,14 @@ class Server {
     std::int64_t process_id=0;
     std::set<std::string> cancellations;
     bool related_information=false, diagnostic_versions=false, rename_edits=false, signature_plaintext=false;
+    bool semantic_full=false, semantic_refresh=false, semantic_requested=false;
+    bool semantic_refresh_pending=false, semantic_refresh_needed=false;
+    void refresh_semantics() {
+        if(!semantic_refresh_needed || semantic_refresh_pending || state!=State::ready)return;
+        semantic_refresh_needed=false;
+        semantic_refresh_pending=true;
+        send(j::Object{{"jsonrpc","2.0"},{"id",semantic_refresh_id},{"method","workspace/semanticTokens/refresh"}});
+    }
     std::string identity(const std::string& uri) const {
         auto path=vd::lsp::uri_path(uri);
         if(auto current=session.current_analysis();current) {
@@ -310,6 +324,10 @@ class Server {
         }
         published=std::move(next_published);
         if(manifest_mode)send(j::Object{{"jsonrpc","2.0"},{"method","void/projectState"},{"params",summary()}});
+        if(semantic_refresh && semantic_requested) {
+            semantic_refresh_needed=true;
+            refresh_semantics();
+        }
     }
     j::Object summary() const {
         auto current=session.current_analysis();
@@ -388,6 +406,32 @@ class Server {
     }
     const vd::SourceFile* source_in(const vd::ValidatedAnalysis& program,const std::string& id) const {
         for(const auto& m:program.modules())if(m.identity==id)return &m.source;return nullptr;
+    }
+    j::Object semantic_tokens(const j::Object& params) {
+        auto id=identity(string(object(params.get("textDocument")),"uri"));
+        auto document=open.find(id);
+        j::Object result{{"data",j::Array{}}};
+        if(!semantic_full || document==open.end() || !document->second.source)return result;
+        semantic_requested=true;
+        auto current=session.current_analysis();
+        if(!current || !current->index() || session.requires_reselection())return result;
+        const auto* source=source_in(*current->semantic_analysis(),id);
+        if(!source || source->text()!=document->second.source->text())return result;
+        Positions positions(*source);
+        vd::lsp::Position previous;
+        auto& data=*result.getArray("data");
+        for(const auto& token:current->index()->semantic_tokens(id)) {
+            auto begin=positions.position(token.begin),end=positions.position(token.end);
+            if(!begin || !end || begin->line!=end->line || begin->character>=end->character)continue;
+            auto line=begin->line-previous.line;
+            data.push_back(line);
+            data.push_back(line ? begin->character : begin->character-previous.character);
+            data.push_back(end->character-begin->character);
+            data.push_back(static_cast<unsigned>(token.kind));
+            data.push_back(token.modifiers);
+            previous=*begin;
+        }
+        return result;
     }
     bool disk_current(const vd::ValidatedAnalysis& program) const {
         if(manifest_mode) {
@@ -613,6 +657,11 @@ public:
         }
         if(o->getString("jsonrpc")!="2.0") { error(valid_id ? *id : j::Value(nullptr),-32600,"Invalid JSON-RPC version"); return {}; }
         if(!o->get("method") && (o->get("result") || o->get("error"))) {
+            if(semantic_refresh_pending && o->getString("id")==semantic_refresh_id) {
+                semantic_refresh_pending=false;
+                refresh_semantics();
+                return {};
+            }
             std::cerr<<"Ignoring unsolicited client response\n"; return {};
         }
         if(id && !valid_id) { error(nullptr,-32600,"Invalid LSP request ID"); return {}; }
@@ -643,6 +692,13 @@ public:
                     if(auto help=td->getObject("signatureHelp"))if(auto info=help->getObject("signatureInformation"))if(auto formats=info->getArray("documentationFormat"))
                         for(const auto& format:*formats)if(format.getAsString()=="plaintext")signature_plaintext=true;
                     if(auto symbols=td->getObject("documentSymbol"))hierarchical_symbols=symbols->getBoolean("hierarchicalDocumentSymbolSupport").value_or(false);
+                    if(auto tokens=td->getObject("semanticTokens")) {
+                        auto requests=tokens->getObject("requests");
+                        auto formats=tokens->getArray("formats");
+                        semantic_full=requests && formats &&
+                            (requests->getBoolean("full").value_or(false) || requests->getObject("full")) &&
+                            std::any_of(formats->begin(),formats->end(),[](const auto& f){return f.getAsString()=="relative";});
+                    }
                 }
                 if(auto td=caps.getObject("textDocument")) if(auto pd=td->getObject("publishDiagnostics")) {
                     related_information=pd->getBoolean("relatedInformation").value_or(false);
@@ -650,13 +706,23 @@ public:
                 }
                 if(auto workspace=caps.getObject("workspace"))if(auto edit=workspace->getObject("workspaceEdit"))
                     rename_edits=edit->getBoolean("documentChanges").value_or(false) && (edit->getString("failureHandling")=="textOnlyTransactional" || (params.getObject("initializationOptions") && params.getObject("initializationOptions")->getBoolean("voidVersionedEdits").value_or(false)));
+                if(auto workspace=caps.getObject("workspace"))if(auto tokens=workspace->getObject("semanticTokens"))
+                    semantic_refresh=semantic_full && tokens->getBoolean("refreshSupport").value_or(false);
                 state=State::waiting;
-                send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",j::Object{
-                    {"capabilities",j::Object{{"positionEncoding","utf-16"},{"textDocumentSync",j::Object{{"openClose",true},{"change",1},{"save",j::Object{{"includeText",false}}}}},
+                j::Object capabilities{{"positionEncoding","utf-16"},{"textDocumentSync",j::Object{{"openClose",true},{"change",1},{"save",j::Object{{"includeText",false}}}}},
                         {"definitionProvider",true},{"referencesProvider",true},{"hoverProvider",true},{"completionProvider",j::Object{{"triggerCharacters",j::Array{"."," ","\"","/",":"}}}},
                         {"signatureHelpProvider",j::Object{{"triggerCharacters",j::Array{"(",","}}}},{"documentSymbolProvider",true},{"workspaceSymbolProvider",true},
                         {"documentFormattingProvider",true},{"renameProvider",rename_edits ? j::Value(j::Object{{"prepareProvider",true}}):j::Value(false)},
-                        {"workspace",manifest_mode?j::Value(j::Object{{"fileOperations",j::Object{{"didCreate",j::Object{{"filters",j::Array{j::Object{{"scheme","file"},{"pattern",j::Object{{"glob","**/*"}}}}}}}},{"didRename",j::Object{{"filters",j::Array{j::Object{{"scheme","file"},{"pattern",j::Object{{"glob","**/*"}}}}}}}},{"didDelete",j::Object{{"filters",j::Array{j::Object{{"scheme","file"},{"pattern",j::Object{{"glob","**/*"}}}}}}}}}}}):j::Value(j::Object{})},{"experimental",j::Object{{"voidToolingProtocol",1},{"voidProjectProtocol",1},{"refreshProject",true}}}}},{"serverInfo",j::Object{{"name","VOID"},{"version","0.2.0"}}}}}});
+                        {"workspace",manifest_mode?j::Value(j::Object{{"fileOperations",j::Object{{"didCreate",j::Object{{"filters",j::Array{j::Object{{"scheme","file"},{"pattern",j::Object{{"glob","**/*"}}}}}}}},{"didRename",j::Object{{"filters",j::Array{j::Object{{"scheme","file"},{"pattern",j::Object{{"glob","**/*"}}}}}}}},{"didDelete",j::Object{{"filters",j::Array{j::Object{{"scheme","file"},{"pattern",j::Object{{"glob","**/*"}}}}}}}}}}}):j::Value(j::Object{})},{"experimental",j::Object{{"voidToolingProtocol",1},{"voidProjectProtocol",1},{"refreshProject",true}}}};
+                if(semantic_full) {
+                    j::Array types,modifiers;
+                    for(auto type:semantic_types)types.push_back(type);
+                    for(auto modifier:semantic_modifiers)modifiers.push_back(modifier);
+                    capabilities["semanticTokensProvider"]=j::Object{{"legend",j::Object{{"tokenTypes",std::move(types)},
+                        {"tokenModifiers",std::move(modifiers)}}},{"full",true}};
+                }
+                send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",j::Object{
+                    {"capabilities",std::move(capabilities)},{"serverInfo",j::Object{{"name","VOID"},{"version","0.2.0"}}}}}});
                 return {};
             }
             if(name=="initialized") {
@@ -672,6 +738,11 @@ public:
             if(name=="textDocument/didOpen" || name=="textDocument/didChange" || name=="textDocument/didClose") {
                 if(id) { fail(-32600,"Document synchronization uses notifications"); return {}; }
                 synchronize(name,object(o->get("params"))); return {};
+            }
+            if(name=="textDocument/semanticTokens/full") {
+                if(!id){fail(-32600,"Semantic tokens require a request");return {};}
+                auto result=semantic_tokens(object(o->get("params")));
+                send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",std::move(result)}});return {};
             }
             if(name=="textDocument/definition" || name=="textDocument/references") {
                 if(!id) { fail(-32600,"Navigation requires a request"); return {}; }
