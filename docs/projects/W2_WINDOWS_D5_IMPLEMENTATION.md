@@ -187,7 +187,8 @@ use the W1 private-root helper and require all ten selected tests,
 including `project_git_dependencies`, to have active commands and no CTest
 skip properties. At the initial local handoff, Actionlint 1.7.12 passed,
 the native PowerShell 5.1 parser accepted all eight run blocks, and the
-two embedded Python scripts compiled. Hosted W2 qualification is pending.
+two embedded Python scripts compiled. The initial hosted results and
+the correction are recorded in the [hosted failure repair](#hosted-failure-repair).
 
 The final qualification preparation added the Git acquisition regression
 to the mandatory hosted selection. Actionlint 1.7.12 passed and both
@@ -292,3 +293,163 @@ modified tracked paths, the new manual workflow, this new implementation
 record and the pre-existing untracked research record. The index is empty
 and `git diff --check` passes. The change is ready for Golden Wrench's
 independent source review.
+
+## Hosted failure repair
+
+The initial hosted W2 run #43004582839 at
+`fa8dac51e940c1cd3eaf69cbfadb1d3c80423748` built the compiler and pinned
+dependencies in both Windows Server 2022 x64 profiles. Each passed nine of
+ten CTests. `application_workflow_stage9` failed after 103.13 s in Debug
+and 95.83 s in Release. Both jobs recorded the 300-second CTest timeout,
+successful private-root and ACL controls, and the expected directory
+rename refusal with Windows error 32. At the long-root control,
+`workflow.py:168` waited 90 seconds for `voidc build` and reported
+`subprocess.TimeoutExpired`.
+[Run](https://github.com/Shmellyorc/Void.Language/actions/runs/43004582839) ·
+[Debug job](https://github.com/Shmellyorc/Void.Language/actions/runs/43004582839/job/130468778140) ·
+[Release job](https://github.com/Shmellyorc/Void.Language/actions/runs/43004582839/job/130468778561)
+
+The authenticated GitHub Actions log archive recorded a 56-UTF-16-unit
+project path under `D:\a\_temp\w2\t`. The fixture adds six 36-unit
+components to reach a 272-unit `TMP` and `TEMP`. The preceding local
+qualification used 256-unit and 258-unit paths in Debug and Release.
+W1 at `01c465d444060fae1e2806a21673db5ccacfcc8f` and the hosted W2
+baseline use the same `GetTempPathW` call in `temporary_root()`, and
+the Stage 9 fixture is byte-identical. The accepted W1 workflow selected
+six project-dependency cases and did not exercise this Stage 9 control.
+
+A bounded Win32 probe on the native Windows guest showed that
+`GetTempPathW` returned with a raw 260-unit value and blocked with
+261- and 272-unit values. The process remained live until terminated.
+At 272 units the call blocked with output capacities of 240, 261 and
+32,768. The newer `GetTempPath2W` also blocked in the same probe.
+`GetEnvironmentVariableW(name, nullptr, 0)` returned 273 immediately
+for the 272-unit input. The probe reproduced the problem when an
+oversize `TMP`, `TEMP` or `USERPROFILE` supplied the selected
+value. A short `TMP` took precedence over a long `TEMP`. A defined
+empty `TMP` reported a one-unit buffer requirement and was selected
+by the original API. A short relative value resolved from a deep
+working directory returned promptly from the original API.
+[Win32 temp selection](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-gettemppathw) ·
+[Win32 environment size query](https://learn.microsoft.com/en-us/windows/win32/api/processenv/nf-processenv-getenvironmentvariablew)
+
+The W1 function was also compiled as a standalone native control with
+Clang/LLD 23.1.4, `/MT` and the repository's long-path-aware manifest.
+It returned at 260 units and remained live at 272 until the probe
+terminated it. The corrected function returned status 1 and the
+`too long` diagnostic at 272. An initial control without the manifest
+returned a 10-unit fallback at 272. The long-path-aware manifest was
+needed to reproduce the compiler's behavior.
+
+The correction in `src/native_windows.hpp` checks the first defined
+candidate in the existing Windows precedence order before calling
+`GetTempPathW`. A value above `MAX_PATH` produces the existing
+`Windows temporary root is too long for native linking.` diagnostic.
+The original resolver handles in-range input and the system fallback.
+The 240-unit linker-path budget, exact-path and reparse checks, ACL
+admission, owning handles, rename exclusion and cleanup remain in their
+existing paths. The Stage 9 assertion, 90-second subprocess timeout,
+300-second CTest timeout and ten-test manual hosted workflow retain
+their original settings.
+
+### Native diagnosis and reproduction
+
+The Windows 10 x64 guest (19045.6466) used Clang/LLD 23.1.4, MSVC
+14.44.35207 and Windows SDK 10.0.19041.0. The hosted jobs used Windows SDK
+10.0.26100.0. The guest reused the verified LLVM and Schannel inputs and
+rebuilt the checkout-bound host receipts in the disposable source tree.
+
+The original Debug and Release compilers reproduced the hang with the
+hosted component spellings and 272 UTF-16 units. The replay mapped only
+task-owned directories to `Q:` and `R:`, preserving the drive-letter
+path shape. The private-root helper admitted each long directory. Win32
+volume and file IDs matched the corresponding physical paths. Before
+termination, both compiler processes were still live with an output-side
+`.void-build-*` stage present. Their process snapshots had no child
+processes. The long root stayed empty and the previous executable kept
+its bytes and identity.
+
+On guest volume 3322181814, the baseline Debug and Release long-root
+file IDs were 3659174698206615 and 3659174698209160. The corresponding
+output file IDs were 4222124651627925 and 3659174698209162 before and
+after the bounded reproductions.
+
+An instrumented Debug copy flushed a marker immediately before
+`GetTempPathW` and another after return. The 272-unit replay emitted
+only the first marker. This places the block in the Win32 resolver,
+before the linker-root path inspection and handle acquisition, LLVM
+emission, and Clang or LLD execution.
+
+| Native compiler profile | Original 272-unit command | Corrected 272-unit command |
+| --- | --- | --- |
+| Debug | Live at 5.091 s, terminated by probe | Status 1 with `too long` in 0.471 s |
+| Release | Live at 5.073 s, terminated by probe | Status 1 with `too long` in 0.187 s |
+
+Both corrected profiles also rejected an overlong selected `TMP`,
+`TEMP` or `USERPROFILE` and a 256-unit root that reached the existing
+linker-path budget. A short `TMP` with a long `TEMP` still linked a
+native application that returned 7. All rejected commands preserved the
+prior output bytes and file ID and cleaned their owned output stages.
+The mapped drives and their disposable fixtures were removed after
+the replays.
+
+A disposable launcher initially sent a literal `\n` to the private-root
+helper. Fixing its stdin line ending allowed the CTests to start on the
+already-built corrected binaries.
+
+### Replay the affected control
+
+Configure the two single-configuration Windows builds with the W2 workflow
+settings and build `voidc` and `void_windows_native_staging`. Use the
+private-root helper to set `TMP` and `TEMP` for the test runner as in
+the workflow. A private parent whose path is 15 or 51 UTF-16 units long
+makes the unchanged Stage 9 fixture reach a 272-unit root.
+
+```powershell
+ctest --test-dir $build --no-tests=error --verbose -R '^application_workflow_stage9$'
+ctest --test-dir $build --no-tests=error --output-on-failure -R '^(project_application_package|project_package_native|project_managed_native)$'
+```
+
+For the standalone replay, create the fixture's Unicode, space, hash
+and percent path components under the private root. Build `return 7`
+to the existing `output # % é.exe` destination with a short root.
+Use the helper to create a 272-unit directory, point both `TMP` and
+`TEMP` at it, and repeat the same `voidc build <source> -o <output>`.
+The corrected command must return 1 with `too long`, preserve the
+output bytes and file identity, and leave the long root empty.
+
+### Focused results and review boundary
+
+| Windows 10 x64 profile | Unchanged Stage 9 at 272 units | Adjacent W1/W2 CTests |
+| --- | --- | --- |
+| Debug | 1/1 in 41.67 s, 125 workflow checks | 3/3 in 184.56 s |
+| Release | 1/1 in 21.51 s, 125 workflow checks | 3/3 in 58.11 s |
+
+The Stage 9 logs confirm the same 272-unit root in both profiles.
+The adjacent tests were `project_managed_native`,
+`project_application_package` and `project_package_native`. The
+production edit is Windows-only. The prior Linux evidence remains
+the Linux execution record. The corrected hosted Windows Server
+2022 x64 matrix awaits a manual replay after independent review.
+
+### Repair cleanup and Git status
+
+The guest workspace contained 853,797,891 logical bytes before removal.
+Guest free space rose from 12,679,270,400 to 13,552,365,568 bytes during
+cleanup. The task detached the three owned junctions and verified that
+the retained SDK and provider inputs were still present.
+
+The host log scratch and guest exchange used 2,908,160 and 14,630,912
+allocated bytes respectively. Both were removed. Host free space
+measured 371,366,756,352 bytes immediately before host cleanup and
+371,366,903,808 bytes afterward. The Markdown record retains the findings,
+including the original hosted failure and the bounded reproductions.
+The temporary log download, diagnostic source, binaries, objects, test
+applications and builds were removed.
+
+The repair changes only `src/native_windows.hpp` and this record.
+`main` and local `origin/main` remain at
+`fa8dac51e940c1cd3eaf69cbfadb1d3c80423748`. The index is empty and
+`git diff --check` passes. The Stage 9 fixture and manual W2 workflow
+match the baseline byte for byte. Ready for independent Golden Wrench
+source review.

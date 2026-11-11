@@ -172,7 +172,16 @@ struct PrivateAccess {
             throw std::runtime_error("Native staging DACL grants unexpected access.");
     }
 };
+inline constexpr auto long_temporary_root_error = "Windows temporary root is too long for native linking.";
 inline fs::path temporary_root() {
+    // GetTempPathW can hang when its first defined environment value exceeds
+    // MAX_PATH, even with a larger output buffer. The size query includes NUL.
+    for(const auto* name:{L"TMP",L"TEMP",L"USERPROFILE"}) {
+        const auto size=GetEnvironmentVariableW(name,nullptr,0);
+        if(!size)continue;
+        if(size>MAX_PATH+1)throw std::runtime_error(long_temporary_root_error);
+        break;
+    }
     std::vector<wchar_t> buffer(32768);
     auto size=GetTempPathW(static_cast<DWORD>(buffer.size()),buffer.data());
     if(!size || size>=buffer.size())fail("Cannot locate native temporary root");
@@ -205,7 +214,7 @@ struct Directory {
             auto next=root/leaf;
             // Count the entire UTF-16 linker path, including filename and NUL.
             if(short_path && (next/L"program.exe").native().size()+1>240)
-                throw std::runtime_error("Windows temporary root is too long for native linking.");
+                throw std::runtime_error(long_temporary_root_error);
             if(!CreateDirectoryW(next.c_str(),&access.attributes)) {
                 auto error=GetLastError();
                 if(error==ERROR_ALREADY_EXISTS || error==ERROR_FILE_EXISTS)continue;
