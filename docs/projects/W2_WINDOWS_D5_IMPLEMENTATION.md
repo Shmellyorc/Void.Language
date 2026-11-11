@@ -453,3 +453,130 @@ The repair changes only `src/native_windows.hpp` and this record.
 `git diff --check` passes. The Stage 9 fixture and manual W2 workflow
 match the baseline byte for byte. Ready for independent Golden Wrench
 source review.
+
+## Hosted Debug installed-package isolation repair
+
+The [Debug job](https://github.com/Shmellyorc/Void.Language/actions/runs/43016960498/job/130510331983)
+at `54e21045431143367988d1f7b6f7a401b0b8278d` passed 9/10 CTests.
+`cli_install` failed in 3.82 s after the installed stdlib, native build
+and LSP checks passed. The traceback reached the per-file `CreateFileW`
+reservation from `tests/cli/install.py:77`. Windows refused the
+`GENERIC_READ` open with share mode zero and error 32
+(`ERROR_SHARING_VIOLATION`). That open precedes ACL denial for its root.
+The job output gives neither the filename nor the conflicting handle
+or process. Either the relocated installation or the parked source
+tree could contain the refused file. The run published no diagnostic
+artifacts that identify the holder or show how long it held the file.
+
+The [Release job](https://github.com/Shmellyorc/Void.Language/actions/runs/43016960498/job/130510331544)
+passed 10/10, including `cli_install` in 2.02 s. The Stage 9
+long-temporary-root control passed in both hosted profiles (18.57 s
+Debug and 7.36 s Release).
+
+### Native reproduction and correction
+
+The installed compiler, package, CMake and LSP invocations use
+`subprocess.run`. The LSP receives shutdown and exit in its input
+and the verification waits for the process and consumes its replies.
+The Python resource reads close their streams before isolation.
+The native linker invocation uses LLVM's `ExecuteAndWait`.
+
+The native Windows 10 x64 Debug installation passed the instrumented
+baseline run without contention. At isolation, the installer had zero
+live descendants. The relocated installation contained 127 distinct
+one-link files and the parked source contained two. Each root's files
+were reservable and all 131 helper handles closed.
+
+A sibling Windows process then opened the relocated
+`after move 雪/bin/voidc.exe` for `GENERIC_READ` with share-all before
+the Debug fixture entered isolation. The volume and file identity matched
+the requested installed image. The baseline failed on its first share-zero
+open with error 32 while the installer still had zero live descendants.
+The holder was PID 8480, handle 268, with `st_dev` 11873182573352220854
+and `st_ino` 3377699721501376. This reproduces the hosted error with a
+known independent holder. The original hosted file, holder and
+contention duration remain unknown.
+
+`tools/test_platform.py` starts a one-second monotonic retry window
+for the root on its first file reservation error 32. Each retry waits
+up to 50 ms and uses the original share-zero `CreateFileW` call.
+A successful retry reports the filename and retry count. A terminal
+open error preserves its native status and includes the filename.
+Other errors fail immediately. Each root still requires every file
+reservation before applying its read-denial ACL. The child read probes,
+ACL restoration and fixture relocations are the existing operations.
+
+The corrected Debug installation replay used a fresh installed
+`bin/voidc.exe`. Holder PID 4196 (handle 436, `st_ino`
+3940649674922696 on the same volume) released it after the third
+observed error 32. The next share-zero open succeeded, the child
+confirmed both root listing and sentinel reads were denied, and the
+packaged application ran. Both roots were readable again afterward
+and all 131 acquired isolation handles closed.
+
+For persistent contention, a sibling process held a file in the
+second blocked root while the first root already had a deny ACE.
+All 21 exclusive opens were refused. The helper raised error 32
+with the exact path after 1.007 s from the first refused open.
+All three acquired handles closed and the first root's DACL was
+restored. In both success and failure controls, post-run ACEs and
+the DACL protection state matched and the released files could be
+opened exclusively again. Windows added the auto-inherited
+bookkeeping flag during the existing ACL restore on this guest.
+The same flag change occurred with the baseline helper.
+
+### Focused reproduction
+
+The local runs used Windows 10 x64 (19045.6466), Python 3.14,
+Clang/LLD 23.1.4, MSVC 14.44.35207 and Windows SDK 10.0.19041.0.
+The failing hosted job used Windows Server 2022 x64, Python 3.12.10
+and Windows SDK 10.0.26100.0.
+
+Configure the native Debug and Release builds with the existing W2
+pins and build `voidc`, `voidls` and `void_windows_native_staging`.
+Use the staging helper to create a verified private `TMP`/`TEMP`
+root per profile as in the hosted workflow. Run only the install
+fixture and the two package checks that call the shared helper.
+
+```powershell
+ctest --test-dir $build --no-tests=error --verbose -R '^(cli_install|project_application_package|project_package_native)$'
+```
+
+For a controlled sharing violation, pause the Debug install fixture
+at entry to `windows_isolated_application`. Have a separate process
+hold its relocated `bin/voidc.exe` with Win32 `GENERIC_READ` and share
+mask 7. Resume the fixture after the holder signals it has the handle.
+Release the handle after the third observed error 32 to exercise
+recovery. For the persistent control, use two private roots with one
+file each, hold the file in the second root through failure, and
+check the restored DACL and exclusive file opens after unwinding.
+
+### Native results and review boundary
+
+| CTest | Debug | Release |
+| --- | --- | --- |
+| `cli_install` | PASS, 14.13 s | PASS, 7.04 s |
+| `project_application_package` | PASS, 89.58 s | PASS, 25.50 s |
+| `project_package_native` | PASS, 55.27 s | PASS, 15.45 s |
+
+Both `cli_install` profiles confirmed that the packaged application
+ran after the child verified read denial. The focused CTest runs used
+the existing 240 s, 600 s and 300 s timeouts. The manual workflow
+and its ten-test Debug/Release selection match the baseline. Hosted
+qualification of the isolation retry remains pending independent
+Golden Wrench review.
+
+### Cleanup and Git status
+
+The removed guest workspace contained 1,045,905,060 logical bytes.
+Guest free space measured 13,422,555,136 bytes before removal and
+14,493,659,136 bytes afterward. Cleanup detached the three
+task-owned junctions and verified the retained SDK and provider
+inputs. The host exchange and log scratch, which occupied 29,954,048
+and 20,480 allocated bytes, were also removed. The Markdown record
+retains the evidence.
+
+The worktree changes are this record and `tools/test_platform.py`.
+`main` and local `origin/main` remain at
+`54e21045431143367988d1f7b6f7a401b0b8278d`. The index is empty
+and `git diff --check` passes.

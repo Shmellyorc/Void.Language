@@ -56,7 +56,8 @@ def _windows_deny_fixture_reads(root, sid):
     import ctypes as c
     from ctypes import wintypes as w
 
-    kernel, security = c.windll.kernel32, c.windll.advapi32
+    kernel = c.WinDLL('kernel32', use_last_error=True)
+    security = c.windll.advapi32
     kernel.CreateFileW.argtypes = [w.LPCWSTR, w.DWORD, w.DWORD, w.LPVOID, w.DWORD, w.DWORD, w.HANDLE]
     kernel.CreateFileW.restype = w.HANDLE
     kernel.CloseHandle.argtypes = [w.HANDLE]
@@ -72,8 +73,9 @@ def _windows_deny_fixture_reads(root, sid):
     file_object, dacl_information = 1, 4
     dacl_protected, protect, unprotect = 0x1000, 0x80000000, 0x20000000
     handle = kernel.CreateFileW(str(root), read_control | write_dac, share_all, None, open_existing, directory, None)
-    if handle == c.c_void_p(-1).value:
-        raise c.WinError()
+    invalid_handle = c.c_void_p(-1).value
+    if handle == invalid_handle:
+        raise c.WinError(c.get_last_error())
     descriptor, dacl = w.LPVOID(), w.LPVOID()
     try:
         status = security.GetSecurityInfo(handle, file_object, dacl_information, None, None,
@@ -87,14 +89,33 @@ def _windows_deny_fixture_reads(root, sid):
             # Deny content opens even when the token can bypass directory
             # traversal checks. File reservations avoid inheritable deny ACEs.
             generic_read, open_reparse_point = 0x80000000, 0x00200000
+            sharing_violation = 32
+            retry_until = None
             for path in root.rglob('*'):
                 assert not path.is_symlink() and not path.is_junction(), path
                 if path.is_dir():
                     continue
-                pinned = kernel.CreateFileW(str(path), generic_read, 0, None, open_existing, open_reparse_point, None)
-                if pinned == c.c_void_p(-1).value:
-                    raise c.WinError()
-                files.callback(kernel.CloseHandle, pinned)
+                retries = 0
+                while True:
+                    pinned = kernel.CreateFileW(str(path), generic_read, 0, None, open_existing, open_reparse_point, None)
+                    if pinned != invalid_handle:
+                        files.callback(kernel.CloseHandle, pinned)
+                        break
+                    status = c.get_last_error()
+                    if status == sharing_violation:
+                        now = time.monotonic()
+                        if retry_until is None:
+                            # Share one retry window across all files in this root.
+                            retry_until = now + 1.0
+                        if now < retry_until:
+                            retries += 1
+                            time.sleep(min(0.05, retry_until - now))
+                            continue
+                    error = c.WinError(status)
+                    error.filename = str(path)
+                    raise error
+                if retries:
+                    print(f'Windows fixture reservation recovered after {retries} sharing retries for {path}', flush=True)
             try:
                 subprocess.run(['icacls.exe', root, '/deny', f'*{sid}:(RX)'],
                                check=True, capture_output=True, timeout=30)
