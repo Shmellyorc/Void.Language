@@ -1,0 +1,130 @@
+name: W2 application packaging / Windows x64
+on:
+  workflow_dispatch:
+    inputs:
+      reviewed_sha:
+        description: Full commit SHA containing the reviewed sources and this workflow
+        type: string
+        required: true
+permissions:
+  contents: read
+jobs:
+  qualify:
+    name: Windows x64 / ${{ matrix.configuration }}
+    runs-on: windows-2022
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      W2_CONFIGURATION: ${{ matrix.configuration }}
+      W2_REVIEWED_SHA: ${{ inputs.reviewed_sha }}
+      W2_TESTS: project_application_package|project_package_native|project_managed_native|project_creation|project_creation_process|project_manifest|cli_install|cli_contract|application_workflow_stage9|project_git_dependencies
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          architecture: x64
+      - name: Windows native SDK environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Verify reviewed source and native runner
+        run: |
+          $PSNativeCommandUseErrorActionPreference = $true
+          $head = git rev-parse HEAD
+          if ($env:W2_REVIEWED_SHA -cnotmatch '^[0-9a-f]{40}$' -or
+              $env:W2_REVIEWED_SHA -cne $env:GITHUB_SHA -or $env:W2_REVIEWED_SHA -cne $head) {
+            throw 'The selected ref and checkout must both match the full reviewed commit SHA.'
+          }
+          if ($env:GITHUB_EVENT_NAME -ne 'workflow_dispatch' -or $env:RUNNER_ENVIRONMENT -ne 'github-hosted' -or
+              $env:RUNNER_OS -ne 'Windows' -or $env:RUNNER_ARCH -ne 'X64' -or
+              -not [System.OperatingSystem]::IsWindows() -or
+              [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture -ne 'X64' -or
+              $env:VSCMD_ARG_TGT_ARCH -ne 'x64' -or -not $env:WindowsSDKVersion) {
+            throw 'W2 requires a GitHub-hosted Windows x64 runner with the x64 MSVC and Windows SDK environment.'
+          }
+          $work = Join-Path $env:RUNNER_TEMP 'w2'
+          $temp = (New-Item -ItemType Directory -Force -Path "$work/bootstrap").FullName
+          "W2_WORK=$work", "TEMP=$temp", "TMP=$temp" >> $env:GITHUB_ENV
+          Write-Host "Reviewed commit $head / $env:W2_CONFIGURATION / MSVC $env:VCToolsVersion / SDK $env:WindowsSDKVersion"
+          git --version
+          cmake --version
+          ninja --version
+      - name: Restore existing verified LLVM SDK cache
+        uses: actions/cache/restore@v5
+        with:
+          path: .toolchains/llvm-23.1.4
+          key: llvm-sdk-23.1.4-${{ runner.os }}-${{ runner.arch }}-v1
+      - name: Bootstrap and verify LLVM Clang LLD 23.1.4
+        run: python -B tools/ci/llvm_sdk.py
+      - name: Bootstrap pinned Windows HTTP providers
+        run: python -B tools/setup_http_deps.py --profile "$env:W2_CONFIGURATION" --jobs 2
+      - name: Bootstrap host providers and verify both dependency closures
+        run: python -B tools/ci/voidup_bootstrap.py bootstrap --configuration "$env:W2_CONFIGURATION" --evidence "$env:W2_WORK/host"
+      - name: Configure Windows project tests
+        run: |
+          $git = (Get-Command git.exe -CommandType Application | Select-Object -First 1).Source
+          cmake -S . -B "$env:W2_WORK/b" -G Ninja `
+            "-DCMAKE_BUILD_TYPE=$env:W2_CONFIGURATION" -DBUILD_TESTING=ON `
+            -DVOID_SANITIZERS=OFF -DVOID_LLVM_RESEARCH=OFF `
+            "-DCMAKE_C_COMPILER=$env:CC" "-DCMAKE_CXX_COMPILER=$env:CXX" `
+            "-DLLVM_DIR=$env:LLVM_DIR" "-DVOID_CLANG=$env:VOID_CLANG" "-DVOID_GIT_EXECUTABLE=$git"
+      - name: Build required targets
+        run: cmake --build "$env:W2_WORK/b" --parallel 2 --target voidc voidls void_project_manifest void_project_creation void_windows_native_staging
+      - name: Create and verify private native temporary root
+        run: |
+          @'
+          import os
+          from pathlib import Path
+          import subprocess
+
+          work = Path(os.environ["W2_WORK"])
+          root = work / "t"
+          helper = work / "b" / "void_windows_native_staging.exe"
+          result = subprocess.run([helper, "--create-private-root"],
+                                  input=(str(root) + "\n").encode("utf-8"),
+                                  stdout=subprocess.PIPE, check=True)
+          receipt = result.stdout.decode("ascii")
+          print(receipt, end="")
+          if "private_root_verified=1 owner_access=1 restricted_mutation=0" not in receipt.splitlines():
+              raise SystemExit("Missing private native temporary root verification")
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as environment:
+              environment.write(f"TEMP={root}\nTMP={root}\n")
+          '@ | python -B -
+      - name: Verify and run the exact focused CTest selection
+        run: |
+          @'
+          import json
+          import os
+          from pathlib import Path
+          import subprocess
+
+          names = os.environ["W2_TESTS"]
+          expected = sorted(names.split("|"))
+          if len(expected) != 10 or len(set(expected)) != 10:
+              raise SystemExit("W2 requires exactly ten distinct test names.")
+          build = Path(os.environ["W2_WORK"]) / "b"
+          ctest = ["ctest", "--test-dir", build, "-R", f"^({names})$"]
+          listing = subprocess.check_output([*ctest, "--show-only=json-v1"])
+          tests = json.loads(listing)["tests"]
+          selected = sorted(test["name"] for test in tests)
+          if selected != expected:
+              raise SystemExit(f"Expected {expected}, selected {selected}")
+          for test in tests:
+              command = test.get("command")
+              properties = {prop["name"] for prop in test.get("properties", [])}
+              if not command or not command[0] or properties & {"DISABLED", "SKIP_RETURN_CODE", "SKIP_REGULAR_EXPRESSION"}:
+                  raise SystemExit(f"Missing command or skip condition for {test['name']}")
+          print(f"Exact CTest selection: {', '.join(selected)}", flush=True)
+          subprocess.run([*ctest, "--no-tests=error", "--verbose",
+                          "--test-output-size-failed", "16384", "--test-output-truncation", "tail"], check=True)
+          '@ | python -B -

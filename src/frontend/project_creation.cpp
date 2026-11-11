@@ -62,11 +62,19 @@ std::string toml_string(std::string_view text) {
 bool named(const fs::path& directory, const std::string& leaf, bool require_exact = false) {
     std::size_t seen=0, matches=0;
     bool exact=false;
-    auto expected=fold(leaf);
+#ifdef _WIN32
+    const auto expected=utf8_path(leaf);
+#else
+    const auto expected=fold(leaf);
+#endif
     for (const auto& child : fs::directory_iterator(directory)) {
         if (++seen > entry_limit) throw std::runtime_error("Project creation directory-entry limit exceeded.");
         auto name=path_utf8(child.path().filename());
+#ifdef _WIN32
+        if (native_windows::same_filename(child.path().filename(),expected)) {++matches;exact|=name==leaf;}
+#else
         if (fold(name)==expected) {++matches;exact|=name==leaf;}
+#endif
     }
     if (require_exact && (matches!=1 || !exact))
         throw std::runtime_error("Project creation path has wrong case or a case collision: "+path_utf8(directory/utf8_path(leaf)));
@@ -185,28 +193,10 @@ struct Parent {
     fs::path path;
     std::vector<NativeHandle> pins;
     HANDLE leaf_handle;
-    explicit Parent(fs::path requested, bool exact_spelling=true, const Node* stage=nullptr)
+    explicit Parent(fs::path requested, bool exact_spelling=true,
+                    const native_windows::DirectoryReservation* reservation=nullptr)
         :path(absolute_target(requested)) {
-        const auto relative=stage ? path.lexically_relative(stage->path) : fs::path{};
-        if (!relative.empty() && *relative.begin()!=L"..") {
-            pins=native_windows::pin_directories(stage->path.parent_path());
-            // The owning handle already reserves this component. Reopening it
-            // without delete sharing would conflict with its own DELETE access.
-            if (!owns(*stage))
-                throw std::runtime_error("Project staging directory identity changed.");
-            leaf_handle=stage->handle.value;
-            if (relative!=L".") {
-                auto current=stage->path;
-                for (const auto& part : relative) {
-                    current/=part;
-                    pins.push_back(native_windows::pin_directory(current));
-                }
-                leaf_handle=pins.back().value;
-            }
-        } else {
-            pins=native_windows::pin_directories(path);
-            leaf_handle=pins.back().value;
-        }
+        pins=native_windows::pin_directories(path,reservation,&leaf_handle);
         if(exact_spelling) {
             auto current=path.root_path();
             for (const auto& part:path.relative_path()) {named(current,path_utf8(part),true);current/=part;}
@@ -547,14 +537,33 @@ void publish_git_snapshot(const CreationRoot& root, const std::string& key,
 }
 
 namespace {
+#ifdef _WIN32
+ProjectDirectoryReader staged_reader(const native_windows::DirectoryReservation& reservation) {
+    return {
+        [&](const fs::path& path) {
+            Parent admitted(path,true,&reservation);
+            return CreationRoot{admitted.path,admitted.identity_key()};
+        },
+        [&](const fs::path& path, std::size_t limit) {
+            return read_project_input(path,limit,Parent(path.parent_path(),false,&reservation));
+        },
+        &reservation,
+    };
+}
+#endif
 template<class Work>
-void with_project_stage(const CreationRoot& directory, Work work) {
+void with_project_stage(const CreationRoot& directory, const ProjectDirectoryReader& parent_reader, Work work,
+                        std::string_view private_child={}) {
     const auto& store = directory.path;
+#ifdef _WIN32
+    Parent destination(store,true,parent_reader.reservation);
+#else
     Parent destination(store);
+#endif
     if (destination.identity_key() != directory.identity)
         throw std::runtime_error("Staged directory parent changed before publication.");
-    const auto temporary = "acquire-" + random_hex();
-    const auto stage = store / temporary;
+    const auto temporary = private_child.empty() ? "acquire-" + random_hex() : std::string(private_child);
+    const auto stage = store / utf8_path(temporary);
 #ifdef _WIN32
     auto staged = make_directory(stage, true);
 #else
@@ -562,7 +571,7 @@ void with_project_stage(const CreationRoot& directory, Work work) {
 #endif
     bool keep = false;
     auto cleanup = [&] {
-        if (!owns(staged) || inspect_creation_root(store).identity != destination.identity_key())
+        if (!owns(staged) || parent_reader.inspect(store).identity != destination.identity_key())
             throw std::runtime_error("Staged directory ownership changed; retained " + path_utf8(stage) + ".");
 #ifdef _WIN32
         CloseHandle(std::exchange(staged.handle.value, INVALID_HANDLE_VALUE));
@@ -582,13 +591,24 @@ void with_project_stage(const CreationRoot& directory, Work work) {
 void publish_project_directory(const CreationRoot& directory, const std::string& leaf,
                                const std::map<std::string, std::string_view>& files,
                                const VerifyProjectDirectory& verify,
-                               const std::function<void()>& recheck) {
-    with_project_stage(directory, [&](const Parent& destination, Node& staged, const fs::path& stage, bool& keep) {
+                               const std::function<void()>& recheck,
+                               const ProjectDirectoryReader& parent_reader) {
+    std::string_view private_child;
+#ifdef _WIN32
+    // NTFS also reserves the target parent during a rename. For a payload
+    // inside our unpublished package, create its final child exclusively in
+    // that stage. The outer rename publishes the executable and payload together.
+    if (parent_reader.reservation) private_child = leaf;
+#endif
+    with_project_stage(directory, parent_reader, [&](const Parent& destination, Node& staged, const fs::path& stage, bool& keep) {
+#ifdef _WIN32
+        const native_windows::DirectoryReservation reservation{stage,staged.handle.value,parent_reader.reservation};
+#endif
         for (const auto& [relative, bytes] : files) {
             const bool directory_entry = relative.ends_with('/');
             const auto path = stage / utf8_path(directory_entry ? relative.substr(0, relative.size() - 1) : relative);
 #ifdef _WIN32
-            Parent directory(path.parent_path(),true,&staged);
+            Parent directory(path.parent_path(),true,&reservation);
 #else
             Parent directory(path.parent_path());
 #endif
@@ -608,47 +628,71 @@ void publish_project_directory(const CreationRoot& directory, const std::string&
             write_file(file, bytes);
         }
 #ifdef _WIN32
-        const ProjectDirectoryReader reader{
-            [&](const fs::path& path) {
-                Parent admitted(path,true,&staged);
-                return CreationRoot{admitted.path,admitted.identity_key()};
-            },
-            [&](const fs::path& path, std::size_t limit) {
-                return read_project_input(path,limit,Parent(path.parent_path(),false,&staged));
-            },
-        };
-        verify(stage,reader);
+        verify(stage,staged_reader(reservation));
 #else
         verify(stage,{});
 #endif
         if (recheck) recheck();
-        if (inspect_creation_root(directory.path).identity != destination.identity_key() || !owns(staged))
+        if (parent_reader.inspect(directory.path).identity != destination.identity_key() || !owns(staged))
             throw std::runtime_error("Staged directory parent changed before publication.");
         try {
 #ifdef _WIN32
-            publish_file(staged, directory.path / leaf);
+            if (private_child.empty()) publish_file(staged, directory.path / utf8_path(leaf));
 #else
             rename_exclusive(staged, destination.handle.fd, leaf);
 #endif
             keep = true;
         } catch (const CreationCollision&) {
-            verify(directory.path / leaf,{});
+            verify(directory.path / leaf,parent_reader);
         }
-    });
+    }, private_child);
 }
 
 void publish_application_directory(const CreationRoot& directory, const std::string& leaf,
-                                   const std::function<void(const fs::path&)>& prepare,
+                                   const VerifyProjectDirectory& prepare,
                                    const std::function<void(const fs::path&)>& verify_replacement) {
-#if defined(__linux__)
+#ifdef _WIN32
+    const auto output = directory.path / utf8_path(leaf);
+    auto require_absent = [&] {
+        // The exact directory-entry comparison catches case siblings, and the
+        // physical lookup also catches existing alternate (8.3) spellings.
+        const auto attributes = GetFileAttributesW(output.c_str());
+        const auto error = GetLastError();
+        if (attributes != INVALID_FILE_ATTRIBUTES || named(directory.path, leaf)) {
+            if (verify_replacement)
+                throw CreationCollision("Windows application packaging cannot replace an existing destination: " + path_utf8(output));
+            throw CreationCollision("Application package destination already exists: " + path_utf8(output));
+        }
+        if (error != ERROR_FILE_NOT_FOUND && error != ERROR_PATH_NOT_FOUND)
+            native_windows::fail("Cannot inspect application package destination", error);
+    };
+    Parent destination(directory.path);
+    if (destination.identity_key() != directory.identity)
+        throw std::runtime_error("Application package destination parent changed.");
+    require_absent();
+    with_project_stage(directory, {}, [&](const Parent&, Node& staged, const fs::path& stage, bool& keep) {
+        const native_windows::DirectoryReservation reservation{stage,staged.handle.value,nullptr};
+        prepare(stage,staged_reader(reservation));
+        if (inspect_creation_root(directory.path).identity != directory.identity || !owns(staged))
+            throw std::runtime_error("Application package staging or destination parent changed.");
+        require_absent();
+        try {
+            publish_file(staged,output);
+        } catch (const std::runtime_error&) {
+            require_absent();
+            throw;
+        }
+        keep = true;
+    });
+#elif defined(__linux__)
     const auto output = directory.path / utf8_path(leaf);
     auto collision = [&] {
         return CreationCollision("Application package destination already exists: " + path_utf8(output));
     };
     if (!verify_replacement && named(directory.path, leaf)) throw collision();
-    with_project_stage(directory, [&](const Parent& destination, Node& staged, const fs::path& stage, bool& keep) {
+    with_project_stage(directory, {}, [&](const Parent& destination, Node& staged, const fs::path& stage, bool& keep) {
         auto package = make_directory(staged.handle.fd, "package");
-        prepare(stage / package.name);
+        prepare(stage / package.name,{});
         // Serialize checks and exchange with other package publishers in this parent.
         if (flock(destination.handle.fd, LOCK_EX | LOCK_NB)) system_failure("Cannot lock package destination parent");
         auto recheck = [&] {

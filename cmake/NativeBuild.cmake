@@ -112,11 +112,19 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/native-install-$<CONFIG>.txt" DESTINA
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/native-resources-install-$<CONFIG>.txt"
   DESTINATION bin RENAME void-native-resources.txt COMPONENT compiler)
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR (WIN32 AND MSVC AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(AMD64|amd64|x86_64)$"))
   # Use the existing compiler install's notice files, with independent hashes
   # and distinct distribution names for files with the same upstream basename.
   set(package_notices_build "VOID package notices 1\n")
   set(package_notices_install "VOID package notices 1\n")
+  set(package_notice_identities "")
+  if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    set(package_tls_notices
+      "AWS-LC-LICENSE.txt|third_party/http-licenses/aws-lc-5.12.0/LICENSE|http/aws-lc-5.12.0/LICENSE"
+      "AWS-LC-NOTICE.txt|third_party/http-licenses/aws-lc-5.12.0/NOTICE|http/aws-lc-5.12.0/NOTICE")
+  else()
+    set(package_tls_notices "")
+  endif()
   foreach(notice IN ITEMS
       "VOID-MIT-LICENSE.txt|LICENSE|VOID-MIT-LICENSE.txt"
       "Ryu-Boost.txt|third_party/ryu/LICENSE-Boost|LICENSE-Boost"
@@ -132,8 +140,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
       "curl-COPYING.txt|third_party/curl/COPYING|http/COPYING"
       "curl-NOTICE.txt|third_party/curl/NOTICE|http/NOTICE"
       "curl-PROVENANCE.json|third_party/curl/VOID-PROVENANCE.json|http/VOID-PROVENANCE.json"
-      "AWS-LC-LICENSE.txt|third_party/http-licenses/aws-lc-5.12.0/LICENSE|http/aws-lc-5.12.0/LICENSE"
-      "AWS-LC-NOTICE.txt|third_party/http-licenses/aws-lc-5.12.0/NOTICE|http/aws-lc-5.12.0/NOTICE"
+      ${package_tls_notices}
       "c-ares-LICENSE.md|third_party/http-licenses/c-ares-1.34.9/LICENSE.md|http/c-ares-1.34.9/LICENSE.md"
       "nghttp2-COPYING.txt|third_party/http-licenses/nghttp2-1.70.0/COPYING|http/nghttp2-1.70.0/COPYING"
       "zlib-LICENSE.txt|third_party/http-licenses/zlib-1.3.2/LICENSE|http/zlib-1.3.2/LICENSE"
@@ -149,7 +156,13 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     file(SHA256 "${source}" digest)
     string(APPEND package_notices_build "${digest}\t${name}\t${source}\n")
     string(APPEND package_notices_install "${digest}\t${name}\t../share/void/licenses/${installed}\n")
+    string(APPEND package_notice_identities "    {\"${name}\", \"${digest}\"},\n")
   endforeach()
+  if(WIN32)
+    file(CONFIGURE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/void-package-notices.inc"
+      CONTENT "${package_notice_identities}" NEWLINE_STYLE LF)
+    target_include_directories(voidc_objects PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+  endif()
   file(GENERATE OUTPUT "$<TARGET_FILE_DIR:voidc>/void-package-notices.txt" CONTENT "${package_notices_build}")
   file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/package-notices-install.txt" CONTENT "${package_notices_install}")
   install(FILES "${CMAKE_CURRENT_BINARY_DIR}/package-notices-install.txt" DESTINATION bin

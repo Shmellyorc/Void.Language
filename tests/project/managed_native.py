@@ -9,6 +9,9 @@ import tempfile
 import tomllib
 from unittest.mock import patch
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'tools'))
+from test_platform import relocate, windows_isolated_application, windows_package_imports
+
 compiler, clang = (Path(arg).resolve() for arg in sys.argv[1:3])
 sanitized = sys.argv[3] == "ON"
 server = Path(sys.argv[4]).resolve() if len(sys.argv) > 4 and sys.argv[4] else None
@@ -126,6 +129,7 @@ with tempfile.TemporaryDirectory(prefix="VOID D4 雪 ") as temporary:
     cwd = base / "working directory"
     cwd.mkdir()
     marker, released = cwd / "native-init.log", cwd / "native-release.log"
+    modules = cwd / "native-modules.log"
     project = base / "application"
     run(compiler, "new", project, "--source", "src/main.void")
     manifest = project / "void.project.toml"
@@ -174,6 +178,8 @@ with tempfile.TemporaryDirectory(prefix="VOID D4 雪 ") as temporary:
         if windows:
             args += ["--target=x86_64-pc-windows-msvc", "-fms-runtime-lib=static", "-D_CRT_SECURE_NO_WARNINGS",
                      "-Wl,/implib:" + str(c_sources / (output.stem + ".lib"))]
+            if packaging and output == dependency:
+                args += ["-DVOID_D5_WINDOWS_MODULE_PROBE"]
             imports = tuple(c_sources / (item.stem + ".lib") for item in imports)
         else:
             args += ["-fPIC", "-fvisibility=hidden", "-Wl,-rpath,$ORIGIN", "-Wl,-soname," + output.name]
@@ -323,7 +329,13 @@ with tempfile.TemporaryDirectory(prefix="VOID D4 雪 ") as temporary:
         image = package / ("app.exe" if windows else "app")
         if packaging:
             cli("package", "--allow-native", "--profile", profile, "-o", package)
-            cli("package", "--allow-native", "--profile", profile, "-o", package, "--replace")
+            if windows:
+                cli("package", "--allow-native", "--profile", profile, "-o", package, "--replace", status=1,
+                    message="Windows application packaging cannot replace an existing destination")
+                for binary in (image, *sorted((package / "native").glob("*.dll"))):
+                    windows_package_imports(clang.with_name("llvm-readobj.exe"), binary)
+            else:
+                cli("package", "--allow-native", "--profile", profile, "-o", package, "--replace")
             run(compiler, "package", "--verify", package)
         else:
             cli("build", "--allow-native", "--profile", profile, "-o", image)
@@ -337,12 +349,32 @@ with tempfile.TemporaryDirectory(prefix="VOID D4 雪 ") as temporary:
             p.name: digest(p) for p in [*images, notice]
         }
         moved = base / ("relocated 雪 " + profile)
-        package.rename(moved)
-        project.rename(base / "parked source")
-        catalog.rename(base / "parked catalog")
+        relocate(package, moved)
+        parked_project, parked_catalog = base / "parked source", base / "parked catalog"
+        relocate(project, parked_project)
+        relocate(catalog, parked_catalog)
         try:
             image = moved / image.name
-            executed(image, "payload")
+            if windows and packaging:
+                modules.unlink(missing_ok=True)
+                decoys = base / "DLL search decoys"
+                decoys.mkdir(exist_ok=True)
+                for dll in images:
+                    for directory in (cwd, decoys):
+                        (directory / dll.name).write_bytes(b"unexpected DLL search location")
+                result = windows_isolated_application(image, ["payload"],
+                    blocked=[(parked_project, "src/main.void"), (parked_catalog, dependency.relative_to(catalog))],
+                    cwd=cwd, env=environment | {"PATH": str(decoys) + os.pathsep + environment["PATH"]}, timeout=90)
+                assert result.returncode == 0 and b"VOID native application payload" in result.stdout, result
+                assert marker.read_text().splitlines() == ["dependency initialized"]
+                assert released.read_text().splitlines() == ["-2", "23"]
+                loaded = [Path(path).resolve(strict=True) for path in modules.read_bytes().decode("utf-16-le").splitlines()]
+                assert loaded == [(moved / "native" / dll.name).resolve(strict=True) for dll in images], loaded
+                print(f"{profile} loaded all three selected DLLs from relocated native/")
+                for dll in images:
+                    (cwd / dll.name).unlink()
+            else:
+                executed(image, "payload")
             reset_markers()
             staged_dependency = moved / "native" / dependency.name
             staged_dependency.write_bytes(corrupted)
@@ -356,8 +388,8 @@ with tempfile.TemporaryDirectory(prefix="VOID D4 雪 ") as temporary:
                 run(compiler, "package", "--verify", moved, status=1, message="inventory mismatch")
             no_initializers()
         finally:
-            (base / "parked source").rename(project)
-            (base / "parked catalog").rename(catalog)
+            relocate(parked_project, project)
+            relocate(parked_catalog, catalog)
 
     helper = project / "helper"
     helper.mkdir()

@@ -9,13 +9,13 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))
 from verify_install import HELLO, verify
-from test_platform import relocate
+from test_platform import relocate, windows_isolated_application
 
 cmake, build, configuration = sys.argv[1:]
 environment = os.environ.copy()
 environment.pop('VOID_STDLIB_ROOT', None)
-package_host = (sys.platform.startswith('linux') and platform.machine().lower() in ('x86_64', 'amd64')
-                and platform.libc_ver()[0] == 'glibc')
+package_host = os.name == 'nt' or (platform.machine().lower() in ('x86_64', 'amd64')
+                                   and sys.platform.startswith('linux') and platform.libc_ver()[0] == 'glibc')
 
 
 def run(argv, status=0, *, cwd=None):
@@ -51,10 +51,36 @@ with tempfile.TemporaryDirectory(prefix='VOID CLI installation é ') as director
         distribution = root / 'installed package 雪'
         run([compiler, 'package', '--project', generated, '-o', distribution], cwd=root)
         run([compiler, 'package', '--verify', distribution], cwd=root)
-    generated.rename(root / 'hidden application sources')
+        if os.name == 'nt':
+            notice = prefix / 'share/void/licenses/VOID-MIT-LICENSE.txt'
+            installed_bytes = notice.read_bytes()
+            assert (distribution / 'licenses' / notice.name).read_bytes() == installed_bytes
+            refused = root / 'refused package'
+            backup = notice.with_suffix('.hidden')
+            relocate(notice, backup)
+            failure = run([compiler, 'package', '--project', generated, '-o', refused], 1, cwd=root)
+            assert b'project input' in failure.stderr
+            relocate(backup, notice)
+            notice.write_bytes(installed_bytes + b'alteration')
+            failure = run([compiler, 'package', '--project', generated, '-o', refused], 1, cwd=root)
+            assert b'notice checksum mismatch' in failure.stderr
+            notice.write_bytes(installed_bytes)
+            assert not refused.exists() and not list(root.glob('acquire-*'))
+    parked = root / 'hidden application sources'
+    relocate(generated, parked)
     run([generated_output], cwd=root)
     if package_host:
-        run([distribution / 'app'], cwd=root)
+        image = distribution / ('app' + suffix)
+        if os.name == 'nt':
+            unrelated = root / 'unrelated working directory'
+            unrelated.mkdir()
+            isolated = windows_isolated_application(image, [],
+                blocked=[(prefix, 'bin/voidc.exe'), (parked, 'nested/launcher.void')],
+                cwd=unrelated, env=environment, timeout=90)
+            assert isolated.returncode == 0, (isolated.stdout, isolated.stderr)
+            print('Windows package ran while reads of its compiler installation and source were denied')
+        else:
+            run([image], cwd=root)
     source = project / 'main.void'
     source.write_text(HELLO, encoding='utf-8')
     output = project / ('hello' + suffix)

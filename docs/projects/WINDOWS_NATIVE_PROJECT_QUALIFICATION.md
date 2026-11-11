@@ -28,15 +28,15 @@ unchanged fixture and does not change privilege or OS policy.
 currently register only on Linux. The Windows managed fixture already
 covers selection and resource cleanup. W1 leaves managed retained callbacks,
 managed editor navigation and graphical raylib outside its Windows
-qualification. D5 `package` is implemented for Linux x86-64 GNU. Windows
-packaging remains **UNQUALIFIED**. [D4](DEPENDENCY_D4_CLOSEOUT.md) · [D5](DEPENDENCY_D5_CLOSEOUT.md)
+qualification. The W2 implementation record tracks Windows D5 packaging.
+[D4](DEPENDENCY_D4_CLOSEOUT.md) · [W2](W2_WINDOWS_D5_IMPLEMENTATION.md)
 
 ## Workflow
 
 [W1 workflow](../../.github/workflows/ci-windows-dependencies.yml) runs
 only on `workflow_dispatch`, using GitHub-hosted `windows-2022` x64 with
-separate Debug and Release jobs. At the later authorized dispatch, the
-selected ref, checked-out HEAD and required 40-character `reviewed_sha`
+separate Debug and Release jobs. At dispatch, the selected ref, checked-out
+HEAD and required 40-character `reviewed_sha`
 must identify the same commit. The job verifies the Windows x64 runner
 and x64 MSVC SDK environment before bootstrap. [GitHub runner labels](https://github.com/actions/runner-images#available-images)
 
@@ -233,8 +233,7 @@ existing winner in place.
 
 The six maintained tests exercised concurrent Git acquisition, immutable
 snapshots and locks, offline compilation, and the HTTPS assertions including
-zero unsolicited requests to the second TLS origin. Hosted Windows Server
-2022 Debug and Release qualification on the reviewed repair remains pending.
+zero unsolicited requests to the second TLS origin.
 
 To replay on a native Windows x64 host, configure both profiles with the
 [W1 configure and build targets](../../.github/workflows/ci-windows-dependencies.yml),
@@ -244,6 +243,19 @@ build directories. Its local wrappers select those build directories explicitly.
 The publication control adds `w1_publication_probe.cpp` to a disposable source
 copy as a target linked against `void_core`. Run it once per profile with an
 empty, owned probe directory under the verified workspace.
+
+## Accepted hosted qualification
+
+GitHub Actions run #42986407961 passed on Windows Server 2022 x64 at
+`01c465d444060fae1e2806a21673db5ccacfcc8f`.
+[Accepted W1 run](https://github.com/Shmellyorc/Void.Language/actions/runs/42986407961)
+
+| Profile | Focused CTests | Native discovery, check, JIT and AOT smoke | Private-root verification |
+| --- | --- | --- | --- |
+| Debug | 6/6 | Passed | Passed |
+| Release | 6/6 | Passed | Passed |
+
+[Debug job](https://github.com/Shmellyorc/Void.Language/actions/runs/42986407961/job/130408526896) · [Release job](https://github.com/Shmellyorc/Void.Language/actions/runs/42986407961/job/130408526334)
 
 ## Evidence and cleanup
 
@@ -270,6 +282,5 @@ space increased by 12,156,928 bytes during the removal. The external archive
 index records the ZIP checksum and restoration check. Maintained source,
 tests, fixtures and pinned dependencies were retained.
 
-Git is on `main` at the repair baseline with an empty index. The original
-hosted failure remains recorded and the repair is ready for independent
-Golden Wrench review.
+The local repair handoff recorded an empty Git index on `main` at the repair
+baseline. The original hosted failure and local repair evidence remain above.

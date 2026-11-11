@@ -38,6 +38,11 @@ inline BY_HANDLE_FILE_INFORMATION information(HANDLE h) {
         throw std::runtime_error("Native temporary path contains a reparse point.");
     return info;
 }
+inline bool same_filename(const fs::path& left,const fs::path& right) {
+    const auto result=CompareStringOrdinal(left.c_str(),-1,right.c_str(),-1,TRUE);
+    if(!result)fail("Cannot compare Windows filenames");
+    return result==CSTR_EQUAL;
+}
 // Pin a directory with directory read access and no delete sharing.
 // Metadata-only opens do not establish the read/write/delete sharing reservation.
 // OPEN_REPARSE_POINT inspects the component itself, never its redirect target.
@@ -50,12 +55,47 @@ inline Handle pin_directory(const fs::path& path) {
         throw std::runtime_error("Native temporary ancestor is not a directory.");
     return h;
 }
-inline std::vector<Handle> pin_directories(const fs::path& path) {
+// A private stage's owner already holds DELETE without delete sharing. Borrow
+// that reservation only below its admitted path, and only while it is alive.
+struct DirectoryReservation {
+    const fs::path& path;
+    HANDLE handle;
+    const DirectoryReservation* parent;
+};
+inline std::vector<Handle> pin_directories(const fs::path& path,
+        const DirectoryReservation* reservation=nullptr,HANDLE* leaf=nullptr) {
     if(!path.is_absolute() || path!=path.lexically_normal())
         throw std::runtime_error("Native temporary root must be absolute and normalized.");
+    if(reservation) {
+        const auto relative=path.lexically_relative(reservation->path);
+        if(relative.empty() || *relative.begin()==L"..")
+            throw std::runtime_error("Path is outside the reserved project stage.");
+    }
     std::vector<Handle> result;
-    auto current=path.root_path();result.push_back(pin_directory(current));
-    for(const auto& part:path.relative_path()){current/=part;result.push_back(pin_directory(current));}
+    auto pin=[&](const fs::path& current) {
+        HANDLE handle;
+        auto owner=reservation;
+        while(owner && owner->path!=current)owner=owner->parent;
+        if(owner) {
+            // This metadata-only open checks identity. The owner retains the
+            // actual read/delete reservation throughout the nested operation.
+            Handle observed(CreateFileW(current.c_str(),FILE_READ_ATTRIBUTES,
+                FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,nullptr,OPEN_EXISTING,
+                FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
+            if(observed.value==INVALID_HANDLE_VALUE)fail("Cannot check project staging directory");
+            const auto actual=information(observed.value), expected=information(owner->handle);
+            if(actual.dwVolumeSerialNumber!=expected.dwVolumeSerialNumber ||
+               actual.nFileIndexHigh!=expected.nFileIndexHigh || actual.nFileIndexLow!=expected.nFileIndexLow)
+                throw std::runtime_error("Project staging directory identity changed.");
+            handle=owner->handle;
+        } else {
+            result.push_back(pin_directory(current));
+            handle=result.back().value;
+        }
+        if(leaf)*leaf=handle;
+    };
+    auto current=path.root_path();pin(current);
+    for(const auto& part:path.relative_path()){current/=part;pin(current);}
     return result;
 }
 struct PrivateAccess {
@@ -231,20 +271,45 @@ inline void copy_checked(const fs::path& from,const fs::path& to,bool executable
         if(!got)break;
     }
 }
-inline Handle verified_executable(const fs::path& executable) {
-    auto pinned=read_file(executable,true);
-    auto buffer=llvm::MemoryBuffer::getFile(path_utf8(executable));
-    if(!buffer)throw std::runtime_error("Cannot read native executable for verification.");
-    auto pe=llvm::object::COFFObjectFile::create((*buffer)->getMemBufferRef());
+inline void check_executable(llvm::MemoryBufferRef buffer, bool amd64=false) {
+    auto pe=llvm::object::COFFObjectFile::create(buffer);
     if(!pe)throw std::runtime_error("Invalid native executable: "+llvm::toString(pe.takeError()));
     if(!(*pe)->getDOSHeader() || (!(*pe)->getPE32Header() && !(*pe)->getPE32PlusHeader()) ||
        !((*pe)->getCharacteristics() & IMAGE_FILE_EXECUTABLE_IMAGE) ||
        ((*pe)->getCharacteristics() & IMAGE_FILE_DLL) || !(*pe)->getNumberOfSections())
         throw std::runtime_error("Native linker did not produce a PE executable.");
+    const auto* header=amd64 ? (*pe)->getPE32PlusHeader() : nullptr;
+    if(amd64) {
+        if(!header || (*pe)->getMachine()!=IMAGE_FILE_MACHINE_AMD64)
+            throw std::runtime_error("Application package requires a PE32+ AMD64 executable.");
+        const auto count=(*pe)->getNumberOfSections();
+        const auto optional=(*pe)->getSizeOfOptionalHeader();
+        const auto table_end=std::uint64_t((*pe)->getDOSHeader()->AddressOfNewExeHeader) + 4 +
+            sizeof(llvm::object::coff_file_header) + optional + count*sizeof(llvm::object::coff_section);
+        if(count>96 || optional<sizeof(llvm::object::pe32plus_header) ||
+           header->SizeOfHeaders<table_end || header->SizeOfHeaders>buffer.getBufferSize())
+            throw std::runtime_error("Invalid native executable headers.");
+    }
+    bool executable_entry=false;
     for(const auto& section:(*pe)->sections()) {
         auto contents=section.getContents();
         if(!contents)throw std::runtime_error("Invalid native executable section: "+llvm::toString(contents.takeError()));
+        if(!header)continue;
+        const auto* raw=(*pe)->getCOFFSection(section);
+        if(raw->SizeOfRawData && (raw->PointerToRawData<header->SizeOfHeaders ||
+           std::uint64_t(raw->PointerToRawData)+raw->SizeOfRawData>buffer.getBufferSize()))
+            throw std::runtime_error("Invalid native executable section extent.");
+        if((raw->Characteristics & IMAGE_SCN_MEM_EXECUTE) && header->AddressOfEntryPoint>=raw->VirtualAddress &&
+           std::uint64_t(header->AddressOfEntryPoint)-raw->VirtualAddress<contents->size())
+            executable_entry=true;
     }
+    if(header && !executable_entry)throw std::runtime_error("Invalid native executable entry point.");
+}
+inline Handle verified_executable(const fs::path& executable) {
+    auto pinned=read_file(executable,true);
+    auto buffer=llvm::MemoryBuffer::getFile(path_utf8(executable));
+    if(!buffer)throw std::runtime_error("Cannot read native executable for verification.");
+    check_executable((*buffer)->getMemBufferRef());
     return pinned;
 }
 } // namespace vd::native_windows

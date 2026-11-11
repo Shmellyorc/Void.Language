@@ -3,6 +3,10 @@
 #include <functional>
 #include <map>
 
+#ifdef _WIN32
+namespace vd::native_windows { struct DirectoryReservation; }
+#endif
+
 namespace vd::project {
 inline constexpr std::string_view lock_name = "void.lock";
 inline constexpr std::size_t lock_byte_limit = 1024 * 1024;
@@ -16,11 +20,13 @@ bool valid_git_subdir(std::string_view);
 bool project_path_alias(const std::filesystem::path&);
 std::string read_project_input(const std::filesystem::path&, std::size_t limit);
 
-// During verification these operations may borrow the live stage reservation.
-// Keep their use within the verification callback.
+// Keep borrowed stage authority within the synchronous publisher callback.
 struct ProjectDirectoryReader {
     std::function<CreationRoot(const std::filesystem::path&)> inspect = inspect_creation_root;
     std::function<std::string(const std::filesystem::path&, std::size_t)> read = read_project_input;
+#ifdef _WIN32
+    const native_windows::DirectoryReservation* reservation = nullptr;
+#endif
 };
 using VerifyProjectDirectory = std::function<void(const std::filesystem::path&, const ProjectDirectoryReader&)>;
 
@@ -33,9 +39,10 @@ void publish_git_snapshot(const CreationRoot&, const std::string& key,
 void publish_project_directory(const CreationRoot&, const std::string& leaf,
                                const std::map<std::string, std::string_view>& files,
                                const VerifyProjectDirectory& verify,
-                               const std::function<void()>& recheck = {});
+                               const std::function<void()>& recheck = {},
+                               const ProjectDirectoryReader& parent_reader = {});
 void publish_application_directory(const CreationRoot&, const std::string& leaf,
-                                   const std::function<void(const std::filesystem::path&)>& prepare,
+                                   const VerifyProjectDirectory& prepare,
                                    const std::function<void(const std::filesystem::path&)>& verify_replacement);
 
 enum class LockShape { valid, malformed, unsupported, conflicting };

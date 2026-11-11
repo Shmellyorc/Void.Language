@@ -391,10 +391,12 @@ GitSnapshot acquire_git_snapshot(const fs::path& root, const GitPin& pin) {
 static std::optional<GitSnapshot> read_git_snapshot(const fs::path& directory, const GitPin& pin,
                                                    const ProjectDirectoryReader& reader) {
     // Check existing ancestors even when the pin itself is missing.
-    for (const auto& ancestor : {directory.parent_path().parent_path(), directory.parent_path(), directory}) {
+    for (const auto& ancestor : {directory.parent_path().parent_path(), directory.parent_path()}) {
         if (!present(ancestor)) return {};
-        (void)reader.inspect(ancestor);
+        (void)inspect_creation_root(ancestor);
     }
+    if (!present(directory)) return {};
+    (void)reader.inspect(directory);
     auto leaf = fs::directory_iterator(directory);
     if (leaf == fs::directory_iterator{} || !hex_id(path_utf8(leaf->path().filename()), 64))
         fail("Git snapshot content index is incomplete or invalid.");

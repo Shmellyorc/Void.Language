@@ -1,7 +1,9 @@
 #include "void/project_creation.hpp"
+#include "../../src/frontend/project_files.hpp"
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <string_view>
 #ifdef _WIN32
@@ -58,6 +60,60 @@ std::string read(const fs::path& file) {
     std::ifstream input(file,std::ios::binary);
     return {std::istreambuf_iterator<char>(input),{}};
 }
+
+#if defined(_WIN32) || defined(__linux__)
+void application_publication(const fs::path& root) {
+    const auto parent=inspect_creation_root(root);
+    const auto published=root/"distribution";
+    auto prepare=[&](const fs::path& stage,const ProjectDirectoryReader& reader) {
+#ifdef _WIN32
+        fails([&]{reader.inspect(stage.parent_path());});
+#endif
+        std::ofstream(stage/"app")<<"application bytes";
+        publish_project_directory(reader.inspect(stage),"native",{{"payload","native bytes"}},
+            [&](const fs::path& nested,const ProjectDirectoryReader& nested_reader) {
+                check(nested_reader.read(nested/"payload",32)=="native bytes","Nested staged payload missing");
+#ifdef _WIN32
+                for (const auto& pinned : {stage,nested}) {
+                    const auto moved=pinned.parent_path()/"unexpected rename";
+                    const auto renamed=MoveFileExW(pinned.c_str(),moved.c_str(),0);
+                    const auto error=GetLastError();
+                    check(!renamed && error==ERROR_SHARING_VIOLATION,"Active stage did not exclude a competing rename");
+                }
+#endif
+            },{},reader);
+        check(reader.read(stage/"native/payload",32)=="native bytes","Published nested payload missing from stage");
+    };
+    fails([&]{publish_application_directory(parent,"distribution",[&](const auto& stage,const auto& reader) {
+        prepare(stage,reader);
+        throw std::runtime_error("Injected package verification failure");
+    },{});});
+    check(fs::is_empty(root),"Package verification rollback left output");
+    fails<CreationCollision>([&]{publish_application_directory(parent,"distribution",[&](const auto& stage,const auto& reader) {
+        prepare(stage,reader);
+        fs::create_directory(published);
+        std::ofstream(published/"external")<<"existing winner";
+    },{});});
+    check(read(published/"external")=="existing winner","Late collision altered external output");
+    check(std::distance(fs::directory_iterator(root),fs::directory_iterator{})==1,"Late collision left package staging");
+    fs::remove_all(published);
+    publish_application_directory(parent,"distribution",prepare,{});
+    check(read(published/"app")=="application bytes" && read(published/"native/payload")=="native bytes",
+        "Exclusive publication lost verified content");
+#ifdef _WIN32
+    const auto locked=CreateFileW((published/"app").c_str(),GENERIC_READ,0,nullptr,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,nullptr);
+    check(locked!=INVALID_HANDLE_VALUE,"Cannot lock published executable fixture");
+    const auto unlock=[](void* handle) {CloseHandle(handle);};
+    std::unique_ptr<void,decltype(unlock)> lock(locked,unlock);
+    fails<CreationCollision>([&]{publish_application_directory(parent,"distribution",
+        [&](const auto&,const auto&) {throw std::logic_error("Prepared replacement");},
+        [&](const auto&) {throw std::logic_error("Admitted replacement");});});
+    lock.reset();
+    check(read(published/"app")=="application bytes","Windows replacement refusal altered output");
+#endif
+    fs::rename(published,root/"renamed after release");
+}
+#endif
 }
 
 int main() {
@@ -104,6 +160,11 @@ int main() {
                 "Unexpected staging failure after tampering");
         }
         check(!fs::exists(target),"Changed staged bytes were published");
+#if defined(_WIN32) || defined(__linux__)
+        const auto package_parent=fixture.root/"package parent";
+        fs::create_directory(package_parent);
+        application_publication(package_parent);
+#endif
         std::cout<<"creation: entropy, reviewed directory, external collision, rollback ownership, staged content passed\n";
     } catch(const std::exception& error) {
         std::cerr<<error.what()<<'\n';

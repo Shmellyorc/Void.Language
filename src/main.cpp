@@ -42,7 +42,7 @@ void help(const std::string& command={}) {
           "  check   Analyze source and imports without executing startup code.\n"
           "  run     Execute through the JIT.\n"
           "  build   Compile and link a native executable with the matching Runtime.\n"
-          "  package Assemble a relocatable Linux application directory.\n"
+          "  package Assemble a relocatable application directory.\n"
           "  emit    Write a native object for manual linking.\n"
           "  init    Add a project manifest to an existing directory.\n"
           "  new     Create a project and starter source in a new directory.\n"
@@ -66,8 +66,9 @@ void help(const std::string& command={}) {
     if(command=="check")std::cout<<"\nCheck source and imported modules; no application entry is required.\n"
       "--no-opt is accepted for compatibility and has no effect on checking.\n"
       "Example: voidc check main.void\n";
-    if(command=="package")std::cout<<"\nPackage a manifest-selected Linux x86-64 GNU application.\n"
-      "The default directory is <project>/dist. Use --replace for an existing verified package of the same application.\n"
+    if(command=="package")std::cout<<"\nPackage a manifest-selected Linux x86-64 GNU or Windows x64 MSVC application.\n"
+      "The default directory is <project>/dist. On Linux, --replace accepts an existing verified package of the same application.\n"
+      "Windows requires a fresh destination, including when --replace is supplied.\n"
       "Use --verify DIR to check the package inventory without building.\n"
       "Example: voidc package --project . --profile release -o dist\n";
     if(command=="run")std::cout<<"\nRun a synchronous application; its return value is the process status.\n"
@@ -105,11 +106,11 @@ void help(const std::string& command={}) {
       "Project discovery selects a unique eligible main in any filename; --entry bypasses scanning.\n"
       "Library projects support check only. Project build output defaults to <project-root>/build/<entry-stem>.\n"
       "Application entry selection is automatic (main or executable top-level code);\n"
-      "--app has been removed. Use -- before a source path beginning with '-'.\n"
+      "Use -- before a source path beginning with '-'.\n"
       "Quote paths containing spaces. Options may precede or follow operands.\n"
       "Exit status: 0 success; 1 compilation/toolchain failure; 2 invocation error.\n"
       "run propagates an application's process status.\n"
-      "Documentation: https://voidlang.com/docs/compiler-workflow/\n";
+      "Documentation: https://github.com/Shmellyorc/Void.Language/wiki\n";
 }
 std::int32_t input(const char* text) {
     char* end = nullptr; errno = 0;
@@ -267,7 +268,7 @@ static int run_cli(int argc, char** argv) {
             }
             if(argument=="--app")throw UsageError("--app has been removed; entry selection is automatic.");
         }
-        if(argc==2 && (std::string(argv[1])=="--help" || std::string(argv[1])=="-h")) {help();return 0;}
+        if(argc==1 || (argc==2 && (std::string(argv[1])=="--help" || std::string(argv[1])=="-h"))) {help();return 0;}
         if(argc==2 && std::string(argv[1])=="--version") {
             std::cout<<"VOID Language Compiler v"<<VOID_COMPILER_VERSION<<" (development)\nLLVM "<<LLVM_VERSION_STRING
               <<"\nTarget: "<<LLVM_DEFAULT_TARGET_TRIPLE<<"\nBuild identity: "<<vd::compiler_build_identity()<<'\n';
@@ -287,7 +288,6 @@ static int run_cli(int argc, char** argv) {
             vd::Jit jit;auto code=jit.compile(vd::ir::architecture_proof(),"entry");
             auto result=code->invoke(0);std::cout<<result<<'\n';return result==42?0:1;
         }
-        if(argc<2)throw UsageError("Expected a command.");
         command=argv[1];
         if(command=="--app")throw UsageError("--app has been removed; entry selection is automatic.");
         if(!known_command(command))

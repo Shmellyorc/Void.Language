@@ -32,6 +32,8 @@ holds in historical records do not govern current work.
 
 - [Archive and retention policy](projects/VOID_ARCHIVE_AND_RETENTION_POLICY.md)
   governs qualification outputs and cleanup for every milestone.
+- [Windows x64 D5 application packaging](projects/W2_WINDOWS_D5_IMPLEMENTATION.md)
+  records the package contract, focused qualification and handoff.
 - [Slice 2 project discovery and entry selection](projects/SLICE2.md): compiler-owned
   manifest/VFS admission, immutable D/E snapshots, any-name main, library checking,
   explicit overrides, actual execution tests and independent-review boundary.

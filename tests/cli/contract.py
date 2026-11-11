@@ -28,12 +28,16 @@ def run(args, status=0, out=None, error=None, *, cwd=None, tool=compiler, env=No
     return result
 
 
-for args in (['--help'], ['-h'], ['help']):
+full_help = run(['--help']).stdout
+for args in ([], ['--help'], ['-h'], ['help']):
     result = run(args, out='Commands:')
     assert not result.stderr
+    assert result.stdout == full_help
     lines = result.stdout.decode('utf-8').splitlines()
     assert lines[:2] == ['VOID Language Compiler v0.1.0 (development)', 'LLVM 23.1.4'], lines
     assert lines.index('Commands:') < lines.index('Options:'), lines
+    assert b'--app has been removed.' not in result.stdout
+    assert 'Documentation: https://github.com/Shmellyorc/Void.Language/wiki' in lines
     for option in ('--help', '--version', '--no-opt', '--cache', '--no-cache', '-o PATH'):
         assert option in result.stdout.decode('utf-8')
     for command in ('check', 'run', 'build', 'emit'):
@@ -46,7 +50,7 @@ for command in ('check', 'run', 'build', 'emit'):
         assert b'Example' in result.stdout and not result.stderr
         assert result.stdout.decode('utf-8').splitlines()[:2] == ['VOID Language Compiler v0.1.0 (development)', 'LLVM 23.1.4']
 
-invalid = [([], 'Expected a command'), (['unknown'], 'Unknown command'),
+invalid = [(['unknown'], 'Unknown command'),
            (['--version', 'extra'], 'Unknown command'), (['help', 'unknown'], 'Expected help'),
            (['help', 'run', 'extra'], 'Expected help'), (['--app'], 'removed'),
            (['run', '--app'], 'removed'), (['run', '--help', '--app'], 'removed'),

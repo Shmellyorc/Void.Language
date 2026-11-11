@@ -165,11 +165,10 @@ limit changed on the retry, so the triggering condition remains unisolated.
 
 ## Platform and retained limitations
 
-Windows and macOS packaging are **UNQUALIFIED**. The command's implemented
-target is Linux x86-64 GNU. macOS ARM64 managed native execution remains
-unsupported. A metadata-only or unsupported-target D5 workflow would add
-no application-distribution qualification, so D5 adds no macOS workflow.
-The existing D1–D4 workflow selectors are preserved.
+This closeout records Linux x86-64 GNU. The W2 implementation adds Windows
+x64 MSVC using `app.exe` in the same directory layout. Windows requires an
+absent destination even when `--replace` is supplied. macOS ARM64 packaging
+and managed native execution remain unsupported. [W2 implementation](W2_WINDOWS_D5_IMPLEMENTATION.md)
 
 The known 256-byte Mesa graphics allocation remains the accepted display
 limitation. Leak detection stays enabled for focused headless sanitizer
