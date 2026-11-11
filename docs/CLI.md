@@ -109,7 +109,8 @@ Creation implementation awaits its later reviewed slice.
 
 The [project roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) proposes `voidc init` and
 `voidc new` and eventual resolve/package workflows. Those forms remain future
-commands; manifest-aware check/run/build/emit and selectors are implemented in S2,
+commands in that dated proposal. `package` is now implemented for Linux x86-64
+GNU as described below. Manifest-aware check/run/build/emit and selectors are implemented in S2,
 with project profiles added in S3. The approved entry direction requires no filename convention or mandatory
 entry field: one valid main is selected by compiler analysis; ambiguity diagnoses.
 The command forms below remain compatible; `main.void` directory discovery
@@ -191,6 +192,43 @@ changes the whole-compiler fingerprint normally; old compiled cache entries are
 not promised to survive that rebuild.
 
 ## Native output and installation
+
+### Application distributions
+
+`voidc package --project . --profile release` assembles one Linux x86-64 GNU
+application in `<project>/dist`. `-o DIR` selects another destination, with
+missing parent directories created. Entry discovery and `--entry` use the
+existing manifest rules. A declared managed native provider requires
+`--allow-native` and a verified `void.lock` and local catalog.
+
+```sh
+voidc package --project . --profile release -o "output/My Application"
+voidc package --project . --allow-native --replace
+voidc package --verify "output/My Application"
+```
+
+The directory contains `app`, the existing encoded `application.meta`, a
+`void-package.txt` inventory, Runtime notices in `licenses/`, and the
+managed `native/` payload when selected. Declare up to 32 non-source files
+with `[application] resources = ["assets/message.txt"]`. These are flat,
+portable ASCII `assets/` paths with a combined 16 MiB limit. A root `LICENSE`
+is also included when supplied. Applications locate assets with
+`os.resource_dir()`. `--verify` checks lengths, SHA-256, metadata, names and
+permissions. Applications retain their own asset-use checks.
+
+`--replace` accepts an existing verified package of the same application ID.
+Publication uses a private staged directory and Linux atomic directory
+exchange. The inventory records the selected input digest and actual file
+digests. Equivalent input selections preserve the file membership and
+selected data identities. Executable byte identity across build locations
+has a separate qualification boundary.
+
+Linux packages use OS-provided runtime libraries, including the IDN and
+Unicode SONAMEs selected by the native link. The package executable has no
+development RUNPATH. Required OS and display dependencies and qualification
+limits are recorded in the [D5 closeout](projects/DEPENDENCY_D5_CLOSEOUT.md).
+
+### Native build outputs
 
 `build` defaults to `<entry-directory>/build/<entry-stem>` with `.exe` on Windows.
 Manifest-selected builds instead default to `<manifest-root>/build/<entry-stem>`

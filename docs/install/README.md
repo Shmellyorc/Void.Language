@@ -43,6 +43,11 @@ Clang/LLD. Keep that SDK and the platform's development libraries in place.
 Native executables have their own platform/dependency requirements; successful
 source installation does not make either the tools or their output universally portable.
 
+Linux x86-64 GNU installations also provide `voidc package --project DIR`.
+The compiler's `bin/void-package-notices.txt` verifies the existing installed
+license files used for an application distribution. Keep the installation
+together while building packages. See the [package command](../CLI.md#application-distributions).
+
 After adding `bin` to PATH, run `voidc --version` and
 `python3 tools/verify_install.py <prefix>`. Logs and the per-command receipt are in
 `<build-directory>/source-install.json` and adjacent `.log` files. A failed setup

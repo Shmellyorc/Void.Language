@@ -74,6 +74,9 @@ struct NativeRequirement {
 inline constexpr std::size_t native_catalog_byte_limit = 32 * 1024;
 inline constexpr std::size_t native_catalog_file_limit = 24;
 inline constexpr std::uint64_t native_catalog_payload_limit = 128 * 1024 * 1024;
+inline constexpr std::size_t application_resource_count_limit = 32;
+inline constexpr std::size_t application_resource_byte_limit = 16 * 1024 * 1024;
+bool valid_application_resource(std::string_view path);
 struct NativeArtifact {
     std::string name, sha256;
     std::uint64_t size = 0;
@@ -96,6 +99,7 @@ class Manifest {
     Identity project_;
     Kind kind_ = Kind::application;
     std::optional<Identity> application_, package_;
+    std::vector<std::string> resources_;
     std::optional<std::string> entry_, package_entry_;
     std::map<std::string, Dependency> dependencies_;
     std::map<std::string, NativeLibrary> native_;
@@ -111,6 +115,7 @@ public:
     const Identity& project() const { return project_; }
     Kind kind() const { return kind_; }
     const auto& application() const { return application_; }
+    const auto& resources() const { return resources_; }
     const auto& package() const { return package_; }
     const auto& entry() const { return entry_; }
     const auto& package_entry() const { return package_entry_; }

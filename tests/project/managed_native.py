@@ -12,6 +12,7 @@ from unittest.mock import patch
 compiler, clang = (Path(arg).resolve() for arg in sys.argv[1:3])
 sanitized = sys.argv[3] == "ON"
 server = Path(sys.argv[4]).resolve() if len(sys.argv) > 4 and sys.argv[4] else None
+packaging = '--package' in sys.argv[5:]
 ffi = Path(__file__).resolve().parents[1] / "ffi"
 windows = sys.platform == "win32"
 native_host = windows or sys.platform.startswith("linux")
@@ -236,6 +237,8 @@ with tempfile.TemporaryDirectory(prefix="VOID D4 雪 ") as temporary:
     cli("run", status=2, message="--allow-native")
     cli("build", "-o", base / "denied", status=2, message="--allow-native")
     cli("emit", "-o", base / "denied.o", status=2, message="--allow-native")
+    if packaging:
+        cli("package", "-o", base / "denied package", status=2, message="--allow-native")
     no_initializers()
 
     for leaf in ("native", "Native"):
@@ -280,11 +283,16 @@ with tempfile.TemporaryDirectory(prefix="VOID D4 雪 ") as temporary:
     corrupted = content[:-1] + bytes([content[-1] ^ 1])
     dependency.write_bytes(corrupted)
     cli("run", "--allow-native", status=1, message="artifact identity mismatch")
+    if packaging:
+        cli("package", "--allow-native", "-o", base / "invalid package", status=1, message="artifact identity mismatch")
     dependency.write_bytes(b"not a dynamic library")
     write_catalog()
     cli("check", status=1, message="wrong target or image type")
     dependency.unlink()
     cli("build", "--allow-native", "-o", base / "missing", status=1, message="Missing managed native artifact")
+    if packaging:
+        cli("package", "--allow-native", "-o", base / "invalid package", status=1, message="Missing managed native artifact")
+        assert not (base / "invalid package").exists()
     dependency.write_bytes(content)
     write_catalog(catalog_target="x86_64-unknown-linux-gnu" if windows else "x86_64-pc-windows-msvc")
     cli("resolve", "--refresh", status=1, message="catalog target")
@@ -313,8 +321,13 @@ with tempfile.TemporaryDirectory(prefix="VOID D4 雪 ") as temporary:
         reset_markers()
         package = base / profile
         image = package / ("app.exe" if windows else "app")
-        cli("build", "--allow-native", "--profile", profile, "-o", image)
-        cli("build", "--allow-native", "--profile", profile, "-o", image)
+        if packaging:
+            cli("package", "--allow-native", "--profile", profile, "-o", package)
+            cli("package", "--allow-native", "--profile", profile, "-o", package, "--replace")
+            run(compiler, "package", "--verify", package)
+        else:
+            cli("build", "--allow-native", "--profile", profile, "-o", image)
+            cli("build", "--allow-native", "--profile", profile, "-o", image)
         cli("build", "--allow-native", "-o", package / "native", status=1,
             message="conflicts with the reserved native payload directory")
         if not windows:
@@ -334,9 +347,13 @@ with tempfile.TemporaryDirectory(prefix="VOID D4 雪 ") as temporary:
             staged_dependency = moved / "native" / dependency.name
             staged_dependency.write_bytes(corrupted)
             run(image, "payload", status=1, message="managed native payload identity mismatch")
+            if packaging:
+                run(compiler, "package", "--verify", moved, status=1, message="inventory mismatch")
             no_initializers()
             staged_dependency.unlink()
             run(image, "payload", status=1, message="managed native payload missing or changed")
+            if packaging:
+                run(compiler, "package", "--verify", moved, status=1, message="inventory mismatch")
             no_initializers()
         finally:
             (base / "parked source").rename(project)

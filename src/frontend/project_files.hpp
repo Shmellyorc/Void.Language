@@ -25,6 +25,9 @@ void publish_project_directory(const CreationRoot&, const std::string& leaf,
                                const std::map<std::string, std::string_view>& files,
                                const std::function<void(const std::filesystem::path&)>& verify,
                                const std::function<void()>& recheck = {});
+void publish_application_directory(const CreationRoot&, const std::string& leaf,
+                                   const std::function<void(const std::filesystem::path&)>& prepare,
+                                   const std::function<void(const std::filesystem::path&)>& verify_replacement);
 
 enum class LockShape { valid, malformed, unsupported, conflicting };
 LockShape dependency_lock_shape(std::string_view);

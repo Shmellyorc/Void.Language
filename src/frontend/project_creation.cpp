@@ -519,10 +519,9 @@ void publish_git_snapshot(const CreationRoot& root, const std::string& key,
     });
 }
 
-void publish_project_directory(const CreationRoot& directory, const std::string& leaf,
-                               const std::map<std::string, std::string_view>& files,
-                               const std::function<void(const fs::path&)>& verify,
-                               const std::function<void()>& recheck) {
+namespace {
+template<class Work>
+void with_project_stage(const CreationRoot& directory, Work work) {
     const auto& store = directory.path;
     Parent destination(store);
     if (destination.identity_key() != directory.identity)
@@ -534,7 +533,7 @@ void publish_project_directory(const CreationRoot& directory, const std::string&
 #else
     auto staged = make_directory(destination.handle.fd, temporary);
 #endif
-    bool published = false;
+    bool keep = false;
     auto cleanup = [&] {
         if (!owns(staged) || inspect_creation_root(store).identity != destination.identity_key())
             throw std::runtime_error("Staged directory ownership changed; retained " + path_utf8(stage) + ".");
@@ -544,6 +543,20 @@ void publish_project_directory(const CreationRoot& directory, const std::string&
         fs::remove_all(stage);
     };
     try {
+        work(destination, staged, stage, keep);
+    } catch (...) {
+        if (!keep) cleanup();
+        throw;
+    }
+    if (!keep) cleanup();
+}
+}
+
+void publish_project_directory(const CreationRoot& directory, const std::string& leaf,
+                               const std::map<std::string, std::string_view>& files,
+                               const std::function<void(const fs::path&)>& verify,
+                               const std::function<void()>& recheck) {
+    with_project_stage(directory, [&](const Parent& destination, Node& staged, const fs::path& stage, bool& keep) {
         for (const auto& [relative, bytes] : files) {
             const bool directory_entry = relative.ends_with('/');
             const auto path = stage / utf8_path(directory_entry ? relative.substr(0, relative.size() - 1) : relative);
@@ -565,23 +578,64 @@ void publish_project_directory(const CreationRoot& directory, const std::string&
         }
         verify(stage);
         if (recheck) recheck();
-        if (inspect_creation_root(store).identity != destination.identity_key() || !owns(staged))
+        if (inspect_creation_root(directory.path).identity != destination.identity_key() || !owns(staged))
             throw std::runtime_error("Staged directory parent changed before publication.");
         try {
 #ifdef _WIN32
-            publish_file(staged, store / leaf);
+            publish_file(staged, directory.path / leaf);
 #else
             rename_exclusive(staged, destination.handle.fd, leaf);
 #endif
-            published = true;
+            keep = true;
         } catch (const CreationCollision&) {
-            verify(store / leaf);
+            verify(directory.path / leaf);
         }
-    } catch (...) {
-        if (!published) cleanup();
-        throw;
-    }
-    if (!published) cleanup();
+    });
+}
+
+void publish_application_directory(const CreationRoot& directory, const std::string& leaf,
+                                   const std::function<void(const fs::path&)>& prepare,
+                                   const std::function<void(const fs::path&)>& verify_replacement) {
+#if defined(__linux__)
+    const auto output = directory.path / utf8_path(leaf);
+    auto collision = [&] {
+        return CreationCollision("Application package destination already exists: " + path_utf8(output));
+    };
+    if (!verify_replacement && named(directory.path, leaf)) throw collision();
+    with_project_stage(directory, [&](const Parent& destination, Node& staged, const fs::path& stage, bool& keep) {
+        auto package = make_directory(staged.handle.fd, "package");
+        prepare(stage / package.name);
+        // Serialize checks and exchange with other package publishers in this parent.
+        if (flock(destination.handle.fd, LOCK_EX | LOCK_NB)) system_failure("Cannot lock package destination parent");
+        auto recheck = [&] {
+            if (inspect_creation_root(directory.path).identity != directory.identity || !owns(staged) || !owns(package))
+                throw std::runtime_error("Application package staging or destination parent changed.");
+        };
+        recheck();
+        if (!named(directory.path, leaf)) {
+            rename_exclusive(package, destination.handle.fd, leaf);
+            return;
+        }
+        if (!verify_replacement) throw collision();
+        named(directory.path, leaf, true);
+        Node prior{destination.handle.fd, leaf, NativeHandle(openat(destination.handle.fd, leaf.c_str(), dir_flags)), true};
+        if (prior.handle.fd < 0) system_failure("Cannot admit existing application package");
+        verify_replacement(output);
+        recheck();
+        if (!owns(prior)) throw std::runtime_error("Existing application package changed before replacement.");
+        if (syscall(SYS_renameat2, package.parent, package.name.c_str(), prior.parent, prior.name.c_str(), RENAME_EXCHANGE))
+            system_failure("Cannot atomically replace application package");
+        prior.parent = package.parent;
+        prior.name = package.name;
+        if (!owns(prior)) {
+            keep = true;
+            throw std::runtime_error("Package replacement displaced an unexpected directory. Retained " + path_utf8(stage));
+        }
+    });
+#else
+    (void)directory; (void)leaf; (void)prepare; (void)verify_replacement;
+    throw std::runtime_error("Application packaging requires Linux x86-64 GNU.");
+#endif
 }
 
 CreationPlan plan_creation(const fs::path& requested,const CreationOptions& options,CreationEntropy entropy) {

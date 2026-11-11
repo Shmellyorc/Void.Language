@@ -41,6 +41,13 @@ bool ancestor(std::string_view a, std::string_view b) {
 
 std::string fold_project_name(std::string_view name) { return folded(std::string(name)); }
 
+bool valid_application_resource(std::string_view path) {
+    if (!path.starts_with("assets/")) return false;
+    const auto name = path.substr(7);
+    return name.size() <= 128 && name.find('/') == name.npos && relative_path(path, false) &&
+        !name.starts_with('.') && !fold_project_name(name).ends_with(".void");
+}
+
 bool dependency_admin_directory(std::string_view name) {
     const auto folded_name = fold_project_name(name);
     return folded_name == ".git" || folded_name == ".void" || folded_name == "build";
@@ -569,10 +576,31 @@ public:
             if (auto* other = root.get(forbidden)) fail(Code::project_field, span(other->source()), "Section is forbidden for this project kind.", "Use one application or library target; keep application and package identity separate.");
             if (auto* selected = table(root, section, true)) {
                 if (*kind == "library") fields(*selected, section, {"id", "name", "version", "entry"});
-                else fields(*selected, section, {"id", "name", "version"});
+                else fields(*selected, section, {"id", "name", "version", "resources"});
                 Identity info{{}, manifest_->project_.name, manifest_->project_.version};
                 identity(*selected, info, *kind == "library");
-                if (*kind == "application") manifest_->application_ = std::move(info);
+                if (*kind == "application") {
+                    manifest_->application_ = std::move(info);
+                    if (const auto* declared = selected->get("resources")) {
+                        const auto* list = declared->as_array();
+                        if (!list || list->size() > application_resource_count_limit) {
+                            fail(Code::project_field, span(declared->source()), "Invalid application resource list.",
+                                 "Declare at most 32 files in an array of exact assets/<file> paths.");
+                        } else {
+                            std::set<std::string> names;
+                            for (const auto& item : *list) {
+                                const auto path = item.value_exact<std::string_view>().value_or("");
+                                if (!valid_application_resource(path)) {
+                                    fail(Code::project_path, span(item.source()), "Invalid application resource path.",
+                                         "Use an exact assets/<file> path for a non-source file.");
+                                } else if (!names.insert(fold_project_name(path)).second) {
+                                    fail(Code::project_duplicate, span(item.source()), "Duplicate application resource path.",
+                                         "List each resource once, including case variants.");
+                                } else manifest_->resources_.emplace_back(path);
+                            }
+                        }
+                    }
+                }
                 else {
                     manifest_->package_ = std::move(info);
                     if (auto entry = text(*selected, "entry", false)) {

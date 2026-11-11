@@ -364,17 +364,28 @@ if(BUILD_TESTING)
     "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_SANITIZERS}"
     "$<$<PLATFORM_ID:Linux>:$<TARGET_FILE:voidls>>")
   set_tests_properties(project_managed_native PROPERTIES TIMEOUT 300)
+  add_test(NAME project_application_package COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/project/application_packages.py" "$<TARGET_FILE:voidc>")
+  set_tests_properties(project_application_package PROPERTIES TIMEOUT 600)
   set(VOID_TEST_RAYLIB_ROOT "" CACHE PATH "Approved local raylib 6.0 Linux x86-64 release directory for opt-in tests")
   if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$")
     add_test(NAME project_managed_native_resolution COMMAND "${Python3_EXECUTABLE}"
       "${PROJECT_SOURCE_DIR}/tests/project/managed_native_resolution.py"
       "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_GIT_EXECUTABLE}")
     set_tests_properties(project_managed_native_resolution PROPERTIES TIMEOUT 120)
+    add_test(NAME project_package_native COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/project/managed_native.py"
+      "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_SANITIZERS}" "" --package)
+    set_tests_properties(project_package_native PROPERTIES TIMEOUT 300)
     if(VOID_TEST_RAYLIB_ROOT)
       add_test(NAME project_managed_raylib COMMAND "${Python3_EXECUTABLE}"
         "${PROJECT_SOURCE_DIR}/tests/project/managed_raylib.py"
         "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_TEST_RAYLIB_ROOT}" "${VOID_SANITIZERS}")
       set_tests_properties(project_managed_raylib PROPERTIES TIMEOUT 600)
+      add_test(NAME project_package_raylib COMMAND "${Python3_EXECUTABLE}"
+        "${PROJECT_SOURCE_DIR}/tests/project/managed_raylib.py"
+        "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_TEST_RAYLIB_ROOT}" "${VOID_SANITIZERS}" --package)
+      set_tests_properties(project_package_raylib PROPERTIES TIMEOUT 600)
     endif()
   endif()
   if(VOID_GIT_EXECUTABLE)

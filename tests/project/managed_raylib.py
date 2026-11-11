@@ -17,6 +17,7 @@ parser.add_argument('clang', type=Path)
 parser.add_argument('vendor', type=Path)
 parser.add_argument('sanitizers', choices=('ON', 'OFF'))
 parser.add_argument('--graphics', action='store_true')
+parser.add_argument('--package', action='store_true')
 parser.add_argument('--exclude-confirmed-mesa-lsan', action='store_true')
 args = parser.parse_args()
 assert sys.platform.startswith('linux'), 'This fixture qualifies Linux x86-64'
@@ -122,7 +123,12 @@ with tempfile.TemporaryDirectory(prefix='VOID managed raylib 雪 ') as temporary
             qualify([*jit, *(['--implicit-close'] if profile == 'debug' else [])], catalog, cwd,
                     graphics_environment, base / ('jit-' + profile))
         output = base / ('linked-' + profile) / 'gallery'
-        cli('build', '--allow-native', '--profile', profile, '-o', output)
+        if args.package:
+            cli('package', '--allow-native', '--profile', profile, '-o', output.parent)
+            output = output.parent / 'app'
+            run(compiler, 'package', '--verify', output.parent)
+        else:
+            cli('build', '--allow-native', '--profile', profile, '-o', output)
         needed = run(clang.with_name('llvm-readelf'), '-d', output)
         assert not re.search(r'Shared library: \[(?:libvoid_raylib|libraylib)\.', needed), needed
         native = output.parent / 'native'
@@ -131,7 +137,7 @@ with tempfile.TemporaryDirectory(prefix='VOID managed raylib 雪 ') as temporary
             assert digest(file) == digest(catalog / file.name)
         relocated = base / ('relocated ' + profile + ' 雪')
         output.parent.rename(relocated)
-        packages.append((profile, relocated))
+        packages.append((profile, relocated, output.name))
 
     project.rename(base / 'parked source')
     catalog.rename(base / 'parked catalog')
@@ -143,8 +149,8 @@ with tempfile.TemporaryDirectory(prefix='VOID managed raylib 雪 ') as temporary
                  '--tmpfs', root, '--tmpfs', compiler.parent, '--bind', base, base, '--chdir', cwd, '--']
     run(*isolation, '/usr/bin/test', '!', '-e', root / 'CMakeLists.txt', env=app_environment)
     run(*isolation, '/usr/bin/test', '!', '-e', compiler, env=app_environment)
-    for profile, package in packages:
-        command = [*isolation, package / 'gallery']
+    for profile, package, executable in packages:
+        command = [*isolation, package / executable]
         headless(command, app_environment)
         if args.graphics:
             print('Visible relocated AOT', profile, flush=True)

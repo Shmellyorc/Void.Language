@@ -19,12 +19,14 @@
 namespace {
 struct UsageError : std::invalid_argument {using std::invalid_argument::invalid_argument;};
 bool known_command(const std::string& command) {
-    return command=="check" || command=="run" || command=="build" || command=="emit" || command=="init" || command=="new" || command=="resolve" || command=="deps" || command=="native-bind";
+    return command=="check" || command=="run" || command=="build" || command=="package" || command=="emit" || command=="init" || command=="new" || command=="resolve" || command=="deps" || command=="native-bind";
 }
 void usage(std::ostream& out, const std::string& command={}) {
     if(command.empty() || command=="check")out<<"Usage: voidc check <file-or-directory> [--no-opt]\n";
     if(command.empty() || command=="run")out<<"Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\n";
     if(command.empty() || command=="build")out<<"Usage: voidc build [file-or-directory] [-o executable] [--no-opt]\n";
+    if(command.empty() || command=="package")out<<"Usage: voidc package [--project DIR] [--profile debug|release] [-o directory] [--allow-native] [--replace]\n"
+      "       voidc package --verify DIR\n";
     if(command.empty() || command=="emit")out<<"Usage: voidc emit <file-or-directory> -o <object> [--no-opt]\n";
     if(command.empty() || command=="init")out<<"Usage: voidc init [DIR] [project options]\n";
     if(command.empty() || command=="new")out<<"Usage: voidc new PATH [project options] [--source PATH]\n";
@@ -40,6 +42,7 @@ void help(const std::string& command={}) {
           "  check   Analyze source and imports without executing startup code.\n"
           "  run     Execute through the JIT.\n"
           "  build   Compile and link a native executable with the matching Runtime.\n"
+          "  package Assemble a relocatable Linux application directory.\n"
           "  emit    Write a native object for manual linking.\n"
           "  init    Add a project manifest to an existing directory.\n"
           "  new     Create a project and starter source in a new directory.\n"
@@ -53,16 +56,20 @@ void help(const std::string& command={}) {
           "  --cache     Select Debug code and report cache status (run only).\n"
           "  --no-cache  Disable disk caching (run only).\n"
           "  --project DIR  Select exactly DIR/void.project.toml.\n"
-          "  --allow-native  Authorize this project's declared native provider for run/build/emit.\n"
+          "  --allow-native  Authorize this project's declared native provider for run/build/emit/package.\n"
           "  --entry PATH   Override its entry with a manifest-relative source.\n"
           "  --profile debug|release  Select project optimization/cache settings.\n"
           "                           line/full debug_info warns; profile-controlled emission is not implemented.\n"
-          "  -o PATH     Set output path (build/emit only; required by emit).\n"
+          "  -o PATH     Set output path (build, emit or package; required by emit).\n"
           "  --          End options before a source path.\n";
     }
     if(command=="check")std::cout<<"\nCheck source and imported modules; no application entry is required.\n"
       "--no-opt is accepted for compatibility and has no effect on checking.\n"
       "Example: voidc check main.void\n";
+    if(command=="package")std::cout<<"\nPackage a manifest-selected Linux x86-64 GNU application.\n"
+      "The default directory is <project>/dist. Use --replace for an existing verified package of the same application.\n"
+      "Use --verify DIR to check the package inventory without building.\n"
+      "Example: voidc package --project . --profile release -o dist\n";
     if(command=="run")std::cout<<"\nRun a synchronous application; its return value is the process status.\n"
       "Legacy entry(i32) -> i32 accepts one decimal i32 (default 0), prints its\n"
       "result, and exits 0. Applications read os.args() after an explicit source\n"
@@ -268,7 +275,7 @@ static int run_cli(int argc, char** argv) {
         }
         if(argc>=2 && std::string(argv[1])=="help") {
             if(argc==2) {help();return 0;}
-            if(argc!=3 || !known_command(argv[2]))throw UsageError("Expected help [check|run|build|emit|init|new|resolve|deps|native-bind].");
+            if(argc!=3 || !known_command(argv[2]))throw UsageError("Expected help [check|run|build|package|emit|init|new|resolve|deps|native-bind].");
             help(argv[2]);return 0;
         }
         vd::configure_standard_library_root(vd::utf8_path(llvm::sys::fs::getMainExecutable(argv[0],reinterpret_cast<void*>(&run_cli))));
@@ -289,8 +296,15 @@ static int run_cli(int argc, char** argv) {
         if(command=="resolve")return resolve_project(argc,argv);
         if(command=="deps")return fetch_project(argc,argv);
         if(command=="native-bind") {generate_native_binding(argc,argv);return 0;}
+        if(command=="package" && argc>=3 && std::string_view(argv[2])=="--verify") {
+            if(argc!=4 || !*argv[3] || argv[3][0]=='-')throw UsageError("Expected one directory after package --verify.");
+            vd::verify_application_package(vd::utf8_path(argv[3]));
+            std::cout<<"Application package verified\n";
+            return 0;
+        }
         bool optimize=true,cache=false,no_cache=false,no_opt=false;
         bool allow_native=false;
+        bool replace_package=false;
         bool positional_only=false;
         bool forwarded=false;
         std::vector<std::string> application_arguments;
@@ -314,6 +328,10 @@ static int run_cli(int argc, char** argv) {
             else if(arg=="--cache") {if(cache)throw UsageError("Duplicate --cache.");cache=true;optimize=false;}
             else if(arg=="--no-cache") {if(no_cache)throw UsageError("Duplicate --no-cache.");no_cache=true;}
             else if(arg=="--allow-native") {if(allow_native)throw UsageError("Duplicate --allow-native.");allow_native=true;}
+            else if(arg=="--replace" && command=="package") {
+                if(replace_package)throw UsageError("Duplicate --replace.");
+                replace_package=true;
+            }
             else if(arg=="--project") {
                 if(project_root || ++i==argc || !*argv[i] || argv[i][0]=='-')throw UsageError("Expected one directory after --project.");
                 project_root=vd::utf8_path(argv[i]);
@@ -339,7 +357,7 @@ static int run_cli(int argc, char** argv) {
         if(cache && command!="run")throw UsageError("--cache is available only for Debug JIT runs.");
         if(no_cache && command!="run")throw UsageError("--no-cache is available only for JIT runs.");
         if(cache && no_cache)throw UsageError("--cache and --no-cache cannot be combined.");
-        if(output && command!="emit" && command!="build")throw UsageError("-o is available only for emit/build.");
+        if(output && command!="emit" && command!="build" && command!="package")throw UsageError("-o is available only for emit/build/package.");
         if(command=="emit" && !output)throw UsageError("emit requires -o <object>.");
         if(project_root && !operands.empty())throw UsageError("--project cannot accompany a positional file or directory selector.");
         if((command=="check" || command=="emit") && operands.empty() && !project_root)throw UsageError("Expected a file or directory.");
@@ -348,6 +366,7 @@ static int run_cli(int argc, char** argv) {
         auto value=operands.size()==2?input(operands[1].c_str()):0;
         auto path=project_root?*project_root:operands.empty()?std::filesystem::current_path():vd::utf8_path(operands[0]);
         const bool project_mode=project_root || (std::filesystem::is_directory(path) && vd::project_manifest_present(path));
+        if(command=="package" && !project_mode)throw UsageError("Package requires a manifest-selected application project.");
         if(allow_native && (!project_mode || command=="check"))
             throw UsageError("--allow-native requires a manifest-selected run, build or emit.");
         if(profile && !project_mode)throw UsageError("--profile requires a manifest-selected project context.");
@@ -371,6 +390,7 @@ static int run_cli(int argc, char** argv) {
             if(!result.succeeded())throw vd::CompilationError(std::move(result.diagnostics));
             project=std::move(result.project);
             if(project->manifest()->kind()==vd::project::Kind::library) {
+                if(command=="package")throw UsageError("Package requires an application project.");
                 if(command!="check")throw std::invalid_argument("Library project run/build/emit is unsupported; use check for source analysis.");
                 for(const auto& warning:result.diagnostics)std::cerr<<vd::render_diagnostic(warning)<<'\n';
                 std::cout<<"Library project checked successfully\n";return 0;
@@ -388,6 +408,12 @@ static int run_cli(int argc, char** argv) {
         }
         if(application && operands.size()==2)throw UsageError("Application entries do not accept arguments.");
         vd::require_source_entry(*analysis.program);
+        if(command=="package") {
+            if(!output)output=project->root()/"dist";
+            vd::build_application_package(*project,*output,optimize,argv[0],profile_key,replace_package);
+            std::cout<<"Packaged application: "<<vd::path_utf8(*output)<<'\n';
+            return 0;
+        }
         if(command=="run") {
             std::unique_ptr<vd::Jit> jit;
             if(!no_cache)jit=std::make_unique<vd::Jit>(vd::DebugCache{project?project->root():std::filesystem::canonical(selected.parent_path().empty()?std::filesystem::path("."):selected.parent_path()),std::string(vd::compiler_build_identity())+(project?":project-selection-v1:"+project->selection_key()+":"+profile_key:"")},vd::ir::Emission::entry);

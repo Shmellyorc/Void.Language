@@ -5,4 +5,7 @@ namespace vd {
 // in a separate short private directory, then verifies/copies into that staging.
 void publish_object(const ValidatedAnalysis&, const std::filesystem::path&, bool optimize, std::string_view profile = {});
 void build_executable(const ValidatedAnalysis&, const std::filesystem::path&, bool optimize, const char* argv0, std::string_view profile = {});
+void build_application_package(const ProjectAnalysis&, const std::filesystem::path&, bool optimize,
+                               const char* argv0, std::string_view profile, bool replace);
+void verify_application_package(const std::filesystem::path&);
 }

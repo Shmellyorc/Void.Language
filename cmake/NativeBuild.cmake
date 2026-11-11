@@ -112,6 +112,50 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/native-install-$<CONFIG>.txt" DESTINA
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/native-resources-install-$<CONFIG>.txt"
   DESTINATION bin RENAME void-native-resources.txt COMPONENT compiler)
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  # Use the existing compiler install's notice files, with independent hashes
+  # and distinct distribution names for files with the same upstream basename.
+  set(package_notices_build "VOID package notices 1\n")
+  set(package_notices_install "VOID package notices 1\n")
+  foreach(notice IN ITEMS
+      "VOID-MIT-LICENSE.txt|LICENSE|VOID-MIT-LICENSE.txt"
+      "Ryu-Boost.txt|third_party/ryu/LICENSE-Boost|LICENSE-Boost"
+      "date-LICENSE.txt|third_party/date/LICENSE.txt|LICENSE.txt"
+      "date-NOTICE.txt|third_party/date/NOTICE|NOTICE"
+      "tzdata-LICENSE.txt|third_party/tzdata/LICENSE|LICENSE"
+      "Unicode-LICENSE.txt|tools/unicode/LICENSE.txt|UNICODE-LICENSE.txt"
+      "LLVM-LICENSE.txt|third_party/llvm-licenses/23.1.4/LICENSE.TXT|llvm-23.1.4/LICENSE.TXT"
+      "libarchive-COPYING.txt|third_party/host-licenses/libarchive/COPYING|host/libarchive/COPYING"
+      "libarchive-SOURCE-NOTICES.json|third_party/host-licenses/libarchive/SOURCE-NOTICES.json|host/libarchive/SOURCE-NOTICES.json"
+      "libsodium-LICENSE.txt|third_party/host-licenses/libsodium/LICENSE|host/libsodium/LICENSE"
+      "libsodium-SOURCE-NOTICES.json|third_party/host-licenses/libsodium/SOURCE-NOTICES.json|host/libsodium/SOURCE-NOTICES.json"
+      "curl-COPYING.txt|third_party/curl/COPYING|http/COPYING"
+      "curl-NOTICE.txt|third_party/curl/NOTICE|http/NOTICE"
+      "curl-PROVENANCE.json|third_party/curl/VOID-PROVENANCE.json|http/VOID-PROVENANCE.json"
+      "AWS-LC-LICENSE.txt|third_party/http-licenses/aws-lc-5.12.0/LICENSE|http/aws-lc-5.12.0/LICENSE"
+      "AWS-LC-NOTICE.txt|third_party/http-licenses/aws-lc-5.12.0/NOTICE|http/aws-lc-5.12.0/NOTICE"
+      "c-ares-LICENSE.md|third_party/http-licenses/c-ares-1.34.9/LICENSE.md|http/c-ares-1.34.9/LICENSE.md"
+      "nghttp2-COPYING.txt|third_party/http-licenses/nghttp2-1.70.0/COPYING|http/nghttp2-1.70.0/COPYING"
+      "zlib-LICENSE.txt|third_party/http-licenses/zlib-1.3.2/LICENSE|http/zlib-1.3.2/LICENSE"
+      "libpsl-LICENSE.txt|third_party/http-licenses/libpsl-0.21.5/LICENSE|http/libpsl-0.21.5/LICENSE"
+      "libpsl-LICENSE.chromium|third_party/http-licenses/libpsl-0.21.5/LICENSE.chromium|http/libpsl-0.21.5/LICENSE.chromium"
+      "PSL-LICENSE.txt|third_party/publicsuffix/LICENSE|http/publicsuffix/LICENSE"
+      "PSL-UPSTREAM.json|third_party/publicsuffix/UPSTREAM.json|http/publicsuffix/UPSTREAM.json"
+      "public_suffix_list.dat|third_party/publicsuffix/public_suffix_list.dat|http/publicsuffix/public_suffix_list.dat")
+    string(REPLACE "|" ";" fields "${notice}")
+    list(POP_FRONT fields name source installed)
+    set(source "${PROJECT_SOURCE_DIR}/${source}")
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${source}")
+    file(SHA256 "${source}" digest)
+    string(APPEND package_notices_build "${digest}\t${name}\t${source}\n")
+    string(APPEND package_notices_install "${digest}\t${name}\t../share/void/licenses/${installed}\n")
+  endforeach()
+  file(GENERATE OUTPUT "$<TARGET_FILE_DIR:voidc>/void-package-notices.txt" CONTENT "${package_notices_build}")
+  file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/package-notices-install.txt" CONTENT "${package_notices_install}")
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/package-notices-install.txt" DESTINATION bin
+    RENAME void-package-notices.txt COMPONENT compiler)
+endif()
+
 if(VOID_HOST_DEPS_ROOT)
   install(FILES "${VOID_HOST_DEPS_ROOT}/VOID-HOST-DEPENDENCIES.json" DESTINATION share/void/licenses/host COMPONENT compiler)
   install(DIRECTORY "${PROJECT_SOURCE_DIR}/.toolchains/host/downloads/" DESTINATION share/void/licenses/host/corresponding-source COMPONENT compiler FILES_MATCHING PATTERN "libsodium-1.0.22.tar.gz" PATTERN "libarchive-3.8.11.tar.xz")
