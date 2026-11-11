@@ -1,9 +1,11 @@
 import {runTests} from '@vscode/test-electron';
-import {spawn} from 'node:child_process';
+import assert from 'node:assert/strict';
+import {execFile, spawn} from 'node:child_process';
 import {promises as fs} from 'node:fs';
 import {createServer} from 'node:net';
 import * as path from 'node:path';
 import * as os from 'node:os';
+import {promisify} from 'node:util';
 import {offer, pause, until, workbench} from './creationWorkbench';
 
 async function freePort(): Promise<number> {
@@ -57,7 +59,8 @@ async function verifyPersistence(executable: string, server: string, root: strin
                     if (await ui.visible(offer, '.notification-toast')) throw new Error('Offer repeated after normal editor restart');
                     events.push('same physical root and persisted workspace storage suppress the next qualifying event');
                 }
-                ui.key('q', 'KeyQ', 81, 2);
+                if (process.platform === 'win32') ui.key('w', 'KeyW', 87, 2 | 8);
+                else ui.key('q', 'KeyQ', 81, 2);
                 let timer: NodeJS.Timeout | undefined;
                 try {
                     await Promise.race([stopped, new Promise<never>((_, reject) => {
@@ -88,6 +91,14 @@ async function main(): Promise<void> {
     if (!older) throw new Error('Set VOID_OLDER_VOIDLS_PATH to the retained legacy server.');
     const temporary = await fs.mkdtemp(path.join(os.tmpdir(), 'VOID S5 editor '));
     try {
+        const nativeGuard = process.platform === 'win32' ?
+            await fs.realpath(path.join(path.dirname(VOIDLS_PATH), 'void_editor_spawn_probe.exe')) : undefined;
+        if (nativeGuard) {
+            const calibration = path.join(temporary, 'native-launch-calibration');
+            await promisify(execFile)(nativeGuard, ['--discover-project'],
+                {cwd: temporary, env: {...process.env, VOID_CREATION_SPAWN: calibration}, timeout: 10000});
+            assert.equal(await fs.readFile(calibration, 'utf8'), 'native launch\n');
+        }
         for (const mode of ['trusted', 'old-tree', 'offered-close', 'manual', 'collision', 'outside', 'old-server', 'multi-root', 'untrusted']) {
             const group = mode.startsWith('offered-') ? 'offered' : mode;
             const root = path.join(temporary, group);
@@ -97,18 +108,18 @@ async function main(): Promise<void> {
             const marker = path.join(temporary, 'native-launch');
             const wrapper = path.join(temporary, 'voidls-launch-guard');
             const restricted = mode === 'untrusted' || mode === 'multi-root';
-            if (restricted) {
+            if (restricted && !nativeGuard) {
                 await fs.writeFile(wrapper, `#!/bin/sh\ntouch "${marker}"\n`, {mode: 0o700});
             } else if (mode === 'old-tree' || mode === 'manual') {
                 await fs.writeFile(path.join(root, 'existing.void'), 'func main() -> i32:\n    return 7\n');
                 if (mode === 'manual') await fs.writeFile(path.join(root, 'helper.void'), '');
             }
             await fs.writeFile(path.join(profile, 'User/settings.json'), JSON.stringify({
-                'void.server.path': restricted ? wrapper : await fs.realpath(mode === 'old-server' ? older : VOIDLS_PATH),
+                'void.server.path': restricted ? nativeGuard ?? wrapper : await fs.realpath(mode === 'old-server' ? older : VOIDLS_PATH),
                 'void.trace.server': 'verbose',
                 'security.workspace.trust.startupPrompt': 'never', 'workbench.startupEditor': 'none',
                 'telemetry.telemetryLevel': 'off', 'update.mode': 'none', 'extensions.autoCheckUpdates': false,
-                'files.hotExit': 'off', 'files.enableTrash': false, 'chat.disableAIFeatures': true
+                'files.eol': '\n', 'files.hotExit': 'off', 'files.enableTrash': false, 'chat.disableAIFeatures': true
             }));
             const port = await freePort();
             let workspace = root;
@@ -146,7 +157,7 @@ async function main(): Promise<void> {
         await verifyPersistence(VSCODE_EXECUTABLE_PATH, await fs.realpath(VOIDLS_PATH), temporary,
             path.join(VOID_CREATION_EVIDENCE_DIR, 'persistence-host.json'));
     } finally {
-        await fs.rm(temporary, {recursive: true, force: true});
+        await fs.rm(temporary, {recursive: true, force: true, maxRetries: 5, retryDelay: 100});
     }
 }
 main().catch(error => {console.error(error); process.exitCode = 1;});

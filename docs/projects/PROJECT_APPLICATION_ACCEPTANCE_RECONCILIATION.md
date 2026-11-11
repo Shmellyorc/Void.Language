@@ -56,3 +56,75 @@ The original gate is one full, unfiltered matrix at a reviewed integrated SHA. I
 2. Once Golden Wrench has reviewed those receipts, use the existing seven-configuration workflow at one Boss-authorized immutable integrated SHA. Review the actual registration, full CTest and editor results and artifacts together with the supported raylib display evidence. Preserve original failures and existing limits. The focused W1/W2, macOS dependency and hosted installation runs already answer their scoped questions.
 
 This audit inspected source, registrations, retained local receipts and hosted job metadata/logs. The links above identify the evidence used. No builds or test executions were needed for the reconciliation. Historical diagnostic archives remain indexed by the existing retention record. [Archive and retention policy](VOID_ARCHIVE_AND_RETENTION_POLICY.md)
+
+## Focused native application context and editor qualification
+
+11 November 2026 · Baseline `b8c58e256d5e890fcda2f6de55da075a1f51f2cc`. The compiler, Runtime and extension source used for the focused builds came from this baseline. The SDK was LLVM/Clang/LLD 23.1.4 with profile-matched verified provider inputs. The editor runs used native VS Code 1.141.0, Node 24.19.0 and separate temporary profiles.
+
+### macOS ARM64
+
+**UNQUALIFIED at this baseline.** The available hosts were Linux x86-64 and a native Windows 10 x64 guest. There was no Darwin ARM64 execution host. The original macOS Debug and Release jobs at `7a3e02008db64ee185aa4665aac5c76e3aff4b2b` did run the unchanged `os_packaging` fixture. It passed in 5.58 s and 1.41 s respectively. The fixture checks plain-process and recognized `.app` resource paths, including moved bundles, for both standalone AOT modes. Those results predate project application identity. The focused D1–D4 runs above remain the native macOS evidence for their selections. [Debug log](https://github.com/Shmellyorc/Void.Language/actions/runs/42486766707/job/128750237120) · [Release log](https://github.com/Shmellyorc/Void.Language/actions/runs/42486766707/job/128750237418) · [Bundle fixture](../../tests/os/packaging.py)
+
+The missing maintained coverage was the Darwin ARM64 project-context process fixture. `project_application` already registers for the immutable metadata, admission, ownership and reload assertions. `project_application_process` now registers on Apple ARM64 with its existing 300 s CTest timeout and 90 s subprocess limit. The Darwin branch independently queries Foundation's user-domain Application Support and Caches roots. The expected paths use the existing macOS data, config, cache and state layouts. It runs the existing normal/O2 JIT, independently linked AOT, embedded metadata and negative assertions from a disposable compiler-component install. The final relocated executions follow removal of the fixture project and compiler installation, and check that the path queries created no app directories. The existing `os_packaging` CTest supplies the bundle/plain-process control. Python syntax and the CMake registration branches were checked locally. Native Darwin execution of the new branch remains pending. [Application placement contract](../os/API.md#application-placement) · [Apple adapter](../../src/runtime/os_apple.mm) · [Project fixture](../../tests/project/application.py) · [CTest registration](../../CMakeLists.txt)
+
+On a native ARM64 host, use the pinned macOS configure/build recipe and run the registered application and filesystem controls below. Inspect active commands and existing timeouts with `ctest --show-only=json-v1 -R "$tests"` before execution. Use the dedicated editor commands in the next section against the native server on that host. [Pinned configure recipe](../../.github/workflows/ci-macos-package-qualification.yml)
+
+```sh
+tests='^(project_application|project_application_process|os_packaging|project_selection|project_creation_process|project_profiles)$'
+ctest --test-dir "$build" -R "$tests" --no-tests=error --output-on-failure
+```
+
+### Dedicated editor and related process tests
+
+Linux ran on PikaOS 4 x86-64, kernel 7.2.11, with native VS Code on the local display. The Release build used CMake 4.3.4, Python 3.14.8 and the pinned SDK. The first configure lacked Ninja on PATH and stopped before compilation. Supplying the retained Ninja 1.13.2 executable fixed configure. An offline install in an empty task-local npm cache reported `ENOTCACHED`. The extension build then reused the existing dependencies and compiled a fresh copy of the baseline extension in scratch.
+
+| Linux native check | Result |
+| --- | --- |
+| Focused Release CTests | 8/8 in 12.24 s. The application process fixture passed its 61 checks and passed again in 9.20 s after reconfigure. |
+| `runProjectHost.js` | PASS, 14 checks in 8 s. Includes arbitrary entry recognition, dirty TOML, unsaved source completion, rename, ambiguous-main recovery and old session results withheld after switching roots. |
+| `runNumericHost.js` | PASS, 6 checks in 5 s. Includes definition, hover, dirty diagnostics and recovery, signed completion, UTF-16 range and formatting. |
+| `runCreationHost.js` | PASS, 9 scenarios and 2 ordinary editor windows in 57 s. Includes accept/decline/dismiss, simultaneous files, collision, old server, untrusted and multi-root restrictions, and offer suppression after reopening. |
+
+Windows ran on the native Windows 10 x64 guest, build 19045.6466, with MSVC 14.44.35207 and Windows SDK 10.0.19041.0. It reused the verified LLVM and Schannel inputs, provisioned the checkout-bound Release host receipt, and used the W1 private-root helper for the subprocess tests. The first registration check caught a missing `void_project_application.exe` build target. Building that target in the same tree activated the eighth command. The Windows focused Release CTests then passed **8/8 in 48.97 s** in a serial run. `project_application_process` took 21.31 s.
+
+The first Windows editor run passed all six numeric checks in 7.84 s. The project host timed out at its first entry selection, and the creation host failed its metadata review path assertion after passing decline, dismiss and cancel. The Windows creation receipt showed the running entry as `C:/.../game.void` and the matching editor document as `c:\\...\\game.void`. The review displayed the compiler's forward-slash manifest path. The fixture now compares editor file identities through VS Code's URI representation, checks the displayed path in the compiler's format, and selects LF explicitly for the exact dirty-text assertion. The file, manifest and metadata assertions retain their original meaning.
+
+The first corrected Windows project run completed all 14 checks, then failed on `EBUSY` unlinking the extension-host `VOID.log`. The host runners now bound recursive scratch cleanup retries. The corrected project host passed all 14 checks and exited zero in 12.01 s. An initial standalone assertion inserted into the trusted creation scenario left a deleted but open document in the overlay. It yielded an ambiguous main on both Linux and Windows. The assertion now runs in the separate old-tree scenario, where it verifies real manifestless document symbols and leaves the trusted creation overlay unchanged.
+
+The Windows shell-script launch sentinel could not run as an executable. A first replacement using a Node child-process observer missed its calibration process inside the Electron extension host. The final fixture uses the test-only Windows `void_editor_spawn_probe.exe`, built with the same pinned compiler. The runner first verifies that the executable writes a marker, then configures it as the native server in the untrusted and multi-root profiles. Both cases kept the marker and manifest absent and the extension stopped. The persistence scenario closed and reopened two ordinary editor windows using the same profile and verified suppression after restart. Its Windows replay used Ctrl+Shift+W. [Native sentinel](../../tests/project/editor_spawn_probe.cpp) · [Creation runner](../../editors/vscode/src/test/runCreationHost.ts)
+
+| Final dedicated editor result | Linux x86-64 | Windows 10 x64 |
+| --- | --- | --- |
+| Project | 14 checks, exit 0 in 6 s | 14 checks, exit 0 in 12.01 s |
+| Numeric enum | 6 checks, exit 0 in 5 s | 6 checks, exit 0 in 7.84 s |
+| Creation | 9 scenarios plus 2 persistence windows, exit 0 in 57 s | 9 scenarios plus 2 persistence windows, exit 0 in 78.56 s |
+
+The Windows editor setup first looked for the cached VS Code manifest next to the outer executable. Reading the archive's versioned resource directory confirmed 1.141.0 and allowed setup to proceed. TypeScript also rejected a VS Code `Thenable` passed directly to the fixture's Promise poller during the standalone-check draft. The final callback is asynchronous and both native extension builds passed.
+
+The focused CTest selection was the following. Active registrations used 180 s for application, sessions and protocol, 300 s for the application process and both creation cases, and 480 s for both numeric cases. The standalone project-session CTest also exercised revision admission. [Session fixture](../../tests/project/sessions.cpp)
+
+```sh
+tests='^(project_application|project_application_process|project_creation|project_creation_process|project_sessions|project_protocol|numeric_enum_ir|numeric_enum_lsp)$'
+ctest --test-dir "$build" --show-only=json-v1 -R "$tests"
+ctest --test-dir "$build" --no-tests=error --output-on-failure -j2 -R "$tests"
+```
+
+The Windows run used the same selection with one CTest job. The native builds selected `voidc voidls void_project_application void_project_creation void_project_sessions void_numeric_enum_ir` using `cmake --build "$build" --target`. Windows also built `void_windows_native_staging` for the private `TMP`/`TEMP` root.
+
+For the editor checks, build the copied extension with `npm run build`. Set `VOIDLS_PATH` to the matching native Release server, `VOID_STDLIB_ROOT` to the source standard library, and `VSCODE_EXECUTABLE_PATH` to the verified native editor. Set `VOID_OLDER_VOIDLS_PATH` to the retained project-incapable native server. Give `VOID_S3_HOST_EVIDENCE`, `VOID_NUMERIC_HOST_EVIDENCE` and `VOID_CREATION_EVIDENCE_DIR` task-local destinations. On Windows run `cmake --build "$build" --target void_editor_spawn_probe` first so the guard executable is beside `voidls.exe`. Run these commands from the copied extension root on the native desktop.
+
+```sh
+node out/test/runProjectHost.js
+node out/test/runNumericHost.js
+node out/test/runCreationHost.js
+```
+
+The extension exposes project selection, creation and language-service commands. The source contains no project build/run task provider or debug adapter. A first-class editor-to-run path and debugger support require a separate implementation decision. The dedicated editor tests exercise the workflows already present. [Extension command registration](../../editors/vscode/package.json)
+
+### Handoff and cleanup
+
+The changes are limited to this record and test fixtures. `CMakeLists.txt` registers the existing process test on Darwin ARM64 and makes the Windows sentinel an explicit test build target. `tests/project/application.py` adds the Darwin oracle and disposable install replay. `tests/project/editor_spawn_probe.cpp` implements the launch marker. The editor changes are in `creationHost.ts`, `projectHost.ts`, `runCreationHost.ts` and `runProjectHost.ts` under `editors/vscode/src/test/`. The focused builds were Release. The original sanitizer requirements and W1/W2 acceptance records remain in force.
+
+The removed Windows guest workspace held 638,444,442 logical bytes. Free space measured 12,020,760,576 bytes before removal and 12,708,122,624 bytes afterward. Cleanup detached the task-owned junctions and verified the retained SDK. The Linux scratch and guest exchange used 564,158,464 and 30,117,888 allocated bytes and were removed after the runs. The Markdown record retains the findings and original failure details.
+
+Native macOS ARM64 application-context and editor execution remain **UNQUALIFIED**. This assignment supplies the maintained Darwin registration and leaves the integrated hosted gate for separate authorization and independent review.

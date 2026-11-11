@@ -17,6 +17,6 @@ async function main(): Promise<void> {
     } catch(error) {
         if (process.env.VOID_S3_PROFILE_EVIDENCE) await fs.cp(temp,process.env.VOID_S3_PROFILE_EVIDENCE,{recursive:true});
         throw error;
-    } finally {await fs.rm(temp,{recursive:true,force:true});}
+    } finally {await fs.rm(temp,{recursive:true,force:true,maxRetries:5,retryDelay:100});}
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

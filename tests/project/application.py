@@ -57,6 +57,38 @@ def encoded_metadata(name, version):
     return struct.pack("<I", 1) + b"".join(struct.pack("<I", len(b)) + b for b in map(lambda s: s.encode(), fields))
 
 
+def foundation_roots():
+    import ctypes as c
+
+    objc = c.CDLL("/usr/lib/libobjc.A.dylib")
+    foundation = c.CDLL("/System/Library/Frameworks/Foundation.framework/Foundation")
+    for lookup in (objc.objc_getClass, objc.sel_registerName):
+        lookup.argtypes = [c.c_char_p]
+        lookup.restype = c.c_void_p
+    send = c.CFUNCTYPE(c.c_void_p, c.c_void_p, c.c_void_p)(("objc_msgSend", objc))
+    send_text = c.CFUNCTYPE(c.c_char_p, c.c_void_p, c.c_void_p)(("objc_msgSend", objc))
+    drain = c.CFUNCTYPE(None, c.c_void_p, c.c_void_p)(("objc_msgSend", objc))
+    selector = objc.sel_registerName
+    search = foundation.NSSearchPathForDirectoriesInDomains
+    search.argtypes = [c.c_ulong, c.c_ulong, c.c_bool]
+    search.restype = c.c_void_p
+    pool = send(objc.objc_getClass(b"NSAutoreleasePool"), selector(b"new"))
+    assert pool
+    try:
+        # Search only the user domain and expand the native home path.
+        paths = []
+        for directory in (14, 13):  # NSApplicationSupportDirectory, NSCachesDirectory
+            candidates = search(directory, 1, True)  # NSUserDomainMask
+            first = send(candidates, selector(b"firstObject"))
+            path = send_text(first, selector(b"fileSystemRepresentation"))
+            assert path and os.path.isabs(path), path
+            paths.append(Path(os.fsdecode(path)))
+        support, cache = paths
+        return {"data": support, "config": support, "cache": cache, "state": support}
+    finally:
+        drain(pool, selector(b"drain"))
+
+
 def roots(base, use_xdg):
     env = dict(os.environ)
     locations = {}
@@ -90,8 +122,12 @@ def roots(base, use_xdg):
         roaming = known_folder("3EB685DB-65F9-4CF6-A03A-E3EF65729F3D")
         locations = {"data": local, "config": roaming, "cache": local, "state": local}
         env.update(LOCALAPPDATA=str(base / "poisoned-local"), APPDATA=str(base / "poisoned-roaming"))
+    elif sys.platform == "darwin":
+        locations = foundation_roots()
+        if use_xdg:
+            env.update(XDG_DATA_HOME=str(base / "poisoned-data"), XDG_CACHE_HOME=str(base / "poisoned-cache"))
     else:
-        raise RuntimeError("This fixture has native Linux and Windows path oracles")
+        raise RuntimeError("This fixture requires a supported native path oracle")
     return env, locations
 
 
@@ -100,6 +136,8 @@ def expected_paths(locations, label):
     for operation, root in locations.items():
         path = root / app_id
         if os.name == "nt" and operation in ("cache", "state"):
+            path /= operation
+        if sys.platform == "darwin" and operation in ("config", "state"):
             path /= operation
         rows.append(f"{label}-{operation}|{path.as_posix()}")
     return rows
@@ -138,8 +176,20 @@ try:
         policy.write_text(manifest(), encoding="utf-8")
         active = root / "launcher.void"
         active.write_text(src, encoding="utf-8")
+        if sys.platform == "darwin":
+            assert os.uname().machine == "arm64", "Native ARM64 is required"
         env, locations = roots(base, True)
         fallback, fallback_locations = roots(base, False)
+        compiler_install = None
+        if sys.platform == "darwin":
+            cmake, build, config = sys.argv[3:]
+            compiler_install = base / "compiler installation"
+            run([cmake, "--install", build, "--prefix", compiler_install, "--config", config,
+                 "--component", "compiler"], cwd, env)
+            compiler = compiler_install / "bin" / compiler.name
+            for environment in (env, fallback):
+                environment.pop("VOID_STDLIB_ROOT", None)
+            app_locations = {path / app_id: os.path.lexists(path / app_id) for path in set(locations.values())}
         absent = cwd / "standalone.void"
         absent.write_text(src, encoding="utf-8")
 
@@ -212,12 +262,17 @@ try:
         check("VOID5004" in run([compiler, "run", "--project", root], cwd, env, 1)[1], "invalid ID ran application")
         shutil.rmtree(root)
         absent.unlink()
+        if compiler_install is not None:
+            shutil.rmtree(compiler_install)
         for target in outputs:
             for active_env, expected in ((env, locations), (fallback, fallback_locations)):
                 # Even an explicit compiler source root cannot affect the installed program.
                 active_env = dict(active_env, VOID_STDLIB_ROOT=str(base / "missing compiler resources"))
                 success(run([target], cwd, active_env)[0], expected)
         run([scalar], cwd, env, 7)
+        if sys.platform == "darwin":
+            check(all(os.path.lexists(path) == existed for path, existed in app_locations.items()),
+                  "Foundation location query changed directory existence")
         for root_path in locations.values():
             if sys.platform == "linux":
                 check(not root_path.exists(), f"location query created {root_path}")

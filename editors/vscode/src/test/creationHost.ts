@@ -14,6 +14,8 @@ export async function run(): Promise<void> {
     const events: string[] = [];
     const pass = (label: string) => {events.push(label); console.log('PASS ' + label);};
     const uri = (name: string) => vscode.Uri.file(path.join(root, name));
+    const entryIs = (entry: string | undefined, target: vscode.Uri) =>
+        entry !== undefined && vscode.Uri.file(entry).fsPath === target.fsPath;
     const exists = (file: string) => fs.access(file).then(() => true, () => false);
     const extension = vscode.extensions.getExtension('void-language.void-language');
     assert(extension);
@@ -68,8 +70,15 @@ export async function run(): Promise<void> {
         }
         const main = 'func main() -> i32:\n    return 27\n';
         if (mode === 'old-tree') {
-            const document = await vscode.workspace.openTextDocument(uri('existing.void'));
+            const existing = uri('existing.void');
+            const document = await vscode.workspace.openTextDocument(existing);
             await vscode.window.showTextDocument(document);
+            await api!.ready();
+            await until(() => api!.status(), status => status.state === 'running' && entryIs(status.entry, existing),
+                'legacy standalone session');
+            await until(async () => vscode.commands.executeCommand<vscode.DocumentSymbol[]>('vscode.executeDocumentSymbolProvider', existing),
+                symbols => !!symbols?.some(symbol => symbol.name === 'main'), 'legacy standalone symbols');
+            pass('manifestless existing source keeps real standalone analysis available');
             await noOffer();
             pass('activation and opening a pre-existing source do not offer');
             await add('later.void', main);
@@ -104,7 +113,7 @@ export async function run(): Promise<void> {
             assert(!await exists(manifest));
             await ui.click('Create Manifest', dialog);
             await create;
-            await until(() => api!.status().entry, entry => entry === source.fsPath, 'manual project entry');
+            await until(() => api!.status().entry, entry => entryIs(entry, source), 'manual project entry');
             assert(await exists(manifest));
             pass('deliberate creation works around existing multiple sources');
             return;
@@ -117,7 +126,7 @@ export async function run(): Promise<void> {
             const incoming = "schema=1\n[project]\nid='org.test.external'\nname='External'\nversion='1.0.0'\nkind='application'\n[application]\nid='org.test.external-app'\n";
             await fs.writeFile(manifest, incoming, {flag: 'wx'});
             await ui.click('Create Manifest', dialog);
-            await until(() => api!.status().entry, entry => entry === source.fsPath, 'same-root session after collision');
+            await until(() => api!.status().entry, entry => entryIs(entry, source), 'same-root session after collision');
             assert.equal(await fs.readFile(manifest, 'utf8'), incoming);
             pass('a manifest arriving during review is preserved and selected in the same root');
             return;
@@ -175,13 +184,14 @@ export async function run(): Promise<void> {
         await ui.click('Create VOID project', toast);
         await until(() => ui!.visible(review, dialog), n => n === 1, 'metadata review');
         const detail = await ui.evaluate<string>("document.querySelector('.quick-input-widget').innerText");
-        assert(detail.includes(manifest) && /local\.p[0-9a-f]{32}/.test(detail) && /local\.a[0-9a-f]{32}/.test(detail));
+        const reviewedManifest = process.platform === 'win32' ? manifest.replaceAll('\\', '/') : manifest;
+        assert(detail.includes(reviewedManifest) && /local\.p[0-9a-f]{32}/.test(detail) && /local\.a[0-9a-f]{32}/.test(detail));
         assert(!await exists(manifest));
         await ui.click('Create Manifest', dialog);
         await until(() => exists(manifest), Boolean, 'exclusive manifest publication');
         const manifestBytes = await fs.readFile(manifest, 'utf8');
         for (const id of detail.match(/local\.[pa][0-9a-f]{32}/g)!) assert(manifestBytes.includes(id));
-        await until(() => api!.status().entry, entry => entry === source.fsPath, 'dirty main in a compiler project session');
+        await until(() => api!.status().entry, entry => entryIs(entry, source), 'dirty main in a compiler project session');
         assert(dirty.isDirty && dirty.getText() === main);
         assert.equal(await fs.readFile(source.fsPath, 'utf8'), '');
         assert.equal(await fs.readFile(helper.fsPath, 'utf8'), '');
