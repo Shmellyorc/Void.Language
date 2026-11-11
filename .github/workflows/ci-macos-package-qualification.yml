@@ -317,6 +317,7 @@ jobs:
                       destination.write_bytes(tail)
           PY
       - name: Retain failure diagnostics
+        id: failure_upload
         if: failure()
         uses: actions/upload-artifact@v6
         with:
@@ -324,3 +325,24 @@ jobs:
           path: ${{ runner.temp }}/void-${{ inputs.slice }}/failure
           if-no-files-found: warn
           retention-days: 7
+      - name: Keep collected diagnostics in the job log if upload fails
+        if: ${{ !cancelled() && inputs.project_application && steps.failure_upload.outcome == 'failure' }}
+        run: |
+          python3 -B - <<'PY'
+          import os
+          from pathlib import Path
+          import uuid
+
+          work = Path(os.environ.get("PACKAGE_WORK") or Path(os.environ["RUNNER_TEMP"]) /
+                      ("void-" + os.environ["PACKAGE_SLICE"]))
+          # Child output can contain strings that resemble workflow commands.
+          token = uuid.uuid4().hex
+          print(f"::stop-commands::{token}", flush=True)
+          try:
+              for path in sorted((work / "failure").iterdir()):
+                  if path.is_file():
+                      print(f"===== {path.name} =====")
+                      print(path.read_bytes().decode("utf-8", errors="backslashreplace"))
+          finally:
+              print(f"::{token}::", flush=True)
+          PY

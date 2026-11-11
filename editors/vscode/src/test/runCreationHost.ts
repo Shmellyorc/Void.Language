@@ -19,6 +19,13 @@ async function freePort(): Promise<number> {
         });
     });
 }
+async function retainProfileLogs(profile: string, evidence: string): Promise<void> {
+    try {
+        await fs.cp(path.join(profile, 'logs'), evidence, {recursive: true});
+    } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== 'ENOENT') console.error('Could not retain editor logs:', error);
+    }
+}
 async function verifyPersistence(executable: string, server: string, root: string, evidence: string): Promise<void> {
     const workspace = path.join(root, 'persistence');
     const profile = path.join(root, 'persistent-profile');
@@ -77,6 +84,7 @@ async function verifyPersistence(executable: string, server: string, root: strin
         }
     } catch (error) {
         failure = String(error);
+        await retainProfileLogs(profile, path.join(path.dirname(evidence), 'failed-persistence-logs'));
         throw error;
     } finally {
         await fs.writeFile(evidence, JSON.stringify({events, failure, status: failure ? 'FAIL' : 'PASS'}, null, 2) + '\n');
@@ -89,7 +97,12 @@ async function main(): Promise<void> {
         throw new Error('Set VOIDLS_PATH, VSCODE_EXECUTABLE_PATH, and VOID_CREATION_EVIDENCE_DIR.');
     const older = process.env.VOID_OLDER_VOIDLS_PATH;
     if (!older) throw new Error('Set VOID_OLDER_VOIDLS_PATH to the retained legacy server.');
-    const temporary = await fs.mkdtemp(path.join(os.tmpdir(), 'VOID S5 editor '));
+    // VS Code puts its main IPC socket under the profile on macOS. The hosted
+    // TMPDIR can make even the first profile exceed the 103-byte socket path.
+    // Resolve /tmp before passing workspace paths to the compiler's physical-root check.
+    const prefix = process.platform === 'darwin' ? path.join(await fs.realpath('/tmp'), 'VOID S5 ') :
+        path.join(os.tmpdir(), 'VOID S5 editor ');
+    const temporary = await fs.mkdtemp(prefix);
     try {
         const nativeGuard = process.platform === 'win32' ?
             await fs.realpath(path.join(path.dirname(VOIDLS_PATH), 'void_editor_spawn_probe.exe')) : undefined;
@@ -136,22 +149,23 @@ async function main(): Promise<void> {
                 VOID_CREATION_SPAWN: marker, VOID_CREATION_EVIDENCE: path.join(VOID_CREATION_EVIDENCE_DIR, mode + '-host.json')};
             const extension = path.resolve(__dirname, '../..');
             const test = path.resolve(__dirname, 'creationHost.js');
-            if (mode !== 'untrusted') {
-                try { await runTests({vscodeExecutablePath: VSCODE_EXECUTABLE_PATH, extensionDevelopmentPath: extension,
-                    extensionTestsPath: test, extensionTestsEnv: env, launchArgs: args}); }
-                catch (error) {
-                    await fs.cp(path.join(profile, 'logs'), path.join(VOID_CREATION_EVIDENCE_DIR, 'failed-' + mode + '-logs'), {recursive: true});
-                    throw error;
+            try {
+                if (mode !== 'untrusted') {
+                    await runTests({vscodeExecutablePath: VSCODE_EXECUTABLE_PATH, extensionDevelopmentPath: extension,
+                        extensionTestsPath: test, extensionTestsEnv: env, launchArgs: args});
+                } else {
+                    await new Promise<void>((resolve, reject) => {
+                        const child = spawn(VSCODE_EXECUTABLE_PATH, [...args, '--no-sandbox', '--disable-gpu-sandbox',
+                            '--extensionDevelopmentPath=' + extension, '--extensionTestsPath=' + test], {
+                            env: {...process.env, ...env}, stdio: 'inherit'});
+                        const timeout = setTimeout(() => {child.kill(); reject(new Error('Restricted workspace test timed out'));}, 60000);
+                        child.once('error', error => {clearTimeout(timeout); reject(error);});
+                        child.once('exit', code => {clearTimeout(timeout); code === 0 ? resolve() : reject(new Error('Restricted workspace test exited ' + code));});
+                    });
                 }
-            } else {
-                await new Promise<void>((resolve, reject) => {
-                    const child = spawn(VSCODE_EXECUTABLE_PATH, [...args, '--no-sandbox', '--disable-gpu-sandbox',
-                        '--extensionDevelopmentPath=' + extension, '--extensionTestsPath=' + test], {
-                        env: {...process.env, ...env}, stdio: 'inherit'});
-                    const timeout = setTimeout(() => {child.kill(); reject(new Error('Restricted workspace test timed out'));}, 60000);
-                    child.once('error', error => {clearTimeout(timeout); reject(error);});
-                    child.once('exit', code => {clearTimeout(timeout); code === 0 ? resolve() : reject(new Error('Restricted workspace test exited ' + code));});
-                });
+            } catch (error) {
+                await retainProfileLogs(profile, path.join(VOID_CREATION_EVIDENCE_DIR, 'failed-' + mode + '-logs'));
+                throw error;
             }
         }
         await verifyPersistence(VSCODE_EXECUTABLE_PATH, await fs.realpath(VOIDLS_PATH), temporary,

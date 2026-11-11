@@ -96,7 +96,10 @@ export async function run(): Promise<void> {
             return;
         }
         if (mode === 'old-server') {
-            await add('first.void', main);
+            // Exercise compatibility through VS Code's explicit file-create event.
+            const edit = new vscode.WorkspaceEdit();
+            edit.createFile(uri('first.void'), {contents: Buffer.from(main)});
+            assert(await vscode.workspace.applyEdit(edit));
             await until(() => ui!.visible('Project creation requires a matching voidls', toast), Boolean, 'older server rejection');
             await noOffer();
             pass('an older server fails visibly with no standalone creation fallback');

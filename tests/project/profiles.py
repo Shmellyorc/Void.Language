@@ -26,7 +26,13 @@ try:
   # arithmetic even at O0; its retained stack traffic still distinguishes O2.
   def instructions(label,flags,warning):
    path=root/(label+'.o');run([compiler,'emit','--project',root,*flags,'-o',path],warning=warning)
-   dump=run([objdump,'-d','--no-show-raw-insn',path]).stdout.decode();symbol='__vd_'+b'/src/game.void::compute'.hex()+'__void'
+   symbol='__vd_'+b'/src/game.void::compute'.hex()+'__void'
+   args=[objdump,'-d','--no-show-raw-insn']
+   if sys.platform=='darwin':
+    # Mach-O prefixes the symbol and may display its same-address ltmp0 alias.
+    symbol='_'+symbol
+    args.append(f'--disassemble-symbols={symbol}')
+   dump=run([*args,path]).stdout.decode()
    match=re.search(r'<'+symbol+r'>:\n(.*?)(?:\n\n|\Z)',dump,re.S);assert match,dump
    body=[]
    for line in match[1].splitlines():
