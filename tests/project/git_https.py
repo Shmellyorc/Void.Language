@@ -1,9 +1,11 @@
 """Exercise D3 through conventional smart HTTPS and disposable real Git repositories."""
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
+import hashlib
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import os
 from pathlib import Path
+import secrets
 import shutil
 import socket
 import ssl
@@ -65,8 +67,44 @@ def create_repo(directory, name, source, dependencies=""):
     return repo, commit(repo)
 
 
-def certificates(base):
-    config = write(base / "tls.cnf", """[req]
+@contextmanager
+def serve_crl():
+    if os.name != "nt":
+        yield None
+        return
+
+    # A unique URL keeps Schannel's CRL cache separate between fixture runs.
+    path = f"/{secrets.token_hex(16)}.crl"
+
+    class Handler(BaseHTTPRequestHandler):
+        def log_message(self, *_):
+            pass
+
+        def do_GET(self):
+            content = self.server.crl
+            if self.path != path or not content:
+                self.send_error(404)
+                return
+            self.send_response(200)
+            self.send_header("Content-Type", "application/pkix-crl")
+            self.send_header("Content-Length", str(len(content)))
+            self.end_headers()
+            self.wfile.write(content)
+
+    with ThreadingHTTPServer(("127.0.0.1", 0), Handler) as server:
+        server.crl = b""
+        server.crl_url = f"http://127.0.0.1:{server.server_port}{path}"
+        thread = Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        try:
+            yield server
+        finally:
+            server.shutdown()
+            thread.join(timeout=5)
+
+
+def certificates(base, revocation):
+    config = """[req]
 distinguished_name=dn
 [dn]
 [ca]
@@ -77,7 +115,16 @@ basicConstraints=critical,CA:FALSE
 keyUsage=critical,digitalSignature,keyEncipherment
 extendedKeyUsage=serverAuth
 subjectAltName=IP:127.0.0.1
-""")
+"""
+    if revocation:
+        config += f"""crlDistributionPoints=URI:{revocation.crl_url}
+[crl_issuer]
+database=ca-index.txt
+private_key=ca.key
+certificate=ca.pem
+default_md=sha256
+"""
+    write(base / "tls.cnf", config)
     openssl = shutil.which("openssl")
     if not openssl and os.name == "nt":
         exec_path = Path(run(git, "--exec-path", env=git_env).stdout.decode().strip())
@@ -85,17 +132,31 @@ subjectAltName=IP:127.0.0.1
         if bundled.is_file():
             openssl = bundled
     assert openssl, "The focused Git HTTPS fixture requires the openssl command."
-    ca, key, request, cert = (base / name for name in ("ca.pem", "server.key", "server.csr", "server.pem"))
+    openssl = Path(openssl).resolve(strict=True)
+    if os.name == "nt":
+        print(f"OpenSSL executable {ascii(str(openssl))} SHA-256 {hashlib.sha256(openssl.read_bytes()).hexdigest()}",
+              flush=True)
+        version = run(openssl, "version", "-a").stdout.decode(errors="backslashreplace")
+        print(version.replace("\r\n", "\n"), end="", flush=True)
+    # The child process receives a Unicode cwd from Python. Its OpenSSL file
+    # operands stay ASCII across the executable's narrow path boundary.
     run(openssl, "req", "-new", "-x509", "-nodes", "-newkey", "rsa:2048", "-days", "3",
-        "-config", config, "-extensions", "ca", "-subj", "/CN=VOID D3 HTTPS CA",
-        "-keyout", base / "ca.key", "-out", ca)
-    run(openssl, "req", "-new", "-nodes", "-newkey", "rsa:2048", "-config", config,
-        "-subj", "/CN=VOID D3 HTTPS fixture", "-keyout", key, "-out", request)
-    run(openssl, "x509", "-req", "-in", request, "-CA", ca, "-CAkey", base / "ca.key",
-        "-set_serial", "1", "-days", "2", "-extfile", config, "-extensions", "leaf", "-out", cert)
+        "-config", "tls.cnf", "-extensions", "ca", "-subj", "/CN=VOID D3 HTTPS CA",
+        "-keyout", "ca.key", "-out", "ca.pem", cwd=base)
+    run(openssl, "req", "-new", "-nodes", "-newkey", "rsa:2048", "-config", "tls.cnf",
+        "-subj", "/CN=VOID D3 HTTPS fixture", "-keyout", "server.key", "-out", "server.csr", cwd=base)
+    run(openssl, "x509", "-req", "-in", "server.csr", "-CA", "ca.pem", "-CAkey", "ca.key",
+        "-set_serial", "1", "-days", "2", "-extfile", "tls.cnf", "-extensions", "leaf", "-out", "server.pem",
+        cwd=base)
+    if revocation:
+        write(base / "ca-index.txt", "")
+        run(openssl, "ca", "-batch", "-name", "crl_issuer", "-config", "tls.cnf", "-gencrl",
+            "-crldays", "2", "-out", "ca.crl.pem", cwd=base)
+        run(openssl, "crl", "-in", "ca.crl.pem", "-outform", "DER", "-out", "ca.crl", cwd=base)
+        revocation.crl = (base / "ca.crl").read_bytes()
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    context.load_cert_chain(cert, key)
-    return ca, context
+    context.load_cert_chain(base / "server.pem", base / "server.key")
+    return base / "ca.pem", context
 
 
 def packet(data):
@@ -255,7 +316,8 @@ def reproduce_packfile_uris(base, ca, server, forbidden, revision):
             write(git_dir / "config", "[core]\n\trepositoryformatversion = 0\n\tbare = true\n")
             env = dict(GIT_OBJECT_DIRECTORY=str(git_dir / "objects"), GIT_CONFIG_GLOBAL=str(work / "no-config"),
                        GIT_CONFIG_SYSTEM=str(work / "no-config"), GIT_CONFIG_NOSYSTEM="1", GIT_NO_REPLACE_OBJECTS="1",
-                       GIT_NO_LAZY_FETCH="1", GIT_PROTOCOL_FROM_USER="0", LC_ALL="C", GIT_ALLOW_PROTOCOL="https",
+                       GIT_NO_LAZY_FETCH="1", GIT_PROTOCOL_FROM_USER="0",
+                       LC_ALL="C.UTF-8" if os.name == "nt" else "C", GIT_ALLOW_PROTOCOL="https",
                        GIT_TERMINAL_PROMPT="0", GIT_ALLOC_LIMIT="134217728", HOME=str(work), USERPROFILE=str(work),
                        XDG_CONFIG_HOME=str(work), NETRC=str(work / "no-netrc"), TMPDIR=str(work), TEMP=str(work),
                        TMP=str(work), GIT_SSL_CAINFO=str(ca))
@@ -307,14 +369,14 @@ def cache_run(root, expected, state):
         assert f"Debug cache: {state}".encode() in result.stderr, result
 
 
-with tempfile.TemporaryDirectory(prefix="VOID D3 HTTPS 雪 ") as temp:
+with tempfile.TemporaryDirectory(prefix="VOID D3 HTTPS 雪 ") as temp, serve_crl() as revocation:
     base = Path(temp).resolve()
     git_env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
     git_env.update(GIT_CONFIG_NOSYSTEM="1", GIT_CONFIG_GLOBAL=str(base / "empty-git-config"))
     scratch = base / "transport"
     scratch.mkdir()
     clean = dict(git_env, TMPDIR=str(scratch), TEMP=str(scratch), TMP=str(scratch))
-    ca, context = certificates(base)
+    ca, context = certificates(base, revocation)
     trusted = dict(clean, GIT_SSL_CAINFO=str(ca))
     repos = base / "repositories"
     repos.mkdir()
@@ -346,7 +408,7 @@ with tempfile.TemporaryDirectory(prefix="VOID D3 HTTPS 雪 ") as temp:
         write(user / ".netrc", "machine 127.0.0.1 login forbidden password forbidden\n")
         config = write(user / ".gitconfig", f'[url "{server.origin}/redirect.git"]\n'
                        f'  insteadOf = {origin}\n[http]\n  sslVerify = false\n')
-        hostile = dict(trusted, HOME=str(user), USERPROFILE=str(user), NETRC=str(user / ".netrc"),
+        hostile = dict(trusted, HOME=str(user), USERPROFILE=str(user), NETRC=str(user / ".netrc"), LC_ALL="C",
                        GIT_CONFIG_GLOBAL=str(config), GIT_CONFIG_COUNT="1", GIT_CONFIG_KEY_0="http.proxy",
                        GIT_CONFIG_VALUE_0="http://127.0.0.1:1", HTTPS_PROXY="http://127.0.0.1:1", NO_PROXY="*",
                        GIT_SSL_NO_VERIFY="1", GIT_ASKPASS=str(base / "forbidden-askpass"),
@@ -496,7 +558,9 @@ with tempfile.TemporaryDirectory(prefix="VOID D3 HTTPS 雪 ") as temp:
     for profile in ("debug", "release"):
         assert cli(app, "run", "--profile", profile, "--no-cache", env=clean).stdout == b"58\n"
         image = base / (profile + (".exe" if os.name == "nt" else ""))
-        cli(app, "build", "--profile", profile, "-o", image, env=clean)
+        # AOT uses the caller's admitted native-link root. The transport
+        # scratch only controls Git workspaces and their cleanup assertions.
+        cli(app, "build", "--profile", profile, "-o", image, env=git_env)
         assert run(image, cwd=base, env=clean).stdout == b"58\n"
     assert lock.read_bytes() == final_lock
     exported, = (fresh / store).glob("*/*/tree/src/api.void")

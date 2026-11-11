@@ -53,7 +53,7 @@ jobs:
             throw 'W1 requires a GitHub-hosted Windows x64 runner with the x64 MSVC and Windows SDK environment.'
           }
           $work = Join-Path $env:RUNNER_TEMP 'w1'
-          $temp = (New-Item -ItemType Directory -Force -Path "$work/t").FullName
+          $temp = (New-Item -ItemType Directory -Force -Path "$work/bootstrap").FullName
           "W1_WORK=$work", "TEMP=$temp", "TMP=$temp" >> $env:GITHUB_ENV
           Write-Host "Reviewed commit $head / $env:W1_CONFIGURATION / MSVC $env:VCToolsVersion / SDK $env:WindowsSDKVersion"
           git --version
@@ -80,7 +80,28 @@ jobs:
             "-DLLVM_DIR=$env:LLVM_DIR" "-DVOID_CLANG=$env:VOID_CLANG" "-DVOID_GIT_EXECUTABLE=$git"
       - name: Build required targets
         id: build
-        run: cmake --build "$env:W1_WORK/b" --parallel 2 --target voidc voidls void_project_manifest void_project_packages_ir
+        run: cmake --build "$env:W1_WORK/b" --parallel 2 --target voidc voidls void_project_manifest void_project_packages_ir void_windows_native_staging
+      - name: Create and verify private native temporary root
+        id: private_root
+        run: |
+          @'
+          import os
+          from pathlib import Path
+          import subprocess
+
+          work = Path(os.environ["W1_WORK"])
+          root = work / "t"
+          helper = work / "b" / "void_windows_native_staging.exe"
+          result = subprocess.run([helper, "--create-private-root"],
+                                  input=(str(root) + "\n").encode("utf-8"),
+                                  stdout=subprocess.PIPE, check=True)
+          receipt = result.stdout.decode("ascii")
+          print(receipt, end="")
+          if "private_root_verified=1 owner_access=1 restricted_mutation=0" not in receipt.splitlines():
+              raise SystemExit("Missing private native temporary root verification")
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as environment:
+              environment.write(f"TEMP={root}\nTMP={root}\n")
+          '@ | python -B -
       - name: Smoke test native project discovery, check, JIT and AOT
         run: |
           @'
@@ -124,7 +145,7 @@ jobs:
           print("Native Windows x64 check, JIT and AOT passed")
           '@ | python -B -
       - name: Verify and run the exact focused CTest selection
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.private_root.outcome == 'success' }}
         run: |
           @'
           import json

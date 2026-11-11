@@ -314,13 +314,14 @@ static std::string link_executable(const ValidatedAnalysis& analysis, const fs::
         throw std::runtime_error("Native linker did not produce a usable executable.");
     if (managed) {
         std::map<std::string, std::string_view> files(payload.begin(), payload.end());
-        project::publish_project_directory(*destination, managed_payload_directory, files, [&](const fs::path& directory) {
-            if (project::inspect_creation_root(directory).path != directory)
+        project::publish_project_directory(*destination, managed_payload_directory, files,
+                                           [&](const fs::path& directory, const project::ProjectDirectoryReader& reader) {
+            if (reader.inspect(directory).path != directory)
                 throw std::runtime_error("Managed native output directory spelling changed.");
             std::size_t count = 0;
             for (const auto& entry : fs::directory_iterator(directory)) {
                 const auto file = payload.find(path_utf8(entry.path().filename()));
-                if (file == payload.end() || project::read_project_input(entry.path(), file->second.size()) != file->second)
+                if (file == payload.end() || reader.read(entry.path(), file->second.size()) != file->second)
                     throw std::runtime_error("Managed native output has a different payload; select a fresh output directory.");
                 ++count;
             }

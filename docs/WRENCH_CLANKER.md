@@ -58,6 +58,34 @@ with Boss's separate explicit authorization. Use canonical API and architecture
 documents for current contracts, implementation reports for current evidence,
 and [history](README.md#historical-records) for superseded instructions and earlier results.
 
+## Permanent engineering evidence and cleanup
+
+- Close each milestone with a Markdown record of findings, accepted behavior,
+  failures, platform limits, exact test results, commands and reproduction
+  requirements. Preserve raw artifacts selectively.
+- Use task-owned temporary directories outside the tracked checkout and reuse
+  verified build environments. Build outputs, disposable executables, `.o` and
+  `.obj` files, generated `.void` applications, caches, test projects, logs and
+  intermediate evidence are disposable unless an active test, CI job, required
+  dependency or unresolved investigation needs them.
+- When valuable raw evidence needs retention, use a compressed ZIP with
+  verified checksums and a restoration manifest. Keep historical archives
+  outside the tracked repository where practical. A complete Markdown record
+  can suffice when no raw-evidence dependency remains. Avoid large duplicate
+  archives.
+- Before handoff, confirm what is still needed. Preserve source, maintained
+  tests, unique fixtures, pinned dependencies, CI requirements and unresolved
+  reproduction inputs. Remove only verified disposable material within the
+  authorized task scope. Leave unrelated files, active builds and unique
+  evidence in place. Record retained evidence and relevant disk measurements.
+- Golden Wrench includes these requirements in future Keyboard assignments and
+  independently reviews cleanup compliance. Keyboard handles authorized
+  implementation, verification, documentation and safe cleanup. Boss alone
+  controls staging, commits, pushes, hosted CI and separately authorized major
+  cleanup.
+
+See the [canonical archive and retention policy](projects/VOID_ARCHIVE_AND_RETENTION_POLICY.md).
+
 ## Mandatory Keyboard Clanker rule: MINIMAL OUTPUT
 
 Work through the authorized scope. Keep updates concise and useful; report exact

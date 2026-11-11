@@ -38,24 +38,24 @@ inline BY_HANDLE_FILE_INFORMATION information(HANDLE h) {
         throw std::runtime_error("Native temporary path contains a reparse point.");
     return info;
 }
-// Pin every existing ancestor with directory read access and no delete sharing.
+// Pin a directory with directory read access and no delete sharing.
 // Metadata-only opens do not establish the read/write/delete sharing reservation.
 // OPEN_REPARSE_POINT inspects the component itself, never its redirect target.
+inline Handle pin_directory(const fs::path& path) {
+    Handle h(CreateFileW(path.c_str(),FILE_LIST_DIRECTORY|FILE_READ_ATTRIBUTES|READ_CONTROL,
+        FILE_SHARE_READ|FILE_SHARE_WRITE,nullptr,OPEN_EXISTING,
+        FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
+    if(h.value==INVALID_HANDLE_VALUE)fail("Cannot pin native temporary directory");
+    if(!(information(h.value).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+        throw std::runtime_error("Native temporary ancestor is not a directory.");
+    return h;
+}
 inline std::vector<Handle> pin_directories(const fs::path& path) {
     if(!path.is_absolute() || path!=path.lexically_normal())
         throw std::runtime_error("Native temporary root must be absolute and normalized.");
     std::vector<Handle> result;
-    auto pin=[&](const fs::path& p) {
-        Handle h(CreateFileW(p.c_str(),FILE_LIST_DIRECTORY|FILE_READ_ATTRIBUTES|READ_CONTROL,
-            FILE_SHARE_READ|FILE_SHARE_WRITE,nullptr,OPEN_EXISTING,
-            FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
-        if(h.value==INVALID_HANDLE_VALUE)fail("Cannot pin native temporary directory");
-        if(!(information(h.value).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-            throw std::runtime_error("Native temporary ancestor is not a directory.");
-        result.push_back(std::move(h));
-    };
-    auto current=path.root_path();pin(current);
-    for(const auto& part:path.relative_path()){current/=part;pin(current);}
+    auto current=path.root_path();result.push_back(pin_directory(current));
+    for(const auto& part:path.relative_path()){current/=part;result.push_back(pin_directory(current));}
     return result;
 }
 struct PrivateAccess {

@@ -135,7 +135,14 @@ public:
             isolated_settings = {
                 "GIT_OBJECT_DIRECTORY=" + path_utf8(objects), "GIT_CONFIG_GLOBAL=" + unused,
                 "GIT_CONFIG_SYSTEM=" + unused, "GIT_CONFIG_NOSYSTEM=1", "GIT_NO_REPLACE_OBJECTS=1",
-                "GIT_NO_LAZY_FETCH=1", "GIT_PROTOCOL_FROM_USER=0", "LC_ALL=C"
+                "GIT_NO_LAZY_FETCH=1", "GIT_PROTOCOL_FROM_USER=0",
+#ifdef _WIN32
+                // Git for Windows' Schannel helper needs a UTF-8 locale to open
+                // a Unicode CA bundle pathname.
+                "LC_ALL=C.UTF-8"
+#else
+                "LC_ALL=C"
+#endif
             };
         } catch (...) { std::error_code ignored; fs::remove_all(work, ignored); throw; }
     }
@@ -381,16 +388,17 @@ GitSnapshot acquire_git_snapshot(const fs::path& root, const GitPin& pin) {
     return result;
 }
 
-std::optional<GitSnapshot> read_git_snapshot(const fs::path& directory, const GitPin& pin) {
+static std::optional<GitSnapshot> read_git_snapshot(const fs::path& directory, const GitPin& pin,
+                                                   const ProjectDirectoryReader& reader) {
     // Check existing ancestors even when the pin itself is missing.
     for (const auto& ancestor : {directory.parent_path().parent_path(), directory.parent_path(), directory}) {
         if (!present(ancestor)) return {};
-        (void)inspect_creation_root(ancestor);
+        (void)reader.inspect(ancestor);
     }
     auto leaf = fs::directory_iterator(directory);
     if (leaf == fs::directory_iterator{} || !hex_id(path_utf8(leaf->path().filename()), 64))
         fail("Git snapshot content index is incomplete or invalid.");
-    const auto content = inspect_creation_root(leaf->path()).path;
+    const auto content = reader.inspect(leaf->path()).path;
     if (++leaf != fs::directory_iterator{}) fail("Git snapshot contains an unexpected content index.");
     Ids content_names;
     for (const auto& item : fs::directory_iterator(content)) {
@@ -399,8 +407,8 @@ std::optional<GitSnapshot> read_git_snapshot(const fs::path& directory, const Gi
     }
     if (content_names != Ids{"proof", "tree"}) fail("Git snapshot contains unexpected content metadata.");
     GitSnapshot result;
-    result.tree = inspect_creation_root(content / "tree").path;
-    result.proof = read_project_input(content / "proof", proof_limit);
+    result.tree = reader.inspect(content / "tree").path;
+    result.proof = reader.read(content / "proof", proof_limit);
     auto records = std::string_view(result.proof);
     const auto commit = header(records);
     if (commit.id != pin.revision || commit.type != "commit" || commit.size > manifest_byte_limit)
@@ -428,7 +436,7 @@ std::optional<GitSnapshot> read_git_snapshot(const fs::path& directory, const Gi
     if (canonical_proof != result.proof) fail("Git snapshot tree proof is not canonical.");
     std::size_t bytes = 0;
     for (const auto& [path, id] : entries.blobs) {
-        auto data = read_project_input(result.tree / utf8_path(path), source_limit - bytes);
+        auto data = reader.read(result.tree / utf8_path(path), source_limit - bytes);
         verify_object(id, "blob", data);
         bytes += data.size();
         result.files.emplace(path, std::move(data));
@@ -440,6 +448,10 @@ std::optional<GitSnapshot> read_git_snapshot(const fs::path& directory, const Gi
     return result;
 }
 
+std::optional<GitSnapshot> read_git_snapshot(const fs::path& directory, const GitPin& pin) {
+    return read_git_snapshot(directory, pin, {});
+}
+
 void publish_git_snapshot(const CreationRoot& root, const GitPin& pin, const GitSnapshot& snapshot) {
     const auto prefix = snapshot.digest + "/";
     std::map<std::string, std::string_view> files{{prefix, {}}, {prefix + "proof", snapshot.proof}};
@@ -448,8 +460,8 @@ void publish_git_snapshot(const CreationRoot& root, const GitPin& pin, const Git
     // directories so the verified inventory is still exact.
     for (const auto& path : snapshot.directories)
         files.emplace(prefix + "tree/" + (path.empty() ? "" : path + "/"), std::string_view{});
-    publish_git_snapshot(root, git_store_key(pin), files, [&](const fs::path& directory) {
-        auto observed = read_git_snapshot(directory, pin);
+    publish_git_snapshot(root, git_store_key(pin), files, [&](const fs::path& directory, const ProjectDirectoryReader& reader) {
+        auto observed = read_git_snapshot(directory, pin, reader);
         if (!observed || observed->digest != snapshot.digest) fail("Git snapshot changed during publication.");
     });
 }
