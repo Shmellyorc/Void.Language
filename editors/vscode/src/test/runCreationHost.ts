@@ -60,7 +60,7 @@ async function verifyPersistence(executable: string, server: string, root: strin
                     events.push('same physical root and persisted workspace storage suppress the next qualifying event');
                 }
                 if (process.platform === 'win32') ui.key('w', 'KeyW', 87, 2 | 8);
-                else ui.key('q', 'KeyQ', 81, 2);
+                else ui.key('q', 'KeyQ', 81, process.platform === 'darwin' ? 4 : 2);
                 let timer: NodeJS.Timeout | undefined;
                 try {
                     await Promise.race([stopped, new Promise<never>((_, reject) => {

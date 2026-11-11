@@ -128,3 +128,28 @@ The changes are limited to this record and test fixtures. `CMakeLists.txt` regis
 The removed Windows guest workspace held 638,444,442 logical bytes. Free space measured 12,020,760,576 bytes before removal and 12,708,122,624 bytes afterward. Cleanup detached the task-owned junctions and verified the retained SDK. The Linux scratch and guest exchange used 564,158,464 and 30,117,888 allocated bytes and were removed after the runs. The Markdown record retains the findings and original failure details.
 
 Native macOS ARM64 application-context and editor execution remain **UNQUALIFIED**. This assignment supplies the maintained Darwin registration and leaves the integrated hosted gate for separate authorization and independent review.
+
+## Manual macOS ARM64 application and editor qualification
+
+11 November 2026 · Workflow preparation baseline `2a607ce78f6f9ebbcfb23ee3a37763a47ecfaa6b`. The manual entry point takes one required `reviewed_sha`. Dispatch requires a ref pointing to the full reviewed commit that contains the workflow. The reusable workflow checks the 40 lowercase hexadecimal digits and equality with both the event SHA and checkout HEAD. It requires a GitHub-hosted `macos-15` ARM64 runner, native `uname -m`, Xcode 26.3, the existing macOS 14.0 deployment target and Python 3.12. Both jobs reuse the pinned LLVM/Clang/LLD 23.1.4 SDK and verified HTTP and host-provider preparation. [Manual entry point](../../.github/workflows/ci-macos-project-application.yml) · [Reusable qualification](../../.github/workflows/ci-macos-package-qualification.yml)
+
+Debug and Release each build `voidc`, `voidls`, `void_project_application` and `void_project_selection` and run the existing native project smoke. The exact anchored CTest selection is checked against CTest's JSON registry before execution. For this caller the check requires active commands and rejects disabled and skip properties. The existing timeouts are retained.
+
+| CTest | Timeout (s) |
+| --- | ---: |
+| `project_application` | 180 |
+| `project_application_process` | 300 |
+| `os_packaging` | 900 |
+| `project_selection` | 300 |
+| `project_creation_process` | 300 |
+| `project_profiles` | 240 |
+
+The new caller opts into the editor lane in Debug. The other callers keep their existing selection and diagnostics behavior through the default-off input. The editor lane requires a native graphical session that can launch VS Code and connect to its local workbench debugging socket. It uses Node 24.19.0, the extension lockfile, and the existing downloader for VS Code 1.141.0 with the ARM64 asset. The project, creation and numeric runners use the built native server and temporary profiles. Each runner is attempted after setup succeeds, and any runner failure fails the step. The macOS persistence fixture sends Command+Q and retains the same normal-exit and reopen assertions. [Creation runner](../../editors/vscode/src/test/runCreationHost.ts)
+
+The creation suite checks actual legacy-server refusal. Debug sparsely checks out `7a3e02008db64ee185aa4665aac5c76e3aff4b2b` in a disposable nested tree and builds only its `voidls` target. It reuses the verified SDK, HTTP prefix and source archives. The existing host-provider recipe issues a separate receipt because the verifier binds the absolute SDK tool paths for each checkout. The workflow checks the legacy checkout SHA, verifies the ARM64 executable, and confirms status 2 with the legacy usage diagnostic for `--discover-project`. The reviewed checkout remains the source for the current compiler and extension.
+
+The runner keeps each original selected CTest and editor transcript in its job log. On failure, the existing seven-day failure artifact also keeps complete CTest and editor transcripts, available child diagnostics and test receipts for this caller. Provider diagnostics retain the existing bounded excerpts. The artifact excludes executables, provider trees and editor profiles.
+
+Local preparation checks passed on Linux. Actionlint 1.7.12 checked the macOS workflow files. Bash, Python and JavaScript syntax checks and the extension TypeScript typecheck passed. Static CMake evaluation confirmed the six native ARM64 registrations and their timeouts in both configurations. Simulated steps checked SHA rejection, exact CTest selection, failure propagation across the three editor invocations and original log retention.
+
+Native macOS ARM64 application-context and dedicated editor execution remain **UNQUALIFIED** until the reviewed workflow runs. The selected tests cover the existing application-context and bundle/plain-process behavior. Signed App Sandbox behavior remains unverified. macOS managed-native execution and D5 application packaging remain unsupported. The complete seven-job gate retains its separate sanitizer and platform requirements.

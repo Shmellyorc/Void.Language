@@ -14,6 +14,9 @@ on:
       build_targets:
         type: string
         required: true
+      project_application:
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -34,6 +37,8 @@ jobs:
       PACKAGE_SLICE: ${{ inputs.slice }}
       PACKAGE_TESTS: ${{ inputs.test_names }}
       PACKAGE_TARGETS: ${{ inputs.build_targets }}
+      PACKAGE_PROJECT_APPLICATION: ${{ inputs.project_application }}
+      PROJECT_EDITOR_LEGACY_SHA: 7a3e02008db64ee185aa4665aac5c76e3aff4b2b
       DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
       MACOSX_DEPLOYMENT_TARGET: '14.0'
       PYTHONDONTWRITEBYTECODE: '1'
@@ -98,6 +103,7 @@ jobs:
             -DCMAKE_OSX_DEPLOYMENT_TARGET="$MACOSX_DEPLOYMENT_TARGET" \
             2>&1 | tee "$PACKAGE_WORK/logs/configure.log"
       - name: Build the required compiler and test binaries
+        id: build
         run: |
           read -r -a targets <<< "$PACKAGE_TARGETS"
           cmake --build "$PACKAGE_WORK/build" --parallel 2 \
@@ -143,9 +149,116 @@ jobs:
           selected = sorted(test["name"] for test in tests)
           if selected != expected:
               raise SystemExit(f"Expected {expected}, selected {selected}")
+          if os.environ["PACKAGE_PROJECT_APPLICATION"] == "true":
+              for test in tests:
+                  command = test.get("command")
+                  properties = {prop["name"] for prop in test.get("properties", [])}
+                  if not command or not command[0] or properties & {
+                      "DISABLED", "SKIP_RETURN_CODE", "SKIP_REGULAR_EXPRESSION"
+                  }:
+                      raise SystemExit(f"Missing command or skip condition for {test['name']}")
+              print(f"Exact active CTest selection: {', '.join(selected)}", flush=True)
           PY
+          if [[ "$PACKAGE_PROJECT_APPLICATION" = true ]]; then
+            export VOID_TEST_DIAGNOSTICS_DIR="$PACKAGE_WORK/ctest-evidence"
+          fi
           ctest --test-dir "$PACKAGE_WORK/build" -R "$selector" --no-tests=error \
             --verbose --output-on-failure 2>&1 | tee "$PACKAGE_WORK/logs/ctest.log"
+      - name: Check out the pinned legacy editor server sources
+        id: legacy_checkout
+        if: ${{ !cancelled() && inputs.project_application && matrix.configuration == 'Debug' && steps.build.outcome == 'success' }}
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ env.PROJECT_EDITOR_LEGACY_SHA }}
+          path: .toolchains/project-editor-legacy
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /CMakeLists.txt
+            /LICENSE
+            /cmake/
+            /docs/net/http/evidence/curl-8.23.0-*-candidate.patch
+            /examples/
+            /include/
+            /src/
+            /stdlib/
+            /third_party/
+            /tools/
+      - name: Build and verify the native legacy voidls
+        id: legacy_server
+        if: ${{ !cancelled() && steps.legacy_checkout.outcome == 'success' }}
+        run: |
+          {
+            legacy="$GITHUB_WORKSPACE/.toolchains/project-editor-legacy"
+            test "$(git -C "$legacy" rev-parse HEAD)" = "$PROJECT_EDITOR_LEGACY_SHA"
+            printf 'Legacy editor server source %s\n' "$PROJECT_EDITOR_LEGACY_SHA"
+            mkdir -p "$legacy/.toolchains/host"
+            ln -s "$GITHUB_WORKSPACE/.toolchains/llvm-23.1.4" "$legacy/.toolchains/llvm-23.1.4"
+            ln -s "$GITHUB_WORKSPACE/.toolchains/http" "$legacy/.toolchains/http"
+            ln -s "$GITHUB_WORKSPACE/.toolchains/host/downloads" "$legacy/.toolchains/host/downloads"
+            # The legacy checkout needs its own receipt for its SDK tool paths.
+            python -B "$legacy/tools/setup_host_deps.py" --profile Debug --jobs 2
+            cmake -S "$legacy" -B "$PACKAGE_WORK/legacy-build" -G Ninja \
+              -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=OFF \
+              -DVOID_SANITIZERS=OFF -DVOID_LLVM_RESEARCH=OFF \
+              -DCMAKE_C_COMPILER="$CC" -DCMAKE_CXX_COMPILER="$CXX" \
+              -DLLVM_DIR="$LLVM_DIR" -DVOID_CLANG="$VOID_CLANG" -DVOID_LINKER="$VOID_LINKER" \
+              -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_SYSROOT="$SDKROOT" \
+              -DCMAKE_OSX_DEPLOYMENT_TARGET="$MACOSX_DEPLOYMENT_TARGET"
+            cmake --build "$PACKAGE_WORK/legacy-build" --parallel 2 --target voidls
+            older="$PACKAGE_WORK/legacy-build/voidls"
+            test "$(xcrun lipo -archs "$older")" = arm64
+            status=0
+            "$older" --discover-project '' '' '' '' > "$PACKAGE_WORK/logs/editor-legacy-probe.log" 2>&1 || status=$?
+            cat "$PACKAGE_WORK/logs/editor-legacy-probe.log"
+            test "$status" -eq 2
+            grep -F -- 'Usage: voidls --entry' "$PACKAGE_WORK/logs/editor-legacy-probe.log"
+          } 2>&1 | tee "$PACKAGE_WORK/logs/editor-legacy-build.log"
+      - name: Set up the pinned editor Node.js
+        id: editor_node
+        if: ${{ !cancelled() && steps.legacy_server.outcome == 'success' }}
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24.19.0'
+      - name: Run the dedicated native VS Code project, creation and numeric hosts
+        if: ${{ !cancelled() && steps.editor_node.outcome == 'success' }}
+        working-directory: editors/vscode
+        env:
+          VOID_STDLIB_ROOT: ${{ github.workspace }}/stdlib
+        run: |
+          test "$(node -p 'process.platform + "/" + process.arch')" = darwin/arm64
+          export VOIDLS_PATH="$PACKAGE_WORK/build/voidls"
+          export VOID_OLDER_VOIDLS_PATH="$PACKAGE_WORK/legacy-build/voidls"
+          test "$(xcrun lipo -archs "$VOIDLS_PATH")" = arm64
+          mkdir -p "$PACKAGE_WORK/editor-evidence"
+          export VOID_CREATION_EVIDENCE_DIR="$PACKAGE_WORK/editor-evidence"
+          export VOID_S3_HOST_EVIDENCE="$VOID_CREATION_EVIDENCE_DIR/project-host.json"
+          export VOID_NUMERIC_HOST_EVIDENCE="$VOID_CREATION_EVIDENCE_DIR/numeric-host.json"
+          npm ci --cache "$PACKAGE_WORK/npm-cache" 2>&1 | tee "$PACKAGE_WORK/logs/editor-dependencies.log"
+          npm run build 2>&1 | tee "$PACKAGE_WORK/logs/editor-build.log"
+          node - <<'JS' 2>&1 | tee "$PACKAGE_WORK/logs/editor-download.log"
+          const {writeFileSync} = require('node:fs');
+          const {downloadAndUnzipVSCode} = require('@vscode/test-electron');
+          const {downloadEditor} = require('./out/test/download.js');
+          const work = process.env.PACKAGE_WORK;
+          downloadEditor(options => downloadAndUnzipVSCode({
+              ...options, platform: 'darwin-arm64', cachePath: work + '/vscode',
+          })).then(executable => writeFileSync(work + '/editor-path', executable + '\n'))
+              .catch(error => { console.error(error); process.exitCode = 1; });
+          JS
+          IFS= read -r VSCODE_EXECUTABLE_PATH < "$PACKAGE_WORK/editor-path"
+          export VSCODE_EXECUTABLE_PATH
+          test "$(xcrun lipo -archs "$VSCODE_EXECUTABLE_PATH")" = arm64
+          failed=0
+          for suite in Project Creation Numeric; do
+            if node "out/test/run${suite}Host.js" 2>&1 | tee "$PACKAGE_WORK/logs/editor-${suite}.log"; then
+              printf 'Editor %s host passed\n' "$suite"
+            else
+              printf 'Editor %s host failed with status %s\n' "$suite" "$?"
+              failed=1
+            fi
+          done
+          exit "$failed"
       - name: Collect bounded failure diagnostics
         if: failure()
         run: |
@@ -156,6 +269,7 @@ jobs:
           python3 -B - <<'PY'
           import os
           from pathlib import Path
+          import shutil
 
           work = Path(os.environ["PACKAGE_WORK"])
           profile = os.environ["PACKAGE_CONFIGURATION"]
@@ -171,6 +285,19 @@ jobs:
               (Path("docs/net/http/evidence"), f"dependencies-macos-aws-lc-5.12.0-arm64-{profile}-*"),
               (work / "host/provider-builds", f"dependencies-macos-arm64-{profile}-*"),
           )
+          originals = set()
+          if os.environ["PACKAGE_PROJECT_APPLICATION"] == "true":
+              originals = {work / "logs/ctest.log", work / "build/Testing/Temporary/LastTest.log",
+                           *(work / "logs").glob("editor-*.log")}
+              receipts = [path for path in (work / "ctest-evidence").rglob("*")
+                          if path.is_file() and path.name.endswith(
+                              (".json", ".log", ".stdout", ".stderr", "stdout.bin", "stderr.bin"))]
+              receipts.extend((work / "editor-evidence").glob("*.json"))
+              receipts.extend((work / "editor-evidence").rglob("*.log"))
+              originals.update(receipts)
+              logs.extend(receipts)
+              roots += ((Path(".toolchains/project-editor-legacy/docs/voidup/evidence"),
+                         f"dependencies-macos-arm64-{profile}-*"),)
           for parent, pattern in roots:
               receipts = sorted(parent.glob(pattern))
               if receipts:
@@ -180,10 +307,14 @@ jobs:
                   logs.extend(sorted(files, key=lambda path: path.stat().st_mtime_ns)[-4:])
           for number, path in enumerate(logs):
               if path.is_file():
-                  with path.open("rb") as stream:
-                      stream.seek(max(0, path.stat().st_size - 32 * 1024))
-                      tail = stream.read()
-                  (work / "failure" / f"{number:02d}-{path.name}").write_bytes(tail)
+                  destination = work / "failure" / f"{number:02d}-{path.name}"
+                  if path in originals:
+                      shutil.copyfile(path, destination)
+                  else:
+                      with path.open("rb") as stream:
+                          stream.seek(max(0, path.stat().st_size - 32 * 1024))
+                          tail = stream.read()
+                      destination.write_bytes(tail)
           PY
       - name: Retain failure diagnostics
         if: failure()
