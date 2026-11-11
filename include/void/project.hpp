@@ -105,8 +105,8 @@ class Manifest {
     std::map<std::string, NativeLibrary> native_;
     std::optional<NativeRequirement> native_requirement_;
     Sources sources_;
-    Profile debug_ = {Optimization::none, DebugInfo::full};
-    Profile release_ = {Optimization::O2, DebugInfo::line};
+    Profile debug_ = {Optimization::none, DebugInfo::none};
+    Profile release_ = {Optimization::O2, DebugInfo::none};
     std::map<std::string, Field> fields_;
     Manifest() = default;
     friend class ManifestParser;

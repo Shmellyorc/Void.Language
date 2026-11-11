@@ -42,8 +42,8 @@ an explicitly selected release profile. It requires effective debug optimization
 disables it. `--no-cache` remains run-only and changes persistence, not optimization.
 Conflicts, duplicate profile options and unknown profile names are usage errors.
 
-Only the selected profile's unsupported `debug_info="line"` or `"full"` emits the
-owned structured warning **VOID5012**, including on project check. `none` is quiet.
+Both profiles default to `debug_info="none"`. An explicit `"line"` or `"full"`
+in the selected profile emits **VOID5012**, including on project check.
 The requested value remains in the immutable manifest. Profile-controlled debug
 information modes are not implemented: existing backend source/type/location
 metadata behavior is retained, so `none` does not newly strip those records and a

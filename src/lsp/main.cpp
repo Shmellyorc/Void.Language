@@ -480,16 +480,17 @@ class Server {
         if(method=="textDocument/formatting") {
             if(read_only_source(module))return j::Array{};
             const auto& options=object(params.get("options"));
-            if(!options.getBoolean("insertSpaces").value_or(false) || integer(options.get("tabSize"),1)!=4)throw std::invalid_argument("VOID formatting requires four spaces");
+            const auto insert_spaces=options.getBoolean("insertSpaces");
+            if(!insert_spaces || integer(options.get("tabSize"),1)!=4)throw std::invalid_argument("VOID formatting requires a tab size of four and an indentation style");
             j::Array result;if(!source || !index || !source_in(*current->semantic_analysis(),module) || !disk_current(*current->semantic_analysis()))return result;
-            auto formatted=vd::format_source(*source);if(!formatted || *formatted==source->text())return result;
+            auto formatted=vd::format_source(*source,*insert_spaces);if(!formatted || *formatted==source->text())return result;
             // The same compiler checks both lexical structure and the entire
             // proposed graph before returning a conservative whole-file edit.
             auto overlays=snapshot.overrides();for(const auto& m:current->semantic_analysis()->modules())if(!read_only_source(m.identity))overlays.insert_or_assign(m.identity,m.source);
             overlays.insert_or_assign(module,vd::SourceFile(source->path(),*formatted));
             auto checked=check_overlays(overlays);
             if(!checked.program || checked.program->compatibility_contract()!=current->semantic_analysis()->compatibility_contract())return result;
-            auto again=vd::format_source(vd::SourceFile(source->path(),*formatted));
+            auto again=vd::format_source(vd::SourceFile(source->path(),*formatted),*insert_spaces);
             if(!again || *again!=*formatted || !session.is_current(*current) || !disk_current(*current->semantic_analysis()))return result;
             result.push_back(j::Object{{"range",range({std::make_shared<const vd::SourceFile>(*source),module,0,source->text().size()})},{"newText",*formatted}});
             return result;

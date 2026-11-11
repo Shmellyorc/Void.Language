@@ -133,8 +133,8 @@ void schema() {
     check(app->application()->name == "Orbit" && app->application()->version == app->project().version, "application defaults");
     check(lib->package()->version == lib->project().version, "package version default");
     check(app->sources().roots == std::vector<std::string>{"."} && app->sources().exclude.size() == 5, "source defaults");
-    check(app->debug().optimization == Optimization::none && app->debug().debug_info == DebugInfo::full &&
-        app->release().optimization == Optimization::O2 && app->release().debug_info == DebugInfo::line, "profile defaults");
+    check(app->debug().optimization == Optimization::none && app->debug().debug_info == DebugInfo::none &&
+        app->release().optimization == Optimization::O2 && app->release().debug_info == DebugInfo::none, "profile defaults");
     auto settings = good(application + R"(name = "Orbit application"
 version = "9.8.7+local"
 [sources]

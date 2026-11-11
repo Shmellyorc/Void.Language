@@ -38,7 +38,7 @@ export class CreationWorkflow implements vscode.Disposable {
             vscode.workspace.onDidCloseTextDocument(document => this.missingAtSave.delete(document.uri.fsPath)),
             vscode.workspace.onDidChangeWorkspaceFolders(() => this.invalidate()),
             vscode.workspace.onDidChangeConfiguration(event => {
-                if (event.affectsConfiguration('void')) this.invalidate();
+                if (event.affectsConfiguration('void.server') || event.affectsConfiguration('void.project')) this.invalidate();
             }),
         ];
     }

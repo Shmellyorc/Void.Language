@@ -102,7 +102,7 @@ test('validate executable and deterministic canonical project selection', async 
     } finally { await fs.rm(directory, {recursive: true, force: true}); }
 });
 
-test('presentation covers approved keyword colors and space indentation', async () => {
+test('presentation covers approved keyword colors and block indentation', async () => {
     const root = path.resolve(__dirname, '../..');
     const grammar = JSON.parse(await fs.readFile(path.join(root, 'syntaxes/void.tmLanguage.json'), 'utf8'));
     const stringRule = grammar.patterns.find((p:{name?:string}) => p.name === 'string.quoted.double.void');
@@ -137,11 +137,13 @@ test('presentation covers approved keyword colors and space indentation', async 
     assert(keywords.some((rule:RegExp) => ['and','or','not','as','if','return'].every(word => rule.test(word))), 'logical words must share the ordinary control keyword category');
     const config = JSON.parse(await fs.readFile(path.join(root, 'language-configuration.json'), 'utf8'));
     assert.equal(config.comments.lineComment, '#');
-    const indent = new RegExp(config.indentationRules.increaseIndentPattern);
-    assert(indent.test('    else if value < 0: # branch'));
-    assert(indent.test('func (p point) move(dx: i32, dy: i32):'));
-    assert(indent.test('for:')); assert(!indent.test('# for:'));
-    assert(indent.test('value struct point:')); assert(indent.test('struct point:'));
+    const indents = (text: string) => config.onEnterRules.some((rule: {beforeText: string; afterText?: string; action: {indent: string}}) =>
+        rule.action.indent === 'indent' && new RegExp(rule.beforeText).test(text) &&
+        (!rule.afterText || new RegExp(rule.afterText).test('')));
+    assert(indents('    else if value < 0: # branch'));
+    assert(indents('func (p point) move(dx: i32, dy: i32):'));
+    assert(indents('for:')); assert(!indents('# for:'));
+    assert(indents('value struct point:')); assert(indents('struct point:'));
     assert(keywords.some((rule:RegExp) => rule.exec('value struct point:')?.[0] === 'value struct'));
     assert(keywords.some((rule:RegExp) => rule.exec('struct point:')?.[0] === 'struct'));
     assert(!highlighted('value: i32'));
@@ -149,17 +151,17 @@ test('presentation covers approved keyword colors and space indentation', async 
     for (const text of ['using: movement', 'p.using', 'haste', 'extends', 'interface', 'virtual', 'override']) assert(!highlighted(text));
     for (const [text, token] of [['struct derived extends base:', 'extends'], ['virtual func (b base) read():', 'virtual'], ['override func (d derived) read():', 'override'], ['super.read()', 'super'], ['super .read()', 'super']])
         assert(keywords.some((rule:RegExp) => rule.exec(text)?.[0] === token), `Missing contextual keyword: ${token}`);
-    assert(indent.test('struct derived extends module.base:'));
-    assert(indent.test('interface readable:'));
+    assert(indents('struct derived extends module.base:'));
+    assert(indents('interface readable:'));
     assert(keywords.some((rule:RegExp) => rule.exec('interface readable:')?.[0] === 'interface'));
     assert(!highlighted('p.interface')); assert(!highlighted('interface: i32'));
-    assert(indent.test('public virtual func (b base) read():'));
-    assert(indent.test('override func (d derived) read():'));
+    assert(indents('public virtual func (b base) read():'));
+    assert(indents('override func (d derived) read():'));
     const literals = grammar.patterns.filter((p:{name?:string}) => p.name === 'constant.language.void')
         .map((p:{match:string}) => new RegExp(p.match));
     for (const word of ['true','false','null']) assert(literals.some((r:RegExp) => r.test(word)));
     assert(!literals.some((r:RegExp) => r.test('nullify')));
-    assert(!indent.test('structure node:'));
+    assert(!indents('structure node:'));
 });
 
 

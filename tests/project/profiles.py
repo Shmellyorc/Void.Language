@@ -15,9 +15,9 @@ def run(args,status=0,warning=None):
 try:
  with tempfile.TemporaryDirectory(prefix='VOID profile execution 雪 ') as directory:
   root=Path(directory);(root/'src').mkdir();toml=root/'void.project.toml';toml.write_bytes(manifest.encode());(root/'src/game.void').write_bytes(source.encode())
-  for flags,warning in [([], 'line'),(['--profile','release'],'line'),(['--profile','debug'],'full'),(['--no-opt'],'line')]:
-   run([compiler,'check','--project',root,*flags],warning=warning)
-   run([compiler,'run','--project',root,'--no-cache',*flags],23,warning=warning)
+  for flags in [[],['--profile','release'],['--profile','debug'],['--no-opt']]:
+   run([compiler,'check','--project',root,*flags],warning='')
+   run([compiler,'run','--project',root,'--no-cache',*flags],23,warning='')
   for flags in [['--profile'],['--profile','Debug'],['--profile','other'],['--profile','debug','--profile','release'],['--profile','release','--cache'],['--profile','release','--cache','--no-opt'],['--profile','debug','--cache','--no-cache']]:run([compiler,'run','--project',root,*flags],2)
   for command in ['run','check','build','emit']:
    flags=['-o',root/'unused.o'] if command=='emit' else []
@@ -41,16 +41,24 @@ try:
      if re.match(r'ret\w*\b',body[-1]):break
    assert body and re.match(r'ret\w*\b',body[-1]),body
    return len(body)
-  debug=instructions('debug',['--profile','debug'],'full');release=instructions('release',['--profile','release'],'line');noopt=instructions('release-noopt',['--profile','release','--no-opt'],'line');assert debug>release and noopt==debug,(debug,release,noopt)
-  for profile,warning in [('debug','full'),('release','line')]:
-   exe=root/(profile+('.exe' if os.name=='nt' else ''));run([compiler,'build','--project',root,'--profile',profile,'-o',exe],warning=warning);run([exe],23,warning='')
+  debug=instructions('debug',['--profile','debug'],'');release=instructions('release',['--profile','release'],'');noopt=instructions('release-noopt',['--profile','release','--no-opt'],'');assert debug>release and noopt==debug,(debug,release,noopt)
+  for profile in ('debug','release'):
+   exe=root/(profile+('.exe' if os.name=='nt' else ''));run([compiler,'build','--project',root,'--profile',profile,'-o',exe],warning='');run([exe],23,warning='')
   # The cache creates excluded infrastructure after source capture; bootstrap it
   # before measuring a stable inventory's explicit cold/warm pair.
-  run([compiler,'run','--project',root,'--profile','debug'],23,warning='full')
-  cold=run([compiler,'run','--project',root,'--profile','debug','--cache'],23,warning='full');warm=run([compiler,'run','--project',root,'--profile','debug','--cache'],23,warning='full')
+  run([compiler,'run','--project',root,'--profile','debug'],23,warning='')
+  cold=run([compiler,'run','--project',root,'--profile','debug','--cache'],23,warning='');warm=run([compiler,'run','--project',root,'--profile','debug','--cache'],23,warning='')
   if b'Debug cache: unavailable' not in cold.stderr:assert b'Debug cache: miss' in cold.stderr and b'Debug cache: hit' in warm.stderr,(cold.stderr,warm.stderr)
   else:print('UNQUALIFIED: native persistent disk cache warm hit')
-  run([compiler,'run','--project',root,'--cache'],23,warning='full')
+  run([compiler,'run','--project',root,'--cache'],23,warning='')
+  # The same modes still warn on every command when the user requests them.
+  toml.write_text(manifest+"[build.debug]\ndebug_info='full'\n[build.release]\ndebug_info='line'\n",encoding='utf-8')
+  for profile,warning in [('debug','full'),('release','line')]:
+   flags=['--profile',profile]
+   run([compiler,'check','--project',root,*flags],warning=warning)
+   run([compiler,'run','--project',root,'--no-cache',*flags],23,warning=warning)
+   instructions('authored-'+profile,flags,warning)
+   exe=root/('authored-'+profile+('.exe' if os.name=='nt' else ''));run([compiler,'build','--project',root,*flags,'-o',exe],warning=warning);run([exe],23,warning='')
   overrides="[build.debug]\noptimization='O2'\ndebug_info='none'\n[build.release]\noptimization='none'\ndebug_info='full'\n";toml.write_bytes((manifest+overrides).encode())
   optimized_debug=instructions('custom-debug',['--profile','debug'],'');plain_release=instructions('custom-release',['--profile','release'],'full');assert optimized_debug==release and plain_release==debug,(optimized_debug,plain_release)
   run([compiler,'run','--project',root,'--profile','debug','--cache'],2,warning='');run([compiler,'run','--project',root,'--profile','debug','--cache','--no-opt'],23,warning='')

@@ -525,9 +525,11 @@ func entry(value: i32) -> i32:
 
 Files must be valid UTF-8; a leading UTF-8 BOM is accepted. LF, CRLF and CR line
 endings work, as does a missing final newline. Comments start with `#` (including
-`##` documentation-style lines), and may contain Unicode. Indentation uses
-spaces with consistent enclosing levels; four spaces are recommended, rather
-than imposed. Tabs are diagnosed. Blank/comment lines do not open blocks.
+`##` documentation-style lines), and may contain Unicode. Indent each block
+with tabs or spaces consistently through its nested levels. Tabs count as four
+columns. Space indentation may use other widths when dedents match earlier
+levels. Mixing tabs and spaces in a structural prefix or switching style
+within an enclosing block is diagnosed. Blank/comment lines do not open blocks.
 Expressions and declarations are single-line in this subset.
 
 Names currently accept lowercase ASCII letters, digits after the first character,

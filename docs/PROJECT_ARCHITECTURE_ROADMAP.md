@@ -313,7 +313,7 @@ file override, never a function selector, and is valid only for an application.
 | `sources.roots` | Nonempty array of up to 32 unique, nonoverlapping relative directories; default `["."]`. Directories must exist at later physical admission; Slice 1 validates only lexical policy. Named overlays are later work. Root does not relocate the project VFS boundary. |
 | `sources.exclude` | Up to 256 unique relative file/directory paths; default `["tests", "examples", "vendor", "node_modules", "dist"]`. An explicit array replaces this default; `[]` removes these convenience exclusions. Paths may be absent. Exact paths exclude themselves and directory descendants, not similarly prefixed names. No globs/negation. |
 | `build.debug.optimization`, `build.release.optimization` | Exactly `none` or `O2`; defaults respectively `none` and `O2`. |
-| `build.debug.debug_info`, `build.release.debug_info` | Exactly `none`, `line` or `full`; defaults respectively `full` and `line`. No promise the current emitter supports these new choices yet. |
+| `build.debug.debug_info`, `build.release.debug_info` | Exactly `none`, `line` or `full`. Both default to `none`. An explicit `line` or `full` in the selected profile reports `VOID5012` because profile-controlled debug information is deferred. |
 
 Manifest-relative paths use `/`, printable portable ASCII components and exact
 case, no absolute/drive/UNC form, backslash, empty segment, `.` segment (except the

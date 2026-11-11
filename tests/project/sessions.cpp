@@ -76,10 +76,18 @@ void reload(){
 void profiles(){
  auto parsed=vd::project::parse_manifest(vd::SourceFile("manifest",manifest));check(parsed.succeeded(),"profile schema");auto m=parsed.manifest;
  auto release=vd::project::resolve_profile(*m,{},false,false),debug=vd::project::resolve_profile(*m,vd::project::ProfileName::debug,false,false);
- check(release.optimize && !debug.optimize && release.diagnostics.size()==1 && debug.diagnostics.size()==1,"schema-default profiles and selected warnings");
- check(release.diagnostics[0].primary.begin==manifest.size() && release.diagnostics[0].primary.end==manifest.size(),"default-profile warning uses owned EOF insertion span");
- check(release.debug_info==vd::project::DebugInfo::line && debug.debug_info==vd::project::DebugInfo::full,"requested modes retained");
- check(release.diagnostics[0].severity==vd::Severity::warning && release.diagnostics[0].code==vd::DiagnosticCode::project_debug_info,"structured profile warning");
+ check(release.optimize && !debug.optimize && release.diagnostics.empty() && debug.diagnostics.empty(),"schema-default profiles keep their optimization and stay quiet");
+ check(release.debug_info==vd::project::DebugInfo::none && debug.debug_info==vd::project::DebugInfo::none,"implicit debug information mode");
+ auto authored=vd::project::parse_manifest(vd::SourceFile("manifest",manifest+"[build.debug]\ndebug_info='full'\n[build.release]\ndebug_info='line'\n"));
+ check(authored.succeeded(),"authored debug information modes");
+ for(auto [name,mode,spelling]:{std::tuple{vd::project::ProfileName::release,vd::project::DebugInfo::line,"'line'"},
+                                std::tuple{vd::project::ProfileName::debug,vd::project::DebugInfo::full,"'full'"}}) {
+  const auto profile=vd::project::resolve_profile(*authored.manifest,name,false,false);
+  check(profile.debug_info==mode && profile.diagnostics.size()==1,"explicit selected mode retained");
+  const auto& warning=profile.diagnostics.front();
+  check(warning.severity==vd::Severity::warning && warning.code==vd::DiagnosticCode::project_debug_info,"structured profile warning");
+  check(warning.primary.source->text().substr(warning.primary.begin,warning.primary.end-warning.primary.begin)==spelling,"authored profile warning owns exact value span");
+ }
  check(!vd::project::resolve_profile(*m,{},true,false).optimize,"explicit no-opt wins");check(vd::project::resolve_profile(*m,{},false,true).name==vd::project::ProfileName::debug,"implicit release yields to cache debug selection");
  bool rejected=false;try{(void)vd::project::resolve_profile(*m,vd::project::ProfileName::release,true,true);}catch(const std::invalid_argument&){rejected=true;}check(rejected,"explicit release cache conflict survives no-opt");
  auto override=vd::project::parse_manifest(vd::SourceFile("dirty",manifest+"[build.debug]\noptimization='O2'\ndebug_info='none'\n[build.release]\noptimization='none'\ndebug_info='full'\n"));check(override.succeeded(),"profile overrides");

@@ -174,10 +174,28 @@ bool digit(char c) { return c >= '0' && c <= '9'; }
 const std::set<std::string> reserved = {"func", "var", "return", "if", "else", "for", "break", "continue", "pass",
     "operator", "async", "await", "spawn", "event", "defer", "with", "enum", "has", "is", "match", "property", "and", "or", "not", "true", "false", "null", "while", "const", "use", "struct", "in", "reverse", "i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64", "f32", "f64", "bool", "string", "as", "private", "public", "internal"};
 #include "strings.inc"
+struct Indentation {
+    std::size_t end, width = 0;
+    char style = 0;
+    std::size_t mixed = std::string::npos;
+};
+Indentation indentation_at(std::string_view text, std::size_t start) {
+    Indentation result{start};
+    while (result.end < text.size()) {
+        const char c = text[result.end];
+        if (c != ' ' && c != '\t') break;
+        if (!result.style) result.style = c;
+        if (c != result.style && result.mixed == std::string::npos) result.mixed = result.end;
+        result.width += c == '\t' ? 4 : 1;
+        ++result.end;
+    }
+    return result;
+}
 std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::size_t begin=0, std::size_t end=std::string::npos, unsigned interpolation_depth=0,bool expand_interpolation=true) {
     const auto& text = source.text();
     std::vector<Token> tokens;
-    std::vector<std::size_t> indents{0};
+    struct IndentLevel {std::size_t width; char style;};
+    std::vector<IndentLevel> indents{{0, 0}};
     std::size_t p = begin ? begin : text.starts_with("\xef\xbb\xbf") ? 3 : 0;
     end=std::min(end,text.size());
     std::vector<bool> parentheses;
@@ -187,23 +205,34 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::
     while (p < end) {
         if (diagnostics.full()) break;
         try {
-        if(beginning && !literal_blocks.empty() && !braces){
-            auto end=p;while(end<text.size() && text[end]==' ')++end;
-            const bool blank=end==text.size() || text[end]=='#' || text[end]=='\r' || text[end]=='\n';
-            if(!blank && end-p<=literal_blocks.back().indent && !(literal_blocks.back().conditional && end-p==literal_blocks.back().indent && text.compare(end,4,"else")==0)){auto block=literal_blocks.back();literal_blocks.pop_back();while(indents.size()>block.parent+1){indents.pop_back();emit(TokenKind::dedent,"<dedent>",end);}indents.pop_back();braces=block.braces;}
-        }
-        if(beginning && braces){while(p<text.size() && text[p]==' ')++p;beginning=false;}
         if (beginning) {
-            auto start = p;
-            while (p < text.size() && text[p] == ' ') ++p;
-            if (p < text.size() && text[p] == '\t') error(source, {TokenKind::symbol, "", p}, Code::indentation, "Tabs are not supported in source indentation.", "Use spaces consistently (four spaces recommended).");
-            bool blank = p == text.size() || text[p] == '#' || text[p] == '\r' || text[p] == '\n';
-            if (!blank) {
-                auto width = p - start;
-                if (width > indents.back()) { indents.push_back(width); emit(TokenKind::indent, "<indent>", p); }
-                else if (width < indents.back()) {
-                    while (width < indents.back()) { indents.pop_back(); emit(TokenKind::dedent, "<dedent>", p); }
-                    if (width != indents.back()) error(source, {TokenKind::symbol, "", p}, Code::indentation, "Indentation does not match an enclosing block.", "Align this statement with an earlier block level.");
+            const auto start = p;
+            const auto prefix = indentation_at(text, start);
+            p = prefix.end;
+            const bool blank = p == text.size() || text[p] == '#' || text[p] == '\r' || text[p] == '\n';
+            if (!blank && !braces && !literal_blocks.empty()) {
+                const auto block = literal_blocks.back();
+                const bool alternative = block.conditional && prefix.width == block.indent && text.compare(p, 4, "else") == 0;
+                if (prefix.width <= block.indent && !alternative) {
+                    literal_blocks.pop_back();
+                    while (indents.size() > block.parent + 1) { indents.pop_back(); emit(TokenKind::dedent, "<dedent>", p); }
+                    indents.pop_back();
+                    braces = block.braces;
+                }
+            }
+            if (!blank && !braces) {
+                if (prefix.mixed != std::string::npos)
+                    error(source, {TokenKind::symbol, "", prefix.mixed}, Code::indentation, "Mixed tabs and spaces in source indentation.", "Use only tabs or only spaces in this block.");
+                const bool dedenting = prefix.width < indents.back().width;
+                while (prefix.width < indents.back().width) { indents.pop_back(); emit(TokenKind::dedent, "<dedent>", p); }
+                const auto enclosing = indents.back();
+                if (dedenting && prefix.width != enclosing.width)
+                    error(source, {TokenKind::symbol, "", p}, Code::indentation, "Indentation does not match an enclosing block.", "Align this statement with an earlier block level.");
+                if (enclosing.width && prefix.style != enclosing.style)
+                    error(source, {TokenKind::symbol, "", start}, Code::indentation, "Inconsistent tabs and spaces in an enclosing block.", "Match the indentation style of the enclosing block.");
+                if (prefix.width > enclosing.width) {
+                    indents.push_back({prefix.width, prefix.style});
+                    emit(TokenKind::indent, "<indent>", p);
                 }
             }
             beginning = false;
@@ -214,13 +243,16 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::
         if (c == ' ') { ++p; continue; }
         if (c == '#') { while (p < text.size() && text[p] != '\r' && text[p] != '\n') ++p; continue; }
         if (c == '\r' || c == '\n') {
-            ++p; if (c == '\r' && p < text.size() && text[p] == '\n') ++p;
             if(braces && tokens.size()>line_tokens && tokens.back().text==":"){
                 for(auto n=line_tokens;n<tokens.size();++n)if(tokens[n].text=="match" || tokens[n].text=="if" || (tokens[n].text=="func" && n+1<tokens.size() && tokens[n+1].text=="(")){
-                    auto line=tokens[n].offset;while(line && text[line-1]!='\n' && text[line-1]!='\r')--line;std::size_t width=0;while(line+width<text.size() && text[line+width]==' ')++width;
-                    literal_blocks.push_back({braces,indents.size(),width,tokens[n].text=="if"});indents.push_back(width);braces=0;break;
+                    auto line=tokens[n].offset;while(line && text[line-1]!='\n' && text[line-1]!='\r')--line;
+                    const auto prefix=indentation_at(text,line);
+                    if(prefix.mixed!=std::string::npos || (prefix.width && indents.back().width && prefix.style!=indents.back().style))
+                        error(source,{TokenKind::symbol,"",prefix.mixed==std::string::npos?line:prefix.mixed},Code::indentation,"Inconsistent tabs and spaces in an enclosing block.","Match the indentation style of the enclosing block.");
+                    literal_blocks.push_back({braces,indents.size(),prefix.width,tokens[n].text=="if"});indents.push_back({prefix.width,prefix.style});braces=0;break;
                 }
             }
+            ++p; if (c == '\r' && p < text.size() && text[p] == '\n') ++p;
             if (!braces && !tokens.empty() && tokens.back().kind != TokenKind::newline) emit(TokenKind::newline, "<newline>", start);
             line_tokens=tokens.size();beginning = true; continue;
         }
@@ -301,7 +333,7 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::
             }else if(c==')' && !parentheses.empty()){if(parentheses.back() && braces)--braces;parentheses.pop_back();}
             else if(c=='{' && (tokens.empty() || tokens.back().text!="defer"))++braces;else if(c=='}' && braces)--braces;++p; emit(TokenKind::symbol, std::string(1, c), start); continue; }
         error(source, {TokenKind::symbol, "", p}, Code::character, "Unexpected character in source.",
-              c == '\t' ? "Use spaces instead of tabs." : "Use supported expressions and lowercase ASCII identifiers; Unicode identifiers and collection/indexing syntax are deferred.");
+              c == '\t' ? "Use spaces between tokens. Tabs are only allowed in indentation or multiline strings." : "Use supported expressions and lowercase ASCII identifiers; Unicode identifiers and collection/indexing syntax are deferred.");
         } catch (const CompilationError& e) {
             diagnostics.add(e);
             auto line = source.location(p).line;
@@ -7169,7 +7201,7 @@ EditorAssistance project_editor_assistance(const std::filesystem::path& root,con
     try {ProjectCapture capture(root,sources,manifests);return editor_assistance_impl(root,sources,module,cursor,&capture,entry);}
     catch(const CompilationError&){return {};}
 }
-std::optional<std::string> format_source(const SourceFile& source) {
+std::optional<std::string> format_source(const SourceFile& source, bool insert_spaces) {
     // Parse with the ordinary compiler before proposing edits. This is local
     // syntax validation, never import discovery or a second semantic resolver.
     Diagnostics diagnostics;Parser parser(source,diagnostics);Unit parsed(source,source.path());parser.parse(parsed);
@@ -7189,8 +7221,8 @@ std::optional<std::string> format_source(const SourceFile& source) {
         auto start=text.find_last_of("\r\n",t.offset ? t.offset-1 : 0);start=start==std::string::npos?0:start+1;
         if(lines.insert(start).second) {
             auto indent=start;if(!start && text.starts_with("\xef\xbb\xbf"))indent=3;
-            auto end=indent;while(end<text.size() && text[end]==' ')++end;
-            if(end==t.offset && !parentheses)edits.push_back({indent,end,std::string((depth+brace_depth)*4,' ')});
+            const auto end=indentation_at(text,indent).end;
+            if(end==t.offset && !parentheses)edits.push_back({indent,end,std::string((depth+brace_depth)*(insert_spaces?4:1),insert_spaces?' ':'\t')});
         }
         if(previous) {
             auto left=span(source,*previous);

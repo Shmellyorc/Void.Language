@@ -62,7 +62,7 @@ try:
         assert app["project"]["name"] == "existing" and app["project"]["version"] == "0.1.0"
         assert {p.name for p in root.iterdir()} == {manifest_name, "game.void"} and original.read_bytes() == main.encode()
         for options in ([], ["--no-opt"]):
-            run("run", "--project", root, *options, status=19)
+            assert "VOID5012" not in run("run", "--project", root, *options, status=19)["stderr"]
         before = (root / manifest_name).read_bytes()
         run("init", root, status=1)
         assert before == (root / manifest_name).read_bytes()
@@ -109,6 +109,35 @@ try:
         defaults = manifest(app_default)
         assert defaults["project"]["id"] == "org.test.project" and defaults["application"]["id"] == "org.test.application"
         assert (app_default / "src/app.void").is_file() and defaults["sources"]["roots"] == ["src"]
+        # The CLI and editor use the same creation contract. Keep the resulting
+        # manifests minimal, then exercise them with a no-result application.
+        fresh = base / "quiet-new"
+        run("new", fresh)
+        initialized = directory("quiet-init")
+        created_in_editor = directory("quiet-editor")
+        (fresh / "src/app.void").write_bytes(b"func main():\n    pass\n")
+        (initialized / "game.void").write_bytes(b"func main():\n\tpass\n")
+        (created_in_editor / "game.void").write_bytes(b"func main():\n\tpass\n")
+        run("init", initialized)
+        inventory = wire("--discover-creation", created_in_editor, "")["creation"]
+        plan = wire("--plan-project", created_in_editor, "application", "", "")
+        assert wire("--create-project", created_in_editor, inventory["rootIdentity"], plan["kind"], plan["name"],
+                    plan["version"], plan["projectId"], plan["roleId"], plan["packageName"])["status"] == "created"
+        for generated_root in (fresh, initialized, created_in_editor):
+            generated_manifest = generated_root / manifest_name
+            generated_before = generated_manifest.read_bytes()
+            data = manifest(generated_root)
+            assert "build" not in data and re.fullmatch(r"local\.p[0-9a-f]{32}", data["project"]["id"])
+            assert re.fullmatch(r"local\.a[0-9a-f]{32}", data["application"]["id"])
+            if generated_root != fresh:
+                assert set(data) == {"schema", "project", "application"}, data
+            for profile in ("debug", "release"):
+                flags = ("--project", generated_root, "--profile", profile)
+                output = base / (generated_root.name + "-" + profile + suffix)
+                for result in (run("check", *flags), run("run", *flags), run("build", *flags, "-o", output)):
+                    assert "VOID5012" not in result["stderr"], result
+                invoke(output, cwd=base)
+            assert generated_manifest.read_bytes() == generated_before
         lib = base / "lib"
         run("new", lib, "--kind", "library", "--package-name", "toolkit", "--package-id", "org.test.toolkit")
         package = manifest(lib, "package")

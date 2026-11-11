@@ -79,5 +79,39 @@ int main(){try{
         if(windows)text=crlf(text);auto out=format(text);check(out.find("    var a = input # keep")!=std::string::npos,"indentation not canonical");
     }
     auto pretty=format(program);auto original=analyze(program),changed=analyze(pretty);for(bool optimized:{false,true}){vd::Jit jit;check(jit.compile(*original,optimized)->invoke(4)==9 && jit.compile(*changed,optimized)->invoke(4)==9,"formatter changed native effects/evaluation");}
+    const std::string spaces=R"(value struct point:
+    x: i32
+property (p point) position: i32:
+    get:
+        return p.x
+func (p point) move(delta: i32) -> i32:
+    return p.position + delta
+func entry(input: i32) -> i32:
+    var p = point(x = input)
+    var total = 0
+    for n in [1, 2, 3]:
+        if n > 1:
+            total += p.move(n)
+        else:
+            total += n
+    return total
+)";
+    auto tabs=vd::format_source({"/format.void",spaces},false);
+    check(tabs && tabs->find("\n\t\t\ttotal += p.move(n)")!=std::string::npos,"formatter emits actual nested tabs");
+    check(vd::format_source({"/format.void",*tabs},false)==tabs,"tab formatting not idempotent");
+    check(vd::format_source({"/format.void",*tabs},true)==spaces,"tab-to-space formatting changed text");
+    auto tab_program=analyze(crlf(*tabs)),space_program=analyze(spaces);
+    check(tab_program->compatibility_contract()==space_program->compatibility_contract() && bindings(*tab_program)==bindings(*space_program),"indentation style changed compiler bindings");
+    for(bool optimized:{false,true}) {
+        vd::Jit jit;
+        check(jit.compile(*tab_program,optimized)->invoke(4)==14 && jit.compile(*space_program,optimized)->invoke(4)==14,"indentation style changed JIT result");
+    }
+    for(const std::string indent:{"\t ","    ","  "}) {
+        const auto invalid="func entry(input: i32) -> i32:\r\n\tvar value = input\r\n"+indent+"return value\r\n";
+        auto failed=vd::analyze_source({"/format.void",invalid});
+        const auto error=std::find_if(failed.diagnostics.begin(),failed.diagnostics.end(),[](const auto& d){return d.code==vd::DiagnosticCode::indentation;});
+        check(!failed.program && error!=failed.diagnostics.end() && error->primary.source->location(error->primary.begin).line==3,"mixed indentation must diagnose the original line");
+        check(!vd::format_source({"/format.void",invalid},false),"formatter rewrote mixed indentation");
+    }
     std::cout<<checks<<" source formatting/diagnostic checks passed\n";
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}

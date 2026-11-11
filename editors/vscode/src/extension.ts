@@ -6,6 +6,13 @@ import {CreationWorkflow} from './creationWorkflow';
 
 let manager: ServerManager | undefined;
 let creation: CreationWorkflow | undefined;
+
+function applyIndentation(editor: vscode.TextEditor): void {
+    if (editor.document.languageId !== 'void') return;
+    const useTabs = vscode.workspace.getConfiguration('void.editor', editor.document).get('useTabs', true);
+    editor.options = {insertSpaces: !useTabs, tabSize: 4, indentSize: 4};
+}
+
 class ServerManager {
     private client?: LanguageClient;
     private project?: Project;
@@ -209,9 +216,19 @@ export function activate(context: vscode.ExtensionContext): {ready: () => Promis
         vscode.workspace.onDidOpenTextDocument(d => { if (d.languageId === 'void' || basename(d.uri.fsPath) === 'void.project.toml') void current.refresh(); }),
         vscode.window.onDidChangeActiveTextEditor(e => { if (e && (e.document.languageId === 'void' || basename(e.document.uri.fsPath) === 'void.project.toml')) void current.refresh(); }),
         vscode.workspace.onDidChangeTextDocument(e => { if (e.document.languageId === 'void' || basename(e.document.uri.fsPath) === 'void.project.toml') current.changed(); }),
-        vscode.workspace.onDidChangeConfiguration(e => { if (e.affectsConfiguration('void')) void current.refresh(true); }),
+        vscode.window.onDidChangeVisibleTextEditors(editors => editors.forEach(applyIndentation)),
+        vscode.workspace.onDidOpenTextDocument(document => {
+            for (const editor of vscode.window.visibleTextEditors) if (editor.document === document) applyIndentation(editor);
+        }),
+        vscode.workspace.onDidChangeConfiguration(e => {
+            for (const editor of vscode.window.visibleTextEditors) {
+                if (e.affectsConfiguration('void.editor.useTabs', editor.document)) applyIndentation(editor);
+            }
+            if (['void.server', 'void.project', 'void.trace'].some(setting => e.affectsConfiguration(setting))) void current.refresh(true);
+        }),
         vscode.workspace.onDidChangeWorkspaceFolders(() => { void current.refresh(true); }),
         vscode.workspace.onDidGrantWorkspaceTrust(() => { void current.refresh(true); }));
+    vscode.window.visibleTextEditors.forEach(applyIndentation);
     void current.refresh();
     return {ready: () => current.refresh(), status: () => current.status(), deactivate};
 }

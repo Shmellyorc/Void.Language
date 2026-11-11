@@ -115,6 +115,11 @@ spelling, source docs, known-root navigation and readonly installed sources.
 
 ### VS Code / VSCodium
 
+VOID editors insert tabs by default. Set `void.editor.useTabs` to `false` in
+user or workspace settings to insert four spaces instead. Tabs display at four
+columns. Changing the setting preserves existing text. **Format Document**
+uses the active indentation style when the compiler can verify the edit.
+
 The extension now declares VS Code **1.141.0+**, raising the old untested 1.91
 minimum to the actually exercised API version. VSCodium is an integration target;
 execution evidence must be recorded separately. Configure `void.project.entry`

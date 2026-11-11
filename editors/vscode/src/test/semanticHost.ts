@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import assert from 'node:assert/strict';
 import * as path from 'node:path';
 import {promises as fs} from 'node:fs';
+import {verifyEditorBasics} from './editorBasics';
 
 const manifest = `schema=1
 [project]
@@ -76,6 +77,7 @@ export async function run(): Promise<void> {
     assert(extension);
     const api: {ready(): Promise<void>; status(): {entry?: string}; deactivate(): Promise<void>} = await extension.activate();
     try {
+        await verifyEditorBasics(root);
         const document = await vscode.workspace.openTextDocument(app);
         await vscode.window.showTextDocument(document);
         await api.ready();
@@ -94,6 +96,21 @@ export async function run(): Promise<void> {
         expect('    print(', 'lib.print', 'lib', 'namespace');
         expect('    print(', 'lib.print', 'print', 'function');
         expect('    print(', 'p.x', 'x', 'property', 'readonly');
+
+        const format = (insertSpaces: boolean) => vscode.commands.executeCommand<vscode.TextEdit[]>('vscode.executeFormatDocumentProvider', app, {tabSize: 4, insertSpaces});
+        const applyFormat = async (edits: vscode.TextEdit[]) => {
+            const edit = new vscode.WorkspaceEdit();
+            edit.set(document.uri, edits);
+            assert(await vscode.workspace.applyEdit(edit));
+        };
+        const tabEdits = await format(false);
+        assert(tabEdits.length);
+        await applyFormat(tabEdits);
+        const tabbed = source.replace(/^ +/gm, indent => '\t'.repeat(indent.length / 4));
+        assert.equal(document.getText(), tabbed);
+        const spaceEdits = await until(() => format(true), edits => !!edits?.length, 'formatter accepts tabbed dirty source');
+        await applyFormat(spaceEdits);
+        assert.equal(document.getText(), source);
 
         const dirty = source.replaceAll('move', 'translate');
         await replace(document, dirty);

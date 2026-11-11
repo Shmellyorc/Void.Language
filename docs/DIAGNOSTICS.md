@@ -47,8 +47,9 @@ LF, CRLF, CR, empty lines and EOF without a final newline retain original offset
 The renderer shows a numbered gutter and a scalar-counted caret range on the
 primary line, plus related snippets, expected/received types and hints. A multiline
 span remains intact in the representation; its console underline stops at the
-first line ending. Tabs are errors; carets do not claim tab expansion, grapheme,
-wide-character or terminal-display-width accuracy. Long source lines are retained
+first line ending. Diagnostic columns count a tab as one source character.
+Carets do not claim tab expansion, grapheme, wide-character or terminal-display-width
+accuracy. Long source lines are retained
 and rendered in full. A future IDE adapter must convert byte spans to its protocol
 encoding using these snapshots, not reinterpret scalar columns as UTF-16.
 

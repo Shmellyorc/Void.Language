@@ -1,7 +1,18 @@
 {
   "comments": { "lineComment": "#" },
-  "brackets": [["(", ")"]],
-  "autoClosingPairs": [{"open":"(","close":")"}],
-  "surroundingPairs": [["(", ")"], ["\"", "\""]],
-  "indentationRules": { "increaseIndentPattern": "^\\s*(?:(?:public|private|internal)\\s+)?(?:(?:(?:virtual|override)\\s+)?func|(?:value\\s+)?struct|interface|if|else|for)\\b[^#]*:\\s*(?:#.*)?$" }
+  "brackets": [["(", ")"], ["[", "]"], ["{", "}"]],
+  "autoClosingPairs": [
+    {"open": "\"", "close": "\"", "notIn": ["string", "comment"]},
+    {"open": "(", "close": ")"},
+    {"open": "[", "close": "]"},
+    {"open": "{", "close": "}"}
+  ],
+  "surroundingPairs": [["(", ")"], ["[", "]"], ["{", "}"], ["\"", "\""]],
+  "onEnterRules": [
+    {"beforeText": "^[ \\t]*(?:(?:(?:public|private|internal)\\s+)?(?:async\\s+)?(?:(?:virtual|override)\\s+)?(?:func|operator|(?:value\\s+)?struct|interface|enum|property)\\b|(?:if|else|for|with|match)\\b|(?:get(?=\\s*:)|set(?=\\s*\\())|(?:(?:var|const)\\s+[^\"#=]*=|[a-z_]\\w*(?:\\.[a-z_]\\w*)*\\s*=|return\\s+)\\s*(?:func|if|match)\\b|(?:_(?=\\s*:)|(?:true|false|null)\\b|[+-]?\\d|[\\[{(]|(?=\")|[A-Za-z_]\\w*(?:(?:\\.[A-Za-z_]\\w*)+|(?=\\s*[<(]))))(?:[^\"#\\r\\n]|\"(?:[^\"\\\\\\r\\n]|\\\\.)*\")*:\\s*(?:#.*)?$", "action": {"indent": "indent"}},
+    {"beforeText": "^[ \\t]*defer\\s*\\{\\s*(?:#.*)?$", "afterText": "^(?!\\s*\\})", "action": {"indent": "indent"}}
+  ],
+  "indentationRules": {
+    "decreaseIndentPattern": "^\\s*\\}\\s*(?:#.*)?$"
+  }
 }

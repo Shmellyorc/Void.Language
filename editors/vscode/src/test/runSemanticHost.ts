@@ -16,7 +16,7 @@ async function main(): Promise<void> {
         await fs.mkdir(path.join(profile, 'User'), {recursive: true});
         await fs.writeFile(path.join(settings, 'settings.json'), JSON.stringify({
             'void.server.path': await fs.realpath(VOIDLS_PATH), 'void.project.root': '.', 'void.trace.server': 'off',
-            'editor.semanticHighlighting.enabled': true,
+            'editor.semanticHighlighting.enabled': true, 'files.eol': '\n',
         }));
         await fs.writeFile(path.join(profile, 'User/settings.json'), JSON.stringify({
             'security.workspace.trust.startupPrompt': 'never', 'workbench.startupEditor': 'none',

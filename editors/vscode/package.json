@@ -44,13 +44,20 @@
           ".void"
         ],
         "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "void-string"
       }
     ],
     "grammars": [
       {
         "language": "void",
         "scopeName": "source.void",
-        "path": "./syntaxes/void.tmLanguage.json"
+        "path": "./syntaxes/void.tmLanguage.json",
+        "embeddedLanguages": {
+          "string.quoted.triple.void": "void-string",
+          "meta.interpolation.void": "void"
+        }
       }
     ],
     "commands": [
@@ -78,6 +85,12 @@
     "configuration": {
       "title": "VOID",
       "properties": {
+        "void.editor.useTabs": {
+          "type": "boolean",
+          "default": true,
+          "scope": "language-overridable",
+          "description": "Indent VOID code with tabs. Disable to insert four spaces. Changing this setting does not convert existing text."
+        },
         "void.server.path": {
           "type": "string",
           "default": "",
@@ -111,7 +124,7 @@
     },
     "configurationDefaults": {
       "[void]": {
-        "editor.insertSpaces": true,
+        "editor.insertSpaces": false,
         "editor.tabSize": 4,
         "editor.detectIndentation": false
       }

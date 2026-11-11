@@ -182,15 +182,24 @@ export async function run(): Promise<void> {
         assert.equal(children.length,typingCount);assert(!gone(typingChild));
         record('PASS real editor local libraries: typed imports, nested completion, source definition, docs and same-server repair');
         const suggestionWidget=await signatureWidget();
-        try {for (const [prefix,expected] of [['use ','use console'],['use io/','use io/files'],['use "','use ".vscode/'],['use "app/','use "app/systems/'],['use "app/systems/','use "app/systems/player.void"']]) {
+        try {for (const [prefix,expected] of [['use ','use console'],['use io/','use io/files'],['use "','use ".vscode/"'],['use "app/','use "app/systems/"'],['use "app/systems/','use "app/systems/player.void"']]) {
             await vscode.commands.executeCommand('hideSuggestWidget');
             await replace(main,'');mainEditor.selection=new vscode.Selection(0,0,0,0);
-            await vscode.commands.executeCommand('type',{text:prefix});
+            const quote=prefix.indexOf('"');
+            if(quote<0)await vscode.commands.executeCommand('type',{text:prefix});
+            else {
+                await vscode.commands.executeCommand('type',{text:prefix.slice(0,quote)});
+                await vscode.commands.executeCommand('type',{text:'"'});
+                assert.equal(main.getText(),prefix.slice(0,quote)+'""');
+                assert.equal(mainEditor.selection.active.character,quote+1);
+                if(quote+1<prefix.length)await vscode.commands.executeCommand('type',{text:prefix.slice(quote+1)});
+            }
             if(suggestionWidget)await until(()=>suggestionWidget.read(`[...document.querySelectorAll('.suggest-widget.visible .monaco-list-row.focused')].map(e=>e.innerText)`),
                 rows=>rows.some(row=>row.includes(expected.slice(prefix.length).replace(/"$/, ''))),'visible import suggestion '+prefix);
             else await new Promise(resolve=>setTimeout(resolve,750));
             await vscode.commands.executeCommand('acceptSelectedSuggestion');
             assert.equal(main.getText(),expected,'automatic import suggestions '+prefix);
+            if(expected.endsWith('/"'))assert.equal(mainEditor.selection.active.character,expected.length-1,'folder completion leaves the cursor inside quotes');
         }} finally {suggestionWidget?.close();}
         for (const [prefix,label] of [['use ','io/'],['use io/','files'],['use "','app/'],['use "app/','systems/'],['use "app/systems/','player.void']]) {
             await replace(main,prefix);

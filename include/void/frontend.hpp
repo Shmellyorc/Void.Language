@@ -196,7 +196,7 @@ EditorAssistance editor_assistance(const std::filesystem::path&, const SourceOve
     const std::string& module, std::size_t cursor);
 bool valid_editor_identifier(const std::string&);
 EditorAssistance project_editor_assistance(const std::filesystem::path&,const std::optional<std::string>&,const SourceOverrides&,const ManifestOverrides&,const std::string&,std::size_t);
-std::optional<std::string> format_source(const SourceFile&);
+std::optional<std::string> format_source(const SourceFile&, bool insert_spaces = true);
 // One source pipeline shared by checking, JIT and AOT. Errors contain rendered
 // source diagnostics and are raised before invoking any backend.
 ir::Module compile_source(const SourceFile& source);
