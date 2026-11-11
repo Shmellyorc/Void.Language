@@ -165,10 +165,14 @@ limit changed on the retry, so the triggering condition remains unisolated.
 
 ## Platform and retained limitations
 
-This closeout records Linux x86-64 GNU. The W2 implementation adds Windows
-x64 MSVC using `app.exe` in the same directory layout. Windows requires an
+This closeout records Linux x86-64 GNU. W2 adds Windows x64 MSVC
+packaging and passed all ten focused CTests in both hosted Windows
+Server 2022 profiles, Debug and Release.
+[W2 hosted acceptance](W2_WINDOWS_D5_IMPLEMENTATION.md#hosted-acceptance)
+
+Windows uses `app.exe` in the same directory layout and requires an
 absent destination even when `--replace` is supplied. macOS ARM64 packaging
-and managed native execution remain unsupported. [W2 implementation](W2_WINDOWS_D5_IMPLEMENTATION.md)
+and managed native execution remain unsupported.
 
 The known 256-byte Mesa graphics allocation remains the accepted display
 limitation. Leak detection stays enabled for focused headless sanitizer

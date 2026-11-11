@@ -180,10 +180,10 @@ ctest --test-dir "$build" -j2 --no-tests=error --output-on-failure -R "^($tests)
 
 ## Hosted workflow
 
-The manual Windows Server 2022 x64 workflow is ready for source review.
-Its reviewed-SHA gate checks the requested SHA, workflow SHA and actual
-checkout. The two jobs verify the pinned SDK and provider closures,
-use the W1 private-root helper and require all ten selected tests,
+The manual Windows Server 2022 x64 workflow checks the requested SHA,
+workflow SHA and actual checkout. The two jobs verify the pinned SDK
+and provider closures, use the W1 private-root helper and require all
+ten selected tests,
 including `project_git_dependencies`, to have active commands and no CTest
 skip properties. At the initial local handoff, Actionlint 1.7.12 passed,
 the native PowerShell 5.1 parser accepted all eight run blocks, and the
@@ -196,8 +196,46 @@ embedded Python blocks compiled. A temporary CTest fixture exercised the
 workflow gate with ten active commands. The gate rejected missing Git
 registration, a missing executable, each disabled or skip property,
 duplicate names and selections of nine or eleven. The fixture was
-removed. The existing native and Linux results below are the execution
-record for this handoff.
+removed. The local qualification results below record the execution
+available at that handoff.
+
+## Hosted acceptance
+
+The manual W2 run on 11 November 2026 qualified commit
+`5fffda8f406e23507367b19152fb8fdce3483522` on GitHub-hosted Windows Server
+2022 x64. Both jobs verified the requested, workflow and checkout SHA,
+the LLVM/Clang/LLD 23.1.4 SDK and pinned provider closures, and the W1
+private temporary root. [Hosted run #43069968456](https://github.com/Shmellyorc/Void.Language/actions/runs/43069968456)
+
+| Profile | CTest result and total time | `cli_install` | `application_workflow_stage9` |
+| --- | --- | ---: | ---: |
+| [Debug](https://github.com/Shmellyorc/Void.Language/actions/runs/43069968456/job/130694882254) | 10/10 passed, 141.62 s | 5.19 s | 20.61 s |
+| [Release](https://github.com/Shmellyorc/Void.Language/actions/runs/43069968456/job/130694883553) | 10/10 passed, 40.91 s | 2.01 s | 7.09 s |
+
+Both jobs passed the exact CTest selection gate, which requires an
+active command for each test and rejects `DISABLED`, `SKIP_RETURN_CODE`
+and `SKIP_REGULAR_EXPRESSION`. The logs confirmed all ten tests passed
+with the timeout settings below in both profiles.
+
+| Required CTest | Timeout (s) |
+| --- | ---: |
+| `application_workflow_stage9` | 300 |
+| `cli_contract` | 180 |
+| `cli_install` | 240 |
+| `project_application_package` | 600 |
+| `project_creation` | 300 |
+| `project_creation_process` | 300 |
+| `project_git_dependencies` | 300 |
+| `project_managed_native` | 300 |
+| `project_manifest` | 60 |
+| `project_package_native` | 300 |
+
+The workflow retains its 120-minute per-job limit. The Stage 9
+long-temporary-root rejection retains its 90-second subprocess timeout
+and `too long` assertion. Both `cli_install` logs confirm the packaged
+application ran while reads of the relocated compiler installation and
+source were denied. The earlier hosted failures and repairs are recorded
+below.
 
 ## Local qualification
 
@@ -429,8 +467,9 @@ The Stage 9 logs confirm the same 272-unit root in both profiles.
 The adjacent tests were `project_managed_native`,
 `project_application_package` and `project_package_native`. The
 production edit is Windows-only. The prior Linux evidence remains
-the Linux execution record. The corrected hosted Windows Server
-2022 x64 matrix awaits a manual replay after independent review.
+the Linux execution record. At this handoff, the corrected hosted
+Windows Server 2022 x64 matrix still awaited a manual replay after
+independent review.
 
 ### Repair cleanup and Git status
 
@@ -562,9 +601,9 @@ check the restored DACL and exclusive file opens after unwinding.
 Both `cli_install` profiles confirmed that the packaged application
 ran after the child verified read denial. The focused CTest runs used
 the existing 240 s, 600 s and 300 s timeouts. The manual workflow
-and its ten-test Debug/Release selection match the baseline. Hosted
-qualification of the isolation retry remains pending independent
-Golden Wrench review.
+and its ten-test Debug/Release selection match the baseline. At this
+handoff, hosted qualification of the isolation retry still awaited
+independent Golden Wrench review.
 
 ### Cleanup and Git status
 
