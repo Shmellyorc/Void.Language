@@ -1,0 +1,177 @@
+name: W1 project dependencies / Windows x64
+on:
+  workflow_dispatch:
+    inputs:
+      reviewed_sha:
+        description: Full commit SHA containing the reviewed sources and this workflow
+        type: string
+        required: true
+permissions:
+  contents: read
+jobs:
+  qualify:
+    name: Windows x64 / ${{ matrix.configuration }}
+    runs-on: windows-2022
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      W1_CONFIGURATION: ${{ matrix.configuration }}
+      W1_REVIEWED_SHA: ${{ inputs.reviewed_sha }}
+      W1_TESTS: project_manifest|project_dependencies|project_packages|project_git_dependencies|project_git_https|project_managed_native
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          architecture: x64
+      - name: Windows native SDK environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Verify reviewed source and native runner
+        run: |
+          $PSNativeCommandUseErrorActionPreference = $true
+          $head = git rev-parse HEAD
+          if ($env:W1_REVIEWED_SHA -cnotmatch '^[0-9a-f]{40}$' -or
+              $env:W1_REVIEWED_SHA -cne $env:GITHUB_SHA -or $env:W1_REVIEWED_SHA -cne $head) {
+            throw 'The selected ref and checkout must both match the full reviewed commit SHA.'
+          }
+          if ($env:GITHUB_EVENT_NAME -ne 'workflow_dispatch' -or $env:RUNNER_ENVIRONMENT -ne 'github-hosted' -or
+              $env:RUNNER_OS -ne 'Windows' -or $env:RUNNER_ARCH -ne 'X64' -or
+              -not [System.OperatingSystem]::IsWindows() -or
+              [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture -ne 'X64' -or
+              $env:VSCMD_ARG_TGT_ARCH -ne 'x64' -or -not $env:WindowsSDKVersion) {
+            throw 'W1 requires a GitHub-hosted Windows x64 runner with the x64 MSVC and Windows SDK environment.'
+          }
+          $work = Join-Path $env:RUNNER_TEMP 'w1'
+          $temp = (New-Item -ItemType Directory -Force -Path "$work/t").FullName
+          "W1_WORK=$work", "TEMP=$temp", "TMP=$temp" >> $env:GITHUB_ENV
+          Write-Host "Reviewed commit $head / $env:W1_CONFIGURATION / MSVC $env:VCToolsVersion / SDK $env:WindowsSDKVersion"
+          git --version
+          cmake --version
+          ninja --version
+      - name: Restore existing verified LLVM SDK cache
+        uses: actions/cache/restore@v5
+        with:
+          path: .toolchains/llvm-23.1.4
+          key: llvm-sdk-23.1.4-${{ runner.os }}-${{ runner.arch }}-v1
+      - name: Bootstrap and verify LLVM Clang LLD 23.1.4
+        run: python -B tools/ci/llvm_sdk.py
+      - name: Bootstrap pinned Windows HTTP providers
+        run: python -B tools/setup_http_deps.py --profile "$env:W1_CONFIGURATION" --jobs 2
+      - name: Bootstrap host providers and verify both dependency closures
+        run: python -B tools/ci/voidup_bootstrap.py bootstrap --configuration "$env:W1_CONFIGURATION" --evidence "$env:W1_WORK/host"
+      - name: Configure Windows project tests
+        run: |
+          $git = (Get-Command git.exe -CommandType Application | Select-Object -First 1).Source
+          cmake -S . -B "$env:W1_WORK/b" -G Ninja `
+            "-DCMAKE_BUILD_TYPE=$env:W1_CONFIGURATION" -DBUILD_TESTING=ON `
+            -DVOID_SANITIZERS=OFF -DVOID_LLVM_RESEARCH=OFF `
+            "-DCMAKE_C_COMPILER=$env:CC" "-DCMAKE_CXX_COMPILER=$env:CXX" `
+            "-DLLVM_DIR=$env:LLVM_DIR" "-DVOID_CLANG=$env:VOID_CLANG" "-DVOID_GIT_EXECUTABLE=$git"
+      - name: Build required targets
+        id: build
+        run: cmake --build "$env:W1_WORK/b" --parallel 2 --target voidc voidls void_project_manifest void_project_packages_ir
+      - name: Smoke test native project discovery, check, JIT and AOT
+        run: |
+          @'
+          import os
+          from pathlib import Path
+          import re
+          import subprocess
+
+          work = Path(os.environ["W1_WORK"])
+          compiler = work / "b" / "voidc.exe"
+          readobj = Path(os.environ["VOID_CLANG"]).with_name("llvm-readobj.exe")
+          project = work / "project \u96ea with spaces"
+          image = work / "output \u96ea with spaces" / "smoke.exe"
+
+          def verify_pe(binary):
+              headers = subprocess.check_output([readobj, "--file-headers", "--coff-imports", binary], text=True)
+              if "IMAGE_FILE_MACHINE_AMD64 (0x8664)" not in headers:
+                  raise SystemExit(f"Expected x64 PE image: {binary}")
+              dynamic_crt = re.findall(
+                  r"(?im)^\s*Name:\s*((?:(?:vcruntime|msvcp|msvcr)\d[^\s]*|ucrtbased?|api-ms-win-crt-[^\s]*)\.dll)\s*$",
+                  headers,
+              )
+              if dynamic_crt:
+                  raise SystemExit(f"Unexpected direct dynamic CRT imports in {binary}: {dynamic_crt}")
+
+          def run(*args, **options):
+              return subprocess.run(args, check=True, timeout=90, **options)
+
+          verify_pe(compiler)
+          run(compiler, "--version")
+          run(compiler, "new", project, "--source", "src/launcher.void")
+          (project / "src" / "launcher.void").write_text(
+              'func main() -> i32:\n    print("VOID x64 smoke")\n    return 0\n', encoding="utf-8")
+          run(compiler, "check", project)
+          jit = run(compiler, "run", "--no-cache", cwd=project, stdout=subprocess.PIPE, text=True)
+          run(compiler, "build", "--project", project, "-o", image)
+          verify_pe(image)
+          aot = run(image, cwd=work, stdout=subprocess.PIPE, text=True)
+          if jit.stdout != "VOID x64 smoke\n" or aot.stdout != jit.stdout:
+              raise SystemExit(f"Unexpected smoke output: JIT {jit.stdout!r}, AOT {aot.stdout!r}")
+          print("Native Windows x64 check, JIT and AOT passed")
+          '@ | python -B -
+      - name: Verify and run the exact focused CTest selection
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          @'
+          import json
+          import os
+          from pathlib import Path
+          import subprocess
+
+          names = os.environ["W1_TESTS"]
+          expected = sorted(names.split("|"))
+          build = Path(os.environ["W1_WORK"]) / "b"
+          ctest = ["ctest", "--test-dir", build, "-R", f"^({names})$"]
+          listing = subprocess.check_output([*ctest, "--show-only=json-v1"])
+          (build / "w1-selection.json").write_bytes(listing)
+          tests = json.loads(listing)["tests"]
+          selected = sorted(test["name"] for test in tests)
+          if selected != expected:
+              raise SystemExit(f"Expected {expected}, selected {selected}")
+          for test in tests:
+              properties = {prop["name"] for prop in test.get("properties", [])}
+              if not test.get("command") or properties & {"DISABLED", "SKIP_RETURN_CODE", "SKIP_REGULAR_EXPRESSION"}:
+                  raise SystemExit(f"Missing command or skip condition for {test['name']}")
+          print(f"Exact CTest selection: {', '.join(selected)}", flush=True)
+          subprocess.run([*ctest, "--no-tests=error", "--output-on-failure",
+                          "--test-output-size-failed", "16384", "--test-output-truncation", "tail"], check=True)
+          '@ | python -B -
+      - name: Print bounded failure diagnostics
+        if: failure()
+        run: |
+          @'
+          import os
+          from pathlib import Path
+
+          work = Path(os.environ["RUNNER_TEMP"]) / "w1"
+          logs = [work / path for path in (
+              "b/w1-selection.json", "b/Testing/Temporary/LastTest.log",
+              "b/CMakeFiles/CMakeConfigureLog.yaml", "host/build-host-providers.log",
+              "host/verify-dependencies.log",
+          )]
+          http = Path("docs/net/http/evidence")
+          receipts = sorted(http.glob(f"dependencies-windows-schannel-x86_64-{os.environ['W1_CONFIGURATION']}-*"))
+          if receipts:
+              streams = [path for path in receipts[-1].iterdir()
+                         if path.suffix in {".stdout", ".stderr"} and path.is_file() and path.stat().st_size]
+              logs.extend(sorted(streams, key=lambda path: path.stat().st_mtime_ns)[-4:])
+          for path in logs:
+              if path.is_file():
+                  with path.open("rb") as stream:
+                      stream.seek(max(0, path.stat().st_size - 8192))
+                      print(f"\n--- {path} ---\n{stream.read().decode('utf-8', errors='replace')}")
+          '@ | python -B -
