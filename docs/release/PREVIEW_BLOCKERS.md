@@ -40,3 +40,24 @@ The three-platform hosted installation qualification is ACCEPTED and closed.
 Release holds remain open. Historical optimizer uncertainty is conditional risk,
 not a demonstrated current LLVM23 defect. Golden Wrench reviews evidence; Boss
 controls repairs, Git, hosted CI and publication decisions.
+
+
+## G00-A reconciliation, 12 November 2026
+
+**AUDIT IN PROGRESS pending Golden Wrench review.** The 8 November planning
+entry above retains the historical state. Manifest/project development,
+locked dependencies, VS Code Check/Build/Run, supported AOT debugging and
+Linux/Windows D5 have since gained scoped evidence. D5 app relocation and
+native macOS application-context relocation have separate qualification
+from portable compiler distribution. The accepted three-host source install
+used the dedicated CI driver at its recorded SHA. Later Windows/macOS
+onboarding through the source-install wrapper and the independent public
+first-user journey remain unqualified. [Developer journey and native matrix](G00_READINESS_AUDIT.md#developer-journey)
+
+The historical optimizer causes remain unresolved. FILE200's original
+**<10 ms** aim remains advisory by Boss decision. G08 production optimization
+and Windows persistent cache stay on HOLD. Public redistribution remains
+blocked on the exact payload and channel, GNU corresponding-source and
+replacement disposition, applicable provenance/notice rights, platform
+closures and public install evidence. The original seven-job project/raylib
+gate remains **OPEN / DEFERRED BY BOSS DECISION**. [Blocker classification](G00_READINESS_AUDIT.md#all-preview-register-entries) · [Readiness decision](G00_READINESS_AUDIT.md#readiness-decision-and-next-work)

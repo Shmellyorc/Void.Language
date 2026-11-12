@@ -1,5 +1,16 @@
 # First-class VOID projects and native application roadmap
 
+## G00-A readiness reconciliation, 12 November 2026
+
+The dated proposals and gate definitions below retain their original scope.
+S1–S7 and D1–D5 are integrated within their qualified platform boundaries.
+Later local evidence covers trusted VS Code Check/Build/Run, the admitted AOT
+debugger lanes and real Windows managed raylib through D5. Focused macOS
+ARM64 project/application/editor acceptance stands at its tested SHA.
+macOS managed-native execution and D5 remain unsupported. The original
+seven-job integrated project/raylib gate is **OPEN / DEFERRED BY BOSS DECISION**.
+Public distribution remains on HOLD. [Canonical G00-A readiness audit](release/G00_READINESS_AUDIT.md) · [Project acceptance and hosted history](projects/PROJECT_APPLICATION_ACCEPTANCE_RECONCILIATION.md)
+
 ## Current Slice 5 implementation
 
 Golden Wrench accepted S4 for local continuation. Slice 5 implements exclusive

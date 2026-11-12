@@ -1,9 +1,9 @@
 # VOID developer experience milestone register
 
-Current assignment is Batch 13, G12 bounded application ZIP export, starting
-from `79f212f2907b3fb5eeeabebb0aa8fa5705b82c86`. Batch entries below identify
-the integration commits and the scope of their qualification. Boss controls
-integration, hosted qualification and public release.
+Current assignment is Batch 14, G00-A feature completeness and distribution
+readiness audit, starting from `afe14d4c0cd7fd0576ecc194a38c294d7e54ec0a`.
+Batch entries below identify the integration commits and qualification scopes.
+Boss controls integration, hosted qualification and public release.
 [Feature roadmap](FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md)
 
 ## Integrated milestones
@@ -18,17 +18,18 @@ integration, hosted qualification and public release.
 | 5 · G15 | `1e988f00e41f3d3433859e756737acc25d3bf35c` | Local Linux Debug/Release/strict and Windows 10 Debug/Release after correcting the obsolete tab-indentation test. Named/unnamed returns and ordered destructuring retain the typed ABI. First-class tuples and async/function-value multiple returns are outside scope. [Record](FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md#g15-native-qualification) |
 | 6 · G05 | `7af58a3ad4ebee4e0bc6c9a97c23f356ea2bcd4c` | Local Linux Debug/Release/strict and Windows 10 Debug/Release. Verified read-only dependency explanation and guarded VS Code quick fixes. Vim/Neovim manifest parity remains open. [Record](FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md#g05-dependency-intelligence-and-guarded-maintenance) |
 | 7 · G16 | `6b28c57ff50256734fb804387f7c0ffca828d51f` | Local Linux Debug/Release/strict and Windows 10 Debug/Release. Compiler-owned enum completion and semantic roles respect visibility and stale-result guards. Recovery remains limited to supported incomplete contexts. [Record](FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md#g16-enum-completion-and-semantic-highlighting) |
-| 8 · G06 | `561bd020d9904dcfa2dc792297f9e87688e89f5e` | New save tests passed on all five local profiles. The two existing Windows I/O suites still encountered file-symlink privilege error 1314. The synchronous API uses admitted local filesystems and a held private directory. Async saves and macOS remain outside scope. [Record](FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md#g06-atomic-application-saves) |
+| 8 · G06 | `561bd020d9904dcfa2dc792297f9e87688e89f5e` | New save tests passed on all five local profiles. The two existing Windows I/O source suites failed the file-symlink prerequisite at check 91. The separate native control observed error 1314 and verified junction refusal. The synchronous API uses admitted local filesystems and a held private directory. Async saves and macOS remain outside scope. [Record](FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md#g06-atomic-application-saves) · [Incident and replay boundary](../release/G00_READINESS_AUDIT.md#windows-file-symlink-incident) |
 | 9 · G08 | `8b714ebb525fa7c822e7f7c35780b58f9f48208c` | **BASELINE MEASURED / OPTIMIZATION HOLD.** Local Linux and Windows 10 Debug/Release timing and strict Linux correctness. A revision-only completion cache would miss a changed dependency. Windows persistent caching remains an architecture decision. [Qualification](../compiler-health/G08_COMPILER_PERFORMANCE.md) |
 | 10 · G09 | `e83c1070e5d2f6b49a2b84c52e21fbf2e6e319b1` | **INTEGRATED / GOLDEN WRENCH SOURCE ACCEPTED.** Bounded JSON configuration, explicit typed field defaults and G06 atomic save/reload. Local PikaOS Debug/Release/strict and Windows 10 Debug/Release. Other data and text conveniences remain separate. [Qualification](../json/IMPLEMENTATION.md#g09-configuration-and-typed-field-defaults) |
 | 11 · G10 | `ceefd3f9a75257756cb8ab476868731e4359dcca` | **INTEGRATED.** Bounded monotonic sleep and structured cancellation/drain. Local PikaOS Debug/Release/strict and Windows 10 Debug/Release. General deadline composition and async queue/backpressure remain deferred. [Qualification](../ASYNC.md#g10-monotonic-timers) |
 | 12 · G11 | `79f212f2907b3fb5eeeabebb0aa8fa5705b82c86` | **INTEGRATED.** Real Windows managed raylib and D5 headless execution. The separate G5 retained-callback fixture passed within its contract. The retained raylib callback remains on HOLD. macOS managed native and D5 remain unsupported. Signed App Sandbox remains unverified. [Qualification](../projects/G11_WINDOWS_MANAGED_NATIVE_QUALIFICATION.md) |
+| 13 · G12 | `afe14d4c0cd7fd0576ecc194a38c294d7e54ec0a` | **INTEGRATED / INDEPENDENT SOURCE REVIEW COMPLETE.** Bounded deterministic stored ZIP with G06 publication. Both archive tests passed on PikaOS Debug/Release/strict and Windows 10 Debug/Release. The unrelated Windows file-symlink control remains open. [Qualification](../archive/ZIP_EXPORT.md) |
 
 ## Current and upcoming
 
 | Milestone | Status and next evidence |
 | --- | --- |
-| 13 · G12 | **IN PROGRESS pending independent Golden Wrench review.** Bounded stored ZIP application export with explicit bytes, deterministic metadata and G06 publication. Additional archive formats and optional language, FFI and crypto expansion remain deferred. [Design and qualification](../archive/ZIP_EXPORT.md) |
+| 14 · G00-A | **AUDIT IN PROGRESS pending independent Golden Wrench review.** Reconciles source, native qualification and distribution blockers. [Readiness audit](../release/G00_READINESS_AUDIT.md) |
 | G00 · Production distribution | Conditional on release authorization. Public bootstrap, distribution and platform obligations remain tracked in the release record. [Preview blockers](../release/PREVIEW_BLOCKERS.md) |
 
 ## Hosted acceptance

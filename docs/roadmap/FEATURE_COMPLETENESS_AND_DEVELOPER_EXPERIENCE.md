@@ -6,6 +6,15 @@ Baseline `4d39a2b121b8ba6fb6cfa3b60d02d8e048b27b59` on `main`. The audit used tr
 
 The [milestone register](MILESTONE_REGISTER.md) tracks integrated batches, current assignments, qualification scope and remaining gates.
 
+**12 November 2026 reconciliation.** G00-A assesses the integrated source at
+`afe14d4c0cd7fd0576ecc194a38c294d7e54ec0a`. The inventory tables below retain
+their original audit baseline. Later G01–G03 records establish diagnostic
+recovery, trusted project Check/Build/Run and AOT source debugging in their
+qualified scopes. G12 is integrated and independently source-reviewed.
+The canonical readiness report gives the current developer journey, native
+matrix and open public-distribution obligations. G00-A remains **AUDIT IN
+PROGRESS**. [Readiness audit](../release/G00_READINESS_AUDIT.md)
+
 VOID already supports ordinary native applications, including manifest creation, dependency locking, normal and O2 JIT, linked executables, and relocatable application directories on the supported Linux and Windows targets. The highest general development priorities are a reliable project-to-run editor workflow, usable source debugging, and a bounded way to run and capture a child process. A public binary distribution has separate trust, redistribution and native installation obligations.
 
 **Status key**
@@ -38,7 +47,7 @@ All **25** tracked `.void` modules are covered below. Pure source APIs use the e
 
 | Module | Status and everyday use | Boundary and evidence |
 | --- | --- | --- |
-| [archive](../../stdlib/archive.void) | **PARTIAL.** Bounded ZIP/ZIP64 stored/deflate reader with entry, expansion, CRC and close checks. G12 adds a bounded deterministic stored ZIP writer for explicitly supplied files, pending independent review. | Caller controls extraction and publication. General unpack, writer compression and ZIP64 output are deferred. [ZIP export contract](../archive/ZIP_EXPORT.md) · [Reader fixtures](../../tests/host_capabilities) |
+| [archive](../../stdlib/archive.void) | **PARTIAL.** Bounded ZIP/ZIP64 stored/deflate reader with entry, expansion, CRC and close checks. G12 adds a bounded deterministic stored ZIP writer for explicitly supplied files. | Caller controls extraction and publication. General unpack, writer compression and ZIP64 output are deferred. [ZIP export contract](../archive/ZIP_EXPORT.md) · [Reader fixtures](../../tests/host_capabilities) |
 | [channel](../../stdlib/channel.void) | **IMPLEMENTED.** Owner-thread typed topic routing, ordered synchronous delivery and exact subscription tokens. | **DEFERRED** for a cross-thread queue or async backpressure channel. [Channel contract](../channel/API.md), [routing tests](../../tests/channel), compiler event/callable semantics. |
 | [collections](../../stdlib/collections.void) | **IMPLEMENTED.** Stable copied sorting, search, predicates, transforms, fold, sum, extrema and ordered dictionary extraction/copy. | Fixed callers explicitly slice. Map sometimes needs concrete type arguments or a typed transform. Callback authority and mutation checks apply. [API](../collections/API.md), [native collection storage](../../src/runtime/list.cpp), [tests](../../tests/collections_stdlib). G09. |
 | [console](../../stdlib/console.void) | **IMPLEMENTED.** Checked text/byte streams, EOF/timeout distinctions, prompt conveniences, terminal mode, keys, cursor, color and size where supported. | Terminal capabilities vary by host and redirection. Convenience reads have a different failure contract from checked reads. [Native console](../../src/runtime/console.cpp), [combined contract](../combined/CONTRACT.md), [console source fixtures](../../tests/stage10/console.py), [Runtime tests](../../tests/runtime). |
@@ -224,7 +233,8 @@ integration gate remains deferred.
 
 ### P3 — G12 · Optional language, FFI, crypto and archive extensions
 
-**IN PROGRESS pending independent Golden Wrench review.** Batch 13 packages a
+**INTEGRATED / INDEPENDENT SOURCE REVIEW COMPLETE** at
+`afe14d4c0cd7fd0576ecc194a38c294d7e54ec0a`. Batch 13 packages a
 validated game configuration, binary checkpoint and manifest as a deterministic
 stored ZIP. Callers supply explicit flat names and bounded byte arrays. The
 application uses G06 to publish and reopens the result through the existing ZIP
