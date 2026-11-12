@@ -33,6 +33,18 @@ rename require ordinary validated analysis. Broken imports, ambiguous project
 selection and edits that leave a receiver or binding unresolved can withhold
 assistance until the source is repaired.
 
+### Guarded source quick fix
+
+In a trusted VS Code manifest project with an admitted application entry,
+the compiler can offer **Replace 'while' with 'for'** for the literal
+headers `while true:` and `while false:` in the selected source graph.
+The compiler checks the proposed edit in the current project before offering
+it and again when selected. The extension checks the active document,
+version and selected project before editing the buffer. The edit remains
+unsaved. Older actions are discarded after a document or project change.
+Import, alias and dependency diagnostics stay diagnostic-only. The action
+applies only when the compiler can validate the corrected project.
+
 ### Multiple return signatures
 
 Hover, callable completion and signature help show the complete return

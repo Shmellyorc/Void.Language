@@ -7,6 +7,7 @@
 #include "void/project_resolution.hpp"
 #include "void/runtime.hpp"
 #include <llvm/Support/FileSystem.h>
+#include <llvm/Support/JSON.h>
 #include <llvm/Config/llvm-config.h>
 #include <llvm/Support/raw_ostream.h>
 #include <cerrno>
@@ -15,6 +16,7 @@
 #include <iostream>
 #include <limits>
 #include <set>
+#include <sstream>
 #include <vector>
 namespace {
 struct UsageError : std::invalid_argument {using std::invalid_argument::invalid_argument;};
@@ -31,7 +33,8 @@ void usage(std::ostream& out, const std::string& command={}) {
     if(command.empty() || command=="init")out<<"Usage: voidc init [DIR] [project options]\n";
     if(command.empty() || command=="new")out<<"Usage: voidc new PATH [project options] [--source PATH]\n";
     if(command.empty() || command=="resolve")out<<"Usage: voidc resolve --project DIR [--locked | --refresh]\n";
-    if(command.empty() || command=="deps")out<<"Usage: voidc deps fetch --project DIR [--allow-git ORIGIN REV]...\n";
+    if(command.empty() || command=="deps")out<<"Usage: voidc deps explain --project DIR [--json]\n"
+      "       voidc deps fetch --project DIR [--allow-git ORIGIN REV]...\n";
     if(command.empty() || command=="native-bind")out<<"Usage: voidc native-bind <descriptor> <C-header> -o <adapter.c>\n";
 }
 void help(const std::string& command={}) {
@@ -47,6 +50,7 @@ void help(const std::string& command={}) {
           "  init    Add a project manifest to an existing directory.\n"
           "  new     Create a project and starter source in a new directory.\n"
           "  resolve Resolve available library dependencies and verify or write void.lock.\n"
+          "  deps explain Inspect the verified local dependency graph without changes.\n"
           "  deps fetch   Explicitly acquire pinned Git source snapshots.\n"
           "  native-bind  Generate a checked C11 adapter for a native library.\n"
           "\nOptions:\n"
@@ -143,9 +147,126 @@ int resolve_project(int argc,char** argv) {
     }
     return 0;
 }
+constexpr std::size_t dependency_output_limit = 4 * 1024 * 1024;
+
+std::string dependency_json(const vd::project::DependencyExplanation* report, std::string_view error = {}) {
+    std::string text;
+    llvm::raw_string_ostream out(text);
+    llvm::json::OStream json(out);
+    auto source = [&](const std::string& path, const std::optional<vd::project::GitDependency>& git) {
+        json.attributeObject("source", [&] {
+            if (git) {
+                json.attribute("kind", "git");
+                json.attribute("origin", git->pin.origin);
+                json.attribute("revision", git->pin.revision);
+                json.attribute("subdir", git->subdir);
+            } else {
+                json.attribute("kind", "local");
+                json.attribute("path", path);
+            }
+        });
+    };
+    json.object([&] {
+        json.attribute("schema", 1);
+        json.attribute("status", report ? "ok" : "error");
+        if (!report) {
+            json.attribute("message", llvm::json::fixUTF8(llvm::StringRef(error)));
+            return;
+        }
+        json.attribute("project_id", report->project_id);
+        json.attributeObject("lock", [&] {
+            json.attribute("status", report->lock_sha256 ? "verified" : "not_required");
+            if (report->lock_sha256) json.attribute("sha256", *report->lock_sha256);
+        });
+        json.attributeArray("packages", [&] {
+            for (const auto& package : report->packages) json.object([&] {
+                json.attribute("id", package.id);
+                json.attribute("version", package.version);
+                json.attribute("entry", package.entry);
+                json.attribute("manifest_sha256", package.manifest_sha256);
+                json.attribute("tree_sha256", package.tree_sha256);
+                source(package.path, package.git);
+            });
+        });
+        json.attributeArray("relationships", [&] {
+            for (const auto& edge : report->relationships) json.object([&] {
+                json.attribute("direct", edge.direct);
+                json.attribute("parent", edge.parent);
+                json.attribute("alias", edge.alias);
+                json.attribute("target", edge.target);
+                json.attribute("version_requirement", edge.version_requirement);
+                source(edge.path, edge.git);
+            });
+        });
+    });
+    out << '\n';
+    return text;
+}
+
+std::string dependency_text(const vd::project::DependencyExplanation& report) {
+    std::ostringstream out;
+    auto source = [&](const std::string& path, const std::optional<vd::project::GitDependency>& git) {
+        if (!git) out << "local " << path;
+        else {
+            out << "Git " << git->pin.origin << " at " << git->pin.revision;
+            if (!git->subdir.empty()) out << " subdir " << git->subdir;
+        }
+    };
+    out << "Project " << report.project_id << '\n';
+    if (report.lock_sha256) out << "Verified void.lock SHA-256 " << *report.lock_sha256 << '\n';
+    else out << "No void.lock required.\n";
+    if (report.packages.empty()) out << "No source package dependencies.\n";
+    for (const auto& package : report.packages) {
+        out << "Package " << package.id << ' ' << package.version << " [";
+        source(package.path, package.git);
+        out << "]\n  entry " << package.entry << "\n  manifest SHA-256 " << package.manifest_sha256
+            << "\n  tree SHA-256 " << package.tree_sha256 << '\n';
+    }
+    for (const auto& edge : report.relationships) {
+        out << (edge.direct ? "Direct     " : "Transitive ") << edge.parent << " --" << edge.alias
+            << "--> " << edge.target << " (" << edge.version_requirement << "; ";
+        source(edge.path, edge.git);
+        out << ")\n";
+    }
+    return out.str();
+}
+
+int explain_project(int argc, char** argv) {
+    std::optional<std::filesystem::path> root;
+    bool json = false;
+    for (int i = 3; i < argc; ++i) {
+        const std::string_view option = argv[i];
+        if (option == "--project") {
+            if (root || ++i == argc || !*argv[i] || argv[i][0] == '-')
+                throw UsageError("Expected one directory after --project.");
+            root = vd::utf8_path(argv[i]);
+        } else if (option == "--json" && !json) json = true;
+        else throw UsageError("Unknown or repeated deps explain option: " + std::string(option));
+    }
+    if (!root) throw UsageError("deps explain requires --project DIR.");
+    try {
+        const auto report = vd::project::explain_dependencies(*root);
+        const auto text = json ? dependency_json(&report) : dependency_text(report);
+        if (text.size() > dependency_output_limit) throw std::runtime_error("Dependency explanation exceeds the output byte limit.");
+        std::cout << text;
+        return 0;
+    } catch (const std::exception& failure) {
+        const std::string_view message = failure.what();
+        constexpr auto limit_message = "Dependency diagnostic exceeds the output byte limit.";
+        if (!json) {
+            std::cerr << (message.size() <= dependency_output_limit ? message : limit_message) << '\n';
+            return 1;
+        }
+        const auto text = message.size() <= dependency_output_limit ? dependency_json(nullptr, message) : std::string{};
+        std::cout << (text.empty() || text.size() > dependency_output_limit
+            ? dependency_json(nullptr, limit_message) : text);
+        return 1;
+    }
+}
+
 int fetch_project(int argc, char** argv) {
     using namespace vd::project;
-    if (argc < 3 || std::string_view(argv[2]) != "fetch") throw UsageError("Expected deps fetch.");
+    if (argc < 3 || std::string_view(argv[2]) != "fetch") throw UsageError("Expected deps explain or deps fetch.");
     std::optional<std::filesystem::path> root;
     std::vector<GitPin> allowed;
     for (int i = 3; i < argc; ++i) {
@@ -294,7 +415,12 @@ static int run_cli(int argc, char** argv) {
             throw UsageError("Unknown command: "+command);
         if(argc==3 && (std::string(argv[2])=="--help" || std::string(argv[2])=="-h")) {help(command);return 0;}
         if(command=="resolve")return resolve_project(argc,argv);
-        if(command=="deps")return fetch_project(argc,argv);
+        if(command=="deps") {
+            if(argc==4 && (std::string_view(argv[2])=="explain" || std::string_view(argv[2])=="fetch") &&
+               (std::string_view(argv[3])=="--help" || std::string_view(argv[3])=="-h")) { help(command); return 0; }
+            if(argc>=3 && std::string_view(argv[2])=="explain")return explain_project(argc,argv);
+            return fetch_project(argc,argv);
+        }
         if(command=="native-bind") {generate_native_binding(argc,argv);return 0;}
         if(command=="package" && argc>=3 && std::string_view(argv[2])=="--verify") {
             if(argc!=4 || !*argv[3] || argv[3][0]=='-')throw UsageError("Expected one directory after package --verify.");

@@ -2,12 +2,15 @@ import * as vscode from 'vscode';
 import {basename, isAbsolute, join, parse} from 'node:path';
 import {promises as fs, constants} from 'node:fs';
 import {LanguageClient, CloseAction, ErrorAction, Trace, State, RevealOutputChannelOn, ServerOptions, LanguageClientOptions} from 'vscode-languageclient/node';
+import type {TextEdit as ProtocolTextEdit} from 'vscode-languageclient/node';
 import {inside, Project, resolveCompiler, resolveProject, Settings} from './config';
 import {CreationWorkflow} from './creationWorkflow';
 import {compilerExecution} from './projectTask';
 
 let manager: ServerManager | undefined;
 let creation: CreationWorkflow | undefined;
+
+interface QuickFixTicket {uri: string; version: number; revision: string; offset: number}
 
 function applyIndentation(editor: vscode.TextEditor): void {
     if (editor.document.languageId !== 'void') return;
@@ -30,6 +33,32 @@ class ServerManager {
     private createdRoot?: string;
     constructor(private readonly output: vscode.LogOutputChannel, private readonly bundled: string, private readonly statusBar: vscode.StatusBarItem) {}
     async refreshProject(): Promise<void> { await this.serial; if (this.client?.isRunning()) await this.client.sendRequest('void/refreshProject', {}); }
+    async applyQuickFix(offeredEpoch: number, ticket: QuickFixTicket): Promise<boolean> {
+        await this.serial;
+        const client = this.client, project = this.project, serial = this.requestSerial;
+        const editor = vscode.window.activeTextEditor, document = editor?.document;
+        if (!vscode.workspace.isTrusted || !client?.isRunning() || !project?.manifestMode || !editor || !document ||
+            offeredEpoch !== this.epoch || !ticket || document.languageId !== 'void' || document.uri.scheme !== 'file' ||
+            ticket.uri !== document.uri.toString() || ticket.version !== document.version ||
+            !inside(project.root, document.uri.fsPath)) return false;
+        try {
+            const proposal = await client.sendRequest<(ProtocolTextEdit & {expectedText: string}) | null>('void/resolveQuickFix', ticket);
+            if (!proposal) return false;
+            const root = await fs.realpath(project.requestedRoot ?? project.root);
+            const file = await fs.realpath(document.uri.fsPath);
+            if (!inside(root, project.root) || !inside(project.root, root) || !inside(root, file) ||
+                !inside(file, document.uri.fsPath) || !inside(document.uri.fsPath, file) ||
+                !vscode.workspace.isTrusted || this.client !== client || this.project !== project || this.requestSerial !== serial ||
+                offeredEpoch !== this.epoch || document.isClosed || document.version !== ticket.version ||
+                vscode.window.activeTextEditor !== editor) return false;
+            const edit = client.protocol2CodeConverter.asTextEdit(proposal);
+            if (document.getText(edit.range) !== proposal.expectedText) return false;
+            // TextEditor.edit carries the editor model version through to application.
+            return await editor.edit(builder => builder.replace(edit.range, edit.newText));
+        } catch {
+            return false;
+        }
+    }
     async projectTask(command: 'check' | 'build' | 'run'): Promise<vscode.TaskExecution | undefined> {
         if (!vscode.workspace.isTrusted) return;
         await this.serial;
@@ -181,6 +210,7 @@ class ServerManager {
         };
         this.watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(project.root, project.manifestMode ? '**/*' : '**/*.void'));
         const clientOptions: LanguageClientOptions = {
+            initializationOptions: {voidGuardedFixes: true},
             documentSelector: [selector, ...(project.manifestMode ? [{scheme: 'file', pattern: {baseUri: vscode.Uri.file(project.root).toString(), pattern: '**/void.project.toml'}}] : [])],
             synchronize: {fileEvents: this.watcher},
             middleware: {provideDefinition: async (document, position, token, next) => {
@@ -228,6 +258,19 @@ class ServerManager {
                 const version = document.version; const epoch = this.epoch;
                 const result = await next(document, options, token);
                 return !token.isCancellationRequested && !document.isClosed && document.version === version && epoch === this.epoch && this.client === client ? result : [];
+            }, provideCodeActions: async (document, range, context, token, next) => {
+                const version = document.version, epoch = this.epoch, serial = this.requestSerial;
+                if (!vscode.workspace.isTrusted || !project.manifestMode) return [];
+                const result = await next(document, range, context, token);
+                if (!vscode.workspace.isTrusted || token.isCancellationRequested || document.isClosed ||
+                    document.version !== version || this.epoch !== epoch || this.requestSerial !== serial ||
+                    this.client !== client) return [];
+                for (const item of result ?? []) {
+                    if (item instanceof vscode.CodeAction && item.command?.command === 'void.applyQuickFix' &&
+                        item.command.arguments?.length === 1)
+                        item.command.arguments = [epoch, item.command.arguments[0]];
+                }
+                return result;
             }},
             outputChannel: this.output, traceOutputChannel: this.output,
             revealOutputChannelOn: RevealOutputChannelOn.Never, // Never steal focus; explicit errors include the channel location.
@@ -282,6 +325,7 @@ export function activate(context: vscode.ExtensionContext): {ready: () => Promis
         vscode.commands.registerCommand('void.resetCreationPrompt', () => workflow.reset()),
         vscode.commands.registerCommand('void.selectEntry', () => current.selectEntry()),
         vscode.commands.registerCommand('void.refreshProject', () => current.refreshProject()),
+        vscode.commands.registerCommand('void.applyQuickFix', (epoch, ticket) => current.applyQuickFix(epoch, ticket)),
         vscode.commands.registerCommand('void.checkProject', () => current.projectTask('check')),
         vscode.commands.registerCommand('void.buildProject', () => current.projectTask('build')),
         vscode.commands.registerCommand('void.runProject', () => current.projectTask('run')),

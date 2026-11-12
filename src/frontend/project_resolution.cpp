@@ -94,6 +94,7 @@ struct Package {
 
 struct Snapshot {
     std::string manifest, lock;
+    Edges direct;
 };
 
 [[noreturn]] void native_selection_failed(const Manifest& manifest, const NativeRequirement& requirement,
@@ -505,13 +506,35 @@ public:
         }
         if (native) append_native_lock(lock, native->artifacts);
         if (lock.size() > lock_byte_limit) fail(Code::limit, "Dependency lock byte limit exceeded.");
-        return {manifest.source().text(), std::move(lock)};
+        return {manifest.source().text(), std::move(lock), std::move(edges)};
     }
     bool has_dependencies() {
         const auto& manifest = read_manifest("");
         return !manifest.dependencies().empty() || manifest.native_requirement().has_value();
     }
     std::optional<SelectedNative> take_native() { return std::move(native); }
+
+    DependencyExplanation explanation(const Snapshot& captured, const std::optional<std::string>& lock) {
+        const auto& manifest = read_manifest("");
+        DependencyExplanation report;
+        report.project_id = manifest.project().id;
+        if (lock) report.lock_sha256 = sha256(*lock);
+        auto add_edges = [&](bool direct, const std::string& parent, const Manifest& owner, const Edges& edges) {
+            for (const auto& [alias, target] : edges) {
+                const auto& declaration = owner.dependencies().at(alias);
+                report.relationships.push_back({direct, parent, alias, target, declaration.version.text(),
+                    declaration.path, declaration.git});
+            }
+        };
+        add_edges(true, report.project_id, manifest, captured.direct);
+        for (const auto& [id, package] : packages) {
+            const auto& owner = *manifests.at(package.path);
+            report.packages.push_back({id, package.version, *owner.package_entry(),
+                package.git ? std::string{} : package.path, package.manifest_digest, package.tree_digest, package.git});
+            add_edges(false, id, owner, package.edges);
+        }
+        return report;
+    }
 };
 
 void require_lock_shape(std::string_view bytes) {
@@ -527,6 +550,27 @@ void require_lock_shape(std::string_view bytes) {
 }
 [[noreturn]] void stale_lock() {
     throw std::runtime_error("Stale or tampered void.lock. Review the inputs and run voidc resolve --project <directory> --refresh.");
+}
+
+void recheck_capture(const CreationRoot& root, const Snapshot& captured) {
+    if (inspect_creation_root(root.path).identity != root.identity)
+        throw std::runtime_error("Project root changed during dependency resolution; retry.");
+    const auto fresh = Resolver(root.path).capture();
+    if (fresh.manifest != captured.manifest || fresh.lock != captured.lock)
+        throw std::runtime_error("Dependency inputs changed during resolution; retry.");
+}
+
+Snapshot capture_locked_project(const CreationRoot& root, Resolver& resolver, const std::optional<std::string>& previous) {
+    if (!previous && resolver.has_dependencies()) missing_lock();
+    if (previous) require_lock_shape(*previous);
+    auto captured = resolver.capture();
+    if (previous && *previous != captured.lock) stale_lock();
+    recheck_capture(root, captured);
+    if (inspect_creation_root(root.path).identity != root.identity)
+        throw std::runtime_error("Project root changed during dependency resolution; retry.");
+    if (read_dependency_lock(root.path) != previous)
+        throw std::runtime_error("Dependency lock changed during verification; retry.");
+    return captured;
 }
 }
 
@@ -558,16 +602,13 @@ ResolveResult resolve_dependencies(const fs::path& requested, ResolveMode mode) 
     const bool dependencies = resolver.has_dependencies();
     const auto previous = read_dependency_lock(root.path);
     if (!previous && !dependencies) return ResolveResult::no_dependencies;
-    if (!previous && mode == ResolveMode::locked) missing_lock();
+    if (mode == ResolveMode::locked) {
+        (void)capture_locked_project(root, resolver, previous);
+        return ResolveResult::verified;
+    }
     if (previous) require_lock_shape(*previous);
     const auto captured = resolver.capture();
-    auto recheck = [&] {
-        if (inspect_creation_root(root.path).identity != root.identity)
-            throw std::runtime_error("Project root changed during dependency resolution; retry.");
-        const auto fresh = Resolver(root.path).capture();
-        if (fresh.manifest != captured.manifest || fresh.lock != captured.lock)
-            throw std::runtime_error("Dependency inputs changed during resolution; retry.");
-    };
+    auto recheck = [&] { recheck_capture(root, captured); };
     if (previous && *previous == captured.lock) {
         recheck();
         if (read_dependency_lock(root.path) != previous)
@@ -577,6 +618,15 @@ ResolveResult resolve_dependencies(const fs::path& requested, ResolveMode mode) 
     if (previous && mode != ResolveMode::refresh) stale_lock();
     if (!publish_dependency_lock(root, previous, captured.lock, recheck)) return ResolveResult::verified;
     return previous ? ResolveResult::refreshed : ResolveResult::created;
+}
+
+DependencyExplanation explain_dependencies(const fs::path& requested) {
+    const auto root = inspect_creation_root(requested);
+    Resolver resolver(root.path);
+    (void)resolver.has_dependencies(); // Admit the exact manifest before examining its lock.
+    const auto previous = read_dependency_lock(root.path);
+    const auto captured = capture_locked_project(root, resolver, previous);
+    return resolver.explanation(captured, previous);
 }
 
 std::size_t fetch_dependencies(const fs::path& requested, const std::vector<GitPin>& allowed) {

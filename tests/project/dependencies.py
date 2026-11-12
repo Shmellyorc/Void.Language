@@ -326,26 +326,27 @@ def test_interrupted(root, base, clang):
     invoke(root, "--locked")
 
 
-with tempfile.TemporaryDirectory(prefix="void-project-dependencies-") as folder:
-    base = Path(folder).resolve()
-    plain = base / "plain"
-    write(plain, manifest_name, manifest("demo"))
-    write(plain, "main.void", b"func main() -> i32:\n    return 0\n")
-    invoke(plain, "--locked", message="No project dependencies")
-    invoke(plain, command="check", message="Source checked successfully")
-    assert not (plain / "void.lock").exists() and not (plain / ".void").exists()
-    standalone = library(base, "standalone", "geometry", entry=None)
-    invoke(standalone, command="check", message="Library project checked successfully")
-    assert not (standalone / "void.lock").exists()
-    write(standalone, manifest_name,
-          manifest("geometry", dependency("units", "deps/units"), library=True, entry=None))
-    library(standalone, "deps/units", "units")
-    invoke(standalone, message="Created void.lock")
-    assert tomllib.loads(read_lock(standalone).decode())["root"]["kind"] == "library"
-    root = test_diamond(base)
-    test_negative(base)
-    test_depth(base)
-    test_file_limit(base)
-    test_concurrent(base)
-    if sys.platform.startswith("linux"):
-        test_interrupted(root, base, sys.argv[2])
+if __name__ == "__main__":
+    with tempfile.TemporaryDirectory(prefix="void-project-dependencies-") as folder:
+        base = Path(folder).resolve()
+        plain = base / "plain"
+        write(plain, manifest_name, manifest("demo"))
+        write(plain, "main.void", b"func main() -> i32:\n    return 0\n")
+        invoke(plain, "--locked", message="No project dependencies")
+        invoke(plain, command="check", message="Source checked successfully")
+        assert not (plain / "void.lock").exists() and not (plain / ".void").exists()
+        standalone = library(base, "standalone", "geometry", entry=None)
+        invoke(standalone, command="check", message="Library project checked successfully")
+        assert not (standalone / "void.lock").exists()
+        write(standalone, manifest_name,
+              manifest("geometry", dependency("units", "deps/units"), library=True, entry=None))
+        library(standalone, "deps/units", "units")
+        invoke(standalone, message="Created void.lock")
+        assert tomllib.loads(read_lock(standalone).decode())["root"]["kind"] == "library"
+        root = test_diamond(base)
+        test_negative(base)
+        test_depth(base)
+        test_file_limit(base)
+        test_concurrent(base)
+        if sys.platform.startswith("linux"):
+            test_interrupted(root, base, sys.argv[2])

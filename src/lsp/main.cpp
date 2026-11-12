@@ -214,6 +214,7 @@ class Server {
     std::int64_t process_id=0;
     std::set<std::string> cancellations;
     bool related_information=false, diagnostic_versions=false, rename_edits=false, signature_plaintext=false;
+    bool guarded_fixes=false;
     bool semantic_full=false, semantic_refresh=false, semantic_requested=false;
     bool semantic_refresh_pending=false, semantic_refresh_needed=false;
     void refresh_semantics() {
@@ -344,6 +345,76 @@ class Server {
         if(!manifest_mode)return vd::analyze_project(entry_path,sources);
         auto checked=vd::analyze_editor_project(requested_root,snapshot.entry_override(),sources,snapshot.manifests(),snapshot.discovery());
         return {checked.project?checked.project->semantic_analysis():nullptr,std::move(checked.diagnostics)};
+    }
+    j::Value quick_fix(const j::Object& params, bool resolve) {
+        if(!guarded_fixes) return resolve ? j::Value(nullptr) : j::Value(j::Array{});
+        flush();
+        auto current=session.current_analysis();
+        if(!current || !current->project() || !current->project()->state)
+            return resolve ? j::Value(nullptr) : j::Value(j::Array{});
+        const auto& state=*current->project()->state;
+        if(!state.manifest || !state.entry || state.root!=root)
+            return resolve ? j::Value(nullptr) : j::Value(j::Array{});
+        const auto requested_uri=resolve ? string(params,"uri") : string(object(params.get("textDocument")),"uri");
+        const auto module=identity(requested_uri);
+        const auto document=open.find(module);
+        if(read_only_source(module) || document==open.end() || document->second.uri!=requested_uri || !document->second.source)
+            return resolve ? j::Value(nullptr) : j::Value(j::Array{});
+        const auto& source=*document->second.source;
+        const auto revision=std::to_string(current->snapshot().revision());
+        auto eligible=[&](const vd::Diagnostic& diagnostic) {
+            const auto& site=diagnostic.primary;
+            return diagnostic.fix && site.module_identity==module && site.source &&
+                site.source->text()==source.text() && site.begin<site.end && site.end<=source.text().size();
+        };
+        auto validated_edit=[&](const vd::Diagnostic& diagnostic) -> j::Value {
+            std::error_code ec;
+            if(fs::canonical(requested_root,ec)!=root || ec)return nullptr;
+            const auto& site=diagnostic.primary;
+            auto text=source.text();
+            const auto before=text.substr(site.begin,site.end-site.begin);
+            text.replace(site.begin,site.end-site.begin,diagnostic.fix->replacement);
+            const auto& snapshot=current->snapshot();
+            auto overlays=snapshot.overrides();
+            overlays.insert_or_assign(module,vd::SourceFile(source.path(),std::move(text)));
+            auto checked=vd::analyze_editor_project(requested_root,snapshot.entry_override(),overlays,snapshot.manifests(),snapshot.discovery());
+            if(!checked.project || checked.project->root()!=root || checked.project->entry()!=state.entry ||
+               checked.project->manifest()->source().text()!=state.manifest->source().text() ||
+               !session.matches_selection(*checked.project) ||
+               !source_in(*checked.project->semantic_analysis(),module) || !session.is_current(*current))
+                return nullptr;
+            return j::Object{{"range",range(site)},{"newText",diagnostic.fix->replacement},{"expectedText",before}};
+        };
+        if(resolve) {
+            if(integer(params.get("version"))!=document->second.version || string(params,"revision")!=revision)
+                return nullptr;
+            const auto offset=static_cast<std::size_t>(integer(params.get("offset"),0));
+            for(const auto& diagnostic:current->result().diagnostics)
+                if(eligible(diagnostic) && diagnostic.primary.begin==offset)return validated_edit(diagnostic);
+            return nullptr;
+        }
+        if(auto context=params.getObject("context"))if(auto only=context->getArray("only"))
+            if(std::none_of(only->begin(),only->end(),[](const auto& kind){return kind.getAsString()=="quickfix";}))return j::Array{};
+        const auto& selection=object(params.get("range"));
+        auto position=[&](std::string_view key) {
+            const auto& point=object(selection.get(key));
+            return Positions(source).offset({static_cast<std::uint32_t>(integer(point.get("line"),0)),
+                static_cast<std::uint32_t>(integer(point.get("character"),0))});
+        };
+        const auto begin=position("start"),end=position("end");
+        if(!begin || !end || *end<*begin)return j::Array{};
+        j::Array actions;
+        for(const auto& diagnostic:current->result().diagnostics)if(eligible(diagnostic)) {
+            const auto& site=diagnostic.primary;
+            if((*begin==*end && (*begin<site.begin || *begin>=site.end)) ||
+               (*begin!=*end && (*begin>=site.end || *end<=site.begin)))continue;
+            if(validated_edit(diagnostic).getAsNull())continue;
+            actions.push_back(j::Object{{"title",diagnostic.fix->title},{"kind","quickfix"},
+                {"command",j::Object{{"title",diagnostic.fix->title},{"command","void.applyQuickFix"},
+                    {"arguments",j::Array{j::Object{{"uri",requested_uri},{"version",document->second.version},
+                        {"revision",revision},{"offset",static_cast<std::int64_t>(site.begin)}}}}}}});
+        }
+        return actions;
     }
     j::Value query(const std::string& method,const j::Object& params) const {
         auto id=identity(string(object(params.get("textDocument")),"uri"));
@@ -752,12 +823,15 @@ public:
                     rename_edits=edit->getBoolean("documentChanges").value_or(false) && (edit->getString("failureHandling")=="textOnlyTransactional" || (params.getObject("initializationOptions") && params.getObject("initializationOptions")->getBoolean("voidVersionedEdits").value_or(false)));
                 if(auto workspace=caps.getObject("workspace"))if(auto tokens=workspace->getObject("semanticTokens"))
                     semantic_refresh=semantic_full && tokens->getBoolean("refreshSupport").value_or(false);
+                if(auto options=params.getObject("initializationOptions"))
+                    guarded_fixes=manifest_mode && options->getBoolean("voidGuardedFixes").value_or(false);
                 state=State::waiting;
                 j::Object capabilities{{"positionEncoding","utf-16"},{"textDocumentSync",j::Object{{"openClose",true},{"change",1},{"save",j::Object{{"includeText",false}}}}},
                         {"definitionProvider",true},{"referencesProvider",true},{"hoverProvider",true},{"completionProvider",j::Object{{"triggerCharacters",j::Array{"."," ","\"","/",":"}}}},
                         {"signatureHelpProvider",j::Object{{"triggerCharacters",j::Array{"(",","}}}},{"documentSymbolProvider",true},{"workspaceSymbolProvider",true},
                         {"documentFormattingProvider",true},{"renameProvider",rename_edits ? j::Value(j::Object{{"prepareProvider",true}}):j::Value(false)},
                         {"workspace",manifest_mode?j::Value(j::Object{{"fileOperations",j::Object{{"didCreate",j::Object{{"filters",j::Array{j::Object{{"scheme","file"},{"pattern",j::Object{{"glob","**/*"}}}}}}}},{"didRename",j::Object{{"filters",j::Array{j::Object{{"scheme","file"},{"pattern",j::Object{{"glob","**/*"}}}}}}}},{"didDelete",j::Object{{"filters",j::Array{j::Object{{"scheme","file"},{"pattern",j::Object{{"glob","**/*"}}}}}}}}}}}):j::Value(j::Object{})},{"experimental",j::Object{{"voidToolingProtocol",1},{"voidProjectProtocol",1},{"refreshProject",true}}}};
+                if(guarded_fixes)capabilities["codeActionProvider"]=j::Object{{"codeActionKinds",j::Array{"quickfix"}}};
                 if(semantic_full) {
                     j::Array types,modifiers;
                     for(auto type:semantic_types)types.push_back(type);
@@ -786,6 +860,11 @@ public:
             if(name=="textDocument/semanticTokens/full") {
                 if(!id){fail(-32600,"Semantic tokens require a request");return {};}
                 auto result=semantic_tokens(object(o->get("params")));
+                send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",std::move(result)}});return {};
+            }
+            if(name=="textDocument/codeAction" || name=="void/resolveQuickFix") {
+                if(!id){fail(-32600,"Quick fixes require a request");return {};}
+                auto result=quick_fix(object(o->get("params")),name=="void/resolveQuickFix");
                 send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",std::move(result)}});return {};
             }
             if(name=="textDocument/definition" || name=="textDocument/references") {

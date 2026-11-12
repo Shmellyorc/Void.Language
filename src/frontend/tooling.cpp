@@ -306,11 +306,14 @@ void ToolingSession::reselect(std::optional<std::string> entry) {
     if(!current_.project_root_)throw std::invalid_argument("Project reselection requires manifest mode.");
     refresh();current_.entry_override_=std::move(entry);selected_context_.clear();
 }
+bool ToolingSession::matches_selection(const ProjectAnalysis& project) const {
+    return selected_context_.empty() || selected_context_==project.context_key();
+}
 bool ToolingSession::requires_reselection() const {
     if(!current_.project_root_)return false;
     auto current=current_analysis();
     if(!current || !current->project() || !current->project()->project)return true;
-    return !selected_context_.empty() && selected_context_!=current->project()->project->context_key();
+    return !matches_selection(*current->project()->project);
 }
 void ToolingSession::snapshot_discovery() {
     current_.discovery_.clear();

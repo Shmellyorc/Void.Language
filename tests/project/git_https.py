@@ -2,6 +2,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 import hashlib
+import json
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import os
 from pathlib import Path
@@ -15,6 +16,7 @@ import tempfile
 from threading import Thread
 import tomllib
 from urllib.parse import urlsplit
+from dependency_explain import explain
 
 compiler, git = (Path(arg).resolve() for arg in sys.argv[1:3])
 replay = sys.argv[3:] == ["--reproduce-packfile-uris"]
@@ -397,6 +399,7 @@ with tempfile.TemporaryDirectory(prefix="VOID D3 HTTPS 雪 ") as temp, serve_crl
 
         # These commands must fail before any Git traffic, even without a snapshot.
         cli(app, "resolve", status=1, message="Missing Git dependency snapshot")
+        explain(app, status=1, message="Missing void.lock")
         for args in [("check",), ("run",), ("build", "-o", base / "missing"),
                      ("emit", "-o", base / "missing.o")]:
             cli(app, *args, status=1, message="Missing void.lock")
@@ -431,11 +434,17 @@ with tempfile.TemporaryDirectory(prefix="VOID D3 HTTPS 雪 ") as temp, serve_crl
         first_lock = lock.read_bytes()
         row = lock_row(app)
         assert row["git"] == origin and row["rev"] == old and row["subdir"] == ""
+        report = explain(app, env=untrusted)
+        assert json.loads(report)["packages"][0]["source"] == {
+            "kind": "git", "origin": origin, "revision": old, "subdir": "",
+        }
+        assert explain(app, env=hostile) == report and len(server.requests) == calls
         assert os.fsencode(base) not in first_lock and b".void/git-deps" not in first_lock
         pin_dir = app / store / acquired[0]
         parked = base / "parked snapshot"
         pin_dir.rename(parked)
         try:
+            explain(app, status=1, message="Missing Git dependency snapshot", env=trusted)
             for args in [("resolve", "--locked"), ("check",), ("run",), ("build", "-o", base / "missing"),
                          ("emit", "-o", base / "missing.o")]:
                 cli(app, *args, status=1, message="Missing Git dependency snapshot")
@@ -552,6 +561,7 @@ with tempfile.TemporaryDirectory(prefix="VOID D3 HTTPS 雪 ") as temp, serve_crl
     final_lock = lock.read_bytes()
     cli(app, "deps", "fetch", env=clean)
     cli(app, "resolve", "--locked", env=clean)
+    assert json.loads(explain(app, env=clean))["lock"]["sha256"] == hashlib.sha256(final_lock).hexdigest()
     cli(app, "check", env=clean)
     cli(app, "emit", "-o", base / "offline.o", env=clean)
     cache_run(app, b"58\n", "hit")

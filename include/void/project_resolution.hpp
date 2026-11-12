@@ -40,6 +40,26 @@ enum class ResolveMode { create, refresh, locked };
 enum class ResolveResult { no_dependencies, verified, created, refreshed };
 // Resolve local source metadata and verify or publish the selected root's lock.
 ResolveResult resolve_dependencies(const std::filesystem::path&, ResolveMode);
+
+struct ExplainedPackage {
+    std::string id, version, entry, path, manifest_sha256, tree_sha256;
+    std::optional<GitDependency> git;
+};
+struct ExplainedDependency {
+    bool direct;
+    std::string parent, alias, target, version_requirement, path;
+    std::optional<GitDependency> git;
+};
+struct DependencyExplanation {
+    std::string project_id;
+    std::optional<std::string> lock_sha256;
+    std::vector<ExplainedPackage> packages;
+    std::vector<ExplainedDependency> relationships;
+};
+// The selected manifest and exact local lock are verified before returning any
+// package claims. The compiler's acquisition and publication paths are absent.
+DependencyExplanation explain_dependencies(const std::filesystem::path&);
+
 // Only this operation may consult the explicitly authorized Git repositories.
 std::size_t fetch_dependencies(const std::filesystem::path&, const std::vector<GitPin>&);
 bool valid_git_pin(const GitPin&);

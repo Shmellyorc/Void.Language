@@ -135,6 +135,13 @@ have distinct diagnostics with recovery commands. There is no automatic
 resolution or dependency-store repair during analysis or builds. Projects with
 no dependency declarations and no lock need no new setup.
 
+G05 exposes this verification through `voidc deps explain --project .`.
+It shares the locked resolver path and reports verified package records and
+manifest relationships. The report is independent of compilation entry
+selection. Inspection has no acquisition or publication path. A failed
+verification emits the resolver diagnostic before emitting any graph claims.
+[Command and schema](../CLI.md#inspect-project-dependencies)
+
 Only an explicit acquisition command, proposed as `voidc deps fetch`, accepts
 an origin plus commit or an approved set of exact pins from a reviewed lock.
 A newly encountered transitive origin requires its own authorization. Start

@@ -32,6 +32,72 @@ Use `voidc resolve --project .` for available declared dependencies and
 
 The following sections retain the scope of their original implementation slices.
 
+## Inspect project dependencies
+
+```text
+voidc deps explain --project .
+voidc deps explain --project . --json
+```
+
+The compiler verifies the existing lock and local inputs before displaying a
+graph. `Direct` rows start at the selected project and `Transitive` rows start
+at a package. For example, a direct alias `geometry` can introduce `units`,
+while another direct alias `algebra` also introduces `units`. The report has
+one package record for `units` and shows both parent relationships. Package
+records include the verified version, entry, manifest and tree SHA-256, and
+local path or pinned Git origin, revision and subdirectory. Relationships
+include each alias, version requirement and declared source.
+
+The command reads project and lock inputs and the existing local snapshots.
+It performs no Git acquisition, lock publication, cache update or package
+execution. A dependency-free project with no lock reports that a lock is
+unnecessary. For a project with an existing lock, changing a manifest alias
+or a local package input produces the resolver's stale-lock diagnostic.
+Review the changes before choosing an explicit command.
+Removing a required transitive record from a previously valid lock also
+produces the stale-lock diagnostic. A missing Git snapshot identifies the
+declared origin and exact revision in its diagnostic.
+
+```text
+voidc resolve --project .
+voidc deps fetch --project .
+voidc deps fetch --project . --allow-git https://example.org/units.git 0123456789abcdef0123456789abcdef01234567
+voidc resolve --project . --refresh
+voidc resolve --project . --locked
+```
+
+Use ordinary `resolve` to create a missing lock when inputs are available.
+Use `deps fetch` when a declared Git snapshot is missing and supply the exact
+origin and revision for any transitive pin that needs approval. The origin and
+revision above illustrate the argument format. Use `resolve --refresh` to
+publish reviewed manifest or package changes, then verify the result with
+`resolve --locked` or `deps explain`. A corrupt Git snapshot needs a verified
+replacement or a clean project copy with explicit acquisition. A malformed
+lock must be reviewed and moved aside before ordinary resolution. Correct
+wrong IDs, missing entries, cycles and origin conflicts in the declared
+project inputs before running resolution again.
+
+`--json` writes one UTF-8 object with `schema: 1`. On success, `status` is
+`"ok"` and the remaining fields are:
+
+- `project_id` and `lock`, which has `status: "verified"` and a `sha256` field,
+  or `status: "not_required"`.
+- `packages`, ordered by ID. Each record has `id`, `version`, `entry`,
+  `manifest_sha256`, `tree_sha256` and `source`.
+- `relationships`, ordered by direct aliases, then by package ID and
+  that package's aliases. Each record has `direct`, `parent`, `alias`, `target`,
+  `version_requirement` and `source`. `direct` distinguishes a project ID
+  from a package ID in `parent`.
+
+A local `source` has `kind: "local"` and `path`. A package path is relative to
+the project root. A relationship path is relative to its declaring manifest.
+A Git `source` has `kind: "git"`, `origin`, `revision` and `subdir`.
+Success exits 0. An inspection failure exits 1 and prints an ordinary diagnostic
+on stderr, or an object with `schema`, `status: "error"` and `message` on stdout
+in JSON mode. Malformed invocations exit 2. Output is bounded to 4 MiB before
+writing. Native-provider inputs participate in lock verification when declared.
+The graph report describes source packages.
+
 ## Manifest project profiles (Slice 3)
 
 `--profile debug|release` is project-only on check/run/build/emit/package. An explicit

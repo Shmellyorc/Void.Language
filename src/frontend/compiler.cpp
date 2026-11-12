@@ -1232,7 +1232,17 @@ class Parser {
             Statement s(Statement::Kind::no_op, take());
             newline(); return s;
         }
-        if (at("while")) error(source, peek(), Code::while_loop, "VOID uses 'for' for all loops.", "Replace 'while condition:' with 'for condition:'.");
+        if (at("while")) {
+            Diagnostic diagnostic(Code::while_loop);
+            diagnostic.primary = span(source, peek());
+            diagnostic.description = "VOID uses 'for' for all loops.";
+            diagnostic.hint = "Replace 'while condition:' with 'for condition:'.";
+            // The literal condition has one interpretation in both spellings.
+            // Keep iteration headers and incomplete conditions diagnostic-only.
+            if ((peek(1).text == "true" || peek(1).text == "false") && peek(2).text == ":")
+                diagnostic.fix = SourceFix{"Replace 'while' with 'for'", "for"};
+            throw CompilationError({std::move(diagnostic)});
+        }
         if(at("match")) {
             Statement s(Statement::Kind::match,take());s.expression=expression();need(":");newline();need("<indent>");
             while(!at("<dedent>") && !at("<end of file>")){Statement arm(Statement::Kind::no_op,peek());arm.pattern=pattern();arm.body=block();s.body.push_back(std::move(arm));}

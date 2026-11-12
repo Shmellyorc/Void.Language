@@ -1,6 +1,7 @@
 #pragma once
 #include "void/source.hpp"
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -30,6 +31,7 @@ struct SourceSpan {
     std::size_t begin = 0, end = 0; // Half-open byte offsets; insertion spans may be empty.
 };
 struct RelatedLocation { SourceSpan span; std::string description; };
+struct SourceFix { std::string title, replacement; }; // Replace the primary diagnostic span.
 struct Diagnostic {
     explicit Diagnostic(DiagnosticCode assigned_code) : code(assigned_code) {}
     DiagnosticCode code;
@@ -38,6 +40,7 @@ struct Diagnostic {
     SourceSpan primary;
     std::vector<RelatedLocation> related;
     std::string expected_type, received_type, hint;
+    std::optional<SourceFix> fix;
 };
 std::string diagnostic_code(DiagnosticCode code);
 std::string render_diagnostic(const Diagnostic& diagnostic);

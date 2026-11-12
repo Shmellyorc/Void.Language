@@ -357,6 +357,9 @@ if(BUILD_TESTING)
   add_test(NAME project_dependencies COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/project/dependencies.py" "$<TARGET_FILE:voidc>" "${CMAKE_C_COMPILER}")
   set_tests_properties(project_dependencies PROPERTIES TIMEOUT 300)
+  add_test(NAME project_dependency_explain COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/project/dependency_explain.py" "$<TARGET_FILE:voidc>")
+  set_tests_properties(project_dependency_explain PROPERTIES TIMEOUT 90)
   add_executable(void_project_packages_ir tests/project/packages_ir.cpp)
   target_link_libraries(void_project_packages_ir PRIVATE void_llvm void_runtime)
   add_test(NAME project_packages COMMAND "${Python3_EXECUTABLE}"
@@ -477,6 +480,9 @@ if(BUILD_TESTING)
   add_test(NAME lsp_editor_recovery COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/lsp/editor_recovery.py" "$<TARGET_FILE:voidls>" "$<TARGET_FILE:voidc>")
   set_tests_properties(lsp_editor_recovery PROPERTIES TIMEOUT 180)
+  add_test(NAME lsp_quick_fixes COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/lsp/quick_fixes.py" "$<TARGET_FILE:voidls>")
+  set_tests_properties(lsp_quick_fixes PROPERTIES TIMEOUT 90)
   add_test(NAME lsp_multiple_returns COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/lsp/multiple_returns.py" "$<TARGET_FILE:voidls>")
   set_tests_properties(lsp_multiple_returns PROPERTIES TIMEOUT 180)

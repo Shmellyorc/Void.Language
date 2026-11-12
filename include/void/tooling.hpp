@@ -183,6 +183,7 @@ public:
     // Explicit disk refresh invalidates freshness even if bytes have not changed.
     void refresh();
     void reselect(std::optional<std::string> entry = {});
+    bool matches_selection(const ProjectAnalysis&) const;
     bool requires_reselection() const;
     ProjectSnapshot select() const { return current_; }
     static std::shared_ptr<const SessionAnalysis> analyze(ProjectSnapshot);

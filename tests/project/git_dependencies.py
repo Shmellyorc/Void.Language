@@ -1,6 +1,7 @@
 """D3 acquisition and offline compilation from real disposable Git repositories."""
 from concurrent.futures import ThreadPoolExecutor
 from hashlib import sha256
+import json
 import os
 from pathlib import Path
 import shutil
@@ -9,6 +10,7 @@ import sys
 import tempfile
 import time
 import tomllib
+from dependency_explain import explain
 
 compiler, git, clang = (Path(arg).resolve() for arg in sys.argv[1:])
 manifest = "void.project.toml"
@@ -251,6 +253,15 @@ with tempfile.TemporaryDirectory(prefix="VOID D3 雪 ") as temp:
     origins.rename(parked)
     cli(root, "deps", "fetch")
     cli(root, "resolve", "--locked")
+    inspected = explain(root)
+    graph = json.loads(inspected)
+    assert graph["lock"]["sha256"] == sha256(locked).hexdigest()
+    assert {p["id"]: p for p in graph["packages"]}["org.example.units"]["source"] == {
+        "kind": "git", "origin": units_origin, "revision": units_rev, "subdir": "",
+    }
+    assert {(e["parent"], e["alias"]) for e in graph["relationships"] if e["target"] == "org.example.units"} == {
+        ("org.example.geometry", "units"), ("org.example.algebra", "units"),
+    }
     for profile in ("debug", "release"):
         assert cli(root, "run", "--profile", profile, "--no-cache") == b"13\n"
         executable = base / (profile + (".exe" if os.name == "nt" else ""))
@@ -266,6 +277,7 @@ with tempfile.TemporaryDirectory(prefix="VOID D3 雪 ") as temp:
     moved = base / "relocated project"
     shutil.copytree(root, moved)
     cli(moved, "resolve", "--locked")
+    assert explain(moved) == inspected
     assert (moved / "void.lock").read_bytes() == locked
     assert cli(moved, "run", "--no-cache") == b"13\n"
     for text, message in [
@@ -283,10 +295,12 @@ with tempfile.TemporaryDirectory(prefix="VOID D3 雪 ") as temp:
     parked_snapshot = base / "missing snapshot"
     bad_snapshot.rename(parked_snapshot)
     cli(root, "check", status=1, message="Missing Git dependency snapshot")
+    explain(root, status=1, message="Missing Git dependency snapshot")
     parked_snapshot.rename(bad_snapshot)
     blob = next(bad_snapshot.glob("*/tree/**/api.void"))
     original = blob.read_bytes()
     blob.write_bytes(original + b"# corrupted snapshot\n")
+    explain(root, status=1, message="Git object identity mismatch")
     for command in [("check",), ("resolve", "--refresh"), ("deps", "fetch")]:
         cli(root, *command, status=1, message="Git object identity mismatch")
     assert lock.read_bytes() == locked

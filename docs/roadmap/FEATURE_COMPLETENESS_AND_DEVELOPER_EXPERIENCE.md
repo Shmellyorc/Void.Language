@@ -144,7 +144,12 @@ completion and structured cancellation. [Public process API](../process/API.md) 
 
 ### P2 — G05 · Maintenance commands and safer editor fixes
 
-**PARTIAL.** Developers can edit pins, fetch and refresh, but have no dedicated read-only graph/change explanation. Vim/Neovim adapters still use legacy selection. Code actions and wider rename lack guarded contracts. Start with a read-only lock/provenance explanation and bounded diagnostic actions with version checks. Review manifest-mode adapters separately using the existing schema and session guard. Keep registry search, private Git credentials and destructive package/cache management outside this increment. Verify offline graphs, stale lock refusal, no writes/network from inspect, rejected stale edits and actual editor switches. [Resolver](../../src/frontend/project_resolution.cpp) · [Project package tests](../../tests/project/packages.py) · [Language server](../../src/lsp/main.cpp) · [Editor fixtures](../../tests/editors)
+**IMPLEMENTED.** `voidc deps explain` reports the verified source package graph
+and lock identity in text or JSON without acquisition or publication. VS Code
+offers a compiler-validated, version-guarded correction for literal obsolete
+loop headers. Import and dependency diagnostics retain their existing guidance.
+Vim/Neovim manifest selection remains a separate follow-up.
+[Command and schema](../CLI.md#inspect-project-dependencies) · [Editor guard](../EDITOR_INTEGRATION.md#guarded-source-quick-fix)
 
 ### P2 — G06 · Application save/replace workflow
 
@@ -914,3 +919,103 @@ free space rose from 16,566,788,096 to 16,574,095,360 bytes.
 - Verification — `CMakeLists.txt`, `editors/vscode/src/test/semanticHost.ts`, `tests/frontend/multiple_returns.py`, `tests/frontend/multiple_returns.void`, `tests/frontend/multiple_returns_helper.void`, `tests/frontend/tests.cpp`, `tests/lsp/multiple_returns.py`.
 - Example — `examples/multiple_returns/test_game.void`.
 - Documentation — `docs/LANGUAGE_BIBLE.md`, `docs/ADVANCED_LANGUAGE.md`, `docs/DOCUMENTATION_HOVER.md`, `docs/EDITOR_INTEGRATION.md`, `docs/roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md`.
+
+## G05 dependency intelligence and guarded maintenance
+
+Baseline `1e988f00e41f3d3433859e756737acc25d3bf35c`. Inspection and
+`resolve --locked` share the existing local graph capture and lock comparison.
+The report projects one record per package and one record per declared
+relationship from that capture. The selected root, manifest inputs and lock
+are rechecked before the graph is released. JSON schema 1 preserves the
+resolver's diagnostic on failure. [CLI contract](../CLI.md#inspect-project-dependencies)
+
+The local fixtures compare file bytes, modes and modification times before
+and after successful and failed inspection. The Git fixtures inspect exact
+locked revisions and both parents of a shared transitive pin. The HTTPS
+fixture checks the live server's request count and repeats inspection after
+shutdown. Existing explicit fetch and transitive authorization controls
+remain active. [Local fixtures](../../tests/project/dependency_explain.py) · [Git fixtures](../../tests/project/git_dependencies.py) · [HTTPS fixtures](../../tests/project/git_https.py)
+
+The compiler attaches an exact primary-span replacement to the literal
+obsolete loop diagnostic. The server validates the edit against the current
+manifest project before offering it and again on invocation. The VS Code
+command uses the current editor model version and rechecks the URI, project
+root and connection generation. Import and alias diagnostics provide no
+proven uniquely authorized replacement in this increment. [Protocol fixture](../../tests/lsp/quick_fixes.py) · [Workbench fixture](../../editors/vscode/src/test/quickFixHost.ts)
+
+Inspection is limited to verified local source inputs. Dependency acquisition
+and lock refresh remain explicit operations. Registry search, upgrades,
+authenticated private Git, destructive cleanup and Vim/Neovim manifest-mode
+parity stay outside the G05 implementation.
+
+The first JSON build exposed an explicit LLVM string conversion requirement.
+The output now uses the SDK's UTF-8 repair routine for diagnostic bytes.
+A disposable POSIX path with an invalid byte verifies that the failed
+inspection still returns parseable JSON. The first cycle fixture used a
+disallowed `.` dependency path and correctly failed path validation. The
+fixture now uses two mutually dependent packages. The first quick-fix
+control was withheld by the ordinary reselection gate during failed analysis.
+The final gate compares the validated repair against the existing selection.
+
+### G05 focused native qualification
+
+The tested source is the baseline above plus the working-tree changes listed
+below. All profiles used LLVM/Clang/LLD 23.1.4 and the pinned provider
+inputs. The Windows guest reported Windows 10 Home x64 build 19045.6466.
+Its tests used a private root admitted by `void_windows_native_staging`.
+The strict PikaOS build used `RelWithDebInfo` with `VOID_SANITIZERS=ON`.
+
+| Host and profile | `project_dependency_explain` | `lsp_quick_fixes` | Focused CTests |
+| --- | ---: | ---: | ---: |
+| PikaOS 4 x64 Debug | 0.63 s | 0.29 s | 18/18, 113.41 s |
+| PikaOS 4 x64 Release | 0.40 s | 0.19 s | 18/18, 40.84 s |
+| PikaOS 4 x64 strict ASan/UBSan with leaks | 1.70 s | 0.51 s | 18/18, 132.37 s |
+| Windows 10 x64 Debug | 2.39 s | 0.80 s | 17/17, 267.37 s |
+| Windows 10 x64 Release | 1.94 s | 0.76 s | 17/17, 89.35 s |
+
+The common selection is `project_dependency_explain`, `project_dependencies`,
+`project_packages`, `project_git_dependencies`, `project_git_https`,
+`project_sessions`, `project_protocol`, `project_profiles`, `lsp_quick_fixes`,
+`lsp_editor_recovery`, `lsp_semantic_tokens`, `frontend`, `multiple_returns`,
+`lsp_multiple_returns`, `net_sockets`, `net_sockets_lsp` and `process_capture`.
+Linux also runs `project_managed_native_resolution`. Each selection has
+active commands and no skip properties. The two new CTests each have a 90 s
+limit. Existing tests retain their timeouts.
+
+Replay from the repository root. On Windows, use the same anchored selector
+without `project_managed_native_resolution` and pass the configured native
+Debug or Release build directory to `ctest --test-dir`.
+
+```sh
+common='project_dependency_explain|project_dependencies|project_packages|project_git_dependencies|project_git_https|project_sessions|project_protocol|project_profiles|lsp_quick_fixes|lsp_editor_recovery|lsp_semantic_tokens|frontend|multiple_returns|lsp_multiple_returns|net_sockets|net_sockets_lsp|process_capture'
+selection="^($common|project_managed_native_resolution)$"
+ctest --test-dir build/llvm23-debug -j 2 --output-on-failure -R "$selection"
+ctest --test-dir build/llvm23-release -j 2 --output-on-failure -R "$selection"
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+  ctest --test-dir build/llvm23-strict -j 2 --output-on-failure -R "$selection"
+```
+
+The strict run reported no ASan, UBSan or leak findings.
+
+Native VS Code 1.141.0 with Node 24.19.0 and the Debug `voidls` passed the
+guarded source correction on PikaOS and Windows. The workbench confirmed
+application to the current unsaved buffer, rejection after a document
+version change and project switch, and unchanged disk bytes. PikaOS also
+passed the G14 workbench recovery suite. Replay from `editors/vscode` with
+`VOIDLS_PATH` and `VSCODE_EXECUTABLE_PATH` set to the native executables.
+Run `npm run build` then `node out/test/runSemanticHost.js --quick-fix`.
+Use `--recovery` for the adjacent G14 suite.
+
+The disposable Windows build, editor, provider and test workspace, source
+transfers, and Linux scratch files were removed. Guest free space rose
+from 5,734,891,520 to 13,771,386,880 bytes. Linux `/tmp` free space rose
+from 16,197,185,536 to 16,570,511,360 bytes. The maintained Linux build
+profiles and verified provider inputs remain available for replay.
+
+### G05 changed-file inventory
+
+- Compiler and CLI — `include/void/diagnostic.hpp`, `include/void/project_resolution.hpp`, `include/void/tooling.hpp`, `src/frontend/compiler.cpp`, `src/frontend/project_resolution.cpp`, `src/frontend/tooling.cpp`, `src/lsp/main.cpp`, `src/main.cpp`.
+- VS Code — `editors/vscode/src/extension.ts`, `editors/vscode/src/test/quickFixHost.ts`, `editors/vscode/src/test/runSemanticHost.ts`.
+- Verification — `CMakeLists.txt`, `tests/lsp/quick_fixes.py`, `tests/project/dependencies.py`, `tests/project/dependency_explain.py`, `tests/project/git_dependencies.py`, `tests/project/git_https.py`.
+- Documentation — `docs/CLI.md`, `docs/EDITOR_INTEGRATION.md`, `docs/projects/PROJECT_DEPENDENCY_RESOLUTION_DESIGN.md`, `docs/roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md`.
