@@ -385,7 +385,7 @@ std::shared_ptr<const SessionAnalysis> ToolingSession::analyze(ProjectSnapshot s
         std::string module;
         for(const auto& d:diagnostics) {
             if(d.severity!=Severity::error)continue;
-            if(d.code!=DiagnosticCode::syntax && d.code!=DiagnosticCode::identifier)return;
+            if(d.code!=DiagnosticCode::syntax && d.code!=DiagnosticCode::identifier && !d.editor_enum_recovery)return;
             if(module.empty())module=d.primary.module_identity;
             if(module.empty() || module!=d.primary.module_identity || (document && module!=*document))return;
         }

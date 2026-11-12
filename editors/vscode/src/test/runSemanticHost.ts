@@ -6,6 +6,7 @@ import * as path from 'node:path';
 async function main(): Promise<void> {
     const suite = process.argv.includes('--constructor') ? 'constructorHost' :
         process.argv.includes('--recovery') ? 'recoveryHost' :
+        process.argv.includes('--enum-recovery') ? 'enumRecoveryHost' :
         process.argv.includes('--quick-fix') ? 'quickFixHost' : 'semanticHost';
     const {VOIDLS_PATH, VSCODE_EXECUTABLE_PATH} = process.env;
     if (!VOIDLS_PATH || !VSCODE_EXECUTABLE_PATH) throw new Error('Set VOIDLS_PATH and VSCODE_EXECUTABLE_PATH.');

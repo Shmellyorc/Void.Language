@@ -1,0 +1,6 @@
+struct app:
+    running: bool
+
+property (a app) is_running: bool:
+    get:
+        return a.running

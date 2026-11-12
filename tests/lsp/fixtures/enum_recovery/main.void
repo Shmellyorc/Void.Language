@@ -1,0 +1,42 @@
+use console
+use convert
+
+use "/app.void"
+
+const min_random_value = 1
+const max_random_value = 10
+
+enum process_type:
+    none
+    incorrect
+    unknown
+
+func main():
+    var game = app()
+
+    for game.is_running:
+        var data = console.readline("type a number from {min_random_value} to {max_random_value}")
+        var result, title = process_value(data)
+
+        match result:
+            process_type.none:
+                pass
+            process_type.incorrect:
+                print(title)
+            _:
+                print(title)
+                break
+
+func process_value(data: string) -> (process_type, string):
+    var conv = convert.parse<i32>(data)
+
+    match conv:
+        Err(var e):
+            return process_type.incorrect, "Invalid number"
+        Ok(var value):
+            if value < min_random_value or value > max_random_value:
+                return process_type.incorrect, "Outside allowed range"
+            else:
+                return process_type.none, ""
+
+    return process_type.unknown, "Unknown error"

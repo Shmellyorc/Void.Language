@@ -63,6 +63,12 @@ Fixed children copy independently; managed/list/dictionary children retain
 identity and readonly authority. Inactive variant fields are zero and traced
 precisely. The lowerer validates/extracts only the active payload.
 
+In the editor, `response.` offers the declared variants in an expression or
+an arm of `match item`, including while the arm's colon is still missing.
+The editor reports the written type and completed member as separate semantic
+roles. Payload constructors still require their arguments, and payload patterns
+still require the correct subpatterns. [Editor behavior](EDITOR_INTEGRATION.md#enum-member-completion)
+
 ## Multiple return values
 
 ```python

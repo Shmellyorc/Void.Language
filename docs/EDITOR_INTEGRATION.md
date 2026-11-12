@@ -33,6 +33,21 @@ rename require ordinary validated analysis. Broken imports, ambiguous project
 selection and edits that leave a receiver or binding unresolved can withhold
 assistance until the source is repaired.
 
+### Enum member completion
+
+Type `process_type.` in an expression, a return statement or a `match` arm.
+The compiler offers members of the visible enum. In a `match` arm it uses the
+inferred subject type, including a component obtained by destructuring a
+named or unnamed multiple return. Typing `i` or `in` filters the list to
+matching member names. A payload variant includes its parameter types in
+completion, and the source still needs its required arguments or patterns.
+
+The server sends `enum` for the validated type name and `enumMember` for a
+validated member. An incomplete prefix can retain the type token while the
+member remains unclassified and the error remains visible. The active theme
+controls the rendered colors and may use the same color for both roles.
+[Enum and pattern syntax](ADVANCED_LANGUAGE.md#enums-results-and-patterns)
+
 ### Guarded source quick fix
 
 In a trusted VS Code manifest project with an admitted application entry,

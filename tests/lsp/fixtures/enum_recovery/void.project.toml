@@ -1,0 +1,10 @@
+schema = 1
+
+[project]
+id = "org.example.enumrecovery"
+name = "Enum recovery"
+version = "0.1.0"
+kind = "application"
+
+[application]
+id = "org.example.enumrecovery.app"

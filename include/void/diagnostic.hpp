@@ -41,6 +41,7 @@ struct Diagnostic {
     std::vector<RelatedLocation> related;
     std::string expected_type, received_type, hint;
     std::optional<SourceFix> fix;
+    bool editor_enum_recovery = false;
 };
 std::string diagnostic_code(DiagnosticCode code);
 std::string render_diagnostic(const Diagnostic& diagnostic);

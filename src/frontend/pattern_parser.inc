@@ -28,7 +28,14 @@
             if(end<tokens.size() && tokens[end].text=="("){unsigned count=0;auto close=end;for(;close<tokens.size();++close){if(tokens[close].text=="(")++count;else if(tokens[close].text==")" && !--count)break;}if(close+1<tokens.size())value_tail=precedence(tokens[close+1].text)>=4 || tokens[close+1].text=="as" || tokens[close+1].text=="as?" || tokens[close+1].text==".." || tokens[close+1].text=="..<";}
             if(end<tokens.size() && (tokens[end].text=="(" || generic) && !value_tail) {
                 result.kind=Pattern::Kind::constructor;result.variant_token=take();result.spelling=result.variant_token.text;
-                while(accept(".")){result.variant_token=name();result.spelling+="."+result.variant_token.text;}
+                unsigned components=1;
+                while(accept(".")) {
+                    auto receiver=result.variant_token;
+                    result.variant_token=name();result.spelling+="."+result.variant_token.text;
+                    if(++components<=3)result.enum_type_use=std::make_unique<TypeUse>(TypeUse{
+                        std::move(receiver),Type::none,components==3?std::optional<Token>{result.token}:std::nullopt});
+                    else result.enum_type_use.reset();
+                }
                 if(at("<"))result.type_arguments=type_arguments();
                 if(!accept("("))return result;
                 if(!at(")"))do {
@@ -43,11 +50,24 @@
         if(at("..") || at("..<")){result.kind=Pattern::Kind::range;result.exclusive=take().text=="..<";result.values.push_back(expression(4));}
         return result;
     }
+    bool recover_match_arm(Pattern& arm) {
+        if(!repair_available() || !at("<newline>") || arm.kind!=Pattern::Kind::value ||
+           arm.values.front()->kind!=Expr::Kind::field)return false;
+        // Semantic checking must bind the written receiver to the subject enum
+        // before this editor-only arm can contribute any presentation records.
+        arm.editor_incomplete_arm=true;
+        diagnostics.recovery->record();
+        newline();
+        return true;
+    }
     std::unique_ptr<Expr> match_expression(Token token) {
         auto result=std::make_unique<Expr>(Expr::Kind::match,std::move(token));result->parts.push_back(expression());
         need(":");newline();need("<indent>");
         while(!at("<dedent>") && !at("<end of file>")) {
-            result->patterns.push_back(pattern());need(":");result->parts.push_back(expression());newline();
+            result->patterns.push_back(pattern());
+            if(recover_match_arm(result->patterns.back()))
+                result->parts.push_back(std::make_unique<Expr>(Expr::Kind::editor_hole,result->patterns.back().token));
+            else {need(":");result->parts.push_back(expression());newline();}
         }
         need("<dedent>");multiline_expression=true;return result;
     }

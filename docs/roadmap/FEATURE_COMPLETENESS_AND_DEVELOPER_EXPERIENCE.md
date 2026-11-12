@@ -130,6 +130,14 @@ receiver in its current lexical scope, retain accessible members and preserve
 ordinary diagnostics and validated source roles as the buffer changes.
 [G14 implementation and qualification](#g14-editor-intelligence-recovery-and-vsix-packaging)
 
+### P1 — G16 · Enum completion and semantic highlighting
+
+**IMPLEMENTED.** The compiler resolves enum member completion in expressions,
+returns and incomplete `match` arms from the current source. Validated enum
+type references have their own semantic token. G15 destructuring supplies the
+subject type for both named and unnamed return components.
+[G16 implementation and qualification](#g16-enum-completion-and-semantic-highlighting)
+
 ### P1 — G03 · Debug information and source debugging
 
 **PARTIAL** emission, **MISSING** a supported source debugging workflow. Explicit `line` and `full` requests only warn today. Define the concrete object/executable symbol contract for the first native AOT lane and decide which requests remain unsupported for JIT. Carry the approved mode through provenance and compilation, preserve current implicit quiet defaults and native resource admission, and use existing platform debugger interfaces for launch/attach. Verify emitted sections and linked symbols with the pinned SDK, then demonstrate breakpoints, stepping, a representative local value, and attach/normal termination on the claimed Linux/Windows hosts. Treat optimized-out values and relocated paths as explicit checks. [Existing profile fixture](../../tests/project/profiles.py) · [LLVM metadata](../../src/backend/llvm/backend.cpp) · [IDE/debugger proposal](../PROJECT_ARCHITECTURE_ROADMAP.md#proposed-ide-and-public-usability-milestones)
@@ -1019,3 +1027,153 @@ profiles and verified provider inputs remain available for replay.
 - VS Code — `editors/vscode/src/extension.ts`, `editors/vscode/src/test/quickFixHost.ts`, `editors/vscode/src/test/runSemanticHost.ts`.
 - Verification — `CMakeLists.txt`, `tests/lsp/quick_fixes.py`, `tests/project/dependencies.py`, `tests/project/dependency_explain.py`, `tests/project/git_dependencies.py`, `tests/project/git_https.py`.
 - Documentation — `docs/CLI.md`, `docs/EDITOR_INTEGRATION.md`, `docs/projects/PROJECT_DEPENDENCY_RESOLUTION_DESIGN.md`, `docs/roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md`.
+
+## G16 enum completion and semantic highlighting
+
+Baseline `7af58a3ad4ebee4e0bc6c9a97c23f356ea2bcd4c`. The native LSP and
+workbench reproduced the report against a disposable copy of the existing
+TestGame project. The original tab-indented `main.void` had SHA-256
+`3236545d6fcfa64e6ab0850ca60829e50e60e9c0df33f04212299371fdb705ca` before
+and after qualification. Its saved entry was valid. The maintained fixture
+uses the pasted source and a minimal `app.void` with the same property access.
+[Maintained source](../../tests/lsp/fixtures/enum_recovery/main.void)
+
+| Dirty TestGame snapshot | Baseline items | Baseline result |
+| --- | --- | --- |
+| `process_type.` in a statement arm, without its colon | Empty | `VOID1102`, no semantic tokens |
+| `process_type.i` and `process_type.in`, without a colon | Empty | `VOID1101` and `VOID1102`, no semantic tokens |
+| `process_type.` with an existing colon | `none`, `incorrect`, `unknown` | `VOID1102`, no semantic tokens |
+| `var value = process_type.` | `none`, `incorrect`, `unknown` | `VOID1102`, no semantic tokens |
+| `return process_type.` before the second G15 value was typed | Empty | `VOID1102`, no semantic tokens |
+| Completed `process_type.incorrect:` | `incorrect` at the end of the name | Ready. `incorrect` had `enumMember`. The type qualifier had no token. |
+
+The failing statement-arm cursor was byte 366, zero-based LSP line 21,
+UTF-16 column 16 in TestGame. The pasted-space fixture reproduces at byte
+408, line 21, column 25. On TestGame, the equivalent ordinary-expression
+probe used byte 183, line 14, column 26. The return probe used byte 912,
+line 41, column 21. Every dirty baseline row reported project state `error`.
+The existing cursor probe reached enum lookup in value expressions and in
+arms with a colon. Without the colon, parsing stopped before semantic
+checking could reach the sentinel. In a return, G15's arity check stopped
+the probe before it examined the first expression. G14 presentation had no
+enum-hole recovery path. Baseline completion could also fall through a
+rejected shadowing declaration to the outer enum.
+
+The repair admits a bounded editor-only arm with a missing colon and checks
+the written receiver against the actual match subject. A constructor pattern
+uses the same enum candidates when its payload parentheses are already
+present. A partially typed value or first return component can retain a
+validated enum type in the current recovery snapshot. An unbound prefix
+contributes no member reference or exhaustive case. Ordinary analysis owns
+diagnostics, and the recovery analysis cannot lower to IR. The checker also
+rejects enum candidates after an earlier error that makes lookup uncertain.
+
+Tagged and numeric member expressions and payload patterns now retain their
+written type span and optional module qualifier in the compiler index. Type
+references have the `enum` role and no declaration modifiers. Member
+references have `enumMember`, `readonly` and `static`. Declarations retain
+their declaration and definition flags. The LSP legend is unchanged and the
+extension consumes these roles through its existing client. [Protocol regression](../../tests/lsp/enum_recovery.py) · [Workbench regression](../../editors/vscode/src/test/enumRecoveryHost.ts)
+
+During development, syntax-only recovery still dropped tokens for an
+unknown member prefix with no parser error and for a return arity error.
+Only compiler-marked enum prefixes and eligible first-component returns now
+enter that recovery path. A rejected local declaration initially left no
+binding and let completion reach the enum, which the earlier-error guard
+now prevents. Fixture corrections included expecting the whole `none`
+replacement range when querying the closed document's saved source.
+
+### G16 workbench evidence
+
+Native VS Code 1.141.0 with Node 24.19.0 ran the real extension against
+the Debug server and an unchanged copy of TestGame. On PikaOS the baseline
+dot keystroke produced no popup or enum items. The corrected workbench
+opened the popup on the actual `.` keystroke and showed all three members.
+It narrowed the popup for `i` and `in` and restored the completed member
+token after `incorrect:` cleared the diagnostic. The workbench verified
+that the source on disk retained its original bytes. The adjacent G14
+recovery and numeric-enum workbench suites also passed on PikaOS.
+
+The Windows 10 workbench passed the same keystroke, prefix and token checks
+with the copied TestGame source. The extension host briefly reported that it
+was unresponsive during startup, recovered in the same session, and exited
+with code 0. Its stock Dark 2026 profile rendered distinct type and member
+colors.
+
+The isolated Linux profile was checked with the stock Dark 2026 theme and
+with the Dark+ theme configured in Boss's VS Code user profile. The Dark+
+baseline had no type token and rendered the type and member as
+`rgb(102, 136, 204)`. The corrected Dark+ replay returned `enum` and
+`enumMember`. The rendered type was `rgb(255, 238, 187)` and the member
+stayed `rgb(102, 136, 204)`. These are observations of the theme. The compiler
+and extension have no color rules for this feature.
+
+From `editors/vscode`, run `npm run build` then
+`node out/test/runSemanticHost.js --enum-recovery` with `VOIDLS_PATH` and
+`VSCODE_EXECUTABLE_PATH` set to native executables and `VOID_TEST_CDP_PORT`
+set to an unused loopback port. The default fixture is the maintained source.
+`VOID_ENUM_FIXTURE` can point to a disposable copy of TestGame. For a baseline
+replay, point to the baseline server and set `VOID_ENUM_BASELINE=1`.
+
+### G16 focused native qualification
+
+The selection includes the new LSP regression, existing G14 recovery,
+semantic tokens and Stage 10 intelligence, G15 execution and LSP, numeric
+enum IR/process/LSP, pattern source and CLI coverage, frontend diagnostics,
+project selection and project sessions. The pattern CLI test uses the
+maintained prelinked normal and O2 targets. The regression also checks
+non-BMP UTF-16 edit ranges, dirty buffer revisions, closure, project
+switching, visibility, missing imports, and ordinary CLI rejection of
+incomplete or invalid source. Payload signatures describe their declared
+arguments. Variant-level visibility modifiers remain unsupported by the
+existing language, so the visibility negative uses a private imported enum.
+Recovery depends on a visible enum and a current, resolvable subject for
+match arms. Malformed payload patterns and invalid imports can still
+withhold assistance until the source is repaired.
+
+A disposable legacy LSP control also recovered the incomplete TestGame arm,
+withheld formatting and rename, and withheld tokens after the recovery budget
+was exhausted. `console.color.green` carried `defaultLibrary` on both the
+type and member, with `readonly` and `static` on the member. The first control
+used `color` for a local and triggered the existing shadowing diagnostic.
+Renaming that fixture local to `shade` exercised the intended token path.
+
+| Host and profile | `lsp_enum_recovery` | Focused CTests |
+| --- | ---: | ---: |
+| PikaOS 4 x64 Debug | 19.10 s | 14/14, 97.30 s |
+| PikaOS 4 x64 Release | 3.62 s | 14/14, 23.37 s |
+| PikaOS 4 x64 strict ASan/UBSan with leaks | 14.99 s | 14/14, 75.56 s |
+| Windows 10 x64 Debug | 31.72 s | 14/14, 201.99 s |
+| Windows 10 x64 Release | 7.83 s | 14/14, 56.37 s |
+
+The separate PikaOS Debug preservation selection passed `net_sockets`,
+`net_sockets_lsp` and `process_capture` in 69.56 s. All qualification builds
+used LLVM/Clang/LLD 23.1.4 and verified provider inputs. Windows reported
+Windows 10 Home x64 build 19045.6466. The test driver admitted a private
+temporary root with `void_windows_native_staging` for each Windows profile.
+
+```sh
+selection='^(lsp_enum_recovery|lsp_editor_recovery|lsp_semantic_tokens|lsp_stage10_intelligence|multiple_returns|lsp_multiple_returns|patterns_source|patterns_cli|numeric_enum_ir|numeric_enum_process|numeric_enum_lsp|project_selection|project_sessions|frontend)$'
+ctest --test-dir BUILD -j 2 --output-on-failure -R "$selection"
+```
+
+All five configurations registered the exact same 14 tests with active
+commands and no skip properties. The new `lsp_enum_recovery` registration
+has a 180 s timeout. Existing registrations and timeouts are preserved.
+The strict Linux profile is
+`RelWithDebInfo` with `VOID_SANITIZERS=ON` and uses
+`ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`. It reported
+no ASan, UBSan or leak findings.
+
+The disposable guest workspace, source transfers, workbench profiles and
+scratch logs were removed. Guest free space rose from 5,565,751,296 to
+15,006,392,320 bytes. Linux `/tmp` free space rose from 16,041,676,800 to
+16,632,401,920 bytes. The maintained Linux build profiles retain their
+verified inputs and prelinked regression targets for replay.
+
+### G16 changed-file inventory
+
+- Compiler — `include/void/diagnostic.hpp`, `src/frontend/compiler.cpp`, `src/frontend/pattern_parser.inc`, `src/frontend/pattern_semantics.inc`, `src/frontend/tooling.cpp`.
+- Qualification — `CMakeLists.txt`, `editors/vscode/src/test/enumRecoveryHost.ts`, `editors/vscode/src/test/runSemanticHost.ts`, `tests/lsp/enum_recovery.py`, `tests/lsp/fixtures/enum_recovery/app.void`, `tests/lsp/fixtures/enum_recovery/main.void`, `tests/lsp/fixtures/enum_recovery/void.project.toml`.
+- Documentation — `docs/ADVANCED_LANGUAGE.md`, `docs/EDITOR_INTEGRATION.md`, `docs/roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md`.

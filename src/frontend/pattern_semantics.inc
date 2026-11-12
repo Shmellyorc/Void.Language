@@ -25,6 +25,7 @@
     template<class Visit> bool warn_match(const Token& token,Type type,Visit patterns) {
         bool complete=false,present=false,absent=false;std::set<unsigned> covered;std::set<std::uint64_t> scalar_cases;
         patterns([&](const Pattern& p){
+            if(p.editor_incomplete_arm)return;
             complete|=irrefutable(p);
             present|=p.nullable && p.children.size()==1 && irrefutable(p.children[0]);
             absent|=p.kind==Pattern::Kind::value && p.values[0]->token.text=="null";
@@ -46,10 +47,19 @@
         case K::wildcard: return;
         case K::capture:p.slot=declare(p.token,type);return;
         case K::value:{
+            auto& value=*p.values.front();
+            if(value.kind==Expr::Kind::field && (p.editor_incomplete_arm || editor_cursor(value))) {
+                if(auto selected=enum_expression(value,false,&type)) {
+                    expect(*selected,type,p.token);
+                    return;
+                }
+                if(p.editor_incomplete_arm)error(source,p.token,Code::syntax,"An incomplete enum arm needs a visible subject enum.");
+            }
             auto spelling=[&](const auto& self,const Expr& expression)->std::string{if(expression.kind==Expr::Kind::name)return expression.token.text;if(expression.kind==Expr::Kind::field){auto prefix=self(self,*expression.parts[0]);if(!prefix.empty())return prefix+"."+expression.token.text;}return {};};
             const auto name=spelling(spelling,*p.values[0]);
             if(!name.empty() && !lookup(name.substr(0,name.find('.')))){auto [owner,structure]=structure_lookup(unit,root,units,name,p.token);if(structure){p.kind=K::constructor;p.spelling=name;p.values.clear();check_pattern(p,type);return;}}
             expect(expression(*p.values[0],type),type,p.token);
+            if(value.kind==Expr::Kind::editor_hole)return;
             if(!(p.values[0]->kind==Expr::Kind::sum && p.values[0]->parts.empty()) && !ir::pattern_comparable(type))error(source,p.token,Code::type_mismatch,"Use explicit list/dictionary patterns for collection contents.");return;
         }
         case K::range:
@@ -96,7 +106,12 @@
                     const auto dot=variant.rfind('.');
                     if(dot==std::string::npos)error(source,p.token,Code::type_mismatch,"Enum patterns require type.variant spelling.");
                     auto [owner,structure]=structure_lookup(unit,root,units,variant.substr(0,dot),p.token);
+                    if(editor_cursor(p.variant_token)) {
+                        if(structure && structure->definition==type.definition)editor_enum_candidates(*owner,*structure,p.variant_token);
+                        throw EditorProbeFound{};
+                    }
                     if(!structure || structure->definition!=type.definition)error(source,p.token,Code::type_mismatch,"Enum pattern has a different nominal type.");
+                    if(p.enum_type_use)p.enum_type_use->type=type;
                     variant=variant.substr(dot+1);
                 }
                 auto selected=std::find_if(cases.begin(),cases.end(),[&](const auto& c){return c.name==variant;});
@@ -156,8 +171,12 @@
     Type check_match(Expr& e,std::optional<Type> expected) {
         auto type=expression(*e.parts[0]);std::optional<Type> result=expected;
         for(unsigned n=0;n<e.patterns.size();++n) {
-            scopes.emplace_back();check_pattern(e.patterns[n],type);auto value=expression(*e.parts[n+1],result);
-            if(result)expect(value,*result,e.parts[n+1]->token);else result=value;
+            scopes.emplace_back();check_pattern(e.patterns[n],type);
+            auto& arm=*e.parts[n+1];
+            if(arm.kind!=Expr::Kind::editor_hole) {
+                auto value=expression(arm,result);
+                if(result)expect(value,*result,arm.token);else result=value;
+            }
             scopes.pop_back();
         }
         if(!result || *result==Type::none)error(source,e.token,Code::invalid_value,"A match expression requires value-producing arms.");
