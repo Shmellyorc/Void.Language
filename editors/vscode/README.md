@@ -24,6 +24,9 @@ Compiler-owned semantic highlighting, completion, hover, signature help,
 diagnostics, navigation, source symbols, guarded rename and conservative
 formatting use the native `voidls`. Open project sources receive editor
 analysis before any application source imports them, including unsaved edits.
+When a nested `if` condition ends in an unfinished member, the compiler can
+offer accessible members and retain highlighting and navigation for valid
+code in the current buffer while showing the syntax error.
 Requires a trusted local filesystem workspace and VS Code API 1.141.0+. VSCodium
 execution is a separate verification target. One pinned project/session per window.
 
@@ -62,31 +65,35 @@ with `--allow-native`.
 Syntax highlighting works in Restricted Mode; native execution requires trust.
 Multi-root, virtual/untitled, network/UNC and unrelated projects need separate
 windows or are unsupported. Source debugging uses an existing native debugger.
-On Linux x64, the qualified [LLDB DAP launch configuration](../../docs/EDITOR_INTEGRATION.md#native-aot-source-debugging)
+On Linux x64, the qualified [LLDB DAP launch configuration](https://github.com/Shmellyorc/Void.Language/blob/main/docs/EDITOR_INTEGRATION.md#native-aot-source-debugging)
 uses the compiler-selected project's executable. Windows x64 uses native GDB
 from a terminal. Automatic native reload remains outside this workflow.
 
-Developer build/package (pinned Node 24.19.0, locked dependencies):
+Build and install from this directory with Node 24.19.0 and the locked dependencies.
 
 ```sh
-npm ci
-npm test
-npm run package
-code --install-extension dist/void-language-0.1.0.vsix
-# VSCodium offline installation target:
-codium --install-extension dist/void-language-0.1.0.vsix
+if npm ci && npm run package && code --install-extension dist/void-language-0.1.0.vsix; then
+  printf '%s\n' 'VOID extension installed.'
+else
+  printf 'VOID setup stopped with exit status %s. See the failing command above.\n' "$?" >&2
+fi
 ```
+
+For VSCodium, use `codium` in place of `code`.
 
 A generic VSIX requires a separately built/installed `voidls` from LLVM 23.1.4.
 Owner-local platform packages can include the matching server. Host runtime
 libraries still apply; no clean-machine portability claim is made. Repository
 VOID-original integration source is MIT-licensed under the repository's `LICENSE`.
 Third-party dependencies retain their own licenses; see
-`docs/release/LICENSING_SCOPE.md` and `docs/release/REDISTRIBUTION_NOTICES.md`.
+[licensing scope](https://github.com/Shmellyorc/Void.Language/blob/main/docs/release/LICENSING_SCOPE.md)
+and [redistribution notices](https://github.com/Shmellyorc/Void.Language/blob/main/docs/release/REDISTRIBUTION_NOTICES.md).
 This source-license declaration does not certify a distributable VSIX or native
 server bundle. Public release remains subject to the recorded release holds.
-See the repository's `docs/EDITOR_INTEGRATION.md`, `docs/STAGE7_IMPLEMENTATION.md`
-and `docs/stage7/ACCEPTANCE.md` for setup, exact executed versions and limitations.
+See [editor integration](https://github.com/Shmellyorc/Void.Language/blob/main/docs/EDITOR_INTEGRATION.md),
+[Stage 7 implementation](https://github.com/Shmellyorc/Void.Language/blob/main/docs/STAGE7_IMPLEMENTATION.md)
+and [Stage 7 acceptance](https://github.com/Shmellyorc/Void.Language/blob/main/docs/stage7/ACCEPTANCE.md)
+for setup, exact executed versions and limitations.
 
 Sprint 1 adds nested standard imports (`use io/files`) and importer-relative quoted
 project imports (`use "app/player.void"`), with space/quote/slash completion triggers.
@@ -95,4 +102,4 @@ completion and signatures; `## @param name description` documents parameters.
 Set the absolute `VOID_STDLIB_ROOT` environment variable before launching the
 editor for relocated installations; otherwise the matching build's configured
 source root is used. Installed sources permit navigation without rename/format
-or project overlay authority. See `docs/STAGE8_DISCOVERY.md` for the contract.
+or project overlay authority. [Stage 8 discovery contract](https://github.com/Shmellyorc/Void.Language/blob/main/docs/STAGE8_DISCOVERY.md)

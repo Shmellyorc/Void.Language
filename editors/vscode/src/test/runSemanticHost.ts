@@ -4,7 +4,8 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 
 async function main(): Promise<void> {
-    const suite = process.argv.includes('--constructor') ? 'constructorHost' : 'semanticHost';
+    const suite = process.argv.includes('--constructor') ? 'constructorHost' :
+        process.argv.includes('--recovery') ? 'recoveryHost' : 'semanticHost';
     const {VOIDLS_PATH, VSCODE_EXECUTABLE_PATH} = process.env;
     if (!VOIDLS_PATH || !VSCODE_EXECUTABLE_PATH) throw new Error('Set VOIDLS_PATH and VSCODE_EXECUTABLE_PATH.');
     const base = process.platform === 'darwin' ? await fs.realpath('/tmp') : os.tmpdir();

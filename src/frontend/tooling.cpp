@@ -378,8 +378,24 @@ std::shared_ptr<const SessionAnalysis> ToolingSession::analyze(ProjectSnapshot s
     if (result->semantic_) result->index_ = std::make_shared<ToolingIndex>(result->semantic_);
     const auto& selected=result->snapshot_;
     const auto* state=result->project_?result->project_->state.get():nullptr;
+    auto recover=[&](const std::vector<Diagnostic>& diagnostics,const std::string* document) {
+        std::string module;
+        for(const auto& d:diagnostics) {
+            if(d.severity!=Severity::error)continue;
+            if(d.code!=DiagnosticCode::syntax && d.code!=DiagnosticCode::identifier)return;
+            if(module.empty())module=d.primary.module_identity;
+            if(module.empty() || module!=d.primary.module_identity || (document && module!=*document))return;
+        }
+        auto open=selected.overrides_.find(module);
+        if(open==selected.overrides_.end() || !open->second)return;
+        auto program=recover_editor_analysis(state?*selected.project_request_:selected.entry_,selected.entry_override_,
+            selected.overrides_,state?&selected.manifests_:nullptr,selected.discovery_,module,document!=nullptr);
+        if(program)result->recovery_.emplace(module,EditorRecoveryAnalysis{program,ToolingIndex(program)});
+    };
+    if(!result->semantic_ && (!state || state->manifest))recover(result->result_.diagnostics,nullptr);
     if(!state || state->manifest)for(const auto& [id,source]:selected.overrides_) {
         if(!source)continue;
+        if(result->recovery_.contains(id))continue;
         if(state && (state->execution.contains(id) ||
             (state->entry && state->root/utf8_path(id).relative_path()==*state->entry)))continue;
         if(!state && id=="/"+path_utf8(selected.entry_.filename()))continue;
@@ -389,6 +405,7 @@ std::shared_ptr<const SessionAnalysis> ToolingSession::analyze(ProjectSnapshot s
         document.result=analyze_editor_document(state?*selected.project_request_:selected.entry_,selected.overrides_,id,
             state?&selected.manifests_:nullptr);
         if(document.result.program)document.index.emplace(document.result.program);
+        else recover(document.result.diagnostics,&id);
     }
     return result;
 }

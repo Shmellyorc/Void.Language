@@ -358,8 +358,10 @@ class Server {
         auto current=session.current_analysis();
         if(current && current->editor_documents().contains(id) && !open.contains(id))return empty();
         auto index=current?current->index_for(id):nullptr;
+        const auto* recovery=current && !index && method=="textDocument/definition" && open.contains(id)?current->recovery_for(id):nullptr;
+        if(recovery)index=&recovery->index;
         if(!index) return empty();
-        auto program=analysis_for(*current,id);
+        auto program=recovery?recovery->program.get():analysis_for(*current,id);
         const auto* source=source_in(*program,id);
         if(!source) return empty();
         auto offset=Positions(*source).offset(p);
@@ -427,8 +429,10 @@ class Server {
         auto current=session.current_analysis();
         if(!current)return result;
         const auto* index=current->index_for(id);
-        const auto* program=analysis_for(*current,id);
-        if(!index || (session.requires_reselection() && !current->editor_documents().contains(id)))return result;
+        const auto* recovery=index?nullptr:current->recovery_for(id);
+        if(recovery)index=&recovery->index;
+        const auto* program=recovery?recovery->program.get():analysis_for(*current,id);
+        if(!index || (!recovery && session.requires_reselection() && !current->editor_documents().contains(id)))return result;
         const auto* source=source_in(*program,id);
         if(!source || source->text()!=document->second.source->text())return result;
         Positions positions(*source);
@@ -499,6 +503,8 @@ class Server {
         const auto* program=current?analysis_for(*current,module):nullptr;
         const auto& context=manifest_mode?requested_root:entry_path;
         index=current?current->index_for(module):nullptr;
+        if(current && !index && method=="textDocument/hover" && open.contains(module))
+            if(auto recovery=current->recovery_for(module))index=&recovery->index;
         const vd::SourceFile* source=nullptr;
         auto snapshot=session.select();
         if(auto found=snapshot.overrides().find(module);found!=snapshot.overrides().end() && found->second)source=&*found->second;

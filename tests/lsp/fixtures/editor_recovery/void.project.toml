@@ -1,0 +1,8 @@
+schema=1
+[project]
+id='org.test.game'
+name='TestGame'
+version='1.0.0'
+kind='application'
+[application]
+id='org.test.game'

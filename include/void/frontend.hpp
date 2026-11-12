@@ -190,6 +190,11 @@ struct ProjectAnalysisResult {
 };
 ProjectAnalysisResult analyze_editor_project(const std::filesystem::path&, const std::optional<std::string>&,
     const SourceOverrides&, const ManifestOverrides&, const EditorDiscovery&);
+// Presentation-only analysis of a current open source. Any recovered graph is
+// barred from lowering and never becomes the selected project analysis.
+std::shared_ptr<const ValidatedAnalysis> recover_editor_analysis(const std::filesystem::path&,
+    const std::optional<std::string>& entry, const SourceOverrides&, const ManifestOverrides*,
+    const EditorDiscovery&, const std::string& module, bool independent_document);
 std::vector<Diagnostic> check_project_documents(const std::filesystem::path&,const SourceOverrides&,const ManifestOverrides&,const std::vector<std::string>&);
 struct ProjectPreflight {
     std::filesystem::path root;std::optional<std::filesystem::path> entry;

@@ -127,6 +127,10 @@ struct EditorDocumentAnalysis {
     AnalysisResult result;
     std::optional<ToolingIndex> index;
 };
+struct EditorRecoveryAnalysis {
+    std::shared_ptr<const ValidatedAnalysis> program;
+    ToolingIndex index;
+};
 class SessionAnalysis {
     friend class ToolingSession;
     ProjectSnapshot snapshot_;
@@ -135,6 +139,7 @@ class SessionAnalysis {
     std::optional<ProjectAnalysisResult> project_;
     std::shared_ptr<const ValidatedAnalysis> semantic_;
     std::map<std::string, EditorDocumentAnalysis> editor_documents_;
+    std::map<std::string, EditorRecoveryAnalysis> recovery_;
 public:
     const ProjectSnapshot& snapshot() const { return snapshot_; }
     const AnalysisResult& result() const { return result_; }
@@ -142,6 +147,10 @@ public:
     const auto& project() const { return project_; }
     const auto& semantic_analysis() const { return semantic_; }
     const auto& editor_documents() const { return editor_documents_; }
+    const EditorRecoveryAnalysis* recovery_for(const std::string& document) const {
+        auto found=recovery_.find(document);
+        return found==recovery_.end()?nullptr:&found->second;
+    }
     const ToolingIndex* index_for(const std::string& document) const {
         if(auto found=editor_documents_.find(document);found!=editor_documents_.end())
             return found->second.index?&*found->second.index:nullptr;

@@ -102,6 +102,14 @@ test('validate executable and deterministic canonical project selection', async 
     } finally { await fs.rm(directory, {recursive: true, force: true}); }
 });
 
+test('VSIX README links resolve without a repository-relative base', async () => {
+    const readme = await fs.readFile(path.resolve(__dirname, '../../README.md'), 'utf8');
+    const documentation = 'https://github.com/Shmellyorc/Void.Language/blob/main/docs/EDITOR_INTEGRATION.md';
+    assert(readme.includes(`(${documentation}#native-aot-source-debugging)`));
+    for (const [, target] of readme.matchAll(/\]\(([^\s)]+)\)/g))
+        assert(target.startsWith('#') || new URL(target).protocol === 'https:', `Unpackaged README link: ${target}`);
+});
+
 test('presentation covers approved keyword colors and block indentation', async () => {
     const root = path.resolve(__dirname, '../..');
     const grammar = JSON.parse(await fs.readFile(path.join(root, 'syntaxes/void.tmLanguage.json'), 'utf8'));

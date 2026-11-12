@@ -470,6 +470,9 @@ if(BUILD_TESTING)
   add_test(NAME lsp_semantic_tokens COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/lsp/semantic_tokens.py" "$<TARGET_FILE:voidls>")
   set_tests_properties(lsp_semantic_tokens PROPERTIES TIMEOUT 180)
+  add_test(NAME lsp_editor_recovery COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/lsp/editor_recovery.py" "$<TARGET_FILE:voidls>" "$<TARGET_FILE:voidc>")
+  set_tests_properties(lsp_editor_recovery PROPERTIES TIMEOUT 180)
   void_add_output_test(project_nested_cli "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/project/nested.py" "$<TARGET_FILE:voidc>"
     "@VOID_TEST_OUTPUT@/project-nested-evidence.json")

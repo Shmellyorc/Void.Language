@@ -1,0 +1,18 @@
+use console
+use convert
+use "/app.void"
+
+const min_random_value = 1
+const max_random_value = 10
+
+func main():
+    var game = app()
+
+    for game.running:
+        var data = console.readline("type a number from {min_random_value} to {max_random_value}")
+
+        if convert.parse<i32>(data) is Ok(var p):
+            if game.
+                pass
+        else:
+            print("It must be a value from {min_random_value} to {max_random_value}")

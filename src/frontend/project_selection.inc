@@ -366,7 +366,7 @@ bool project_manifest_present(const std::filesystem::path& root) {
     for(const auto& item:std::filesystem::directory_iterator(root))if(folded(path_utf8(item.path().filename()))=="void.project.toml")return true;
     return false;
 }
-ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path& root,const std::optional<std::string>& entry_override,const SourceOverrides& sources,const ManifestOverrides& manifests,EditorProbe* editor,bool authorize_native,const EditorDiscovery* editor_discovery=nullptr) {
+ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path& root,const std::optional<std::string>& entry_override,const SourceOverrides& sources,const ManifestOverrides& manifests,EditorProbe* editor,bool authorize_native,const EditorDiscovery* editor_discovery=nullptr,EditorRecovery* recovery=nullptr) {
     ProjectAnalysisResult result;
     std::unique_ptr<ProjectCapture> owned;
     std::set<std::string> seeds;std::string entry;bool automatic=false,complete=false;
@@ -395,7 +395,7 @@ ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path&
         result.state=std::move(state);
     };
     try {
-        owned=std::make_unique<ProjectCapture>(root,sources,manifests);auto& capture=*owned;result.manifest=capture.manifest;capture.diagnostics.editor=editor;
+        owned=std::make_unique<ProjectCapture>(root,sources,manifests);auto& capture=*owned;result.manifest=capture.manifest;capture.diagnostics.editor=editor;capture.diagnostics.recovery=recovery;
         const bool library=capture.manifest->kind()==project::Kind::library;
         if(library && entry_override)project_failure(capture.anchor,Code::project_entry,"A library project cannot select an application entry.");
         auto explicit_entry=entry_override?entry_override:capture.manifest->entry();
@@ -462,6 +462,12 @@ ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path&
             auto found=fresh.sources.find(id);
             fresh.changed(found==fresh.sources.end() || found->second.text()!=source.text());
         }
+        if(recovery) {
+            if(!editor && recovery->repaired && capture.graph.units.contains(std::string(recovery->module)))
+                recovery->analysis=AnalysisAccess::build(std::move(capture.graph.units),entry,capture.diagnostics.warnings(),
+                    {},std::move(library_scope),{},false,capture.dependencies,true);
+            return result;
+        }
         result.project=ProjectAnalysisAccess::build(capture,seeds,entry,automatic,std::move(library_scope),authorize_native);result.diagnostics=capture.diagnostics.warnings();retain();return result;
     } catch(const CompilationError& failure) {result.diagnostics=failure.diagnostics();retain();return result;}
       catch(const std::filesystem::filesystem_error& failure) {Diagnostic d{Code::project_boundary};d.primary={std::make_shared<const SourceFile>(path_utf8(root),""),{},0,0};d.description=failure.what();d.hint="Check the selected project root, permissions and exact path spelling.";result.diagnostics.push_back(std::move(d));retain();return result;}
@@ -477,16 +483,33 @@ ProjectAnalysisResult analyze_editor_project(const std::filesystem::path& root,c
 }
 
 static std::shared_ptr<const ValidatedAnalysis> validated_editor_document(ProjectCapture& capture,
-    const std::string& id, EditorProbe* editor = nullptr) {
+    const std::string& id, EditorProbe* editor = nullptr, EditorRecovery* recovery = nullptr) {
     capture.diagnostics.editor=editor;
+    capture.diagnostics.recovery=recovery;
     capture.graph.load(capture.from,{TokenKind::path,id,0});
     capture.diagnostics.finish();
     validate_graph(capture.graph.units,id,capture.diagnostics);
     ProjectCapture fresh(capture.root,capture.overlays,capture.manifest_overlays,&capture);
     for(const auto& [module,unit]:capture.graph.units)if(!package_source(module))
         fresh.changed(fresh.recapture_source(module).text()!=unit->source.text());
+    if(editor && recovery)return {};
     return AnalysisAccess::build(std::move(capture.graph.units),id,capture.diagnostics.warnings(),
         {}, {}, {}, false,capture.dependencies,true);
+}
+
+std::shared_ptr<const ValidatedAnalysis> recover_editor_analysis(const std::filesystem::path& context,
+    const std::optional<std::string>& entry,const SourceOverrides& sources,const ManifestOverrides* manifests,
+    const EditorDiscovery& discovery,const std::string& module,bool document) {
+    EditorRecovery recovery{module,{}};
+    try {
+        if(!manifests) recovery.analysis=validated_project(context,sources,true,nullptr,nullptr,{},document?&module:nullptr,&recovery);
+        else if(document) {
+            ProjectCapture capture(context,sources,*manifests);
+            recovery.analysis=validated_editor_document(capture,module,nullptr,&recovery);
+        } else (void)analyze_manifest_project_impl(context,entry,sources,*manifests,nullptr,false,&discovery,&recovery);
+        return recovery.repaired?recovery.analysis:nullptr;
+    } catch(const CompilationError&) {return {};}
+      catch(const std::filesystem::filesystem_error&) {return {};}
 }
 
 AnalysisResult analyze_editor_document(const std::filesystem::path& context,const SourceOverrides& sources,

@@ -93,6 +93,14 @@ struct EditorProbe {
     unsigned operator_occurrences = 0;
 };
 struct EditorProbeFound {};
+// A second editor-only parse may recognize a small number of safe holes in
+// one open source. The ordinary analysis still owns all reported diagnostics.
+struct EditorRecovery {
+    std::string_view module;
+    std::shared_ptr<const ValidatedAnalysis> analysis;
+    bool repaired = false;
+    bool member_probe = false;
+};
 class Diagnostics {
     std::vector<Diagnostic> items;
     std::map<std::string, std::pair<std::string, std::shared_ptr<const SourceFile>>> snapshots;
@@ -102,6 +110,7 @@ class Diagnostics {
     std::vector<RelatedLocation> context;
 public:
     EditorProbe* editor = nullptr;
+    EditorRecovery* recovery = nullptr;
     struct Context {
         Diagnostics& owner;std::size_t previous;unsigned previous_depth;
         Context(Diagnostics& d,const std::vector<RelatedLocation>& locations,std::optional<unsigned> depth={}):owner(d),previous(d.context.size()),previous_depth(d.specialization_depth){d.context.insert(d.context.end(),locations.begin(),locations.end());if(depth)d.specialization_depth=*depth;}
@@ -780,6 +789,8 @@ class Parser {
     std::map<std::string,Type> substitutions;
     std::set<std::string> generic_names;
     bool instantiating=false,multiline_expression=false;
+    bool recover_editor=false;
+    unsigned editor_repairs=0;
     Function* parsing_function=nullptr;
     struct FunctionScope {Function*& active;Function* saved;FunctionScope(Function*& slot,Function& next):active(slot),saved(slot){active=&next;}~FunctionScope(){active=saved;}};
     std::vector<TypeUse> type_uses;
@@ -950,14 +961,32 @@ class Parser {
         return named_type();
     }
     void newline() { if(multiline_expression && !at("<newline>")){multiline_expression=false;return;}multiline_expression=false;need("<newline>"); }
-    std::vector<Statement> block() {
-        Depth guard(depth, source, peek(), 64);
-        need(":"); newline(); need("<indent>");
+    bool repair_available() const { return recover_editor && editor_repairs<8; }
+    bool recover_leaf_statement() {
+        if(!repair_available())return false;
+        // A dropped declaration cannot shadow a written use. For completion,
+        // only probe a member, where the omitted name cannot enter the candidate set.
+        const bool member_or_presentation=!diagnostics.editor || diagnostics.recovery->member_probe;
+        if(member_or_presentation && (at("var") || at("const")) && peek(1).kind==TokenKind::name && !reserved.contains(peek(1).text) &&
+           peek(2).text=="=" && peek(3).kind==TokenKind::newline && peek(4).kind!=TokenKind::indent &&
+           std::none_of(tokens.begin()+p+2,tokens.end(),[&](const auto& t){return t.text==peek(1).text;})) {
+            p+=4;
+        } else if(at("pass") && peek(1).kind==TokenKind::name &&
+                  peek(2).kind==TokenKind::newline && peek(3).kind!=TokenKind::indent) {
+            p+=3;
+        } else return false;
+        ++editor_repairs;
+        diagnostics.recovery->repaired=true;
+        return true;
+    }
+    std::vector<Statement> block_body() {
+        need("<indent>");
         std::vector<Statement> body;
         bool recovered = false;
         while (peek().kind != TokenKind::dedent && peek().kind != TokenKind::end) {
             if (diagnostics.full()) { p = tokens.size() - 1; break; }
             auto start = p;
+            if(recover_leaf_statement()){recovered=true;continue;}
             try { body.push_back(statement()); }
             catch (const CompilationError& e) {
                 diagnostics.add(e); recovered = true;
@@ -972,6 +1001,11 @@ class Parser {
         }
         if (body.empty() && !recovered) error(source, peek(), Code::syntax, "Expected an indented statement.");
         need("<dedent>"); return body;
+    }
+    std::vector<Statement> block() {
+        Depth guard(depth, source, peek(), 64);
+        need(":"); newline();
+        return block_body();
     }
 #include "pattern_parser.inc"
     static int precedence(const std::string& op) {
@@ -1100,7 +1134,30 @@ class Parser {
     Statement conditional(Token token) {
         Depth guard(depth, source, token, 64);
         Statement s(Statement::Kind::conditional, std::move(token));
-        s.expression = expression(); s.body = block();
+        const auto* probe=diagnostics.editor;
+        const bool typed_member=peek(2).kind==TokenKind::name && peek(3).kind==TokenKind::newline &&
+            !(probe && peek(2).text=="_void_editor_cursor_" && peek(2).offset==probe->offset);
+        const bool missing_member=repair_available() && peek().kind==TokenKind::name && peek(1).text=="." &&
+            (typed_member || peek(2).kind==TokenKind::newline || (peek(2).text==":" && peek(3).kind==TokenKind::newline));
+        if(missing_member) {
+            s.selection=std::make_unique<Expr>(Expr::Kind::name,name());
+            auto dot=take();
+            s.expression=std::make_unique<Expr>(Expr::Kind::literal,std::move(dot));
+            s.expression->type=Type::boolean;
+            if(typed_member)take();
+            accept(":");
+        } else s.expression=expression();
+        const auto& condition=*s.expression;
+        const bool incomplete_probe=repair_available() && probe && at("<newline>") &&
+            condition.kind==Expr::Kind::field && condition.token.text=="_void_editor_cursor_" &&
+            condition.token.offset==probe->offset;
+        if(missing_member || incomplete_probe) {
+            Depth block_depth(depth, source, peek(), 64);
+            ++editor_repairs;
+            diagnostics.recovery->repaired=true;
+            newline();
+            if(at("<indent>"))s.body=block_body();
+        } else s.body=block();
         if (accept("else")) {
             if (at("if")) { auto next = take(); s.otherwise.push_back(conditional(next)); }
             else s.otherwise = block();
@@ -1198,6 +1255,7 @@ public:
     }
     const auto& syntax_tokens() const { return tokens; }
     void parse(Unit& unit) {
+        recover_editor=diagnostics.recovery && diagnostics.recovery->module==unit.identity;
         auto before = diagnostics.size();
         Function application; application.token={TokenKind::name,"$application",0}; application.result=Type::i32; application.visibility="private";
         while (peek().kind != TokenKind::end) {
@@ -3931,7 +3989,10 @@ class Semantics {
             flow = return_flow; break;
         case K::conditional: {
             scopes.emplace_back();
-            try { condition(*s.expression); }
+            try {
+                if(s.selection)expression(*s.selection); // Authored receiver of an editor-only member hole.
+                condition(*s.expression);
+            }
             catch (const CompilationError& failure) { diagnostics.add(failure); }
             pattern_bindings=false;
             auto yes=sequence(s.body);scopes.pop_back();
@@ -6570,7 +6631,7 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
 
 }
 std::shared_ptr<const ValidatedAnalysis> validated_source(const SourceFile&);
-std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path&, const SourceOverrides& = {}, bool verify_disk = false,const NativeProject* = nullptr,EditorProbe* = nullptr,CPrimitiveAdmission::Owner = {},const std::string* document = nullptr);
+std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path&, const SourceOverrides& = {}, bool verify_disk = false,const NativeProject* = nullptr,EditorProbe* = nullptr,CPrimitiveAdmission::Owner = {},const std::string* document = nullptr,EditorRecovery* = nullptr);
 // This factory is the only way to construct a successful result.
 struct AnalysisAccess {
     static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry,std::vector<Diagnostic> warnings={},const std::string& context_key={},std::shared_ptr<Unit> library_scope={},ApplicationMetadata::Owner metadata={},bool native_authorized=true,std::shared_ptr<const project::LockedDependencies> dependencies={},bool editor_only=false) {
@@ -7086,7 +7147,7 @@ std::shared_ptr<const ValidatedAnalysis> validated_source(const SourceFile& sour
     validate_graph(units, identity, diagnostics);
     return AnalysisAccess::build(std::move(units), identity,diagnostics.warnings());
 }
-std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path& entry, const SourceOverrides& overrides, bool verify_disk,const NativeProject* bindings,EditorProbe* editor,CPrimitiveAdmission::Owner primitives,const std::string* document) {
+std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path& entry, const SourceOverrides& overrides, bool verify_disk,const NativeProject* bindings,EditorProbe* editor,CPrimitiveAdmission::Owner primitives,const std::string* document,EditorRecovery* recovery) {
     for (const auto& [id, source] : overrides) { (void)source; require_module_identity(id); }
     std::error_code ec;
     auto absolute = std::filesystem::absolute(entry, ec);
@@ -7094,7 +7155,7 @@ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem
     // A diagnostic anchor is needed even before the entry file can be opened.
     const auto seed=document?*document:"/" + path_utf8(location.filename());
     Unit anchor(SourceFile(path_utf8(location.parent_path()/utf8_path(seed).relative_path()), ""), "/");
-    Diagnostics diagnostics; diagnostics.editor=editor; diagnostics.bind(anchor.source,seed);
+    Diagnostics diagnostics; diagnostics.editor=editor;diagnostics.recovery=recovery;diagnostics.bind(anchor.source,seed);
     try {
     if (ec) error(anchor.source, {TokenKind::end, "", 0}, Code::import_read, "Cannot resolve the entry source path.");
     auto root = std::filesystem::canonical(absolute.parent_path(), ec);
@@ -7107,7 +7168,7 @@ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem
     // A disk read is not an atomic filesystem transaction. Re-discover paths and
     // compare exact bytes before accepting this captured graph. Overlays are frozen.
     if (verify_disk) {
-        Diagnostics check; SourceGraph again(root, check, overrides,bindings,primitives);
+        Diagnostics check;check.recovery=recovery;check.editor=editor;SourceGraph again(root, check, overrides,bindings,primitives);
         check.bind(anchor.source,seed);
         try {
             again.load(anchor, {TokenKind::path, first.identity, 0});
@@ -7140,7 +7201,8 @@ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem
         }
     }
     auto identity = first.identity;
-    return AnalysisAccess::build(std::move(graph.units), identity,diagnostics.warnings(),{}, {}, {}, true, {}, document!=nullptr);
+    if(editor && recovery)return {};
+    return AnalysisAccess::build(std::move(graph.units), identity,diagnostics.warnings(),{}, {}, {}, true, {}, document || recovery);
     } catch(const CompilationError& failure) { throw diagnostics.owned_failure(failure); }
 }
 void require_module_identity(const std::string& identity) {
@@ -7306,12 +7368,17 @@ EditorAssistance editor_assistance_impl(const std::filesystem::path& entry,const
     }
     auto frozen=overrides;frozen.insert_or_assign(module,SourceFile(source.path(),std::move(repaired)));
     EditorProbe probe{module,begin,{},operator_context,{},{},0};probe.result.begin=begin;probe.result.end=end;
+    EditorRecovery recovery{module,{}};
+    if(begin && !format_context && !operator_context) {
+        const auto previous=text.find_last_not_of(" \t",begin-1);
+        recovery.member_probe=previous!=std::string::npos && text[previous]=='.';
+    }
     try {
         if(project && document) {
             ProjectCapture repaired(project->root,frozen,project->manifest_overlays);
-            (void)validated_editor_document(repaired,module,&probe);
-        } else if(project)(void)analyze_manifest_project_impl(project->root,project_entry,frozen,project->manifest_overlays,&probe,false,discovery);
-        else (void)validated_project(entry,frozen,true,nullptr,&probe,{},document?&module:nullptr);
+            (void)validated_editor_document(repaired,module,&probe,&recovery);
+        } else if(project)(void)analyze_manifest_project_impl(project->root,project_entry,frozen,project->manifest_overlays,&probe,false,discovery,&recovery);
+        else (void)validated_project(entry,frozen,true,nullptr,&probe,{},document?&module:nullptr,&recovery);
         if(operator_context)return probe.result;
     }
     catch(const EditorProbeFound&) {

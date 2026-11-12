@@ -45,6 +45,19 @@ void libraries(){
  s.open("/src/a.void",1,"public func value() -> i32:\n    return 7\n");s.open("/src/b.void",1,"use \"./a.void\" as a\nfunc main() -> i32:\n    return a.value()\n");auto indexed=analyze(s,true);check(indexed->index()->definition_at("/src/b.void",std::string("use \"./a.void\" as a\nfunc main() -> i32:\n    return a.").size())->module=="/src/a.void","library import navigation uses declarationless root");
  s.replace("/src/b.void",2,"func read() -> i32:\n    return hidden\n");analyze(s,false);
 }
+void editor_recovery(){
+ Fixture f;const std::string id="/src/main.void";
+ const std::string good="struct game:\n    running: bool\nfunc main():\n    var player = game()\n    if player.running:\n        pass\n";
+ auto broken=good;broken.replace(broken.find("player.running:"),15,"player.");
+ f.write("src/main.void",good);vd::ToolingSession s(vd::ProjectSession{f.root});
+ s.open(id,1,broken);auto failed=analyze(s,false);
+ const auto* recovery=failed->recovery_for(id);check(recovery && !recovery->index.semantic_tokens(id).empty(),"current recovery has presentation without a selected program");
+ bool rejected=false;try{(void)recovery->program->lower();}catch(const std::invalid_argument&){rejected=true;}
+ check(rejected,"editor recovery cannot lower IR");
+ auto pending=s.select();s.replace(id,2,good);
+ check(!s.accept(vd::ToolingSession::analyze(pending)),"recovery for an earlier revision is rejected");
+ check(!analyze(s,true)->recovery_for(id),"successful analysis replaces recovered presentation");
+}
 void preflight_ownership(){
  vd::ProjectPreflight rejected;
  fs::path active;
@@ -101,4 +114,4 @@ void profiles(){
  rejected=false;try{(void)vd::project::resolve_profile(*override.manifest,{},false,true);}catch(const std::invalid_argument&){rejected=true;}check(rejected,"custom O2 debug conflicts with cache");check(!vd::project::resolve_profile(*override.manifest,{},true,true).optimize,"explicit no-opt resolves effective debug optimization");
 }
 }
-int main(){try{sessions();libraries();preflight_ownership();reload();profiles();std::cout<<"project_sessions: "<<checks<<" checks passed\n";return 0;}catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}}
+int main(){try{sessions();libraries();editor_recovery();preflight_ownership();reload();profiles();std::cout<<"project_sessions: "<<checks<<" checks passed\n";return 0;}catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 1;}}

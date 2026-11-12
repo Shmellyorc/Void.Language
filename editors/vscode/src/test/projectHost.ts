@@ -133,7 +133,14 @@ export async function run():Promise<void>{
  let passed=false;const root=process.env.VOID_TEST_ROOT!;const manifest=process.env.VOID_S3_MANIFEST!;const output=process.env.VOID_S3_HOST_EVIDENCE;let api:{ready():Promise<void>;status():{state:string;entry?:string};deactivate():Promise<void>}|undefined;
  try {
   assert(vscode.workspace.isTrusted);const toml=vscode.Uri.file(path.join(root,'void.project.toml'));let document=await vscode.workspace.openTextDocument(toml);await vscode.window.showTextDocument(document);
-  const extension=vscode.extensions.getExtension('void-language.void-language');assert(extension);api=await extension.activate();await api!.ready();
+  const extension=vscode.extensions.getExtension('void-language.void-language');assert(extension);
+  if(process.env.VOID_TEST_EXTENSIONS){
+   assert.equal(path.dirname(await fs.realpath(extension.extensionPath)),await fs.realpath(process.env.VOID_TEST_EXTENSIONS));
+   const readme=await fs.readFile(path.join(extension.extensionPath,'readme.md'),'utf8');
+   assert(readme.includes('https://github.com/Shmellyorc/Void.Language/blob/main/docs/EDITOR_INTEGRATION.md#native-aot-source-debugging'));
+   events.push('installed VSIX and its packaged README selected');
+  }
+  api=await extension.activate();await api!.ready();
   await until(()=>vscode.languages.getDiagnostics(toml),ds=>ds.some(d=>code(d)==='VOID5010'),'no-main project session opens with manifest diagnostics');assert.equal(api!.status().state,'running');assert.equal(api!.status().entry,undefined);
   const game=vscode.Uri.file(path.join(root,'src/game.void'));const main='use "./helper.void" as h\nfunc main() -> i32:\n    return h.value()\n';await vscode.workspace.fs.writeFile(game,Buffer.from(main));let source=await vscode.workspace.openTextDocument(game);await vscode.window.showTextDocument(source);
   await until(()=>api!.status().entry,p=>entryIs(p,game),'file creation selects any-name main');await until(()=>vscode.languages.getDiagnostics(toml),ds=>!ds.some(d=>code(d)==='VOID5010'),'missing-main diagnostic clears');

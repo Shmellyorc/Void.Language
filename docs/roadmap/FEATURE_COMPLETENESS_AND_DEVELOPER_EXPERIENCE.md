@@ -122,6 +122,14 @@ VOIDUP is a native VOID application and an ordinary `ALL` build target. Its priv
 
 **PARTIAL.** Boss reproduced an open `app.void` with incomplete semantic highlighting and IntelliSense until `main.void` imported it with `use`. Every opened VOID source needs compiler-owned analysis of its current buffer, including semantic tokens, completion, hover, constructor signatures, definitions, validated formatting and diagnostics. Keep this analysis outside the selected execution graph, with the existing import, dependency and visibility rules. Verify the original reproduction before and after adding `use`, and exercise malformed buffers, project switches and closure to confirm results stay current. [Compiler tooling](../../src/frontend/tooling.cpp) · [LSP](../../src/lsp/main.cpp) · [VS Code project host](../../editors/vscode/src/test/projectHost.ts)
 
+### P1 — G14 · Editor intelligence during incomplete edits
+
+Boss reproduced a loss of IntelliSense and semantic highlighting while typing
+`if game.` inside a nested TestGame condition. Completion must resolve the
+receiver in its current lexical scope, retain accessible members and preserve
+ordinary diagnostics and validated source roles as the buffer changes.
+[G14 implementation and qualification](#g14-editor-intelligence-recovery-and-vsix-packaging)
+
 ### P1 — G03 · Debug information and source debugging
 
 **PARTIAL** emission, **MISSING** a supported source debugging workflow. Explicit `line` and `full` requests only warn today. Define the concrete object/executable symbol contract for the first native AOT lane and decide which requests remain unsupported for JIT. Carry the approved mode through provenance and compilation, preserve current implicit quiet defaults and native resource admission, and use existing platform debugger interfaces for launch/attach. Verify emitted sections and linked symbols with the pinned SDK, then demonstrate breakpoints, stepping, a representative local value, and attach/normal termination on the claimed Linux/Windows hosts. Treat optimized-out values and relocated paths as explicit checks. [Existing profile fixture](../../tests/project/profiles.py) · [LLVM metadata](../../src/backend/llvm/backend.cpp) · [IDE/debugger proposal](../PROJECT_ARCHITECTURE_ROADMAP.md#proposed-ide-and-public-usability-milestones)
@@ -403,3 +411,129 @@ Linux temporary filesystem rose from 16,528,011,264 to 16,553,705,472 bytes.
 - Compiler fixtures — `tests/project/native_debug.py`, `tests/project/profiles.py`, `tests/project/sessions.cpp`.
 - VS Code integration and fixtures — `editors/vscode/package.json`, `editors/vscode/src/extension.ts`, `editors/vscode/src/test/debugHost.ts`, `editors/vscode/src/test/runDebugHost.ts`.
 - Documentation — `docs/CLI.md`, `docs/EDITOR_INTEGRATION.md`, `docs/FIRST_PROGRAM.md`, `docs/roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md`, `editors/vscode/README.md`.
+
+## G14 editor intelligence recovery and VSIX packaging
+
+Baseline `6ef25f38644b326a398bb334ba0da4954d57ca4c`. The original
+two-file TestGame source works after completing `if game.is_running:`.
+The deliberate `if game.` edit reports `VOID1102` at line 15, column 21
+and `VOID1101` at the following indent. The baseline returned seven
+completion labels, 25 semantic tokens, hover and the initializer
+definition before the edit. During the edit it returned zero completion
+items, zero semantic tokens and no hover or definition. Completing the
+condition restored the original results. Real VS Code 1.141.0 rendered
+semantic color before the edit and failed to show the property suggestion
+after the edit, consistent with the protocol results.
+[Exact TestGame fixture](../../tests/lsp/fixtures/editor_recovery/main.void)
+
+The compiler's completion probe inserted a member name at the cursor,
+but the parser still required the condition's colon and block before
+the semantic checker could reach the receiver. Separately, the failed
+project graph supplied no index for semantic tokens, hover or definition.
+The editor parser now admits an unfinished member in an `if` header
+without guessing the member or its type. It checks the authored receiver
+in the existing lexical scope and uses the ordinary member resolver for
+completion. The current snapshot can also supply read-only presentation
+from a separately checked graph. The parser retains the original source
+offsets, applies at most eight supported repairs per parse and leaves
+the ordinary parser and diagnostics on the normal validation path.
+The presentation graph cannot lower IR or become the selected project.
+Formatting, rename and references still require ordinary validated
+analysis. Revision, close and project selection guards also apply to
+recovered presentation.
+
+The supported recovery covers a simple receiver and a missing or
+partially typed member at the end of an `if` header. It can also discard
+a malformed leaf `pass` statement or a bare initializer hole for a
+local with no subsequent written use. When an error can change a live
+binding, import authority or project selection, ordinary validation still
+withholds the affected presentation. The source protocol fixture exercises
+an invalid receiver, a shadowing incomplete declaration, inaccessible
+fields and methods, an undeclared package, stale versions, document closure,
+reselection and UTF-16 positions in nested `if`, `else`, `for` and
+`match` scopes. It also verifies that the original errors still fail
+`voidc check`. The real workbench test observes the rendered completion
+widget and the semantic color on a newly named dirty local. The project
+host retains the Batch 1 unreferenced-source checks.
+[Protocol regression](../../tests/lsp/editor_recovery.py) · [Workbench regression](../../editors/vscode/src/test/recoveryHost.ts)
+
+The baseline `npm run package` exited 1 because vsce could not rewrite
+the Batch 2 relative debugger link from the packaged README. The repaired
+README uses full repository URLs for its documentation. The packaging
+command and extension metadata retain the existing configuration. The
+README link unit test catches repository-relative links and the installed
+project host verifies the actual archive's README. On Linux, `npm ci`,
+`npm run package` and `npm test` passed with Node 24.19.0. The resulting
+`void-language-0.1.0.vsix` passed the ZIP CRC and eight-member inventory
+checks. VS Code installed it in a disposable profile and activated that
+copy in the project host. The installation recipe reports the failing
+stage's exit status and stops before installing if preparation fails.
+The generic package uses a separately built matching `voidls` for G14.
+The link regression failed with the baseline README. A controlled package
+exit of 17 printed that status and left the interactive shell running.
+`npm ci` reported six audit findings in the existing lockfile.
+The Windows packaging run also passed with Node 24.19.0 and produced the
+eight-file archive. The Windows installed-project fixture locates the
+versioned editor CLI from the stock launcher and tests the package in
+an isolated extension directory.
+[Build and installation](../EDITOR_INTEGRATION.md#build-development-host-and-local-installation)
+
+The focused CTest selector covered `project_sessions`, `project_protocol`,
+`lsp_semantic_tokens`, `lsp_editor_recovery`, `lsp_stage10_intelligence`,
+`lsp_stage10_source_formatting` and `numeric_enum_lsp`. The editor used
+VS Code 1.141.0 and its dedicated recovery, semantic, constructor and
+installed project hosts. The project host exercised Check, Build and
+Run in each compiler profile and passed 36 checks per Linux run.
+
+| Native configuration | CTest | VS Code hosts |
+| --- | --- | --- |
+| PikaOS 4 x64 Debug | 7/7, 17.70 s | Recovery, semantic, constructor and installed project passed |
+| PikaOS 4 x64 Release | 7/7, 2.81 s | Recovery, semantic, constructor and installed project passed |
+| Windows 10 Home x64, 10.0.19045.6466 Debug | 7/7, 44.04 s | Recovery, semantic, constructor and installed project passed |
+| Windows 10 Home x64, 10.0.19045.6466 Release | 7/7, 14.65 s | Recovery, semantic, constructor and installed project passed |
+
+The installed Windows project host also passed 36 checks per profile.
+All eight extension unit checks passed against both compiler profiles
+on both hosts.
+
+PikaOS strict RelWithDebInfo passed all seven CTests in 23.69 seconds with
+`ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`.
+The first strict run had used an object compiled before the typed-prefix
+case was implemented and failed that case. Rebuilding the affected
+translation unit and relinking produced the final 7/7 result.
+The existing Linux Debug LLDB DAP host also passed with extension 0.4.1
+and pinned `lldb-dap`. It exercised missing-adapter rejection, a source
+breakpoint, a step, local inspection and normal exit.
+
+The Windows SDK bootstrap initially stalled in the system archive reader
+before extraction. Python extracted the same SHA-256-verified LLVM 23.1.4
+SDK successfully. Both native Windows profiles used the pinned provider
+receipts and private test roots.
+
+From a configured native build, set `build_dir` to its path.
+
+```sh
+ctest --test-dir "$build_dir" --no-tests=error --output-on-failure \
+  -R '^(project_sessions|project_protocol|lsp_semantic_tokens|lsp_editor_recovery|lsp_stage10_intelligence|lsp_stage10_source_formatting|numeric_enum_lsp)$'
+```
+
+From `editors/vscode`, set `VOIDLS_PATH` and `VSCODE_EXECUTABLE_PATH` to the
+matching native server and editor. Build the extension and run
+`node out/test/runSemanticHost.js --recovery` with a free local
+`VOID_TEST_CDP_PORT`. Omit the switch for the semantic suite or pass
+`--constructor` for the constructor suite. To test the installed archive,
+set `VOID_TEST_VSIX` to the packaged VSIX and `VOID_TEST_PROJECT_TASKS` to
+the selected profile, then run `node out/test/runProjectHost.js`.
+
+The disposable workspaces and transfer files were removed after
+qualification. Free space in the Windows guest rose from 5,537,140,736
+to 13,675,732,992 bytes. The final generic VSIX is retained in the
+extension's ignored `dist` directory.
+
+### Changed-file inventory
+
+- Compiler and session — `include/void/frontend.hpp`, `include/void/tooling.hpp`, `src/frontend/compiler.cpp`, `src/frontend/project_selection.inc`, `src/frontend/tooling.cpp`, `src/lsp/main.cpp`.
+- Compiler verification — `CMakeLists.txt`, `tests/lsp/editor_recovery.py`, `tests/lsp/fixtures/editor_recovery/app.void`, `tests/lsp/fixtures/editor_recovery/main.void`, `tests/lsp/fixtures/editor_recovery/void.project.toml`, `tests/project/sessions.cpp`.
+- VS Code verification — `editors/vscode/src/test/config.test.ts`, `editors/vscode/src/test/projectHost.ts`, `editors/vscode/src/test/recoveryHost.ts`, `editors/vscode/src/test/runProjectHost.ts`, `editors/vscode/src/test/runSemanticHost.ts`.
+- Documentation — `docs/EDITOR_INTEGRATION.md`, `docs/roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md`, `editors/vscode/README.md`.

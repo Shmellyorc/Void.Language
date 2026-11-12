@@ -23,6 +23,16 @@ graph. Those buffers have editor analysis without contributing executable
 inputs or authorizing a dependency. Automatic entry discovery still follows
 the manifest's saved source inventory and its existing syntax checks.
 
+### Assistance during incomplete edits
+
+While typing a member in an `if` condition, the compiler can still resolve the
+receiver and offer its accessible fields, properties and methods. Supported
+incomplete statements can retain semantic highlighting, hover and navigation
+from the current buffer while their diagnostics remain visible. Formatting and
+rename require ordinary validated analysis. Broken imports, ambiguous project
+selection and edits that leave a receiver or binding unresolved can withhold
+assistance until the source is repaired.
+
 ## Native AOT source debugging
 
 Set `debug_info = "full"` under `[build.debug]` in `void.project.toml`.
@@ -446,16 +456,17 @@ projects are unsupported. Remote editor scenarios were not locally verified.
 
 ## Build, development host and local installation
 
-From `editors/vscode/`:
+From `editors/vscode/`, using Node 24.19.0 and the locked dependencies:
 
 ```sh
-npm ci
-npm test
-npm run package
-code --install-extension dist/void-language-0.1.0.vsix
-# Or:
-codium --install-extension dist/void-language-0.1.0.vsix
+if npm ci && npm run package && code --install-extension dist/void-language-0.1.0.vsix; then
+  printf '%s\n' 'VOID extension installed.'
+else
+  printf 'VOID setup stopped with exit status %s. See the failing command above.\n' "$?" >&2
+fi
 ```
+
+For VSCodium, use `codium` in place of `code`.
 
 `npm test` type-checks strictly, compiles TypeScript, bundles the language client
 with esbuild and runs configuration/executable/path tests. Packaging repeats the

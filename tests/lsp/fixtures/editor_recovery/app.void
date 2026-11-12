@@ -1,0 +1,24 @@
+use random
+
+struct app:
+    score: i32
+    value: i32
+    tries: i32
+    running: bool
+
+property (a app) is_running: bool:
+    get:
+        return a.running
+
+func (a app) init():
+    a.value = rand_i32(1, 10)
+    a.score = 0
+    a.tries = 3
+
+func (a app) game_over():
+    a.running = false
+
+func (a app) reset():
+    a.score = 0
+    a.tries = 3
+    a.value = rand_i32(1, 10)
