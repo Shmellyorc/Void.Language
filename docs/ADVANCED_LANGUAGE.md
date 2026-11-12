@@ -69,6 +69,33 @@ The editor reports the written type and completed member as separate semantic
 roles. Payload constructors still require their arguments, and payload patterns
 still require the correct subpatterns. [Editor behavior](EDITOR_INTEGRATION.md#enum-member-completion)
 
+### Enum case tests and imports
+
+Use `is` to test one enum case and `match` to dispatch across cases.
+Ordinary tagged enums, including payload-free `console.key`, have no
+built-in `==` or `!=` comparison. An enum pattern can also bind a case's payload.
+
+```void
+use console
+
+func is_up(pressed: console.key_event) -> bool:
+    return pressed.key is console.key.up
+
+func direction(pressed: console.key_event) -> string:
+    match pressed.key:
+        console.key.up:
+            return "w"
+        _:
+            return ""
+```
+
+With `use console`, `key.up` also resolves through the imported type name.
+With `use console as term`, spell the qualified case `term.key.up`.
+An exhaustive enum match can list every case explicitly. Use a final `_:`
+arm to handle all remaining values. A return after a partial statement match
+leaves the match itself incomplete and can still produce warning `VOID2021`.
+[Adventure source and diagnostic probes](developer-experience/G17_ASCII_ADVENTURE.md#language-and-diagnostic-findings)
+
 ## Multiple return values
 
 ```python

@@ -250,6 +250,20 @@ and misuse tests. New native signatures or reload scope need ABI and
 owner/generation lifetime negatives in JIT and independently linked AOT where
 applicable. [Language boundaries](../LANGUAGE_BIBLE.md) · [Native bridge](../../include/void/c_primitive.hpp) · [Host tests](../../tests/host_capabilities) · [FFI controls](../../tests/ffi)
 
+### G17 · Real application developer experience
+
+**IN PROGRESS pending independent Golden Wrench review.** Reproduce the
+three supplied five-module ASCII Adventure revisions before correction.
+Qualify a maintained version with the existing enum patterns, structured
+console input and scoped terminal ownership. Deterministic gameplay and
+real keyboard input have separate controls. The review does not authorize
+enum equality or changes to the terminal subsystem.
+[Executable game](../../examples/ascii_adventure/README.md) · [Qualification](../developer-experience/G17_ASCII_ADVENTURE.md)
+
+G00-A was independently reviewed at `d453195bfcbd34db211f4dddd8fa0832acbf8733`.
+Its public distribution HOLD, G08 performance and Windows cache HOLDs, and
+the deferred integrated seven-job gate remain. [Readiness audit](../release/G00_READINESS_AUDIT.md)
+
 ## 6. First three proposed implementation batches
 
 ### Batch 1 — Reliable project check, build and run from the editor

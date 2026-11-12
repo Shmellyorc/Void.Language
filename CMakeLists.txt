@@ -496,6 +496,11 @@ if(BUILD_TESTING)
   set_tests_properties(project_nested_cli PROPERTIES TIMEOUT 180)
   add_test(NAME cli_contract COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/cli/contract.py" "$<TARGET_FILE:voidc>")
   set_tests_properties(cli_contract PROPERTIES TIMEOUT 180)
+  if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR WIN32)
+    add_test(NAME ascii_adventure COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/cli/ascii_adventure.py" "$<TARGET_FILE:voidc>" "$<TARGET_FILE_DIR:voidc>/void-native.txt")
+    set_tests_properties(ascii_adventure PROPERTIES TIMEOUT 1200)
+  endif()
   add_test(NAME cli_install COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/cli/install.py"
     "${CMAKE_COMMAND}" "${CMAKE_CURRENT_BINARY_DIR}" "$<CONFIG>")
   set_tests_properties(cli_install PROPERTIES TIMEOUT 240)

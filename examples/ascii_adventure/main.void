@@ -1,0 +1,16 @@
+use console
+use os
+use "./game.void" as game
+
+func main() -> i32:
+    match os.args():
+        Err(var failure):
+            print(failure.message, file = console.stderr)
+            return 2
+        Ok(var arguments):
+            if arguments.count == 0:
+                return game.run()
+            if arguments.count == 1 and arguments[0] == "--line":
+                return game.play(true)
+    print("Usage: ascii-adventure [--line]", file = console.stderr)
+    return 2

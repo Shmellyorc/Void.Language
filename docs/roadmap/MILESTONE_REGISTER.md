@@ -1,7 +1,8 @@
 # VOID developer experience milestone register
 
-Current assignment is Batch 14, G00-A feature completeness and distribution
-readiness audit, starting from `afe14d4c0cd7fd0576ecc194a38c294d7e54ec0a`.
+Current assignment is Batch 15, G17 real application developer experience
+and ASCII Adventure qualification, starting from
+`d453195bfcbd34db211f4dddd8fa0832acbf8733`.
 Batch entries below identify the integration commits and qualification scopes.
 Boss controls integration, hosted qualification and public release.
 [Feature roadmap](FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md)
@@ -24,12 +25,13 @@ Boss controls integration, hosted qualification and public release.
 | 11 · G10 | `ceefd3f9a75257756cb8ab476868731e4359dcca` | **INTEGRATED.** Bounded monotonic sleep and structured cancellation/drain. Local PikaOS Debug/Release/strict and Windows 10 Debug/Release. General deadline composition and async queue/backpressure remain deferred. [Qualification](../ASYNC.md#g10-monotonic-timers) |
 | 12 · G11 | `79f212f2907b3fb5eeeabebb0aa8fa5705b82c86` | **INTEGRATED.** Real Windows managed raylib and D5 headless execution. The separate G5 retained-callback fixture passed within its contract. The retained raylib callback remains on HOLD. macOS managed native and D5 remain unsupported. Signed App Sandbox remains unverified. [Qualification](../projects/G11_WINDOWS_MANAGED_NATIVE_QUALIFICATION.md) |
 | 13 · G12 | `afe14d4c0cd7fd0576ecc194a38c294d7e54ec0a` | **INTEGRATED / INDEPENDENT SOURCE REVIEW COMPLETE.** Bounded deterministic stored ZIP with G06 publication. Both archive tests passed on PikaOS Debug/Release/strict and Windows 10 Debug/Release. The unrelated Windows file-symlink control remains open. [Qualification](../archive/ZIP_EXPORT.md) |
+| 14 · G00-A | `d453195bfcbd34db211f4dddd8fa0832acbf8733` | **AUDIT INTEGRATED / INDEPENDENT REVIEW COMPLETE.** The distribution HOLD and deferred seven-job project/raylib gate remain. [Readiness audit](../release/G00_READINESS_AUDIT.md) |
 
 ## Current and upcoming
 
 | Milestone | Status and next evidence |
 | --- | --- |
-| 14 · G00-A | **AUDIT IN PROGRESS pending independent Golden Wrench review.** Reconciles source, native qualification and distribution blockers. [Readiness audit](../release/G00_READINESS_AUDIT.md) |
+| 15 · G17 | **IN PROGRESS pending independent Golden Wrench review.** Qualify the supplied ASCII Adventure and document reproduced application and terminal issues. [Qualification](../developer-experience/G17_ASCII_ADVENTURE.md) |
 | G00 · Production distribution | Conditional on release authorization. Public bootstrap, distribution and platform obligations remain tracked in the release record. [Preview blockers](../release/PREVIEW_BLOCKERS.md) |
 
 ## Hosted acceptance

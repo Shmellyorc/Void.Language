@@ -13,6 +13,32 @@ Implementation, examples and executed coverage are reconciled in
 native evidence remain open. Stage 10 is not locked. Earlier dated research and
 progress statements below retain their historical meaning.
 
+## Choosing key or line input
+
+Use `console.stdin.capabilities()` for the actual input endpoint.
+`read_key()` can provide immediate input on a supported terminal using
+its own temporary noncanonical/no-echo mode. It restores that mode
+when the read returns. Use `begin_mode(echo = false, line_input = false)`
+and `with session` to keep that mode across a full game or menu, including
+redraws between reads. The default preserves OS interrupt handling.
+`session.close()` lets an application check restoration explicitly.
+Scope cleanup covers supported exit paths. Forced process termination
+can prevent cleanup.
+
+Handle the returned `key_event.key` with `is` or `match`. Ignore a release
+only when `key_down_known` is true and `key_down` is false. POSIX key
+sequences typically do not carry physical direction metadata. Use
+`stdout.capabilities().clear` before clearing and flush prompts or complete
+frames before waiting for input. Redirected output can use plain frames.
+
+For scripts or redirected input, select a line-input path explicitly.
+`stdin.read_line()` returns `Ok(text(...))`, `Ok(eof)` or a structured
+`Err`. The convenience `console.readline()` collapses empty text, EOF and
+recoverable failures to an empty string. Use the structured endpoint when
+those outcomes matter. `read_key()` refuses redirected stdin, and its
+terminal EOF is a checked `closed` error.
+[Executable Adventure](../../examples/ascii_adventure/README.md) · [Native terminal evidence](../developer-experience/G17_ASCII_ADVENTURE.md#terminal-behavior)
+
 ## Boss authorization — 21 October 2026
 
 Boss approved implementation of the entire 44-step Stage 10 mission, B1–B4,

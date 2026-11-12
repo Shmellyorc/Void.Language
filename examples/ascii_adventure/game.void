@@ -1,0 +1,127 @@
+use console
+use "./world.void" as world
+use "./player.void" as player
+use "./renderer.void" as renderer
+
+private value struct progress:
+    current: player.hero
+    first_collected: bool = false
+    second_collected: bool = false
+    turns: i32 = 0
+    status: string = "Collect both treasures ($), then reach the exit (X)."
+
+private enum player_command:
+    move(text: string)
+    ignored
+    finished
+
+# Both input paths use the same terminal-independent movement rules.
+private func advance(previous: progress, command: string) -> progress:
+    var next = previous
+    if not player.is_move(command):
+        next.status = "Unknown command. Use the controls shown above."
+        return next
+
+    var target_x = player.next_x(next.current, command)
+    var target_y = player.next_y(next.current, command)
+    if not world.can_enter(target_x, target_y):
+        next.status = "A wall blocks your path!"
+        return next
+    if world.tile(target_x, target_y) == "X" and not (next.first_collected and next.second_collected):
+        next.status = "The exit is locked! Collect both treasures first."
+        return next
+
+    next.current = player.hero(x = target_x, y = target_y)
+    next.turns += 1
+    next.status = "Explore the dungeon."
+    if target_x == 3 and target_y == 5 and not next.first_collected:
+        next.first_collected = true
+        next.status = "You collected the first treasure!"
+    if target_x == 6 and target_y == 9 and not next.second_collected:
+        next.second_collected = true
+        next.status = "You collected the second treasure!"
+    return next
+
+private func read_line_command() -> result<player_command, console.io_error>:
+    var prompted = console.stdout.write("Command> ")?
+    var flushed = console.stdout.flush()?
+    match console.stdin.read_line()?:
+        console.text_read.text(var line):
+            return Ok(player_command.move(line))
+        console.text_read.eof:
+            return Ok(player_command.finished)
+
+private func read_key_command() -> result<player_command, console.io_error>:
+    match console.stdin.read_key():
+        Err(var failure):
+            if failure.kind is console.io_error_kind.closed:
+                return Ok(player_command.finished)
+            return Err(failure)
+        Ok(var pressed):
+            if pressed.key_down_known and not pressed.key_down:
+                return Ok(player_command.ignored)
+            match pressed.key:
+                console.key.up:
+                    return Ok(player_command.move("w"))
+                console.key.down:
+                    return Ok(player_command.move("s"))
+                console.key.left:
+                    return Ok(player_command.move("a"))
+                console.key.right:
+                    return Ok(player_command.move("d"))
+                console.key.escape:
+                    return Ok(player_command.move("q"))
+                console.key.character:
+                    return Ok(player_command.move(pressed.character))
+                _:
+                    return Ok(player_command.move(""))
+
+private func next_command(line_mode: bool) -> result<player_command, console.io_error>:
+    if line_mode:
+        return read_line_command()
+    return read_key_command()
+
+func play(line_mode: bool) -> i32:
+    var state = progress(current = player.start())
+    renderer.draw(state.current, state.first_collected, state.second_collected, state.turns, state.status, line_mode)
+    for:
+        match next_command(line_mode):
+            Err(var failure):
+                print("Console input failed: {failure.message}", file = console.stderr)
+                return 2
+            Ok(var action):
+                match action:
+                    player_command.finished:
+                        print("Input closed. Goodbye!")
+                        return 0
+                    player_command.ignored:
+                        # A reported key release produces no move or redraw.
+                        pass
+                    player_command.move(var command):
+                        if command == "q" or command == "Q":
+                            print("Goodbye!")
+                            return 0
+                        state = advance(state, command)
+                        if world.tile(state.current.x, state.current.y) == "X":
+                            renderer.draw(state.current, state.first_collected, state.second_collected, state.turns, "Dungeon complete!", line_mode)
+                            print("VICTORY! You escaped the dungeon in {state.turns} moves!")
+                            return 0
+                        renderer.draw(state.current, state.first_collected, state.second_collected, state.turns, state.status, line_mode)
+
+func run() -> i32:
+    var terminal = console.stdin.capabilities()
+    if not terminal.key_input or not terminal.input_modes:
+        print("Keyboard input needs an interactive terminal. Use --line for line input.", file = console.stderr)
+        return 2
+
+    match console.stdin.begin_mode(echo = false, line_input = false):
+        Err(var failure):
+            print("Could not enable immediate keyboard input: {failure.message}", file = console.stderr)
+            return 2
+        Ok(var session):
+            with session:
+                var status = play(false)
+                if session.close() is Err(var failure):
+                    print("Could not restore terminal input mode: {failure.message}", file = console.stderr)
+                    return 2
+                return status
