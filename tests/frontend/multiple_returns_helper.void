@@ -1,0 +1,8 @@
+public func sample(flag: bool) -> (accepted: bool, score: i64, ratio: f64, message: string):
+    if flag:
+        return true, 4294967297, 2.5d, "pass"
+    else:
+        return false, -3, 0.25d, "reject"
+
+public func echo<t>(input: t) -> (value: t, ready: bool):
+    return input, true

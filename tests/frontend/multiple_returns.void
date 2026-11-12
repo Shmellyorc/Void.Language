@@ -1,0 +1,92 @@
+use "./multiple_returns_helper.void" as helper
+
+struct state:
+    trace: i32
+
+func mark(s: state, digit: i32) -> i32:
+    s.trace = s.trace * 10 + digit
+    return s.trace
+
+func ordered(s: state) -> (i32, i32):
+    defer mark(s, 3)
+    return mark(s, 1), mark(s, 2)
+
+struct cell:
+    text: string
+
+value struct record:
+    link: cell
+    delta: f32
+
+func allocate() -> string:
+    var n = 0
+    var last = ""
+    for n < 5000:
+        var garbage = cell(text = "garbage {n}")
+        last = garbage.text
+        n += 1
+    return last
+
+func lifetime() -> (record, string, string):
+    return record(link = cell(text = "kept " + string(7)), delta = 1.25), "text " + string(3), allocate()
+
+value struct counter:
+    current: i32
+
+func (c counter) advance<t>(tag: t) -> (previous: i32, next: i32, label: t):
+    var previous_value = c.current
+    c.current += 1
+    return previous_value, c.current, tag
+
+interface readable:
+    func inspect() -> (i32, string)
+
+struct base:
+    number: i32
+
+virtual func (b base) inspect() -> (number: i32, text: string):
+    return b.number, "base"
+
+struct derived extends base:
+    label: string
+
+override func (d derived) inspect() -> (i32, string):
+    var inherited, text = super.inspect()
+    return inherited + 1, text + d.label
+
+func single(value: i32) -> (result<i32, string>):
+    return Ok(value + 1)
+
+func main() -> i32:
+    const passed, score, ratio, message = helper.sample(true)
+    var rejected, penalty, remainder, failure = helper.sample(false)
+    if not passed or score != 4294967297 or ratio != 2.5d or message != "pass":
+        return 1
+    if rejected or penalty != -3 or remainder != 0.25d or failure != "reject":
+        return 2
+    var s = state()
+    var first, second = ordered(s)
+    if first != 1 or second != 12 or s.trace != 123:
+        return 3
+    var c = counter(current = 10)
+    var old, new, label = c.advance("counter")
+    if old != 10 or new != 11 or c.current != 11 or label != "counter":
+        return 4
+    var kept, text, last = lifetime()
+    var copy, ready = helper.echo(kept)
+    if not ready or text != "text 3" or copy.delta != 1.25 or copy.link.text != "kept 7" or last != "garbage 4999":
+        return 5
+    var owner = derived(number = 7, label = "d")
+    var parent: base = owner
+    var reader: readable = owner
+    var from_virtual, virtual_label = parent.inspect()
+    var from_interface, interface_label = reader.inspect()
+    if from_virtual != 8 or from_interface != 8 or virtual_label != "based" or interface_label != virtual_label:
+        return 6
+    if single(first) is Ok(var next):
+        var closure: func() -> (i32) = func() -> (i32):
+            return first + second + next
+        if closure() == 15:
+            print("Multiple returns verified")
+            return 0
+    return 7

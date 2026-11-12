@@ -33,6 +33,15 @@ rename require ordinary validated analysis. Broken imports, ambiguous project
 selection and edits that leave a receiver or binding unresolved can withhold
 assistance until the source is repaired.
 
+### Multiple return signatures
+
+Hover, callable completion and signature help show the complete return
+list, such as `(valid: bool, message: string)` or `(bool, string)`.
+Named return labels receive declaration highlighting. Destructured locals
+have their inferred component types in completion and hover, with ordinary
+Go to Definition. The language server derives all of these from the current
+compiler analysis, including supported unsaved edits.
+
 ## Native AOT source debugging
 
 Set `debug_info = "full"` under `[build.debug]` in `void.project.toml`.
@@ -239,9 +248,10 @@ authorized while repository licensing remains UNLICENSED.
 ### Plain documentation and popup policy
 
 [The compiler contract](DOCUMENTATION_HOVER.md) applies equally to automatic and
-manual signature requests. Only the active documented parameter supplies prose;
-an undocumented argument closes/suppresses help. Hover/completion shows callable
-description and applicable return text, with no parameter descriptions or raw tags.
+manual signature requests. Only the active documented parameter supplies prose.
+An undocumented argument closes ordinary signature help. Constructors and
+multiple-return functions can still show the compiler's signature label.
+Hover and completion show the callable description and applicable return text.
 
 VS Code uses its existing null-result dismissal path. The Neovim Ctrl-K mapping
 owns a signature float because the builtin command leaves old floats open on null.

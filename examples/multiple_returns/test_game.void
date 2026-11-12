@@ -1,0 +1,23 @@
+use convert
+use os
+
+func process_value(data: string) -> (valid: bool, message: string):
+    match convert.parse<i32>(data):
+        Err(_):
+            return false, "Invalid number"
+        Ok(var number):
+            if number < 1 or number > 10:
+                return false, "Number outside the allowed range"
+            return true, ""
+
+func main() -> i32:
+    if os.args() is Ok(var arguments):
+        if arguments.count == 1:
+            var valid, message = process_value(arguments[0])
+            if valid:
+                print("Accepted")
+                return 0
+            print(message)
+            return 1
+    print("Usage: test_game <number>")
+    return 2

@@ -543,8 +543,11 @@ class Server {
                 :manifest_mode?vd::project_editor_assistance(requested_root,snapshot.entry_override(),overlays,snapshot.manifests(),module,*offset,snapshot.discovery())
                 :vd::editor_assistance(entry_path,overlays,module,*offset);
             if(method=="textDocument/signatureHelp") {
-                if(assistance.signature.empty() || assistance.active_parameter>=assistance.parameters.size())return nullptr;
-                if(!assistance.constructor_signature && (assistance.active_parameter>=assistance.parameter_documentation.size() || assistance.parameter_documentation[assistance.active_parameter].empty()))return nullptr;
+                if(assistance.signature.empty())return nullptr;
+                const bool no_parameters=assistance.multiple_return_signature && assistance.parameters.empty();
+                if(!no_parameters && assistance.active_parameter>=assistance.parameters.size())return nullptr;
+                if(!assistance.constructor_signature && !assistance.multiple_return_signature &&
+                   (assistance.active_parameter>=assistance.parameter_documentation.size() || assistance.parameter_documentation[assistance.active_parameter].empty()))return nullptr;
                 j::Array parameters;for(std::size_t n=0;n<assistance.parameters.size();++n) {
                     j::Object parameter{{"label",assistance.parameters[n]}};
                     if(n==assistance.active_parameter && n<assistance.parameter_documentation.size() && !assistance.parameter_documentation[n].empty()) {
@@ -553,7 +556,9 @@ class Server {
                     }
                     parameters.push_back(std::move(parameter));
                 }
-                return j::Object{{"signatures",j::Array{j::Object{{"label",assistance.signature},{"parameters",std::move(parameters)}}}},{"activeSignature",0},{"activeParameter",assistance.active_parameter}};
+                j::Object help{{"signatures",j::Array{j::Object{{"label",assistance.signature},{"parameters",std::move(parameters)}}}},{"activeSignature",0}};
+                if(!no_parameters)help["activeParameter"]=assistance.active_parameter;
+                return help;
             }
             j::Array items;for(const auto& c:assistance.candidates)items.push_back(j::Object{{"label",c.name},{"kind",c.kind},{"detail",c.detail},{"documentation",c.documentation},
                 {"textEdit",j::Object{{"range",range({std::make_shared<const vd::SourceFile>(*source),module,assistance.begin,assistance.end})},{"newText",c.insert_text.empty()?c.name:c.insert_text}}}});

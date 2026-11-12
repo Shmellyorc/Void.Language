@@ -47,8 +47,9 @@ void diagnostics() {
         "pass syntax recovery lost later function or location");
     rejects("interface idle:\n    func wait():\n        pass\n", "end of statement");
     rejects("interface idle:\n    pass\n", "func");
-    rejects("func entry(x: i32) -> i32:\n    return x\n  return 2\n", "Indentation", "3:3");
-    rejects("func entry(x: i32) -> i32:\n\treturn x\n", "Tabs", "2:1");
+    rejects("func entry(x: i32) -> i32:\n    return x\n  return 2\n", "Indentation does not match an enclosing block.", "3:3");
+    rejects("func entry(x: i32) -> i32:\n\t return x\n", "Mixed tabs and spaces in source indentation.", "2:2");
+    rejects("func entry(x: i32) -> i32:\n\tpass\n    return x\n", "Inconsistent tabs and spaces in an enclosing block.", "3:1");
     rejects("func entry(x: i32) -> i32:\nreturn x\n", "indented block", "2:1");
     rejects("func entry(x: i32) -> i32:\n    return @\n", "Unexpected character", "2:12");
     rejects("func entry(x: i32) -> i32:\n    return missing\n", "Unknown identifier", "2:12");
@@ -110,6 +111,14 @@ void diagnostics() {
     std::cout << "50+ source diagnostic cases and UTF-8/ABI checks passed\n";
 }
 void programs(const std::filesystem::path& root) {
+    run("func entry(x: i32) -> i32:\n"
+        "\tif x > 0:\n"
+        "\t\treturn x\n"
+        "\treturn 0\n", {{-1,0},{3,3}});
+    run("func entry(x: i32) -> i32:\n"
+        "    if x > 0:\n"
+        "        return x\n"
+        "    return 0\n", {{-1,0},{3,3}});
     run("interface idle:\n    func wait()\nstruct worker:\nfunc (w worker) init():\n    pass\nfunc (w worker) wait():\n    pass\nfunc entry(x: i32) -> i32:\n    var w = worker()\n    var i: idle = w\n    i.wait()\n    pass\n    return x\n", {{0,0},{9,9}});
     vd::Jit jit;
     for (auto file : {"architecture.void", "loops.void", "functions.void", "pass.void"}) {

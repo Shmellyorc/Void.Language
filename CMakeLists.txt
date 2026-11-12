@@ -477,6 +477,9 @@ if(BUILD_TESTING)
   add_test(NAME lsp_editor_recovery COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/lsp/editor_recovery.py" "$<TARGET_FILE:voidls>" "$<TARGET_FILE:voidc>")
   set_tests_properties(lsp_editor_recovery PROPERTIES TIMEOUT 180)
+  add_test(NAME lsp_multiple_returns COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/lsp/multiple_returns.py" "$<TARGET_FILE:voidls>")
+  set_tests_properties(lsp_multiple_returns PROPERTIES TIMEOUT 180)
   void_add_output_test(project_nested_cli "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/project/nested.py" "$<TARGET_FILE:voidc>"
     "@VOID_TEST_OUTPUT@/project-nested-evidence.json")
@@ -1829,6 +1832,10 @@ if(BUILD_TESTING)
   if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(legacy_aot_host_libraries ${VOID_HOST_LINK_FILES})
   endif()
+  add_test(NAME multiple_returns COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/frontend/multiple_returns.py" "$<TARGET_FILE:voidc>"
+    "$<TARGET_FILE_DIR:voidc>/void-native.txt")
+  set_tests_properties(multiple_returns PROPERTIES TIMEOUT 240)
   add_test(NAME ergonomics_sprint6 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage8/sprint6.py"
     "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}" ${legacy_aot_host_libraries})
   set_tests_properties(ergonomics_sprint6 PROPERTIES TIMEOUT 240)

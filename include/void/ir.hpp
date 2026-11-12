@@ -114,6 +114,8 @@ std::string capability_key(Type type);
 std::string reference_path_name(Type type,const ReferencePath& path);
 std::string type_name(Type type);
 std::string option_identity(Type payload);
+bool multiple_return_type(const Type&);
+std::string multiple_return_identity(const std::vector<ValueField>&);
 std::string numeric_enum_layout(Type type);
 bool numeric_enum_member(Type type,std::uint64_t bits);
 bool contains_numeric_enum(Type);

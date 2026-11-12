@@ -33,7 +33,7 @@ struct Documentation {
     }
 };
 struct AnalyzedDeclaration {
-    enum class Kind { function, global_variable, module_constant, local_constant, value_structure, value_field, receiver_method, initializer, managed_structure, managed_field, interface_type, interface_requirement, type_parameter, local_variable, parameter, import_alias, operator_function } kind;
+    enum class Kind { function, global_variable, module_constant, local_constant, value_structure, value_field, receiver_method, initializer, managed_structure, managed_field, interface_type, interface_requirement, type_parameter, local_variable, parameter, import_alias, operator_function, return_component } kind;
     std::string identity, module, visibility;
     SourceSpan source;
     std::vector<ir::Type> parameters;
@@ -213,6 +213,7 @@ struct EditorAssistance {
     std::vector<std::string> parameter_documentation;
     bool import_context = false, incomplete = false;
     bool constructor_signature = false;
+    bool multiple_return_signature = false;
     std::vector<std::string> parameters;
     unsigned active_parameter = 0;
     std::size_t begin = 0, end = 0;

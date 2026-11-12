@@ -19,7 +19,7 @@ VOID already supports ordinary native applications, including manifest creation,
 | Capability | Status and actual boundary | Implementation and maintained evidence |
 | --- | --- | --- |
 | Values, types and declarations | **IMPLEMENTED.** Exact-width signed and unsigned integers, f32/f64, bool, immutable UTF-8, contextual numeric literals, typed and inferred locals, pure module constants, runtime readonly locals and initialized module globals. Checked numeric casts and numeric enums exist. Default values and deep readonly views preserve the distinction between value copies and shared reference identities. **DEFERRED** for unrestricted nullable value types and Unicode identifiers. | [Parser and semantic checker](../../src/frontend/compiler.cpp), [numeric operations](../../src/numeric.cpp), [frontend tests](../../tests/frontend), [numeric enum process/IR/LSP](../../tests/numeric), [runtime globals](../RUNTIME_GLOBALS.md) |
-| Functions, calls and initialization | **IMPLEMENTED.** Ordinary and receiver calls use an ordered positional prefix followed by named arguments. Pure defaults and concrete default-based parameter inference work within the current declaration rules. Explicit value/managed `init`, named-field construction, function values and closures work. **MISSING** multiple-return/destructuring syntax. **DEFERRED** fallible or overloaded constructors. Use a returned value struct or a result-returning factory with today's contracts. | [Parameter parser](../../src/frontend/compiler.cpp#L803), [constructor binding](../../src/frontend/compiler.cpp#L2223), [initialization regression](../../tests/frontend/initialization.cpp), [function defaults and inference](../STAGE8_CALLS_NUMERIC.md), [advanced language](../ADVANCED_LANGUAGE.md) |
+| Functions, calls and initialization | **IMPLEMENTED.** Ordinary and receiver calls use an ordered positional prefix followed by named arguments. Pure defaults and concrete default-based parameter inference work within the current declaration rules. Explicit value/managed `init`, named-field construction, function values and closures work. Named and unnamed multiple returns support local destructuring under G15. **DEFERRED** fallible or overloaded constructors. | [Parameter parser](../../src/frontend/compiler.cpp#L883), [constructor binding](../../src/frontend/compiler.cpp#L2377), [initialization regression](../../tests/frontend/initialization.cpp), [function defaults and inference](../STAGE8_CALLS_NUMERIC.md), [advanced language](../ADVANCED_LANGUAGE.md#multiple-return-values) |
 | Structures, object model and generics | **IMPLEMENTED.** Value and managed structs, field visibility and const fields, properties, callable structs, events, single managed inheritance, explicit virtual/override/super, one-hop composition, structural managed-backed interfaces, and generic specialization with constraints and inference. Generic body checking occurs at specialization. **DEFERRED** general user static members and extension methods, broader value erasure, interface inheritance/defaults and variance. | [Frontend declarations](../../src/frontend/compiler.cpp), [generic inference](../../src/frontend/generic_inference.inc), [receiver and property tests](../../tests/frontend/methods.cpp), [inheritance](../../tests/inheritance), [interfaces](../../tests/interfaces), [generics contract](../GENERICS.md) |
 | Collections and operators | **IMPLEMENTED.** Fixed and growable arrays, ordered typed dictionaries, explicit copy slices, checked and result-based access, structural mutation checks, scalar operations and scoped nominal operators. Overloading includes approved arithmetic, comparison and unary forms. **PARTIAL** for whole-collection equality and dictionary key families. Custom equality does not grant hashing authority. **MISSING** general bitwise/shift source operators. G12 covers optional language expansion. | [Collection and operator checks](../../src/frontend/compiler.cpp), [dictionary Runtime](../../src/runtime/dictionary.cpp), [array operations](../ARRAY_OPERATIONS.md), [dictionary contract](../DICTIONARIES.md), [operator and collection tests](../../tests/stage10) |
 | Errors, patterns and control flow | **IMPLEMENTED.** `result`, `Ok`, `Err`, propagation, checked panic/cleanup, sum and numeric enums, scoped `is` captures, statement and expression `match`, statement and typed expression `if`, compile-time `has`, and iterable/range/conditional/unbounded `for`. `reverse`, break, continue, return, pass and compound assignments work. **DEFERRED** general custom iteration and unrestricted compile-time evaluation. The for-based design deliberately has no separate `while`. | [Pattern parser](../../src/frontend/pattern_parser.inc), [pattern semantics](../../src/frontend/pattern_semantics.inc), [pattern tests](../../tests/patterns), [Stage 8 ergonomics](../STAGE8_ERGONOMICS.md) |
@@ -164,6 +164,14 @@ readiness, deadlines and structured cleanup. [Contract review](../net/TCP_UDP_HA
 ### P2 — G09 · Data and text conveniences backed by application examples
 
 **PARTIAL.** File and memory wire data and JSON DTOs work. Large incremental JSON input, optional/default-field policies, formatted-date parsing, and normalization or grapheme-level editing are separate gaps. Collection callback type arguments can be awkward in generic code. Choose only the operation demonstrated by an application, such as a bounded configuration reader with precise field errors. Reuse the existing JSON/resource counters, scalar offsets, strict wire codecs and typed diagnostics. Verify malformed UTF-8, boundaries and round-trip behavior with the existing text/JSON/time suites. Preserve the pinned Unicode and tzdata identities. [JSON API](../json/API.md) · [Collections API](../collections/API.md) · [Text/encoding API](../text-encoding/API.md) · [Temporal implementation](../../src/temporal.cpp)
+
+### G15 · Named and unnamed multiple returns
+
+The language supports ordered return lists and local destructuring with exact
+arity. Generic specialization and receiver dispatch share the same private
+typed ABI. Return names are compiler-owned editor metadata. First-class tuples,
+discard syntax and multiple-return function values, async results, operators
+and native bindings remain outside this contract. [Language contract](../LANGUAGE_BIBLE.md#15-multiple-return-values-not-first-class-tuples-agreed) · [Native qualification](#g15-native-qualification)
 
 ### P2 — G10 · Async deadlines and coordination convenience
 
@@ -803,3 +811,106 @@ and the original pinned provider inputs remain available for replay.
 - Verification — `CMakeLists.txt`, `tests/io/runner.cpp`, `tests/net/socket/native.cpp`, `tests/net/socket/run.py`, `tests/net/socket/lsp.py`, `tests/net/socket/source_sync.void`, `tests/net/socket/source_async.void`.
 - Examples — `examples/net_sockets/addresses.void`, `examples/net_sockets/tcp_echo_server.void`, `examples/net_sockets/tcp_echo_client.void`, `examples/net_sockets/udp_loopback.void`.
 - Documentation — `docs/ASYNC.md`, `docs/net/TCP_UDP_HANDOFF.md`, `docs/net/address/API.md`, `docs/net/error/API.md`, `docs/net/tcp/API.md`, `docs/net/udp/API.md`, `docs/roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md`.
+
+## G15 native qualification
+
+The original qualification used the unstaged G15 patch on
+`bf5e6dc0c335b82e11df81cb540a6364110d3523`. The 16 compiler, build
+and fixture files in the Windows overlay matched the local files byte
+for byte. Both hosts used LLVM, Clang and LLD 23.1.4 with the existing
+verified provider profiles. The guest OS reported Windows 10 Home x64
+build 19045.6466.
+
+`multiple_returns` compares uncached JIT and independently linked native
+executables at O0 and O2, including output and exit status. It exercises
+both return forms, mixed scalar and user-defined types, cross-module calls,
+generic specialization, value-receiver mutation, virtual and interface
+dispatch, ordered evaluation, deferred cleanup and GC reachability. The
+TestGame fixture covers successful validation, parse failure, range
+rejection and usage. The negative cases cover declaration and call arity,
+visibility, readonly authority, partial binding and unsupported call
+categories. Parenthesized single results, ordinary `result` and an
+indirect single-result closure have positive controls. [Execution fixture](../../tests/frontend/multiple_returns.void) · [TestGame](../../examples/multiple_returns/test_game.void) · [Harness](../../tests/frontend/multiple_returns.py)
+
+| Host and profile | `multiple_returns` | `lsp_multiple_returns` | Focused CTests |
+| --- | ---: | ---: | --- |
+| PikaOS 4 x64 Debug | PASS, 50.63 s | PASS, 0.66 s | 15/16, 119.79 s |
+| PikaOS 4 x64 Release | PASS, 12.08 s | PASS, 0.33 s | 15/16, 41.77 s |
+| PikaOS 4 x64 strict ASan/UBSan with leaks | PASS, 52.01 s | PASS, 1.04 s | 15/16, 148.07 s |
+| Windows 10 x64 Debug | PASS, 124.01 s | PASS, 2.20 s | 11/12, 280.25 s |
+| Windows 10 x64 Release | PASS, 22.09 s | PASS, 1.02 s | 11/12, 58.10 s |
+
+The sole failure in each original selection was the baseline `frontend` tab-rejection assertion
+at `tests/frontend/tests.cpp:51`. The retained G07 compiler accepted the
+exact source in a separate check. Tab indentation was admitted in
+`301afc03e4a613cb10dce9107f6ebe2f0c02aa63`. The initial G15 patch left the
+lexer and that assertion intact. The strict run used fatal ASan and
+UBSan with leak detection and reported no sanitizer finding.
+
+The common selection includes `generics_source`, `project_sessions`,
+`project_protocol`, `lsp_editor_recovery`, `lsp_semantic_tokens`,
+`lsp_stage10_intelligence`, `net_sockets`, `net_sockets_lsp`,
+`process_capture`, `frontend` and the two new tests. Linux also runs
+`generics_hint_execution`, `generics_hint_lsp`, `inheritance_source`
+and `interfaces_source` under their existing registration conditions.
+The Windows G15 fixture itself executes both virtual and interface calls.
+The new CTest limits are 240 s for execution and 180 s for LSP.
+All selected tests had active commands and no skip properties.
+
+Native VS Code 1.141.0 with Node 24.19.0 passed the semantic host suite
+on PikaOS and Windows 10. The workbench used the real VOID extension and
+Debug `voidls`. Checks covered both signature labels, named-label
+highlighting, typed local completion, hover, unsaved return metadata,
+UTF-16, failed-analysis recovery and project switching. Linux also passed
+the constructor suite and the G14 workbench recovery suite with visible
+popup and color checks. [Native LSP tests](../../tests/lsp/multiple_returns.py) · [VS Code host](../../editors/vscode/src/test/semanticHost.ts)
+
+Replay the G15 tests in each configured profile with
+`ctest --test-dir BUILD --output-on-failure -R '^(multiple_returns|lsp_multiple_returns)$'`.
+The execution harness uses the profile's generated `void-native.txt` to
+invoke the matching Clang and LLD separately after `voidc emit`. The strict
+run sets `ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`. The Windows
+tests use a private root verified by `void_windows_native_staging`.
+For the real editor, run `npm run build` and
+`node out/test/runSemanticHost.js` from `editors/vscode` with
+`VOIDLS_PATH` and `VSCODE_EXECUTABLE_PATH` set to the native executables.
+
+The disposable guest workspace, source transfers, editor profiles and local
+scratch logs were removed. Guest free space rose from 5,737,869,312 to
+13,768,192,000 bytes. Linux scratch filesystem free space rose from
+16,200,609,792 to 16,574,337,024 bytes. The maintained Linux build profiles
+and existing pinned provider inputs remain available for replay.
+
+### G15 final acceptance correction
+
+The frontend suite now runs the same nested program with consistent tabs
+and consistent spaces through normal and O2 JIT. It checks the primary
+diagnostic and exact location for a mixed prefix (2:2), a style change in
+the same block (3:1), and a dedent to a nonexistent level (3:3). This
+corrects the baseline test mismatch with the accepted indentation behavior.
+[Frontend regression](../../tests/frontend/tests.cpp#L50)
+
+The correction uses the original focused CTest selections, timeouts and
+LLVM/Clang/LLD 23.1.4 profiles. Each selection includes `frontend`.
+
+| Host and profile | `frontend` | `multiple_returns` | `lsp_multiple_returns` | Focused CTests |
+| --- | ---: | ---: | ---: | --- |
+| PikaOS 4 x64 Debug | PASS, 10.92 s | PASS, 50.52 s | PASS, 0.58 s | 16/16, 112.96 s |
+| PikaOS 4 x64 Release | PASS, 4.71 s | PASS, 12.18 s | PASS, 0.25 s | 16/16, 35.50 s |
+| PikaOS 4 x64 strict ASan/UBSan with leaks | PASS, 13.59 s | PASS, 51.55 s | PASS, 1.00 s | 16/16, 123.91 s |
+| Windows 10 x64 Debug | PASS, 19.40 s | PASS, 88.97 s | PASS, 1.36 s | 12/12, 218.37 s |
+| Windows 10 x64 Release | PASS, 7.69 s | PASS, 22.26 s | PASS, 1.02 s | 12/12, 59.68 s |
+
+The strict rerun reported no ASan, UBSan or leak findings. The Windows
+reruns used Windows 10 Home x64 build 19045.6466. The disposable guest
+workspace and transfer and scratch files were removed. Guest free space
+rose from 7,084,748,800 to 13,770,194,944 bytes. Linux scratch filesystem
+free space rose from 16,566,788,096 to 16,574,095,360 bytes.
+
+### G15 changed-file inventory
+
+- Compiler and typed IR — `include/void/frontend.hpp`, `include/void/ir.hpp`, `src/frontend/compiler.cpp`, `src/frontend/capabilities.inc`, `src/frontend/generic_declarations.inc`, `src/frontend/generic_tooling.inc`, `src/frontend/tooling.cpp`, `src/ir/module.cpp`, `src/lsp/main.cpp`.
+- Verification — `CMakeLists.txt`, `editors/vscode/src/test/semanticHost.ts`, `tests/frontend/multiple_returns.py`, `tests/frontend/multiple_returns.void`, `tests/frontend/multiple_returns_helper.void`, `tests/frontend/tests.cpp`, `tests/lsp/multiple_returns.py`.
+- Example — `examples/multiple_returns/test_game.void`.
+- Documentation — `docs/LANGUAGE_BIBLE.md`, `docs/ADVANCED_LANGUAGE.md`, `docs/DOCUMENTATION_HOVER.md`, `docs/EDITOR_INTEGRATION.md`, `docs/roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md`.

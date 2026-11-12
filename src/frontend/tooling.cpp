@@ -96,7 +96,7 @@ SemanticToken::Kind semantic_kind(const AnalyzedDeclaration& d) {
     case D::value_structure: case D::managed_structure: return d.builtin ? K::type : K::structure;
     case D::interface_type: return K::interface_;
     case D::type_parameter: return K::type_parameter;
-    case D::parameter: return K::parameter;
+    case D::parameter: case D::return_component: return K::parameter;
     case D::value_field: case D::managed_field: return K::property;
     case D::function: return K::function;
     case D::receiver_method: case D::interface_requirement: case D::initializer: return K::method;

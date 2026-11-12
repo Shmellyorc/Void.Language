@@ -62,7 +62,9 @@ for(const auto& f:unit->generic_functions) {
     if(f.accessor)record.editor_symbol_kind=7;
     record.generic_template=true;
     if(f.receiver)record.receiver=editor_pattern_type(f.receiver->type);
+    if(!f.returns.empty())record.signature=editor_signature(f);
     declaration(std::move(record),false);parameter_records(f.generics,f.symbol);
+    return_components(f);
     std::map<std::string,std::string> names;
     for(const auto& p:f.generics)names.emplace(p.token.text,f.symbol+"::type::"+p.token.text);
     if(f.receiver)for(const auto& s:unit->generic_structures)if(s.definition->identity==owner)

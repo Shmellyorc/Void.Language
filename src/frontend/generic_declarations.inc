@@ -115,6 +115,7 @@ for(auto& [id,u]:units) {
             type(p.type,p.token,names);
         }
         type(f.result,f.token,names);
+        for(const auto& component:f.returns)type(component.type,component.site,names);
         semantics.validate_header_names(f);semantics.validate_parameter_structure(f);
     }catch(const CompilationError& failure){diagnostics.add(failure);}catch(const Poison&){}
 }

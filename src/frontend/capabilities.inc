@@ -255,6 +255,9 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             }); else if(e.kind==K::sum) frontend_case([&] {
                 const auto& variant=e.type.definition->cases.at(e.slot);
                 for(unsigned n=0;n<e.parts.size();++n)view=ir::replaced_facts(std::move(view),variant.begin+n,expression(*e.parts[n]));
+            }); else if(e.kind==K::return_pack) frontend_case([&] {
+                for(unsigned n=0;n<e.parts.size();++n)
+                    view=ir::replaced_facts(std::move(view),n,expression(*e.parts[n]));
             }); else if(e.kind==K::propagate) frontend_case([&] {
                 auto child=expression(*e.parts[0]);view=ir::field_facts(e.parts[0]->type,child,1);
                 // Error propagation is a real return edge, with the same authority checks.
@@ -457,6 +460,12 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 if (s.kind==K::variable || (s.kind==K::scoped && !s.task_group)) {
                     if (s.readonly) for (auto& [path,fact]:rhs) fact.readonly=true;
                     local_changed|=ir::join_facts(locals[s.slot],rhs);
+                } else if(s.kind==K::destructure) {
+                    for(unsigned n=0;n<s.bindings.size();++n) {
+                        auto component=ir::field_facts(s.expression->type,rhs,n);
+                        if(s.readonly)for(auto& [path,fact]:component)fact.readonly=true;
+                        local_changed|=ir::join_facts(locals[s.bindings[n].slot],component);
+                    }
                 } else if(s.kind==K::assignment && s.event){
                     auto facts=s.selection?evaluated.at(s.selection.get()):locals.at(s.slot);auto type=s.selection?s.selection->type:f.locals.at(s.slot);if(!s.selection)for(auto index:s.field_indexes){facts=ir::field_facts(type,facts,index);type=ir::field_type(type,index);}if(auto found=facts.find({});found!=facts.end()){effect(f.reference_effects.mutations,found->second);if(found->second.readonly)issue(s.token,"Cannot change subscriptions through a readonly event.");}
                 } else if(s.kind==K::assignment && s.selection) {

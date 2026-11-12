@@ -144,6 +144,14 @@ std::string array_identity(Type element, std::optional<std::uint64_t> extent) {
     const auto key=std::to_string(static_cast<unsigned>(element.kind))+":"+Type::key(element)+(element.nullable ? "?" : "");
     return "$array:"+std::to_string(key.size())+":"+key+":"+(extent ? std::to_string(*extent) : "growable");
 }
+bool multiple_return_type(const Type& type) {
+    return type.kind==Type::aggregate && type.definition && type.definition->identity.starts_with("$returns:");
+}
+std::string multiple_return_identity(const std::vector<ValueField>& components) {
+    std::string identity="$returns:";
+    for(const auto& component:components)identity+=array_identity(component.type,{});
+    return identity;
+}
 bool scalar_array(Type t) {
     return array_type(t) && t.definition && t.definition->element &&
         (numeric::number(array_element(t)) || array_element(t)==Type::boolean);
@@ -669,6 +677,23 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             }
             if (!t.definition || t.definition->identity.empty() || t.definition->identity.find('\0')!=std::string::npos || t.definition->name.empty()) fail("missing value type identity");
             auto* d=t.definition.get();
+            const bool returns=d->identity.starts_with("$returns:");
+            if(returns) {
+                if(!multiple_return_type(t) || t.nullable || d->name!="$returns" ||
+                   d->visibility!="private" || !d->module_identity.empty() || d->managed ||
+                   !d->base.expired() || !d->cases.empty() || d->result_type || d->option_type ||
+                   d->native_resource || d->callable || d->task_result || d->call_result ||
+                   !d->call_parameters.empty() || d->custom_equality || d->fields.size()<2 ||
+                   d->identity!=multiple_return_identity(d->fields))
+                    fail("invalid multiple-return layout");
+                for(unsigned n=0;n<d->fields.size();++n) {
+                    const auto& field=d->fields[n];Type component=field.type;
+                    if(field.name!="$"+std::to_string(n) || field.owner!=d->identity ||
+                       field.visibility!="public" || field.using_field || field.event || field.readonly ||
+                       component==Type::none || multiple_return_type(component))
+                        fail("invalid multiple-return component");
+                }
+            }
             if(auto base=d->base.lock();base && base->native_resource)fail("native resource cannot be extended");
             if(console::endpoint_type(t) && (t.kind!=Type::aggregate || d->module_identity!=console::source_module || d->identity!=d->module_identity+"::"+d->name || d->managed || !d->base.expired() || !d->cases.empty() || d->interface_type || d->callable || d->native_resource || d->fields.size()!=1 || Type(d->fields[0].type)!=Type::i64 || d->fields[0].name!="_id" || !d->fields[0].readonly || d->fields[0].visibility!="internal"))fail("invalid console endpoint identity");
             if(console::session_type(t) && (!d->native_resource || d->native_provider!="void.console.v1" || t.kind!=Type::managed_ref || !d->managed || d->module_identity!=console::source_module || !d->base.expired() || d->callable || !d->cases.empty() || d->interface_type || d->fields.size()!=1 || Type(d->fields[0].type)!=Type::i64 || d->fields[0].readonly || d->fields[0].visibility!="internal" || d->fields[0].name!="_token"))fail("invalid terminal session identity");
@@ -708,7 +733,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             if(!m.interface_requirements.empty() && d->visibility!="public" && d->visibility!="internal" && d->visibility!="private") fail("invalid concrete nominal visibility");
             const bool callable_environment=d->identity=="$void::$environment";
             if(callable_environment && (!d->managed || !d->fields.empty() || !d->base.expired() || !d->module_identity.empty() || d->name!="$environment" || d->visibility!="private"))fail("invalid shared callable environment base");
-            if(!m.interface_requirements.empty() && !callable_environment && !dictionary_entries.contains(d) && !d->result_type && !d->option_type && !d->callable && !d->task_result && (d->identity!=d->module_identity+"::"+d->name || !m.source_imports.contains(d->module_identity))) fail("invalid concrete nominal ownership for interface binding");
+            if(!m.interface_requirements.empty() && !returns && !callable_environment && !dictionary_entries.contains(d) && !d->result_type && !d->option_type && !d->callable && !d->task_result && (d->identity!=d->module_identity+"::"+d->name || !m.source_imports.contains(d->module_identity))) fail("invalid concrete nominal ownership for interface binding");
             if (t.construction && !d->managed) fail("construction view requires a managed nominal");
             if (t.kind==Type::aggregate && d->managed) fail("managed nominal cannot be an inline value");
             auto [found,added]=definitions.emplace(d->identity,d);
@@ -777,9 +802,15 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             fail("invalid interface requirement ownership");
         if(!requirements.emplace(requirement.name,&requirement).second || !names.emplace(requirement.name,Signature{requirement.parameters,requirement.result,true}).second) fail("duplicate interface requirement");
         for(auto t:requirement.parameters) {valid_type(t);if(t==Type::none || t.construction || t.kind==Type::prepared_receiver) fail("invalid interface requirement parameter");}
-        for(auto t:requirement.parameters) if(t.definition && ((requirement.visibility=="public" && t.definition->visibility!="public") || (requirement.visibility=="internal" && t.definition->visibility=="private"))) fail("interface requirement exposes a less-visible parameter type");
-        if(requirement.result.definition && ((requirement.visibility=="public" && requirement.result.definition->visibility!="public") || (requirement.visibility=="internal" && requirement.result.definition->visibility=="private"))) fail("interface requirement exposes a less-visible result type");
+        auto less_visible=[&](Type t) { return t.definition &&
+            ((requirement.visibility=="public" && t.definition->visibility!="public") ||
+             (requirement.visibility=="internal" && t.definition->visibility=="private")); };
+        for(auto t:requirement.parameters) if(less_visible(t)) fail("interface requirement exposes a less-visible parameter type");
         valid_type(requirement.result);if(requirement.result.construction || requirement.result.kind==Type::prepared_receiver) fail("invalid interface requirement result");
+        if(multiple_return_type(requirement.result)) {
+            for(const auto& component:requirement.result.definition->fields)
+                if(less_visible(component.type))fail("interface requirement exposes a less-visible return component type");
+        } else if(less_visible(requirement.result))fail("interface requirement exposes a less-visible result type");
     }
     for(auto t:m.nominal_types) if(t.kind==Type::interface_ref) {
         bool found=false;for(const auto& [name,r]:requirements) found|=r->parameters[0].definition==t.definition;
@@ -1709,7 +1740,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         }
     }
     if(m.async_root){auto entry=functions.find(m.entry_symbol);if(entry!=functions.end() && entry->second->worker)fail("worker cannot be a root adapter");if(entry==functions.end() || !entry->second->asynchronous || entry->second->parameters!=std::vector<Type>{Type::i32} || entry->second->result!=Type::i32)fail("invalid explicit async root adapter signature");}
-    if(!m.interface_requirements.empty()) for(const auto& [key,definition]:definitions) if(!catalog_definitions.contains(definition) && !dictionary_entries.contains(definition) && !definition->result_type && !definition->option_type && !definition->callable) fail("incomplete nominal universe for structural interfaces");
+    if(!m.interface_requirements.empty()) for(const auto& [key,definition]:definitions) if(!catalog_definitions.contains(definition) && !dictionary_entries.contains(definition) && !key.starts_with("$returns:") && !definition->result_type && !definition->option_type && !definition->callable) fail("incomplete nominal universe for structural interfaces");
     std::map<std::string,ReferenceEffects> worker_effects;
     auto* inferred=verified_effects?verified_effects:&worker_effects;
     validate_reference_capabilities(m,qualified_types,inferred);

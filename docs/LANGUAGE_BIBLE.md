@@ -896,7 +896,9 @@ func main():
 
 Unnamed forms such as `-> (f32, f32)` are valid. Multiple returns are conceptually **not** first-class tuple values; developers use a `struct` or `value struct` for a persistent grouped value.
 
-**OPEN:** Exact ABI lowering, discarding selected returns, named-return metadata, and whether implicit destructuring of non-function values is allowed.
+**G15 contract.** A return list has at least two components and uses either names for every component or types alone. Names are declaration metadata for the corresponding positions. The body evaluates explicitly written return expressions from left to right and checks each against its declared type. A local declaration of the form `var a, b = call()` (or `const a, b = call()`) evaluates the call once and binds every result in order. There is no discard, assignment destructuring, destructuring of ordinary values, or implicit return binding.
+
+Direct, generic, receiver, virtual and interface calls use the internal VOID ABI. It carries the ordered component types in a private, layout-checked aggregate with the existing native return and GC root machinery. Names do not affect ABI identity. Single results retain their current ABI, including parenthesized single type annotations. Function values, anonymous functions, async results, operators and native bindings require separate multiple-return contracts.
 
 ## 16. Constructors: `init()` [AGREED / details OPEN]
 

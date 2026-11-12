@@ -33,9 +33,12 @@ Existing attachment to fields, types and other symbols is preserved.
 Callable hover/completion contains the compiler signature, description and
 `Returns: DESCRIPTION` when the callable returns a value. Parameter descriptions
 and raw recognized tags are excluded. Signature help includes all existing labels
-and binding metadata, but documentation only on the active parameter. An empty or
-undocumented active parameter returns null for **automatic and manual** invocation,
-including requests without trigger context. There is no manual exception.
+and binding metadata. Only the active parameter supplies prose. An empty or
+undocumented active parameter returns null for **automatic and manual** invocation
+of ordinary functions, including requests without trigger context. Constructors
+and functions with multiple returns can show their signature label without
+parameter prose. A multiple-return signature with zero parameters shows its
+return list without an active parameter.
 
 No parameter tags, empty-only tags and unknown-only tags produce no missing-tag
 cascade. At least one known nonempty parameter description enables one warning

@@ -63,6 +63,37 @@ Fixed children copy independently; managed/list/dictionary children retain
 identity and readonly authority. Inactive variant fields are zero and traced
 precisely. The lowerer validates/extracts only the active payload.
 
+## Multiple return values
+
+```python
+func position() -> (x: f32, y: f32):
+    return 10.0, 20.0
+
+func validate(data: string) -> (bool, string):
+    return data != "", data
+
+func main():
+    var x, y = position()
+    const valid, message = validate("ready")
+    print(x, y, valid, message)
+```
+
+Components are checked against their declared types. A named list requires
+unique labels for every component. These labels appear in editor signatures.
+Return expressions and destructured bindings follow declaration order.
+The local bindings appear together after the call succeeds and follow the
+ordinary scope, shadowing and readonly rules.
+
+Generic calls and receiver methods, including virtual and interface dispatch,
+use the same typed return convention. The private ABI uses the ordered types
+and preserves component reference authority across return and extraction.
+Use a value struct for a grouped value that needs storage or independent
+access. Multiple returns have no discard syntax, assignment destructuring,
+tuple literals or indexing. Function values and closures retain their
+single-result ABI, as do async functions, operators and native bindings.
+The [TestGame example](../examples/multiple_returns/test_game.void) uses
+multiple returns to handle a fallible parse and validate its range.
+
 ## Function values and closures
 
 ```typescript
