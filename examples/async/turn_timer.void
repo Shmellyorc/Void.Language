@@ -1,0 +1,20 @@
+use convert
+use time
+
+func aim_adjustment() -> i32:
+    # The next shot uses the average of three recent aim offsets.
+    return (12 + 18 + 15) / 3
+
+async func entry(input: i32) -> i32:
+    var windup = convert.unwrap(time.make_duration(0, 30000000))
+    var idle = convert.unwrap(time.make_duration(30))
+    with tasks.group() as turn:
+        var ready = time.sleep(windup)
+        var idle_turn = time.sleep(idle)
+        var aim = spawn aim_adjustment()
+        print("Aim adjustment:", await aim)
+        convert.unwrap(await ready)
+        print("Shot ready")
+        idle_turn.cancel()
+    print("Turn drained")
+    return input

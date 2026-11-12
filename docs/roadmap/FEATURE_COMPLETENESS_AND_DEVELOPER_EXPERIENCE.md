@@ -61,7 +61,7 @@ All **25** tracked `.void` modules are covered below. Pure source APIs use the e
 | [random](../../stdlib/random.void) | **IMPLEMENTED.** Reproducible seeded gameplay streams, per-Runtime default with OS seeding, bounded draws, checked variants, choice and shuffle. | Gameplay output carries no cryptographic guarantee. [Runtime](../../src/runtime/random.cpp), [API](../random/API.md), [tests](../../tests/random). |
 | [system_error](../../stdlib/system_error.void) | **IMPLEMENTED.** Host capability errors carry portable kind, operation and native/cleanup/progress detail. | Existing process, archive and crypto error translation is reusable for additions in those APIs. [Host ABI](../../src/runtime/host_abi.cpp), [host error provider](../../src/runtime/host_error.cpp), [source tests](../../tests/host_capabilities). |
 | [text](../../stdlib/text.void) | **IMPLEMENTED.** Unicode-scalar search, trim, substring, split/join, replacement, padding and pinned Unicode 16.0 full default casing. | **DEFERRED** normalization, case folding, grapheme segmentation and regex. Scalar indexes and pinned case mapping are established contracts. [Native case mapping](../../src/runtime/text_case.cpp), [API](../text-encoding/API.md), [tests](../../tests/text_encoding). G09. |
-| [time](../../stdlib/time.void) | **IMPLEMENTED.** Gregorian construction, instants/durations, offsets and IANA zones, ambiguity handling, checked arithmetic, formatting and UTC/monotonic clocks. | **PARTIAL** for parsing and scheduling convenience. No general inverse formatted-date parser or public timer task. [Temporal core](../../src/temporal.cpp), [ABI](../../src/runtime/temporal_abi.cpp), [temporal tests](../../tests/stage10), [installed API guide](../../stdlib/README.md). G09/G10. |
+| [time](../../stdlib/time.void) | **IMPLEMENTED.** Gregorian construction, instants/durations, offsets and IANA zones, ambiguity handling, checked arithmetic, formatting, UTC/monotonic clocks and bounded async sleep. | General inverse formatted-date parsing and deadline composition are deferred. [Temporal core](../../src/temporal.cpp), [temporal tests](../../tests/stage10), [timer contract](../ASYNC.md#g10-monotonic-timers), [installed API guide](../../stdlib/README.md). G09/G10. |
 | [url](../../stdlib/url.void) | **IMPLEMENTED.** Checked HTTP(S) addresses, relative resolution, normalization, percent byte/text operations and ordered query pairs. | HTTP(S) scope. URL parsing does not perform DNS or imply raw sockets. [Runtime URL](../../src/runtime/url.cpp), [HTTP/URL examples](../net/http/README.md), [network fixtures](../../tests/net). |
 
 There is no public TCP listener, TCP stream, UDP endpoint or standalone resolver in the module tree. The [TCP/UDP handoff](../net/TCP_UDP_HANDOFF.md) supplies a proposed design and reuse points. Public task syntax and owner-side native completion already exist in the compiler and Runtime. A synchronous topic router or a monotonic clock does not supply an async queue or timer.
@@ -186,7 +186,8 @@ target stays advisory.
 
 ### P2 — G09 · Data and text conveniences backed by application examples
 
-**IN PROGRESS pending independent review.** Batch 10 covers bounded JSON
+**INTEGRATED.** Golden Wrench accepted the Batch 10 source at
+`e83c1070e5d2f6b49a2b84c52e21fbf2e6e319b1`. It covers bounded JSON
 configuration and explicit typed field defaults. `json.get_or` defaults
 only absent properties. The TestGame example uses bounded UTF-8 input,
 strict parsing, application validation and G06 private-directory saving.
@@ -204,7 +205,12 @@ and native bindings remain outside this contract. [Language contract](../LANGUAG
 
 ### P2 — G10 · Async deadlines and coordination convenience
 
-**PARTIAL.** Task groups, cancellation and provider-specific deadlines are usable. General timer/deadline composition and an async queue with backpressure need a source contract. Consider only after a concrete workflow needs them. Reuse current scheduler, scope cancellation/drain and monotonic clocks. Verify completion order, cancellation before/after work admission, scope exit and retained roots, including shutdown under concurrent I/O. [Async contract](../ASYNC.md) · [Runtime scheduler](../../src/runtime/async.cpp) · [Lifecycle tests](../../tests/async)
+**IN PROGRESS pending independent review.** Batch 11 adds bounded
+`time.sleep(duration)` to the existing executor and external completion path.
+The gameplay example awaits the windup and cancels and drains the idle timer
+with its task group. G04 and G07 retain their provider-specific deadlines.
+General deadline composition and a bounded async queue are deferred.
+[Timer contract and qualification](../ASYNC.md#g10-monotonic-timers) · [Turn example](../../examples/async/turn_timer.void)
 
 ### P2 — G11 · Native platform extensions and qualification
 

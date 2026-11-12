@@ -20,6 +20,7 @@ void vd_async_cleanup_leave() noexcept;
 void vd_async_finish(vd::RuntimeFailure*) noexcept;
 void vd_async_cancel_children() noexcept;
 void vd_async_checkpoint(vd::RuntimeFailure*) noexcept;
+void vd_async_sleep(void**,std::int64_t,std::int64_t,const char*,const void*,vd::RuntimeFailure*) noexcept;
 bool vd_worker_checkpoint(vd::RuntimeFailure*) noexcept;
 bool vd_worker_cleanup_failure(vd::RuntimeFailure*,const vd::RuntimeFailure*) noexcept;
 std::uint64_t vd_async_group_enter(vd::RuntimeFailure*) noexcept;
@@ -59,8 +60,12 @@ public:
     static NativeCompletion pending(std::shared_ptr<NativeWake>);
     bool ready() const noexcept;
     bool complete(const RuntimeFailure& = {}) const noexcept;
+    // Complete with the existing cancellation outcome, including provider stop.
+    bool complete_cancelled() const noexcept;
     bool cancellation_requested() const noexcept;
+    bool operator==(const NativeCompletion&) const noexcept = default;
 private:
+    bool finish(const RuntimeFailure&, bool cancelled) const noexcept;
     std::shared_ptr<State> state_;
 };
 

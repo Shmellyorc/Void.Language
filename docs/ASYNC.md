@@ -327,6 +327,182 @@ failure, cleanup failure ordering and parent precedence. Deterministic semaphore
 poll gates cover cancellation with GC rendezvous, compatible reload/retirement
 and Runtime close; allocation sweeps and malformed IR are permanent regressions.
 
+## G10 monotonic timers
+
+Batch 11 starts from `e83c1070e5d2f6b49a2b84c52e21fbf2e6e319b1`.
+The existing Runtime owns one async executor per active root. Before G10,
+`time` could read a monotonic clock and measure elapsed time. G07 socket
+deadlines belonged to the socket provider, and G04 process capture used
+the bounded native-worker pool to drain and reap a child. Those facilities
+retain their existing contracts.
+
+`time.sleep(delay: time.duration) -> result<bool, time.error>` is async.
+Use `time.make_duration(0, 100000000)` for 100 ms. The duration has signed
+whole seconds and normalized fractional nanoseconds. Sleep accepts zero
+through 24 hours inclusive. Zero completes at the first timer checkpoint
+without a timed wait or queue slot. The async call itself follows ordinary
+task scheduling. Success yields `Ok(true)`. Invalid durations, full timer
+capacity and unrepresentable deadlines yield `Err` with operation `sleep`.
+The Runtime checks the bounds before nanosecond conversion and checks the
+addition to the monotonic sample. If the native clock has coarser ticks, the
+deadline rounds up. A ready task may resume later under cooperative scheduling.
+Allocation and Runtime admission failures use the checked Runtime failure
+path. [Temporal API](../stdlib/time.void) · [Steady clock contract](https://eel.is/c++draft/time.clock.steady)
+
+### Ownership and cancellation
+
+The compiler admits the private timer operation only in the standard-library
+`time` module. Typed IR validates the async effect, operands and scalar task
+payload. LLVM supplies the current generation and a rooted output to the
+same-build Runtime ABI. The owning executor uses the existing external native
+completion path for each timer and accounts for the job until retirement.
+
+The Runtime ledger owns one bounded queue of up to 256 pending positive
+deadlines. Entries hold a monotonic time point and a native completion ticket.
+The owner expires due entries at its normal receive checkpoints. When it has
+no runnable activation, it waits for native work or the earliest deadline on
+the existing condition variable. There is no timer thread or timer work in
+the worker pool. Equal deadlines and deadlines observed in the same receive
+pass have no source ordering guarantee. Publication still occurs on the
+owner. [Runtime design](net/http/RUNTIME_FOUNDATION.md#g10-timer-participant)
+
+Cancellation before entry runs no sleep body. Cancellation after admission
+removes the pending entry and settles its ticket. If expiry has already
+settled the ticket, source cancellation can still win before owner
+publication. A completed task preserves its outcome on later cancellation and
+repeated await. A cancelled sleep propagates the existing task cancellation
+outcome. Group exit, early return and parent cancellation use the existing
+join, drain and reached defer rules. Runtime close rejects new admission and
+stops the queue before waiting on native job accounting. Stop cancels and
+wakes pending timers. The owner drains their tickets and frames through the
+existing scheduler. Timer deadlines have no authority to cancel arbitrary
+external effects.
+
+### Application and coordination scope
+
+The [turn example](../examples/async/turn_timer.void) starts a shot windup and
+an idle timer. A bounded worker calculates an aim adjustment while the turn
+is active. The application awaits the shot and cancels the remaining idle
+timer before its lexical group drains. Run it through the explicit async
+adapter with `void_io_runner --async-one-worker examples/async/turn_timer.void`.
+The normal CLI entry contract is unchanged. The focused tests also link
+normal and optimized standalone executables using `emit_async_object` and the
+pinned Clang and LLD.
+
+General deadline composition is deferred. The application can explicitly
+cancel a pending child and drain its scope. Selecting a winner between
+arbitrary task results would require an agreed observation order, result type,
+loser cancellation policy and external-effect contract. The turn uses
+bounded work and two owned timers. A general async queue with backpressure
+is deferred until an application needs its send, receive and closure semantics.
+
+### Focused G10 qualification
+
+The Linux host is PikaOS 4 x64 with kernel `7.2.11-pikaos`. The native
+Windows guest reported Windows 10 Home x64, build `10.0.19045.6466`.
+Both used the pinned LLVM, Clang and LLD 23.1.4. The Windows baseline
+export and source overlay were checked by SHA-256. Debug and Release
+used their matching provider prefixes and owner-only NTFS temporary
+roots. The configure-only shim delegated to the byte-identical host
+verifier at its attested root. [Attested verifier setup](projects/SLICE7_FINAL_CLOSEOUT.md#qualification-scope-and-preserved-platform-boundaries)
+
+| Control | Evidence |
+| --- | --- |
+| Native duration and queue | Zero, signed/fractional limits, exact 24-hour boundary, checked deadline overflow, the 256-slot limit and slot reuse. Injected monotonic samples prove separated and simultaneous deadlines, no early expiry and cancellation just before expiry. Retained tickets reject duplicate completion. |
+| Owner and shutdown | Cancellation immediately after admission and after native expiry but before publication. A published result survives later cancellation. An ordinary native job completes with one worker while a long timer remains pending. After 1,024 immediate completions, collection leaves just the root and its frame until return. Runtime close from another thread wakes an admitted timer and the root observes cancellation. |
+| Public source | Real elapsed time for positive waits, pre-start and parent cancellation, normal join, early return, reached defers, repeated await, checked capacity and post-drain reuse. The turn example runs useful worker work, awaits expiration and cancels the idle timer. Exact source diagnostics cover synchronous await, deferred await, wrong duration type and attempts to call the private primitive. |
+| Interoperability | Real loopback TCP accept/read/write and UDP receive/send while a long timer is pending. A short timer expires while the TCP and UDP requests are outstanding. The unchanged G07 and G04 suites exercise their cancellation, provider retirement and native compatibility. |
+| Code generation | Each public timer fixture and turn example runs through one-worker normal and O2 JIT, and normal and O2 standalone AOT. The harness emits the async-root object, then invokes the pinned Clang driver independently with the configured Runtime link manifest. On Windows it checks the actual driver plan selects the pinned `lld-link.exe`. |
+
+[Native controls](../tests/async/timer.cpp) · [Public controls](../tests/async/timers.void) · [TCP and UDP fixture](../tests/async/timer_network.void) · [JIT and link driver](../tests/async/timer.py)
+
+Configure the corresponding pinned build before invoking the new Make targets.
+Use a private temporary root for the tests. On Windows use the x64 developer
+environment, physical pinned Clang path and the staging probe's
+`--create-private-root` verification before setting `TMP` and `TEMP`.
+Use `RelWithDebInfo` and `VOID_SANITIZERS=ON` for the strict Linux profile.
+
+```sh
+cmake --build BUILD --parallel 3 --target voidc void_io_runner void_async_timer_tests \
+  void_async_tests void_async_external_tests void_native_workers_tests void_runtime_tests \
+  void_network_async_aot void_network_native void_process_capture_async_aot \
+  void_process_capture_probe void_host_portable void_temporal void_temporal_ir
+selector='^(async_timer_native|async_timer_source|async_timer_network|async_source|async_ir|async_parallel|async_lifecycle|async_external|native_workers|runtime_coordination|process_capture|net_sockets|format_temporal|stage10_temporal_ir|documentation_execution)$'
+ctest --test-dir BUILD -R "$selector" --show-only=json-v1
+ctest --test-dir BUILD -j 2 --output-on-failure -R "$selector"
+```
+
+For strict Linux, export
+`ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86` before
+building and running the selection. The new CTest timeouts are 60 seconds
+for native controls and 180 seconds each for source and network controls.
+The Python harness bounds each subprocess at 45 seconds.
+
+All five profiles had the same 15 active CTests with no skip properties.
+
+| Native host and profile | Final result | Execution record |
+| --- | --- | --- |
+| PikaOS Debug | **15/15** | The first selection passed 14/15 in 122.77 s. The three final timer tests passed in 20.49 s. |
+| PikaOS Release | **15/15** | The selection passed in 32.86 s. The three final timer tests passed in 9.44 s after the portable path correction. |
+| PikaOS strict ASan/UBSan with leak detection | **15/15** | The final selection passed in 100.05 s. |
+| Windows 10 Debug | **15/15** | All 12 adjacent tests passed in the original 184.14 s selection. The three corrected timer tests passed in 44.47 s. |
+| Windows 10 Release | **15/15** | The rebuilt selection passed in 50.55 s. |
+
+### Qualification corrections and remaining scope
+
+- Initial source probes found the existing synchronous CLI boundary.
+  An async `main` produced `VOID4001`. Running an async `entry` with the
+  normal CLI returned `Async entry requires the explicit scheduler root adapter`.
+  The maintained fixture uses the explicit adapter. Source locals that
+  collided with the imported names `elapsed`, `listener` and `datagram` were
+  renamed within the fixtures.
+- The first Linux builds with new Make targets reported
+  `No rule to make target 'void_async_timer_tests'` during regeneration.
+  The build succeeded with the regenerated Makefiles.
+- The first Linux and Windows Debug native witness returned
+  `Async scheduler invariant failed`. The test repeated its pending-timer
+  assertion when the root resumed from its own drain. The witness now
+  checks progress before cancellation and resumes the drain at its saved
+  stage.
+- Windows Debug's two new source checks initially failed object emission
+  with `cannot write object: invalid argument`. The baseline Release
+  and candidate Debug development adapters both emitted
+  `ascii control.obj` successfully and returned that error for
+  `unicode 雪.obj`, using the unchanged async activation example.
+  The existing adapter takes narrow Windows arguments. The timer harness
+  now uses an ASCII path with spaces. Unicode paths through that
+  development adapter remain outside this qualification.
+- The first Windows Release incremental build reused a baseline frontend
+  object because the overlay's archived timestamps predated that object.
+  `stage10_temporal_ir` and the new source checks then reported
+  `VOID2003` for the private `_sleep` call. The corrected run verifies
+  the source hashes, refreshes the overlay timestamps and rebuilds the
+  selected targets.
+
+G10 native macOS execution is unqualified. The G08 optimization and Windows
+persistent-cache holds remain in force. The existing G06 Windows symlink
+privilege limitation (error 1314) remains recorded. G10 stays **IN PROGRESS**
+for independent review. [Milestone register](roadmap/MILESTONE_REGISTER.md)
+
+The Windows scratch source and builds, host transfer archives, temporary
+applications and raw logs were removed. PikaOS retained its three existing
+configured builds. Available bytes immediately before and after cleanup were
+16,369,459,200 and 16,588,279,808 on Linux temporary storage, 367,688,339,456
+and 367,688,343,552 on the Linux share filesystem, and 12,311,003,136 and
+15,008,583,680 on Windows. The Markdown record retains the failures and replay
+commands. [Retention policy](projects/VOID_ARCHIVE_AND_RETENTION_POLICY.md)
+
+### G10 changed-file inventory
+
+| Role | Paths |
+| --- | --- |
+| Build registration | `CMakeLists.txt` |
+| Checked source and lowering | `include/void/ir.hpp`, `src/frontend/compiler.cpp`, `src/ir/module.cpp`, `src/ir/async_validation.inc`, `src/backend/llvm/backend.cpp`, `stdlib/time.void` |
+| Runtime | `include/void/async.hpp`, `src/runtime/async.cpp`, `src/runtime/timer.hpp`, `src/runtime/timer.cpp` |
+| Runnable example and qualification | `examples/async/turn_timer.void`, `tests/async/timer.cpp`, `tests/async/timer.py`, `tests/async/timers.void`, `tests/async/timer_network.void` |
+| Documentation | `docs/ASYNC.md`, `docs/net/http/RUNTIME_FOUNDATION.md`, `docs/roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md`, `docs/roadmap/MILESTONE_REGISTER.md`, `docs/stage10/DISPLAY_FORMATTING.md`, `stdlib/README.md` |
+
 ## Bounded parallel spawn (Delivery 3)
 
 ```typescript

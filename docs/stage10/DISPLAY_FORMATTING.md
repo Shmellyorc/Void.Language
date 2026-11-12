@@ -252,6 +252,11 @@ seconds. Monotonic values cannot be formatted as calendar dates or compared acro
 different Runtime clock contexts. Clock precision may be coarser than 1 ns and
 must be reported rather than fabricating precision.
 
+G10 reuses `duration` for async `time.sleep(delay)`. The sleep range is
+zero through 24 hours inclusive. This bound applies to scheduling a wait.
+Temporal construction, arithmetic and formatting retain their own ranges.
+[Timer API and cancellation contract](../ASYNC.md#g10-monotonic-timers)
+
 `resolve_local(local, zone, choice = reject)` returns `result<zoned_datetime,string>`.
 An overlap rejects unless the caller selects `earlier` or `later`. A gap always
 returns an error; no invisible shift-forward. Explicit offset conversion cannot

@@ -1,7 +1,7 @@
 # VOID developer experience milestone register
 
-Current assignment is Batch 10, G09 JSON configuration and typed field defaults,
-starting from `8b714ebb525fa7c822e7f7c35780b58f9f48208c`. Batch entries below identify
+Current assignment is Batch 11, G10 async timers and structured coordination,
+starting from `e83c1070e5d2f6b49a2b84c52e21fbf2e6e319b1`. Batch entries below identify
 the integration commits and the scope of their qualification. Boss controls
 integration, hosted qualification and public release.
 [Feature roadmap](FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md)
@@ -20,13 +20,13 @@ integration, hosted qualification and public release.
 | 7 · G16 | `6b28c57ff50256734fb804387f7c0ffca828d51f` | Local Linux Debug/Release/strict and Windows 10 Debug/Release. Compiler-owned enum completion and semantic roles respect visibility and stale-result guards. Recovery remains limited to supported incomplete contexts. [Record](FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md#g16-enum-completion-and-semantic-highlighting) |
 | 8 · G06 | `561bd020d9904dcfa2dc792297f9e87688e89f5e` | New save tests passed on all five local profiles. The two existing Windows I/O suites still encountered file-symlink privilege error 1314. The synchronous API uses admitted local filesystems and a held private directory. Async saves and macOS remain outside scope. [Record](FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md#g06-atomic-application-saves) |
 | 9 · G08 | `8b714ebb525fa7c822e7f7c35780b58f9f48208c` | **BASELINE MEASURED / OPTIMIZATION HOLD.** Local Linux and Windows 10 Debug/Release timing and strict Linux correctness. A revision-only completion cache would miss a changed dependency. Windows persistent caching remains an architecture decision. [Qualification](../compiler-health/G08_COMPILER_PERFORMANCE.md) |
+| 10 · G09 | `e83c1070e5d2f6b49a2b84c52e21fbf2e6e319b1` | **INTEGRATED / GOLDEN WRENCH SOURCE ACCEPTED.** Bounded JSON configuration, explicit typed field defaults and G06 atomic save/reload. Local PikaOS Debug/Release/strict and Windows 10 Debug/Release. Other data and text conveniences remain separate. [Qualification](../json/IMPLEMENTATION.md#g09-configuration-and-typed-field-defaults) |
 
 ## Current and upcoming
 
 | Milestone | Status and next evidence |
 | --- | --- |
-| 10 · G09 | **IN PROGRESS pending independent review.** Bounded JSON configuration, explicit typed field defaults and atomic save/reload using the existing contracts. Other data and text conveniences remain separate. [Qualification](../json/IMPLEMENTATION.md#g09-configuration-and-typed-field-defaults) |
-| G10 · Async timers and coordination | Upcoming. Preserve scheduler ownership and define deadlines, cancellation and draining for the selected application workflow. |
+| 11 · G10 | **IN PROGRESS pending independent review.** Bounded monotonic sleep and structured cancellation/drain using the existing async executor. General deadline composition and async queue/backpressure remain deferred. [Timer contract and qualification](../ASYNC.md#g10-monotonic-timers) |
 | G11 · Remaining native platform qualification | Open. Windows managed raylib packaging and retained callbacks need native evidence. macOS managed native and D5 remain outside the supported lanes. Signed App Sandbox remains unverified. |
 | G12 · Optional language and library extensions | Deferred pending concrete use cases and reviewed contracts. |
 | G00 · Production distribution | Conditional on release authorization. Public bootstrap, distribution and platform obligations remain tracked in the release record. [Preview blockers](../release/PREVIEW_BLOCKERS.md) |

@@ -165,6 +165,12 @@ kernel through ordinary source display/format hooks. Clock precision queries rep
 native resolution in nanoseconds, not UTC accuracy. Monotonic samples belong to
 one Runtime context; compare/elapsed reject mismatched contexts.
 
+`await time.sleep(delay)` waits for a monotonic `time.duration` of up to 24
+hours using the existing async root adapter. Zero needs no timed wait.
+Expiry returns `Ok(true)`. Invalid bounds and capacity return `time.error`.
+Task cancellation uses the existing structured cancellation outcome.
+[Timer contract](../docs/ASYNC.md#g10-monotonic-timers) · [Turn example](../examples/async/turn_timer.void)
+
 The compiler owns only narrow checked native operations; library policies and
 public values use ordinary VOID source. Installed CLI/LSP tools discover matching
 sources under `share/void/stdlib`, with `VOID_STDLIB_ROOT` as an explicit override.

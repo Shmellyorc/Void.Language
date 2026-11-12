@@ -1482,6 +1482,22 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     else {if(value.kind!=Type::aggregate || Type::key(value)!="/@stdlib/time.void::_clock_sample" || value.definition->module_identity!="/@stdlib/time.void" || value.definition->fields.size()!=3)fail("invalid temporal clock sample");for(unsigned n=0;n<3;++n)if(field_type(value,n)!=Type::i64 || !value.definition->fields[n].readonly || value.definition->fields[n].visibility!="private")fail("invalid temporal clock sample fields");}
                     result=i.type;break;
                 }
+                case Op::async_sleep: {
+                    auto task=i.type;
+                    if(!m.coordinated || !f.asynchronous || f.worker || f.module_identity!="/@stdlib/time.void" ||
+                       i.immediate || i.receiver || !i.arguments.empty() || !i.callee.empty() ||
+                       i.initialization || i.array_repeat || !i.operator_glyph.empty() || i.os_location_adapter)
+                        fail("invalid async timer authority or effects");
+                    expect(i.a,Type::i64);
+                    expect(i.b,Type::i64);
+                    valid_type(task);
+                    if(task.kind!=Type::managed_ref || task.nullable || task.construction || task.readonly ||
+                       !readonly_paths(task).empty() || !task.definition || !task.definition->task_result ||
+                       Type(*task.definition->task_result)!=Type::i32)
+                        fail("invalid async timer task");
+                    result=task;
+                    break;
+                }
                 case Op::format_layout:
                     if(!m.coordinated || operand(i.a)!=Type::string || i.b || i.immediate<0 || i.immediate>1 || i.receiver || !i.arguments.empty() || !i.callee.empty() || i.initialization || i.array_repeat || i.type.kind!=Type::aggregate || !i.type.definition || !i.type.definition->result_type || i.type.definition->fields.size()!=3 || field_type(i.type,1)!=Type::string || field_type(i.type,2)!=Type::string)fail("invalid format layout");
                     valid_type(i.type);result=i.type;break;

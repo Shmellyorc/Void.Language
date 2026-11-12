@@ -3706,7 +3706,20 @@ class Semantics {
             Function target;target.token=e.token;target.symbol="$layout.unwrap";target.result=Type::string;target.parameters.push_back({Token{TokenKind::name,"value",e.token.offset},unit.make_result(Type::string,Type::string)});
             builtin_record(target,"Checked temporal default display.");e.source_target=target.symbol;e.target=target.symbol;return e.type=call_arguments(e,target,0);
         }
-        if(e.target.starts_with("$time."))return e.type;
+        if(e.target.starts_with("$time.") || e.target=="$async.sleep")return e.type;
+        if(unit.identity=="/@stdlib/time.void" && e.qualifier.empty() && e.token.text=="_sleep") {
+            if(!current || !current->asynchronous)
+                error(source,e.token,Code::unsupported_type,"Sleep requires an owning async activation.");
+            Function target;
+            target.token=e.token;
+            target.symbol="$async.sleep";
+            target.result=unit.make_task(Type::i32);
+            target.parameters.push_back({Token{TokenKind::name,"seconds",e.token.offset},Type::i64});
+            target.parameters.push_back({Token{TokenKind::name,"nanoseconds",e.token.offset},Type::i64});
+            builtin_record(target,"Private monotonic timer admission.");
+            e.target=e.source_target=target.symbol;
+            return e.type=call_arguments(e,target,0);
+        }
         if(unit.identity=="/@stdlib/time.void" && e.qualifier.empty())for(unsigned n=0;n<temporal::operations.size();++n)if(temporal::operations[n].name==e.token.text)return temporal_call(e,n);
 
         if(current && current->collection_adapter && e.token.text.starts_with("$collection_")) {
@@ -4608,6 +4621,7 @@ class Lowering {
             i.op == ir::Op::scalar_parse ||
             i.op == ir::Op::result_unwrap ||
             i.op == ir::Op::temporal_native ||
+            i.op == ir::Op::async_sleep ||
             i.op == ir::Op::random_seed ||
             i.op == ir::Op::scalar_display ||
             i.op == ir::Op::scalar_format;
@@ -5243,6 +5257,16 @@ class Lowering {
                 return emit(operation, e.token);
             }
 
+            if(e.target=="$async.sleep") {
+                std::array<unsigned,2> slots{};
+                for(unsigned n=0;n<e.parts.size();++n)
+                    slots[e.argument_indexes.at(n)]=snapshot(expression(*e.parts[n]),e.parts[n]->type,e.parts[n]->token);
+                auto seconds=emit({ir::Op::load,slots[0]},e.token);
+                auto nanos=emit({ir::Op::load,slots[1]},e.token);
+                ir::Instruction operation{ir::Op::async_sleep,seconds,nanos};
+                operation.type=e.type;
+                return emit(operation,e.token);
+            }
             if(e.target.starts_with("$time.")) {
                 std::vector<unsigned> slots(e.parts.size());for(unsigned n=0;n<e.parts.size();++n)slots[e.argument_indexes.at(n)]=snapshot(expression(*e.parts[n]),e.parts[n]->type,e.parts[n]->token);
                 ir::Instruction operation{ir::Op::temporal_native};operation.type=e.type;operation.immediate=std::stoul(e.target.substr(6));for(auto slot:slots)operation.arguments.push_back(emit({ir::Op::load,slot},e.token));return emit(operation,e.token);

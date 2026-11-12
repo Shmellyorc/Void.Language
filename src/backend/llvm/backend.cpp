@@ -1852,6 +1852,21 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     v = b.CreateLoad(type(instruction.type), storage);
                     break;
                 }
+                case Op::async_sleep: {
+                    auto task=ir::Type(instruction.type.definition);
+                    if(layout.getTypeAllocSize(type(task))!=2*sizeof(std::int32_t) ||
+                       field_offset(task,1)!=sizeof(std::int32_t))
+                        throw std::logic_error("Async timer task ABI mismatch");
+                    auto* output=value_roots[n].at(values.size());
+                    b.CreateStore(llvm::ConstantPointerNull::get(b.getPtrTy()),output);
+                    auto call=module->getOrInsertFunction("vd_async_sleep",b.getVoidTy(),b.getPtrTy(),
+                        b.getInt64Ty(),b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy());
+                    b.CreateCall(call,{output,values[instruction.a],values[instruction.b],
+                        b.CreateGlobalString(task.definition->identity),async_generation,failure});
+                    selected_failure();
+                    v=b.CreateLoad(b.getPtrTy(),output);
+                    break;
+                }
                 case Op::temporal_native: {
                     const auto& contract=temporal::operations.at(instruction.immediate);
                     auto* storage=value_roots[n].at(values.size());b.CreateStore(llvm::Constant::getNullValue(type(instruction.type)),storage);
@@ -2386,6 +2401,7 @@ Jit::Jit(DebugCache cache,ir::Emission emission) : impl_(std::make_shared<Impl>(
     bind("vd_host_call",vd_host_call);bind("vd_host_cleanup",vd_host_cleanup);bind("vd_host_capture",vd_host_capture);
     bind("vd_net_call",vd_net_call);bind("vd_net_cleanup",vd_net_cleanup);
     bind("vd_file_control", vd_file_control);
+    bind("vd_async_sleep",vd_async_sleep);
     bind("vd_console_v2",vd_console_v2);bind("vd_console_print",vd_console_print);
     bind("vd_temporal",vd_temporal);bind("vd_format_layout",vd_format_layout);bind("vd_display_enter",vd_display_enter);bind("vd_display_leave",vd_display_leave);bind("vd_display_error",vd_display_error);
     bind("vd_collection_scope",vd_collection_scope);bind("vd_collection_scope_leave",vd_collection_scope_leave);bind("vd_collection_enter",vd_collection_enter);bind("vd_collection_leave",vd_collection_leave);bind("vd_collection_append",vd_collection_append);bind("vd_collection_finish",vd_collection_finish);

@@ -1,0 +1,95 @@
+use convert
+use time
+
+struct round_state:
+    entered: i32 = 0
+    cleaned: i32 = 0
+    completed: i32 = 0
+
+async func mark() -> i32:
+    return 1
+
+async func tracked(state: round_state, delay: time.duration):
+    state.entered += 1
+    defer {
+        state.cleaned += 1
+    }
+    convert.unwrap(await time.sleep(delay))
+    state.completed += 1
+
+async func parent(state: round_state, delay: time.duration):
+    defer {
+        state.cleaned += 10
+    }
+    var child = tracked(state, delay)
+    await child
+
+async func leave_early(state: round_state, delay: time.duration) -> i32:
+    with tasks.group() as turn:
+        var pending = tracked(state, delay)
+        var checkpoint = await mark()
+        return checkpoint
+
+async func fill_queue(delay: time.duration, zero: time.duration) -> i32:
+    with tasks.group() as capacity:
+        for index in 0..<256:
+            var pending = time.sleep(delay)
+        if not convert.unwrap(await time.sleep(zero)):
+            return 1
+        if await time.sleep(delay) is Err(var problem):
+            if problem.operation == "sleep" and problem.message == "Async timer capacity exhausted":
+                return 0
+        return 2
+
+async func entry(input: i32) -> i32:
+    var zero = convert.unwrap(time.make_duration(0))
+    var short = convert.unwrap(time.make_duration(0, 5000000))
+    var limit = convert.unwrap(time.make_duration(86400))
+    var rejected = convert.unwrap(time.make_duration(86400, 1))
+    var negative = convert.unwrap(time.make_duration(-1, 999999999))
+    var extreme = convert.unwrap(time.make_duration(9223372036854775807, 999999999))
+    if not convert.unwrap(await time.sleep(zero)):
+        return 1
+    for invalid in [rejected, negative, extreme]:
+        if await time.sleep(invalid) is Err(var problem):
+            if problem.operation != "sleep" or problem.message != "Sleep duration must be between zero and 24 hours":
+                return 2
+        else:
+            return 3
+    var before = convert.unwrap(time.monotonic_now())
+    var state = round_state()
+    with tasks.group() as concurrent:
+        var a = tracked(state, short)
+        var b = tracked(state, short)
+    var measured = convert.unwrap(time.elapsed(before, convert.unwrap(time.monotonic_now())))
+    if state.completed != 2 or state.cleaned != 2 or measured.seconds < 0 or (measured.seconds == 0 and measured.nanosecond < 5000000):
+        return 4
+    var untouched = round_state()
+    with tasks.group() as unstarted:
+        var pending = tracked(untouched, limit)
+        pending.cancel()
+    if untouched.entered != 0 or untouched.cleaned != 0:
+        return 5
+    var interrupted = round_state()
+    if await leave_early(interrupted, limit) != 1:
+        return 6
+    if interrupted.entered != 1 or interrupted.cleaned != 1 or interrupted.completed != 0:
+        return 7
+    var nested = round_state()
+    with tasks.group() as cancelled_parent:
+        var pending = parent(nested, limit)
+        var first = await mark()
+        var second = await mark()
+        pending.cancel()
+    if nested.entered != 1 or nested.cleaned != 11 or nested.completed != 0:
+        return 8
+    var finished = time.sleep(short)
+    if not convert.unwrap(await finished):
+        return 9
+    finished.cancel()
+    if not convert.unwrap(await finished):
+        return 10
+    if await fill_queue(limit, zero) != 0 or not convert.unwrap(await time.sleep(short)):
+        return 11
+    print("Timer source controls passed")
+    return input

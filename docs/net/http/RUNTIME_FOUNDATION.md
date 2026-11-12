@@ -57,6 +57,19 @@ owner-only publication remain authoritative. No replacement scheduler or GC was
 introduced. Curl process lifetime and a real Runtime HTTP driver remain future
 work in this same mission.
 
+### G10 timer participant
+
+The timer queue is a Runtime ledger participant driven by the existing async
+executor. No provider thread enters the Runtime. A queue entry holds only a
+monotonic deadline and a native completion ticket. Admission, expiry and
+source cancellation run on the owner. Shutdown can remove entries from another
+thread and settle their tickets as cancelled through the same notification
+path. Entry removal precedes completion. The queue lock can precede the
+completion wake lock, so the owner reads the earliest deadline before taking
+the wake lock. Shutdown cannot install an earlier deadline while the owner
+waits. The existing native job count remains live until the owning executor
+retires each job. [Timer contract](../../ASYNC.md#g10-monotonic-timers) · [Queue implementation](../../../src/runtime/timer.cpp)
+
 ## Completed result ownership
 
 The scheduler releases a completed child result's persistent Handle after its

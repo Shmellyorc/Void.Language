@@ -1,6 +1,7 @@
 #include "void/async.hpp"
 #include "void/runtime.hpp"
 #include "void/native_work.hpp"
+#include "timer.hpp"
 #include <algorithm>
 #include <atomic>
 #include <mutex>
@@ -59,9 +60,18 @@ NativeCompletion NativeCompletion::pending(std::shared_ptr<NativeWake> wake) {
 bool NativeCompletion::ready() const noexcept { return state_ && state_->phase.load(std::memory_order_acquire) == 2; }
 
 bool NativeCompletion::complete(const RuntimeFailure& failure) const noexcept {
+    return finish(failure, false);
+}
+
+bool NativeCompletion::complete_cancelled() const noexcept {
+    return finish({}, true);
+}
+
+bool NativeCompletion::finish(const RuntimeFailure& failure, bool cancelled) const noexcept {
     if (!state_) return false;
     unsigned pending = 0;
     if (!state_->phase.compare_exchange_strong(pending, 1, std::memory_order_acq_rel)) return false;
+    if (cancelled) state_->cancel_requested.store(true, std::memory_order_release);
     state_->failure.assign(failure);
     {
         // Serialize with the waiter's predicate-to-sleep transition. This
@@ -192,6 +202,7 @@ struct Scope {
     Task* ready_tail=nullptr;
     std::shared_ptr<NativeWake> wake = std::make_shared<NativeWake>();
     std::shared_ptr<vd::NativeWorkers> workers;
+    std::shared_ptr<vd::AsyncTimers> timers;
     const void* generation;
     ~Scope(){
         for(auto& task:tasks)request_cancel(*task);
@@ -243,6 +254,7 @@ struct Scope {
     }
     bool work_pending() const noexcept {for(auto* task=live_head;task;task=task->next_live)if(task->state==Task::working)return true;return false;}
     void receive() noexcept {
+        if (timers) timers->expire(vd::AsyncTimers::Clock::now());
         for(auto* task=live_head;task;){
             auto* following=task->next_live;
             if(task->state==Task::working && task->work->ready()){
@@ -286,7 +298,8 @@ struct Scope {
             task.outcome = Task::failed;
         }
         if (!work.abandoning && task.outcome != Task::failed) {
-            if (work.cancelled || task.cancel_requested.load(std::memory_order_relaxed)) {
+            if (work.cancelled || task.cancel_requested.load(std::memory_order_relaxed) ||
+                (work.external && work.external->cancel_requested.load(std::memory_order_acquire))) {
                 task.outcome = Task::cancelled;
             } else {
                 try {
@@ -344,8 +357,19 @@ struct Scope {
         }
     }
     void wait_work(){
-        vd::Runtime::Native native(runtime);std::unique_lock lock(wake->mutex);
-        wake->changed.wait(lock,[&]{for(auto* task=live_head;task;task=task->next_live)if(task->state==Task::working && task->work->ready())return true;return false;});
+        // Only this executor adds timers. Concurrent shutdown can only
+        // remove them and signal the same completion predicate. Never take
+        // the timer mutex while holding the ticket notification mutex.
+        const auto deadline = timers ? timers->next_deadline() : std::nullopt;
+        vd::Runtime::Native native(runtime);
+        std::unique_lock lock(wake->mutex);
+        auto ready = [&] {
+            for (auto* task = live_head; task; task = task->next_live)
+                if (task->state == Task::working && task->work->ready()) return true;
+            return false;
+        };
+        if (deadline) wake->changed.wait_until(lock, *deadline, ready);
+        else wake->changed.wait(lock, ready);
     }
 
     Scope(vd::Runtime& owner,const void* identity):runtime(owner),generation(identity){}
@@ -532,6 +556,43 @@ thread_local Scope* active=nullptr;
 thread_local Diagnostic exported_failure;
 Scope& scope(){if(!active || active->owner!=std::this_thread::get_id())throw std::logic_error("Async calls require an explicit owning root adapter");return *active;}
 void exception(vd::RuntimeFailure* failure,const char* message) noexcept {failure->message=message;}
+
+class TimerJob final : public vd::ExternalNativeJob {
+    vd::Runtime& runtime_;
+    vd::AsyncTimers& timers_;
+    const std::int64_t seconds_, nanoseconds_;
+    vd::AsyncTimers::Result result_ = vd::AsyncTimers::Result::accepted;
+    std::optional<vd::NativeCompletion> ticket_;
+public:
+    TimerJob(vd::Runtime& runtime, vd::AsyncTimers& timers, std::int64_t seconds,
+             std::int64_t nanoseconds)
+        : runtime_(runtime), timers_(timers), seconds_(seconds), nanoseconds_(nanoseconds) {
+        runtime_.begin_native_job();
+    }
+    ~TimerJob() override { runtime_.end_native_job(); }
+
+    void start(vd::NativeCompletion ticket) noexcept override {
+        ticket_ = ticket;
+        try {
+            result_ = timers_.start(ticket, seconds_, nanoseconds_, vd::AsyncTimers::Clock::now());
+            if (result_ != vd::AsyncTimers::Result::accepted) ticket.complete();
+        } catch (...) {
+            vd::RuntimeFailure failure;
+            failure.message = "Async timer queue allocation failed";
+            ticket.complete(failure);
+        }
+    }
+    void cancel() noexcept override {
+        if (ticket_) timers_.cancel(*ticket_);
+    }
+    void publish(vd::Runtime&, void* address) override {
+        const auto status = static_cast<std::int32_t>(result_);
+        std::memcpy(static_cast<char*>(address) + sizeof(status), &status, sizeof(status));
+    }
+    void abandon_external(vd::NativeCompletion cleanup) noexcept override {
+        cleanup.complete(); // A timer never acquires a resource to abandon.
+    }
+};
 }
 extern "C" {
 void vd_async_new(void** task,void** frame,std::size_t frame_size,const std::size_t* frame_offsets,std::size_t frame_count,std::size_t task_size,const std::size_t* task_offsets,std::size_t task_count,const char* task_key,const void* generation,vd_async_resume_entry resume,vd::RuntimeFailure* failure,std::int32_t worker) noexcept {
@@ -604,6 +665,26 @@ void vd_async_checkpoint(vd::RuntimeFailure* failure) noexcept {
         if(s.child_failure(task)){task.child_interrupt=true;exception(failure,"Async child failure requires structured cleanup");return;}
         if(task.cancel_requested){task.cancel_observed=true;exception(failure,"Async task cancelled");}
     }catch(...){exception(failure,"Invalid async checkpoint");}
+}
+void vd_async_sleep(void** output, std::int64_t seconds, std::int64_t nanoseconds,
+                    const char* task_key, const void* generation, vd::RuntimeFailure* failure) noexcept {
+    try {
+        auto& s = scope();
+        if (!s.current || s.current->draining || s.current->cleanup_depth ||
+            s.generation != generation || !output || !task_key)
+            throw std::logic_error("Invalid async timer context");
+        vd_async_checkpoint(failure);
+        if (failure->message) return;
+        if (!s.timers) s.timers = vd::AsyncTimers::get(s.runtime);
+        vd::TypeLayout layout{2 * sizeof(std::int32_t), {}};
+        layout.descriptor = s.runtime.descriptor(task_key);
+        vd::async_submit_external(output, layout, generation,
+            std::make_shared<TimerJob>(s.runtime, *s.timers, seconds, nanoseconds));
+    } catch (const std::bad_alloc&) {
+        exception(failure, "Async timer allocation failed");
+    } catch (...) {
+        exception(failure, "Async timer admission failed");
+    }
 }
 std::uint64_t vd_async_group_enter(vd::RuntimeFailure* failure) noexcept {
     try{auto& s=scope();if(!s.current || s.current->draining)throw std::logic_error("invalid group entry");

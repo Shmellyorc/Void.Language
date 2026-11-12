@@ -1,0 +1,41 @@
+use convert
+use net/address
+use net/tcp
+use net/udp
+use time
+
+async func entry(input: i32) -> i32:
+    var local = address.endpoint(ip = address.loopback_v4(), port = 0)
+    var server = convert.unwrap(await tcp.listen_async(local))
+    var receive_socket = convert.unwrap(await udp.bind_async(local))
+    var send_socket = convert.unwrap(await udp.bind_async(local))
+    var tcp_target = convert.unwrap(server.local_endpoint())
+    var udp_target = convert.unwrap(receive_socket.local_endpoint())
+    var short = convert.unwrap(time.make_duration(0, 5000000))
+    var long = convert.unwrap(time.make_duration(86400))
+    with tasks.group() as service:
+        var idle = time.sleep(long)
+        var accept = server.accept_async(timeout_ms = 5000)
+        var receive = receive_socket.receive_from_async(timeout_ms = 5000)
+        convert.unwrap(await time.sleep(short))
+        var client = convert.unwrap(await tcp.connect_endpoint_async(tcp_target))
+        var peer = convert.unwrap(await accept)
+        var read = peer.read_bytes_async(max_count = 1, timeout_ms = 5000)
+        if convert.unwrap(await client.write_bytes_async([41], timeout_ms = 5000)) != 1:
+            return 1
+        if convert.unwrap(await send_socket.send_to_async([42], udp_target, timeout_ms = 5000)) != 1:
+            return 2
+        var tcp_packet = convert.unwrap(await read)
+        var packet = convert.unwrap(await receive)
+        if tcp_packet.bytes.count != 1 or tcp_packet.bytes[0] != 41:
+            return 3
+        if packet.bytes.count != 1 or packet.bytes[0] != 42:
+            return 4
+        idle.cancel()
+        convert.unwrap(await peer.close_async())
+        convert.unwrap(await client.close_async())
+    convert.unwrap(await server.close_async())
+    convert.unwrap(await receive_socket.close_async())
+    convert.unwrap(await send_socket.close_async())
+    print("Timer, TCP and UDP controls passed")
+    return input

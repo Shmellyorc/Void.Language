@@ -534,6 +534,20 @@ func monotonic_now() -> result<monotonic_tick, error>:
     return Ok(monotonic_tick(sample.seconds, sample.nanosecond, sample.context))
 
 
+## Wait for a duration on the Runtime's monotonic clock.
+## @param delay Nonnegative duration up to 24 hours, inclusive. Zero does not wait.
+## @return True on expiration, or a temporal error for invalid duration, exhausted capacity or an unrepresentable deadline. Task cancellation propagates through structured cleanup.
+async func sleep(delay: duration) -> result<bool, error>:
+    var status = await _sleep(delay.seconds, delay.nanosecond as i64)
+    if status == 0:
+        return Ok(true)
+    if status == 1:
+        return Err(error(message = "Sleep duration must be between zero and 24 hours", operation = "sleep"))
+    if status == 2:
+        return Err(error(message = "Async timer capacity exhausted", operation = "sleep"))
+    return Err(error(message = "Monotonic sleep deadline is out of range", operation = "sleep"))
+
+
 ## Query nominal UTC clock resolution in nanoseconds.
 ## @return Validated value on success; a managed temporal error on invalid data or range.
 func utc_precision_ns() -> result<i64, error>:

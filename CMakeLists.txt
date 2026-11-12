@@ -124,6 +124,7 @@ include(cmake/HostDependencies.cmake)
 target_sources(void_runtime PRIVATE src/runtime/host_abi.cpp src/runtime/host_error.cpp src/runtime/host_crypto.cpp src/runtime/host_archive.cpp src/runtime/host_directory.cpp src/runtime/host_process.cpp src/runtime/host_process_windows.cpp src/runtime/host_directory_windows.cpp)
 target_sources(void_runtime PRIVATE src/runtime/http_provider.cpp src/runtime/url.cpp src/runtime/url_abi.cpp src/runtime/http.cpp src/runtime/http_bulk.cpp src/runtime/http_resource.cpp src/runtime/http_file.cpp src/runtime/http_abi.cpp src/runtime/native_work.cpp)
 target_sources(void_runtime PRIVATE src/runtime/network_address.cpp src/runtime/network.cpp src/runtime/network_abi.cpp)
+target_sources(void_runtime PRIVATE src/runtime/timer.cpp)
 target_include_directories(void_runtime SYSTEM PRIVATE "${VOID_HTTP_DEPS_ROOT}/include")
 set_source_files_properties(src/runtime/network_address.cpp src/runtime/network.cpp src/runtime/network_abi.cpp
   PROPERTIES COMPILE_DEFINITIONS CARES_STATICLIB)
@@ -1626,6 +1627,19 @@ if(BUILD_TESTING)
   target_link_libraries(void_async_external_tests PRIVATE void_runtime)
   add_test(NAME async_external COMMAND void_async_external_tests)
   set_tests_properties(async_external PROPERTIES TIMEOUT 60)
+  add_executable(void_async_timer_tests tests/async/timer.cpp)
+  target_link_libraries(void_async_timer_tests PRIVATE void_runtime)
+  add_test(NAME async_timer_native COMMAND void_async_timer_tests)
+  set_tests_properties(async_timer_native PROPERTIES TIMEOUT 60)
+  add_test(NAME async_timer_source COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/async/timer.py"
+    "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_io_runner>" "$<TARGET_FILE_DIR:voidc>/void-native.txt")
+  set_tests_properties(async_timer_source PROPERTIES TIMEOUT 180)
+  if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$" AND
+     (CMAKE_SYSTEM_NAME STREQUAL "Linux" OR (WIN32 AND MSVC)))
+    add_test(NAME async_timer_network COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/async/timer.py"
+      "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_io_runner>" "$<TARGET_FILE_DIR:voidc>/void-native.txt" --network)
+    set_tests_properties(async_timer_network PROPERTIES TIMEOUT 180)
+  endif()
 
   add_executable(void_io_kernel tests/io/kernel.cpp)
   target_link_libraries(void_io_kernel PRIVATE void_runtime)
