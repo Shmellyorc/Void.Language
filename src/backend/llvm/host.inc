@@ -17,8 +17,10 @@
                         b.CreateStore(values[instruction.arguments[k]],b.CreateInBoundsGEP(scalar?nt:rt,scalar?nums:refs,{b.getInt32(0),b.getInt32(scalar?s++:r++)}));
                     }
                     auto* output=value_roots[n].at(values.size());b.CreateStore(llvm::Constant::getNullValue(type(instruction.type)),output);
-                    llvm::Constant* strings=llvm::ConstantPointerNull::get(b.getPtrTy());
-                    for(unsigned k=0;k<contract.arguments.size();++k)if(contract.arguments[k]=='a')strings=element_record(ir::array_element(operand_type(instruction.arguments[k])));
+                    llvm::Constant* element=llvm::ConstantPointerNull::get(b.getPtrTy());
+                    for(unsigned k=0;k<contract.arguments.size();++k)
+                        if(contract.arguments[k]=='a' || contract.arguments[k]=='z')
+                            element=element_record(ir::array_element(operand_type(instruction.arguments[k])));
                     const bool capture=host::capture_operation(instruction.immediate);
                     const bool asynchronous=host::asynchronous(instruction.immediate);
                     const auto reply=asynchronous?ir::field_type(instruction.type,1):instruction.type;
@@ -27,7 +29,7 @@
                     std::vector<llvm::Constant*> offsets;
                     for(unsigned k=0;k<fields;++k)offsets.push_back(llvm::ConstantInt::get(size_type,field_offset(reply,k)));
                     std::vector<llvm::Constant*> geometry{
-                        llvm::ConstantInt::get(size_type,layout.getTypeAllocSize(type(reply))),llvm::ConstantArray::get(offsets_type,offsets),strings};
+                        llvm::ConstantInt::get(size_type,layout.getTypeAllocSize(type(reply))),llvm::ConstantArray::get(offsets_type,offsets),element};
                     auto* record_type=llvm::StructType::get(size_type,offsets_type,b.getPtrTy());
                     if(capture || network) {
                         record_type=llvm::StructType::get(size_type,offsets_type,b.getPtrTy(),size_type,b.getPtrTy(),size_type,size_type,b.getPtrTy());
@@ -43,7 +45,7 @@
                             llvm::ConstantInt::get(size_type,asynchronous?field_offset(instruction.type,1):0),
                             b.CreateGlobalString(asynchronous?instruction.type.definition->identity:"")});
                     } else if(layout.getTypeAllocSize(record_type)!=sizeof(host::ReplyLayout) ||
-                        layout.getStructLayout(record_type)->getElementOffset(2)!=offsetof(host::ReplyLayout,strings))
+                        layout.getStructLayout(record_type)->getElementOffset(2)!=offsetof(host::ReplyLayout,element))
                         throw std::logic_error("Host reply ABI mismatch");
                     auto* record=new llvm::GlobalVariable(*module,record_type,true,llvm::GlobalValue::PrivateLinkage,
                         llvm::ConstantStruct::get(record_type,geometry),"host.reply.layout");

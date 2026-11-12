@@ -3,7 +3,7 @@
 #include <string_view>
 namespace vd::host {
 // Private, statically admitted source operations; not source-visible FFI.
-// t UTF-8 text, b bytes, s i64, a string list; uppercase owned resource identities.
+// t UTF-8 text, b bytes, s i64, a string list, z ZIP input list; uppercase owned resource identities.
 struct Operation { std::string_view module, name, arguments; bool cleanup=false; };
 inline constexpr std::string_view os="/@stdlib/os.void", crypto="/@stdlib/crypto.void",
     archive="/@stdlib/archive.void", io="/@stdlib/io.void", process="/@stdlib/process.void";
@@ -58,6 +58,7 @@ inline constexpr std::array operations = {
 #undef VOID_NET_PAIR
 #undef VOID_NET_SYNC
     Operation{io,"_host_dir_save","Dtbs"},
+    Operation{archive,"_host_zip_encode","zssss"},
 };
 enum Code : unsigned {args_count,arg,hash_open,hash_update,hash_final,hash_close,hash_cleanup,verify,
  zip_open,zip_next,zip_read,zip_close,zip_cleanup,dir_create,dir_admit,dir_child,dir_open,dir_file,
@@ -68,7 +69,7 @@ enum Code : unsigned {args_count,arg,hash_open,hash_update,hash_final,hash_close
  VOID_NET_OPERATIONS(VOID_NET_PAIR, VOID_NET_SYNC, VOID_NET_SYNC)
 #undef VOID_NET_PAIR
 #undef VOID_NET_SYNC
- dir_save,
+ dir_save,zip_encode,
 };
 constexpr bool capture_operation(unsigned op) {return op==capture || op==capture_async;}
 constexpr bool network_operation(unsigned op) {return op>=net_parse && op<dir_save;}

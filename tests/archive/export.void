@@ -1,0 +1,153 @@
+use archive
+use convert
+use encoding/hex
+use io
+use os
+use system_error
+
+func check_error(outcome: result<[u8], system_error.error>, expected: i32) -> bool:
+    if outcome is Err(var failure):
+        if failure.code != expected or failure.operation != "archive.encode_zip" or failure.os_code != 0:
+            return false
+        if failure.kind is system_error.error_kind.invalid_argument:
+            return expected == 20
+        if failure.kind is system_error.error_kind.invalid_range:
+            return expected == 6
+        if failure.kind is system_error.error_kind.limit_exceeded:
+            return expected == 12
+    return false
+
+func unsafe_names() -> bool:
+    var forbidden = ["", "/absolute", "C:relative", "C:\\file", "\\\\host\\file", "//host/file", "../entry", "a/../entry", "a//b", "a/b", "a\\b", "a/", ".", "..", "a.", "a ", "a\0b", "a\nb", "a?b", "CON.txt", "nul", "Lpt9.dat", "雪.txt"]
+    for rejected in forbidden:
+        if not check_error(archive.encode_zip([archive.zip_input(name = rejected, bytes = [])]),
+            20):
+            return false
+    if string.from_utf8([255]) is Ok(var invalid):
+        return false
+    var sample = archive.zip_input(name = "Config.JSON", bytes = [])
+    var alias = archive.zip_input(name = "config.json", bytes = [1])
+    return check_error(archive.encode_zip([sample, sample]), 20) and check_error(archive.encode_zip([sample, alias]), 20)
+
+func small_limits() -> bool:
+    var one = archive.zip_input(name = "a", bytes = [1, 2])
+    var two = archive.zip_input(name = "b", bytes = [3])
+    var payloads = [one, two]
+    var refused_limits = [archive.zip_write_limits(entries = 1), archive.zip_write_limits(entry_bytes = 1), archive.zip_write_limits(expanded_bytes = 2)]
+    for ceiling in refused_limits:
+        if not check_error(archive.encode_zip(payloads, ceiling), 12):
+            return false
+    if not check_error(archive.encode_zip([one], archive.zip_write_limits(archive_bytes = 101)), 12):
+        return false
+    if convert.unwrap(archive.encode_zip([one], archive.zip_write_limits(archive_bytes = 102))).count != 102:
+        return false
+    var invalid_limits = [archive.zip_write_limits(entries = -1), archive.zip_write_limits(entries = 65), archive.zip_write_limits(entry_bytes = 4194305), archive.zip_write_limits(expanded_bytes = 16777217), archive.zip_write_limits(archive_bytes = 21), archive.zip_write_limits(archive_bytes = 16777217)]
+    for ceiling in invalid_limits:
+        if not check_error(archive.encode_zip([], ceiling), 6):
+            return false
+    return true
+
+func large_limits() -> bool:
+    var full = convert.unwrap(io.read_bytes("entry-max.bin", 4194304))
+    var excess = convert.unwrap(io.read_bytes("entry-over.bin", 4194305))
+    var tail = convert.unwrap(io.read_bytes("image-max-tail.bin", 4194304))
+    var first = archive.zip_input(name = "a", bytes = full)
+    var second = archive.zip_input(name = "b", bytes = full)
+    var third = archive.zip_input(name = "c", bytes = full)
+    var fourth = archive.zip_input(name = "d", bytes = full)
+    var fifth = archive.zip_input(name = "e", bytes = [0])
+    if not check_error(archive.encode_zip([archive.zip_input(name = "a", bytes = excess)]), 12):
+        return false
+    if not check_error(archive.encode_zip([first, second, third, fourth, fifth]), 12):
+        return false
+    if not check_error(archive.encode_zip([first, second, third, fourth]), 12):
+        return false
+    var image = convert.unwrap(archive.encode_zip([first, second, third, archive.zip_input(name = "d", bytes = tail)]))
+    return image.count == 16777216 and full[0] == 255
+
+func many_names() -> bool:
+    var longest = "a"
+    for index in 1..254:
+        longest = "{longest}b"
+    var max_name = convert.unwrap(archive.encode_zip([archive.zip_input(name = longest, bytes = [])]))
+    if max_name.count != 608 or not check_error(archive.encode_zip([archive.zip_input(name = "{longest}b", bytes = [])]),
+        20):
+        return false
+    var payloads: [archive.zip_input] = []
+    for index in 0..63:
+        payloads.push(archive.zip_input(name = "f{index}", bytes = []))
+    var full = convert.unwrap(archive.encode_zip(payloads))
+    if full.count != 5250:
+        return false
+    payloads.push(archive.zip_input(name = "extra", bytes = []))
+    return check_error(archive.encode_zip(payloads), 12)
+
+func save_controls(directory: io.private_directory) -> bool:
+    var empty = convert.unwrap(archive.encode_zip([], archive.zip_write_limits(entries = 0,
+        entry_bytes = 0, expanded_bytes = 0, archive_bytes = 22)))
+    var original: [u8] = [0, 128, 255, 0]
+    var entry_a = archive.zip_input(name = "A.bin", bytes = original)
+    var entry_z = archive.zip_input(name = "z.txt", bytes = [])
+    var utf8 = archive.zip_input(name = "b.json", bytes = "\"雪😀\"".to_utf8())
+    var first = convert.unwrap(archive.encode_zip([entry_z, utf8, entry_a]))
+    var reordered = convert.unwrap(archive.encode_zip([entry_a, entry_z, utf8]))
+    original[1] = 42
+    var single = convert.unwrap(archive.encode_zip([entry_a]))
+    var images = [archive.zip_input(name = "empty.zip", bytes = empty), archive.zip_input(name = "first.zip", bytes = first), archive.zip_input(name = "reordered.zip", bytes = reordered), archive.zip_input(name = "single.zip", bytes = single)]
+    for image in images:
+        var outcome = directory.save_bytes_atomic(image.name, image.bytes)
+        if not outcome.published or outcome.code != 0 or outcome.cleanup_code != 0:
+            return false
+    first[0] = 0
+    return original[1] == 42 and reordered[0] == 80
+
+func inspect_input(filename: string, expected: string) -> i32:
+    with convert.unwrap(io.open(filename, io.open_mode.read)) as input:
+        match archive.open_zip(input):
+            Err(var failure):
+                if expected == "format" and (failure.kind is system_error.error_kind.invalid_format):
+                    return 0
+                return 2
+            Ok(var stream):
+                with stream as reader:
+                    var member = convert.unwrap(reader.next())
+                    if expected == "empty":
+                        if not member.eof or not convert.unwrap(reader.close()):
+                            return 3
+                        if input.read_bytes(4) is Ok(var signature):
+                            if hex.encode(signature) == "504b0506":
+                                return 0
+                        return 3
+                    if expected != "crc":
+                        return 3
+                    if member.eof:
+                        return 4
+                    for true:
+                        match reader.read(3):
+                            Err(var failure):
+                                if failure.kind is system_error.error_kind.integrity_failure:
+                                    return 0
+                                return 5
+                            Ok(var chunk):
+                                if chunk.count == 0:
+                                    return 6
+
+func main() -> i32:
+    var arguments = convert.unwrap(os.args())
+    if arguments.count == 2:
+        return inspect_input(arguments[0], arguments[1])
+    if arguments.count != 1:
+        return 7
+    if not unsafe_names():
+        return 8
+    if not small_limits():
+        return 9
+    if not many_names():
+        return 10
+    if not large_limits():
+        return 11
+    with convert.unwrap(io.create_private_directory(arguments[0])) as directory:
+        if not save_controls(directory):
+            return 12
+    print("archive names, quotas and independent buffers verified")
+    return 0

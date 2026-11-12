@@ -132,6 +132,13 @@ admitted `io.private_directory`. Check `save_outcome.published` before retrying
 an error. `synchronized` reports the native file and directory barriers.
 [Atomic save contract](../docs/io/CONTRACT.md#atomic-application-saves) · [Executable TestGame save](../examples/atomic_save/test_game.void)
 
+`use archive` provides `encode_zip` for explicit flat file names and byte
+arrays. It returns an owned, deterministic stored ZIP of up to 16 MiB.
+`open_zip` reads the restricted ZIP/ZIP64 stored and deflate profile from
+a held file. Drain each entry to EOF to verify its integrity. The game export
+example validates JSON and publishes the archive through the atomic save API.
+[Archive contract and usage](../docs/archive/ZIP_EXPORT.md) · [Executable game export](../examples/archive/save_export.void)
+
 `use error as core` exposes the three-field managed `core.error` base. Every
 installed module uses a derived public recoverable error; result error types
 remain exact. `use convert` provides checked numeric/Boolean/payload-free-enum

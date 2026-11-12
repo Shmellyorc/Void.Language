@@ -1,17 +1,17 @@
 #include "host_internal.hpp"
+#include "zip_geometry.hpp"
 #include "void/utf8.hpp"
 #ifndef VOID_HOST_PROVIDERS_UNAVAILABLE
 #include <archive.h>
 #include <archive_entry.h>
+#include <zlib.h>
 #endif
 #include <algorithm>
 #include <cerrno>
 #include <cstring>
 #include <limits>
 #include <set>
-#ifndef VOID_HOST_PROVIDERS_UNAVAILABLE
-
-#endif
+#include <stdexcept>
 namespace vd::host {
 #ifndef VOID_HOST_PROVIDERS_UNAVAILABLE
 namespace {
@@ -76,6 +76,85 @@ bool name(const std::string& value,bool directory) {
     }
     return false;
 }
+bool ascii_alphanumeric(unsigned char c) {
+    return (c>='A' && c<='Z') || (c>='a' && c<='z') || (c>='0' && c<='9');
+}
+
+bool export_name(const std::string& value) {
+    return !value.empty() && ascii_alphanumeric(value.front()) &&
+        std::all_of(value.begin(),value.end(),[](unsigned char c) {
+            return ascii_alphanumeric(c) || c=='.' || c=='_' || c=='-';
+        }) && name(value,false);
+}
+
+struct ExportMember {
+    std::string name,bytes;
+    std::uint32_t offset=0,crc=0;
+};
+
+void put16(std::string& image,std::uint16_t value) {
+    image.push_back(static_cast<char>(value & 0xff));
+    image.push_back(static_cast<char>(value >> 8));
+}
+
+void put32(std::string& image,std::uint32_t value) {
+    put16(image,static_cast<std::uint16_t>(value & 0xffff));
+    put16(image,static_cast<std::uint16_t>(value >> 16));
+}
+
+void file_fields(std::string& image,const ExportMember& member) {
+    put16(image,10); // ZIP 1.0 needed, no flags, stored, 1980-01-01 00:00:00.
+    put16(image,0);
+    put16(image,0);
+    put16(image,0);
+    put16(image,33);
+    put32(image,member.crc);
+    const auto bytes=static_cast<std::uint32_t>(member.bytes.size());
+    put32(image,bytes);
+    put32(image,bytes);
+    put16(image,static_cast<std::uint16_t>(member.name.size()));
+    put16(image,0); // Extra fields.
+}
+
+std::string zip_image(std::vector<ExportMember>& members,const ZipGeometry& geometry) {
+    std::sort(members.begin(),members.end(),[](const auto& a,const auto& b){return a.name<b.name;});
+    std::string image;
+    image.reserve(geometry.size());
+    for(auto& member:members) {
+        member.offset=static_cast<std::uint32_t>(image.size());
+        member.crc=static_cast<std::uint32_t>(crc32_z(0,
+            reinterpret_cast<const Bytef*>(member.bytes.data()),member.bytes.size()));
+        put32(image,0x04034b50);
+        file_fields(image,member);
+        image+=member.name;
+        image+=member.bytes;
+    }
+    const auto central=static_cast<std::uint32_t>(image.size());
+    for(const auto& member:members) {
+        put32(image,0x02014b50);
+        put16(image,20); // Made by DOS, ZIP 2.0.
+        file_fields(image,member);
+        put16(image,0); // Comment length.
+        put16(image,0); // Disk number.
+        put16(image,0); // Internal attributes.
+        put32(image,0); // External attributes.
+        put32(image,member.offset);
+        image+=member.name;
+    }
+    const auto central_size=static_cast<std::uint32_t>(image.size())-central;
+    const auto count=static_cast<std::uint16_t>(members.size());
+    put32(image,0x06054b50);
+    put16(image,0);
+    put16(image,0);
+    put16(image,count);
+    put16(image,count);
+    put32(image,central_size);
+    put32(image,central);
+    put16(image,0);
+    if(image.size()!=geometry.size())throw std::logic_error("ZIP output geometry mismatch");
+    return image;
+}
+
 // Reject metadata extensions that could override names, add links, encryption or
 // additional decoders. ZIP64 and bounded timestamp/uid records are sufficient.
 bool extra(const std::string& fields,std::uint64_t& size,std::uint64_t& compressed,std::uint64_t& local,bool need_local) {
@@ -174,6 +253,64 @@ Result preflight(Zip& z,std::uint64_t count_limit) {
 }
 }
 #endif
+Result encode_zip(Runtime& runtime,void* input,const NativeArrayElement* element,
+                  std::span<const std::int64_t,4> limits) {
+#ifdef VOID_HOST_PROVIDERS_UNAVAILABLE
+    (void)runtime;(void)input;(void)element;(void)limits;
+    return error(11);
+#else
+    const auto [count_limit,entry_limit,expanded_limit,archive_limit]=
+        std::array{limits[0],limits[1],limits[2],limits[3]};
+    if(count_limit<0 || count_limit>64 || entry_limit<0 || entry_limit>4*1024*1024 ||
+       expanded_limit<0 || expanded_limit>static_cast<std::int64_t>(byte_snapshot_limit) ||
+       archive_limit<static_cast<std::int64_t>(zip_end_bytes) || archive_limit>static_cast<std::int64_t>(byte_snapshot_limit))
+        return error(6);
+
+    struct Input {void* name;void* bytes;};
+    constexpr std::array references{offsetof(Input,name),offsetof(Input,bytes)};
+    if(!element || element->bytes!=sizeof(Input) || element->count!=2 || !element->fields ||
+       element->fields[0].kind!=12 || element->fields[0].offset!=references[0] ||
+       element->fields[1].kind!=15 || element->fields[1].offset!=references[1])
+        throw std::logic_error("Invalid ZIP input ABI");
+    constexpr std::size_t zero=0;
+    Runtime::Slot slot{&input,sizeof(input),&zero,1};
+    Runtime::Frame root(runtime,&slot,1);
+    const auto layout=runtime.native_array_layout(*element,0);
+    const auto count=runtime.array_count(runtime.root_word(&input),layout,true);
+    if(count>static_cast<std::uint64_t>(count_limit))return error(12);
+
+    ZipGeometry geometry(static_cast<std::uint64_t>(archive_limit));
+    auto expanded_room=static_cast<std::uint64_t>(expanded_limit);
+    std::vector<ExportMember> members;
+    members.reserve(count);
+    std::set<std::string> names;
+    for(std::uint64_t n=0;n<count;++n) {
+        Input item{};
+        Runtime::Slot item_slot{&item,sizeof(item),references.data(),references.size()};
+        Runtime::Frame item_root(runtime,&item_slot,1);
+        runtime.array_read(&item,runtime.root_word(&input),layout,true,n);
+        const auto text=runtime.string_bytes(item.name);
+        if(text.size()>zip_name_limit)return error(20);
+        std::string filename(text);
+        if(!export_name(filename))return error(20);
+        auto canonical=filename;
+        for(char& c:canonical)if(c>='A' && c<='Z')c+=('a'-'A');
+        if(!names.insert(std::move(canonical)).second)return error(20);
+        const auto room=geometry.payload_room(filename.size());
+        if(!room)return error(12);
+        auto bytes=runtime.bounded_byte_array_bytes(runtime.root_word(&item.bytes),
+            std::min({*room,expanded_room,static_cast<std::uint64_t>(entry_limit)}));
+        if(!bytes)return error(12);
+        if(!geometry.add(filename.size(),bytes->size()))throw std::logic_error("ZIP payload exceeds preflight");
+        expanded_room-=bytes->size();
+        members.push_back({std::move(filename),std::move(*bytes)});
+    }
+    Runtime::Native safe(runtime);
+    Result result;
+    result.bytes=zip_image(members,geometry);
+    return result;
+#endif
+}
 Result zip_execute(Request& q) {
 #ifdef VOID_HOST_PROVIDERS_UNAVAILABLE
     (void)q;return error(11);

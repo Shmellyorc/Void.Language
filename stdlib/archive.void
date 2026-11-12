@@ -20,6 +20,29 @@ value struct zip_limits:
     ## Maximum combined decoded bytes; native ceiling 64 GiB.
     expanded_bytes: i64 = 4294967296
 
+## One explicitly supplied flat file. Encoding snapshots its exact bytes.
+value struct zip_input:
+    name: string
+    bytes: [u8]
+
+## Independent writer ceilings. Callers can lower these, including to zero except archive_bytes (minimum 22).
+value struct zip_write_limits:
+    entries: i64 = 64
+    entry_bytes: i64 = 4194304
+    expanded_bytes: i64 = 16777216
+    archive_bytes: i64 = 16777216
+
+## Encode an owned stored ZIP image in ASCII name order with a fixed timestamp.
+## Names are flat ASCII file names with no case aliases. This operation does no filesystem I/O.
+## @param files Explicit names and payloads. An empty list encodes an empty archive.
+## @param limits Entry count, per-file bytes, combined payload and serialized size ceilings.
+## @return Complete owned ZIP bytes or a checked argument, range or quota error.
+func encode_zip(const files: [zip_input], limits: zip_write_limits = zip_write_limits()) -> result<[u8], system_error.error>:
+    var reply = _host_zip_encode(files, limits.entries, limits.entry_bytes, limits.expanded_bytes, limits.archive_bytes)
+    if reply.kind != 0:
+        return Err(system_error.make("archive.encode_zip", reply.kind, reply.os_code))
+    return Ok(reply.bytes)
+
 ## Owned header. The reader writes no filesystem paths.
 value struct zip_entry:
     ## Portable ASCII relative name; directory names retain their terminal slash.

@@ -38,7 +38,7 @@ All **25** tracked `.void` modules are covered below. Pure source APIs use the e
 
 | Module | Status and everyday use | Boundary and evidence |
 | --- | --- | --- |
-| [archive](../../stdlib/archive.void) | **PARTIAL.** Bounded read-only ZIP/ZIP64 stored/deflate stream with entry, expansion, CRC and close checks. Caller controls extraction. | No ZIP writer or general unpack command. [Native archive](../../src/runtime/host_archive.cpp) and [host capability fixtures](../../tests/host_capabilities). G12. |
+| [archive](../../stdlib/archive.void) | **PARTIAL.** Bounded ZIP/ZIP64 stored/deflate reader with entry, expansion, CRC and close checks. G12 adds a bounded deterministic stored ZIP writer for explicitly supplied files, pending independent review. | Caller controls extraction and publication. General unpack, writer compression and ZIP64 output are deferred. [ZIP export contract](../archive/ZIP_EXPORT.md) · [Reader fixtures](../../tests/host_capabilities) |
 | [channel](../../stdlib/channel.void) | **IMPLEMENTED.** Owner-thread typed topic routing, ordered synchronous delivery and exact subscription tokens. | **DEFERRED** for a cross-thread queue or async backpressure channel. [Channel contract](../channel/API.md), [routing tests](../../tests/channel), compiler event/callable semantics. |
 | [collections](../../stdlib/collections.void) | **IMPLEMENTED.** Stable copied sorting, search, predicates, transforms, fold, sum, extrema and ordered dictionary extraction/copy. | Fixed callers explicitly slice. Map sometimes needs concrete type arguments or a typed transform. Callback authority and mutation checks apply. [API](../collections/API.md), [native collection storage](../../src/runtime/list.cpp), [tests](../../tests/collections_stdlib). G09. |
 | [console](../../stdlib/console.void) | **IMPLEMENTED.** Checked text/byte streams, EOF/timeout distinctions, prompt conveniences, terminal mode, keys, cursor, color and size where supported. | Terminal capabilities vary by host and redirection. Convenience reads have a different failure contract from checked reads. [Native console](../../src/runtime/console.cpp), [combined contract](../combined/CONTRACT.md), [console source fixtures](../../tests/stage10/console.py), [Runtime tests](../../tests/runtime). |
@@ -214,17 +214,31 @@ General deadline composition and a bounded async queue are deferred.
 
 ### P2 — G11 · Native platform extensions and qualification
 
-**IN PROGRESS pending independent review.** Batch 12 qualifies the real
-Windows raylib 6.0 software provider through the D4 catalog and D5 package.
-The G5 fixture exercises the separate retained-callback contract. The
-macOS lane requires architecture review for Mach-O identity, loader
-resolution, bundle paths and signing. Signed App Sandbox remains
-unverified. The seven-job integration gate remains deferred.
+**INTEGRATED** at `79f212f2907b3fb5eeeabebb0aa8fa5705b82c86`. Batch 12
+qualifies the real Windows raylib 6.0 software provider through the D4 catalog
+and D5 package. The G5 fixture exercises the separate retained-callback
+contract. The retained raylib callback remains on HOLD. macOS managed native
+and D5 remain unsupported. Signed App Sandbox remains unverified. The seven-job
+integration gate remains deferred.
 [G11 qualification](../projects/G11_WINDOWS_MANAGED_NATIVE_QUALIFICATION.md) · [Platform and gate reconciliation](../projects/PROJECT_APPLICATION_ACCEPTANCE_RECONCILIATION.md)
 
 ### P3 — G12 · Optional language, FFI, crypto and archive extensions
 
-**DEFERRED/MISSING.** Advanced source constructs, generalized FFI/reload, broader crypto and archive writing require a demonstrated use case and reviewed observable semantics. Existing applications can use explicit factories, typed C descriptors, owned handles and read-only ZIP. New operators require consistent constant evaluation, typed IR validation and LLVM lowering, including edge-value tests. Any approved crypto addition needs provider vectors and misuse tests. An archive writer needs round-trip/CRC, path and resource-limit negatives. New native signatures or reload scope need ABI and owner/generation lifetime negatives in JIT and independently linked AOT where applicable. [Language boundaries](../LANGUAGE_BIBLE.md) · [Native bridge](../../include/void/c_primitive.hpp) · [Host tests](../../tests/host_capabilities) · [FFI controls](../../tests/ffi)
+**IN PROGRESS pending independent Golden Wrench review.** Batch 13 packages a
+validated game configuration, binary checkpoint and manifest as a deterministic
+stored ZIP. Callers supply explicit flat names and bounded byte arrays. The
+application uses G06 to publish and reopens the result through the existing ZIP
+reader. Acceptance covers independently verified record geometry and CRC,
+hostile names, limits, ownership, native JIT and independent AOT.
+[Design, example and qualification](../archive/ZIP_EXPORT.md)
+
+Advanced source constructs, generalized FFI/reload, broader crypto, ZIP writer
+compression, ZIP64 output and directory traversal remain deferred. New source
+operators require consistent constant evaluation, typed IR validation and LLVM
+lowering, including edge-value tests. Crypto additions need provider vectors
+and misuse tests. New native signatures or reload scope need ABI and
+owner/generation lifetime negatives in JIT and independently linked AOT where
+applicable. [Language boundaries](../LANGUAGE_BIBLE.md) · [Native bridge](../../include/void/c_primitive.hpp) · [Host tests](../../tests/host_capabilities) · [FFI controls](../../tests/ffi)
 
 ## 6. First three proposed implementation batches
 

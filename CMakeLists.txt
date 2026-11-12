@@ -1500,6 +1500,14 @@ if(BUILD_TESTING)
     add_test(NAME io_atomic_save_source COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/io/atomic_save.py"
       "$<TARGET_FILE:voidc>" "$<TARGET_FILE_DIR:voidc>/void-native.txt")
     set_tests_properties(io_atomic_save_source PROPERTIES TIMEOUT 180)
+
+    add_executable(void_archive_geometry tests/archive/geometry.cpp)
+    target_link_libraries(void_archive_geometry PRIVATE void_options)
+    add_test(NAME archive_export_geometry COMMAND void_archive_geometry)
+    set_tests_properties(archive_export_geometry PROPERTIES TIMEOUT 30)
+    add_test(NAME archive_export COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/archive/export.py"
+      "$<TARGET_FILE:voidc>" "$<TARGET_FILE_DIR:voidc>/void-native.txt")
+    set_tests_properties(archive_export PROPERTIES TIMEOUT 1200)
   endif()
 
   add_test(NAME io_execution COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/io/execution.py" "$<TARGET_FILE:voidc>")

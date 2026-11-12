@@ -53,6 +53,7 @@ Result error(std::int64_t kind,std::int64_t code=0);
 Result native_error(int code);
 Result crypto_execute(Request&);
 Result zip_execute(Request&);
+Result encode_zip(Runtime&,void*,const NativeArrayElement*,std::span<const std::int64_t,4>);
 Result directory_execute(Request&);
 Result windows_directory_execute(Request&);
 Result process_execute(Request&,const CaptureLimits* = nullptr);

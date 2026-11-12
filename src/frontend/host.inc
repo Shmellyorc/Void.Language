@@ -12,8 +12,9 @@
             char code=contract.arguments[n];Type type=Type::i64;
             if(code=='t')type=Type::string;
             else if(code=='b')type=ir::readonly_view(byte_list());
-            else if(code=='a') {
-                auto array=std::make_shared<ir::ValueType>();Type element=Type::string;
+            else if(code=='a' || code=='z') {
+                auto array=std::make_shared<ir::ValueType>();
+                Type element=code=='a' ? Type(Type::string) : Type(unit.structure_names.at("zip_input")->definition);
                 array->identity=array->name=ir::array_identity(element,{});array->element=ir::FieldType(element);
                 type=ir::readonly_view(Type(array,Type::growable_array));
             } else if(code!='s') {

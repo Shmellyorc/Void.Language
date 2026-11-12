@@ -108,6 +108,8 @@ Native hard ceilings are 16 GiB of archive input, 100000 members, 16 MiB of comb
 
 The curated profile requires portable ASCII relative components. It rejects encryption, other codecs, multidisk archives, unsupported metadata extensions, links/devices, duplicate/case/type aliases, regular-file ancestors, absolute/drive/backslash paths, dot traversal, reserved device names and trailing-dot/space aliases. Local and central names/methods/flags/sizes must agree. ZIP64 local headers, ZIP64 end records and data descriptors are exercised. Directories have empty data and zero CRC. Whole-entry EOF and CRC verification precede admission of the next file; unread file data returns busy. Closing an unread archive does not claim integrity.
 
+The later application ZIP writer emits a stored subset of this reader profile. [G12 writer contract and evidence](../archive/ZIP_EXPORT.md)
+
 This restriction is a reusable reader profile, not an extraction or installation policy. Phase B must still authenticate the archive, match the signed inventory, meter writes, verify every extracted file and control activation entirely in `.void`.
 
 ## Ownership and publication safety

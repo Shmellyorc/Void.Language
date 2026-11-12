@@ -11,6 +11,16 @@
                         if(c=='t' || c=='s') {if(t!=(c=='t'?Type(Type::string):Type(Type::i64)))fail("invalid host scalar");}
                         else if(c=='b' || c=='a') {
                             if(t.kind!=Type::growable_array || array_element(t)!=(c=='b'?Type(Type::u8):Type(Type::string)))fail("invalid host array");
+                        } else if(c=='z') {
+                            if(t.kind!=Type::growable_array || f.worker)fail("invalid ZIP input list");
+                            const auto entry=array_element(t);
+                            if(entry.kind!=Type::aggregate || !entry.definition ||
+                               entry.definition->identity!=std::string(host::archive)+"::zip_input" ||
+                               entry.definition->fields.size()!=2 || field_type(entry,0)!=Type::string)
+                                fail("invalid ZIP input element");
+                            const auto bytes=field_type(entry,1);
+                            if(bytes.kind!=Type::growable_array || array_element(bytes)!=Type::u8)
+                                fail("invalid ZIP input bytes");
                         } else if(t.kind!=Type::managed_ref || !t.definition || t.nullable || t.construction || t.readonly || !readonly_paths(t).empty() ||
                             t.definition->identity!=std::string(host::resource_module(c))+"::"+std::string(host::resource_name(c)))fail("invalid host resource");
                     }

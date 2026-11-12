@@ -1,0 +1,102 @@
+use archive
+use io
+use json
+use os
+use system_error
+
+value struct game_settings:
+    player: string
+    volume: u8
+
+value struct export_manifest:
+    version: i64
+    configuration: string
+    checkpoint: string
+
+func settings_budget() -> json.limits:
+    return json.limits(max_input_bytes = 4096, max_output_bytes = 4096,
+        max_depth = 4, max_nodes = 24, max_string_bytes = 256, max_number_bytes = 16,
+        max_object_members = 8, max_work = 32768)
+
+func matches(const expected: archive.zip_input, reader: archive.zip_reader) -> result<bool, system_error.error>:
+    var member = reader.next()?
+    if member.eof or member.directory or member.name != expected.name or member.size != expected.bytes.count:
+        return Ok(false)
+    var offset: i64 = 0
+    for true:
+        var chunk = reader.read(65536)?
+        if chunk.count == 0:
+            return Ok(offset == expected.bytes.count)
+        if chunk.count > expected.bytes.count - offset:
+            return Ok(false)
+        for byte in chunk:
+            if byte != expected.bytes[offset]:
+                return Ok(false)
+            offset = offset + 1
+
+func verify(input: io.file, const ordered: [archive.zip_input]) -> result<bool, system_error.error>:
+    with archive.open_zip(input)? as reader:
+        for expected in ordered:
+            if not matches(expected, reader)?:
+                return Ok(false)
+        var end = reader.next()?
+        var closed = reader.close()?
+        return Ok(end.eof and closed)
+
+func publish(destination: string, const image: [u8], const ordered: [archive.zip_input]) -> result<i32, io.error>:
+    with io.create_private_directory(destination)? as directory:
+        var saved = directory.save_bytes_atomic("save-export.zip", image, replace = false)
+        if not saved.published:
+            print("export failed before publication (code {saved.code}, cleanup {saved.cleanup_code})")
+            return Ok(3)
+        print("export published (synchronized {saved.synchronized}, code {saved.code}, cleanup {saved.cleanup_code})")
+        with directory.open_file("save-export.zip")? as input:
+            match verify(input, ordered):
+                Err(var failure):
+                    print(failure.message)
+                    return Ok(4)
+                Ok(var verified):
+                    if not verified:
+                        print("published archive does not match the export")
+                        return Ok(4)
+                    print("verified exact configuration, checkpoint and manifest bytes")
+        if saved.code != 0 or saved.cleanup_code != 0:
+            return Ok(5)
+        return Ok(0)
+
+func export_save(configuration: string, checkpoint: string, destination: string) -> result<i32, io.error>:
+    var raw = io.read_text(configuration, 4096)?
+    if json.parse_as<game_settings>(raw, settings_budget()) is Ok(var settings):
+        if settings.player == "" or settings.volume > 100:
+            print("invalid player name or volume")
+            return Ok(2)
+    else:
+        print("invalid game configuration")
+        return Ok(2)
+    var data = io.read_bytes(checkpoint, 4194304)?
+    var description = export_manifest(version = 1, configuration = "game.json", checkpoint = "checkpoint.bin")
+    if json.stringify(description, settings_budget()) is Ok(var manifest):
+        var game = archive.zip_input(name = "game.json", bytes = raw.to_utf8())
+        var save = archive.zip_input(name = "checkpoint.bin", bytes = data)
+        var info = archive.zip_input(name = "manifest.json", bytes = manifest.to_utf8())
+        match archive.encode_zip([info, game, save]):
+            Err(var failure):
+                print(failure.message)
+                return Ok(3)
+            Ok(var image):
+                # Exact read-back of the already validated UTF-8 text preserves its JSON semantics.
+                return publish(destination, image, [save, game, info])
+    print("could not encode export metadata")
+    return Ok(3)
+
+func main() -> i32:
+    if os.args() is Ok(var arguments):
+        if arguments.count == 3:
+            match export_save(arguments[0], arguments[1], arguments[2]):
+                Ok(var status):
+                    return status
+                Err(var failure):
+                    print(failure.message)
+                    return 1
+    print("Usage: save_export <configuration.json> <checkpoint.bin> <new absolute private directory>")
+    return 6

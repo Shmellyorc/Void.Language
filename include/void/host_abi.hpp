@@ -2,7 +2,7 @@
 #include "void/runtime_abi.hpp"
 #include <array>
 namespace vd::host {
-struct ReplyLayout {std::size_t size;std::array<std::size_t,7> fields;const NativeArrayElement* strings;};
+struct ReplyLayout {std::size_t size;std::array<std::size_t,7> fields;const NativeArrayElement* element;};
 template<std::size_t Fields>
 struct AsyncReplyLayout {
     std::size_t size;

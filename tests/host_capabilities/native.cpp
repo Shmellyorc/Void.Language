@@ -53,7 +53,7 @@ struct Boundary {
     }
     Reply call(unsigned op,std::initializer_list<void*> values={},std::initializer_list<std::int64_t> numbers={},bool strings=false) {
         std::array<void*,8> refs{};std::array<std::int64_t,8> nums{};std::copy(values.begin(),values.end(),refs.begin());std::copy(numbers.begin(),numbers.end(),nums.begin());
-        auto layout=geometry;if(strings)layout.strings=&string_element;reply={};failure={};
+        auto layout=geometry;if(strings)layout.element=&string_element;reply={};failure={};
         vd_host_call(&reply,&layout,op,refs.data(),nums.data(),&failure);return reply;
     }
     void cleanup(unsigned op,unsigned key) {failure={};vd_host_cleanup(op,keys[key],&failure);check(!failure.message,"checked resource cleanup failed");}

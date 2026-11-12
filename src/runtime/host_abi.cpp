@@ -143,6 +143,13 @@ extern "C" void vd_host_call(void* output,const vd::host::ReplyLayout* layout,un
         auto& runtime=Runtime::current();Admission admission(runtime);
         Reply reply;constexpr std::array<std::size_t,2> offsets{offsetof(Reply,text),offsetof(Reply,bytes)};
         Runtime::Slot slot{&reply,sizeof(reply),offsets.data(),offsets.size()};Runtime::Frame roots(runtime,&slot,1);
+        if(op==zip_encode) {
+            auto result=encode_zip(runtime,refs[0],layout->element,std::span<const std::int64_t,4>{nums,4});
+            reply.kind=result.kind;reply.code=result.code;
+            runtime.bytes_into(&reply.bytes,result.bytes);
+            std::memcpy(output,&reply,sizeof(reply));
+            return;
+        }
         // Allocate the empty owned byte reply before entering any namespace
         // mutation. Publication status can then be returned without allocation.
         runtime.bytes_into(&reply.bytes,{});
@@ -165,7 +172,7 @@ extern "C" void vd_host_call(void* output,const vd::host::ReplyLayout* layout,un
                 if(extent>byte_snapshot_limit){result=error(12);break;}
                 request.bytes.push_back(runtime.byte_array_bytes(runtime.root_word(&value)));
             } else if(c=='a') {
-                request.arrays.push_back(strings(runtime,value,layout->strings));
+                request.arrays.push_back(strings(runtime,value,layout->element));
             } else if(factory(op) && ((op==dir_child || op==dir_open || op==dir_file || op==dir_lock)?reference==2:reference==1)) {
                 created_key=value;created_kind=c;
                 if(!value)throw std::logic_error("Null host acquisition identity");
