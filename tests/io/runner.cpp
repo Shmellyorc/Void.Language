@@ -1,5 +1,6 @@
 #include "void/backend.hpp"
 #include "void/frontend.hpp"
+#include "void/runtime.hpp"
 #include "void/source.hpp"
 
 #include <filesystem>
@@ -73,13 +74,16 @@ int main(int argc, char** argv) {
             else vd::emit_object(analysis.program->lower(), argv[3], optimized);
             return 0;
         }
-        if (mode != "--async" && mode != "--sync") throw std::runtime_error("Unknown runner mode");
+        const bool one_worker = mode == "--async-one-worker";
+        if (mode != "--async" && mode != "--sync" && !one_worker) throw std::runtime_error("Unknown runner mode");
         for (bool optimized : {false, true}) {
-            vd::Jit jit;
-            auto code = mode == "--async" ? jit.compile_async(*analysis.program, optimized) :
+            vd::Jit jit({}, one_worker ? vd::ir::Emission::entry : vd::ir::Emission::all);
+            auto code = mode != "--sync" ? jit.compile_async(*analysis.program, optimized) :
                                            jit.compile(*analysis.program, optimized);
+            if (one_worker) code->runtime_owner()->async_worker_limit(1);
             auto answer = code->invoke(7);
             if (answer != 7) throw std::runtime_error("Expected 7, received " + std::to_string(answer));
+            if (one_worker && code->runtime_owner()->close()) throw std::runtime_error("Network Runtime did not drain");
             std::cout << (optimized ? "O2" : "Debug") << " source execution passed\n";
         }
         return 0;

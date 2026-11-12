@@ -11,6 +11,14 @@ approved vendored curl fixes and Linux TLS pin are integrated. Native platform
 execution, provider worst-case memory certification and independent full HTTP
 acceptance remain pending.
 
+`net/address`, `net/tcp`, `net/udp` and `net/error` provide typed numeric
+endpoints, bounded c-ares DNS resolution, owned TCP listeners and byte streams,
+and owned unicast UDP sockets. Linux x64 and Windows x64 use native
+nonblocking sockets. Async calls use Runtime external completion.
+TCP reports exact local write progress and EOF. UDP reports consumed oversized
+datagrams as checked errors. [Addresses and DNS](../docs/net/address/API.md) ·
+[TCP](../docs/net/tcp/API.md) · [UDP](../docs/net/udp/API.md) · [Errors](../docs/net/error/API.md)
+
 `use log` provides five checked severity functions, inclusive/off filtering,
 lazy messages, fixed UTC single-line UTF-8 framing, borrowed console destinations,
 persistent files, explicit adoption, bounded rotation, independent managed loggers,

@@ -1,0 +1,26 @@
+use net/address
+use net/tcp
+use net/error as net_error
+
+func serve_once() -> result<i64, net_error.error>:
+    var local = address.endpoint(ip = address.loopback_v4(), port = 0)
+    with tcp.listen(local)? as server:
+        var bound = server.local_endpoint()?
+        print("Listening", bound.port)
+        with server.accept(timeout_ms = 10000)? as peer:
+            var total: i64 = 0
+            for true:
+                var block = peer.read_bytes(max_count = 4096, timeout_ms = 5000)?
+                if block.eof:
+                    var half_closed = peer.shutdown_write()?
+                    var peer_closed = peer.close()?
+                    var server_closed = server.close()?
+                    return Ok(total)
+                total += peer.write_bytes(block.bytes, timeout_ms = 5000)?
+    return Ok(0)
+
+func main() -> i32:
+    if serve_once() is Err(var problem):
+        print(problem.message)
+        return 1
+    return 0

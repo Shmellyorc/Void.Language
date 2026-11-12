@@ -1,0 +1,215 @@
+use net/address
+use net/error as net_error
+
+## Overall DNS/connect deadline and optional per-candidate hostname budget.
+value struct connect_options:
+    family: address.family = address.family.any
+    timeout_ms: i64 = 30000
+    attempt_timeout_ms: i64 = 3000
+    no_delay: bool = true
+
+## Requested native backlog and no-delay policy for accepted streams.
+value struct listen_options:
+    backlog: i32 = 128
+    no_delay: bool = true
+
+## Owned connected TCP stream. Aliases share closure and direction reservations.
+struct stream:
+    private _identity: bool
+
+private func (self stream) init():
+    pass
+
+## Owned TCP listener. Accepted streams have independent lifetimes.
+struct listener:
+    private _identity: bool
+
+private func (self listener) init():
+    pass
+
+## A bounded byte read. EOF is reported on a successful empty read.
+struct chunk:
+    bytes: [u8]
+    eof: bool
+
+private value struct _network_reply:
+    kind: i64
+    phase: i64
+    domain: i64
+    native_code: i64
+    cleanup: i64
+    number: i64
+    detail: i64
+    port: i64
+    family_code: i64
+    flag: bool
+    text: string
+    bytes: [u8]
+
+private func _error(operation: string, reply: _network_reply, attempts: i64 = 0) -> net_error.error:
+    var progress = reply.number
+    if attempts != 0:
+        progress = 0
+    return net_error.make(operation, reply.kind, reply.phase, reply.domain, reply.native_code,
+        reply.cleanup, progress, reply.bytes, reply.text, false, -1, attempts)
+
+private func _bool(operation: string, reply: _network_reply) -> result<bool, net_error.error>:
+    if reply.kind != 0:
+        return Err(_error(operation, reply))
+    return Ok(true)
+
+private func _count(operation: string, reply: _network_reply) -> result<i64, net_error.error>:
+    if reply.kind != 0:
+        return Err(_error(operation, reply))
+    return Ok(reply.number)
+
+private func _chunk(operation: string, reply: _network_reply) -> result<chunk, net_error.error>:
+    if reply.kind != 0:
+        return Err(_error(operation, reply))
+    return Ok(chunk(bytes = reply.bytes, eof = reply.flag))
+
+private func _endpoint(operation: string, reply: _network_reply) -> result<address.endpoint, net_error.error>:
+    if reply.kind != 0:
+        return Err(_error(operation, reply))
+    return Ok(address._endpoint(reply.text, reply.port))
+
+private func _flag(value: bool) -> i64:
+    if value:
+        return 1
+    return 0
+
+## Resolve a hostname and connect using sequential candidate fallback.
+func connect(host: string, port: u16, options: connect_options = connect_options()) -> result<stream, net_error.error>:
+    var owned = stream()
+    var reply = _net_connect(owned, host, port as i64, address._family_code(options.family), options.timeout_ms,
+        options.attempt_timeout_ms, _flag(options.no_delay), 1)
+    if reply.kind != 0:
+        return Err(_error("tcp.connect", reply, reply.number))
+    return Ok(owned)
+
+## Resolve a hostname and connect using sequential candidate fallback. Uses external native completion.
+async func connect_async(host: string, port: u16, options: connect_options = connect_options()) -> result<stream, net_error.error>:
+    var owned = stream()
+    var reply = await _net_connect_async(owned, host, port as i64, address._family_code(options.family), options.timeout_ms,
+        options.attempt_timeout_ms, _flag(options.no_delay), 1)
+    if reply.kind != 0:
+        return Err(_error("tcp.connect_async", reply, reply.number))
+    return Ok(owned)
+
+## Connect directly to a numeric endpoint.
+func connect_endpoint(remote: address.endpoint, options: connect_options = connect_options()) -> result<stream, net_error.error>:
+    var owned = stream()
+    var reply = _net_connect(owned, address.format_ip(remote.ip), remote.port as i64, address._family_code(options.family), options.timeout_ms,
+        options.attempt_timeout_ms, _flag(options.no_delay), 0)
+    if reply.kind != 0:
+        return Err(_error("tcp.connect_endpoint", reply, reply.number))
+    return Ok(owned)
+
+## Connect directly to a numeric endpoint. Uses external native completion.
+async func connect_endpoint_async(remote: address.endpoint, options: connect_options = connect_options()) -> result<stream, net_error.error>:
+    var owned = stream()
+    var reply = await _net_connect_async(owned, address.format_ip(remote.ip), remote.port as i64, address._family_code(options.family), options.timeout_ms,
+        options.attempt_timeout_ms, _flag(options.no_delay), 0)
+    if reply.kind != 0:
+        return Err(_error("tcp.connect_endpoint_async", reply, reply.number))
+    return Ok(owned)
+
+## Bind and listen on an explicit numeric endpoint.
+func listen(local: address.endpoint, options: listen_options = listen_options()) -> result<listener, net_error.error>:
+    var owned = listener()
+    var reply = _net_listen(owned, address.format_ip(local.ip), local.port as i64, options.backlog as i64, _flag(options.no_delay))
+    if reply.kind != 0:
+        return Err(_error("tcp.listen", reply))
+    return Ok(owned)
+
+## Bind and listen on an explicit numeric endpoint. Uses external native completion.
+async func listen_async(local: address.endpoint, options: listen_options = listen_options()) -> result<listener, net_error.error>:
+    var owned = listener()
+    var reply = await _net_listen_async(owned, address.format_ip(local.ip), local.port as i64, options.backlog as i64, _flag(options.no_delay))
+    if reply.kind != 0:
+        return Err(_error("tcp.listen_async", reply))
+    return Ok(owned)
+
+## Accept a connection with its own lifetime.
+func (self listener) accept(timeout_ms: i64 = 0) -> result<stream, net_error.error>:
+    var owned = stream()
+    var reply = _net_accept(self, owned, timeout_ms)
+    if reply.kind != 0:
+        return Err(_error("tcp.accept", reply))
+    return Ok(owned)
+
+## Accept a connection with its own lifetime. Uses external native completion.
+async func (self listener) accept_async(timeout_ms: i64 = 0) -> result<stream, net_error.error>:
+    var owned = stream()
+    var reply = await _net_accept_async(self, owned, timeout_ms)
+    if reply.kind != 0:
+        return Err(_error("tcp.accept_async", reply))
+    return Ok(owned)
+
+## Read up to the requested byte count or observe EOF.
+func (self stream) read_bytes(max_count: i64 = 65536, timeout_ms: i64 = 30000) -> result<chunk, net_error.error>:
+    var reply = _net_read(self, max_count, timeout_ms)
+    return _chunk("tcp.read_bytes", reply)
+
+## Read up to the requested byte count or observe EOF. Uses external native completion.
+async func (self stream) read_bytes_async(max_count: i64 = 65536, timeout_ms: i64 = 30000) -> result<chunk, net_error.error>:
+    var reply = await _net_read_async(self, max_count, timeout_ms)
+    return _chunk("tcp.read_bytes_async", reply)
+
+## Write the complete snapshot or report the locally accepted prefix.
+func (self stream) write_bytes(const bytes: [u8], timeout_ms: i64 = 30000) -> result<i64, net_error.error>:
+    var reply = _net_write(self, bytes, timeout_ms)
+    return _count("tcp.write_bytes", reply)
+
+## Write the complete snapshot or report the locally accepted prefix. Uses external native completion.
+async func (self stream) write_bytes_async(const bytes: [u8], timeout_ms: i64 = 30000) -> result<i64, net_error.error>:
+    var reply = await _net_write_async(self, bytes, timeout_ms)
+    return _count("tcp.write_bytes_async", reply)
+
+## Close the write direction while preserving reads.
+func (self stream) shutdown_write() -> result<bool, net_error.error>:
+    var reply = _net_shutdown(self)
+    return _bool("tcp.shutdown_write", reply)
+
+## Close the write direction while preserving reads. Uses external native completion.
+async func (self stream) shutdown_write_async() -> result<bool, net_error.error>:
+    var reply = await _net_shutdown_async(self)
+    return _bool("tcp.shutdown_write_async", reply)
+
+## Close the owned stream and wake pending operations.
+func (self stream) close() -> result<bool, net_error.error>:
+    var reply = _net_close_stream(self)
+    return _bool("tcp.close", reply)
+
+## Close the owned stream and wake pending operations. Uses external native completion.
+async func (self stream) close_async() -> result<bool, net_error.error>:
+    var reply = await _net_close_stream_async(self)
+    return _bool("tcp.close_async", reply)
+
+## Close the listener and wake its pending accept.
+func (self listener) close() -> result<bool, net_error.error>:
+    var reply = _net_close_listener(self)
+    return _bool("tcp.close", reply)
+
+## Close the listener and wake its pending accept. Uses external native completion.
+async func (self listener) close_async() -> result<bool, net_error.error>:
+    var reply = await _net_close_listener_async(self)
+    return _bool("tcp.close_async", reply)
+
+## Report the bound address and port.
+func (self listener) local_endpoint() -> result<address.endpoint, net_error.error>:
+    return _endpoint("tcp.local_endpoint", _net_listener_local(self))
+
+## Report the stream's local address and port.
+func (self stream) local_endpoint() -> result<address.endpoint, net_error.error>:
+    return _endpoint("tcp.local_endpoint", _net_stream_local(self))
+
+## Report the connected peer.
+func (self stream) remote_endpoint() -> result<address.endpoint, net_error.error>:
+    return _endpoint("tcp.remote_endpoint", _net_stream_remote(self))
+
+func (self stream) deinit():
+    _net_cleanup_stream(self)
+
+func (self listener) deinit():
+    _net_cleanup_listener(self)

@@ -1,0 +1,38 @@
+use net/address
+use net/tcp
+use net/error as net_error
+use convert
+use os
+
+func echo(port: u16) -> result<bool, net_error.error>:
+    var target = address.endpoint(ip = address.loopback_v4(), port = port)
+    with tcp.connect_endpoint(target, tcp.connect_options(timeout_ms = 5000))? as peer:
+        var sent = peer.write_bytes("hello VOID".to_utf8(), timeout_ms = 5000)?
+        var half_closed = peer.shutdown_write()?
+        var echoed: [u8] = []
+        for true:
+            var block = peer.read_bytes(max_count = 32, timeout_ms = 5000)?
+            if block.eof:
+                var closed = peer.close()?
+                if string.from_utf8(echoed) is Ok(var response):
+                    return Ok(echoed.count == sent and response == "hello VOID")
+                return Ok(false)
+            for value in block.bytes:
+                if echoed.count >= sent:
+                    return Ok(false)
+                echoed.push(value)
+    return Ok(false)
+
+func main() -> i32:
+    if os.args() is Ok(var operands):
+        if operands.count == 1:
+            if convert.parse<u16>(operands[0]) is Ok(var port):
+                if echo(port) is Ok(var matched):
+                    if matched:
+                        print("Echo verified")
+                        return 0
+                else:
+                    print("Echo exchange failed")
+                    return 1
+    print("Usage: tcp_echo_client <loopback port>")
+    return 2

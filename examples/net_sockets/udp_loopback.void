@@ -1,0 +1,23 @@
+use net/address
+use net/udp
+use net/error as net_error
+
+func exchange() -> result<bool, net_error.error>:
+    var local = address.endpoint(ip = address.loopback_v4(), port = 0)
+    with udp.bind(local)? as receiver:
+        with udp.bind(local)? as sender:
+            var destination = receiver.local_endpoint()?
+            var origin = sender.local_endpoint()?
+            var sent = sender.send_to([0, 17, 255], destination, timeout_ms = 5000)?
+            var received = receiver.receive_from(max_count = 3, timeout_ms = 5000)?
+            var receiver_closed = receiver.close()?
+            var sender_closed = sender.close()?
+            return Ok(sent == 3 and received.peer.port == origin.port and received.bytes.count == 3 and received.bytes[0] == 0)
+
+func main() -> i32:
+    if exchange() is Ok(var matched):
+        if matched:
+            print("Datagram verified")
+            return 0
+    print("UDP exchange failed")
+    return 1

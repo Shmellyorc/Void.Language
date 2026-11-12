@@ -513,3 +513,39 @@ sequential fallback); and the first unicast feature boundary/default resource
 limits. Recommended answers are the policies specified above. No decision is
 needed to preserve existing roots, error ordering, worker restrictions or HTTP.
 Stop for Golden Wrench/Boss review before engineering.
+
+## Batch 4 contract review
+
+The authorized implementation starts at `77986362acf8b40d52aacbbdb324665b4484155b`.
+The G04 worker adapter runs one operation until completion. A pending
+socket read or accept could therefore occupy the only worker needed by
+its peer. Sockets use `ExternalNativeJob` and its two completion tickets
+instead. A native-only poll service per Runtime handles readiness, deadlines
+and c-ares channels. Synchronous calls use the same service and wait in
+`Runtime::Native`. The service holds the existing `http::ProviderLease`
+through socket and resolver shutdown. HTTP and its initialization remain
+separate from the socket operation queue.
+
+The first supported targets are Linux x64 and Windows x64. Numeric
+addresses store a private canonical representation, family and numeric
+scope. The native boundary reconstructs validated binary socket addresses.
+Network operations enforce explicit family, exclusive binds, unicast
+destinations and the proposed sequential fallback. One c-ares channel
+per lookup isolates cancellation and uses the already pinned headers and
+library. DNS answers contain at most 32 distinct endpoints.
+
+The service admits at most 1,024 native sockets, 2,048 ordinary operations,
+32 lookups and 64 MiB of retained native payload and receive reservations
+per Runtime. TCP transfers allow at most 4 MiB per operation. A positive
+deadline is limited to 24 hours. Accept, TCP data and datagram operations
+accept zero for no deadline. Direction reservations precede input copies.
+A reserved close path and the original completion tickets retire native
+state even when ordinary admission is full. The provider holds native
+copies only. The executor roots wrappers and materializes results.
+
+Cancellation of an admitted TCP data operation closes its stream before
+retirement, including completion races. The same cleanup applies if
+managed publication fails. Accept or connect abandonment closes an
+unpublished stream. UDP cancellation retires the operation and can leave
+one send or receive effect. Oversized UDP receives consume one message
+and return its known size and sender without a truncated success.

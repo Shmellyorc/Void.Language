@@ -1,0 +1,95 @@
+use convert
+use net/address
+use net/tcp
+use net/udp
+use net/error as net_error
+
+func main() -> i32:
+    var local = address.endpoint(ip = address.loopback_v4(), port = 0)
+    var scoped = convert.unwrap(address.parse_ip("FE80:0::1%42"))
+    if address.format_ip(scoped) != "fe80::1%42" or scoped.scope_index() != 42 or scoped.address_family() != address.family.v6:
+        return 10
+    if address.format_endpoint(address.endpoint(ip = scoped, port = 65535)) != "[fe80::1%42]:65535":
+        return 11
+    for invalid in ["1.2.03.4", "[::1]", "127.1", "::ffff:192.0.2.1", "fe80::1%lo", "fe80::1%4294967296"]:
+        if address.parse_ip(invalid) is Ok(var unexpected):
+            return 12
+    if address.resolve("1.2.03.4", 80) is Ok(var unexpected):
+        return 13
+    var known = convert.unwrap(address.resolve("localhost", 80, address.resolve_options(family = address.family.v4)))
+    if known.count < 1 or known.count > 32 or known[0].port != 80 or known[0].ip.address_family() != address.family.v4:
+        return 14
+    var payload: [u8] = []
+    for index in 0..<70000:
+        payload.push((index % 256) as u8)
+    with convert.unwrap(tcp.listen(local)) as server:
+        var bound = convert.unwrap(server.local_endpoint())
+        if bound.port == 0 or address.format_ip(bound.ip) != "127.0.0.1":
+            return 15
+        with convert.unwrap(tcp.connect_endpoint(bound)) as client:
+            with convert.unwrap(server.accept(timeout_ms = 2000)) as peer:
+                convert.unwrap(server.close())
+                var remote = convert.unwrap(peer.remote_endpoint())
+                if remote.port != convert.unwrap(client.local_endpoint()).port:
+                    return 16
+                if peer.read_bytes(timeout_ms = 25) is Err(var failure):
+                    if failure.kind != net_error.error_kind.timed_out:
+                        return 17
+                else:
+                    return 18
+                if convert.unwrap(client.write_bytes(payload)) != payload.count:
+                    return 19
+                convert.unwrap(client.shutdown_write())
+                convert.unwrap(client.shutdown_write())
+                if client.write_bytes([1]) is Err(var failure):
+                    if failure.kind != net_error.error_kind.write_closed:
+                        return 20
+                else:
+                    return 21
+                var total: i64 = 0
+                var eof = false
+                for not eof:
+                    var block = convert.unwrap(peer.read_bytes(max_count = 1024))
+                    eof = block.eof
+                    if block.bytes.count > 1024 or (eof and block.bytes.count != 0):
+                        return 22
+                    for value in block.bytes:
+                        if value != (total % 256) as u8:
+                            return 23
+                        total += 1
+                if total != payload.count or not convert.unwrap(peer.read_bytes()).eof:
+                    return 24
+    with convert.unwrap(udp.bind(local)) as sender:
+        with convert.unwrap(udp.bind(local)) as receiver:
+            var destination = convert.unwrap(receiver.local_endpoint())
+            if convert.unwrap(sender.send_to([], destination)) != 0:
+                return 25
+            var empty = convert.unwrap(receiver.receive_from(max_count = 0))
+            if empty.bytes.count != 0 or empty.peer.port != convert.unwrap(sender.local_endpoint()).port:
+                return 26
+            convert.unwrap(sender.send_to([0, 255, 8], destination))
+            convert.unwrap(sender.send_to([0, 255], destination))
+            if receiver.receive_from(max_count = 1) is Err(var failure):
+                if failure.kind != net_error.error_kind.message_too_large or not failure.datagram_consumed or failure.datagram_size != 3 or failure.bytes_transferred != 3 or failure.partial.count != 0:
+                    return 27
+            else:
+                return 28
+            var delivered = convert.unwrap(receiver.receive_from(max_count = 2))
+            if delivered.bytes.count != 2 or delivered.bytes[0] != 0 or delivered.bytes[1] != 255:
+                return 29
+            if sender.send_to([1], address.endpoint(ip = address.loopback_v6(), port = destination.port)) is Err(var failure):
+                if failure.kind != net_error.error_kind.invalid_address:
+                    return 30
+            else:
+                return 31
+            if sender.send_to(payload, destination) is Err(var failure):
+                if failure.kind != net_error.error_kind.message_too_large or failure.datagram_consumed:
+                    return 32
+            else:
+                return 33
+            if sender.send_to([1], address.endpoint(ip = address.any_v4(), port = destination.port)) is Err(var failure):
+                if failure.kind != net_error.error_kind.invalid_address:
+                    return 34
+            else:
+                return 35
+    return 0

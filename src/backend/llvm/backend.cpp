@@ -2384,6 +2384,7 @@ Jit::Jit(DebugCache cache,ir::Emission emission) : impl_(std::make_shared<Impl>(
     bind("vd_http_cleanup", vd_http_cleanup);
     bind("vd_os_call", vd_os_call);
     bind("vd_host_call",vd_host_call);bind("vd_host_cleanup",vd_host_cleanup);bind("vd_host_capture",vd_host_capture);
+    bind("vd_net_call",vd_net_call);bind("vd_net_cleanup",vd_net_cleanup);
     bind("vd_file_control", vd_file_control);
     bind("vd_console_v2",vd_console_v2);bind("vd_console_print",vd_console_print);
     bind("vd_temporal",vd_temporal);bind("vd_format_layout",vd_format_layout);bind("vd_display_enter",vd_display_enter);bind("vd_display_leave",vd_display_leave);bind("vd_display_error",vd_display_error);

@@ -1,7 +1,8 @@
                 case Op::host_native: {
                     const auto& contract=host::operations.at(instruction.immediate);
+                    const bool network=host::network_operation(instruction.immediate);
                     if(contract.cleanup) {
-                        b.CreateCall(module->getOrInsertFunction("vd_host_cleanup",b.getVoidTy(),b.getInt32Ty(),b.getPtrTy(),b.getPtrTy()),
+                        b.CreateCall(module->getOrInsertFunction(network?"vd_net_cleanup":"vd_host_cleanup",b.getVoidTy(),b.getInt32Ty(),b.getPtrTy(),b.getPtrTy()),
                             {b.getInt32(instruction.immediate),values[instruction.arguments[0]],failure});selected_failure();
                         v=llvm::UndefValue::get(b.getInt8Ty());break;
                     }
@@ -19,20 +20,20 @@
                     llvm::Constant* strings=llvm::ConstantPointerNull::get(b.getPtrTy());
                     for(unsigned k=0;k<contract.arguments.size();++k)if(contract.arguments[k]=='a')strings=element_record(ir::array_element(operand_type(instruction.arguments[k])));
                     const bool capture=host::capture_operation(instruction.immediate);
-                    const bool asynchronous=instruction.immediate==host::capture_async;
+                    const bool asynchronous=host::asynchronous(instruction.immediate);
                     const auto reply=asynchronous?ir::field_type(instruction.type,1):instruction.type;
-                    const unsigned fields=capture?11:7;
+                    const unsigned fields=network?12:capture?11:7;
                     auto* offsets_type=llvm::ArrayType::get(size_type,fields);
                     std::vector<llvm::Constant*> offsets;
                     for(unsigned k=0;k<fields;++k)offsets.push_back(llvm::ConstantInt::get(size_type,field_offset(reply,k)));
                     std::vector<llvm::Constant*> geometry{
                         llvm::ConstantInt::get(size_type,layout.getTypeAllocSize(type(reply))),llvm::ConstantArray::get(offsets_type,offsets),strings};
                     auto* record_type=llvm::StructType::get(size_type,offsets_type,b.getPtrTy());
-                    if(capture) {
+                    if(capture || network) {
                         record_type=llvm::StructType::get(size_type,offsets_type,b.getPtrTy(),size_type,b.getPtrTy(),size_type,size_type,b.getPtrTy());
-                        if(layout.getTypeAllocSize(record_type)!=sizeof(host::CaptureLayout) ||
-                           layout.getStructLayout(record_type)->getElementOffset(7)!=offsetof(host::CaptureLayout,task_key))
-                            throw std::logic_error("Host capture ABI mismatch");
+                        if(layout.getTypeAllocSize(record_type)!=(network?sizeof(host::NetworkLayout):sizeof(host::CaptureLayout)) ||
+                           layout.getStructLayout(record_type)->getElementOffset(7)!=(network?offsetof(host::NetworkLayout,task_key):offsetof(host::CaptureLayout,task_key)))
+                            throw std::logic_error("Extended host reply ABI mismatch");
                         auto task=asynchronous?ir::Type(instruction.type.definition):ir::Type(ir::Type::none);
                         std::vector<std::uint64_t> task_refs;
                         if(asynchronous)reference_offsets(task,0,task_refs);
@@ -46,7 +47,7 @@
                         throw std::logic_error("Host reply ABI mismatch");
                     auto* record=new llvm::GlobalVariable(*module,record_type,true,llvm::GlobalValue::PrivateLinkage,
                         llvm::ConstantStruct::get(record_type,geometry),"host.reply.layout");
-                    if(capture)b.CreateCall(module->getOrInsertFunction("vd_host_capture",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),
+                    if(capture || network)b.CreateCall(module->getOrInsertFunction(network?"vd_net_call":"vd_host_capture",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),
                         {output,record,b.getInt32(instruction.immediate),refs,nums,async_generation,failure});
                     else b.CreateCall(module->getOrInsertFunction("vd_host_call",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),
                         {output,record,b.getInt32(instruction.immediate),refs,nums,failure});

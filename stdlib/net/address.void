@@ -1,0 +1,116 @@
+use convert
+use text as strings
+use net/error as net_error
+
+## Address-family filter. Each numeric address has a concrete family.
+enum family(u8):
+    any = 0
+    v4 = 4
+    v6 = 6
+
+## Validated IP address with a canonical numeric representation.
+value struct ip_address:
+    private _canonical: string = ""
+    private _family: family = family.any
+    private _scope: u32 = 0
+
+private func (self ip_address) init(canonical: string, selected: family, scope: u32):
+    self._canonical = canonical
+    self._family = selected
+    self._scope = scope
+
+## Numeric endpoint with a host-order port. Port zero requests ephemeral bind.
+value struct endpoint:
+    ip: ip_address
+    port: u16
+
+value struct resolve_options:
+    family: family = family.any
+    timeout_ms: i64 = 5000
+
+private value struct _network_reply:
+    kind: i64
+    phase: i64
+    domain: i64
+    native_code: i64
+    cleanup: i64
+    number: i64
+    detail: i64
+    port: i64
+    family_code: i64
+    flag: bool
+    text: string
+    bytes: [u8]
+
+private func _error(operation: string, reply: _network_reply) -> net_error.error:
+    return net_error.make(operation, reply.kind, reply.phase, reply.domain, reply.native_code,
+        reply.cleanup, 0, reply.bytes, "", false, -1, 0)
+
+## Parse a strict numeric IPv4 or IPv6 address, with an optional IPv6 numeric scope.
+func parse_ip(value: string) -> result<ip_address, net_error.error>:
+    var reply = _net_parse(value)
+    if reply.kind != 0:
+        return Err(_error("address.parse_ip", reply))
+    var selected = family.v4
+    if reply.family_code == 6:
+        selected = family.v6
+    return Ok(ip_address(reply.text, selected, reply.detail as u32))
+
+## Canonical numeric IP without brackets or a port.
+func format_ip(value: ip_address) -> string:
+    return value.numeric()
+
+## Canonical endpoint, with brackets around IPv6.
+func format_endpoint(value: endpoint) -> string:
+    var numeric = value.ip.numeric()
+    if value.ip.address_family() == family.v6:
+        return "[{numeric}]:{value.port}"
+    return "{numeric}:{value.port}"
+
+func (self ip_address) address_family() -> family:
+    return self._family
+
+private func (self ip_address) numeric() -> string:
+    return self._canonical
+
+func (self ip_address) scope_index() -> u32:
+    return self._scope
+
+func any_v4() -> ip_address:
+    return ip_address("0.0.0.0", family.v4, 0)
+
+func any_v6() -> ip_address:
+    return ip_address("::", family.v6, 0)
+
+func loopback_v4() -> ip_address:
+    return ip_address("127.0.0.1", family.v4, 0)
+
+func loopback_v6() -> ip_address:
+    return ip_address("::1", family.v6, 0)
+
+internal func _family_code(selected: family) -> i64:
+    if selected == family.v4:
+        return 4
+    if selected == family.v6:
+        return 6
+    return 0
+
+internal func _endpoint(numeric: string, port: i64) -> endpoint:
+    return endpoint(ip = convert.unwrap(parse_ip(numeric)), port = port as u16)
+
+private func _resolved(operation: string, reply: _network_reply, port: u16) -> result<[endpoint], net_error.error>:
+    if reply.kind != 0:
+        return Err(_error(operation, reply))
+    var endpoints: [endpoint] = []
+    for numeric in convert.unwrap(strings.split(reply.text, "\n", max_parts = 32)):
+        endpoints.push(_endpoint(numeric, port as i64))
+    return Ok(endpoints)
+
+## Resolve a numeric literal or ASCII DNS name to at most 32 distinct endpoints.
+func resolve(host: string, port: u16, options: resolve_options = resolve_options()) -> result<[endpoint], net_error.error>:
+    return _resolved("address.resolve", _net_resolve(host, port as i64, _family_code(options.family), options.timeout_ms), port)
+
+## Resolve through the Runtime provider while the owner activation remains available.
+async func resolve_async(host: string, port: u16, options: resolve_options = resolve_options()) -> result<[endpoint], net_error.error>:
+    var reply = await _net_resolve_async(host, port as i64, _family_code(options.family), options.timeout_ms)
+    return _resolved("address.resolve_async", reply, port)

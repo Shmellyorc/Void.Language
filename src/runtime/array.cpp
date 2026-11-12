@@ -378,12 +378,22 @@ void Runtime::bytes_into(void** out,std::string_view source) {
     auto& header=list_header(root,layout->schema());header.backing=backing;header.count=header.capacity=bytes.size();*out=result;
 }
 std::string Runtime::byte_array_bytes(RegisteredRootWord source) {
+    return std::move(*bounded_byte_array_bytes(source,std::numeric_limits<std::uint64_t>::max()));
+}
+std::uint64_t Runtime::byte_array_size(RegisteredRootWord source) {
+    auto schema=fixed_scalar_layout(ScalarEncoding::u8,0)->schema();
+    std::lock_guard lock(mutex_);
+    return list_header(source,schema).count;
+}
+std::optional<std::string> Runtime::bounded_byte_array_bytes(RegisteredRootWord source,std::uint64_t maximum) {
     auto schema=fixed_scalar_layout(ScalarEncoding::u8,0)->schema();
     // Capture the existing backing with a precise root and a read lease. No
     // source mutation is allowed while the owned native snapshot is copied.
     void* backing=nullptr;constexpr std::size_t zero=0;Slot slot{&backing,sizeof(backing),&zero,1};Frame roots(*this,&slot,1);
     std::uint64_t count;BufferLayoutRef layout;
-    {std::lock_guard lock(mutex_);const auto& header=list_header(source,schema);count=header.count;backing=header.backing;if(backing)layout=heap_.buffer_state(backing).layout;}
+    {std::lock_guard lock(mutex_);const auto& header=list_header(source,schema);count=header.count;
+        if(count>maximum)return {};
+        backing=header.backing;if(backing)layout=heap_.buffer_state(backing).layout;}
     std::string bytes;
     if(count){BufferReadLease lease(*this,root_word(&backing),layout);bytes.resize(count);
         if(layout->schema()==schema && layout->stride()==1){

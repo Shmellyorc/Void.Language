@@ -123,6 +123,10 @@ target_link_libraries(void_runtime PUBLIC CURL::libcurl_static void_http_compres
 include(cmake/HostDependencies.cmake)
 target_sources(void_runtime PRIVATE src/runtime/host_abi.cpp src/runtime/host_error.cpp src/runtime/host_crypto.cpp src/runtime/host_archive.cpp src/runtime/host_directory.cpp src/runtime/host_process.cpp src/runtime/host_process_windows.cpp src/runtime/host_directory_windows.cpp)
 target_sources(void_runtime PRIVATE src/runtime/http_provider.cpp src/runtime/url.cpp src/runtime/url_abi.cpp src/runtime/http.cpp src/runtime/http_bulk.cpp src/runtime/http_resource.cpp src/runtime/http_file.cpp src/runtime/http_abi.cpp src/runtime/native_work.cpp)
+target_sources(void_runtime PRIVATE src/runtime/network_address.cpp src/runtime/network.cpp src/runtime/network_abi.cpp)
+target_include_directories(void_runtime SYSTEM PRIVATE "${VOID_HTTP_DEPS_ROOT}/include")
+set_source_files_properties(src/runtime/network_address.cpp src/runtime/network.cpp src/runtime/network_abi.cpp
+  PROPERTIES COMPILE_DEFINITIONS CARES_STATICLIB)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   # Keep bundled provider symbols local when VOID is embedded in a process that
   # also loads another curl/TLS/DNS/decoder instance.
@@ -537,6 +541,31 @@ if(BUILD_TESTING)
   void_add_output_test(http_dns "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/http/dns.py"
     "$<TARGET_FILE:void_http_dns>" --evidence "@VOID_TEST_OUTPUT@/http-dns-evidence")
   set_tests_properties(http_dns PROPERTIES TIMEOUT 180)
+  if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$" AND
+     (CMAKE_SYSTEM_NAME STREQUAL "Linux" OR (WIN32 AND MSVC)))
+    add_executable(void_network_native tests/net/socket/native.cpp)
+    target_include_directories(void_network_native SYSTEM PRIVATE "${VOID_HTTP_DEPS_ROOT}/include")
+    target_compile_definitions(void_network_native PRIVATE CARES_STATICLIB)
+    target_link_libraries(void_network_native PRIVATE void_runtime)
+    set(network_source "${PROJECT_SOURCE_DIR}/tests/net/socket/source_async.void")
+    set(network_object "${CMAKE_CURRENT_BINARY_DIR}/network-async${CMAKE_CXX_OUTPUT_EXTENSION}")
+    add_custom_command(OUTPUT "${network_object}"
+      COMMAND void_io_runner --emit-async "${network_source}" "${network_object}" "$<IF:$<CONFIG:Debug>,normal,optimized>"
+      DEPENDS void_io_runner "${network_source}" "${PROJECT_SOURCE_DIR}/stdlib/net/address.void"
+        "${PROJECT_SOURCE_DIR}/stdlib/net/error.void" "${PROJECT_SOURCE_DIR}/stdlib/net/tcp.void"
+        "${PROJECT_SOURCE_DIR}/stdlib/net/udp.void"
+      VERBATIM)
+    set_source_files_properties("${network_object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
+    add_executable(void_network_async_aot tests/async/aot.cpp "${network_object}")
+    target_link_libraries(void_network_async_aot PRIVATE void_runtime)
+    add_test(NAME net_sockets COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/socket/run.py"
+      "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_network_native>" "$<TARGET_FILE:void_io_runner>"
+      "$<TARGET_FILE:void_network_async_aot>")
+    set_tests_properties(net_sockets PROPERTIES TIMEOUT 300)
+    add_test(NAME net_sockets_lsp COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/net/socket/lsp.py"
+      "$<TARGET_FILE:voidls>")
+    set_tests_properties(net_sockets_lsp PROPERTIES TIMEOUT 180)
+  endif()
   target_link_libraries(void_url_native PRIVATE void_runtime)
   add_test(NAME url_native COMMAND void_url_native)
   add_executable(void_http_source_runner tests/net/http/source_runner.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)

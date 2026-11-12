@@ -1,0 +1,12 @@
+use net/address
+
+func main() -> i32:
+    if address.parse_ip("::1") is Ok(var loopback):
+        print(address.format_endpoint(address.endpoint(ip = loopback, port = 7777)))
+    else:
+        return 1
+    if address.resolve("localhost", 7777) is Ok(var endpoints):
+        for candidate in endpoints:
+            print(address.format_endpoint(candidate))
+        return 0
+    return 1

@@ -1,0 +1,73 @@
+use error as core
+
+## Portable checked networking failure category.
+enum error_kind(u8):
+    invalid_argument = 1
+    invalid_address = 2
+    name_not_found = 3
+    resolve_failed = 4
+    address_in_use = 5
+    address_not_available = 6
+    permission_denied = 7
+    connection_refused = 8
+    connection_reset = 9
+    network_unreachable = 10
+    host_unreachable = 11
+    timed_out = 12
+    closed = 13
+    write_closed = 14
+    busy = 15
+    message_too_large = 16
+    limit_exceeded = 17
+    unsupported = 18
+    io_failure = 19
+
+enum error_phase(u8):
+    prepare = 0
+    resolve = 1
+    open = 2
+    bind = 3
+    listen = 4
+    connect = 5
+    accept = 6
+    read = 7
+    write = 8
+    shutdown = 9
+    close = 10
+
+enum error_domain(u8):
+    none = 0
+    posix = 1
+    winsock = 2
+    cares = 3
+
+## Owned networking error retaining native status and observed effects.
+struct error extends core.error:
+    kind: error_kind
+    operation: string
+    phase: error_phase
+    native_domain: error_domain
+    native_code: i64
+    cleanup_code: i64
+    bytes_transferred: i64
+    partial: [u8]
+    peer: string
+    datagram_consumed: bool
+    datagram_size: i64
+    attempted_count: i64
+
+internal func make(operation: string, code: i64, phase: i64, domain: i64, native: i64, cleanup: i64, progress: i64, partial: [u8], peer: string, consumed: bool, datagram_size: i64, attempts: i64) -> error:
+    var category = error_kind.io_failure
+    var stage = error_phase.prepare
+    var platform = error_domain.none
+    if code as? error_kind is Some(var decoded):
+        category = decoded
+    if phase as? error_phase is Some(var decoded):
+        stage = decoded
+    if domain as? error_domain is Some(var decoded):
+        platform = decoded
+    return error(message = "{operation} failed; native code {native}", code = code as i32,
+        kind = category, operation = operation, phase = stage, native_domain = platform,
+        native_code = native, cleanup_code = cleanup, bytes_transferred = progress,
+        partial = partial, peer = peer, datagram_consumed = consumed,
+        datagram_size = datagram_size, attempted_count = attempts)

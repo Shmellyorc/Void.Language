@@ -1,0 +1,97 @@
+use convert
+use io
+use net/address
+use net/http as web
+use net/tcp
+use net/udp
+use net/error as net_error
+
+async func entry(input: i32) -> i32:
+    var local = address.endpoint(ip = address.loopback_v4(), port = 0)
+    var names = convert.unwrap(await address.resolve_async("localhost", 123, address.resolve_options(family = address.family.v4)))
+    if names.count == 0 or names[0].port != 123:
+        return 10
+    var server = convert.unwrap(await tcp.listen_async(local))
+    var spare = convert.unwrap(await tcp.listen_async(local))
+    var receiver = convert.unwrap(await udp.bind_async(local))
+    var sender = convert.unwrap(await udp.bind_async(local))
+    var bound = convert.unwrap(server.local_endpoint())
+    var datagram_target = convert.unwrap(receiver.local_endpoint())
+    with tasks.group() as pending:
+        var accepting = server.accept_async(timeout_ms = 5000)
+        var waiting = spare.accept_async()
+        var datagram_read = receiver.receive_from_async(timeout_ms = 5000)
+        var http_target = convert.unwrap(await io.read_text_async("http-peer.txt"))
+        var response = convert.unwrap(await web.get_async(http_target))
+        if not convert.unwrap(response.require_success()) or convert.unwrap(response.text()) != "shared provider":
+            return 27
+        var client = convert.unwrap(await tcp.connect_endpoint_async(bound))
+        var peer = convert.unwrap(await accepting)
+        var sent = convert.unwrap(await sender.send_to_async([0, 255], datagram_target))
+        var packet = convert.unwrap(await datagram_read)
+        if sent != 2 or packet.bytes.count != 2 or packet.bytes[0] != 0 or packet.bytes[1] != 255:
+            return 11
+        if await spare.accept_async(timeout_ms = 25) is Err(var problem):
+            if problem.kind != net_error.error_kind.busy:
+                return 12
+        else:
+            return 13
+        waiting.cancel()
+        var incoming = client.read_bytes_async(timeout_ms = 5000)
+        var outgoing = client.write_bytes_async([0, 5], timeout_ms = 5000)
+        if convert.unwrap(await outgoing) != 2:
+            return 14
+        var read_count: i64 = 0
+        for read_count < 2:
+            var block = convert.unwrap(await peer.read_bytes_async(max_count = 2))
+            if block.eof:
+                return 15
+            for value in block.bytes:
+                if (read_count == 0 and value != 0) or (read_count == 1 and value != 5):
+                    return 16
+                read_count += 1
+        convert.unwrap(await peer.write_bytes_async([9]))
+        var echo = convert.unwrap(await incoming)
+        if echo.bytes.count != 1 or echo.bytes[0] != 9:
+            return 17
+        convert.unwrap(await peer.shutdown_write_async())
+        var tail = convert.unwrap(await client.read_bytes_async())
+        if not tail.eof:
+            return 18
+        with tasks.group() as cancelled:
+            var outstanding = peer.read_bytes_async()
+            if await peer.read_bytes_async(timeout_ms = 25) is Err(var problem):
+                if problem.kind != net_error.error_kind.busy:
+                    return 19
+            else:
+                return 20
+            outstanding.cancel()
+        if peer.remote_endpoint() is Err(var problem):
+            if problem.kind != net_error.error_kind.closed:
+                return 21
+        else:
+            return 22
+        convert.unwrap(await peer.close_async())
+        convert.unwrap(await client.close_async())
+    var available = convert.unwrap(await tcp.connect_endpoint_async(convert.unwrap(spare.local_endpoint())))
+    var accepted = convert.unwrap(await spare.accept_async(timeout_ms = 2000))
+    convert.unwrap(await spare.close_async())
+    convert.unwrap(await available.close_async())
+    convert.unwrap(await accepted.close_async())
+    convert.unwrap(await server.close_async())
+    with tasks.group() as pending:
+        var read = receiver.receive_from_async()
+        if await receiver.receive_from_async(timeout_ms = 25) is Err(var problem):
+            if problem.kind != net_error.error_kind.busy:
+                return 23
+        else:
+            return 24
+        convert.unwrap(await receiver.close_async())
+        if await read is Err(var problem):
+            if problem.kind != net_error.error_kind.closed:
+                return 25
+        else:
+            return 26
+    convert.unwrap(await sender.close_async())
+    var held_until_shutdown = convert.unwrap(udp.bind(local))
+    return input

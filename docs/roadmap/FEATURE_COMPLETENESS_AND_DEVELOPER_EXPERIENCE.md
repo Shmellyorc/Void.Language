@@ -152,7 +152,10 @@ completion and structured cancellation. [Public process API](../process/API.md) 
 
 ### P2 — G07 · TCP/UDP and server applications
 
-**MISSING.** HTTP clients and URL helpers do not cover local listeners, datagrams or standalone name resolution. The proposed socket work is important for a service or game networking lane. Review endpoints, ownership, bounded queues and cancellation before adding public facades. Reuse external completion and provider initialization. Verify loopback client/listener and UDP, refusal, IPv4/IPv6 capability, bounded transfers, cancellation and shutdown using real Linux and Windows sockets. [Architecture proposal](../net/TCP_UDP_HANDOFF.md) · [External completion](../../src/runtime/async.cpp) · [Existing HTTP provider](../../src/runtime/http_provider.cpp)
+**IMPLEMENTED.** Linux x64 and Windows x64 have typed numeric addresses,
+bounded DNS resolution, owned TCP listeners and streams, and unicast UDP
+sockets. The synchronous and async interfaces share nonblocking native
+readiness, deadlines and structured cleanup. [Contract review](../net/TCP_UDP_HANDOFF.md#batch-4-contract-review) · [Addresses](../net/address/API.md) · [TCP](../net/tcp/API.md) · [UDP](../net/udp/API.md)
 
 ### P2 — G08 · Measurable edit/build performance and Windows cache
 
@@ -666,3 +669,137 @@ The three maintained Linux build trees remain available for replay.
 - Runtime — `include/void/runtime.hpp`, `src/runtime/coordination.cpp`, `src/runtime/host_internal.hpp`, `src/runtime/host_abi.cpp`, `src/runtime/host_process.cpp`, `src/runtime/host_process_windows.cpp`.
 - Verification — `CMakeLists.txt`, `tests/host_capabilities/process_capture.cpp`, `tests/host_capabilities/process_capture.py`, `tests/host_capabilities/process_capture_sync.void`, `tests/host_capabilities/process_capture_async.void`.
 - Engineering documentation — `docs/ASYNC.md`, `docs/roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md`.
+
+## G07 native TCP, UDP and DNS
+
+The review worktree starts at `77986362acf8b40d52aacbbdb324665b4484155b`.
+The public modules provide numeric address parsing and formatting, scoped
+IPv6, typed endpoints, bounded DNS and native TCP and UDP resources. TCP
+supports sequential hostname fallback, independent accepted streams,
+bounded reads, EOF, write progress and write half-close. UDP preserves
+message boundaries, including empty datagrams. An oversized receive
+consumes one message and returns checked sender and size evidence.
+[Addresses](../net/address/API.md) · [TCP](../net/tcp/API.md) · [UDP](../net/udp/API.md) · [Errors](../net/error/API.md)
+
+One Runtime-owned native service drains a bounded command queue. It
+owns nonblocking sockets, uses `poll` or `WSAPoll`, and feeds readiness
+to one c-ares channel per DNS lookup. The existing HTTP provider lease
+owns process initialization. Source async code uses external completion
+tickets and can run its peers with one source worker. Native operations
+charge capacity before snapshotting bytes. Socket quota survives through
+terminal-wrapper retirement, and native buffer quota survives through
+result publication. Acquisition abandonment and admitted TCP data
+cancellation close the owned socket on the provider. UDP cancellation
+can leave one whole-message effect. [Reviewed architecture](../net/TCP_UDP_HANDOFF.md#batch-4-contract-review) · [Async ownership](../ASYNC.md#ownership-and-validation)
+
+The transport implementation admits Linux x64 and Windows x64. macOS
+transport remains outside this batch. The resolver uses the already
+pinned c-ares 1.34.9. Installed source modules use the existing standard
+library directory and native packages use the existing provider link
+inputs. The API has no public raw handles, multicast membership, TLS
+server or HTTP server facilities. The proposed throughput and idle-CPU
+measurement campaign was outside the focused qualification.
+
+The native fixture uses existing local DNS infrastructure for A and
+AAAA answers, NXDOMAIN, no data, a stalled query, TCP DNS fallback,
+the endpoint-count limit and cancellation isolation. It exercises both
+TCP families, connect refusal, timed partial writes with reduced native
+socket buffers, reset, independent stream ownership, maximum IPv4 UDP payload,
+noninheritance, repeated close and shutdown with pending accepts and
+receives. The source fixtures test normal and optimized JIT and
+independently linked AOT. One-worker source execution overlaps pending
+socket operations with file work and a local HTTP request. The LSP check
+queries public definitions and hover at UTF-16 positions after non-BMP
+text. The echo server and client run as independently linked loopback
+applications. [Maintained tests](../../tests/net/socket) · [Examples](../../examples/net_sockets)
+
+Early development checks rejected private-field construction, direct
+numeric-enum extraction, a fixture name that shadowed `udp.datagram`,
+and ambiguous native helper names. The source now uses a private value
+initializer and explicit family conversion. The fixture uses distinct
+names and includes the Runtime definition for its one-worker adapter.
+The first corrected Linux Debug run passed both new registrations.
+An intermediate Linux Debug run built the Runtime archive again after
+its native-link manifest had been generated. Both socket and G04 source
+tests rejected the mismatch before linking. The subsequent qualification
+build checks the Runtime archive digest against the final generated
+manifest before executing the focused selection.
+
+The first Windows Debug run stopped the refusal control at its own
+two-second deadline. A direct Winsock comparison reproduced the native
+refusal after 2.03–2.06 seconds, for both a closed listener and a bound
+port with no listener. `WSAPoll` reported `0x13` and `SO_ERROR` returned
+`10061` in all four controls. The new fixture allows four seconds to
+observe the same required native refusal. The public timeout and Winsock
+operation are unchanged. [Winsock readiness](https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsapoll)
+
+The same run could not start two existing HTTP fixtures because their
+test-only certificate executable was absent. The maintained recipe first
+reported a missing Perl prerequisite. Using the Windows guest's installed
+Git Perl with the pinned inputs produced the verified certificate tool
+and loopback HTTP/2 wheels in the disposable workspace.
+
+The first Windows one-worker JIT replay used all-exports emission and
+exceeded the 90-second fixture subprocess bound.
+A disposable traced run reached the end of the normal source execution
+with HTTP and socket operations complete. The independently linked
+fixture completed in 1.44 seconds on the same Windows Debug host.
+The one-worker networking mode uses the CLI's entry-only emission and
+still executes normal and optimized JIT. An overlapping diagnostic
+held the old executable open during the first relink. The next build
+waited for that process to retire.
+
+The focused selector for a configured native build is
+
+```sh
+ctest --test-dir "$build_dir" --no-tests=error --output-on-failure \
+  -R '^(net_sockets|net_sockets_lsp|process_capture|host_capabilities_portable|native_workers|io_native_jobs|async_external|runtime_invariants|http_native|http_dns|http_timeouts|http_wire|http_lsp)$'
+```
+
+The new socket and LSP timeouts are 300 and 180 seconds. Strict Linux
+uses `ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`. Windows
+uses the existing private-root staging helper before source builds and
+tests. [Retention policy](../projects/VOID_ARCHIVE_AND_RETENTION_POLICY.md)
+
+PikaOS 4 x64 ran kernel `7.2.11-pikaos`. The Windows guest reported
+Windows 10 Home x64 build `19045.6466`. Both used LLVM, Clang and LLD
+23.1.4. All thirteen selected registrations had active commands and
+no skip properties. The final native-link inventory matched the
+Runtime archive digest in every profile.
+
+| Host and profile | Focused CTests | Final socket fixture |
+| --- | --- | --- |
+| PikaOS 4 Debug | 13/13 in 206.29 s | 71.44 s |
+| PikaOS 4 Release | 13/13 in 85.48 s | 22.90 s |
+| PikaOS 4 strict RelWithDebInfo | 13/13 in 215.34 s | 77.30 s |
+| Windows 10 Debug | 13/13 across the initial run and targeted replays | 115.21 s |
+| Windows 10 Release | 13/13 in 101.19 s | 33.62 s on replay |
+
+The final Linux socket replay included the revised fixture and entry
+emission. The strict selection and replay reported no ASan, UBSan or
+leak failure. The Windows Debug HTTP replay passed both checks in
+22.66 seconds. Existing G04 capture, native-resource ownership,
+external completion and HTTP compatibility passed in all five
+profiles.
+
+The additional native source controls passed on both Windows profiles
+and all three Linux profiles. They exercised IPv6 UDP loopback,
+exclusive TCP bind, public hostname connect and refusal of a numeric
+literal supplied to the hostname API with a smaller per-candidate
+budget.
+
+The Windows workspace, Linux scratch outputs and the transfer directory
+were removed. Windows free space rose from 6,702,731,264 to 13,652,996,096
+bytes. Available space on the Linux checkout filesystem rose from
+368,589,406,208 to 368,779,608,064 bytes. The maintained Linux build trees
+and the original pinned provider inputs remain available for replay.
+
+### G07 changed-file inventory
+
+- Compiler and private ABI — `include/void/host_abi.hpp`, `include/void/host_ops.hpp`, `src/frontend/host.inc`, `src/ir/host.inc`, `src/backend/llvm/host.inc`, `src/backend/llvm/backend.cpp`.
+- Native Runtime — `include/void/runtime.hpp`, `src/runtime/array.cpp`, `src/runtime/host_abi.cpp`, `src/runtime/network.hpp`, `src/runtime/network_address.cpp`, `src/runtime/network.cpp`, `src/runtime/network_abi.cpp`.
+- Standard library — `stdlib/net/address.void`, `stdlib/net/error.void`, `stdlib/net/tcp.void`, `stdlib/net/udp.void`, `stdlib/README.md`.
+- Verification — `CMakeLists.txt`, `tests/io/runner.cpp`, `tests/net/socket/native.cpp`, `tests/net/socket/run.py`, `tests/net/socket/lsp.py`, `tests/net/socket/source_sync.void`, `tests/net/socket/source_async.void`.
+- Examples — `examples/net_sockets/addresses.void`, `examples/net_sockets/tcp_echo_server.void`, `examples/net_sockets/tcp_echo_client.void`, `examples/net_sockets/udp_loopback.void`.
+- Documentation — `docs/ASYNC.md`, `docs/net/TCP_UDP_HANDOFF.md`, `docs/net/address/API.md`, `docs/net/error/API.md`, `docs/net/tcp/API.md`, `docs/net/udp/API.md`, `docs/roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md`.

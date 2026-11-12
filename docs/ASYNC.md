@@ -257,6 +257,23 @@ cancellation/shutdown APIs.
 
 ## Ownership and validation
 
+TCP, UDP and DNS submit bounded native requests to one lazily acquired
+socket provider per Runtime. The provider holds native descriptors, c-ares
+channels, byte snapshots and external completion tickets. Socket readiness
+uses the provider thread, leaving the source worker pool available for
+file operations and source workers. Synchronous calls wait in NativeSafe
+state. Async calls complete on the owning executor, which publishes managed
+results and ledger entries. Provisional sockets and reserved buffers remain
+owned until publication, commit or abandonment.
+
+A source cancellation signals the provider and drains its native access.
+An admitted TCP data cancellation closes the stream. An unpublished connect
+or accept result closes its acquired socket. UDP cancellation can leave one
+datagram effect, and DNS cancellation destroys the individual channel.
+Runtime shutdown signals the service before waiting for admitted native
+work, then joins it before releasing the shared HTTP provider lease.
+[Socket architecture](net/TCP_UDP_HANDOFF.md#batch-4-contract-review)
+
 On supported hosts, `process.capture_async` submits one native worker job.
 It receives copied launch inputs and owns the process and pipe readers until
 native cleanup finishes. The owner can resume other activations during launch,

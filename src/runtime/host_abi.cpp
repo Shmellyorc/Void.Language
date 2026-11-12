@@ -138,7 +138,7 @@ extern "C" void vd_host_call(void* output,const vd::host::ReplyLayout* layout,un
     using namespace vd;using namespace vd::host;
     std::error_code rollback_error;
     try {
-        if(!failure || !output || !layout || !refs || !nums || op>=operations.size() || operations[op].cleanup || capture_operation(op) || layout->size!=sizeof(Reply) || layout->fields!=fields)
+        if(!failure || !output || !layout || !refs || !nums || op>=operations.size() || operations[op].cleanup || capture_operation(op) || network_operation(op) || layout->size!=sizeof(Reply) || layout->fields!=fields)
             throw std::logic_error("Invalid host boundary ABI");
         auto& runtime=Runtime::current();Admission admission(runtime);
         Reply reply;constexpr std::array<std::size_t,2> offsets{offsetof(Reply,text),offsetof(Reply,bytes)};

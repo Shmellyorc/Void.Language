@@ -87,6 +87,8 @@ public:
     void string_into(void** rooted_slot, std::string_view);
     void bytes_into(void**,std::string_view);
     std::string byte_array_bytes(RegisteredRootWord);
+    std::uint64_t byte_array_size(RegisteredRootWord);
+    std::optional<std::string> bounded_byte_array_bytes(RegisteredRootWord,std::uint64_t maximum);
     void concat_into(void** rooted_slot, void* left, void* right);
     std::uint64_t string_count(void*, bool bytes) const;
     void string_index_into(void**, void*, ScalarEncoding, std::uint64_t);
