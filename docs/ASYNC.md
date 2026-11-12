@@ -257,6 +257,16 @@ cancellation/shutdown APIs.
 
 ## Ownership and validation
 
+On supported hosts, `process.capture_async` submits one native worker job.
+It receives copied launch inputs and owns the process and pipe readers until
+native cleanup finishes. The owner can resume other activations during launch,
+drain and reap. Scope and Runtime shutdown request cancellation and drain the
+worker before releasing its completion state. The worker holds no managed
+output references. The owner materializes and roots the two byte lists only
+when publishing the completion. Task cancellation discards the native reply
+and propagates the existing cancellation outcome.
+[Process capture contract](process/API.md)
+
 The existing typed CFG and LLVM lowerer emit a native start wrapper and native
 resume function. Heap homes hold arguments, locals, instruction temporaries,
 resume state and cleanup state. Resume stack roots cover existing copy/construction

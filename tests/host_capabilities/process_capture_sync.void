@@ -1,0 +1,26 @@
+use convert
+use os
+use process
+
+func main() -> i32:
+    var operands = convert.unwrap(os.args())
+    var exact = process.capture_options(stdout_limit = 65536, stderr_limit = 65536, total_limit = 131072, timeout_ms = 5000)
+    var captured = convert.unwrap(process.capture(operands[0], ["--io", "65536", "65536", "23"], [], operands[1], exact))
+    if captured.outcome != process.capture_end.complete or not captured.exited or captured.status.code != 23:
+        return 10
+    if not captured.stdout_complete or not captured.stderr_complete or captured.cleanup_code != 0:
+        return 11
+    if captured.stdout.count != 65536 or captured.stderr.count != 65536:
+        return 12
+    if captured.stdout[0] != 0 or captured.stdout[255] != 255 or captured.stderr[0] != 17 or captured.stderr[239] != 0:
+        return 13
+    var tiny = process.capture_options(stdout_limit = 4, stderr_limit = 4, total_limit = 8, timeout_ms = 5000)
+    var partial = convert.unwrap(process.capture(operands[0], ["--io", "20", "20", "0"], [], operands[1], tiny))
+    if partial.outcome != process.capture_end.output_limit or partial.stdout.count + partial.stderr.count > 8 or partial.cleanup_code != 0:
+        print("capture overflow", partial.outcome == process.capture_end.output_limit, partial.stdout.count,
+            partial.stderr.count, partial.os_code, partial.cleanup_code, partial.exited, partial.status.code)
+        return 14
+    if process.capture(operands[0] + ".absent", [], [], operands[1], tiny) is Err(var failed):
+        if failed.operation == "process.capture" and failed.os_code != 0:
+            return 0
+    return 15

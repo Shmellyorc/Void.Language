@@ -3,7 +3,10 @@
 #include "void/native_resource.hpp"
 #include "void/filesystem_abi.hpp"
 #include <array>
+#include <atomic>
 #include <memory>
+#include <optional>
+#include <span>
 #include <string>
 #include <vector>
 namespace vd::host {
@@ -29,12 +32,29 @@ struct Request {
     std::shared_ptr<Object> acquired;
     std::shared_ptr<filesystem::File> acquired_file;
 };
+using CaptureLimits = std::array<std::int64_t,4>; // stdout, stderr, combined bytes, milliseconds
+enum class CaptureEnd : std::int64_t { complete, output_limit, deadline, io_failure, cancelled };
+struct CaptureResult {
+    Result launch, status;
+    CaptureEnd end=CaptureEnd::complete;
+    int io_code=0, cleanup_code=0;
+    bool exited=false;
+    std::array<bool,2> eof{};
+    std::array<std::string,2> output;
+};
+struct PipeRead { std::size_t size=0; int error=0; bool eof=false; };
+struct CaptureChild : Object {
+    virtual std::optional<Result> poll_exit() noexcept=0;
+    virtual PipeRead read(unsigned, std::span<char>) noexcept=0;
+    virtual std::error_code close_readers() noexcept=0;
+};
 Result error(std::int64_t kind,std::int64_t code=0);
 Result native_error(int code);
 Result crypto_execute(Request&);
 Result zip_execute(Request&);
 Result directory_execute(Request&);
 Result windows_directory_execute(Request&);
-Result process_execute(Request&);
-Result windows_process_execute(Request&);
+Result process_execute(Request&,const CaptureLimits* = nullptr);
+Result windows_process_execute(Request&,const CaptureLimits*);
+CaptureResult capture_execute(Request&,const CaptureLimits&,Runtime&,const std::atomic<bool>&);
 }

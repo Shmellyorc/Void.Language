@@ -355,6 +355,11 @@ void Runtime::begin_native_job() {
     ++native_jobs_;
 }
 
+bool Runtime::native_stop_requested() const {
+    std::lock_guard lock(mutex_);
+    return closing_;
+}
+
 void Runtime::end_native_job() noexcept {
     std::lock_guard lock(mutex_);
     if (!native_jobs_) std::terminate();

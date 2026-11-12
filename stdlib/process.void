@@ -62,3 +62,83 @@ func (self child) close() -> result<bool, system_error.error>:
 ## Terminate and reap an outstanding child without allocating a checked reply.
 func (self child) deinit():
     _host_child_cleanup(self)
+
+## Bounded output budgets and a monotonic deadline after native launch.
+value struct capture_options:
+    ## Bytes to retain from stdout. Use -1 to inherit stdout.
+    stdout_limit: i64
+    ## Bytes to retain from stderr. Use -1 to inherit stderr.
+    stderr_limit: i64
+    ## Maximum retained bytes across both streams.
+    total_limit: i64
+    ## Milliseconds from successful launch until exit and captured EOF.
+    timeout_ms: i64
+
+enum capture_end(u8):
+    complete = 0
+    output_limit = 1
+    deadline = 2
+    io_failure = 3
+    cancelled = 4
+
+## Owned binary prefixes and termination evidence from a launched direct child.
+value struct capture_result:
+    outcome: capture_end
+    ## True if the child's own exit was observed before abort cleanup.
+    exited: bool
+    status: exit_status
+    stdout_complete: bool
+    stderr_complete: bool
+    stdout: [u8]
+    stderr: [u8]
+    os_code: i64
+    cleanup_code: i64
+
+private value struct _capture_reply:
+    launch_kind: i64
+    os_code: i64
+    reason: i64
+    cleanup_code: i64
+    code: i64
+    signal: i64
+    exited: bool
+    stdout_complete: bool
+    stderr_complete: bool
+    stdout_bytes: [u8]
+    stderr_bytes: [u8]
+
+private func _capture_value(operation: string, reply: _capture_reply) -> result<capture_result, system_error.error>:
+    if reply.launch_kind != 0:
+        return Err(system_error.make(operation, reply.launch_kind, reply.os_code))
+    var outcome = capture_end.complete
+    if reply.reason == 1:
+        outcome = capture_end.output_limit
+    else if reply.reason == 2:
+        outcome = capture_end.deadline
+    else if reply.reason == 3:
+        outcome = capture_end.io_failure
+    else if reply.reason == 4:
+        outcome = capture_end.cancelled
+    var status = exit_status(code = reply.code, signaled = reply.signal != 0, signal = reply.signal)
+    return Ok(capture_result(outcome = outcome, exited = reply.exited, status = status,
+        stdout_complete = reply.stdout_complete, stderr_complete = reply.stderr_complete,
+        stdout = reply.stdout_bytes, stderr = reply.stderr_bytes, os_code = reply.os_code, cleanup_code = reply.cleanup_code))
+
+## Launch an explicit native image, drain both selected streams, and reap the direct child.
+## @param executable Absolute native executable path. No PATH search or shell.
+## @param arguments Literal arguments excluding argv[0].
+## @param environment Complete caller-supplied NAME=value environment.
+## @param cwd Absolute child working directory.
+## @param options Explicit stream, aggregate and deadline limits.
+## @return Launch error or a checked capture outcome with owned binary prefixes.
+func capture(executable: string, const arguments: [string], const environment: [string], cwd: string, options: capture_options) -> result<capture_result, system_error.error>:
+    var reply = _host_capture(executable, arguments, environment, cwd,
+        options.stdout_limit, options.stderr_limit, options.total_limit, options.timeout_ms)
+    return _capture_value("process.capture", reply)
+
+## Capture on a bounded native worker while the owner activation can run other work.
+## Cancellation follows task semantics and drains the direct child before retiring.
+async func capture_async(executable: string, const arguments: [string], const environment: [string], cwd: string, options: capture_options) -> result<capture_result, system_error.error>:
+    var reply = await _host_capture_async(executable, arguments, environment, cwd,
+        options.stdout_limit, options.stderr_limit, options.total_limit, options.timeout_ms)
+    return _capture_value("process.capture_async", reply)

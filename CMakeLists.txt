@@ -1093,6 +1093,28 @@ if(BUILD_TESTING)
   set_tests_properties(host_capabilities_portable PROPERTIES TIMEOUT 180)
   add_test(NAME host_capabilities_portable_source COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/host_capabilities/portable_source.py" "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_host_portable>")
   set_tests_properties(host_capabilities_portable_source PROPERTIES TIMEOUT 1200)
+  if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$" AND
+     (CMAKE_SYSTEM_NAME STREQUAL "Linux" OR (WIN32 AND MSVC)))
+    add_executable(void_process_capture_probe tests/host_capabilities/process_capture.cpp)
+    target_link_libraries(void_process_capture_probe PRIVATE void_runtime)
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+      target_compile_definitions(void_process_capture_probe PRIVATE VOID_CAPTURE_READ_FAULT)
+      target_link_options(void_process_capture_probe PRIVATE "-Wl,--wrap=read")
+    endif()
+    set(capture_source "${PROJECT_SOURCE_DIR}/tests/host_capabilities/process_capture_async.void")
+    set(capture_object "${CMAKE_CURRENT_BINARY_DIR}/process-capture-async${CMAKE_CXX_OUTPUT_EXTENSION}")
+    add_custom_command(OUTPUT "${capture_object}"
+      COMMAND void_io_runner --emit-async "${capture_source}" "${capture_object}" "$<IF:$<CONFIG:Debug>,normal,optimized>"
+      DEPENDS void_io_runner "${capture_source}" "${PROJECT_SOURCE_DIR}/stdlib/process.void"
+      VERBATIM)
+    set_source_files_properties("${capture_object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
+    add_executable(void_process_capture_async_aot tests/async/aot.cpp "${capture_object}")
+    target_link_libraries(void_process_capture_async_aot PRIVATE void_runtime)
+    add_test(NAME process_capture COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/host_capabilities/process_capture.py"
+      "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_process_capture_probe>" "$<TARGET_FILE:void_host_portable>"
+      "$<TARGET_FILE:void_io_runner>" "$<TARGET_FILE:void_process_capture_async_aot>")
+    set_tests_properties(process_capture PROPERTIES TIMEOUT 300)
+  endif()
   if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_executable(void_host_child tests/host_capabilities/child.c)
     add_executable(void_host_capabilities tests/host_capabilities/native.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)

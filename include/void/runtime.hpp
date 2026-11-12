@@ -173,6 +173,7 @@ public:
     // Private native-job admission. Shutdown drains entered work and unpublished
     // acquisitions before retiring resources; it does not cancel source tasks.
     void begin_native_job();
+    bool native_stop_requested() const;
     void end_native_job() noexcept;
     std::shared_ptr<const DynamicBinding> dynamic_binding() const;
     void bind_dynamic(std::shared_ptr<const DynamicBinding>);

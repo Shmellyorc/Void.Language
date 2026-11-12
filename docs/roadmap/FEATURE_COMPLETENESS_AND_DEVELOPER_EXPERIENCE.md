@@ -55,7 +55,7 @@ All **25** tracked `.void` modules are covered below. Pure source APIs use the e
 | [net/http](../../stdlib/net/http.void) | **IMPLEMENTED.** HTTP/HTTPS 1.1/2, explicit clients, buffered/streaming sync and async operations, file transfers, multipart, cookies, auth/proxy, TLS and deadlines. | Hosted acceptance covers the stated provider contracts. Windows Schannel has the explicit store identity boundary. Supplied P12 is refused there. [Runtime HTTP](../../src/runtime/http.cpp), [acceptance](../net/http/ACCEPTANCE.md), [tests](../../tests/net/http). G07 covers separate socket APIs. |
 | [os](../../stdlib/os.void) | **IMPLEMENTED.** App-aware paths, home/temp, executable/resources, environment lookup, host identity, bundle classification and literal application arguments. | **PARTIAL** environment convenience. Read-by-name exists. Whole-environment enumeration, mutation and implicit child inheritance have no public API. [OS Runtime](../../src/runtime/os.cpp), [Foundation adapter](../../src/runtime/os_apple.mm), [API](../os/API.md), [tests](../../tests/os). G04. |
 | [path](../../stdlib/path.void) | **IMPLEMENTED.** Host-aware lexical join, normalize, decomposition and absolute/relative conversion. | Lexical results grant no filesystem authority or existence guarantee. [Filesystem operations](../../src/runtime/filesystem.cpp), [I/O API](../io/API.md), [I/O fixtures](../../tests/io). |
-| [process](../../stdlib/process.void) | **PARTIAL.** Launches an explicit native image with literal arguments, a complete environment and cwd. Inherits stdio. Owns synchronous wait, close and reap of the direct child. | No stdin/stdout/stderr capture, nonblocking status, deadline or async wait. Direct-child scope excludes descendants. [POSIX](../../src/runtime/host_process.cpp), [Windows](../../src/runtime/host_process_windows.cpp), [portable process fixtures](../../tests/host_capabilities). G04. |
+| [process](../../stdlib/process.void) | **IMPLEMENTED.** Explicit native launch with literal arguments, complete environment and cwd. Inherited-stream launch retains synchronous wait and close. Linux x64 GNU and Windows x64 MSVC add bounded binary stdout/stderr capture, deadlines and async task cancellation. | Stdin is inherited. The API owns and reaps one direct child. Separate async wait of an existing child, stdin piping and descendant supervision remain outside G04. [Process API](../process/API.md) · [G04 implementation and qualification](#g04-bounded-subprocess-capture-deadlines-and-cancellation) |
 | [random](../../stdlib/random.void) | **IMPLEMENTED.** Reproducible seeded gameplay streams, per-Runtime default with OS seeding, bounded draws, checked variants, choice and shuffle. | Gameplay output carries no cryptographic guarantee. [Runtime](../../src/runtime/random.cpp), [API](../random/API.md), [tests](../../tests/random). |
 | [system_error](../../stdlib/system_error.void) | **IMPLEMENTED.** Host capability errors carry portable kind, operation and native/cleanup/progress detail. | Existing process, archive and crypto error translation is reusable for additions in those APIs. [Host ABI](../../src/runtime/host_abi.cpp), [host error provider](../../src/runtime/host_error.cpp), [source tests](../../tests/host_capabilities). |
 | [text](../../stdlib/text.void) | **IMPLEMENTED.** Unicode-scalar search, trim, substring, split/join, replacement, padding and pinned Unicode 16.0 full default casing. | **DEFERRED** normalization, case folding, grapheme segmentation and regex. Scalar indexes and pinned case mapping are established contracts. [Native case mapping](../../src/runtime/text_case.cpp), [API](../text-encoding/API.md), [tests](../../tests/text_encoding). G09. |
@@ -136,7 +136,11 @@ ordinary diagnostics and validated source roles as the buffer changes.
 
 ### P1 — G04 · Bounded child output and wait
 
-**PARTIAL.** A build helper can launch a checked native image, but cannot capture both output streams, set a deadline, or await completion through the source task model. Add a small explicit capture/wait contract using the existing child resource and checked native completion. Concurrent drainage, output budgets, partial bytes, inherited handles, cancellation and direct-child reap are the main risks. Preserve inherited stdio for existing callers, literal arguments, complete explicit environments and the current no-shell and descendant boundaries. Verify heavy simultaneous stdout/stderr, Unicode arguments, nonzero/signal exit, timeout, launch failure and no leaked owned handles in native Linux and Windows Debug/Release and applicable Linux strict. [Public process API](../../stdlib/process.void) · [Host ABI](../../src/runtime/host_abi.cpp) · [Current process fixtures](../../tests/host_capabilities) · [VOIDUP caller](../../apps/voidup/manager.void)
+**IMPLEMENTED.** `process.capture` and `process.capture_async` collect bounded
+binary prefixes from selected output streams with independent EOF flags and
+direct-child status. They share native launch and resource handling with the
+existing inherited-stream workflow. The async operation uses checked native
+completion and structured cancellation. [Public process API](../process/API.md) · [G04 implementation and qualification](#g04-bounded-subprocess-capture-deadlines-and-cancellation)
 
 ### P2 — G05 · Maintenance commands and safer editor fixes
 
@@ -537,3 +541,128 @@ extension's ignored `dist` directory.
 - Compiler verification — `CMakeLists.txt`, `tests/lsp/editor_recovery.py`, `tests/lsp/fixtures/editor_recovery/app.void`, `tests/lsp/fixtures/editor_recovery/main.void`, `tests/lsp/fixtures/editor_recovery/void.project.toml`, `tests/project/sessions.cpp`.
 - VS Code verification — `editors/vscode/src/test/config.test.ts`, `editors/vscode/src/test/projectHost.ts`, `editors/vscode/src/test/recoveryHost.ts`, `editors/vscode/src/test/runProjectHost.ts`, `editors/vscode/src/test/runSemanticHost.ts`.
 - Documentation — `docs/EDITOR_INTEGRATION.md`, `docs/roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md`, `editors/vscode/README.md`.
+
+## G04 bounded subprocess capture, deadlines and cancellation
+
+The review worktree is based on `131db64368751f9fdac5608aba11f3241dd9ba6d`.
+The baseline `process.start` already enforced an explicit image, literal
+arguments, a complete environment and explicit cwd. Its inherited-stdio
+child resource owns wait, close and direct-child reap. VOIDUP's manager uses
+that sequence. G04 adds a one-shot capture owner while retaining the
+existing launch and error translation.
+[Baseline caller](../../apps/voidup/manager.void) · [Public process contract](../process/API.md)
+
+The capture owner drains both readers in bounded increments and reaps
+the direct child before publishing. Linux uses close-on-exec pipes and
+spawn descriptor closure. Windows uses private named pipes and an
+explicit child inheritance list. A checked launch error is distinct
+from a launched child's outcome. EOF flags, partial bytes, original exit
+status and separate native I/O and cleanup codes remain available after
+an abort. Async capture copies launch inputs and runs on an existing
+bounded native worker. The owner activation stays available while that
+worker drains. Task cancellation joins native cleanup and propagates the
+scheduler's cancellation outcome. Captured bytes become managed values
+only on the owner thread. Descendant writers can postpone EOF within
+the same deadline and budgets. Abort targets the direct child.
+[Runtime ownership](../ASYNC.md#ownership-and-validation)
+
+The capture fixture covers native byte patterns with embedded NUL,
+concurrent writers, single-stream and aggregate limits, zero-byte EOF,
+launch error, literal Unicode and empty arguments, environment
+replacement, explicit cwd, normal and abnormal status, unrelated handle
+inheritance, deadlines and direct-child reap. It verifies cancellation
+with quiet and active writers, descendant survival and repeated ownership
+cleanup. The Linux probe also injects a read error after positive reads
+and checks the partial output and native error. Source tests exercise
+normal and optimized JIT, independently linked AOT, actual async worker
+progress, group drain and cancellation propagation. [Native and source fixture](../../tests/host_capabilities/process_capture.py)
+
+The first Linux Debug capture attempt exposed a fixture race. The child
+could publish its PID before both pipes had been drained, so an immediate
+cancellation could legitimately leave an empty prefix. The cancellation
+fixture now writes past each pipe's capacity before publishing the PID.
+Two initial Windows configure attempts failed because the disposable source
+snapshot omitted the two approved curl review diffs required by provenance
+verification. Restoring both exact tracked inputs completed the original
+verification step. Windows also rejected the initial temporary build and
+staging locations. The task workspace inherited an effective
+Authenticated Users mutation grant, and the first VOIDUP build still used
+the ordinary temporary root. Protecting the task-owned ancestor and
+selecting the existing per-profile private root before compilation
+resolved both setup failures.
+
+The first Windows ownership probe counted handles before native process
+startup and Win32 error formatting had initialized their process-wide
+caches. A bounded snapshot showed first-launch semaphores, tracing and
+registry handles, `\Device\CNG`, and the
+`KernelBase.dll.mui` message-resource file after the first launch error.
+The count stayed fixed through deadline, cancellation and descendant
+controls. No additional child process, thread or capture pipe handle
+remained in the snapshot. The fixture now verifies one successful and
+one missing-image launch before establishing its Windows baseline.
+Repeated launches still require exact handle-count equality.
+
+The next Debug run reached independently linked AOT and returned fixture
+status 14 on a short-lived overflowing child. A bounded replay reproduced
+it in both normal and optimized AOT. The initial Release build also
+reproduced status 14 in optimized JIT. The failing executions returned the correct
+`output_limit` outcome and four stdout bytes with native I/O code zero,
+but reported cleanup code 5. The child had begun its natural exit before
+`TerminateProcess` and had yet to signal at the immediate zero-time poll.
+The Windows close path now confirms exit with the owned handle before
+resolving that access-denied race. A wait failure or other termination
+error is still reported. The native fixture repeats the small-output
+overflow case alongside the large backpressure control.
+[Win32 termination and process-handle wait](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-terminateprocess)
+
+From a configured build, set `build_dir` to its path and run the shared
+selection. Add `|host_capabilities_native` inside the selector on Linux.
+
+```sh
+ctest --test-dir "$build_dir" --no-tests=error --output-on-failure \
+  -R '^(process_capture|host_capabilities_portable|host_capabilities_portable_source|voidup_smoke|native_workers|io_native_jobs|async_external|async_lifecycle)$'
+```
+
+Windows uses the existing private native test-root helper. Strict Linux
+uses `ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`.
+The new `process_capture` registration has a 300-second timeout. Existing
+test assertions and timeouts remain as recorded in the baseline.
+
+PikaOS 4 x64 ran kernel `7.2.11-pikaos` with glibc 2.44. The Windows
+guest reported Windows 10 Home x64, build `19045.6466`. Both used the
+pinned LLVM/Clang/LLD 23.1.4 and verified provider inputs.
+
+| Native configuration | Focused CTests | Capture |
+| --- | --- | --- |
+| PikaOS 4 x64 Debug | 9/9, 178.19 s | 51.90 s |
+| PikaOS 4 x64 Release | 9/9, 52.20 s | 18.02 s |
+| PikaOS 4 x64 strict RelWithDebInfo | 9/9, 169.02 s | 50.33 s |
+| Windows 10 Home x64 Debug | 8/8, 271.07 s across two invocations | 82.03 s |
+| Windows 10 Home x64 Release | 8/8, 82.98 s across two invocations | 28.59 s |
+
+The final capture-only replay also passed in each PikaOS profile after
+the Windows fix and the added failure diagnostic. Capture ran in
+51.21 s in Debug, 18.92 s in Release and 52.41 s in strict RelWithDebInfo.
+The strict focused run and replay reported no sanitizer or leak failure.
+Both Windows profiles passed the final capture registration followed by
+all seven compatibility registrations. Registration validation found
+active commands and the expected timeouts for all focused tests on
+both hosts, with no skip properties. The inherited-stream process
+controls and VOIDUP smoke passed in every configuration.
+
+The task-owned Windows workspace, Linux scratch directory and transfer
+directory were removed after verification. Windows free space rose from
+7,279,407,104 to 13,656,858,624 bytes. Available space on the Linux
+checkout filesystem rose from 368,835,530,752 to 369,085,435,904 bytes.
+The three maintained Linux build trees remain available for replay.
+
+[Runnable example](../../examples/process/capture.void) · [Archive and retention policy](../projects/VOID_ARCHIVE_AND_RETENTION_POLICY.md)
+
+### Changed-file inventory
+
+- Public API and example — `stdlib/process.void`, `stdlib/README.md`, `docs/process/API.md`, `examples/process/capture.void`.
+- Compiler and ABI — `include/void/host_abi.hpp`, `include/void/host_ops.hpp`, `src/frontend/host.inc`, `src/ir/host.inc`, `src/backend/llvm/host.inc`, `src/backend/llvm/backend.cpp`.
+- Runtime — `include/void/runtime.hpp`, `src/runtime/coordination.cpp`, `src/runtime/host_internal.hpp`, `src/runtime/host_abi.cpp`, `src/runtime/host_process.cpp`, `src/runtime/host_process_windows.cpp`.
+- Verification — `CMakeLists.txt`, `tests/host_capabilities/process_capture.cpp`, `tests/host_capabilities/process_capture.py`, `tests/host_capabilities/process_capture_sync.void`, `tests/host_capabilities/process_capture_async.void`.
+- Engineering documentation — `docs/ASYNC.md`, `docs/roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md`.

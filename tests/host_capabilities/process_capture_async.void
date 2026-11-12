@@ -1,0 +1,33 @@
+use convert
+use io
+use process
+
+async func entry(input: i32) -> i32:
+    var executable = convert.unwrap(await io.read_text_async("capture-image.txt"))
+    var directory = convert.unwrap(await io.read_text_async("capture-cwd.txt"))
+    var marker = convert.unwrap(await io.read_text_async("capture-marker.txt"))
+    var observation = convert.unwrap(await io.read_text_async("capture-mode.txt"))
+    var exact = process.capture_options(stdout_limit = 65536, stderr_limit = 65536, total_limit = 131072, timeout_ms = 5000)
+    var captured = convert.unwrap(await process.capture_async(executable, ["--io", "65536", "65536", "23"], [], directory, exact))
+    if captured.outcome != process.capture_end.complete or not captured.exited or captured.status.code != 23:
+        return 10
+    if captured.stdout.count != 65536 or captured.stderr.count != 65536 or captured.stdout[0] != 0 or captured.stderr[0] != 17:
+        return 11
+    var limited = process.capture_options(stdout_limit = 1048576, stderr_limit = 1048576, total_limit = 2097152, timeout_ms = 7000)
+    for mode in ["quiet", "active"]:
+        convert.unwrap(await io.remove_file_async(marker, missing_ok = true))
+        var child_id = ""
+        with tasks.group() as jobs:
+            var pending = process.capture_async(executable, ["--linger", marker, mode], [], directory, limited)
+            var tries = 0
+            for child_id == "" and tries < 8192:
+                if await io.read_text_async(marker) is Ok(var written):
+                    child_id = written
+                tries += 1
+            pending.cancel()
+            if observation == "await":
+                await pending
+        if child_id == "":
+            return 12
+        print("drained", child_id)
+    return input

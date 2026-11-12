@@ -1,6 +1,7 @@
 #include "host_internal.hpp"
 #ifdef _WIN32
 #include "host_windows.hpp"
+#include <bcrypt.h>
 #include <condition_variable>
 #include <mutex>
 #include <set>
@@ -10,42 +11,73 @@ namespace {
 enum class LaunchStage : std::int64_t { paths=1,arguments,environment,image_ancestors,
     cwd_ancestors,image_open,image_metadata,cwd_open,cwd_metadata,stdio,attributes_init,
     attributes_update,create_process };
-struct Child final : Object {
+struct Child final : CaptureChild {
     std::mutex mutex;
     std::condition_variable changed;
     win::Handle process;
+    std::array<win::Handle,2> readers;
     bool waited=false;
     DWORD status=0,wait_error=0;
     ~Child() override {close();}
-    void stop() noexcept override {
+    std::error_code terminate() noexcept {
         std::lock_guard lock(mutex);
+        std::error_code error;
         if(!waited && process.value!=INVALID_HANDLE_VALUE) {
             // Direct-child ownership only. No PID lookup or process-tree claim.
-            if(!TerminateProcess(process.value,1) && GetLastError()!=ERROR_ACCESS_DENIED)wait_error=GetLastError();
+            if(!TerminateProcess(process.value,1))
+                error={static_cast<int>(GetLastError()),std::system_category()};
         }
         changed.notify_all();
+        return error;
     }
-    Result wait_for_exit() noexcept {
-        std::unique_lock lock(mutex);
-        while(!waited && !wait_error) {
+    void stop() noexcept override {(void)terminate();}
+    std::optional<Result> poll_locked() noexcept {
+        if(!waited && !wait_error) {
             auto state=WaitForSingleObject(process.value,0);
             if(state==WAIT_OBJECT_0) {
                 if(!GetExitCodeProcess(process.value,&status))wait_error=GetLastError();
                 else waited=true;
-                break;
-            }
-            if(state==WAIT_FAILED){wait_error=GetLastError();break;}
-            changed.wait_for(lock,std::chrono::milliseconds(10));
+            } else if(state==WAIT_FAILED)wait_error=GetLastError();
+            else return {};
         }
         if(wait_error)return native_error(static_cast<int>(wait_error));
         Result result;result.number=status;return result;
     }
+    std::optional<Result> poll_exit() noexcept override {
+        std::lock_guard lock(mutex);
+        return poll_locked();
+    }
+    Result wait_for_exit() noexcept {
+        std::unique_lock lock(mutex);
+        for(;;) {
+            if(auto result=poll_locked())return *result;
+            changed.wait_for(lock,std::chrono::milliseconds(10));
+        }
+    }
+    PipeRead read(unsigned stream,std::span<char> buffer) noexcept override {
+        DWORD size=0;
+        if(ReadFile(readers[stream].value,buffer.data(),static_cast<DWORD>(buffer.size()),&size,nullptr))
+            return {size};
+        const auto code=GetLastError();
+        if(code==ERROR_BROKEN_PIPE || code==ERROR_PIPE_NOT_CONNECTED)return {0,0,true};
+        return {0,code==ERROR_NO_DATA?0:static_cast<int>(code)};
+    }
+    std::error_code close_readers() noexcept override {
+        auto first=readers[0].close(),second=readers[1].close();
+        return first?first:second;
+    }
     std::error_code close() noexcept override {
         {std::lock_guard lock(mutex);if(process.value==INVALID_HANDLE_VALUE)return {};}
-        stop();auto result=wait_for_exit();
+        const auto termination=terminate();
+        auto result=wait_for_exit();
         // Do not release the process authority while a child may still execute.
-        if(result.kind)return {static_cast<int>(result.code),std::system_category()};
-        std::lock_guard lock(mutex);return process.close();
+        if(result.kind)
+            return termination?termination:std::error_code(static_cast<int>(result.code),std::system_category());
+        std::lock_guard lock(mutex);
+        const auto closed=process.close();
+        // TerminateProcess can report access denied while a natural exit is
+        // in progress. Only the completed wait above confirms that race.
+        return termination && termination.value()!=ERROR_ACCESS_DENIED?termination:closed;
     }
     std::error_code quiesce() noexcept override {return close();}
 };
@@ -70,12 +102,33 @@ struct Attributes {
     LPPROC_THREAD_ATTRIBUTE_LIST list=nullptr;
     ~Attributes(){if(list)DeleteProcThreadAttributeList(list);}
 };
+win::Handle capture_pipe(win::Handle& reader) {
+    std::array<unsigned char,16> nonce;
+    if(BCryptGenRandom(nullptr,nonce.data(),static_cast<ULONG>(nonce.size()),BCRYPT_USE_SYSTEM_PREFERRED_RNG)!=0)
+        win::fail(ERROR_GEN_FAILURE);
+    constexpr std::wstring_view digits=L"0123456789abcdef";
+    std::wstring name=LR"(\\.\pipe\void-capture-)";
+    for(auto byte:nonce){name+=digits[byte>>4];name+=digits[byte&15];}
+    win::PrivateAccess private_access;
+    // Only the reader uses nonblocking mode. The child receives a regular
+    // blocking write handle and can apply ordinary pipe backpressure.
+    reader.value=CreateNamedPipeW(name.c_str(),PIPE_ACCESS_INBOUND|FILE_FLAG_FIRST_PIPE_INSTANCE,
+        PIPE_TYPE_BYTE|PIPE_READMODE_BYTE|PIPE_NOWAIT|PIPE_REJECT_REMOTE_CLIENTS,1,0,8192,0,&private_access.attributes);
+    if(reader.value==INVALID_HANDLE_VALUE)win::fail();
+    win::Handle writer(CreateFileW(name.c_str(),GENERIC_WRITE,0,nullptr,OPEN_EXISTING,0,nullptr));
+    if(writer.value==INVALID_HANDLE_VALUE)win::fail();
+    if(!ConnectNamedPipe(reader.value,nullptr) && GetLastError()!=ERROR_PIPE_CONNECTED)win::fail();
+    return writer;
 }
-Result windows_process_execute(Request& q) {
+}
+Result windows_process_execute(Request& q,const CaptureLimits* capture) {
     auto stage=LaunchStage::paths;
     try {
         if(q.operation==wait)return std::static_pointer_cast<Child>(q.objects[0])->wait_for_exit();
         if(q.operation!=spawn)throw std::logic_error("Invalid Windows process operation");
+#if !defined(_M_X64) || !defined(_MSC_VER)
+        if(capture)return error(11);
+#endif
         auto executable=win::absolute(q.texts[0]),cwd=win::absolute(q.texts[1]);
         stage=LaunchStage::arguments;
         std::wstring command=quote(win::wide(q.texts[0]));
@@ -108,8 +161,13 @@ Result windows_process_execute(Request& q) {
         STARTUPINFOEXW startup{};startup.StartupInfo.cb=sizeof(startup);startup.StartupInfo.dwFlags=STARTF_USESTDHANDLES;
         std::vector<win::Handle> standard;std::vector<HANDLE> inherited;standard.reserve(3);inherited.reserve(3);
         stage=LaunchStage::stdio;
+        unsigned index=0;
         for(DWORD selected:{STD_INPUT_HANDLE,STD_OUTPUT_HANDLE,STD_ERROR_HANDLE}) {
-            auto original=GetStdHandle(selected);HANDLE duplicate=INVALID_HANDLE_VALUE;
+            win::Handle writer;
+            if(capture && index && (*capture)[index-1]>=0)
+                writer.value=capture_pipe(child->readers[index-1]).release();
+            auto original=writer.value==INVALID_HANDLE_VALUE?GetStdHandle(selected):writer.value;
+            HANDLE duplicate=INVALID_HANDLE_VALUE;
             if(original && original!=INVALID_HANDLE_VALUE) {
                 if(!DuplicateHandle(GetCurrentProcess(),original,GetCurrentProcess(),&duplicate,0,TRUE,DUPLICATE_SAME_ACCESS))win::fail();
                 standard.emplace_back(duplicate);inherited.push_back(duplicate);
@@ -117,6 +175,7 @@ Result windows_process_execute(Request& q) {
             if(selected==STD_INPUT_HANDLE)startup.StartupInfo.hStdInput=duplicate;
             else if(selected==STD_OUTPUT_HANDLE)startup.StartupInfo.hStdOutput=duplicate;
             else startup.StartupInfo.hStdError=duplicate;
+            ++index;
         }
         Attributes attributes;DWORD flags=CREATE_UNICODE_ENVIRONMENT;
         if(!inherited.empty()) {

@@ -44,6 +44,13 @@ See the [OS API and boundaries](../docs/os/API.md),
 [startup](../examples/os/startup.void), [save](../examples/os/save.void) and
 [resource](../examples/os/resources.void) examples.
 
+`use process` launches an explicit native executable with literal arguments,
+a caller-supplied environment and working directory. On Linux x64 GNU and
+Windows x64 MSVC, `capture` and `capture_async` return independently bounded
+stdout and stderr bytes, EOF flags and direct-child exit information. Output
+overflow, deadlines and I/O failures preserve retained bytes and clean up the
+child. The existing inherited-stream `start` workflow remains available.
+[Process API](../docs/process/API.md) · [Executable example](../examples/process/capture.void)
 
 `use channel` provides `channel.router<t>()` for synchronous typed string-topic
 routing. `subscribe(topic, handler)` returns an opaque `subscription` for exact

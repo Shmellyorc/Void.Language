@@ -1,8 +1,12 @@
     VOID_SEMANTIC_HANDLER Type host_call(Expr& e, unsigned operation) {
         if (!current) error(source,e.token,Code::unsupported_type,"Host primitives require runtime evaluation.");
         const auto& contract=host::operations.at(operation);
+        if(operation==host::capture_async && !current->asynchronous)
+            error(source,e.token,Code::unsupported_type,"Native process jobs require an owning async activation.");
         Function target;target.token=e.token;target.symbol="$host."+std::to_string(operation);
-        target.result=contract.cleanup ? Type(Type::none) : Type(unit.structure_names.at("_host_reply")->definition);
+        target.result=contract.cleanup ? Type(Type::none) :
+            Type(unit.structure_names.at(host::capture_operation(operation)?"_capture_reply":"_host_reply")->definition);
+        if(operation==host::capture_async)target.result=unit.make_task(target.result);
         for(unsigned n=0;n<contract.arguments.size();++n) {
             char code=contract.arguments[n];Type type=Type::i64;
             if(code=='t')type=Type::string;

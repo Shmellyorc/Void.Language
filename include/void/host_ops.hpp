@@ -24,12 +24,14 @@ inline constexpr std::array operations = {
     Operation{io,"_host_dir_cleanup","D",true}, Operation{io,"_host_lock_cleanup","L",true},
     Operation{process,"_host_spawn","Ptaat"}, Operation{process,"_host_wait","P"},
     Operation{process,"_host_child_close","P"}, Operation{process,"_host_child_cleanup","P",true},
-    Operation{io,"_host_file_mode_matches","Fs"}
+    Operation{io,"_host_file_mode_matches","Fs"},
+    Operation{process,"_host_capture","taatssss"}, Operation{process,"_host_capture_async","taatssss"}
 };
 enum Code : unsigned {args_count,arg,hash_open,hash_update,hash_final,hash_close,hash_cleanup,verify,
  zip_open,zip_next,zip_read,zip_close,zip_cleanup,dir_create,dir_admit,dir_child,dir_open,dir_file,
  dir_lock,dir_sync,dir_publish,dir_replace,file_mode,dir_close,lock_close,dir_cleanup,lock_cleanup,
- spawn,wait,child_close,child_cleanup,file_mode_matches};
+ spawn,wait,child_close,child_cleanup,file_mode_matches,capture,capture_async};
+constexpr bool capture_operation(unsigned op) {return op==capture || op==capture_async;}
 constexpr std::string_view resource_name(char c) {
     switch(c) {case 'H':return "sha256_state";case 'R':return "zip_reader";case 'D':return "private_directory";
         case 'L':return "directory_lock";case 'F':return "file";case 'P':return "child";default:return {};}

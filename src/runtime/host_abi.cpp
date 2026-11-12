@@ -1,4 +1,5 @@
 #include "host_internal.hpp"
+#include "void/async.hpp"
 #include "void/host_abi.hpp"
 #include <cerrno>
 #include <charconv>
@@ -78,13 +79,66 @@ std::vector<std::string> strings(Runtime& r,void* input,const NativeArrayElement
     }
     return result;
 }
+
+struct CaptureReply {
+    std::int64_t launch_kind,os_code,reason,cleanup_code,code,signal;
+    bool exited,stdout_complete,stderr_complete;
+    void* stdout_bytes=nullptr;
+    void* stderr_bytes=nullptr;
+};
+constexpr std::array<std::size_t,11> capture_fields{
+    offsetof(CaptureReply,launch_kind),offsetof(CaptureReply,os_code),offsetof(CaptureReply,reason),
+    offsetof(CaptureReply,cleanup_code),offsetof(CaptureReply,code),offsetof(CaptureReply,signal),
+    offsetof(CaptureReply,exited),offsetof(CaptureReply,stdout_complete),offsetof(CaptureReply,stderr_complete),
+    offsetof(CaptureReply,stdout_bytes),offsetof(CaptureReply,stderr_bytes)};
+void publish_capture(Runtime& runtime,void* output,const CaptureResult& result,
+                     std::optional<std::size_t> task_offset={}) {
+    CaptureReply reply{result.launch.kind,result.launch.kind?result.launch.code:result.io_code,
+        static_cast<std::int64_t>(result.end),result.cleanup_code,result.status.number,result.status.detail,
+        result.exited,result.eof[0],result.eof[1]};
+    constexpr std::array offsets{capture_fields[9],capture_fields[10]};
+    Runtime::Slot slot{&reply,sizeof(reply),offsets.data(),offsets.size()};
+    Runtime::Frame roots(runtime,&slot,1);
+    runtime.bytes_into(&reply.stdout_bytes,result.output[0]);
+    runtime.bytes_into(&reply.stderr_bytes,result.output[1]);
+    if(task_offset) {
+        std::memcpy(static_cast<char*>(output)+*task_offset,&reply,capture_fields[9]);
+        runtime.store(output,*task_offset+capture_fields[9],reply.stdout_bytes);
+        runtime.store(output,*task_offset+capture_fields[10],reply.stderr_bytes);
+    } else std::memcpy(output,&reply,sizeof(reply));
+}
+class CaptureJob final : public NativeJob {
+    Runtime& runtime_;
+    std::optional<Admission> admission_;
+    Request request_;
+    CaptureLimits limits_;
+    CaptureResult result_;
+    std::size_t offset_;
+public:
+    CaptureJob(Runtime& runtime,Request request,CaptureLimits limits,CaptureResult result,std::size_t offset)
+        :runtime_(runtime),admission_(std::in_place,runtime),request_(std::move(request)),
+         limits_(limits),result_(std::move(result)),offset_(offset){}
+    void cancel_queued() noexcept override {admission_.reset();}
+    void execute(const std::atomic<bool>& cancellation,RuntimeFailure* failure) noexcept override {
+        try {
+            if(!result_.launch.kind)result_=capture_execute(request_,limits_,runtime_,cancellation);
+            if(cancellation.load(std::memory_order_relaxed) && result_.cleanup_code)
+                close_failure({result_.cleanup_code,std::system_category()},failure);
+        } catch(const std::bad_alloc&) {failure->message="Native capture allocation failed";}
+          catch(...) {failure->message="Native capture invariant failed";}
+        admission_.reset();
+    }
+    void publish(Runtime& runtime,void* task) override {
+        publish_capture(runtime,task,result_,offset_);
+    }
+};
 }
 }
 extern "C" void vd_host_call(void* output,const vd::host::ReplyLayout* layout,unsigned op,void* const* refs,const std::int64_t* nums,vd::RuntimeFailure* failure) noexcept {
     using namespace vd;using namespace vd::host;
     std::error_code rollback_error;
     try {
-        if(!failure || !output || !layout || !refs || !nums || op>=operations.size() || operations[op].cleanup || layout->size!=sizeof(Reply) || layout->fields!=fields)
+        if(!failure || !output || !layout || !refs || !nums || op>=operations.size() || operations[op].cleanup || capture_operation(op) || layout->size!=sizeof(Reply) || layout->fields!=fields)
             throw std::logic_error("Invalid host boundary ABI");
         auto& runtime=Runtime::current();Admission admission(runtime);
         Reply reply;constexpr std::array<std::size_t,2> offsets{offsetof(Reply,text),offsetof(Reply,bytes)};
@@ -167,6 +221,47 @@ extern "C" void vd_host_call(void* output,const vd::host::ReplyLayout* layout,un
         auto end=std::to_chars(message.data()+length,message.data()+message.size()-1,rollback_error.value());*end.ptr=0;
         RuntimeFailure detail;detail.message=message.data();retain_native_failure(detail,failure);
     }
+}
+extern "C" void vd_host_capture(void* output,const vd::host::CaptureLayout* layout,unsigned op,void* const* refs,
+    const std::int64_t* nums,const void* generation,vd::RuntimeFailure* failure) noexcept {
+    using namespace vd;using namespace vd::host;
+    try {
+        if(!failure || !output || !layout || !refs || !nums || !capture_operation(op) ||
+           layout->size!=sizeof(CaptureReply) || layout->fields!=capture_fields)
+            throw std::logic_error("Invalid host capture ABI");
+        auto& runtime=Runtime::current();
+        Admission admission(runtime);
+        Request request{};request.operation=spawn;
+        CaptureLimits limits{nums[0],nums[1],nums[2],nums[3]};
+        CaptureResult result;
+        try {
+            for(unsigned index:{0,3}) {
+                auto text=runtime.string_bytes(refs[index]);
+                if(text.size()>1048576)throw Rejected{12};
+                request.texts.emplace_back(text);
+            }
+            for(unsigned index:{1,2})request.arrays.push_back(strings(runtime,refs[index],layout->strings));
+        } catch(const Rejected& rejected) {result.launch=error(rejected.kind);}
+        if(op==capture_async) {
+            if(!layout->task_key || !layout->task_references || layout->task_reference_count!=2 ||
+               layout->task_result>layout->task_size || sizeof(CaptureReply)>layout->task_size-layout->task_result ||
+               layout->task_references[0]!=layout->task_result+capture_fields[9] ||
+               layout->task_references[1]!=layout->task_result+capture_fields[10])
+                throw std::logic_error("Invalid capture task layout");
+            TypeLayout task{layout->task_size,{layout->task_references[0],layout->task_references[1]}};
+            task.descriptor=runtime.descriptor(layout->task_key);
+            auto job=std::make_shared<CaptureJob>(runtime,std::move(request),limits,std::move(result),layout->task_result);
+            async_submit_native(static_cast<void**>(output),task,generation,std::move(job));
+            return;
+        }
+        if(!result.launch.kind) {
+            const std::atomic<bool> cancellation{false};
+            Runtime::Native safe(runtime);
+            result=capture_execute(request,limits,runtime,cancellation);
+        }
+        publish_capture(runtime,output,result);
+    } catch(const std::bad_alloc&) {if(failure)failure->message="Host capture allocation failed";}
+      catch(...) {if(failure)failure->message="Host capture invariant failed";}
 }
 extern "C" void vd_host_cleanup(unsigned op,void* key,vd::RuntimeFailure* failure) noexcept {
     using namespace vd;using namespace vd::host;
