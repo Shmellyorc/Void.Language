@@ -34,6 +34,7 @@ braces. VOID interpolation rules are unchanged.
 | `parse_as<t>(text, budget = limits(), unknown = unknown_fields.reject)` | Parse and decode with one shared budget |
 | `to_value<t>(const input, budget = limits())` | Fresh independent JSON tree |
 | `from_value<t>(const node, budget = limits(), unknown = unknown_fields.reject)` | Fresh writable typed data |
+| `get_or<t>(const node, name, fallback, budget = limits(), unknown = unknown_fields.reject)` | Decode one object property or return the explicit fallback on absence |
 | `stringify<t>(const input, budget = limits())` | Compact ordered UTF-8 JSON using the one source writer |
 
 `to_value` and `stringify` infer input types. Return-only `t` stays explicit.
@@ -85,6 +86,69 @@ managed target or `json.value`. Unknown names reject in input order by default;
 `unknown_fields.ignore` still parses all values, detects decoded duplicates and
 charges parse budgets. Fields then decode in effective declaration order.
 
+## Explicit configuration defaults
+
+```void
+use json as json
+
+func music_enabled(const audio: json.value) -> result<bool, json.error>:
+    return json.get_or<bool>(audio, "music", true)
+```
+
+`get_or` selects an exact decoded property name from an object. An absent
+name returns the ordinary, eagerly evaluated `fallback` argument. A
+present name is decoded with the same schema and conversions as
+`from_value`. Thus `false`, zero and empty collections or strings are
+ordinary present values. Explicit null decodes as null for a nullable
+managed target and as a null node for `json.value`. A nonnullable
+target returns `wrong_type` for null. An application that needs to tell
+null from other wrong kinds can inspect `node.get(name)` and the child's
+`kind` before decoding. Wrong types, invalid enum names and range
+failures propagate without selecting the default. [JSON value syntax](https://www.rfc-editor.org/rfc/rfc8259#section-3)
+
+The fallback is checked at the argument boundary. A supplied managed or
+collection fallback keeps its identity and ordinary mutability. Present
+values decode to fresh writable data, including a fresh tree for
+`json.value`. A readonly reference cannot supply a writable fallback.
+The compiler admits the complete target schema even if the property is
+absent. `parse_as` retains its required-field rules. The `unknown`
+parameter controls DTO membership within the selected value. For
+whole-document DTO membership, use `parse_as` or `from_value`.
+
+Lookup and selected-value conversion share one work budget. The
+object member count and requested name size are checked before lookup.
+Typed decoding applies its own depth, node, string and number limits to
+the selected subtree. A fallback is application-owned data and is
+returned without a JSON traversal. Parse the complete document with its
+own input limits before calling the helper.
+
+Errors retain original UTF-8 byte offsets and paths relative to the
+supplied object. A decoding error at field `volume` under a selected
+property named `audio` has path `/audio/volume`. Name segments escape
+`~` as `~0` and `/` as `~1`. Passing the nested audio object directly
+makes `/volume` relative to that object. [JSON Pointer syntax](https://www.rfc-editor.org/rfc/rfc6901#section-3)
+
+The TestGame example reads up to 4,096 bytes with strict UTF-8
+`io.read_text`, parses the entire file with explicit JSON budgets,
+requires a player name and audio object, and supplies defaults for
+music and volume. It distinguishes input errors, JSON failures and the
+application's nonempty-name and 0–100 volume checks. The save command
+uses a fresh admitted private directory and reloads the file through
+the same bounded path. [Executable configuration example](../../examples/json/configuration.void) · [Atomic save contract](../io/CONTRACT.md#atomic-application-saves)
+
+Save this as `game.json` to exercise both defaults.
+
+```json
+{"player":"初雪","audio":{}}
+```
+
+```sh
+voidc run examples/json/configuration.void --no-cache -- check game.json
+voidc run examples/json/configuration.void --no-cache -- save "$PRIVATE_PARENT/new-game"
+```
+
+## Errors and budgets
+
 Errors derive from the ordinary core error. `kind` is one of the thirteen documented
 categories, `code` is its one-based declaration index, `offset` is an original
 zero-based UTF-8 byte offset (or -1 for converted data), and `path` is a relative
@@ -100,6 +164,7 @@ Cycles and excessively deep acyclic data both fail as `limit_exceeded` through
 bounded iterative traversal. Output is deterministic for ordered inputs; it is
 not sorted cryptographic canonical JSON.
 
-Linux verification includes relocated installed execution and independently linked
-AOT in both optimization modes. Native Windows/macOS and hosted acceptance remain
-unverified; independent Golden Wrench source review is the next gate.
+The original JSON verification includes relocated Linux installed execution
+and independently linked AOT in both modes. G09 adds focused PikaOS and
+Windows 10 qualification for configuration. macOS and hosted G09
+qualification are open. [G09 implementation and native results](IMPLEMENTATION.md#g09-configuration-and-typed-field-defaults)

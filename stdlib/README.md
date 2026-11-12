@@ -76,7 +76,11 @@ returns an ordinary list for enumeration; `stringify` and `parse_as` round-trip
 string-key dictionaries and eligible DTOs. Exact numeric tokens, Unicode checks,
 decoded duplicate rejection and shared resource limits apply. The explicit module
 alias permits a loop binder named `value` under the existing no-shadowing rule.
-See the [JSON API](../docs/json/API.md) and [working save example](../examples/json/save.void).
+`json.get_or<bool>(object, "music", true)` supplies a default for an absent
+field. Present null and invalid values follow the ordinary typed decoder.
+Use bounded `io.read_text` for file input and application checks for
+constraints such as a volume between 0 and 100.
+[JSON API](../docs/json/API.md) · [Configuration example](../examples/json/configuration.void) · [DTO save example](../examples/json/save.void)
 
 `use io` provides owned file handles, bounded whole-file bytes/UTF-8 reads,
 write/append, metadata, file and directory copy/move/removal, symbolic links and

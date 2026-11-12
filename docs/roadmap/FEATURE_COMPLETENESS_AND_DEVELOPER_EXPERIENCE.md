@@ -186,7 +186,13 @@ target stays advisory.
 
 ### P2 — G09 · Data and text conveniences backed by application examples
 
-**PARTIAL.** File and memory wire data and JSON DTOs work. Large incremental JSON input, optional/default-field policies, formatted-date parsing, and normalization or grapheme-level editing are separate gaps. Collection callback type arguments can be awkward in generic code. Choose only the operation demonstrated by an application, such as a bounded configuration reader with precise field errors. Reuse the existing JSON/resource counters, scalar offsets, strict wire codecs and typed diagnostics. Verify malformed UTF-8, boundaries and round-trip behavior with the existing text/JSON/time suites. Preserve the pinned Unicode and tzdata identities. [JSON API](../json/API.md) · [Collections API](../collections/API.md) · [Text/encoding API](../text-encoding/API.md) · [Temporal implementation](../../src/temporal.cpp)
+**IN PROGRESS pending independent review.** Batch 10 covers bounded JSON
+configuration and explicit typed field defaults. `json.get_or` defaults
+only absent properties. The TestGame example uses bounded UTF-8 input,
+strict parsing, application validation and G06 private-directory saving.
+Large incremental JSON, formatted-date parsing, normalization,
+grapheme handling and collection conveniences remain separate work.
+[JSON configuration API](../json/API.md#explicit-configuration-defaults) · [G09 qualification](../json/IMPLEMENTATION.md#g09-configuration-and-typed-field-defaults)
 
 ### G15 · Named and unnamed multiple returns
 

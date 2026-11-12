@@ -1099,6 +1099,29 @@ func from_value<t>(const node: value, budget: limits = limits(), unknown: unknow
     var context = _context_for(budget)?
     return _json_from_value<t>(node, context, unknown)
 
+## Decode a named object property, using the supplied value only when the name is absent.
+## @param node An existing JSON object. The input tree and its authority are preserved.
+## @param name Exact decoded property name. Errors in the selected value are relative to this object.
+## @param fallback An ordinary typed argument returned as supplied on absence.
+## @param budget Limits for lookup and the selected subtree's typed conversion.
+## @param unknown Unknown-property policy for DTOs inside the selected value.
+## @return The fallback or the decoded value. Present null follows the target schema.
+func get_or<t>(const node: value, name: string, fallback: t, budget: limits = limits(), unknown: unknown_fields = unknown_fields.reject) -> result<t, error>:
+    var context = _context_for(budget)?
+    context.location = node.source_offset()
+    if not (node.kind is value_kind.object):
+        return Err(context.fail(error_kind.wrong_type, "Expected JSON object"))
+    if node.length()? > budget.max_object_members:
+        return Err(context.fail(error_kind.limit_exceeded, "max_object_members"))
+    if name.byte_length > budget.max_string_bytes:
+        return Err(context.fail(error_kind.limit_exceeded, "max_string_bytes"))
+    var admitted = context.charge(name.byte_length)?
+    context.path.push(name)
+    var child = _find(node, name, context)?
+    if child == null:
+        return Ok(fallback)
+    return _json_from_value<t>(child as value, context, unknown)
+
 ## Parse strict JSON and decode it with one shared operation budget.
 ## @param text Valid VOID Unicode text containing exactly one JSON value.
 ## @param budget Limits shared by the source parser and typed conversion.

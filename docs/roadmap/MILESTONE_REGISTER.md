@@ -1,7 +1,7 @@
 # VOID developer experience milestone register
 
-Current assignment is Batch 9, G08 compiler and editor performance, starting
-from `561bd020d9904dcfa2dc792297f9e87688e89f5e`. Batch entries below identify
+Current assignment is Batch 10, G09 JSON configuration and typed field defaults,
+starting from `8b714ebb525fa7c822e7f7c35780b58f9f48208c`. Batch entries below identify
 the integration commits and the scope of their qualification. Boss controls
 integration, hosted qualification and public release.
 [Feature roadmap](FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md)
@@ -19,13 +19,13 @@ integration, hosted qualification and public release.
 | 6 · G05 | `7af58a3ad4ebee4e0bc6c9a97c23f356ea2bcd4c` | Local Linux Debug/Release/strict and Windows 10 Debug/Release. Verified read-only dependency explanation and guarded VS Code quick fixes. Vim/Neovim manifest parity remains open. [Record](FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md#g05-dependency-intelligence-and-guarded-maintenance) |
 | 7 · G16 | `6b28c57ff50256734fb804387f7c0ffca828d51f` | Local Linux Debug/Release/strict and Windows 10 Debug/Release. Compiler-owned enum completion and semantic roles respect visibility and stale-result guards. Recovery remains limited to supported incomplete contexts. [Record](FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md#g16-enum-completion-and-semantic-highlighting) |
 | 8 · G06 | `561bd020d9904dcfa2dc792297f9e87688e89f5e` | New save tests passed on all five local profiles. The two existing Windows I/O suites still encountered file-symlink privilege error 1314. The synchronous API uses admitted local filesystems and a held private directory. Async saves and macOS remain outside scope. [Record](FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md#g06-atomic-application-saves) |
+| 9 · G08 | `8b714ebb525fa7c822e7f7c35780b58f9f48208c` | **BASELINE MEASURED / OPTIMIZATION HOLD.** Local Linux and Windows 10 Debug/Release timing and strict Linux correctness. A revision-only completion cache would miss a changed dependency. Windows persistent caching remains an architecture decision. [Qualification](../compiler-health/G08_COMPILER_PERFORMANCE.md) |
 
 ## Current and upcoming
 
 | Milestone | Status and next evidence |
 | --- | --- |
-| 9 · G08 | **BASELINE MEASURED / OPTIMIZATION HOLD.** Local Linux and Windows 10 Debug/Release timing and strict Linux correctness are recorded for Golden Wrench review. A revision-only completion cache would miss a changed dependency. Windows persistent caching remains an architecture decision. [Qualification](../compiler-health/G08_COMPILER_PERFORMANCE.md) |
-| G09 · Data and text conveniences | Upcoming. Select a demonstrated application need and reuse the existing text, codec, temporal or typed JSON contracts. |
+| 10 · G09 | **IN PROGRESS pending independent review.** Bounded JSON configuration, explicit typed field defaults and atomic save/reload using the existing contracts. Other data and text conveniences remain separate. [Qualification](../json/IMPLEMENTATION.md#g09-configuration-and-typed-field-defaults) |
 | G10 · Async timers and coordination | Upcoming. Preserve scheduler ownership and define deadlines, cancellation and draining for the selected application workflow. |
 | G11 · Remaining native platform qualification | Open. Windows managed raylib packaging and retained callbacks need native evidence. macOS managed native and D5 remain outside the supported lanes. Signed App Sandbox remains unverified. |
 | G12 · Optional language and library extensions | Deferred pending concrete use cases and reviewed contracts. |

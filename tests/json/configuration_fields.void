@@ -1,0 +1,159 @@
+use json
+
+enum difficulty:
+    easy
+    hard
+
+struct profile:
+    const level: u8
+    enabled: bool
+
+value struct record:
+    level: u8
+
+func expect_failure<t>(attempt: result<t, json.error>, kind: json.error_kind, code: i32, offset: i64, pointer: string, detail: string = "") -> bool:
+    if attempt is Err(var failure):
+        if "{failure.kind}" == "{kind}" and failure.code == code and failure.offset == offset and failure.path == pointer:
+            if detail == "" or failure.message == detail:
+                return true
+        print("unexpected error {failure.kind} {failure.code}@{failure.offset}:{failure.path} {failure.message}")
+        return false
+    print("expected error {code}@{offset}:{pointer}, received a value")
+    return false
+
+func values() -> result<bool, json.error>:
+    const tree = json.parse("{{\"雪\":\"初雪😀\",\"empty\":\"\",\"switch\":false,\"signed\":-128,\"total\":18446744073709551615,\"f32\":0.5,\"f64\":1.25,\"mode\":\"hard\",\"levels\":[],\"marks\":{{\"a\":2}},\"player\":{{\"level\":7,\"enabled\":true}},\"null\":null}}")?
+    var local_name = json.get_or(tree, "雪", "fallback")?
+    var empty_name = json.get_or(tree, "empty", "fallback")?
+    var selected = json.get_or(tree, "switch", true)?
+    var absent = json.get_or(tree, "unknown", true)?
+    var signed = json.get_or<i8>(tree, "signed", 0)?
+    var total = json.get_or<u64>(tree, "total", 0)?
+    var small_real = json.get_or<f32>(tree, "f32", 0)?
+    var large_real = json.get_or<f64>(tree, "f64", 0)?
+    var mode = json.get_or(tree, "mode", difficulty.easy)?
+    if local_name != "初雪😀" or empty_name != "" or selected or not absent or signed != -128 or total != u64.max_value or small_real != 0.5 or large_real != 1.25 or not (mode is difficulty.hard):
+        print("incorrect scalar or enum value")
+        return Ok(false)
+
+    var supplied: [i32] = [99]
+    var received = json.get_or<[i32]>(tree, "levels", supplied)?
+    if received.count != 0:
+        return Ok(false)
+    received.push(12)
+    var fresh = json.get_or<[i32]>(tree, "levels", supplied)?
+    if fresh.count != 0 or supplied.count != 1:
+        return Ok(false)
+    var empty_object = json.parse("{{}}")?
+    var reused = json.get_or<[i32]>(empty_object, "levels", supplied)?
+    reused.push(19)
+    if supplied.count != 2 or supplied[1] != 19:
+        return Ok(false)
+
+    var stock: {string: i32} = {"seed": 3}
+    var decoded = json.get_or<{string: i32}>(tree, "marks", stock)?
+    decoded["a"] = 4
+    var again = json.get_or<{string: i32}>(tree, "marks", stock)?
+    if again["a"] != 2 or stock["seed"] != 3:
+        return Ok(false)
+
+    var seed = profile(level = 5, enabled = false)
+    var present = json.get_or(tree, "player", seed)?
+    if present.level != 7 or not present.enabled:
+        return Ok(false)
+    present.enabled = false
+    var next = json.get_or(tree, "player", seed)?
+    if not next.enabled or seed.enabled:
+        return Ok(false)
+    var null_profile = json.get_or<profile?>(tree, "null", seed)?
+    var absent_profile = json.get_or<profile?>(tree, "missing", seed)?
+    if null_profile != null or absent_profile == null or not ((absent_profile as profile) is seed):
+        return Ok(false)
+    var fallback_node = json.null_value()
+    var cloned = json.get_or(tree, "null", fallback_node)?
+    var original = tree.get("null")?
+    if not (cloned.kind is json.value_kind.null_value) or cloned is original or cloned is fallback_node:
+        return Ok(false)
+    return Ok(true)
+
+func errors() -> result<bool, json.error>:
+    var scalar = json.parse("[]")?
+    if not expect_failure(json.get_or(scalar, "absent", true), json.error_kind.wrong_type, 6, 0, ""):
+        return Ok(false)
+    var tree = json.parse("{{\"雪\":null,\"n\":256,\"fraction\":1e-1,\"enum\":\"HARD\",\"a~/\":{{\"level\":false}},\"flags\":{{\"level\":3,\"x/y\":0}}}}")?
+    if not expect_failure(json.get_or(tree, "雪", true), json.error_kind.wrong_type, 6, 7, "/雪"):
+        return Ok(false)
+    if not expect_failure(json.get_or<u8>(tree, "n", 0), json.error_kind.out_of_range, 7, 16, "/n"):
+        return Ok(false)
+    if not expect_failure(json.get_or<i32>(tree, "fraction", 1), json.error_kind.out_of_range, 7, 31, "/fraction"):
+        return Ok(false)
+    if not expect_failure(json.get_or(tree, "enum", difficulty.easy), json.error_kind.invalid_enum, 9, 43, "/enum"):
+        return Ok(false)
+    var defaults = record(level = 0)
+    if not expect_failure(json.get_or(tree, "a~/", defaults), json.error_kind.wrong_type, 6, 65, "/a~0~1/level"):
+        return Ok(false)
+    if not expect_failure(json.get_or(tree, "flags", defaults), json.error_kind.unknown_property, 10, 91, "/flags/x~1y"):
+        return Ok(false)
+    var ignored = json.get_or(tree, "flags", defaults, unknown = json.unknown_fields.ignore)?
+    if ignored.level != 3:
+        return Ok(false)
+    var programmatic = json.to_value({"selected": true})?
+    if not expect_failure(json.get_or<u8>(programmatic, "selected", 0), json.error_kind.wrong_type, 6, -1, "/selected"):
+        return Ok(false)
+    var old = json.parse_as<profile>("{{\"enabled\":true}}")
+    return Ok(expect_failure(old, json.error_kind.missing_property, 4, 0, "/level"))
+
+func bounded() -> result<bool, json.error>:
+    var tree = json.parse("{{\"a\":0,\"b\":[[1]]}}")?
+    if not expect_failure(json.get_or(tree, "b", true, budget = json.limits(max_work = 2)),
+        json.error_kind.limit_exceeded, 12, 0, "/b", "max_work"):
+        return Ok(false)
+    if not expect_failure(json.get_or(tree, "b", true, budget = json.limits(max_work = 7)),
+        json.error_kind.limit_exceeded, 12, 11, "/b", "max_work"):
+        return Ok(false)
+    if not expect_failure(json.get_or(tree, "absent", true, budget = json.limits(max_object_members = 1)),
+        json.error_kind.limit_exceeded, 12, 0, "", "max_object_members"):
+        return Ok(false)
+    if not expect_failure(json.get_or(tree, "absent", true, budget = json.limits(max_string_bytes = 1)),
+        json.error_kind.limit_exceeded, 12, 0, "", "max_string_bytes"):
+        return Ok(false)
+    if not expect_failure(json.get_or(tree, "absent", true, budget = json.limits(max_work = 0)),
+        json.error_kind.invalid_limits, 13, -1, ""):
+        return Ok(false)
+    var fallback_list: [[i32]] = []
+    if not expect_failure(json.get_or(tree, "b", fallback_list, budget = json.limits(max_nodes = 1)),
+        json.error_kind.limit_exceeded, 12, 11, "/b", "max_nodes"):
+        return Ok(false)
+    if not expect_failure(json.get_or(tree, "b", fallback_list, budget = json.limits(max_depth = 1)),
+        json.error_kind.limit_exceeded, 12, 12, "/b/0", "max_depth"):
+        return Ok(false)
+    var nested = "0"
+    var ancestor_pointer = ""
+    for level in 0..<128:
+        nested = "[" + nested + "]"
+        ancestor_pointer += "/0"
+    var deepest = json.parse(nested, json.limits(max_depth = 128))?
+    if not (deepest.kind is json.value_kind.array):
+        return Ok(false)
+    var too_deep = json.parse("[" + nested + "]", json.limits(max_depth = 128))
+    if too_deep is Err(var failure):
+        return Ok(failure.kind is json.error_kind.limit_exceeded and failure.code == 12 and failure.offset == 128 and failure.path == ancestor_pointer and failure.message == "max_depth")
+    return Ok(false)
+
+func verify() -> result<i32, json.error>:
+    if not values()?:
+        return Ok(1)
+    if not errors()?:
+        return Ok(2)
+    if not bounded()?:
+        return Ok(3)
+    print("Typed defaults, ownership, located errors and budgets verified")
+    return Ok(0)
+
+func main() -> i32:
+    match verify():
+        Ok(var status):
+            return status
+        Err(var failure):
+            print("unexpected error {failure.kind} {failure.code}@{failure.offset}:{failure.path} {failure.message}")
+            return 4

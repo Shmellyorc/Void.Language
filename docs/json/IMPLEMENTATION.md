@@ -277,3 +277,167 @@ The original parent JUnit/status/logs remain intact. No reconstructed source is
 labeled an original captured artifact. Splitting current cases avoids that group
 budget conflict. Source freeze 10 and a source/build audit verify 177 source files
 and the protected root README/research archive; final wide AOT runs still remain.
+
+## G09 configuration and typed field defaults
+
+Baseline `8b714ebb525fa7c822e7f7c35780b58f9f48208c`. Batch 10 remains
+**IN PROGRESS pending independent Golden Wrench review**. The production
+change is one source-library function. The existing parser, compiler
+schema adapter, Runtime, native save contract and typed decoding rules
+remain the authorities.
+[JSON API](API.md#explicit-configuration-defaults) · [Design](DESIGN.md#explicit-single-property-defaults-g09)
+
+### Baseline application probe
+
+A disposable TestGame reader used bounded `io.read_text`, strict
+`json.parse` and manual `get`/conversion branches for both audio settings.
+In normal and O2 JIT it loaded `初雪 true 60` from
+`{"player":"初雪","audio":{}}`. The manual reader correctly
+accepted only missing settings as defaults. It needed a separate branch
+per field and produced an empty relative path when a child accessor
+reported wrong type or range. Direct `parse_as<game_config>` rejected
+the missing Boolean even though the VOID field initializer was present.
+
+| Baseline control | Normal and O2 JIT outcome |
+| --- | --- |
+| Empty audio object with a UTF-8 player | Manual mapping returned the explicit defaults and exit 0. |
+| Missing required player | `missing_property` (4), byte 0, `/player`. |
+| Explicit null music | `wrong_type` (6), byte 36, empty child-relative path. |
+| Volume 256 as u8 | `out_of_range` (7), byte 37, empty child-relative path. |
+| Direct DTO decode of missing music | `missing_property` (4), byte 27, `/audio/music`. |
+
+The original baseline fixture local `args` collided with the imported
+OS function. Its first optimized launch also supplied `--no-cache` twice.
+Using a distinct local and one uncached flag allowed the baseline probe
+to execute with the existing compiler. The first field-fixture drafts
+also corrected JSON literal escaping, a multiline function signature
+and error-kind comparison. VOID's payload-free enum tests use case
+matching or exact display names under the current equality contract.
+
+### Implementation and failure semantics
+
+`json.get_or<t>` uses the existing object lookup and static decoder
+with one checked lookup/conversion context. Missing returns the
+caller-supplied value. Its type and capabilities are checked during
+ordinary specialization, including when the runtime object is empty.
+A managed or collection fallback retains its identity. Present data
+comes from the existing fresh typed-data construction. JSON null flows
+through the selected schema. Callers can inspect the immutable child's
+kind when they need to distinguish null from other wrong kinds.
+
+The portable fixture checks bool, string, integer, f32/f64, payload-free
+enum, array, string-key dictionary, nullable managed and public stored
+data targets. The negative compiler controls reject an incorrect
+fallback type, readonly collection and managed fallbacks, private data
+and a custom initializer. The original factory example keeps its DTO
+and explicit validation step.
+
+The TestGame reader requires a player and nested audio object. It keeps
+strict UTF-8 and I/O errors separate from JSON errors and application
+validation. It admits 4,096 bytes and rejects 4,097. The parser uses a
+depth of 8, 64 nodes, 16 object members, 256 bytes per decoded string,
+32 bytes per number and 65,536 work units. The portable controls also
+exercise depth 128/129, selected-value depth and node exhaustion, and
+lookup and conversion work exhaustion. A source null reports byte 36
+at `/audio/music`. Overflow reports byte 37 at `/audio/volume`.
+The nested test reports `/a~0~1/level` at byte 65. An invalid Unicode
+escape retains byte 11 and `/player`, whereas malformed UTF-8 is an
+I/O error before a JSON text value exists. The duplicate decoded key
+case reports byte 36 at `/audio/music`. An ignored field still consumes
+the parse budget. The 65th node in the file test fails at byte 154 and
+`/extra/60`.
+[Runnable configuration reader and save](../../examples/json/configuration.void) · [Field controls](../../tests/json/configuration_fields.void) · [Native driver](../../tests/json/configuration.py)
+
+### Local native qualification
+
+The five local profiles use LLVM, Clang and LLD 23.1.4. Linux uses the
+verified PikaOS 4 x64 builds. The Windows guest reported Windows 10
+Home x64 and NT build 19045.6466. It used the physical SDK driver, the
+profile-matched verified providers and private NTFS temporary roots.
+The copied baseline and source overlay were hash-verified. The
+configure-only host-provider shim delegated to the original
+byte-identical verifier at its attested root. Production recipes and
+receipts remained intact.
+[Attested Windows verifier setup](../projects/SLICE7_FINAL_CLOSEOUT.md#qualification-scope-and-preserved-platform-boundaries)
+
+The portable `json_configuration` CTest exercises the field controls
+in normal and O2 JIT and independently emitted and linked normal/O2
+AOT. It runs eight representative file cases in both JIT modes and
+all 15 cases in both AOT modes. Each mode verifies real G06 save and
+reload, exact UTF-8 JSON bytes and stage cleanup. The unchanged
+validated factory example also runs in both JIT modes. Linux
+configuration children have actual 1 MiB stack limits. The Windows
+test verifies the independent Clang driver plan selects the pinned
+LLD executable. This configuration CTest is registered on the same
+platforms as the G06 save tests.
+
+The focused selector for both operating systems is:
+
+```sh
+common='json_configuration|text_encoding_text|text_encoding_errors|text_encoding_interop|frontend|lsp_enum_recovery|multiple_returns|net_sockets|project_dependency_explain|io_kernel|io_ownership|io_atomic_save_native|io_atomic_save_source'
+ctest --test-dir BUILD -j 2 --output-on-failure -R "^($common)$"
+```
+
+On Linux the selection adds:
+
+```sh
+linux='json_readonly|json_dynamic|json_numbers|json_schema|json_bounds|json_execution_validated|json_execution_typed_smoke|json_execution_shapes|json_execution_ownership|json_lsp|io_execution|io_async_execution'
+ctest --test-dir BUILD -j 3 --output-on-failure -R "^($common|$linux)$"
+```
+
+Use mode 0700 for Linux scratch directories. Use the existing
+`void_windows_native_staging --create-private-root` verifier before
+assigning the private Windows `TMP` and `TEMP`. The original JSON
+registrations use the POSIX 1 MiB stack harness. The selected Windows
+legacy replay uses the unchanged source and existing byte oracles
+through a native runner with the platform's normal stack. Windows
+file-symlink privilege error 1314 remains the recorded limitation
+from G06. This Windows selection exercises I/O kernel, ownership and
+atomic save. The symlink-dependent `io_execution` and
+`io_async_execution` were selected on Linux.
+[G06 native qualification](../roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md#g06-native-qualification)
+
+The strict Linux build is RelWithDebInfo with `VOID_SANITIZERS=ON`,
+`ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`.
+Existing test assertions and timeouts are preserved. The new
+`json_configuration` CTest uses 900 s and its subprocesses use
+180 s. This is a focused selection.
+
+| Native profile | CTest outcomes | Total wall time | Configuration case |
+| --- | ---: | ---: | ---: |
+| PikaOS 4 x64 Debug | 25/25 | 712.94 s | 429.55 s |
+| PikaOS 4 x64 Release | 25/25 | 293.27 s | 183.42 s |
+| PikaOS 4 x64 strict ASan/UBSan with leaks | 25/25 | 740.96 s | 412.77 s |
+| Windows 10 Home x64 Debug | 13/13 | 777.72 s | 743.57 s |
+| Windows 10 Home x64 Release | 13/13 | 216.64 s | 208.84 s |
+
+CTest registration and execution receipts verified matching common
+timeouts, active commands and zero skips. The strict Linux selection
+reported zero ASan, UBSan or leak findings. The existing JSON suites
+preserve required initializer-backed DTO fields, unknown-field
+ordering, strict Unicode and number handling, and readonly boundaries.
+The separate Windows legacy replay passed 24 child commands per
+profile. The four unchanged source programs were `accessors`,
+`typed_smoke`, `shapes` and `ownership`. Each used the existing byte
+oracle with normal and O2 JIT and native build execution. The portable
+configuration test independently linked both application modes.
+The verified native scope excludes macOS G09 and hosted qualification.
+
+### Evidence retention
+
+Removed the disposable guest build and source trees after the native
+tests completed. Available guest space rose from 12,364,394,496 to
+15,001,022,464 bytes. Removed the host share and scratch, including
+the source transfer, generated applications and raw logs. Available
+Linux tmpfs space rose from 16,383,692,800 to 16,589,053,952 bytes.
+Available host XFS space rose from 367,796,473,856 to
+367,796,477,952 bytes. The existing Linux builds and verified inputs
+remain available for replay. The original outcomes are recorded above.
+[Retention policy](../projects/VOID_ARCHIVE_AND_RETENTION_POLICY.md)
+
+### G09 changed-file inventory
+
+- Production library — `stdlib/json.void`.
+- Example and native test registration — `examples/json/configuration.void`, `tests/json/configuration_fields.void`, `tests/json/configuration.py`, `CMakeLists.txt`.
+- Documentation — `docs/json/API.md`, `docs/json/DESIGN.md`, `docs/json/IMPLEMENTATION.md`, `stdlib/README.md`, `docs/roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md`, `docs/roadmap/MILESTONE_REGISTER.md`.

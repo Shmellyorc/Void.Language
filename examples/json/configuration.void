@@ -1,0 +1,136 @@
+use io
+use json
+use os
+use path
+
+const configuration_bytes: i64 = 4096
+const default_music = true
+const default_volume: u8 = 60
+
+value struct player_fields:
+    player: string
+
+value struct selected_fields:
+    player: string
+    const audio_node: json.value
+
+value struct audio_settings:
+    music: bool
+    volume: u8
+
+value struct game_configuration:
+    player: string
+    audio: audio_settings
+
+enum configuration_issue:
+    input(failure: io.error)
+    document(failure: json.error)
+    audio(failure: json.error)
+    invalid(message: string)
+
+func configuration_budget() -> json.limits:
+    return json.limits(max_input_bytes = configuration_bytes, max_output_bytes = configuration_bytes,
+        max_depth = 8, max_nodes = 64, max_string_bytes = 256, max_number_bytes = 32,
+        max_object_members = 16, max_work = 65536)
+
+func decode_audio(const node: json.value) -> result<audio_settings, json.error>:
+    var music = json.get_or<bool>(node, "music", default_music, budget = configuration_budget())?
+    var volume = json.get_or<u8>(node, "volume", default_volume, budget = configuration_budget())?
+    return Ok(audio_settings(music = music, volume = volume))
+
+func player_and_audio(const node: json.value) -> result<selected_fields, json.error>:
+    # The player DTO selects just the required field. The parser has already
+    # validated all siblings, including settings this version does not use.
+    var required = json.from_value<player_fields>(node, budget = configuration_budget(),
+        unknown = json.unknown_fields.ignore)?
+    var nested = node.get("audio")?
+    return Ok(selected_fields(player = required.player, audio_node = nested))
+
+func decode_configuration(raw: string) -> result<game_configuration, configuration_issue>:
+    match json.parse(raw, configuration_budget()):
+        Err(var failure):
+            return Err(configuration_issue.document(failure))
+        Ok(var node):
+            return decode_fields(node)
+
+func decode_fields(const node: json.value) -> result<game_configuration, configuration_issue>:
+    match player_and_audio(node):
+        Err(var failure):
+            return Err(configuration_issue.document(failure))
+        Ok(var fields):
+            match decode_audio(fields.audio_node):
+                Err(var failure):
+                    return Err(configuration_issue.audio(failure))
+                Ok(var audio):
+                    if fields.player == "":
+                        return Err(configuration_issue.invalid("Player name must not be empty"))
+                    if audio.volume > 100:
+                        return Err(configuration_issue.invalid("Volume must be between 0 and 100"))
+                    return Ok(game_configuration(player = fields.player, audio = audio))
+
+func load_configuration(config_path: string) -> result<game_configuration, configuration_issue>:
+    match io.read_text(config_path, configuration_bytes):
+        Err(var failure):
+            return Err(configuration_issue.input(failure))
+        Ok(var raw):
+            return decode_configuration(raw)
+
+func check_configuration(config_path: string) -> i32:
+    match load_configuration(config_path):
+        Ok(var config):
+            print("{config.player} music={config.audio.music} volume={config.audio.volume}")
+            return 0
+        Err(var issue):
+            match issue:
+                configuration_issue.input(var failure):
+                    print("input {failure.kind}")
+                    return 1
+                configuration_issue.document(var failure):
+                    print("json {failure.code}@{failure.offset}:{failure.path}")
+                    return 2
+                configuration_issue.audio(var failure):
+                    print("json {failure.code}@{failure.offset}:/audio{failure.path}")
+                    return 2
+                configuration_issue.invalid(var message):
+                    print("validation {message}")
+                    return 3
+
+func save_configuration(destination: string, serialized: string) -> result<i32, io.error>:
+    var config_path = path.join([destination, "game.json"])?
+    with io.create_private_directory(destination)? as directory:
+        var saved = directory.save_text_atomic("game.json", serialized, replace = false)
+        if not saved.published:
+            print("save failed before publication (code {saved.code}, cleanup {saved.cleanup_code})")
+            return Ok(4)
+        if not saved.synchronized or saved.code != 0:
+            print("save published (synchronized {saved.synchronized}, code {saved.code}, cleanup {saved.cleanup_code})")
+            var checked = check_configuration(config_path)
+            if checked != 0:
+                return Ok(checked)
+            return Ok(5)
+        return Ok(check_configuration(config_path))
+
+func write_example(destination: string) -> i32:
+    var config = game_configuration(player = "初雪",
+        audio = audio_settings(music = default_music, volume = default_volume))
+    match json.stringify(config, configuration_budget()):
+        Err(var failure):
+            print("json {failure.code}@{failure.offset}:{failure.path}")
+            return 2
+        Ok(var serialized):
+            match save_configuration(destination, serialized):
+                Err(var failure):
+                    print("input {failure.kind}")
+                    return 1
+                Ok(var status):
+                    return status
+
+func main() -> i32:
+    if os.args() is Ok(var arguments):
+        if arguments.count == 2:
+            if arguments[0] == "check":
+                return check_configuration(arguments[1])
+            if arguments[0] == "save":
+                return write_example(arguments[1])
+    print("Usage: configuration check <file> | save <new absolute private directory>")
+    return 6

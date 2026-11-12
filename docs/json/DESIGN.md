@@ -285,6 +285,31 @@ If Boss specifically requires a separate cycle diagnostic, review that extra
 private identity facility before implementation; do not silently generate `==`
 calls that can invoke user operators or invalid collection comparisons.
 
+### Explicit single-property defaults (G09)
+
+`get_or<t>(const node, name, fallback, budget, unknown)` is a source-library
+operation on an already admitted DOM. It validates limits, requires an
+object, and bounds the object member count and lookup name size. The
+existing exact lookup charges comparisons in the same context used by
+the typed adapter. Only absence returns the explicit fallback. The
+private lookup uses an absent managed reference internally. A JSON null
+remains an actual immutable node and goes through the existing decoder.
+
+The context starts at the object's source offset. Lookup work errors
+after name admission and conversion errors include the requested
+property as the first relative path segment. Nested fields and indexes
+append to that prefix. The selected value retains its original UTF-8
+offset. Converted DOM values use offset `-1`. Unknown-field policy
+applies within the selected typed subtree. The caller uses the complete
+parser and its own file/read policy to admit the input document.
+
+Ordinary specialization still admits the concrete schema and verifies
+argument types and readonly capabilities before execution. The caller's
+fallback keeps its ordinary identity and capability. The typed result
+for a present field is independent of both the fallback and the DOM.
+No automatic initializer policy or parser change is needed.
+[Public configuration contract](API.md#explicit-configuration-defaults)
+
 ## 6. Errors and output
 
 `json.error extends core.error` adds `kind: error_kind` and `offset: i64`.

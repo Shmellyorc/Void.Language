@@ -718,6 +718,12 @@ if(BUILD_TESTING)
       set_tests_properties(json_lsp PROPERTIES TIMEOUT 300)
     endif()
   endif()
+  if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR WIN32)
+    # The application control also exercises G06 private-directory publication.
+    add_test(NAME json_configuration COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/json/configuration.py" "$<TARGET_FILE:voidc>" "$<TARGET_FILE_DIR:voidc>/void-native.txt")
+    set_tests_properties(json_configuration PROPERTIES TIMEOUT 900)
+  endif()
   set(native_staging_probe)
   if(WIN32)
     add_executable(void_windows_native_staging tests/stage9/windows_native_staging.cpp cmake/LongPathAware.manifest)
