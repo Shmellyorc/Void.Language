@@ -20,7 +20,9 @@
     "onStartupFinished",
     "onLanguage:void",
     "onLanguage:toml",
-    "workspaceContains:void.project.toml"
+    "workspaceContains:void.project.toml",
+    "onCommand:void.debugProjectProgram",
+    "onCommand:void.debugProjectRoot"
   ],
   "capabilities": {
     "untrustedWorkspaces": {
@@ -33,6 +35,9 @@
     }
   },
   "contributes": {
+    "breakpoints": [
+      {"language": "void"}
+    ],
     "languages": [
       {
         "id": "void",

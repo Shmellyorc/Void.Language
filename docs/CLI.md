@@ -34,7 +34,7 @@ The following sections retain the scope of their original implementation slices.
 
 ## Manifest project profiles (Slice 3)
 
-`--profile debug|release` is project-only on check/run/build/emit. An explicit
+`--profile debug|release` is project-only on check/run/build/emit/package. An explicit
 source file keeps legacy semantics and rejects this option with usage status 2.
 Default project selection is release; manifest settings apply, then `--no-opt`.
 `--cache` may replace an implicit release default with debug, but cannot override
@@ -43,15 +43,29 @@ an explicitly selected release profile. It requires effective debug optimization
 disables it. `--no-cache` remains run-only and changes persistence, not optimization.
 Conflicts, duplicate profile options and unknown profile names are usage errors.
 
-Both profiles default to `debug_info="none"`. An explicit `"line"` or `"full"`
-in the selected profile emits **VOID5012**, including on project check.
-The requested value remains in the immutable manifest. Profile-controlled debug
-information modes are not implemented: existing backend source/type/location
-metadata behavior is retained, so `none` does not newly strip those records and a
-line/full request does not establish that its requested symbols were generated.
-Standalone commands receive no new warning or behavior change. This limitation
-and warning policy were explicitly approved for S3; actual mode-specific emission
-remains a separate review milestone.
+Both profiles default to `debug_info="none"`. Generated manifests can omit the
+build tables. On Linux x64 GNU and Windows x64 MSVC, project `emit` and `build`
+apply the selected mode.
+
+| Mode | VOID source metadata |
+| --- | --- |
+| `none` | Omits optional VOID source debug information. Runtime failure locations and native unwind information remain available. |
+| `line` | Emits DWARF source locations and subprogram ranges for breakpoints and stepping. |
+| `full` | Adds type information and, in O0 builds, names and locations for supported scalar parameters and function-level locals. Inspect these values after their declarations execute. |
+
+Windows embeds DWARF in the PE executable with the matching SDK's
+`lld-link.exe`. The executable remains a single published file. PDB-based
+debuggers require a separate contract. Linux emits DWARF in ELF. Both formats
+retain physical source paths, including spaces. A debug build may reveal the
+checkout path in its metadata.
+
+Debug information and optimization are independent. Debug defaults to O0 and
+Release to O2. O2 may inline or remove source statements, and the current
+optimized build does not emit local variable locations. The selected mode
+participates in profile and build provenance. Explicit `line` and `full` are
+quiet on supported project check/build/emit. JIT, package and unsupported
+native targets report **VOID5012** for these requests. Standalone commands
+keep their existing behavior. [Source debugger setup](EDITOR_INTEGRATION.md#native-aot-source-debugging)
 
 The conservative project selection digest plus effective profile settings belongs
 to build/cache provenance. It is distinct from semantic project context and the

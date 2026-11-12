@@ -87,6 +87,11 @@ void profiles(){
   const auto& warning=profile.diagnostics.front();
   check(warning.severity==vd::Severity::warning && warning.code==vd::DiagnosticCode::project_debug_info,"structured profile warning");
   check(warning.primary.source->text().substr(warning.primary.begin,warning.primary.end-warning.primary.begin)==spelling,"authored profile warning owns exact value span");
+  auto supported=vd::project::resolve_profile(*authored.manifest,name,false,false,vd::project::ProfileDebugSupport::available);
+  check(supported.diagnostics.empty() && supported.debug_info==mode && supported.cache_key==profile.cache_key,
+        "native support applies the selected mode without changing profile identity");
+  check(supported.cache_key!=vd::project::resolve_profile(*m,name,false,false).cache_key,
+        "requested debug mode participates in provenance");
  }
  check(!vd::project::resolve_profile(*m,{},true,false).optimize,"explicit no-opt wins");check(vd::project::resolve_profile(*m,{},false,true).name==vd::project::ProfileName::debug,"implicit release yields to cache debug selection");
  bool rejected=false;try{(void)vd::project::resolve_profile(*m,vd::project::ProfileName::release,true,true);}catch(const std::invalid_argument&){rejected=true;}check(rejected,"explicit release cache conflict survives no-opt");

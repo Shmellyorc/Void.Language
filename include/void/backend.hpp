@@ -8,6 +8,7 @@
 namespace vd {
 class ToolingSession;
 class SessionAnalysis;
+namespace project { enum class DebugInfo; }
 class Jit {
 public:
     explicit Jit(DebugCache cache = {}, ir::Emission emission = ir::Emission::all);
@@ -35,7 +36,8 @@ private:
     std::shared_ptr<Impl> impl_;
 };
 void emit_async_object(const ir::Module&, const std::filesystem::path&, bool optimize);
-void emit_object(const ir::Module&, const std::filesystem::path&, bool optimize, bool source_program = false, std::string_view build_inputs = {});
+void emit_object(const ir::Module&, const std::filesystem::path&, bool optimize, bool source_program = false,
+                 std::string_view build_inputs = {}, std::optional<project::DebugInfo> source_debug = {});
 // Internal architectural harness supplies its own runtime entry guard/main.
 void emit_runtime_object(const ir::Module&, const std::filesystem::path&, bool optimize, const std::string& generation_suffix = {});
 }

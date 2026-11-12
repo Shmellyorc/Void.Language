@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
-import {basename, join} from 'node:path';
+import {basename, isAbsolute, join, parse} from 'node:path';
+import {promises as fs, constants} from 'node:fs';
 import {LanguageClient, CloseAction, ErrorAction, Trace, State, RevealOutputChannelOn, ServerOptions, LanguageClientOptions} from 'vscode-languageclient/node';
 import {inside, Project, resolveCompiler, resolveProject, Settings} from './config';
 import {CreationWorkflow} from './creationWorkflow';
@@ -56,7 +57,7 @@ class ServerManager {
                 this.report('VOID: The editor or selected project changed. Invoke the command again.', true);
                 return;
             }
-            const dirty = this.documents().find(document => document.isDirty && inside(project.root, document.uri.fsPath));
+            const dirty = this.dirtyProjectDocument(project.root);
             if (dirty) {
                 this.report(`VOID: Save ${basename(dirty.uri.fsPath)} before running a project command. Project commands use saved files.`, true);
                 return;
@@ -67,6 +68,32 @@ class ServerManager {
             task.presentationOptions = {panel: vscode.TaskPanelKind.Dedicated, clear: true};
             return await vscode.tasks.executeTask(task);
         } catch (error) { this.report(`VOID: ${error instanceof Error ? error.message : String(error)}`, true); }
+    }
+    async debugProjectLocation(part: 'program' | 'root'): Promise<string> {
+        if (!vscode.workspace.isTrusted) throw new Error('VOID debugging requires a trusted workspace.');
+        if (process.platform !== 'linux' || process.arch !== 'x64')
+            throw new Error('VOID’s LLDB DAP launch configuration supports Linux x64. See the native debugger instructions for other hosts.');
+        if (!vscode.extensions.getExtension('llvm-vs-code-extensions.lldb-dap'))
+            throw new Error('Install the LLVM LLDB DAP extension and configure its pinned LLVM 23.1.4 lldb-dap executable.');
+        await this.serial;
+        const project = this.project, client = this.client, epoch = this.epoch;
+        if (!project?.manifestMode || !client?.isRunning())
+            throw new Error('Select a VOID manifest application before debugging.');
+        const state = await client.sendRequest<{root: string; entry: string | null; status: string}>('void/projectState', {});
+        if (state.status !== 'ready' || state.root !== project.root || !state.entry || !isAbsolute(state.entry) ||
+            !inside(project.root, state.entry))
+            throw new Error('Resolve project errors or reselect the application entry before debugging.');
+        const program = join(project.root, 'build', parse(state.entry).name);
+        if (part === 'program') {
+            const artifact = await fs.stat(program).catch(() => undefined);
+            if (!artifact?.isFile()) throw new Error('Build the selected Debug project with debug_info = "full" or "line" first.');
+            await fs.access(program, constants.X_OK);
+        }
+        if (!vscode.workspace.isTrusted || this.project !== project || this.client !== client || this.epoch !== epoch)
+            throw new Error('The selected project changed. Start debugging again.');
+        const dirty = this.dirtyProjectDocument(project.root);
+        if (dirty) throw new Error(`Save ${basename(dirty.uri.fsPath)} and build the Debug project before debugging.`);
+        return part === 'program' ? program : project.root;
     }
     async selectEntry(): Promise<void> {
         if (!vscode.workspace.isTrusted) return;
@@ -85,6 +112,9 @@ class ServerManager {
     }
     private documents(): vscode.TextDocument[] {
         return vscode.workspace.textDocuments.filter(d => (d.languageId === 'void' || basename(d.uri.fsPath) === 'void.project.toml') && d.uri.scheme === 'file');
+    }
+    private dirtyProjectDocument(root: string): vscode.TextDocument | undefined {
+        return this.documents().find(document => document.isDirty && inside(root, document.uri.fsPath));
     }
     refresh(restart = false): Promise<void> {
         this.restartRequested ||= restart;
@@ -255,6 +285,8 @@ export function activate(context: vscode.ExtensionContext): {ready: () => Promis
         vscode.commands.registerCommand('void.checkProject', () => current.projectTask('check')),
         vscode.commands.registerCommand('void.buildProject', () => current.projectTask('build')),
         vscode.commands.registerCommand('void.runProject', () => current.projectTask('run')),
+        vscode.commands.registerCommand('void.debugProjectProgram', () => current.debugProjectLocation('program')),
+        vscode.commands.registerCommand('void.debugProjectRoot', () => current.debugProjectLocation('root')),
         vscode.commands.registerCommand('void.restartLanguageServer', () => current.refresh(true)),
         vscode.workspace.onDidOpenTextDocument(d => { if (d.languageId === 'void' || basename(d.uri.fsPath) === 'void.project.toml') void current.refresh(); }),
         vscode.window.onDidChangeActiveTextEditor(e => { if (e && (e.document.languageId === 'void' || basename(e.document.uri.fsPath) === 'void.project.toml')) void current.refresh(); }),

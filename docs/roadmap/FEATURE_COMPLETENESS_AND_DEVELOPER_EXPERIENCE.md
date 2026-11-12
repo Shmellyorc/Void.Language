@@ -271,3 +271,135 @@ VS Code 1.141.0 executable, and `VOID_TEST_PROJECT_TASKS` to `debug` or
 - VS Code fixtures — `editors/vscode/src/test/config.test.ts`, `editors/vscode/src/test/creationHost.ts`, `editors/vscode/src/test/editorBasics.ts`, `editors/vscode/src/test/projectHost.ts`, `editors/vscode/src/test/runProjectHost.ts`, `editors/vscode/src/test/semanticHost.ts`.
 - Protocol fixtures — `tests/lsp/semantic_tokens.py`, `tests/project/protocol.py`.
 - Documentation — `docs/CLI.md`, `docs/EDITOR_INTEGRATION.md`, `docs/FIRST_PROGRAM.md`, `docs/roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md`, `editors/vscode/README.md`.
+
+## Batch 2 native source debugging
+
+Baseline `29d50c9a21cdf93579941b872ef815b2ae7f881a`. The manifest selects Debug
+O0 or Release O2 by default and already records the requested debug mode in
+profile provenance. Both profiles default to `none`. The baseline accepted
+`line` and `full` with VOID5012 and lowered the same LLVM compile unit,
+subprograms, type descriptions and source locations regardless of that
+setting. On PikaOS, LLDB 23.1.4 stopped inside a VOID function at the expected
+line in a directory with spaces. It could not inspect the initialized local.
+The frontend resolves written names to typed slots, but the baseline did not
+describe those slots to the debugger. The Runtime's failure locations are
+separate from LLVM debug metadata. VS Code has project Check, Build and Run
+commands from Batch 1 and no debugger integration.
+
+The initial contract covers native project `emit` and `build`. `none` emits
+no optional VOID source debug metadata. `line` emits source files, locations
+and subprogram ranges for breakpoints and stepping. `full` adds source types
+and names and locations for supported scalar bindings in unoptimized code.
+Optimization remains under the selected profile, and optimized builds may
+inline or remove source statements. Support for additional local scopes,
+captured values and Runtime-managed values requires separate qualification.
+JIT execution and application packaging remain outside this debugger lane.
+
+ELF can carry DWARF in the executable. The pinned LLD 23.1.4 COFF linker
+produced a PE image with embedded DWARF using `/debug:dwarf`. LLDB resolved
+the probe's source breakpoint and local description from that image.
+On Windows 10 x64, native GDB 17.2 stopped inside the probe, stepped to the
+return, printed `doubled = 14` and observed normal exit. The Windows SDK
+archive has no `lldb.exe`. Embedding the symbols keeps publication a
+single-file operation.
+
+### Implementation and focused qualification
+
+Project `emit` and `build` now apply the selected mode on Linux x64 GNU and
+Windows x64 MSVC. Profile keys record the requested mode and effective
+optimization. The Windows linker uses the verified Clang SDK's LLD and
+keeps DWARF inside the PE executable. The frontend records authored scalar
+bindings from validated function identities and typed slots. In O0, the
+LLVM lowerer attaches variable locations to their owning declaration
+stores. Runtime failure locations and the application publication path
+remain independent of this metadata. On these hosts, project `check`,
+`emit` and `build` accept explicit `line` and `full` without VOID5012.
+JIT, packaging and unsupported native targets still report VOID5012 for
+these requests.
+
+The focused CTest selection was `project_native_debug_info`,
+`project_profiles`, `project_sessions`, `cli_contract` and
+`project_application_process`. The new test checks linked images and
+emitted objects for Debug `none/line/full` and Release `line/full`. It
+also checks repeated object bytes, native execution, rejection of an
+unknown mode and single-file Windows publication. Existing timeouts
+were preserved.
+
+| Native host and compiler configuration | Focused CTest | Native debugger |
+| --- | --- | --- |
+| PikaOS 4 x64 Debug | 5/5, 42.61 s | LLDB 23.1.4, `line` and `full` passed |
+| PikaOS 4 x64 Release | 5/5, 9.26 s | LLDB 23.1.4, `line` and `full` passed |
+| Windows 10 Home x64 (10.0.19045.6466) Debug | 4/5, 134.10 s. `cli_contract` failed in fixture cleanup. | GDB 17.2, `line` and `full` passed |
+| Windows 10 Home x64 (10.0.19045.6466) Release | 5/5, 34.80 s | GDB 17.2, `line` and `full` passed |
+
+PikaOS also passed `project_protocol`, `lsp_semantic_tokens` and
+`application_workflow_stage9` in both Debug and Release. The strict
+RelWithDebInfo build passed `project_sessions`, `project_profiles` and
+`project_native_debug_info` in 15.26 seconds with
+`ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`.
+Native debugger sessions ran separately from the leak-detection checks.
+
+Both native debuggers ran the executable under test, hit source breakpoints
+in a value-structure initializer and an imported ordinary function, stepped
+to the next statement and observed exit 19. Sources and executables lived
+under paths containing spaces. In `full` mode the debuggers read
+`initial = 7`, `assigned = 8`, `input = 8` and `doubled = 16`. The
+debugger runs used a Debug application from each compiler configuration.
+Release O2 has verified DWARF and normal native execution. Local-variable
+locations are limited to supported O0 parameters and function-level
+numeric/Boolean bindings. Managed and captured values, nested bindings
+and async frames remain unqualified. Set breakpoints on executable
+statements. LLDB resolved a `main` declaration-line breakpoint to both
+the generated application adapter and the authored entry body.
+
+The real VS Code 1.141.0 host on PikaOS passed with both compiler
+configurations and the official LLVM LLDB DAP extension 0.4.1 using pinned
+`lldb-dap`. The tests rejected a missing adapter, missing executable and
+dirty source, built the compiler-selected nested project and launched its
+executable. They hit a VOID breakpoint, stepped, inspected `observed = 14`
+and observed exit 17 and session termination. Extension typechecking and
+all seven extension unit tests passed. The first-project walkthrough also
+hit its breakpoint in LLDB, printed `answer = 14` and exited 14. Windows
+uses native GDB at the command line. PDB-based debugging and a Windows
+editor launch remain outside the qualified workflow.
+
+Windows Debug `cli_contract` failed at `tests/cli/contract.py:79` in
+`TemporaryDirectory` cleanup with `[WinError 5] Access is denied` on
+`broken installation\voidc.exe`. Its isolated CTest retry failed the
+same way.
+A disposable diagnostic observed that the assertions completed and the
+copied file became removable after retries with delays of 0.2 and 1 seconds.
+The process responsible for the denial was unidentified. Batch 1 also
+recorded this cleanup failure. The original failing results are retained
+here and the maintained fixture is unchanged.
+
+Set `build_dir` to the configured native build directory and replay the suite.
+
+```sh
+ctest --test-dir "$build_dir" --no-tests=error --output-on-failure \
+  -R '^(project_native_debug_info|project_profiles|project_sessions|cli_contract|project_application_process)$'
+```
+
+To reproduce the native debugger checks, run
+`python3 -B tests/project/native_debug.py <absolute-voidc> <absolute-llvm-dwarfdump> --lldb <absolute-lldb>`
+on Linux or the same fixture with `--gdb <absolute-gdb.exe>` on Windows.
+Use the verified LLVM 23.1.4 SDK for the compiler and LLVM tools. Run
+`npm run build` from `editors/vscode` and then
+`node out/test/runDebugHost.js` for the Linux editor check. Set `VOIDLS_PATH`
+to the profile's server, `VSCODE_EXECUTABLE_PATH` to the installed editor,
+`VOID_LLDB_DAP` to the pinned adapter binary and `VOID_LLDB_EXTENSIONS` to a
+directory with the official adapter extension installed.
+
+The task-owned Windows workspace, host transfer directory and PikaOS
+temporary workspace were removed. Available space in the Windows guest
+rose from 6,748,295,168 to 12,733,493,248 bytes. Available space on the
+Linux temporary filesystem rose from 16,528,011,264 to 16,553,705,472 bytes.
+
+### Changed-file inventory
+
+- Build registration — `CMakeLists.txt`.
+- Profile and native emission — `include/void/backend.hpp`, `include/void/frontend.hpp`, `include/void/native_build.hpp`, `include/void/project.hpp`, `src/backend/llvm/backend.cpp`, `src/frontend/compiler.cpp`, `src/frontend/project.cpp`, `src/main.cpp`, `src/native_build.cpp`.
+- Compiler fixtures — `tests/project/native_debug.py`, `tests/project/profiles.py`, `tests/project/sessions.cpp`.
+- VS Code integration and fixtures — `editors/vscode/package.json`, `editors/vscode/src/extension.ts`, `editors/vscode/src/test/debugHost.ts`, `editors/vscode/src/test/runDebugHost.ts`.
+- Documentation — `docs/CLI.md`, `docs/EDITOR_INTEGRATION.md`, `docs/FIRST_PROGRAM.md`, `docs/roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md`, `editors/vscode/README.md`.

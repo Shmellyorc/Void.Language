@@ -678,21 +678,22 @@ public:
     }
 };
 ParseResult parse_manifest(const SourceFile& source) { return ManifestParser(source).parse(); }
-EffectiveProfile resolve_profile(const Manifest& manifest,std::optional<ProfileName> requested,bool no_opt,bool cache) {
+EffectiveProfile resolve_profile(const Manifest& manifest,std::optional<ProfileName> requested,bool no_opt,bool cache,
+                                 ProfileDebugSupport debug_support) {
     auto name=requested.value_or(cache?ProfileName::debug:ProfileName::release);
     const auto& profile=name==ProfileName::debug?manifest.debug():manifest.release();
     bool optimize=profile.optimization==Optimization::O2 && !no_opt;
     if(cache && (name!=ProfileName::debug || optimize))throw std::invalid_argument("--cache requires the debug profile with effective optimization='none'; it cannot override an explicit release profile or O2 setting.");
-    EffectiveProfile result{name,optimize,profile.debug_info,{},"project-profile-v1:"};
+    EffectiveProfile result{name,optimize,profile.debug_info,{},"project-profile-v2:"};
     const std::string label=name==ProfileName::debug?"debug":"release";
     result.cache_key+=label+":"+(optimize?"O2":"none")+":"+std::to_string(static_cast<int>(profile.debug_info));
-    if(profile.debug_info!=DebugInfo::none) {
+    if(profile.debug_info!=DebugInfo::none && debug_support==ProfileDebugSupport::unavailable) {
         Diagnostic warning(DiagnosticCode::project_debug_info);warning.severity=Severity::warning;
-        warning.description="Project profile '"+label+"' requests debug_info='"+(profile.debug_info==DebugInfo::line?"line":"full")+"'; profile-controlled debug-information emission is not implemented.";
+        warning.description="Project profile '"+label+"' requests debug_info='"+(profile.debug_info==DebugInfo::line?"line":"full")+"'; profile-controlled native debug information is unavailable for this command or target.";
         auto field=manifest.fields().find("build."+label+".debug_info");
         warning.primary=field!=manifest.fields().end()?field->second.value:SourceSpan{std::make_shared<const SourceFile>(manifest.source()),"/void.project.toml",manifest.source().text().size(),manifest.source().text().size()};
         warning.primary.module_identity="/void.project.toml";
-        warning.hint="The requested mode was not applied; existing emitter behavior is unchanged. Optimization/cache settings still apply. debug_info='none' suppresses this warning.";
+        warning.hint="Use native project build or emit on a supported target. Optimization and cache settings still apply.";
         result.diagnostics.push_back(std::move(warning));
     }
     return result;

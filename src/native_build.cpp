@@ -231,15 +231,25 @@ void version(const fs::path& tool,const char* expected,const fs::path& capture) 
         throw std::runtime_error("Native toolchain requires matching LLVM/Clang/LLD 23.1.4: "+path_utf8(tool));
 }
 }
-void publish_object(const ValidatedAnalysis& analysis,const fs::path& requested,bool optimize,std::string_view profile) {
+bool native_source_debug_supported() {
+#if (defined(__linux__) && defined(__GLIBC__) && defined(__x86_64__)) || \
+    (defined(_WIN32) && defined(_MSC_VER) && defined(_M_X64))
+    return true;
+#else
+    return false;
+#endif
+}
+void publish_object(const ValidatedAnalysis& analysis,const fs::path& requested,bool optimize,std::string_view profile,
+                    std::optional<project::DebugInfo> source_debug) {
     auto output=output_path(analysis,requested);Staging stage(output);
     auto object=stage.directory/"program.o";
-    emit_object(analysis.lower(),object,optimize,true,std::string(compiler_build_identity())+":"+std::string(profile));
+    emit_object(analysis.lower(),object,optimize,true,std::string(compiler_build_identity())+":"+std::string(profile),source_debug);
     output_path(analysis,output);publish(object,output);
 }
 static std::string link_executable(const ValidatedAnalysis& analysis, const fs::path& requested, bool optimize,
                                    const char* argv0, std::string_view profile, bool package,
-                                   const project::ProjectDirectoryReader& reader={}) {
+                                   const project::ProjectDirectoryReader& reader={},
+                                   std::optional<project::DebugInfo> source_debug={}) {
     if (analysis.c_primitive_admission() && !analysis.c_primitive_admission()->dynamic())
         throw std::invalid_argument("Host-admitted C primitives require an explicitly linked AOT fixture");
     auto config=[&] {
@@ -250,21 +260,26 @@ static std::string link_executable(const ValidatedAnalysis& analysis, const fs::
               "and the original LLVM/Clang/LLD 23.1.4 SDK together. See docs/install/README.md.");
         }
     }();
-    if (package) {
-        if (config.verified_digests.empty()) throw std::runtime_error("Application packaging requires a verified v2 native resource inventory.");
+    if (package && config.verified_digests.empty())
+        throw std::runtime_error("Application packaging requires a verified v2 native resource inventory.");
 #ifdef _WIN32
+    const bool embedded_dwarf=source_debug && *source_debug!=project::DebugInfo::none;
+    if (package || embedded_dwarf) {
         config.linker = config.driver.parent_path() / "lld-link.exe";
         if (!fs::is_regular_file(config.linker) || project::project_path_alias(config.linker))
-            throw std::runtime_error("Windows application packaging requires the configured Clang SDK's lld-link.exe.");
+            throw std::runtime_error(package?"Windows application packaging requires the configured Clang SDK's lld-link.exe.":
+                "Windows source debugging requires the configured Clang SDK's lld-link.exe.");
         exact_path(config.linker);
+    }
 #else
+    if (package) {
         // NativeBuild.cmake emits this group to locate the development IDN
         // libraries. Package executables use their OS-provided SONAMEs.
         const std::array<std::string,3> prefix{"-Xlinker", "-rpath", "-Xlinker"};
         auto found = std::search(config.flags.begin(), config.flags.end(), prefix.begin(), prefix.end());
         if (found != config.flags.end() && config.flags.end() - found >= 4) config.flags.erase(found, found + 4);
-#endif
     }
+#endif
     const auto& native = analysis.c_primitive_admission();
     const auto managed = native && native->dynamic() && !native->dynamic()->payload().empty();
     auto output=output_path(analysis,requested,managed);
@@ -295,9 +310,11 @@ static std::string link_executable(const ValidatedAnalysis& analysis, const fs::
     for(const auto& flag:config.flags)provenance+=std::to_string(flag.size())+":"+flag;
     std::vector<std::string> args{path_utf8(config.driver),"--driver-mode=g++"};
 #ifdef _WIN32
-    if (package) {
+    if (package || embedded_dwarf) {
         args.push_back("-B"+path_utf8(config.linker.parent_path()));
         args.push_back("-fuse-ld=lld");
+        if(embedded_dwarf)args.insert(args.end(),{"-Xlinker","/debug:dwarf","-Xlinker","/incremental:no",
+            "-Xlinker","/opt:ref","-Xlinker","/opt:noicf","-Xlinker","/brepro"});
     } else
 #endif
     if(!config.linker.empty())args.push_back("--ld-path="+path_utf8(config.linker));
@@ -330,7 +347,7 @@ static std::string link_executable(const ValidatedAnalysis& analysis, const fs::
 #if defined(__linux__)
     args.push_back("-ldl"); // Optional system terminfo binding in the Runtime archive.
 #endif
-    emit_object(analysis.lower(ir::Emission::entry),object,optimize,true,provenance);
+    emit_object(analysis.lower(ir::Emission::entry),object,optimize,true,provenance,source_debug);
     auto status=execute(args);
     if(status!=0)throw std::runtime_error("Native linker failed (status "+std::to_string(status)+
       "). Driver: "+path_utf8(config.driver)+"\nCheck the linker diagnostics above and host C/C++ development libraries. See docs/install/README.md.");
@@ -374,8 +391,8 @@ static std::string link_executable(const ValidatedAnalysis& analysis, const fs::
 }
 
 void build_executable(const ValidatedAnalysis& analysis, const fs::path& requested, bool optimize,
-                      const char* argv0, std::string_view profile) {
-    link_executable(analysis, requested, optimize, argv0, profile, false);
+                      const char* argv0, std::string_view profile,std::optional<project::DebugInfo> source_debug) {
+    link_executable(analysis, requested, optimize, argv0, profile, false,{},source_debug);
 }
 
 #ifdef VOID_APPLICATION_PACKAGING

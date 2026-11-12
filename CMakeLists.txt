@@ -456,6 +456,13 @@ if(BUILD_TESTING)
     "${LLVM_TOOLS_BINARY_DIR}/llvm-objdump${CMAKE_EXECUTABLE_SUFFIX}"
     "@VOID_TEST_OUTPUT@/project-profiles-evidence.json")
   set_tests_properties(project_profiles PROPERTIES TIMEOUT 240)
+  if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$" AND
+     (CMAKE_SYSTEM_NAME STREQUAL "Linux" OR (WIN32 AND MSVC)))
+    add_test(NAME project_native_debug_info COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/project/native_debug.py" "$<TARGET_FILE:voidc>"
+      "${LLVM_TOOLS_BINARY_DIR}/llvm-dwarfdump${CMAKE_EXECUTABLE_SUFFIX}")
+    set_tests_properties(project_native_debug_info PROPERTIES TIMEOUT 300)
+  endif()
   void_add_output_test(project_protocol "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/project/protocol.py" "$<TARGET_FILE:voidls>"
     "@VOID_TEST_OUTPUT@/project-protocol-evidence.json")

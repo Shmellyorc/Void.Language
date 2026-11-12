@@ -59,7 +59,7 @@ void help(const std::string& command={}) {
           "  --allow-native  Authorize this project's declared native provider for run/build/emit/package.\n"
           "  --entry PATH   Override its entry with a manifest-relative source.\n"
           "  --profile debug|release  Select project optimization/cache settings.\n"
-          "                           line/full debug_info warns; profile-controlled emission is not implemented.\n"
+          "                           Project build/emit can emit line/full DWARF on supported native targets.\n"
           "  -o PATH     Set output path (build, emit or package; required by emit).\n"
           "  --          End options before a source path.\n";
     }
@@ -313,6 +313,7 @@ static int run_cli(int argc, char** argv) {
         std::optional<std::string> project_entry;
         std::optional<vd::project::ProfileName> profile;
         std::string profile_key;
+        std::optional<vd::project::DebugInfo> source_debug;
         for(int i=2;i<argc;++i) {
             const std::string arg=argv[i];
             if(arg=="--" && command=="run" && (!operands.empty() || project_root)) {
@@ -382,9 +383,13 @@ static int run_cli(int argc, char** argv) {
             if(result.manifest && result.manifest->kind()==vd::project::Kind::library && project_entry)throw UsageError("--entry cannot select an application entry in a library project.");
             if(result.manifest) {
                 vd::project::EffectiveProfile selected_profile;
-                try{selected_profile=vd::project::resolve_profile(*result.manifest,profile,no_opt,cache);}
+                const bool supports_debug=vd::native_source_debug_supported() &&
+                    (command=="check" || command=="build" || command=="emit");
+                try{selected_profile=vd::project::resolve_profile(*result.manifest,profile,no_opt,cache,
+                    supports_debug?vd::project::ProfileDebugSupport::available:vd::project::ProfileDebugSupport::unavailable);}
                 catch(const std::invalid_argument& error){throw UsageError(error.what());}
                 optimize=selected_profile.optimize;profile_key=selected_profile.cache_key;
+                if(supports_debug && command!="check")source_debug=selected_profile.debug_info;
                 for(const auto& warning:selected_profile.diagnostics)std::cerr<<vd::render_diagnostic(warning)<<'\n';
             }
             if(!result.succeeded())throw vd::CompilationError(std::move(result.diagnostics));
@@ -435,10 +440,10 @@ static int run_cli(int argc, char** argv) {
 #endif
                 output=(project?project->root():entry.parent_path())/"build"/name;
             }
-            vd::build_executable(*analysis.program,*output,optimize,argv[0],profile_key);
+            vd::build_executable(*analysis.program,*output,optimize,argv[0],profile_key,source_debug);
             std::cout<<"Built native executable: "<<vd::path_utf8(*output)<<'\n';
         } else {
-            vd::publish_object(*analysis.program,*output,optimize,profile_key);
+            vd::publish_object(*analysis.program,*output,optimize,profile_key,source_debug);
             std::cout<<"Wrote native source object: "<<vd::path_utf8(*output)<<'\n';
         }
         return 0;

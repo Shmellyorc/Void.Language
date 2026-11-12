@@ -13,6 +13,9 @@ def run(args,status=0,warning=None):
   if warning:assert b'warning:' in p.stderr and b"debug_info='"+warning.encode()+b"'" in p.stderr and b'profile-controlled' in p.stderr,rows[-1]
  checks+=1;return p
 try:
+ version=run([compiler,'--version']).stdout.splitlines()
+ native_debug=any(target in version for target in
+                  (b'Target: x86_64-unknown-linux-gnu',b'Target: x86_64-pc-windows-msvc'))
  with tempfile.TemporaryDirectory(prefix='VOID profile execution 雪 ') as directory:
   root=Path(directory);(root/'src').mkdir();toml=root/'void.project.toml';toml.write_bytes(manifest.encode());(root/'src/game.void').write_bytes(source.encode())
   for flags in [[],['--profile','release'],['--profile','debug'],['--no-opt']]:
@@ -51,19 +54,20 @@ try:
   if b'Debug cache: unavailable' not in cold.stderr:assert b'Debug cache: miss' in cold.stderr and b'Debug cache: hit' in warm.stderr,(cold.stderr,warm.stderr)
   else:print('UNQUALIFIED: native persistent disk cache warm hit')
   run([compiler,'run','--project',root,'--cache'],23,warning='')
-  # The same modes still warn on every command when the user requests them.
+  # Only native build/emit apply the debug mode; run retains its warning.
   toml.write_text(manifest+"[build.debug]\ndebug_info='full'\n[build.release]\ndebug_info='line'\n",encoding='utf-8')
   for profile,warning in [('debug','full'),('release','line')]:
    flags=['--profile',profile]
-   run([compiler,'check','--project',root,*flags],warning=warning)
+   aot_warning='' if native_debug else warning
+   run([compiler,'check','--project',root,*flags],warning=aot_warning)
    run([compiler,'run','--project',root,'--no-cache',*flags],23,warning=warning)
-   instructions('authored-'+profile,flags,warning)
-   exe=root/('authored-'+profile+('.exe' if os.name=='nt' else ''));run([compiler,'build','--project',root,*flags,'-o',exe],warning=warning);run([exe],23,warning='')
+   instructions('authored-'+profile,flags,aot_warning)
+   exe=root/('authored-'+profile+('.exe' if os.name=='nt' else ''));run([compiler,'build','--project',root,*flags,'-o',exe],warning=aot_warning);run([exe],23,warning='')
   overrides="[build.debug]\noptimization='O2'\ndebug_info='none'\n[build.release]\noptimization='none'\ndebug_info='full'\n";toml.write_bytes((manifest+overrides).encode())
-  optimized_debug=instructions('custom-debug',['--profile','debug'],'');plain_release=instructions('custom-release',['--profile','release'],'full');assert optimized_debug==release and plain_release==debug,(optimized_debug,plain_release)
+  optimized_debug=instructions('custom-debug',['--profile','debug'],'');plain_release=instructions('custom-release',['--profile','release'],'' if native_debug else 'full');assert optimized_debug==release and plain_release==debug,(optimized_debug,plain_release)
   run([compiler,'run','--project',root,'--profile','debug','--cache'],2,warning='');run([compiler,'run','--project',root,'--profile','debug','--cache','--no-opt'],23,warning='')
   # An unselected unsupported setting is quiet; only the selected setting warns.
-  toml.write_bytes((manifest+"[build.debug]\ndebug_info='full'\n[build.release]\ndebug_info='none'\n").encode());run([compiler,'check','--project',root],warning='');run([compiler,'check','--project',root,'--profile','debug'],warning='full')
+  toml.write_bytes((manifest+"[build.debug]\ndebug_info='full'\n[build.release]\ndebug_info='none'\n").encode());run([compiler,'run','--project',root,'--no-cache'],23,warning='');run([compiler,'run','--project',root,'--no-cache','--profile','debug'],23,warning='full')
   # Legacy standalone emission/run stays on the established option grammar.
   run([compiler,'run',root/'src/game.void','--no-cache'],23,warning='');run([compiler,'run',root/'src/game.void','--cache'],23,warning='')
  print(f'project_profiles: {checks} process checks passed; compute instruction counts O0={debug}, O2={release}, release --no-opt={noopt}')

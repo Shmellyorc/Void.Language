@@ -6929,6 +6929,19 @@ struct AnalysisAccess {
                     if(f.accessor)for(const auto& other:unit->functions)if(other.accessor && other.token.offset==f.token.offset)r.end=std::max(r.end,other.source_end);
                     method_record.extent=r;}
                 declaration(std::move(method_record),true,!f.anonymous && !f.display_adapter && !f.json_adapter && !f.global_initializer && f.token.text!="$application");
+                if(!f.asynchronous && !f.anonymous && f.generic_origin.empty() && !f.display_adapter &&
+                   !f.json_adapter && !f.global_initializer && !f.accessor && valid_editor_identifier(f.token.text)) {
+                    auto binding=[&](const Token& token,unsigned slot,unsigned argument) {
+                        const auto type=f.locals.at(slot);
+                        if(f.captured_locals.contains(slot) || !valid_editor_identifier(token.text) ||
+                           !(numeric::number(type) || type==Type::boolean))return;
+                        result->debug_bindings_[f.symbol].push_back({slot,argument,token.text,unit->source.location(token.offset)});
+                    };
+                    for(unsigned n=0;n<f.parameters.size();++n)
+                        binding(f.parameters[n].token,f.parameters[n].slot,n+1+unsigned(f.receiver.has_value()));
+                    for(const auto& statement:f.body)
+                        if(statement.kind==Statement::Kind::variable)binding(statement.token,statement.slot,0);
+                }
                 if(f.overriding) {Expr use(Expr::Kind::name,f.token);reference(f.symbol,f.virtual_slot,use,*unit,true);}
                 for (const auto& p : f.parameters) if (p.default_expression) expression(*p.default_expression,f.symbol,{});
                 std::map<unsigned,std::string> locals;

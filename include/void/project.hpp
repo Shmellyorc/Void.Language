@@ -136,6 +136,7 @@ struct ParseResult {
 // Does not open paths, discover entries, query the environment or execute code.
 ParseResult parse_manifest(const SourceFile&);
 enum class ProfileName { debug, release };
+enum class ProfileDebugSupport { unavailable, available };
 struct EffectiveProfile {
     ProfileName name=ProfileName::release;
     bool optimize=true;
@@ -144,5 +145,6 @@ struct EffectiveProfile {
     std::string cache_key;
 };
 // Usage conflicts throw invalid_argument. Only the selected profile can warn.
-EffectiveProfile resolve_profile(const Manifest&,std::optional<ProfileName>,bool no_opt,bool cache);
+EffectiveProfile resolve_profile(const Manifest&,std::optional<ProfileName>,bool no_opt,bool cache,
+                                 ProfileDebugSupport = ProfileDebugSupport::unavailable);
 }

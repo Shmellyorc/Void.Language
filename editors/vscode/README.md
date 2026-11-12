@@ -61,7 +61,10 @@ with `--allow-native`.
 
 Syntax highlighting works in Restricted Mode; native execution requires trust.
 Multi-root, virtual/untitled, network/UNC and unrelated projects need separate
-windows or are unsupported. There is no debugger or automatic native reload.
+windows or are unsupported. Source debugging uses an existing native debugger.
+On Linux x64, the qualified [LLDB DAP launch configuration](../../docs/EDITOR_INTEGRATION.md#native-aot-source-debugging)
+uses the compiler-selected project's executable. Windows x64 uses native GDB
+from a terminal. Automatic native reload remains outside this workflow.
 
 Developer build/package (pinned Node 24.19.0, locked dependencies):
 

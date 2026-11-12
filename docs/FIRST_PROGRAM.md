@@ -63,3 +63,32 @@ returns 7, both the JIT and native application exit 7; that number is not printe
 The historical `entry(i32) -> i32` adapter instead prints a numeric result and
 exits zero. See [CLI commands](CLI.md), [language examples](../examples/),
 [types](NUMERIC_TYPES.md) and [editor setup](EDITOR_INTEGRATION.md).
+
+## Step through a native Debug build
+
+On Linux x64 or Windows x64, append the following table to `void.project.toml`.
+
+```toml
+[build.debug]
+debug_info = "full"
+```
+
+Replace `src/hello.void` with this program.
+
+```void
+func doubled(input: i32) -> i32:
+    var answer = input * 2
+    return answer
+
+func main() -> i32:
+    return doubled(7)
+```
+
+Run `voidc build --project . --profile debug`. On Linux, open
+`build/hello` in LLVM 23.1.4 LLDB. Run `settings set target.disable-aslr false`
+and `breakpoint set -f hello.void -l 2`, then `run`, `next`, and
+`frame variable answer`. On Windows, open
+`build\hello.exe` in native GDB and run `break hello.void:2`, `run`,
+`next`, and `print answer`. The initialized value is 14. Use `continue`
+to finish and observe the application exit status.
+[VS Code launch and native debugger setup](EDITOR_INTEGRATION.md#native-aot-source-debugging)

@@ -193,7 +193,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                                   const std::string& suffix, const llvm::DataLayout& target_layout, const std::string& exported_entry,
                                   std::vector<NominalDescriptor>* host_catalog=nullptr,std::vector<InterfaceWitness>* host_witnesses=nullptr,
                                   llvm_backend::LoweringInventory* inventory=nullptr,
-                                  bool fixed_call_research=false) {
+                                  bool fixed_call_research=false,std::optional<project::DebugInfo> source_debug={},bool optimized=false) {
     // Pure default DAGs are outlined into ordinary private typed-IR functions.
     // The normal shared lowerer supplies roots, failure cleanup and native ABI;
     // defaults execute once per element without expanding IR by array extent.
@@ -582,20 +582,32 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         b.SetInsertPoint(invalid);b.CreateStore(string("Invalid interface binding, domain or generation catalog"),prepare->getArg(1));b.CreateRet(llvm::Constant::getNullValue(prepared_type));
         b.SetInsertPoint(bad_call);b.CreateStore(string("Invalid prepared interface receiver"),invoke->getArg(invoke->arg_size()-1));if(requirement.result==ir::Type::none) b.CreateRetVoid();else b.CreateRet(llvm::Constant::getNullValue(type(requirement.result)));
     }
-    llvm::DIBuilder debug(*module);
-    auto module_path = vd::utf8_path(input.source_path.empty() ? input.identity : input.source_path);
-    auto* file = debug.createFile(vd::path_utf8(module_path.filename()), vd::path_utf8(module_path.parent_path()));
-    debug.createCompileUnit(llvm::dwarf::DW_LANG_C, file, "VOID source compiler", false, "", 0);
+    // An absent profile keeps the historical JIT, standalone and proof metadata.
+    std::unique_ptr<llvm::DIBuilder> debug;
+    llvm::DIFile* file=nullptr;
+    const bool debug_types_enabled=source_debug!=project::DebugInfo::line;
+    auto debug_file=[&](const std::string& name) {
+        const auto path=vd::utf8_path(name);
+        return debug->createFile(vd::path_utf8(path.filename()),vd::path_utf8(path.parent_path()));
+    };
+    if(source_debug!=project::DebugInfo::none) {
+        debug=std::make_unique<llvm::DIBuilder>(*module);
+        file=debug_file(input.source_path.empty()?input.identity:input.source_path);
+        debug->createCompileUnit(llvm::dwarf::DW_LANG_C,file,"VOID source compiler",source_debug && optimized,"",0,"",
+            debug_types_enabled?llvm::DICompileUnit::FullDebug:llvm::DICompileUnit::LineTablesOnly);
+        module->addModuleFlag(llvm::Module::Warning,"Debug Info Version",llvm::DEBUG_METADATA_VERSION);
+        if(source_debug)module->addModuleFlag(llvm::Module::Warning,"Dwarf Version",4);
+    }
     std::map<std::string,llvm::DIType*> debug_aggregates;
     std::function<llvm::DIType*(ir::Type)> debug_value_type = [&](ir::Type t) -> llvm::DIType* {
-        if (t.kind == ir::Type::managed_ref || t.kind==ir::Type::string) return debug.createPointerType(nullptr, layout.getPointerSizeInBits());
+        if (t.kind == ir::Type::managed_ref || t.kind==ir::Type::string) return debug->createPointerType(nullptr, layout.getPointerSizeInBits());
         if(t.kind==ir::Type::interface_ref || t.kind==ir::Type::prepared_receiver) {
             auto* native=llvm::cast<llvm::StructType>(type(t));auto* offsets=layout.getStructLayout(native);std::vector<llvm::Metadata*> members;
-            for(unsigned n=0;n<native->getNumElements();++n) {auto* part=native->getElementType(n);llvm::DIType* debug_part=n< (t.kind==ir::Type::interface_ref ? 2u : 3u) ? static_cast<llvm::DIType*>(debug.createPointerType(nullptr,layout.getPointerSizeInBits())) : debug.createBasicType("binding selector",64,llvm::dwarf::DW_ATE_unsigned);
-                members.push_back(debug.createMemberType(file,std::to_string(n),file,0,layout.getTypeSizeInBits(part),layout.getABITypeAlign(part).value()*8,offsets->getElementOffsetInBits(n),llvm::DINode::FlagZero,debug_part));}
-            return debug.createStructType(file,ir::type_name(t),file,0,offsets->getSizeInBits(),layout.getABITypeAlign(native).value()*8,llvm::DINode::FlagZero,nullptr,debug.getOrCreateArray(members));
+            for(unsigned n=0;n<native->getNumElements();++n) {auto* part=native->getElementType(n);llvm::DIType* debug_part=n< (t.kind==ir::Type::interface_ref ? 2u : 3u) ? static_cast<llvm::DIType*>(debug->createPointerType(nullptr,layout.getPointerSizeInBits())) : debug->createBasicType("binding selector",64,llvm::dwarf::DW_ATE_unsigned);
+                members.push_back(debug->createMemberType(file,std::to_string(n),file,0,layout.getTypeSizeInBits(part),layout.getABITypeAlign(part).value()*8,offsets->getElementOffsetInBits(n),llvm::DINode::FlagZero,debug_part));}
+            return debug->createStructType(file,ir::type_name(t),file,0,offsets->getSizeInBits(),layout.getABITypeAlign(native).value()*8,llvm::DINode::FlagZero,nullptr,debug->getOrCreateArray(members));
         }
-        if (ir::collection_type(t)) return debug.createPointerType(nullptr,layout.getPointerSizeInBits(),0,{},ir::type_name(t));
+        if (ir::collection_type(t)) return debug->createPointerType(nullptr,layout.getPointerSizeInBits(),0,{},ir::type_name(t));
         if (t == ir::Type::none) return nullptr;
         if (t.kind == ir::Type::aggregate) {
             if (auto found = debug_aggregates.find(t.definition->identity); found != debug_aggregates.end()) return found->second;
@@ -603,21 +615,20 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             std::vector<llvm::Metadata*> members;
             for (unsigned n = 0; n < t.definition->fields.size(); ++n) {
                 const auto& field = t.definition->fields[n]; auto* native_field = type(field.type);
-                members.push_back(debug.createMemberType(file,field.name,file,0,layout.getTypeSizeInBits(native_field),
+                members.push_back(debug->createMemberType(file,field.name,file,0,layout.getTypeSizeInBits(native_field),
                     layout.getABITypeAlign(native_field).value()*8,field_offset(t,n)*8,llvm::DINode::FlagZero,debug_value_type(field.type)));
             }
-            auto* result = debug.createStructType(file,ir::type_name(t),file,0,offsets->getSizeInBits(),
-                layout.getABITypeAlign(native).value()*8,llvm::DINode::FlagZero,nullptr,debug.getOrCreateArray(members));
+            auto* result = debug->createStructType(file,ir::type_name(t),file,0,offsets->getSizeInBits(),
+                layout.getABITypeAlign(native).value()*8,llvm::DINode::FlagZero,nullptr,debug->getOrCreateArray(members));
             debug_aggregates.emplace(t.definition->identity,result); return result;
         }
         if(t.kind==ir::Type::numeric_enum) {
             auto backing=ir::Type(*t.definition->enum_backing);
-            return debug.createBasicType(ir::type_name(t),numeric::width(backing),
+            return debug->createBasicType(ir::type_name(t),numeric::width(backing),
                 numeric::signed_integer(backing)?llvm::dwarf::DW_ATE_signed:llvm::dwarf::DW_ATE_unsigned);
         }
-        return debug.createBasicType(ir::type_name(t),numeric::width(t), t == ir::Type::boolean ? llvm::dwarf::DW_ATE_boolean : numeric::floating(t) ? llvm::dwarf::DW_ATE_float : numeric::signed_integer(t) ? llvm::dwarf::DW_ATE_signed : llvm::dwarf::DW_ATE_unsigned);
+        return debug->createBasicType(ir::type_name(t),numeric::width(t), t == ir::Type::boolean ? llvm::dwarf::DW_ATE_boolean : numeric::floating(t) ? llvm::dwarf::DW_ATE_float : numeric::signed_integer(t) ? llvm::dwarf::DW_ATE_signed : llvm::dwarf::DW_ATE_unsigned);
     };
-    module->addModuleFlag(llvm::Module::Warning, "Debug Info Version", llvm::DEBUG_METADATA_VERSION);
     std::size_t function_index = 0;
     for (const auto& f : input.functions) {
         const auto& instruction_types = checked_types.at(function_index++);
@@ -625,19 +636,34 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         auto* fn = async?async->resume:functions.at(f.name);
         llvm::BasicBlock* setup=async?llvm::BasicBlock::Create(context,"async.enter",fn):nullptr;
         auto frame_home=[&](unsigned field){return b.CreateStructGEP(async->frame,fn->getArg(0),field);};
-        auto path = vd::utf8_path(f.source.path);
-        auto* source_file = debug.createFile(vd::path_utf8(path.filename()), vd::path_utf8(path.parent_path()));
-        std::vector<llvm::Metadata*> debug_types{debug_value_type(f.result)};
-        for (unsigned n = 0; n < f.parameters.size(); ++n) {
-            auto* logical = debug_value_type(f.parameters[n]);
-            if (f.receiver && n == 0) logical = debug.createReferenceType(llvm::dwarf::DW_TAG_reference_type,logical,layout.getPointerSizeInBits(),layout.getPointerABIAlignment(0).value()*8);
-            debug_types.push_back(logical);
+        llvm::DIFile* source_file=nullptr;
+        llvm::DISubprogram* subprogram=nullptr;
+        std::map<unsigned,const DebugBinding*> debug_bindings;
+        std::map<std::string,llvm::DILocalScope*> file_scopes;
+        if(debug) {
+            source_file=debug_file(f.source.path);
+            std::vector<llvm::Metadata*> debug_types;
+            if(debug_types_enabled) {
+                debug_types.push_back(debug_value_type(f.result));
+                for(unsigned n=0;n<f.parameters.size();++n) {
+                    auto* logical=debug_value_type(f.parameters[n]);
+                    if(f.receiver && n==0)logical=debug->createReferenceType(llvm::dwarf::DW_TAG_reference_type,logical,layout.getPointerSizeInBits(),layout.getPointerABIAlignment(0).value()*8);
+                    debug_types.push_back(logical);
+                }
+            }
+            auto flags=llvm::DISubprogram::SPFlagDefinition;
+            if(fn->hasLocalLinkage())flags|=llvm::DISubprogram::SPFlagLocalToUnit;
+            if(source_debug && optimized)flags|=llvm::DISubprogram::SPFlagOptimized;
+            auto* debug_type=debug->createSubroutineType(debug->getOrCreateTypeArray(debug_types));
+            subprogram=debug->createFunction(source_file,!f.display_name.empty()?f.display_name:f.source_name.empty()?f.name:f.source_name,fn->getName(),
+                source_file,f.source.line,debug_type,f.source.line,llvm::DINode::FlagPrototyped,flags);
+            fn->setSubprogram(subprogram);
+            if(source_debug==project::DebugInfo::full && !optimized && input.analysis) {
+                const auto& names=input.analysis->debug_bindings();
+                if(auto found=names.find(f.name);found!=names.end())
+                    for(const auto& binding:found->second)debug_bindings.emplace(binding.slot,&binding);
+            }
         }
-        auto* debug_type = debug.createSubroutineType(debug.getOrCreateTypeArray(debug_types));
-        auto* subprogram = debug.createFunction(source_file, !f.display_name.empty() ? f.display_name : f.source_name.empty() ? f.name : f.source_name, fn->getName(), source_file,
-            f.source.line, debug_type, f.source.line, llvm::DINode::FlagPrototyped,
-            llvm::DISubprogram::SPFlagDefinition | (fn->hasLocalLinkage() ? llvm::DISubprogram::SPFlagLocalToUnit : llvm::DISubprogram::SPFlagZero));
-        fn->setSubprogram(subprogram);
         std::vector<llvm::BasicBlock*> blocks;
         for (std::size_t i = 0; i < f.blocks.size(); ++i)
             blocks.push_back(llvm::BasicBlock::Create(context, "block" + std::to_string(i), fn));
@@ -889,6 +915,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         if(async){auto* invalid=llvm::BasicBlock::Create(context,"async.invalid_state",fn);resume_states=b.CreateSwitch(b.CreateLoad(b.getInt32Ty(),frame_home(1)),invalid);resume_states->addCase(b.getInt32(0),blocks.front());b.SetInsertPoint(invalid);b.CreateStore(b.CreateGlobalString("Invalid async resume state"),failure);return_failure();}
         for (std::size_t n = 0; n < f.blocks.size(); ++n) {
             active_block=n;b.SetInsertPoint(blocks[n]);
+            if(source_debug)b.SetCurrentDebugLocation(llvm::DebugLoc());
             if (input.coordinated) b.CreateCall(module->getOrInsertFunction("vd_gc_poll",b.getVoidTy()));
             if(!async && input.coordinated && (!f.cleanup_entry || n<*f.cleanup_entry)){
                 auto* cancelled=b.CreateCall(module->getOrInsertFunction("vd_worker_checkpoint",b.getInt1Ty(),b.getPtrTy()),{failure});
@@ -908,7 +935,15 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             };
             for (const auto& instruction : f.blocks[n].instructions) {
                 const auto& loc = instruction.source.path.empty() ? f.source : instruction.source;
-                b.SetCurrentDebugLocation(llvm::DILocation::get(context, loc.line, loc.column, subprogram));
+                if(subprogram) {
+                    llvm::DILocalScope* scope=subprogram;
+                    if(source_debug && loc.path!=f.source.path) {
+                        auto [entry,fresh]=file_scopes.try_emplace(loc.path);
+                        if(fresh)entry->second=debug->createLexicalBlockFile(subprogram,debug_file(loc.path));
+                        scope=entry->second;
+                    }
+                    b.SetCurrentDebugLocation(llvm::DILocation::get(context,loc.line,loc.column,scope));
+                }
                 if(defer_return_load && &instruction==&f.blocks[n].instructions.back())check_cleanup_return();
                 llvm::Value* v = nullptr;
                 using ir::Op;
@@ -2051,7 +2086,20 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                         auto* staging=copy_staging.at(t);copy_value(t,staging,value_roots[n].at(instruction.b),array_failure);
                         value=b.CreateLoad(type(t),staging);
                     }
-                    v=b.CreateStore(value,slots[instruction.a]);break;
+                    v=b.CreateStore(value,slots[instruction.a]);
+                    if(auto found=debug_bindings.find(instruction.a);found!=debug_bindings.end() &&
+                        loc.path==found->second->source.path && loc.line==found->second->source.line &&
+                        loc.column==found->second->source.column) {
+                        const auto& binding=*found->second;
+                        auto* debug_type=debug_value_type(t);
+                        auto* variable=binding.argument?
+                            debug->createParameterVariable(subprogram,binding.name,binding.argument,source_file,binding.source.line,debug_type):
+                            debug->createAutoVariable(subprogram,binding.name,source_file,binding.source.line,debug_type);
+                        auto* location=llvm::DILocation::get(context,binding.source.line,binding.source.column,subprogram);
+                        debug->insertDeclare(slots[instruction.a],variable,debug->createExpression(),location,b.GetInsertBlock());
+                        debug_bindings.erase(found);
+                    }
+                    break;
                 }
                 case Op::async_call: case Op::function_call: case Op::interface_call: case Op::call: case Op::virtual_call: case Op::base_init: {
                     if(instruction.op==Op::base_init && instruction.callee.empty()) {
@@ -2185,7 +2233,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         b.CreateRet(b.CreateCall(body, args));
         b.SetInsertPoint(failed); b.CreateRet(llvm::Constant::getNullValue(wrapper->getReturnType()));
     }
-    debug.finalize();
+    if(debug)debug->finalize();
 #ifdef VOID_LLVM_RESEARCH
     if(inventory) for(auto& function:*module) if(!function.isDeclaration()) {
         inventory->function(function,false);
@@ -2630,7 +2678,8 @@ std::shared_ptr<const NativeCode> Jit::compile_root_probe(bool optimize) {
     return impl_->load(std::move(module), std::move(context), name, {"/proof::root_probe"}, impl_);
 }
 static void emit_impl(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program, bool runtime_object, const std::string& generation_suffix = {},
-                      bool storage_proof = false, const std::filesystem::path& proof_report = {}, std::string_view build_inputs = {}) {
+                      bool storage_proof = false, const std::filesystem::path& proof_report = {}, std::string_view build_inputs = {},
+                      std::optional<project::DebugInfo> source_debug = {}) {
     if ((runtime_object && !input.coordinated) || (input.coordinated && !runtime_object && !source_program)) throw std::invalid_argument("coordinated AOT requires the runtime proof bootstrap");
     initialize();
     llvm::LLVMContext context;
@@ -2654,8 +2703,10 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
                         nullptr,nullptr
 #ifdef VOID_LLVM_RESEARCH
                         ,storage_proof ? &inventory : nullptr
+#else
+                        ,nullptr
 #endif
-                        );
+                        ,false,source_debug,optimize);
     module->setTargetTriple(machine->getTargetTriple());
     module->setDataLayout(machine->createDataLayout());
     llvm::GlobalVariable* application_record = nullptr;
@@ -2850,8 +2901,9 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
     write_object(*module,*machine,output);
 }
 void emit_async_object(const ir::Module& source,const std::filesystem::path& output,bool optimize){auto module=source;module.async_root=true;emit_object(module,output,optimize,true);}
-void emit_object(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program, std::string_view build_inputs) {
-    emit_impl(input,output,optimize,source_program,false,{},false,{},build_inputs);
+void emit_object(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program, std::string_view build_inputs,
+                 std::optional<project::DebugInfo> source_debug) {
+    emit_impl(input,output,optimize,source_program,false,{},false,{},build_inputs,source_debug);
 }
 void emit_runtime_object(const ir::Module& input, const std::filesystem::path& output, bool optimize, const std::string& generation_suffix) {
     emit_impl(input,output,optimize,false,true,generation_suffix);

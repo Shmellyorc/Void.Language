@@ -23,6 +23,52 @@ graph. Those buffers have editor analysis without contributing executable
 inputs or authorizing a dependency. Automatic entry discovery still follows
 the manifest's saved source inventory and its existing syntax checks.
 
+## Native AOT source debugging
+
+Set `debug_info = "full"` under `[build.debug]` in `void.project.toml`.
+Save the project and build its native executable with
+`voidc build --project . --profile debug`. In VS Code, select the
+`debug` value for `void.tasks.profile` and run **VOID: Build Project**.
+Rebuild after editing saved sources. Use `line` for source stepping without
+local-variable inspection. [Debug modes](CLI.md#manifest-project-profiles-slice-3)
+
+On Linux x64, install the official **LLDB DAP** extension and set
+`lldb-dap.executable-path` to the absolute path of the LLVM 23.1.4
+`lldb-dap` executable. Add this configuration to `.vscode/launch.json`.
+[LLVM LLDB DAP documentation](https://lldb.llvm.org/use/lldbdap.html) · [Official extension](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.lldb-dap)
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "VOID Debug project",
+      "type": "lldb-dap",
+      "request": "launch",
+      "program": "${command:void.debugProjectProgram}",
+      "cwd": "${command:void.debugProjectRoot}",
+      "disableASLR": false
+    }
+  ]
+}
+```
+
+The command variables use the selected manifest and entry from `voidls`.
+They require a trusted workspace, a current application selection, saved
+project buffers, the adapter and an existing executable at the normal build
+path. The launch uses the existing executable. Set a breakpoint in a
+`.void` file and start debugging from Run and Debug. Put application
+arguments in the launch configuration's `args` array.
+
+On Linux, the pinned LLDB 23.1.4 command line also opens the ELF executable.
+On Windows 10 x64, native GDB 17.2 opens the MSVC-targeted executable and
+reads its embedded DWARF. Open the exact executable reported by Build.
+In either debugger, use a file-and-line breakpoint and step past a scalar
+declaration before inspecting it. The VS Code launch recipe is qualified
+on Linux x64. Windows qualification uses GDB directly. Asynchronous frames,
+captured locals, nested lexical scopes and managed values lack a qualified
+inspection contract.
+
 ## First-file project creation (Slice 5)
 
 In a trusted single filesystem workspace using automatic project selection, a

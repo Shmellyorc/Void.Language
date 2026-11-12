@@ -75,6 +75,13 @@ struct AnalyzedReference {
     std::string signature = {}; // Concrete selected callable, before source identity normalization.
     bool navigation_only = false; // Related target, with no distinct authored token.
 };
+// Presentation-only metadata. A slot is the same typed slot copied by the
+// frontend lowerer. Argument numbers are one-based; zero denotes a local.
+struct DebugBinding {
+    unsigned slot, argument;
+    std::string name;
+    SourceLocation source;
+};
 class ValidatedAnalysis : public std::enable_shared_from_this<ValidatedAnalysis> {
     friend struct AnalysisAccess;
     std::string entry_, entry_symbol_, contract_, constants_;
@@ -88,6 +95,7 @@ class ValidatedAnalysis : public std::enable_shared_from_this<ValidatedAnalysis>
     std::vector<AnalyzedReference> references_;
     std::vector<AnalyzedDeclaration> editor_declarations_;
     std::vector<AnalyzedReference> editor_references_;
+    std::map<std::string,std::vector<DebugBinding>> debug_bindings_;
     std::function<ir::Module()> lower_;
     ValidatedAnalysis() = default;
 public:
@@ -106,6 +114,7 @@ public:
     const auto& references() const { return references_; }
     const auto& editor_declarations() const { return editor_declarations_; }
     const auto& editor_references() const { return editor_references_; }
+    const auto& debug_bindings() const { return debug_bindings_; }
     const std::string& compatibility_contract() const { return contract_; }
     const std::string& constant_contract() const { return constants_; }
     // Lowers the retained validated tree; no filesystem reads or reanalysis.
