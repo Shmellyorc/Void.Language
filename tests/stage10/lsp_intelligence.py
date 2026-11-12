@@ -206,5 +206,89 @@ func entry(input: i32) -> i32:
         check(query('textDocument/definition','day.year',5)['uri'].endswith('/time.void'), 'library identity')
         check('error' in request('textDocument/rename','day.year',5,newName='years'), 'library rename allowed')
         check('make_date' in hover('make_date(2024',2), 'temporal docs')
+
+        game = '''struct game:
+    name: string
+    running: bool
+
+func (g game) init(name: string):
+    g.name = name
+
+func main():
+    var test = game(name = "player")
+'''
+        check(not replace(game), 'reported game source')
+        call = 'game(name = "player")'
+        definition = query('textDocument/definition', call, 1)
+        check(definition['range']['start']['line'] == 4, definition)
+
+        def signature(prefix, label, active=0):
+            out = query('textDocument/signatureHelp', prefix, len(prefix))
+            check(out and out['signatures'][0]['label'] == label and out['activeParameter'] == active, out)
+            return out['signatures'][0]['parameters'][active]
+
+        check(signature('game(na', 'game(name: string)') == {'label': 'name: string'},
+              'constructor parameters need no invented documentation')
+        for typed in ['game(', 'game(na']:
+            replace(game.replace(call, typed))
+            signature(typed, 'game(name: string)')
+            items = completion(typed, len(typed))
+            check(items['name =']['textEdit']['newText'] == 'name = ' and 'running =' not in items, items)
+        replace(game.replace(call, 'game(na = "player")'))
+        items = completion('game(na', len('game(na'))
+        check(items['name =']['textEdit']['newText'] == 'name', items)
+        replace(game.replace(call, 'game(name = '))
+        signature('game(name = ', 'game(name: string)')
+        check('name =' not in completion('game(name = ', len('game(name = ')), 'value slot offered a second label')
+        for invalid, diagnostic in [('game(running = true)', 'Unknown initializer parameter'),
+                                    ('game(name = "a", name = "b")', 'supplied more than once')]:
+            check(any(diagnostic in d['message'] for d in replace(game.replace(call, invalid))), invalid)
+
+        constructors = game[:game.index('func main')] + '''value struct card:
+    title: string
+    rank: i32
+func (c card) init(title: string, rank: i32 = 7):
+    c.title = title
+    c.rank = rank
+value struct settings<t>:
+    private secret: bool = false
+    title: string
+    count: t
+## @param label A label before the game.
+func consume(label: string, instance: game):
+    pass
+## @param suffix The suffix to append.
+func (g game) label(suffix: string) -> string:
+    return g.name + suffix
+func main():
+    var existing = game("old")
+'''
+        card = 'card(title: string, rank: i32 = …)'
+        replace(constructors + '    var fresh = card(rank = 3, \n')
+        signature('card(rank = 3, ', card)
+        items = completion('card(rank = 3, ', len('card(rank = 3, '))
+        check('title =' in items and 'rank =' not in items, items)
+        replace(constructors + '    var fresh = card(rank = \n')
+        signature('card(rank = ', card, 1)
+        replace(constructors + '    var fresh = settings<i32>(count = 1, ti\n')
+        signature('settings<i32>(count = 1, ti', 'settings<i32>(title: string, count: i32)')
+        items = completion('settings<i32>(count = 1, ti', len('settings<i32>(count = 1, ti'))
+        check(set(items) == {'title ='}, items)
+        replace(constructors + '    var fresh = settings<i32>(\n')
+        signature('settings<i32>(', 'settings<i32>(title: string, count: i32)')
+        items = completion('settings<i32>(', len('settings<i32>('))
+        check(set(items) == {'title =', 'count ='}, items)
+        replace(constructors + '    consume("雪😀", game(\n')
+        signature('consume("雪😀", game(', 'game(name: string)')
+        replace(constructors + '    var fresh = game(name = existing.label(\n')
+        check(signature('existing.label(', 'label(suffix: string) -> string')['documentation'] == 'The suffix to append.',
+              'nested documented method')
+        replace(constructors + '    var fresh = game(name = unknown(\n')
+        check(query('textDocument/signatureHelp', 'unknown(', len('unknown(')) is None, 'unknown nested call reused constructor signature')
+
+        foreign.write_text('public struct hidden:\n    title: string\nprivate func (h hidden) init(title: string):\n    h.title = title\n', encoding='utf-8')
+        replace('use "foreign.void" as f\nfunc main():\n    var value = f.hidden(\n')
+        check(query('textDocument/signatureHelp', 'f.hidden(', len('f.hidden(')) is None, 'private initializer leaked')
+        check('title =' not in completion('f.hidden(', len('f.hidden(')), 'private initializer parameter leaked')
         client.shutdown()
 print(f'{checks} Stage 10 LSP intelligence checks passed')

@@ -187,6 +187,7 @@ struct EditorAssistance {
     std::string signature, documentation;
     std::vector<std::string> parameter_documentation;
     bool import_context = false, incomplete = false;
+    bool constructor_signature = false;
     std::vector<std::string> parameters;
     unsigned active_parameter = 0;
     std::size_t begin = 0, end = 0;

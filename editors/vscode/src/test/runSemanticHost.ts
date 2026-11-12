@@ -4,6 +4,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 
 async function main(): Promise<void> {
+    const suite = process.argv.includes('--constructor') ? 'constructorHost' : 'semanticHost';
     const {VOIDLS_PATH, VSCODE_EXECUTABLE_PATH} = process.env;
     if (!VOIDLS_PATH || !VSCODE_EXECUTABLE_PATH) throw new Error('Set VOIDLS_PATH and VSCODE_EXECUTABLE_PATH.');
     const base = process.platform === 'darwin' ? await fs.realpath('/tmp') : os.tmpdir();
@@ -23,11 +24,13 @@ async function main(): Promise<void> {
             'telemetry.telemetryLevel': 'off', 'update.mode': 'none', 'extensions.autoCheckUpdates': false,
             'chat.disableAIFeatures': true, 'files.hotExit': 'off',
         }));
+        const cdp = process.env.VOID_TEST_CDP_PORT;
         await runTests({vscodeExecutablePath: VSCODE_EXECUTABLE_PATH,
-            extensionDevelopmentPath: path.resolve(__dirname, '../..'), extensionTestsPath: path.resolve(__dirname, 'semanticHost.js'),
+            extensionDevelopmentPath: path.resolve(__dirname, '../..'), extensionTestsPath: path.resolve(__dirname, suite + '.js'),
             extensionTestsEnv: {VOID_SEMANTIC_ROOT: root},
             launchArgs: [root, '--user-data-dir=' + profile, '--extensions-dir=' + path.join(temporary, 'extensions'),
-                '--disable-extensions', '--disable-updates', '--disable-gpu', '--skip-welcome', '--skip-release-notes']});
+                '--disable-extensions', '--disable-updates', '--disable-gpu', '--skip-welcome', '--skip-release-notes',
+                ...(cdp ? ['--remote-debugging-port=' + cdp] : [])]});
     } finally {
         await fs.rm(temporary, {recursive: true, force: true, maxRetries: 5, retryDelay: 100});
     }

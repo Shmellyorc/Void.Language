@@ -509,10 +509,11 @@ class Server {
             } else overlays.insert_or_assign(module,*source); // Position conversion and probe share exact bytes.
             auto assistance=manifest_mode?vd::project_editor_assistance(requested_root,snapshot.entry_override(),overlays,snapshot.manifests(),module,*offset):vd::editor_assistance(entry_path,overlays,module,*offset);
             if(method=="textDocument/signatureHelp") {
-                if(assistance.signature.empty() || assistance.active_parameter>=assistance.parameter_documentation.size() || assistance.parameter_documentation[assistance.active_parameter].empty())return nullptr;
+                if(assistance.signature.empty() || assistance.active_parameter>=assistance.parameters.size())return nullptr;
+                if(!assistance.constructor_signature && (assistance.active_parameter>=assistance.parameter_documentation.size() || assistance.parameter_documentation[assistance.active_parameter].empty()))return nullptr;
                 j::Array parameters;for(std::size_t n=0;n<assistance.parameters.size();++n) {
                     j::Object parameter{{"label",assistance.parameters[n]}};
-                    if(n==assistance.active_parameter) {
+                    if(n==assistance.active_parameter && n<assistance.parameter_documentation.size() && !assistance.parameter_documentation[n].empty()) {
                         if(signature_plaintext)parameter["documentation"]=j::Object{{"kind","plaintext"},{"value",assistance.parameter_documentation[n]}};
                         else parameter["documentation"]=assistance.parameter_documentation[n];
                     }

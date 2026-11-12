@@ -96,7 +96,7 @@ const Function& concrete_function(Expr& e,const Function& declaration,unsigned f
     // a successfully specialized call replaces this with its concrete signature.
     if(diagnostics.editor) {
         auto docs=source_documentation(owner.source,generic.token.offset);
-        editor_call(e,generic,first,false,&docs);
+        editor_call(e,generic,first,&docs);
     }
     auto mapping=argument_mapping(e,generic,first,false);
     std::vector<std::pair<Type,Expr*>> supplied;for(unsigned n=0;n<mapping.size();++n)supplied.emplace_back(generic.parameters[mapping[n]].type,e.parts[n+first].get());
@@ -113,6 +113,7 @@ Structure& concrete_structure(Expr& e,Unit& owner,Structure& declaration,unsigne
     for(const auto& f:owner.generic_functions)if(f.receiver && f.token.text=="init")
         for(const auto& a:owner.applications)if(a.definition==f.receiver->type.definition && a.name==declaration.token.text)initializer=&f;
     for(unsigned n=0;n<e.parts.size()-first;++n) {
+        if(editor_cursor(e.names[n]) || (e.names[n].text.empty() && editor_cursor(*e.parts[n+first])))continue;
         const auto name=e.names[n].text;std::optional<Type> pattern;
         if(initializer) {
             if(name.empty() && n<initializer->parameters.size())pattern=initializer->parameters[n].type;
@@ -181,7 +182,7 @@ const Function* concrete_method(Expr& e, Type receiver, bool reference = false) 
     if (generic) {
         if(diagnostics.editor && !reference) {
             auto docs=source_documentation(owner->source,generic->token.offset);
-            editor_call(e,*generic,1,false,&docs);
+            editor_call(e,*generic,1,&docs);
         }
         std::vector<std::pair<Type, Expr*>> supplied;
 

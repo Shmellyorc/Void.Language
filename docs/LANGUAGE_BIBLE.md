@@ -2348,8 +2348,11 @@ func load_name(path: string) -> result<string, error>:
 ```
 
 Callable hover shows its signature, description and applicable return information.
-Signature help shows only the active parameter's description. An undocumented or
-empty active parameter produces no popup for automatic **or manual** invocation.
+Signature help shows only the active parameter's description. Ordinary callable
+popups require a documented active parameter for automatic and manual invocation.
+Constructors show the selected initializer's parameters or accessible construction
+fields even without documentation. Named-argument completion uses those same
+parameters or fields.
 If some explicit parameters have nonempty documentation, missing descriptions warn;
 zero documented parameters do not warn. Unknown/duplicate parameter names warn
 without blocking compilation or execution. The first nonempty duplicate text wins.

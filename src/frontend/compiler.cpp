@@ -1996,7 +1996,7 @@ class Semantics {
         }
         return e.type = call_arguments(e,target,1);
     }
-    VOID_SEMANTIC_HANDLER void editor_call(const Expr& e,const Function& target,std::size_t first,bool /*constructor*/,const Documentation* selected_docs=nullptr) {
+    VOID_SEMANTIC_HANDLER void editor_call(const Expr& e,const Function& target,std::size_t first,const Documentation* selected_docs=nullptr) {
         std::optional<std::size_t> active;
         for(std::size_t n=first;n<e.parts.size() && !active;++n) {
             std::vector<const Expr*> work{e.parts[n].get()};
@@ -2008,6 +2008,7 @@ class Semantics {
         }
         if(!active)return;
         auto& out=diagnostics.editor->result;out.parameters.clear();out.signature=random_public_name(target)+"(";
+        out.constructor_signature=false;
         Documentation docs;
         if(selected_docs)docs=*selected_docs;
         else {
@@ -2059,7 +2060,7 @@ class Semantics {
 
     Type call_arguments(Expr& e, const Function& target, std::size_t first, bool constructor = false) {
         e.asynchronous_call=target.asynchronous;e.native_symbol=target.native_symbol;
-        if(diagnostics.editor) {editor_call(e,target,first,constructor);if(first==1 && target.token.text=="format" && e.parts.size()==2)editor_format(*e.parts[1],e.parts[0]->type);}
+        if(diagnostics.editor && !constructor) {editor_call(e,target,first);if(first==1 && target.token.text=="format" && e.parts.size()==2)editor_format(*e.parts[1],e.parts[0]->type);}
         if(e.interface_call) {
             std::vector<const Expr*> pending;for(std::size_t n=first;n<e.parts.size();++n)pending.push_back(e.parts[n].get());
             while(!pending.empty()){auto* part=pending.back();pending.pop_back();if(part->kind==Expr::Kind::awaited)error(source,part->token,Code::unsupported_type,"await cannot retain a prepared interface receiver across suspension.","Await arguments into locals before selecting the interface method.");for(const auto& child:part->parts)pending.push_back(child.get());}
@@ -2132,6 +2133,93 @@ class Semantics {
             }
         }
     }
+    VOID_SEMANTIC_HANDLER void editor_constructor(Expr& e, const Unit& owner, const Structure& structure, const Unit& access) {
+        if(invalid_function || unit.failed_import || (current && current->parse_failed))return;
+        const auto cursor_in_argument = [&](std::size_t n) {
+            if(editor_cursor(e.names[n]))return true;
+            std::vector<const Expr*> pending{e.parts[n].get()};
+            while(!pending.empty()) {
+                const auto* part=pending.back();pending.pop_back();
+                // Leave an inner call to its own binder, even if it has no valid target.
+                if(part->kind==Expr::Kind::call || part->kind==Expr::Kind::method_call)continue;
+                if(editor_cursor(*part))return true;
+                for(const auto& child:part->parts)pending.push_back(child.get());
+            }
+            return false;
+        };
+        std::size_t active=0;
+        while(active<e.parts.size() && !cursor_in_argument(active))++active;
+        if(active==e.parts.size())return;
+
+        const auto* init=structure.initializer;
+        std::vector<Parameter> fields;
+        if(!init)for(unsigned n=0;n<structure.definition->fields.size();++n) {
+            const auto& field=structure.definition->fields[n];
+            if(!field.event && ir::field_accessible(*root.member_catalog,e.type,n,access.identity,lexical_owner()))
+                fields.push_back({structure.effective_fields[n].second->token,field.type});
+        }
+        const auto& parameters=init?init->parameters:fields;
+        const auto find_parameter=[&](const std::string& name) {
+            return static_cast<std::size_t>(std::find_if(parameters.begin(),parameters.end(),[&](const auto& p){return p.token.text==name;})-parameters.begin());
+        };
+        const auto& label=e.names[active];
+        const bool editing_label=editor_cursor(label);
+        const bool bare_cursor=label.text.empty() && editor_cursor(*e.parts[active]);
+        std::vector<bool> bound(parameters.size());
+        bool named=false, positional_active=false;
+        for(std::size_t n=0;n<e.parts.size();++n) {
+            if(n==active) {
+                positional_active=init && !named && label.text.empty();
+                named|=!label.text.empty();
+                continue;
+            }
+            const auto& argument=e.names[n].text;
+            if(argument.empty() && (!init || named))return;
+            named|=!argument.empty();
+            const auto index=argument.empty()?n:find_parameter(argument);
+            if(index>=bound.size() || bound[index])return;
+            bound[index]=true;
+        }
+        auto index=label.text.empty()?active:find_parameter(label.text);
+        if(editing_label || (bare_cursor && (!positional_active || index>=bound.size() || bound[index])))
+            index=static_cast<std::size_t>(std::find(bound.begin(),bound.end(),false)-bound.begin());
+        if(index>=bound.size() || bound[index] || (!positional_active && label.text.empty() && !bare_cursor))return;
+
+        auto& out=diagnostics.editor->result;
+        const auto docs=init?source_documentation(owner.source,init->token.offset):Documentation{};
+        out.signature=e.qualifier.empty()?e.token.text:e.qualifier+"."+e.token.text;
+        if(!structure.type_arguments.empty()) {
+            out.signature+="<";
+            for(std::size_t n=0;n<structure.type_arguments.size();++n) {
+                if(n)out.signature+=", ";
+                out.signature+=ir::type_name(structure.type_arguments[n]);
+            }
+            out.signature+=">";
+        }
+        out.signature+="(";
+        out.constructor_signature=true;
+        out.documentation=docs.text();
+        out.parameters.clear();
+        out.parameter_documentation.clear();
+        out.active_parameter=static_cast<unsigned>(index);
+        for(std::size_t n=0;n<parameters.size();++n) {
+            const auto& parameter=parameters[n];
+            const auto& name=parameter.token.text;
+            auto type=ir::type_name(parameter.type);
+            auto documentation=docs.parameter(name);
+            auto parameter_label=name+": "+type;
+            if(parameter.default_expression)parameter_label+=" = …";
+            if(n)out.signature+=", ";
+            out.signature+=parameter_label;
+            out.parameters.push_back(std::move(parameter_label));
+            if((editing_label || bare_cursor) && !bound[n] && out.candidates.size()<256)
+                out.candidates.push_back({name+" =",std::move(type),init?6:5,editing_label?name:name+" = ",documentation});
+            out.parameter_documentation.push_back(std::move(documentation));
+        }
+        out.signature+=")";
+        if(editing_label || (bare_cursor && !positional_active))throw EditorProbeFound{};
+        if(bare_cursor)editor_name_candidates(*e.parts[active],parameters[index].type);
+    }
     void construction(Expr& e, Unit& owner, Structure& structure, bool runtime, Unit& access) {
         if(console::endpoint_type(Type(structure.definition)) && unit.identity!=console::source_module)error(source,e.token,Code::unsupported_type,"Console endpoints are compiler-owned borrowed tokens; use console.stdin/stdout/stderr.");
         if(structure.definition->native_resource && !(console::session_type(Type(structure.definition)) && unit.identity==console::source_module))error(source,e.token,Code::unsupported_type,"Native resources are nonforgeable; use the checked binding factory.");
@@ -2140,9 +2228,13 @@ class Semantics {
         if (structure.definition->managed && !runtime) error(source,e.token,Code::constant_call,"Managed allocation is not a compile-time expression.");
         e.kind = Expr::Kind::construction; e.type = Type(structure.definition,structure.definition->interface_type ? Type::interface_ref : structure.definition->managed ? Type::managed_ref : Type::aggregate); e.target = structure.definition->identity;
         e.aggregate_value = structure.defaults;
-        if (auto* init = structure.initializer) {
+        auto* init = structure.initializer;
+        if (init) {
             if (!runtime) error(source,e.token,Code::constant_call,"Compile-time expressions cannot execute custom initialization.","Construct this value in a function or local const.",{{span(owner.source,init->token),"Runtime initializer declared here."}});
             if (!source_visible(init->visibility,owner.identity,access.identity)) error(source,e.token,Code::visibility,"Initializer is private to " + owner.identity + ".");
+        }
+        if(diagnostics.editor)editor_constructor(e,owner,structure,access);
+        if(init) {
             e.initializer = init->symbol;
             if (call_arguments(e,*init,0,true) == error_type) e.type = error_type;
         } else {
@@ -2458,10 +2550,11 @@ class Semantics {
     }
     // Keep the recursive dispatch frame small: reserving every handler's
     // temporaries here exhausts a 1 MiB Debug stack before the depth guard.
-    bool editor_cursor(const Expr& e) const {
+    bool editor_cursor(const Token& token) const {
         return diagnostics.editor && diagnostics.editor->module==unit.identity &&
-            diagnostics.editor->offset==e.token.offset && e.token.text=="_void_editor_cursor_";
+            diagnostics.editor->offset==token.offset && token.text=="_void_editor_cursor_";
     }
+    bool editor_cursor(const Expr& e) const {return editor_cursor(e.token);}
     VOID_SEMANTIC_HANDLER void editor_candidates(Expr& e, std::optional<Type> receiver = {}) {
         auto& out=diagnostics.editor->result;
         // A broken local context or import must never manufacture authority.
@@ -2789,7 +2882,7 @@ class Semantics {
     VOID_SEMANTIC_HANDLER Type result_expression(Expr& e,const std::optional<Type>& expected) {
         if(!expected || !expected->definition || !expected->definition->result_type)error(source,e.token,Code::type_mismatch,"Ok/Err require a contextual result<t, e> type.","Annotate the variable or the enclosing function result.");
         auto target=result_editor_target(*expected,e.token.text=="Ok"?0:1,e.token);
-        if(diagnostics.editor)editor_call(e,target,0,false);
+        if(diagnostics.editor)editor_call(e,target,0);
         e.source_target=target.symbol;
         return sum_expression(e,*expected,e.token.text=="Ok"?0:1,0);
     }
@@ -2858,7 +2951,7 @@ class Semantics {
         auto found=std::find_if(variants.begin(),variants.end(),[&](const auto& variant){return variant.name==e.token.text;});
         if(found==variants.end())error(source,e.token,Code::unknown_identifier,"Unknown enum variant '"+e.token.text+"'.");
         if(!call && found->count)error(source,e.token,Code::argument_count,"Variant requires its payload arguments.");
-        if(diagnostics.editor && call){Function target;target.token=e.token;target.result=Type(structure->definition);for(unsigned i=0;i<found->count;++i){const auto& field=structure->fields[found->begin+i];target.parameters.push_back({field.token,ir::field_type(target.result,found->begin+i)});}auto docs=source_documentation(owner->source,structure->case_tokens[found-variants.begin()].offset);editor_call(e,target,1,false,&docs);}
+        if(diagnostics.editor && call){Function target;target.token=e.token;target.result=Type(structure->definition);for(unsigned i=0;i<found->count;++i){const auto& field=structure->fields[found->begin+i];target.parameters.push_back({field.token,ir::field_type(target.result,found->begin+i)});}auto docs=source_documentation(owner->source,structure->case_tokens[found-variants.begin()].offset);editor_call(e,target,1,&docs);}
         auto result=sum_expression(e,Type(structure->definition),static_cast<unsigned>(found-variants.begin()),1);e.target=structure->definition->identity+"::variant::"+found->name;return result;
     }
     VOID_SEMANTIC_HANDLER Type dictionary_expression(Expr& e,const std::optional<Type>& context) {
@@ -3151,7 +3244,7 @@ class Semantics {
         auto mapping=argument_mapping(e,target,0,false);
         const std::string public_signature="print(*values, sep: string = space, end: string = newline, file: console.output = console.stdout, flush: bool = false) -> no result";
         if(diagnostics.editor) {
-            editor_call(e,target,0,false);
+            editor_call(e,target,0);
             auto& out=diagnostics.editor->result;
             if(!out.signature.empty() && out.signature.starts_with("print(")) {
                 out.signature=public_signature;out.parameters={"*values","sep: string = space","end: string = newline","file: console.output = console.stdout","flush: bool = false"};
