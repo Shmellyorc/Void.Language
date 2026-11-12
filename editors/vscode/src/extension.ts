@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
 import {basename, join} from 'node:path';
 import {LanguageClient, CloseAction, ErrorAction, Trace, State, RevealOutputChannelOn, ServerOptions, LanguageClientOptions} from 'vscode-languageclient/node';
-import {inside, Project, resolveProject, Settings} from './config';
+import {inside, Project, resolveCompiler, resolveProject, Settings} from './config';
 import {CreationWorkflow} from './creationWorkflow';
+import {compilerExecution} from './projectTask';
 
 let manager: ServerManager | undefined;
 let creation: CreationWorkflow | undefined;
@@ -28,6 +29,45 @@ class ServerManager {
     private createdRoot?: string;
     constructor(private readonly output: vscode.LogOutputChannel, private readonly bundled: string, private readonly statusBar: vscode.StatusBarItem) {}
     async refreshProject(): Promise<void> { await this.serial; if (this.client?.isRunning()) await this.client.sendRequest('void/refreshProject', {}); }
+    async projectTask(command: 'check' | 'build' | 'run'): Promise<vscode.TaskExecution | undefined> {
+        if (!vscode.workspace.isTrusted) return;
+        await this.serial;
+        const folder = vscode.workspace.workspaceFolders?.length === 1 ? vscode.workspace.workspaceFolders[0] : undefined;
+        const project = this.project;
+        if (!folder || folder.uri.scheme !== 'file' || !project?.manifestMode || !this.client?.isRunning()) {
+            this.report('VOID: Open a trusted folder and select a VOID manifest project first.', true);
+            return;
+        }
+        const epoch = this.epoch;
+        const settings = vscode.workspace.getConfiguration('void', folder.uri);
+        try {
+            const profile = settings.get('tasks.profile', 'debug');
+            if (!['debug', 'release'].includes(profile)) throw new Error('Choose debug or release in void.tasks.profile.');
+            const args = [command, '--project', project.requestedRoot ?? project.root, '--profile', profile];
+            if (project.entryOverride) args.push('--entry', project.entryOverride);
+            if (command === 'run') {
+                const runArguments = settings.get<unknown>('tasks.runArguments', []);
+                if (!Array.isArray(runArguments) || runArguments.some(argument => typeof argument !== 'string' || argument.includes('\0')))
+                    throw new Error('Set void.tasks.runArguments to an array of literal strings.');
+                if (runArguments.length) args.push('--', ...runArguments);
+            }
+            const compiler = await resolveCompiler(project.server, settings.get('compiler.path', ''), folder.uri.fsPath);
+            if (!vscode.workspace.isTrusted || this.project !== project || this.epoch !== epoch) {
+                this.report('VOID: The editor or selected project changed. Invoke the command again.', true);
+                return;
+            }
+            const dirty = this.documents().find(document => document.isDirty && inside(project.root, document.uri.fsPath));
+            if (dirty) {
+                this.report(`VOID: Save ${basename(dirty.uri.fsPath)} before running a project command. Project commands use saved files.`, true);
+                return;
+            }
+            const name = `${command[0].toUpperCase()}${command.slice(1)} Project (${profile})`;
+            const task = new vscode.Task({type: 'void', command, profile, project: project.root}, folder, name, 'VOID',
+                compilerExecution(compiler, args, project.root), '$void-compiler');
+            task.presentationOptions = {panel: vscode.TaskPanelKind.Dedicated, clear: true};
+            return await vscode.tasks.executeTask(task);
+        } catch (error) { this.report(`VOID: ${error instanceof Error ? error.message : String(error)}`, true); }
+    }
     async selectEntry(): Promise<void> {
         if (!vscode.workspace.isTrusted) return;
         const files = await vscode.window.showOpenDialog({canSelectMany: false, filters: {VOID: ['void']}, title: 'Select VOID project entry'});
@@ -212,6 +252,9 @@ export function activate(context: vscode.ExtensionContext): {ready: () => Promis
         vscode.commands.registerCommand('void.resetCreationPrompt', () => workflow.reset()),
         vscode.commands.registerCommand('void.selectEntry', () => current.selectEntry()),
         vscode.commands.registerCommand('void.refreshProject', () => current.refreshProject()),
+        vscode.commands.registerCommand('void.checkProject', () => current.projectTask('check')),
+        vscode.commands.registerCommand('void.buildProject', () => current.projectTask('build')),
+        vscode.commands.registerCommand('void.runProject', () => current.projectTask('run')),
         vscode.commands.registerCommand('void.restartLanguageServer', () => current.refresh(true)),
         vscode.workspace.onDidOpenTextDocument(d => { if (d.languageId === 'void' || basename(d.uri.fsPath) === 'void.project.toml') void current.refresh(); }),
         vscode.window.onDidChangeActiveTextEditor(e => { if (e && (e.document.languageId === 'void' || basename(e.document.uri.fsPath) === 'void.project.toml')) void current.refresh(); }),

@@ -1,5 +1,28 @@
 # VOID editor integration (Phase 11)
 
+## VS Code project commands
+
+Open a trusted local folder with a selected VOID manifest. **VOID: Check
+Project** checks the saved source, **VOID: Build Project** writes the native
+executable to the project's normal `build/` location, and **VOID: Run Project**
+runs the saved application through the JIT. The commands use the compiler's
+project selector and honor an explicit entry override.
+
+Set `void.tasks.profile` to `debug` or `release` and enter application
+arguments as separate strings in `void.tasks.runArguments`. Set
+`void.compiler.path` if the matching `voidc` is installed separately from
+`voidls`. Save dirty VOID sources and manifests in the selected root before
+launch. The task terminal shows output and the exit status, and compiler
+diagnostics appear in Problems. Use a regular terminal for TTY applications
+or explicit `--allow-native` authorization.
+
+Open VOID sources within the project get compiler-owned semantic highlighting,
+completion, hover, signatures, definitions, formatting and diagnostics from
+their current buffers, including sources outside the application's import
+graph. Those buffers have editor analysis without contributing executable
+inputs or authorizing a dependency. Automatic entry discovery still follows
+the manifest's saved source inventory and its existing syntax checks.
+
 ## First-file project creation (Slice 5)
 
 In a trusted single filesystem workspace using automatic project selection, a
@@ -43,20 +66,11 @@ existing document-version checks. Configuration restart intent survives coalesce
 readiness requests. A root switch creates a fresh client; stale callbacks from the
 previous project cannot update current state. Source/TOML/structural events invalidate
 selection, including wrong-case boundaries; actual admission stays in the compiler.
-The Select Project Entry command in project mode retains its pinned root. No init/new,
-first-file offers, automatic manifest writing or creation UI is delivered here.
+The Select Project Entry command in project mode retains its pinned root.
 
 Actual Linux VS Code host qualification and native/platform limits are recorded in
 [Slice 3](projects/SLICE3.md); protocol handshakes alone are not editor qualification.
 
-
-The [Phase 1 creation state machine](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-first-file-creation-and-terminal-workflows)
-now freezes proposed first-event detection, concurrent-event coalescing, persisted
-`offered`/accept/decline/dismiss suppression and explicit reset/retry behavior.
-Creation remains unimplemented. Slice 3 now delivers `void.project.root` manifest context; entry-only legacy configuration keeps
-its old root semantics. No manifest/main parser is added to the adapter. Error-bearing
-project sessions and dirty manifest overlays belong to the shared compiler/voidls
-contract and are delivered in S3. The first-file creation workflow remains deferred.
 
 ## Approved project workflow roadmap, 8 November 2026
 
@@ -96,13 +110,13 @@ executed versions; compatibility targets do not establish a tested version range
 
 All editors share compiler diagnostics, completion, hover, signatures, navigation,
 document/workspace symbols, conservative formatting and refresh. Supported rename
-categories are negotiated by client capability; **Vim rename stays disabled**.
-Each window selects one entry-reachable project. Unsaved overlays remain authoritative.
+categories are negotiated by client capability. **Vim rename stays disabled**.
+Each window selects one project. Unsaved overlays remain authoritative for editor analysis.
 
 ### Shared Sprint 1 setup
 
-All adapters call `voidls --discover <workspace> <active> <override>`; empty
-arguments represent absent inputs. Explicit entry wins. Neovim accepts
+The Vim and Neovim adapters call `voidls --discover <workspace> <active> <override>`.
+Empty arguments represent absent inputs. Explicit entry wins. Neovim accepts
 `require('void').setup({server='/absolute/voidls', workspace='/project'})`;
 Vim accepts `call void#setup('/absolute/voidls', '', '/project')`.
 Their workspace defaults to cwd, so select it deliberately. Neovim restart retains

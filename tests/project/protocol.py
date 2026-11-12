@@ -26,6 +26,49 @@ def close(c,path):c.notify('textDocument/didClose',{'textDocument':{'uri':path.a
 def codes(notes):return [d['code'] for n in notes for d in n['diagnostics']]
 def definition(c,path,text,word):
  at=text.index(word);prefix=text[:at];return query(c,'textDocument/definition',{'textDocument':{'uri':path.as_uri()},'position':{'line':prefix.count('\n'),'character':len(prefix.rsplit('\n',1)[-1].encode('utf-16-le'))//2}})[0]
+def unreferenced(root):
+ root.mkdir();(root/'void.project.toml').write_text(manifest.replace("roots=['src']","roots=['.']"),encoding='utf-8')
+ entry=root/'main.void';entry_text='private const hidden = 23\nfunc main() -> i32:\n    return hidden\n';entry.write_text(entry_text,encoding='utf-8')
+ app=root/'app.void'
+ body=('struct game:\n    name: string\n    running: bool\n\n'
+       'func (g game) init(name: string):\n    g.name = name\n\n'
+       'public func play():\n    var test = game(name = "player")\n')
+ app.write_text(body,encoding='utf-8')
+ doc={'textDocument':{'uri':app.as_uri()}}
+ with Client(server,root,project=True) as c:
+  c.initialize();before=state(c);check(before['status']=='ready','application selected before independent file opens')
+  opened(c,app,body)
+  check(definition(c,app,body,'game(name')['uri']==app.as_uri(),'independent constructor definition')
+  hover=query(c,'textDocument/hover',dict(doc,position={'line':5,'character':6}))[0]
+  check(hover and 'name' in hover['contents']['value'],'independent property hover')
+  formatting=lambda spaces:query(c,'textDocument/formatting',dict(doc,options={'tabSize':4,'insertSpaces':spaces}))[0]
+  tabs=formatting(False);check(len(tabs)==1 and '\tname: string' in tabs[0]['newText'],'independent compiler-validated tabs')
+  change(c,app,tabs[0]['newText'],2)
+  check(formatting(True)[0]['newText']==body,'independent compiler-validated spaces')
+  change(c,app,body.replace('name = "player")','na'),3)
+  position={'line':8,'character':22}
+  signature=query(c,'textDocument/signatureHelp',dict(doc,position=position))[0]
+  check(signature and signature['signatures'][0]['label']=='game(name: string)','independent incomplete constructor signature')
+  items=query(c,'textDocument/completion',dict(doc,position=position))[0]
+  check(any(item['label']=='name =' for item in items),'independent named argument completion')
+  notes=change(c,app,'use pkg/undeclared\n'+body,4)
+  check(any('Undeclared direct package import' in d['message'] for n in notes if n['uri']==app.as_uri() for d in n['diagnostics']),'independent imports retain lock policy')
+  check(definition(c,app,'use pkg/undeclared\n'+body,'game(name') is None,'failed document drops previous definitions')
+  after=state(c)
+  check(after['entry']==before['entry'] and after['snapshotKey']==before['snapshotKey'] and after['status']=='ready','independent overlays never change application selection')
+  notes=change(c,app,body+'\nfunc main() -> i32:\n    return hidden\n',5)
+  check(any('hidden' in d['message'] for n in notes if n['uri']==app.as_uri() for d in n['diagnostics']),'independent module cannot see private entry symbols')
+  check(state(c)['snapshotKey']==before['snapshotKey'],'a dirty main in an existing unreferenced file does not enter discovery')
+  change(c,app,body,6)
+  opened(c,entry,'use "./app.void" as app\n'+entry_text.replace('    return','    app.play()\n    return'))
+  check(definition(c,app,body,'game(name') is not None,'same definition after explicit import')
+  change(c,app,'func unfinished(',7)
+  check(state(c)['status']=='error','a referenced dirty file still affects the selected graph')
+  change(c,entry,entry_text,2)
+  check(state(c)['status']=='ready','removing the import separates dirty errors from the application again')
+  close(c,entry);close(c,app)
+  check(definition(c,app,body,'game(name') is None,'closing unreferenced file drops its analysis')
+  c.shutdown()
 def preflight_boundaries(workspace):
  root=workspace/'parent';child=root/'child';child.mkdir(parents=True)
  policy=manifest.replace("roots=['src']","roots=['.']")
@@ -88,6 +131,23 @@ try:
   relative=root/'bare.void';relative.write_bytes(b'func entry(x: i32) -> i32:\n    return x\n')
   with Client(server,Path('bare.void'),cwd=root) as legacy:
    check(not any(n['diagnostics'] for n in legacy.initialize()),'legacy relative --entry initializes beside a manifest');location=query(legacy,'textDocument/definition',{'textDocument':{'uri':relative.as_uri()},'position':{'line':0,'character':6}})[0];check(location['uri']==relative.as_uri(),'legacy relative entry navigation');legacy.shutdown()
+  with Client(server,relative) as legacy:
+   legacy.initialize()
+   opened(legacy,relative,relative.read_text(encoding='utf-8'))
+   moved=relative.with_name('bare renamed.void')
+   relative.rename(moved)
+   legacy.notify('workspace/didChangeWatchedFiles',{'changes':[{'uri':relative.as_uri(),'type':3},{'uri':moved.as_uri(),'type':1}]})
+   notes=legacy.sync()
+   check(any(n['uri']==relative.as_uri() and any(d['code']=='VOID3002' for d in n['diagnostics']) for n in notes),'legacy missing entry diagnostic keeps the original URI')
+   position={'textDocument':{'uri':relative.as_uri()},'position':{'line':0,'character':6}}
+   check(query(legacy,'textDocument/definition',position)[0] is None,'legacy rename invalidates old index')
+   close(legacy,relative)
+   moved.rename(relative)
+   legacy.notify('workspace/didChangeWatchedFiles',{'changes':[{'uri':moved.as_uri(),'type':3},{'uri':relative.as_uri(),'type':1}]})
+   notes=legacy.sync()
+   check(any(n['uri']==relative.as_uri() and not n['diagnostics'] for n in notes),'legacy restored entry clears diagnostic in the same server')
+   check(query(legacy,'textDocument/definition',position)[0]['uri']==relative.as_uri(),'legacy restored entry can be navigated in the same server')
+   legacy.shutdown()
   initial=preflight(root);check(initial['mode']=='project' and initial['kind']=='application' and initial['entry'] is None and initial['status']=='error','no-main preflight is a successful error-bearing summary')
   with Client(server,root,project=True) as c:
    caps=query(c,'initialize',{'capabilities':{'textDocument':{'publishDiagnostics':{'relatedInformation':True,'versionSupport':True}},'workspace':{'workspaceEdit':{'documentChanges':True,'failureHandling':'textOnlyTransactional'}}}})[0]['capabilities'];check(caps['experimental']['voidProjectProtocol']==1 and caps['experimental']['voidToolingProtocol']==1,'separate protocol capabilities');c.notify('initialized',{});check('VOID5010' in codes(c.sync()),'initial no-main diagnostic')
@@ -121,6 +181,7 @@ try:
   with Client(server,root,project=True) as c:
    c.initialize();info=state(c);check(info['kind']=='library' and info['entry'] is None and info['status']=='ready','library session no fabricated entry');check(definition(c,game,main,'value()') is not None,'library semantic navigation');c.shutdown()
   preflight_boundaries(root/'preflight')
+  unreferenced(root/'unreferenced')
  print(f'project_protocol: {checks} checks passed')
 finally:
  if evidence:evidence.write_text(json.dumps({'checks':checks,'commands_and_requests':rows},indent=2)+'\n')

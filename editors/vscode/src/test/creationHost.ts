@@ -33,6 +33,8 @@ export async function run(): Promise<void> {
             await vscode.window.showTextDocument(document);
             await vscode.commands.executeCommand('void.createProject');
             await vscode.commands.executeCommand('void.resetCreationPrompt');
+            for (const command of ['void.checkProject','void.buildProject','void.runProject'])
+                assert.equal(await vscode.commands.executeCommand(command), undefined);
             await pause(1300);
             assert.equal(document.languageId, 'void');
             assert.equal(api!.status().state, 'stopped');

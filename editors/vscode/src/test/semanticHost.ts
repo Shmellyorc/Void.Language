@@ -103,8 +103,7 @@ export async function run(): Promise<void> {
             edit.set(document.uri, edits);
             assert(await vscode.workspace.applyEdit(edit));
         };
-        const tabEdits = await format(false);
-        assert(tabEdits.length);
+        const tabEdits = await until(() => format(false), edits => !!edits?.length, 'formatter accepts saved source');
         await applyFormat(tabEdits);
         const tabbed = source.replace(/^ +/gm, indent => '\t'.repeat(indent.length / 4));
         assert.equal(document.getText(), tabbed);

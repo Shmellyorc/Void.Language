@@ -74,6 +74,21 @@
         "title": "VOID: Refresh Project"
       },
       {
+        "command": "void.checkProject",
+        "title": "VOID: Check Project",
+        "enablement": "isWorkspaceTrusted"
+      },
+      {
+        "command": "void.buildProject",
+        "title": "VOID: Build Project",
+        "enablement": "isWorkspaceTrusted"
+      },
+      {
+        "command": "void.runProject",
+        "title": "VOID: Run Project",
+        "enablement": "isWorkspaceTrusted"
+      },
+      {
         "command": "void.createProject",
         "title": "VOID: Create Project"
       },
@@ -82,9 +97,51 @@
         "title": "VOID: Reset Project Creation Prompt"
       }
     ],
+    "problemMatchers": [
+      {
+        "name": "void-compiler",
+        "owner": "void-compiler",
+        "source": "VOID compiler",
+        "fileLocation": "absolute",
+        "pattern": [
+          {
+            "regexp": "^(.+):(\\d+):(\\d+): (error|warning|info): (.*)$",
+            "file": 1,
+            "line": 2,
+            "column": 3,
+            "severity": 4,
+            "message": 5
+          },
+          {
+            "regexp": "^    code: (VOID\\d+)$",
+            "code": 1
+          }
+        ]
+      }
+    ],
     "configuration": {
       "title": "VOID",
       "properties": {
+        "void.compiler.path": {
+          "type": "string",
+          "default": "",
+          "scope": "window",
+          "description": "Literal path to the matching voidc executable. Empty uses voidc next to the selected voidls."
+        },
+        "void.tasks.profile": {
+          "type": "string",
+          "enum": ["debug", "release"],
+          "default": "debug",
+          "scope": "window",
+          "description": "Compiler profile used by VOID project commands."
+        },
+        "void.tasks.runArguments": {
+          "type": "array",
+          "items": {"type": "string"},
+          "default": [],
+          "scope": "window",
+          "description": "Literal arguments passed to the application by VOID: Run Project."
+        },
         "void.editor.useTabs": {
           "type": "boolean",
           "default": true,

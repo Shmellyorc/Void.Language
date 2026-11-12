@@ -62,6 +62,9 @@ export async function verifyEditorBasics(root: string): Promise<void> {
             'with resource as handle:', 'var callback = func():', 'defer {']) await enter(header, '\t');
         await enter('func main():', '\t');
         await type('if ready:', 'func main():\n\tif ready:');
+        // This burst of programmatic edits can outrun workbench tokenization.
+        // Make the nested line current before exercising the real Enter action.
+        await vscode.commands.executeCommand('editor.action.forceRetokenize');
         const nested = 'func main():\n\tif ready:\n\t\t';
         await type('\n', nested, nested.length);
         await enter('func main():\n\tif ready:\n\t\tpass', '\t\t');

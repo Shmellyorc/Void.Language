@@ -287,9 +287,11 @@ class Server {
         if(result->project() && result->project()->project && result->project()->project->entry())entry_path=*result->project()->project->entry();
         else if(manifest_mode)entry_path.clear();
         if(result->semantic_analysis()) for(const auto& module:result->semantic_analysis()->modules()) groups[module.identity];
-        for(const auto& d:result->result().diagnostics) {
+        std::set<std::tuple<std::string,std::size_t,std::size_t,vd::DiagnosticCode,std::string>> emitted;
+        auto publish_record=[&](const vd::Diagnostic& d) {
             auto id=d.primary.module_identity;
             if(id.empty()) throw std::logic_error("Project diagnostic has no VFS owner");
+            if(!emitted.emplace(id,d.primary.begin,d.primary.end,d.code,d.description).second)return;
             if(vd::package_source(id) && d.primary.source)
                 package_uris[id]=vd::lsp::file_uri(vd::utf8_path(d.primary.source->path()));
             auto message=d.description;
@@ -302,7 +304,10 @@ class Server {
                 diagnostic["relatedInformation"]=std::move(related);
             }
             groups[id].push_back(std::move(diagnostic));
-        }
+        };
+        for(const auto& d:result->result().diagnostics)publish_record(d);
+        for(const auto& [id,document]:result->editor_documents())if(open.contains(id))
+            for(const auto& d:document.result.diagnostics)publish_record(d);
         // Closing/reopening under another URI spelling must clear old diagnostics.
         auto target_uri=[&](const std::string& id) {
             if(auto found=package_uris.find(id);found!=package_uris.end())return found->second;
@@ -337,7 +342,7 @@ class Server {
     vd::AnalysisResult check_overlays(const vd::SourceOverrides& sources) const {
         auto snapshot=session.select();
         if(!manifest_mode)return vd::analyze_project(entry_path,sources);
-        auto checked=vd::analyze_manifest_project(requested_root,snapshot.entry_override(),sources,snapshot.manifests());
+        auto checked=vd::analyze_editor_project(requested_root,snapshot.entry_override(),sources,snapshot.manifests(),snapshot.discovery());
         return {checked.project?checked.project->semantic_analysis():nullptr,std::move(checked.diagnostics)};
     }
     j::Value query(const std::string& method,const j::Object& params) const {
@@ -350,10 +355,12 @@ class Server {
             if(!value) throw std::invalid_argument("Expected includeDeclaration boolean"); include=*value;
         }
         auto empty=[&]() -> j::Value { return method=="textDocument/definition" ? j::Value(nullptr) : j::Value(j::Array{}); };
-        auto current=session.current_analysis(); auto index=session.current_index();
-        if(!current || !index) return empty();
-        const vd::SourceFile* source=nullptr;
-        for(const auto& m:current->semantic_analysis()->modules()) if(m.identity==id) source=&m.source;
+        auto current=session.current_analysis();
+        if(current && current->editor_documents().contains(id) && !open.contains(id))return empty();
+        auto index=current?current->index_for(id):nullptr;
+        if(!index) return empty();
+        auto program=analysis_for(*current,id);
+        const auto* source=source_in(*program,id);
         if(!source) return empty();
         auto offset=Positions(*source).offset(p);
         if(!offset) throw std::invalid_argument("Position is outside the document or inside a surrogate pair");
@@ -407,6 +414,10 @@ class Server {
     const vd::SourceFile* source_in(const vd::ValidatedAnalysis& program,const std::string& id) const {
         for(const auto& m:program.modules())if(m.identity==id)return &m.source;return nullptr;
     }
+    static const vd::ValidatedAnalysis* analysis_for(const vd::SessionAnalysis& current,const std::string& id) {
+        if(auto found=current.editor_documents().find(id);found!=current.editor_documents().end())return found->second.result.program.get();
+        return current.semantic_analysis().get();
+    }
     j::Object semantic_tokens(const j::Object& params) {
         auto id=identity(string(object(params.get("textDocument")),"uri"));
         auto document=open.find(id);
@@ -414,13 +425,16 @@ class Server {
         if(!semantic_full || document==open.end() || !document->second.source)return result;
         semantic_requested=true;
         auto current=session.current_analysis();
-        if(!current || !current->index() || session.requires_reselection())return result;
-        const auto* source=source_in(*current->semantic_analysis(),id);
+        if(!current)return result;
+        const auto* index=current->index_for(id);
+        const auto* program=analysis_for(*current,id);
+        if(!index || (session.requires_reselection() && !current->editor_documents().contains(id)))return result;
+        const auto* source=source_in(*program,id);
         if(!source || source->text()!=document->second.source->text())return result;
         Positions positions(*source);
         vd::lsp::Position previous;
         auto& data=*result.getArray("data");
-        for(const auto& token:current->index()->semantic_tokens(id)) {
+        for(const auto& token:index->semantic_tokens(id)) {
             auto begin=positions.position(token.begin),end=positions.position(token.end);
             if(!begin || !end || begin->line!=end->line || begin->character>=end->character)continue;
             auto line=begin->line-previous.line;
@@ -433,10 +447,10 @@ class Server {
         }
         return result;
     }
-    bool disk_current(const vd::ValidatedAnalysis& program) const {
-        if(manifest_mode) {
+    bool disk_current(const vd::ValidatedAnalysis& program,bool document=false) const {
+        if(manifest_mode && !document) {
             auto current=session.current_analysis();auto snapshot=session.select();
-            auto checked=vd::analyze_manifest_project(requested_root,snapshot.entry_override(),snapshot.overrides(),snapshot.manifests());
+            auto checked=vd::analyze_editor_project(requested_root,snapshot.entry_override(),snapshot.overrides(),snapshot.manifests(),snapshot.discovery());
             if(!checked.project || !current || !current->project() || !current->project()->project || checked.project->selection_key()!=current->project()->project->selection_key())return false;
         }
         for(const auto& m:program.modules())if(!open.contains(m.identity)) {
@@ -446,13 +460,19 @@ class Server {
         return true;
     }
     j::Value editor_query(const std::string& method,const j::Object& params) {
-        auto current=session.current_analysis();auto index=session.current_index();
+        auto current=session.current_analysis();
+        auto index=current?current->index().get():nullptr;
         if(method=="workspace/symbol" || method=="textDocument/documentSymbol") {
-            j::Array result;if(!index)return result;
+            j::Array result;
             std::set<std::tuple<std::string,std::size_t,std::size_t>> seen;
             std::string selected,filter;
             if(method=="workspace/symbol")filter=string(params,"query");
-            else selected=identity(string(object(params.get("textDocument")),"uri"));
+            else {
+                selected=identity(string(object(params.get("textDocument")),"uri"));
+                if(current && current->editor_documents().contains(selected) && !open.contains(selected))return result;
+                index=current?current->index_for(selected):nullptr;
+            }
+            if(!index)return result;
             for(const auto& d:index->declarations()) {
                 if(!selected.empty() && selected!=d.module)continue;
                 if(d.module.starts_with("/@stdlib/") && d.visibility!="public")continue;
@@ -473,25 +493,31 @@ class Server {
         }
         auto module=identity(string(object(params.get("textDocument")),"uri"));
         if(manifest_mode && module.ends_with("/void.project.toml"))return method=="textDocument/completion" || method=="textDocument/formatting"?j::Value(j::Array{}):j::Value(nullptr);
+        const bool document=current && current->editor_documents().contains(module);
+        if(document && !open.contains(module))
+            return method=="textDocument/completion" || method=="textDocument/formatting"?j::Value(j::Array{}):j::Value(nullptr);
+        const auto* program=current?analysis_for(*current,module):nullptr;
+        const auto& context=manifest_mode?requested_root:entry_path;
+        index=current?current->index_for(module):nullptr;
         const vd::SourceFile* source=nullptr;
         auto snapshot=session.select();
         if(auto found=snapshot.overrides().find(module);found!=snapshot.overrides().end() && found->second)source=&*found->second;
-        if(!source && current && current->semantic_analysis())source=source_in(*current->semantic_analysis(),module);
+        if(!source && program)source=source_in(*program,module);
         if(method=="textDocument/formatting") {
             if(read_only_source(module))return j::Array{};
             const auto& options=object(params.get("options"));
             const auto insert_spaces=options.getBoolean("insertSpaces");
             if(!insert_spaces || integer(options.get("tabSize"),1)!=4)throw std::invalid_argument("VOID formatting requires a tab size of four and an indentation style");
-            j::Array result;if(!source || !index || !source_in(*current->semantic_analysis(),module) || !disk_current(*current->semantic_analysis()))return result;
+            j::Array result;if(!source || !program || !source_in(*program,module) || !disk_current(*program,document))return result;
             auto formatted=vd::format_source(*source,*insert_spaces);if(!formatted || *formatted==source->text())return result;
             // The same compiler checks both lexical structure and the entire
             // proposed graph before returning a conservative whole-file edit.
-            auto overlays=snapshot.overrides();for(const auto& m:current->semantic_analysis()->modules())if(!read_only_source(m.identity))overlays.insert_or_assign(m.identity,m.source);
+            auto overlays=snapshot.overrides();for(const auto& m:program->modules())if(!read_only_source(m.identity))overlays.insert_or_assign(m.identity,m.source);
             overlays.insert_or_assign(module,vd::SourceFile(source->path(),*formatted));
-            auto checked=check_overlays(overlays);
-            if(!checked.program || checked.program->compatibility_contract()!=current->semantic_analysis()->compatibility_contract())return result;
+            auto checked=document?vd::analyze_editor_document(context,overlays,module,manifest_mode?&snapshot.manifests():nullptr):check_overlays(overlays);
+            if(!checked.program || checked.program->compatibility_contract()!=program->compatibility_contract())return result;
             auto again=vd::format_source(vd::SourceFile(source->path(),*formatted),*insert_spaces);
-            if(!again || *again!=*formatted || !session.is_current(*current) || !disk_current(*current->semantic_analysis()))return result;
+            if(!again || *again!=*formatted || !session.is_current(*current) || !disk_current(*program,document))return result;
             result.push_back(j::Object{{"range",range({std::make_shared<const vd::SourceFile>(*source),module,0,source->text().size()})},{"newText",*formatted}});
             return result;
         }
@@ -502,12 +528,14 @@ class Server {
         if(method=="textDocument/completion" || method=="textDocument/signatureHelp") {
             auto overlays=snapshot.overrides();
             if(module.starts_with("/@stdlib/"))return method=="textDocument/completion"?j::Value(j::Array{}):j::Value(nullptr);
-            if(current && current->semantic_analysis())for(const auto& m:current->semantic_analysis()->modules())if(!read_only_source(m.identity))overlays.insert_or_assign(m.identity,m.source);
+            if(program)for(const auto& m:program->modules())if(!read_only_source(m.identity))overlays.insert_or_assign(m.identity,m.source);
             if(vd::package_source(module)) {
                 if(!current || !current->semantic_analysis() || !disk_current(*current->semantic_analysis()))
                     return method=="textDocument/completion"?j::Value(j::Array{}):j::Value(nullptr);
             } else overlays.insert_or_assign(module,*source); // Position conversion and probe share exact bytes.
-            auto assistance=manifest_mode?vd::project_editor_assistance(requested_root,snapshot.entry_override(),overlays,snapshot.manifests(),module,*offset):vd::editor_assistance(entry_path,overlays,module,*offset);
+            auto assistance=document?vd::document_editor_assistance(context,overlays,module,*offset,manifest_mode?&snapshot.manifests():nullptr)
+                :manifest_mode?vd::project_editor_assistance(requested_root,snapshot.entry_override(),overlays,snapshot.manifests(),module,*offset,snapshot.discovery())
+                :vd::editor_assistance(entry_path,overlays,module,*offset);
             if(method=="textDocument/signatureHelp") {
                 if(assistance.signature.empty() || assistance.active_parameter>=assistance.parameters.size())return nullptr;
                 if(!assistance.constructor_signature && (assistance.active_parameter>=assistance.parameter_documentation.size() || assistance.parameter_documentation[assistance.active_parameter].empty()))return nullptr;
@@ -526,7 +554,7 @@ class Server {
             if(assistance.import_context)return j::Object{{"isIncomplete",assistance.incomplete},{"items",std::move(items)}};
             return items;
         }
-        if(!index)return nullptr;
+        if(!index || (document && method!="textDocument/hover"))return nullptr;
         auto definitions=index->definitions_at(module,*offset);
         if(definitions.empty())for(const auto& d:index->declarations_in(module))if(d.source.begin<=*offset && *offset<d.source.end){definitions.push_back(d);break;}
         if(definitions.empty())return nullptr;
@@ -607,8 +635,11 @@ class Server {
                 if(!(manifest_mode && id.ends_with("/void.project.toml")) && string(document,"languageId")!="void") throw std::invalid_argument("Expected VOID languageId 'void'");
                 if(open.size()>=4096) throw std::invalid_argument("Too many open documents");
                 text=string(document,"text");
+                // initialize and didOpen can share a transport batch. Capture
+                // the saved selection before admitting the first dirty overlay.
+                if(manifest_mode && !session.latest_accepted())analyze();
                 auto selected=session.select();const auto& overrides=manifest_mode && id.ends_with("/void.project.toml")?selected.manifests():selected.overrides();
-                if(manifest_mode && overrides.contains(id))session.replace(id,next(id),std::move(text));else session.open(id,next(id),std::move(text));
+                if(overrides.contains(id))session.replace(id,next(id),std::move(text));else session.open(id,next(id),std::move(text));
                 open.emplace(id,Document{version,string(document,"uri"), (manifest_mode && id.ends_with("/void.project.toml")?session.select().manifests():session.select().overrides()).at(id)});
             } else {
                 if(found==open.end()) throw std::invalid_argument("Document is not open");
@@ -807,14 +838,16 @@ public:
                 if(id){fail(-32600,"Watch changes require a notification");return {};}
                 auto changes=object(o->get("params")).getArray("changes");if(!changes)throw std::invalid_argument("Expected watched changes");
                 bool refresh=false;for(const auto& change:*changes)try{const auto& event=object(&change);auto event_uri=string(event,"uri");(void)vd::lsp::uri_path(event_uri);auto type=integer(event.get("type"),1);if(type>3)throw std::invalid_argument("Invalid watch type");
-                    if(manifest_mode) {
-                        refresh=true; // Unknown/wrong-case boundary names still invalidate selection.
-                        auto module=identity(event_uri);
-                        if(read_only_source(module))continue;
-                        if(type==3)session.unavailable(module,next(module));
-                        if(type==1) {auto selected=session.select();const auto& overrides=module.ends_with("/void.project.toml")?selected.manifests():selected.overrides();if(auto found=overrides.find(module);found!=overrides.end() && !found->second && !open.contains(module))session.close(module,next(module));}
+                    if(manifest_mode)refresh=true; // Unknown/wrong-case boundary names still invalidate selection.
+                    auto module=identity(event_uri);
+                    if(read_only_source(module))continue;
+                    if(type==3 && (manifest_mode || open.contains(module)))session.unavailable(module,next(module));
+                    if(type==1) {
+                        auto selected=session.select();
+                        const auto& overrides=manifest_mode && module.ends_with("/void.project.toml")?selected.manifests():selected.overrides();
+                        if(auto found=overrides.find(module);found!=overrides.end() && !found->second && !open.contains(module))
+                            session.close(module,next(module));
                     }
-                    else (void)identity(event_uri);
                     refresh=true;}catch(const std::invalid_argument&){}
                 if(refresh){session.refresh();dirty=true;}return {};
             }

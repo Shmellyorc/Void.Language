@@ -26,8 +26,9 @@ by default. A custom source path sets the source root to its parent. Neither com
 writes an entry override. Publication refuses existing or wrong-case destinations,
 and a child of a manifest project requires `--nested`. Completed creation returns
 0, validation or filesystem failures return 1, and malformed usage returns 2.
-Resolve and package workflows remain in the project roadmap. See
-[Slice 5](projects/SLICE5.md).
+Use `voidc resolve --project .` for available declared dependencies and
+`voidc resolve --project . --locked` to verify the existing lock. See
+[Slice 5](projects/SLICE5.md) and the [dependency closeout](projects/DEPENDENCY_D2_CLOSEOUT.md).
 
 The following sections retain the scope of their original implementation slices.
 
@@ -89,33 +90,10 @@ is a usage conflict. Paths cannot cross child project boundaries. API callers ca
 supply frozen named source and TOML overlays separately; Slice 3 integrates those
 inputs into ToolingSession/voidls and VS Code without an editor-side resolver.
 
-`--profile debug|release` is implemented in Slice 3 with the precedence and warning
-contract above. The [Phase 1 ownership contract](PROJECT_ARCHITECTURE_ROADMAP.md#phase-1-ownership-and-data-flow)
-retains future creation and resolver/package workflows. The build example is supported;
-init/new examples remain proposed only:
-
-```text
-voidc build --project . --entry src/launcher.void --profile debug
-voidc init . --name Orbit --app-id org.example.orbit
-voidc new orbit --source src/game.void --app-id org.example.orbit
-```
-
-The [creation contract](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-first-file-creation-and-terminal-workflows)
-creates no dependency installation authority, never overwrites manifests or renames
-sources, and omits entry by default. Detailed options remain proposed pending review.
-Creation implementation awaits its later reviewed slice.
-
-## Future project commands, 8 November 2026
-
-The [project roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) proposes `voidc init` and
-`voidc new` and eventual resolve/package workflows. Those forms remain future
-commands in that dated proposal. `package` is now implemented for Linux x86-64
-GNU as described below. Manifest-aware check/run/build/emit and selectors are implemented in S2,
-with project profiles added in S3. The approved entry direction requires no filename convention or mandatory
-entry field: one valid main is selected by compiler analysis; ambiguity diagnoses.
-The command forms below remain compatible; `main.void` directory discovery
-applies when no manifest is selected. Explicit source paths and standalone/top-level/legacy
-execution must remain compatible. Init/new perform no implicit dependency install.
+VS Code's Check, Build and Run commands invoke these same selectors and profile
+flags on saved files. The editor defaults to the Debug profile. Application
+arguments from the editor are passed after `--`. Use a terminal for explicit
+native provider authorization. [Editor setup](EDITOR_INTEGRATION.md#vs-code-project-commands)
 
 ## Implemented command contract
 
@@ -195,8 +173,8 @@ not promised to survive that rebuild.
 
 ### Application distributions
 
-`voidc package --project . --profile release` assembles one Linux x86-64 GNU
-application in `<project>/dist`. `-o DIR` selects another destination, with
+`voidc package --project . --profile release` assembles a Linux x64 GNU or
+Windows x64 MSVC application in `<project>/dist`. `-o DIR` selects another destination, with
 missing parent directories created. Entry discovery and `--entry` use the
 existing manifest rules. A declared managed native provider requires
 `--allow-native` and a verified `void.lock` and local catalog.
@@ -207,7 +185,7 @@ voidc package --project . --allow-native --replace
 voidc package --verify "output/My Application"
 ```
 
-The directory contains `app`, the existing encoded `application.meta`, a
+The directory contains `app` on Linux or `app.exe` on Windows, the encoded `application.meta`, a
 `void-package.txt` inventory, Runtime notices in `licenses/`, and the
 managed `native/` payload when selected. Declare up to 32 non-source files
 with `[application] resources = ["assets/message.txt"]`. These are flat,
@@ -216,9 +194,10 @@ is also included when supplied. Applications locate assets with
 `os.resource_dir()`. `--verify` checks lengths, SHA-256, metadata, names and
 permissions. Applications retain their own asset-use checks.
 
-`--replace` accepts an existing verified package of the same application ID.
-Publication uses a private staged directory and Linux atomic directory
-exchange. The inventory records the selected input digest and actual file
+On Linux, `--replace` accepts an existing verified package of the same
+application ID and publishes it by atomic directory exchange. Windows
+requires a fresh destination, including when `--replace` is present. The
+inventory records the selected input digest and actual file
 digests. Equivalent input selections preserve the file membership and
 selected data identities. Executable byte identity across build locations
 has a separate qualification boundary.
@@ -227,6 +206,8 @@ Linux packages use OS-provided runtime libraries, including the IDN and
 Unicode SONAMEs selected by the native link. The package executable has no
 development RUNPATH. Required OS and display dependencies and qualification
 limits are recorded in the [D5 closeout](projects/DEPENDENCY_D5_CLOSEOUT.md).
+See the [Windows implementation record](projects/W2_WINDOWS_D5_IMPLEMENTATION.md)
+for Windows package layout, admission, and qualification.
 
 ### Native build outputs
 

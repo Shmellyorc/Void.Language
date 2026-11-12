@@ -257,10 +257,11 @@ with TemporaryDirectory(prefix='VOID semantic 雪😀 ') as directory:
 
         other_text = 'func main() -> i32:\n    var alternate = 9\n    return alternate\n'
         opened(client, other, other_text)
-        assert tokens(client, other)[0] == [], 'Unselected entry does not get tokens from an old project'
+        independent = tokens(client, other)[0]
+        expect(decoded(independent, other_text), other_text, '    return', 'alternate', 'alternate', 'variable')
         result, _ = request(client, 'void/reselectProject', {'entry': 'src/other.void'})
         assert result['entry'] == other.as_posix(), result
-        assert tokens(client, main)[0] == []
+        assert tokens(client, main)[0] == dirty, 'The former entry now has its own current document analysis'
         expect(decoded(tokens(client, other)[0], other_text), other_text, '    return', 'alternate', 'alternate', 'variable')
         request(client, 'void/reselectProject', {'entry': 'src/main.void'})
         assert tokens(client, main)[0] == dirty

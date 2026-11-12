@@ -110,15 +110,24 @@ public:
     void bind(const SourceFile& source, const std::string& identity) {
         snapshots.insert_or_assign(source.path(), std::make_pair(identity, std::make_shared<const SourceFile>(source)));
     }
+    void own(SourceSpan& location) const {
+        if(!location.source)return;
+        auto found = snapshots.find(location.source->path());
+        if (found != snapshots.end() && (&found->second.second->text() == &location.source->text() || found->second.second->text() == location.source->text())) {
+            location.module_identity = found->second.first; location.source = found->second.second;
+        }
+    }
+    CompilationError owned_failure(const CompilationError& failure) const {
+        auto records=failure.diagnostics();
+        for(auto& record:records) {
+            own(record.primary);
+            for(auto& related:record.related)own(related.span);
+        }
+        return CompilationError(std::move(records));
+    }
     void add(const CompilationError& failure) {
         for (auto d : failure.diagnostics()) {
             d.related.insert(d.related.end(),context.begin(),context.end());
-            auto own = [&](SourceSpan& location) {
-                auto found = snapshots.find(location.source->path());
-                if (found != snapshots.end() && (&found->second.second->text() == &location.source->text() || found->second.second->text() == location.source->text())) {
-                    location.module_identity = found->second.first; location.source = found->second.second;
-                }
-            };
             own(d.primary); for (auto& related : d.related) own(related.span);
             std::set<std::tuple<std::string, std::size_t, std::size_t, std::string>> related_seen;
             std::erase_if(d.related, [&](const auto& related) {
@@ -6561,19 +6570,19 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
 
 }
 std::shared_ptr<const ValidatedAnalysis> validated_source(const SourceFile&);
-std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path&, const SourceOverrides& = {}, bool verify_disk = false,const NativeProject* = nullptr,EditorProbe* = nullptr,CPrimitiveAdmission::Owner = {});
+std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path&, const SourceOverrides& = {}, bool verify_disk = false,const NativeProject* = nullptr,EditorProbe* = nullptr,CPrimitiveAdmission::Owner = {},const std::string* document = nullptr);
 // This factory is the only way to construct a successful result.
 struct AnalysisAccess {
-    static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry,std::vector<Diagnostic> warnings={},const std::string& context_key={},std::shared_ptr<Unit> library_scope={},ApplicationMetadata::Owner metadata={},bool native_authorized=true,std::shared_ptr<const project::LockedDependencies> dependencies={}) {
+    static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry,std::vector<Diagnostic> warnings={},const std::string& context_key={},std::shared_ptr<Unit> library_scope={},ApplicationMetadata::Owner metadata={},bool native_authorized=true,std::shared_ptr<const project::LockedDependencies> dependencies={},bool editor_only=false) {
         auto result = std::shared_ptr<ValidatedAnalysis>(new ValidatedAnalysis);result->warnings_=std::move(warnings);
         result->entry_ = entry;
         result->application_metadata_ = std::move(metadata);
         result->locked_dependencies_ = dependencies;
         const auto& selected=library_scope?*library_scope:*units.at(entry);
-        result->executable_=!library_scope;
+        result->executable_=!library_scope && !editor_only;
         const auto* app=application_entry(selected);
         result->application_=app!=nullptr || (!selected.globals.empty() && !selected.declarations.contains("entry") && !selected.declarations.contains("main"));
-        result->entry_symbol_=library_scope?std::string{}:entry+(result->application_?"::$app_adapter":"::entry");
+        result->entry_symbol_=result->executable_?entry+(result->application_?"::$app_adapter":"::entry"):std::string{};
         // Builtin declaration snapshots provide stable canonical hover/reference
         // identity, but never masquerade as filesystem navigation/edit targets.
         for(auto type:{Type::i8,Type::u8,Type::i16,Type::u16,Type::i32,Type::u32,Type::i64,Type::u64,Type::f32,Type::f64})for(const auto& api:numeric::members()) {
@@ -6999,7 +7008,8 @@ struct AnalysisAccess {
             if(alternatives.size()>1){r.signature="Selected specializations:";for(const auto& label:alternatives)r.signature+="\n\n"+label;}
         }
         field(result->contract_,result->constants_);
-        result->lower_ = [graph,entry,library_scope,native_authorized,dependencies=std::move(dependencies)] {
+        result->lower_ = [graph,entry,library_scope,native_authorized,editor_only,dependencies=std::move(dependencies)] {
+            if(editor_only)throw std::invalid_argument("Editor document analysis cannot lower IR.");
             if(library_scope)throw std::invalid_argument("Library analysis has no executable entry or supported IR build operation.");
             if(!native_authorized)throw std::invalid_argument("Native project execution requires explicit host authorization.");
             return lower_graph(*graph,entry,dependencies);
@@ -7063,26 +7073,33 @@ std::shared_ptr<const ValidatedAnalysis> validated_source(const SourceFile& sour
     validate_graph(units, identity, diagnostics);
     return AnalysisAccess::build(std::move(units), identity,diagnostics.warnings());
 }
-std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path& entry, const SourceOverrides& overrides, bool verify_disk,const NativeProject* bindings,EditorProbe* editor,CPrimitiveAdmission::Owner primitives) {
+std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path& entry, const SourceOverrides& overrides, bool verify_disk,const NativeProject* bindings,EditorProbe* editor,CPrimitiveAdmission::Owner primitives,const std::string* document) {
     for (const auto& [id, source] : overrides) { (void)source; require_module_identity(id); }
     std::error_code ec;
     auto absolute = std::filesystem::absolute(entry, ec);
-    if (ec) error(SourceFile(path_utf8(entry), ""), {TokenKind::end, "", 0}, Code::import_read, "Cannot resolve the entry source path.");
-    auto root = std::filesystem::canonical(absolute.parent_path(), ec);
-    if (ec) error(SourceFile(path_utf8(entry), ""), {TokenKind::end, "", 0}, Code::import_read, "Cannot resolve the project root directory.", "Filesystem error " + std::to_string(ec.value()) + " (" + ec.category().name() + "): " + ec.message() + ". Check that the entry's parent directory exists and is readable.");
+    const auto& location=ec?entry:absolute;
     // A diagnostic anchor is needed even before the entry file can be opened.
-    Unit anchor(SourceFile(path_utf8(absolute), ""), "/");
-    Diagnostics diagnostics; diagnostics.editor=editor; diagnostics.bind(anchor.source, "/" + path_utf8(absolute.filename()));
+    const auto seed=document?*document:"/" + path_utf8(location.filename());
+    Unit anchor(SourceFile(path_utf8(location.parent_path()/utf8_path(seed).relative_path()), ""), "/");
+    Diagnostics diagnostics; diagnostics.editor=editor; diagnostics.bind(anchor.source,seed);
+    try {
+    if (ec) error(anchor.source, {TokenKind::end, "", 0}, Code::import_read, "Cannot resolve the entry source path.");
+    auto root = std::filesystem::canonical(absolute.parent_path(), ec);
+    if (ec) error(anchor.source, {TokenKind::end, "", 0}, Code::import_read, "Cannot resolve the project root directory.", "Filesystem error " + std::to_string(ec.value()) + " (" + ec.category().name() + "): " + ec.message() + ". Check that the entry's parent directory exists and is readable.");
     SourceGraph graph(root, diagnostics, overrides,bindings,primitives);
     auto& first = [&]() -> Unit& {
-        try { return graph.load(anchor, {TokenKind::path, "/" + path_utf8(absolute.filename()), 0}); }
+        try { return graph.load(anchor, {TokenKind::path, seed, 0}); }
         catch (const CompilationError& failure) { diagnostics.add(failure); diagnostics.finish(); throw; }
     }();
     // A disk read is not an atomic filesystem transaction. Re-discover paths and
     // compare exact bytes before accepting this captured graph. Overlays are frozen.
     if (verify_disk) {
         Diagnostics check; SourceGraph again(root, check, overrides,bindings,primitives);
-        again.load(anchor, {TokenKind::path, first.identity, 0});
+        check.bind(anchor.source,seed);
+        try {
+            again.load(anchor, {TokenKind::path, first.identity, 0});
+            check.finish();
+        } catch(const CompilationError& failure) { throw check.owned_failure(failure); }
         bool same = graph.units.size() == again.units.size();
         for (const auto& [id, unit] : graph.units) {
             auto next = again.units.find(id);
@@ -7110,7 +7127,8 @@ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem
         }
     }
     auto identity = first.identity;
-    return AnalysisAccess::build(std::move(graph.units), identity,diagnostics.warnings());
+    return AnalysisAccess::build(std::move(graph.units), identity,diagnostics.warnings(),{}, {}, {}, true, {}, document!=nullptr);
+    } catch(const CompilationError& failure) { throw diagnostics.owned_failure(failure); }
 }
 void require_module_identity(const std::string& identity) {
     Unit anchor(SourceFile("<document identity>", ""), "/");
@@ -7209,7 +7227,7 @@ bool valid_editor_identifier(const std::string& name) {
     return !name.empty() && letter(name[0]) && !reserved.contains(name) &&
         std::all_of(name.begin(),name.end(),[](char c){return letter(c)||digit(c);});
 }
-EditorAssistance editor_assistance_impl(const std::filesystem::path& entry,const SourceOverrides& overrides,const std::string& module,std::size_t cursor,ProjectCapture* project=nullptr,const std::optional<std::string>& project_entry={}) {
+EditorAssistance editor_assistance_impl(const std::filesystem::path& entry,const SourceOverrides& overrides,const std::string& module,std::size_t cursor,ProjectCapture* project=nullptr,const std::optional<std::string>& project_entry={},bool document=false,const EditorDiscovery* discovery=nullptr) {
     const bool locked_source=project && package_source(module);
     if(!locked_source)require_module_identity(module);
     EditorAssistance empty;
@@ -7276,8 +7294,11 @@ EditorAssistance editor_assistance_impl(const std::filesystem::path& entry,const
     auto frozen=overrides;frozen.insert_or_assign(module,SourceFile(source.path(),std::move(repaired)));
     EditorProbe probe{module,begin,{},operator_context,{},{},0};probe.result.begin=begin;probe.result.end=end;
     try {
-        if(project)(void)analyze_manifest_project_impl(project->root,project_entry,frozen,project->manifest_overlays,&probe,false);
-        else (void)validated_project(entry,frozen,true,nullptr,&probe);
+        if(project && document) {
+            ProjectCapture repaired(project->root,frozen,project->manifest_overlays);
+            (void)validated_editor_document(repaired,module,&probe);
+        } else if(project)(void)analyze_manifest_project_impl(project->root,project_entry,frozen,project->manifest_overlays,&probe,false,discovery);
+        else (void)validated_project(entry,frozen,true,nullptr,&probe,{},document?&module:nullptr);
         if(operator_context)return probe.result;
     }
     catch(const EditorProbeFound&) {
@@ -7290,9 +7311,18 @@ EditorAssistance editor_assistance_impl(const std::filesystem::path& entry,const
 EditorAssistance editor_assistance(const std::filesystem::path& entry,const SourceOverrides& sources,const std::string& module,std::size_t cursor) {
     return editor_assistance_impl(entry,sources,module,cursor);
 }
-EditorAssistance project_editor_assistance(const std::filesystem::path& root,const std::optional<std::string>& entry,const SourceOverrides& sources,const ManifestOverrides& manifests,const std::string& module,std::size_t cursor) {
-    try {ProjectCapture capture(root,sources,manifests);return editor_assistance_impl(root,sources,module,cursor,&capture,entry);}
+EditorAssistance project_editor_assistance(const std::filesystem::path& root,const std::optional<std::string>& entry,const SourceOverrides& sources,const ManifestOverrides& manifests,const std::string& module,std::size_t cursor,const EditorDiscovery& discovery) {
+    try {ProjectCapture capture(root,sources,manifests);return editor_assistance_impl(root,sources,module,cursor,&capture,entry,false,&discovery);}
     catch(const CompilationError&){return {};}
+}
+EditorAssistance document_editor_assistance(const std::filesystem::path& context,const SourceOverrides& sources,
+    const std::string& module,std::size_t cursor,const ManifestOverrides* manifests) {
+    try {
+        if(!manifests)return editor_assistance_impl(context,sources,module,cursor,nullptr,{},true);
+        ProjectCapture capture(context,sources,*manifests);
+        return editor_assistance_impl(context,sources,module,cursor,&capture,{},true);
+    } catch(const CompilationError&) {return {};}
+      catch(const std::filesystem::filesystem_error&) {return {};}
 }
 std::optional<std::string> format_source(const SourceFile& source, bool insert_spaces) {
     // Parse with the ordinary compiler before proposing edits. This is local

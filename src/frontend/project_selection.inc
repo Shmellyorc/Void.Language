@@ -30,6 +30,8 @@ struct ProjectCapture {
     CPrimitiveAdmission::Owner native;
     project::Sources creation_policy;
     std::map<std::string,SourceFile> sources;
+    std::map<std::string,SourceFile> disk_discovery;
+    const EditorDiscovery* editor_discovery = nullptr;
     std::map<std::string,std::vector<std::string>> listings;
     std::map<std::string,bool> boundaries;
     std::map<std::string,std::set<std::string>> virtual_children;
@@ -220,10 +222,19 @@ struct ProjectCapture {
     }
     SourceFile capture(const project_fs::path& path,const std::string& id,bool discovery=false) {
         if(standard_module(id))return read_source(path);
+        if(editor_discovery && editor_discovery->contains(id)) {
+            if(auto found=disk_discovery.find(id);found!=disk_discovery.end())return found->second;
+            if(discovery && std::filesystem::is_regular_file(path)) {
+                if(sources.size()+disk_discovery.size()>=project_file_limit)project_failure(anchor,Code::limit,"Project discovery source-file limit exceeded.");
+                auto source=read_bounded(path,project_source_limit-bytes);
+                bytes+=source.text().size();
+                return disk_discovery.emplace(id,std::move(source)).first->second;
+            }
+        }
         if(auto found=sources.find(id);found!=sources.end())return found->second;
         // D is inventoried before E expansion. Its new work/byte budgets must
         // not replace the existing import/parser limits for E-only sources.
-        if(discovery && sources.size()>=project_file_limit)project_failure(anchor,Code::limit,"Project discovery source-file limit exceeded.");
+        if(discovery && sources.size()+disk_discovery.size()>=project_file_limit)project_failure(anchor,Code::limit,"Project discovery source-file limit exceeded.");
         auto o=overlays.find(id);
         if(discovery && o!=overlays.end() && o->second->text().size()>project_source_limit-bytes)project_failure(anchor,Code::limit,"Project discovery aggregate source-byte limit exceeded.");
         auto source=native && id==native->module()?SourceFile(path_utf8(path),native->source()):
@@ -280,6 +291,10 @@ struct ProjectCapture {
         if(standard_module(id)) {path.kind=TokenKind::name;path.text=id.substr(9,id.size()-9-5);}
         auto [key,physical]=graph.resolve(from,path);return capture(physical,key);
     }
+    const SourceFile& discovery_source(const std::string& id) const {
+        if(auto disk=disk_discovery.find(id);disk!=disk_discovery.end())return disk->second;
+        return sources.at(id);
+    }
 };
 std::string project_snapshot_key(const ProjectCapture& capture,const std::string& entry,bool automatic) {
     llvm::SHA256 hash;
@@ -287,7 +302,21 @@ std::string project_snapshot_key(const ProjectCapture& capture,const std::string
     field("void-project-selection-v1");field(path_utf8(capture.root));field(capture.manifest->source().text());field(entry);field(automatic?"automatic":"explicit");
     if(capture.native)field(capture.native->dynamic()->bytes());
     if(capture.dependencies){field("locked-dependency-plan-v1");field(capture.dependencies->identity());}
-    for(const auto& [id,source]:capture.sources){field(id);field(source.text());}
+    // An overlay outside E must leave the ordinary selection key unchanged.
+    auto disk=capture.disk_discovery.begin();
+    for(const auto& [id,source]:capture.sources) {
+        while(disk!=capture.disk_discovery.end() && disk->first<id) {
+            field(disk->first);field(disk->second.text());++disk;
+        }
+        field(id);field(source.text());
+        if(disk!=capture.disk_discovery.end() && disk->first==id) {
+            if(disk->second.text()!=source.text()){
+                field("editor discovery bytes");field(disk->second.text());
+            }
+            ++disk;
+        }
+    }
+    for(;disk!=capture.disk_discovery.end();++disk){field(disk->first);field(disk->second.text());}
     for(const auto& [id,present]:capture.boundaries){field(id);field(present?"present":"absent");}
     for(const auto& [id,names]:capture.listings){field(id);for(const auto& name:names)field(name);field("end-directory");}
     constexpr char hex[]="0123456789abcdef";std::string result;for(auto byte:hash.final()){result+=hex[byte>>4];result+=hex[byte&15];}return result;
@@ -311,7 +340,7 @@ struct ProjectAnalysisAccess {
     static std::shared_ptr<const ProjectAnalysis> build(ProjectCapture& capture,const std::set<std::string>& seeds,const std::string& entry,bool automatic,std::shared_ptr<Unit> library_scope,bool authorize_native) {
         auto result=std::shared_ptr<ProjectAnalysis>(new ProjectAnalysis);
         result->root_=capture.root;result->manifest_=capture.manifest;
-        for(const auto& id:seeds)result->discovery_.emplace(id,capture.sources.at(id));
+        for(const auto& id:seeds)result->discovery_.emplace(id,capture.discovery_source(id));
         for(const auto& [id,unit]:capture.graph.units)result->execution_.emplace(id,unit->source);
         result->selection_key_=project_snapshot_key(capture,entry,automatic);
         result->context_key_=project_context_key(capture,entry);
@@ -337,7 +366,7 @@ bool project_manifest_present(const std::filesystem::path& root) {
     for(const auto& item:std::filesystem::directory_iterator(root))if(folded(path_utf8(item.path().filename()))=="void.project.toml")return true;
     return false;
 }
-ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path& root,const std::optional<std::string>& entry_override,const SourceOverrides& sources,const ManifestOverrides& manifests,EditorProbe* editor,bool authorize_native) {
+ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path& root,const std::optional<std::string>& entry_override,const SourceOverrides& sources,const ManifestOverrides& manifests,EditorProbe* editor,bool authorize_native,const EditorDiscovery* editor_discovery=nullptr) {
     ProjectAnalysisResult result;
     std::unique_ptr<ProjectCapture> owned;
     std::set<std::string> seeds;std::string entry;bool automatic=false,complete=false;
@@ -345,7 +374,7 @@ ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path&
         auto state=std::make_shared<ProjectState>();std::error_code ec;state->root=owned?owned->root:std::filesystem::canonical(root,ec);if(ec){ec.clear();state->root=std::filesystem::absolute(root,ec);}if(ec)state->root=root;
         state->manifest=result.manifest;state->discovery_complete=complete;state->validated=result.succeeded();
         if(owned) {
-            for(const auto& id:seeds)if(auto source=owned->sources.find(id);source!=owned->sources.end())state->discovery.emplace(id,source->second);
+            for(const auto& id:seeds)state->discovery.emplace(id,owned->discovery_source(id));
             for(const auto& [id,unit]:owned->graph.units)state->execution.emplace(id,unit->source);
             if(!entry.empty())state->entry=owned->root/utf8_path(entry).relative_path();
             state->snapshot_key=project_snapshot_key(*owned,entry,automatic);
@@ -372,6 +401,7 @@ ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path&
         auto explicit_entry=entry_override?entry_override:capture.manifest->entry();
         automatic=!explicit_entry;
         if(automatic) {
+            capture.editor_discovery=editor_discovery;
             seeds=capture.inventory();
             complete=true;
             for(const auto& id:seeds)capture.graph.parse(capture.from,{TokenKind::path,id,0});
@@ -398,6 +428,8 @@ ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path&
                 }
                 entry=candidates[0].first->identity;
             }
+            capture.editor_discovery=nullptr;
+            for(const auto& [id,source]:capture.disk_discovery)capture.graph.parsed.erase(id);
         } else {
             entry="/"+*explicit_entry;
             if(explicit_entry->empty() || explicit_entry->front()=='/' || entry.find('\\')!=std::string::npos)project_failure(capture.anchor,Code::project_path,"Explicit entry must be a portable manifest-relative .void path.");
@@ -416,7 +448,14 @@ ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path&
         // membership/bytes. Failed admission/read operations retain their own
         // diagnostics; an exception alone is not evidence of a changed snapshot.
         ProjectCapture fresh(root,sources,manifests,&capture);
+        fresh.editor_discovery=editor_discovery;
         fresh.changed(automatic && fresh.inventory()!=seeds);
+        fresh.editor_discovery=nullptr;
+        fresh.changed(fresh.disk_discovery.size()!=capture.disk_discovery.size());
+        for(const auto& [id,source]:capture.disk_discovery) {
+            auto found=fresh.disk_discovery.find(id);
+            fresh.changed(found==fresh.disk_discovery.end() || found->second.text()!=source.text());
+        }
         for(const auto& [id,unit]:capture.graph.units)if(!package_source(id))fresh.changed(fresh.recapture_source(id).text()!=unit->source.text());
         fresh.changed(fresh.manifest->source().text()!=capture.manifest->source().text() || fresh.root!=capture.root || fresh.boundaries!=capture.boundaries || fresh.listings!=capture.listings || fresh.sources.size()!=capture.sources.size());
         for(const auto& [id,source]:capture.sources) {
@@ -431,6 +470,53 @@ ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path&
 
 ProjectAnalysisResult analyze_manifest_project(const std::filesystem::path& root,const std::optional<std::string>& entry,const SourceOverrides& sources,const ManifestOverrides& manifests,bool authorize_native) {
     return analyze_manifest_project_impl(root,entry,sources,manifests,nullptr,authorize_native);
+}
+ProjectAnalysisResult analyze_editor_project(const std::filesystem::path& root,const std::optional<std::string>& entry,
+    const SourceOverrides& sources,const ManifestOverrides& manifests,const EditorDiscovery& discovery) {
+    return analyze_manifest_project_impl(root,entry,sources,manifests,nullptr,false,&discovery);
+}
+
+static std::shared_ptr<const ValidatedAnalysis> validated_editor_document(ProjectCapture& capture,
+    const std::string& id, EditorProbe* editor = nullptr) {
+    capture.diagnostics.editor=editor;
+    capture.graph.load(capture.from,{TokenKind::path,id,0});
+    capture.diagnostics.finish();
+    validate_graph(capture.graph.units,id,capture.diagnostics);
+    ProjectCapture fresh(capture.root,capture.overlays,capture.manifest_overlays,&capture);
+    for(const auto& [module,unit]:capture.graph.units)if(!package_source(module))
+        fresh.changed(fresh.recapture_source(module).text()!=unit->source.text());
+    return AnalysisAccess::build(std::move(capture.graph.units),id,capture.diagnostics.warnings(),
+        {}, {}, {}, false,capture.dependencies,true);
+}
+
+AnalysisResult analyze_editor_document(const std::filesystem::path& context,const SourceOverrides& sources,
+    const std::string& id,const ManifestOverrides* manifests) {
+    require_module_identity(id);
+    std::vector<Diagnostic> diagnostics;
+    try {
+        std::shared_ptr<const ValidatedAnalysis> program;
+        if(manifests) {
+            ProjectCapture capture(context,sources,*manifests);
+            program=validated_editor_document(capture,id);
+        } else program=validated_project(context,sources,true,nullptr,nullptr,{},&id);
+        return {program,program->warnings()};
+    } catch(const CompilationError& failure) { diagnostics=failure.diagnostics(); }
+      catch(const std::filesystem::filesystem_error& failure) {
+        Diagnostic diagnostic{Code::import_read};
+        diagnostic.description=failure.what();
+        diagnostics.push_back(std::move(diagnostic));
+    }
+    auto own=[&](SourceSpan& span) {
+        if(!span.module_identity.empty())return;
+        const auto overlay=sources.find(id);
+        if(!span.source || (manifests && utf8_path(span.source->path()).filename()=="void.project.toml")) {
+            span=overlay!=sources.end() && overlay->second
+                ? SourceSpan{std::make_shared<const SourceFile>(*overlay->second),id,0,0}
+                : SourceSpan{std::make_shared<const SourceFile>(id,""),id,0,0};
+        } else span.module_identity=id;
+    };
+    for(auto& d:diagnostics){own(d.primary);for(auto& r:d.related)own(r.span);}
+    return {{},std::move(diagnostics)};
 }
 
 static std::vector<Diagnostic> check_project_documents_impl(const std::filesystem::path& root,const SourceOverrides& sources,const ManifestOverrides& manifests,const std::vector<std::string>& documents,bool read_physical) {

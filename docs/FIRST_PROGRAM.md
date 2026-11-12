@@ -1,7 +1,14 @@
 # Your first VOID program
 
 [Install the tools](install/README.md), add their `bin` directory to PATH and
-confirm `voidc --version`. Create a new directory and save `main.void` inside it:
+confirm `voidc --version`. Generate a project and open its starter source:
+
+```sh
+voidc new "Hello Project" --source src/hello.void
+cd "Hello Project"
+```
+
+Replace the contents of `src/hello.void` with this program.
 
 ```void
 use console
@@ -18,19 +25,25 @@ newline. `main` returns the process status; returning zero itself prints nothing
 From that directory:
 
 ```sh
-voidc check .
+voidc check --project . --profile debug
 # Source checked successfully
-voidc run .
+voidc run --project . --profile debug
 # Hello, world!
-voidc build . -o hello
+voidc build --project . --profile release -o hello
 # Built native executable: hello
 ./hello
 # Hello, world!
 ```
 
 On Windows use `-o hello.exe` and `.\hello.exe`. A path with spaces must be quoted.
-The default `voidc build .` output is `build/main` (`build/main.exe` on Windows).
+The default output for this project is `build/hello` (`build/hello.exe` on Windows).
 Output paths are relative to your shell's directory unless absolute.
+
+In VS Code, open **Hello Project** as a trusted folder. Save changes and use
+**VOID: Check Project**, **VOID: Build Project**, or **VOID: Run Project**.
+Compiler diagnostics appear in Problems. A file you open in the project can
+receive editor assistance before you import it into the application.
+[VS Code project commands](EDITOR_INTEGRATION.md#vs-code-project-commands)
 
 ```mermaid
 flowchart LR
@@ -40,10 +53,10 @@ flowchart LR
     B --> E[hello executable]
 ```
 
-Entry selection is automatic: use a supported synchronous `main` or executable
-top-level statements. Do not combine competing entry styles. Directories select
-exact-case `main.void`; explicit file paths can use another filename. `check`
-analyzes without running startup or requiring an application entry.
+The manifest selects a unique supported synchronous `main` in any filename
+under its source roots. For a standalone source, pass its file path directly.
+A manifestless directory still selects exact-case `main.void`. `check` analyzes
+source without running startup code.
 
 Try changing the printed message, then run and build again. If an application
 returns 7, both the JIT and native application exit 7; that number is not printed.

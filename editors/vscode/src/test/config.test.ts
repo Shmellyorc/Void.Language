@@ -169,25 +169,29 @@ test('manifest projects preserve nullable entries and reject unsupported older s
     const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'VOID manifest config 雪 '));
     const server = process.env.VOIDLS_TEST_SERVER!;
     const manifest = "schema=1\n[project]\nid='org.test.sources'\nname='Sources'\nversion='1.0.0'\nkind='application'\n[application]\nid='org.test.app'\n";
+    const entry = path.join(directory, 'game.void');
     try {
         await fs.writeFile(path.join(directory, 'void.project.toml'), manifest);
         const settings = {server,entry:'',trace:'off' as const};
         let selected = await resolveProject(settings,[directory]);
         assert(selected.manifestMode && selected.entry === null && !selected.singleFile);
-        await fs.writeFile(path.join(directory,'game.void'),'func main() -> i32:\n    return 23\n');
-        selected = await resolveProject(settings,[directory],path.join(directory,'game.void'));
-        assert(selected.manifestMode && selected.entry === path.join(directory,'game.void'));
+        await fs.writeFile(entry,'func main() -> i32:\n    return 23\n');
+        selected = await resolveProject(settings,[directory],entry);
+        assert(selected.manifestMode && selected.entry);
+        assert.equal(path.normalize(selected.entry),entry);
         const explicit = await resolveProject({...settings,root:directory,entry:'game.void'},[directory]);
         assert(explicit.manifestMode && explicit.entryOverride === 'game.void' && explicit.root === selected.root);
         const legacy = await resolveProject({...settings,entry:'game.void'},[directory]);
-        assert(!legacy.manifestMode && legacy.entry === path.join(directory,'game.void'));
+        assert(!legacy.manifestMode && legacy.entry);
+        assert.equal(path.normalize(legacy.entry),entry);
         await fs.writeFile(path.join(directory, 'void.project.toml'),'[=roject]');
         selected = await resolveProject({...settings,root:directory},[directory]);
         assert(selected.manifestMode && selected.entry === null);
         if (process.env.VOIDLS_OLD_SERVER_TEST) {
             await assert.rejects(resolveProject({...settings,server:process.env.VOIDLS_OLD_SERVER_TEST},[directory]), /requires a matching voidProjectProtocol 1 server/);
             const retained = await resolveProject({...settings,server:process.env.VOIDLS_OLD_SERVER_TEST,entry:'game.void'},[directory]);
-            assert(!retained.manifestMode && retained.entry === path.join(directory,'game.void'));
+            assert(!retained.manifestMode && retained.entry);
+            assert.equal(path.normalize(retained.entry),entry);
         }
     } finally { await fs.rm(directory,{recursive:true,force:true}); }
 });

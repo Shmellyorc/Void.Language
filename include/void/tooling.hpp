@@ -110,6 +110,7 @@ class ProjectSnapshot {
     std::optional<std::filesystem::path> project_root_, project_request_;
     std::optional<std::string> entry_override_;
     ManifestOverrides manifests_;
+    EditorDiscovery discovery_;
     std::map<std::string, DocumentRevision> documents_;
     std::uint64_t revision_ = 0;
 public:
@@ -119,7 +120,12 @@ public:
     const auto& project_root() const { return project_root_; }
     const auto& entry_override() const { return entry_override_; }
     const auto& manifests() const { return manifests_; }
+    const auto& discovery() const { return discovery_; }
     bool same_revision(const ProjectSnapshot& other) const { return identity_ && identity_ == other.identity_; }
+};
+struct EditorDocumentAnalysis {
+    AnalysisResult result;
+    std::optional<ToolingIndex> index;
 };
 class SessionAnalysis {
     friend class ToolingSession;
@@ -128,12 +134,19 @@ class SessionAnalysis {
     std::shared_ptr<const ToolingIndex> index_;
     std::optional<ProjectAnalysisResult> project_;
     std::shared_ptr<const ValidatedAnalysis> semantic_;
+    std::map<std::string, EditorDocumentAnalysis> editor_documents_;
 public:
     const ProjectSnapshot& snapshot() const { return snapshot_; }
     const AnalysisResult& result() const { return result_; }
     const auto& index() const { return index_; } // Explicit historical access.
     const auto& project() const { return project_; }
     const auto& semantic_analysis() const { return semantic_; }
+    const auto& editor_documents() const { return editor_documents_; }
+    const ToolingIndex* index_for(const std::string& document) const {
+        if(auto found=editor_documents_.find(document);found!=editor_documents_.end())
+            return found->second.index?&*found->second.index:nullptr;
+        return index_.get();
+    }
     bool succeeded() const {return project_?project_->succeeded():result_.succeeded();}
 };
 struct ProjectSession {std::filesystem::path root; std::optional<std::string> entry = {};};
@@ -148,6 +161,7 @@ class ToolingSession {
     void change(const std::string&, DocumentRevision, std::optional<SourceFile>, bool close);
     bool manifest_document(const std::string&) const;
     bool overridden(const std::string&) const;
+    void snapshot_discovery();
 public:
     explicit ToolingSession(std::filesystem::path entry);
     explicit ToolingSession(ProjectSession);

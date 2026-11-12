@@ -1,4 +1,5 @@
 #include "void/tooling.hpp"
+#include "void/path.hpp"
 #include <algorithm>
 #include <iterator>
 #include <set>
@@ -311,10 +312,20 @@ bool ToolingSession::requires_reselection() const {
     if(!current || !current->project() || !current->project()->project)return true;
     return !selected_context_.empty() && selected_context_!=current->project()->project->context_key();
 }
+void ToolingSession::snapshot_discovery() {
+    current_.discovery_.clear();
+    if(!last_success_ || !last_success_->project())return;
+    const auto& project=*last_success_->project()->project;
+    if(!project.entry())return;
+    const auto entry="/"+path_utf8(project.entry()->lexically_relative(project.root()));
+    for(const auto& [id,source]:current_.overrides_)
+        if(source && id!=entry)current_.discovery_.insert(id);
+}
 void ToolingSession::refresh() {
     if (current_.revision_ == UINT64_MAX) throw std::overflow_error("Project revision exhausted");
     if (last_success_) for (const auto& m : last_success_->semantic_analysis()->modules())
         if (std::find(changed_.begin(),changed_.end(),m.identity) == changed_.end()) changed_.push_back(m.identity);
+    snapshot_discovery();
     current_.identity_ = std::make_shared<const ProjectSnapshot::Identity>();
     ++current_.revision_;
 }
@@ -329,6 +340,7 @@ void ToolingSession::change(const std::string& id, DocumentRevision revision, st
     if (closing) overrides.erase(id);
     else overrides.insert_or_assign(id, std::move(source));
     if (std::find(changed_.begin(),changed_.end(),id) == changed_.end()) changed_.push_back(id);
+    snapshot_discovery();
     current_.identity_ = std::make_shared<const ProjectSnapshot::Identity>();
     ++current_.revision_;
 }
@@ -350,7 +362,7 @@ std::shared_ptr<const SessionAnalysis> ToolingSession::analyze(ProjectSnapshot s
     auto result = std::make_shared<SessionAnalysis>();
     result->snapshot_ = std::move(snapshot);
     if(result->snapshot_.project_root_) {
-        result->project_=analyze_manifest_project(*result->snapshot_.project_request_,result->snapshot_.entry_override_,result->snapshot_.overrides_,result->snapshot_.manifests_);
+        result->project_=analyze_editor_project(*result->snapshot_.project_request_,result->snapshot_.entry_override_,result->snapshot_.overrides_,result->snapshot_.manifests_,result->snapshot_.discovery_);
         if(result->project_->manifest) {
             std::vector<std::string> documents;for(const auto& [id,source]:result->snapshot_.overrides_)if(source)documents.push_back(id);
             auto manifests=result->snapshot_.manifests_;manifests.insert_or_assign("/void.project.toml",result->project_->manifest->source());
@@ -364,6 +376,20 @@ std::shared_ptr<const SessionAnalysis> ToolingSession::analyze(ProjectSnapshot s
         if(auto project=result->project_->project){result->result_.program=project->program();result->semantic_=project->semantic_analysis();}
     } else {result->result_=analyze_project(result->snapshot_.entry_,result->snapshot_.overrides_);result->semantic_=result->result_.program;}
     if (result->semantic_) result->index_ = std::make_shared<ToolingIndex>(result->semantic_);
+    const auto& selected=result->snapshot_;
+    const auto* state=result->project_?result->project_->state.get():nullptr;
+    if(!state || state->manifest)for(const auto& [id,source]:selected.overrides_) {
+        if(!source)continue;
+        if(state && (state->execution.contains(id) ||
+            (state->entry && state->root/utf8_path(id).relative_path()==*state->entry)))continue;
+        if(!state && id=="/"+path_utf8(selected.entry_.filename()))continue;
+        if(result->semantic_ && std::any_of(result->semantic_->modules().begin(),result->semantic_->modules().end(),
+            [&](const auto& module){return module.identity==id;}))continue;
+        auto& document=result->editor_documents_[id];
+        document.result=analyze_editor_document(state?*selected.project_request_:selected.entry_,selected.overrides_,id,
+            state?&selected.manifests_:nullptr);
+        if(document.result.program)document.index.emplace(document.result.program);
+    }
     return result;
 }
 bool ToolingSession::accept(std::shared_ptr<const SessionAnalysis> result) {

@@ -41,6 +41,15 @@ export async function resolveServer(explicit: string, workspace?: string, bundle
     }
     return server;
 }
+export async function resolveCompiler(server: string, explicit: string, workspace: string): Promise<string> {
+    const compiler = explicit ? resolveSetting(explicit, workspace) :
+        path.join(path.dirname(server), process.platform === 'win32' ? 'voidc.exe' : 'voidc');
+    const stat = await fs.stat(compiler).catch(() => undefined);
+    if (!stat?.isFile() || (process.platform === 'win32' && path.extname(compiler).toLowerCase() !== '.exe'))
+        throw new Error('Set void.compiler.path to the matching native voidc executable.');
+    if (process.platform !== 'win32') await fs.access(compiler, constants.X_OK);
+    return compiler;
+}
 export async function resolveProject(settings: Settings, workspaces: readonly string[], active?: string, bundled?: string): Promise<Project> {
     if (workspaces.length > 1) throw new Error('VOID supports one project in one workspace folder. Open each project in a separate window.');
     const workspace = workspaces[0];

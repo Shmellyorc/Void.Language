@@ -7,6 +7,7 @@
 #include <functional>
 #include <optional>
 #include <map>
+#include <set>
 namespace vd {
 // Records are owned by an immutable successful analysis, never by parser storage.
 struct AnalyzedModule { std::string identity; SourceFile source; std::vector<std::string> imports; };
@@ -132,6 +133,14 @@ AnalysisResult analyze_project(const std::filesystem::path& entry, const SourceO
 // Manifest-selected mode is separate from the legacy entry-parent adapter above.
 // TOML overlays have their own canonical root-relative namespace.
 using ManifestOverrides = std::map<std::string, std::optional<SourceFile>>;
+// Once an entry is selected, other existing files use their disk bytes for
+// entry discovery. Import validation still uses their current editor overlays.
+using EditorDiscovery = std::set<std::string>;
+// Editor metadata for a single source and its explicit imports. It carries no
+// application entry or authority to lower code.
+// Context is the project root in manifest mode and the selected legacy entry otherwise.
+AnalysisResult analyze_editor_document(const std::filesystem::path& context, const SourceOverrides&,
+    const std::string& module, const ManifestOverrides* manifests = nullptr);
 void require_manifest_identity(const std::string&);
 // Owned observations, including failed selections. Never executable authority.
 struct ProjectState {
@@ -170,6 +179,8 @@ struct ProjectAnalysisResult {
     std::shared_ptr<const ProjectState> state;
     bool succeeded() const { return bool(project); }
 };
+ProjectAnalysisResult analyze_editor_project(const std::filesystem::path&, const std::optional<std::string>&,
+    const SourceOverrides&, const ManifestOverrides&, const EditorDiscovery&);
 std::vector<Diagnostic> check_project_documents(const std::filesystem::path&,const SourceOverrides&,const ManifestOverrides&,const std::vector<std::string>&);
 struct ProjectPreflight {
     std::filesystem::path root;std::optional<std::filesystem::path> entry;
@@ -196,7 +207,9 @@ struct EditorAssistance {
 EditorAssistance editor_assistance(const std::filesystem::path&, const SourceOverrides&,
     const std::string& module, std::size_t cursor);
 bool valid_editor_identifier(const std::string&);
-EditorAssistance project_editor_assistance(const std::filesystem::path&,const std::optional<std::string>&,const SourceOverrides&,const ManifestOverrides&,const std::string&,std::size_t);
+EditorAssistance project_editor_assistance(const std::filesystem::path&,const std::optional<std::string>&,const SourceOverrides&,const ManifestOverrides&,const std::string&,std::size_t,const EditorDiscovery& = {});
+EditorAssistance document_editor_assistance(const std::filesystem::path& context, const SourceOverrides&,
+    const std::string& module, std::size_t cursor, const ManifestOverrides* manifests = nullptr);
 std::optional<std::string> format_source(const SourceFile&, bool insert_spaces = true);
 // One source pipeline shared by checking, JIT and AOT. Errors contain rendered
 // source diagnostics and are raised before invoking any backend.
