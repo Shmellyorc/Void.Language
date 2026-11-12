@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 namespace vd::host {
+inline constexpr std::size_t byte_snapshot_limit = 16 * 1024 * 1024;
 // Native snapshots only. No managed pointers may be dereferenced in execute().
 struct Result {
     std::int64_t kind=0,code=0,number=0,detail=0;

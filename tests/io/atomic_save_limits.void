@@ -1,0 +1,26 @@
+use io
+use path
+
+func exercise() -> result<i32, io.error>:
+    var save_directory = path.absolute("limits")?
+    var oversized = io.read_bytes("oversized-input")?
+    var oversized_text = io.read_text("oversized-input")?
+    var maximum = io.read_bytes("maximum-input")?
+    with io.create_private_directory(save_directory)? as directory:
+        var bytes_result = directory.save_bytes_atomic("oversized.bin", oversized)
+        var text_result = directory.save_text_atomic("oversized.txt", oversized_text)
+        if bytes_result.published or not (bytes_result.kind is io.error_kind.limit_exceeded):
+            return Ok(1)
+        if text_result.published or not (text_result.kind is io.error_kind.limit_exceeded):
+            return Ok(2)
+        if io.exists(path.join([save_directory, ".void-save-lock"])?)?:
+            return Ok(3)
+        var accepted = directory.save_bytes_atomic("maximum.bin", maximum)
+        if not accepted.published or accepted.cleanup_code != 0:
+            return Ok(4)
+    return Ok(0)
+
+func main() -> i32:
+    if exercise() is Ok(var status):
+        return status
+    return 5

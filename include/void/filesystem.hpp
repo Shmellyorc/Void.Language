@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace vd::filesystem {
@@ -95,6 +96,9 @@ Result regular_length(File&);
 #ifdef _WIN32
 std::shared_ptr<File> adopt_native_handle(void* handle, bool writable);
 void* native_handle(const File&);
+Result write_staged(void* handle, std::string_view, const testing::Hooks*);
+#else
+Result write_staged(int descriptor, std::string_view, const testing::Hooks*);
 #endif
 
 } // namespace vd::filesystem

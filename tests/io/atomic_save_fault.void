@@ -1,0 +1,23 @@
+use io
+use path
+
+func exercise() -> result<i32, io.error>:
+    var save_directory = path.absolute("save-root")?
+    with io.open_private_directory(save_directory)? as directory:
+        var saved = directory.save_text_atomic("progress.txt", "level=12\nplayer=新雪\n")
+        if saved.published:
+            if saved.synchronized and saved.code == 0 and saved.cleanup_code == 0:
+                return Ok(0)
+            if not saved.synchronized and saved.code != 0 and saved.os_code != 0 and saved.cleanup_code == 0:
+                return Ok(13)
+            if saved.code != 0 and saved.cleanup_code != 0:
+                return Ok(14)
+        else:
+            if not saved.synchronized and saved.code != 0 and saved.os_code != 0:
+                return Ok(11)
+        return Ok(2)
+
+func main() -> i32:
+    if exercise() is Ok(var status):
+        return status
+    return 1

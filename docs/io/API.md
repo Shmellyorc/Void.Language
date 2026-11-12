@@ -1,6 +1,6 @@
 # Public surface and completeness audit
 
-The compiler inventory contains **149 public declarations** across `io` and
+The original filesystem qualification inventoried **149 public declarations** across `io` and
 `path`, including enum cases, metadata/error fields, properties and lifecycle
 methods. [API.tsv](evidence/API.tsv) records each identity, actual source location,
 written declaration and parameter/return documentation status.
@@ -28,6 +28,7 @@ checks hover, definition, completion and parameter help against those declaratio
 | Numeric wire representations | file `read<t>`, `write<t>`, `order`, paired `_async` methods | `io_execution`, `io_async_execution`, `io_wire_normal`, `io_wire_optimized`: 42 independent integer/IEEE vectors, all ten types and both byte orders |
 | Strict raw and Pascal strings | file `read_string`, `write_string`, `read_pascal_string`, `write_pascal_string`, paired `_async` methods | wire tests, error fixtures, allocation sweeps; malformed UTF-8, NUL, Unicode, truncated frames and hostile prefixes |
 | Whole-file operations | `read_bytes`, `read_text`, `write_bytes`, `write_text`, `append_bytes`, `append_text`, paired `_async` functions | source execution tests, `io_kernel` (real short-read FIFO, bounded reads, 3 MiB streaming) |
+| Atomic application saves | Held `private_directory.save_bytes_atomic`, `save_text_atomic`, and `save_outcome` | `io_atomic_save_native`, `io_atomic_save_source` |
 | File copy/move/delete | `copy_file`, `move_file`, `remove_file`, paired `_async` functions | source execution tests, `io_kernel` (exclusive collision, same inode/hard link and destination symlink), `io_cross_volume` |
 | Directory creation/removal | `create_directory`, `create_directories`, `remove_directory`, `remove_tree`, paired `_async` functions | source execution tests, `io_kernel` (budget-before-mutation and symlink targets retained) |
 | Directory lookup/enumeration | `entries`, `get_files`, `get_directories`, paired `_async` functions | source execution tests, `io_kernel`: filename glob, Unicode scalar `?`, recursion through unmatched directories, entry budgets, permission errors |
@@ -35,6 +36,30 @@ checks hover, definition, completion and parameter help against those declaratio
 | Symbolic links | `create_symlink`, `read_link`, paired `_async` functions | source execution tests and `io_kernel`; native Windows execution requires symlink privileges |
 | Path composition/extraction | `join`, `normalize`, `filename`, `stem`, `extension`, `change_extension`, `parent`, `root`, `separator` | source execution tests and `io_kernel` |
 | Path qualification | `is_absolute`, `is_relative`, `is_rooted`, `absolute`, `relative` | source execution tests and `io_kernel`; compiled Windows branches cover drives, UNC share roots and incompatible roots |
+
+## Atomic application saves
+
+Open or exclusively create a private directory, then save a literal child
+name. Both operations are synchronous and return a value that distinguishes
+publication from native synchronization and cleanup.
+
+```void
+func (self private_directory) save_bytes_atomic(name: string, const bytes: [u8], replace: bool = true) -> save_outcome
+func (self private_directory) save_text_atomic(name: string, value: string, replace: bool = true) -> save_outcome
+```
+
+| `save_outcome` | Meaning |
+| --- | --- |
+| `published: bool` | The native rename installed the new entry. Inspect this field even when `code` is nonzero. |
+| `synchronized: bool` | The native file and containing-directory synchronization calls both completed. |
+| `kind: error_kind`, `code: i64` | Portable failure category and ordinal. `code == 0` indicates success and makes `kind` immaterial. |
+| `os_code: i64`, `cleanup_code: i64` | Primary native code and first native cleanup failure. Zero indicates a validation-only primary error or successful cleanup, respectively. |
+
+The payload cap is 16 MiB. Text uses exact UTF-8 bytes. Use `replace = false`
+to require a new destination. The example creates a private save directory,
+replaces a UTF-8 configuration, writes a binary checkpoint, and verifies that
+an exclusive collision leaves the committed configuration intact.
+[Executable TestGame example](../../examples/atomic_save/test_game.void) · [Ownership, retry and platform contract](CONTRACT.md#atomic-application-saves)
 
 ## Runtime and compiler boundaries
 

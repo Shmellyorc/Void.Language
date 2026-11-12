@@ -1863,6 +1863,42 @@ func (self private_directory) publish(target: private_directory, name: string) -
 func (self private_directory) publish_file(input_file: file, source: string, target: private_directory, name: string, replace: bool = false) -> publication:
     return _publication(_host_dir_replace(self, input_file, source, target, name, _flag(replace)))
 
+## Checked atomic save outcome. Always examine published independently of code.
+value struct save_outcome:
+    ## True once the native rename has published the new destination entry.
+    published: bool
+    ## True after both native file and directory synchronization completed.
+    synchronized: bool
+    ## Portable error category when code is nonzero.
+    kind: error_kind
+    ## Zero on success, otherwise a portable IO error ordinal.
+    code: i64
+    ## Primary native error code, or zero for validation failures.
+    os_code: i64
+    ## First native cleanup failure, or zero when cleanup succeeded.
+    cleanup_code: i64
+
+## Atomically save up to 16 MiB in this private directory on supported local filesystems.
+## @param name Literal destination component. The save stage and lock names are reserved.
+## @param bytes Exact bytes to publish, including an empty payload.
+## @param replace Allow replacement of an existing private single-link regular file.
+## @return Checked publication, native synchronization and cleanup status.
+func (self private_directory) save_bytes_atomic(name: string, const bytes: [u8], replace: bool = true) -> save_outcome:
+    var reply = _host_dir_save(self, name, bytes, _flag(replace))
+    return save_outcome(published = reply.flag, synchronized = reply.number != 0,
+        kind = _kind(reply.kind), code = reply.kind, os_code = reply.os_code, cleanup_code = reply.detail)
+
+## Atomically save a string's exact UTF-8 bytes without newline or BOM conversion.
+## @param name Literal destination component in the held private directory.
+## @param value UTF-8 text, bounded to 16 MiB before encoding.
+## @param replace Allow replacement of an existing private single-link regular file.
+## @return Checked publication, native synchronization and cleanup status.
+func (self private_directory) save_text_atomic(name: string, value: string, replace: bool = true) -> save_outcome:
+    if value.byte_length > 16777216:
+        return save_outcome(published = false, synchronized = false,
+            kind = error_kind.limit_exceeded, code = 12, os_code = 0, cleanup_code = 0)
+    return self.save_bytes_atomic(name, value.to_utf8(), replace)
+
 ## Apply private data/executable mode only to a file created by a private_directory capability.
 ## @param executable Unix selects 0700 or 0600; Windows verifies the private DACL for either value.
 ## Never repairs adopted files; Windows has no POSIX executable-mode bit.

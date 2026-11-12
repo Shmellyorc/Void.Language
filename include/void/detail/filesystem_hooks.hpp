@@ -7,6 +7,7 @@
 #include <memory>
 
 namespace vd::filesystem::testing {
+enum class SaveStep { before_create, content_sync, before_publish, directory_sync, remove_stage, close_stage };
 // Trusted native test seam, never registered as a source provider or source API.
 // Install on the owner before admission; requests retain an immutable native
 // snapshot so worker waits never borrow the test thread's payload or managed data.
@@ -17,6 +18,7 @@ struct Hooks {
     bool zero_write = false;
     int close_error = 0;
     std::function<void(Operation)> before;
+    std::function<int(SaveStep)> save_error;
 };
 
 std::shared_ptr<const Hooks> current();

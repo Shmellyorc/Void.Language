@@ -1484,6 +1484,17 @@ if(BUILD_TESTING)
     "${PROJECT_SOURCE_DIR}/tests/io/ownership.void" "${PROJECT_SOURCE_DIR}/tests/io/ownership_async.void")
   set_tests_properties(io_ownership PROPERTIES TIMEOUT 600)
 
+  if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR WIN32)
+    add_executable(void_io_atomic_save tests/io/atomic_save.cpp)
+    target_link_libraries(void_io_atomic_save PRIVATE void_llvm void_cache_identity)
+    void_add_output_test(io_atomic_save_native --chdir "$<TARGET_FILE:void_io_atomic_save>"
+      "${PROJECT_SOURCE_DIR}/tests/io/ordinary_save.void" "${PROJECT_SOURCE_DIR}/tests/io/atomic_save_fault.void")
+    set_tests_properties(io_atomic_save_native PROPERTIES TIMEOUT 180)
+    add_test(NAME io_atomic_save_source COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/io/atomic_save.py"
+      "$<TARGET_FILE:voidc>" "$<TARGET_FILE_DIR:voidc>/void-native.txt")
+    set_tests_properties(io_atomic_save_source PROPERTIES TIMEOUT 180)
+  endif()
+
   add_test(NAME io_execution COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/io/execution.py" "$<TARGET_FILE:voidc>")
   set_tests_properties(io_execution PROPERTIES TIMEOUT 600)
   add_test(NAME io_crash_preservation COMMAND "${Python3_EXECUTABLE}"

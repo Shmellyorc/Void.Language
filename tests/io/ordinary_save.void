@@ -1,0 +1,12 @@
+use io
+
+func main() -> i32:
+    var saved = io.write_text("progress.txt", "level=12\nplayer=新雪\n")
+    if saved is Err(var failure):
+        if failure.bytes_transferred == 8:
+            return 7
+        return 2
+    if io.read_text("progress.txt") is Ok(var stored):
+        if stored == "level=12\nplayer=新雪\n":
+            return 0
+    return 1

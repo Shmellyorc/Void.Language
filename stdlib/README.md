@@ -123,6 +123,11 @@ defaults to 100,000 inspected entries and never intentionally traverses links.
 See the [full contract](../docs/io/CONTRACT.md), [API audit](../docs/io/API.md) and
 [executable configuration/save/asset example](../examples/io/filesystem.void).
 
+For replacement saves, use `save_text_atomic` or `save_bytes_atomic` on an
+admitted `io.private_directory`. Check `save_outcome.published` before retrying
+an error. `synchronized` reports the native file and directory barriers.
+[Atomic save contract](../docs/io/CONTRACT.md#atomic-application-saves) · [Executable TestGame save](../examples/atomic_save/test_game.void)
+
 `use error as core` exposes the three-field managed `core.error` base. Every
 installed module uses a derived public recoverable error; result error types
 remain exact. `use convert` provides checked numeric/Boolean/payload-free-enum

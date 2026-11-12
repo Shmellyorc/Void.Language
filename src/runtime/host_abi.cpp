@@ -162,7 +162,7 @@ extern "C" void vd_host_call(void* output,const vd::host::ReplyLayout* layout,un
             } else if(c=='b') {
                 std::size_t zero=0;Runtime::Slot input{&value,sizeof(value),&zero,1};Runtime::Frame root(runtime,&input,1);
                 auto extent=runtime.list_count(runtime.root_word(&value),ScalarEncoding::u8);
-                if(extent>16*1024*1024){result=error(12);break;}
+                if(extent>byte_snapshot_limit){result=error(12);break;}
                 request.bytes.push_back(runtime.byte_array_bytes(runtime.root_word(&value)));
             } else if(c=='a') {
                 request.arrays.push_back(strings(runtime,value,layout->strings));
@@ -196,7 +196,7 @@ extern "C" void vd_host_call(void* output,const vd::host::ReplyLayout* layout,un
                 }
             } else if(op<=verify)result=crypto_execute(request);
             else if(op<=zip_cleanup)result=zip_execute(request);
-            else if(op<=lock_cleanup || op==file_mode_matches)result=directory_execute(request);
+            else if(op<=lock_cleanup || op==file_mode_matches || op==dir_save)result=directory_execute(request);
             else result=process_execute(request);
         }
         if(closing(op) && !resources.empty())NativeLibrary::existing(runtime)->erase(refs[0],resources[0].get());

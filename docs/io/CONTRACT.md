@@ -112,7 +112,7 @@ queries retain ordinary readonly authority.
 
 ## Whole-file and filesystem functions
 
-All blocking functions below have paired _async functions with identical payloads
+The ordinary blocking functions listed here have paired _async functions with identical payloads
 and error/progress policies. Byte/text whole-file reads default to a 64 MiB budget;
 callers can select another nonnegative max_bytes. Reads continue to actual EOF,
 not the first short read. Returned arrays/text are owned.
@@ -165,6 +165,65 @@ ancestor replacement. Exclusive creation/rename uses native no-replace operation
 copy checks the actual opened file identities before truncating a destination.
 Removal uses native file-versus-directory operations at mutation time rather than
 treating a prior metadata observation as authority to remove a replacement type.
+
+## Atomic application saves
+
+`private_directory.save_bytes_atomic` and `save_text_atomic` use one held
+private directory for staging and publication. Open an existing absolute,
+no-follow, admitted private directory or create one exclusively. Supply a
+single literal child name using the host's private-directory rules. The
+existing destination can be absent. Replacement requires an existing file
+to be private, regular and single-link. Symlinks, reparse points, hard-link
+aliases, invalid components, and attempts to supply another path or volume
+fail before publication. A replacement takes the staging file's private
+permissions and identity. Use `replace = false` for exclusive creation.
+
+The host snapshots up to 16 MiB, including an empty payload, and uses an
+exclusive writer lock on `.void-save-lock`. It exclusively creates
+`.void-save-stage`, writes the complete payload with checked short progress,
+and synchronizes that file. The native rename publishes one directory entry
+within the held directory. If the destination was absent when checked, the
+rename is no-replace even when `replace` was requested. The direct directory
+binding and staged identity are rechecked before publication. A previously
+present destination must still match the inspected identity. Held directory
+authority also prevents an ancestor path substitution from redirecting the
+operation. Same-owner writers must use the save operation or coordinate
+with its writer lock. Arbitrary namespace mutation by the same authority is
+outside the private-directory contract.
+
+| Outcome | Caller interpretation |
+| --- | --- |
+| `published == false` | This operation left the destination entry intact. Check `code`, `os_code` and `cleanup_code` before retrying. |
+| `published == true`, `synchronized == true`, `code == 0` | The new entry was installed and the native file and directory synchronization calls completed. |
+| `published == true`, `code != 0` | Publication completed before the error. Read and verify the destination before deciding whether to retry. `synchronized` records whether both barriers completed, even when closing a handle later failed. |
+
+The staging and lock handles are retired before return. Before publication,
+cleanup removes only the owned staging entry. A cleanup failure preserves
+the primary error and reports the first native cleanup error separately. A
+crash or failed cleanup can leave the one reserved stage behind. The next
+save fails if that slot is occupied. Quiesce all writers, verify the private
+directory and inspect the staged data before explicitly removing that entry.
+Keep `.void-save-lock` at its stable name so all writers contend on one native
+identity. The file remains after the OS releases the lock. Each save takes
+the lock without waiting and reports contention as `busy`.
+
+Linux uses descriptor-relative `renameat2` and `fsync` on the file and
+directory. The admitted filesystem types are local XFS, ext-family and
+tmpfs. A held reader continues reading the old inode and later opens read
+the new file after publication. Windows uses the existing held-source
+`FileRenameInformation` path on local NTFS and `FlushFileBuffers` on the
+file and directory. A reader that keeps the destination open can block
+replacement, including under delete sharing. A native directory flush error
+leaves publication true and synchronization false. Synchronization records
+the host barriers. Persistence through power loss depends on the filesystem,
+storage and hardware. tmpfs is volatile. Other filesystems and macOS save
+admission remain outside this increment.
+[Linux rename](https://man7.org/linux/man-pages/man2/renameat2.2.html) · [Linux synchronization](https://man7.org/linux/man-pages/man2/fsync.2.html) · [Windows rename](https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/ns-ntifs-_file_rename_information) · [Windows synchronization](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-flushfilebuffers)
+
+Async saves are deferred. An async contract needs a defined cancellation
+boundary at the native rename and checked delivery of an already-published
+outcome before a cancelled owner retires. The synchronous operation uses
+the existing Runtime native admission and held-directory ledger.
 
 ## Real async implementation obligations
 

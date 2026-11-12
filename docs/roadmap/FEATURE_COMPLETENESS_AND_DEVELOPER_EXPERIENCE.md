@@ -47,7 +47,7 @@ All **25** tracked `.void` modules are covered below. Pure source APIs use the e
 | [encoding/binary](../../stdlib/encoding/binary.void) | **IMPLEMENTED.** Exact-width ten-primitive endian codecs with checked widths and IEEE bit preservation. | No arbitrary object layout serialization. [Compiler codec](../../src/frontend/binary_codec.inc), [wire tests](../../tests/binary), [contract](../binary/CONTRACT.md). |
 | [encoding/hex](../../stdlib/encoding/hex.void) | **IMPLEMENTED.** Strict ASCII pairs and bounded encode/decode. | Whole-value APIs. [Encoding API](../text-encoding/API.md), [tests](../../tests/text_encoding). |
 | [error](../../stdlib/error.void) | **IMPLEMENTED.** Shared managed base carrying message, path and code. | Recoverable error types stay exact in results, with subsystem detail on derived errors. [Combined contract](../combined/CONTRACT.md), [error and result controls](../../tests/combined). |
-| [io](../../stdlib/io.void) | **IMPLEMENTED.** Bounded whole-file text/bytes, file handles, cursor and numeric/Pascal wire methods, directory operations, links, sync/async ordinary file operations and private-directory publication primitives. | **PARTIAL** for ordinary recoverable atomic-save ergonomics. General writes/copies may leave progress, and private publication has a stricter ownership contract. [Filesystem Runtime](../../src/runtime/filesystem.cpp), [host Windows publication](../../src/runtime/host_directory_windows.cpp), [I/O contract](../io/CONTRACT.md), [I/O tests](../../tests/io). G06. |
+| [io](../../stdlib/io.void) | **IMPLEMENTED.** Bounded whole-file text/bytes, file handles, cursor and numeric/Pascal wire methods, directory operations, links, sync/async ordinary file operations, and synchronous atomic saves through a private-directory capability. | General writes/copies may leave partial progress. Atomic saves report publication, synchronization and cleanup separately. [I/O contract](../io/CONTRACT.md#atomic-application-saves) · [G06 implementation and qualification](#g06-atomic-application-saves). |
 | [io/memory](../../stdlib/io/memory.void) | **IMPLEMENTED.** Owned stream, independent snapshots, shared cursor, bounded seek and numeric/raw/Pascal reads and writes. | A memory-specific source API. [Memory contract](../memory/CONTRACT.md), [tests](../../tests/memory). |
 | [json](../../stdlib/json.void) | **IMPLEMENTED.** Strict bounded tree parser, immutable observations, exact numeric tokens, typed DTO encoding/decoding and stringify. | **PARTIAL** for incremental input and application-specific schemas. Typed conversion is restricted to supported public stored data. Custom initialization/private state and missing/defaulted scalar schema policy require explicit DTO mapping. [Compiler schema adapter](../../src/frontend/json.inc), [API](../json/API.md), [tests](../../tests/json). G09. |
 | [log](../../stdlib/log.void) | **IMPLEMENTED.** Level filters, lazy messages, checked managed loggers, single-line framing, console/file sinks, rotation, recovery and awaitable operations. | The default creates no files. File namespaces have an exclusive ownership contract. Historical performance aims and unresolved measurements retain their scope. [API](../log/API.md), [log tests](../../tests/log), [integrated performance evidence](../compiler-health/INTEGRATED_PERFORMANCE_QUALIFICATION.md). |
@@ -161,7 +161,10 @@ Vim/Neovim manifest selection remains a separate follow-up.
 
 ### P2 — G06 · Application save/replace workflow
 
-**PARTIAL.** Ordinary file writes can expose partial data on failure. Private-directory publication already supplies narrower capability-based primitives. Measure a real save/config example before choosing a documented helper or new public API. Reuse held-file identity, same-filesystem staging and explicit publication/durability outcomes. Verify old content on pre-publication failure, collision and alias rejection, reported post-publication failure, and concurrent readers on each claimed filesystem/host. [I/O API](../io/API.md) · [Existing publish implementation](../../src/runtime/host_directory.cpp) · [Windows publication](../../src/runtime/host_directory_windows.cpp) · [Filesystem tests](../../tests/io)
+**IMPLEMENTED.** An admitted private directory can atomically save bytes or
+UTF-8 text with checked publication and synchronization outcomes. The operation
+uses same-directory staging, held native identities and a bounded writer lock.
+Async saves are deferred. [I/O API](../io/API.md#atomic-application-saves) · [G06 implementation and qualification](#g06-atomic-application-saves)
 
 ### P2 — G07 · TCP/UDP and server applications
 
@@ -1177,3 +1180,142 @@ verified inputs and prelinked regression targets for replay.
 - Compiler — `include/void/diagnostic.hpp`, `src/frontend/compiler.cpp`, `src/frontend/pattern_parser.inc`, `src/frontend/pattern_semantics.inc`, `src/frontend/tooling.cpp`.
 - Qualification — `CMakeLists.txt`, `editors/vscode/src/test/enumRecoveryHost.ts`, `editors/vscode/src/test/runSemanticHost.ts`, `tests/lsp/enum_recovery.py`, `tests/lsp/fixtures/enum_recovery/app.void`, `tests/lsp/fixtures/enum_recovery/main.void`, `tests/lsp/fixtures/enum_recovery/void.project.toml`.
 - Documentation — `docs/ADVANCED_LANGUAGE.md`, `docs/EDITOR_INTEGRATION.md`, `docs/roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md`.
+
+## G06 atomic application saves
+
+Baseline `6b28c57ff50256734fb804387f7c0ffca828d51f`. Before changing the
+Runtime, the normal and O2 JIT baseline saved a small UTF-8 game-progress
+record using ordinary `io.write_text`. The native fixture limited each write
+to three bytes and then failed after eight bytes. The returned error reported
+eight bytes transferred. Reopening the destination yielded `level=12`, which
+had replaced the previous 19-byte record. The unmodified ordinary save also
+loaded and verified its full output when the fault was removed.
+[Ordinary save fixture](../../tests/io/ordinary_save.void) · [Fault driver](../../tests/io/atomic_save.cpp)
+
+The existing private-directory API can exclusively create a held file,
+acquire a native writer lock, and publish the file after synchronization.
+Its file publication checks the source identity. The available public
+removal is path-based, and the existing publication operation does not pin
+and verify the destination against the save's initial observation. A pure
+source wrapper could therefore neither reclaim an abandoned stage with held
+directory authority nor enforce the replacement contract. The bounded
+implementation adds one private synchronous host operation and two public
+methods on the existing capability. It reuses the ordinary transfer loop,
+private directory admission, native lock, native rename and Runtime ledger.
+[Public signatures and outcomes](../io/API.md#atomic-application-saves) · [Full contract](../io/CONTRACT.md#atomic-application-saves)
+
+The stage is exclusive, capped at 16 MiB, and always in the held directory.
+An existing destination is inspected again before replacement. An initially
+absent destination uses native no-replace rename. The result sets `published`
+immediately after rename, then records directory synchronization and cleanup
+independently. The host retires native handles and removes only the checked
+uncommitted stage. If cleanup fails, at most one reserved stage remains and
+future saves refuse to adopt it. Async save remains deferred until a native
+commit boundary can report the outcome even when the owning task cancels.
+
+The executable example writes and replaces a UTF-8 configuration, refuses an
+exclusive collision and loads a binary checkpoint using the existing numeric
+codec. The first independent Python oracle expected `00 00 00 ff` for
+`4278190208`. The application and a direct byte read yielded the correct
+little-endian `80 00 00 ff`. The oracle was corrected. Initial source probes
+also caught fixture locals that shadowed `os.args` and `path.root`. The
+examples use distinct local names.
+[Executable TestGame example](../../examples/atomic_save/test_game.void) · [Independent JIT/AOT fixture](../../tests/io/atomic_save.py)
+
+The first Windows Debug native run reported a handle-count increase from
+117 to 118. A disposable handle snapshot identified the added handle as
+`KernelBase.dll.mui`. It appeared on the first missing-destination error
+lookup and stayed constant through the fault cases and repeated writes. The
+stage was absent. The native fixture now initializes Windows error messages
+before taking its baseline and still requires the exact same handle count
+after repeated saves. The first Windows independent AOT link exited zero
+but the MSVC-target driver warned that `--ld-path` was unused. A single
+`--ld-path` produced the same warning on replay. The fixture now selects
+LLD with `-B` and `-fuse-ld=lld`, and verifies that `-###` selects the exact
+SDK `lld-link` executable. The first launch-plan check expected the
+`.exe` suffix and failed because Clang omits it. The check now accepts
+either spelling, resolves the same SDK executable, and checks its version.
+A separate default-driver control also selected the SDK's LLD for the
+existing Windows build tests.
+
+Windows file-symlink creation returned error 1314 in the native control.
+The save fixture exercised refusal of a real NTFS junction in that guest.
+The existing `io_execution` and `io_async_execution` fixtures both reached
+their mandatory symlink creation check and returned check 91. Their
+assertions remain in place. Linux qualified the file-symlink rejection.
+
+### G06 native qualification
+
+The native save fixture checks the exact old bytes after each injected
+pre-publication error. It separately checks committed bytes and flags after
+injected directory-sync and close errors. Other controls cover empty and
+maximum payloads, oversize admission, permission and hard-link refusal,
+exclusive collisions, parent identity changes, native reader behavior, lock
+contention, handle counts and managed ledger retirement. The separate source
+fixture verifies UTF-8 and binary data in normal/O2 JIT and independently
+linked normal/O2 AOT. It also exercises the public byte snapshot and text
+encoding limits before mutation. [Native fixture](../../tests/io/atomic_save.cpp) · [Source fixture](../../tests/io/atomic_save.py)
+
+PikaOS 4 x64 qualified tmpfs and an additional Debug replay on local XFS.
+An open Linux reader retained the original file and new opens saw only
+complete old or new payloads. Windows 10 Home x64 build 19045.6466 used a
+verified private NTFS test root. NTFS returned code 5 before replacement
+with either a reader that denied delete sharing or a reader that granted it.
+Uncontended saves reported both native synchronization barriers complete.
+The ordinary cross-volume move test used XFS and tmpfs on Linux and the
+guest's NTFS volume and a disposable VBox shared filesystem on Windows.
+Windows file-symlink creation remains unqualified in this guest. The junction
+refusal and ordinary cross-volume move results apply to the tested providers.
+
+| Host and profile | Focused CTests | Initial selection wall time | G06 native / source on final fixtures |
+| --- | ---: | ---: | --- |
+| PikaOS 4 x64 Debug | 26/26 | 383.43 s | 31.64 s / 29.17 s |
+| PikaOS 4 x64 Release | 26/26 | 122.17 s | 12.39 s / 9.51 s |
+| PikaOS 4 x64 strict ASan/UBSan with leaks | 26/26 | 334.22 s | 31.59 s / 28.82 s |
+| Windows 10 Home x64 Debug | 23/25 after targeted replays | 531.35 s | 65.54 s / 54.99 s |
+| Windows 10 Home x64 Release | 23/25 | 145.54 s | 17.85 s / 14.65 s |
+
+All profiles used LLVM/Clang/LLD 23.1.4 and verified provider inputs. The
+strict Linux profile used `RelWithDebInfo`, `VOID_SANITIZERS=ON`,
+`ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`.
+The original strict selection and final G06 replays reported zero sanitizer
+findings. The original Windows Debug selection passed 21/25. The two G06
+fixtures passed on targeted replays. The Windows Release selection passed
+both G06 fixtures on its first run. The two existing I/O suites retained
+the file-symlink prerequisite failure in both Windows profiles.
+
+```sh
+common='io_atomic_save_native|io_atomic_save_source|io_ownership|io_execution|io_async_execution|io_native_close_failure|io_native_shutdown|io_native_opening_shutdown|io_native_pending_close|io_native_cancelled|io_kernel|io_cross_volume|io_native_jobs|host_capabilities_portable|host_capabilities_portable_source|lsp_io|lsp_enum_recovery|multiple_returns|lsp_multiple_returns|project_dependency_explain|project_profiles|project_application|net_sockets|net_sockets_lsp|process_capture'
+ctest --test-dir BUILD -j 2 --output-on-failure -R "^($common|host_capabilities_native)$"
+```
+
+On Windows, run `ctest --test-dir BUILD -j 2 --output-on-failure -R
+"^($common)$"` with the same test names and a private native temporary root.
+Set `VOID_IO_SECOND_VOLUME` to a distinct filesystem for `io_cross_volume`.
+The maintained `io_execution` and `io_async_execution` suites require a
+Windows session that can create file symlinks. The new save tests each use
+180 s. The CTest registrations had active commands and the same timeouts
+for all common tests across the five profiles. The existing cross-volume
+skip condition stayed in place and the test executed on each profile.
+
+To run the example, pass the absolute path of a new private directory
+beneath an admitted parent.
+
+```sh
+voidc run examples/atomic_save/test_game.void --no-cache -- "$PRIVATE_PARENT/new-save"
+```
+
+Removed the disposable Windows workspace, Linux scratch roots and host
+share after qualification. Available guest space rose from 7,295,012,864
+to 15,007,399,936 bytes. Host tmpfs space rose from 16,417,361,920 to
+16,622,710,784 bytes, and host XFS space rose from 367,337,570,304 to
+367,337,689,088 bytes. The active Linux builds and pinned inputs remain in
+their existing locations. This record retains the failure observations and
+replay commands.
+
+### G06 changed-file inventory
+
+- Runtime and ABI — `include/void/detail/filesystem_hooks.hpp`, `include/void/filesystem.hpp`, `include/void/host_ops.hpp`, `src/runtime/filesystem.cpp`, `src/runtime/host_abi.cpp`, `src/runtime/host_directory.cpp`, `src/runtime/host_directory_windows.cpp`, `src/runtime/host_internal.hpp`, `src/runtime/host_save.hpp`, `stdlib/io.void`.
+- Verification and example — `CMakeLists.txt`, `examples/atomic_save/test_game.void`, `tests/io/atomic_save.cpp`, `tests/io/atomic_save.py`, `tests/io/atomic_save_fault.void`, `tests/io/atomic_save_limits.void`, `tests/io/ordinary_save.void`.
+- Documentation — `docs/io/API.md`, `docs/io/CONTRACT.md`, `docs/roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md`, `stdlib/README.md`.

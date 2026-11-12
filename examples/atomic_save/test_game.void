@@ -1,0 +1,54 @@
+use encoding/binary
+use io
+use os
+
+func report(label: string, saved: io.save_outcome) -> bool:
+    if not saved.published:
+        print("{label}: pre-publication failure (code {saved.code}, native {saved.os_code}, cleanup {saved.cleanup_code})")
+        return false
+    if not saved.synchronized:
+        print("{label}: published, synchronization incomplete (native {saved.os_code})")
+    if saved.cleanup_code != 0:
+        print("{label}: published, cleanup reported native {saved.cleanup_code}")
+    return true
+
+func load_configuration(directory: io.private_directory, expected: string) -> result<bool, io.error>:
+    with directory.open_file("configuration.txt")? as input:
+        return Ok(input.read_string(expected.byte_length)? == expected and input.length()? == expected.byte_length)
+
+func load_checkpoint(directory: io.private_directory, expected: u32) -> result<bool, io.error>:
+    with directory.open_file("checkpoint.bin")? as input:
+        return Ok(input.read<u32>()? == expected and input.length()? == 4)
+
+func save_game(directory: io.private_directory) -> result<i32, io.error>:
+    var initial = "volume=60\nplayer=初雪\n"
+    var updated = "volume=85\nplayer=初雪\n"
+    if not report("Initial configuration", directory.save_text_atomic("configuration.txt", initial)):
+        return Ok(1)
+    if not report("Updated configuration", directory.save_text_atomic("configuration.txt", updated)):
+        return Ok(2)
+    var refused = directory.save_text_atomic("configuration.txt", "volume=0\n", replace = false)
+    if refused.published or refused.code == 0 or not (refused.kind is io.error_kind.already_exists):
+        return Ok(3)
+    if not report("Checkpoint", directory.save_bytes_atomic("checkpoint.bin", binary.encode(4278190208 as u32))):
+        return Ok(4)
+    if not load_configuration(directory, updated)? or not load_checkpoint(directory, 4278190208 as u32)?:
+        return Ok(5)
+    print("Collision refused and committed text and binary saves verified")
+    return Ok(0)
+
+func exercise(root: string) -> result<i32, io.error>:
+    with io.create_private_directory(root)? as directory:
+        return save_game(directory)
+
+func main() -> i32:
+    if os.args() is Ok(var arguments):
+        if arguments.count == 1:
+            match exercise(arguments[0]):
+                Ok(var status):
+                    return status
+                Err(var failure):
+                    print(failure.message)
+                    return 6
+    print("Usage: test_game <new absolute private directory>")
+    return 7

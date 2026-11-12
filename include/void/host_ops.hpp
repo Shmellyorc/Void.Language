@@ -57,6 +57,7 @@ inline constexpr std::array operations = {
 #undef VOID_NET_CLEANUP
 #undef VOID_NET_PAIR
 #undef VOID_NET_SYNC
+    Operation{io,"_host_dir_save","Dtbs"},
 };
 enum Code : unsigned {args_count,arg,hash_open,hash_update,hash_final,hash_close,hash_cleanup,verify,
  zip_open,zip_next,zip_read,zip_close,zip_cleanup,dir_create,dir_admit,dir_child,dir_open,dir_file,
@@ -67,9 +68,10 @@ enum Code : unsigned {args_count,arg,hash_open,hash_update,hash_final,hash_close
  VOID_NET_OPERATIONS(VOID_NET_PAIR, VOID_NET_SYNC, VOID_NET_SYNC)
 #undef VOID_NET_PAIR
 #undef VOID_NET_SYNC
+ dir_save,
 };
 constexpr bool capture_operation(unsigned op) {return op==capture || op==capture_async;}
-constexpr bool network_operation(unsigned op) {return op>=net_parse && op<operations.size();}
+constexpr bool network_operation(unsigned op) {return op>=net_parse && op<dir_save;}
 constexpr unsigned network_sync(unsigned op) {
     switch(op) {
 #define VOID_NET_SKIP(code, module, args)

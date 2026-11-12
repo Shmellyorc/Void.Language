@@ -379,6 +379,55 @@ bool align_for_write(File& file, Result& result) {
     return true;
 }
 
+void write_transfers(NativeHandle handle, [[maybe_unused]] bool append, std::string_view bytes,
+                     std::int64_t& written, std::int64_t& logical, const testing::Hooks* hooks,
+                     Result& result, const std::atomic<bool>* cancellation) {
+    while (static_cast<std::size_t>(result.completed) < bytes.size() && !cancelled(cancellation)) {
+        auto amount = std::min(bytes.size() - static_cast<std::size_t>(result.completed), transfer_size);
+        if (hooks) {
+            if (hooks->before) hooks->before(Operation::write_bytes);
+            amount = std::min(amount, hooks->write_chunk);
+            if (hooks->write_failure_after >= 0) {
+                if (written >= hooks->write_failure_after) {
+                    fail(result, ErrorKind::io_failure, EIO);
+                    break;
+                }
+                amount = std::min(amount, static_cast<std::size_t>(hooks->write_failure_after - written));
+            }
+            if (hooks->zero_write || amount == 0) {
+                fail(result, ErrorKind::io_failure);
+                break;
+            }
+        }
+        auto* data = bytes.data() + result.completed;
+#ifdef _WIN32
+        DWORD sent = 0;
+        OVERLAPPED end{};
+        end.Offset = MAXDWORD;
+        end.OffsetHigh = MAXDWORD;
+        auto* positioning = append ? &end : nullptr;
+        if (!WriteFile(handle, data, static_cast<DWORD>(amount), &sent, positioning)) {
+            fail(result, native_error());
+            break;
+        }
+#else
+        auto sent = ::write(handle, data, amount);
+        if (sent < 0) {
+            if (errno == EINTR) continue;
+            fail(result, native_error());
+            break;
+        }
+#endif
+        if (sent == 0) {
+            fail(result, ErrorKind::io_failure);
+            break;
+        }
+        written += std::min<std::int64_t>(sent, maximum - written);
+        logical += sent;
+        result.completed += sent;
+    }
+}
+
 void write(File& file, const std::string& bytes, Result& result,
            const std::atomic<bool>* cancellation) {
     if (!writable(file)) {
@@ -390,51 +439,8 @@ void write(File& file, const std::string& bytes, Result& result,
         return;
     }
     if (!align_for_write(file, result)) return;
-    while (static_cast<std::size_t>(result.completed) < bytes.size() && !cancelled(cancellation)) {
-        auto amount = std::min(bytes.size() - static_cast<std::size_t>(result.completed), transfer_size);
-        if (file.hooks) {
-            if (file.hooks->before) file.hooks->before(Operation::write_bytes);
-            amount = std::min(amount, file.hooks->write_chunk);
-            if (file.hooks->write_failure_after >= 0) {
-                if (file.written >= file.hooks->write_failure_after) {
-                    fail(result, ErrorKind::io_failure, EIO);
-                    break;
-                }
-                amount = std::min(amount, static_cast<std::size_t>(file.hooks->write_failure_after - file.written));
-            }
-            if (file.hooks->zero_write || amount == 0) {
-                fail(result, ErrorKind::io_failure);
-                break;
-            }
-        }
-        auto* data = bytes.data() + result.completed;
-#ifdef _WIN32
-        DWORD sent = 0;
-        OVERLAPPED append{};
-        append.Offset = MAXDWORD;
-        append.OffsetHigh = MAXDWORD;
-        auto* positioning = file.mode == OpenMode::append ? &append : nullptr;
-        if (!WriteFile(file.handle, data, static_cast<DWORD>(amount), &sent, positioning)) {
-            fail(result, native_error());
-            break;
-        }
-#else
-        auto sent = ::write(file.handle, data, amount);
-        if (sent < 0) {
-            if (errno == EINTR) continue;
-            fail(result, native_error());
-            break;
-        }
-#endif
-        if (sent == 0) {
-            fail(result, ErrorKind::io_failure);
-            break;
-        }
-        if (static_cast<std::uint64_t>(sent) > static_cast<std::uint64_t>(maximum - file.written)) {
-            file.written = maximum;
-        } else file.written += static_cast<std::int64_t>(sent);
-        if (!advance(file, static_cast<std::size_t>(sent), result)) break;
-    }
+    write_transfers(file.handle, file.mode == OpenMode::append, bytes, file.written, file.logical,
+                    file.hooks.get(), result, cancellation);
     if (file.mode == OpenMode::append) {
         Result position;
         if (seek_native(file, 0, 1, position)) file.logical = position.number;
@@ -628,6 +634,14 @@ static std::shared_ptr<File> open_native(const std::string& path, OpenMode mode,
 std::shared_ptr<File> open(const std::string& path, OpenMode mode, Result& result,
                           std::shared_ptr<const testing::Hooks> hooks) {
     return open_native(path, mode, result, std::move(hooks), false);
+}
+
+Result write_staged(NativeHandle handle, std::string_view bytes, const testing::Hooks* hooks) {
+    Result result;
+    (void)checked(bytes.size());
+    std::int64_t written = 0, logical = 0;
+    write_transfers(handle, false, bytes, written, logical, hooks, result, nullptr);
+    return result;
 }
 
 std::shared_ptr<File> adopt_descriptor(int fd, bool writable) {
