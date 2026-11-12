@@ -183,6 +183,13 @@ Debug cache identity includes the actual compiled C fixture. Cache hits relocate
 ordinary code and bind the verified bridge anew; no C pointers, active callbacks,
 roots or native resource state are serialized.
 
+The Windows G11 qualification uses the managed catalog with the real
+raylib Win32 software provider. The separate G5 fixture checks retained
+callbacks through both Windows admission paths. Its reload harness observes
+the provider and adapter DLL mappings while a registration retains its
+generation and after their Runtime and generation owners retire.
+[G11 Windows evidence and replay](projects/G11_WINDOWS_MANAGED_NATIVE_QUALIFICATION.md)
+
 ## Bounds and acceptance
 
 Permanent source tests cover all scalar widths, bool/floats, UTF-8/NUL transfers,

@@ -174,6 +174,9 @@ Windows uses `app.exe` in the same directory layout and requires an
 absent destination even when `--replace` is supplied. macOS ARM64 packaging
 and managed native execution remain unsupported.
 
+G11 covers the real Windows raylib payload and the profile-key compatibility
+repair for D5 inventory revision 1. [G11 Windows qualification](G11_WINDOWS_MANAGED_NATIVE_QUALIFICATION.md)
+
 The known 256-byte Mesa graphics allocation remains the accepted display
 limitation. Leak detection stays enabled for focused headless sanitizer
 tests. Any strict visible replay using the established Mesa exclusion

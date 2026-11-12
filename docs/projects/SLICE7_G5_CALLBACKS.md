@@ -92,3 +92,11 @@ The corrected fixture checks that the native worker returns `44` from the origin
 The first Windows attempt passed the callback refusal harness in both profiles. Native linking rejected the inherited ACL on the new scratch directory, which failed the CLI, G4 and G5 process suites. The rerun used a verified user-only ACL on each profile’s scratch directory. Debug then hit a transient CLI cleanup file lock and passed the full suite on retry. The cleanup audit verified removal of the CLI remnants and both guest scratch roots. [Initial Windows ACL failures](evidence/slice7-g5-release-refusal/windows/first-temp-acl/) · [Debug CLI cleanup failure](evidence/slice7-g5-release-refusal/windows/Debug-parallel-first.txt) · [Workspace cleanup](evidence/slice7-g5-release-refusal/workspace.txt)
 
 Raylib uses a scoped trace callback and a window resource without a retained callback. The correction is confined to the retained callback’s refusal branch, so the existing 20 G5 graphics receipts and the 20 original integration receipts were preserved and hash-verified. The final inventory also verifies Research Clanker’s report, earlier evidence, and the opening HEAD and index. [Layered Git inventory](evidence/slice7-g5-release-refusal/inventory.txt)
+
+## G11 Windows managed callback follow-up
+
+The existing fixed-signature C fixture now also runs with an approved
+Windows D4 catalog. Both Windows modes observe the provider and adapter
+DLL paths while the original generation remains leased. The probe checks
+their unload after the Runtime and generation owners retire. The raylib
+trace callback keeps its existing scoped lifetime. [G11 qualification](G11_WINDOWS_MANAGED_NATIVE_QUALIFICATION.md)

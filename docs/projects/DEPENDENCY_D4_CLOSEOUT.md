@@ -314,6 +314,10 @@ opt-in test registered only when the local vendor path was supplied. The
 workflow was not dispatched.
 [macOS wrapper](../../.github/workflows/ci-macos-managed-native.yml) · [Shared workflow](../../.github/workflows/ci-macos-package-qualification.yml)
 
+The later G11 record covers the Windows raylib software-provider lane on
+Windows 10 Home x64. The results above retain their original source and
+platform scope. [G11 Windows qualification](G11_WINDOWS_MANAGED_NATIVE_QUALIFICATION.md)
+
 ### Replay
 
 Configure each profile using the existing pinned Linux recipe. Keep `build`

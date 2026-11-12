@@ -619,3 +619,12 @@ The worktree changes are this record and `tools/test_platform.py`.
 `main` and local `origin/main` remain at
 `54e21045431143367988d1f7b6f7a401b0b8278d`. The index is empty
 and `git diff --check` passes.
+
+## G11 real-provider follow-up
+
+The G11 record adds native Windows 10 Home Debug and Release evidence for
+the actual raylib 6.0 Win32 software provider. It also records the D5
+profile-key regression introduced after W2. Inventory revision 1 accepts
+the historical v1 and current v2 profile keys. Windows still requires a
+fresh package destination. The hosted acceptance above remains the
+synthetic-payload W2 result. [G11 Windows qualification](G11_WINDOWS_MANAGED_NATIVE_QUALIFICATION.md)

@@ -55,7 +55,7 @@ def exact_inventory(package):
     lines = (package / 'void-package.txt').read_text().splitlines()
     assert lines[0] == 'VOID application package 1'
     assert lines[1] == 'target ' + ('x86_64-pc-windows-msvc' if windows else 'x86_64-unknown-linux-gnu')
-    assert lines[2].startswith('profile project-profile-v1:')
+    assert lines[2].startswith('profile project-profile-v2:')
     files = snapshot(package)
     del files['void-package.txt']
     assert lines[5:] == [f'{digest}\t{(package / name).stat().st_size}\t{name}'
@@ -109,6 +109,19 @@ with tempfile.TemporaryDirectory(prefix='VOID D5 packages 雪 % ') as temporary:
     assert all(good[name] == digest for name, digest in required.items())
     assert ('licenses/AWS-LC-NOTICE.txt' in required) != windows
     exact_inventory(default)
+    receipt = default / 'void-package.txt'
+    current = receipt.read_bytes()
+    profile_tag = b'\nprofile project-profile-v2:'
+    assert current.count(profile_tag) == 1
+    try:
+        # Inventory revision 1 also exists with a profile key from before
+        # native source debugging changed the effective-profile key version.
+        receipt.write_bytes(current.replace(profile_tag, b'\nprofile project-profile-v1:'))
+        run(compiler, 'package', '--verify', default)
+        receipt.write_bytes(current.replace(profile_tag, b'\nprofile project-profile-v3:'))
+        run(compiler, 'package', '--verify', default, status=1, message='Invalid application package inventory header.')
+    finally:
+        receipt.write_bytes(current)
     manifest_data = tomllib.loads(manifest.read_text(encoding='utf-8'))
     project_info, application = manifest_data['project'], manifest_data['application']
     fields = (project_info['id'], project_info['name'], project_info['version'],

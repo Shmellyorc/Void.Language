@@ -10,12 +10,34 @@
 #include <stdexcept>
 #include <string>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 namespace {
 using Path = std::filesystem::path;
+using Modules = std::array<Path, 2>;
 
 void require(bool condition, const char* message) {
     if (!condition) throw std::runtime_error(message);
 }
+
+#ifdef _WIN32
+void expect_modules(const Modules& paths, bool loaded) {
+    for (const auto& path : paths) {
+        // Observe the mapping without taking a loader reference.
+        const auto module = GetModuleHandleW(path.filename().c_str());
+        require(bool(module) == loaded, "unexpected callback provider or adapter lifetime");
+        if (loaded) {
+            std::wstring name(32768, L'\0');
+            const auto length = GetModuleFileNameW(module, name.data(), static_cast<DWORD>(name.size()));
+            require(length && length < name.size(), "could not identify mapped callback DLL");
+            name.resize(length);
+            require(std::filesystem::equivalent(Path(name), path), "wrong callback DLL was mapped");
+        }
+    }
+}
+#endif
 
 void expect_failure(vd::ReloadSlot& slot, int input, std::string_view message) {
     try { (void)slot.invoke(input); }
@@ -68,7 +90,8 @@ void check_ir(const vd::ValidatedAnalysis& analysis) {
 
 template<class Analyze, class Incompatible>
 void qualify(const Path& entry, const std::string& original, bool optimize,
-             const Analyze& analyze_current, const Incompatible& analyze_incompatible) {
+             const Analyze& analyze_current, const Incompatible& analyze_incompatible,
+             [[maybe_unused]] const Modules& modules) {
     write(entry, original);
     auto before = analyze_current();
     check_ir(*before);
@@ -91,6 +114,9 @@ void qualify(const Path& entry, const std::string& original, bool optimize,
             "compatible callback reload changed the Runtime or dynamic binding");
     old.reset();
     require(jit.live_generations() == 2, "registration lost its original ORC generation");
+#ifdef _WIN32
+    expect_modules(modules, true);
+#endif
     {
         vd::Runtime::Attachment attachment(*runtime);
         vd::Runtime::Managed managed(*runtime);
@@ -101,6 +127,9 @@ void qualify(const Path& entry, const std::string& original, bool optimize,
     require(slot.invoke(3) == 43, "incompatible candidate touched original registration");
     expect_failure(slot, -1, "C resource operation rejected");
     require(jit.live_generations() == 2, "transport refusal retired the original ORC generation");
+#ifdef _WIN32
+    expect_modules(modules, true);
+#endif
     const auto after_refusal = slot.invoke(4);
     require(slot.invoke(-1) == 0 && jit.live_generations() == 1, "unregister did not retire original ORC generation");
     std::cout << "G5 callback after refused release returned " << after_refusal << " (expected 44)\n";
@@ -114,6 +143,9 @@ void qualify(const Path& entry, const std::string& original, bool optimize,
     require(failure.kind == vd::console::ErrorKind::io_failure &&
             failure.os_code == static_cast<int>(std::errc::operation_canceled),
             "retained failure was not reported after shutdown drain");
+#ifdef _WIN32
+    expect_modules(modules, true); // The live Runtime still owns the binding.
+#endif
     std::cout << "G5 ORC " << (optimize ? "O2" : "normal")
               << " capture, compatible/incompatible reload, refusal/retry, retirement and self-drain passed\n";
 }
@@ -145,7 +177,13 @@ void qualify_managed(const Path& project, const Path& catalog, const Path& alter
         for (std::size_t index = 0; index < files.size(); ++index) write(files[index], originals[index]);
         return replacement;
     };
-    for (bool optimize : {false, true}) qualify(entry, source, optimize, current, incompatible);
+    const Modules modules{catalog / "g5_fixture.dll", catalog / "g5_refusal_adapter.dll"};
+    for (bool optimize : {false, true}) {
+        qualify(entry, source, optimize, current, incompatible, modules);
+#ifdef _WIN32
+        expect_modules(modules, false);
+#endif
+    }
     write(entry, source);
 }
 } // namespace
@@ -170,7 +208,13 @@ int main(int argc, char** argv) {
             text.replace(position, signature.size(), "callback integer context-first c_int c_int");
             return analyze(entry, vd::CPrimitiveAdmission::admit_conventional(text, argv[2], argv[3], argv[4]));
         };
-        for (bool optimize : {false, true}) qualify(entry, source, optimize, current, incompatible);
+        const Modules modules{Path(argv[2]) / argv[3], Path(argv[2]) / argv[4]};
+        for (bool optimize : {false, true}) {
+            qualify(entry, source, optimize, current, incompatible, modules);
+#ifdef _WIN32
+            expect_modules(modules, false);
+#endif
+        }
         write(entry, source);
         return 0;
     } catch (const std::exception& error) {

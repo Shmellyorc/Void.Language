@@ -1808,13 +1808,11 @@ if(BUILD_TESTING)
       "${VOID_SANITIZERS}" "$<TARGET_FILE:void_g5_reload>"
       "${CMAKE_COMMAND}" "${CMAKE_CURRENT_BINARY_DIR}" "$<CONFIG>")
     set_tests_properties(ffi_g5_callbacks PROPERTIES TIMEOUT 480)
-    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-      add_test(NAME project_managed_native_callbacks COMMAND "${Python3_EXECUTABLE}"
-        "${PROJECT_SOURCE_DIR}/tests/ffi/callback_process.py" "$<TARGET_FILE:voidc>" "${VOID_CLANG}"
-        "${VOID_SANITIZERS}" "$<TARGET_FILE:void_g5_reload>"
-        "${CMAKE_COMMAND}" "${CMAKE_CURRENT_BINARY_DIR}" "$<CONFIG>" --managed)
-      set_tests_properties(project_managed_native_callbacks PROPERTIES TIMEOUT 480)
-    endif()
+    add_test(NAME project_managed_native_callbacks COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/ffi/callback_process.py" "$<TARGET_FILE:voidc>" "${VOID_CLANG}"
+      "${VOID_SANITIZERS}" "$<TARGET_FILE:void_g5_reload>"
+      "${CMAKE_COMMAND}" "${CMAKE_CURRENT_BINARY_DIR}" "$<CONFIG>" --managed)
+    set_tests_properties(project_managed_native_callbacks PROPERTIES TIMEOUT 480)
   endif()
   add_test(NAME numeric_sprint2 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/numeric/sprint2.py"
     "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}")

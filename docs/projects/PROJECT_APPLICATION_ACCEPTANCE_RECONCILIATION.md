@@ -207,3 +207,11 @@ The removed Linux scratch and Windows exchange used 5,304,320 and 360,448 alloca
 11 November 2026 · Workflow run `43101701646` tested `31608c2dd2ca1ae20e3bdd021d0c36581a01dabc` on native macOS 15.8.2 ARM64. Debug passed **6/6** CTests in **124.97 s** and Release passed **6/6** in **21.52 s**. Each passed `project_application`, `project_application_process`, `os_packaging`, `project_selection`, `project_creation_process`, and `project_profiles`. The Debug VS Code Project, Creation, and Numeric suites all passed. Both jobs concluded `success` and completed normal post-job cleanup and finalization. [Run](https://github.com/Shmellyorc/Void.Language/actions/runs/43101701646) · [Debug](https://github.com/Shmellyorc/Void.Language/actions/runs/43101701646/job/130794552189) · [Release](https://github.com/Shmellyorc/Void.Language/actions/runs/43101701646/job/130794569594)
 
 Focused native macOS project, application, and editor qualification is **ACCEPTED** at that SHA. macOS managed-native execution and D5 packaging remain unsupported, and signed App Sandbox behavior remains unverified. The original seven-job matrix is **OPEN / DEFERRED BY BOSS DECISION**.
+
+## Native Windows managed-provider follow-up
+
+G11 records real raylib 6.0 managed admission, visible JIT and relocated
+AOT and D5 execution on Windows 10 Home x64 in both compiler profiles.
+The separate C fixture records Windows managed retained-callback
+lifetime and DLL retirement. These focused results are pending
+independent review. [G11 qualification](G11_WINDOWS_MANAGED_NATIVE_QUALIFICATION.md)

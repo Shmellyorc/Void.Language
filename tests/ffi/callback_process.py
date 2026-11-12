@@ -23,6 +23,7 @@ if sanitized:
                        UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1')
 suffix = '.dll' if windows else '.so'
 exe = '.exe' if windows else ''
+target = 'x86_64-pc-windows-msvc' if windows else 'x86_64-unknown-linux-gnu'
 requirement = '\n[native-requirements.g5]\nid = "org.voidlang.g5"\nversion = "=1.0.0"\nabi = 3\n'
 
 
@@ -44,7 +45,7 @@ def approve(catalog, descriptor, provider, adapter):
         descriptor_copy, provider_copy, adapter_copy = (catalog / path.name for path in (descriptor, provider, adapter))
         (catalog / 'void.native.toml').write_text(
             'format = 1\n[native]\nid = "org.voidlang.g5"\nversion = "1.0.0"\nabi = 3\n'
-            'target = "x86_64-unknown-linux-gnu"\nrevision = "g5-fixture"\n'
+            f'target = "{target}"\nrevision = "g5-fixture"\n'
             f'descriptor = "{descriptor.name}"\ndescriptor-identity = "{identity(descriptor_copy)}"\n'
             f'library = "{provider.name}"\nadapter = "{adapter.name}"\n[native.runtime]\n'
             f'"{provider.name}" = "{identity(provider_copy)}"\n"{adapter.name}" = "{identity(adapter_copy)}"\n'
@@ -90,7 +91,7 @@ def qualify(root):
                      f'library = "{provider.name}"\nadapter = "{adapter.name}"\n')
     text = (sources / 'callback.descriptor.in').read_text()
     for key, value in {
-        'TARGET': 'x86_64-pc-windows-msvc msvc-x64' if windows else 'x86_64-unknown-linux-gnu sysv-x64',
+        'TARGET': target + (' msvc-x64' if windows else ' sysv-x64'),
         'LONG': 'i32' if windows else 'i64', 'THUNK': digest(sources / 'callback_fixture.h'),
         'FIXTURE': digest(sources / 'callback_fixture.c'),
     }.items():
@@ -236,7 +237,7 @@ def qualify(root):
 
 
 retained = os.environ.get('VOID_G5_EVIDENCE_ROOT')
-assert not managed or sys.platform.startswith('linux'), 'Managed G5 qualification requires Linux'
+assert not managed or windows or sys.platform.startswith('linux'), 'Managed G5 qualification requires Windows or Linux'
 if retained:
     root = Path(retained)
     root.mkdir(parents=True, exist_ok=True)

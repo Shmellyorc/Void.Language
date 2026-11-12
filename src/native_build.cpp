@@ -611,7 +611,8 @@ ApplicationMetadata::Owner verify_package(const fs::path& directory, const proje
     std::string magic, target, profile, lock, inputs;
     if (!std::getline(receipt, magic) || !std::getline(receipt, target) || !std::getline(receipt, profile) ||
         !std::getline(receipt, lock) || !std::getline(receipt, inputs) ||
-        !profile.starts_with("profile project-profile-v1:") || !lock.starts_with("lock ") ||
+        (!profile.starts_with("profile project-profile-v1:") &&
+         !profile.starts_with("profile project-profile-v2:")) || !lock.starts_with("lock ") ||
         !inputs.starts_with("inputs ") || !hex_digest(std::string_view(inputs).substr(7)))
         throw std::runtime_error("Invalid application package inventory header.");
     lock.erase(0, 5);
