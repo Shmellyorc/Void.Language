@@ -1,0 +1,12 @@
+schema = 1
+
+[project]
+id = "org.void.benchmark.rates.project"
+name = "Inventory Rates"
+version = "1.0.0"
+kind = "library"
+
+[package]
+id = "org.void.benchmark.rates"
+name = "rates"
+entry = "src/api.void"

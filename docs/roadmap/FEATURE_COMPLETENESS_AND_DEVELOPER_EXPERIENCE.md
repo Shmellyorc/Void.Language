@@ -4,6 +4,8 @@
 
 Baseline `4d39a2b121b8ba6fb6cfa3b60d02d8e048b27b59` on `main`. The audit used tracked source, maintained test registrations and recorded results at their stated revisions. LLVM/Clang/LLD **23.1.4** remains the active toolchain. This roadmap proposes work for Boss's subsequent authorization.
 
+The [milestone register](MILESTONE_REGISTER.md) tracks integrated batches, current assignments, qualification scope and remaining gates.
+
 VOID already supports ordinary native applications, including manifest creation, dependency locking, normal and O2 JIT, linked executables, and relocatable application directories on the supported Linux and Windows targets. The highest general development priorities are a reliable project-to-run editor workflow, usable source debugging, and a bounded way to run and capture a child process. A public binary distribution has separate trust, redistribution and native installation obligations.
 
 **Status key**
@@ -175,7 +177,12 @@ readiness, deadlines and structured cleanup. [Contract review](../net/TCP_UDP_HA
 
 ### P2 — G08 · Measurable edit/build performance and Windows cache
 
-**PARTIAL.** Cache policy and prior compiler improvements already exist. Full graph work affects edit/check time, and Windows intentionally falls back without native persistent disk caching. Measure edit latency and cold/warm check/JIT/AOT on one frozen representative project per host. Use measured hotspots to choose bounded reuse. Treat Windows persistence as a separate owner/private-file and publish-integrity design. Verify hits/misses, revision invalidation, malformed artifacts, root identity and unchanged output. Keep the historical FILE200 target advisory and retain unfavorable results. [Tooling analysis](../../src/frontend/tooling.cpp) · [Cache implementation](../../src/backend/llvm/native_cache.cpp) · [Cache tests](../../tests/cache) · [Performance record](../compiler-health/INTEGRATED_PERFORMANCE_QUALIFICATION.md)
+**BASELINE MEASURED / OPTIMIZATION HOLD.** G08 recorded native edit latency,
+check, JIT, emission and linking on a frozen manifest application. Same-revision
+completion must still observe changed package inputs. Windows persistence
+remains a separate ownership and publication design. The historical FILE200
+target stays advisory.
+[G08 baseline and cache review](../compiler-health/G08_COMPILER_PERFORMANCE.md) · [Historical performance record](../compiler-health/INTEGRATED_PERFORMANCE_QUALIFICATION.md)
 
 ### P2 — G09 · Data and text conveniences backed by application examples
 

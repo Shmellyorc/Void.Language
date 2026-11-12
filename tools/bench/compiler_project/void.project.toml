@@ -1,0 +1,19 @@
+schema = 1
+
+[project]
+id = "org.void.benchmark.inventory"
+name = "Inventory Report"
+version = "1.0.0"
+kind = "application"
+entry = "src/main.void"
+
+[application]
+id = "org.void.benchmark.inventory"
+
+[sources]
+roots = ["src"]
+
+[dependencies.rates]
+id = "org.void.benchmark.rates"
+path = "deps/rates"
+version = "=1.0.0"

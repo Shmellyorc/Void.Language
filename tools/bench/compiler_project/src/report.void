@@ -1,0 +1,8 @@
+use text as t
+use "./model.void" as model
+
+func label(raw: string, units: i32) -> string:
+    return model.choose<string>(units > 0, t.trim(raw), "empty")
+
+func report(name: string, units: i32, value: i32):
+    print("inventory", name.byte_length, units, value)

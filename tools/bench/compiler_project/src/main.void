@@ -1,0 +1,9 @@
+use "./stock.void" as stock
+use "./report.void" as report
+
+func adjustment() -> i32:
+    return 1
+
+func main():
+    var units, total = stock.summarize()
+    report.report(report.label("  雪😀  ", units), units, total + adjustment())

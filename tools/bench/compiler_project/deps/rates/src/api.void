@@ -1,0 +1,5 @@
+public func bulk_threshold() -> i32:
+    return 4
+
+public func unit_discount() -> i32:
+    return 2

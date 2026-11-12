@@ -7,6 +7,9 @@
 
 5 November 2026. Local Linux integration handoff for Golden Wrench/Boss review.
 
+Batch 9 measures a separate frozen application at a later source identity.
+See the [G08 compiler and editor baseline](G08_COMPILER_PERFORMANCE.md).
+
 **Recommendation: RETAIN the integrated implementation for Golden Wrench/Boss review.**
 All selected tests passed: **85 Release, 85 Debug and 84 strict ASan/UBSan/leak**
 on this Linux host. No reproducible integration correctness defect was

@@ -1,0 +1,11 @@
+value struct line_item:
+    units: i32
+    unit_price: i32
+
+struct inventory:
+    lines: [line_item]
+
+func choose<t>(condition: bool, preferred: t, fallback: t) -> t:
+    if condition:
+        return preferred
+    return fallback

@@ -1,0 +1,15 @@
+use "./model.void" as model
+use pkg/rates
+
+func subtotal(item: model.line_item) -> i32:
+    var discount = model.choose<i32>(item.units >= rates.bulk_threshold(), rates.unit_discount(), 0)
+    return item.units * (item.unit_price - discount)
+
+func summarize() -> (units: i32, value: i32):
+    var stock = model.inventory(lines = [model.line_item(units = 4, unit_price = 11), model.line_item(units = 3, unit_price = 7)])
+    var units: i32 = 0
+    var total: i32 = 0
+    for item in stock.lines:
+        units += item.units
+        total += subtotal(item)
+    return units, total

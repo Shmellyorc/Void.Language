@@ -1,0 +1,5 @@
+use "./stock.void" as stock
+
+func main():
+    var units, total = stock.summarize()
+    print("audit", units, total)
