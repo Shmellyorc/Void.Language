@@ -46,11 +46,15 @@ to stale disk bytes. Library navigation uses validated declarationless-root meta
 there is no library application entry or executable IR.
 
 Project sessions support standard didCreateFiles/didRenameFiles/didDeleteFiles
-notifications and watched-file invalidation. Dirty rename bytes are retained even
-when a deletion watch arrives first. Closing a document returns explicitly to disk;
-newer full-text edits can repair a tombstoned document. Broad project watches also
-invalidate on directory and wrong-case manifest events, leaving admission to the
-compiler. Nested manifest edits change boundaries without switching the root.
+notifications and watched-file invalidation. Watched create, change and delete
+events refresh analysis using current filesystem state and retain open source
+and manifest buffers. A delayed delete can therefore observe a restored file.
+Explicit rename transfers owned dirty bytes to the new URI, and explicit delete
+marks the old source unavailable. Closing a document releases its overlay and
+returns to current disk authority. Newer full-text edits can repair an explicitly
+tombstoned document. Broad project watches also invalidate on directory and
+wrong-case manifest events, leaving admission to the compiler. Nested manifest
+edits change boundaries without switching the root.
 
 `void/projectState` requests return the current schema-2 summary; notifications of
 that name accompany accepted project revisions. Project diagnostics carry a
@@ -306,7 +310,8 @@ and a missing referenced source can produce an import error in the importer.
 Closing a visual editor tab can leave the text document LSP-open. The Stage 7
 acceptance record describes the earlier contract.
 [G13 implementation](roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md#batch-1-implementation-record) ·
-[G21 qualification](compiler-health/G21_LSP_DIAGNOSTIC_LIFECYCLE_QUALIFICATION.md)
+[G21 qualification](compiler-health/G21_LSP_DIAGNOSTIC_LIFECYCLE_QUALIFICATION.md) ·
+[G22 watcher repair](compiler-health/G22_WATCHER_OVERLAY_RESEARCH.md#authorized-production-repair)
 
 Definition and references support resolved direct/aliased imported functions,
 forward/cyclic functions, project-root/imported constants and local readonly

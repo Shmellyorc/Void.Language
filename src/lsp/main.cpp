@@ -948,7 +948,7 @@ public:
                     if(manifest_mode)refresh=true; // Unknown/wrong-case boundary names still invalidate selection.
                     auto module=identity(event_uri);
                     if(read_only_source(module))continue;
-                    if(type==3 && (manifest_mode || open.contains(module)))session.unavailable(module,next(module));
+                    // Disk watches invalidate analysis; document ownership changes through synchronization or explicit file operations.
                     if(type==1) {
                         auto selected=session.select();
                         const auto& overrides=manifest_mode && module.ends_with("/void.project.toml")?selected.manifests():selected.overrides();

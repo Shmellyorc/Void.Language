@@ -1,7 +1,7 @@
 # VOID developer experience milestone register
 
-Current assignment is Batch 19, G21 diagnostic lifecycle reconciliation.
-G21-R research is accepted and integrated. G21 implementation is in progress
+Current assignment is the Boss-authorized G22 watcher and overlay repair.
+G21 is accepted and integrated. G22 implementation and qualification are
 pending Golden Wrench review.
 Batch entries below identify the integration commits and qualification scopes.
 Boss controls integration, hosted qualification and public release.
@@ -30,13 +30,14 @@ Boss controls integration, hosted qualification and public release.
 | 16 · G18 | `3c81b7eb75c44533a5326da589a6fe47144c3c0f` | **INTEGRATED / INDEPENDENT SOURCE REVIEW COMPLETE**, as reconciled by the G19 assignment. Tagged-enum comparison guidance preserves original error codes/spans and guarded fixes. The separate Windows executable-cleanup refusal remains unexplained. [Qualification](../developer-experience/G18_ENUM_EQUALITY_DIAGNOSTICS.md) |
 | 17 · G19 | `bd6e0ebe6e43dc26d9a4ce1258d85739806d22e1` | **INTEGRATED / INDEPENDENT SOURCE REVIEW COMPLETE. PRODUCTION OPTIMIZATION HOLD.** The deferred-capture candidate failed root-error equivalence. The timings, root-disappearance transcript and five original 15/16 results remain in the G19 record. [Attribution and experiment](../compiler-health/G19_COMPLETION_ATTRIBUTION.md) |
 | G21-R | `c80e686a30e83ebf154985dcd00f5f40296882f8` | **RESEARCH ACCEPTED / INTEGRATED.** The Stage 7 assertion predated G13 open-document ownership. The rejected graph-only publisher hid valid independent diagnostics, including the undeclared-package error. The research preserves the five experimental profiles and the VS Code visual-close observation. [Research](../compiler-health/G21_LSP_DIAGNOSTIC_LIFECYCLE_RESEARCH.md) |
+| 19 · G21 | `59db769cacd80ceba60d3bf9041007d21f300428` | **ACCEPTED / INTEGRATED.** The complete legacy protocol follows G13 diagnostic ownership. Maintained tests cover open and disk ownership transitions. All five native profiles passed the 17-case selection. [Qualification](../compiler-health/G21_LSP_DIAGNOSTIC_LIFECYCLE_QUALIFICATION.md) |
 
 ## Current and upcoming
 
 | Milestone | Status and next evidence |
 | --- | --- |
 | 18 · G20 | **ACCEPTED**, as confirmed by the G21-R assignment. Integrated at `49d2e66243d80957e7dd1bbeecb9767a43a13964`. Physical-root recovery and established tabs formatting remain preserved. [Qualification](../compiler-health/G20_PROJECT_ROOT_RECOVERY.md) |
-| 19 · G21 | **IMPLEMENTATION IN PROGRESS / GOLDEN WRENCH REVIEW PENDING.** Reconciles the complete legacy protocol with G13 and adds maintained diagnostic lifecycle coverage. Production diagnostic ownership is preserved. [Implementation qualification](../compiler-health/G21_LSP_DIAGNOSTIC_LIFECYCLE_QUALIFICATION.md) |
+| G22 | **BOSS-AUTHORIZED REPAIR / GOLDEN WRENCH REVIEW PENDING.** Watched events refresh current analysis while preserving open buffers. Explicit rename, delete and document close retain ownership transitions. The research and original failures remain preserved. [Research and implementation qualification](../compiler-health/G22_WATCHER_OVERLAY_RESEARCH.md#authorized-production-repair) |
 | G00 · Production distribution | Conditional on release authorization. Public bootstrap, distribution and platform obligations remain tracked in the release record. [Preview blockers](../release/PREVIEW_BLOCKERS.md) |
 
 ## Hosted acceptance

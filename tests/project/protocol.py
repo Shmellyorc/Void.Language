@@ -114,6 +114,93 @@ def unreferenced(root):
   check('version' not in cleared and not cleared['diagnostics'],cleared)
   check(definition(c,app,body,'game(name') is None,'closing unreferenced file drops its analysis')
   c.shutdown()
+def watcher_overlays(root):
+ root.mkdir()
+ (root/'void.project.toml').write_text(manifest.replace("roots=['src']","roots=['.']"),encoding='utf-8')
+ entry=root/'main.void'
+ part=root/'part.void'
+ original='value struct point:\n    count: i32\npublic func value() -> i32:\n    const p = point(count = 1)\n    return p.count\n'
+ dirty=original.replace('count','dirty_count').replace('return p.dirty_count','return p.dirty_count + missing')
+ replacement=original.replace('count','disk_count')
+ graph='use "./part.void" as part\nfunc main() -> i32:\n    return part.value()\n'
+ independent='func main() -> i32:\n    return 0\n'
+ entry.write_text(graph,encoding='utf-8')
+ part.write_text(original,encoding='utf-8')
+ with Client(server,root,project=True,entry_override='main.void') as c:
+  c.initialize()
+  def watch(*events):
+   c.notify('workspace/didChangeWatchedFiles',{'changes':[{'uri':path.as_uri(),'type':kind} for path,kind in events]})
+   return c.sync()
+  def publication(notes,path):
+   found=[n for n in notes if n['uri']==path.as_uri()]
+   check(len(found)==1,notes)
+   return found[0]
+  def completion(text,field):
+   line=text.splitlines()[-1]
+   return query(c,'textDocument/completion',{'textDocument':{'uri':part.as_uri()},'position':{'line':len(text.splitlines())-1,'character':line.index('p.'+field)+2}})[0]
+  opened(c,entry,graph)
+  opened(c,part,original)
+  current=publication(change(c,part,dirty,2),part)
+  diagnostic=current['diagnostics']
+  check(len(diagnostic)==1 and diagnostic[0]['code']=='VOID2002' and "Unknown identifier 'missing'." in diagnostic[0]['message'],current)
+  part.unlink()
+  retained=publication(watch((part,3)),part)
+  check(retained['version']==2 and retained['diagnostics']==diagnostic,retained)
+  check([item['label'] for item in completion(dirty,'dirty_count')]==['dirty_count'],'dirty completion survives watched physical deletion')
+  check(not part.exists(),'analysis leaves the deleted disk source absent')
+  notes=change(c,entry,independent,2)
+  retained=publication(notes,part)
+  check(state(c)['status']=='ready' and retained['version']==2 and retained['diagnostics']==diagnostic,'independent diagnostics survive graph removal after a watch')
+  retained=publication(watch((part,3),(part,3)),part)
+  check(retained['version']==2 and retained['diagnostics']==diagnostic,'duplicate delayed deletions retain the current independent diagnostic')
+  notes=change(c,entry,graph,3)
+  check(publication(notes,part)['diagnostics']==diagnostic,'reimport uses the current overlay once')
+  notes=close(c,part)
+  missing=publication(notes,entry)
+  closed=publication(notes,part)
+  check('version' not in closed and not closed['diagnostics'],'actual close clears the independent diagnostic')
+  check(codes([missing])==['VOID3002'] and 'Cannot find imported file' in missing['diagnostics'][0]['message'],'closing a referenced virtual source exposes the missing disk import')
+  check(completion(original,'count')==[],'closed missing source supplies no completion')
+  part.write_text(replacement,encoding='utf-8')
+  notes=watch((part,3))
+  check(all(not n['diagnostics'] for n in notes) and state(c)['status']=='ready','late delete sees the restored closed source')
+  check([item['label'] for item in completion(replacement,'disk_count')]==['disk_count'],'restored disk source supplies current completion')
+  reopened=publication(opened(c,part,dirty,0),part)
+  check(reopened['version']==0 and reopened['diagnostics']==diagnostic,'reset-version reopen restores the dirty source')
+  retained=publication(watch((part,3),(part,1),(part,2)),part)
+  check(retained['version']==0 and retained['diagnostics']==diagnostic,'watch batches retain the open source over replacement disk bytes')
+  notes=close(c,part)
+  check(all(not n['diagnostics'] for n in notes),'close falls back to the restored disk source')
+  check([item['label'] for item in completion(replacement,'disk_count')]==['disk_count'],'close restores disk completion authority')
+  renamed=root/'renamed.void'
+  opened(c,part,dirty,1)
+  part.rename(renamed)
+  watch((part,3),(renamed,1))
+  c.notify('workspace/didRenameFiles',{'files':[{'oldUri':part.as_uri(),'newUri':renamed.as_uri()}]})
+  c.sync()
+  notes=change(c,entry,graph.replace('part.void','renamed.void'),4)
+  check(publication(notes,renamed)['diagnostics']==diagnostic,'explicit rename transfers the dirty source')
+  close(c,part)
+  c.notify('workspace/didDeleteFiles',{'files':[{'uri':renamed.as_uri()}]})
+  notes=c.sync()
+  check(codes([publication(notes,entry)])==['VOID3002'],'explicit deletion retains its unavailable-source contract')
+  c.shutdown()
+ entry.write_text(independent,encoding='utf-8')
+ config=root/'void.project.toml'
+ policy=config.read_text(encoding='utf-8')
+ with Client(server,root,project=True,entry_override='main.void') as c:
+  c.initialize()
+  opened(c,config,policy,1,'toml')
+  config.unlink()
+  watch((config,3))
+  check(state(c)['status']=='ready','watched deletion preserves the open manifest buffer')
+  notes=close(c,config)
+  check(codes([publication(notes,config)])==['VOID5009'],'closing the missing manifest exposes physical project invalidation')
+  config.write_text(policy,encoding='utf-8')
+  watch((config,3))
+  check(state(c)['status']=='ready','late deletion sees the restored closed manifest')
+  c.shutdown()
+
 def preflight_boundaries(workspace):
  root=workspace/'parent';child=root/'child';child.mkdir(parents=True)
  policy=manifest.replace("roots=['src']","roots=['.']")
@@ -183,10 +270,12 @@ try:
    relative.rename(moved)
    legacy.notify('workspace/didChangeWatchedFiles',{'changes':[{'uri':relative.as_uri(),'type':3},{'uri':moved.as_uri(),'type':1}]})
    notes=legacy.sync()
-   check(any(n['uri']==relative.as_uri() and any(d['code']=='VOID3002' for d in n['diagnostics']) for n in notes),'legacy missing entry diagnostic keeps the original URI')
+   check(any(n['uri']==relative.as_uri() and not n['diagnostics'] for n in notes),'legacy open entry retains its buffer after a disk rename')
    position={'textDocument':{'uri':relative.as_uri()},'position':{'line':0,'character':6}}
-   check(query(legacy,'textDocument/definition',position)[0] is None,'legacy rename invalidates old index')
-   close(legacy,relative)
+   check(query(legacy,'textDocument/definition',position)[0]['uri']==relative.as_uri(),'legacy open entry remains navigable after a disk rename')
+   notes=close(legacy,relative)
+   check(any(n['uri']==relative.as_uri() and any(d['code']=='VOID3002' for d in n['diagnostics']) for n in notes),'closing the renamed legacy entry exposes its missing disk source')
+   check(query(legacy,'textDocument/definition',position)[0] is None,'closed missing legacy entry invalidates its index')
    moved.rename(relative)
    legacy.notify('workspace/didChangeWatchedFiles',{'changes':[{'uri':moved.as_uri(),'type':3},{'uri':relative.as_uri(),'type':1}]})
    notes=legacy.sync()
@@ -205,9 +294,8 @@ try:
    inline="schema=1\nproject={id='org.test.sources',name='é😀',version='bad',kind='application'}\napplication={id='org.test.app'}\n";notes=change(c,toml,inline,3);d=next(d for n in notes for d in n['diagnostics'] if d['code']=='VOID5005');column=len(inline.splitlines()[1].split("'bad'")[0].encode('utf-16-le'))//2;check(d['range']=={'start':{'line':1,'character':column},'end':{'line':1,'character':column+5}},'same-line astral manifest UTF-16 range');change(c,toml,manifest,4)
    ambiguous=opened(c,other,'func main() -> i32:\n    return 4\n');check('VOID5010' in codes(ambiguous) and state(c)['entry'] is None,'second dirty main invalidates entry')
    c.notify('workspace/didDeleteFiles',{'files':[{'uri':other.as_uri()}]});c.sync();check(state(c)['entry']==game.as_posix(),'deleted dirty main tombstoned');close(c,other)
-   # A watch deletion can arrive before rename. The dirty bytes are retained by
-   # the open document, but never used as a deleted source entry.
-   c.notify('workspace/didChangeWatchedFiles',{'changes':[{'uri':game.as_uri(),'type':3}]});c.sync();check(state(c)['entry'] is None,'watch deletion hides open source')
+   # This virtual entry has no physical file. A disk watch leaves its open buffer authoritative.
+   c.notify('workspace/didChangeWatchedFiles',{'changes':[{'uri':game.as_uri(),'type':3}]});c.sync();check(state(c)['entry']==game.as_posix() and state(c)['status']=='ready','watch deletion preserves the open entry')
    renamed=root/'src/renamed.void';c.notify('workspace/didRenameFiles',{'files':[{'oldUri':game.as_uri(),'newUri':renamed.as_uri()}]});c.sync();check(state(c)['entry']==renamed.as_posix(),'rename transfers owned dirty bytes');close(c,game);opened(c,renamed,main)
    check(state(c)['requiresReselection'],'entry rename requires deliberate reselection');selected=query(c,'void/reselectProject',{})[0];check(not selected['requiresReselection'],'explicit reselection')
    versions=[int(v['selectionRevision']) for v in c.project_states];check(versions==sorted(set(versions)),'published revisions strictly increase')
@@ -227,6 +315,7 @@ try:
    c.initialize();info=state(c);check(info['kind']=='library' and info['entry'] is None and info['status']=='ready','library session no fabricated entry');check(definition(c,game,main,'value()') is not None,'library semantic navigation');c.shutdown()
   preflight_boundaries(root/'preflight')
   unreferenced(root/'unreferenced')
+  watcher_overlays(root/'watcher')
  print(f'project_protocol: {checks} checks passed')
 finally:
  if evidence:evidence.write_text(json.dumps({'checks':checks,'commands_and_requests':rows},indent=2)+'\n')
