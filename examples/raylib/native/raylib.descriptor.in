@@ -1,7 +1,7 @@
 void-c-primitive 3 3
 provider org.voidlang.raylib
 target @TARGET@
-source /raylib_checked.void
+source-file /src/gallery_native.void
 thunk @THUNK@
 fixture @FIXTURE@
 effects direct-sync blocking checked-callbacks

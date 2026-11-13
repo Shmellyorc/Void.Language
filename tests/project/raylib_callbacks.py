@@ -28,10 +28,11 @@ with tempfile.TemporaryDirectory(prefix='VOID raylib final callbacks ') as tempo
     platform='windows' if windows else 'linux';library='void_raylib.dll' if windows else 'libvoid_raylib.so'
     manifest=project/'void.project.toml'
     with manifest.open('a',encoding='utf-8') as f:f.write(f'\n[native.{platform}]\ndescriptor="raylib-{platform}.descriptor"\nlibrary="{library}"\nadapter="{library}"\n')
-    shutil.copyfile(repo/'verified-packages/raylib/src/api.void',project/'src/api.void')
+    shutil.copyfile(repo/'verified-packages/raylib/src/raylib.void',project/'src/raylib.void')
+    shutil.copyfile(repo/'verified-packages/raylib/src/raylib_native.void',project/'src/raylib_native.void')
     source=repo/'examples/raylib-consumer/src/callbacks.void'
-    (project/'src/checks.void').write_bytes(source.read_bytes().replace(b'use pkg/raylib as rl',b'use "./api.void" as rl'))
-    entry=next(p for p in (project/'src').glob('*.void') if p.name not in ('api.void','checks.void'))
+    (project/'src/checks.void').write_bytes(source.read_bytes().replace(b'use pkg/raylib as rl',b'use "./raylib.void" as rl'))
+    entry=next(p for p in (project/'src').glob('*.void') if p.name not in ('raylib.void','raylib_native.void','checks.void'))
     entry.write_bytes(b'''use "./checks.void" as checks
 use os
 func main() -> i32:
@@ -70,8 +71,8 @@ func main() -> i32:
                 assert 'runtime error' in text,text
     if reload:
         # Same source API and G5 code lease, exercised through compatible reload.
-        reload_entry=project/'src/reload.void'
-        reload_entry.write_bytes(b'''use "./api.void" as rl
+        reload_entry=project/'reload.void'
+        reload_entry.write_bytes(b'''use "./src/raylib.void" as rl
 var registration: rl.callback_registration? = null
 struct capture:
     bias: i32

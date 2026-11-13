@@ -8,7 +8,8 @@ import sys
 import tempfile
 
 compiler, clang = map(lambda value: Path(value).resolve(), sys.argv[1:3])
-sanitized = sys.argv[3:] == ['ON']
+sanitized = 'ON' in sys.argv[3:]
+physical = '--physical' in sys.argv[3:]
 windows = os.name == 'nt'
 fixtures = Path(__file__).resolve().parents[1] / 'ffi'
 environment = dict(os.environ)
@@ -25,6 +26,7 @@ with tempfile.TemporaryDirectory(prefix='VOID mixed ABI ') as temporary:
     native = project/'native'; native.mkdir()
     target = 'x86_64-pc-windows-msvc msvc-x64' if windows else 'x86_64-unknown-linux-gnu sysv-x64'
     content = (fixtures/'mixed.descriptor.in').read_text()
+    if physical:content=content.replace('source /mixed.void','source-file /src/interop.void')
     for name,value in dict(TARGET=target,LONG='i32' if windows else 'i64',THUNK=sha256((fixtures/'mixed_fixture.h').read_bytes()).hexdigest(),FIXTURE=sha256((fixtures/'mixed_fixture.c').read_bytes()).hexdigest()).items():
         content=content.replace('@'+name+'@',value)
     descriptor=native/'mixed.descriptor';descriptor.write_bytes(content.encode('ascii'))
@@ -40,7 +42,11 @@ with tempfile.TemporaryDirectory(prefix='VOID mixed ABI ') as temporary:
     manifest.write_text(manifest.read_text()+f'\n[native.{"windows" if windows else "linux"}]\ndescriptor="mixed.descriptor"\nlibrary="{library}"\nadapter="{library}"\n')
     # new creates a manifest-selected source entry.
     source=next((project/'src').glob('*.void'))
-    source.write_bytes((fixtures/'mixed.void').read_bytes())
+    program=(fixtures/'mixed.void').read_bytes()
+    if physical:
+        run(compiler,'native-bind',descriptor,'mixed_fixture.h','-o',project/'src/interop.void')
+        program=program.replace(b'use "/mixed.void"',b'use "./interop.void"')
+    source.write_bytes(program)
     run(compiler,'check','--project',project)
     for profile in ('debug','release'):
         assert b'Mixed native resources/records/spans passed' in run(compiler,'run','--project',project,'--allow-native','--profile',profile)
@@ -49,7 +55,7 @@ with tempfile.TemporaryDirectory(prefix='VOID mixed ABI ') as temporary:
         shutil.copytree(native,output.parent/'native',dirs_exist_ok=True)
         moved=base/('relocated '+profile);output.parent.rename(moved)
         assert b'Mixed native resources/records/spans passed' in run(moved/output.name,cwd=base)
-    source.write_bytes(b'use "/mixed.void" as ffi\nfunc main() -> i32:\n'
+    source.write_bytes((b'use "./interop.void" as ffi\n' if physical else b'use "/mixed.void" as ffi\n')+b'func main() -> i32:\n'
                        b'    var owner = ffi.create(1) as ffi.box\n'
                        b'    ffi.close_box(owner)\n'
                        b'    var pair = ffi.combine(owner, owner, ffi.pair(x = 0, y = 0 as f32))\n'
@@ -59,4 +65,4 @@ with tempfile.TemporaryDirectory(prefix='VOID mixed ABI ') as temporary:
                             env=environment,capture_output=True,timeout=180)
     assert rejected.returncode==1 and b'C primitive transport rejected' in rejected.stderr, rejected
     assert b'AddressSanitizer' not in rejected.stderr and b'UndefinedBehaviorSanitizer' not in rejected.stderr, rejected
-print('Mixed conventional ABI JIT/AOT and relocation passed')
+print('Mixed '+('physical declarations ' if physical else '')+'conventional ABI JIT/AOT and relocation passed')

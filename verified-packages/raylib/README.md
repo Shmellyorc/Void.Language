@@ -1,39 +1,70 @@
-# raylib 6.0 source package
+# raylib 6.0 — editable VOID source package
 
-**600/600 usable APIs: 236 direct C ABI mappings, 352 ownership adapters, ten
-callback lifecycle adapters and two typed variadic equivalents.** Original C
-varargs are not exposed.
-Package ID `org.voidlang.raylib`, source version `0.1.0`, native provider version
-`6.0.0`, transport ABI `3`. The complete declaration list and individual mapping
-or technical blocker are in [inventory.json](inventory.json).
+All 600 declarations have usable interfaces: 236 direct C ABI mappings,
+352 ownership adapters, ten G5 callback lifecycle adapters and two typed
+variadic equivalents. Arbitrary C varargs remain unsupported. Exact declarations,
+exposure categories and native limits are in [inventory.json](inventory.json) and
+[OWNERSHIP.md](OWNERSHIP.md).
 
-The bindings cover window/input, shapes/collision, images/textures/render targets,
-fonts/text, meshes/materials/models/animation, shaders/VR, files/compression/hashes,
-automation and wave/sound/music/streams. [OWNERSHIP.md](OWNERSHIP.md) specifies the
-native types, field views, allocations, transfers, terminal operations, callback
-lifetimes and observed upstream leaks. All original C declarations retain their
-native compile assertions. The 35 complete structs, two opaque audio types,
-21 enums, 305 enumerators, 70 typedefs and 46 macros are inventoried separately.
-A native probe compiles, links and resolves all 600 function symbols.
+## Source and native layout
 
-## Source dependency and native approval
-
-Copy `examples/raylib-consumer` to a writable directory. After Boss integrates
-and pushes the implementation, configure the actual full lowercase commit SHA:
-
-```sh
-python3 configure.py --rev "$RAYLIB_COMMIT"
-voidc deps fetch --project .
+```text
+void.project.toml                 library/package identity and entry
+src/raylib.void                   public implementation; edit this normally
+src/raylib_native.void            explicit, descriptor-checked native declarations
+native/raylib.descriptor.in       native descriptor template
+native/raylib_api.descriptor.inc  complete native signature/layout declarations
+native/raylib_provider.c/.h       native context and gallery implementation
+native/raylib_api.c/.h            resource/value adapters
+native/raylib_callbacks.inc       C routing into existing G5 ownership
+native/raylib_parity.h            exact upstream C prototype/layout assertions
+upstream/raylib.h                 pinned raylib 6.0 header
+upstream/LICENSE                 upstream license
+prepare.py                       explicit native preparation from approved local inputs
 ```
 
-`configure.py` refuses a floating revision or an existing manifest. It writes:
+The package entry is `src/raylib.void`. It imports `./raylib_native.void`; both
+files are real source. The declaration file starts with
+`native "org.voidlang.raylib"`. The approved descriptor uses
+`source-file /src/raylib_native.void`. The generic C interop system verifies the
+provider, complete declaration inventory, sealed resources, records, function
+signatures and declaration-only pass bodies. It then uses the existing checked C
+transport. The compiler and Runtime contain no raylib-specific mappings.
+
+There is no virtual binding source or VOID `.inc` dependency. Normal check/build
+reads these `.void` bytes; it never regenerates them. Edit a wrapper or add a
+function in `raylib.void`, refresh the local dependency lock, and build normally.
+Edits to fetched Git snapshots remain tampering and are rejected. Use a local path
+dependency for development, then publish a new immutable Git commit.
+
+`generate.py --check --clang /pinned/clang --require-complete` maintains native
+C parity and declaration accounting; it checks public API names without imposing
+generated implementation bodies. It does not overwrite either VOID source file.
+The optional explicit `voidc native-bind DESCRIPTOR raylib_api.h -o NEW.void`
+maintenance operation exports native declarations to a **new** file only. Ordinary
+source edits require neither generator nor export command.
+
+## Dependencies and native approval
+
+Source ID/version: `org.voidlang.raylib`, `0.1.0`. Native ID/version:
+`org.voidlang.raylib`, `6.0.0`, ABI `3`, catalog revision
+`raylib-6.0-api-v4-physical`. The compiler must support generic physical C
+declarations (`source-file`/`native`); the older baseline compiler is insufficient.
+LLVM/Clang/LLD remain pinned to 23.1.4.
+
+Canonical development stays at `verified-packages/raylib/` in VOID.Language.
+The proposed standalone repository contains **this directory's contents at its
+root**, including this manifest and the package-owned C implementation. Publication
+requires Boss authorization and an integration commit containing the physical
+conversion. No standalone repository has been published by this task.
+
+A normal standalone consumer declares:
 
 ```toml
 [dependencies.raylib]
 id = "org.voidlang.raylib"
-git = "https://github.com/Shmellyorc/Void.Language.git"
-rev = "<actual full lowercase 40-character integration SHA>"
-subdir = "verified-packages/raylib"
+git = "https://github.com/Shmellyorc/VOID.raylib.git"
+rev = "<actual full lowercase standalone package commit SHA>"
 version = "=0.1.0"
 
 [native-requirements.raylib]
@@ -42,123 +73,64 @@ version = "=6.0.0"
 abi = 3
 ```
 
-The displayed placeholder is documentation, not a usable pin. The final public
-GitHub fetch requires the eventual integration commit. Qualification uses a
-disposable real Git commit over the existing D3 smart HTTPS fixture.
+The URL is proposed and uncreated; the SHA placeholder is documentation, not a
+valid pin. Boss chooses the repository and actual immutable commit. No `subdir`
+is needed because the standalone library manifest is at the repository root.
+The existing example supports `configure.py --origin URL --rev SHA --standalone`.
+The full monorepo exceeds D3's existing limits; those limits are unchanged.
 
-Native approval remains a separate explicit operation, using trusted local
-raylib files and pinned Clang/LLVM/LLD 23.1.4:
+Git acquisition downloads/verifies source only. Approve and prepare native code
+separately using the existing command and trusted local raylib library:
 
 ```sh
-python3 examples/raylib/prepare.py --voidc /path/to/voidc \
-  --clang /path/to/clang --header verified-packages/raylib/upstream/raylib.h \
-  --library /path/to/libraylib.so.6.0.0 --license /path/to/raylib/LICENSE \
-  --api-package verified-packages/raylib --managed-catalog /new/approved/catalog
+python3 prepare.py --voidc /path/to/voidc --clang /pinned/clang \
+  --header upstream/raylib.h --library /approved/libraylib.so.6.0.0 \
+  --license upstream/LICENSE --managed-catalog /new/approved/catalog
 export VOID_NATIVE_CATALOG=/new/approved/catalog
-```
-
-On Windows run in an x64 VS 2022 Native Tools shell, use `python`, `raylib.dll`
-and its matching `--import-library /path/to/raylib.lib`. The renderer must be
-supported by the machine. The Windows 10 guest requires the pinned source's
-Win32 software renderer; its shader/framebuffer capabilities differ from Linux
-OpenGL. For strict Linux add `--sanitize`. Preparation consumes reviewed generated
-files and uses existing native-bind, catalog and dynamic-closure infrastructure.
-Git dependency acquisition neither builds nor authorizes native code.
-
-```sh
-voidc resolve --project .
-voidc resolve --locked --project .
-voidc deps explain --project . --json
-voidc check --project .
-voidc run --project . --allow-native --profile debug
-voidc run --project . --allow-native --profile release
-voidc build --project . --allow-native -o /new/aot/app
-voidc package --project . --allow-native -o /new/package
+voidc deps fetch --project /consumer
+voidc resolve --project /consumer
+voidc resolve --locked --project /consumer
+voidc deps explain --project /consumer --json
+voidc check --project /consumer
+voidc run --project /consumer --allow-native --profile debug
+voidc run --project /consumer --allow-native --profile release
+voidc package --project /consumer --allow-native -o /new/package
 voidc package --verify /new/package
 ```
 
-Move the whole package and verify/run it from another working directory. D5
-verifies the executable, native payload, licenses and declared resources. VS Code
-1.141.0 uses the same locked package and approved catalog for typed hover,
-completion and Check. Editor tasks retain their existing explicit native execution
-boundary; they do not silently add `--allow-native`.
+On Windows use the x64 VS 2022 Native Tools shell, `python`, `raylib.dll` and its
+matching `--import-library /approved/raylib.lib`. On strict Linux add `--sanitize`
+to preparation. Preparation consumes package-owned native source; it does not
+rewrite VOID. Packages carry approved runtime/link/notices through existing D4/D5.
 
-## Using values and owners
+## Using the API
 
 ```void
 use pkg/raylib as rl
 
 func main():
-    var pixels = rl.gen_image_color(16, 16, rl.orange()) as rl.image
-    defer rl.unload_image(pixels)
-    rl.image_draw_pixel(pixels, 2, 3, rl.blue())
-    print(rl.get_image_color(pixels, 2, 3).b)
-    var codepoints = rl.load_codepoints("Aé🎮") as rl.int_array
-    defer rl.unload_codepoints(codepoints)
-    print(rl.int_array_get(codepoints, 2))
+    var image = rl.gen_image_color(16, 16, rl.orange()) as rl.image
+    defer rl.unload_image(image)
+    rl.image_draw_pixel(image, 2, 3, rl.blue())
+    print(rl.get_image_color(image, 2, 3).b)
 ```
 
-Names are generated snake case. Use explicit ownership-consuming unloads or the
-existing Runtime cleanup. Borrowed fields retain their native parent and reject
-stale generations. Native pointers never become source integers. Close functions
-return i32 ledger status; out pointers become counted buffers, result fields or
-owner metadata. Source strings cross as owned terminated UTF-8. Nullable C text
-uses `c_string?`, while C text results use nullable `byte_buffer` and `buffer_text`.
-Native C preconditions and application-thread rules still apply.
+Names are snake case. Native pointers stay opaque; owner terminals consume their
+handles and borrowed fields retain/check parents. Native operation, thread,
+format, dimension and index preconditions still apply.
 
-The consumer defaults to headless ABI and ownership checks. `--window` exercises
-public resource APIs and an interactive gallery. `--audio` exercises a real audio
-device, aliases, memory-backed music, playback states and stream updates. Optional
-font/animation inputs can be extracted from the already approved source archive:
+`trace_log(level, text)` uses native `TraceLog(level,"%s",text)`.
+`text_format(value, spec = "")` reuses VOID's typed formatter and returns a result;
+use interpolation for multiple values. Supported values retain the existing
+numeric/bool/string and display/format-hook contracts. These are typed equivalents,
+not arbitrary C varargs bindings.
 
-```sh
-python3 tests/project/raylib_assets.py /approved/raylib-6.0-source.tar.gz /new/assets
-export VOID_TEST_RAYLIB_ASSETS=/new/assets
-```
+Callback setters/attachments return an owned `callback_registration`. Close or
+matching detach unregisters and drains before G5 retires managed state/code. Global
+hooks require an exclusive application-thread window without audio. PCM callbacks
+cannot recursively call raylib; processors use float32 stereo bytes. Sixteen audio
+slots and bounded I/O are explicit limits. See [OWNERSHIP.md](OWNERSHIP.md).
 
-The Git consumer fixture copies those inputs into ordinary D5 application
-resources. Relocated graphics qualification loads them from the package resource
-directory. They are test inputs, not another dependency downloader.
-
-## Final typed interfaces and native limits
-
-`trace_log(level, text)` uses native TraceLog with a literal "%s" format.
-`text_format(value, spec = "")` delegates to VOID's existing typed formatter and
-returns a result; use interpolation for multiple values. Numeric types, bool,
-string and existing nominal display/format hooks retain their ordinary supported
-format syntax. Neither interface implements arbitrary C varargs.
-
-All ten callback declarations have retained G5 adapters. Setters/attachments
-return an owned `callback_registration`; close or the matching detach unregisters
-and drains it before releasing the managed closure. File handlers exchange owned
-bytes/text, with native MemAlloc/Unload handoff. Audio generation uses the stream
-format; processors use float32 stereo bytes. Global hooks require an exclusive
-application-thread window without audio. Audio callbacks cannot recursively call
-raylib. Sixteen audio slots and bounded I/O are explicit limits. See the exact
-signatures, replacement, failure and shutdown rules in [OWNERSHIP.md](OWNERSHIP.md).
-
-Supported ABI targets are Linux x86-64 GNU/SysV and Windows x64 MSVC. Native
-symbol presence and headless checks do not establish every device/backend feature
-or runtime exercise of every declaration. Strict graphics and real strict audio
-remain failed for independently reproduced external allocations: 256 bytes in
-Gallium, 408 bytes in raylib's WAV music context and 64 bytes in its sound-alias
-converter residual. Leak detection remains enabled; none is suppressed or claimed
-fixed. See the [consolidated qualification record](../../docs/projects/G23_G24_IMPLEMENTATION.md).
-
-## Reproduce generated parity and package checks
-
-```sh
-python3 verified-packages/raylib/generate.py --clang /pinned/clang --check --require-complete
-python3 tests/project/raylib_native_symbols.py /pinned/clang verified-packages/raylib /approved/catalog
-VOID_TEST_RAYLIB_CATALOG=/approved/catalog \
-VOID_TEST_RAYLIB_EVIDENCE=/new/evidence \
-python3 -B tests/project/git_https.py /path/to/voidc /path/to/git
-```
-
-`generate.py --check --require-complete` verifies all 600 usable interfaces.
-`complete_usable_api` is true; the legacy exact-signature `complete_binding` flag
-and `complete_direct_c_abi` remain false. Typed equivalents are counted separately. The pinned header SHA-256 is
-`047e7255f93f8c34039cab906ad76136706b5c7b4c5b5b065d84141963ee9b6b`.
-Generation inspects the existing Clang AST/layouts, verifies an independent RLAPI
-name inventory and emits ordinary native-bind inputs. It introduces no compiler
-syntax, registry, replacement package manager or second native loader.
+Strict full-device leaks remain unsuppressed: 256 bytes in Gallium, 408 bytes in
+raylib's WAV music context and 64 bytes in the sound-alias converter residual.
+Clean strict headless/bounded callback results do not make these device paths clean.

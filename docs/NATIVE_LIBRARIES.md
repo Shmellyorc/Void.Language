@@ -1,5 +1,29 @@
 # Trusted static native providers
 
+## Physical C declarations, G24 source conversion
+
+The conventional C ABI now also accepts `source-file /src/interop.void` in an
+approved descriptor. This selects an ordinary project or package file instead
+of the legacy `source /interop.void` virtual module. The real file begins with
+`native "provider.identity"`, followed by the complete descriptor's resources,
+records and function declarations. Native function bodies contain only `pass`.
+The marker grants no native approval: a matching admitted descriptor is required.
+
+The existing admission checks the provider, source path, complete inventory,
+sealed resources, record layouts and every function signature, including unused
+declarations. Executable bodies/default arguments, extra declarations and two
+matching modules are rejected. Package identities are contextualized through the
+existing source graph; loading, ABI transport, G5 callbacks and generation
+ownership remain the existing mechanisms. Legacy virtual descriptors still work.
+
+`voidc native-bind descriptor header.h -o NEW.void` explicitly exports initial
+declarations for a `source-file` descriptor. As with C output, the destination
+must be new. Compilation never invokes this export or replaces source bytes.
+Normal relative imports, dependency lock verification and LSP physical locations
+apply. See the [physical-source qualification](projects/G24_PHYSICAL_SOURCE_IMPLEMENTATION.md).
+
+The sections below retain their original implementation history and scope.
+
 Slice 1 now validates application/library metadata and rejects nonempty reserved
 native/dependency declarations through the explicit compiler-library parser only.
 [Engineering evidence](projects/SLICE1.md) records the qualification. Source-library

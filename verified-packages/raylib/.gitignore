@@ -1,0 +1,9 @@
+__pycache__/
+native/.bind-*/
+native/*.so*
+native/*.dll
+native/*.lib
+native/raylib_checked.c
+native/raylib-*.descriptor
+native/void.native.toml
+native/RAYLIB-LICENSE.txt

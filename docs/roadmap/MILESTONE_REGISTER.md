@@ -4,7 +4,13 @@ Current assignment is the Boss-authorized G23 editor packaging and G24 raylib
 verified source package integration. G22 is accepted at
 `ff3bbcd5a20fa2e81506d23e276a8a7837e9404f`. G23 is implemented; G24 has usable
 interfaces for all 600 declarations, with typed adaptations and native limits
-explicit. Boss acceptance and public post-push qualification remain pending.
+explicit. The G24 physical-source conversion is implemented locally; canonical
+development stays in `verified-packages/raylib/`, with a standalone Git subtree
+publication proposal awaiting Boss authorization. Boss acceptance remains pending.
+Public post-push qualification at `6a7cb50b2d35023324053694275596c9a4a7b328` failed
+on unchanged D3 whole-repository acquisition limits; see the
+[public-origin report](../projects/G24_PUBLIC_GITHUB_QUALIFICATION.md) and
+[physical-source report](../projects/G24_PHYSICAL_SOURCE_IMPLEMENTATION.md).
 Batch entries below identify the integration commits and qualification scopes.
 Boss controls integration, hosted qualification and public release.
 [Feature roadmap](FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md)
@@ -41,7 +47,7 @@ Boss controls integration, hosted qualification and public release.
 | --- | --- |
 | 18 · G20 | **ACCEPTED**, as confirmed by the G21-R assignment. Integrated at `49d2e66243d80957e7dd1bbeecb9767a43a13964`. Physical-root recovery and established tabs formatting remain preserved. [Qualification](../compiler-health/G20_PROJECT_ROOT_RECOVERY.md) |
 | G23 | **IMPLEMENTED / LOCAL EDITOR QUALIFICATION.** Package reuses Check/Build/Run selection, trust, saved-buffer, profile and compiler execution checks. Real package verification passed in native VS Code 1.141.0 on PikaOS and Windows 10 Debug/Release. No integration commit created. [Implementation](../projects/G23_G24_IMPLEMENTATION.md) |
-| G24 | **IMPLEMENTED; BOSS ACCEPTANCE / POST-PUSH QUALIFICATION PENDING.** All 600 declarations have usable interfaces: 236 direct C ABI mappings, 352 ownership adapters, ten G5 lifecycle adapters and two typed variadic equivalents. Original arbitrary C varargs and concurrent external global-hook mutation remain unsupported. Existing native/Linux/Windows qualification is preserved and final-interface qualification is recorded with its explicit bounds. Strict full-device tests retain independently reproduced Gallium/raylib leaks. No final public GitHub SHA exists. [Consolidated implementation and qualification](../projects/G23_G24_IMPLEMENTATION.md) |
+| G24 | **IMPLEMENTED; PHYSICAL SOURCE LOCAL; STANDALONE PUBLICATION PENDING.** Baseline `6a7cb50b2d35023324053694275596c9a4a7b328` preserves all 600 usable interfaces: 236 direct, 352 ownership, ten G5 lifecycle and two typed equivalents. Real `.void` public/native modules replace raylib ghost source; editable behavior and root-repository Git consumers are locally qualified. The actual monorepo GitHub failure on all five builds remains recorded; D3 limits are unchanged. Reproducible subtree publication is proposed, with no repository creation/push authorized or performed. Strict external device leaks remain unsuppressed. [Physical-source report and publication commands](../projects/G24_PHYSICAL_SOURCE_IMPLEMENTATION.md) · [Public-origin qualification](../projects/G24_PUBLIC_GITHUB_QUALIFICATION.md) · [Integrated implementation](../projects/G23_G24_IMPLEMENTATION.md) |
 | G00 · Production distribution | Conditional on release authorization. Public bootstrap, distribution and platform obligations remain tracked in the release record. [Preview blockers](../release/PREVIEW_BLOCKERS.md) |
 
 ## Hosted acceptance

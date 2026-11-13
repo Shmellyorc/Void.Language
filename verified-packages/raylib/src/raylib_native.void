@@ -1,0 +1,1699 @@
+# Host-admitted C primitive declarations for org.voidlang.raylib
+native "org.voidlang.raylib"
+
+struct window:
+    private _seal: u64 = 0
+struct owner_buffer:
+    private _seal: u64 = 0
+struct owner_window:
+    private _seal: u64 = 0
+struct owner_audio:
+    private _seal: u64 = 0
+struct owner_image:
+    private _seal: u64 = 0
+struct owner_texture:
+    private _seal: u64 = 0
+struct owner_render_texture:
+    private _seal: u64 = 0
+struct owner_font:
+    private _seal: u64 = 0
+struct owner_mesh:
+    private _seal: u64 = 0
+struct owner_shader:
+    private _seal: u64 = 0
+struct owner_material:
+    private _seal: u64 = 0
+struct owner_model:
+    private _seal: u64 = 0
+struct owner_wave:
+    private _seal: u64 = 0
+struct owner_audio_stream:
+    private _seal: u64 = 0
+struct owner_sound:
+    private _seal: u64 = 0
+struct owner_music:
+    private _seal: u64 = 0
+struct owner_file_path_list:
+    private _seal: u64 = 0
+struct owner_glyph_info:
+    private _seal: u64 = 0
+struct owner_material_map:
+    private _seal: u64 = 0
+struct owner_model_skeleton:
+    private _seal: u64 = 0
+struct owner_model_animation:
+    private _seal: u64 = 0
+struct owner_automation_event_list:
+    private _seal: u64 = 0
+struct callback_target:
+    private _seal: u64 = 0
+struct callback_registration:
+    private _seal: u64 = 0
+value struct color:
+    r: u8
+    g: u8
+    b: u8
+    a: u8
+value struct vector2:
+    x: f32
+    y: f32
+value struct vector3:
+    x: f32
+    y: f32
+    z: f32
+value struct vector4:
+    x: f32
+    y: f32
+    z: f32
+    w: f32
+value struct matrix:
+    m0: f32
+    m4: f32
+    m8: f32
+    m12: f32
+    m1: f32
+    m5: f32
+    m9: f32
+    m13: f32
+    m2: f32
+    m6: f32
+    m10: f32
+    m14: f32
+    m3: f32
+    m7: f32
+    m11: f32
+    m15: f32
+value struct rectangle:
+    x: f32
+    y: f32
+    width: f32
+    height: f32
+value struct n_patch_info:
+    source: rectangle
+    left: i32
+    top: i32
+    right: i32
+    bottom: i32
+    layout: i32
+value struct camera3_d:
+    position: vector3
+    target: vector3
+    up: vector3
+    fovy: f32
+    projection: i32
+value struct camera2_d:
+    offset: vector2
+    target: vector2
+    rotation: f32
+    zoom: f32
+value struct transform:
+    translation: vector3
+    rotation: vector4
+    scale: vector3
+value struct bone_info:
+    name: [i8, 32]
+    parent: i32
+value struct ray:
+    position: vector3
+    direction: vector3
+value struct ray_collision:
+    hit: bool
+    distance: f32
+    point: vector3
+    normal: vector3
+value struct bounding_box:
+    min: vector3
+    max: vector3
+value struct vr_device_info:
+    h_resolution: i32
+    v_resolution: i32
+    h_screen_size: f32
+    v_screen_size: f32
+    eye_to_screen_distance: f32
+    lens_separation_distance: f32
+    interpupillary_distance: f32
+    lens_distortion_values: [f32, 4]
+    chroma_ab_correction: [f32, 4]
+value struct vr_stereo_config:
+    projection: [matrix, 2]
+    view_offset: [matrix, 2]
+    left_lens_center: [f32, 2]
+    right_lens_center: [f32, 2]
+    left_screen_center: [f32, 2]
+    right_screen_center: [f32, 2]
+    scale: [f32, 2]
+    scale_in: [f32, 2]
+value struct automation_event:
+    frame: u32
+    type: u32
+    params: [i32, 4]
+value struct int_out:
+    value: i32
+    size: i32
+value struct collision_out:
+    hit: bool
+    point: vector2
+func tint(arg0: color, arg1: f32) -> color:
+    pass
+func trace(arg0: func(i32, u32, u32)) -> i32:
+    pass
+func title(const arg0: [u8], arg1: u64, arg2: u64) -> i64:
+    pass
+func open(arg0: i32, arg1: i32) -> window?:
+    pass
+func should_close(const arg0: window) -> bool:
+    pass
+func direction(const arg0: window) -> i32:
+    pass
+func draw(arg0: window, arg1: i32, arg2: i32, arg3: u8, arg4: u8, arg5: u8) -> i32:
+    pass
+func close(arg0: window) -> i32:
+    pass
+func window_should_close() -> bool:
+    pass
+func is_window_ready() -> bool:
+    pass
+func is_window_fullscreen() -> bool:
+    pass
+func is_window_hidden() -> bool:
+    pass
+func is_window_minimized() -> bool:
+    pass
+func is_window_maximized() -> bool:
+    pass
+func is_window_focused() -> bool:
+    pass
+func is_window_resized() -> bool:
+    pass
+func is_window_state(arg0: u32) -> bool:
+    pass
+func set_window_state(arg0: u32):
+    pass
+func clear_window_state(arg0: u32):
+    pass
+func toggle_fullscreen():
+    pass
+func toggle_borderless_windowed():
+    pass
+func maximize_window():
+    pass
+func minimize_window():
+    pass
+func restore_window():
+    pass
+func set_window_position(arg0: i32, arg1: i32):
+    pass
+func set_window_monitor(arg0: i32):
+    pass
+func set_window_min_size(arg0: i32, arg1: i32):
+    pass
+func set_window_max_size(arg0: i32, arg1: i32):
+    pass
+func set_window_size(arg0: i32, arg1: i32):
+    pass
+func set_window_opacity(arg0: f32):
+    pass
+func set_window_focused():
+    pass
+func get_screen_width() -> i32:
+    pass
+func get_screen_height() -> i32:
+    pass
+func get_render_width() -> i32:
+    pass
+func get_render_height() -> i32:
+    pass
+func get_monitor_count() -> i32:
+    pass
+func get_current_monitor() -> i32:
+    pass
+func get_monitor_position(arg0: i32) -> vector2:
+    pass
+func get_monitor_width(arg0: i32) -> i32:
+    pass
+func get_monitor_height(arg0: i32) -> i32:
+    pass
+func get_monitor_physical_width(arg0: i32) -> i32:
+    pass
+func get_monitor_physical_height(arg0: i32) -> i32:
+    pass
+func get_monitor_refresh_rate(arg0: i32) -> i32:
+    pass
+func get_window_position() -> vector2:
+    pass
+func get_window_scale_dpi() -> vector2:
+    pass
+func enable_event_waiting():
+    pass
+func disable_event_waiting():
+    pass
+func show_cursor():
+    pass
+func hide_cursor():
+    pass
+func is_cursor_hidden() -> bool:
+    pass
+func enable_cursor():
+    pass
+func disable_cursor():
+    pass
+func is_cursor_on_screen() -> bool:
+    pass
+func clear_background(arg0: color):
+    pass
+func begin_drawing():
+    pass
+func end_drawing():
+    pass
+func begin_mode2_d(arg0: camera2_d):
+    pass
+func end_mode2_d():
+    pass
+func begin_mode3_d(arg0: camera3_d):
+    pass
+func end_mode3_d():
+    pass
+func end_texture_mode():
+    pass
+func end_shader_mode():
+    pass
+func begin_blend_mode(arg0: i32):
+    pass
+func end_blend_mode():
+    pass
+func begin_scissor_mode(arg0: i32, arg1: i32, arg2: i32, arg3: i32):
+    pass
+func end_scissor_mode():
+    pass
+func begin_vr_stereo_mode(arg0: vr_stereo_config):
+    pass
+func end_vr_stereo_mode():
+    pass
+func load_vr_stereo_config(arg0: vr_device_info) -> vr_stereo_config:
+    pass
+func unload_vr_stereo_config(arg0: vr_stereo_config):
+    pass
+func get_screen_to_world_ray(arg0: vector2, arg1: camera3_d) -> ray:
+    pass
+func get_screen_to_world_ray_ex(arg0: vector2, arg1: camera3_d, arg2: i32, arg3: i32) -> ray:
+    pass
+func get_world_to_screen(arg0: vector3, arg1: camera3_d) -> vector2:
+    pass
+func get_world_to_screen_ex(arg0: vector3, arg1: camera3_d, arg2: i32, arg3: i32) -> vector2:
+    pass
+func get_world_to_screen2_d(arg0: vector2, arg1: camera2_d) -> vector2:
+    pass
+func get_screen_to_world2_d(arg0: vector2, arg1: camera2_d) -> vector2:
+    pass
+func get_camera_matrix(arg0: camera3_d) -> matrix:
+    pass
+func get_camera_matrix2_d(arg0: camera2_d) -> matrix:
+    pass
+func set_target_fps(arg0: i32):
+    pass
+func get_frame_time() -> f32:
+    pass
+func get_time() -> f64:
+    pass
+func get_fps() -> i32:
+    pass
+func swap_screen_buffer():
+    pass
+func poll_input_events():
+    pass
+func wait_time(arg0: f64):
+    pass
+func set_random_seed(arg0: u32):
+    pass
+func get_random_value(arg0: i32, arg1: i32) -> i32:
+    pass
+func set_config_flags(arg0: u32):
+    pass
+func set_trace_log_level(arg0: i32):
+    pass
+func is_file_dropped() -> bool:
+    pass
+func set_automation_event_base_frame(arg0: i32):
+    pass
+func start_automation_event_recording():
+    pass
+func stop_automation_event_recording():
+    pass
+func play_automation_event(arg0: automation_event):
+    pass
+func is_key_pressed(arg0: i32) -> bool:
+    pass
+func is_key_pressed_repeat(arg0: i32) -> bool:
+    pass
+func is_key_down(arg0: i32) -> bool:
+    pass
+func is_key_released(arg0: i32) -> bool:
+    pass
+func is_key_up(arg0: i32) -> bool:
+    pass
+func get_key_pressed() -> i32:
+    pass
+func get_char_pressed() -> i32:
+    pass
+func set_exit_key(arg0: i32):
+    pass
+func is_gamepad_available(arg0: i32) -> bool:
+    pass
+func is_gamepad_button_pressed(arg0: i32, arg1: i32) -> bool:
+    pass
+func is_gamepad_button_down(arg0: i32, arg1: i32) -> bool:
+    pass
+func is_gamepad_button_released(arg0: i32, arg1: i32) -> bool:
+    pass
+func is_gamepad_button_up(arg0: i32, arg1: i32) -> bool:
+    pass
+func get_gamepad_button_pressed() -> i32:
+    pass
+func get_gamepad_axis_count(arg0: i32) -> i32:
+    pass
+func get_gamepad_axis_movement(arg0: i32, arg1: i32) -> f32:
+    pass
+func set_gamepad_vibration(arg0: i32, arg1: f32, arg2: f32, arg3: f32):
+    pass
+func is_mouse_button_pressed(arg0: i32) -> bool:
+    pass
+func is_mouse_button_down(arg0: i32) -> bool:
+    pass
+func is_mouse_button_released(arg0: i32) -> bool:
+    pass
+func is_mouse_button_up(arg0: i32) -> bool:
+    pass
+func get_mouse_x() -> i32:
+    pass
+func get_mouse_y() -> i32:
+    pass
+func get_mouse_position() -> vector2:
+    pass
+func get_mouse_delta() -> vector2:
+    pass
+func set_mouse_position(arg0: i32, arg1: i32):
+    pass
+func set_mouse_offset(arg0: i32, arg1: i32):
+    pass
+func set_mouse_scale(arg0: f32, arg1: f32):
+    pass
+func get_mouse_wheel_move() -> f32:
+    pass
+func get_mouse_wheel_move_v() -> vector2:
+    pass
+func set_mouse_cursor(arg0: i32):
+    pass
+func get_touch_x() -> i32:
+    pass
+func get_touch_y() -> i32:
+    pass
+func get_touch_position(arg0: i32) -> vector2:
+    pass
+func get_touch_point_id(arg0: i32) -> i32:
+    pass
+func get_touch_point_count() -> i32:
+    pass
+func set_gestures_enabled(arg0: u32):
+    pass
+func is_gesture_detected(arg0: u32) -> bool:
+    pass
+func get_gesture_detected() -> i32:
+    pass
+func get_gesture_hold_duration() -> f32:
+    pass
+func get_gesture_drag_vector() -> vector2:
+    pass
+func get_gesture_drag_angle() -> f32:
+    pass
+func get_gesture_pinch_vector() -> vector2:
+    pass
+func get_gesture_pinch_angle() -> f32:
+    pass
+func get_shapes_texture_rectangle() -> rectangle:
+    pass
+func draw_pixel(arg0: i32, arg1: i32, arg2: color):
+    pass
+func draw_pixel_v(arg0: vector2, arg1: color):
+    pass
+func draw_line(arg0: i32, arg1: i32, arg2: i32, arg3: i32, arg4: color):
+    pass
+func draw_line_v(arg0: vector2, arg1: vector2, arg2: color):
+    pass
+func draw_line_ex(arg0: vector2, arg1: vector2, arg2: f32, arg3: color):
+    pass
+func draw_line_bezier(arg0: vector2, arg1: vector2, arg2: f32, arg3: color):
+    pass
+func draw_line_dashed(arg0: vector2, arg1: vector2, arg2: i32, arg3: i32, arg4: color):
+    pass
+func draw_circle(arg0: i32, arg1: i32, arg2: f32, arg3: color):
+    pass
+func draw_circle_v(arg0: vector2, arg1: f32, arg2: color):
+    pass
+func draw_circle_gradient(arg0: vector2, arg1: f32, arg2: color, arg3: color):
+    pass
+func draw_circle_sector(arg0: vector2, arg1: f32, arg2: f32, arg3: f32, arg4: i32, arg5: color):
+    pass
+func draw_circle_sector_lines(arg0: vector2, arg1: f32, arg2: f32, arg3: f32, arg4: i32, arg5: color):
+    pass
+func draw_circle_lines(arg0: i32, arg1: i32, arg2: f32, arg3: color):
+    pass
+func draw_circle_lines_v(arg0: vector2, arg1: f32, arg2: color):
+    pass
+func draw_ellipse(arg0: i32, arg1: i32, arg2: f32, arg3: f32, arg4: color):
+    pass
+func draw_ellipse_v(arg0: vector2, arg1: f32, arg2: f32, arg3: color):
+    pass
+func draw_ellipse_lines(arg0: i32, arg1: i32, arg2: f32, arg3: f32, arg4: color):
+    pass
+func draw_ellipse_lines_v(arg0: vector2, arg1: f32, arg2: f32, arg3: color):
+    pass
+func draw_ring(arg0: vector2, arg1: f32, arg2: f32, arg3: f32, arg4: f32, arg5: i32, arg6: color):
+    pass
+func draw_ring_lines(arg0: vector2, arg1: f32, arg2: f32, arg3: f32, arg4: f32, arg5: i32, arg6: color):
+    pass
+func draw_rectangle(arg0: i32, arg1: i32, arg2: i32, arg3: i32, arg4: color):
+    pass
+func draw_rectangle_v(arg0: vector2, arg1: vector2, arg2: color):
+    pass
+func draw_rectangle_rec(arg0: rectangle, arg1: color):
+    pass
+func draw_rectangle_pro(arg0: rectangle, arg1: vector2, arg2: f32, arg3: color):
+    pass
+func draw_rectangle_gradient_v(arg0: i32, arg1: i32, arg2: i32, arg3: i32, arg4: color, arg5: color):
+    pass
+func draw_rectangle_gradient_h(arg0: i32, arg1: i32, arg2: i32, arg3: i32, arg4: color, arg5: color):
+    pass
+func draw_rectangle_gradient_ex(arg0: rectangle, arg1: color, arg2: color, arg3: color, arg4: color):
+    pass
+func draw_rectangle_lines(arg0: i32, arg1: i32, arg2: i32, arg3: i32, arg4: color):
+    pass
+func draw_rectangle_lines_ex(arg0: rectangle, arg1: f32, arg2: color):
+    pass
+func draw_rectangle_rounded(arg0: rectangle, arg1: f32, arg2: i32, arg3: color):
+    pass
+func draw_rectangle_rounded_lines(arg0: rectangle, arg1: f32, arg2: i32, arg3: color):
+    pass
+func draw_rectangle_rounded_lines_ex(arg0: rectangle, arg1: f32, arg2: i32, arg3: f32, arg4: color):
+    pass
+func draw_triangle(arg0: vector2, arg1: vector2, arg2: vector2, arg3: color):
+    pass
+func draw_triangle_lines(arg0: vector2, arg1: vector2, arg2: vector2, arg3: color):
+    pass
+func draw_poly(arg0: vector2, arg1: i32, arg2: f32, arg3: f32, arg4: color):
+    pass
+func draw_poly_lines(arg0: vector2, arg1: i32, arg2: f32, arg3: f32, arg4: color):
+    pass
+func draw_poly_lines_ex(arg0: vector2, arg1: i32, arg2: f32, arg3: f32, arg4: f32, arg5: color):
+    pass
+func draw_spline_segment_linear(arg0: vector2, arg1: vector2, arg2: f32, arg3: color):
+    pass
+func draw_spline_segment_basis(arg0: vector2, arg1: vector2, arg2: vector2, arg3: vector2, arg4: f32, arg5: color):
+    pass
+func draw_spline_segment_catmull_rom(arg0: vector2, arg1: vector2, arg2: vector2, arg3: vector2, arg4: f32, arg5: color):
+    pass
+func draw_spline_segment_bezier_quadratic(arg0: vector2, arg1: vector2, arg2: vector2, arg3: f32, arg4: color):
+    pass
+func draw_spline_segment_bezier_cubic(arg0: vector2, arg1: vector2, arg2: vector2, arg3: vector2, arg4: f32, arg5: color):
+    pass
+func get_spline_point_linear(arg0: vector2, arg1: vector2, arg2: f32) -> vector2:
+    pass
+func get_spline_point_basis(arg0: vector2, arg1: vector2, arg2: vector2, arg3: vector2, arg4: f32) -> vector2:
+    pass
+func get_spline_point_catmull_rom(arg0: vector2, arg1: vector2, arg2: vector2, arg3: vector2, arg4: f32) -> vector2:
+    pass
+func get_spline_point_bezier_quad(arg0: vector2, arg1: vector2, arg2: vector2, arg3: f32) -> vector2:
+    pass
+func get_spline_point_bezier_cubic(arg0: vector2, arg1: vector2, arg2: vector2, arg3: vector2, arg4: f32) -> vector2:
+    pass
+func check_collision_recs(arg0: rectangle, arg1: rectangle) -> bool:
+    pass
+func check_collision_circles(arg0: vector2, arg1: f32, arg2: vector2, arg3: f32) -> bool:
+    pass
+func check_collision_circle_rec(arg0: vector2, arg1: f32, arg2: rectangle) -> bool:
+    pass
+func check_collision_circle_line(arg0: vector2, arg1: f32, arg2: vector2, arg3: vector2) -> bool:
+    pass
+func check_collision_point_rec(arg0: vector2, arg1: rectangle) -> bool:
+    pass
+func check_collision_point_circle(arg0: vector2, arg1: vector2, arg2: f32) -> bool:
+    pass
+func check_collision_point_triangle(arg0: vector2, arg1: vector2, arg2: vector2, arg3: vector2) -> bool:
+    pass
+func check_collision_point_line(arg0: vector2, arg1: vector2, arg2: vector2, arg3: i32) -> bool:
+    pass
+func get_collision_rec(arg0: rectangle, arg1: rectangle) -> rectangle:
+    pass
+func color_is_equal(arg0: color, arg1: color) -> bool:
+    pass
+func fade(arg0: color, arg1: f32) -> color:
+    pass
+func color_to_int(arg0: color) -> i32:
+    pass
+func color_normalize(arg0: color) -> vector4:
+    pass
+func color_from_normalized(arg0: vector4) -> color:
+    pass
+func color_to_hsv(arg0: color) -> vector3:
+    pass
+func color_from_hsv(arg0: f32, arg1: f32, arg2: f32) -> color:
+    pass
+func color_tint(arg0: color, arg1: color) -> color:
+    pass
+func color_brightness(arg0: color, arg1: f32) -> color:
+    pass
+func color_contrast(arg0: color, arg1: f32) -> color:
+    pass
+func color_alpha(arg0: color, arg1: f32) -> color:
+    pass
+func color_alpha_blend(arg0: color, arg1: color, arg2: color) -> color:
+    pass
+func color_lerp(arg0: color, arg1: color, arg2: f32) -> color:
+    pass
+func get_color(arg0: u32) -> color:
+    pass
+func get_pixel_data_size(arg0: i32, arg1: i32, arg2: i32) -> i32:
+    pass
+func draw_fps(arg0: i32, arg1: i32):
+    pass
+func set_text_line_spacing(arg0: i32):
+    pass
+func draw_line3_d(arg0: vector3, arg1: vector3, arg2: color):
+    pass
+func draw_point3_d(arg0: vector3, arg1: color):
+    pass
+func draw_circle3_d(arg0: vector3, arg1: f32, arg2: vector3, arg3: f32, arg4: color):
+    pass
+func draw_triangle3_d(arg0: vector3, arg1: vector3, arg2: vector3, arg3: color):
+    pass
+func draw_cube(arg0: vector3, arg1: f32, arg2: f32, arg3: f32, arg4: color):
+    pass
+func draw_cube_v(arg0: vector3, arg1: vector3, arg2: color):
+    pass
+func draw_cube_wires(arg0: vector3, arg1: f32, arg2: f32, arg3: f32, arg4: color):
+    pass
+func draw_cube_wires_v(arg0: vector3, arg1: vector3, arg2: color):
+    pass
+func draw_sphere(arg0: vector3, arg1: f32, arg2: color):
+    pass
+func draw_sphere_ex(arg0: vector3, arg1: f32, arg2: i32, arg3: i32, arg4: color):
+    pass
+func draw_sphere_wires(arg0: vector3, arg1: f32, arg2: i32, arg3: i32, arg4: color):
+    pass
+func draw_cylinder(arg0: vector3, arg1: f32, arg2: f32, arg3: f32, arg4: i32, arg5: color):
+    pass
+func draw_cylinder_ex(arg0: vector3, arg1: vector3, arg2: f32, arg3: f32, arg4: i32, arg5: color):
+    pass
+func draw_cylinder_wires(arg0: vector3, arg1: f32, arg2: f32, arg3: f32, arg4: i32, arg5: color):
+    pass
+func draw_cylinder_wires_ex(arg0: vector3, arg1: vector3, arg2: f32, arg3: f32, arg4: i32, arg5: color):
+    pass
+func draw_capsule(arg0: vector3, arg1: vector3, arg2: f32, arg3: i32, arg4: i32, arg5: color):
+    pass
+func draw_capsule_wires(arg0: vector3, arg1: vector3, arg2: f32, arg3: i32, arg4: i32, arg5: color):
+    pass
+func draw_plane(arg0: vector3, arg1: vector2, arg2: color):
+    pass
+func draw_ray(arg0: ray, arg1: color):
+    pass
+func draw_grid(arg0: i32, arg1: f32):
+    pass
+func draw_bounding_box(arg0: bounding_box, arg1: color):
+    pass
+func check_collision_spheres(arg0: vector3, arg1: f32, arg2: vector3, arg3: f32) -> bool:
+    pass
+func check_collision_boxes(arg0: bounding_box, arg1: bounding_box) -> bool:
+    pass
+func check_collision_box_sphere(arg0: bounding_box, arg1: vector3, arg2: f32) -> bool:
+    pass
+func get_ray_collision_sphere(arg0: ray, arg1: vector3, arg2: f32) -> ray_collision:
+    pass
+func get_ray_collision_box(arg0: ray, arg1: bounding_box) -> ray_collision:
+    pass
+func get_ray_collision_triangle(arg0: ray, arg1: vector3, arg2: vector3, arg3: vector3) -> ray_collision:
+    pass
+func get_ray_collision_quad(arg0: ray, arg1: vector3, arg2: vector3, arg3: vector3, arg4: vector3) -> ray_collision:
+    pass
+func is_audio_device_ready() -> bool:
+    pass
+func set_master_volume(arg0: f32):
+    pass
+func get_master_volume() -> f32:
+    pass
+func set_audio_stream_buffer_size_default(arg0: i32):
+    pass
+func api_error() -> i32:
+    pass
+func buffer_new(arg0: u64, arg1: u32) -> owner_buffer?:
+    pass
+func buffer_close(arg0: owner_buffer) -> i32:
+    pass
+func buffer_count(const arg0: owner_buffer) -> u64:
+    pass
+func buffer_write(arg0: owner_buffer, arg1: u64, const arg2: [u8], arg3: u64, arg4: u64) -> i64:
+    pass
+func buffer_read(const arg0: owner_buffer, arg1: u64, arg2: [u8], arg3: u64, arg4: u64) -> i64:
+    pass
+func buffer_text_length(const arg0: owner_buffer) -> u64:
+    pass
+func strings_new(arg0: u64) -> owner_buffer?:
+    pass
+func strings_set(arg0: owner_buffer, arg1: u64, const arg2: owner_buffer):
+    pass
+func strings_get(const arg0: owner_buffer, arg1: u64) -> owner_buffer?:
+    pass
+func init_window(arg0: i32, arg1: i32, const arg2: owner_buffer) -> owner_window?:
+    pass
+func close_window(arg0: owner_window) -> i32:
+    pass
+func init_audio_device() -> owner_audio?:
+    pass
+func close_audio_device(arg0: owner_audio) -> i32:
+    pass
+func set_window_title(const arg0: owner_buffer):
+    pass
+func get_window_handle() -> owner_buffer?:
+    pass
+func owner_image_new() -> owner_image?:
+    pass
+func owner_image_close(arg0: owner_image) -> i32:
+    pass
+func image_get_width(const arg0: owner_image) -> i32:
+    pass
+func image_get_height(const arg0: owner_image) -> i32:
+    pass
+func image_get_mipmaps(const arg0: owner_image) -> i32:
+    pass
+func image_get_pixel_format(const arg0: owner_image) -> i32:
+    pass
+func owner_texture_new() -> owner_texture?:
+    pass
+func owner_texture_close(arg0: owner_texture) -> i32:
+    pass
+func texture_get_id(const arg0: owner_texture) -> u32:
+    pass
+func texture_get_width(const arg0: owner_texture) -> i32:
+    pass
+func texture_get_height(const arg0: owner_texture) -> i32:
+    pass
+func texture_get_mipmaps(const arg0: owner_texture) -> i32:
+    pass
+func texture_get_pixel_format(const arg0: owner_texture) -> i32:
+    pass
+func owner_render_texture_new() -> owner_render_texture?:
+    pass
+func owner_render_texture_close(arg0: owner_render_texture) -> i32:
+    pass
+func render_texture_get_id(const arg0: owner_render_texture) -> u32:
+    pass
+func owner_font_new() -> owner_font?:
+    pass
+func owner_font_close(arg0: owner_font) -> i32:
+    pass
+func font_get_base_size(const arg0: owner_font) -> i32:
+    pass
+func font_get_glyph_count(const arg0: owner_font) -> i32:
+    pass
+func font_get_glyph_padding(const arg0: owner_font) -> i32:
+    pass
+func owner_mesh_new() -> owner_mesh?:
+    pass
+func owner_mesh_close(arg0: owner_mesh) -> i32:
+    pass
+func mesh_get_vertex_count(const arg0: owner_mesh) -> i32:
+    pass
+func mesh_get_triangle_count(const arg0: owner_mesh) -> i32:
+    pass
+func mesh_get_bone_count(const arg0: owner_mesh) -> i32:
+    pass
+func mesh_get_vao_id(const arg0: owner_mesh) -> u32:
+    pass
+func owner_shader_new() -> owner_shader?:
+    pass
+func owner_shader_close(arg0: owner_shader) -> i32:
+    pass
+func shader_get_id(const arg0: owner_shader) -> u32:
+    pass
+func owner_material_new() -> owner_material?:
+    pass
+func owner_material_close(arg0: owner_material) -> i32:
+    pass
+func owner_model_new() -> owner_model?:
+    pass
+func owner_model_close(arg0: owner_model) -> i32:
+    pass
+func model_get_transform(const arg0: owner_model) -> matrix:
+    pass
+func model_get_mesh_count(const arg0: owner_model) -> i32:
+    pass
+func model_get_material_count(const arg0: owner_model) -> i32:
+    pass
+func owner_wave_new() -> owner_wave?:
+    pass
+func owner_wave_close(arg0: owner_wave) -> i32:
+    pass
+func wave_get_frame_count(const arg0: owner_wave) -> u32:
+    pass
+func wave_get_sample_rate(const arg0: owner_wave) -> u32:
+    pass
+func wave_get_sample_size(const arg0: owner_wave) -> u32:
+    pass
+func wave_get_channels(const arg0: owner_wave) -> u32:
+    pass
+func owner_audio_stream_new() -> owner_audio_stream?:
+    pass
+func owner_audio_stream_close(arg0: owner_audio_stream) -> i32:
+    pass
+func audio_stream_get_sample_rate(const arg0: owner_audio_stream) -> u32:
+    pass
+func audio_stream_get_sample_size(const arg0: owner_audio_stream) -> u32:
+    pass
+func audio_stream_get_channels(const arg0: owner_audio_stream) -> u32:
+    pass
+func owner_sound_new() -> owner_sound?:
+    pass
+func owner_sound_close(arg0: owner_sound) -> i32:
+    pass
+func sound_get_frame_count(const arg0: owner_sound) -> u32:
+    pass
+func owner_music_new() -> owner_music?:
+    pass
+func owner_music_close(arg0: owner_music) -> i32:
+    pass
+func music_get_frame_count(const arg0: owner_music) -> u32:
+    pass
+func music_get_looping(const arg0: owner_music) -> bool:
+    pass
+func music_get_ctx_type(const arg0: owner_music) -> i32:
+    pass
+func owner_file_path_list_new() -> owner_file_path_list?:
+    pass
+func owner_file_path_list_close(arg0: owner_file_path_list) -> i32:
+    pass
+func file_path_list_get_count(const arg0: owner_file_path_list) -> u32:
+    pass
+func owner_glyph_info_new() -> owner_glyph_info?:
+    pass
+func owner_glyph_info_close(arg0: owner_glyph_info) -> i32:
+    pass
+func glyph_info_get_value(const arg0: owner_glyph_info) -> i32:
+    pass
+func glyph_info_get_offset_x(const arg0: owner_glyph_info) -> i32:
+    pass
+func glyph_info_get_offset_y(const arg0: owner_glyph_info) -> i32:
+    pass
+func glyph_info_get_advance_x(const arg0: owner_glyph_info) -> i32:
+    pass
+func owner_material_map_new() -> owner_material_map?:
+    pass
+func owner_material_map_close(arg0: owner_material_map) -> i32:
+    pass
+func material_map_get_color(const arg0: owner_material_map) -> color:
+    pass
+func material_map_get_value(const arg0: owner_material_map) -> f32:
+    pass
+func owner_model_skeleton_new() -> owner_model_skeleton?:
+    pass
+func owner_model_skeleton_close(arg0: owner_model_skeleton) -> i32:
+    pass
+func model_skeleton_get_bone_count(const arg0: owner_model_skeleton) -> i32:
+    pass
+func owner_model_animation_new() -> owner_model_animation?:
+    pass
+func owner_model_animation_close(arg0: owner_model_animation) -> i32:
+    pass
+func model_animation_get_bone_count(const arg0: owner_model_animation) -> i32:
+    pass
+func model_animation_get_keyframe_count(const arg0: owner_model_animation) -> i32:
+    pass
+func owner_automation_event_list_new() -> owner_automation_event_list?:
+    pass
+func owner_automation_event_list_close(arg0: owner_automation_event_list) -> i32:
+    pass
+func automation_event_list_get_capacity(const arg0: owner_automation_event_list) -> u32:
+    pass
+func automation_event_list_get_count(const arg0: owner_automation_event_list) -> u32:
+    pass
+func buffer_int_new(arg0: u64) -> owner_buffer?:
+    pass
+func buffer_int_get(const arg0: owner_buffer, arg1: u64) -> i32:
+    pass
+func buffer_int_set(arg0: owner_buffer, arg1: u64, arg2: i32):
+    pass
+func buffer_unsigned_int_new(arg0: u64) -> owner_buffer?:
+    pass
+func buffer_unsigned_int_get(const arg0: owner_buffer, arg1: u64) -> u32:
+    pass
+func buffer_unsigned_int_set(arg0: owner_buffer, arg1: u64, arg2: u32):
+    pass
+func buffer_float_new(arg0: u64) -> owner_buffer?:
+    pass
+func buffer_float_get(const arg0: owner_buffer, arg1: u64) -> f32:
+    pass
+func buffer_float_set(arg0: owner_buffer, arg1: u64, arg2: f32):
+    pass
+func buffer_vector2_new(arg0: u64) -> owner_buffer?:
+    pass
+func buffer_vector2_get(const arg0: owner_buffer, arg1: u64) -> vector2:
+    pass
+func buffer_vector2_set(arg0: owner_buffer, arg1: u64, arg2: vector2):
+    pass
+func buffer_vector3_new(arg0: u64) -> owner_buffer?:
+    pass
+func buffer_vector3_get(const arg0: owner_buffer, arg1: u64) -> vector3:
+    pass
+func buffer_vector3_set(arg0: owner_buffer, arg1: u64, arg2: vector3):
+    pass
+func buffer_matrix_new(arg0: u64) -> owner_buffer?:
+    pass
+func buffer_matrix_get(const arg0: owner_buffer, arg1: u64) -> matrix:
+    pass
+func buffer_matrix_set(arg0: owner_buffer, arg1: u64, arg2: matrix):
+    pass
+func buffer_color_new(arg0: u64) -> owner_buffer?:
+    pass
+func buffer_color_get(const arg0: owner_buffer, arg1: u64) -> color:
+    pass
+func buffer_color_set(arg0: owner_buffer, arg1: u64, arg2: color):
+    pass
+func buffer_rectangle_new(arg0: u64) -> owner_buffer?:
+    pass
+func buffer_rectangle_get(const arg0: owner_buffer, arg1: u64) -> rectangle:
+    pass
+func buffer_rectangle_set(arg0: owner_buffer, arg1: u64, arg2: rectangle):
+    pass
+func buffer_transform_new(arg0: u64) -> owner_buffer?:
+    pass
+func buffer_transform_get(const arg0: owner_buffer, arg1: u64) -> transform:
+    pass
+func buffer_transform_set(arg0: owner_buffer, arg1: u64, arg2: transform):
+    pass
+func buffer_image_new(arg0: u64) -> owner_buffer?:
+    pass
+func buffer_image_get(const arg0: owner_buffer, arg1: u64) -> owner_image?:
+    pass
+func buffer_image_set(arg0: owner_buffer, arg1: u64, const arg2: owner_image):
+    pass
+func buffer_glyph_info_new(arg0: u64) -> owner_buffer?:
+    pass
+func buffer_glyph_info_get(const arg0: owner_buffer, arg1: u64) -> owner_glyph_info?:
+    pass
+func buffer_glyph_info_set(arg0: owner_buffer, arg1: u64, const arg2: owner_glyph_info):
+    pass
+func buffer_material_new(arg0: u64) -> owner_buffer?:
+    pass
+func buffer_material_get(const arg0: owner_buffer, arg1: u64) -> owner_material?:
+    pass
+func buffer_material_set(arg0: owner_buffer, arg1: u64, const arg2: owner_material):
+    pass
+func buffer_model_animation_new(arg0: u64) -> owner_buffer?:
+    pass
+func buffer_model_animation_get(const arg0: owner_buffer, arg1: u64) -> owner_model_animation?:
+    pass
+func buffer_model_animation_set(arg0: owner_buffer, arg1: u64, const arg2: owner_model_animation):
+    pass
+func buffer_automation_event_new(arg0: u64) -> owner_buffer?:
+    pass
+func buffer_automation_event_get(const arg0: owner_buffer, arg1: u64) -> automation_event:
+    pass
+func buffer_automation_event_set(arg0: owner_buffer, arg1: u64, arg2: automation_event):
+    pass
+func buffer_unsigned_short_new(arg0: u64) -> owner_buffer?:
+    pass
+func buffer_unsigned_short_get(const arg0: owner_buffer, arg1: u64) -> u16:
+    pass
+func buffer_unsigned_short_set(arg0: owner_buffer, arg1: u64, arg2: u16):
+    pass
+func buffer_bone_info_new(arg0: u64) -> owner_buffer?:
+    pass
+func buffer_bone_info_get(const arg0: owner_buffer, arg1: u64) -> bone_info:
+    pass
+func buffer_bone_info_set(arg0: owner_buffer, arg1: u64, arg2: bone_info):
+    pass
+func buffer_mesh_new(arg0: u64) -> owner_buffer?:
+    pass
+func buffer_mesh_get(const arg0: owner_buffer, arg1: u64) -> owner_mesh?:
+    pass
+func buffer_mesh_set(arg0: owner_buffer, arg1: u64, const arg2: owner_mesh):
+    pass
+func buffer_material_map_new(arg0: u64) -> owner_buffer?:
+    pass
+func buffer_material_map_get(const arg0: owner_buffer, arg1: u64) -> owner_material_map?:
+    pass
+func buffer_material_map_set(arg0: owner_buffer, arg1: u64, const arg2: owner_material_map):
+    pass
+func image_get_data(const arg0: owner_image) -> owner_buffer?:
+    pass
+func render_texture_get_texture(const arg0: owner_render_texture) -> owner_texture?:
+    pass
+func render_texture_get_depth(const arg0: owner_render_texture) -> owner_texture?:
+    pass
+func font_get_texture(const arg0: owner_font) -> owner_texture?:
+    pass
+func font_get_recs(const arg0: owner_font) -> owner_buffer?:
+    pass
+func font_get_glyphs(const arg0: owner_font) -> owner_buffer?:
+    pass
+func mesh_get_vertices(const arg0: owner_mesh) -> owner_buffer?:
+    pass
+func mesh_get_texcoords(const arg0: owner_mesh) -> owner_buffer?:
+    pass
+func mesh_get_texcoords2(const arg0: owner_mesh) -> owner_buffer?:
+    pass
+func mesh_get_normals(const arg0: owner_mesh) -> owner_buffer?:
+    pass
+func mesh_get_tangents(const arg0: owner_mesh) -> owner_buffer?:
+    pass
+func mesh_get_colors(const arg0: owner_mesh) -> owner_buffer?:
+    pass
+func mesh_get_indices(const arg0: owner_mesh) -> owner_buffer?:
+    pass
+func mesh_get_bone_indices(const arg0: owner_mesh) -> owner_buffer?:
+    pass
+func mesh_get_bone_weights(const arg0: owner_mesh) -> owner_buffer?:
+    pass
+func mesh_get_anim_vertices(const arg0: owner_mesh) -> owner_buffer?:
+    pass
+func mesh_get_anim_normals(const arg0: owner_mesh) -> owner_buffer?:
+    pass
+func mesh_get_vbo_id(const arg0: owner_mesh) -> owner_buffer?:
+    pass
+func shader_get_locs(const arg0: owner_shader) -> owner_buffer?:
+    pass
+func material_get_shader(const arg0: owner_material) -> owner_shader?:
+    pass
+func material_get_maps(const arg0: owner_material) -> owner_buffer?:
+    pass
+func material_get_params(const arg0: owner_material) -> owner_buffer?:
+    pass
+func model_get_meshes(const arg0: owner_model) -> owner_buffer?:
+    pass
+func model_get_materials(const arg0: owner_model) -> owner_buffer?:
+    pass
+func model_get_mesh_material(const arg0: owner_model) -> owner_buffer?:
+    pass
+func model_get_skeleton(const arg0: owner_model) -> owner_model_skeleton?:
+    pass
+func model_get_current_pose(const arg0: owner_model) -> owner_buffer?:
+    pass
+func model_get_bone_matrices(const arg0: owner_model) -> owner_buffer?:
+    pass
+func wave_get_data(const arg0: owner_wave) -> owner_buffer?:
+    pass
+func audio_stream_get_buffer(const arg0: owner_audio_stream) -> owner_buffer?:
+    pass
+func audio_stream_get_processor(const arg0: owner_audio_stream) -> owner_buffer?:
+    pass
+func sound_get_stream(const arg0: owner_sound) -> owner_audio_stream?:
+    pass
+func music_get_stream(const arg0: owner_music) -> owner_audio_stream?:
+    pass
+func music_get_ctx_data(const arg0: owner_music) -> owner_buffer?:
+    pass
+func file_path_list_get_paths(const arg0: owner_file_path_list) -> owner_buffer?:
+    pass
+func glyph_info_get_image(const arg0: owner_glyph_info) -> owner_image?:
+    pass
+func material_map_get_texture(const arg0: owner_material_map) -> owner_texture?:
+    pass
+func model_skeleton_get_bones(const arg0: owner_model_skeleton) -> owner_buffer?:
+    pass
+func model_skeleton_get_bind_pose(const arg0: owner_model_skeleton) -> owner_buffer?:
+    pass
+func model_animation_get_name(const arg0: owner_model_animation) -> owner_buffer?:
+    pass
+func model_animation_get_keyframe_poses(const arg0: owner_model_animation) -> owner_buffer?:
+    pass
+func automation_event_list_get_events(const arg0: owner_automation_event_list) -> owner_buffer?:
+    pass
+func poses_get(const arg0: owner_buffer, arg1: u64) -> owner_buffer?:
+    pass
+func image_output_count(const arg0: owner_image) -> i32:
+    pass
+func font_output_count(const arg0: owner_font) -> i32:
+    pass
+func mem_realloc(arg0: owner_buffer, arg1: u32) -> bool:
+    pass
+func load_dropped_files() -> owner_file_path_list?:
+    pass
+func set_shapes_texture(const arg0: owner_texture, arg1: rectangle):
+    pass
+func set_window_icons(const arg0: owner_buffer, arg1: i32):
+    pass
+func get_codepoint_previous(const arg0: owner_buffer, arg1: u64) -> int_out:
+    pass
+func text_copy(arg0: owner_buffer, const arg1: owner_buffer) -> i32:
+    pass
+func text_append(arg0: owner_buffer, const arg1: owner_buffer, arg2: i32) -> i32:
+    pass
+func text_join(const arg0: owner_buffer, arg1: i32, const arg2: owner_buffer) -> owner_buffer?:
+    pass
+func load_model_from_mesh(arg0: owner_mesh) -> owner_model?:
+    pass
+func set_material_texture(arg0: owner_material, arg1: i32, arg2: owner_texture):
+    pass
+func load_sound_alias(const arg0: owner_sound) -> owner_sound?:
+    pass
+func gen_image_font_atlas(const arg0: owner_buffer, arg1: i32, arg2: i32, arg3: i32, arg4: i32) -> owner_image?:
+    pass
+func image_atlas_rects(const arg0: owner_image) -> owner_buffer?:
+    pass
+func set_window_icon(arg0: owner_image):
+    pass
+func get_monitor_name(arg0: i32) -> owner_buffer?:
+    pass
+func set_clipboard_text(const arg0: owner_buffer):
+    pass
+func get_clipboard_text() -> owner_buffer?:
+    pass
+func get_clipboard_image() -> owner_image?:
+    pass
+func begin_texture_mode(const arg0: owner_render_texture):
+    pass
+func begin_shader_mode(const arg0: owner_shader):
+    pass
+func load_shader(const arg0: owner_buffer, const arg1: owner_buffer) -> owner_shader?:
+    pass
+func load_shader_from_memory(const arg0: owner_buffer, const arg1: owner_buffer) -> owner_shader?:
+    pass
+func is_shader_valid(const arg0: owner_shader) -> bool:
+    pass
+func get_shader_location(const arg0: owner_shader, const arg1: owner_buffer) -> i32:
+    pass
+func get_shader_location_attrib(const arg0: owner_shader, const arg1: owner_buffer) -> i32:
+    pass
+func set_shader_value(arg0: owner_shader, arg1: i32, const arg2: owner_buffer, arg3: i32):
+    pass
+func set_shader_value_v(arg0: owner_shader, arg1: i32, const arg2: owner_buffer, arg3: i32, arg4: i32):
+    pass
+func set_shader_value_matrix(arg0: owner_shader, arg1: i32, arg2: matrix):
+    pass
+func set_shader_value_texture(arg0: owner_shader, arg1: i32, const arg2: owner_texture):
+    pass
+func load_random_sequence(arg0: u32, arg1: i32, arg2: i32) -> owner_buffer?:
+    pass
+func take_screenshot(const arg0: owner_buffer):
+    pass
+func open_url(const arg0: owner_buffer):
+    pass
+func load_file_data(const arg0: owner_buffer) -> owner_buffer?:
+    pass
+func save_file_data(const arg0: owner_buffer, const arg1: owner_buffer, arg2: i32) -> bool:
+    pass
+func export_data_as_code(const arg0: owner_buffer, arg1: i32, const arg2: owner_buffer) -> bool:
+    pass
+func load_file_text(const arg0: owner_buffer) -> owner_buffer?:
+    pass
+func save_file_text(const arg0: owner_buffer, const arg1: owner_buffer) -> bool:
+    pass
+func file_rename(const arg0: owner_buffer, const arg1: owner_buffer) -> i32:
+    pass
+func file_remove(const arg0: owner_buffer) -> i32:
+    pass
+func file_copy(const arg0: owner_buffer, const arg1: owner_buffer) -> i32:
+    pass
+func file_move(const arg0: owner_buffer, const arg1: owner_buffer) -> i32:
+    pass
+func file_text_replace(const arg0: owner_buffer, const arg1: owner_buffer, const arg2: owner_buffer) -> i32:
+    pass
+func file_text_find_index(const arg0: owner_buffer, const arg1: owner_buffer) -> i32:
+    pass
+func file_exists(const arg0: owner_buffer) -> bool:
+    pass
+func directory_exists(const arg0: owner_buffer) -> bool:
+    pass
+func is_file_extension(const arg0: owner_buffer, const arg1: owner_buffer) -> bool:
+    pass
+func get_file_length(const arg0: owner_buffer) -> i32:
+    pass
+func get_file_mod_time(const arg0: owner_buffer) -> i64:
+    pass
+func get_file_extension(const arg0: owner_buffer) -> owner_buffer?:
+    pass
+func get_file_name(const arg0: owner_buffer) -> owner_buffer?:
+    pass
+func get_file_name_without_ext(const arg0: owner_buffer) -> owner_buffer?:
+    pass
+func get_directory_path(const arg0: owner_buffer) -> owner_buffer?:
+    pass
+func get_prev_directory_path(const arg0: owner_buffer) -> owner_buffer?:
+    pass
+func get_working_directory() -> owner_buffer?:
+    pass
+func get_application_directory() -> owner_buffer?:
+    pass
+func make_directory(const arg0: owner_buffer) -> i32:
+    pass
+func change_directory(const arg0: owner_buffer) -> bool:
+    pass
+func is_path_file(const arg0: owner_buffer) -> bool:
+    pass
+func is_file_name_valid(const arg0: owner_buffer) -> bool:
+    pass
+func load_directory_files(const arg0: owner_buffer) -> owner_file_path_list?:
+    pass
+func load_directory_files_ex(const arg0: owner_buffer, const arg1: owner_buffer, arg2: bool) -> owner_file_path_list?:
+    pass
+func get_directory_file_count(const arg0: owner_buffer) -> u32:
+    pass
+func get_directory_file_count_ex(const arg0: owner_buffer, const arg1: owner_buffer, arg2: bool) -> u32:
+    pass
+func compress_data(const arg0: owner_buffer, arg1: i32) -> owner_buffer?:
+    pass
+func decompress_data(const arg0: owner_buffer, arg1: i32) -> owner_buffer?:
+    pass
+func encode_data_base64(const arg0: owner_buffer, arg1: i32) -> owner_buffer?:
+    pass
+func decode_data_base64(const arg0: owner_buffer) -> owner_buffer?:
+    pass
+func compute_crc32(const arg0: owner_buffer, arg1: i32) -> u32:
+    pass
+func compute_md5(const arg0: owner_buffer, arg1: i32) -> owner_buffer?:
+    pass
+func compute_sha1(const arg0: owner_buffer, arg1: i32) -> owner_buffer?:
+    pass
+func compute_sha256(const arg0: owner_buffer, arg1: i32) -> owner_buffer?:
+    pass
+func load_automation_event_list(const arg0: owner_buffer) -> owner_automation_event_list?:
+    pass
+func export_automation_event_list(const arg0: owner_automation_event_list, const arg1: owner_buffer) -> bool:
+    pass
+func set_automation_event_list(arg0: owner_automation_event_list):
+    pass
+func get_key_name(arg0: i32) -> owner_buffer?:
+    pass
+func get_gamepad_name(arg0: i32) -> owner_buffer?:
+    pass
+func set_gamepad_mappings(const arg0: owner_buffer) -> i32:
+    pass
+func update_camera(arg0: camera3_d, arg1: i32) -> camera3_d:
+    pass
+func update_camera_pro(arg0: camera3_d, arg1: vector3, arg2: vector3, arg3: f32) -> camera3_d:
+    pass
+func get_shapes_texture() -> owner_texture?:
+    pass
+func draw_line_strip(const arg0: owner_buffer, arg1: i32, arg2: color):
+    pass
+func draw_triangle_fan(const arg0: owner_buffer, arg1: i32, arg2: color):
+    pass
+func draw_triangle_strip(const arg0: owner_buffer, arg1: i32, arg2: color):
+    pass
+func draw_spline_linear(const arg0: owner_buffer, arg1: i32, arg2: f32, arg3: color):
+    pass
+func draw_spline_basis(const arg0: owner_buffer, arg1: i32, arg2: f32, arg3: color):
+    pass
+func draw_spline_catmull_rom(const arg0: owner_buffer, arg1: i32, arg2: f32, arg3: color):
+    pass
+func draw_spline_bezier_quadratic(const arg0: owner_buffer, arg1: i32, arg2: f32, arg3: color):
+    pass
+func draw_spline_bezier_cubic(const arg0: owner_buffer, arg1: i32, arg2: f32, arg3: color):
+    pass
+func check_collision_point_poly(arg0: vector2, const arg1: owner_buffer, arg2: i32) -> bool:
+    pass
+func check_collision_lines(arg0: vector2, arg1: vector2, arg2: vector2, arg3: vector2) -> collision_out:
+    pass
+func load_image(const arg0: owner_buffer) -> owner_image?:
+    pass
+func load_image_raw(const arg0: owner_buffer, arg1: i32, arg2: i32, arg3: i32, arg4: i32) -> owner_image?:
+    pass
+func load_image_anim(const arg0: owner_buffer) -> owner_image?:
+    pass
+func load_image_anim_from_memory(const arg0: owner_buffer, const arg1: owner_buffer, arg2: i32) -> owner_image?:
+    pass
+func load_image_from_memory(const arg0: owner_buffer, const arg1: owner_buffer, arg2: i32) -> owner_image?:
+    pass
+func load_image_from_texture(const arg0: owner_texture) -> owner_image?:
+    pass
+func load_image_from_screen() -> owner_image?:
+    pass
+func is_image_valid(const arg0: owner_image) -> bool:
+    pass
+func export_image(const arg0: owner_image, const arg1: owner_buffer) -> bool:
+    pass
+func export_image_to_memory(const arg0: owner_image, const arg1: owner_buffer) -> owner_buffer?:
+    pass
+func export_image_as_code(const arg0: owner_image, const arg1: owner_buffer) -> bool:
+    pass
+func gen_image_color(arg0: i32, arg1: i32, arg2: color) -> owner_image?:
+    pass
+func gen_image_gradient_linear(arg0: i32, arg1: i32, arg2: i32, arg3: color, arg4: color) -> owner_image?:
+    pass
+func gen_image_gradient_radial(arg0: i32, arg1: i32, arg2: f32, arg3: color, arg4: color) -> owner_image?:
+    pass
+func gen_image_gradient_square(arg0: i32, arg1: i32, arg2: f32, arg3: color, arg4: color) -> owner_image?:
+    pass
+func gen_image_checked(arg0: i32, arg1: i32, arg2: i32, arg3: i32, arg4: color, arg5: color) -> owner_image?:
+    pass
+func gen_image_white_noise(arg0: i32, arg1: i32, arg2: f32) -> owner_image?:
+    pass
+func gen_image_perlin_noise(arg0: i32, arg1: i32, arg2: i32, arg3: i32, arg4: f32) -> owner_image?:
+    pass
+func gen_image_cellular(arg0: i32, arg1: i32, arg2: i32) -> owner_image?:
+    pass
+func gen_image_text(arg0: i32, arg1: i32, const arg2: owner_buffer) -> owner_image?:
+    pass
+func image_copy(const arg0: owner_image) -> owner_image?:
+    pass
+func image_from_image(const arg0: owner_image, arg1: rectangle) -> owner_image?:
+    pass
+func image_from_channel(const arg0: owner_image, arg1: i32) -> owner_image?:
+    pass
+func image_text(const arg0: owner_buffer, arg1: i32, arg2: color) -> owner_image?:
+    pass
+func image_text_ex(const arg0: owner_font, const arg1: owner_buffer, arg2: f32, arg3: f32, arg4: color) -> owner_image?:
+    pass
+func image_format(arg0: owner_image, arg1: i32):
+    pass
+func image_to_pot(arg0: owner_image, arg1: color):
+    pass
+func image_crop(arg0: owner_image, arg1: rectangle):
+    pass
+func image_alpha_crop(arg0: owner_image, arg1: f32):
+    pass
+func image_alpha_clear(arg0: owner_image, arg1: color, arg2: f32):
+    pass
+func image_alpha_mask(arg0: owner_image, const arg1: owner_image):
+    pass
+func image_alpha_premultiply(arg0: owner_image):
+    pass
+func image_blur_gaussian(arg0: owner_image, arg1: i32):
+    pass
+func image_kernel_convolution(arg0: owner_image, const arg1: owner_buffer, arg2: i32):
+    pass
+func image_resize(arg0: owner_image, arg1: i32, arg2: i32):
+    pass
+func image_resize_nn(arg0: owner_image, arg1: i32, arg2: i32):
+    pass
+func image_resize_canvas(arg0: owner_image, arg1: i32, arg2: i32, arg3: i32, arg4: i32, arg5: color):
+    pass
+func image_mipmaps(arg0: owner_image):
+    pass
+func image_dither(arg0: owner_image, arg1: i32, arg2: i32, arg3: i32, arg4: i32):
+    pass
+func image_flip_vertical(arg0: owner_image):
+    pass
+func image_flip_horizontal(arg0: owner_image):
+    pass
+func image_rotate(arg0: owner_image, arg1: i32):
+    pass
+func image_rotate_cw(arg0: owner_image):
+    pass
+func image_rotate_ccw(arg0: owner_image):
+    pass
+func image_color_tint(arg0: owner_image, arg1: color):
+    pass
+func image_color_invert(arg0: owner_image):
+    pass
+func image_color_grayscale(arg0: owner_image):
+    pass
+func image_color_contrast(arg0: owner_image, arg1: f32):
+    pass
+func image_color_brightness(arg0: owner_image, arg1: i32):
+    pass
+func image_color_replace(arg0: owner_image, arg1: color, arg2: color):
+    pass
+func load_image_colors(const arg0: owner_image) -> owner_buffer?:
+    pass
+func load_image_palette(const arg0: owner_image, arg1: i32) -> owner_buffer?:
+    pass
+func get_image_alpha_border(const arg0: owner_image, arg1: f32) -> rectangle:
+    pass
+func get_image_color(const arg0: owner_image, arg1: i32, arg2: i32) -> color:
+    pass
+func image_clear_background(arg0: owner_image, arg1: color):
+    pass
+func image_draw_pixel(arg0: owner_image, arg1: i32, arg2: i32, arg3: color):
+    pass
+func image_draw_pixel_v(arg0: owner_image, arg1: vector2, arg2: color):
+    pass
+func image_draw_line(arg0: owner_image, arg1: i32, arg2: i32, arg3: i32, arg4: i32, arg5: color):
+    pass
+func image_draw_line_v(arg0: owner_image, arg1: vector2, arg2: vector2, arg3: color):
+    pass
+func image_draw_line_ex(arg0: owner_image, arg1: vector2, arg2: vector2, arg3: i32, arg4: color):
+    pass
+func image_draw_circle(arg0: owner_image, arg1: i32, arg2: i32, arg3: i32, arg4: color):
+    pass
+func image_draw_circle_v(arg0: owner_image, arg1: vector2, arg2: i32, arg3: color):
+    pass
+func image_draw_circle_lines(arg0: owner_image, arg1: i32, arg2: i32, arg3: i32, arg4: color):
+    pass
+func image_draw_circle_lines_v(arg0: owner_image, arg1: vector2, arg2: i32, arg3: color):
+    pass
+func image_draw_rectangle(arg0: owner_image, arg1: i32, arg2: i32, arg3: i32, arg4: i32, arg5: color):
+    pass
+func image_draw_rectangle_v(arg0: owner_image, arg1: vector2, arg2: vector2, arg3: color):
+    pass
+func image_draw_rectangle_rec(arg0: owner_image, arg1: rectangle, arg2: color):
+    pass
+func image_draw_rectangle_lines(arg0: owner_image, arg1: rectangle, arg2: i32, arg3: color):
+    pass
+func image_draw_triangle(arg0: owner_image, arg1: vector2, arg2: vector2, arg3: vector2, arg4: color):
+    pass
+func image_draw_triangle_ex(arg0: owner_image, arg1: vector2, arg2: vector2, arg3: vector2, arg4: color, arg5: color, arg6: color):
+    pass
+func image_draw_triangle_lines(arg0: owner_image, arg1: vector2, arg2: vector2, arg3: vector2, arg4: color):
+    pass
+func image_draw_triangle_fan(arg0: owner_image, const arg1: owner_buffer, arg2: i32, arg3: color):
+    pass
+func image_draw_triangle_strip(arg0: owner_image, const arg1: owner_buffer, arg2: i32, arg3: color):
+    pass
+func image_draw(arg0: owner_image, const arg1: owner_image, arg2: rectangle, arg3: rectangle, arg4: color):
+    pass
+func image_draw_text(arg0: owner_image, const arg1: owner_buffer, arg2: i32, arg3: i32, arg4: i32, arg5: color):
+    pass
+func image_draw_text_ex(arg0: owner_image, const arg1: owner_font, const arg2: owner_buffer, arg3: vector2, arg4: f32, arg5: f32, arg6: color):
+    pass
+func load_texture(const arg0: owner_buffer) -> owner_texture?:
+    pass
+func load_texture_from_image(const arg0: owner_image) -> owner_texture?:
+    pass
+func load_texture_cubemap(const arg0: owner_image, arg1: i32) -> owner_texture?:
+    pass
+func load_render_texture(arg0: i32, arg1: i32) -> owner_render_texture?:
+    pass
+func is_texture_valid(const arg0: owner_texture) -> bool:
+    pass
+func is_render_texture_valid(const arg0: owner_render_texture) -> bool:
+    pass
+func update_texture(arg0: owner_texture, const arg1: owner_buffer):
+    pass
+func update_texture_rec(arg0: owner_texture, arg1: rectangle, const arg2: owner_buffer):
+    pass
+func gen_texture_mipmaps(arg0: owner_texture):
+    pass
+func set_texture_filter(arg0: owner_texture, arg1: i32):
+    pass
+func set_texture_wrap(arg0: owner_texture, arg1: i32):
+    pass
+func draw_texture(const arg0: owner_texture, arg1: i32, arg2: i32, arg3: color):
+    pass
+func draw_texture_v(const arg0: owner_texture, arg1: vector2, arg2: color):
+    pass
+func draw_texture_ex(const arg0: owner_texture, arg1: vector2, arg2: f32, arg3: f32, arg4: color):
+    pass
+func draw_texture_rec(const arg0: owner_texture, arg1: rectangle, arg2: vector2, arg3: color):
+    pass
+func draw_texture_pro(const arg0: owner_texture, arg1: rectangle, arg2: rectangle, arg3: vector2, arg4: f32, arg5: color):
+    pass
+func draw_texture_n_patch(const arg0: owner_texture, arg1: n_patch_info, arg2: rectangle, arg3: vector2, arg4: f32, arg5: color):
+    pass
+func get_pixel_color(const arg0: owner_buffer, arg1: i32) -> color:
+    pass
+func set_pixel_color(arg0: owner_buffer, arg1: color, arg2: i32):
+    pass
+func get_font_default() -> owner_font?:
+    pass
+func load_font(const arg0: owner_buffer) -> owner_font?:
+    pass
+func load_font_ex(const arg0: owner_buffer, arg1: i32, const arg2: owner_buffer, arg3: i32) -> owner_font?:
+    pass
+func load_font_from_image(const arg0: owner_image, arg1: color, arg2: i32) -> owner_font?:
+    pass
+func load_font_from_memory(const arg0: owner_buffer, const arg1: owner_buffer, arg2: i32, arg3: i32, const arg4: owner_buffer, arg5: i32) -> owner_font?:
+    pass
+func is_font_valid(const arg0: owner_font) -> bool:
+    pass
+func load_font_data(const arg0: owner_buffer, arg1: i32, arg2: i32, const arg3: owner_buffer, arg4: i32, arg5: i32) -> owner_buffer?:
+    pass
+func export_font_as_code(const arg0: owner_font, const arg1: owner_buffer) -> bool:
+    pass
+func draw_text(const arg0: owner_buffer, arg1: i32, arg2: i32, arg3: i32, arg4: color):
+    pass
+func draw_text_ex(const arg0: owner_font, const arg1: owner_buffer, arg2: vector2, arg3: f32, arg4: f32, arg5: color):
+    pass
+func draw_text_pro(const arg0: owner_font, const arg1: owner_buffer, arg2: vector2, arg3: vector2, arg4: f32, arg5: f32, arg6: f32, arg7: color):
+    pass
+func draw_text_codepoint(const arg0: owner_font, arg1: i32, arg2: vector2, arg3: f32, arg4: color):
+    pass
+func draw_text_codepoints(const arg0: owner_font, const arg1: owner_buffer, arg2: i32, arg3: vector2, arg4: f32, arg5: f32, arg6: color):
+    pass
+func measure_text(const arg0: owner_buffer, arg1: i32) -> i32:
+    pass
+func measure_text_ex(const arg0: owner_font, const arg1: owner_buffer, arg2: f32, arg3: f32) -> vector2:
+    pass
+func measure_text_codepoints(const arg0: owner_font, const arg1: owner_buffer, arg2: i32, arg3: f32, arg4: f32) -> vector2:
+    pass
+func get_glyph_index(const arg0: owner_font, arg1: i32) -> i32:
+    pass
+func get_glyph_info(const arg0: owner_font, arg1: i32) -> owner_glyph_info?:
+    pass
+func get_glyph_atlas_rec(const arg0: owner_font, arg1: i32) -> rectangle:
+    pass
+func load_utf8(const arg0: owner_buffer, arg1: i32) -> owner_buffer?:
+    pass
+func load_codepoints(const arg0: owner_buffer) -> owner_buffer?:
+    pass
+func get_codepoint_count(const arg0: owner_buffer) -> i32:
+    pass
+func get_codepoint(const arg0: owner_buffer) -> int_out:
+    pass
+func get_codepoint_next(const arg0: owner_buffer) -> int_out:
+    pass
+func codepoint_to_utf8(arg0: i32) -> owner_buffer?:
+    pass
+func load_text_lines(const arg0: owner_buffer) -> owner_buffer?:
+    pass
+func text_is_equal(const arg0: owner_buffer, const arg1: owner_buffer) -> bool:
+    pass
+func text_length(const arg0: owner_buffer) -> u32:
+    pass
+func text_subtext(const arg0: owner_buffer, arg1: i32, arg2: i32) -> owner_buffer?:
+    pass
+func text_remove_spaces(const arg0: owner_buffer) -> owner_buffer?:
+    pass
+func get_text_between(const arg0: owner_buffer, const arg1: owner_buffer, const arg2: owner_buffer) -> owner_buffer?:
+    pass
+func text_replace(const arg0: owner_buffer, const arg1: owner_buffer, const arg2: owner_buffer) -> owner_buffer?:
+    pass
+func text_replace_alloc(const arg0: owner_buffer, const arg1: owner_buffer, const arg2: owner_buffer) -> owner_buffer?:
+    pass
+func text_replace_between(const arg0: owner_buffer, const arg1: owner_buffer, const arg2: owner_buffer, const arg3: owner_buffer) -> owner_buffer?:
+    pass
+func text_replace_between_alloc(const arg0: owner_buffer, const arg1: owner_buffer, const arg2: owner_buffer, const arg3: owner_buffer) -> owner_buffer?:
+    pass
+func text_insert(const arg0: owner_buffer, const arg1: owner_buffer, arg2: i32) -> owner_buffer?:
+    pass
+func text_insert_alloc(const arg0: owner_buffer, const arg1: owner_buffer, arg2: i32) -> owner_buffer?:
+    pass
+func text_split(const arg0: owner_buffer, arg1: i8) -> owner_buffer?:
+    pass
+func text_find_index(const arg0: owner_buffer, const arg1: owner_buffer) -> i32:
+    pass
+func text_to_upper(const arg0: owner_buffer) -> owner_buffer?:
+    pass
+func text_to_lower(const arg0: owner_buffer) -> owner_buffer?:
+    pass
+func text_to_pascal(const arg0: owner_buffer) -> owner_buffer?:
+    pass
+func text_to_snake(const arg0: owner_buffer) -> owner_buffer?:
+    pass
+func text_to_camel(const arg0: owner_buffer) -> owner_buffer?:
+    pass
+func text_to_integer(const arg0: owner_buffer) -> i32:
+    pass
+func text_to_float(const arg0: owner_buffer) -> f32:
+    pass
+func draw_triangle_strip3_d(const arg0: owner_buffer, arg1: i32, arg2: color):
+    pass
+func load_model(const arg0: owner_buffer) -> owner_model?:
+    pass
+func is_model_valid(const arg0: owner_model) -> bool:
+    pass
+func get_model_bounding_box(const arg0: owner_model) -> bounding_box:
+    pass
+func draw_model(const arg0: owner_model, arg1: vector3, arg2: f32, arg3: color):
+    pass
+func draw_model_ex(const arg0: owner_model, arg1: vector3, arg2: vector3, arg3: f32, arg4: vector3, arg5: color):
+    pass
+func draw_model_wires(const arg0: owner_model, arg1: vector3, arg2: f32, arg3: color):
+    pass
+func draw_model_wires_ex(const arg0: owner_model, arg1: vector3, arg2: vector3, arg3: f32, arg4: vector3, arg5: color):
+    pass
+func draw_billboard(arg0: camera3_d, const arg1: owner_texture, arg2: vector3, arg3: f32, arg4: color):
+    pass
+func draw_billboard_rec(arg0: camera3_d, const arg1: owner_texture, arg2: rectangle, arg3: vector3, arg4: vector2, arg5: color):
+    pass
+func draw_billboard_pro(arg0: camera3_d, const arg1: owner_texture, arg2: rectangle, arg3: vector3, arg4: vector3, arg5: vector2, arg6: vector2, arg7: f32, arg8: color):
+    pass
+func upload_mesh(arg0: owner_mesh, arg1: bool):
+    pass
+func update_mesh_buffer(arg0: owner_mesh, arg1: i32, const arg2: owner_buffer, arg3: i32, arg4: i32):
+    pass
+func draw_mesh(const arg0: owner_mesh, const arg1: owner_material, arg2: matrix):
+    pass
+func draw_mesh_instanced(const arg0: owner_mesh, const arg1: owner_material, const arg2: owner_buffer, arg3: i32):
+    pass
+func get_mesh_bounding_box(const arg0: owner_mesh) -> bounding_box:
+    pass
+func gen_mesh_tangents(arg0: owner_mesh):
+    pass
+func export_mesh(const arg0: owner_mesh, const arg1: owner_buffer) -> bool:
+    pass
+func export_mesh_as_code(const arg0: owner_mesh, const arg1: owner_buffer) -> bool:
+    pass
+func gen_mesh_poly(arg0: i32, arg1: f32) -> owner_mesh?:
+    pass
+func gen_mesh_plane(arg0: f32, arg1: f32, arg2: i32, arg3: i32) -> owner_mesh?:
+    pass
+func gen_mesh_cube(arg0: f32, arg1: f32, arg2: f32) -> owner_mesh?:
+    pass
+func gen_mesh_sphere(arg0: f32, arg1: i32, arg2: i32) -> owner_mesh?:
+    pass
+func gen_mesh_hemi_sphere(arg0: f32, arg1: i32, arg2: i32) -> owner_mesh?:
+    pass
+func gen_mesh_cylinder(arg0: f32, arg1: f32, arg2: i32) -> owner_mesh?:
+    pass
+func gen_mesh_cone(arg0: f32, arg1: f32, arg2: i32) -> owner_mesh?:
+    pass
+func gen_mesh_torus(arg0: f32, arg1: f32, arg2: i32, arg3: i32) -> owner_mesh?:
+    pass
+func gen_mesh_knot(arg0: f32, arg1: f32, arg2: i32, arg3: i32) -> owner_mesh?:
+    pass
+func gen_mesh_heightmap(const arg0: owner_image, arg1: vector3) -> owner_mesh?:
+    pass
+func gen_mesh_cubicmap(const arg0: owner_image, arg1: vector3) -> owner_mesh?:
+    pass
+func load_materials(const arg0: owner_buffer) -> owner_buffer?:
+    pass
+func load_material_default() -> owner_material?:
+    pass
+func is_material_valid(const arg0: owner_material) -> bool:
+    pass
+func set_model_mesh_material(arg0: owner_model, arg1: i32, arg2: i32):
+    pass
+func load_model_animations(const arg0: owner_buffer) -> owner_buffer?:
+    pass
+func update_model_animation(arg0: owner_model, const arg1: owner_model_animation, arg2: f32):
+    pass
+func update_model_animation_ex(arg0: owner_model, const arg1: owner_model_animation, arg2: f32, const arg3: owner_model_animation, arg4: f32, arg5: f32):
+    pass
+func is_model_animation_valid(const arg0: owner_model, const arg1: owner_model_animation) -> bool:
+    pass
+func get_ray_collision_mesh(arg0: ray, const arg1: owner_mesh, arg2: matrix) -> ray_collision:
+    pass
+func load_wave(const arg0: owner_buffer) -> owner_wave?:
+    pass
+func load_wave_from_memory(const arg0: owner_buffer, const arg1: owner_buffer, arg2: i32) -> owner_wave?:
+    pass
+func is_wave_valid(const arg0: owner_wave) -> bool:
+    pass
+func load_sound(const arg0: owner_buffer) -> owner_sound?:
+    pass
+func load_sound_from_wave(const arg0: owner_wave) -> owner_sound?:
+    pass
+func is_sound_valid(const arg0: owner_sound) -> bool:
+    pass
+func update_sound(arg0: owner_sound, const arg1: owner_buffer, arg2: i32):
+    pass
+func export_wave(const arg0: owner_wave, const arg1: owner_buffer) -> bool:
+    pass
+func export_wave_as_code(const arg0: owner_wave, const arg1: owner_buffer) -> bool:
+    pass
+func play_sound(arg0: owner_sound):
+    pass
+func stop_sound(arg0: owner_sound):
+    pass
+func pause_sound(arg0: owner_sound):
+    pass
+func resume_sound(arg0: owner_sound):
+    pass
+func is_sound_playing(const arg0: owner_sound) -> bool:
+    pass
+func set_sound_volume(arg0: owner_sound, arg1: f32):
+    pass
+func set_sound_pitch(arg0: owner_sound, arg1: f32):
+    pass
+func set_sound_pan(arg0: owner_sound, arg1: f32):
+    pass
+func wave_copy(const arg0: owner_wave) -> owner_wave?:
+    pass
+func wave_crop(arg0: owner_wave, arg1: i32, arg2: i32):
+    pass
+func wave_format(arg0: owner_wave, arg1: i32, arg2: i32, arg3: i32):
+    pass
+func load_wave_samples(const arg0: owner_wave) -> owner_buffer?:
+    pass
+func load_music_stream(const arg0: owner_buffer) -> owner_music?:
+    pass
+func load_music_stream_from_memory(const arg0: owner_buffer, const arg1: owner_buffer, arg2: i32) -> owner_music?:
+    pass
+func is_music_valid(const arg0: owner_music) -> bool:
+    pass
+func play_music_stream(arg0: owner_music):
+    pass
+func is_music_stream_playing(const arg0: owner_music) -> bool:
+    pass
+func update_music_stream(arg0: owner_music):
+    pass
+func stop_music_stream(arg0: owner_music):
+    pass
+func pause_music_stream(arg0: owner_music):
+    pass
+func resume_music_stream(arg0: owner_music):
+    pass
+func seek_music_stream(const arg0: owner_music, arg1: f32):
+    pass
+func set_music_volume(arg0: owner_music, arg1: f32):
+    pass
+func set_music_pitch(arg0: owner_music, arg1: f32):
+    pass
+func set_music_pan(arg0: owner_music, arg1: f32):
+    pass
+func get_music_time_length(const arg0: owner_music) -> f32:
+    pass
+func get_music_time_played(const arg0: owner_music) -> f32:
+    pass
+func load_audio_stream(arg0: u32, arg1: u32, arg2: u32) -> owner_audio_stream?:
+    pass
+func is_audio_stream_valid(const arg0: owner_audio_stream) -> bool:
+    pass
+func update_audio_stream(arg0: owner_audio_stream, const arg1: owner_buffer, arg2: i32):
+    pass
+func is_audio_stream_processed(const arg0: owner_audio_stream) -> bool:
+    pass
+func play_audio_stream(arg0: owner_audio_stream):
+    pass
+func pause_audio_stream(arg0: owner_audio_stream):
+    pass
+func resume_audio_stream(arg0: owner_audio_stream):
+    pass
+func is_audio_stream_playing(const arg0: owner_audio_stream) -> bool:
+    pass
+func stop_audio_stream(arg0: owner_audio_stream):
+    pass
+func set_audio_stream_volume(arg0: owner_audio_stream, arg1: f32):
+    pass
+func set_audio_stream_pitch(arg0: owner_audio_stream, arg1: f32):
+    pass
+func set_audio_stream_pan(arg0: owner_audio_stream, arg1: f32):
+    pass
+func callback_target_new(arg0: u32) -> callback_target?:
+    pass
+func callback_target_stream(const arg0: owner_audio_stream, arg1: u32) -> callback_target?:
+    pass
+func callback_target_mixed() -> callback_target?:
+    pass
+func callback_target_close(arg0: callback_target) -> i32:
+    pass
+func callback_activate(const arg0: callback_target):
+    pass
+func callback_register(arg0: func(u32, i32) -> i32) -> callback_registration?:
+    pass
+func callback_close(arg0: callback_registration) -> i32:
+    pass
+func callback_count(const arg0: callback_registration) -> u64:
+    pass
+func callback_active(const arg0: callback_registration) -> bool:
+    pass
+func callback_kind(const arg0: callback_registration) -> u32:
+    pass
+func callback_input_size(arg0: u32) -> u64:
+    pass
+func callback_read(arg0: u32, arg1: u64, arg2: [u8], arg3: u64, arg4: u64) -> i64:
+    pass
+func callback_output_size(arg0: u64):
+    pass
+func callback_write(arg0: u64, const arg1: [u8], arg2: u64, arg3: u64) -> i64:
+    pass
+func trace_log(arg0: i32, const arg1: owner_buffer):
+    pass

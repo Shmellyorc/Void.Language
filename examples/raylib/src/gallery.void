@@ -1,4 +1,4 @@
-use "/raylib_checked.void" as graphics
+use "./gallery_native.void" as graphics
 use os as host
 
 struct trace_capture:

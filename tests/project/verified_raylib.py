@@ -38,7 +38,8 @@ def qualify(compiler, git, repos, base, origin, environment):
         assert 'AddressSanitizer' not in text and 'UndefinedBehaviorSanitizer' not in text, text
         return text
     repo = repos / 'raylib.git'
-    package = repo / 'verified-packages/raylib'
+    standalone = os.environ.get('VOID_TEST_RAYLIB_STANDALONE') == '1'
+    package = repo if standalone else repo / 'verified-packages/raylib'
     shutil.copytree(root / 'verified-packages/raylib', package, ignore=shutil.ignore_patterns('__pycache__'))
     run(git, 'init', '--quiet', '--object-format=sha1', repo)
     run(git, '-C', repo, 'add', '.')
@@ -48,7 +49,8 @@ def qualify(compiler, git, repos, base, origin, environment):
     consumer = output / 'consumer'
     assert not consumer.exists(), consumer
     shutil.copytree(root / 'examples/raylib-consumer', consumer, ignore=shutil.ignore_patterns('__pycache__', 'void.project.toml'))
-    run(sys.executable, consumer / 'configure.py', '--origin', origin + '/raylib.git', '--rev', revision)
+    run(sys.executable, consumer / 'configure.py', '--origin', origin + '/raylib.git', '--rev', revision,
+        *(['--standalone'] if standalone else []))
     if os.environ.get('VOID_TEST_RAYLIB_ASSETS'):
         assets=Path(os.environ['VOID_TEST_RAYLIB_ASSETS']).resolve()
         shutil.copytree(assets,consumer/'assets')
@@ -101,7 +103,8 @@ def qualify(compiler, git, repos, base, origin, environment):
     (consumer / 'void.project.toml').write_text(original.replace('=0.1.0', '>=0.1.0'))
     cli('resolve', '--locked', status=1, message='Stale or tampered void.lock')
     (consumer / 'void.project.toml').write_text(original)
-    file, = (consumer / '.void/git-deps').glob('*/*/tree/verified-packages/raylib/src/api.void')
+    suffix = 'src/raylib.void' if standalone else 'verified-packages/raylib/src/raylib.void'
+    file, = (consumer / '.void/git-deps').glob('*/*/tree/' + suffix)
     contents = file.read_bytes()
     file.write_bytes(contents + b'\n# tampered source\n')
     cli('check', status=1, message='Git object identity mismatch')
@@ -139,7 +142,7 @@ def qualify(compiler, git, repos, base, origin, environment):
         client.shutdown()
     events.append('real language server resolves pinned pkg import and typed completion/hover')
     record = {'status': 'PASS', 'public_github_fetch': 'NOT RUN; final commit does not exist', 'revision': revision,
-              'origin': origin + '/raylib.git', 'subdir': 'verified-packages/raylib', 'events': events,
+              'origin': origin + '/raylib.git', 'subdir': '' if standalone else 'verified-packages/raylib', 'events': events,
               'lock_sha256': sha256(lock.read_bytes()).hexdigest()}
     (output / 'result.json').write_text(json.dumps(record, indent=2) + '\n')
     print('Verified raylib source package HTTPS consumer passed', revision, flush=True)

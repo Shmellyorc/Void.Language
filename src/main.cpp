@@ -339,8 +339,8 @@ void generate_native_binding(int argc, char** argv) {
         throw UsageError("Expected native-bind <descriptor> <C-header> -o <adapter.c>.");
     const auto descriptor = vd::utf8_path(argv[2]);
     const auto output = vd::utf8_path(argv[5]);
-    if (output.extension() != ".c")
-        throw UsageError("Expected a new .c output path.");
+    if (output.extension() != ".c" && output.extension() != ".void")
+        throw UsageError("Expected a new .c or .void output path.");
     if (!std::filesystem::is_regular_file(descriptor))
         throw std::runtime_error("Missing native descriptor: " + vd::path_utf8(descriptor));
     std::ifstream source(descriptor, std::ios::binary);
@@ -349,7 +349,10 @@ void generate_native_binding(int argc, char** argv) {
     if (source.bad() || !source.eof() || source.gcount() == 0)
         throw std::runtime_error("Cannot read native descriptor (outside conventional descriptor bounds).");
     bytes.resize(static_cast<std::size_t>(source.gcount()));
-    const auto generated = vd::CPrimitiveAdmission::generate_adapter(bytes, argv[3]);
+    std::string generated;
+    if(output.extension()==".void") {
+        generated=vd::CPrimitiveAdmission::generate_declarations(bytes);
+    } else generated=vd::CPrimitiveAdmission::generate_adapter(bytes, argv[3]);
     int fd;
     const auto name = vd::path_utf8(output);
     if (auto error = llvm::sys::fs::openFileForWrite(name, fd, llvm::sys::fs::CD_CreateNew))

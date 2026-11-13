@@ -9,4 +9,4 @@ kind = "library"
 [package]
 id = "org.voidlang.raylib"
 name = "raylib"
-entry = "src/api.void"
+entry = "src/raylib.void"

@@ -110,7 +110,7 @@ struct ProjectCapture {
                 project_failure(anchor, Code::project_reserved, "Native descriptor target does not match this host.");
         }
         if (native) {
-            if (overlays.contains(native->module()))
+            if (!native->physical_source() && overlays.contains(native->module()))
                 project_failure(anchor, Code::project_boundary, "Generated C binding module cannot be overridden.");
             changed(original && (!original->native || native->dynamic_contract() != original->native->dynamic_contract()));
             graph.generated_primitives(native);
@@ -246,7 +246,7 @@ struct ProjectCapture {
         if(discovery && sources.size()+disk_discovery.size()>=project_file_limit)project_failure(anchor,Code::limit,"Project discovery source-file limit exceeded.");
         auto o=overlays.find(id);
         if(discovery && o!=overlays.end() && o->second->text().size()>project_source_limit-bytes)project_failure(anchor,Code::limit,"Project discovery aggregate source-byte limit exceeded.");
-        auto source=native && id==native->module()?SourceFile(path_utf8(path),native->source()):
+        auto source=native && !native->physical_source() && id==native->module()?SourceFile(path_utf8(path),native->source()):
             o!=overlays.end()?SourceFile(path_utf8(path),o->second->text()):discovery?read_bounded(path,project_source_limit-bytes):read_source(path);
         if(original)if(auto old=original->sources.find(id);old!=original->sources.end())changed(source.text()!=old->second.text());
         if(discovery)bytes+=source.text().size();sources.emplace(id,source);return source;

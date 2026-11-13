@@ -157,7 +157,8 @@ DynamicClosure::Owner DynamicClosure::parse(std::string_view bytes) {
         (descriptor_header != expected && !(conventional && revision == '3' && descriptor_header == "void-c-primitive 4 3")) ||
         next() != "provider " + plan->provider_ || next() != target)
         bad("exact descriptor provider or target mismatch");
-    if (!next().starts_with("source ") || next() != "thunk " + plan->thunk_)
+    const auto declaration_source=next();
+    if ((!declaration_source.starts_with("source ") && !declaration_source.starts_with("source-file ")) || next() != "thunk " + plan->thunk_)
         bad("exact descriptor thunk mismatch");
     plan->descriptor_ = descriptor;
     return plan;

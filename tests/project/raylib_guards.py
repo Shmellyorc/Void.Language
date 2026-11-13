@@ -22,7 +22,8 @@ with tempfile.TemporaryDirectory(prefix='VOID raylib buffer guards ') as tempora
     with manifest.open('a',encoding='utf-8') as f:
         f.write(f'\n[native.{platform}]\ndescriptor="raylib-{platform}.descriptor"\nlibrary="{library}"\nadapter="{library}"\n')
     source=next((project/'src').glob('*.void'))
-    source.write_bytes(b'''use "/raylib_checked.void" as native
+    shutil.copyfile(Path(__file__).resolve().parents[2]/'verified-packages/raylib/src/raylib_native.void',source.parent/'raylib_native.void')
+    source.write_bytes(b'''use "./raylib_native.void" as native
 func main() -> i32:
     if native.buffer_new(8, 30) != null or native.api_error() != 1:
         return 11

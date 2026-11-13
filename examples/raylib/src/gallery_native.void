@@ -1,0 +1,26 @@
+# Host-admitted C primitive declarations for org.voidlang.raylib
+native "org.voidlang.raylib"
+
+struct window:
+    private _seal: u64 = 0
+value struct color:
+    r: u8
+    g: u8
+    b: u8
+    a: u8
+func tint(arg0: color, arg1: f32) -> color:
+    pass
+func trace(arg0: func(i32, u32, u32)) -> i32:
+    pass
+func title(const arg0: [u8], arg1: u64, arg2: u64) -> i64:
+    pass
+func open(arg0: i32, arg1: i32) -> window?:
+    pass
+func should_close(const arg0: window) -> bool:
+    pass
+func direction(const arg0: window) -> i32:
+    pass
+func draw(arg0: window, arg1: i32, arg2: i32, arg3: u8, arg4: u8, arg5: u8) -> i32:
+    pass
+func close(arg0: window) -> i32:
+    pass

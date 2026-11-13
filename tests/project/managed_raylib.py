@@ -73,7 +73,7 @@ with tempfile.TemporaryDirectory(prefix='VOID managed raylib 雪 ') as temporary
     project = base / 'gallery source'
     shutil.copytree(root / 'examples/raylib', project)
     catalog = base / 'approved catalog'
-    run(sys.executable, '-B', project / 'prepare.py', '--voidc', compiler, '--clang', clang,
+    run(sys.executable, '-B', root / 'verified-packages/raylib/prepare.py', '--gallery-only', '--voidc', compiler, '--clang', clang,
         '--header', vendor / 'include/raylib.h', '--library', vendor / 'lib/libraylib.so.6.0.0',
         '--license', vendor / 'LICENSE', '--managed-catalog', catalog,
         *(['--sanitize'] if args.sanitizers == 'ON' else []))

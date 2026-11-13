@@ -749,6 +749,7 @@ std::string import_alias(const Import& import) {
 }
 struct Unit {
     CPrimitiveAdmission::Owner c_primitives;
+    std::string c_provider;
     EditorProbe* editor=nullptr;
     std::function<void(Type,Type,const SourceFile&,const Token&)> prepare_relationships;
     SourceFile source;
@@ -1375,6 +1376,13 @@ public:
             try {
             if (accept("<newline>")) continue;
             if (peek().kind == TokenKind::invalid) throw Poison{};
+            if (accept("native")) {
+                auto provider=take();
+                if(provider.kind!=TokenKind::string || !unit.c_provider.empty() ||
+                   !unit.imports.empty() || !unit.functions.empty() || !unit.structures.empty() || !unit.globals.empty() || !unit.constants.empty())
+                    error(source,provider,Code::syntax,"A native declaration module starts with one literal provider identity.");
+                unit.c_provider=provider.decoded;newline();continue;
+            }
             if (at("while")) error(source, peek(), Code::while_loop, "VOID uses 'for' for all loops.", "Replace 'while condition:' with 'for condition:' inside a function.");
             if (accept("use")) {
                 if (!unit.functions.empty() || !unit.constants.empty() || !unit.globals.empty() || !unit.structures.empty() || unit.application_body) error(source, peek(), Code::syntax, "Imports must precede constant and function declarations.", "Move use declarations to the start of this file.");
@@ -5801,6 +5809,7 @@ class SourceGraph {
     const SourceOverrides& overrides;
     const NativeProject* native=nullptr;
     CPrimitiveAdmission::Owner primitives;
+    std::string physical_primitive_module;
     std::optional<std::filesystem::path> standard_root;
     struct Directory {std::map<std::string,std::set<std::string>> names;std::error_code error;};
     std::map<std::filesystem::path,Directory> directories;
@@ -5834,7 +5843,8 @@ public:
         }
     }
     void generated_primitives(CPrimitiveAdmission::Owner admission) {
-        virtual_children[""][folded(admission->module().substr(1))].insert(admission->module().substr(1));
+        if(!admission->physical_source())
+            virtual_children[""][folded(admission->module().substr(1))].insert(admission->module().substr(1));
         primitives = std::move(admission);
     }
     const project::LockedPackage* package(std::string_view identity) const {
@@ -5899,7 +5909,7 @@ public:
         // after its application has admitted that provider. Relative imports
         // and every other absolute path retain the locked package boundary.
         const bool admitted_native = owner && !directory && path.kind == TokenKind::path &&
-            primitives && path.text == primitives->module();
+            primitives && !primitives->physical_source() && path.text == primitives->module();
         if (admitted_native && owner->sources.contains(std::string_view(relative).substr(1)))
             error(from.source,path,Code::import_path,"Host-admitted C binding module collides with a package source.");
         if (owner && !standard && !admitted_native) {
@@ -5920,7 +5930,7 @@ public:
         auto id=standard ? "/@stdlib"+relative : relative;
         if(directory) {relative=path_utf8(utf8_path(relative).parent_path());id=standard ? "/@stdlib"+relative : relative;}
         auto overlay = overrides.find(id);
-        const bool generated = !directory && primitives && id == primitives->module();
+        const bool generated = !directory && primitives && !primitives->physical_source() && id == primitives->module();
         // All parse/load/recapture readers resolve first, including cached units.
         // Overrides are frozen for the synchronous analysis: a tombstone can
         // never reach their optional dereferences or fall back to disk bytes.
@@ -5959,7 +5969,7 @@ public:
             auto status = std::filesystem::symlink_status(physical, ec);
             if (ec == std::errc::no_such_file_or_directory && (generated || overlay != overrides.end() || (directory && !standard && virtual_directories.contains(id)))) ec.clear();
             if (ec) error(from.source, path, Code::import_read, "Cannot inspect imported path '" + id + "'.");
-            if (prefix == relative && primitives && id == primitives->module() && std::filesystem::exists(status))
+            if (prefix == relative && primitives && !primitives->physical_source() && id == primitives->module() && std::filesystem::exists(status))
                 error(from.source,path,Code::import_path,"Host-admitted C binding module collides with a project source.");
             if (std::filesystem::is_symlink(status)) error(from.source, path, Code::import_path, "Symbolic links are not supported in module paths.", "Import a regular project file; symlink identity and external permissions are deferred.");
             if (std::filesystem::exists(status)) {
@@ -6013,8 +6023,39 @@ public:
         Parser(result->source, diagnostics).parse(*result);
         result->parse_failed |= diagnostics.size() != before;
         if(id==console::source_module)for(auto& structure:result->structures)if(structure.token.text=="terminal_session"){structure.definition->native_resource=true;structure.definition->native_provider="void.console.v1";}
-        if (primitives && id == primitives->module()) {
-            result->c_primitives = primitives;
+        const auto declaration_path=package_source(id)?"/"+std::string(package_relative_source(id)):id;
+        if(!result->c_provider.empty() && (!primitives || !primitives->physical_source() ||
+           declaration_path!=primitives->module() || result->c_provider!=primitives->provider()))
+            error(result->source,path,Code::unsupported_type,"Physical native declarations require the application's matching admitted descriptor.");
+        if (primitives && declaration_path == primitives->module()) {
+            if(primitives->physical_source()) {
+                if(result->c_provider!=primitives->provider())
+                    error(result->source,path,Code::unsupported_type,"Physical native declaration provider differs from the admitted descriptor.");
+                if(!physical_primitive_module.empty() && physical_primitive_module!=id)
+                    error(result->source,path,Code::import_path,"More than one physical C declaration module matches the descriptor.");
+                physical_primitive_module=id;
+                if(!result->imports.empty() || !result->constants.empty() || !result->globals.empty() ||
+                   !result->generic_functions.empty() || !result->generic_structures.empty() ||
+                   result->functions.size()!=primitives->bindings().size() ||
+                   result->structures.size()!=primitives->records().size()+primitives->resources().size())
+                    error(result->source,path,Code::unsupported_type,"Physical C declaration inventory differs from the admitted descriptor.");
+                std::set<std::string> names;
+                for(const auto& structure:result->structures) {
+                    if(structure.base_type || !structure.generics.empty())
+                        error(result->source,structure.token,Code::unsupported_type,"Physical native declarations cannot extend types or introduce generics.");
+                    for(const auto& field:structure.fields)if(field.expression &&
+                        (field.name!="_seal" || field.expression->kind!=Expr::Kind::literal || field.expression->token.text!="0"))
+                        error(result->source,field.token,Code::unsupported_type,"Physical native declarations cannot contain executable field initializers.");
+                }
+                for(const auto& f:result->functions) {
+                    if(!names.insert(f.token.text).second || f.receiver || f.asynchronous || !f.generics.empty() ||
+                       f.body.size()!=1 || f.body.front().kind!=Statement::Kind::no_op ||
+                       std::none_of(primitives->bindings().begin(),primitives->bindings().end(),[&](const auto& b){return b.name==f.token.text;}) ||
+                       std::any_of(f.parameters.begin(),f.parameters.end(),[](const auto& p){return bool(p.default_expression);}))
+                        error(result->source,f.token,Code::unsupported_type,"Physical C bindings require exact descriptor declarations with a pass body.");
+                }
+                result->c_primitives=primitives->at_source_module(id);
+            } else result->c_primitives = primitives;
             for (auto& structure : result->structures)
                 for (const auto& resource : primitives->resources())
                     if (structure.token.text == resource.name) {
@@ -6192,6 +6233,9 @@ void generic_provenance(ir::Module& module,const std::map<std::string,std::uniqu
     }
 }
 void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry, Diagnostics& diagnostics, Unit* library_scope=nullptr) {
+    for(const auto& [id,u]:units)if(!u->c_provider.empty() && !u->c_primitives)
+        error(u->source,{TokenKind::name,"native",0},Code::unsupported_type,
+              "Physical native declarations require the application's matching admitted descriptor.");
     for(auto& [id,u]:units)if(u->application_body) {
         try {
             if(id!=entry)error(u->source,{TokenKind::name,"",0},Code::entry,"Imported modules cannot contain executable top-level statements.");
@@ -6693,6 +6737,25 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     }
     bool pending_headers=true;
     while(pending_headers) {pending_headers=false;for(auto& [id,u]:units)for(auto& f:u->functions)if(!f.prepared){prepare_function(*u,f);pending_headers=true;}}
+    for(const auto& [id,u]:units)if(u->c_primitives && u->c_primitives->physical_source()) {
+        const auto& admission=*u->c_primitives;
+        for(const auto& f:u->functions) {
+            std::vector<Type> parameters;for(const auto& p:f.parameters)parameters.push_back(p.type);
+            if(!f.c_primitive || !admission.signature(admission.bindings().at(*f.c_primitive),parameters,f.result))
+                error(u->source,f.token,Code::type_mismatch,"Physical native signature differs from the admitted descriptor.");
+        }
+        for(const auto& resource:admission.resources()) {
+            auto found=u->structure_names.find(resource.name);
+            if(found==u->structure_names.end() || !admission.resource_type(Type::nominal(found->second->definition)))
+                error(u->source,{TokenKind::name,resource.name,0},Code::type_mismatch,"Physical native resource differs from the admitted descriptor.");
+        }
+        for(unsigned n=0;n<admission.records().size();++n) {
+            const auto& record=admission.records()[n];auto found=u->structure_names.find(record.name);
+            CPrimitiveAdmission::Shape shape;shape.record=n+1;
+            if(found==u->structure_names.end() || !admission.matches(shape,Type::nominal(found->second->definition)))
+                error(u->source,{TokenKind::name,record.name,0},Code::type_mismatch,"Physical native record differs from the admitted descriptor.");
+        }
+    }
     headers_ready=true;
     root.prepare_relationships=[](Type,Type,const SourceFile&,const Token&){};
     validate_inheritance(units,root,diagnostics);
@@ -7475,7 +7538,8 @@ AnalysisResult analyze_project(const std::filesystem::path& entry, CPrimitiveAdm
     if ("/" + path_utf8(entry.filename()) == admission->module())
         throw std::invalid_argument("A C primitive declaration module cannot be the project entry");
     SourceOverrides overrides;
-    overrides.emplace(admission->module(), SourceFile("<host binding " + admission->module() + ">", admission->source()));
+    if(!admission->physical_source())
+        overrides.emplace(admission->module(), SourceFile("<host binding " + admission->module() + ">", admission->source()));
     try {
         auto program = validated_project(entry, overrides, true, nullptr, nullptr, std::move(admission));
         return {program, program->warnings()};

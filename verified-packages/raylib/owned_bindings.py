@@ -83,7 +83,7 @@ def extend(nodes, inventory, aliases, pod, scalar, void_types, snake, resolve):
     snake=lambda name: original_snake(name).replace(' ', '_').replace('*', 'pointer')
     scalar=dict(scalar, **{'long':'i64','unsigned short':'u16'})
     void_types=dict(void_types, **{'long':'i64','unsigned short':'u16'})
-    decls, body, api, resources, records, binds = [], [], [], [], [], []
+    decls, body, resources, records, binds = [], [], [], [], []
     def canon(t):
         if t.endswith(' *'):
             base=t[:-2]
@@ -237,38 +237,6 @@ static void vd_unload_model(Model value) {
          '    (void)offset; vd_error=0;\n    if (!vd_bytes_live(p) || at>p->count*p->stride || count>p->count*p->stride-at) { vd_error=1;return -1;}\n    if (count) memcpy(data,(const uint8_t*)p->data+at,count);\n    return (int64_t)count;')
     emit('buffer_text_length','vd_raylib_buffer_text_length','c_size',['borrow:owner_buffer'],'size_t',['const VdBuffer* p'],
          '    vd_error=0;if(!vd_bytes_live(p)){vd_error=1;return 0;}const char* end=memchr(p->data,0,p->count);return end?(size_t)(end-(const char*)p->data):p->count;')
-    api += [
-            'private func _check():','    var code = native.api_error()',
-            '    if code != 0:','        var refused: result<bool, core_error.error> = Err(core_error.error(message = "Raylib adapter rejected invalid or stale native input", code = code))',
-            '        conversion.unwrap(refused)','',
-            'private func _require(condition: bool):','    if not condition:',
-            '        var refused: result<bool, core_error.error> = Err(core_error.error(message = "Raylib argument outside native extent", code = 1))',
-            '        conversion.unwrap(refused)','',
-            'private func _bytes_buffer(const bytes: [u8], kind: u32) -> native.owner_buffer:',
-            '    var owner = native.buffer_new(bytes.count as u64, kind) as native.owner_buffer',
-            '    var at: i64 = 0','    for at < bytes.count:','        var count = bytes.count - at',
-            '        if count > 65536:','            count = 65536',
-            '        native.buffer_write(owner, at as u64, bytes, at as u64, count as u64)','        _check()',
-            '        at += count','    return owner','',
-            'private func _string_buffer(value: string) -> native.owner_buffer:',
-            '    return _bytes_buffer(value.to_utf8(), 1 as u32)','',
-            'private func _optional_string_buffer(value: c_string?) -> native.owner_buffer:',
-            '    if value == null:','        return native.buffer_new(0, 3 as u32) as native.owner_buffer',
-            '    return _string_buffer((value as c_string).value)','',
-            'private func _buffer_bytes(owner: native.owner_buffer, requested: i64 = -1) -> [u8]:',
-            '    var length = native.buffer_count(owner) as i64','    _check()', '    if requested >= 0:', '        _require(requested <= length)', '        length = requested',
-            '    var bytes: [u8] = []','    for index in 0..<length:','        bytes.push(0)',
-            '    var at: i64 = 0','    for at < length:','        var count = length - at',
-            '        if count > 65536:','            count = 65536',
-            '        native.buffer_read(owner, at as u64, bytes, at as u64, count as u64)','        _check()',
-            '        at += count','    return bytes','',
-            'struct c_string:', '    value: string', '', 'struct byte_buffer:','    owner: native.owner_buffer','',
-            'func buffer_from_bytes(const bytes: [u8]) -> byte_buffer:',
-            '    return byte_buffer(owner = _bytes_buffer(bytes, 0 as u32))','',
-            'func buffer_bytes(value: byte_buffer) -> [u8]:','    return _buffer_bytes(value.owner)','',
-            'func buffer_text(value: byte_buffer) -> string:',
-            '    var length = native.buffer_text_length(value.owner)', '    _check()', '    return conversion.unwrap(string.from_utf8(_buffer_bytes(value.owner, length as i64)))','',
-            'func buffer_close(value: byte_buffer) -> i32:','    return native.buffer_close(value.owner)','']
     body += [r'''
 static void vd_strings_release(VdBuffer* p) {
     char** values=p->data;
@@ -304,17 +272,6 @@ static VdBuffer* vd_strings_copy(char** values, size_t count) {
     vd_error=0;if(!vd_buffer_live(p)||p->kind!=30||index>=p->count){vd_error=1;return NULL;}
     const char* text=((const char*const*)p->data)[index];if(!text){vd_error=1;return NULL;}
     return vd_copy(text,strlen(text),1,1);''')
-    api += ['struct string_array:','    owner: native.owner_buffer','',
-            'func string_array_from(const values: [string]) -> string_array:',
-            '    var array = native.strings_new(values.count as u64) as native.owner_buffer','    _check()',
-            '    for index in 0..<values.count:','        var value = _string_buffer(values[index])',
-            '        native.strings_set(array, index as u64, value)','        native.buffer_close(value)','        _check()',
-            '    return string_array(owner = array)','',
-            'func string_array_count(value: string_array) -> i64:','    return native.buffer_count(value.owner) as i64','',
-            'func string_array_get(array: string_array, index: i64) -> string:',
-            '    var value = native.strings_get(array.owner, index as u64) as native.owner_buffer','    _check()',
-            '    defer native.buffer_close(value)','    return conversion.unwrap(string.from_utf8(_buffer_bytes(value)))','',
-            'func string_array_close(value: string_array) -> i32:','    return native.buffer_close(value.owner)','']
     decls += ['typedef struct VdWindow VdWindow;','typedef struct VdAudio VdAudio;']
     resources += [
         'resource owner_window VdWindow pointer null init_window close_window owner-calls shutdown-owner consume-always',
@@ -356,22 +313,6 @@ static void vd_destroy_audio(VdBase* base) {
     emit('get_window_handle','vd_raylib_api_GetWindowHandle','owner:owner_buffer',[],'VdBuffer*',[],r'''
     vd_error=0;if(!vd_window){vd_error=1;return NULL;}void* value=GetWindowHandle();
     return value?vd_buffer(value,0,1,4,false,&vd_window->base,NULL):NULL;''')
-    api += ['struct window:','    owner: native.owner_window','',
-        'func init_window(width: i32, height: i32, title: string) -> window?:',
-        '    var text = _string_buffer(title)','    defer native.buffer_close(text)',
-        '    var value = native.init_window(width, height, text)','    _check()',
-        '    if value == null:','        return null','    return window(owner = value as native.owner_window)','',
-        'func close_window(value: window) -> i32:','    return native.close_window(value.owner)','',
-        'struct audio_device:','    owner: native.owner_audio','',
-        'func init_audio_device() -> audio_device?:','    var value = native.init_audio_device()','    _check()',
-        '    if value == null:','        return null','    return audio_device(owner = value as native.owner_audio)','',
-        'func close_audio_device(value: audio_device) -> i32:','    return native.close_audio_device(value.owner)','',
-        'func set_window_title(title: string):','    var text = _string_buffer(title)','    defer native.buffer_close(text)',
-        '    native.set_window_title(text)','    _check()','',
-        'struct window_handle:','    owner: native.owner_buffer','',
-        'func get_window_handle() -> window_handle?:','    var value = native.get_window_handle()','    _check()',
-        '    if value == null:','        return null','    return window_handle(owner = value as native.owner_buffer)','',
-        'func window_handle_close(value: window_handle) -> i32:','    return native.buffer_close(value.owner)','']
     actual_owners=[t for t in OWNERS if owner(t)]
     for t in actual_owners:
         n=snake(t);ct=ctype(t);on=ownername(t);unload,valid=OWNERS[t]
@@ -389,9 +330,6 @@ static void vd_destroy_audio(VdBase* base) {
                  f'    vd_base(&p->base,owned,parent,vd_destroy_{n}); p->storage=value; p->value=&p->storage; return p;','}']
         emit(on+'_new','vd_raylib_'+on+'_new','owner:'+on,[],ct+'*',[],f'    vd_error=0; return vd_own_{n}(({t}){{0}},false,NULL);')
         emit(on+'_close','vd_raylib_'+on+'_close','i32',['close:'+on],'int32_t',[ct+'* p'],'    vd_drop(&p->base); return 0;')
-        api += [f'func {n}_close(value: {n}) -> i32:',f'    return native.{on}_close(value.owner)','',f'struct {n}:',f'    owner: native.{on}','',
-                f'private func _wrap_{n}(value: native.{on}?) -> {n}?:','    _check()',
-                '    if value == null:','        return null',f'    return {n}(owner = value as native.{on})','']
         record=next(x for x in nodes if x.get('kind')=='RecordDecl' and x.get('name')==t)
         for f in record.get('inner',[]):
             if f.get('kind')!='FieldDecl':continue
@@ -403,8 +341,6 @@ static void vd_destroy_audio(VdBase* base) {
             symbol=f'vd_raylib_{n}_get_{fn}'
             emit(n+'_get_'+fn,symbol,maptype(ft),['borrow:'+on],ft,[f'const {ct}* p'],
                  f'    vd_error=0; if (!vd_live(&p->base)) {{vd_error=1;return ({ft}){{0}};}} return p->value->{f["name"]};')
-            api += [f'property (self {n}) {fn}: {stype(ft)}:','    get:',
-                    f'        var value = native.{n}_get_{fn}(self.owner)','        _check()','        return value','']
     buffer_types={t:i+10 for i,t in enumerate(['int','unsigned int','float','Vector2','Vector3','Matrix','Color','Rectangle','Transform','Image','GlyphInfo','Material','ModelAnimation','AutomationEvent','unsigned short','BoneInfo','Mesh','MaterialMap'])}
     buffer_types.update({'unsigned char':0,'char':1})
     def array_name(t):
@@ -417,9 +353,6 @@ static void vd_destroy_audio(VdBase* base) {
         emit('buffer_'+snake(t)+'_new','vd_raylib_buffer_'+snake(t)+'_new','owner:owner_buffer',['c_size'],'VdBuffer*',['size_t count'],
              f'    vd_error=0; if(count>64*1024*1024/{size_expr}) {{vd_error=2;return NULL;}}\n    void* data=MemAlloc((unsigned int)(count*{size_expr}+1)); if(!data){{vd_error=2;return NULL;}} memset(data,0,count*{size_expr}+1);\n    VdBuffer* p=vd_buffer(data,count,{size_expr},{kind},true,NULL,vd_mem_release); if(!p)MemFree(data);\n'+
              ('    if(p){p->keepers=calloc(count?count:1,sizeof(VdBase*));p->epochs=calloc(count?count:1,sizeof(uint64_t));if(!p->keepers||!p->epochs){vd_error=2;vd_drop(&p->base);return NULL;}}\n' if owner(t) else '')+'    return p;')
-        api += [f'struct {n}:','    owner: native.owner_buffer','',f'func {n}_count(value: {n}) -> i64:',
-                '    var count = native.buffer_count(value.owner)','    _check()','    return count as i64','',
-                f'func {n}_close(value: {n}) -> i32:','    return native.buffer_close(value.owner)','']
         getter='buffer_'+snake(t)+'_get';setter='buffer_'+snake(t)+'_set'
         guard=f'    vd_error=0; if(!vd_buffer_live(p)||p->kind!={kind}||index>=p->count){{vd_error=1;'
         if owner(t):
@@ -436,9 +369,6 @@ static void vd_destroy_audio(VdBase* base) {
             sgettype=stype(t);sget='    _check()\n    return value';svalue='value'
         emit(getter,'vd_raylib_'+getter,rt,['borrow:owner_buffer','c_size'],crt,['const VdBuffer* p','size_t index'],getcode)
         emit(setter,'vd_raylib_'+setter,'void',setparams,'void',setcparams,setcode)
-        api += [f'func {n}_get(array: {n}, index: i64) -> {sgettype}:',f'    var value = native.{getter}(array.owner, index as u64)',sget,'',
-                f'func {n}_from(const values: [{stype(t)}]) -> {n}:',f'    var array = native.buffer_{snake(t)}_new(values.count as u64) as native.owner_buffer',
-                '    _check()','    for index in 0..<values.count:','        var value = values[index]',f'        native.{setter}(array, index as u64, {svalue})','        _check()',f'    return {n}(owner = array)','']
     # Nested owner fields never create a second allocation owner. Their native
     # parent is retained, and mutation invalidates old views before the next use.
     field_extents={
@@ -465,8 +395,6 @@ static size_t vd_image_bytes(Image image) {
     return bytes;
 }
 """]
-    api += ['struct opaque_handle:','    owner: native.owner_buffer','',
-            'func opaque_handle_close(value: opaque_handle) -> i32:','    return native.buffer_close(value.owner)','']
     for t in actual_owners:
         n=snake(t);on=ownername(t);ct=ctype(t)
         record=next(x for x in nodes if x.get('kind')=='RecordDecl' and x.get('name')==t)
@@ -478,7 +406,7 @@ static size_t vd_image_bytes(Image image) {
             if owner(ft):
                 emit(get,'vd_raylib_'+get,'owner:'+ownername(ft),['borrow:'+on],ctype(ft)+'*',[f'const {ct}* p'],
                      f'    vd_error=0;if(!vd_live(&p->base)){{vd_error=1;return NULL;}} return vd_own_{snake(ft)}(p->value->{field},false,(VdBase*)&p->base);')
-                public=snake(ft);finish=f'        return _wrap_{public}(value)'
+                public=snake(ft)
             else:
                 public='opaque_handle';element=None;count='0';kind=4;data=f'p->value->{field}'
                 extra=''
@@ -494,20 +422,12 @@ static size_t vd_image_bytes(Image image) {
                 emit(get,'vd_raylib_'+get,'owner:owner_buffer',['borrow:'+on],'VdBuffer*',[f'const {ct}* p'],
                      f'    vd_error=0;if(!vd_live(&p->base)){{vd_error=1;return NULL;}}'+('' if fixed else f'if(!{data})return NULL;')+'\n'
                      f'    VdBuffer* value=vd_buffer((void*){data},(size_t)({count}),{stride},{kind},false,(VdBase*)&p->base,NULL);{extra}return value;')
-                finish=f'        _check()\n        if value == null:\n            return null\n        return {public}(owner = value as native.owner_buffer)'
-            api += [f'property (self {n}) {fn}: {public}?:','    get:',f'        var value = native.{get}(self.owner)',finish,'']
     emit('poses_get','vd_raylib_poses_get','owner:owner_buffer',['borrow:owner_buffer','c_size'],'VdBuffer*',['const VdBuffer* p','size_t index'],
          f'    vd_error=0;if(!vd_buffer_live(p)||p->kind!=31||index>=p->count){{vd_error=1;return NULL;}}return vd_buffer(((Transform**)p->data)[index],p->child_count,sizeof(Transform),{buffer_types["Transform"]},false,(VdBase*)&p->base,NULL);')
-    api += ['struct pose_array:','    owner: native.owner_buffer','',
-            'func pose_array_count(value: pose_array) -> i64:','    var count = native.buffer_count(value.owner)','    _check()','    return count as i64','',
-            'func pose_array_get(array: pose_array, index: i64) -> transform_array?:','    var value = native.poses_get(array.owner, index as u64)','    _check()',
-            '    if value == null:','        return null','    return transform_array(owner = value as native.owner_buffer)','',
-            'func pose_array_close(value: pose_array) -> i32:','    return native.buffer_close(value.owner)','']
     for t in ('Image','Font'):
         n=snake(t)
         emit(n+'_output_count','vd_raylib_'+n+'_output_count','i32',['borrow:'+ownername(t)],'int32_t',[f'const {ctype(t)}* p'],
              '    vd_error=0;if(!vd_live(&p->base)){vd_error=1;return 0;}return p->out_count;')
-        api += [f'func {n}_output_count(value: {n}) -> i32:',f'    var count = native.{n}_output_count(value.owner)','    _check()','    return count','']
     outcomes={name:{'void_name':snake(name),'native_abi':'ABI 3 sealed resource / exact prototype in generated descriptor',
         'ownership':'Explicit context owner; native close waits for dependent native resources. OS handle is a parented opaque borrow.' if name!='SetWindowTitle' else 'Owned terminated UTF-8 retained until title replacement/window destruction.',
         'implementation':'checked native context adapter','blocker':None,'test_coverage':'native compilation; representative context lifecycle tests in examples/raylib-consumer/src/subsystems.void'}
@@ -529,33 +449,24 @@ static size_t vd_image_bytes(Image image) {
         body.append(f'static void {symbol}(VdBuffer* p) {{ {action} }}')
     for name,release in ALLOCATED_STRINGS.items():
         body.append(f'static void vd_release_{name}(VdBuffer* p) {{ {release}((char*)p->data); }}')
-    def manual(name, result, parameters, cresult, cparams, code, source, ownership):
+    def manual(name, result, parameters, cresult, cparams, code, ownership):
         emit(snake(name),'vd_raylib_api_'+name,result,parameters,cresult,cparams,code)
-        api.extend(source+[''])
         outcomes[name]={'void_name':snake(name),'native_abi':{'result':result,'parameters':parameters},
             'ownership':ownership,'implementation':'audited thin adapter and existing native resource ledger',
             'blocker':None,'test_coverage':'native compile/link; representative ownership/runtime tests in examples/raylib-consumer/src/subsystems.void'}
-    api += ['func mem_alloc(size: u32) -> byte_buffer?:',
-            '    var value = native.buffer_new(size as u64, 0 as u32)','    _check()',
-            '    if value == null:','        return null','    return byte_buffer(owner = value as native.owner_buffer)','']
     outcomes['MemAlloc']={'void_name':'mem_alloc','native_abi':'owner:owner_buffer c_size u32','ownership':'Native MemAlloc storage, released once with MemFree by the ledger.',
         'implementation':'existing buffer allocator adapter','blocker':None,'test_coverage':'allocation/cleanup runtime tests'}
     manual('MemRealloc','c_bool',['mut:owner_buffer','u32'],'bool',['VdBuffer* p','uint32_t size'],r'''
     vd_error=0;if(!vd_bytes_live(p)||!p->base.owned||p->base.parent||p->base.refs!=1||p->stride!=1||size>64*1024*1024){vd_error=1;return false;}
     void* value=MemRealloc(p->data,size+1);if(!value)return false;p->data=value;p->count=size;
     ((uint8_t*)value)[size]=0;vd_change(&p->base);return true;''',
-        ['func mem_realloc(value: byte_buffer, size: u32) -> byte_buffer?:',
-         '    var resized = native.mem_realloc(value.owner, size)','    _check()',
-         '    if not resized:','        return null','    return value'],
         'Resizes the same sealed owner; allocation failure preserves the original storage. Live dependent borrows forbid realloc.')
     manual('LoadDroppedFiles','owner:owner_file_path_list',[],'VdFilePathList*',[],r"""
     vd_error=0;if(!vd_window){vd_error=1;return NULL;}
     FilePathList raw=LoadDroppedFiles();VdBuffer* copy=vd_strings_copy(raw.paths,raw.count);UnloadDroppedFiles(raw);
     if(!copy)return NULL;FilePathList snapshot={.count=raw.count,.paths=copy->data};
     copy->base.owned=false;vd_drop(&copy->base);return vd_own_file_path_list(snapshot,true,NULL);""",
-        ['func load_dropped_files() -> file_path_list?:','    var value = native.load_dropped_files()','    return _wrap_file_path_list(value)'],
         'Deep snapshot of the native event list; acknowledges the upstream dropped-file allocation immediately, so later input polling cannot invalidate the source result.')
-    api += ['func unload_dropped_files(value: file_path_list) -> i32:','    return native.owner_file_path_list_close(value.owner)','']
     outcomes['UnloadDroppedFiles']={'void_name':'unload_dropped_files','native_abi':'close:owner_file_path_list',
         'ownership':'Consumes the copied event snapshot; the original upstream drop allocation was acknowledged by LoadDroppedFiles.',
         'implementation':'terminal snapshot release','blocker':None,'test_coverage':'native compilation and window lifecycle test'}
@@ -564,34 +475,23 @@ static size_t vd_image_bytes(Image image) {
     vd_error=0;if(!vd_window||!vd_live(&texture->base)){vd_error=1;return;}
     vd_keep((VdBase*)&texture->base);SetShapesTexture(*texture->value,source);
     vd_drop(vd_shapes);vd_shapes=(VdBase*)&texture->base;""",
-        ['func set_shapes_texture(value: texture, source: native.rectangle):','    native.set_shapes_texture(value.owner, source)','    _check()'],
         'Retains the selected texture until replacement or explicit window close; the global shapes borrow cannot dangle.')
     manual('SetWindowIcons','void',['borrow:owner_buffer','i32'],'void',['const VdBuffer* p','int32_t count'],f'''
     vd_error=0;if(count<1||p->kind!={buffer_types['Image']}||!vd_extent(p,(size_t)count,sizeof(Image))){{vd_error=1;return;}}
     SetWindowIcons((Image*)p->data,count);''',
-        ['func set_window_icons(values: image_array, count: i32):','    native.set_window_icons(values.owner, count)','    _check()'],
         'Synchronous image-array borrow; every underlying image remains retained and generation-checked.')
     manual('GetCodepointPrevious','record:int_out',['borrow:owner_buffer','c_size'],'VdIntOut',['const VdBuffer* p','size_t position'],r'''
     vd_error=0;const char* text=vd_text(p);if(vd_error||!text||!position||position>p->count){vd_error=1;return(VdIntOut){0};}
     int size=0;int value=GetCodepointPrevious(text+position,&size);return(VdIntOut){value,size};''',
-        ['func get_codepoint_previous(text: string, position: i64 = -1) -> native.int_out:',
-         '    var bytes = _string_buffer(text)','    defer native.buffer_close(bytes)',
-         '    if position < 0:','        position = text.to_utf8().count',
-         '    var value = native.get_codepoint_previous(bytes, position as u64)','    _check()','    return value'],
         'Explicit byte cursor into valid UTF-8; returned value/size preserve the native out parameter.')
     manual('TextCopy','i32',['mut:owner_buffer','borrow:owner_buffer'],'int32_t',['VdBuffer* dst','const VdBuffer* src'],r'''
     vd_error=0;const char* text=vd_text(src);if(vd_error||!text||!vd_bytes_live(dst)||(!dst->base.owned||dst->base.parent||dst->base.refs!=1)||!vd_extent(dst,src->count+1,1)){vd_error=1;return 0;}
     int count=TextCopy((char*)dst->data,text);vd_change(&dst->base);return count;''',
-        ['func text_copy(dst: byte_buffer, text: string) -> i32:','    var src = _string_buffer(text)',
-         '    defer native.buffer_close(src)','    var count = native.text_copy(dst.owner, src)','    _check()','    return count'],
         'Caller-owned writable capacity is checked including the terminator; return is the native copied count.')
     manual('TextAppend','i32',['mut:owner_buffer','borrow:owner_buffer','i32'],'int32_t',['VdBuffer* dst','const VdBuffer* src','int32_t position'],r'''
     vd_error=0;const char* text=vd_text(src);
     if(vd_error||!text||!vd_bytes_live(dst)||position<0||(size_t)position>dst->count||(!dst->base.owned||dst->base.parent||dst->base.refs!=1)||!vd_extent(dst,(size_t)position+src->count+1,1)){vd_error=1;return 0;}
     int at=position;TextAppend((char*)dst->data,text,&at);vd_change(&dst->base);return at;''',
-        ['func text_append(dst: byte_buffer, text: string, position: i32) -> i32:',
-         '    var src = _string_buffer(text)','    defer native.buffer_close(src)',
-         '    var at = native.text_append(dst.owner, src, position)','    _check()','    return at'],
         'Capacity includes the append and terminator; the returned position is the updated native in/out argument.')
     manual('TextJoin','owner:owner_buffer',['borrow:owner_buffer','i32','borrow:owner_buffer'],'VdBuffer*',
         ['const VdBuffer* list','int32_t count','const VdBuffer* separator'],r'''
@@ -599,11 +499,6 @@ static size_t vd_image_bytes(Image image) {
     if(vd_error||!delimiter||count<0||list->kind!=30||!vd_extent(list,(size_t)count,sizeof(char*))){vd_error=1;return NULL;}
     for(int i=0;i<count;++i)if(!((char**)list->data)[i]){vd_error=1;return NULL;}
     const char* value=TextJoin((char**)list->data,count,delimiter);return value?vd_copy(value,strlen(value),1,1):NULL;''',
-        ['func text_join(list: string_array, count: i32, separator: string) -> byte_buffer?:',
-         '    var delimiter = _string_buffer(separator)','    defer native.buffer_close(delimiter)',
-         '    var value = native.text_join(list.owner, count, delimiter)','    _check()',
-         '    if value == null:','        return null','    var owner = value as native.owner_buffer',
-         '    return byte_buffer(owner = owner)'],
         'Static native result is copied before another native call; input string list and delimiter remain borrowed.')
     manual('LoadModelFromMesh','owner:owner_model',['mut:owner_mesh'],'VdModel*',['VdMesh* mesh'],r'''
     vd_error=0;if(!vd_window||!vd_live(&mesh->base)||!mesh->base.owned||mesh->base.refs!=1){vd_error=1;return NULL;}
@@ -611,10 +506,6 @@ static size_t vd_image_bytes(Image image) {
     Model value=LoadModelFromMesh(*mesh->value);
     vd_base(&p->base,true,&vd_window->base,vd_destroy_model);p->storage=value;p->value=&p->storage;
     mesh->base.owned=false;*mesh->value=(Mesh){0};return p;''',
-        ['func load_model_from_mesh(input_mesh: mesh) -> model?:',
-         '    var value = native.load_model_from_mesh(input_mesh.owner)','    _check()',
-         '    if value == null:','        return null','    native.owner_mesh_close(input_mesh.owner)',
-         '    return model(owner = value as native.owner_model)'],
         'Transfers mesh allocations into the model and consumes the source mesh owner only after successful acquisition.')
     manual('SetMaterialTexture','void',['mut:owner_material','i32','mut:owner_texture'],'void',
         ['VdMaterial* material','int32_t map','VdTexture* texture'],r'''
@@ -622,19 +513,13 @@ static size_t vd_image_bytes(Image image) {
     Texture old=material->value->maps[map].texture;
     if(old.id!=texture->value->id){Material temporary=LoadMaterialDefault();temporary.maps[MATERIAL_MAP_ALBEDO].texture=old;UnloadMaterial(temporary);}
     SetMaterialTexture(material->value,map,*texture->value);texture->base.owned=false;*texture->value=(Texture){0};vd_change(&material->base);''',
-        ['func set_material_texture(input_material: material, map: i32, input_texture: texture):',
-         '    native.set_material_texture(input_material.owner, map, input_texture.owner)','    _check()',
-         '    native.owner_texture_close(input_texture.owner)'],
         'Explicit texture ownership transfer; previous map texture is released, and the consumed texture cannot be reused.')
     manual('LoadSoundAlias','owner:owner_sound',['borrow:owner_sound'],'VdSound*',['const VdSound* source'],r'''
     vd_error=0;if(!vd_live(&source->base)||!source->value->stream.buffer){vd_error=1;return NULL;}
     VdSound* p=calloc(1,sizeof *p);if(!p){vd_error=2;return NULL;}
     Sound value=LoadSoundAlias(*source->value);if(!value.stream.buffer){free(p);return NULL;}
     vd_base(&p->base,true,(VdBase*)&source->base,vd_destroy_sound);p->storage=value;p->value=&p->storage;p->out_count=1;return p;''',
-        ['func load_sound_alias(source: sound) -> sound?:','    var value = native.load_sound_alias(source.owner)',
-         '    return _wrap_sound(value)'],
         'Alias uses UnloadSoundAlias and retains the source sound and audio device until its terminal release.')
-    api += ['func unload_sound_alias(value: sound) -> i32:','    return native.owner_sound_close(value.owner)','']
     outcomes['UnloadSoundAlias']={'void_name':'unload_sound_alias','native_abi':'close:owner_sound',
         'ownership':'Sound owner records whether the native allocation is an alias and calls its matching unload exactly once.',
         'implementation':'existing terminal resource release','blocker':None,'test_coverage':'alias ownership runtime tests'}
@@ -645,17 +530,11 @@ static size_t vd_image_bytes(Image image) {
     VdImage* image=vd_own_image(value,true,NULL);if(!image){{MemFree(recs);return NULL;}}
     image->extra=vd_buffer(recs,(size_t)count,sizeof(Rectangle),{buffer_types['Rectangle']},true,NULL,vd_mem_release);
     if(!image->extra){{MemFree(recs);vd_drop(&image->base);return NULL;}}return image;''',
-        ['func gen_image_font_atlas(glyphs: glyph_info_array, count: i32, font_size: i32, padding: i32, method: i32) -> image?:',
-         '    var value = native.gen_image_font_atlas(glyphs.owner, count, font_size, padding, method)',
-         '    return _wrap_image(value)'],
         'Image owns its CPU pixels and returned glyph rectangles; rectangle views retain the atlas image.')
     emit('image_atlas_rects','vd_raylib_image_atlas_rects','owner:owner_buffer',['borrow:owner_image'],
         'VdBuffer*',['const VdImage* image'],r'''
     vd_error=0;if(!vd_live(&image->base)){vd_error=1;return NULL;}if(!image->extra)return NULL;
     return vd_buffer(image->extra->data,image->extra->count,image->extra->stride,image->extra->kind,false,(VdBase*)&image->base,NULL);''')
-    api += ['func image_atlas_rects(input_image: image) -> rectangle_array?:',
-        '    var value = native.image_atlas_rects(input_image.owner)','    _check()',
-        '    if value == null:','        return null','    return rectangle_array(owner = value as native.owner_buffer)','']
     for entry in inventory['functions']:
         if entry['void_name'] is not None:continue
         name=entry['name'];node=functions[name]
@@ -665,7 +544,6 @@ static size_t vd_image_bytes(Image image) {
         terminal=next((t for t in actual_owners if OWNERS[t][0]==name),None)
         if terminal:
             n=snake(terminal)
-            api += [f'func {snake(name)}(value: {n}) -> i32:',f'    return native.{ownername(terminal)}_close(value.owner)','']
             outcomes[name]={'void_name':snake(name),'native_abi':{'result':'i32','parameters':['close:'+ownername(terminal)]},
                 'ownership':f'Consumes the ledger owner; native destruction calls {name} once after dependent views drain.',
                 'implementation':'existing native resource terminal release','blocker':None,'test_coverage':'native prototype/layout compilation; representative ownership tests in examples/raylib-consumer/src/subsystems.void, not individual execution of every declaration'}
@@ -677,9 +555,6 @@ static size_t vd_image_bytes(Image image) {
             if element is None:continue
             public=array_name(element) if element!='char*' else 'string_array'
             extra=', count: i32' if len(ps)>1 else ''
-            api += [f'func {snake(name)}(value: {public}{extra}) -> i32:']
-            if extra:api += ['    _require(count as u64 == native.buffer_count(value.owner))']
-            api += ['    return native.buffer_close(value.owner)','']
             outcomes[name]={'void_name':snake(name),'native_abi':'existing close:owner_buffer',
                 'ownership':f'Sealed buffer owns its original allocator and count; terminal release invokes {name} for matching producer.',
                 'implementation':'native buffer terminal release','blocker':None,'test_coverage':'native compilation; representative allocated-result tests in examples/raylib-consumer/src/subsystems.void'}
@@ -693,7 +568,7 @@ static size_t vd_image_bytes(Image image) {
         int_pair=name in ('GetCodepoint','GetCodepointNext')
         transformed_result='Camera3D' if mutable_camera else 'VdCollisionOut' if collision else 'VdIntOut' if int_pair else result
         error_return='return;' if transformed_result=='void' else 'return NULL;' if pointer_result or owner(result) else f'return ({transformed_result}){{0}};'
-        params=[];cparams=[];args=[];sparams=[];sargs=[];preamble=['    vd_error=0;'];source_pre=[];failed=None;mut=[]
+        params=[];cparams=[];args=[];preamble=['    vd_error=0;'];failed=None;mut=[]
         if out_int:preamble.append('    int out_count=0;')
         if collision:preamble.append('    Vector2 out_point={0};')
         names={p.get('name'):i for i,p in enumerate(ps)}
@@ -704,20 +579,18 @@ static size_t vd_image_bytes(Image image) {
             if collision and pn=='collisionPoint':args.append('&out_point');continue
             if mutable_camera and i==0:
                 params.append('record:camera3_d');cparams.append('Camera3D '+v);args.append('&'+v)
-                sparams.append(v+': native.camera3_d');sargs.append(v);continue
+                continue
             if ct=='const char *':
                 optional=name in ('LoadShader','LoadShaderFromMemory','LoadAutomationEventList')
                 params.append('borrow:owner_buffer');cparams.append('const VdBuffer* '+v);args.append('text'+str(i))
                 preamble.append(f'    const char* text{i}=vd_text({v}); if(vd_error){{{error_return}}}')
-                sparams.append(v+': '+('c_string?' if optional else 'string'))
-                source_pre += [f'    var {v}_bytes = '+('_optional_string_buffer' if optional else '_string_buffer')+f'({v})',f'    defer native.buffer_close({v}_bytes)'];sargs.append(v+'_bytes')
             elif ct in scalar or ct in pod:
-                params.append(maptype(ct));cparams.append(ct+' '+v);args.append(v);sparams.append(v+': '+stype(ct));sargs.append(v)
+                params.append(maptype(ct));cparams.append(ct+' '+v);args.append(v)
             elif ct.endswith(' *') and (ct[:-2].removeprefix('const ') in buffer_types or ct[:-2].removeprefix('const ')=='void') and not (owner(ct[:-2]) and pn not in COUNT_ARGS.get(name,{})):
                 element=ct[:-2].removeprefix('const ')
                 is_write=name=='SetPixelColor'
                 params.append(('mut:' if is_write else 'borrow:')+'owner_buffer');cparams.append(('' if is_write else 'const ')+'VdBuffer* '+v)
-                args.append('('+ct+')('+v+'->count?'+v+'->data:NULL)');sparams.append(v+': '+(array_name(element) if element!='void' else 'byte_buffer'));sargs.append(v+'.owner')
+                args.append('('+ct+')('+v+'->count?'+v+'->data:NULL)')
                 if element in ('void','unsigned char'):
                     preamble.append(f'    if(!vd_bytes_live({v})){{vd_error=1;{error_return}}}')
                 if is_write:
@@ -756,7 +629,6 @@ static size_t vd_image_bytes(Image image) {
                 params.append(('mut:' if changes else 'borrow:')+ownername(base));cparams.append(('' if changes else 'const ')+ctype(base)+'* '+v)
                 args.append(v+'->value' if ct.endswith(' *') else '*'+v+'->value')
                 preamble.append(f'    if (!vd_live(&{v}->base)) {{vd_error=1;{error_return}}}')
-                sparams.append(v+': '+snake(base));sargs.append(v+'.owner')
                 if changes:mut.append(v)
                 if ct.endswith(' *') and base in ('Image','Wave','Mesh','Texture'):
                     preamble.append(f'    if(!{v}->base.owned||{v}->base.refs!=1){{vd_error=1;{error_return}}}')
@@ -801,12 +673,8 @@ static size_t vd_image_bytes(Image image) {
                 code+='    return vd_copy(raw,(size_t)out_count,1,1);'
             else:
                 public='byte_buffer';owned=True;code+='    return vd_copy(raw,strlen(raw),1,1);'
-            sret=public+'?'
-            source_result='    _check()\n    if value == null:\n        return null\n    var owner = value as native.owner_buffer\n'
-            if owned:source_result+=f'    return {public}(owner = owner)'
-            else:source_result+='    defer native.buffer_close(owner)\n    return conversion.unwrap(string.from_utf8(_buffer_bytes(owner)))'
         elif owner(result):
-            ret='owner:'+ownername(result);cret=ctype(result)+'*';sret=snake(result)+'?'
+            ret='owner:'+ownername(result);cret=ctype(result)+'*'
             parent='(VdBase*)&p0->base' if name in BORROWED_RESULTS and ps and owner(canon(ps[0]['type']['qualType'])) else 'NULL'
             if (result in ('Texture','RenderTexture','Font','Shader','Material','Model') or result=='Mesh' and name.startswith('GenMesh')) and parent=='NULL':
                 preamble.append('    if(!vd_window){vd_error=1;return NULL;}');parent='&vd_window->base'
@@ -823,33 +691,27 @@ static size_t vd_image_bytes(Image image) {
             if name in RETAIN_INPUT:
                 code+='\n    if(wrapped)wrapped->retained=&music_data->base;else vd_drop(&music_data->base);'
             code+='\n    return wrapped;'
-            source_result=f'    return _wrap_{snake(result)}(value)'
         elif int_pair:
-            ret='record:int_out';cret='VdIntOut';sret='native.int_out'
+            ret='record:int_out';cret='VdIntOut'
             code='\n'.join(preamble)+f'\n    int value={call}; return (VdIntOut){{value,out_count}};'
-            source_result='    _check()\n    return value'
         elif collision:
-            ret='record:collision_out';cret='VdCollisionOut';sret='native.collision_out'
+            ret='record:collision_out';cret='VdCollisionOut'
             code='\n'.join(preamble)+f'\n    bool value={call}; return (VdCollisionOut){{value,out_point}};'
-            source_result='    _check()\n    return value'
         elif mutable_camera:
-            ret='record:camera3_d';cret='Camera3D';sret='native.camera3_d'
-            code='\n'.join(preamble)+f'\n    {call}; return p0;';source_result='    _check()\n    return value'
+            ret='record:camera3_d';cret='Camera3D'
+            code='\n'.join(preamble)+f'\n    {call}; return p0;'
         elif result in scalar or result in pod:
-            ret=maptype(result);cret='int64_t' if result=='long' else result;sret=stype(result) if result!='void' else None
+            ret=maptype(result);cret='int64_t' if result=='long' else result
             code='\n'.join(preamble)+'\n    '+('return ' if result!='void' else '')+call+';'
             if mut:
                 if result=='void':code+='\n'+''.join(f'    vd_change(&{v}->base);\n' for v in mut)
                 else:continue
             if name=='SetAutomationEventList':code+='\n    vd_active_events=p0;'
-            source_result='    _check()'+('\n    return value' if result!='void' else '')
         else:continue
         symbol='vd_raylib_api_'+name;exposed=snake(name)
         emit(exposed,symbol,ret,params,cret,cparams,code)
-        api += [f'func {exposed}({", ".join(sparams)})'+(' -> '+sret if sret else '')+':',*source_pre,
-                '    '+('var value = ' if sret else '')+f'native.{exposed}({", ".join(sargs)})',source_result,'']
         outcomes[name]={'void_name':exposed,'native_abi':{'result':ret,'parameters':params},
             'ownership':'owned native result with recorded allocator/extent and dependent-resource retention' if owner(result) or pointer_result else 'checked synchronous values and resource borrows; out parameters are explicit result fields',
             'implementation':'generated ownership/extent adapter and existing native-bind transport','blocker':None,
             'test_coverage':'native prototype/layout compilation; representative subsystem runtime tests in examples/raylib-consumer/src/subsystems.void, not individual execution of every declaration'}
-    return dict(declarations=decls,body=body,api=api,resources=resources,records=records,bindings=binds,outcomes=outcomes)
+    return dict(declarations=decls,body=body,api=[],resources=resources,records=records,bindings=binds,outcomes=outcomes)

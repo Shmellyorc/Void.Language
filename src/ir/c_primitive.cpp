@@ -118,10 +118,21 @@ std::shared_ptr<CPrimitiveAdmission> CPrimitiveAdmission::parse(std::string_view
         reject(reader.line, "unsupported target/profile combination");
     admitted->target_ = target[1];
 
-    auto module = reader.value("source");
-    if (!module.starts_with('/') || !module.ends_with(".void") || module.size() <= 6 ||
-        !identifier(module.substr(1, module.size() - 6)))
-        reject(reader.line, "expected a canonical single-file VFS identity");
+    const auto source = reader.take();
+    if(source.size()!=2 || (source[0]!="source" && source[0]!="source-file"))
+        reject(reader.line,"expected source or source-file declaration");
+    admitted->physical_source_ = source[0]=="source-file";
+    auto module = source[1];
+    if (!module.starts_with('/') || !module.ends_with(".void") || module.size() <= 6)
+        reject(reader.line,"expected a canonical VOID source identity");
+    auto path=module.substr(1,module.size()-6);
+    while(true) {
+        const auto slash=path.find('/');
+        if(!identifier(path.substr(0,slash)))reject(reader.line,"invalid declaration source path");
+        if(slash==path.npos)break;
+        if(!admitted->physical_source_)reject(reader.line,"expected a canonical single-file VFS identity");
+        path.remove_prefix(slash+1);
+    }
     admitted->module_ = module;
     admitted->thunk_identity_ = reader.value("thunk");
     if (!digest(admitted->thunk_identity_)) reject(reader.line, "invalid thunk SHA-256 identity");
@@ -600,6 +611,17 @@ std::string CPrimitiveAdmission::dynamic_contract() const {
     return dynamic_ ? dynamic_->bytes() + '\0' + path_utf8(dynamic_root_) : std::string{};
 }
 
+CPrimitiveAdmission::Owner CPrimitiveAdmission::at_source_module(std::string identity) const {
+    if(!physical_source_ || identity.empty() || identity.front()!='/')
+        throw std::invalid_argument("Physical C declarations require an admitted source identity");
+    auto result=std::shared_ptr<CPrimitiveAdmission>(new CPrimitiveAdmission);
+    result->descriptor_=descriptor_;result->provider_=provider_;result->target_=target_;result->module_=std::move(identity);
+    result->revision_=revision_;result->physical_source_=true;result->bindings_=bindings_;
+    result->callbacks_=callbacks_;result->records_=records_;result->resources_=resources_;
+    result->thunk_=thunk_;result->thunk_identity_=thunk_identity_;result->dynamic_=dynamic_;result->dynamic_root_=dynamic_root_;
+    return result;
+}
+
 unsigned CPrimitiveAdmission::scalar_bytes(Type type) {
     switch (type.kind) {
     case Type::i8: case Type::u8: case Type::boolean: return 1;
@@ -689,6 +711,7 @@ std::string CPrimitiveAdmission::source_type(const Shape& shape) const {
 }
 std::string CPrimitiveAdmission::source() const {
     std::string text = "# Host-admitted C primitive declarations for " + provider_ + "\n";
+    if(physical_source_)text += "native \""+provider_+"\"\n\n";
     for (const auto& resource : resources_)
         text += "struct " + resource.name + ":\n    private _seal: u64 = 0\n";
     for (const auto& record : records_) {
@@ -711,5 +734,10 @@ std::string CPrimitiveAdmission::source() const {
         text += ":\n    pass\n";
     }
     return text;
+}
+std::string CPrimitiveAdmission::generate_declarations(std::string_view descriptor) {
+    auto admission=parse(descriptor,true);
+    if(!admission->physical_source())throw std::invalid_argument("Physical declarations require source-file in the descriptor");
+    return admission->source();
 }
 }

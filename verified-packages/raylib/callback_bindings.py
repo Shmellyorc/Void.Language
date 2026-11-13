@@ -64,7 +64,7 @@ def extend():
     outcomes['TraceLog']['native_abi']='Fixed void(i32, borrow:owner_buffer) adapter calls native TraceLog(level,"%s",text); original C varargs are not transported'
     outcomes['TextFormat']['native_abi']='Pure VOID generic value/spec -> result<string,string>; no C variadic call or native TextFormat binding'
     return dict(declarations=declarations,resources=resources,records=['callback raylib_event context-first i32 u32 i32'],bindings=binds,
-                body=['#include "raylib_callbacks.inc"'],api=(ROOT/'src/callbacks.void.inc').read_text().splitlines(),outcomes=outcomes)
+                body=['#include "raylib_callbacks.inc"'],api=[],outcomes=outcomes)
 
 def _snake(name):
     import re

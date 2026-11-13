@@ -127,10 +127,15 @@ public:
                                     std::string_view library, std::string_view adapter,
                                     const std::vector<DynamicClosure::Payload>& payload = {});
     static std::string generate_adapter(std::string_view descriptor, std::string_view header);
+    static std::string generate_declarations(std::string_view descriptor);
     const std::string& descriptor() const { return descriptor_; }
     const std::string& provider() const { return provider_; }
     const std::string& target() const { return target_; }
     const std::string& module() const { return module_; }
+    bool physical_source() const { return physical_source_; }
+    // Rebase a descriptor-selected physical declaration onto its verified
+    // project/package source identity. The native descriptor remains exact.
+    Owner at_source_module(std::string identity) const;
     const std::vector<Binding>& bindings() const { return bindings_; }
     const std::vector<Callback>& callbacks() const { return callbacks_; }
     CPrimitiveThunk* thunk() const { return thunk_; }
@@ -159,6 +164,7 @@ private:
     static std::shared_ptr<CPrimitiveAdmission> parse(std::string_view, bool conventional = false);
     std::string descriptor_, provider_, target_, module_;
     unsigned revision_ = 1;
+    bool physical_source_ = false;
     std::vector<Binding> bindings_;
     std::vector<Callback> callbacks_;
     std::vector<Record> records_;

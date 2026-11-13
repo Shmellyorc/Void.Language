@@ -12,6 +12,16 @@ layouts and every field offset. Two audio structs remain opaque exactly as in th
 header. It checks all callback typedefs and 305 enumerator values. The separate
 native symbol probe links and resolves all 600 names; it does not call them all.
 
+## Physical source declarations
+
+`src/raylib.void` is the editable public implementation. Its ordinary relative
+import selects the physical `src/raylib_native.void` declaration module. The
+`native` provider marker and descriptor `source-file` path bind that module through
+the existing generic C ABI verifier; signature/record/resource mismatches and
+non-declaration bodies fail checking. No virtual binding source is created.
+Local package edits require an explicit lock refresh; Git snapshot edits remain
+integrity failures. Native preparation does not run a VOID generator.
+
 ## Reused transport
 
 Conventional descriptor revision `4 3` extends the existing ABI 3 word transport.
