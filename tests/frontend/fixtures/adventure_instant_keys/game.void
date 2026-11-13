@@ -1,0 +1,74 @@
+use console
+use "./world.void" as world
+use "./player.void" as player
+use "./renderer.void" as renderer
+
+# Turn-based gameplay using direct keyboard events (no Enter required).
+# Requires an interactive terminal with key input support.
+func run() -> i32:
+    if not console.stdin.capabilities().key_input:
+        print("This game needs an interactive terminal with keyboard support.", file = console.stderr)
+        return 2
+
+    var current = player.start()
+    var first_collected = false
+    var second_collected = false
+    var turns: i32 = 0
+    var status = "Collect both treasures ($), then reach the exit (X)."
+
+    for:
+        renderer.draw(current, first_collected, second_collected, turns, status)
+
+        var command = ""
+        if console.stdin.read_key() is Ok(var pressed):
+            # Some terminals report key-up events. Act on presses only.
+            if pressed.key_down_known and not pressed.key_down:
+                continue
+            if pressed.key == console.key.up:
+                command = "w"
+            else if pressed.key == console.key.down:
+                command = "s"
+            else if pressed.key == console.key.left:
+                command = "a"
+            else if pressed.key == console.key.right:
+                command = "d"
+            else if pressed.key == console.key.escape:
+                command = "q"
+            else if pressed.key == console.key.character:
+                command = pressed.character
+        else:
+            print("Keyboard input failed or terminal mode is unsupported.", file = console.stderr)
+            return 2
+
+        if command == "q" or command == "Q":
+            print("Goodbye!")
+            return 0
+        if not player.is_move(command):
+            status = "Use W/A/S/D or arrow keys to move. Q or Esc quits."
+            continue
+
+        var target_x = player.next_x(current, command)
+        var target_y = player.next_y(current, command)
+        if not world.can_enter(target_x, target_y):
+            status = "A wall blocks your path!"
+            continue
+
+        if world.tile(target_x, target_y) == "X" and not (first_collected and second_collected):
+            status = "The exit is locked! Collect both treasures first."
+            continue
+
+        current.x = target_x
+        current.y = target_y
+        turns += 1
+        status = "Explore the dungeon."
+
+        if current.x == 3 and current.y == 5 and not first_collected:
+            first_collected = true
+            status = "You collected the first treasure!"
+        if current.x == 6 and current.y == 9 and not second_collected:
+            second_collected = true
+            status = "You collected the second treasure!"
+        if world.tile(current.x, current.y) == "X":
+            renderer.draw(current, first_collected, second_collected, turns, "Dungeon complete!")
+            print("VICTORY! You escaped the dungeon in {turns} moves!")
+            return 0

@@ -96,6 +96,41 @@ arm to handle all remaining values. A return after a partial statement match
 leaves the match itself incomplete and can still produce warning `VOID2021`.
 [Adventure source and diagnostic probes](developer-experience/G17_ASCII_ADVENTURE.md#language-and-diagnostic-findings)
 
+Built-in `==` and `!=` support compatible numeric and Boolean operands, string
+contents, managed reference identity, and values of the same numeric-backed enum
+type. A nominal type can also supply an applicable `operator ==`. An ordinary
+tagged enum stores a case and any associated payload. It has no built-in rule
+for equality of that data, even if all its cases are payload-free.
+
+Use `not (pressed is console.key.up)` to exclude the `up` case. To compare two
+runtime enum values, decide which cases and payloads count as equal. This
+example binds both payloads and compares their numbers explicitly.
+
+```void
+enum notice:
+    idle
+    done(amount: i32)
+
+func same_notice(left: notice, right: notice) -> bool:
+    match left:
+        notice.idle:
+            return right is notice.idle
+        notice.done(var amount):
+            if right is notice.done(var other_amount):
+                return amount == other_amount
+            return false
+
+func main() -> i32:
+    if same_notice(notice.done(7), notice.done(7)):
+        return 0
+    return 1
+```
+
+A literal payload pattern such as `notice.done(7)` tests both the case and the
+payload. A pattern that binds or discards a payload leaves its comparison to
+the surrounding code. Arbitrary runtime enum expressions cannot always be
+substituted for patterns. [Diagnostic guidance](DIAGNOSTICS.md#tagged-enum-equality)
+
 ## Multiple return values
 
 ```python

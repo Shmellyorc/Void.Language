@@ -1,0 +1,4 @@
+use "./game.void" as game
+
+func main() -> i32:
+    return game.run()

@@ -1,8 +1,7 @@
 # VOID developer experience milestone register
 
-Current assignment is Batch 15, G17 real application developer experience
-and ASCII Adventure qualification, starting from
-`d453195bfcbd34db211f4dddd8fa0832acbf8733`.
+Current assignment is Batch 16, G18 context-aware enum comparison diagnostics,
+starting from `35406a00aee892def5a0a7555c5beeae6fe284b3`.
 Batch entries below identify the integration commits and qualification scopes.
 Boss controls integration, hosted qualification and public release.
 [Feature roadmap](FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md)
@@ -26,12 +25,13 @@ Boss controls integration, hosted qualification and public release.
 | 12 · G11 | `79f212f2907b3fb5eeeabebb0aa8fa5705b82c86` | **INTEGRATED.** Real Windows managed raylib and D5 headless execution. The separate G5 retained-callback fixture passed within its contract. The retained raylib callback remains on HOLD. macOS managed native and D5 remain unsupported. Signed App Sandbox remains unverified. [Qualification](../projects/G11_WINDOWS_MANAGED_NATIVE_QUALIFICATION.md) |
 | 13 · G12 | `afe14d4c0cd7fd0576ecc194a38c294d7e54ec0a` | **INTEGRATED / INDEPENDENT SOURCE REVIEW COMPLETE.** Bounded deterministic stored ZIP with G06 publication. Both archive tests passed on PikaOS Debug/Release/strict and Windows 10 Debug/Release. The unrelated Windows file-symlink control remains open. [Qualification](../archive/ZIP_EXPORT.md) |
 | 14 · G00-A | `d453195bfcbd34db211f4dddd8fa0832acbf8733` | **AUDIT INTEGRATED / INDEPENDENT REVIEW COMPLETE.** The distribution HOLD and deferred seven-job project/raylib gate remain. [Readiness audit](../release/G00_READINESS_AUDIT.md) |
+| 15 · G17 | `35406a00aee892def5a0a7555c5beeae6fe284b3` | **INTEGRATED / INDEPENDENT REVIEW COMPLETE.** Five-module ASCII Adventure, deterministic JIT and AOT gameplay, and physical keyboard qualification on PikaOS and Windows 10. [Qualification](../developer-experience/G17_ASCII_ADVENTURE.md) |
 
 ## Current and upcoming
 
 | Milestone | Status and next evidence |
 | --- | --- |
-| 15 · G17 | **IN PROGRESS pending independent Golden Wrench review.** Qualify the supplied ASCII Adventure and document reproduced application and terminal issues. [Qualification](../developer-experience/G17_ASCII_ADVENTURE.md) |
+| 16 · G18 | **IN PROGRESS pending independent Golden Wrench review.** Preserve the six original Adventure failures and provide typed enum comparison guidance through the compiler and language server. [Qualification](../developer-experience/G18_ENUM_EQUALITY_DIAGNOSTICS.md) |
 | G00 · Production distribution | Conditional on release authorization. Public bootstrap, distribution and platform obligations remain tracked in the release record. [Preview blockers](../release/PREVIEW_BLOCKERS.md) |
 
 ## Hosted acceptance

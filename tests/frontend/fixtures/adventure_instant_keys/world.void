@@ -1,0 +1,38 @@
+# Fixed 12 x 12 ASCII dungeon. Coordinates are zero-based.
+const width: i32 = 12
+const height: i32 = 12
+
+func row(y: i32) -> string:
+    if y == 0:
+        return "############"
+    if y == 1:
+        return "#..........#"
+    if y == 2:
+        return "#..###.....#"
+    if y == 3:
+        return "#..........#"
+    if y == 4:
+        return "#.....#....#"
+    if y == 5:
+        return "#..$..#....#"
+    if y == 6:
+        return "#..........#"
+    if y == 7:
+        return "#....###...#"
+    if y == 8:
+        return "#..........#"
+    if y == 9:
+        return "#.....$....#"
+    if y == 10:
+        return "#.........X#"
+    if y == 11:
+        return "############"
+    return "############"
+
+func tile(x: i32, y: i32) -> string:
+    if x < 0 or x >= width or y < 0 or y >= height:
+        return "#"
+    return row(y)[x]
+
+func can_enter(x: i32, y: i32) -> bool:
+    return tile(x, y) != "#"

@@ -3979,7 +3979,20 @@ class Semantics {
         if (e.op == "==" || e.op == "!=") {
             if(left.definition && right.definition && left.definition->callable && right.definition->callable && Type::key(left)==Type::key(right))return e.type=Type::boolean;
             if(ir::collection_type(left))error(source,e.token,Code::numeric_operator,"Collection equality is not implemented; use an element predicate.");
-            if (left.kind == Type::aggregate) error(source,e.token,Code::numeric_operator,"Value struct equality is not implemented.");
+            if (left.kind == Type::aggregate) {
+                const auto& definition = *left.definition;
+                if (!definition.cases.empty() && !definition.result_type && !definition.option_type) {
+                    // Only an explicitly resolved case with no arguments gives a direct case test.
+                    const auto& rhs = *e.parts[1];
+                    const bool case_test = rhs.kind == K::sum && rhs.enum_type_use && rhs.parts.empty();
+                    const char* hint = "Use 'match' to inspect the cases and compare any payloads explicitly.";
+                    if (case_test)
+                        hint = e.op == "==" ? "Use 'is' to test this enum case, or 'match' to handle multiple cases."
+                                            : "Use a negated 'is' test to exclude this enum case, or 'match' to handle multiple cases.";
+                    error(source,e.token,Code::numeric_operator,"Tagged enum values do not support built-in '==' or '!='.",hint);
+                }
+                error(source,e.token,Code::numeric_operator,"Value struct equality is not implemented.");
+            }
             if (left == Type::none) error(source,e.token,Code::invalid_value,"Cannot compare a no-result call.");
             return e.type = Type::boolean;
         }

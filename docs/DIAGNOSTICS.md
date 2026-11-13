@@ -135,7 +135,7 @@ are implemented.
 | VOID2013 | Known division/remainder by zero |
 | VOID2014 | Integer literal magnitude outside the supported range |
 | VOID2015 | Invalid checked numeric conversion |
-| VOID2016 | Illegal numeric operator |
+| VOID2016 | Illegal numeric operator or unsupported equality |
 | VOID2017 | Floating literal range or exact-representability failure |
 | VOID2021 | Incomplete match (warning) |
 | VOID2022 | Missing explicit parameter description in a partially documented callable (warning) |
@@ -371,6 +371,16 @@ remains primary, additional deferred failures attach diagnostics, and remaining
 applicable cleanup continues. See ADVANCED_LANGUAGE.md and WORK_LOG.md for tests
 and the boundary against native process corruption or forced termination.
 
+### Tagged enum equality
+
+`VOID2016` identifies unsupported built-in `==` and `!=` at the operator when
+both operands have the same ordinary tagged enum type. An explicit payload-free
+case on the right receives guidance for `is`, or a negated `is` for `!=`.
+Comparisons with arbitrary enum expressions or payload arguments receive
+guidance for `match` and explicit payload comparisons. The CLI and language
+server use the same hint. An incompatible operand still receives the existing
+type error, and unrelated value structs retain their own equality diagnostic.
+[Enum case tests and imports](ADVANCED_LANGUAGE.md#enum-case-tests-and-imports)
 
 ## Stage 8 Sprint 6 — 21 October 2026
 

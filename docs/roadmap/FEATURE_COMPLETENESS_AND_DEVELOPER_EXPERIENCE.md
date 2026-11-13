@@ -252,13 +252,23 @@ applicable. [Language boundaries](../LANGUAGE_BIBLE.md) · [Native bridge](../..
 
 ### G17 · Real application developer experience
 
-**IN PROGRESS pending independent Golden Wrench review.** Reproduce the
-three supplied five-module ASCII Adventure revisions before correction.
-Qualify a maintained version with the existing enum patterns, structured
-console input and scoped terminal ownership. Deterministic gameplay and
-real keyboard input have separate controls. The review does not authorize
-enum equality or changes to the terminal subsystem.
+**INTEGRATED / INDEPENDENT REVIEW COMPLETE** at
+`35406a00aee892def5a0a7555c5beeae6fe284b3`. The three supplied five-module
+ASCII Adventure revisions were reproduced before correction. The maintained
+game uses existing enum patterns, structured console input and scoped terminal
+ownership. Deterministic gameplay and physical keyboard input have separate
+controls.
 [Executable game](../../examples/ascii_adventure/README.md) · [Qualification](../developer-experience/G17_ASCII_ADVENTURE.md)
+
+### G18 · Context-aware enum comparison diagnostics
+
+**IN PROGRESS pending independent Golden Wrench review.** Preserve all six
+original Adventure errors and make `VOID2016` identify tagged enum equality.
+Suggest a case pattern only for a resolved payload-free right-hand case.
+Explain explicit case and payload comparisons for other operands. Qualify
+the CLI and current unsaved editor diagnostics across the five local profiles
+and rerun deterministic Adventure gameplay.
+[Implementation and qualification](../developer-experience/G18_ENUM_EQUALITY_DIAGNOSTICS.md)
 
 G00-A was independently reviewed at `d453195bfcbd34db211f4dddd8fa0832acbf8733`.
 Its public distribution HOLD, G08 performance and Windows cache HOLDs, and

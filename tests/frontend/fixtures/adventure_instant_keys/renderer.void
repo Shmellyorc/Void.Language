@@ -1,0 +1,35 @@
+use console
+use "./world.void" as world
+use "./player.void" as player
+
+# Redraw in place when the terminal supports clear; otherwise separate frames.
+func draw(current: player.hero, first_collected: bool, second_collected: bool, turns: i32, status: string):
+    if console.stdout.capabilities().clear:
+        if console.stdout.clear() is Err(var clear_failure):
+            print("")
+    else:
+        print("")
+        print("----------------------------")
+
+    print("=== VOID ASCII ADVENTURE ===")
+    for y in 0..<world.height:
+        var line = ""
+        for x in 0..<world.width:
+            var glyph = world.tile(x, y)
+            if x == current.x and y == current.y:
+                glyph = "@"
+            else if x == 3 and y == 5 and first_collected:
+                glyph = "."
+            else if x == 6 and y == 9 and second_collected:
+                glyph = "."
+            line += glyph
+        print(line)
+    var collected = 0
+    if first_collected:
+        collected += 1
+    if second_collected:
+        collected += 1
+    print("Treasure: {collected}/2   Turns: {turns}")
+    print("@ = you   # = wall   $ = treasure   X = exit")
+    print("W/A/S/D or arrows = move (no Enter)   Q/Esc = quit")
+    print(status, flush = true)

@@ -1355,6 +1355,11 @@ func handle_event(e: game_event):
 
 Missing cases warn rather than block compilation for statement matches. Value-producing matches warn at compile time and raise a runtime match error if actually unmatched. The precise enum representation and payload ABI are implementation matters.
 
+Ordinary tagged enums have no built-in `==` or `!=`. Use case patterns with
+`is` and `match`, or declare an applicable equality operator when the type
+needs its own equality rule. Numeric-backed enums of the same type support
+built-in equality. [Enum comparison examples](ADVANCED_LANGUAGE.md#enum-case-tests-and-imports)
+
 ## 26. Iteration: `for`, optional index/key, and `reverse` [AGREED]
 
 The collection element is always first; optional metadata comes second. Metadata is the original numeric index for a list and the actual key for a dictionary.

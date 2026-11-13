@@ -1,0 +1,24 @@
+# A compact value-type player; position changes only after collision checks.
+value struct hero:
+    x: i32
+    y: i32
+
+func start() -> hero:
+    return hero(x = 1, y = 1)
+
+func next_x(current: hero, direction: string) -> i32:
+    if direction == "a" or direction == "A":
+        return current.x - 1
+    if direction == "d" or direction == "D":
+        return current.x + 1
+    return current.x
+
+func next_y(current: hero, direction: string) -> i32:
+    if direction == "w" or direction == "W":
+        return current.y - 1
+    if direction == "s" or direction == "S":
+        return current.y + 1
+    return current.y
+
+func is_move(direction: string) -> bool:
+    return direction == "w" or direction == "W" or direction == "a" or direction == "A" or direction == "s" or direction == "S" or direction == "d" or direction == "D"

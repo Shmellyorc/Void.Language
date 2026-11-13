@@ -426,3 +426,13 @@ Source packaged and inspected. No VOID compiler executable is available here, so
 ````
 
 </details>
+
+## G18 follow-up
+
+G17 was integrated and independently reviewed at
+`35406a00aee892def5a0a7555c5beeae6fe284b3`. G18 preserves the original five
+Instant Keys source files in the maintained diagnostic fixture and checks all
+six original comparison locations. The compiler now identifies the tagged enum
+comparison and provides pattern guidance. The accepted game continues to use
+`match` and its existing terminal and gameplay code.
+[G18 implementation and qualification](G18_ENUM_EQUALITY_DIAGNOSTICS.md)
