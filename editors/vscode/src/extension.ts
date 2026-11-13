@@ -59,7 +59,7 @@ class ServerManager {
             return false;
         }
     }
-    async projectTask(command: 'check' | 'build' | 'run'): Promise<vscode.TaskExecution | undefined> {
+    async projectTask(command: 'check' | 'build' | 'run' | 'package'): Promise<vscode.TaskExecution | undefined> {
         if (!vscode.workspace.isTrusted) return;
         await this.serial;
         const folder = vscode.workspace.workspaceFolders?.length === 1 ? vscode.workspace.workspaceFolders[0] : undefined;
@@ -329,6 +329,7 @@ export function activate(context: vscode.ExtensionContext): {ready: () => Promis
         vscode.commands.registerCommand('void.checkProject', () => current.projectTask('check')),
         vscode.commands.registerCommand('void.buildProject', () => current.projectTask('build')),
         vscode.commands.registerCommand('void.runProject', () => current.projectTask('run')),
+        vscode.commands.registerCommand('void.packageProject', () => current.projectTask('package')),
         vscode.commands.registerCommand('void.debugProjectProgram', () => current.debugProjectLocation('program')),
         vscode.commands.registerCommand('void.debugProjectRoot', () => current.debugProjectLocation('root')),
         vscode.commands.registerCommand('void.restartLanguageServer', () => current.refresh(true)),

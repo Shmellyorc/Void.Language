@@ -19,6 +19,7 @@ inline constexpr std::string_view c_record_transport = "vd_c_primitive_dispatch_
 inline constexpr std::string_view c_resource_transport = "vd_c_primitive_dispatch_v3";
 inline constexpr std::string_view c_resource_bridge = "vd_c_resource_dispatch_v3";
 inline constexpr std::string_view c_owner_resource_bridge = "vd_c_resource_dispatch_owner_v3";
+inline constexpr std::string_view c_resources_bridge = "vd_c_resources_dispatch_v3";
 inline constexpr std::string_view c_dynamic_resolve = "vd_c_dynamic_resolve_v1";
 inline constexpr std::string_view c_dynamic_call = "vd_c_dynamic_call_v1";
 inline constexpr std::string_view c_callback_bridge = "vd_c_callback_dispatch_v1";
@@ -45,6 +46,17 @@ struct CSpanRequest {
     std::uint32_t argument, direction; // 1 input, 2 output, 3 input/output
     std::uint32_t offset_argument, length_argument;
 };
+// Private, rooted borrow operands for mixed conventional calls. Addresses never
+// become source values; every operand is checked against the existing ledger.
+struct CResourceArgument {
+    void** root;
+    const char* identity;
+    std::uint32_t argument, release, shutdown_owner;
+};
+extern "C" std::uint32_t vd_c_resources_dispatch_v3(CPrimitiveThunk*, const char*, std::uint32_t,
+    std::uint32_t, const std::uint64_t*, std::uint32_t, std::uint64_t*,
+    const CResourceArgument*, std::uint32_t, void**, const char*, std::uint32_t, std::uint32_t,
+    const CSpanRequest*, std::uint32_t) noexcept;
 extern "C" std::uint32_t vd_c_dynamic_call_v1(const char*, std::uint32_t, std::uint32_t,
     const std::uint64_t*, std::uint32_t, std::uint64_t*, const CSpanRequest*, std::uint32_t) noexcept;
 extern "C" std::uint32_t vd_c_span_dispatch_v2(CPrimitiveThunk*, const char*, std::uint32_t,
@@ -55,6 +67,7 @@ inline bool reserved_c_transport(std::string_view symbol) {
     return symbol.starts_with(c_primitive_transport) || symbol.starts_with(c_record_transport) ||
         symbol.starts_with(c_span_bridge) || symbol.starts_with(c_resource_transport) ||
         symbol.starts_with(c_resource_bridge) || symbol.starts_with(c_owner_resource_bridge) || symbol.starts_with(c_dynamic_resolve) ||
+        symbol.starts_with(c_resources_bridge) ||
         symbol.starts_with(c_dynamic_call) || symbol.starts_with(c_callback_bridge) ||
         symbol.starts_with("vd_runtime_entry_dynamic_v1");
 }
@@ -65,7 +78,7 @@ class CPrimitiveAdmission final {
 public:
     struct Shape {
         ir::Type scalar = ir::Type::none;
-        enum class Alias { none, c_int, c_long, c_size, c_bool } alias = Alias::none;
+        enum class Alias { none, c_int, c_long, c_size, c_bool, c_char } alias = Alias::none;
         unsigned record = 0; // 1-based index, zero for primitives
         unsigned extent = 0; // inline C array of scalars only
         unsigned direction = 0; // C byte span only
@@ -125,8 +138,9 @@ public:
     const std::filesystem::path& dynamic_root() const { return dynamic_root_; }
     std::string dynamic_contract() const;
     unsigned revision() const { return revision_; }
+    unsigned abi_revision() const { return revision_ > 3 ? 3 : revision_; }
     std::string_view transport() const {
-        if (revision_ == 3) return c_resource_transport;
+        if (revision_ >= 3) return c_resource_transport;
         return revision_ == 1 ? c_primitive_transport : c_record_transport;
     }
     const Resource& resource(unsigned index) const { return resources_.at(index - 1); }

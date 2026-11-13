@@ -1,0 +1,250 @@
+use pkg/raylib as rl
+use convert as conversion
+use time
+
+struct callback_state:
+    calls: i32
+    last_name: string
+    last_text: string
+    saved: [u8]
+
+func (self callback_state) log(level: i32, message: string):
+    self.calls += 1
+    self.last_text = message
+
+func (self callback_state) load(name: string) -> result<[u8], string>:
+    self.calls += 1
+    self.last_name = name
+    if name == "missing":
+        return Err("not found")
+    return Ok("callback bytes é🎮".to_utf8())
+
+func (self callback_state) save(name: string, bytes: [u8]) -> bool:
+    self.calls += 1
+    self.last_name = name
+    self.saved = bytes
+    return name != "reject"
+
+func (self callback_state) load_text(name: string) -> result<string, string>:
+    self.calls += 1
+    self.last_name = name
+    if name == "missing":
+        return Err("not found")
+    return Ok("callback text é🎮")
+
+func (self callback_state) save_text(name: string, text: string) -> bool:
+    self.calls += 1
+    self.last_name = name
+    self.last_text = text
+    return name != "reject"
+
+func headless() -> i32:
+    rl.set_trace_log_level(rl.log_all)
+    if conversion.unwrap(rl.text_format(42, "0000")) != "0042":
+        return 201
+    if conversion.unwrap(rl.text_format(true)) != "true" or conversion.unwrap(rl.text_format("typed")) != "typed":
+        return 202
+    if conversion.unwrap(rl.text_format(1.25 as f32, "0.00")) != "1.25" or conversion.unwrap(rl.text_format(2.5 as f64, "0.0")) != "2.5":
+        return 214
+    if rl.text_format(42, "invalid") is Ok(var unexpected):
+        return 215
+    var first = callback_state(calls = 0, last_name = "", last_text = "", saved = [])
+    var old_log = rl.set_trace_log_callback(first.log)
+    rl.trace_log(rl.log_warning, "typed %s %n é🎮")
+    if first.calls != 1 or first.last_text != "typed %s %n é🎮":
+        return 203
+    var second = callback_state(calls = 0, last_name = "", last_text = "", saved = [])
+    var new_log = rl.set_trace_log_callback(second.log)
+    rl.trace_log(rl.log_warning, "replacement")
+    if first.calls != 1 or second.calls != 1 or rl.callback_active(old_log):
+        return 204
+    if rl.callback_close(old_log) != 0 or not rl.callback_active(new_log):
+        return 205
+    if rl.callback_count(new_log) != 1:
+        return 206
+    rl.callback_close(new_log)
+    var loader = rl.set_load_file_data_callback(first.load)
+    var saver = rl.set_save_file_data_callback(first.save)
+    var text_loader = rl.set_load_file_text_callback(first.load_text)
+    var text_saver = rl.set_save_file_text_callback(first.save_text)
+    var loaded = rl.load_file_data("virtual.bin") as rl.byte_buffer
+    if rl.buffer_text(loaded) != "callback bytes é🎮" or first.last_name != "virtual.bin":
+        return 207
+    if not rl.save_file_data("save.bin", loaded, rl.buffer_bytes(loaded).count as i32):
+        return 208
+    rl.unload_file_data(loaded)
+    if conversion.unwrap(string.from_utf8(first.saved)) != "callback bytes é🎮":
+        return 209
+    if rl.load_file_data("missing") != null:
+        return 210
+    var text = rl.load_file_text("virtual.txt") as rl.byte_buffer
+    if rl.buffer_text(text) != "callback text é🎮":
+        return 211
+    rl.unload_file_text(text)
+    if not rl.save_file_text("save.txt", "saved text é🎮") or first.last_text != "saved text é🎮":
+        return 212
+    if rl.save_file_text("reject", "normal rejection") or rl.load_file_text("missing") != null:
+        return 213
+    var replacement_loader = rl.set_load_file_data_callback(second.load)
+    var replacement_saver = rl.set_save_file_data_callback(second.save)
+    var replacement_text_loader = rl.set_load_file_text_callback(second.load_text)
+    var replacement_text_saver = rl.set_save_file_text_callback(second.save_text)
+    if rl.callback_active(loader) or rl.callback_active(saver) or rl.callback_active(text_loader) or rl.callback_active(text_saver):
+        return 216
+    rl.callback_close(loader)
+    rl.callback_close(saver)
+    rl.callback_close(text_loader)
+    rl.callback_close(text_saver)
+    var replacement_data = rl.load_file_data("replacement") as rl.byte_buffer
+    if rl.save_file_data("reject", replacement_data, rl.buffer_bytes(replacement_data).count as i32):
+        return 217
+    rl.unload_file_data(replacement_data)
+    var replacement_text = rl.load_file_text("replacement") as rl.byte_buffer
+    rl.unload_file_text(replacement_text)
+    rl.save_file_text("replacement", "replacement text")
+    if rl.callback_count(replacement_loader) != 1 or rl.callback_count(replacement_saver) != 1 or rl.callback_count(replacement_text_loader) != 1 or rl.callback_count(replacement_text_saver) != 1:
+        return 218
+    rl.callback_close(replacement_loader)
+    rl.callback_close(replacement_saver)
+    rl.callback_close(replacement_text_loader)
+    rl.callback_close(replacement_text_saver)
+    print("RAYLIB final typed format/log and file callbacks passed")
+    return 0
+
+private func wait_callbacks(first: rl.callback_registration, second: rl.callback_registration, third: rl.callback_registration) -> bool:
+    var start = conversion.unwrap(time.monotonic_now())
+    var waiting = true
+    for waiting:
+        if rl.callback_count(first) > 0 and rl.callback_count(second) > 0 and rl.callback_count(third) > 0:
+            return true
+        var interval = conversion.unwrap(time.elapsed(start, conversion.unwrap(time.monotonic_now())))
+        waiting = interval.seconds < 5
+    return false
+
+func generate(frames: u32, channels: u32, sample_size: u32) -> [u8]:
+    var bytes: [u8] = []
+    var length = (frames as i64) * (channels as i64) * (sample_size as i64) / 8
+    for index in 0..<length:
+        if sample_size == 8:
+            bytes.push(128)
+        else:
+            bytes.push(0)
+    return bytes
+
+func process(bytes: [u8], frames: u32) -> [u8]:
+    if bytes.count != (frames as i64) * 8:
+        var fail = 1 / (frames as i32 - frames as i32)
+    return bytes
+
+func audio() -> i32:
+    var device = rl.init_audio_device() as rl.audio_device
+    var stream = rl.load_audio_stream(8000, 8, 1) as rl.audio_stream
+    var generator = rl.set_audio_stream_callback(stream, generate)
+    var processor = rl.attach_audio_stream_processor(stream, process)
+    var mixed = rl.attach_audio_mixed_processor(process)
+    rl.play_audio_stream(stream)
+    if not wait_callbacks(generator, processor, mixed):
+        return 220
+    var replacement = rl.set_audio_stream_callback(stream, generate)
+    if rl.callback_active(generator):
+        return 221
+    rl.callback_close(generator)
+    if not wait_callbacks(replacement, replacement, replacement):
+        return 222
+    rl.detach_audio_stream_processor(processor)
+    rl.detach_audio_mixed_processor(mixed)
+    rl.stop_audio_stream(stream)
+    # The native stream/device remain live until the retained callback drains.
+    rl.unload_audio_stream(stream)
+    rl.close_audio_device(device)
+    if rl.callback_close(replacement) != 0 or rl.is_audio_device_ready():
+        return 223
+    print("RAYLIB final real audio callback invocation/replacement/drain passed")
+    return 0
+
+func fail_log(level: i32, message: string):
+    var invalid = 1 / (level - level)
+
+var self_registration: rl.callback_registration? = null
+func close_self(level: i32, message: string):
+    rl.callback_close(self_registration as rl.callback_registration)
+
+func bad_generate(frames: u32, channels: u32, sample_size: u32) -> [u8]:
+    return []
+
+func forbidden_generate(frames: u32, channels: u32, sample_size: u32) -> [u8]:
+    var forbidden = rl.get_master_volume()
+    return generate(frames, channels, sample_size)
+
+func failure(mode: string) -> i32:
+    if mode == "failure":
+        var owner = rl.set_trace_log_callback(fail_log)
+        rl.trace_log(rl.log_warning, "managed failure")
+        return 230
+    if mode == "self-close":
+        self_registration = rl.set_trace_log_callback(close_self)
+        rl.trace_log(rl.log_warning, "self close")
+        return 231
+    if mode == "global-audio":
+        var capture = callback_state(calls=0, last_name="", last_text="", saved=[])
+        var owner = rl.set_trace_log_callback(capture.log)
+        var invalid = rl.init_audio_device()
+        return 232
+    if mode == "double-close":
+        var capture = callback_state(calls=0, last_name="", last_text="", saved=[])
+        var owner = rl.set_trace_log_callback(capture.log)
+        rl.callback_close(owner)
+        rl.callback_close(owner)
+        return 234
+    var device = rl.init_audio_device() as rl.audio_device
+    var stream = rl.load_audio_stream(8000, 8, 1) as rl.audio_stream
+    if mode == "slots":
+        var registrations: [rl.callback_registration] = []
+        for index in 0..<17:
+            registrations.push(rl.attach_audio_mixed_processor(process))
+        return 235
+    if mode == "wrong-detach":
+        var invalid = rl.attach_audio_mixed_processor(process)
+        rl.detach_audio_stream_processor(invalid)
+        return 236
+    if mode == "audio-implicit":
+        var retained = rl.set_audio_stream_callback(stream, generate)
+        rl.play_audio_stream(stream)
+        if not wait_callbacks(retained, retained, retained):
+            return 237
+        print("RAYLIB final callback implicit audio shutdown passed")
+        return 0
+    if mode == "race":
+        rl.play_audio_stream(stream)
+        var previous = rl.set_audio_stream_callback(stream, generate)
+        for index in 0..<1000:
+            var replacement = rl.set_audio_stream_callback(stream, generate)
+            rl.callback_close(previous)
+            previous = replacement
+            var processor = rl.attach_audio_mixed_processor(process)
+            rl.detach_audio_mixed_processor(processor)
+        rl.callback_close(previous)
+        rl.unload_audio_stream(stream)
+        rl.close_audio_device(device)
+        print("RAYLIB final callback mixer replacement/shutdown stress passed")
+        return 0
+    var owner: rl.callback_registration? = null
+    if mode == "bad-size":
+        owner = rl.set_audio_stream_callback(stream, bad_generate)
+    else:
+        owner = rl.set_audio_stream_callback(stream, forbidden_generate)
+    rl.play_audio_stream(stream)
+    wait_callbacks(owner as rl.callback_registration, owner as rl.callback_registration, owner as rl.callback_registration)
+    var count = rl.callback_count(owner as rl.callback_registration)
+    return 233
+
+func implicit() -> i32:
+    var capture = callback_state(calls=0, last_name="", last_text="", saved=[])
+    var owner = rl.set_trace_log_callback(capture.log)
+    for index in 0..<1024:
+        var pressure = callback_state(calls=index as i32, last_name="", last_text="", saved=[])
+    rl.trace_log(rl.log_warning, "capture survives")
+    if capture.calls != 1:
+        return 240
+    print("RAYLIB final callback implicit shutdown passed")
+    return 0

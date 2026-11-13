@@ -9,7 +9,7 @@ extern "C" std::uint32_t vd::vd_c_span_dispatch_v2(CPrimitiveThunk* thunk, const
     std::uint32_t descriptor_size, std::uint32_t ordinal, const std::uint64_t* words,
     std::uint32_t count, std::uint64_t* result, const CSpanRequest* spans, std::uint32_t span_count) noexcept {
     if (!thunk || !descriptor || count > c_primitive_max_arguments || (count && !words) ||
-        span_count > 2 || (span_count && (!spans || !result))) return 2;
+        span_count > 2 || (span_count && !spans)) return 2;
     try {
         auto& runtime = Runtime::current();
         std::array<std::uint64_t, c_primitive_max_arguments> arguments{};
@@ -31,7 +31,7 @@ extern "C" std::uint32_t vd::vd_c_span_dispatch_v2(CPrimitiveThunk* thunk, const
             if (!span.limit || span.limit > c_span_limit || lengths[n] > span.limit ||
                 offsets[n] > UINT64_MAX - lengths[n]) return 3;
             if (span.direction != 1) {
-                if (writable != span_count) return 2;
+                if (writable != span_count || !result) return 2;
                 writable = n;
             }
             // Capture only into independent zero-initialized native words.

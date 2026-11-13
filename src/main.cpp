@@ -344,10 +344,10 @@ void generate_native_binding(int argc, char** argv) {
     if (!std::filesystem::is_regular_file(descriptor))
         throw std::runtime_error("Missing native descriptor: " + vd::path_utf8(descriptor));
     std::ifstream source(descriptor, std::ios::binary);
-    std::string bytes(16385, '\0');
+    std::string bytes(vd::c_conventional_descriptor_limit + 1, '\0');
     source.read(bytes.data(), static_cast<std::streamsize>(bytes.size()));
     if (source.bad() || !source.eof() || source.gcount() == 0)
-        throw std::runtime_error("Cannot read native descriptor (expected 1..16384 bytes).");
+        throw std::runtime_error("Cannot read native descriptor (outside conventional descriptor bounds).");
     bytes.resize(static_cast<std::size_t>(source.gcount()));
     const auto generated = vd::CPrimitiveAdmission::generate_adapter(bytes, argv[3]);
     int fd;

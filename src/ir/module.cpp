@@ -520,7 +520,8 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         for (const auto& target : imports) {
             if (!package_source(scope) && !package_source(target)) continue;
             if (!package_source(target)) {
-                if (source_domain(target) != "/@stdlib" || !m.source_imports.contains(target))
+                const bool admitted_native = m.c_primitives && target == m.c_primitives->module();
+                if ((!admitted_native && source_domain(target) != "/@stdlib") || !m.source_imports.contains(target))
                     fail("package import escapes its source domain");
                 continue;
             }

@@ -10,7 +10,8 @@ legacy discovery only if no manifest was selected. No TypeScript source scan is 
 
 Manifest/error-bearing and library sessions use `voidProjectProtocol: 1` and schema-2
 preflight. Missing main and malformed TOML produce diagnostics without preventing
-project opening. Dirty source/TOML buffers, file events and root switches retain
+project opening. Preflight has a 60-second bound for large locked packages under
+Debug/instrumented servers. Dirty source/TOML buffers, file events and root switches retain
 revision/client guards. An older project-incapable server produces a visible error;
 there is no silent legacy downgrade. Explicit legacy-entry mode remains available.
 
@@ -48,10 +49,10 @@ Language Server** to select a different physical directory at the same path or
 to recover after a configuration or process failure.
 Output → VOID reports startup/lifecycle failures; verbose trace can include source.
 
-### Check, build and run
+### Check, build, run and package
 
 In a trusted folder with a selected manifest, run **VOID: Check Project**,
-**VOID: Build Project**, or **VOID: Run Project** from the Command Palette.
+**VOID: Build Project**, **VOID: Run Project**, or **VOID: Package Project** from the Command Palette.
 The extension uses the selected root and any explicit entry override. It runs
 the matching `voidc` next to `voidls`, or a literal path in `void.compiler.path`.
 Set `void.tasks.profile` to `debug` (default) or `release`. Put application
@@ -62,7 +63,11 @@ Save changed VOID sources and manifests in the selected project before using
 these commands. Tasks use saved files and stop before launch when those buffers
 are dirty. The task terminal shows the compiler and application output and exit
 status. Compiler errors appear in Problems. Build writes the normal native
-output under `build/`. Run uses the JIT. Use a regular terminal for programs
+output under `build/`. Run uses the JIT. Package invokes `voidc package` and
+writes the compiler's normal `dist/` application directory. Verify it with
+`voidc package --verify dist`. Existing output follows the compiler's refusal
+rules; use the CLI for an explicit replacement or another output directory.
+Use a regular terminal for programs
 that require a TTY or commands that deliberately authorize a native dependency
 with `--allow-native`.
 

@@ -1,0 +1,23 @@
+void-c-primitive 4 3
+provider org.voidlang.mixed
+target @TARGET@
+source /mixed.void
+thunk @THUNK@
+fixture @FIXTURE@
+effects direct-sync blocking no-callbacks
+call c-default
+aliases c_int:i32 c_long:@LONG@ c_size:u64 c_bool:bool c_char:i8
+resource box MixedBox pointer null create close_box owner-calls shutdown-owner consume-always
+record pair MixedPair 8 4 2
+field x x i32 0
+field y y f32 4
+record bundle MixedBundle 20 4 2
+field pairs pairs array_record:pair:2:8 0
+field label label array:c_char:4:1 16
+bind create mixed_create owner:box i32
+bind clone mixed_clone owner:box borrow:box record:pair
+bind bytes mixed_bytes owner:box in:1:2:16 c_size c_size
+bind combine mixed_combine record:pair borrow:box borrow:box record:pair
+bind read mixed_read i64 borrow:box out:2:3:16 c_size c_size
+bind close_box mixed_close i32 close:box
+bind bundle_transform mixed_bundle record:bundle record:bundle

@@ -387,6 +387,9 @@ if(BUILD_TESTING)
       "${PROJECT_SOURCE_DIR}/tests/project/managed_native_resolution.py"
       "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_GIT_EXECUTABLE}")
     set_tests_properties(project_managed_native_resolution PROPERTIES TIMEOUT 120)
+    add_test(NAME project_raylib_api_parity COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/verified-packages/raylib/generate.py" --check --clang "${VOID_CLANG}")
+    set_tests_properties(project_raylib_api_parity PROPERTIES TIMEOUT 60)
     if(VOID_TEST_RAYLIB_ROOT)
       add_test(NAME project_managed_raylib COMMAND "${Python3_EXECUTABLE}"
         "${PROJECT_SOURCE_DIR}/tests/project/managed_raylib.py"
@@ -1823,8 +1826,14 @@ if(BUILD_TESTING)
       "${PROJECT_SOURCE_DIR}/tests/ffi/conventional_process.py"
       "${CMAKE_COMMAND}" "${CMAKE_CURRENT_BINARY_DIR}" "$<CONFIG>" "${VOID_CLANG}" "${VOID_SANITIZERS}")
     set_tests_properties(ffi_g4_conventional PROPERTIES TIMEOUT 480)
+    add_test(NAME project_mixed_native COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/project/mixed_native.py"
+      "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_SANITIZERS}")
+    set_tests_properties(project_mixed_native PROPERTIES TIMEOUT 480)
     add_executable(void_g5_reload tests/ffi/callback_reload.cpp)
     target_link_libraries(void_g5_reload PRIVATE void_llvm void_runtime)
+    add_executable(void_raylib_callback_reload tests/ffi/raylib_callback_reload.cpp)
+    target_link_libraries(void_raylib_callback_reload PRIVATE void_llvm void_runtime)
     add_test(NAME ffi_g5_callbacks COMMAND "${Python3_EXECUTABLE}"
       "${PROJECT_SOURCE_DIR}/tests/ffi/callback_process.py" "$<TARGET_FILE:voidc>" "${VOID_CLANG}"
       "${VOID_SANITIZERS}" "$<TARGET_FILE:void_g5_reload>"

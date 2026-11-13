@@ -28,7 +28,10 @@ struct TraceCall {
     int delivered;
 };
 static _Thread_local struct TraceCall* trace_call;
-static atomic_flag trace_active = ATOMIC_FLAG_INIT;
+static atomic_bool trace_active;
+#ifdef VOID_RAYLIB_API_CALLBACKS
+bool vd_raylib_scoped_trace_active(void) { return atomic_load(&trace_active); }
+#endif
 
 static void raylib_trace(int level, const char* format, va_list args) {
     struct TraceCall* call = trace_call;
@@ -54,14 +57,17 @@ static void raylib_trace(int level, const char* format, va_list args) {
 int vd_raylib_trace(VoidRaylibTrace callback, void* context) {
     // Gallery startup owns all raylib calls and has no window/audio workers.
     // raylib's global setter is used only within this synchronous scope.
-    if (atomic_flag_test_and_set(&trace_active)) return -1;
+    if (atomic_exchange(&trace_active,true)) return -1;
+#ifdef VOID_RAYLIB_API_CALLBACKS
+    if(vd_raylib_api_trace_registered()){atomic_store(&trace_active,false);return -1;}
+#endif
     struct TraceCall call = {callback, context, 0};
     trace_call = &call;
     SetTraceLogCallback(raylib_trace);
     TraceLog(LOG_WARNING, "VOID G5 trace %d %s", 7, "raylib");
     SetTraceLogCallback(NULL);
     trace_call = NULL;
-    atomic_flag_clear(&trace_active);
+    atomic_store(&trace_active,false);
     return call.delivered == 1 ? 0 : -1;
 }
 

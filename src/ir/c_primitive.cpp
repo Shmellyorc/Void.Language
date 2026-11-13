@@ -84,6 +84,7 @@ Type primitive(std::string_view name, bool llp64, bool result, std::size_t line)
     if (name == "c_long") return llp64 ? Type::i32 : Type::i64;
     if (name == "c_size") return Type::u64;
     if (name == "c_bool") return Type::boolean;
+    if (name == "c_char") return Type::i8;
     if (name == "void" && result) return Type::none;
     reject(line, "unsupported C primitive type");
 }
@@ -95,12 +96,14 @@ std::string_view void_spelling(Type type) {
 }
 
 std::shared_ptr<CPrimitiveAdmission> CPrimitiveAdmission::parse(std::string_view descriptor, bool conventional) {
-    if (descriptor.empty() || descriptor.size() > descriptor_limit) reject(1, "descriptor size outside 1..16384 bytes");
+    if (descriptor.empty() || descriptor.size() > (conventional ? c_conventional_descriptor_limit : descriptor_limit))
+        reject(1, "descriptor size outside admitted profile bounds");
     auto admitted = std::shared_ptr<CPrimitiveAdmission>(new CPrimitiveAdmission);
     admitted->descriptor_ = descriptor;
     DescriptorReader reader(admitted->descriptor_);
     const auto revision = reader.take();
-    if (revision == std::vector<std::string_view>{"void-c-primitive", "3", "3"}) admitted->revision_ = 3;
+    if (conventional && revision == std::vector<std::string_view>{"void-c-primitive", "4", "3"}) admitted->revision_ = 4;
+    else if (revision == std::vector<std::string_view>{"void-c-primitive", "3", "3"}) admitted->revision_ = 3;
     else if (revision == std::vector<std::string_view>{"void-c-primitive", "2", "2"}) admitted->revision_ = 2;
     else if (revision != std::vector<std::string_view>{"void-c-primitive", "1", "1"})
         reject(reader.line, "unsupported descriptor, ABI revision or effects");
@@ -131,7 +134,9 @@ std::shared_ptr<CPrimitiveAdmission> CPrimitiveAdmission::parse(std::string_view
     if (!callbacks && !std::ranges::equal(effects, nonblocking) && !(conventional && std::ranges::equal(effects, blocking)))
         reject(reader.line, "unsupported descriptor, ABI revision or effects");
     reader.exact({"call", "c-default"});
-    reader.exact({"aliases", "c_int:i32", llp64 ? "c_long:i32" : "c_long:i64", "c_size:u64", "c_bool:bool"});
+    if (admitted->revision_ >= 4)
+        reader.exact({"aliases", "c_int:i32", llp64 ? "c_long:i32" : "c_long:i64", "c_size:u64", "c_bool:bool", "c_char:i8"});
+    else reader.exact({"aliases", "c_int:i32", llp64 ? "c_long:i32" : "c_long:i64", "c_size:u64", "c_bool:bool"});
     auto number = [&](std::string_view value, unsigned limit) {
         unsigned result = 0;
         const auto [end, error] = std::from_chars(value.data(), value.data() + value.size(), result);
@@ -157,6 +162,10 @@ std::shared_ptr<CPrimitiveAdmission> CPrimitiveAdmission::parse(std::string_view
             if (spelling == "c_long") type.alias = Shape::Alias::c_long;
             if (spelling == "c_size") type.alias = Shape::Alias::c_size;
             if (spelling == "c_bool") type.alias = Shape::Alias::c_bool;
+            if (spelling == "c_char") {
+                if (admitted->revision_ < 4) reject(reader.line, "C char requires conventional descriptor revision 4");
+                type.alias = Shape::Alias::c_char;
+            }
         };
         if (admitted->revision_ >= 2) {
             const auto p = parts(token);
@@ -170,7 +179,7 @@ std::shared_ptr<CPrimitiveAdmission> CPrimitiveAdmission::parse(std::string_view
                     }
                 reject(reader.line, "callback parameter requires an earlier admitted signature");
             }
-            if (admitted->revision_ == 3 && !field && p.size() == 2) {
+            if (admitted->revision_ >= 3 && !field && p.size() == 2) {
                 if (result && p[0] == "owner") type.role = CResourceRole::acquire;
                 if (!result && p[0] == "borrow") type.role = CResourceRole::borrow;
                 if (!result && p[0] == "mut") type.role = CResourceRole::mutate;
@@ -192,6 +201,15 @@ std::shared_ptr<CPrimitiveAdmission> CPrimitiveAdmission::parse(std::string_view
                 const auto stride = number(p[3], 8);
                 if (!type.extent || stride != scalar_bytes(type.scalar))
                     reject(reader.line, "invalid inline array extent or stride");
+                return type;
+            }
+            if (admitted->revision_ >= 4 && field && p.size() == 4 && p[0] == "array_record") {
+                for (unsigned n = 0; n < admitted->records_.size(); ++n)
+                    if (admitted->records_[n].name == p[1]) { type.record = n + 1; break; }
+                if (!type.record) reject(reader.line, "array record must name an earlier verified declaration");
+                type.extent = number(p[2], 32);
+                if (!type.extent || number(p[3], 4096) != admitted->record(type.record).size)
+                    reject(reader.line, "invalid inline record array extent or stride");
                 return type;
             }
             if (!field && !result && p.size() == 4) {
@@ -231,9 +249,9 @@ std::shared_ptr<CPrimitiveAdmission> CPrimitiveAdmission::parse(std::string_view
             admitted->callbacks_.push_back(std::move(callback));
             continue;
         }
-        if (admitted->revision_ == 3 && fields[0] == "resource") {
+        if (admitted->revision_ >= 3 && fields[0] == "resource") {
             if (fields.size() != 10 || !admitted->bindings_.empty() || !admitted->records_.empty() ||
-                admitted->resources_.size() == 16 || !identifier(fields[1]) || !identifier(fields[2], true) ||
+                admitted->resources_.size() == (admitted->revision_ >= 4 ? 64 : 16) || !identifier(fields[1]) || !identifier(fields[2], true) ||
                 !names.insert(fields[1]).second || !c_records.insert(fields[2]).second ||
                 fields[3] != "pointer" || fields[4] != "null" ||
                 !identifier(fields[5]) || !identifier(fields[6]) || fields[5] == fields[6] ||
@@ -245,13 +263,14 @@ std::shared_ptr<CPrimitiveAdmission> CPrimitiveAdmission::parse(std::string_view
             continue;
         }
         if (admitted->revision_ >= 2 && !fields.empty() && fields[0] == "record") {
-            if (fields.size() != 6 || !admitted->bindings_.empty() || admitted->records_.size() == 16 ||
+            if (fields.size() != 6 || !admitted->bindings_.empty() || admitted->records_.size() == (admitted->revision_ >= 4 ? 64 : 16) ||
                 !identifier(fields[1]) || !identifier(fields[2], true) ||
                 !names.insert(fields[1]).second || !c_records.insert(fields[2]).second)
                 reject(reader.line, "invalid record declaration or identity");
-            Record record{std::string(fields[1]), std::string(fields[2]), number(fields[3], 256),
+            const unsigned record_limit = admitted->revision_ >= 4 ? 4096 : 256;
+            Record record{std::string(fields[1]), std::string(fields[2]), number(fields[3], record_limit),
                 number(fields[4], 8), {}};
-            const auto field_count = number(fields[5], 24);
+            const auto field_count = number(fields[5], admitted->revision_ >= 4 ? 64 : 24);
             if (!field_count) reject(reader.line, "empty C records are unsupported");
             std::set<std::string_view> members, c_members;
             unsigned end = 0, alignment = 1;
@@ -262,11 +281,10 @@ std::shared_ptr<CPrimitiveAdmission> CPrimitiveAdmission::parse(std::string_view
                     reject(reader.line, "invalid or duplicate C record field");
                 auto type = shape(f[3], true, false);
                 const auto field_align = type.record ? admitted->record(type.record).alignment : scalar_bytes(type.scalar);
-                const auto bytes = type.record ? admitted->record(type.record).size :
-                    field_align * std::max(type.extent, 1u);
+                const auto bytes = (type.record ? admitted->record(type.record).size : field_align) * std::max(type.extent, 1u);
                 const auto natural = (end + field_align - 1) / field_align * field_align;
-                const auto offset = number(f[4], 255);
-                if (offset != natural || bytes > 256 - offset)
+                const auto offset = number(f[4], record_limit - 1);
+                if (offset != natural || bytes > record_limit - offset)
                     reject(reader.line, "C record field offset or padding disagrees with natural layout");
                 alignment = std::max(alignment, field_align);
                 end = offset + bytes;
@@ -278,7 +296,7 @@ std::shared_ptr<CPrimitiveAdmission> CPrimitiveAdmission::parse(std::string_view
             continue;
         }
         if (fields.size() < 4 || fields.size() > 4 + c_primitive_max_arguments || fields[0] != "bind" ||
-            admitted->bindings_.size() == binding_limit)
+            admitted->bindings_.size() == (conventional ? c_conventional_binding_limit : binding_limit))
             reject(reader.line, "expected a bounded primitive binding record");
         if (!identifier(fields[1]) || !identifier(fields[2], true) ||
             !names.insert(fields[1]).second || !exports.insert(fields[2]).second)
@@ -305,26 +323,28 @@ std::shared_ptr<CPrimitiveAdmission> CPrimitiveAdmission::parse(std::string_view
                 if (index >= binding.abi_parameters.size() || fields[4 + index] != "c_size" || !controls.insert(index).second)
                     reject(reader.line, "byte span offsets and lengths require exact c_size operands");
         }
-        if (spans && (spans > 2 || writable > 1 || records || binding.result != Type::i64))
+        if (spans && (spans > 2 || writable > 1 ||
+            (admitted->revision_ < 4 && (records || binding.result != Type::i64)) ||
+            (writable && binding.result != Type::i64)))
             reject(reader.line, "unsupported span count, overlap profile, record or result contract");
         unsigned resources = binding.abi_result.resource != 0;
         for (unsigned n = 0; n < binding.abi_parameters.size(); ++n) {
             const auto& argument = binding.abi_parameters[n];
             if (!argument.resource) continue;
             ++resources;
-            if (n || (argument.role == CResourceRole::close &&
+            if ((n && admitted->revision_ < 4) || (argument.role == CResourceRole::close &&
                 (binding.abi_parameters.size() != 1 || binding.result != Type::i32 ||
                  binding.name != admitted->resource(argument.resource).release)))
                 reject(reader.line, "invalid native borrow or terminal release signature");
         }
-        if (resources > 1 || (resources && (records || spans)) ||
-            (binding.abi_result.resource && binding.name != admitted->resource(binding.abi_result.resource).acquire))
+        if (admitted->revision_ < 4 && (resources > 1 || (resources && (records || spans)) ||
+            (binding.abi_result.resource && binding.name != admitted->resource(binding.abi_result.resource).acquire)))
             reject(reader.line, "invalid native ownership transfer or mixed ABI");
         for (unsigned n = 0; n < binding.abi_parameters.size(); ++n) {
             const auto& parameter = binding.abi_parameters[n];
             if (!parameter.callback) continue;
             if (n + 1 != binding.abi_parameters.size() || records || spans ||
-                (parameter.retained ? !binding.abi_result.resource : resources != 0))
+                (parameter.retained ? !binding.abi_result.resource || resources != 1 : resources != 0))
                 reject(reader.line, "callback must be last, with scalar transport or retained resource acquisition");
             used_callbacks.insert(parameter.callback);
         }
@@ -333,7 +353,7 @@ std::shared_ptr<CPrimitiveAdmission> CPrimitiveAdmission::parse(std::string_view
     if (callbacks && (used_callbacks.empty() || used_callbacks.size() != admitted->callbacks_.size()))
         reject(reader.line, "each checked callback declaration must be used by a binding");
     if (admitted->bindings_.empty()) reject(reader.line, "expected at least one binding");
-    if (admitted->revision_ == 3 && admitted->resources_.empty())
+    if (admitted->revision_ >= 3 && admitted->resources_.empty())
         reject(reader.line, "expected a resource contract in descriptor revision 3");
     for (unsigned n = 0; n < admitted->resources_.size(); ++n) {
         auto& resource = admitted->resources_[n];
@@ -426,6 +446,7 @@ std::string CPrimitiveAdmission::generate_adapter(std::string_view descriptor, s
             case Shape::Alias::c_long: return "long";
             case Shape::Alias::c_size: return "size_t";
             case Shape::Alias::c_bool: return "_Bool";
+            case Shape::Alias::c_char: return "char";
             case Shape::Alias::none: break;
         }
         switch (shape.scalar.kind) {
@@ -449,6 +470,8 @@ std::string CPrimitiveAdmission::generate_adapter(std::string_view descriptor, s
         << "#error Wrong C adapter target\n#endif\n"
         << "_Static_assert(CHAR_BIT == 8 && sizeof(void*) == 8 && sizeof(int) == 4 && sizeof(long) == "
         << (windows ? 4 : 8) << " && sizeof(size_t) == 8 && sizeof(float) == 4 && sizeof(double) == 8, \"C ABI widths\");\n";
+    if (admitted->revision_ >= 4)
+        out << "_Static_assert(CHAR_MIN == -128 && CHAR_MAX == 127, \"C char signedness\");\n";
     if (!admitted->callbacks_.empty())
         out << "struct vd_callback_context {\n"
                "    uint32_t (*invoke)(void*, const uint64_t*, uint32_t, uint64_t*);\n"
@@ -622,8 +645,10 @@ bool CPrimitiveAdmission::matches(const Shape& shape, Type type) const {
             !type.definition->extent && ir::array_element(type) == Type::u8 &&
             (shape.direction == 1 || ir::readonly_paths(type).empty());
     if (shape.extent)
-        return type.kind == Type::fixed_array && type.definition && type.definition->element &&
-            type.definition->extent == shape.extent && ir::array_element(type) == shape.scalar;
+        if (type.kind == Type::fixed_array && type.definition && type.definition->element && type.definition->extent == shape.extent) {
+            auto element = shape; element.extent = 0;
+            return matches(element, ir::array_element(type));
+        } else return false;
     if (!shape.record) return type == shape.scalar;
     const auto& expected = record(shape.record);
     if (type.kind != Type::aggregate || !type.definition) return false;
@@ -658,8 +683,8 @@ std::string CPrimitiveAdmission::source_type(const Shape& shape) const {
     if (shape.resource)
         return resource(shape.resource).name + (shape.role == CResourceRole::acquire ? "?" : "");
     if (shape.direction) return "[u8]";
+    if (shape.extent) return "[" + (shape.record ? record(shape.record).name : std::string(void_spelling(shape.scalar))) + ", " + std::to_string(shape.extent) + "]";
     if (shape.record) return record(shape.record).name;
-    if (shape.extent) return "[" + std::string(void_spelling(shape.scalar)) + ", " + std::to_string(shape.extent) + "]";
     return std::string(void_spelling(shape.scalar));
 }
 std::string CPrimitiveAdmission::source() const {

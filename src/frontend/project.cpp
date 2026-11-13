@@ -3,6 +3,7 @@
 #include "void/path.hpp"
 #include "project_files.hpp"
 #include "void/project_resolution.hpp"
+#include "void/c_dynamic.hpp"
 #include <algorithm>
 #include <charconv>
 #include <set>
@@ -213,7 +214,7 @@ std::optional<NativeCatalog> native_catalog(const toml::table& table) {
         return NativeArtifact{std::string(name), std::string(hash), size};
     };
     auto descriptor_file = file(descriptor, get("descriptor-identity"));
-    if (!descriptor_file || descriptor_file->size > 16384) return {};
+    if (!descriptor_file || descriptor_file->size > c_conventional_descriptor_limit) return {};
     NativeCatalog plan{std::string(id), std::string(target), std::string(revision), std::string(library),
         std::string(adapter), std::move(*version), static_cast<unsigned>(abi), std::move(*descriptor_file), {}, {}, {}};
     auto rows = [&](const char* role, auto& output) {

@@ -1,0 +1,24 @@
+use "/mixed.void" as ffi
+func main() -> i32:
+    var a = ffi.create(10) as ffi.box
+    var b = ffi.clone(a, ffi.pair(x = 7, y = 0 as f32)) as ffi.box
+    var bytes: [u8] = [0, 0, 0]
+    if ffi.read(b, bytes, 1, 1) != 1 or bytes[1] != 17:
+        return 11
+    var c = ffi.bytes(bytes, 1, 1) as ffi.box
+    var result = ffi.combine(a, c, ffi.pair(x = 3, y = 2.5 as f32))
+    if result.x != 30 or result.y != 5 as f32:
+        return 12
+    var aliased = ffi.combine(a, a, ffi.pair(x = 1, y = 1 as f32))
+    if aliased.x != 21:
+        return 13
+    var pairs: [ffi.pair, 2] = [ffi.pair(x = 1, y = 2 as f32), ffi.pair(x = 3, y = 4 as f32)]
+    var label: [i8, 4] = [65, 66, 67, 0]
+    var bundle = ffi.bundle_transform(ffi.bundle(pairs = pairs, label = label))
+    if bundle.pairs[0].x != 3 or bundle.pairs[1].y != 2 as f32 or bundle.label[1] != 90:
+        return 14
+    ffi.close_box(a)
+    ffi.close_box(b)
+    # c is deliberately released through the existing Runtime ledger.
+    print("Mixed native resources/records/spans passed")
+    return 0

@@ -1,0 +1,887 @@
+resource owner_buffer VdBuffer pointer null buffer_new buffer_close owner-calls shutdown-owner consume-always
+resource owner_window VdWindow pointer null init_window close_window owner-calls shutdown-owner consume-always
+resource owner_audio VdAudio pointer null init_audio_device close_audio_device owner-calls shutdown-owner consume-always
+resource owner_image VdImage pointer null owner_image_new owner_image_close owner-calls shutdown-owner consume-always
+resource owner_texture VdTexture pointer null owner_texture_new owner_texture_close owner-calls shutdown-owner consume-always
+resource owner_render_texture VdRenderTexture pointer null owner_render_texture_new owner_render_texture_close owner-calls shutdown-owner consume-always
+resource owner_font VdFont pointer null owner_font_new owner_font_close owner-calls shutdown-owner consume-always
+resource owner_mesh VdMesh pointer null owner_mesh_new owner_mesh_close owner-calls shutdown-owner consume-always
+resource owner_shader VdShader pointer null owner_shader_new owner_shader_close owner-calls shutdown-owner consume-always
+resource owner_material VdMaterial pointer null owner_material_new owner_material_close owner-calls shutdown-owner consume-always
+resource owner_model VdModel pointer null owner_model_new owner_model_close owner-calls shutdown-owner consume-always
+resource owner_wave VdWave pointer null owner_wave_new owner_wave_close owner-calls shutdown-owner consume-always
+resource owner_audio_stream VdAudioStream pointer null owner_audio_stream_new owner_audio_stream_close owner-calls shutdown-owner consume-always
+resource owner_sound VdSound pointer null owner_sound_new owner_sound_close owner-calls shutdown-owner consume-always
+resource owner_music VdMusic pointer null owner_music_new owner_music_close owner-calls shutdown-owner consume-always
+resource owner_file_path_list VdFilePathList pointer null owner_file_path_list_new owner_file_path_list_close owner-calls shutdown-owner consume-always
+resource owner_glyph_info VdGlyphInfo pointer null owner_glyph_info_new owner_glyph_info_close owner-calls shutdown-owner consume-always
+resource owner_material_map VdMaterialMap pointer null owner_material_map_new owner_material_map_close owner-calls shutdown-owner consume-always
+resource owner_model_skeleton VdModelSkeleton pointer null owner_model_skeleton_new owner_model_skeleton_close owner-calls shutdown-owner consume-always
+resource owner_model_animation VdModelAnimation pointer null owner_model_animation_new owner_model_animation_close owner-calls shutdown-owner consume-always
+resource owner_automation_event_list VdAutomationEventList pointer null owner_automation_event_list_new owner_automation_event_list_close owner-calls shutdown-owner consume-always
+resource callback_target VdCallbackTarget pointer null callback_target_new callback_target_close owner-calls shutdown-owner consume-always
+resource callback_registration VdCallbackRegistration pointer null callback_register callback_close owner-calls shutdown-owner consume-always
+record vector2 Vector2 8 4 2
+field x x f32 0
+field y y f32 4
+record vector3 Vector3 12 4 3
+field x x f32 0
+field y y f32 4
+field z z f32 8
+record vector4 Vector4 16 4 4
+field x x f32 0
+field y y f32 4
+field z z f32 8
+field w w f32 12
+record matrix Matrix 64 4 16
+field m0 m0 f32 0
+field m4 m4 f32 4
+field m8 m8 f32 8
+field m12 m12 f32 12
+field m1 m1 f32 16
+field m5 m5 f32 20
+field m9 m9 f32 24
+field m13 m13 f32 28
+field m2 m2 f32 32
+field m6 m6 f32 36
+field m10 m10 f32 40
+field m14 m14 f32 44
+field m3 m3 f32 48
+field m7 m7 f32 52
+field m11 m11 f32 56
+field m15 m15 f32 60
+record rectangle Rectangle 16 4 4
+field x x f32 0
+field y y f32 4
+field width width f32 8
+field height height f32 12
+record n_patch_info NPatchInfo 36 4 6
+field source source record:rectangle 0
+field left left c_int 16
+field top top c_int 20
+field right right c_int 24
+field bottom bottom c_int 28
+field layout layout c_int 32
+record camera3_d Camera3D 44 4 5
+field position position record:vector3 0
+field target target record:vector3 12
+field up up record:vector3 24
+field fovy fovy f32 36
+field projection projection c_int 40
+record camera2_d Camera2D 24 4 4
+field offset offset record:vector2 0
+field target target record:vector2 8
+field rotation rotation f32 16
+field zoom zoom f32 20
+record transform Transform 40 4 3
+field translation translation record:vector3 0
+field rotation rotation record:vector4 12
+field scale scale record:vector3 28
+record bone_info BoneInfo 36 4 2
+field name name array:c_char:32:1 0
+field parent parent c_int 32
+record ray Ray 24 4 2
+field position position record:vector3 0
+field direction direction record:vector3 12
+record ray_collision RayCollision 32 4 4
+field hit hit c_bool 0
+field distance distance f32 4
+field point point record:vector3 8
+field normal normal record:vector3 20
+record bounding_box BoundingBox 24 4 2
+field min min record:vector3 0
+field max max record:vector3 12
+record vr_device_info VrDeviceInfo 60 4 9
+field h_resolution hResolution c_int 0
+field v_resolution vResolution c_int 4
+field h_screen_size hScreenSize f32 8
+field v_screen_size vScreenSize f32 12
+field eye_to_screen_distance eyeToScreenDistance f32 16
+field lens_separation_distance lensSeparationDistance f32 20
+field interpupillary_distance interpupillaryDistance f32 24
+field lens_distortion_values lensDistortionValues array:f32:4:4 28
+field chroma_ab_correction chromaAbCorrection array:f32:4:4 44
+record vr_stereo_config VrStereoConfig 304 4 8
+field projection projection array_record:matrix:2:64 0
+field view_offset viewOffset array_record:matrix:2:64 128
+field left_lens_center leftLensCenter array:f32:2:4 256
+field right_lens_center rightLensCenter array:f32:2:4 264
+field left_screen_center leftScreenCenter array:f32:2:4 272
+field right_screen_center rightScreenCenter array:f32:2:4 280
+field scale scale array:f32:2:4 288
+field scale_in scaleIn array:f32:2:4 296
+record automation_event AutomationEvent 24 4 3
+field frame frame u32 0
+field type type u32 4
+field params params array:c_int:4:4 8
+record int_out VdIntOut 8 4 2
+field value value i32 0
+field size size i32 4
+record collision_out VdCollisionOut 12 4 2
+field hit hit c_bool 0
+field point point record:vector2 4
+callback raylib_event context-first i32 u32 i32
+bind window_should_close vd_raylib_api_WindowShouldClose c_bool
+bind is_window_ready vd_raylib_api_IsWindowReady c_bool
+bind is_window_fullscreen vd_raylib_api_IsWindowFullscreen c_bool
+bind is_window_hidden vd_raylib_api_IsWindowHidden c_bool
+bind is_window_minimized vd_raylib_api_IsWindowMinimized c_bool
+bind is_window_maximized vd_raylib_api_IsWindowMaximized c_bool
+bind is_window_focused vd_raylib_api_IsWindowFocused c_bool
+bind is_window_resized vd_raylib_api_IsWindowResized c_bool
+bind is_window_state vd_raylib_api_IsWindowState c_bool u32
+bind set_window_state vd_raylib_api_SetWindowState void u32
+bind clear_window_state vd_raylib_api_ClearWindowState void u32
+bind toggle_fullscreen vd_raylib_api_ToggleFullscreen void
+bind toggle_borderless_windowed vd_raylib_api_ToggleBorderlessWindowed void
+bind maximize_window vd_raylib_api_MaximizeWindow void
+bind minimize_window vd_raylib_api_MinimizeWindow void
+bind restore_window vd_raylib_api_RestoreWindow void
+bind set_window_position vd_raylib_api_SetWindowPosition void c_int c_int
+bind set_window_monitor vd_raylib_api_SetWindowMonitor void c_int
+bind set_window_min_size vd_raylib_api_SetWindowMinSize void c_int c_int
+bind set_window_max_size vd_raylib_api_SetWindowMaxSize void c_int c_int
+bind set_window_size vd_raylib_api_SetWindowSize void c_int c_int
+bind set_window_opacity vd_raylib_api_SetWindowOpacity void f32
+bind set_window_focused vd_raylib_api_SetWindowFocused void
+bind get_screen_width vd_raylib_api_GetScreenWidth c_int
+bind get_screen_height vd_raylib_api_GetScreenHeight c_int
+bind get_render_width vd_raylib_api_GetRenderWidth c_int
+bind get_render_height vd_raylib_api_GetRenderHeight c_int
+bind get_monitor_count vd_raylib_api_GetMonitorCount c_int
+bind get_current_monitor vd_raylib_api_GetCurrentMonitor c_int
+bind get_monitor_position vd_raylib_api_GetMonitorPosition record:vector2 c_int
+bind get_monitor_width vd_raylib_api_GetMonitorWidth c_int c_int
+bind get_monitor_height vd_raylib_api_GetMonitorHeight c_int c_int
+bind get_monitor_physical_width vd_raylib_api_GetMonitorPhysicalWidth c_int c_int
+bind get_monitor_physical_height vd_raylib_api_GetMonitorPhysicalHeight c_int c_int
+bind get_monitor_refresh_rate vd_raylib_api_GetMonitorRefreshRate c_int c_int
+bind get_window_position vd_raylib_api_GetWindowPosition record:vector2
+bind get_window_scale_dpi vd_raylib_api_GetWindowScaleDPI record:vector2
+bind enable_event_waiting vd_raylib_api_EnableEventWaiting void
+bind disable_event_waiting vd_raylib_api_DisableEventWaiting void
+bind show_cursor vd_raylib_api_ShowCursor void
+bind hide_cursor vd_raylib_api_HideCursor void
+bind is_cursor_hidden vd_raylib_api_IsCursorHidden c_bool
+bind enable_cursor vd_raylib_api_EnableCursor void
+bind disable_cursor vd_raylib_api_DisableCursor void
+bind is_cursor_on_screen vd_raylib_api_IsCursorOnScreen c_bool
+bind clear_background vd_raylib_api_ClearBackground void record:color
+bind begin_drawing vd_raylib_api_BeginDrawing void
+bind end_drawing vd_raylib_api_EndDrawing void
+bind begin_mode2_d vd_raylib_api_BeginMode2D void record:camera2_d
+bind end_mode2_d vd_raylib_api_EndMode2D void
+bind begin_mode3_d vd_raylib_api_BeginMode3D void record:camera3_d
+bind end_mode3_d vd_raylib_api_EndMode3D void
+bind end_texture_mode vd_raylib_api_EndTextureMode void
+bind end_shader_mode vd_raylib_api_EndShaderMode void
+bind begin_blend_mode vd_raylib_api_BeginBlendMode void c_int
+bind end_blend_mode vd_raylib_api_EndBlendMode void
+bind begin_scissor_mode vd_raylib_api_BeginScissorMode void c_int c_int c_int c_int
+bind end_scissor_mode vd_raylib_api_EndScissorMode void
+bind begin_vr_stereo_mode vd_raylib_api_BeginVrStereoMode void record:vr_stereo_config
+bind end_vr_stereo_mode vd_raylib_api_EndVrStereoMode void
+bind load_vr_stereo_config vd_raylib_api_LoadVrStereoConfig record:vr_stereo_config record:vr_device_info
+bind unload_vr_stereo_config vd_raylib_api_UnloadVrStereoConfig void record:vr_stereo_config
+bind get_screen_to_world_ray vd_raylib_api_GetScreenToWorldRay record:ray record:vector2 record:camera3_d
+bind get_screen_to_world_ray_ex vd_raylib_api_GetScreenToWorldRayEx record:ray record:vector2 record:camera3_d c_int c_int
+bind get_world_to_screen vd_raylib_api_GetWorldToScreen record:vector2 record:vector3 record:camera3_d
+bind get_world_to_screen_ex vd_raylib_api_GetWorldToScreenEx record:vector2 record:vector3 record:camera3_d c_int c_int
+bind get_world_to_screen2_d vd_raylib_api_GetWorldToScreen2D record:vector2 record:vector2 record:camera2_d
+bind get_screen_to_world2_d vd_raylib_api_GetScreenToWorld2D record:vector2 record:vector2 record:camera2_d
+bind get_camera_matrix vd_raylib_api_GetCameraMatrix record:matrix record:camera3_d
+bind get_camera_matrix2_d vd_raylib_api_GetCameraMatrix2D record:matrix record:camera2_d
+bind set_target_fps vd_raylib_api_SetTargetFPS void c_int
+bind get_frame_time vd_raylib_api_GetFrameTime f32
+bind get_time vd_raylib_api_GetTime f64
+bind get_fps vd_raylib_api_GetFPS c_int
+bind swap_screen_buffer vd_raylib_api_SwapScreenBuffer void
+bind poll_input_events vd_raylib_api_PollInputEvents void
+bind wait_time vd_raylib_api_WaitTime void f64
+bind set_random_seed vd_raylib_api_SetRandomSeed void u32
+bind get_random_value vd_raylib_api_GetRandomValue c_int c_int c_int
+bind set_config_flags vd_raylib_api_SetConfigFlags void u32
+bind set_trace_log_level vd_raylib_api_SetTraceLogLevel void c_int
+bind is_file_dropped vd_raylib_api_IsFileDropped c_bool
+bind set_automation_event_base_frame vd_raylib_api_SetAutomationEventBaseFrame void c_int
+bind start_automation_event_recording vd_raylib_api_StartAutomationEventRecording void
+bind stop_automation_event_recording vd_raylib_api_StopAutomationEventRecording void
+bind play_automation_event vd_raylib_api_PlayAutomationEvent void record:automation_event
+bind is_key_pressed vd_raylib_api_IsKeyPressed c_bool c_int
+bind is_key_pressed_repeat vd_raylib_api_IsKeyPressedRepeat c_bool c_int
+bind is_key_down vd_raylib_api_IsKeyDown c_bool c_int
+bind is_key_released vd_raylib_api_IsKeyReleased c_bool c_int
+bind is_key_up vd_raylib_api_IsKeyUp c_bool c_int
+bind get_key_pressed vd_raylib_api_GetKeyPressed c_int
+bind get_char_pressed vd_raylib_api_GetCharPressed c_int
+bind set_exit_key vd_raylib_api_SetExitKey void c_int
+bind is_gamepad_available vd_raylib_api_IsGamepadAvailable c_bool c_int
+bind is_gamepad_button_pressed vd_raylib_api_IsGamepadButtonPressed c_bool c_int c_int
+bind is_gamepad_button_down vd_raylib_api_IsGamepadButtonDown c_bool c_int c_int
+bind is_gamepad_button_released vd_raylib_api_IsGamepadButtonReleased c_bool c_int c_int
+bind is_gamepad_button_up vd_raylib_api_IsGamepadButtonUp c_bool c_int c_int
+bind get_gamepad_button_pressed vd_raylib_api_GetGamepadButtonPressed c_int
+bind get_gamepad_axis_count vd_raylib_api_GetGamepadAxisCount c_int c_int
+bind get_gamepad_axis_movement vd_raylib_api_GetGamepadAxisMovement f32 c_int c_int
+bind set_gamepad_vibration vd_raylib_api_SetGamepadVibration void c_int f32 f32 f32
+bind is_mouse_button_pressed vd_raylib_api_IsMouseButtonPressed c_bool c_int
+bind is_mouse_button_down vd_raylib_api_IsMouseButtonDown c_bool c_int
+bind is_mouse_button_released vd_raylib_api_IsMouseButtonReleased c_bool c_int
+bind is_mouse_button_up vd_raylib_api_IsMouseButtonUp c_bool c_int
+bind get_mouse_x vd_raylib_api_GetMouseX c_int
+bind get_mouse_y vd_raylib_api_GetMouseY c_int
+bind get_mouse_position vd_raylib_api_GetMousePosition record:vector2
+bind get_mouse_delta vd_raylib_api_GetMouseDelta record:vector2
+bind set_mouse_position vd_raylib_api_SetMousePosition void c_int c_int
+bind set_mouse_offset vd_raylib_api_SetMouseOffset void c_int c_int
+bind set_mouse_scale vd_raylib_api_SetMouseScale void f32 f32
+bind get_mouse_wheel_move vd_raylib_api_GetMouseWheelMove f32
+bind get_mouse_wheel_move_v vd_raylib_api_GetMouseWheelMoveV record:vector2
+bind set_mouse_cursor vd_raylib_api_SetMouseCursor void c_int
+bind get_touch_x vd_raylib_api_GetTouchX c_int
+bind get_touch_y vd_raylib_api_GetTouchY c_int
+bind get_touch_position vd_raylib_api_GetTouchPosition record:vector2 c_int
+bind get_touch_point_id vd_raylib_api_GetTouchPointId c_int c_int
+bind get_touch_point_count vd_raylib_api_GetTouchPointCount c_int
+bind set_gestures_enabled vd_raylib_api_SetGesturesEnabled void u32
+bind is_gesture_detected vd_raylib_api_IsGestureDetected c_bool u32
+bind get_gesture_detected vd_raylib_api_GetGestureDetected c_int
+bind get_gesture_hold_duration vd_raylib_api_GetGestureHoldDuration f32
+bind get_gesture_drag_vector vd_raylib_api_GetGestureDragVector record:vector2
+bind get_gesture_drag_angle vd_raylib_api_GetGestureDragAngle f32
+bind get_gesture_pinch_vector vd_raylib_api_GetGesturePinchVector record:vector2
+bind get_gesture_pinch_angle vd_raylib_api_GetGesturePinchAngle f32
+bind get_shapes_texture_rectangle vd_raylib_api_GetShapesTextureRectangle record:rectangle
+bind draw_pixel vd_raylib_api_DrawPixel void c_int c_int record:color
+bind draw_pixel_v vd_raylib_api_DrawPixelV void record:vector2 record:color
+bind draw_line vd_raylib_api_DrawLine void c_int c_int c_int c_int record:color
+bind draw_line_v vd_raylib_api_DrawLineV void record:vector2 record:vector2 record:color
+bind draw_line_ex vd_raylib_api_DrawLineEx void record:vector2 record:vector2 f32 record:color
+bind draw_line_bezier vd_raylib_api_DrawLineBezier void record:vector2 record:vector2 f32 record:color
+bind draw_line_dashed vd_raylib_api_DrawLineDashed void record:vector2 record:vector2 c_int c_int record:color
+bind draw_circle vd_raylib_api_DrawCircle void c_int c_int f32 record:color
+bind draw_circle_v vd_raylib_api_DrawCircleV void record:vector2 f32 record:color
+bind draw_circle_gradient vd_raylib_api_DrawCircleGradient void record:vector2 f32 record:color record:color
+bind draw_circle_sector vd_raylib_api_DrawCircleSector void record:vector2 f32 f32 f32 c_int record:color
+bind draw_circle_sector_lines vd_raylib_api_DrawCircleSectorLines void record:vector2 f32 f32 f32 c_int record:color
+bind draw_circle_lines vd_raylib_api_DrawCircleLines void c_int c_int f32 record:color
+bind draw_circle_lines_v vd_raylib_api_DrawCircleLinesV void record:vector2 f32 record:color
+bind draw_ellipse vd_raylib_api_DrawEllipse void c_int c_int f32 f32 record:color
+bind draw_ellipse_v vd_raylib_api_DrawEllipseV void record:vector2 f32 f32 record:color
+bind draw_ellipse_lines vd_raylib_api_DrawEllipseLines void c_int c_int f32 f32 record:color
+bind draw_ellipse_lines_v vd_raylib_api_DrawEllipseLinesV void record:vector2 f32 f32 record:color
+bind draw_ring vd_raylib_api_DrawRing void record:vector2 f32 f32 f32 f32 c_int record:color
+bind draw_ring_lines vd_raylib_api_DrawRingLines void record:vector2 f32 f32 f32 f32 c_int record:color
+bind draw_rectangle vd_raylib_api_DrawRectangle void c_int c_int c_int c_int record:color
+bind draw_rectangle_v vd_raylib_api_DrawRectangleV void record:vector2 record:vector2 record:color
+bind draw_rectangle_rec vd_raylib_api_DrawRectangleRec void record:rectangle record:color
+bind draw_rectangle_pro vd_raylib_api_DrawRectanglePro void record:rectangle record:vector2 f32 record:color
+bind draw_rectangle_gradient_v vd_raylib_api_DrawRectangleGradientV void c_int c_int c_int c_int record:color record:color
+bind draw_rectangle_gradient_h vd_raylib_api_DrawRectangleGradientH void c_int c_int c_int c_int record:color record:color
+bind draw_rectangle_gradient_ex vd_raylib_api_DrawRectangleGradientEx void record:rectangle record:color record:color record:color record:color
+bind draw_rectangle_lines vd_raylib_api_DrawRectangleLines void c_int c_int c_int c_int record:color
+bind draw_rectangle_lines_ex vd_raylib_api_DrawRectangleLinesEx void record:rectangle f32 record:color
+bind draw_rectangle_rounded vd_raylib_api_DrawRectangleRounded void record:rectangle f32 c_int record:color
+bind draw_rectangle_rounded_lines vd_raylib_api_DrawRectangleRoundedLines void record:rectangle f32 c_int record:color
+bind draw_rectangle_rounded_lines_ex vd_raylib_api_DrawRectangleRoundedLinesEx void record:rectangle f32 c_int f32 record:color
+bind draw_triangle vd_raylib_api_DrawTriangle void record:vector2 record:vector2 record:vector2 record:color
+bind draw_triangle_lines vd_raylib_api_DrawTriangleLines void record:vector2 record:vector2 record:vector2 record:color
+bind draw_poly vd_raylib_api_DrawPoly void record:vector2 c_int f32 f32 record:color
+bind draw_poly_lines vd_raylib_api_DrawPolyLines void record:vector2 c_int f32 f32 record:color
+bind draw_poly_lines_ex vd_raylib_api_DrawPolyLinesEx void record:vector2 c_int f32 f32 f32 record:color
+bind draw_spline_segment_linear vd_raylib_api_DrawSplineSegmentLinear void record:vector2 record:vector2 f32 record:color
+bind draw_spline_segment_basis vd_raylib_api_DrawSplineSegmentBasis void record:vector2 record:vector2 record:vector2 record:vector2 f32 record:color
+bind draw_spline_segment_catmull_rom vd_raylib_api_DrawSplineSegmentCatmullRom void record:vector2 record:vector2 record:vector2 record:vector2 f32 record:color
+bind draw_spline_segment_bezier_quadratic vd_raylib_api_DrawSplineSegmentBezierQuadratic void record:vector2 record:vector2 record:vector2 f32 record:color
+bind draw_spline_segment_bezier_cubic vd_raylib_api_DrawSplineSegmentBezierCubic void record:vector2 record:vector2 record:vector2 record:vector2 f32 record:color
+bind get_spline_point_linear vd_raylib_api_GetSplinePointLinear record:vector2 record:vector2 record:vector2 f32
+bind get_spline_point_basis vd_raylib_api_GetSplinePointBasis record:vector2 record:vector2 record:vector2 record:vector2 record:vector2 f32
+bind get_spline_point_catmull_rom vd_raylib_api_GetSplinePointCatmullRom record:vector2 record:vector2 record:vector2 record:vector2 record:vector2 f32
+bind get_spline_point_bezier_quad vd_raylib_api_GetSplinePointBezierQuad record:vector2 record:vector2 record:vector2 record:vector2 f32
+bind get_spline_point_bezier_cubic vd_raylib_api_GetSplinePointBezierCubic record:vector2 record:vector2 record:vector2 record:vector2 record:vector2 f32
+bind check_collision_recs vd_raylib_api_CheckCollisionRecs c_bool record:rectangle record:rectangle
+bind check_collision_circles vd_raylib_api_CheckCollisionCircles c_bool record:vector2 f32 record:vector2 f32
+bind check_collision_circle_rec vd_raylib_api_CheckCollisionCircleRec c_bool record:vector2 f32 record:rectangle
+bind check_collision_circle_line vd_raylib_api_CheckCollisionCircleLine c_bool record:vector2 f32 record:vector2 record:vector2
+bind check_collision_point_rec vd_raylib_api_CheckCollisionPointRec c_bool record:vector2 record:rectangle
+bind check_collision_point_circle vd_raylib_api_CheckCollisionPointCircle c_bool record:vector2 record:vector2 f32
+bind check_collision_point_triangle vd_raylib_api_CheckCollisionPointTriangle c_bool record:vector2 record:vector2 record:vector2 record:vector2
+bind check_collision_point_line vd_raylib_api_CheckCollisionPointLine c_bool record:vector2 record:vector2 record:vector2 c_int
+bind get_collision_rec vd_raylib_api_GetCollisionRec record:rectangle record:rectangle record:rectangle
+bind color_is_equal vd_raylib_api_ColorIsEqual c_bool record:color record:color
+bind fade vd_raylib_api_Fade record:color record:color f32
+bind color_to_int vd_raylib_api_ColorToInt c_int record:color
+bind color_normalize vd_raylib_api_ColorNormalize record:vector4 record:color
+bind color_from_normalized vd_raylib_api_ColorFromNormalized record:color record:vector4
+bind color_to_hsv vd_raylib_api_ColorToHSV record:vector3 record:color
+bind color_from_hsv vd_raylib_api_ColorFromHSV record:color f32 f32 f32
+bind color_tint vd_raylib_api_ColorTint record:color record:color record:color
+bind color_brightness vd_raylib_api_ColorBrightness record:color record:color f32
+bind color_contrast vd_raylib_api_ColorContrast record:color record:color f32
+bind color_alpha vd_raylib_api_ColorAlpha record:color record:color f32
+bind color_alpha_blend vd_raylib_api_ColorAlphaBlend record:color record:color record:color record:color
+bind color_lerp vd_raylib_api_ColorLerp record:color record:color record:color f32
+bind get_color vd_raylib_api_GetColor record:color u32
+bind get_pixel_data_size vd_raylib_api_GetPixelDataSize c_int c_int c_int c_int
+bind draw_fps vd_raylib_api_DrawFPS void c_int c_int
+bind set_text_line_spacing vd_raylib_api_SetTextLineSpacing void c_int
+bind draw_line3_d vd_raylib_api_DrawLine3D void record:vector3 record:vector3 record:color
+bind draw_point3_d vd_raylib_api_DrawPoint3D void record:vector3 record:color
+bind draw_circle3_d vd_raylib_api_DrawCircle3D void record:vector3 f32 record:vector3 f32 record:color
+bind draw_triangle3_d vd_raylib_api_DrawTriangle3D void record:vector3 record:vector3 record:vector3 record:color
+bind draw_cube vd_raylib_api_DrawCube void record:vector3 f32 f32 f32 record:color
+bind draw_cube_v vd_raylib_api_DrawCubeV void record:vector3 record:vector3 record:color
+bind draw_cube_wires vd_raylib_api_DrawCubeWires void record:vector3 f32 f32 f32 record:color
+bind draw_cube_wires_v vd_raylib_api_DrawCubeWiresV void record:vector3 record:vector3 record:color
+bind draw_sphere vd_raylib_api_DrawSphere void record:vector3 f32 record:color
+bind draw_sphere_ex vd_raylib_api_DrawSphereEx void record:vector3 f32 c_int c_int record:color
+bind draw_sphere_wires vd_raylib_api_DrawSphereWires void record:vector3 f32 c_int c_int record:color
+bind draw_cylinder vd_raylib_api_DrawCylinder void record:vector3 f32 f32 f32 c_int record:color
+bind draw_cylinder_ex vd_raylib_api_DrawCylinderEx void record:vector3 record:vector3 f32 f32 c_int record:color
+bind draw_cylinder_wires vd_raylib_api_DrawCylinderWires void record:vector3 f32 f32 f32 c_int record:color
+bind draw_cylinder_wires_ex vd_raylib_api_DrawCylinderWiresEx void record:vector3 record:vector3 f32 f32 c_int record:color
+bind draw_capsule vd_raylib_api_DrawCapsule void record:vector3 record:vector3 f32 c_int c_int record:color
+bind draw_capsule_wires vd_raylib_api_DrawCapsuleWires void record:vector3 record:vector3 f32 c_int c_int record:color
+bind draw_plane vd_raylib_api_DrawPlane void record:vector3 record:vector2 record:color
+bind draw_ray vd_raylib_api_DrawRay void record:ray record:color
+bind draw_grid vd_raylib_api_DrawGrid void c_int f32
+bind draw_bounding_box vd_raylib_api_DrawBoundingBox void record:bounding_box record:color
+bind check_collision_spheres vd_raylib_api_CheckCollisionSpheres c_bool record:vector3 f32 record:vector3 f32
+bind check_collision_boxes vd_raylib_api_CheckCollisionBoxes c_bool record:bounding_box record:bounding_box
+bind check_collision_box_sphere vd_raylib_api_CheckCollisionBoxSphere c_bool record:bounding_box record:vector3 f32
+bind get_ray_collision_sphere vd_raylib_api_GetRayCollisionSphere record:ray_collision record:ray record:vector3 f32
+bind get_ray_collision_box vd_raylib_api_GetRayCollisionBox record:ray_collision record:ray record:bounding_box
+bind get_ray_collision_triangle vd_raylib_api_GetRayCollisionTriangle record:ray_collision record:ray record:vector3 record:vector3 record:vector3
+bind get_ray_collision_quad vd_raylib_api_GetRayCollisionQuad record:ray_collision record:ray record:vector3 record:vector3 record:vector3 record:vector3
+bind is_audio_device_ready vd_raylib_api_IsAudioDeviceReady c_bool
+bind set_master_volume vd_raylib_api_SetMasterVolume void f32
+bind get_master_volume vd_raylib_api_GetMasterVolume f32
+bind set_audio_stream_buffer_size_default vd_raylib_api_SetAudioStreamBufferSizeDefault void c_int
+bind api_error vd_raylib_api_error i32
+bind buffer_new vd_raylib_buffer_new owner:owner_buffer c_size u32
+bind buffer_close vd_raylib_buffer_close i32 close:owner_buffer
+bind buffer_count vd_raylib_buffer_count c_size borrow:owner_buffer
+bind buffer_write vd_raylib_buffer_write i64 mut:owner_buffer c_size in:3:4:65536 c_size c_size
+bind buffer_read vd_raylib_buffer_read i64 borrow:owner_buffer c_size out:3:4:65536 c_size c_size
+bind buffer_text_length vd_raylib_buffer_text_length c_size borrow:owner_buffer
+bind strings_new vd_raylib_strings_new owner:owner_buffer c_size
+bind strings_set vd_raylib_strings_set void mut:owner_buffer c_size borrow:owner_buffer
+bind strings_get vd_raylib_strings_get owner:owner_buffer borrow:owner_buffer c_size
+bind init_window vd_raylib_api_InitWindow owner:owner_window i32 i32 borrow:owner_buffer
+bind close_window vd_raylib_api_CloseWindow i32 close:owner_window
+bind init_audio_device vd_raylib_api_InitAudioDevice owner:owner_audio
+bind close_audio_device vd_raylib_api_CloseAudioDevice i32 close:owner_audio
+bind set_window_title vd_raylib_api_SetWindowTitle void borrow:owner_buffer
+bind get_window_handle vd_raylib_api_GetWindowHandle owner:owner_buffer
+bind owner_image_new vd_raylib_owner_image_new owner:owner_image
+bind owner_image_close vd_raylib_owner_image_close i32 close:owner_image
+bind image_get_width vd_raylib_image_get_width c_int borrow:owner_image
+bind image_get_height vd_raylib_image_get_height c_int borrow:owner_image
+bind image_get_mipmaps vd_raylib_image_get_mipmaps c_int borrow:owner_image
+bind image_get_pixel_format vd_raylib_image_get_pixel_format c_int borrow:owner_image
+bind owner_texture_new vd_raylib_owner_texture_new owner:owner_texture
+bind owner_texture_close vd_raylib_owner_texture_close i32 close:owner_texture
+bind texture_get_id vd_raylib_texture_get_id u32 borrow:owner_texture
+bind texture_get_width vd_raylib_texture_get_width c_int borrow:owner_texture
+bind texture_get_height vd_raylib_texture_get_height c_int borrow:owner_texture
+bind texture_get_mipmaps vd_raylib_texture_get_mipmaps c_int borrow:owner_texture
+bind texture_get_pixel_format vd_raylib_texture_get_pixel_format c_int borrow:owner_texture
+bind owner_render_texture_new vd_raylib_owner_render_texture_new owner:owner_render_texture
+bind owner_render_texture_close vd_raylib_owner_render_texture_close i32 close:owner_render_texture
+bind render_texture_get_id vd_raylib_render_texture_get_id u32 borrow:owner_render_texture
+bind owner_font_new vd_raylib_owner_font_new owner:owner_font
+bind owner_font_close vd_raylib_owner_font_close i32 close:owner_font
+bind font_get_base_size vd_raylib_font_get_base_size c_int borrow:owner_font
+bind font_get_glyph_count vd_raylib_font_get_glyph_count c_int borrow:owner_font
+bind font_get_glyph_padding vd_raylib_font_get_glyph_padding c_int borrow:owner_font
+bind owner_mesh_new vd_raylib_owner_mesh_new owner:owner_mesh
+bind owner_mesh_close vd_raylib_owner_mesh_close i32 close:owner_mesh
+bind mesh_get_vertex_count vd_raylib_mesh_get_vertex_count c_int borrow:owner_mesh
+bind mesh_get_triangle_count vd_raylib_mesh_get_triangle_count c_int borrow:owner_mesh
+bind mesh_get_bone_count vd_raylib_mesh_get_bone_count c_int borrow:owner_mesh
+bind mesh_get_vao_id vd_raylib_mesh_get_vao_id u32 borrow:owner_mesh
+bind owner_shader_new vd_raylib_owner_shader_new owner:owner_shader
+bind owner_shader_close vd_raylib_owner_shader_close i32 close:owner_shader
+bind shader_get_id vd_raylib_shader_get_id u32 borrow:owner_shader
+bind owner_material_new vd_raylib_owner_material_new owner:owner_material
+bind owner_material_close vd_raylib_owner_material_close i32 close:owner_material
+bind owner_model_new vd_raylib_owner_model_new owner:owner_model
+bind owner_model_close vd_raylib_owner_model_close i32 close:owner_model
+bind model_get_transform vd_raylib_model_get_transform record:matrix borrow:owner_model
+bind model_get_mesh_count vd_raylib_model_get_mesh_count c_int borrow:owner_model
+bind model_get_material_count vd_raylib_model_get_material_count c_int borrow:owner_model
+bind owner_wave_new vd_raylib_owner_wave_new owner:owner_wave
+bind owner_wave_close vd_raylib_owner_wave_close i32 close:owner_wave
+bind wave_get_frame_count vd_raylib_wave_get_frame_count u32 borrow:owner_wave
+bind wave_get_sample_rate vd_raylib_wave_get_sample_rate u32 borrow:owner_wave
+bind wave_get_sample_size vd_raylib_wave_get_sample_size u32 borrow:owner_wave
+bind wave_get_channels vd_raylib_wave_get_channels u32 borrow:owner_wave
+bind owner_audio_stream_new vd_raylib_owner_audio_stream_new owner:owner_audio_stream
+bind owner_audio_stream_close vd_raylib_owner_audio_stream_close i32 close:owner_audio_stream
+bind audio_stream_get_sample_rate vd_raylib_audio_stream_get_sample_rate u32 borrow:owner_audio_stream
+bind audio_stream_get_sample_size vd_raylib_audio_stream_get_sample_size u32 borrow:owner_audio_stream
+bind audio_stream_get_channels vd_raylib_audio_stream_get_channels u32 borrow:owner_audio_stream
+bind owner_sound_new vd_raylib_owner_sound_new owner:owner_sound
+bind owner_sound_close vd_raylib_owner_sound_close i32 close:owner_sound
+bind sound_get_frame_count vd_raylib_sound_get_frame_count u32 borrow:owner_sound
+bind owner_music_new vd_raylib_owner_music_new owner:owner_music
+bind owner_music_close vd_raylib_owner_music_close i32 close:owner_music
+bind music_get_frame_count vd_raylib_music_get_frame_count u32 borrow:owner_music
+bind music_get_looping vd_raylib_music_get_looping c_bool borrow:owner_music
+bind music_get_ctx_type vd_raylib_music_get_ctx_type c_int borrow:owner_music
+bind owner_file_path_list_new vd_raylib_owner_file_path_list_new owner:owner_file_path_list
+bind owner_file_path_list_close vd_raylib_owner_file_path_list_close i32 close:owner_file_path_list
+bind file_path_list_get_count vd_raylib_file_path_list_get_count u32 borrow:owner_file_path_list
+bind owner_glyph_info_new vd_raylib_owner_glyph_info_new owner:owner_glyph_info
+bind owner_glyph_info_close vd_raylib_owner_glyph_info_close i32 close:owner_glyph_info
+bind glyph_info_get_value vd_raylib_glyph_info_get_value c_int borrow:owner_glyph_info
+bind glyph_info_get_offset_x vd_raylib_glyph_info_get_offset_x c_int borrow:owner_glyph_info
+bind glyph_info_get_offset_y vd_raylib_glyph_info_get_offset_y c_int borrow:owner_glyph_info
+bind glyph_info_get_advance_x vd_raylib_glyph_info_get_advance_x c_int borrow:owner_glyph_info
+bind owner_material_map_new vd_raylib_owner_material_map_new owner:owner_material_map
+bind owner_material_map_close vd_raylib_owner_material_map_close i32 close:owner_material_map
+bind material_map_get_color vd_raylib_material_map_get_color record:color borrow:owner_material_map
+bind material_map_get_value vd_raylib_material_map_get_value f32 borrow:owner_material_map
+bind owner_model_skeleton_new vd_raylib_owner_model_skeleton_new owner:owner_model_skeleton
+bind owner_model_skeleton_close vd_raylib_owner_model_skeleton_close i32 close:owner_model_skeleton
+bind model_skeleton_get_bone_count vd_raylib_model_skeleton_get_bone_count c_int borrow:owner_model_skeleton
+bind owner_model_animation_new vd_raylib_owner_model_animation_new owner:owner_model_animation
+bind owner_model_animation_close vd_raylib_owner_model_animation_close i32 close:owner_model_animation
+bind model_animation_get_bone_count vd_raylib_model_animation_get_bone_count c_int borrow:owner_model_animation
+bind model_animation_get_keyframe_count vd_raylib_model_animation_get_keyframe_count c_int borrow:owner_model_animation
+bind owner_automation_event_list_new vd_raylib_owner_automation_event_list_new owner:owner_automation_event_list
+bind owner_automation_event_list_close vd_raylib_owner_automation_event_list_close i32 close:owner_automation_event_list
+bind automation_event_list_get_capacity vd_raylib_automation_event_list_get_capacity u32 borrow:owner_automation_event_list
+bind automation_event_list_get_count vd_raylib_automation_event_list_get_count u32 borrow:owner_automation_event_list
+bind buffer_int_new vd_raylib_buffer_int_new owner:owner_buffer c_size
+bind buffer_int_get vd_raylib_buffer_int_get c_int borrow:owner_buffer c_size
+bind buffer_int_set vd_raylib_buffer_int_set void mut:owner_buffer c_size c_int
+bind buffer_unsigned_int_new vd_raylib_buffer_unsigned_int_new owner:owner_buffer c_size
+bind buffer_unsigned_int_get vd_raylib_buffer_unsigned_int_get u32 borrow:owner_buffer c_size
+bind buffer_unsigned_int_set vd_raylib_buffer_unsigned_int_set void mut:owner_buffer c_size u32
+bind buffer_float_new vd_raylib_buffer_float_new owner:owner_buffer c_size
+bind buffer_float_get vd_raylib_buffer_float_get f32 borrow:owner_buffer c_size
+bind buffer_float_set vd_raylib_buffer_float_set void mut:owner_buffer c_size f32
+bind buffer_vector2_new vd_raylib_buffer_vector2_new owner:owner_buffer c_size
+bind buffer_vector2_get vd_raylib_buffer_vector2_get record:vector2 borrow:owner_buffer c_size
+bind buffer_vector2_set vd_raylib_buffer_vector2_set void mut:owner_buffer c_size record:vector2
+bind buffer_vector3_new vd_raylib_buffer_vector3_new owner:owner_buffer c_size
+bind buffer_vector3_get vd_raylib_buffer_vector3_get record:vector3 borrow:owner_buffer c_size
+bind buffer_vector3_set vd_raylib_buffer_vector3_set void mut:owner_buffer c_size record:vector3
+bind buffer_matrix_new vd_raylib_buffer_matrix_new owner:owner_buffer c_size
+bind buffer_matrix_get vd_raylib_buffer_matrix_get record:matrix borrow:owner_buffer c_size
+bind buffer_matrix_set vd_raylib_buffer_matrix_set void mut:owner_buffer c_size record:matrix
+bind buffer_color_new vd_raylib_buffer_color_new owner:owner_buffer c_size
+bind buffer_color_get vd_raylib_buffer_color_get record:color borrow:owner_buffer c_size
+bind buffer_color_set vd_raylib_buffer_color_set void mut:owner_buffer c_size record:color
+bind buffer_rectangle_new vd_raylib_buffer_rectangle_new owner:owner_buffer c_size
+bind buffer_rectangle_get vd_raylib_buffer_rectangle_get record:rectangle borrow:owner_buffer c_size
+bind buffer_rectangle_set vd_raylib_buffer_rectangle_set void mut:owner_buffer c_size record:rectangle
+bind buffer_transform_new vd_raylib_buffer_transform_new owner:owner_buffer c_size
+bind buffer_transform_get vd_raylib_buffer_transform_get record:transform borrow:owner_buffer c_size
+bind buffer_transform_set vd_raylib_buffer_transform_set void mut:owner_buffer c_size record:transform
+bind buffer_image_new vd_raylib_buffer_image_new owner:owner_buffer c_size
+bind buffer_image_get vd_raylib_buffer_image_get owner:owner_image borrow:owner_buffer c_size
+bind buffer_image_set vd_raylib_buffer_image_set void mut:owner_buffer c_size borrow:owner_image
+bind buffer_glyph_info_new vd_raylib_buffer_glyph_info_new owner:owner_buffer c_size
+bind buffer_glyph_info_get vd_raylib_buffer_glyph_info_get owner:owner_glyph_info borrow:owner_buffer c_size
+bind buffer_glyph_info_set vd_raylib_buffer_glyph_info_set void mut:owner_buffer c_size borrow:owner_glyph_info
+bind buffer_material_new vd_raylib_buffer_material_new owner:owner_buffer c_size
+bind buffer_material_get vd_raylib_buffer_material_get owner:owner_material borrow:owner_buffer c_size
+bind buffer_material_set vd_raylib_buffer_material_set void mut:owner_buffer c_size borrow:owner_material
+bind buffer_model_animation_new vd_raylib_buffer_model_animation_new owner:owner_buffer c_size
+bind buffer_model_animation_get vd_raylib_buffer_model_animation_get owner:owner_model_animation borrow:owner_buffer c_size
+bind buffer_model_animation_set vd_raylib_buffer_model_animation_set void mut:owner_buffer c_size borrow:owner_model_animation
+bind buffer_automation_event_new vd_raylib_buffer_automation_event_new owner:owner_buffer c_size
+bind buffer_automation_event_get vd_raylib_buffer_automation_event_get record:automation_event borrow:owner_buffer c_size
+bind buffer_automation_event_set vd_raylib_buffer_automation_event_set void mut:owner_buffer c_size record:automation_event
+bind buffer_unsigned_short_new vd_raylib_buffer_unsigned_short_new owner:owner_buffer c_size
+bind buffer_unsigned_short_get vd_raylib_buffer_unsigned_short_get u16 borrow:owner_buffer c_size
+bind buffer_unsigned_short_set vd_raylib_buffer_unsigned_short_set void mut:owner_buffer c_size u16
+bind buffer_bone_info_new vd_raylib_buffer_bone_info_new owner:owner_buffer c_size
+bind buffer_bone_info_get vd_raylib_buffer_bone_info_get record:bone_info borrow:owner_buffer c_size
+bind buffer_bone_info_set vd_raylib_buffer_bone_info_set void mut:owner_buffer c_size record:bone_info
+bind buffer_mesh_new vd_raylib_buffer_mesh_new owner:owner_buffer c_size
+bind buffer_mesh_get vd_raylib_buffer_mesh_get owner:owner_mesh borrow:owner_buffer c_size
+bind buffer_mesh_set vd_raylib_buffer_mesh_set void mut:owner_buffer c_size borrow:owner_mesh
+bind buffer_material_map_new vd_raylib_buffer_material_map_new owner:owner_buffer c_size
+bind buffer_material_map_get vd_raylib_buffer_material_map_get owner:owner_material_map borrow:owner_buffer c_size
+bind buffer_material_map_set vd_raylib_buffer_material_map_set void mut:owner_buffer c_size borrow:owner_material_map
+bind image_get_data vd_raylib_image_get_data owner:owner_buffer borrow:owner_image
+bind render_texture_get_texture vd_raylib_render_texture_get_texture owner:owner_texture borrow:owner_render_texture
+bind render_texture_get_depth vd_raylib_render_texture_get_depth owner:owner_texture borrow:owner_render_texture
+bind font_get_texture vd_raylib_font_get_texture owner:owner_texture borrow:owner_font
+bind font_get_recs vd_raylib_font_get_recs owner:owner_buffer borrow:owner_font
+bind font_get_glyphs vd_raylib_font_get_glyphs owner:owner_buffer borrow:owner_font
+bind mesh_get_vertices vd_raylib_mesh_get_vertices owner:owner_buffer borrow:owner_mesh
+bind mesh_get_texcoords vd_raylib_mesh_get_texcoords owner:owner_buffer borrow:owner_mesh
+bind mesh_get_texcoords2 vd_raylib_mesh_get_texcoords2 owner:owner_buffer borrow:owner_mesh
+bind mesh_get_normals vd_raylib_mesh_get_normals owner:owner_buffer borrow:owner_mesh
+bind mesh_get_tangents vd_raylib_mesh_get_tangents owner:owner_buffer borrow:owner_mesh
+bind mesh_get_colors vd_raylib_mesh_get_colors owner:owner_buffer borrow:owner_mesh
+bind mesh_get_indices vd_raylib_mesh_get_indices owner:owner_buffer borrow:owner_mesh
+bind mesh_get_bone_indices vd_raylib_mesh_get_bone_indices owner:owner_buffer borrow:owner_mesh
+bind mesh_get_bone_weights vd_raylib_mesh_get_bone_weights owner:owner_buffer borrow:owner_mesh
+bind mesh_get_anim_vertices vd_raylib_mesh_get_anim_vertices owner:owner_buffer borrow:owner_mesh
+bind mesh_get_anim_normals vd_raylib_mesh_get_anim_normals owner:owner_buffer borrow:owner_mesh
+bind mesh_get_vbo_id vd_raylib_mesh_get_vbo_id owner:owner_buffer borrow:owner_mesh
+bind shader_get_locs vd_raylib_shader_get_locs owner:owner_buffer borrow:owner_shader
+bind material_get_shader vd_raylib_material_get_shader owner:owner_shader borrow:owner_material
+bind material_get_maps vd_raylib_material_get_maps owner:owner_buffer borrow:owner_material
+bind material_get_params vd_raylib_material_get_params owner:owner_buffer borrow:owner_material
+bind model_get_meshes vd_raylib_model_get_meshes owner:owner_buffer borrow:owner_model
+bind model_get_materials vd_raylib_model_get_materials owner:owner_buffer borrow:owner_model
+bind model_get_mesh_material vd_raylib_model_get_mesh_material owner:owner_buffer borrow:owner_model
+bind model_get_skeleton vd_raylib_model_get_skeleton owner:owner_model_skeleton borrow:owner_model
+bind model_get_current_pose vd_raylib_model_get_current_pose owner:owner_buffer borrow:owner_model
+bind model_get_bone_matrices vd_raylib_model_get_bone_matrices owner:owner_buffer borrow:owner_model
+bind wave_get_data vd_raylib_wave_get_data owner:owner_buffer borrow:owner_wave
+bind audio_stream_get_buffer vd_raylib_audio_stream_get_buffer owner:owner_buffer borrow:owner_audio_stream
+bind audio_stream_get_processor vd_raylib_audio_stream_get_processor owner:owner_buffer borrow:owner_audio_stream
+bind sound_get_stream vd_raylib_sound_get_stream owner:owner_audio_stream borrow:owner_sound
+bind music_get_stream vd_raylib_music_get_stream owner:owner_audio_stream borrow:owner_music
+bind music_get_ctx_data vd_raylib_music_get_ctx_data owner:owner_buffer borrow:owner_music
+bind file_path_list_get_paths vd_raylib_file_path_list_get_paths owner:owner_buffer borrow:owner_file_path_list
+bind glyph_info_get_image vd_raylib_glyph_info_get_image owner:owner_image borrow:owner_glyph_info
+bind material_map_get_texture vd_raylib_material_map_get_texture owner:owner_texture borrow:owner_material_map
+bind model_skeleton_get_bones vd_raylib_model_skeleton_get_bones owner:owner_buffer borrow:owner_model_skeleton
+bind model_skeleton_get_bind_pose vd_raylib_model_skeleton_get_bind_pose owner:owner_buffer borrow:owner_model_skeleton
+bind model_animation_get_name vd_raylib_model_animation_get_name owner:owner_buffer borrow:owner_model_animation
+bind model_animation_get_keyframe_poses vd_raylib_model_animation_get_keyframe_poses owner:owner_buffer borrow:owner_model_animation
+bind automation_event_list_get_events vd_raylib_automation_event_list_get_events owner:owner_buffer borrow:owner_automation_event_list
+bind poses_get vd_raylib_poses_get owner:owner_buffer borrow:owner_buffer c_size
+bind image_output_count vd_raylib_image_output_count i32 borrow:owner_image
+bind font_output_count vd_raylib_font_output_count i32 borrow:owner_font
+bind mem_realloc vd_raylib_api_MemRealloc c_bool mut:owner_buffer u32
+bind load_dropped_files vd_raylib_api_LoadDroppedFiles owner:owner_file_path_list
+bind set_shapes_texture vd_raylib_api_SetShapesTexture void borrow:owner_texture record:rectangle
+bind set_window_icons vd_raylib_api_SetWindowIcons void borrow:owner_buffer i32
+bind get_codepoint_previous vd_raylib_api_GetCodepointPrevious record:int_out borrow:owner_buffer c_size
+bind text_copy vd_raylib_api_TextCopy i32 mut:owner_buffer borrow:owner_buffer
+bind text_append vd_raylib_api_TextAppend i32 mut:owner_buffer borrow:owner_buffer i32
+bind text_join vd_raylib_api_TextJoin owner:owner_buffer borrow:owner_buffer i32 borrow:owner_buffer
+bind load_model_from_mesh vd_raylib_api_LoadModelFromMesh owner:owner_model mut:owner_mesh
+bind set_material_texture vd_raylib_api_SetMaterialTexture void mut:owner_material i32 mut:owner_texture
+bind load_sound_alias vd_raylib_api_LoadSoundAlias owner:owner_sound borrow:owner_sound
+bind gen_image_font_atlas vd_raylib_api_GenImageFontAtlas owner:owner_image borrow:owner_buffer i32 i32 i32 i32
+bind image_atlas_rects vd_raylib_image_atlas_rects owner:owner_buffer borrow:owner_image
+bind set_window_icon vd_raylib_api_SetWindowIcon void mut:owner_image
+bind get_monitor_name vd_raylib_api_GetMonitorName owner:owner_buffer c_int
+bind set_clipboard_text vd_raylib_api_SetClipboardText void borrow:owner_buffer
+bind get_clipboard_text vd_raylib_api_GetClipboardText owner:owner_buffer
+bind get_clipboard_image vd_raylib_api_GetClipboardImage owner:owner_image
+bind begin_texture_mode vd_raylib_api_BeginTextureMode void borrow:owner_render_texture
+bind begin_shader_mode vd_raylib_api_BeginShaderMode void borrow:owner_shader
+bind load_shader vd_raylib_api_LoadShader owner:owner_shader borrow:owner_buffer borrow:owner_buffer
+bind load_shader_from_memory vd_raylib_api_LoadShaderFromMemory owner:owner_shader borrow:owner_buffer borrow:owner_buffer
+bind is_shader_valid vd_raylib_api_IsShaderValid c_bool borrow:owner_shader
+bind get_shader_location vd_raylib_api_GetShaderLocation c_int borrow:owner_shader borrow:owner_buffer
+bind get_shader_location_attrib vd_raylib_api_GetShaderLocationAttrib c_int borrow:owner_shader borrow:owner_buffer
+bind set_shader_value vd_raylib_api_SetShaderValue void mut:owner_shader c_int borrow:owner_buffer c_int
+bind set_shader_value_v vd_raylib_api_SetShaderValueV void mut:owner_shader c_int borrow:owner_buffer c_int c_int
+bind set_shader_value_matrix vd_raylib_api_SetShaderValueMatrix void mut:owner_shader c_int record:matrix
+bind set_shader_value_texture vd_raylib_api_SetShaderValueTexture void mut:owner_shader c_int borrow:owner_texture
+bind load_random_sequence vd_raylib_api_LoadRandomSequence owner:owner_buffer u32 c_int c_int
+bind take_screenshot vd_raylib_api_TakeScreenshot void borrow:owner_buffer
+bind open_url vd_raylib_api_OpenURL void borrow:owner_buffer
+bind load_file_data vd_raylib_api_LoadFileData owner:owner_buffer borrow:owner_buffer
+bind save_file_data vd_raylib_api_SaveFileData c_bool borrow:owner_buffer borrow:owner_buffer c_int
+bind export_data_as_code vd_raylib_api_ExportDataAsCode c_bool borrow:owner_buffer c_int borrow:owner_buffer
+bind load_file_text vd_raylib_api_LoadFileText owner:owner_buffer borrow:owner_buffer
+bind save_file_text vd_raylib_api_SaveFileText c_bool borrow:owner_buffer borrow:owner_buffer
+bind file_rename vd_raylib_api_FileRename c_int borrow:owner_buffer borrow:owner_buffer
+bind file_remove vd_raylib_api_FileRemove c_int borrow:owner_buffer
+bind file_copy vd_raylib_api_FileCopy c_int borrow:owner_buffer borrow:owner_buffer
+bind file_move vd_raylib_api_FileMove c_int borrow:owner_buffer borrow:owner_buffer
+bind file_text_replace vd_raylib_api_FileTextReplace c_int borrow:owner_buffer borrow:owner_buffer borrow:owner_buffer
+bind file_text_find_index vd_raylib_api_FileTextFindIndex c_int borrow:owner_buffer borrow:owner_buffer
+bind file_exists vd_raylib_api_FileExists c_bool borrow:owner_buffer
+bind directory_exists vd_raylib_api_DirectoryExists c_bool borrow:owner_buffer
+bind is_file_extension vd_raylib_api_IsFileExtension c_bool borrow:owner_buffer borrow:owner_buffer
+bind get_file_length vd_raylib_api_GetFileLength c_int borrow:owner_buffer
+bind get_file_mod_time vd_raylib_api_GetFileModTime i64 borrow:owner_buffer
+bind get_file_extension vd_raylib_api_GetFileExtension owner:owner_buffer borrow:owner_buffer
+bind get_file_name vd_raylib_api_GetFileName owner:owner_buffer borrow:owner_buffer
+bind get_file_name_without_ext vd_raylib_api_GetFileNameWithoutExt owner:owner_buffer borrow:owner_buffer
+bind get_directory_path vd_raylib_api_GetDirectoryPath owner:owner_buffer borrow:owner_buffer
+bind get_prev_directory_path vd_raylib_api_GetPrevDirectoryPath owner:owner_buffer borrow:owner_buffer
+bind get_working_directory vd_raylib_api_GetWorkingDirectory owner:owner_buffer
+bind get_application_directory vd_raylib_api_GetApplicationDirectory owner:owner_buffer
+bind make_directory vd_raylib_api_MakeDirectory c_int borrow:owner_buffer
+bind change_directory vd_raylib_api_ChangeDirectory c_bool borrow:owner_buffer
+bind is_path_file vd_raylib_api_IsPathFile c_bool borrow:owner_buffer
+bind is_file_name_valid vd_raylib_api_IsFileNameValid c_bool borrow:owner_buffer
+bind load_directory_files vd_raylib_api_LoadDirectoryFiles owner:owner_file_path_list borrow:owner_buffer
+bind load_directory_files_ex vd_raylib_api_LoadDirectoryFilesEx owner:owner_file_path_list borrow:owner_buffer borrow:owner_buffer c_bool
+bind get_directory_file_count vd_raylib_api_GetDirectoryFileCount u32 borrow:owner_buffer
+bind get_directory_file_count_ex vd_raylib_api_GetDirectoryFileCountEx u32 borrow:owner_buffer borrow:owner_buffer c_bool
+bind compress_data vd_raylib_api_CompressData owner:owner_buffer borrow:owner_buffer c_int
+bind decompress_data vd_raylib_api_DecompressData owner:owner_buffer borrow:owner_buffer c_int
+bind encode_data_base64 vd_raylib_api_EncodeDataBase64 owner:owner_buffer borrow:owner_buffer c_int
+bind decode_data_base64 vd_raylib_api_DecodeDataBase64 owner:owner_buffer borrow:owner_buffer
+bind compute_crc32 vd_raylib_api_ComputeCRC32 u32 borrow:owner_buffer c_int
+bind compute_md5 vd_raylib_api_ComputeMD5 owner:owner_buffer borrow:owner_buffer c_int
+bind compute_sha1 vd_raylib_api_ComputeSHA1 owner:owner_buffer borrow:owner_buffer c_int
+bind compute_sha256 vd_raylib_api_ComputeSHA256 owner:owner_buffer borrow:owner_buffer c_int
+bind load_automation_event_list vd_raylib_api_LoadAutomationEventList owner:owner_automation_event_list borrow:owner_buffer
+bind export_automation_event_list vd_raylib_api_ExportAutomationEventList c_bool borrow:owner_automation_event_list borrow:owner_buffer
+bind set_automation_event_list vd_raylib_api_SetAutomationEventList void mut:owner_automation_event_list
+bind get_key_name vd_raylib_api_GetKeyName owner:owner_buffer c_int
+bind get_gamepad_name vd_raylib_api_GetGamepadName owner:owner_buffer c_int
+bind set_gamepad_mappings vd_raylib_api_SetGamepadMappings c_int borrow:owner_buffer
+bind update_camera vd_raylib_api_UpdateCamera record:camera3_d record:camera3_d c_int
+bind update_camera_pro vd_raylib_api_UpdateCameraPro record:camera3_d record:camera3_d record:vector3 record:vector3 f32
+bind get_shapes_texture vd_raylib_api_GetShapesTexture owner:owner_texture
+bind draw_line_strip vd_raylib_api_DrawLineStrip void borrow:owner_buffer c_int record:color
+bind draw_triangle_fan vd_raylib_api_DrawTriangleFan void borrow:owner_buffer c_int record:color
+bind draw_triangle_strip vd_raylib_api_DrawTriangleStrip void borrow:owner_buffer c_int record:color
+bind draw_spline_linear vd_raylib_api_DrawSplineLinear void borrow:owner_buffer c_int f32 record:color
+bind draw_spline_basis vd_raylib_api_DrawSplineBasis void borrow:owner_buffer c_int f32 record:color
+bind draw_spline_catmull_rom vd_raylib_api_DrawSplineCatmullRom void borrow:owner_buffer c_int f32 record:color
+bind draw_spline_bezier_quadratic vd_raylib_api_DrawSplineBezierQuadratic void borrow:owner_buffer c_int f32 record:color
+bind draw_spline_bezier_cubic vd_raylib_api_DrawSplineBezierCubic void borrow:owner_buffer c_int f32 record:color
+bind check_collision_point_poly vd_raylib_api_CheckCollisionPointPoly c_bool record:vector2 borrow:owner_buffer c_int
+bind check_collision_lines vd_raylib_api_CheckCollisionLines record:collision_out record:vector2 record:vector2 record:vector2 record:vector2
+bind load_image vd_raylib_api_LoadImage owner:owner_image borrow:owner_buffer
+bind load_image_raw vd_raylib_api_LoadImageRaw owner:owner_image borrow:owner_buffer c_int c_int c_int c_int
+bind load_image_anim vd_raylib_api_LoadImageAnim owner:owner_image borrow:owner_buffer
+bind load_image_anim_from_memory vd_raylib_api_LoadImageAnimFromMemory owner:owner_image borrow:owner_buffer borrow:owner_buffer c_int
+bind load_image_from_memory vd_raylib_api_LoadImageFromMemory owner:owner_image borrow:owner_buffer borrow:owner_buffer c_int
+bind load_image_from_texture vd_raylib_api_LoadImageFromTexture owner:owner_image borrow:owner_texture
+bind load_image_from_screen vd_raylib_api_LoadImageFromScreen owner:owner_image
+bind is_image_valid vd_raylib_api_IsImageValid c_bool borrow:owner_image
+bind export_image vd_raylib_api_ExportImage c_bool borrow:owner_image borrow:owner_buffer
+bind export_image_to_memory vd_raylib_api_ExportImageToMemory owner:owner_buffer borrow:owner_image borrow:owner_buffer
+bind export_image_as_code vd_raylib_api_ExportImageAsCode c_bool borrow:owner_image borrow:owner_buffer
+bind gen_image_color vd_raylib_api_GenImageColor owner:owner_image c_int c_int record:color
+bind gen_image_gradient_linear vd_raylib_api_GenImageGradientLinear owner:owner_image c_int c_int c_int record:color record:color
+bind gen_image_gradient_radial vd_raylib_api_GenImageGradientRadial owner:owner_image c_int c_int f32 record:color record:color
+bind gen_image_gradient_square vd_raylib_api_GenImageGradientSquare owner:owner_image c_int c_int f32 record:color record:color
+bind gen_image_checked vd_raylib_api_GenImageChecked owner:owner_image c_int c_int c_int c_int record:color record:color
+bind gen_image_white_noise vd_raylib_api_GenImageWhiteNoise owner:owner_image c_int c_int f32
+bind gen_image_perlin_noise vd_raylib_api_GenImagePerlinNoise owner:owner_image c_int c_int c_int c_int f32
+bind gen_image_cellular vd_raylib_api_GenImageCellular owner:owner_image c_int c_int c_int
+bind gen_image_text vd_raylib_api_GenImageText owner:owner_image c_int c_int borrow:owner_buffer
+bind image_copy vd_raylib_api_ImageCopy owner:owner_image borrow:owner_image
+bind image_from_image vd_raylib_api_ImageFromImage owner:owner_image borrow:owner_image record:rectangle
+bind image_from_channel vd_raylib_api_ImageFromChannel owner:owner_image borrow:owner_image c_int
+bind image_text vd_raylib_api_ImageText owner:owner_image borrow:owner_buffer c_int record:color
+bind image_text_ex vd_raylib_api_ImageTextEx owner:owner_image borrow:owner_font borrow:owner_buffer f32 f32 record:color
+bind image_format vd_raylib_api_ImageFormat void mut:owner_image c_int
+bind image_to_pot vd_raylib_api_ImageToPOT void mut:owner_image record:color
+bind image_crop vd_raylib_api_ImageCrop void mut:owner_image record:rectangle
+bind image_alpha_crop vd_raylib_api_ImageAlphaCrop void mut:owner_image f32
+bind image_alpha_clear vd_raylib_api_ImageAlphaClear void mut:owner_image record:color f32
+bind image_alpha_mask vd_raylib_api_ImageAlphaMask void mut:owner_image borrow:owner_image
+bind image_alpha_premultiply vd_raylib_api_ImageAlphaPremultiply void mut:owner_image
+bind image_blur_gaussian vd_raylib_api_ImageBlurGaussian void mut:owner_image c_int
+bind image_kernel_convolution vd_raylib_api_ImageKernelConvolution void mut:owner_image borrow:owner_buffer c_int
+bind image_resize vd_raylib_api_ImageResize void mut:owner_image c_int c_int
+bind image_resize_nn vd_raylib_api_ImageResizeNN void mut:owner_image c_int c_int
+bind image_resize_canvas vd_raylib_api_ImageResizeCanvas void mut:owner_image c_int c_int c_int c_int record:color
+bind image_mipmaps vd_raylib_api_ImageMipmaps void mut:owner_image
+bind image_dither vd_raylib_api_ImageDither void mut:owner_image c_int c_int c_int c_int
+bind image_flip_vertical vd_raylib_api_ImageFlipVertical void mut:owner_image
+bind image_flip_horizontal vd_raylib_api_ImageFlipHorizontal void mut:owner_image
+bind image_rotate vd_raylib_api_ImageRotate void mut:owner_image c_int
+bind image_rotate_cw vd_raylib_api_ImageRotateCW void mut:owner_image
+bind image_rotate_ccw vd_raylib_api_ImageRotateCCW void mut:owner_image
+bind image_color_tint vd_raylib_api_ImageColorTint void mut:owner_image record:color
+bind image_color_invert vd_raylib_api_ImageColorInvert void mut:owner_image
+bind image_color_grayscale vd_raylib_api_ImageColorGrayscale void mut:owner_image
+bind image_color_contrast vd_raylib_api_ImageColorContrast void mut:owner_image f32
+bind image_color_brightness vd_raylib_api_ImageColorBrightness void mut:owner_image c_int
+bind image_color_replace vd_raylib_api_ImageColorReplace void mut:owner_image record:color record:color
+bind load_image_colors vd_raylib_api_LoadImageColors owner:owner_buffer borrow:owner_image
+bind load_image_palette vd_raylib_api_LoadImagePalette owner:owner_buffer borrow:owner_image c_int
+bind get_image_alpha_border vd_raylib_api_GetImageAlphaBorder record:rectangle borrow:owner_image f32
+bind get_image_color vd_raylib_api_GetImageColor record:color borrow:owner_image c_int c_int
+bind image_clear_background vd_raylib_api_ImageClearBackground void mut:owner_image record:color
+bind image_draw_pixel vd_raylib_api_ImageDrawPixel void mut:owner_image c_int c_int record:color
+bind image_draw_pixel_v vd_raylib_api_ImageDrawPixelV void mut:owner_image record:vector2 record:color
+bind image_draw_line vd_raylib_api_ImageDrawLine void mut:owner_image c_int c_int c_int c_int record:color
+bind image_draw_line_v vd_raylib_api_ImageDrawLineV void mut:owner_image record:vector2 record:vector2 record:color
+bind image_draw_line_ex vd_raylib_api_ImageDrawLineEx void mut:owner_image record:vector2 record:vector2 c_int record:color
+bind image_draw_circle vd_raylib_api_ImageDrawCircle void mut:owner_image c_int c_int c_int record:color
+bind image_draw_circle_v vd_raylib_api_ImageDrawCircleV void mut:owner_image record:vector2 c_int record:color
+bind image_draw_circle_lines vd_raylib_api_ImageDrawCircleLines void mut:owner_image c_int c_int c_int record:color
+bind image_draw_circle_lines_v vd_raylib_api_ImageDrawCircleLinesV void mut:owner_image record:vector2 c_int record:color
+bind image_draw_rectangle vd_raylib_api_ImageDrawRectangle void mut:owner_image c_int c_int c_int c_int record:color
+bind image_draw_rectangle_v vd_raylib_api_ImageDrawRectangleV void mut:owner_image record:vector2 record:vector2 record:color
+bind image_draw_rectangle_rec vd_raylib_api_ImageDrawRectangleRec void mut:owner_image record:rectangle record:color
+bind image_draw_rectangle_lines vd_raylib_api_ImageDrawRectangleLines void mut:owner_image record:rectangle c_int record:color
+bind image_draw_triangle vd_raylib_api_ImageDrawTriangle void mut:owner_image record:vector2 record:vector2 record:vector2 record:color
+bind image_draw_triangle_ex vd_raylib_api_ImageDrawTriangleEx void mut:owner_image record:vector2 record:vector2 record:vector2 record:color record:color record:color
+bind image_draw_triangle_lines vd_raylib_api_ImageDrawTriangleLines void mut:owner_image record:vector2 record:vector2 record:vector2 record:color
+bind image_draw_triangle_fan vd_raylib_api_ImageDrawTriangleFan void mut:owner_image borrow:owner_buffer c_int record:color
+bind image_draw_triangle_strip vd_raylib_api_ImageDrawTriangleStrip void mut:owner_image borrow:owner_buffer c_int record:color
+bind image_draw vd_raylib_api_ImageDraw void mut:owner_image borrow:owner_image record:rectangle record:rectangle record:color
+bind image_draw_text vd_raylib_api_ImageDrawText void mut:owner_image borrow:owner_buffer c_int c_int c_int record:color
+bind image_draw_text_ex vd_raylib_api_ImageDrawTextEx void mut:owner_image borrow:owner_font borrow:owner_buffer record:vector2 f32 f32 record:color
+bind load_texture vd_raylib_api_LoadTexture owner:owner_texture borrow:owner_buffer
+bind load_texture_from_image vd_raylib_api_LoadTextureFromImage owner:owner_texture borrow:owner_image
+bind load_texture_cubemap vd_raylib_api_LoadTextureCubemap owner:owner_texture borrow:owner_image c_int
+bind load_render_texture vd_raylib_api_LoadRenderTexture owner:owner_render_texture c_int c_int
+bind is_texture_valid vd_raylib_api_IsTextureValid c_bool borrow:owner_texture
+bind is_render_texture_valid vd_raylib_api_IsRenderTextureValid c_bool borrow:owner_render_texture
+bind update_texture vd_raylib_api_UpdateTexture void mut:owner_texture borrow:owner_buffer
+bind update_texture_rec vd_raylib_api_UpdateTextureRec void mut:owner_texture record:rectangle borrow:owner_buffer
+bind gen_texture_mipmaps vd_raylib_api_GenTextureMipmaps void mut:owner_texture
+bind set_texture_filter vd_raylib_api_SetTextureFilter void mut:owner_texture c_int
+bind set_texture_wrap vd_raylib_api_SetTextureWrap void mut:owner_texture c_int
+bind draw_texture vd_raylib_api_DrawTexture void borrow:owner_texture c_int c_int record:color
+bind draw_texture_v vd_raylib_api_DrawTextureV void borrow:owner_texture record:vector2 record:color
+bind draw_texture_ex vd_raylib_api_DrawTextureEx void borrow:owner_texture record:vector2 f32 f32 record:color
+bind draw_texture_rec vd_raylib_api_DrawTextureRec void borrow:owner_texture record:rectangle record:vector2 record:color
+bind draw_texture_pro vd_raylib_api_DrawTexturePro void borrow:owner_texture record:rectangle record:rectangle record:vector2 f32 record:color
+bind draw_texture_n_patch vd_raylib_api_DrawTextureNPatch void borrow:owner_texture record:n_patch_info record:rectangle record:vector2 f32 record:color
+bind get_pixel_color vd_raylib_api_GetPixelColor record:color borrow:owner_buffer c_int
+bind set_pixel_color vd_raylib_api_SetPixelColor void mut:owner_buffer record:color c_int
+bind get_font_default vd_raylib_api_GetFontDefault owner:owner_font
+bind load_font vd_raylib_api_LoadFont owner:owner_font borrow:owner_buffer
+bind load_font_ex vd_raylib_api_LoadFontEx owner:owner_font borrow:owner_buffer c_int borrow:owner_buffer c_int
+bind load_font_from_image vd_raylib_api_LoadFontFromImage owner:owner_font borrow:owner_image record:color c_int
+bind load_font_from_memory vd_raylib_api_LoadFontFromMemory owner:owner_font borrow:owner_buffer borrow:owner_buffer c_int c_int borrow:owner_buffer c_int
+bind is_font_valid vd_raylib_api_IsFontValid c_bool borrow:owner_font
+bind load_font_data vd_raylib_api_LoadFontData owner:owner_buffer borrow:owner_buffer c_int c_int borrow:owner_buffer c_int c_int
+bind export_font_as_code vd_raylib_api_ExportFontAsCode c_bool borrow:owner_font borrow:owner_buffer
+bind draw_text vd_raylib_api_DrawText void borrow:owner_buffer c_int c_int c_int record:color
+bind draw_text_ex vd_raylib_api_DrawTextEx void borrow:owner_font borrow:owner_buffer record:vector2 f32 f32 record:color
+bind draw_text_pro vd_raylib_api_DrawTextPro void borrow:owner_font borrow:owner_buffer record:vector2 record:vector2 f32 f32 f32 record:color
+bind draw_text_codepoint vd_raylib_api_DrawTextCodepoint void borrow:owner_font c_int record:vector2 f32 record:color
+bind draw_text_codepoints vd_raylib_api_DrawTextCodepoints void borrow:owner_font borrow:owner_buffer c_int record:vector2 f32 f32 record:color
+bind measure_text vd_raylib_api_MeasureText c_int borrow:owner_buffer c_int
+bind measure_text_ex vd_raylib_api_MeasureTextEx record:vector2 borrow:owner_font borrow:owner_buffer f32 f32
+bind measure_text_codepoints vd_raylib_api_MeasureTextCodepoints record:vector2 borrow:owner_font borrow:owner_buffer c_int f32 f32
+bind get_glyph_index vd_raylib_api_GetGlyphIndex c_int borrow:owner_font c_int
+bind get_glyph_info vd_raylib_api_GetGlyphInfo owner:owner_glyph_info borrow:owner_font c_int
+bind get_glyph_atlas_rec vd_raylib_api_GetGlyphAtlasRec record:rectangle borrow:owner_font c_int
+bind load_utf8 vd_raylib_api_LoadUTF8 owner:owner_buffer borrow:owner_buffer c_int
+bind load_codepoints vd_raylib_api_LoadCodepoints owner:owner_buffer borrow:owner_buffer
+bind get_codepoint_count vd_raylib_api_GetCodepointCount c_int borrow:owner_buffer
+bind get_codepoint vd_raylib_api_GetCodepoint record:int_out borrow:owner_buffer
+bind get_codepoint_next vd_raylib_api_GetCodepointNext record:int_out borrow:owner_buffer
+bind codepoint_to_utf8 vd_raylib_api_CodepointToUTF8 owner:owner_buffer c_int
+bind load_text_lines vd_raylib_api_LoadTextLines owner:owner_buffer borrow:owner_buffer
+bind text_is_equal vd_raylib_api_TextIsEqual c_bool borrow:owner_buffer borrow:owner_buffer
+bind text_length vd_raylib_api_TextLength u32 borrow:owner_buffer
+bind text_subtext vd_raylib_api_TextSubtext owner:owner_buffer borrow:owner_buffer c_int c_int
+bind text_remove_spaces vd_raylib_api_TextRemoveSpaces owner:owner_buffer borrow:owner_buffer
+bind get_text_between vd_raylib_api_GetTextBetween owner:owner_buffer borrow:owner_buffer borrow:owner_buffer borrow:owner_buffer
+bind text_replace vd_raylib_api_TextReplace owner:owner_buffer borrow:owner_buffer borrow:owner_buffer borrow:owner_buffer
+bind text_replace_alloc vd_raylib_api_TextReplaceAlloc owner:owner_buffer borrow:owner_buffer borrow:owner_buffer borrow:owner_buffer
+bind text_replace_between vd_raylib_api_TextReplaceBetween owner:owner_buffer borrow:owner_buffer borrow:owner_buffer borrow:owner_buffer borrow:owner_buffer
+bind text_replace_between_alloc vd_raylib_api_TextReplaceBetweenAlloc owner:owner_buffer borrow:owner_buffer borrow:owner_buffer borrow:owner_buffer borrow:owner_buffer
+bind text_insert vd_raylib_api_TextInsert owner:owner_buffer borrow:owner_buffer borrow:owner_buffer c_int
+bind text_insert_alloc vd_raylib_api_TextInsertAlloc owner:owner_buffer borrow:owner_buffer borrow:owner_buffer c_int
+bind text_split vd_raylib_api_TextSplit owner:owner_buffer borrow:owner_buffer c_char
+bind text_find_index vd_raylib_api_TextFindIndex c_int borrow:owner_buffer borrow:owner_buffer
+bind text_to_upper vd_raylib_api_TextToUpper owner:owner_buffer borrow:owner_buffer
+bind text_to_lower vd_raylib_api_TextToLower owner:owner_buffer borrow:owner_buffer
+bind text_to_pascal vd_raylib_api_TextToPascal owner:owner_buffer borrow:owner_buffer
+bind text_to_snake vd_raylib_api_TextToSnake owner:owner_buffer borrow:owner_buffer
+bind text_to_camel vd_raylib_api_TextToCamel owner:owner_buffer borrow:owner_buffer
+bind text_to_integer vd_raylib_api_TextToInteger c_int borrow:owner_buffer
+bind text_to_float vd_raylib_api_TextToFloat f32 borrow:owner_buffer
+bind draw_triangle_strip3_d vd_raylib_api_DrawTriangleStrip3D void borrow:owner_buffer c_int record:color
+bind load_model vd_raylib_api_LoadModel owner:owner_model borrow:owner_buffer
+bind is_model_valid vd_raylib_api_IsModelValid c_bool borrow:owner_model
+bind get_model_bounding_box vd_raylib_api_GetModelBoundingBox record:bounding_box borrow:owner_model
+bind draw_model vd_raylib_api_DrawModel void borrow:owner_model record:vector3 f32 record:color
+bind draw_model_ex vd_raylib_api_DrawModelEx void borrow:owner_model record:vector3 record:vector3 f32 record:vector3 record:color
+bind draw_model_wires vd_raylib_api_DrawModelWires void borrow:owner_model record:vector3 f32 record:color
+bind draw_model_wires_ex vd_raylib_api_DrawModelWiresEx void borrow:owner_model record:vector3 record:vector3 f32 record:vector3 record:color
+bind draw_billboard vd_raylib_api_DrawBillboard void record:camera3_d borrow:owner_texture record:vector3 f32 record:color
+bind draw_billboard_rec vd_raylib_api_DrawBillboardRec void record:camera3_d borrow:owner_texture record:rectangle record:vector3 record:vector2 record:color
+bind draw_billboard_pro vd_raylib_api_DrawBillboardPro void record:camera3_d borrow:owner_texture record:rectangle record:vector3 record:vector3 record:vector2 record:vector2 f32 record:color
+bind upload_mesh vd_raylib_api_UploadMesh void mut:owner_mesh c_bool
+bind update_mesh_buffer vd_raylib_api_UpdateMeshBuffer void mut:owner_mesh c_int borrow:owner_buffer c_int c_int
+bind draw_mesh vd_raylib_api_DrawMesh void borrow:owner_mesh borrow:owner_material record:matrix
+bind draw_mesh_instanced vd_raylib_api_DrawMeshInstanced void borrow:owner_mesh borrow:owner_material borrow:owner_buffer c_int
+bind get_mesh_bounding_box vd_raylib_api_GetMeshBoundingBox record:bounding_box borrow:owner_mesh
+bind gen_mesh_tangents vd_raylib_api_GenMeshTangents void mut:owner_mesh
+bind export_mesh vd_raylib_api_ExportMesh c_bool borrow:owner_mesh borrow:owner_buffer
+bind export_mesh_as_code vd_raylib_api_ExportMeshAsCode c_bool borrow:owner_mesh borrow:owner_buffer
+bind gen_mesh_poly vd_raylib_api_GenMeshPoly owner:owner_mesh c_int f32
+bind gen_mesh_plane vd_raylib_api_GenMeshPlane owner:owner_mesh f32 f32 c_int c_int
+bind gen_mesh_cube vd_raylib_api_GenMeshCube owner:owner_mesh f32 f32 f32
+bind gen_mesh_sphere vd_raylib_api_GenMeshSphere owner:owner_mesh f32 c_int c_int
+bind gen_mesh_hemi_sphere vd_raylib_api_GenMeshHemiSphere owner:owner_mesh f32 c_int c_int
+bind gen_mesh_cylinder vd_raylib_api_GenMeshCylinder owner:owner_mesh f32 f32 c_int
+bind gen_mesh_cone vd_raylib_api_GenMeshCone owner:owner_mesh f32 f32 c_int
+bind gen_mesh_torus vd_raylib_api_GenMeshTorus owner:owner_mesh f32 f32 c_int c_int
+bind gen_mesh_knot vd_raylib_api_GenMeshKnot owner:owner_mesh f32 f32 c_int c_int
+bind gen_mesh_heightmap vd_raylib_api_GenMeshHeightmap owner:owner_mesh borrow:owner_image record:vector3
+bind gen_mesh_cubicmap vd_raylib_api_GenMeshCubicmap owner:owner_mesh borrow:owner_image record:vector3
+bind load_materials vd_raylib_api_LoadMaterials owner:owner_buffer borrow:owner_buffer
+bind load_material_default vd_raylib_api_LoadMaterialDefault owner:owner_material
+bind is_material_valid vd_raylib_api_IsMaterialValid c_bool borrow:owner_material
+bind set_model_mesh_material vd_raylib_api_SetModelMeshMaterial void mut:owner_model c_int c_int
+bind load_model_animations vd_raylib_api_LoadModelAnimations owner:owner_buffer borrow:owner_buffer
+bind update_model_animation vd_raylib_api_UpdateModelAnimation void mut:owner_model borrow:owner_model_animation f32
+bind update_model_animation_ex vd_raylib_api_UpdateModelAnimationEx void mut:owner_model borrow:owner_model_animation f32 borrow:owner_model_animation f32 f32
+bind is_model_animation_valid vd_raylib_api_IsModelAnimationValid c_bool borrow:owner_model borrow:owner_model_animation
+bind get_ray_collision_mesh vd_raylib_api_GetRayCollisionMesh record:ray_collision record:ray borrow:owner_mesh record:matrix
+bind load_wave vd_raylib_api_LoadWave owner:owner_wave borrow:owner_buffer
+bind load_wave_from_memory vd_raylib_api_LoadWaveFromMemory owner:owner_wave borrow:owner_buffer borrow:owner_buffer c_int
+bind is_wave_valid vd_raylib_api_IsWaveValid c_bool borrow:owner_wave
+bind load_sound vd_raylib_api_LoadSound owner:owner_sound borrow:owner_buffer
+bind load_sound_from_wave vd_raylib_api_LoadSoundFromWave owner:owner_sound borrow:owner_wave
+bind is_sound_valid vd_raylib_api_IsSoundValid c_bool borrow:owner_sound
+bind update_sound vd_raylib_api_UpdateSound void mut:owner_sound borrow:owner_buffer c_int
+bind export_wave vd_raylib_api_ExportWave c_bool borrow:owner_wave borrow:owner_buffer
+bind export_wave_as_code vd_raylib_api_ExportWaveAsCode c_bool borrow:owner_wave borrow:owner_buffer
+bind play_sound vd_raylib_api_PlaySound void mut:owner_sound
+bind stop_sound vd_raylib_api_StopSound void mut:owner_sound
+bind pause_sound vd_raylib_api_PauseSound void mut:owner_sound
+bind resume_sound vd_raylib_api_ResumeSound void mut:owner_sound
+bind is_sound_playing vd_raylib_api_IsSoundPlaying c_bool borrow:owner_sound
+bind set_sound_volume vd_raylib_api_SetSoundVolume void mut:owner_sound f32
+bind set_sound_pitch vd_raylib_api_SetSoundPitch void mut:owner_sound f32
+bind set_sound_pan vd_raylib_api_SetSoundPan void mut:owner_sound f32
+bind wave_copy vd_raylib_api_WaveCopy owner:owner_wave borrow:owner_wave
+bind wave_crop vd_raylib_api_WaveCrop void mut:owner_wave c_int c_int
+bind wave_format vd_raylib_api_WaveFormat void mut:owner_wave c_int c_int c_int
+bind load_wave_samples vd_raylib_api_LoadWaveSamples owner:owner_buffer borrow:owner_wave
+bind load_music_stream vd_raylib_api_LoadMusicStream owner:owner_music borrow:owner_buffer
+bind load_music_stream_from_memory vd_raylib_api_LoadMusicStreamFromMemory owner:owner_music borrow:owner_buffer borrow:owner_buffer c_int
+bind is_music_valid vd_raylib_api_IsMusicValid c_bool borrow:owner_music
+bind play_music_stream vd_raylib_api_PlayMusicStream void mut:owner_music
+bind is_music_stream_playing vd_raylib_api_IsMusicStreamPlaying c_bool borrow:owner_music
+bind update_music_stream vd_raylib_api_UpdateMusicStream void mut:owner_music
+bind stop_music_stream vd_raylib_api_StopMusicStream void mut:owner_music
+bind pause_music_stream vd_raylib_api_PauseMusicStream void mut:owner_music
+bind resume_music_stream vd_raylib_api_ResumeMusicStream void mut:owner_music
+bind seek_music_stream vd_raylib_api_SeekMusicStream void borrow:owner_music f32
+bind set_music_volume vd_raylib_api_SetMusicVolume void mut:owner_music f32
+bind set_music_pitch vd_raylib_api_SetMusicPitch void mut:owner_music f32
+bind set_music_pan vd_raylib_api_SetMusicPan void mut:owner_music f32
+bind get_music_time_length vd_raylib_api_GetMusicTimeLength f32 borrow:owner_music
+bind get_music_time_played vd_raylib_api_GetMusicTimePlayed f32 borrow:owner_music
+bind load_audio_stream vd_raylib_api_LoadAudioStream owner:owner_audio_stream u32 u32 u32
+bind is_audio_stream_valid vd_raylib_api_IsAudioStreamValid c_bool borrow:owner_audio_stream
+bind update_audio_stream vd_raylib_api_UpdateAudioStream void mut:owner_audio_stream borrow:owner_buffer c_int
+bind is_audio_stream_processed vd_raylib_api_IsAudioStreamProcessed c_bool borrow:owner_audio_stream
+bind play_audio_stream vd_raylib_api_PlayAudioStream void mut:owner_audio_stream
+bind pause_audio_stream vd_raylib_api_PauseAudioStream void mut:owner_audio_stream
+bind resume_audio_stream vd_raylib_api_ResumeAudioStream void mut:owner_audio_stream
+bind is_audio_stream_playing vd_raylib_api_IsAudioStreamPlaying c_bool borrow:owner_audio_stream
+bind stop_audio_stream vd_raylib_api_StopAudioStream void mut:owner_audio_stream
+bind set_audio_stream_volume vd_raylib_api_SetAudioStreamVolume void mut:owner_audio_stream f32
+bind set_audio_stream_pitch vd_raylib_api_SetAudioStreamPitch void mut:owner_audio_stream f32
+bind set_audio_stream_pan vd_raylib_api_SetAudioStreamPan void mut:owner_audio_stream f32
+bind callback_target_new vd_raylib_callback_target_new owner:callback_target u32
+bind callback_target_stream vd_raylib_callback_target_stream owner:callback_target borrow:owner_audio_stream u32
+bind callback_target_mixed vd_raylib_callback_target_mixed owner:callback_target
+bind callback_target_close vd_raylib_callback_target_close i32 close:callback_target
+bind callback_activate vd_raylib_callback_activate void borrow:callback_target
+bind callback_register vd_raylib_callback_register owner:callback_registration retained:raylib_event
+bind callback_close vd_raylib_callback_close i32 close:callback_registration
+bind callback_count vd_raylib_callback_count u64 borrow:callback_registration
+bind callback_active vd_raylib_callback_active c_bool borrow:callback_registration
+bind callback_kind vd_raylib_callback_kind u32 borrow:callback_registration
+bind callback_input_size vd_raylib_callback_input_size c_size u32
+bind callback_read vd_raylib_callback_read i64 u32 c_size out:3:4:65536 c_size c_size
+bind callback_output_size vd_raylib_callback_output_size void c_size
+bind callback_write vd_raylib_callback_write i64 c_size in:2:3:65536 c_size c_size
+bind trace_log vd_raylib_api_TraceLog void i32 borrow:owner_buffer

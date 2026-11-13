@@ -97,6 +97,7 @@ struct EditorProbe {
     std::map<std::string,std::set<std::string>> candidate_targets;
     std::map<std::string,unsigned> candidate_occurrences;
     unsigned operator_occurrences = 0;
+    std::string prefix;
 };
 struct EditorProbeFound {};
 // A second editor-only parse may recognize a small number of safe holes in
@@ -1652,7 +1653,7 @@ VOID_SEMANTIC_HANDLER void editor_type_candidates(const Type& t,Unit& unit,Unit&
     for(const auto& [id,u]:units)for(const auto& [name,structure]:u->structure_names)names.insert(name);
     for(const auto& name:names)try{
         auto [owner,structure]=structure_lookup(unit,root,units,qualifier+name,token);
-        if(structure && probe.result.candidates.size()<256)probe.result.candidates.push_back({name,structure->generics.empty()?"type":"generic type",7});
+        if(structure && name.starts_with(probe.prefix) && probe.result.candidates.size()<256)probe.result.candidates.push_back({name,structure->generics.empty()?"type":"generic type",7});
     }catch(const CompilationError&){}catch(const Poison&){}
     throw EditorProbeFound{};
 }
@@ -2897,7 +2898,11 @@ class Semantics {
                 if(current && current->asynchronous)for(const auto& name:{"await","spawn"})candidates.emplace(name,EditorCandidate{name,"keyword",14});
             }
         }
-        for(auto& [name,candidate]:candidates) {if(out.candidates.size()==256)break;out.candidates.push_back(std::move(candidate));}
+        for(auto& [name,candidate]:candidates) {
+            if(!name.starts_with(diagnostics.editor->prefix))continue;
+            if(out.candidates.size()==256)break;
+            out.candidates.push_back(std::move(candidate));
+        }
         throw EditorProbeFound{};
     }
     // Borrow the expected type: even an unused by-value probe argument reserves
@@ -5890,7 +5895,14 @@ public:
         auto relative=normalize(anchor,requested);
         if(relative.starts_with("/@stdlib/"))error(from.source,path,Code::import_path,"Reserved standard-library source identity.");
         if(package_source(relative))error(from.source,path,Code::import_path,"Reserved package source identity.","Import packages with pkg/<alias>.");
-        if (owner && !standard) {
+        // A source package may name the exact compiler-generated module only
+        // after its application has admitted that provider. Relative imports
+        // and every other absolute path retain the locked package boundary.
+        const bool admitted_native = owner && !directory && path.kind == TokenKind::path &&
+            primitives && path.text == primitives->module();
+        if (admitted_native && owner->sources.contains(std::string_view(relative).substr(1)))
+            error(from.source,path,Code::import_path,"Host-admitted C binding module collides with a package source.");
+        if (owner && !standard && !admitted_native) {
             if (directory) relative = path_utf8(utf8_path(relative).parent_path());
             auto suffix = std::string_view(relative);
             if (suffix.starts_with('/')) suffix.remove_prefix(1);
@@ -7718,6 +7730,7 @@ EditorAssistance editor_assistance_impl(const std::filesystem::path& entry,const
     }
     auto frozen=overrides;frozen.insert_or_assign(module,SourceFile(source.path(),std::move(repaired)));
     EditorProbe probe{module,begin,{},operator_context,{},{},0};probe.result.begin=begin;probe.result.end=end;
+    probe.prefix=operator_context?std::string{}:text.substr(begin,cursor-begin);
     EditorRecovery recovery{module,{}};
     if(begin && !format_context && !operator_context) {
         const auto previous=text.find_last_not_of(" \t",begin-1);

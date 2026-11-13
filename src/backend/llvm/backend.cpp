@@ -1449,7 +1449,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                         }
                         break;
                     }
-                    if (resource) {
+                    if (resource && (admission.revision() < 4 || resource->role == CResourceRole::close)) {
                         auto* words = b.CreateAlloca(b.getInt64Ty(), b.getInt32(count ? count : 1));
                         const bool acquire = resource->role == CResourceRole::acquire;
                         for (unsigned a = 0; a < count; ++a) {
@@ -1518,6 +1518,36 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                                    llvm::Value* native, bool into_c) {
                         if (shape.record) {
                             const auto& record = admission.record(shape.record);
+                            if (shape.extent) {
+                                const auto child = ir::array_element(source_type);
+                                auto element = shape; element.extent = 0;
+                                auto* element_info = element_record(child);
+                                if (!into_c) {
+                                    b.CreateCall(module->getOrInsertFunction("vd_value_array_new", b.getVoidTy(), b.getPtrTy(), b.getPtrTy(), b.getInt64Ty(), b.getInt32Ty(), b.getPtrTy()),
+                                        {value, element_info, b.getInt64(shape.extent), b.getInt32(0), failure});
+                                    selected_failure();
+                                }
+                                for (unsigned i = 0; i < shape.extent; ++i) {
+                                    auto* temporary = b.CreateAlloca(type(child));
+                                    if (into_c) {
+                                        b.CreateCall(module->getOrInsertFunction("vd_value_array_read", b.getVoidTy(), b.getPtrTy(), b.getPtrTy(), b.getPtrTy(), b.getInt64Ty(), b.getInt32Ty(), b.getInt64Ty(), b.getPtrTy()),
+                                            {temporary, value, element_info, b.getInt64(shape.extent), b.getInt32(0), b.getInt64(i), failure});
+                                        selected_failure();
+                                    }
+                                    transfer(element, child, temporary, b.CreateInBoundsGEP(b.getInt8Ty(), native, b.getInt32(i * record.size)), into_c);
+                                    if (!into_c) {
+                                        b.CreateCall(module->getOrInsertFunction("vd_value_array_write", b.getVoidTy(), b.getPtrTy(), b.getPtrTy(), b.getInt64Ty(), b.getInt32Ty(), b.getInt64Ty(), b.getPtrTy(), b.getInt64Ty(), b.getInt32Ty(), b.getInt32Ty(), b.getPtrTy()),
+                                            {value, element_info, b.getInt64(shape.extent), b.getInt32(0), b.getInt64(i), temporary, b.getInt64(0), b.getInt32(0), b.getInt32(1), failure});
+                                        selected_failure();
+                                    }
+                                }
+                                if (!into_c) {
+                                    b.CreateCall(module->getOrInsertFunction("vd_value_array_complete", b.getVoidTy(), b.getPtrTy(), b.getPtrTy(), b.getInt64Ty(), b.getPtrTy()),
+                                        {value, element_info, b.getInt64(shape.extent), failure});
+                                    selected_failure();
+                                }
+                                return;
+                            }
                             for (unsigned i = 0; i < record.fields.size(); ++i) {
                                 const auto& field = record.fields[i];
                                 transfer(field.shape, ir::field_type(source_type, i),
@@ -1566,11 +1596,37 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     };
                     llvm::Value* words = count ? static_cast<llvm::Value*>(scratch(count * 8)) : absent;
                     unsigned span_count = 0;
+                    unsigned resource_count = 0;
+                    llvm::Value* resource_arguments = absent;
+                    llvm::StructType* resource_argument_type = nullptr;
                     llvm::Value* spans = admission.revision() >= 2 ? absent : nullptr;
                     llvm::StructType* span_type = nullptr;
                     for (unsigned a = 0; a < count; ++a) {
                         const auto argument = instruction.arguments[a];
                         const auto& shape = binding.abi_parameters[a];
+                        if (shape.resource) {
+                            if (!resource_argument_type) {
+                                resource_argument_type = llvm::StructType::get(b.getPtrTy(), b.getPtrTy(),
+                                    b.getInt32Ty(), b.getInt32Ty(), b.getInt32Ty());
+                                const auto* geometry = layout.getStructLayout(resource_argument_type);
+                                if (geometry->getSizeInBytes() != sizeof(CResourceArgument) ||
+                                    geometry->getElementOffset(1) != offsetof(CResourceArgument, identity) ||
+                                    geometry->getElementOffset(2) != offsetof(CResourceArgument, argument) ||
+                                    geometry->getElementOffset(3) != offsetof(CResourceArgument, release) ||
+                                    geometry->getElementOffset(4) != offsetof(CResourceArgument, shutdown_owner))
+                                    throw std::invalid_argument("C resource argument ABI mismatch");
+                                resource_arguments = b.CreateAlloca(resource_argument_type, b.getInt32(count));
+                            }
+                            const auto& owner = admission.resource(shape.resource);
+                            auto* row = b.CreateInBoundsGEP(resource_argument_type, resource_arguments, b.getInt32(resource_count++));
+                            llvm::Value* fields[] = {value_roots[n].at(argument),
+                                b.CreateGlobalString(admission.module() + "::" + owner.name), b.getInt32(a),
+                                b.getInt32(owner.release_ordinal), b.getInt32(owner.shutdown_owner)};
+                            for (unsigned i = 0; i < 5; ++i)
+                                b.CreateStore(fields[i], b.CreateStructGEP(resource_argument_type, row, i));
+                            b.CreateStore(b.getInt64(0), b.CreateInBoundsGEP(b.getInt64Ty(), words, b.getInt32(a)));
+                            continue;
+                        }
                         if (shape.direction) {
                             if (!span_type) {
                                 span_type = llvm::StructType::get(b.getPtrTy(), b.getInt64Ty(), b.getInt32Ty(),
@@ -1609,9 +1665,27 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     const auto result_type = instruction.type;
                     const auto& result_shape = binding.abi_result;
                     llvm::Value* output = absent;
-                    if (result_type != ir::Type::none)
+                    if (result_type != ir::Type::none && !result_shape.resource)
                         output = scratch(result_shape.record ? admission.record(result_shape.record).size : 8);
-                    auto* status = call_c_primitive(b, *module, admission, ordinal, words, count, output, spans, span_count);
+                    llvm::CallInst* status;
+                    if (resource_count || result_shape.resource) {
+                        const auto& plan = admission.dynamic();
+                        if (!plan) throw std::invalid_argument("Mixed resource ABI requires a conventional provider");
+                        auto resolve = module->getOrInsertFunction(c_dynamic_resolve, b.getPtrTy(), b.getPtrTy(), b.getInt32Ty());
+                        auto* thunk = b.CreateCall(resolve, {b.CreateGlobalString(plan->bytes()), b.getInt32(plan->bytes().size())});
+                        fail_if(b.CreateIsNull(thunk), "C dynamic Runtime binding is unavailable");
+                        const auto* owner = result_shape.resource ? &admission.resource(result_shape.resource) : nullptr;
+                        auto bridge = module->getOrInsertFunction(c_resources_bridge, b.getInt32Ty(),
+                            b.getPtrTy(), b.getPtrTy(), b.getInt32Ty(), b.getInt32Ty(), b.getPtrTy(), b.getInt32Ty(),
+                            b.getPtrTy(), b.getPtrTy(), b.getInt32Ty(), b.getPtrTy(), b.getPtrTy(),
+                            b.getInt32Ty(), b.getInt32Ty(), b.getPtrTy(), b.getInt32Ty());
+                        status = b.CreateCall(bridge, {thunk, b.CreateGlobalString(admission.descriptor()),
+                            b.getInt32(admission.descriptor().size()), b.getInt32(ordinal), words, b.getInt32(count), output,
+                            resource_arguments, b.getInt32(resource_count), owner ? value_roots[n].at(values.size()) : absent,
+                            owner ? static_cast<llvm::Value*>(b.CreateGlobalString(admission.module() + "::" + owner->name)) : absent,
+                            b.getInt32(owner ? owner->release_ordinal : 0), b.getInt32(owner && owner->shutdown_owner),
+                            spans, b.getInt32(span_count)});
+                    } else status = call_c_primitive(b, *module, admission, ordinal, words, count, output, spans, span_count);
                     if (span_count) {
                         fail_if(b.CreateICmpEQ(status, b.getInt32(3)), "C byte span outside admitted extent");
                         fail_if(b.CreateICmpEQ(status, b.getInt32(4)), "overlapping C byte spans");
@@ -1620,6 +1694,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     fail_if(b.CreateIsNotNull(status), "C primitive transport rejected " + instruction.callee);
                     if (result_type == ir::Type::none) {
                         v = llvm::UndefValue::get(b.getInt8Ty());
+                    } else if (result_shape.resource) {
+                        v = b.CreateLoad(b.getPtrTy(), value_roots[n].at(values.size()));
                     } else if (result_shape.record) {
                         auto* storage = value_roots[n].at(values.size());
                         if (!storage) storage = b.CreateAlloca(type(result_type));
@@ -2336,11 +2412,13 @@ struct Jit::Impl {
             if (primitives->revision() >= 2)
                 symbols[jit->mangleAndIntern(c_span_bridge)] = llvm::orc::ExecutorSymbolDef(
                     llvm::orc::ExecutorAddr::fromPtr(vd_c_span_dispatch_v2), llvm::JITSymbolFlags::Exported);
-            if (primitives->revision() == 3) {
+            if (primitives->revision() >= 3) {
                 symbols[jit->mangleAndIntern(c_resource_bridge)] = llvm::orc::ExecutorSymbolDef(
                     llvm::orc::ExecutorAddr::fromPtr(vd_c_resource_dispatch_v3), llvm::JITSymbolFlags::Exported);
                 symbols[jit->mangleAndIntern(c_owner_resource_bridge)] = llvm::orc::ExecutorSymbolDef(
                     llvm::orc::ExecutorAddr::fromPtr(vd_c_resource_dispatch_owner_v3), llvm::JITSymbolFlags::Exported);
+                symbols[jit->mangleAndIntern(c_resources_bridge)] = llvm::orc::ExecutorSymbolDef(
+                    llvm::orc::ExecutorAddr::fromPtr(vd_c_resources_dispatch_v3), llvm::JITSymbolFlags::Exported);
             }
             check(dylib.define(llvm::orc::absoluteSymbols(symbols), generation->tracker));
         }

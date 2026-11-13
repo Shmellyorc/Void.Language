@@ -1,0 +1,104 @@
+use pkg/raylib as rl
+use os
+use "./subsystems.void" as subsystems
+use "./callbacks.void" as callbacks
+
+func main() -> i32:
+    var subsystems_status = subsystems.headless()
+    if subsystems_status != 0:
+        return subsystems_status
+    var callbacks_status = callbacks.headless()
+    if callbacks_status != 0:
+        return callbacks_status
+    rl.set_trace_log_level(rl.log_warning)
+    # Headless checks exercise real C calls and nested by-value ABI records.
+    var origin = rl.vector2(0, 0)
+    var point = rl.vector2(3, 4)
+    if not rl.check_collision_circles(origin, 3 as f32, point, 3 as f32):
+        return 11
+    var shade = rl.color(10, 20, 30, 255)
+    var faded = rl.fade(shade, 0.5 as f32)
+    if faded.r != 10 as u8 or faded.a != 127 as u8:
+        return 12
+    var camera = rl.camera3_d(rl.vector3(0, 0, 10), rl.vector3(0, 0, 0), rl.vector3(0, 1, 0), 45 as f32, rl.camera_perspective)
+    var view = rl.get_camera_matrix(camera)
+    if view.m15 != 1 as f32:
+        return 13
+    var bounds = rl.bounding_box(rl.vector3(-1, -1, -1), rl.vector3(1, 1, 1))
+    var ray = rl.ray(rl.vector3(0, 0, 10), rl.vector3(0, 0, -1))
+    var hit = rl.get_ray_collision_box(ray, bounds)
+    if not hit.hit or hit.distance != 9 as f32:
+        return 14
+    if rl.key_right != 262 or rl.raylib_version_major != 6:
+        return 15
+    print("RAYLIB package headless ABI passed")
+    var visible = false
+    var audible = false
+    if os.args() is Ok(var options):
+        for option in options:
+            if option == "--window":
+                visible = true
+            if option == "--audio":
+                audible = true
+    if audible:
+        var audio_status = subsystems.audio()
+        if audio_status != 0:
+            return audio_status
+        var callback_audio_status = callbacks.audio()
+        if callback_audio_status != 0:
+            return callback_audio_status
+    if visible:
+        var active_window = rl.init_window(640, 360, "VOID Raylib Gallery") as rl.window
+        var graphics_status = subsystems.graphics()
+        if graphics_status != 0:
+            return graphics_status
+        var asset_directory = ""
+        if os.env("VOID_TEST_RAYLIB_ASSETS") is Ok(var location):
+            asset_directory = location
+        else:
+            if os.resource_dir() is Ok(var resources):
+                if rl.file_exists(resources + "/assets/guy.iqm"):
+                    asset_directory = resources + "/assets"
+        if asset_directory != "":
+            var assets_status = subsystems.graphics_assets(asset_directory)
+            if assets_status != 0:
+                return assets_status
+        var sprite_image = rl.gen_image_color(24, 24, rl.skyblue()) as rl.image
+        var sprite = rl.load_texture_from_image(sprite_image) as rl.texture
+        rl.unload_image(sprite_image)
+        rl.set_target_fps(60)
+        var frame: i32 = 0
+        var input_frames: i32 = 0
+        var x: i32 = 280
+        print("RAYLIB ready")
+        for not rl.window_should_close():
+            var direction: i32 = 0
+            if rl.is_key_down(rl.key_right):
+                direction += 1
+            if rl.is_key_down(rl.key_left):
+                direction -= 1
+            if direction != 0:
+                input_frames += 1
+                x += direction * 5
+                if x < 25:
+                    x = 25
+                if x > 550:
+                    x = 550
+            rl.begin_drawing()
+            rl.clear_background(shade)
+            rl.draw_rectangle(20, 75, 600, 205, rl.color(34, 48, 74, 255))
+            rl.draw_rectangle(x, 153, 62, 43, rl.orange())
+            rl.draw_circle(60 + frame % 500, 229, 17 as f32, rl.lime())
+            rl.draw_texture_v(sprite, rl.vector2((x + 19) as f32, 162 as f32), rl.white())
+            rl.draw_circle_v(rl.get_mouse_position(), 8 as f32, rl.pink())
+            rl.draw_text("VOID / raylib 6.0", 22, 23, 24, rl.raywhite())
+            rl.draw_text("Left / right to move. Escape or close to quit.", 22, 310, 18, rl.raywhite())
+            rl.end_drawing()
+            frame += 1
+        rl.unload_texture(sprite)
+        rl.close_window(active_window)
+        if rl.is_window_ready():
+            return 22
+        print("RAYLIB owner released texture and window")
+        print("RAYLIB frames", frame, "input frames", input_frames)
+    return 0

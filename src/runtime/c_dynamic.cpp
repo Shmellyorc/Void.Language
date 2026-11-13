@@ -714,7 +714,7 @@ void Runtime::bind_dynamic(std::shared_ptr<const DynamicBinding> binding) {
 extern "C" CPrimitiveThunk* vd_c_dynamic_resolve_v1(const char* bytes, std::uint32_t size) noexcept {
     try {
         auto& runtime = Runtime::current();
-        if (!runtime.is_managed() || !bytes || !size || size > 32768) return nullptr;
+        if (!runtime.is_managed() || !bytes || !size || size > 2 * c_conventional_descriptor_limit) return nullptr;
         auto binding = runtime.dynamic_binding();
         if (binding && binding->plan->bytes() == std::string_view(bytes, size)) return binding->thunk;
     } catch (const std::exception&) {}
@@ -726,7 +726,7 @@ extern "C" std::uint32_t vd_c_dynamic_call_v1(const char* bytes, std::uint32_t s
     const CSpanRequest* spans, std::uint32_t span_count) noexcept {
     try {
         auto& runtime = Runtime::current();
-        if (!runtime.is_managed() || !bytes || !size || size > 32768 || ordinal >= 64 ||
+        if (!runtime.is_managed() || !bytes || !size || size > 2 * c_conventional_descriptor_limit || ordinal >= c_conventional_binding_limit ||
             count > c_primitive_max_arguments || (count && !words)) return 7;
         auto binding = runtime.dynamic_binding();
         if (!binding || binding->plan->bytes() != std::string_view(bytes, size)) return 7;

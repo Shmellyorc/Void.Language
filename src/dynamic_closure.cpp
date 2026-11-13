@@ -49,7 +49,8 @@ std::vector<std::string_view> words(std::string_view line) {
 }
 
 DynamicClosure::Owner DynamicClosure::parse(std::string_view bytes) {
-    if (bytes.empty() || bytes.size() > 32768 || bytes.back() != '\n' ||
+    const bool large_conventional = bytes.starts_with("void-native-conventional 1\n") || bytes.starts_with("void-native-managed 1\n");
+    if (bytes.empty() || bytes.size() > (large_conventional ? 2 * c_conventional_descriptor_limit : 32768) || bytes.back() != '\n' ||
         std::any_of(bytes.begin(), bytes.end(), [](char c) { return c != '\n' && (c < ' ' || c > '~'); }))
         bad("invalid size or encoding");
     auto plan = std::shared_ptr<DynamicClosure>(new DynamicClosure);
@@ -122,7 +123,7 @@ DynamicClosure::Owner DynamicClosure::parse(std::string_view bytes) {
             payload_bytes += size;
             plan->payload_.push_back({std::string(row[1]), std::string(row[2]), size});
         } else if (row[0] == "export") {
-            if (row.size() != 3 || plan->exports_.size() == 128 ||
+            if (row.size() != 3 || plan->exports_.size() == (conventional ? c_conventional_binding_limit : 128) ||
                 (conventional ? row[1] != plan->library_ : !images.contains(row[1])) ||
                 !symbol(row[2]) || !exports.insert(row[2]).second)
                 bad("invalid or conflicting required export");
@@ -151,7 +152,10 @@ DynamicClosure::Owner DynamicClosure::parse(std::string_view bytes) {
     const auto descriptor = bytes;
     const auto revision = plan->dispatch_.back();
     const auto expected = std::string("void-c-primitive ") + revision + " " + revision;
-    if (bytes.size() > 16384 || next() != expected || next() != "provider " + plan->provider_ || next() != target)
+    const auto descriptor_header = next();
+    if (bytes.size() > (conventional ? c_conventional_descriptor_limit : 16384) ||
+        (descriptor_header != expected && !(conventional && revision == '3' && descriptor_header == "void-c-primitive 4 3")) ||
+        next() != "provider " + plan->provider_ || next() != target)
         bad("exact descriptor provider or target mismatch");
     if (!next().starts_with("source ") || next() != "thunk " + plan->thunk_)
         bad("exact descriptor thunk mismatch");

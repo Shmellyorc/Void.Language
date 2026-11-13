@@ -1,0 +1,365 @@
+use pkg/raylib as rl
+use os
+use time
+use convert as conversion
+
+# Each nonzero return identifies a native subsystem or ownership assertion.
+func headless() -> i32:
+    rl.set_trace_log_level(rl.log_warning)
+    if rl.load_image("/__void_raylib_missing__/image.png") != null or rl.load_wave("/__void_raylib_missing__/sound.wav") != null:
+        return 127
+    var bytes = rl.buffer_from_bytes("hello é🎮".to_utf8())
+    defer rl.buffer_close(bytes)
+    var encoded = rl.encode_data_base64(bytes, rl.buffer_bytes(bytes).count as i32) as rl.byte_buffer
+    defer rl.mem_free(encoded)
+    var decoded = rl.decode_data_base64(rl.buffer_text(encoded)) as rl.byte_buffer
+    defer rl.mem_free(decoded)
+    if rl.buffer_text(decoded) != "hello é🎮":
+        return 101
+    var compressed = rl.compress_data(bytes, rl.buffer_bytes(bytes).count as i32) as rl.byte_buffer
+    defer rl.mem_free(compressed)
+    var restored = rl.decompress_data(compressed, rl.buffer_bytes(compressed).count as i32) as rl.byte_buffer
+    defer rl.mem_free(restored)
+    if rl.buffer_text(restored) != "hello é🎮":
+        return 102
+    var hash = rl.compute_sha256(bytes, rl.buffer_bytes(bytes).count as i32) as rl.uint_array
+    if rl.uint_array_count(hash) != 8:
+        return 103
+    rl.uint_array_close(hash)
+    var sequence = rl.load_random_sequence(4, 1, 12) as rl.int_array
+    if rl.int_array_count(sequence) != 4:
+        return 104
+    rl.unload_random_sequence(sequence)
+    var codepoints = rl.load_codepoints("Aé🎮") as rl.int_array
+    defer rl.unload_codepoints(codepoints)
+    if rl.int_array_count(codepoints) != 3 or rl.int_array_get(codepoints, 2) != 127918:
+        return 105
+    var utf8 = rl.load_utf8(codepoints, 3) as rl.byte_buffer
+    defer rl.unload_utf8(utf8)
+    if rl.buffer_text(utf8) != "Aé🎮":
+        return 106
+    var previous = rl.get_codepoint_previous("Aé🎮")
+    if previous.value != 127918 or previous.size != 4:
+        return 107
+    var text = rl.mem_alloc(64) as rl.byte_buffer
+    defer rl.mem_free(text)
+    if rl.text_copy(text, "VOID") != 4 or rl.text_append(text, " 6.0", 4) != 8 or rl.buffer_text(text) != "VOID 6.0":
+        return 108
+    var resized = rl.mem_realloc(text, 96)
+    if resized == null or rl.buffer_text(text) != "VOID 6.0":
+        return 109
+    var words = rl.string_array_from(["VOID", "raylib"])
+    defer rl.string_array_close(words)
+    var joined = rl.text_join(words, 2, " + ") as rl.byte_buffer
+    defer rl.buffer_close(joined)
+    if rl.buffer_text(joined) != "VOID + raylib":
+        return 110
+    var split = rl.text_split("one,two", 44 as i8) as rl.string_array
+    defer rl.string_array_close(split)
+    if rl.string_array_count(split) != 2 or rl.string_array_get(split, 1) != "two":
+        return 111
+    var replaced = rl.text_replace_alloc("raylib 5", "5", "6") as rl.byte_buffer
+    defer rl.mem_free(replaced)
+    if rl.buffer_text(replaced) != "raylib 6":
+        return 112
+    var pixels = rl.gen_image_color(8, 8, rl.orange()) as rl.image
+    defer rl.unload_image(pixels)
+    rl.image_draw_pixel(pixels, 2, 3, rl.blue())
+    var selected = rl.get_image_color(pixels, 2, 3)
+    if selected.b != 241 as u8:
+        return 113
+    var colors = rl.load_image_colors(pixels) as rl.color_array
+    defer rl.unload_image_colors(colors)
+    if rl.color_array_count(colors) != 64 or rl.color_array_get(colors, 26).b != 241 as u8:
+        return 114
+    var copied = rl.image_copy(pixels) as rl.image
+    rl.image_resize_nn(copied, 4, 4)
+    if copied.width != 4 or copied.height != 4:
+        return 115
+    rl.unload_image(copied)
+    var png = rl.export_image_to_memory(pixels, ".png") as rl.byte_buffer
+    defer rl.mem_free(png)
+    var loaded = rl.load_image_from_memory(".png", png, rl.buffer_bytes(png).count as i32) as rl.image
+    defer rl.unload_image(loaded)
+    if loaded.width != 8:
+        return 116
+    var gif: [u8] = [71,73,70,56,57,97,1,0,1,0,128,0,0,0,0,0,255,255,255,33,249,4,0,1,0,0,0,44,0,0,0,0,1,0,1,0,0,2,2,68,1,0,33,249,4,0,1,0,0,0,44,0,0,0,0,1,0,1,0,0,2,2,76,1,0,59]
+    var gif_bytes = rl.buffer_from_bytes(gif)
+    var animated = rl.load_image_anim_from_memory(".gif", gif_bytes, gif.count as i32) as rl.image
+    rl.buffer_close(gif_bytes)
+    if rl.image_output_count(animated) != 2:
+        return 125
+    var frames = animated.data as rl.byte_buffer
+    rl.unload_image(animated)
+    if rl.buffer_bytes(frames).count != 8:
+        return 126
+    rl.buffer_close(frames)
+    var collision = rl.check_collision_lines(rl.vector2(0, 0), rl.vector2(4, 4), rl.vector2(0, 4), rl.vector2(4, 0))
+    if not collision.hit or collision.point.x != 2 as f32:
+        return 117
+    var filename = "void-raylib-consumer-owned-test.txt"
+    if rl.file_exists(filename):
+        return 118
+    if not rl.save_file_text(filename, "native text é🎮"):
+        return 118
+    var file_text = rl.load_file_text(filename) as rl.byte_buffer
+    if rl.buffer_text(file_text) != "native text é🎮":
+        return 119
+    rl.unload_file_text(file_text)
+    var file_data = rl.load_file_data(filename) as rl.byte_buffer
+    if rl.buffer_bytes(file_data).count != "native text é🎮".to_utf8().count:
+        return 120
+    rl.unload_file_data(file_data)
+    if rl.file_remove(filename) != 0:
+        return 121
+    # PCM WAV in ordinary VOID bytes: headless audio decoding uses no device.
+    var wav: [u8] = [82,73,70,70,40,0,0,0,87,65,86,69,102,109,116,32,16,0,0,0,1,0,1,0,64,31,0,0,64,31,0,0,1,0,8,0,100,97,116,97,4,0,0,0,128,144,112,128]
+    var wave_bytes = rl.buffer_from_bytes(wav)
+    defer rl.buffer_close(wave_bytes)
+    var audio_wave = rl.load_wave_from_memory(".wav", wave_bytes, wav.count as i32) as rl.wave
+    defer rl.unload_wave(audio_wave)
+    if audio_wave.frame_count != 4 as u32 or not rl.is_wave_valid(audio_wave):
+        return 122
+    var samples = rl.load_wave_samples(audio_wave) as rl.float_array
+    defer rl.unload_wave_samples(samples)
+    if rl.float_array_count(samples) != 4 or rl.float_array_get(samples, 0) != 0 as f32:
+        return 123
+    var wave_copy = rl.wave_copy(audio_wave) as rl.wave
+    rl.wave_crop(wave_copy, 1, 3)
+    if wave_copy.frame_count != 2 as u32:
+        return 124
+    rl.unload_wave(wave_copy)
+    print("RAYLIB subsystem headless ownership passed")
+    return 0
+
+private func audio_wait(nanoseconds: u32):
+    var start = conversion.unwrap(time.monotonic_now())
+    var waiting = true
+    for waiting:
+        var interval = conversion.unwrap(time.elapsed(start, conversion.unwrap(time.monotonic_now())))
+        waiting = interval.seconds == 0 and interval.nanosecond < nanoseconds
+
+func audio() -> i32:
+    print("RAYLIB audio initializing")
+    var device = rl.init_audio_device()
+    if device == null:
+        print("RAYLIB audio device unavailable")
+        return 150
+    var active_device = device as rl.audio_device
+    print("RAYLIB audio device opened")
+    var wav: [u8] = [82,73,70,70,100,31,0,0,87,65,86,69,102,109,116,32,16,0,0,0,1,0,1,0,64,31,0,0,64,31,0,0,1,0,8,0,100,97,116,97,64,31,0,0]
+    for index in 0..<8000:
+        if index % 16 < 8:
+            wav.push(144)
+        else:
+            wav.push(112)
+    var bytes = rl.buffer_from_bytes(wav)
+    var audio_wave = rl.load_wave_from_memory(".wav", bytes, wav.count as i32) as rl.wave
+    var effect = rl.load_sound_from_wave(audio_wave) as rl.sound
+    var alias = rl.load_sound_alias(effect) as rl.sound
+    print("RAYLIB audio sound and alias acquired")
+    var song = rl.load_music_stream_from_memory(".wav", bytes, wav.count as i32) as rl.music
+    print("RAYLIB audio music acquired")
+    # Streaming music owns a private copy; the original bytes can close now.
+    rl.buffer_close(bytes)
+    rl.unload_wave(audio_wave)
+    rl.unload_sound(effect)
+    print("RAYLIB audio originals released")
+    rl.set_sound_volume(alias, 0.15 as f32)
+    rl.play_sound(alias)
+    audio_wait(30000000)
+    if not rl.is_sound_playing(alias):
+        return 151
+    print("RAYLIB audio alias is playing")
+    rl.pause_sound(alias)
+    rl.resume_sound(alias)
+    rl.stop_sound(alias)
+    print("RAYLIB audio alias stopped")
+    rl.unload_sound_alias(alias)
+    print("RAYLIB audio alias playback passed")
+    rl.play_music_stream(song)
+    for index in 0..<4:
+        rl.update_music_stream(song)
+        audio_wait(20000000)
+    if not rl.is_music_stream_playing(song) or rl.get_music_time_length(song) < 0.9 as f32:
+        return 152
+    rl.stop_music_stream(song)
+    rl.unload_music_stream(song)
+    print("RAYLIB audio music playback passed")
+    var stream = rl.load_audio_stream(8000, 8, 1) as rl.audio_stream
+    var samples: [u8] = []
+    for index in 0..<256:
+        samples.push(128)
+    var data = rl.buffer_from_bytes(samples)
+    rl.update_audio_stream(stream, data, 256)
+    rl.play_audio_stream(stream)
+    audio_wait(20000000)
+    rl.stop_audio_stream(stream)
+    rl.buffer_close(data)
+    # Device closes after its remaining stream dependent; this verifies order.
+    rl.close_audio_device(active_device)
+    rl.unload_audio_stream(stream)
+    if rl.is_audio_device_ready():
+        return 153
+    print("RAYLIB real audio device playback and cleanup passed")
+    return 0
+
+# Requires the caller's real window. Graphics resources drain before it closes.
+func graphics() -> i32:
+    if rl.load_model("/__void_raylib_missing__/model.iqm") != null:
+        return 182
+    var image_data = rl.gen_image_color(16, 16, rl.skyblue()) as rl.image
+    var gpu = rl.load_texture_from_image(image_data) as rl.texture
+    rl.unload_image(image_data)
+    rl.gen_texture_mipmaps(gpu)
+    if os.platform() != "windows" and gpu.mipmaps < 2:
+        return 160
+    var material_data = rl.load_material_default() as rl.material
+    rl.set_material_texture(material_data, rl.material_map_albedo, gpu)
+    rl.unload_material(material_data)
+    var generated = rl.gen_mesh_cube(2 as f32, 2 as f32, 2 as f32) as rl.mesh
+    var scene = rl.load_model_from_mesh(generated) as rl.model
+    var bounds = rl.get_model_bounding_box(scene)
+    if bounds.min.x != -1 as f32 or bounds.max.y != 1 as f32:
+        return 161
+    var mesh_list = scene.meshes as rl.mesh_array
+    var first_mesh = rl.mesh_array_get(mesh_list, 0) as rl.mesh
+    var positions = first_mesh.vertices as rl.float_array
+    if rl.float_array_count(positions) != first_mesh.vertex_count as i64 * 3:
+        return 162
+    rl.float_array_close(positions)
+    rl.unload_mesh(first_mesh)
+    rl.mesh_array_close(mesh_list)
+    rl.begin_drawing()
+    rl.clear_background(rl.black())
+    var camera = rl.camera3_d(rl.vector3(4, 4, 4), rl.vector3(0, 0, 0), rl.vector3(0, 1, 0), 45 as f32, rl.camera_perspective)
+    rl.begin_mode3_d(camera)
+    rl.draw_model(scene, rl.vector3(0, 0, 0), 1 as f32, rl.white())
+    rl.end_mode3_d()
+    rl.end_drawing()
+    rl.unload_model(scene)
+    var face = rl.get_font_default() as rl.font
+    var measured = rl.measure_text_ex(face, "VOID raylib", 20 as f32, 1 as f32)
+    if measured.x <= 0 as f32:
+        return 163
+    var glyph = rl.get_glyph_info(face, 65) as rl.glyph_info
+    if glyph.value != 65:
+        return 164
+    var bitmap = glyph.image as rl.image
+    if bitmap.width < 1:
+        return 165
+    rl.unload_font(face)
+    # Borrowed glyph/image remain live after the parent source owner closes.
+    rl.unload_image(bitmap)
+    # Glyph has no upstream terminal API; close its sealed view explicitly.
+    rl.glyph_info_close(glyph)
+    var shader_program = rl.load_shader_from_memory(null, null)
+    if shader_program != null:
+        var program = shader_program as rl.shader
+        if not rl.is_shader_valid(program):
+            return 166
+        rl.begin_shader_mode(program)
+        rl.end_shader_mode()
+        rl.unload_shader(program)
+    else:
+        if os.platform() != "windows":
+            return 168
+        print("RAYLIB selected renderer has no shader program support")
+    var target = rl.load_render_texture(16, 16)
+    if target != null:
+        var framebuffer = target as rl.render_texture
+        rl.begin_texture_mode(framebuffer)
+        rl.clear_background(rl.orange())
+        rl.end_texture_mode()
+        var attached = framebuffer.texture as rl.texture
+        var snapshot = rl.load_image_from_texture(attached) as rl.image
+        if snapshot.width != 16:
+            return 167
+        rl.unload_image(snapshot)
+        rl.unload_render_texture(framebuffer)
+        rl.unload_texture(attached)
+    else:
+        if os.platform() != "windows":
+            return 169
+        print("RAYLIB selected renderer has no framebuffer support")
+    if os.platform() != "windows":
+        var fragment = rl.c_string(value = "#version 330\nout vec4 finalColor;\nuniform uvec4 tint;\nvoid main() {{ finalColor=vec4(tint)/255.0; }}\n")
+        var custom_program = rl.load_shader_from_memory(null, fragment) as rl.shader
+        var location = rl.get_shader_location(custom_program, "tint")
+        if location < 0:
+            return 180
+        var uniform_bytes = rl.buffer_from_bytes([12,0,0,0,34,0,0,0,56,0,0,0,255,0,0,0])
+        rl.set_shader_value_v(custom_program, location, uniform_bytes, rl.shader_uniform_uivec4, 1)
+        rl.set_shader_value(custom_program, -1, uniform_bytes, rl.shader_uniform_sampler2d)
+        rl.buffer_close(uniform_bytes)
+        var custom_target = rl.load_render_texture(16, 16) as rl.render_texture
+        rl.begin_texture_mode(custom_target)
+        rl.begin_shader_mode(custom_program)
+        rl.draw_rectangle(0, 0, 16, 16, rl.white())
+        rl.end_shader_mode()
+        rl.end_texture_mode()
+        var custom_texture = custom_target.texture as rl.texture
+        var output_image = rl.load_image_from_texture(custom_texture) as rl.image
+        var output_pixel = rl.get_image_color(output_image, 4, 4)
+        if output_pixel.r != 12 as u8 or output_pixel.g != 34 as u8 or output_pixel.b != 56 as u8:
+            return 181
+        rl.unload_image(output_image)
+        rl.unload_texture(custom_texture)
+        rl.unload_render_texture(custom_target)
+        rl.unload_shader(custom_program)
+        print("RAYLIB uint-vector shader pixels passed")
+    print("RAYLIB real graphics ownership passed")
+    return 0
+
+func graphics_assets(directory: string) -> i32:
+    var font_data = rl.load_file_data(directory + "/font.ttf") as rl.byte_buffer
+    var points = rl.int_array_from([65, 66, 67])
+    var glyphs = rl.load_font_data(font_data, rl.buffer_bytes(font_data).count as i32, 20, points, 3, rl.font_default) as rl.glyph_info_array
+    var glyph_count = rl.glyph_info_array_count(glyphs) as i32
+    if glyph_count != 3:
+        return 171
+    var atlas = rl.gen_image_font_atlas(glyphs, 3, 20, 2, 0) as rl.image
+    var rectangles = rl.image_atlas_rects(atlas) as rl.rectangle_array
+    if rl.rectangle_array_count(rectangles) != 3:
+        return 172
+    rl.rectangle_array_close(rectangles)
+    rl.unload_image(atlas)
+    rl.unload_font_data(glyphs, 3)
+    var face = rl.load_font_from_memory(".ttf", font_data, rl.buffer_bytes(font_data).count as i32, 20, points, 3) as rl.font
+    rl.unload_file_data(font_data)
+    rl.int_array_close(points)
+    if face.glyph_count != 3:
+        return 173
+    rl.unload_font(face)
+    var scene = rl.load_model(directory + "/guy.iqm") as rl.model
+    var animations = rl.load_model_animations(directory + "/guyanim.iqm") as rl.model_animation_array
+    var count = rl.model_animation_array_count(animations) as i32
+    if count < 1:
+        return 174
+    var first = rl.model_animation_array_get(animations, 0) as rl.model_animation
+    if not rl.is_model_animation_valid(scene, first):
+        return 175
+    rl.update_model_animation(scene, first, 0 as f32)
+    rl.update_model_animation_ex(scene, first, 0 as f32, first, 1 as f32, 0.5 as f32)
+    var skeleton_data = scene.skeleton as rl.model_skeleton
+    var bones = skeleton_data.bones as rl.bone_info_array
+    if rl.bone_info_array_count(bones) != first.bone_count as i64:
+        return 176
+    var poses = first.keyframe_poses as rl.pose_array
+    var pose = rl.pose_array_get(poses, 0) as rl.transform_array
+    if rl.transform_array_count(pose) != first.bone_count as i64:
+        return 177
+    rl.unload_model(scene)
+    rl.bone_info_array_close(bones)
+    rl.model_skeleton_close(skeleton_data)
+    rl.unload_model_animations(animations, count)
+    rl.transform_array_close(pose)
+    rl.pose_array_close(poses)
+    rl.model_animation_close(first)
+    var recording = rl.load_automation_event_list(null) as rl.automation_event_list
+    rl.set_automation_event_list(recording)
+    rl.start_automation_event_recording()
+    rl.stop_automation_event_recording()
+    rl.unload_automation_event_list(recording)
+    print("RAYLIB native font, atlas, skeletal animation and automation passed")
+    return 0

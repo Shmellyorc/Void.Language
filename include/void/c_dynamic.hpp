@@ -9,6 +9,11 @@
 
 namespace vd {
 
+// Bounded conventional providers may expose complete C libraries. The verified
+// closure profile retains its smaller limits and all ABI checks remain shared.
+inline constexpr std::size_t c_conventional_descriptor_limit = 128 * 1024;
+inline constexpr std::size_t c_conventional_binding_limit = 1024;
+
 // Pure offline data. Only the embedding host or a linked AOT plan may
 // authorize its use. Parsing neither opens artifacts nor runs a probe.
 class DynamicClosure final {

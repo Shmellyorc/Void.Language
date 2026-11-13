@@ -5,7 +5,11 @@
 Open a trusted local folder with a selected VOID manifest. **VOID: Check
 Project** checks the saved source, **VOID: Build Project** writes the native
 executable to the project's normal `build/` location, and **VOID: Run Project**
-runs the saved application through the JIT. The commands use the compiler's
+runs the saved application through the JIT. **VOID: Package Project** invokes
+`voidc package` with the selected profile and writes the normal `dist/`
+application directory. Run `voidc package --verify dist` to verify its inventory.
+Use the CLI to explicitly replace an existing package or select another output.
+The commands use the compiler's
 project selector and honor an explicit entry override.
 
 Set `void.tasks.profile` to `debug` or `release` and enter application
@@ -138,6 +142,9 @@ The following sections retain the scope of their original implementation slices.
 ## Manifest project recognition and sessions (Slice 3)
 
 The VS Code adapter uses compiler/voidls schema-2 preflight and project protocol 1.
+Preflight remains bounded at 60 seconds so Debug/instrumented analysis can load
+large locked packages such as the raylib binding. Completion filters the typed
+prefix before applying its 256-candidate limit.
 Literal `void.project.root` pins a manifest root; with `void.project.entry` it
 selects an in-root override. An entry setting alone retains the legacy entry-parent
 mode. With neither, compiler-owned nearest-manifest discovery precedes the existing

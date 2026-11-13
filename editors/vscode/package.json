@@ -94,6 +94,11 @@
         "enablement": "isWorkspaceTrusted"
       },
       {
+        "command": "void.packageProject",
+        "title": "VOID: Package Project",
+        "enablement": "isWorkspaceTrusted"
+      },
+      {
         "command": "void.createProject",
         "title": "VOID: Create Project"
       },

@@ -161,7 +161,7 @@ SelectedNative select_managed_native(const NativeRequirement& requirement) {
     for (const auto* role : {&plan.runtime, &plan.notices})
         for (const auto& file : *role) payload.push_back({file.name, file.sha256, file.size});
     auto admission = CPrimitiveAdmission::admit_conventional(descriptor, directory, plan.library, plan.adapter, payload);
-    if (admission->provider() != plan.id || admission->target() != plan.target || admission->revision() != plan.abi)
+    if (admission->provider() != plan.id || admission->target() != plan.target || admission->abi_revision() != plan.abi)
         throw std::runtime_error("Managed native descriptor does not match the approved provider, target or ABI.");
 
     return {std::move(plan), std::move(admission)};

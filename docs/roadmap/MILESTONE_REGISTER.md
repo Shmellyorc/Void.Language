@@ -1,8 +1,10 @@
 # VOID developer experience milestone register
 
-Current assignment is the Boss-authorized G22 watcher and overlay repair.
-G21 is accepted and integrated. G22 implementation and qualification are
-pending Golden Wrench review.
+Current assignment is the Boss-authorized G23 editor packaging and G24 raylib
+verified source package integration. G22 is accepted at
+`ff3bbcd5a20fa2e81506d23e276a8a7837e9404f`. G23 is implemented; G24 has usable
+interfaces for all 600 declarations, with typed adaptations and native limits
+explicit. Boss acceptance and public post-push qualification remain pending.
 Batch entries below identify the integration commits and qualification scopes.
 Boss controls integration, hosted qualification and public release.
 [Feature roadmap](FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md)
@@ -31,13 +33,15 @@ Boss controls integration, hosted qualification and public release.
 | 17 · G19 | `bd6e0ebe6e43dc26d9a4ce1258d85739806d22e1` | **INTEGRATED / INDEPENDENT SOURCE REVIEW COMPLETE. PRODUCTION OPTIMIZATION HOLD.** The deferred-capture candidate failed root-error equivalence. The timings, root-disappearance transcript and five original 15/16 results remain in the G19 record. [Attribution and experiment](../compiler-health/G19_COMPLETION_ATTRIBUTION.md) |
 | G21-R | `c80e686a30e83ebf154985dcd00f5f40296882f8` | **RESEARCH ACCEPTED / INTEGRATED.** The Stage 7 assertion predated G13 open-document ownership. The rejected graph-only publisher hid valid independent diagnostics, including the undeclared-package error. The research preserves the five experimental profiles and the VS Code visual-close observation. [Research](../compiler-health/G21_LSP_DIAGNOSTIC_LIFECYCLE_RESEARCH.md) |
 | 19 · G21 | `59db769cacd80ceba60d3bf9041007d21f300428` | **ACCEPTED / INTEGRATED.** The complete legacy protocol follows G13 diagnostic ownership. Maintained tests cover open and disk ownership transitions. All five native profiles passed the 17-case selection. [Qualification](../compiler-health/G21_LSP_DIAGNOSTIC_LIFECYCLE_QUALIFICATION.md) |
+| G22 | `ff3bbcd5a20fa2e81506d23e276a8a7837e9404f` | **ACCEPTED / INTEGRATED**, as authorized by the G23/G24 assignment. Watched-event refresh preserves open buffers; explicit rename, delete and close preserve ownership transitions. [Qualification](../compiler-health/G22_WATCHER_OVERLAY_RESEARCH.md#authorized-production-repair) |
 
 ## Current and upcoming
 
 | Milestone | Status and next evidence |
 | --- | --- |
 | 18 · G20 | **ACCEPTED**, as confirmed by the G21-R assignment. Integrated at `49d2e66243d80957e7dd1bbeecb9767a43a13964`. Physical-root recovery and established tabs formatting remain preserved. [Qualification](../compiler-health/G20_PROJECT_ROOT_RECOVERY.md) |
-| G22 | **BOSS-AUTHORIZED REPAIR / GOLDEN WRENCH REVIEW PENDING.** Watched events refresh current analysis while preserving open buffers. Explicit rename, delete and document close retain ownership transitions. The research and original failures remain preserved. [Research and implementation qualification](../compiler-health/G22_WATCHER_OVERLAY_RESEARCH.md#authorized-production-repair) |
+| G23 | **IMPLEMENTED / LOCAL EDITOR QUALIFICATION.** Package reuses Check/Build/Run selection, trust, saved-buffer, profile and compiler execution checks. Real package verification passed in native VS Code 1.141.0 on PikaOS and Windows 10 Debug/Release. No integration commit created. [Implementation](../projects/G23_G24_IMPLEMENTATION.md) |
+| G24 | **IMPLEMENTED; BOSS ACCEPTANCE / POST-PUSH QUALIFICATION PENDING.** All 600 declarations have usable interfaces: 236 direct C ABI mappings, 352 ownership adapters, ten G5 lifecycle adapters and two typed variadic equivalents. Original arbitrary C varargs and concurrent external global-hook mutation remain unsupported. Existing native/Linux/Windows qualification is preserved and final-interface qualification is recorded with its explicit bounds. Strict full-device tests retain independently reproduced Gallium/raylib leaks. No final public GitHub SHA exists. [Consolidated implementation and qualification](../projects/G23_G24_IMPLEMENTATION.md) |
 | G00 · Production distribution | Conditional on release authorization. Public bootstrap, distribution and platform obligations remain tracked in the release record. [Preview blockers](../release/PREVIEW_BLOCKERS.md) |
 
 ## Hosted acceptance

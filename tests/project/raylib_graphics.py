@@ -84,7 +84,7 @@ def center(path, color):
     return [round(sum(p[axis] for p in points) / len(points), 2) for axis in (0, 1)]
 
 
-def qualify(command, native, cwd, environment, output):
+def qualify(command, native, cwd, environment, output, *, require_trace=True):
     output.mkdir()
     log = output / 'process.txt'
     window = None
@@ -107,6 +107,14 @@ def qualify(command, native, cwd, environment, output):
                 assert process.poll() is None, log.read_text(errors='replace')
                 time.sleep(.1)
             assert window, log.read_text(errors='replace')
+            # Typed asset setup can continue after InitWindow. Input/pixel
+            # assertions apply only once the application's drawing loop is ready.
+            for _ in range(300):
+                if 'RAYLIB ready' in log.read_text(errors='replace'):
+                    break
+                assert process.poll() is None, log.read_text(errors='replace')
+                time.sleep(.1)
+            assert 'RAYLIB ready' in log.read_text(errors='replace'), log.read_text(errors='replace')
             mapping = Path(f'/proc/{native_pid}/maps').read_text()
             for name in ('libraylib.so.600', 'libvoid_raylib.so'):
                 assert str(native / name) in mapping, (name, mapping)
@@ -129,7 +137,7 @@ def qualify(command, native, cwd, environment, output):
             assert status == 0, (status, text, [line for line in mapping.splitlines()
                                                if 'gallium' in line or 'dri.so' in line])
             assert 'AddressSanitizer' not in text and 'UndefinedBehaviorSanitizer' not in text, text
-            assert text.count('RAYLIB trace invoked VOID') == 1, text
+            assert text.count('RAYLIB trace invoked VOID') == (1 if require_trace else 0), text
             assert text.count('RAYLIB owner released texture and window') == 1, text
             frames = re.search(r'RAYLIB frames (\d+) input frames (\d+)', text)
             assert frames and int(frames[1]) > 5 and int(frames[2]) > 0, text

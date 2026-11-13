@@ -6,3 +6,6 @@
 
 # Preserve the approved host patch and provenance bytes on every checkout.
 /third_party/host-patches/** -text
+
+# The raylib generator verifies the unmodified upstream header and notice bytes.
+/verified-packages/raylib/upstream/** -text -whitespace

@@ -67,7 +67,8 @@ export async function resolveProject(settings: Settings, workspaces: readonly st
     const args = legacy ? ['--discover', workspace ?? '', active ?? '', override] :
         ['--discover-project', workspace ?? '', active ?? '', selectedRoot, entryOverride ?? ''];
     let stdout: string;
-    try { ({stdout} = await promisify(execFile)(server, args, {encoding: 'utf8', maxBuffer: 65536, timeout: 10000})); }
+    // Debug/instrumented analysis of a large locked package can exceed ten seconds.
+    try { ({stdout} = await promisify(execFile)(server, args, {encoding: 'utf8', maxBuffer: 65536, timeout: 60000})); }
     catch (error) { throw new Error(`VOID project preflight failed. Automatic/manifest selection requires a matching voidProjectProtocol 1 server; no legacy downgrade was attempted. ${String(error)}`); }
     const selected = JSON.parse(stdout) as {schema?: number; mode?: string; requestedRoot?: string; entry: string|null; root: string; standalone: boolean; status?: string};
     const {entry, root} = selected;

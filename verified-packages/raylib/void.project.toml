@@ -1,0 +1,12 @@
+schema = 1
+
+[project]
+id = "org.voidlang.verified.raylib.source"
+name = "raylib"
+version = "0.1.0"
+kind = "library"
+
+[package]
+id = "org.voidlang.raylib"
+name = "raylib"
+entry = "src/api.void"

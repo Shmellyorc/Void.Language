@@ -104,7 +104,7 @@ struct ProjectCapture {
             const auto path = directory / utf8_path(declaration.descriptor);
             if (!project_fs::is_regular_file(path))
                 project_failure(anchor, Code::project_path, "Missing native descriptor: " + path_utf8(path));
-            auto descriptor = read_bounded(path, 16384);
+            auto descriptor = read_bounded(path, c_conventional_descriptor_limit);
             native = CPrimitiveAdmission::admit_conventional(descriptor.text(), directory, declaration.library, declaration.adapter);
             if (native->target() != target)
                 project_failure(anchor, Code::project_reserved, "Native descriptor target does not match this host.");

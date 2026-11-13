@@ -557,6 +557,10 @@ with tempfile.TemporaryDirectory(prefix="VOID D3 HTTPS 雪 ") as temp, serve_crl
         cache_run(app, b"58\n", "miss")
         assert all(auth is None for _, _, auth, _ in server.requests)
 
+        if os.environ.get("VOID_TEST_RAYLIB_CATALOG"):
+            from verified_raylib import qualify
+            qualify(compiler, git, repos, base, server.origin, trusted)
+
     # The TLS origin is gone. A locked project must compile from held bytes.
     final_lock = lock.read_bytes()
     cli(app, "deps", "fetch", env=clean)

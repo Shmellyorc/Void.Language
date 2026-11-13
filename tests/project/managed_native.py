@@ -396,13 +396,41 @@ with tempfile.TemporaryDirectory(prefix="VOID D4 雪 ") as temporary:
     (helper / "void.project.toml").write_text('schema=1\n[project]\nid="org.test.helper.project"\nname="helper"\n'
         'version="1.0.0"\nkind="library"\n[package]\nid="org.test.helper"\nname="helper"\nentry="api.void"\n')
     helper_source = helper / "api.void"
-    helper_source.write_text("public func value() -> i32:\n    return 1\n")
+    helper_source.write_text('use "/conventional_ffi.void" as native\n'
+                             'public func value() -> i32:\n    return native.add(0, -6)\n')
     manifest.write_text(initial + requirement + '\n[dependencies.helper]\nid="org.test.helper"\n'
                         'path="helper"\nversion="=1.0.0"\n', encoding="utf-8")
     cli("resolve", "--refresh")
     cli("resolve", "--locked")
     cli("check")
     assert tomllib.loads(lock.read_text(encoding="utf-8"))["package"][0]["id"] == "org.test.helper"
+    no_initializers()
+    # Locked source packages can consume only the exact application-admitted
+    # native module. They cannot authorize a provider or reach project files.
+    main = project / "src/main.void"
+    previous_main = main.read_text(encoding="utf-8")
+    main.write_text('use pkg/helper\nfunc main():\n    print(helper.value())\n', encoding="utf-8")
+    cli("run", status=2, message="--allow-native")
+    cli("run", "--allow-native", message="1")
+    assert marker.read_text().splitlines() == ["dependency initialized"]
+    reset_markers()
+    approved_manifest = manifest.read_text(encoding="utf-8")
+    manifest.write_text(approved_manifest.replace(requirement, ""), encoding="utf-8")
+    cli("resolve", "--refresh")
+    cli("check", status=1, message="in the verified package")
+    manifest.write_text(approved_manifest, encoding="utf-8")
+    native_source = helper_source.read_text(encoding="utf-8")
+    helper_source.write_text(native_source.replace("/conventional_ffi.void", "/src/main.void"), encoding="utf-8")
+    cli("resolve", "--refresh")
+    cli("check", status=1, message="in the verified package")
+    helper_source.write_text(native_source, encoding="utf-8")
+    collision = helper / "conventional_ffi.void"
+    collision.write_text("func value():\n    pass\n", encoding="utf-8")
+    cli("resolve", "--refresh")
+    cli("check", status=1, message="collides with a package source")
+    collision.unlink()
+    cli("resolve", "--refresh")
+    main.write_text(previous_main, encoding="utf-8")
     no_initializers()
     if server:
         main = project / "src/main.void"

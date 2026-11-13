@@ -69,7 +69,7 @@ func main() -> i32:
  await config.update('tasks.profile',profile,vscode.ConfigurationTarget.Workspace);
  await config.update('tasks.runArguments',args,vscode.ConfigurationTarget.Workspace);
  await replace(source,program);assert(source.isDirty);
- for(const action of ['check','build','run'])
+ for(const action of ['check','build','run','package'])
   assert.equal(await vscode.commands.executeCommand(`void.${action}Project`),undefined,'dirty source must block '+action);
  events.push('dirty source blocks all project commands');
  assert(await source.save());
@@ -85,6 +85,10 @@ func main() -> i32:
  };
  await run('check',0);
  await run('build',0);
+ await run('package',0);
+ const compiler=path.join(path.dirname(process.env.VOIDLS_PATH!),process.platform==='win32'?'voidc.exe':'voidc');
+ await promisify(execFile)(compiler,['package','--verify',path.join(root,'dist')],{cwd:root,timeout:30000});
+ events.push('editor Package creates a real compiler-verified application package');
  const executable=path.join(root,'build',path.parse(source.uri.fsPath).name+(process.platform==='win32'?'.exe':''));
  await assert.rejects(promisify(execFile)(executable,args,{cwd:root,timeout:10000}),(error:NodeJS.ErrnoException)=>Number(error.code)===17);
  await run('run',17);

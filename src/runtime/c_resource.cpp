@@ -149,9 +149,12 @@ public:
             release_ == release && bool(shutdown_thread_) == shutdown_owner;
     }
 
-    bool acquire(std::uint32_t ordinal, const std::uint64_t* args, std::uint32_t count) {
+    bool acquire(std::uint32_t ordinal, const std::uint64_t* args, std::uint32_t count,
+                 const CSpanRequest* spans = nullptr, std::uint32_t span_count = 0) {
         std::uint64_t acquired = 0;
-        if (dispatch(ordinal, args, count, &acquired))
+        const auto status = span_count ? vd_c_span_dispatch_v2(thunk_, descriptor_.data(), descriptor_.size(),
+            ordinal, args, count, &acquired, spans, span_count) : dispatch(ordinal, args, count, &acquired);
+        if (status)
             throw std::runtime_error("C resource creation transport rejected");
         native_ = acquired; // Only a successful transport transfers ownership.
         exclusive_ = native_;
@@ -162,6 +165,15 @@ public:
         callback_ = std::move(callback);
     }
     bool report_callback(RuntimeFailure* failure) { return callback_ && callback_->report(failure); }
+    std::unique_lock<std::mutex> pin() {
+        own_thread();
+        require_shutdown_thread();
+        if (CheckedCallback::active(this)) throw std::logic_error("C callback cannot reenter its own resource");
+        auto lock = std::unique_lock(mutex_);
+        if (!native_) throw std::runtime_error("Native resource is closed");
+        return lock;
+    }
+    std::uint64_t native_word() const { return native_; } // Only while pinned.
     std::uint32_t borrow(std::uint32_t ordinal, const std::uint64_t* args,
                          std::uint32_t count, std::uint64_t* result) {
         if (CheckedCallback::active(this)) return 7;
@@ -223,9 +235,9 @@ std::uint32_t dispatch_resource(CPrimitiveThunk* thunk, const char* descriptor,
     std::uint32_t size, std::uint32_t ordinal, const std::uint64_t* words, std::uint32_t count,
     std::uint64_t* result, void** handle, const char* identity, std::uint32_t release, CResourceRole role,
     bool shutdown_owner, std::unique_ptr<CheckedCallback> callback = {},
-    RuntimeFailure* failure = nullptr) noexcept {
-    if (!thunk || !descriptor || !size || size > 16384 || !identity || !handle ||
-        ordinal >= 64 || release >= 64 || count > c_primitive_max_arguments || (count && !words) ||
+    RuntimeFailure* failure = nullptr, const CSpanRequest* spans = nullptr, std::uint32_t span_count = 0) noexcept {
+    if (!thunk || !descriptor || !size || size > c_conventional_descriptor_limit || !identity || !handle ||
+        ordinal >= c_conventional_binding_limit || release >= c_conventional_binding_limit || count > c_primitive_max_arguments || (count && !words) ||
         role < CResourceRole::acquire || role > CResourceRole::close ||
         (role != CResourceRole::acquire && !count) ||
         (role == CResourceRole::close && (ordinal != release || count != 1 || !result)))
@@ -249,7 +261,7 @@ std::uint32_t dispatch_resource(CPrimitiveThunk* thunk, const char* descriptor,
                 runtime.allocate_into(handle, layout);
                 auto owner = std::make_shared<Resource>(runtime, *handle, contract, identity, thunk, release, shutdown_owner);
                 if (callback) owner->set_callback(std::move(callback));
-                const bool acquired = owner->acquire(ordinal, words, count);
+                const bool acquired = owner->acquire(ordinal, words, count, spans, span_count);
                 if (acquired && !library->publish_exclusive(*handle, owner)) {
                     owner->discard_duplicate();
                     *handle = nullptr;
@@ -305,12 +317,71 @@ extern "C" std::uint32_t vd::vd_c_resource_dispatch_owner_v3(CPrimitiveThunk* th
     return dispatch_resource(thunk, descriptor, size, ordinal, words, count, result, handle, identity, release, role, true);
 }
 
+extern "C" std::uint32_t vd::vd_c_resources_dispatch_v3(CPrimitiveThunk* thunk, const char* descriptor,
+    std::uint32_t size, std::uint32_t ordinal, const std::uint64_t* words, std::uint32_t count,
+    std::uint64_t* result, const CResourceArgument* arguments, std::uint32_t argument_count,
+    void** result_root, const char* result_identity, std::uint32_t release, std::uint32_t shutdown_owner,
+    const CSpanRequest* spans, std::uint32_t span_count) noexcept {
+    if (!thunk || !descriptor || !size || size > c_conventional_descriptor_limit ||
+        ordinal >= c_conventional_binding_limit || count > c_primitive_max_arguments ||
+        argument_count > count || (count && !words) || (argument_count && !arguments) ||
+        bool(result_root) != bool(result_identity) || shutdown_owner > 1 || span_count > 2)
+        return 5;
+    try {
+        auto& runtime = Runtime::current();
+        NativeJob job(runtime);
+        auto library = NativeLibrary::get(runtime);
+        std::array<std::uint64_t, c_primitive_max_arguments> native_words{};
+        if (count) std::copy_n(words, count, native_words.begin());
+        std::array<bool, c_primitive_max_arguments> occupied{};
+        std::vector<std::shared_ptr<Resource>> resources;
+        std::vector<std::pair<unsigned, std::shared_ptr<Resource>>> operands;
+        for (unsigned n = 0; n < argument_count; ++n) {
+            const auto& arg = arguments[n];
+            if (!arg.root || !arg.identity || arg.argument >= count || occupied[arg.argument] ||
+                arg.release >= c_conventional_binding_limit || arg.shutdown_owner > 1) return 5;
+            occupied[arg.argument] = true;
+            (void)runtime.root_word(arg.root);
+            auto found = library->find(*arg.root, true);
+            if (!found) return 1;
+            if (found->kind() != &resource_kind) return 2;
+            auto resource = std::static_pointer_cast<Resource>(found);
+            if (!resource->matches({descriptor, size}, arg.identity, thunk, arg.release, arg.shutdown_owner)) return 2;
+            operands.emplace_back(arg.argument, resource);
+            resources.push_back(std::move(resource));
+        }
+        std::sort(resources.begin(), resources.end(), [](const auto& a, const auto& b) {
+            return std::less<const void*>{}(a.get(), b.get());
+        });
+        resources.erase(std::unique(resources.begin(), resources.end()), resources.end());
+        std::vector<std::unique_lock<std::mutex>> pins;
+        for (const auto& resource : resources) pins.push_back(resource->pin());
+        for (const auto& [argument, resource] : operands) native_words[argument] = resource->native_word();
+        std::uint32_t status;
+        if (result_root) {
+            if (result) return 5;
+            status = dispatch_resource(thunk, descriptor, size, ordinal, native_words.data(), count,
+                nullptr, result_root, result_identity, release, CResourceRole::acquire, shutdown_owner,
+                {}, nullptr, spans, span_count);
+        } else if (span_count) {
+            status = vd_c_span_dispatch_v2(thunk, descriptor, size, ordinal,
+                native_words.data(), count, result, spans, span_count);
+        } else {
+            Runtime::Native safe(runtime);
+            status = thunk(descriptor, size, ordinal, native_words.data(), count, result);
+        }
+        for (const auto& resource : resources)
+            if (resource->report_callback(nullptr)) return 8;
+        return status;
+    } catch (const std::exception&) { return 4; }
+}
+
 extern "C" std::uint32_t vd::vd_c_callback_dispatch_v1(CPrimitiveThunk* thunk, const char* descriptor,
     std::uint32_t size, std::uint32_t ordinal, std::uint64_t* words, std::uint32_t count,
     std::uint64_t* result, void** handle, const char* identity, std::uint32_t release, std::uint32_t shutdown_owner,
     std::uint64_t function, void* capture, CCallbackEntry* entry, std::uint32_t arity, std::uint32_t returns,
     RuntimeFailure* failure) noexcept {
-    if (!thunk || !descriptor || !size || size > 16384 || ordinal >= 64 ||
+    if (!thunk || !descriptor || !size || size > c_conventional_descriptor_limit || ordinal >= c_conventional_binding_limit ||
         !words || !count || count > c_primitive_max_arguments || words[count - 1] ||
         !function || !entry || arity > c_primitive_max_arguments || !failure ||
         bool(handle) != bool(identity) || (handle && result) || shutdown_owner > 1 || returns > 1)

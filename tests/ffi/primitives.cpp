@@ -83,6 +83,17 @@ void descriptors(const std::string& descriptor) {
     reject("descriptor bounds", "descriptor size", [&] {
         (void)CPrimitiveAdmission::admit(std::string(16385, 'x'), vd_c_primitive_dispatch_v1);
     });
+    auto large = descriptor.substr(0, descriptor.find("bind "));
+    for (unsigned index = 0; index < c_conventional_binding_limit; ++index)
+        large += "bind value" + std::to_string(index) + " export" + std::to_string(index) + " i32\n";
+    const auto adapter = CPrimitiveAdmission::generate_adapter(large, "large_provider.h");
+    require(adapter.find("export1023") != std::string::npos, "large conventional descriptor truncated");
+    reject("conventional binding bound", "bounded primitive binding", [&] {
+        (void)CPrimitiveAdmission::generate_adapter(large + "bind overflow overflow i32\n", "large_provider.h");
+    });
+    reject("conventional descriptor bound", "descriptor size", [&] {
+        (void)CPrimitiveAdmission::generate_adapter(std::string(c_conventional_descriptor_limit + 1, 'x'), "large_provider.h");
+    });
     reject("unavailable fixture", "transport is unavailable", [&] { (void)CPrimitiveAdmission::admit(descriptor, nullptr); });
     std::uint64_t word = 2, result = 0;
     auto transport = [&](std::uint32_t index, const std::uint64_t* words, unsigned count, std::uint64_t* out) {
