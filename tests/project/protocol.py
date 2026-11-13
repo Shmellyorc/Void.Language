@@ -60,13 +60,58 @@ def unreferenced(root):
   check(any('hidden' in d['message'] for n in notes if n['uri']==app.as_uri() for d in n['diagnostics']),'independent module cannot see private entry symbols')
   check(state(c)['snapshotKey']==before['snapshotKey'],'a dirty main in an existing unreferenced file does not enter discovery')
   change(c,app,body,6)
-  opened(c,entry,'use "./app.void" as app\n'+entry_text.replace('    return','    app.play()\n    return'))
+  imported_entry='use "./app.void" as app\n'+entry_text.replace('    return','    app.play()\n    return')
+  opened(c,entry,imported_entry)
   check(definition(c,app,body,'game(name') is not None,'same definition after explicit import')
-  change(c,app,'func unfinished(',7)
-  check(state(c)['status']=='error','a referenced dirty file still affects the selected graph')
-  change(c,entry,entry_text,2)
+
+  def app_publication(notes):
+   publications=[n for n in notes if n['uri']==app.as_uri()]
+   check(len(publications)==1,publications)
+   return publications[0]
+
+  unfinished=app_publication(change(c,app,'func unfinished(',7))
+  check(unfinished['diagnostics'] and state(c)['status']=='error','a referenced dirty file still affects the selected graph')
+  retained=app_publication(change(c,entry,entry_text,2))
+  check(retained['version']==7 and retained['diagnostics']==unfinished['diagnostics'],retained)
   check(state(c)['status']=='ready','removing the import separates dirty errors from the application again')
-  close(c,entry);close(c,app)
+
+  check(app_publication(change(c,app,body,8))['diagnostics']==[],'correction clears the independent error')
+  bad_body=body.replace('game(name = "player")','missing')
+  independent=app_publication(change(c,app,bad_body,9))
+  check(independent['version']==9 and codes([independent])==['VOID2002']
+        and "Unknown identifier 'missing'." in independent['diagnostics'][0]['message'],independent)
+  check(state(c)['status']=='ready','independent error leaves the selected application ready')
+  reimported=app_publication(change(c,entry,imported_entry,3))
+  check(reimported['version']==9 and reimported['diagnostics']==independent['diagnostics'],reimported)
+  check(int(reimported['voidProjectRevision'])>int(independent['voidProjectRevision']),'graph change advances the publication revision')
+  check(state(c)['status']=='error','reimport brings the dirty error into the selected graph')
+
+  disk_body=bad_body.replace('missing','disk_missing')
+  app.write_text(disk_body,encoding='utf-8')
+  check(app_publication(change(c,app,body,10))['diagnostics']==[],'valid overlay supersedes the bad disk source')
+  check(state(c)['status']=='ready','valid overlay repairs the graph')
+  fallback=app_publication(close(c,app))
+  check('version' not in fallback and codes([fallback])==['VOID2002']
+        and "Unknown identifier 'disk_missing'." in fallback['diagnostics'][0]['message'],fallback)
+  check(state(c)['status']=='error','closing a referenced overlay restores disk diagnostic authority')
+
+  reopened=app_publication(opened(c,app,bad_body,0))
+  check(reopened['version']==0 and reopened['diagnostics']==independent['diagnostics'],reopened)
+  check(int(reopened['voidProjectRevision'])>int(fallback['voidProjectRevision']),'reopen advances ownership at a reset client version')
+  alt=root/'alternate.void'
+  alt.write_text(entry_text,encoding='utf-8')
+  alternate,notes=query(c,'void/reselectProject',{'entry':alt.name})
+  check(alternate['entry']==alt.as_posix() and alternate['status']=='ready','explicit entry switch leaves the error outside the selected graph')
+  switched=app_publication(notes)
+  check(switched['version']==0 and switched['diagnostics']==reopened['diagnostics'],switched)
+  original,notes=query(c,'void/reselectProject',{'entry':entry.name})
+  check(original['status']=='error',original)
+  switched_back=app_publication(notes)
+  check(switched_back['version']==0 and switched_back['diagnostics']==reopened['diagnostics'],switched_back)
+
+  close(c,entry)
+  cleared=app_publication(close(c,app))
+  check('version' not in cleared and not cleared['diagnostics'],cleared)
   check(definition(c,app,body,'game(name') is None,'closing unreferenced file drops its analysis')
   c.shutdown()
 def preflight_boundaries(workspace):

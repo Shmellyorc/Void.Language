@@ -15,6 +15,17 @@ def diagnostics(notes):
     return {n["uri"]: n for n in notes}
 
 
+def check_unknown_identifier(note, name, line, start, end):
+    assert len(note["diagnostics"]) == 1, note
+    diagnostic = note["diagnostics"][0]
+    assert (diagnostic["code"], diagnostic["severity"], diagnostic["source"]) == ("VOID2002", 1, "VOID"), note
+    assert diagnostic["message"].splitlines()[0] == f"Unknown identifier '{name}'.", note
+    assert diagnostic["range"] == {
+        "start": {"line": line, "character": start},
+        "end": {"line": line, "character": end},
+    }, note
+
+
 def source_position(text, needle, start=0):
     offset = text.index(needle, start)
     before = text[:offset]
@@ -108,25 +119,58 @@ def editor(executable, root):
         assert diagnostic["range"]["end"] == {"line": 0, "character": 15}, diagnostic
         # New unsaved modules, moved diagnostics, graph removal and clearing.
         virtual_uri = (root / "new" / "virtual.void").as_uri()
+        virtual_source = 'func calculate(x: i32) -> i32:\r\n    return x\r\n'
+        bad_virtual = virtual_source.replace("return x", "return missing")
         graph = 'use "/new/virtual.void" as v\r\nfunc entry(x: i32) -> i32:\r\n    return v.calculate(x)\r\n'
         changed(uri, graph, -3)
-        notes = opened(virtual_uri, 'func calculate(x: i32) -> i32:\r\n    return missing\r\n', 0)
-        assert notes[virtual_uri]["diagnostics"][0]["code"] == "VOID2002"
-        changed(virtual_uri, 'func calculate(x: i32) -> i32:\r\n    return x\r\n', 1)
+        notes = opened(virtual_uri, bad_virtual, 0)
+        check_unknown_identifier(notes[virtual_uri], "missing", 1, 11, 18)
+        assert changed(virtual_uri, virtual_source, 1)[virtual_uri]["diagnostics"] == []
         virtual_query = {"textDocument": {"uri": uri}, "position": source_position(graph, "calculate")}
         assert c.request("textDocument/definition", virtual_query)[0]["result"]["uri"] == virtual_uri
         c.notify("textDocument/didClose", {"textDocument": {"uri": virtual_uri}})
         notes = diagnostics(c.sync())
         assert any(d["code"] == "VOID3002" for d in notes[uri]["diagnostics"])
         assert c.request("textDocument/definition", virtual_query)[0]["result"] is None
-        opened(virtual_uri, 'func calculate(x: i32) -> i32:\r\n    return x\r\n', 0)
-        # Failed graph with virtual error, followed by removing that import clears it.
-        changed(virtual_uri, 'func calculate(x: i32) -> i32:\r\n    return missing\r\n', 2)
-        notes = changed(uri, main, -2)
-        assert not notes[virtual_uri]["diagnostics"]
+        assert opened(virtual_uri, virtual_source, 0)[virtual_uri] == {
+            "uri": virtual_uri, "version": 0, "diagnostics": [],
+        }
+        # G13 keeps the open overlay under independent analysis after import removal.
+        notes = changed(virtual_uri, bad_virtual, 2)
+        check_unknown_identifier(notes[virtual_uri], "missing", 1, 11, 18)
+        c.notify("textDocument/didChange", {"textDocument": {"uri": uri, "version": -2}, "contentChanges": [{"text": main}]})
+        retained = [n for n in c.sync() if n["uri"] == virtual_uri]
+        assert len(retained) == 1 and retained[0]["version"] == 2, retained
+        check_unknown_identifier(retained[0], "missing", 1, 11, 18)
         assert c.request("textDocument/definition", q)[0]["result"]["uri"] == wuri
         c.notify("textDocument/didClose", {"textDocument": {"uri": virtual_uri}})
-        c.sync()
+        assert [n for n in c.sync() if n["uri"] == virtual_uri] == [
+            {"uri": virtual_uri, "diagnostics": []},
+        ]
+
+        # A new lifetime can start at the minimum client version and own a different error.
+        unicode_virtual = 'func calculate() -> string:\r\n    return "😀" + newer\r\n'
+        notes = opened(virtual_uri, unicode_virtual, -2147483648)
+        assert notes[virtual_uri]["version"] == -2147483648, notes
+        check_unknown_identifier(notes[virtual_uri], "newer", 1, 18, 23)
+        assert changed(virtual_uri, virtual_source, 2147483647)[virtual_uri] == {
+            "uri": virtual_uri, "version": 2147483647, "diagnostics": [],
+        }
+        for version in (2147483646, 2147483647, 2147483648):
+            assert changed(virtual_uri, bad_virtual, version) == {}
+        c.notify("textDocument/didClose", {"textDocument": {"uri": virtual_uri}})
+        assert all(not n["diagnostics"] for n in c.sync())
+
+        # One pipe write queues a new lifetime and retires it before the barrier.
+        doc = {"uri": virtual_uri}
+        c.write(b"".join(frame({"jsonrpc": "2.0", "method": method, "params": params}) for method, params in [
+            ("textDocument/didOpen", {"textDocument": {**doc, "languageId": "void", "version": -1, "text": bad_virtual}}),
+            ("textDocument/didChange", {"textDocument": {**doc, "version": 0}, "contentChanges": [{"text": virtual_source}]}),
+            ("textDocument/didClose", {"textDocument": doc}),
+        ]))
+        assert all(not n["diagnostics"] and "version" not in n
+                   for n in c.sync() if n["uri"] == virtual_uri)
+
         c.notify("textDocument/didClose", {"textDocument": {"uri": wuri}})
         notes = diagnostics(c.sync())
         assert "version" not in notes[wuri] and not notes[wuri]["diagnostics"]

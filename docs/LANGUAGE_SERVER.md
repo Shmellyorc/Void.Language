@@ -277,20 +277,36 @@ project tooling, not a sandbox for running untrusted compiler processes.
 ## Freshness, diagnostics and navigation
 
 Each accepted open/change/close selects and completely analyzes a new project
-snapshot, then uses the normal session acceptance/current-result checks. There is
-no incremental compiler or bypass around Phase 7/8 dependency and compatibility
-contracts. Queries use only `current_analysis()` and `current_index()`. Failed or
-stale analysis yields null definitions/empty references, never historical success.
+snapshot, then uses the normal session acceptance and current-result checks.
+The selected project graph owns application analysis. Since G13, eligible open
+source outside that graph has its own analysis of the current editor buffer.
+Both use compiler-owned validation and apply the same root identity, source
+admission and dependency authorization rules. Independent analysis supplies
+editor intelligence without granting execution authority. Queries use current
+analysis for the relevant owner, including bounded editor recovery where
+supported. Failed or stale analysis cannot supply historical success.
 
 Diagnostics preserve compiler codes (`VOIDxxxx`), severity, description and hints.
 Available related locations and open-document versions are included when the
 client advertises the corresponding publishDiagnostics capabilities. All primary
-and related ranges come from their owning snapshots. After acceptance, open,
-reachable successful modules and previously erroneous modules receive diagnostic
-arrays; repaired, closed or removed erroneous modules receive empty arrays.
-Imported failures, virtual overlays and graph changes use the same frontend.
-Only entry-reachable source is semantically analyzed; an open unreachable overlay
-gets empty diagnostics until imported. No independent per-file compiler is added.
+and related ranges come from their owning snapshots. The LSP merges and
+deduplicates diagnostics from the selected graph and open-document analysis
+into a single replacement `textDocument/publishDiagnostics` array per URI.
+Removing an import changes graph membership while leaving the document open.
+The current buffer can still produce the same error under independent analysis,
+at the same client version. When correction, loss of the final owner or project
+invalidation leaves a previously erroneous URI without diagnostics, the
+server sends an empty array.
+
+Dirty overlays supply editor bytes independently of the physical source,
+including for file URIs with no file on disk. An actual `textDocument/didClose`
+releases the overlay and the open document's client version. A referenced
+physical source can still produce its own diagnostics through the selected graph,
+and a missing referenced source can produce an import error in the importer.
+Closing a visual editor tab can leave the text document LSP-open. The Stage 7
+acceptance record describes the earlier contract.
+[G13 implementation](roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md#batch-1-implementation-record) ·
+[G21 qualification](compiler-health/G21_LSP_DIAGNOSTIC_LIFECYCLE_QUALIFICATION.md)
 
 Definition and references support resolved direct/aliased imported functions,
 forward/cyclic functions, project-root/imported constants and local readonly
@@ -299,13 +315,11 @@ index's existing declaration records; references consume its resolved references
 Mutable locals, parameters, aliases themselves, comments, punctuation and arbitrary
 expressions return null/empty results. There is no second symbol scanner.
 
-Disk fallback reads occur during complete analysis and retain the existing
-inconsistency checks; they are not an atomic filesystem snapshot. There is no
-watcher, save notification handler or disk-refresh extension. External disk edits
-alone do not trigger analysis. Restart/reinitialize the process to force a refresh,
-or an accepted open/change/close will reread disk as part of reanalysis. In-process
-clients still have the explicit Phase 9 `refresh_disk` API. Never assume a selected
-analysis certifies filesystem changes made afterward.
+Disk fallback reads occur during analysis and retain the existing inconsistency
+checks. Save and watched-file notifications, `void/refreshProject`, and accepted
+open/change/close events can trigger reanalysis. In-process clients can use the
+Phase 9 `refresh_disk` API. Each result describes the bytes and authority checked
+for its snapshot. Later filesystem changes require a fresh check.
 
 ## Transport and dependency boundaries
 
