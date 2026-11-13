@@ -147,15 +147,24 @@ struct ProjectCapture {
         if(sources.size()>project_visit_limit)project_failure(SourceFile("<project overlays>",""),Code::limit,"Source overlay work limit exceeded.");
         return sources;
     }
-    static project_fs::path admit_root(const project_fs::path& requested) {
+    static project_fs::path root_request(const project_fs::path& requested) {
         // Canonicalize the actual OS path before removing parent references:
         // link/../project need not mean the lexical sibling of link.
         auto absolute=project_fs::absolute(requested);
         while(absolute.has_relative_path() && (absolute.filename().empty() || absolute.filename()=="."))absolute=absolute.parent_path();
+        return absolute;
+    }
+    static project_fs::path canonical_root(const project_fs::path& absolute) {
         SourceFile site(path_utf8(absolute),"");
         if(project_native_alias(absolute))project_failure(site,Code::project_boundary,"Selected project root is an alias.");
         auto root=project_fs::canonical(absolute);
         if(!project_fs::is_directory(root))project_failure(site,Code::project_boundary,"Selected project root is not a directory.");
+        return root;
+    }
+    static project_fs::path admit_root(const project_fs::path& requested) {
+        auto absolute=root_request(requested);
+        auto root=canonical_root(absolute);
+        SourceFile site(path_utf8(absolute),"");
         // Canonical ancestors are permitted; a root's own spelling is exact.
         if(root!=root.root_path()) {
             auto expected=path_utf8(absolute.filename()==".."?root.filename():absolute.filename());std::set<std::string> matches;
@@ -335,6 +344,103 @@ std::string project_context_key(const ProjectCapture& capture,const std::string&
     if(capture.dependencies){field("locked-dependency-plan-v1");field(capture.dependencies->identity());}
     return result;
 }
+}
+class EditorProjectRoot {
+    using Path = std::filesystem::path;
+    using File = llvm::sys::fs::file_t;
+    struct Directory {
+        File file;
+        Directory(const Path& path,bool observe) : file(open(path,observe)) {
+#ifndef _WIN32
+            struct stat info{};
+            if(observe && ::fstatat(file,".",&info,0)!=0) {
+                const auto error=std::error_code(errno,std::generic_category());
+                (void)llvm::sys::fs::closeFile(file);
+                throw std::filesystem::filesystem_error("Cannot access selected project root",path,error);
+            }
+#endif
+        }
+        ~Directory() { (void)llvm::sys::fs::closeFile(file); }
+        Directory(const Directory&) = delete;
+        Directory& operator=(const Directory&) = delete;
+        static File open(const Path& path,bool observe) {
+#ifdef _WIN32
+            // Share deletion so the editor can observe an actual rename.
+            auto file=CreateFileW(path.c_str(),observe?FILE_LIST_DIRECTORY:0,
+                FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,nullptr,OPEN_EXISTING,
+                FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,nullptr);
+            if(file==INVALID_HANDLE_VALUE)
+                throw std::filesystem::filesystem_error("Cannot open selected project root",path,
+                    std::error_code(GetLastError(),std::system_category()));
+#else
+            int access=O_RDONLY;
+#ifdef O_PATH
+            if(!observe)access=O_PATH;
+#else
+            (void)observe;
+#endif
+            auto file=::open(path.c_str(),access|O_DIRECTORY|O_NOFOLLOW|O_CLOEXEC);
+            if(file<0)
+                throw std::filesystem::filesystem_error("Cannot open selected project root",path,
+                    std::error_code(errno,std::generic_category()));
+#endif
+            return file;
+        }
+        llvm::sys::fs::UniqueID identity(const Path& path) const {
+#ifdef _WIN32
+            BY_HANDLE_FILE_INFORMATION info{};
+            if(!GetFileInformationByHandle(file,&info))
+                throw std::filesystem::filesystem_error("Cannot inspect selected project root",path,
+                    std::error_code(GetLastError(),std::system_category()));
+            if(info.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)
+                project_failure(SourceFile(path_utf8(path),""),Code::project_boundary,"Selected project root is an alias.");
+            if(!(info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+                project_failure(SourceFile(path_utf8(path),""),Code::project_boundary,"Selected project root is not a directory.");
+            return {info.dwVolumeSerialNumber,(std::uint64_t(info.nFileIndexHigh)<<32)|info.nFileIndexLow};
+#else
+            llvm::sys::fs::file_status status;
+            if(auto error=llvm::sys::fs::status(file,status))
+                throw std::filesystem::filesystem_error("Cannot inspect selected project root",path,error);
+            if(!llvm::sys::fs::is_directory(status))
+                project_failure(SourceFile(path_utf8(path),""),Code::project_boundary,"Selected project root is not a directory.");
+            return status.getUniqueID();
+#endif
+        }
+    };
+    const Path path_;
+    const Directory held_; // Keeps the original file ID from being recycled.
+    const llvm::sys::fs::UniqueID identity_;
+public:
+    explicit EditorProjectRoot(const Path& root) : path_(root),held_(root,false),identity_(held_.identity(root)) {}
+    const Path& path() const { return path_; }
+    void check(const Path& requested) const {
+        // Selection still enforces exact spelling and case collisions when it
+        // captures the project. This check only compares the physical root.
+        auto canonical=ProjectCapture::canonical_root(ProjectCapture::root_request(requested));
+        if(canonical!=path_ || Directory(canonical,true).identity(canonical)!=identity_)
+            project_failure(SourceFile(path_utf8(path_/"void.project.toml"),""),Code::project_changed,"Selected project directory was replaced or moved.",
+                "Restore the original directory and refresh, or start a new project session.");
+    }
+};
+std::shared_ptr<const EditorProjectRoot> hold_editor_project_root(const std::filesystem::path& root) {
+    return std::make_shared<const EditorProjectRoot>(root);
+}
+std::optional<ProjectAnalysisResult> editor_project_root_failure(const std::filesystem::path& requested,const EditorProjectRoot& root) {
+    ProjectAnalysisResult result;
+    try {root.check(requested);return {};}
+    catch(const CompilationError& failure) {result.diagnostics=failure.diagnostics();}
+    catch(const std::filesystem::filesystem_error& failure) {
+        Diagnostic diagnostic{Code::project_boundary};
+        diagnostic.description=failure.what();
+        diagnostic.hint="Check the selected project root, permissions and exact path spelling.";
+        result.diagnostics.push_back(std::move(diagnostic));
+    }
+    auto state=std::make_shared<ProjectState>();state->root=root.path();result.state=std::move(state);
+    for(auto& diagnostic:result.diagnostics) {
+        if(diagnostic.code==Code::import_read)diagnostic.code=Code::project_boundary;
+        diagnostic.primary={std::make_shared<const SourceFile>(path_utf8(root.path()/"void.project.toml"),""),"/void.project.toml",0,0};
+    }
+    return result;
 }
 struct ProjectAnalysisAccess {
     static std::shared_ptr<const ProjectAnalysis> build(ProjectCapture& capture,const std::set<std::string>& seeds,const std::string& entry,bool automatic,std::shared_ptr<Unit> library_scope,bool authorize_native) {

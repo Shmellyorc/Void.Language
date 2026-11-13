@@ -108,6 +108,7 @@ class ProjectSnapshot {
     std::filesystem::path entry_;
     SourceOverrides overrides_;
     std::optional<std::filesystem::path> project_root_, project_request_;
+    std::shared_ptr<const EditorProjectRoot> physical_root_;
     std::optional<std::string> entry_override_;
     ManifestOverrides manifests_;
     EditorDiscovery discovery_;
@@ -140,6 +141,7 @@ class SessionAnalysis {
     std::shared_ptr<const ValidatedAnalysis> semantic_;
     std::map<std::string, EditorDocumentAnalysis> editor_documents_;
     std::map<std::string, EditorRecoveryAnalysis> recovery_;
+    bool project_root_available_ = true;
 public:
     const ProjectSnapshot& snapshot() const { return snapshot_; }
     const AnalysisResult& result() const { return result_; }
@@ -147,6 +149,7 @@ public:
     const auto& project() const { return project_; }
     const auto& semantic_analysis() const { return semantic_; }
     const auto& editor_documents() const { return editor_documents_; }
+    bool project_root_available() const { return project_root_available_; }
     const EditorRecoveryAnalysis* recovery_for(const std::string& document) const {
         auto found=recovery_.find(document);
         return found==recovery_.end()?nullptr:&found->second;
@@ -183,12 +186,15 @@ public:
     // Explicit disk refresh invalidates freshness even if bytes have not changed.
     void refresh();
     void reselect(std::optional<std::string> entry = {});
+    bool project_root_current() const;
     bool matches_selection(const ProjectAnalysis&) const;
     bool requires_reselection() const;
     ProjectSnapshot select() const { return current_; }
     static std::shared_ptr<const SessionAnalysis> analyze(ProjectSnapshot);
     bool accept(std::shared_ptr<const SessionAnalysis>);
-    bool is_current(const SessionAnalysis& result) const { return current_.same_revision(result.snapshot()); }
+    bool is_current(const SessionAnalysis& result) const {
+        return current_.same_revision(result.snapshot()) && (!result.project_root_available() || project_root_current());
+    }
     std::shared_ptr<const SessionAnalysis> current_analysis() const;
     std::shared_ptr<const ToolingIndex> current_index() const;
     const auto& latest_accepted() const { return latest_; }

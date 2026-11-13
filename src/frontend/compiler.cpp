@@ -15,6 +15,7 @@
 #include "void/temporal.hpp"
 #include "void/reference_capabilities.hpp"
 #include <algorithm>
+#include <cerrno>
 #include <charconv>
 #include <fstream>
 #include <functional>
@@ -30,6 +31,7 @@
 #include <tuple>
 #include <type_traits>
 #include <llvm/Support/SHA256.h>
+#include <llvm/Support/FileSystem.h>
 #include <llvm/ADT/StringRef.h>
 #ifdef _WIN32
 #ifndef WIN32_LEAN_AND_MEAN
@@ -39,6 +41,10 @@
 #define NOMINMAX
 #endif
 #include <windows.h>
+#else
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #endif
 // These handler boundaries keep unrelated temporaries out of recursive semantic
 // frames even in Release. The existing depth budget must fit a 1 MiB stack.
@@ -7721,8 +7727,12 @@ EditorAssistance editor_assistance_impl(const std::filesystem::path& entry,const
         if(project && document) {
             ProjectCapture repaired(project->root,frozen,project->manifest_overlays);
             (void)validated_editor_document(repaired,module,&probe,&recovery);
-        } else if(project)(void)analyze_manifest_project_impl(project->root,project_entry,frozen,project->manifest_overlays,&probe,false,discovery,&recovery);
-        else (void)validated_project(entry,frozen,true,nullptr,&probe,{},document?&module:nullptr,&recovery);
+        } else if(project) {
+            auto checked=analyze_manifest_project_impl(project->root,project_entry,frozen,project->manifest_overlays,&probe,false,discovery,&recovery);
+            if(std::any_of(checked.diagnostics.begin(),checked.diagnostics.end(),[](const auto& diagnostic) {
+                return diagnostic.code==Code::project_boundary || diagnostic.code==Code::project_changed;
+            }))return {};
+        } else (void)validated_project(entry,frozen,true,nullptr,&probe,{},document?&module:nullptr,&recovery);
         if(operator_context)return probe.result;
     }
     catch(const EditorProbeFound&) {
@@ -7738,6 +7748,7 @@ EditorAssistance editor_assistance(const std::filesystem::path& entry,const Sour
 EditorAssistance project_editor_assistance(const std::filesystem::path& root,const std::optional<std::string>& entry,const SourceOverrides& sources,const ManifestOverrides& manifests,const std::string& module,std::size_t cursor,const EditorDiscovery& discovery) {
     try {ProjectCapture capture(root,sources,manifests);return editor_assistance_impl(root,sources,module,cursor,&capture,entry,false,&discovery);}
     catch(const CompilationError&){return {};}
+    catch(const std::filesystem::filesystem_error&){return {};}
 }
 EditorAssistance document_editor_assistance(const std::filesystem::path& context,const SourceOverrides& sources,
     const std::string& module,std::size_t cursor,const ManifestOverrides* manifests) {

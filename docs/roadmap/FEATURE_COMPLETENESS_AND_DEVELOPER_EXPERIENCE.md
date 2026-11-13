@@ -274,7 +274,8 @@ and rerun deterministic Adventure gameplay.
 
 ### G19 · Editor completion performance attribution
 
-**IN PROGRESS pending Golden Wrench review. Production optimization HOLD.**
+**INTEGRATED / INDEPENDENT SOURCE REVIEW COMPLETE** at
+`bd6e0ebe6e43dc26d9a4ce1258d85739806d22e1`. **Production optimization HOLD.**
 The frozen G08 project was replayed at the integrated G18 baseline on native
 PikaOS and Windows 10 Debug/Release with isolated phase measurement. One deferred-capture experiment improves the matched
 Linux member-completion timings but changes error/exit behavior when the project
@@ -282,6 +283,15 @@ root disappears. That fails the exact-equivalence gate; no production
 optimization is approved by these results. Existing G08 measurements, Windows
 persistent-cache HOLD and unrelated release boundaries remain unchanged.
 [Consolidated attribution and qualification](../compiler-health/G19_COMPLETION_ATTRIBUTION.md)
+
+### G20 · Language-server root recovery and Stage 7 formatting
+
+**IN PROGRESS pending Golden Wrench source review.** The compiler reports a
+missing or inaccessible selected root on its manifest URI and rejects a different
+physical directory at the same pathname. The server withholds affected editor
+results until the original root is valid and the session analyzes a new revision.
+Stage 7 exercises the existing tab and space formatting paths.
+[Recovery and qualification](../compiler-health/G20_PROJECT_ROOT_RECOVERY.md)
 
 G00-A was independently reviewed at `d453195bfcbd34db211f4dddd8fa0832acbf8733`.
 Its public distribution HOLD, G08 performance and Windows cache HOLDs, and

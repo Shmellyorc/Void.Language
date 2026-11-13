@@ -290,10 +290,11 @@ ToolingSession::ToolingSession(std::filesystem::path entry) {
     refresh();
 }
 ToolingSession::ToolingSession(ProjectSession project) {
-    // Pins location only. The compiler owns physical/policy admission, including
-    // diagnostics for malformed/no-entry projects; no source discovery here.
+    // Pin the physical directory. The compiler still owns manifest and source
+    // admission, including diagnostics for malformed or entryless projects.
     current_.project_request_=std::filesystem::absolute(project.root);
     current_.project_root_=std::filesystem::canonical(project.root);
+    current_.physical_root_=hold_editor_project_root(*current_.project_root_);
     current_.entry_override_=std::move(project.entry);refresh();
 }
 bool ToolingSession::manifest_document(const std::string& id) const {
@@ -305,6 +306,9 @@ bool ToolingSession::overridden(const std::string& id) const {
 void ToolingSession::reselect(std::optional<std::string> entry) {
     if(!current_.project_root_)throw std::invalid_argument("Project reselection requires manifest mode.");
     refresh();current_.entry_override_=std::move(entry);selected_context_.clear();
+}
+bool ToolingSession::project_root_current() const {
+    return !current_.physical_root_ || !editor_project_root_failure(*current_.project_request_,*current_.physical_root_);
 }
 bool ToolingSession::matches_selection(const ProjectAnalysis& project) const {
     return selected_context_.empty() || selected_context_==project.context_key();
@@ -364,6 +368,21 @@ std::shared_ptr<const SessionAnalysis> ToolingSession::analyze(ProjectSnapshot s
     if (!snapshot.identity_) throw std::invalid_argument("Select a project snapshot before analysis");
     auto result = std::make_shared<SessionAnalysis>();
     result->snapshot_ = std::move(snapshot);
+    auto reject_root=[&] {
+        const auto& selected=result->snapshot_;
+        if(!selected.physical_root_)return false;
+        auto failure=editor_project_root_failure(*selected.project_request_,*selected.physical_root_);
+        if(!failure)return false;
+        result->project_=std::move(*failure);
+        result->result_={nullptr,result->project_->diagnostics};
+        result->semantic_.reset();
+        result->index_.reset();
+        result->editor_documents_.clear();
+        result->recovery_.clear();
+        result->project_root_available_=false;
+        return true;
+    };
+    if(reject_root())return result;
     if(result->snapshot_.project_root_) {
         result->project_=analyze_editor_project(*result->snapshot_.project_request_,result->snapshot_.entry_override_,result->snapshot_.overrides_,result->snapshot_.manifests_,result->snapshot_.discovery_);
         if(result->project_->manifest) {
@@ -381,6 +400,10 @@ std::shared_ptr<const SessionAnalysis> ToolingSession::analyze(ProjectSnapshot s
     if (result->semantic_) result->index_ = std::make_shared<ToolingIndex>(result->semantic_);
     const auto& selected=result->snapshot_;
     const auto* state=result->project_?result->project_->state.get():nullptr;
+    const bool root_boundary=state && !state->manifest &&
+        std::any_of(result->result_.diagnostics.begin(),result->result_.diagnostics.end(),[](const auto& diagnostic) {
+            return diagnostic.code==DiagnosticCode::project_boundary;
+        });
     auto recover=[&](const std::vector<Diagnostic>& diagnostics,const std::string* document) {
         std::string module;
         for(const auto& d:diagnostics) {
@@ -410,6 +433,7 @@ std::shared_ptr<const SessionAnalysis> ToolingSession::analyze(ProjectSnapshot s
         if(document.result.program)document.index.emplace(document.result.program);
         else recover(document.result.diagnostics,&id);
     }
+    if(!reject_root() && root_boundary)result->project_root_available_=false;
     return result;
 }
 bool ToolingSession::accept(std::shared_ptr<const SessionAnalysis> result) {

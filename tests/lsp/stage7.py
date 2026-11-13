@@ -83,7 +83,39 @@ with tempfile.TemporaryDirectory(prefix='VOID Stage7 é😀 ') as directory:
         formatted=q('textDocument/formatting',options={'tabSize':4,'insertSpaces':True})['result'];assert len(formatted)==1,formatted
         pretty=formatted[0]['newText'];assert '    var value = x' in pretty and '# keep é😀' in pretty
         active[0]=pretty;settext(pretty);assert q('textDocument/formatting',options={'tabSize':4,'insertSpaces':True})['result']==[]
-        assert q('textDocument/formatting',options={'tabSize':4,'insertSpaces':False})['error']['code']==-32602
+        tab_options={'tabSize':4,'insertSpaces':False}
+        # Leave a supplementary scalar on the final line so the end of the
+        # whole-document edit differs in bytes, code points, and UTF-16 units.
+        before=pretty.removesuffix('\n')
+        active[0]=before;settext(before)
+        edits=q('textDocument/formatting',options=tab_options)['result']
+        assert len(edits)==1,edits
+        edit=edits[0]
+        assert edit['range']=={'start':{'line':0,'character':0},'end':at(before,'# keep é😀',9)},edit
+        assert edit['newText']==before.replace('    var','\tvar').replace('    return','\treturn'),edit
+        # Applying the whole-document edit preserves the resolved call and
+        # argument binding, including their shifted positions.
+        original_hover=q('textDocument/hover','calculate')['result']['contents']
+        original_target=q('textDocument/definition','calculate')['result']
+        active[0]=edit['newText'];assert all(not n['diagnostics'] for n in settext(active[0]))
+        assert q('textDocument/hover','calculate')['result']['contents']==original_hover
+        assert q('textDocument/definition','calculate')['result']==original_target
+        assert q('textDocument/definition','value,')['result']['range']['start']==at(active[0],'value =')
+        assert q('textDocument/formatting',options=tab_options)['result']==[]
+        assert q('textDocument/formatting',options={'tabSize':4,'insertSpaces':True})['result'][0]['newText']==before
+        mixed=active[0].replace('\treturn','\t return')
+        active[0]=mixed;notes=settext(mixed)
+        assert any(n['uri']==uri and n['version']==version and
+                   any(d['code']=='VOID1002' and d['range']['start']==at(mixed,'\t return',1)
+                       for d in n['diagnostics']) for n in notes),notes
+        assert q('textDocument/formatting',options=tab_options)['result']==[]
+        # Stale didChange cannot replace current bytes or resurrect an old edit.
+        current=before.replace('# keep é😀','# latest 😀😀')
+        active[0]=current;settext(current)
+        c.notify('textDocument/didChange',{'textDocument':{'uri':uri,'version':version-1},'contentChanges':[{'text':before}]})
+        latest=q('textDocument/formatting',options=tab_options)['result']
+        assert len(latest)==1 and '# latest 😀😀' in latest[0]['newText'],latest
+        assert latest[0]['range']['end']==at(current,'😀😀',2),latest
         c.notify('textDocument/didOpen',{'textDocument':{'uri':(root/'unreachable.void').as_uri(),'languageId':'void','version':1,'text':'func broken(:\n'}})
         assert c.request('textDocument/formatting',{'textDocument':{'uri':(root/'unreachable.void').as_uri()},'options':{'tabSize':4,'insertSpaces':True}})[0]['result']==[]
         c.notify('textDocument/didClose',{'textDocument':{'uri':(root/'unreachable.void').as_uri()}});c.sync()

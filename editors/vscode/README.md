@@ -40,8 +40,12 @@ then PATH. No shell expansion, runtime download or repository build occurs.
 
 Use the normal editor completion/hover/signature/navigation/rename/format commands.
 Unsupported rename categories fail safely. **VOID: Refresh Project** observes disk
-changes while retaining dirty buffers; project files are also watched. **VOID:
-Restart Language Server** restarts after configuration or process failures.
+changes while retaining dirty buffers. Project files are also watched. If a
+selected manifest project's directory disappears, the status bar shows project
+errors and editor assistance is withheld. Restore the original directory and
+run **VOID: Refresh Project** to recover the session. Use **VOID: Restart
+Language Server** to select a different physical directory at the same path or
+to recover after a configuration or process failure.
 Output → VOID reports startup/lifecycle failures; verbose trace can include source.
 
 ### Check, build and run

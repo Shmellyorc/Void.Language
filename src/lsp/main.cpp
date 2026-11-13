@@ -335,6 +335,16 @@ class Server {
             refresh_semantics();
         }
     }
+    bool observe_project_root() {
+        if(!manifest_mode)return true;
+        const auto& latest=session.latest_accepted();
+        // A refresh or document mutation starts the next revision after loss.
+        if(latest && !latest->project_root_available())return false;
+        if(session.project_root_current())return true;
+        session.refresh();
+        analyze();
+        return false;
+    }
     j::Object summary() const {
         auto current=session.current_analysis();
         if(!manifest_mode || !current || !current->project())throw std::invalid_argument("No current manifest project summary");
@@ -857,25 +867,32 @@ public:
                 if(id) { fail(-32600,"Document synchronization uses notifications"); return {}; }
                 synchronize(name,object(o->get("params"))); return {};
             }
+            auto editor_result=[&](auto work,j::Value empty) {
+                const auto& params=object(o->get("params"));
+                if(observe_project_root()) {
+                    auto result=work(params);
+                    if(observe_project_root())empty=std::move(result);
+                }
+                send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",std::move(empty)}});
+            };
             if(name=="textDocument/semanticTokens/full") {
                 if(!id){fail(-32600,"Semantic tokens require a request");return {};}
-                auto result=semantic_tokens(object(o->get("params")));
-                send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",std::move(result)}});return {};
+                editor_result([&](const auto& params){return j::Value(semantic_tokens(params));},j::Object{{"data",j::Array{}}});return {};
             }
             if(name=="textDocument/codeAction" || name=="void/resolveQuickFix") {
                 if(!id){fail(-32600,"Quick fixes require a request");return {};}
-                auto result=quick_fix(object(o->get("params")),name=="void/resolveQuickFix");
-                send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",std::move(result)}});return {};
+                editor_result([&](const auto& params){return quick_fix(params,name=="void/resolveQuickFix");},
+                    name=="void/resolveQuickFix"?j::Value(nullptr):j::Value(j::Array{}));return {};
             }
             if(name=="textDocument/definition" || name=="textDocument/references") {
                 if(!id) { fail(-32600,"Navigation requires a request"); return {}; }
-                auto result=query(name,object(o->get("params")));
-                send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",std::move(result)}}); return {};
+                editor_result([&](const auto& params){return query(name,params);},
+                    name=="textDocument/definition"?j::Value(nullptr):j::Value(j::Array{}));return {};
             }
             if(name=="textDocument/hover" || name=="textDocument/completion" || name=="textDocument/signatureHelp" || name=="textDocument/documentSymbol" || name=="workspace/symbol" || name=="textDocument/formatting" || name=="textDocument/prepareRename" || name=="textDocument/rename") {
                 if(!id){fail(-32600,"Editor query requires a request");return {};}
-                auto result=editor_query(name,object(o->get("params")));
-                send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",std::move(result)}});return {};
+                const bool list=name=="textDocument/completion" || name=="textDocument/documentSymbol" || name=="workspace/symbol" || name=="textDocument/formatting";
+                editor_result([&](const auto& params){return editor_query(name,params);},list?j::Value(j::Array{}):j::Value(nullptr));return {};
             }
             if(name=="void/projectState" || name=="void/reselectProject") {
                 if(!manifest_mode){fail(-32601,"Manifest project mode is not selected");return {};}
@@ -884,7 +901,7 @@ public:
                     const auto& params=object(o->get("params"));std::optional<std::string> entry;
                     if(auto value=params.get("entry");value && !value->getAsNull())entry=string(params,"entry");
                     session.reselect(entry);analyze();
-                }
+                } else (void)observe_project_root();
                 send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",summary()}});return {};
             }
             if(name=="void/refreshProject") {

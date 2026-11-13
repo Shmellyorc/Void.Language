@@ -481,6 +481,9 @@ if(BUILD_TESTING)
   add_test(NAME lsp_editor_recovery COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/lsp/editor_recovery.py" "$<TARGET_FILE:voidls>" "$<TARGET_FILE:voidc>")
   set_tests_properties(lsp_editor_recovery PROPERTIES TIMEOUT 180)
+  add_test(NAME lsp_project_root_recovery COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/lsp/project_root_recovery.py" "$<TARGET_FILE:voidls>" "$<TARGET_FILE:voidc>")
+  set_tests_properties(lsp_project_root_recovery PROPERTIES TIMEOUT 180)
   add_test(NAME lsp_enum_recovery COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/lsp/enum_recovery.py" "$<TARGET_FILE:voidls>" "$<TARGET_FILE:voidc>")
   set_tests_properties(lsp_enum_recovery PROPERTIES TIMEOUT 180)

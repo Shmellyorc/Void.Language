@@ -95,9 +95,10 @@ rejects target model changes/close/reopen during the request. A newly loaded dir
 Neovim target cannot consume an unversioned closed-file edit. Vim rename remains
 disabled because its client does not enforce that contract.
 
-Formatting requires `{tabSize: 4, insertSpaces: true}` and a current valid graph.
+Formatting requires a tab size of four, a boolean `insertSpaces` option, and a
+current valid graph. Use `true` for four spaces or `false` for one tab per level.
 The compiler's lexer retains token spans and reads original trivia gaps; it emits
-four-space indentation and conservative spacing without rewriting comments,
+the requested indentation and conservative spacing without rewriting comments,
 literals, imports or line endings. Lexical tokens and indentation relationships
 must remain identical; the entire proposed graph must validate with the same
 native contract. A second formatting pass must produce identical bytes. Ambiguous

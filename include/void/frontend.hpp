@@ -188,6 +188,11 @@ struct ProjectAnalysisResult {
     std::shared_ptr<const ProjectState> state;
     bool succeeded() const { return bool(project); }
 };
+// Retains the selected physical directory for the lifetime of an editor session.
+class EditorProjectRoot;
+std::shared_ptr<const EditorProjectRoot> hold_editor_project_root(const std::filesystem::path& canonical_root);
+std::optional<ProjectAnalysisResult> editor_project_root_failure(const std::filesystem::path& requested,
+    const EditorProjectRoot&);
 ProjectAnalysisResult analyze_editor_project(const std::filesystem::path&, const std::optional<std::string>&,
     const SourceOverrides&, const ManifestOverrides&, const EditorDiscovery&);
 // Presentation-only analysis of a current open source. Any recovered graph is
