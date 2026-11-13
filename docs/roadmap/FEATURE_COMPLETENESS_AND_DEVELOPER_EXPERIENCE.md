@@ -262,13 +262,26 @@ controls.
 
 ### G18 · Context-aware enum comparison diagnostics
 
-**IN PROGRESS pending independent Golden Wrench review.** Preserve all six
+**INTEGRATED / INDEPENDENT SOURCE REVIEW COMPLETE** at
+`3c81b7eb75c44533a5326da589a6fe47144c3c0f`, reconciled by the Batch 17 assignment.
+Preserve all six
 original Adventure errors and make `VOID2016` identify tagged enum equality.
 Suggest a case pattern only for a resolved payload-free right-hand case.
 Explain explicit case and payload comparisons for other operands. Qualify
 the CLI and current unsaved editor diagnostics across the five local profiles
 and rerun deterministic Adventure gameplay.
 [Implementation and qualification](../developer-experience/G18_ENUM_EQUALITY_DIAGNOSTICS.md)
+
+### G19 · Editor completion performance attribution
+
+**IN PROGRESS pending Golden Wrench review. Production optimization HOLD.**
+The frozen G08 project was replayed at the integrated G18 baseline on native
+PikaOS and Windows 10 Debug/Release with isolated phase measurement. One deferred-capture experiment improves the matched
+Linux member-completion timings but changes error/exit behavior when the project
+root disappears. That fails the exact-equivalence gate; no production
+optimization is approved by these results. Existing G08 measurements, Windows
+persistent-cache HOLD and unrelated release boundaries remain unchanged.
+[Consolidated attribution and qualification](../compiler-health/G19_COMPLETION_ATTRIBUTION.md)
 
 G00-A was independently reviewed at `d453195bfcbd34db211f4dddd8fa0832acbf8733`.
 Its public distribution HOLD, G08 performance and Windows cache HOLDs, and

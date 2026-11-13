@@ -54,6 +54,9 @@ holds in historical records do not govern current work.
   [TCP/UDP architecture handoff](net/TCP_UDP_HANDOFF.md),
   [compiler-health issues](compiler-health/ISSUES.md),
   [integrated performance qualification](compiler-health/INTEGRATED_PERFORMANCE_QUALIFICATION.md).
+- [G19 completion attribution](compiler-health/G19_COMPLETION_ATTRIBUTION.md):
+  phase measurements and a rejected isolated reuse experiment; production HOLD
+  pending Golden Wrench review.
 - [LLVM compatibility](llvm23/COMPATIBILITY.md), [preview blockers](release/PREVIEW_BLOCKERS.md),
   [redistribution/licensing](release/REDISTRIBUTION_AUDIT.md),
   [documentation consolidation report](voidup/INTEGRATION_REPORT.md#documentation-review-revision).

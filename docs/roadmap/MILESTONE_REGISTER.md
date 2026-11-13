@@ -1,7 +1,7 @@
 # VOID developer experience milestone register
 
-Current assignment is Batch 16, G18 context-aware enum comparison diagnostics,
-starting from `35406a00aee892def5a0a7555c5beeae6fe284b3`.
+Current assignment is Batch 17, G19 editor completion performance attribution,
+starting from `3c81b7eb75c44533a5326da589a6fe47144c3c0f`.
 Batch entries below identify the integration commits and qualification scopes.
 Boss controls integration, hosted qualification and public release.
 [Feature roadmap](FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md)
@@ -26,12 +26,13 @@ Boss controls integration, hosted qualification and public release.
 | 13 · G12 | `afe14d4c0cd7fd0576ecc194a38c294d7e54ec0a` | **INTEGRATED / INDEPENDENT SOURCE REVIEW COMPLETE.** Bounded deterministic stored ZIP with G06 publication. Both archive tests passed on PikaOS Debug/Release/strict and Windows 10 Debug/Release. The unrelated Windows file-symlink control remains open. [Qualification](../archive/ZIP_EXPORT.md) |
 | 14 · G00-A | `d453195bfcbd34db211f4dddd8fa0832acbf8733` | **AUDIT INTEGRATED / INDEPENDENT REVIEW COMPLETE.** The distribution HOLD and deferred seven-job project/raylib gate remain. [Readiness audit](../release/G00_READINESS_AUDIT.md) |
 | 15 · G17 | `35406a00aee892def5a0a7555c5beeae6fe284b3` | **INTEGRATED / INDEPENDENT REVIEW COMPLETE.** Five-module ASCII Adventure, deterministic JIT and AOT gameplay, and physical keyboard qualification on PikaOS and Windows 10. [Qualification](../developer-experience/G17_ASCII_ADVENTURE.md) |
+| 16 · G18 | `3c81b7eb75c44533a5326da589a6fe47144c3c0f` | **INTEGRATED / INDEPENDENT SOURCE REVIEW COMPLETE**, as reconciled by the G19 assignment. Tagged-enum comparison guidance preserves original error codes/spans and guarded fixes. The separate Windows executable-cleanup refusal remains unexplained. [Qualification](../developer-experience/G18_ENUM_EQUALITY_DIAGNOSTICS.md) |
 
 ## Current and upcoming
 
 | Milestone | Status and next evidence |
 | --- | --- |
-| 16 · G18 | **IN PROGRESS pending independent Golden Wrench review.** Preserve the six original Adventure failures and provide typed enum comparison guidance through the compiler and language server. [Qualification](../developer-experience/G18_ENUM_EQUALITY_DIAGNOSTICS.md) |
+| 17 · G19 | **IN PROGRESS pending Golden Wrench review / PRODUCTION OPTIMIZATION HOLD.** Native phase measurements and editor qualification completed. The isolated deferred-capture candidate improves Linux timings but fails exact root-error equivalence; production remains unchanged. [Attribution and experiment](../compiler-health/G19_COMPLETION_ATTRIBUTION.md) |
 | G00 · Production distribution | Conditional on release authorization. Public bootstrap, distribution and platform obligations remain tracked in the release record. [Preview blockers](../release/PREVIEW_BLOCKERS.md) |
 
 ## Hosted acceptance

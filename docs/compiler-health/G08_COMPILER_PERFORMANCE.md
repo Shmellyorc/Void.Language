@@ -1,5 +1,12 @@
 # G08 compiler and editor performance
 
+> 12 November 2026 follow-up: [G19 attribution and isolated experiment](G19_COMPLETION_ATTRIBUTION.md)
+> uses the integrated G18 baseline `3c81b7eb75c44533a5326da589a6fe47144c3c0f`
+> and the unchanged frozen project. Its new timings are separate from the G08
+> results below. The experiment's project-root disappearance behavior differs
+> from production; the exact-equivalence gate and production optimization HOLD
+> remain active. G19 is IN PROGRESS pending Golden Wrench review.
+
 Baseline `561bd020d9904dcfa2dc792297f9e87688e89f5e`. Local performance
 qualification on PikaOS 4 x64 and the Windows 10 Home x64 VM. Production
 source and test registrations remain at the baseline during measurement.
