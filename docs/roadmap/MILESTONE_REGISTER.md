@@ -1,7 +1,8 @@
 # VOID developer experience milestone register
 
-Current assignment is Batch 18, G20 language-server root recovery and Stage 7
-formatting regression repair, starting from `bd6e0ebe6e43dc26d9a4ce1258d85739806d22e1`.
+Current assignment is G21-R diagnostic-lifecycle research at
+`49d2e66243d80957e7dd1bbeecb9767a43a13964`. G20 is accepted. G21-R research
+is complete and awaiting Golden Wrench/Boss review; no production repair is authorized.
 Batch entries below identify the integration commits and qualification scopes.
 Boss controls integration, hosted qualification and public release.
 [Feature roadmap](FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md)
@@ -33,7 +34,8 @@ Boss controls integration, hosted qualification and public release.
 
 | Milestone | Status and next evidence |
 | --- | --- |
-| 18 · G20 | **IN PROGRESS pending Golden Wrench source review.** Recover the original project session after filesystem invalidation and exercise the established tabs formatting contract. [Qualification](../compiler-health/G20_PROJECT_ROOT_RECOVERY.md) |
+| 18 · G20 | **ACCEPTED**, as confirmed by the G21-R assignment. Integrated at `49d2e66243d80957e7dd1bbeecb9767a43a13964`. Physical-root recovery and established tabs formatting remain preserved. [Qualification](../compiler-health/G20_PROJECT_ROOT_RECOVERY.md) |
+| G21-R | **RESEARCH COMPLETE / REVIEW PENDING.** Fresh independent diagnostics explain the legacy graph-only assertion. Five native profiles pass strengthened lifecycle controls; the graph-only experiment is rejected. Native VS Code visual-close ownership limitation is preserved. No production repair implemented. [Research and handoff](../compiler-health/G21_LSP_DIAGNOSTIC_LIFECYCLE_RESEARCH.md) |
 | G00 · Production distribution | Conditional on release authorization. Public bootstrap, distribution and platform obligations remain tracked in the release record. [Preview blockers](../release/PREVIEW_BLOCKERS.md) |
 
 ## Hosted acceptance
