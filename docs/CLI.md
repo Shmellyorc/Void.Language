@@ -306,3 +306,31 @@ and tool versions are checked. Missing resources include a reinstall hint; linke
 failure reports identify the driver and point to host development prerequisites.
 See [installation](install/README.md), [troubleshooting](TROUBLESHOOTING.md),
 [legacy source contract](SOURCE_COMPILER.md) and [native workflow](STAGE9_APPLICATION_WORKFLOW.md).
+
+## Source packages: add and tidy
+
+```sh
+voidc add ALIAS [--project DIR] --path DIR
+voidc add ALIAS [--project DIR] --git ORIGIN --rev FULL_SHA [--subdir DIR]
+voidc tidy [--project DIR] [--check]
+```
+
+Both commands default to the current project. `--path` is relative to that
+project; a path already inside it remains editable in place, while an external
+source is installed as an editable copy under `libs/ALIAS`. Git pins must be
+complete lowercase immutable commits, acquired through D3's existing transport.
+There is no bare-name registry lookup. `add` selects an application manifest,
+validates the library's package ID/version/entry, appends its dependency table
+and maintains `void.lock`. Conflicts retain the previous project.
+
+`use lib/...` selects ordinary project-owned source. `use pkg/...` selects a
+declared and locked external package, including when its files are physically
+installed under `libs/`. Local libraries do not require tidy or manifests.
+
+Tidy checks relevant imports, retains unused dependencies with advice, refreshes
+legitimate local locks and materializes verified Git source views. It never
+fetches or upgrades Git pins. `--check` performs read-only consistency checking
+and exits nonzero for required corrections; unused-package advice alone does
+not fail CI. Native execution still requires the existing separate D4 approval.
+See [local-library ownership and recovery](LOCAL_LIBRARIES.md#g26-installed-source-packages-and-maintenance)
+and [G26 qualification](projects/G26_PACKAGE_MAINTENANCE.md).

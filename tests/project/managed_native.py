@@ -240,6 +240,7 @@ with tempfile.TemporaryDirectory(prefix="VOID D4 雪 ") as temporary:
     cli("resolve", "--locked")
     assert first == lock.read_bytes()
     cli("check")
+    cli("tidy", "--check")
     cli("run", status=2, message="--allow-native")
     cli("build", "-o", base / "denied", status=2, message="--allow-native")
     cli("emit", "-o", base / "denied.o", status=2, message="--allow-native")

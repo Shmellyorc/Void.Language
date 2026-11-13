@@ -1,5 +1,9 @@
 # Project-local VOID libraries
 
+Current add/tidy behavior and ownership rules are documented in
+[G26: installed source packages and maintenance](#g26-installed-source-packages-and-maintenance).
+The opening notes below retain the earlier implementation history.
+
 Slice 1 now validates application/library metadata and rejects nonempty reserved
 native/dependency declarations through the explicit compiler-library parser only.
 [Engineering evidence](projects/SLICE1.md) records the qualification. Source-library
@@ -135,3 +139,89 @@ dynamic-default linkage direction without freezing those details. No project pac
 manager is implemented by the local-library, Stage 9 or CI #90 repairs.
 Complete VOID language features before substantial
 standard-library implementation. This section records direction, not a new sprint.
+
+## G26: installed source packages and maintenance
+
+The implemented commands are:
+
+```sh
+voidc add geometry --path vendor/geometry --project .
+voidc add geometry --path ../geometry --project .
+voidc add geometry --git https://example.org/geometry.git --rev FULL_LOWERCASE_SHA --project .
+voidc add geometry --git https://example.org/libraries.git --rev FULL_LOWERCASE_SHA --subdir geometry --project .
+voidc tidy --project .
+voidc tidy --check --project .
+```
+
+The project defaults to the current directory. Local source paths are relative to
+that selected project. There is no registry lookup. Git acquisition uses D3's
+existing HTTPS or `file:<project-relative-repository>` pins and its existing
+whole-repository limits.
+
+`use lib/math` still means project-owned `libs/math/math.void`. It needs no
+manifest, registration, Git or maintenance operation. Only referenced libraries
+are loaded; entry discovery still excludes `libs/`. Edits remain ordinary source
+edits, visible to the compiler and editor.
+
+`use pkg/geometry` means the declared package identity, entry and dependency
+edges verified by `void.lock`. For Git packages, `libs/geometry/` is a checked
+materialized view of D3's `.void/git-deps/<pin>/<digest>/tree` snapshot, with the
+package manifest and internal layout intact. `.void-package` contains the
+existing D3 proof as an ownership receipt. It is not an alternative source
+index, cache or approval. Compilation verifies the exact view against D3 and
+reads verified snapshot bytes. Definitions point to the physical installed
+files. Importing those files through `lib/` or a quoted project path cannot
+cross their package boundary. Do not edit a Git view; use an editable local
+package for development.
+
+An existing in-project `--path` keeps its location and live path-dependency
+behavior. A source outside the selected project is copied into `libs/<alias>`;
+that installed copy becomes the editable source. This does not create a live
+link to the original directory. External sibling dependencies that escape the
+installed tree are rejected by the existing resolver enclosure. Move the
+editable package graph inside the project deliberately when that is needed.
+User directories, case collisions, aliases and incompatible declarations are
+never overwritten. Repeating the same addition preserves editable local changes.
+
+`add` appends the smallest dependency table, retaining existing TOML bytes,
+comments, table order and LF/CRLF style. It pins the discovered package ID and
+exact version, validates the graph and writes the existing D3 lock format.
+Existing manual manifest/fetch/resolve workflows remain supported; a Git view is
+optional for those workflows. A missing view is advice in `tidy --check`; `tidy`
+materializes it. A present unowned or altered view is an error.
+
+`tidy` parses relevant source roots or the explicit entry using the compiler's
+source graph and follows referenced project/local imports. It validates package
+metadata and locks without executing or type-checking the application. Missing
+local entry files and undeclared `pkg/` imports are errors. Unused direct
+packages are advice and are retained. No developer `.void` source is changed.
+Legitimate editable-source or manifest changes refresh the lock. Immutable Git
+claims cannot be silently refreshed after tampering. After intentionally editing
+a Git pin, run the existing `deps fetch` first; tidy replaces a managed view only
+when it still exactly matches its previous verified snapshot. It never upgrades
+a pin on its own. The second unchanged tidy writes nothing.
+
+`tidy --check` never writes manifests, locks, sources, views or recovery records.
+It fails when consistency requires correction, while optional advice remains a
+successful result. Tidy does not guess missing source locators or native approval.
+
+Publication is serialized with the existing dependency writer. A temporary
+`.void/package-edit/` record saves prior files and the exact installed trees.
+Compiler/resolver readers reject a pending edit. Failure rolls back; after a
+process interruption, an explicit `add` or mutating `tidy` restores the saved
+project before proceeding. Read-only checking reports the pending operation.
+Recovery refuses to overwrite subsequently changed files or remove a changed
+installed tree, retaining the record for inspection. This is a process-crash
+recovery contract; no power-loss or hostile concurrent-filesystem transaction
+claim is made.
+
+Source installation grants no native authority. Native declaration advice names
+providers and refers to the package's existing README/preparation instructions.
+D4's application requirements, selected catalog, descriptor verification and
+`--allow-native` remain separate. No installation scripts, binary downloads or
+native builds run during add/tidy. Raylib's existing `prepare.py` and catalog
+metadata already describe its preparation; no additional TOML format is needed.
+
+The earlier design discussion in this document is historical. The rules in this
+section describe the implemented G26 workflow; see
+[the qualification report](projects/G26_PACKAGE_MAINTENANCE.md).

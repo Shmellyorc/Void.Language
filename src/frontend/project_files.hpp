@@ -47,4 +47,20 @@ void publish_application_directory(const CreationRoot&, const std::string& leaf,
 
 enum class LockShape { valid, malformed, unsupported, conflicting };
 LockShape dependency_lock_shape(std::string_view);
+bool tidy_lock_change_allowed(std::string_view before, std::string_view after);
+std::map<std::string, GitDependency> locked_direct_git_sources(std::string_view);
+
+using ProjectFiles = std::map<std::string, std::string>;
+// Bounded physical inventory, also used to verify staged/materialized source views.
+ProjectFiles read_package_directory(const std::filesystem::path&, const ProjectDirectoryReader& = {}, bool edit_record = false);
+void require_no_package_edit(const std::filesystem::path&);
+// A pending edit is never compiler authority. Only an explicit maintenance
+// operation may roll it back, after checking its saved bytes and directories.
+void recover_package_edit(const CreationRoot&);
+void publish_package_edit(const CreationRoot&, std::string_view previous_manifest,
+                         const std::optional<std::string>& previous_lock,
+                         const std::map<std::string, ProjectFiles>& additions,
+                         const std::function<std::pair<std::string, std::optional<std::string>>()>& prepare,
+                         CreationCheckpoint = nullptr,
+                         const std::map<std::string, ProjectFiles>& replacements = {});
 }

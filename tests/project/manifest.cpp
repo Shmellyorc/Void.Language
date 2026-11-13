@@ -1,4 +1,5 @@
 #include "void/project.hpp"
+#include "void/c_dynamic.hpp"
 #include "void/frontend.hpp"
 #include "void/path.hpp"
 #include <iostream>
@@ -296,7 +297,7 @@ adapter = "libadapter.so"
     reject(replace(text, "\"libprovider.so\" = ", "\"another.so\" = "));
     reject(replace(text, "\"LICENSE.txt\" = ", "\"LIBVENDOR.SO.1\" = "));
     reject(replace(text, "\"LICENSE.txt\" = " + identity(19), ""));
-    reject(replace(text, identity(17), identity(16385)));
+    reject(replace(text, identity(17), identity(vd::c_conventional_descriptor_limit + 1)));
     reject(replace(text, identity(19), quote("019:" + hash)));
     reject(replace(text, identity(19), quote("19:" + std::string(64, 'A'))));
     reject(replace(text, identity(19), quote("18446744073709551616:" + hash)));

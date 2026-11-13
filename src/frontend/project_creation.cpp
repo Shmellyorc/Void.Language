@@ -726,6 +726,254 @@ void publish_application_directory(const CreationRoot& directory, const std::str
 #endif
 }
 
+// Source-package publication uses the same pinned parents, exclusive staging,
+// atomic file rename and dependency writer as D3. The short-lived journal is a
+// rollback record, never a package index or source authority.
+ProjectFiles read_package_directory(const fs::path& root, const ProjectDirectoryReader& reader, bool edit_record) {
+    const auto admitted=reader.inspect(root);
+    ProjectFiles files;
+    std::size_t bytes=0, visited=0;
+    std::function<void(const fs::path&,const std::string&,unsigned)> walk;
+    walk=[&](const fs::path& directory,const std::string& prefix,unsigned depth) {
+        if(depth>64)throw std::runtime_error("Package directory-depth limit exceeded.");
+        reader.inspect(directory);
+        std::set<std::string> names;
+        for(const auto& child:fs::directory_iterator(directory)) {
+            if(++visited>32768)throw std::runtime_error("Package directory-entry limit exceeded.");
+            auto name=path_utf8(child.path().filename());
+            if(!portable_path_component(name) || !names.insert(fold(name)).second || project_path_alias(child.path()))
+                throw std::runtime_error("Package path has a collision or alias: "+path_utf8(child.path()));
+            auto relative=prefix+name;
+            auto status=child.symlink_status();
+            if(fs::is_directory(status)) {
+                files.emplace(relative+"/","");
+                if(!edit_record || !prefix.empty() || (name!="displaced" && name!="discarded"))walk(child.path(),relative+"/",depth+1);
+            } else if(fs::is_regular_file(status)) {
+                auto content=reader.read(child.path(),64*1024*1024);
+                bytes+=content.size();
+                if(bytes>256*1024*1024)throw std::runtime_error("Package source byte limit exceeded.");
+                files.emplace(std::move(relative),std::move(content));
+            } else throw std::runtime_error("Package source must contain regular files and directories.");
+        }
+    };
+    walk(root,"",0);
+    if(reader.inspect(root).identity!=admitted.identity)throw std::runtime_error("Package directory changed during inventory.");
+    return files;
+}
+
+void require_no_package_edit(const fs::path& root) {
+    if(!named(root,".void"))return;
+    named(root,".void",true);inspect_creation_root(root/".void");
+    if(named(root/".void","package-edit"))
+        throw std::runtime_error("Interrupted package edit. Run voidc tidy to recover before using this project.");
+}
+namespace {
+struct PackageWriter {
+    Parent parent;
+#ifdef _WIN32
+    NativeHandle writer;
+#endif
+    explicit PackageWriter(const CreationRoot& root):parent(root.path) {
+        if(parent.identity_key()!=root.identity)throw std::runtime_error("Package edit root changed.");
+        if(named(root.path,".void"))named(root.path,".void",true);
+#ifdef _WIN32
+        if(!CreateDirectoryW((root.path/".void").c_str(),nullptr) && GetLastError()!=ERROR_ALREADY_EXISTS)
+            native_windows::fail("Cannot create package workspace");
+#else
+        if(flock(parent.handle.fd,LOCK_EX))system_failure("Cannot serialize package edit");
+        if(mkdirat(parent.handle.fd,".void",0700) && errno!=EEXIST)system_failure("Cannot create package workspace");
+#endif
+        Parent workspace(root.path/".void");
+#ifdef _WIN32
+        writer.value=CreateFileW((root.path/".void/dependency-writer").c_str(),GENERIC_READ|GENERIC_WRITE,
+            FILE_SHARE_READ|FILE_SHARE_WRITE,nullptr,OPEN_ALWAYS,FILE_FLAG_OPEN_REPARSE_POINT,nullptr);
+        if(writer.value==INVALID_HANDLE_VALUE)native_windows::fail("Cannot open package writer");
+        auto info=identity(writer);
+        if(info.nNumberOfLinks!=1 || info.dwFileAttributes&(FILE_ATTRIBUTE_DIRECTORY|FILE_ATTRIBUTE_REPARSE_POINT))
+            throw std::runtime_error("Package writer must be a regular file without aliases.");
+        OVERLAPPED offset{};
+        if(!LockFileEx(writer.value,LOCKFILE_EXCLUSIVE_LOCK,0,1,0,&offset))native_windows::fail("Cannot serialize package edit");
+#endif
+    }
+};
+void replace_edit_file(const fs::path& path,std::string_view bytes) {
+    Parent parent(path.parent_path());
+    const auto temporary=".void-edit-"+random_hex();
+#ifdef _WIN32
+    auto file=make_file(parent.path/temporary);
+#else
+    auto file=make_file(parent.handle.fd,temporary);
+#endif
+    try {
+        write_file(file,bytes);
+        bool exists=named(parent.path,path_utf8(path.filename()));
+        if(exists) {named(parent.path,path_utf8(path.filename()),true);(void)vd::project::read_project_input(path,lock_byte_limit);}
+#ifdef _WIN32
+        publish_file(file,path,exists);
+#else
+        if(exists) {
+            if(renameat(file.parent,file.name.c_str(),parent.handle.fd,path.filename().c_str()))system_failure("Cannot publish package edit file");
+        } else rename_exclusive(file,parent.handle.fd,path_utf8(path.filename()));
+#endif
+    } catch(...) {if(owns(file))erase(file);throw;}
+}
+std::map<std::string,std::string_view> borrowed_files(const ProjectFiles& files) {
+    std::map<std::string,std::string_view> result;
+    for(const auto& [path,bytes]:files)result.emplace(path,bytes);
+    return result;
+}
+void publish_edit_directory(const fs::path& parent,const std::string& leaf,const ProjectFiles& files) {
+    publish_project_directory(inspect_creation_root(parent),leaf,borrowed_files(files),
+        [&](const fs::path& staged,const ProjectDirectoryReader& reader) {
+            if(staged==parent/utf8_path(leaf))throw CreationCollision("Package destination already exists: "+path_utf8(staged));
+            if(read_package_directory(staged,reader)!=files)throw std::runtime_error("Package staging content changed.");
+        });
+}
+void rename_edit_directory(const fs::path& source,const fs::path& destination) {
+    Parent from(source.parent_path()),to(destination.parent_path());
+    named(from.path,path_utf8(source.filename()),true);
+#ifdef _WIN32
+    Node directory{source,open_node(source,true,false),true};
+    publish_file(directory,destination);
+#else
+    Node directory{from.handle.fd,path_utf8(source.filename()),NativeHandle(openat(from.handle.fd,source.filename().c_str(),dir_flags)),true};
+    if(directory.handle.fd<0)system_failure("Cannot pin package directory rename");
+    rename_exclusive(directory,to.handle.fd,path_utf8(destination.filename()));
+#endif
+}
+void finish_package_edit(const fs::path& journal) {
+    // Atomic removal of the gate is the commit point. Interrupted garbage
+    // collection cannot strand a partly deleted recovery record at that name.
+    auto garbage=journal.parent_path()/("package-done-"+random_hex());
+    rename_edit_directory(journal,garbage);
+    std::error_code error;fs::remove_all(garbage,error);
+}
+void rollback_package_edit(const CreationRoot& root) {
+    const auto journal=root.path/".void/package-edit";
+    if(!named(root.path/".void","package-edit"))return;
+    named(root.path/".void","package-edit",true);
+    auto files=read_package_directory(journal,{},true);
+    if(!files.contains("before-manifest") || !files.contains("views/"))throw std::runtime_error("Invalid package edit recovery record; retained for inspection.");
+    const auto current=vd::project::read_project_input(root.path/manifest_name,manifest_byte_limit);
+    if(current!=files.at("before-manifest") && (!files.contains("after-manifest") || current!=files.at("after-manifest")))
+        throw std::runtime_error("Manifest changed after interrupted edit; recovery record retained.");
+    const auto lock=read_dependency_lock(root.path);
+    const auto before=files.contains("before-lock")?std::optional(files.at("before-lock")):std::nullopt;
+    const auto after=files.contains("after-lock")?std::optional(files.at("after-lock")):std::nullopt;
+    if(lock!=before && lock!=after)throw std::runtime_error("Lock changed after interrupted edit; recovery record retained.");
+    std::map<std::string,ProjectFiles> views;
+    for(const auto& [path,bytes]:files)if(path.starts_with("views/") && path!="views/") {
+        const auto tail=path.substr(6); const auto slash=tail.find('/');
+        if(slash==std::string::npos || !portable_path_component(tail.substr(0,slash)))throw std::runtime_error("Invalid package recovery path.");
+        auto& view=views[tail.substr(0,slash)];
+        if(slash+1<tail.size())view.emplace(tail.substr(slash+1),bytes);
+    }
+    std::map<std::string,ProjectFiles> replacements;
+    for(const auto& [path,bytes]:files)if(path.starts_with("previous/") && path!="previous/") {
+        const auto tail=path.substr(9);const auto slash=tail.find('/');
+        if(slash==std::string::npos || !views.contains(tail.substr(0,slash)))throw std::runtime_error("Invalid package replacement recovery path.");
+        auto& previous=replacements[tail.substr(0,slash)];
+        if(slash+1<tail.size())previous.emplace(tail.substr(slash+1),bytes);
+    }
+    for(const auto& [alias,expected]:replacements) {
+        auto backup=journal/"displaced"/utf8_path(alias);
+        if(fs::exists(backup) && read_package_directory(backup)!=expected)
+            throw std::runtime_error("Displaced package changed after interrupted edit; retained for inspection.");
+    }
+    // Validate every removal before changing any project-owned state.
+    for(const auto& [alias,expected]:views) {
+        auto path=root.path/"libs"/utf8_path(alias);
+        if(fs::exists(path) || project_path_alias(path)) {
+            auto actual=read_package_directory(path);
+            if(actual!=expected && (!replacements.contains(alias) || actual!=replacements.at(alias)))
+                throw std::runtime_error("Installed source changed after interrupted edit; retained "+path_utf8(path));
+        }
+    }
+    replace_edit_file(root.path/manifest_name,files.at("before-manifest"));
+    if(before)replace_edit_file(root.path/lock_name,*before);
+    else if(lock)fs::remove(root.path/lock_name);
+    for(const auto& [alias,expected]:views) {
+        const auto path=root.path/"libs"/utf8_path(alias);
+        if(fs::exists(path)) {
+            if(replacements.contains(alias) && read_package_directory(path)==replacements.at(alias))continue;
+            rename_edit_directory(path,journal/"discarded"/utf8_path(alias));
+        }
+        if(replacements.contains(alias)) {
+            auto backup=journal/"displaced"/utf8_path(alias);
+            if(fs::exists(backup))rename_edit_directory(backup,path);
+            else publish_edit_directory(root.path/"libs",alias,replacements.at(alias));
+        }
+    }
+    if(files.contains("created-libs") && fs::exists(root.path/"libs") && fs::is_empty(root.path/"libs"))fs::remove(root.path/"libs");
+    if(read_package_directory(journal,{},true)!=files)throw std::runtime_error("Package recovery record changed; retained.");
+    finish_package_edit(journal);
+}
+}
+void recover_package_edit(const CreationRoot& root) {
+    // No workspace creation on a project with no pending transaction.
+    try {require_no_package_edit(root.path);return;}catch(const std::runtime_error&) {}
+    PackageWriter writer(root);
+    rollback_package_edit(root);
+}
+void publish_package_edit(const CreationRoot& root,std::string_view previous_manifest,
+                         const std::optional<std::string>& previous_lock,
+                         const std::map<std::string,ProjectFiles>& additions,
+                         const std::function<std::pair<std::string,std::optional<std::string>>()>& prepare,
+                         CreationCheckpoint checkpoint,
+                         const std::map<std::string,ProjectFiles>& replacements) {
+    PackageWriter writer(root);
+    require_no_package_edit(root.path);
+    if(vd::project::read_project_input(root.path/manifest_name,manifest_byte_limit)!=previous_manifest || read_dependency_lock(root.path)!=previous_lock)
+        throw std::runtime_error("Project inputs changed before package edit; retry.");
+    ProjectFiles record{{"before-manifest",std::string(previous_manifest)},{"views/",""},{"displaced/",""},{"discarded/",""}};
+    if(previous_lock)record.emplace("before-lock",*previous_lock);
+    if(!additions.empty()) {
+        if(named(root.path,"libs")) {named(root.path,"libs",true);inspect_creation_root(root.path/"libs");}
+        else record.emplace("created-libs","");
+    }
+    for(const auto& [alias,files]:additions) {
+        if(!portable_path_component(alias))throw std::runtime_error("Invalid package destination alias.");
+        if(fs::exists(root.path/"libs") && named(root.path/"libs",alias)) {
+            if(!replacements.contains(alias))throw CreationCollision("Package destination already exists: libs/"+alias);
+            if(read_package_directory(root.path/"libs"/utf8_path(alias))!=replacements.at(alias))throw std::runtime_error("Previous installed package changed before replacement.");
+        }
+        if(replacements.contains(alias)) {
+            record.emplace("previous/","");record.emplace("previous/"+alias+"/","");
+            for(const auto& [name,bytes]:replacements.at(alias))record.emplace("previous/"+alias+"/"+name,bytes);
+        }
+        record.emplace("views/"+alias+"/","");
+        for(const auto& [name,bytes]:files)record.emplace("views/"+alias+"/"+name,bytes);
+    }
+    publish_edit_directory(root.path/".void","package-edit",record);
+    const auto journal=root.path/".void/package-edit";
+    try {
+        if(!additions.empty() && record.contains("created-libs"))publish_edit_directory(root.path,"libs",{});
+        for(const auto& [alias,files]:additions) {
+            if(replacements.contains(alias)) {
+                if(read_package_directory(root.path/"libs"/utf8_path(alias))!=replacements.at(alias))throw std::runtime_error("Installed package changed during replacement.");
+                rename_edit_directory(root.path/"libs"/utf8_path(alias),journal/"displaced"/utf8_path(alias));
+                if(checkpoint)checkpoint(journal/"displaced"/utf8_path(alias));
+            }
+            publish_edit_directory(root.path/"libs",alias,files);
+        }
+        auto [manifest,lock]=prepare();
+        replace_edit_file(journal/"after-manifest",manifest);
+        if(lock)replace_edit_file(journal/"after-lock",*lock);
+        if(checkpoint)checkpoint(journal); // Includes process-death qualification.
+        if(vd::project::read_project_input(root.path/manifest_name,manifest_byte_limit)!=previous_manifest || read_dependency_lock(root.path)!=previous_lock)
+            throw std::runtime_error("Project inputs changed during package edit; retry.");
+        if(manifest!=previous_manifest)replace_edit_file(root.path/manifest_name,manifest);
+        if(lock!=previous_lock) {
+            if(lock)replace_edit_file(root.path/lock_name,*lock);
+            else if(previous_lock)fs::remove(root.path/lock_name);
+        }
+        if(checkpoint)checkpoint(root.path); // Before commit, rollback still applies.
+        for(const auto& [alias,files]:additions)if(read_package_directory(root.path/"libs"/utf8_path(alias))!=files)
+            throw std::runtime_error("Installed source changed during publication.");
+        finish_package_edit(journal); // Readers can now admit the complete project.
+    } catch(...) {rollback_package_edit(root);throw;}
+}
+
 CreationPlan plan_creation(const fs::path& requested,const CreationOptions& options,CreationEntropy entropy) {
     auto root=absolute_target(requested);
     auto leaf=path_utf8(root.filename());

@@ -116,7 +116,26 @@ void application_publication(const fs::path& root) {
 #endif
 }
 
-int main() {
+int main(int argc,char** argv) {
+    if(argc==4 && std::string_view(argv[1])=="--package-interrupt") {
+        const auto root=inspect_creation_root(fs::path(argv[2]));
+        const auto before=read(root.path/"void.project.toml");
+        static std::string phase;
+        phase=argv[3];
+        std::map<std::string,ProjectFiles> replacements;
+        if(phase.starts_with("replace"))replacements.emplace("interrupted",ProjectFiles{{"owned.txt","previous source"}});
+        publish_package_edit(root,before,read_dependency_lock(root.path),{{"interrupted",{{"owned.txt","staged source"}}}},
+            [&]{return std::pair{before+"\n# completed edit\n",std::optional<std::string>("interrupted lock")};},
+            [](const fs::path& checkpoint){
+                bool displaced=checkpoint.parent_path().filename()=="displaced";
+                bool before=checkpoint.filename()=="package-edit";
+                if((phase=="replace-displaced" && displaced) ||
+                   ((phase=="before" || phase=="replace-before") && before) ||
+                   ((phase=="after" || phase=="replace-after") && !before && !displaced))std::_Exit(86);
+            },replacements);
+        return 3;
+    }
+
     try {
         Fixture fixture;
         auto root=fixture.root/"existing";

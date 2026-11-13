@@ -63,4 +63,16 @@ DependencyExplanation explain_dependencies(const std::filesystem::path&);
 // Only this operation may consult the explicitly authorized Git repositories.
 std::size_t fetch_dependencies(const std::filesystem::path&, const std::vector<GitPin>&);
 bool valid_git_pin(const GitPin&);
+
+struct AddOptions {
+    std::string alias;
+    std::optional<std::filesystem::path> path;
+    std::optional<GitDependency> git;
+};
+struct MaintenanceReport {
+    bool changed = false;
+    std::vector<std::string> advice;
+};
+MaintenanceReport add_dependency(const std::filesystem::path&, const AddOptions&);
+MaintenanceReport tidy_dependencies(const std::filesystem::path&, bool check);
 }

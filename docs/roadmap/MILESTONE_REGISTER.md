@@ -1,11 +1,10 @@
 # VOID developer experience milestone register
 
-Current authorized work is **G25: general C header importer**, starting at
-`b61a32193fad616ae3863b01809533ab4a721cde`. The physical G24 conversion is
-integrated in that baseline. G25 implementation and native qualification are
-recorded in the [G25 report](../projects/G25_NATIVE_HEADER_IMPORTER.md); Boss
-controls integration and hosted acceptance. The G23/G24 record below retains its
-original qualification/publication boundaries.
+Current authorized work is **G26: package add, project libraries and tidy**, starting
+at `49e419b7985c5e10234d158533d18146753d3308`. G23/G24/G25 are integrated
+in that baseline. G26 reuses local libraries and D3/D4/D5; implementation and
+qualification are recorded in the [G26 report](../projects/G26_PACKAGE_MAINTENANCE.md).
+Boss controls integration, publication and hosted CI.
 
 The preceding assignment was the Boss-authorized G23 editor packaging and G24 raylib
 verified source package integration. G22 is accepted at
@@ -56,6 +55,7 @@ Boss controls integration, hosted qualification and public release.
 | G23 | **IMPLEMENTED / LOCAL EDITOR QUALIFICATION.** Package reuses Check/Build/Run selection, trust, saved-buffer, profile and compiler execution checks. Real package verification passed in native VS Code 1.141.0 on PikaOS and Windows 10 Debug/Release. No integration commit created. [Implementation](../projects/G23_G24_IMPLEMENTATION.md) |
 | G24 | **IMPLEMENTED; PHYSICAL SOURCE LOCAL; STANDALONE PUBLICATION PENDING.** Baseline `6a7cb50b2d35023324053694275596c9a4a7b328` preserves all 600 usable interfaces: 236 direct, 352 ownership, ten G5 lifecycle and two typed equivalents. Real `.void` public/native modules replace raylib ghost source; editable behavior and root-repository Git consumers are locally qualified. The actual monorepo GitHub failure on all five builds remains recorded; D3 limits are unchanged. Reproducible subtree publication is proposed, with no repository creation/push authorized or performed. Strict external device leaks remain unsuppressed. [Physical-source report and publication commands](../projects/G24_PHYSICAL_SOURCE_IMPLEMENTATION.md) · [Public-origin qualification](../projects/G24_PUBLIC_GITHUB_QUALIFICATION.md) · [Integrated implementation](../projects/G23_G24_IMPLEMENTATION.md) |
 | G25 | **IMPLEMENTED LOCALLY / FIVE NATIVE PROFILES QUALIFIED.** Explicit `voidc native import` derives editable physical VOID, conventional descriptors, coverage and value adapters with pinned Clang. Pointer ownership/callbacks remain reviewed G3/G4/G5 contracts. Independent C/C++/SQLite and five-profile qualification are recorded in the [G25 report](../projects/G25_NATIVE_HEADER_IMPORTER.md). No new FFI, loader, registry or Runtime; no staging/commit/push/hosted CI. |
+| G26 | **IMPLEMENTED LOCALLY / FIVE NATIVE PROFILES QUALIFIED.** Explicit `voidc add`, `voidc tidy` and read-only `tidy --check`; editable path sources and verified Git views under `libs/`, existing package identities and D3 locks, recoverable serialized publication, separate D4 approval. See the [G26 report](../projects/G26_PACKAGE_MAINTENANCE.md). No registry, downloader, Runtime, compiler ABI or D3 limit change. |
 | G00 · Production distribution | Conditional on release authorization. Public bootstrap, distribution and platform obligations remain tracked in the release record. [Preview blockers](../release/PREVIEW_BLOCKERS.md) |
 
 

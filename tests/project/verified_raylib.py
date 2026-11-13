@@ -68,6 +68,11 @@ def qualify(compiler, git, repos, base, origin, environment):
     cli('deps', 'fetch')
     events.append('smart HTTPS Git acquisition of exact immutable revision and package subdirectory')
     cli('resolve')
+    cli('add', 'raylib', '--git', origin + '/raylib.git', '--rev', revision,
+        *([] if standalone else ['--subdir', 'verified-packages/raylib']))
+    assert (consumer / 'libs/raylib/src/raylib.void').is_file()
+    cli('tidy', '--check')
+    events.append('existing manual Git declaration adopted by add into verified libs/raylib; read-only tidy')
     lock = consumer / 'void.lock'
     before = lock.read_bytes(), lock.stat().st_mtime_ns
     cli('resolve', '--locked')

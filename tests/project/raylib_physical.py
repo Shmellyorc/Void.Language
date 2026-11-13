@@ -14,11 +14,9 @@ with tempfile.TemporaryDirectory(prefix='VOID editable raylib ') as temporary:
   return output
  run(compiler,'new',project)
  package=project/'deps/raylib';shutil.copytree(repo/'verified-packages/raylib',package,ignore=shutil.ignore_patterns('__pycache__','.bind-*'))
- manifest=project/'void.project.toml';manifest.write_text(manifest.read_text()+'''\n[dependencies.raylib]
-id="org.voidlang.raylib"
-path="deps/raylib"
-version="=0.1.0"
-[native-requirements.raylib]
+ manifest=project/'void.project.toml'
+ run(compiler,'add','raylib','--path','deps/raylib','--project',project,text="source declares native provider 'org.voidlang.raylib'")
+ manifest.write_text(manifest.read_text()+'''\n[native-requirements.raylib]
 id="org.voidlang.raylib"
 version="=6.0.0"
 abi=3
@@ -34,13 +32,13 @@ func main() -> i32:
  assert 'raylib_checked.void' not in api.read_text()
  inventory=json.loads((package/'inventory.json').read_text());names=set(re.findall(r'^func (\w+)',api.read_text(),re.M))
  assert len(inventory['functions'])==600 and all(f['void_name'] in names for f in inventory['functions'])
- run(compiler,'resolve','--project',project)
+ run(compiler,'tidy','--project',project);run(compiler,'tidy','--check','--project',project)
  for profile in ['debug','release']:run(compiler,'run','--project',project,'--allow-native','--profile',profile,text='PHYSICAL: 41')
  before=api.read_bytes();body=before.decode();at=body.index('func get_random_value(');end=body.index('\nfunc ',at+1)
  part=body[at:end];assert 'return value' in part;body=body[:at]+part.replace('return value','return value + 1')+body[end:]
  api.write_text(body)
  run(compiler,'check','--project',project,status=1,text='Stale or tampered void.lock')
- run(compiler,'resolve','--refresh','--project',project)
+ run(compiler,'tidy','--project',project)
  for profile in ['debug','release']:
   run(compiler,'run','--project',project,'--allow-native','--profile',profile,text='PHYSICAL: 42')
   image=root/profile/('app.exe' if windows else 'app');run(compiler,'build','--project',project,'--allow-native','--profile',profile,'-o',image);run(image,text='PHYSICAL: 42')
@@ -51,7 +49,7 @@ func main() -> i32:
     print("WRAPPER:", rl.editable_wrapper())
     return 0
 ''')
- run(compiler,'resolve','--refresh','--project',project);run(compiler,'run','--project',project,'--allow-native',text='WRAPPER: 43')
+ run(compiler,'tidy','--project',project);run(compiler,'run','--project',project,'--allow-native',text='WRAPPER: 43')
  original=native.read_bytes()
  for changed,message in [
   (original.replace(b'func api_error() -> i32:',b'func api_error() -> i64:'),'Physical native signature differs'),
@@ -59,11 +57,11 @@ func main() -> i32:
   (original.replace(b'func api_error() -> i32:\n    pass',b'func api_error() -> i32:\n    return 0'),'exact descriptor declarations'),
   (original.replace(b'org.voidlang.raylib',b'org.invalid.provider'),'matching admitted descriptor')]:
   assert changed!=original
-  native.write_bytes(changed);run(compiler,'resolve','--refresh','--project',project)
+  native.write_bytes(changed);run(compiler,'tidy','--project',project)
   run(compiler,'check','--project',project,status=1,text=message)
- native.write_bytes(original);run(compiler,'resolve','--refresh','--project',project)
+ native.write_bytes(original);run(compiler,'tidy','--project',project)
  run(compiler,'check','--project',project)
  # The approved catalog is still mandatory; physical stubs cannot become no-ops.
- saved=manifest.read_text();manifest.write_text(saved.split('[native-requirements.raylib]')[0]);run(compiler,'resolve','--refresh','--project',project)
+ saved=manifest.read_text();manifest.write_text(saved.split('[native-requirements.raylib]')[0]);run(compiler,'tidy','--project',project)
  run(compiler,'check','--project',project,status=1,text='matching admitted descriptor')
 print('Raylib physical package, all 600 APIs, edited normal/O2 JIT/AOT, new wrapper, lock and native signature/body/provider guards passed')

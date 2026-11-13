@@ -9,6 +9,11 @@
 #include <map>
 #include <set>
 namespace vd {
+std::string inspect_native_provider(const SourceFile&);
+// Parse relevant project sources and resolve local imports with the compiler's
+// source graph. This metadata result cannot authorize native code or lowering.
+std::set<std::string> inspect_project_imports(const std::filesystem::path&,
+                                           const std::optional<std::string>& manifest = {});
 // Records are owned by an immutable successful analysis, never by parser storage.
 struct AnalyzedModule { std::string identity; SourceFile source; std::vector<std::string> imports; };
 struct AnalyzedParameter {

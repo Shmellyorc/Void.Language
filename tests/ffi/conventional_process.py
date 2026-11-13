@@ -80,6 +80,7 @@ def verify(root):
     marker = cwd / 'native-init.log'
     released = cwd / 'native-release.log'
     run([compiler, 'check', *selector], cwd)
+    run([compiler, 'tidy', '--check', *selector], cwd)
     run([compiler, 'run', *selector, '--', 'ignored'], cwd, 2, 'Pass --allow-native')
     assert not marker.exists()
     run([compiler, 'run', *selector, '--allow-native', '--', 'ignored'], cwd, 1, 'C dynamic library')

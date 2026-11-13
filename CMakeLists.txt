@@ -436,6 +436,9 @@ if(BUILD_TESTING)
   add_executable(void_project_creation tests/project/creation.cpp)
   target_link_libraries(void_project_creation PRIVATE void_core)
   add_test(NAME project_creation COMMAND void_project_creation)
+  add_test(NAME project_maintenance COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/project/maintenance.py" "$<TARGET_FILE:voidc>" "$<TARGET_FILE:void_project_creation>")
+  set_tests_properties(project_maintenance PROPERTIES TIMEOUT 300)
   void_add_output_test(project_creation_process "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/project/creation.py" "$<TARGET_FILE:voidc>" "$<TARGET_FILE:voidls>"
     "@VOID_TEST_OUTPUT@/project-creation-evidence.json")

@@ -22,7 +22,7 @@
 namespace {
 struct UsageError : std::invalid_argument {using std::invalid_argument::invalid_argument;};
 bool known_command(const std::string& command) {
-    return command=="check" || command=="run" || command=="build" || command=="package" || command=="emit" || command=="init" || command=="new" || command=="resolve" || command=="deps" || command=="native-bind" || command=="native";
+    return command=="add" || command=="tidy" || command=="check" || command=="run" || command=="build" || command=="package" || command=="emit" || command=="init" || command=="new" || command=="resolve" || command=="deps" || command=="native-bind" || command=="native";
 }
 void usage(std::ostream& out, const std::string& command={}) {
     if(command.empty() || command=="check")out<<"Usage: voidc check <file-or-directory> [--no-opt]\n";
@@ -33,6 +33,8 @@ void usage(std::ostream& out, const std::string& command={}) {
     if(command.empty() || command=="emit")out<<"Usage: voidc emit <file-or-directory> -o <object> [--no-opt]\n";
     if(command.empty() || command=="init")out<<"Usage: voidc init [DIR] [project options]\n";
     if(command.empty() || command=="new")out<<"Usage: voidc new PATH [project options] [--source PATH]\n";
+    if(command.empty() || command=="add")out<<"Usage: voidc add ALIAS [--project DIR] (--path DIR | --git ORIGIN --rev FULL_SHA [--subdir DIR])\n";
+    if(command.empty() || command=="tidy")out<<"Usage: voidc tidy [--project DIR] [--check]\n";
     if(command.empty() || command=="resolve")out<<"Usage: voidc resolve --project DIR [--locked | --refresh]\n";
     if(command.empty() || command=="deps")out<<"Usage: voidc deps explain --project DIR [--json]\n"
       "       voidc deps fetch --project DIR [--allow-git ORIGIN REV]...\n";
@@ -51,6 +53,8 @@ void help(const std::string& command={}) {
           "  emit    Write a native object for manual linking.\n"
           "  init    Add a project manifest to an existing directory.\n"
           "  new     Create a project and starter source in a new directory.\n"
+          "  add     Add an explicit local or immutable Git source package.\n"
+          "  tidy    Validate imports, reconcile dependencies and maintain installed views.\n"
           "  resolve Resolve available library dependencies and verify or write void.lock.\n"
           "  deps explain Inspect the verified local dependency graph without changes.\n"
           "  deps fetch   Explicitly acquire pinned Git source snapshots.\n"
@@ -125,6 +129,37 @@ std::int32_t input(const char* text) {
     if (end == text || *end || errno == ERANGE || value < std::numeric_limits<std::int32_t>::min() || value > std::numeric_limits<std::int32_t>::max())
         throw UsageError("Expected a decimal i32 input (-2147483648 through 2147483647).");
     return static_cast<std::int32_t>(value);
+}
+int maintain_project(const std::string& command,int argc,char** argv) {
+    using namespace vd::project;
+    std::filesystem::path root=".";
+    AddOptions options;
+    std::optional<std::string> origin,rev,subdir;
+    std::set<std::string> seen;
+    bool check=false;
+    for(int i=2;i<argc;++i) {
+        std::string option=argv[i];
+        if(option=="--check" && command=="tidy") {
+            if(check)throw UsageError("Repeated --check.");check=true;
+        } else if(option=="--project" || (command=="add" && (option=="--path" || option=="--git" || option=="--rev" || option=="--subdir"))) {
+            if(!seen.insert(option).second || ++i==argc || !*argv[i] || argv[i][0]=='-')throw UsageError("Expected one value after "+option);
+            if(option=="--project")root=vd::utf8_path(argv[i]);
+            else if(option=="--path")options.path=vd::utf8_path(argv[i]);
+            else if(option=="--git")origin=argv[i];
+            else if(option=="--rev")rev=argv[i];
+            else subdir=argv[i];
+        } else if(command=="add" && !option.starts_with('-') && options.alias.empty())options.alias=std::move(option);
+        else throw UsageError("Unknown or repeated "+command+" option: "+option);
+    }
+    if(command=="add") {
+        if(options.alias.empty() || bool(options.path)==bool(origin) || (origin && !rev) || (!origin && (rev || subdir)))
+            throw UsageError("add requires ALIAS and exactly one --path or --git with --rev; registry lookup is not supported.");
+        if(origin)options.git=GitDependency{{*origin,*rev},subdir.value_or("")};
+    }
+    auto report=command=="add"?add_dependency(root,options):tidy_dependencies(root,check);
+    std::cout<<(report.changed?"Updated source dependencies and installed views.":"Source dependencies unchanged.")<<'\n';
+    for(const auto& advice:report.advice)std::cout<<"Advice: "<<advice<<'\n';
+    return 0;
 }
 int resolve_project(int argc,char** argv) {
     using namespace vd::project;
@@ -403,7 +438,7 @@ static int run_cli(int argc, char** argv) {
         }
         if(argc>=2 && std::string(argv[1])=="help") {
             if(argc==2) {help();return 0;}
-            if(argc!=3 || !known_command(argv[2]))throw UsageError("Expected help [check|run|build|package|emit|init|new|resolve|deps|native-bind|native].");
+            if(argc!=3 || !known_command(argv[2]))throw UsageError("Expected help [check|run|build|package|emit|init|new|add|tidy|resolve|deps|native-bind|native].");
             help(argv[2]);return 0;
         }
         vd::configure_standard_library_root(vd::utf8_path(llvm::sys::fs::getMainExecutable(argv[0],reinterpret_cast<void*>(&run_cli))));
@@ -420,6 +455,7 @@ static int run_cli(int argc, char** argv) {
         if(!known_command(command))
             throw UsageError("Unknown command: "+command);
         if(argc==3 && (std::string(argv[2])=="--help" || std::string(argv[2])=="-h")) {help(command);return 0;}
+        if(command=="add" || command=="tidy")return maintain_project(command,argc,argv);
         if(command=="resolve")return resolve_project(argc,argv);
         if(command=="deps") {
             if(argc==4 && (std::string_view(argv[2])=="explain" || std::string_view(argv[2])=="fetch") &&

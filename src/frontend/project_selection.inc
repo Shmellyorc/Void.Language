@@ -40,7 +40,7 @@ struct ProjectCapture {
     Diagnostics diagnostics;
     SourceGraph graph;
     Unit from;
-    ProjectCapture(const project_fs::path& requested,const SourceOverrides& o,const ManifestOverrides& m,const ProjectCapture* previous=nullptr,bool inventory_only=false)
+    ProjectCapture(const project_fs::path& requested,const SourceOverrides& o,const ManifestOverrides& m,const ProjectCapture* previous=nullptr,bool inventory_only=false,bool imports_only=false)
       :root(admit_root(requested)),overlays(bounded_overlays(o)),manifest_overlays(m),original(previous),anchor(path_utf8(root/"void.project.toml"),""),graph(root,diagnostics,overlays),from(anchor,"/") {
         changed(original && root!=original->root);
         if(manifest_overlays.size()>project_visit_limit)project_failure(anchor,Code::limit,"Manifest overlay work limit exceeded.");
@@ -76,7 +76,14 @@ struct ProjectCapture {
         if(!parsed.succeeded())throw CompilationError(std::move(parsed.diagnostics));
         manifest=std::move(parsed.manifest);
         anchor=manifest->source();from.source=anchor;
-        if (!manifest->dependencies().empty() || manifest->native_requirement()) {
+        graph.imports_only=imports_only;
+        if(!imports_only)try {project::require_no_package_edit(root);}
+        catch(const std::runtime_error& failure) {project_failure(anchor,Code::project_changed,failure.what());}
+        if(imports_only)for(const auto& [alias,dependency]:manifest->dependencies()) {
+            if(dependency.git)package_roots.insert("/libs/"+alias);
+            else package_roots.insert("/"+dependency.path);
+        }
+        if (!imports_only && (!manifest->dependencies().empty() || manifest->native_requirement())) {
             try {
                 dependencies = project::verify_locked_dependencies(root, *manifest, !original);
             } catch (const std::runtime_error& failure) {
@@ -87,6 +94,10 @@ struct ProjectCapture {
             native = dependencies->native();
             graph.dependencies = dependencies.get();
             for (const auto& [id, package] : dependencies->packages()) package_roots.insert("/" + package.locator);
+        }
+        if(imports_only && manifest->native_requirement()) {
+            try {native=project::select_managed_native(*manifest->native_requirement()).admission;}
+            catch(const std::runtime_error& failure) {project_failure(anchor,Code::project_changed,failure.what());}
         }
         if (!manifest->native().empty()) {
 #ifdef _WIN32

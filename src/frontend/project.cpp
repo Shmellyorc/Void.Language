@@ -324,6 +324,52 @@ LockShape dependency_lock_shape(std::string_view bytes) {
     return LockShape::valid;
 }
 
+std::map<std::string,GitDependency> locked_direct_git_sources(std::string_view bytes) {
+    auto parsed=toml::parse(bytes);
+    std::map<std::string,GitDependency> result;
+    if(!parsed)return result;
+    const auto& lock=parsed.table();
+    auto* edges=lock["root"]["dependencies"].as_table();
+    auto* packages=lock["package"].as_array();
+    if(!edges || !packages)return result;
+    for(const auto& [alias,target]:*edges)for(const auto& entry:*packages) {
+        auto* package=entry.as_table();
+        if(!package || (*package)["id"].value<std::string>()!=target.value<std::string>())continue;
+        auto git=(*package)["git"].value<std::string>();
+        if(git)result.emplace(std::string(alias.str()),GitDependency{{*git,*(*package)["rev"].value<std::string>()},*(*package)["subdir"].value<std::string>()});
+    }
+    return result;
+}
+
+bool tidy_lock_change_allowed(std::string_view before,std::string_view after) {
+    auto old=toml::parse(before), fresh=toml::parse(after);
+    if(!old || !fresh)return false;
+    const auto& a=old.table();const auto& b=fresh.table();
+    bool local_change=false;
+    auto packages=[](const toml::table& lock) {
+        std::map<std::string,const toml::table*> result;
+        if(auto* entries=lock["package"].as_array())for(const auto& entry:*entries)
+            if(auto* table=entry.as_table())result.emplace(*(*table)["id"].value<std::string>(),table);
+        return result;
+    };
+    auto prior=packages(a), next=packages(b);
+    for(const auto& [id,package]:prior) {
+        auto found=next.find(id);
+        if(package->contains("git") && found!=next.end() && found->second->contains("git")) {
+            auto* target=found->second;
+            bool same=true;
+            for(const auto* key:{"git","rev","subdir"})same&=(*package)[key].value<std::string>()==(*target)[key].value<std::string>();
+            if(same && *package!=*target)return false; // Immutable claims cannot be refreshed.
+        }
+        if(package->contains("path") && (found==next.end() || *package!=*found->second))local_change=true;
+    }
+    for(const auto& [id,package]:next)if(package->contains("path") && !prior.contains(id))local_change=true;
+    bool inputs_changed=a["root"]["inputs"].value<std::string>()!=b["root"]["inputs"].value<std::string>();
+    if(!inputs_changed && *a["root"].as_table()!=*b["root"].as_table())return false;
+    bool native_change=a["native"].as_table() && b["native"].as_table() && *a["native"].as_table()!=*b["native"].as_table();
+    return inputs_changed || local_change || native_change;
+}
+
 class ManifestParser {
     using Code = DiagnosticCode;
     std::shared_ptr<Manifest> manifest_ = std::shared_ptr<Manifest>(new Manifest);

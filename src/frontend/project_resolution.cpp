@@ -3,6 +3,7 @@
 #include "project_git.hpp"
 #include "project_native.hpp"
 #include "void/path.hpp"
+#include "void/frontend.hpp"
 #include <llvm/ADT/StringRef.h>
 #include <llvm/Support/SHA256.h>
 #include <algorithm>
@@ -106,10 +107,33 @@ struct Snapshot {
     throw CompilationError({std::move(error)});
 }
 
+constexpr std::string_view view_receipt=".void-package";
+ProjectFiles package_view(const GitSnapshot& snapshot,const std::string& subdir) {
+    ProjectFiles files;
+    const auto prefix=subdir.empty()?std::string{}:subdir+"/";
+    for(const auto& directory:snapshot.directories)if(directory.starts_with(prefix) && directory!=subdir)
+        files.emplace(directory.substr(prefix.size())+"/","");
+    for(const auto& [path,bytes]:snapshot.files)if(path.starts_with(prefix))files.emplace(path.substr(prefix.size()),bytes);
+    if(files.contains(std::string(view_receipt)))throw std::runtime_error("Package source collides with reserved materialization receipt.");
+    files.emplace(view_receipt,snapshot.proof);
+    return files;
+}
+bool view_present(const fs::path& root,const std::string& alias) {
+    if(!fs::exists(root/"libs") && !project_path_alias(root/"libs"))return false;
+    inspect_creation_root(root/"libs");
+    bool present=false;
+    for(const auto& child:fs::directory_iterator(root/"libs"))if(fold_project_name(path_utf8(child.path().filename()))==fold_project_name(alias)) {
+        if(path_utf8(child.path().filename())!=alias || present)throw std::runtime_error("Installed package path case collision: libs/"+alias);
+        present=true;
+    }
+    return present;
+}
+
 class Resolver {
     const fs::path& root;
     const Manifest* effective_root;
     bool retain_sources;
+    bool inspect_views;
     const std::vector<GitPin>* fetch;
     using Directory = std::map<std::string, std::set<std::string>>;
     std::map<fs::path, Directory> directories;
@@ -123,6 +147,7 @@ class Resolver {
     std::map<GitPin, GitSnapshot> snapshots;
     std::map<fs::path, const GitPin*> snapshot_roots;
     std::optional<SelectedNative> native;
+    std::map<std::string,std::string> managed_locators;
 
     std::string chain() const {
         std::string result;
@@ -419,8 +444,8 @@ class Resolver {
 
 public:
     explicit Resolver(const fs::path& selected_root, const Manifest* manifest = nullptr, bool keep = false,
-                      const std::vector<GitPin>* authorized_pins = nullptr)
-        : root(selected_root), effective_root(manifest), retain_sources(keep), fetch(authorized_pins) {}
+                      const std::vector<GitPin>* authorized_pins = nullptr,bool views=true)
+        : root(selected_root), effective_root(manifest), retain_sources(keep), inspect_views(views), fetch(authorized_pins) {}
 
     std::size_t publish(const CreationRoot& admitted) const {
         for (const auto& pin : pending) publish_git_snapshot(admitted, pin, snapshots.at(pin));
@@ -431,7 +456,8 @@ public:
         std::map<std::string, LockedPackage, std::less<>> result;
         for (auto& [id, package] : packages) {
             auto entry = *manifests.at(package.path)->package_entry();
-            result.emplace(id, LockedPackage{std::move(package.path), std::move(entry),
+            auto locator=managed_locators.contains(id)?managed_locators.at(id):std::move(package.path);
+            result.emplace(id, LockedPackage{std::move(locator), std::move(entry),
                 std::move(package.edges), std::move(package.sources)});
         }
         return result;
@@ -457,6 +483,21 @@ public:
         Edges edges;
         active.insert("");
         resolve_edges(manifest, "", edges, 0);
+        // Only declared direct Git views are inspected. Cached snapshots remain
+        // authoritative, including for packages without a materialized view.
+        for(const auto& [alias,dependency]:manifest.dependencies())if(!fetch && inspect_views && dependency.git && view_present(root,alias)) {
+            const auto& snapshot=snapshots.at(dependency.git->pin);
+            if(read_package_directory(root/"libs"/utf8_path(alias))!=package_view(snapshot,dependency.git->subdir))
+                fail(Code::project_changed,"Modified or unowned installed Git package: libs/"+alias+". Restore the exact locked source; tidy never overwrites edits.");
+            const auto base=root/"libs"/utf8_path(alias);
+            const auto cached=snapshot.tree/utf8_path(dependency.git->subdir);
+            for(const auto& [id,package]:packages) {
+                auto relative=(root/utf8_path(package.path)).lexically_relative(cached);
+                if(relative.empty() || *relative.begin()=="..")continue;
+                managed_locators.try_emplace(id,path_utf8((base/relative).lexically_normal().lexically_relative(root)));
+            }
+        }
+
         const std::string_view kind = manifest.kind() == Kind::application ? "application" : "library";
         Digest inputs;
         const bool git_graph = !snapshots.empty();
@@ -576,6 +617,7 @@ Snapshot capture_locked_project(const CreationRoot& root, Resolver& resolver, co
 
 std::shared_ptr<const LockedDependencies> verify_locked_dependencies(
     const fs::path& requested, const Manifest& manifest, bool retain_sources) {
+    require_no_package_edit(requested);
     if (manifest.dependencies().empty() && !manifest.native_requirement()) return {};
     const auto root = inspect_creation_root(requested);
     const auto previous = read_dependency_lock(root.path);
@@ -598,6 +640,7 @@ std::shared_ptr<const LockedDependencies> verify_locked_dependencies(
 
 ResolveResult resolve_dependencies(const fs::path& requested, ResolveMode mode) {
     const auto root = inspect_creation_root(requested);
+    require_no_package_edit(root.path);
     Resolver resolver(root.path);
     const bool dependencies = resolver.has_dependencies();
     const auto previous = read_dependency_lock(root.path);
@@ -622,6 +665,7 @@ ResolveResult resolve_dependencies(const fs::path& requested, ResolveMode mode) 
 
 DependencyExplanation explain_dependencies(const fs::path& requested) {
     const auto root = inspect_creation_root(requested);
+    require_no_package_edit(root.path);
     Resolver resolver(root.path);
     (void)resolver.has_dependencies(); // Admit the exact manifest before examining its lock.
     const auto previous = read_dependency_lock(root.path);
@@ -634,6 +678,7 @@ std::size_t fetch_dependencies(const fs::path& requested, const std::vector<GitP
         std::any_of(allowed.begin(), allowed.end(), [](const auto& pin) { return !valid_git_pin(pin); }))
         throw std::invalid_argument("Invalid Git acquisition authorization.");
     const auto root = inspect_creation_root(requested);
+    require_no_package_edit(root.path);
     Resolver resolver(root.path, nullptr, false, &allowed);
     const auto captured = resolver.capture();
     if (inspect_creation_root(root.path).identity != root.identity ||
@@ -641,4 +686,216 @@ std::size_t fetch_dependencies(const fs::path& requested, const std::vector<GitP
         throw std::runtime_error("Project root or manifest changed during Git acquisition; retry.");
     return resolver.publish(root);
 }
+namespace {
+std::shared_ptr<const Manifest> maintenance_manifest(const fs::path& path,const std::optional<std::string>& bytes={}) {
+    auto parsed=parse_manifest(SourceFile(path_utf8(path),bytes?*bytes:read_project_input(path,manifest_byte_limit)));
+    if(!parsed.succeeded())throw CompilationError(std::move(parsed.diagnostics));
+    return std::move(parsed.manifest);
+}
+fs::path add_source_path(const fs::path& root,const fs::path& requested) {
+    auto path=requested.is_absolute()?requested:root/requested;
+    auto current=path.root_path();
+    for(const auto& part:path.relative_path()) {
+        if(part==".")continue;
+        if(part=="..")current=current.parent_path();else current/=part;
+        inspect_creation_root(current); // Check before normalizing any parent step.
+    }
+    return inspect_creation_root(current).path;
+}
+ProjectFiles local_source_files(const fs::path& source) {
+    // Source installation excludes only existing D3 administration, not user
+    // sources. Nested manifests remain physical boundaries in the resolver.
+    ProjectFiles files;
+    std::size_t bytes=0,entries=0;
+    std::function<void(const fs::path&,const std::string&,unsigned)> walk;
+    walk=[&](const fs::path& directory,const std::string& prefix,unsigned depth) {
+        if(depth>64)throw std::runtime_error("Local package depth limit exceeded.");
+        inspect_creation_root(directory);
+        std::set<std::string> names;
+        for(const auto& child:fs::directory_iterator(directory)) {
+            if(++entries>8192)throw std::runtime_error("Local package entry limit exceeded.");
+            auto name=path_utf8(child.path().filename());
+            if(!portable_path_component(name) || !names.insert(fold_project_name(name)).second || project_path_alias(child.path()))
+                throw std::runtime_error("Local package has an invalid path, alias or case collision.");
+            if(dependency_admin_directory(name) || (prefix.empty() && name==lock_name))continue;
+            auto relative=prefix+name;
+            if(child.is_directory()) {files.emplace(relative+"/","");walk(child.path(),relative+"/",depth+1);}
+            else {
+                auto content=read_project_input(child.path(),package_bytes);
+                bytes+=content.size();if(bytes>package_bytes)throw std::runtime_error("Local package byte limit exceeded.");
+                files.emplace(relative,std::move(content));
+            }
+        }
+    };
+    walk(source,"",0);return files;
+}
+void report_native_sources(const ProjectFiles& files,MaintenanceReport& report,const std::string& alias) {
+    // Preparation belongs to the existing package. This is advice, never a
+    // native requirement or approval inferred from an untrusted README.
+    std::set<std::string> providers;
+    for(const auto& [name,bytes]:files)if(name.ends_with(".void") && bytes.find("native")!=std::string::npos) {
+        auto provider=inspect_native_provider(SourceFile(name,bytes));
+        if(!provider.empty())providers.insert(std::move(provider));
+    }
+    for(const auto& provider:providers)report.advice.push_back(alias+": source declares native provider '"+provider+"'; read its README and existing preparation instructions. Select the matching approved D4 catalog explicitly before execution. No native binaries were prepared or approved.");
+}
+std::map<std::string,ProjectFiles> missing_git_views(const CreationRoot& root,const Manifest& manifest,MaintenanceReport& report,
+    const std::optional<std::string>& previous,std::map<std::string,ProjectFiles>& replacements) {
+    std::map<std::string,ProjectFiles> additions;
+    auto old=previous?locked_direct_git_sources(*previous):std::map<std::string,GitDependency>{};
+    for(const auto& [alias,dependency]:manifest.dependencies())if(dependency.git) {
+        auto snapshot=read_git_snapshot(git_snapshot_path(root.path,dependency.git->pin),dependency.git->pin);
+        if(!snapshot)throw std::runtime_error("Missing verified Git snapshot; run voidc deps fetch with the declared immutable pin.");
+        auto files=package_view(*snapshot,dependency.git->subdir);
+        report_native_sources(files,report,alias);
+        if(!view_present(root.path,alias))additions.emplace(alias,std::move(files));
+        else {
+            auto actual=read_package_directory(root.path/"libs"/utf8_path(alias));
+            if(actual==files)continue;
+            auto prior=old.find(alias);
+            if(prior==old.end() || (prior->second.pin==dependency.git->pin && prior->second.subdir==dependency.git->subdir))
+                throw std::runtime_error("Modified or unowned installed Git package: libs/"+alias);
+            auto original=read_git_snapshot(git_snapshot_path(root.path,prior->second.pin),prior->second.pin);
+            if(!original || actual!=package_view(*original,prior->second.subdir))
+                throw std::runtime_error("Modified previous installed Git package: libs/"+alias);
+            replacements.emplace(alias,std::move(actual));additions.emplace(alias,std::move(files));
+        }
+    }
+    return additions;
+}
+void import_advice(const fs::path& root,const Manifest& manifest,MaintenanceReport& report) {
+    auto used=inspect_project_imports(root,manifest.source().text());
+    for(const auto& [alias,dependency]:manifest.dependencies())if(!used.contains(alias))
+        report.advice.push_back("Unused direct dependency '"+alias+"' retained; import inspection cannot establish that deletion is safe.");
+    if(manifest.native_requirement())report.advice.push_back("Native requirement remains separate from source installation; existing D4 catalog selection and --allow-native are required for execution.");
+}
+}
+MaintenanceReport add_dependency(const fs::path& requested,const AddOptions& options) {
+    if(!valid_editor_identifier(options.alias) || options.alias.size()>128 || bool(options.path)==bool(options.git))
+        throw std::invalid_argument("add requires a valid alias and exactly one explicit --path or --git with --rev.");
+    if(options.git && (!valid_git_pin(options.git->pin) || !valid_git_subdir(options.git->subdir)))
+        throw std::invalid_argument("add requires a canonical Git origin, full lowercase commit SHA and portable subdir.");
+    const auto root=inspect_creation_root(requested);
+    recover_package_edit(root);
+    auto manifest=maintenance_manifest(root.path/manifest_name);
+    if(manifest->kind()!=Kind::application)throw std::runtime_error("add selects an application manifest.");
+    const auto previous=read_dependency_lock(root.path);
+    if(previous)require_lock_shape(*previous);
+    // Existing dependencies must already be consistent; adding an unrelated
+    // source never silently blesses a stale or forged lock.
+    if(!manifest->dependencies().empty() || manifest->native_requirement()) {
+        Resolver existing(root.path,manifest.get());
+        auto captured=existing.capture();
+        if(!previous || *previous!=captured.lock)stale_lock();
+    }
+    MaintenanceReport report;
+    ProjectFiles files;
+    std::shared_ptr<const Manifest> selected;
+    std::string path;
+    bool install_local=false;
+    if(options.git) {
+        auto snapshot=read_git_snapshot(git_snapshot_path(root.path,options.git->pin),options.git->pin);
+        if(!snapshot)snapshot=acquire_git_snapshot(root.path,options.git->pin);
+        files=package_view(*snapshot,options.git->subdir);
+        auto entry=files.find(std::string(manifest_name));
+        if(entry==files.end())throw std::runtime_error("Git package has no exact void.project.toml at the selected subdir.");
+        selected=maintenance_manifest(snapshot->tree/utf8_path(options.git->subdir)/manifest_name,entry->second);
+        publish_git_snapshot(root,options.git->pin,*snapshot);
+    } else {
+        const auto source=add_source_path(root.path,*options.path);
+        selected=maintenance_manifest(source/manifest_name);
+        auto relative=source.lexically_relative(root.path);
+        if(relative.empty() || relative==".")throw std::runtime_error("A project cannot depend on itself.");
+        if(*relative.begin()!="..")path=path_utf8(relative);
+        else {path="libs/"+options.alias;install_local=true;}
+        files=local_source_files(source);
+    }
+    if(!selected->package() || !selected->package_entry())throw std::runtime_error("Source must be a VOID library with an explicit package.entry.");
+    const auto& identity=*selected->package();
+    report_native_sources(files,report,options.alias);
+    auto prior=manifest->dependencies().find(options.alias);
+    if(prior!=manifest->dependencies().end()) {
+        const auto& declaration=prior->second;
+        bool same=declaration.id==identity.id && declaration.version.accepts(identity.version) &&
+            (options.git?declaration.git && declaration.git->pin==options.git->pin && declaration.git->subdir==options.git->subdir:!declaration.git && declaration.path==path);
+        if(!same)throw std::runtime_error("Conflicting dependency alias '"+options.alias+"'; existing project retained.");
+        // Adopting an existing manual Git declaration also installs its optional
+        // source view. Editable local contents remain the declared authority.
+        if(options.git && !view_present(root.path,options.alias)) {
+            publish_package_edit(root,manifest->source().text(),previous,{{options.alias,files}},[&] {
+                Resolver fresh(root.path,manifest.get());
+                if(!previous || fresh.capture().lock!=*previous)stale_lock();
+                return std::pair{manifest->source().text(),previous};
+            });
+            report.changed=true;
+        }
+        return report;
+    }
+    auto text=manifest->source().text();
+    const auto newline=text.find("\r\n")!=std::string::npos?"\r\n":"\n";
+    std::string addition="\n[dependencies."+options.alias+"]\n";
+    string_field(addition,"id",identity.id);
+    if(options.git) {
+        string_field(addition,"git",options.git->pin.origin);string_field(addition,"rev",options.git->pin.revision);
+        if(!options.git->subdir.empty())string_field(addition,"subdir",options.git->subdir);
+    } else string_field(addition,"path",path);
+    string_field(addition,"version","="+identity.version.text());
+    if(!text.empty() && text.back()!='\n')text+=newline;
+    for(char c:addition) {if(c=='\n')text+=newline;else text+=c;}
+    auto future=maintenance_manifest(root.path/manifest_name,text);
+    std::map<std::string,ProjectFiles> additions;
+    if(options.git || install_local) {
+        if(view_present(root.path,options.alias))throw CreationCollision("Developer-owned package destination already exists: libs/"+options.alias);
+        additions.emplace(options.alias,std::move(files));
+    }
+    const std::vector<GitPin> direct_only;
+    // D3 performs any explicitly declared source acquisition; no native
+    // preparation, provider selection or execution occurs during acquisition.
+    if(options.git) {
+        Resolver acquisition(root.path,future.get(),false,&direct_only);
+        acquisition.capture();acquisition.publish(root);
+    }
+    publish_package_edit(root,manifest->source().text(),previous,additions,[&] {
+        Resolver resolver(root.path,future.get());
+        auto captured=resolver.capture();
+        // add permits sources before their call sites are edited. Tidy performs
+        // the relevant import inspection separately.
+        Resolver fresh(root.path,future.get());
+        if(fresh.capture().lock!=captured.lock)throw std::runtime_error("Package source changed during addition.");
+        return std::pair{text,std::optional(captured.lock)};
+    });
+    report.changed=true;
+    if(!options.git && path=="libs/"+options.alias)report.advice.push_back("Editable local source installed at "+path+"; subsequent source edits belong there.");
+    return report;
+}
+MaintenanceReport tidy_dependencies(const fs::path& requested,bool check) {
+    const auto root=inspect_creation_root(requested);
+    if(check)require_no_package_edit(root.path);else recover_package_edit(root);
+    auto manifest=maintenance_manifest(root.path/manifest_name);
+    const auto previous=read_dependency_lock(root.path);
+    if(previous)require_lock_shape(*previous);
+    Resolver resolver(root.path,manifest.get(),false,nullptr,false);
+    const bool dependencies=resolver.has_dependencies();
+    auto captured=resolver.capture();
+    MaintenanceReport report;
+    import_advice(root.path,*manifest,report);
+    std::map<std::string,ProjectFiles> replacements;
+    auto additions=missing_git_views(root,*manifest,report,previous,replacements);
+    const auto desired=dependencies||previous?std::optional(captured.lock):std::nullopt;
+    if(previous && *previous!=captured.lock && !tidy_lock_change_allowed(*previous,captured.lock))stale_lock();
+    if(check) {
+        if(previous!=desired || !replacements.empty())throw std::runtime_error("Dependency lock or installed source requires reconciliation; run voidc tidy.");
+        for(const auto& [alias,files]:additions)report.advice.push_back("Optional installed source view missing: libs/"+alias+"; tidy can materialize the verified D3 snapshot.");
+        return report;
+    }
+    if(previous==desired && additions.empty())return report;
+    publish_package_edit(root,manifest->source().text(),previous,additions,[&] {
+        Resolver fresh(root.path,manifest.get());
+        if(fresh.capture().lock!=captured.lock)throw std::runtime_error("Dependency sources changed during tidy; retry.");
+        import_advice(root.path,*manifest,report);
+        return std::pair{manifest->source().text(),desired};
+    },nullptr,replacements);
+    report.changed=true;return report;
+}
+
 }

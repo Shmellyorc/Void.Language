@@ -3,6 +3,8 @@
 #include "void/path.hpp"
 #include "void/project_creation.hpp"
 #include "void/project_resolution.hpp"
+#include "project_files.hpp"
+#include "project_native.hpp"
 #include "void/numeric.hpp"
 #include "void/math_ops.hpp"
 #include "void/temporal_ops.hpp"
@@ -5829,6 +5831,7 @@ public:
     std::function<void(const std::filesystem::path&,const std::string&,bool)> admit;
     std::function<SourceFile(const std::filesystem::path&,const std::string&)> reader;
     const project::LockedDependencies* dependencies = nullptr;
+    bool imports_only = false; // Metadata inspection grants no native or lowering authority.
     explicit SourceGraph(std::filesystem::path project_root, Diagnostics& d, const SourceOverrides& o,const NativeProject* bindings=nullptr,
                          CPrimitiveAdmission::Owner c_primitives = {})
         : root(std::move(project_root)), diagnostics(d), overrides(o), native(bindings), primitives(std::move(c_primitives)) {
@@ -6023,6 +6026,7 @@ public:
         Parser(result->source, diagnostics).parse(*result);
         result->parse_failed |= diagnostics.size() != before;
         if(id==console::source_module)for(auto& structure:result->structures)if(structure.token.text=="terminal_session"){structure.definition->native_resource=true;structure.definition->native_provider="void.console.v1";}
+        if(imports_only)return *result;
         const auto declaration_path=package_source(id)?"/"+std::string(package_relative_source(id)):id;
         if(!result->c_provider.empty() && (!primitives || !primitives->physical_source() ||
            declaration_path!=primitives->module() || result->c_provider!=primitives->provider()))
@@ -7641,6 +7645,42 @@ AnalysisResult analyze_project(const std::filesystem::path& entry, const SourceO
     catch (const CompilationError& failure) { return {{}, failure.diagnostics()}; }
 }
 #include "project_selection.inc"
+std::string inspect_native_provider(const SourceFile& source) {
+    Diagnostics diagnostics;
+    Unit unit(source,"/candidate.void");
+    Parser(source,diagnostics).parse(unit);
+    diagnostics.finish();
+    return unit.c_provider;
+}
+
+std::set<std::string> inspect_project_imports(const std::filesystem::path& root,
+                                            const std::optional<std::string>& manifest) {
+    SourceOverrides sources;
+    ManifestOverrides manifests;
+    if(manifest)manifests.emplace("/void.project.toml",SourceFile(path_utf8(root/"void.project.toml"),*manifest));
+    ProjectCapture capture(root,sources,manifests,nullptr,false,true);
+    std::set<std::string> used, visited;
+    std::function<void(Unit&)> walk=[&](Unit& unit) {
+        if(!visited.insert(unit.identity).second)return;
+        for(const auto& import:unit.imports) {
+            if(import.path.kind!=TokenKind::path && import.path.text.starts_with("pkg/")) {
+                auto alias=import.path.text.substr(4);
+                if(!capture.manifest->dependencies().contains(alias))
+                    error(unit.source,import.path,Code::import_path,"Undeclared direct package import '"+import.path.text+"'.",
+                          "Add an explicit local path or immutable Git source with voidc add.");
+                used.insert(std::move(alias));
+            } else {
+                auto& target=capture.graph.parse(unit,import.path);
+                if(!standard_module(target.identity))walk(target);
+            }
+        }
+    };
+    if(auto entry=capture.manifest->entry())walk(capture.graph.parse(capture.from,{TokenKind::path,"/"+*entry,0}));
+    else for(const auto& id:capture.inventory())walk(capture.graph.parse(capture.from,{TokenKind::path,id,0}));
+    capture.diagnostics.finish();
+    return used;
+}
+
 // Import recovery reads metadata only. Full imports still pass SourceGraph::load.
 std::optional<EditorAssistance> import_assistance(const std::filesystem::path& entry,const SourceOverrides& overrides,
     const std::string& module,const SourceFile& source,std::size_t cursor,ProjectCapture* project=nullptr) {
