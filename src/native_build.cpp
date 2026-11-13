@@ -1,4 +1,5 @@
 #include "void/native_build.hpp"
+#include "void/native_import.hpp"
 #include "void/backend.hpp"
 #include "void/cache.hpp"
 #include "void/c_primitive.hpp"
@@ -231,6 +232,7 @@ void version(const fs::path& tool,const char* expected,const fs::path& capture) 
         throw std::runtime_error("Native toolchain requires matching LLVM/Clang/LLD 23.1.4: "+path_utf8(tool));
 }
 }
+std::filesystem::path native_clang_driver(const char* argv0) { return resources(argv0).driver; }
 bool native_source_debug_supported() {
 #if (defined(__linux__) && defined(__GLIBC__) && defined(__x86_64__)) || \
     (defined(_WIN32) && defined(_MSC_VER) && defined(_M_X64))

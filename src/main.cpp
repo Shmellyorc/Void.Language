@@ -3,6 +3,7 @@
 #include "void/frontend.hpp"
 #include "void/path.hpp"
 #include "void/native_build.hpp"
+#include "void/native_import.hpp"
 #include "void/project_creation.hpp"
 #include "void/project_resolution.hpp"
 #include "void/runtime.hpp"
@@ -21,7 +22,7 @@
 namespace {
 struct UsageError : std::invalid_argument {using std::invalid_argument::invalid_argument;};
 bool known_command(const std::string& command) {
-    return command=="check" || command=="run" || command=="build" || command=="package" || command=="emit" || command=="init" || command=="new" || command=="resolve" || command=="deps" || command=="native-bind";
+    return command=="check" || command=="run" || command=="build" || command=="package" || command=="emit" || command=="init" || command=="new" || command=="resolve" || command=="deps" || command=="native-bind" || command=="native";
 }
 void usage(std::ostream& out, const std::string& command={}) {
     if(command.empty() || command=="check")out<<"Usage: voidc check <file-or-directory> [--no-opt]\n";
@@ -35,6 +36,7 @@ void usage(std::ostream& out, const std::string& command={}) {
     if(command.empty() || command=="resolve")out<<"Usage: voidc resolve --project DIR [--locked | --refresh]\n";
     if(command.empty() || command=="deps")out<<"Usage: voidc deps explain --project DIR [--json]\n"
       "       voidc deps fetch --project DIR [--allow-git ORIGIN REV]...\n";
+    if(command.empty() || command=="native")out<<"Usage: voidc native import <header> --provider ID --out NEW-DIR [--source /native.void] [--clang PATH] [--language c|c++] [-- -Ipath -Dname=value -Uname]\n";
     if(command.empty() || command=="native-bind")out<<"Usage: voidc native-bind <descriptor> <C-header> -o <adapter.c>\n";
 }
 void help(const std::string& command={}) {
@@ -52,6 +54,7 @@ void help(const std::string& command={}) {
           "  resolve Resolve available library dependencies and verify or write void.lock.\n"
           "  deps explain Inspect the verified local dependency graph without changes.\n"
           "  deps fetch   Explicitly acquire pinned Git source snapshots.\n"
+          "  native import Inspect a C header and publish editable candidate bindings.\n"
           "  native-bind  Generate a checked C11 adapter for a native library.\n"
           "\nOptions:\n"
           "  -h, --help  Show help; use <command> --help for examples.\n"
@@ -400,7 +403,7 @@ static int run_cli(int argc, char** argv) {
         }
         if(argc>=2 && std::string(argv[1])=="help") {
             if(argc==2) {help();return 0;}
-            if(argc!=3 || !known_command(argv[2]))throw UsageError("Expected help [check|run|build|package|emit|init|new|resolve|deps|native-bind].");
+            if(argc!=3 || !known_command(argv[2]))throw UsageError("Expected help [check|run|build|package|emit|init|new|resolve|deps|native-bind|native].");
             help(argv[2]);return 0;
         }
         vd::configure_standard_library_root(vd::utf8_path(llvm::sys::fs::getMainExecutable(argv[0],reinterpret_cast<void*>(&run_cli))));
@@ -423,6 +426,25 @@ static int run_cli(int argc, char** argv) {
                (std::string_view(argv[3])=="--help" || std::string_view(argv[3])=="-h")) { help(command); return 0; }
             if(argc>=3 && std::string_view(argv[2])=="explain")return explain_project(argc,argv);
             return fetch_project(argc,argv);
+        }
+        if(command=="native") {
+            if(argc==4 && std::string_view(argv[2])=="import" && std::string_view(argv[3])=="--help") {help(command);return 0;}
+            if(argc<4 || std::string_view(argv[2])!="import")throw UsageError("Expected native import <header> --provider ID --out NEW-DIR.");
+            vd::NativeImportOptions options;options.header=vd::utf8_path(argv[3]);std::set<std::string> seen;
+            for(int i=4;i<argc;++i) {
+                std::string key=argv[i];if(key=="--") {while(++i<argc)options.preprocessing.emplace_back(argv[i]);break;}
+                if(!seen.insert(key).second || i+1==argc)throw UsageError("Duplicate option or missing native import operand: "+key);
+                std::string value=argv[++i];
+                if(key=="--provider")options.provider=value;
+                else if(key=="--out")options.output=vd::utf8_path(value);
+                else if(key=="--source")options.source=value;
+                else if(key=="--clang")options.clang=vd::utf8_path(value);
+                else if(key=="--language")options.language=value;
+                else throw UsageError("Unknown native import option: "+key);
+            }
+            if(options.provider.empty() || options.output.empty())throw UsageError("Native import requires --provider and --out.");
+            if(options.clang.empty())options.clang=vd::native_clang_driver(argv[0]);
+            vd::import_native_header(options);return 0;
         }
         if(command=="native-bind") {generate_native_binding(argc,argv);return 0;}
         if(command=="package" && argc>=3 && std::string_view(argv[2])=="--verify") {

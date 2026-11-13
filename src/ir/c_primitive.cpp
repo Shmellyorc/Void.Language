@@ -364,7 +364,8 @@ std::shared_ptr<CPrimitiveAdmission> CPrimitiveAdmission::parse(std::string_view
     if (callbacks && (used_callbacks.empty() || used_callbacks.size() != admitted->callbacks_.size()))
         reject(reader.line, "each checked callback declaration must be used by a binding");
     if (admitted->bindings_.empty()) reject(reader.line, "expected at least one binding");
-    if (admitted->revision_ >= 3 && admitted->resources_.empty())
+    // Revision 4 also admits value-only records/arrays without inventing an owner.
+    if (admitted->revision_ == 3 && admitted->resources_.empty())
         reject(reader.line, "expected a resource contract in descriptor revision 3");
     for (unsigned n = 0; n < admitted->resources_.size(); ++n) {
         auto& resource = admitted->resources_[n];

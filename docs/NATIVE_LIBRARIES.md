@@ -1,5 +1,178 @@
 # Trusted static native providers
 
+## G25: import a C header explicitly
+
+`voidc native import` inspects a header with pinned Clang 23.1.4 and publishes
+editable candidate files into a **fresh directory whose parent already exists**.
+The importer runs only when requested. Normal check/build/run reads the saved VOID
+source and the authoritative admitted descriptor.
+
+```text
+voidc native import HEADER --provider ID --out NEW-DIR
+    [--source /native.void] [--clang PATH] [--language c|c++]
+    [-- -Ipath -Dname=value -Uname]
+```
+
+`--clang` defaults to the existing verified compiler SDK configuration. The target
+is the host's existing Linux x86-64 GNU or Windows x64 MSVC profile. Use attached
+preprocessing arguments after `--`, and use the same configuration when compiling
+the native library. `--source` is the physical declaration module's canonical path
+relative to the application/library root. Its default `/native.void` is suitable
+when that file is at the root; placing output in `src/ffi` requires
+`--source /src/ffi/native.void`.
+
+| Output | Purpose |
+|---|---|
+| `coverage.json` | Each selected declaration's original location/type/text, category, exclusion reason, normalized name, input hashes, target and preprocessing |
+| `native.void` | Physical, descriptor-checked native declarations using the G24 `native "provider"` contract |
+| `api.void` | Editable ordinary wrappers, record constructors, enum values and numeric constants |
+| `provider.descriptor` | Candidate conventional revision-4/ABI-3 contract for review and existing native-bind |
+| `imported.h`, `imports.c` | Header include, exact POD aliases and fixed-prototype value forwarders |
+| `imports.cpp`, `checked.cpp` | C++ mode's equivalent forwarders and C-linkage wrapper around native-bind's C output |
+| `README.import.txt` | Required review, compilation and approval steps |
+
+Review the report's `generated`, `reviewed_adapter_required` and `unsupported`
+rows. Selected APIs come from the requested header; included headers supply scalar
+typedef resolution. Import each public header explicitly when an umbrella header
+only includes other files. C names/types remain in the report; snake-case VOID
+names and reserved-name adjustments are explicit. Generated value forwarders
+normalize C integer spellings to existing descriptor aliases without assuming
+ownership. Original symbols are called from these forwarders, not exposed as a
+new pointer ABI.
+
+Automatic coverage includes fixed scalar functions, compatible natural POD
+records, named/typedef-owned anonymous records, nested records, fixed scalar/record
+arrays, enums and Clang-evaluated integer/finite floating object macros. Enum values
+use their derived integer representation. Macro undefinition/redefinition is
+accounted for. No C expression evaluator or preprocessor is implemented in VOID.
+
+The existing ABI bounds remain: 16 fixed arguments, 64 records, 64 fields per
+record, natural alignment at most 8, record size at most 4096 bytes, one-dimensional
+arrays of 1..32 elements, and the existing descriptor/function bounds. Packed,
+over-aligned, qualified or bitfield records need a reviewed value-copy adapter.
+Distinct C field types missing an existing exact scalar alias are reported, even
+when their widths match. Function value forwarders handle those numeric spellings.
+Pointers, output buffers, opaque owners and callbacks require explicit extent,
+allocator, acquire/release, retention and drain contracts through G3/G4/G5.
+Arbitrary varargs, unions, flexible arrays, globals, function-like/string/config
+macros and nonconstant expressions are not silently exposed. Enum constants beyond
+the signed 64-bit evaluator profile, non-finite/negative-zero floating constants
+and unsupported C scalar types require explicit action.
+
+For C++ use `--language c++` and an explicit top-level `extern "C"` interface.
+Eligible value functions and POD structs are supported; classes, methods,
+templates, namespace APIs, overloads and exception transfer require a supplied C
+wrapper. Review that no exception escapes any imported C-compatible function.
+The generated C++ glue parses the original header before placing the checked
+adapter under C linkage. It adds no C++ object or exception ABI.
+
+A header with no callable supported functions produces coverage and any pure
+numeric `api.void` constants, with `descriptor_ready_for_review = false`. Existing
+descriptors need at least one callable operation; records-only headers identify
+that limitation rather than adding a dummy callable. Syntax/tool/input failures
+publish no destination. Existing destinations, even identical ones, are refused.
+Regenerate to a fresh directory, compare results, and retain developer edits.
+
+### Complete Linux example using the independent fixture
+
+Run from the repository root with the matching compiler on PATH. These are
+explicit development commands; dependency fetch never executes this process.
+
+```bash
+G25_ROOT="$PWD"
+G25_DEMO=$(mktemp -d)
+G25_CLANG="$G25_ROOT/.toolchains/llvm-23.1.4/bin/clang"
+voidc new "$G25_DEMO/app"
+voidc native import "$G25_ROOT/tests/ffi/native_import/values.h" \
+  --provider org.example.values --out "$G25_DEMO/app/src/ffi" \
+  --source /src/ffi/native.void
+# Review coverage, effects, declarations and adapter inputs before continuing.
+voidc native-bind "$G25_DEMO/app/src/ffi/provider.descriptor" imported.h \
+  -o "$G25_DEMO/app/src/ffi/checked.c"
+mkdir "$G25_DEMO/catalog"
+"$G25_CLANG" -std=c11 -shared -fPIC -fuse-ld=lld -O1 \
+  -I"$G25_DEMO/app/src/ffi" "$G25_ROOT/tests/ffi/native_import/values.c" \
+  "$G25_DEMO/app/src/ffi/imports.c" "$G25_DEMO/app/src/ffi/checked.c" \
+  -o "$G25_DEMO/catalog/libvalues.so"
+cp "$G25_DEMO/app/src/ffi/provider.descriptor" "$G25_DEMO/catalog/"
+cp "$G25_ROOT/LICENSE" "$G25_DEMO/catalog/VOID-MIT-LICENSE.txt"
+export G25_DEMO
+python3 - <<'PY'
+from pathlib import Path
+from hashlib import sha256
+import os
+p=Path(os.environ['G25_DEMO'])/'catalog'
+def identity(name):
+    data=(p/name).read_bytes()
+    return f'{len(data)}:{sha256(data).hexdigest()}'
+(p/'void.native.toml').write_text(f'''format=1
+[native]
+id="org.example.values"
+version="1.0.0"
+abi=3
+target="x86_64-unknown-linux-gnu"
+revision="g25-example-1"
+descriptor="provider.descriptor"
+descriptor-identity="{identity('provider.descriptor')}"
+library="libvalues.so"
+adapter="libvalues.so"
+[native.runtime]
+"libvalues.so"="{identity('libvalues.so')}"
+[native.link]
+[native.notices]
+"VOID-MIT-LICENSE.txt"="{identity('VOID-MIT-LICENSE.txt')}"
+''')
+PY
+cat >> "$G25_DEMO/app/void.project.toml" <<'TOML'
+
+[native-requirements.values]
+id="org.example.values"
+version="=1.0.0"
+abi=3
+TOML
+cat > "$G25_DEMO/app/src/app.void" <<'VOID'
+use "./ffi/api.void" as ffi
+func main() -> i32:
+    var point = ffi.g25_shift(ffi.g25_point(20, 1.5), 2)
+    print(ffi.g25_add(point.x, 20))
+    return 0
+VOID
+# Explicit approval of the reviewed, locally built catalog:
+export VOID_NATIVE_CATALOG="$G25_DEMO/catalog"
+voidc resolve --project "$G25_DEMO/app"
+voidc resolve --locked --project "$G25_DEMO/app"
+voidc check --project "$G25_DEMO/app"
+voidc run --project "$G25_DEMO/app" --allow-native --profile debug
+voidc run --project "$G25_DEMO/app" --allow-native --profile release
+voidc build --project "$G25_DEMO/app" --allow-native -o "$G25_DEMO/out/app"
+"$G25_DEMO/out/app"
+```
+
+Each execution prints `42`. On Windows use the VS 2022 **x64 Native Tools Command
+Prompt**, pinned Clang/LLD 23.1.4, a DLL output and matching COFF import library.
+Record the DLL in `native.runtime` and the generated `.lib` in `native.link` with
+actual identities; every catalog file must have its existing D4 role. The native
+Windows fixture qualifies this path. For strict Linux instrument the provider
+with ASan/UBSan to match the strict compiler/Runtime; keep leak detection enabled.
+
+The [pinned SQLite fixture](../tests/ffi/native_import/sqlite_case.py) demonstrates
+an explicit database owner: open an in-memory database, create/insert/select,
+finalize statements and consume the owner with close. The importer reports its
+pointer APIs for review. That small handwritten wrapper extends the generated
+descriptor using the existing resource ledger; it is not an automatic ownership
+inference. Pinned source identities are in
+[`sqlite.pin.json`](../tests/ffi/native_import/sqlite.pin.json).
+
+Header import derives declarations. `native-bind` verifies the reviewed descriptor
+and emits the checked adapter. Native compilation creates binaries. The approved
+catalog records actual binary/link/notice identities. Resolution locks those
+identities, and execution requires the existing opt-in. A separately locked Git
+source package verifies source integrity; it grants no native execution permission.
+Local edits compile normally, while edits to fetched locked snapshots remain
+subject to the existing source-lock checks. No new source package workflow is
+introduced. See [G25 qualification](projects/G25_NATIVE_HEADER_IMPORTER.md).
+
+
 ## Physical C declarations, G24 source conversion
 
 The conventional C ABI now also accepts `source-file /src/interop.void` in an

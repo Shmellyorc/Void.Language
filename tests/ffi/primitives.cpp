@@ -74,7 +74,7 @@ void descriptors(const std::string& descriptor) {
     changed("bind signed8 g1_signed8 i8 i8", "extra signed8 g1_signed8 i8 i8", "binding record");
     changed("provider org.voidlang.g1-fixture", "provider org.voidlang.forged", "provider rejected");
     changed("source /native_primitives.void", "source /other.void", "provider rejected");
-    changed("source /native_primitives.void", "source /../other.void", "canonical");
+    changed("source /native_primitives.void", "source /../other.void", "invalid declaration source path");
     changed("target x86_64-", "target aarch64-", "unsupported target");
     auto altered = descriptor;
     const auto artifact = altered.find("\nfixture ") + std::string_view("\nfixture ").size();

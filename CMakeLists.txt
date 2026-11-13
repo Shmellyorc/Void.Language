@@ -266,7 +266,7 @@ install(DIRECTORY editors/vim/ DESTINATION share/void/vim COMPONENT tooling)
 install(DIRECTORY editors/neovim/ DESTINATION share/void/neovim COMPONENT tooling)
 add_executable(void_native_example examples/native/host.cpp)
 target_link_libraries(void_native_example PRIVATE void_llvm void_cache_identity)
-add_library(voidc_objects OBJECT src/main.cpp src/native_build.cpp examples/proof.cpp)
+add_library(voidc_objects OBJECT src/main.cpp src/native_build.cpp src/native_import.cpp examples/proof.cpp)
 target_compile_definitions(voidc_objects PRIVATE VOID_COMPILER_VERSION="${PROJECT_VERSION}")
 target_include_directories(voidc_objects SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
 target_link_libraries(voidc_objects PRIVATE void_llvm)
@@ -1826,6 +1826,10 @@ if(BUILD_TESTING)
       "${PROJECT_SOURCE_DIR}/tests/ffi/conventional_process.py"
       "${CMAKE_COMMAND}" "${CMAKE_CURRENT_BINARY_DIR}" "$<CONFIG>" "${VOID_CLANG}" "${VOID_SANITIZERS}")
     set_tests_properties(ffi_g4_conventional PROPERTIES TIMEOUT 480)
+    add_test(NAME project_native_import COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/project/native_import.py"
+      "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_SANITIZERS}")
+    set_tests_properties(project_native_import PROPERTIES TIMEOUT 480)
     add_test(NAME project_mixed_native COMMAND "${Python3_EXECUTABLE}"
       "${PROJECT_SOURCE_DIR}/tests/project/mixed_native.py"
       "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_SANITIZERS}")
